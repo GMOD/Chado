@@ -132,7 +132,7 @@ while(my $arrayio = $affx->next_array){
   die "couldn't find ontology term 'microarray_oligo', did you load the Sequence Ontology?" unless ref($oligo);
   $LOG->debug("loaded records for generic cvterms");
 
-  my($human)                  = Chado::Organism->search( common_name => 'Human' );
+  my($human)                  = Chado::Organism->search( common_name => 'human' );
   $LOG->debug("loaded record for organism");
   my $operator                = Chado::Contact->find_or_create( { name => 'UCLA Microarray Core' });
   $LOG->debug("loaded record for hybridization operator");
@@ -184,7 +184,7 @@ while(my $arrayio = $affx->next_array){
   }
 
   my $assay = Chado::Assay->find_or_create({
-									array_id => $array->id,
+									arraydesign_id => $array->id,
 									operator_id => $operator->id,
                                     name => $chip_id,
 									protocol_id => $protocol_assay->id,
@@ -275,7 +275,7 @@ while(my $arrayio = $affx->next_array){
 
 	  $element = Chado::Element->find_or_create({
 												 feature_id => $feature,
-												 array_id => $array,
+												 arraydesign_id => $array,
 												 subclass_view => 'affymetrixdchip',
 												});
 	  $feature{$featuregroup->id}{element_id} = $element->id;
