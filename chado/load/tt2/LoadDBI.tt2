@@ -1,0 +1,19 @@
+package Chado::LoadDBI;
+
+use strict;
+use lib '[% chado_path %]/lib';
+use Chado::AutoDBI;
+
+sub init
+{
+  Chado::DBI->set_db('Main',
+    "dbi:[% db_vendor %]:dbname=[% db_name %];port=[% db_port %];host=[% db_host %]", 
+    "[% db_username %]",
+    "[% db_password %]",
+    {
+      AutoCommit => 1
+    }
+  );
+}
+
+1;
