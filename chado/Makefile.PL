@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.50 2004-01-07 15:35:18 scottcain Exp $
+# $Id: Makefile.PL,v 1.51 2004-03-02 03:21:37 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -19,6 +19,7 @@ use Cwd;
 use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
 use Template;
+use Module::Build;
 
 my %args    =  (
   DBDRIVER  => {

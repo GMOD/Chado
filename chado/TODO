@@ -20,6 +20,10 @@ begin-transaction/cache/flush/end-transaction/analyze strategy.
 where to start?
 
 For the next release:
+- add documentation for creating Class::DBI classes for an existing schema--
+this will no doubt be necessary for future upgrade paths (I'm thinking the way
+to suggest doing this is dumping the schema from the existing database, via
+`pg_dump -s DBNAME > sqlfile`; `pg2cdbi.pl DBNAME USERNAME PASSWORD sqlfile`
 - add documentation for loading ontologies when the files are already present
 locally.
 - create pre-created Class::DBI classes for a 'default' install, eliminating

@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.14 2004-02-13 21:07:26 scottcain Exp $
+$Id: INSTALL,v 1.15 2004-03-02 03:21:37 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -45,6 +45,7 @@ Prerequisites:
     * SQL::Translator (0.05 or cvs) (chado)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
+    * Module::Build            (chado)
     * Class::DBI               (chado)
     * Class::DBI::Pg           (chado)
     * Class::DBI::Pager        (chado)
