@@ -951,8 +951,7 @@ sub load_feature_locations {
     }
 
     my %feature_attributes = (
-        organism_id => $chado_organism,
-        seqlen => $seqlen,
+        organism_id => $chado_organism->id,
         type_id => $chado_type->id,
         uniquename => $uniquename,
     );
@@ -974,6 +973,7 @@ sub load_feature_locations {
     }
 
     ($chado_feature) = Chado::Feature->find_or_create(\%feature_attributes);
+    $chado_feature->seqlen($seqlen);
 
     push @transaction, $chado_feature;
 
