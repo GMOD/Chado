@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.41 2003-12-05 00:54:58 allenday Exp $
+# $Id: Makefile.PL,v 1.42 2003-12-06 06:21:07 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -42,6 +42,14 @@ my %args    =  (
   }
 );
 
+my %env2arg = (
+  CHADO_DB_NAME     => 'DBNAME',
+  CHADO_DB_USERNAME => 'DBUSER',
+  CHADO_DB_PASSWORD => 'DBPASS',
+  CHADO_DB_HOST     => 'DBHOST',
+  CHADO_DB_PORT     => 'DBPORT',
+);
+
 my $usage = <<"END";
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -79,47 +87,6 @@ argument "DEFAULTS=1."
 END
 
 #
-# Parse arguments.
-#
-my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS ], keys %args );
-my %opts;
-my @argv = @ARGV;
-@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get 
-foreach ( @argv ) {
-  if ( /^--?h(elp)?$/i ) {
-    die $usage;
-  }
-  elsif ( /^($all_args)=(.+)$/ ) {
-    $opts{ $1 } = $2;
-  }
-}
-
-#
-# Check to see if the enviroment is there, mostly to make sure
-# other apps can get what they need.
-#
-my @env_missing = ();
-for my $key (qw[GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME CHADO_DB_PASSWORD]) {
-  push @env_missing, $key unless $ENV{ $key };
-}
-if ( @env_missing ) {
-  die join("\n",
-    '*' x 72,
-    'The following enviroment variables not detected:',
-    ( map { "  $_"} @env_missing ),
-    'Please read the INSTALL document and set required environment variables.',
-    '*' x 72,
-    ''
-  );
-} 
-
-my %VALID_DBS = (
-  Pg => 'PostgreSQL',
-  #Oracle => 'Oracle',
-);
-my %db_lookup = reverse %VALID_DBS;
-
-#
 # Establish some globals.
 #
 my $PERL         =  $Config{'startperl'};
@@ -129,6 +96,10 @@ my $lib_dir      = catdir $working_dir, 'lib';
 my $chado_dir    = catdir $lib_dir, 'Chado';
 my $build_config = catfile $working_dir, 'build.conf';
 my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
+
+my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS ], keys %args );
+my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #CHADO_DB_PASSWORD is valid if undefined
+my $all_envs = join( '|', keys %env_required );
 
 my %O;
 $O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
@@ -154,6 +125,49 @@ if ( -e $build_config && -r _ ) {
   }
   close CONF;
 }
+
+#
+# Parse arguments.
+#
+my %opts;
+my @argv = @ARGV;
+@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get 
+foreach ( @argv ) {
+  if ( /^--?h(elp)?$/i ) {
+    die $usage;
+  }
+  elsif ( /^($all_args)=(.+)$/ ) {
+    $opts{ $1 } = $2;
+  }
+  elsif ( /^($all_envs)=(.+)$/ ) {
+    $args{ $env2arg{$1} }{ default } = $2;
+  }
+}
+
+#
+# Check to see if the enviroment is there, mostly to make sure
+# other apps can get what they need.
+#
+my @env_missing = ();
+for my $key (keys %env_required) {
+  push @env_missing, $key unless defined $ENV{ $key } or defined $args{$env2arg{$key}}{default} or defined $conf{$env2arg{$key}};
+}
+if ( @env_missing ) {
+  die join("\n",
+    '*' x 72,
+    'The following enviroment variables not detected:',
+    ( map { "  $_"} @env_missing ),
+    'Please read the INSTALL document and set required environment variables.',
+    '*' x 72,
+    ''
+  );
+} 
+
+my %VALID_DBS = (
+  Pg => 'PostgreSQL',
+  #Oracle => 'Oracle',
+);
+my %db_lookup = reverse %VALID_DBS;
 
 #
 # Now figure out where the values are coming from -- build.conf, 
