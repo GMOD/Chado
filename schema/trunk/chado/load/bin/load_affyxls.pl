@@ -235,9 +235,9 @@ sub make_cvterms {
   @cvterms = map {_remap_cvterm($_)} @cvterms;
   foreach my $cvterm (@cvterms){
 	my $val = undef;
-	if($cvterm =~ /=(.+)$/){
+	if($cvterm =~ /\@(.+)$/){
 	  $val = $1;
-	  $cvterm =~ s/^(.+)=.+$/$1/;
+	  $cvterm =~ s/^(.+)\@.+$/$1/;
 	}
 
     $cvterm =~ /^(\D*?)(\d*?)$/g;
