@@ -73,6 +73,7 @@ while(my $arrayio = $affx->next_array){
   my $cvterms;
   my $sample_id;
   my $chip_id;
+  my $newchip = 0;
 
   #we can do this on filename or arrayname.
   #if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
@@ -133,7 +134,8 @@ while(my $arrayio = $affx->next_array){
   push @txn, $protocol_acquisition;
   push @txn, $protocol_quantification;
 
-  my $biomaterial = Chado::Biomaterial->find_or_create({ name => $sample_id , description => $arrayio->id , taxon_id => $human});
+  my $biomaterial = Chado::Biomaterial->find_or_create({ name => $sample_id , taxon_id => $human});
+  $biomaterial->description($arrayio->id) and $newchip++ unless $biomaterial->description;
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
@@ -148,7 +150,7 @@ while(my $arrayio = $affx->next_array){
       }
     }
 
-	my $biomaterialprop = Chado::Biomaterialprop->create({
+	my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
                                                           biomaterial_id => $biomaterial->id,
                                                           type_id => $chado_cvterm,
                                                           value => $cvterm{$cvterm},
@@ -157,36 +159,37 @@ while(my $arrayio = $affx->next_array){
     push @txn, $biomaterialprop;
   }
 
-  my($assay) = Chado::Assay->find_or_create({
+  my $assay = Chado::Assay->find_or_create({
 									array_id => $array,
 									operator_id => $operator->id,
                                     name => $chip_id,
-									description => $arrayio->id,
 									protocol_id => $protocol_assay->id,
 								   });
+  $assay->description($arrayio->id) and $newchip++ unless $assay->description;
   push @txn, $assay;
 
-  my $assay_biomaterial = Chado::Assay_Biomaterial->create({
+  my $assay_biomaterial = Chado::Assay_Biomaterial->find_or_create({
                                                             biomaterial_id => $biomaterial->id,
                                                             assay_id => $assay->id,
                                                            });
   push @txn, $assay_biomaterial;
 
-  my $acquisition = Chado::Acquisition->create({
+  my $acquisition = Chado::Acquisition->find_or_create({
 												assay_id => $assay->id,
 												protocol_id => $protocol_acquisition->id,
-												name => $arrayio->id,
 											   });
+  $acquisition->name($arrayio->id) and $newchip++ unless $acquisition->name;
   push @txn, $acquisition;
 
-  my $quantification = Chado::Quantification->create({
+  my $quantification = Chado::Quantification->find_or_create({
 													  acquisition_id => $acquisition->id,
 													  protocol_id => $protocol_acquisition->id,
 													  operator_id => $operator_quantification->id,
 													  analysis_id => $analysis->id,
-													  name => $arrayio->id,
 													 });
+  $quantification->name($arrayio->id) and $newchip++ unless $quantification->name;
   push @txn, $quantification;
+
 
   my $total = scalar($arrayio->each_featuregroup);
   my $progress = Term::ProgressBar->new({name  => 'Probesets loaded',
@@ -195,6 +198,9 @@ while(my $arrayio = $affx->next_array){
                                            });
   $progress->max_update_rate(1);
   my $progress_update = 0;
+
+  $progress->message("already loaded") unless $newchip;
+  $progress->update($total) and next unless $newchip;
 
   my $c = 0;
   $LOG->info("featuregroups loading...");
