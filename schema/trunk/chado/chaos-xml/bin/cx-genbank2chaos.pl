@@ -282,6 +282,10 @@ It is also required for the genbank release of S_Pombe, which has a
 few scattered types purportedly of mRNA which confuse the unflattening
 process
 
+=head2 -ds_root DIR b<EXPERIMENTAL>
+
+Root directory for building a datastore - see L<Datastore::MD5>
+
 =head2 -include_haplotypes
 
 by default, only reference sequences are exported. if the genbank
