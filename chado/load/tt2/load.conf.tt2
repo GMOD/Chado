@@ -62,6 +62,7 @@
 
   <ontology name="Mouse Pathology Ontology (Pathbase)" order="6">
     <file type="ontology" local="obo/phenotype/mouse_pathology/mouse_pathology.ontology" remote="http://eulep.anat.cam.ac.uk/Pathology_Ontology/mpath_obo.php" method="lwp-mirror"/>
+    <file type="definitions" local="obo/phenotype/mouse_pathology/mouse_pathology.defs" remote="http://eulep.anat.cam.ac.uk/Pathology_Ontology/mpath_obo_defs.php" method="lwp-mirror"/>
   </ontology>
 
   <ontology name="Cell Ontology" order="7">
