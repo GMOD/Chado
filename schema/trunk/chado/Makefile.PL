@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.81 2005-03-21 21:12:58 scottcain Exp $
+# $Id: Makefile.PL,v 1.82 2005-03-23 20:21:33 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -135,6 +135,12 @@ new arguments, provide the argument "RECONFIGURE=0."
 If you wish to use the defaults without being prompted, provide the 
 argument "DEFAULTS=1."
 
+You can also use PREFIX and LIB to install perl modules in nonstandard
+locations as you would with a typical package install.  ALTHOUGH THERE
+IS CURRENTLY A PROBLEM THAT DYNAMICALLY GENERATED SCRIPTS MAY NOT
+GET REGENERATED ON SUBSEQUENT RUNNINGS OF perl Makefile.PL WITH
+DIFFERENT VALUES OF LIB AND PREFIX.
+
 END
 
 #
@@ -148,7 +154,7 @@ my $chado_dir    = catdir $lib_dir, 'Chado';
 my $build_config = catfile $working_dir, 'build.conf';
 my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
 
-my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS PREFIX INSTALLSITEMAN1DIR INSTALLSITEMAN3DIR ], keys %args );
+my $all_args = join( '|', qw[LIB RECONFIGURE DEFAULTS PREFIX INSTALLSITEMAN1DIR INSTALLSITEMAN3DIR ], keys %args );
 my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #CHADO_DB_PASSWORD is valid if undefined
 my $all_envs = join( '|', keys %env_required );
 
@@ -198,6 +204,7 @@ foreach ( @argv ) {
 push @ARGV, "PREFIX=$opts{PREFIX}" if $opts{PREFIX};
 push @ARGV, "INSTALLSITEMAN1DIR=$opts{INSTALLSITEMAN1DIR}" if $opts{INSTALLSITEMAN1DIR};
 push @ARGV, "INSTALLSITEMAN3DIR=$opts{INSTALLSITEMAN3DIR}" if $opts{INSTALLSITEMAN3DIR};
+push @ARGV, "LIB=$opts{LIB}" if $opts{LIB};
 
 #
 # Check to see if the enviroment is there, mostly to make sure
@@ -229,7 +236,7 @@ my %db_lookup = reverse %VALID_DBS;
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
-  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO );
+  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO);
 
 $O{'SIMPLE'} = prompt(
    "Use the simple install (uses default database schema)", 'Y'
@@ -470,6 +477,8 @@ if ( open CONF, ">$build_config" ) {
   $conf{'DBPORT'}   = $DBPORT;
   $conf{'LOCAL_TMP'}= $LOCAL_TMP;
   $conf{'DBORGANISM'}=$DBORGANISM;
+  $conf{'PREFIX'}   = $opts{'PREFIX'};
+  $conf{'LIB'}      = $opts{'LIB'};
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";

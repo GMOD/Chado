@@ -1,9 +1,39 @@
-#!/usr/bin/perl
+#!perl -w
+
+use Config;
+use File::Basename qw(&basename &dirname);
+use FindBin '$Bin';
+use Cwd;
+
+$origdir = cwd;
+chdir dirname($0);
+$file = basename($0, '.PL','.PLS');
+$file = "gmod_$file.pl";
+
+my %OPTIONS;
+if (open F,"$Bin/../../build.conf") {
+  while (<F>) {
+    next if /^\#/;
+    chomp;
+    $OPTIONS{$1} = $2 if /^(\w+)\s*=\s*(.+)/;
+  }
+  close F;
+}
+
+open OUT,">$file" or die "Can't create $file: $!";
+print OUT "$Config{startperl}\n";
+
+if ($OPTIONS{LIB}) {
+  print OUT "use lib '$OPTIONS{LIB}';\n";
+}
+if ($OPTIONS{PREFIX}) {
+  print OUT "use lib '$OPTIONS{PREFIX}/lib'i\n";
+}
+
+print OUT <<'!NO!SUBS!';
 use strict;
-#use lib '~/bioperl-live';
 use DBI;
 use Chado::LoadDBI;
-#use Bio::Tools::GFF;
 use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
@@ -882,3 +912,8 @@ sub dump_ana_contents {
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
   exit 1;
 }
+!NO!SUBS!
+close OUT or die "Can't close $file: $!";
+chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
+chdir $origdir;
+
