@@ -462,6 +462,7 @@ while(my $gff_feature = $gffio->next_feature()) {
   }
 
   if ($feature_count % CACHE_SIZE == 0) {
+    $progress->message(sprintf "committed %8d features", $feature_count);
     $_->dbi_commit foreach @transaction;
   }
     @transaction = ();
