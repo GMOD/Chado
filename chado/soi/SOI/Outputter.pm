@@ -189,7 +189,7 @@ sub soi_xml {
             $w->startTag('seq');
             my $md5 = 'md5checksum';
             $w->dataElement($md5,$h->{$md5}) if ($h->{$md5});
-            $w->dataElement($t, $v);
+            $w->dataElement($t, $v) if (defined($v));
             $w->endTag('seq');
         } else {
             $w->dataElement($t, $v) if (defined($v));
@@ -201,8 +201,8 @@ sub soi_xml {
         $w->dataElement('fmin',$h->{fmin});
         $w->dataElement('fmax',$h->{fmax});
         $w->dataElement('strand',$h->{strand});
-        $w->dataElement('rank',$h->{rank});
-        $w->dataElement('locgroup',$h->{locgroup});
+        $w->dataElement('rank',$h->{rank}) if (defined($h->{rank}));
+        $w->dataElement('locgroup',$h->{locgroup}) if (defined($h->{locgroup}));
         $w->dataElement('phase',$h->{phase}) if (defined($h->{phase}));
 #subject seq data is hidden in soi and chaos?!!
 #        my $subj_seq = $h->{seq};

@@ -1012,14 +1012,13 @@ sub _get_auxillaries {
          INNER join
          dbxref gfx ON (gf.dbxref_id = gfx.dbxref_id)
          INNER join
-         db ON (gfx.db_id = db.db_id)
+         db ON (gfx.db_id = db.db_id AND db.name = 'GO')
          INNER join
          cv ON (gf.cv_id = cv.cv_id)
          INNER join
          (
           $soi
          ) as q ON (f.type_id = q.cvterm_id)
-         WHERE db.name = 'GO'
         );
     $sql = sprintf("$sql WHERE %s", $where) if ($where);
 
