@@ -90,7 +90,7 @@ modules/sequence/examples/gene_split/split-t0.WL.xml
 modules/sequence/examples/gene_split/split-t0.xml
 modules/sequence/examples/gene_split/split-t1.itxt
 modules/sequence/functions/feature_subalignments.plpgsql
-modules/sequence/gff-bridge/sequence-gff-funcs.pgsql
+modules/sequence/gff-bridge/sequence-gff-funcs.plpgsql
 modules/sequence/gff-bridge/sequence-gff-views.sql
 modules/sequence/seq_triggers.sql
 modules/sequence/sequence.pgfunc
@@ -112,4 +112,3 @@ src/test/perl/t/data/bf.itxt
 src/test/README
 t/01_okay.t
 TODO
-META.yml                                 Module meta-data (added by MakeMaker)
