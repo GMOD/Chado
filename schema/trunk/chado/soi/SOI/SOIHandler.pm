@@ -27,6 +27,7 @@ Email sshu@fruitfly.org
 
 =cut
 
+use strict;
 use SOI::Feature;
 use FileHandle;
 use Carp;

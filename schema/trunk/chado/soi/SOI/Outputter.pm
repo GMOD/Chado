@@ -224,6 +224,11 @@ sub soi_xml {
         $w->endTag("secondary_location");
     }
 
+    #flatten synonym list???
+    map{
+        $w->dataElement($_->{type},$_->{value});
+    }@{$node->synonyms || []};
+
     my ($dbxt, $pt, $cvt) = qw(dbxref property cvterm);
     map{
         $w->startTag($dbxt);
@@ -284,7 +289,7 @@ sub game_xml {
         foreach my $rset (@{$an->nodes || []}) {
             foreach my $span (@{$rset->nodes || []}) {
                 foreach my $loc (@{$span->secondary_nodes || []}) {
-                    my $seq = $loc->seq;
+                    my $seq = $loc->sseq;
                     my $seq_h = ref($seq) ? $seq->hash : "";
                     $sec_seq_h{$seq_h->{feature_id} || $seq_h->{name}} = $seq_h if ($seq_h);
                 }
@@ -324,7 +329,7 @@ sub _subject_seq_game_xml {
     my $w = shift; #XML writer
 
     foreach my $seq_h (@{$seqs || []}) {
-        $w->startTag('seq', id=>$seq_h->{uniquename}, length=>$seq_h->{seqlen});
+        $w->startTag('seq', id=>$seq_h->{uniquename}, length=>$seq_h->{seqlen} || length($seq_h->{residues}) || 0);
         $w->dataElement('name', $seq_h->{name});
         my $residues = $seq_h->{residues} || "";
         $residues =~ s/(.{50})/$1\n/g;
@@ -431,6 +436,11 @@ sub _game_xml {
         $w->endTag('span');
         $w->endTag('seq_relationship');
     }
+
+    #flatten synonym list???
+    map{
+        $w->dataElement($_->{type},$_->{value});
+    }@{$node->synonyms || []};
 
     my ($dbxt, $pt, $cvt) = qw(dbxref property aspect);
     map{
