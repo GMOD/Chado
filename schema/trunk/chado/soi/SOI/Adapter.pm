@@ -468,7 +468,7 @@ sub get_results {
                 $parent_h{$node->id} = $node;
             }elsif ($node->depth == 2) {
                 #only second level may have subject span!!!
-                map{push @{$sec_loc_h{$_->{srcfeature_id}}}, $_}@{$node->secondary_locations || []};
+                map{push @{$sec_loc_h{$_->srcfeature_id}}, $_}@{$node->secondary_nodes || []};
                 my $parent = $parent_h{$node->parent_id};
                 unless ($parent) {
                     my $pattr_h = {};
@@ -528,13 +528,13 @@ sub get_results {
          INNER join
          cvterm fpt ON (fp.type_id = fpt.cvterm_id)
          INNER join
-         ($sub_select2) as q ON (f.feature_id = q.feature_id)
+         ($sub_select2) as qo ON (f.feature_id = qo.feature_id)
          WHERE fl.rank > 0 AND fpt.name = 'description'
         );
     my $hl = $self->_select_hashlist($sql2) unless ($opts->{noresidues});
     foreach my $h (@{$hl || []}) {
         my $sec_locs = $sec_loc_h{$h->{feature_id}};
-        map{$_->{seq} = $h}@{$sec_locs || []};
+        map{$_->seq(SOI::Feature->new($h))}@{$sec_locs || []};
     }
     undef %sec_loc_h;
 
@@ -960,7 +960,7 @@ sub _get_auxillaries {
          ) as q ON (f.type_id = q.cvterm_id)
          );
     $where = $self->_get_where($constr, $opts);
-    $sql = sprintf("$sql WHERE %s", $where);
+    $sql = sprintf("$sql WHERE %s", $where) if ($where);
     $self->_get_dbxrefs($sql, \%node_h);
 
     #get properties
@@ -987,7 +987,7 @@ sub _get_auxillaries {
           $soi
          ) as q ON (f.type_id = q.cvterm_id)
         );
-    $sql = sprintf("$sql WHERE %s", $where);
+    $sql = sprintf("$sql WHERE %s", $where) if ($where);
     $self->_get_properties($sql, \%node_h);
 
     #get GO ontology
@@ -1020,8 +1020,9 @@ sub _get_auxillaries {
           $soi
          ) as q ON (f.type_id = q.cvterm_id)
          WHERE db.name = 'GO'
-         and $where
         );
+    $sql = sprintf("$sql WHERE %s", $where) if ($where);
+
 #use cvterm.dbxref_id
 #         cvterm_dbxref cvtx ON (gf.cvterm_id = cvtx.cvterm_id)
 #         INNER join
@@ -1229,7 +1230,7 @@ sub get_handle {
         }
     }
 
-    print STDERR "get_handle: $database_name\n";
+    print STDERR "get_handle: $database_name\n" if ($ENV{DEBUG});
 
     return $dbh;
 }
@@ -1370,7 +1371,7 @@ sub _select_objhash {
     my $opts = shift || {};
 
     printf STDERR "SQL: %s\n", $sql if ($ENV{SQL_TRACE});
-    my $t = time;
+
     my $sth = $dbh->prepare($sql);
     my $h;
 
@@ -1413,8 +1414,6 @@ sub _select_objhash {
             }
         }
     }
-
-    printf STDERR "\nObjTime: %d\nnum node=%d\n", (time - $t), scalar(keys %node_h);
 
     return %node_h;
 }

@@ -235,6 +235,12 @@ sub soi_xml {
         $w->endTag($_->{cv});
         $w->endTag($cvt);
     }@{$node->ontologies || []};
+    map{
+        $w->startTag('comment');
+        my $h = $_;
+        map{$w->dataElement($_,$h->{$_})}keys %{$h};
+        $w->endTag('comment');
+    }@{$node->comments || []};
     map{soi_xml($_, $output, $w)}@{$node->nodes || []};
     $w->endTag($node->type);
 }
@@ -269,9 +275,9 @@ sub game_xml {
     foreach my $an (@an_nodes) {
         foreach my $rset (@{$an->nodes || []}) {
             foreach my $span (@{$rset->nodes || []}) {
-                foreach my $loc (@{$span->secondary_locations || []}) {
-                    my $seq_h = $loc->{seq};
-                    $sec_seq_h{$seq_h->{feature_id}} = $seq_h if ($seq_h);
+                foreach my $loc (@{$span->secondary_nodes || []}) {
+                    my $seq_h = $loc->seq ? $loc->seq->hash : "";
+                    $sec_seq_h{$seq_h->{feature_id} || $seq_h->{name}} = $seq_h if ($seq_h);
                 }
             }
         }
@@ -289,7 +295,7 @@ sub _genomic_seq_game_xml {
     my $arm = shift;
 
     $node->_setup_coord;
-    $w->startTag('seq', id=>$node->uniquename, length=>$node->seqlen, focus=>'true');
+    $w->startTag('seq', id=>$node->uniquename, length=>$node->seqlen || $node->length, focus=>'true');
     $w->dataElement('name', $node->name);
     my $residues = $node->hash->{residues} || "";
     $residues =~ s/(.{50})/$1\n/g;
@@ -326,20 +332,21 @@ sub _game_xml {
     my @SO_game_fset = qw(mRNA pseudogene tRNA snRNA snoRNA rRNA ncRNA transcript);
     my @non_gene = qw(transposable_element remark); #only has top level
 
-    my $so_polypep = 'protein';
+    my @so_polypep = qw(protein polypeptide);
     my %game_type_map =
       ('gene' => 'annotation',
        'transposable_element' => 'annotation',
        'remark' => 'annotation',
        'exon' => 'feature_span',
-       $so_polypep => 'feature_span',
+       protein => 'feature_span',
+       polypeptide => 'feature_span',
       );
 
     $node->_setup_coord;
     my $h = $node->hash;
 
     #ok, treat transcript's protein node specially (output it in tr level)
-    return if ($node->type eq $so_polypep);
+    return if (grep{$node->type eq $_}@so_polypep);
 
     my $game_t = $game_type_map{$node->type}
       || ((grep{$_ eq $node->type}@SO_game_fset) ? 'feature_set' : $node->type);
@@ -352,9 +359,9 @@ sub _game_xml {
 
     my $prot_node;
     #hard coded protein-producing feature!!!
-    if ($node->type eq 'mRNA') {
+    if (grep{$node->type eq $_}qw(mRNA transcript)) {
         foreach my $n (@{$node->nodes || []}) {
-            if ($n->type eq $so_polypep) {
+            if (grep{$n->type eq $_}@so_polypep) {
                 $prot_node = $n;
                 last;
             }
@@ -366,7 +373,7 @@ sub _game_xml {
     my $v = $node->type;$v='transcript' if ($v eq 'mRNA');
     if ($game_t eq 'annotation') {
         $v = $node->nodes->[0]->type if (@{$node->nodes || []});
-        $v = $node->type if ($v eq 'mRNA');
+        $v = $node->type if (grep{$v eq $_}qw(mRNA transcript));
     }
     $w->dataElement('type',$v);
 
@@ -374,7 +381,7 @@ sub _game_xml {
         $w->startTag('gene', association=>'IS');
         $w->dataElement('name', $node->name);
         $w->endTag('gene');
-        unless (@{$node->nodes || []}) {
+        unless (scalar(@{$node->nodes || []})) {
             #manufacture tr
             my $h;
             map{$h->{$_} = $node->hash->{$_}}keys %{$node->hash};
@@ -416,30 +423,48 @@ sub _game_xml {
         $w->endTag('seq_relationship');
     }
 
-    my ($dbxt, $pt, $cvt) = qw(dbxref property cvterm);
+    my ($dbxt, $pt, $cvt) = qw(dbxref property aspect);
     map{
         $w->startTag($pt);
         $w->dataElement('type',$_->{type});
         $w->dataElement('valule', $_->{value});
         $w->endTag($pt);
     }@{$node->properties || []};
-#    map{
-#        $w->startTag($dbxt);
-#        $w->dataElement($_->{dbname}, $_->{accession});
-#        $w->endTag($dbxt);
-#    }@{$node->dbxrefs || []};
-#    map{
-#        $w->startTag($cvt);
-#        $w->startTag($_->{cv});
-#        $w->dataElement('name',$_->{name});
-#        $w->dataElement('dbxrefstr',$_->{accession});
-#        $w->endTag($_->{cv});
-#        $w->endTag($cvt);
-#    }@{$node->ontologies || []};
+    map{
+        $w->startTag($dbxt);
+        $w->dataElement('xref_db',$_->{dbname});
+        $w->dataElement('db_xref_id',$_->{accession});
+        $w->endTag($dbxt);
+    }@{$node->dbxrefs || []};
+    map{
+        $w->startTag('comment');
+        my $h = $_;
+        map{$w->dataElement($_,$h->{$_})}keys %{$h};
+        $w->endTag('comment');
+    }@{$node->comments || []};
+
+    map{
+        my $h = $_;
+        $w->startTag($cvt);
+        $w->startTag('dbxref');
+        $w->dataElement('xref_db',$h->{dbname});
+        $w->dataElement('db_xref_id',$h->{accession});
+        $w->endTag('dbxref');
+        if ($h->{cv} && $h->{name}) {
+            $w->dataElement($h->{cv}, $h->{name});#coming from db
+        } else { #coming from game xml
+            my @others = grep{$_ ne 'dbname' && $_ ne 'accession'}keys %{$h || {}};
+            map{
+                $w->dataElement($_, $h->{$_});
+            }@others;
+        }
+        $w->endTag($cvt);
+    }@{$node->ontologies || []};
 
     if ($prot_node) {
         my $g_t = 'feature_span';
-        $w->startTag($g_t, id=>'tmpspace:1',produces_seq=>$prot_node->uniquename);
+        my $id = $prot_node->feature_id || sprintf("%s:tmp%d",$prot_node->uniquename,time);
+        $w->startTag($g_t, id=>$id,produces_seq=>$prot_node->uniquename);
         $w->dataElement('type','translate offset');
         $w->startTag('seq_relationship', type=>'query',seq=>$prot_node->src_seq);
         $w->startTag('span');
@@ -464,7 +489,7 @@ sub _game_xml {
     foreach my $n (@seq_nodes) {
         my $t = 'residues';
         my $v = $n->hash->{residues};
-        my $type = $n->type eq $so_polypep ? "aa" : "cdna";
+        my $type = (grep{$n->type eq $_}@so_polypep) ? "aa" : "cdna";
         $v =~ s/(.{50})/$1\n/g;
         chomp $v;
         $v = "\n$v\n";
@@ -496,7 +521,7 @@ sub _an_game_xml {
     if ($h->{type} eq 'companalysis' || $h->{program}) {
         $game_t = 'computational_analysis';
     } else {
-        $game_t = $game_type_map{$node->type} || ((grep{$_ eq $node->type}@SO_game_fset) ? 'result_set' : "unknow_set");
+        $game_t = $game_type_map{$node->type} || ((grep{$_ eq $node->type}@SO_game_fset) ? 'result_set' : "unknown_set");
     }
     if ($game_t =~ /_analysis/) {
         $w->startTag($game_t);
@@ -535,7 +560,7 @@ sub _an_game_xml {
         $w->startTag('seq_relationship', type=>'query',seq=>$node->src_seq);
         $w->startTag('span');
         map{my $m=$_;$w->dataElement($m,$node->$m)}qw(start end);
-        $w->dataElement('alignment', $_->{residue_info}) if ($_->{residue_info});
+        $w->dataElement('alignment', $node->residue_info) if ($node->residue_info);
         $w->endTag('span');
         $w->endTag('seq_relationship');
     }
@@ -544,7 +569,7 @@ sub _an_game_xml {
         $w->startTag('seq_relationship', type=>'subject',seq=>$h->{src_seq});
         $w->startTag('span');
         map{my $m=$_;$w->dataElement($m,$h->{$m})}qw(start end);
-        $w->dataElement('alignment', $_->{residue_info}) if ($h->{residue_info});
+        $w->dataElement('alignment', $h->{residue_info}) if ($h->{residue_info});
         $w->endTag('span');
         $w->endTag('seq_relationship');
     }

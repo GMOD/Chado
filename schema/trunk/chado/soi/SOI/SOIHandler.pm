@@ -115,8 +115,10 @@ sub end_element {
     }
     else {
         my $e_val = $self->{cur_e_char};
-        $e_val =~ s/^\s*//g;
-        $e_val =~ s/\s*$//g;
+        if ($e_val) {
+            $e_val =~ s/^\s*//g;
+            $e_val =~ s/\s*$//g;
+        }
         if ($level eq 'feature') {
             $feature->hash->{$name} = $e_val;
         }

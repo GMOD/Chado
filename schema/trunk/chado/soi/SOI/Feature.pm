@@ -157,7 +157,7 @@ sub nbeg {
         my $h = shift;
         my $nbeg;
         if (ref($h)) {
-            my $strand = $h->{strand};
+            my $strand = $h->{strand} || 0;
             $nbeg = ($strand > 0) ? $h->{fmin} : $h->{fmax};
         } else {
             $nbeg = $h;
@@ -172,7 +172,7 @@ sub nend {
         my $h = shift;
         my $nend;
         if (ref($h)) {
-            my $strand = $h->{strand};
+            my $strand = $h->{strand} || 0;
             $nend = ($strand > 0) ? $h->{fmax} : $h->{fmin}
         } else {
             $nend = $h;
@@ -181,7 +181,7 @@ sub nend {
     }
     return $self->hash->{nend};
 }
-#it is genomic length
+#it is genomic length (readonly), not seqlen
 sub length {
     my $self = shift;
     $self->{length} = shift if (@_);
@@ -207,6 +207,7 @@ sub strand {
 }
 sub start {
     my $self = shift;
+    $self->hash->{start} = shift if (@_); #support game parsing
     unless (defined($self->hash->{start})) {
         my $strand = $self->strand;
         $self->hash->{start} =
@@ -216,6 +217,7 @@ sub start {
 }
 sub end {
     my $self = shift;
+    $self->hash->{end} = shift if (@_); #support game parsing
     unless (defined($self->hash->{end})) {
         my $strand = $self->strand || ($self->nend - $self->nbeg);
         my $end = ($strand > 0) ? $self->nend : $self->nend + 1;
@@ -300,6 +302,21 @@ sub add_ontology {
     my $self = shift;
     if (@_) {
         push @{$self->{ontologies}}, shift;
+    }
+}
+sub comments {
+    my $self = shift;
+    if (@_) {
+        my $comments = shift;
+        $comments = [$comments] unless (ref($comments) eq 'ARRAY');
+        $self->{comments} = $comments;
+    }
+    return $self->{comments};
+}
+sub add_comment {
+    my $self = shift;
+    if (@_) {
+        push @{$self->{comments}}, shift;
     }
 }
 #it has a seq that is hashref to a chado feature (name,residues,etc, plus SO-type,genus, species)
@@ -465,8 +482,8 @@ sub stitch_child_segments {
        name=>$tmp,
        uniquename=>$tmp,
        fmin=>$nbeg,
-       fmax=>$nbeg + length($residues),
-       seqlen=>length($residues),
+       fmax=>$nbeg + CORE::length($residues),
+       seqlen=>CORE::length($residues),
        strand=>1,
        is_analysis=>0,
        src_seq=>$new->src_seq,
@@ -479,8 +496,21 @@ sub stitch_child_segments {
     $new->dbxrefs([]);$new->properties([]);
     return $new;
 }
+sub _rsetup_coord {
+    my $self = shift;
+    $self->_setup_coord;
+    map{$_->_rsetup_coord}@{$self->nodes || []};
+}
 sub _setup_coord {
     my $self = shift;
+
+    if ($self->hash->{start} && $self->hash->{end}) {
+        my ($s, $e) = ($self->start, $self->end);
+        $self->hash->{strand} = $s < $e ? 1 : -1;
+        ($s, $e) = ($e, $s) if ($self->strand < 0);
+        $self->fmin($s-1);
+        $self->fmax($e);
+    }
     unless (defined $self->nbeg && defined $self->nend) {
         my $h = $self->hash;
         $self->nbeg($h);
@@ -490,19 +520,8 @@ sub _setup_coord {
         $self->start;
         $self->end;
     }
-    foreach my $loc (@{$self->secondary_locations || []}) {
-        my ($nbeg, $nend) = ($loc->{fmin}, $loc->{fmax});
-        if (defined $nbeg && defined $nend) {
-            my ($start, $end) = ($nbeg + 1, $nend);
-            if ($loc->{strand} < 0) {
-                ($nend, $nbeg) = ($nbeg, $nend);
-                ($end, $start) = ($start, $end);
-            }
-            $loc->{nbeg} = $nbeg;
-            $loc->{nend} = $nend;
-            $loc->{start} = $start;
-            $loc->{end} = $end;
-        }
+    foreach my $loc (@{$self->secondary_nodes || []}) {
+        $loc->_setup_coord;
     }
 }
 sub to_chaos_xml {
@@ -540,7 +559,9 @@ sub _min_attr {
         my %att_h;
         map{$att_h{$_}=1}keys %{$self->hash};
         #some of them alread have method that is ok since it is for autoload method (see below)
-        map{$att_h{$_}=1}qw(type relationship_type depth name uniquename feature_id genus species residues seqlen md5checksum srcfeature_id src_seq fmin fmax strand residue_info phase is_fmin_partial is_fmax_partial rank locgroup);
+        map{$att_h{$_}=1}qw(type relationship_type depth name uniquename feature_id genus species residues seqlen md5checksum srcfeature_id src_seq fmin fmax strand residue_info phase is_fmin_partial is_fmax_partial rank locgroup organism program database);
+        #add game fields (seqtype: temp holder for sequence type as seq is feature type in GAME parsing)
+        map{$att_h{$_}=1}qw(produces_seq focus seq author date timestamp version description score seqtype);
         $self->{_min_attr} = [keys %att_h];
     }
     return $self->{_min_attr};
