@@ -1,13 +1,13 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.18 2004-03-26 19:19:42 scottcain Exp $
+$Id: INSTALL,v 1.19 2004-04-07 02:54:44 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
 considered alpha software, so expect there to be bumps in the road.  When
 you experience problems, please email them to the gmod-devel mailing list
 at gmod-devel@lists.sourceforge.net.  Also packaged with this release is
-version 1.58 of the Generic Genome Browser (gbrowse) which has adaptors
+version 1.61 of the Generic Genome Browser (gbrowse) which has adaptors
 to work with chado.  The installation instructions for gbrowse are included
 in that package.  There are plans to make the installation of gbrowse and
 other components more automatic, but for the time being, please unpack it 
@@ -208,10 +208,11 @@ As indicated, the host, port, and password are optional.
 
 *   make ontologies
     Gets and installs various ontologies.  Requires a network 
-    connection.  Note retrieved ontology files are stored
-    in the directory specified when perl Makefile.PL was run (the default
-    is ./tmp).  In order to do a repeat installation, lock files need to be
-    removed to allow reinstallation of ontologies.  Those lock files
+    connection.  Absolutely required are the Relationship Ontology and
+    the Sequence Ontology.  All others are optional.  Note retrieved ontology
+    files are stored in the directory specified when perl Makefile.PL was run
+    (the default is ./tmp).  In order to do a repeat installation, lock files
+    need to be removed to allow reinstallation of ontologies.  Those lock files
     can be removed by executing `make rm_locks`.  Alternatively,
     deleting everything in the temporary directory will force the
     re-downloading of the ontology data from their respective sources.
