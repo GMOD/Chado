@@ -429,30 +429,12 @@ create table element (
     foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    subclass_view varchar(27) not null,
-    tinyint1 int null,
-    smallint1 int null,
-    smallint2 int null,
-    char1 varchar(5) null,
-    char2 varchar(5) null,
-    char3 varchar(5) null,
-    char4 varchar(5) null,
-    char5 varchar(5) null,
-    char6 varchar(5) null,
-    char7 varchar(5) null,
-    tinystring1 varchar(50) null,
-    tinystring2 varchar(50) null,
-    smallstring1 varchar(100) null,
-    smallstring2 varchar(100) null,
-    string1 varchar(500) null,
-    string2 varchar(500) null,
     constraint element_c1 unique (feature_id,arraydesign_id)
 );
 create index element_idx1 on element (feature_id);
 create index element_idx2 on element (arraydesign_id);
 create index element_idx3 on element (type_id);
 create index element_idx4 on element (dbxref_id);
-create index element_idx5 on element (subclass_view);
 
 COMMENT ON TABLE element IS 'represents a feature of the array.  this is typically a region of the array coated or bound to DNA';
 
@@ -463,52 +445,12 @@ create table elementresult (
     foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
     quantification_id int not null,
     foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    subclass_view varchar(27) not null,
-    foreground float(15) null,
-    background float(15) null,
-    foreground_sd float(15) null,
-    background_sd float(15) null,
-    float1 float(15) null,
-    float2 float(15) null,
-    float3 float(15) null,
-    float4 float(15) null,
-    float5 float(15) null,
-    float6 float(15) null,
-    float7 float(15) null,
-    float8 float(15) null,
-    float9 float(15) null,
-    float10 float(15) null,
-    int1 int null,
-    int2 int null,
-    int3 int null,
-    int4 int null,
-    int5 int null,
-    int6 int null,
-    tinyint1 int null,
-    tinyint2 int null,
-    tinyint3 int null,
-    smallint1 int null,
-    smallint2 int null,
-    char1 varchar(5) null,
-    char2 varchar(5) null,
-    char3 varchar(5) null,
-    char4 varchar(5) null,
-    char5 varchar(5) null,
-    char6 varchar(5) null,
-    tinystring1 varchar(50) null,
-    tinystring2 varchar(50) null,
-    tinystring3 varchar(50) null,
-    smallstring1 varchar(100) null,
-    smallstring2 varchar(100) null,
-    string1 varchar(500) null,
-    string2 varchar(500) null,
-    constraint elementresult_c1 unique (element_id,quantification_id,subclass_view)
+    constraint elementresult_c1 unique (element_id,quantification_id)
 );
 create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
-create index elementresult_idx3 on elementresult (subclass_view);
 
-COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
+COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit';
 
 create table element_relationship (
     element_relationship_id serial not null,
