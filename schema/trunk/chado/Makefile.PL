@@ -16,6 +16,7 @@ use Config;
 use Cwd;
 use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
+use Template;
 
 my %args    =  (
   DBDRIVER  => {
@@ -53,7 +54,6 @@ DBUSER   The username to use when connecting to the database ($args{'DBUSER'}{'d
 DBPASS   The password for connecting ($args{'DBPASS'}{'default'})
 DBHOST   The machine name where the database is running ($args{'DBHOST'}{'default'})
 DBPORT   The port on which the database is listening ($args{'DBPORT'}{'default'})
-CONF_DIR The directory to place the GMOD/Chado config file ($args{'CONF_DIR'}{'default'})
 
 e.g., perl Makefile.PL DBDRIVER=PostgreSQL DBNAME=chado [...]
 
@@ -78,7 +78,7 @@ END
 my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS ], keys %args );
 my %opts;
 my @argv = @ARGV;
-@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get confused
+@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get 
 foreach ( @argv ) {
   if ( /^--?h(elp)?$/i ) {
     die $usage;
@@ -102,7 +102,8 @@ $PERL            =~ s/^\s*#!\s*//;
 my $working_dir  = cwd;
 my $lib_dir      = catdir $working_dir, 'lib';
 my $chado_dir    = catdir $lib_dir, 'Chado';
-my $config_file  = catfile $working_dir, 'build.conf';
+my $build_config = catfile $working_dir, 'build.conf';
+my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
 
 my %O;
 $O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
@@ -117,8 +118,8 @@ mkdir $chado_dir unless -d $chado_dir;
 # If the config file is there, parse it.
 #
 my %conf = ();
-if ( -e $config_file && -r _ ) {
-  open CONF, "<$config_file" or die "Can't read file '$config_file': $!\n";
+if ( -e $build_config && -r _ ) {
+  open CONF, "<$build_config" or die "Can't read file '$build_config': $!\n";
   while ( <CONF> ) {
     chomp;
     next if /^\#/;
@@ -138,14 +139,14 @@ my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
 
 if ( ! @argv && %conf ) {
   my $answer = prompt(
-    "Previous configuration detected.\nUse values in '$config_file'?", 'Y'
+    "Previous configuration detected.\nUse values in '$build_config'?", 'Y'
   );
 
   $opts{'RECONFIGURE'} = $answer =~ /^[Yy]/ ? 1 : 0;
 }
 
 if ( $opts{'RECONFIGURE'} && %conf ) {
-  $DBDRIVER = $conf{'DBDRIVER'} || '';
+  $DBDRIVER = $VALID_DBS{ $conf{'DBDRIVER'} } || '';
   $DBNAME   = $conf{'DBNAME'}   || '';
   $DBUSER   = $conf{'DBUSER'}   || '';
   $DBPASS   = $conf{'DBPASS'}   || '';
@@ -250,7 +251,7 @@ close EXT;
 print "\nWhat extensions to the core schema would you like?\n",
   "(Note that selecting any of these will force the\n",
   "rebuilding of Class::DBI classes.)\n";
-my $extstr = prompt("(e.g. 1-3,5)?","0");
+my $extstr = prompt("(Comma-delimited)?","0");
 
 if ($extstr) {
   $rebuild_complete++; 
@@ -262,10 +263,9 @@ if ($extstr) {
 }
 
 my $external = prompt("Enter the full path of an external DDL file", 'none');
-my @seqfiles;
 unless ($external eq 'none') {
   if (-e $external) {
-    push @seqfiles, $external; 
+    push @sqlfiles, $external; 
   } else {
     die "The file $external couldn't be found.  Quitting...\n";
   }
@@ -292,7 +292,7 @@ print join("\n",
 #
 # Save build options.
 #
-if ( open CONF, ">$config_file" ) {
+if ( open CONF, ">$build_config" ) {
   $conf{'DBDRIVER'} = $db_lookup{ $DBDRIVER };
   $conf{'DBNAME'}   = $DBNAME;
   $conf{'DBUSER'}   = $DBUSER;
@@ -301,7 +301,34 @@ if ( open CONF, ">$config_file" ) {
   $conf{'DBPORT'}   = $DBPORT;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
-  close CONF or die "Can't write file '$config_file': $!\n";
+  close CONF or die "Can't write file '$build_config': $!\n";
+}
+
+#
+# Write out new "load.conf" (backup if exists).
+#
+copy( $load_config, $load_config . '.old' ) if -e $load_config;
+my $config_template = catfile( $working_dir, 'load', 'tt2', 'load.conf.tt2' );
+if ( -e $config_template ) {
+  my $t = Template->new( ABSOLUTE => 1 );
+  $t->process( 
+    $config_template, 
+    {
+      db_driver    => $db_lookup{ $DBDRIVER },
+      db_name      => $DBNAME,
+      db_username  => $DBUSER,
+      db_password  => $DBPASS,
+      db_host      => $DBHOST,
+      db_port      => $DBPORT,
+      working_dir  => $working_dir,
+      external_ddl => $external,
+      sql_files    => \@sqlfiles,
+    }, 
+    $load_config 
+  ) or die $t->error;
+}
+else {
+  warn "Template '$config_template' doesn't exist\n";
 }
 
 my $complete_sql = "$working_dir/modules/complete.sql";
