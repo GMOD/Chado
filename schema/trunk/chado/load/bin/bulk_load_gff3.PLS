@@ -211,6 +211,8 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
   $ANALYSIS = 0;
 }
 
+Chado::DBI->set_db('Main',"dbi:Pg:dbname=$DBNAME;host=$DBHOST",$DBUSER,$DBPASS,{AutoCommit=>0});
+
 my %cache = (
              analysis => {},
              db       => {}, #db.db_id cache
@@ -325,11 +327,18 @@ $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Feature Annotation'");
+$sth = $db->prepare("select cv_id from cv where name = 'sofa.ontology'");
 $sth->execute;
 my($sofa_id) =  $sth->fetchrow_array();
 
 #backup plan for old chado instances
+if(!defined($sofa_id)){
+  $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Feature Annotation'");
+  $sth->execute;
+  ($sofa_id) =  $sth->fetchrow_array();
+}
+
+#backup plan for really old chado instances
 if(!defined($sofa_id)){
   $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology'");
   $sth->execute;
