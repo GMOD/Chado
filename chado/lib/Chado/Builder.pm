@@ -32,7 +32,7 @@ sub ACTION_foo {
   print "I'm fooing to death!\n";
 }
 
-sub ACTION_refseq
+sub ACTION_ncbi
 {
   # the build object $m
   my $m = shift;
@@ -40,14 +40,65 @@ sub ACTION_refseq
   my $conf = $m->conf;
 
   # print out the available refseq datasets
-  my %refseqs = printAndReadOptions($m,$conf,"refseq");
-  #print Dumper(%refseqs);
+  my %ncbis = printAndReadOptions($m,$conf,"NCBI");
+  #print Dumper(%ncbis);
 
 }
 
+sub ACTION_affymetrix {
+  my $m = shift;
+  my $conf = $m->conf;
+
+  print "Available MAGE-ML annotation files:\n";
+
+  my $i = 1;
+  my %ml = ();
+  foreach my $mageml (sort keys %{ $conf->{mageml} }){
+	$ml{$i} = $mageml;
+	print "[$i] $mageml\n";
+	$i++;
+  }
+  print "\n";
+
+  my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
+  $m->notes('affymetrix' => $chosen);
+
+  my %mageml = map {$ml{$_} => $conf->{mageml}{$ml{$_}}} split ',',$chosen;
+
+  foreach my $mageml (keys %mageml){
+	print "fetching files for $mageml\n";
+
+	my $load = 0;
+    foreach my $file (@{ $mageml{$mageml}{file} }){
+
+	  my $fullpath = $conf->{path}{data}.'/'.$file->{local};
+	  $fullpath =~ s!^(.+)/[^/]*!$1!;
+
+      if(! -d $fullpath){
+        system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
+      }
+
+      print "  +",$file->{remote},"\n";
+      $load = 1 if $m->_mirror($file->{remote},$file->{local});
+	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
+
+	  next unless $load;
+
+      print "    loading...";
+
+      if(! system('./load/bin/load_affymetrix.pl',
+				  $conf->{'path'}{'data'}.'/'.$file->{'local'},
+				 ) && (print "failed: $!\n" and die)
+		){
+
+		$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
+		print "done!\n";
+	  }
+	}
+  }
+}
 sub ACTION_ontologies {
   my $m = shift;
-
   my $conf = $m->conf;
 
   print "Available ontologies:\n";
@@ -62,7 +113,7 @@ sub ACTION_ontologies {
   print "\n";
 
   my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
-  $m->notes('ontologies' => $chosen);  
+  $m->notes('ontologies' => $chosen);
   
   my %ontologies = map {$ont{$_} => $conf->{ontology}{$ont{$_}}} split ',',$chosen;
 
@@ -79,7 +130,7 @@ sub ACTION_ontologies {
       }
 
       print "  +",$file->{remote},"\n";
-      $load = 1 if $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
+      $load = 1 if $m->_mirror($file->{remote},$file->{local});
     }
 
     my($deffile) = grep {$_ if $_->{type} eq '  print "Available ontologies:\n";
@@ -95,29 +146,25 @@ sub ACTION_ontologies {
     foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
       print "  +",$ontfile->{remote},"\n";
 
-      print "    already loaded, remove touchfile to reload.  skipping\n" and next if -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+      $load = 1 if $m->_mirror($ontfile->{remote},$ontfile->{local});
+	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->local);
 
-      $load = 1 if $m->_mirror($ontfile->{remote},$conf->{path}{data} .'/'. $ontfile->{local});
-      #if there was an error downloading
-      print "    error downloading!\n" and next if ! -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'};
-
-      $load = 1 if ! -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+	  next unless $load;
 
       print "    loading...";
 
-      system('./load/bin/load_ontology.pl',
-             $conf->{'tt2'}{'load/tt2/LoadDBI.tt2'}{'token'}{'db_username'},
-             $conf->{'tt2'}{'load/tt2/LoadDBI.tt2'}{'token'}{'db_name'},
-             $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
-             $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
-            ) && (print "failed: $!\n" and die);
-      print "done!\n"
-        and open(T,'>'.$conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'})
-        and print T "\n" and close(T);
+      if(! system('./load/bin/load_ontology.pl',
+				  $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
+				  $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
+				 ) && (print "failed: $!\n" and die)
+		){
+		_loaded( $conf->{'path'}{'data'}.'/'.$ontfile->{'local'} , 1 );
+		print "done!\n";
+	  }
     }
   }
 }
-  
+
 sub ACTION_tokenize {
   my $m = shift;
   my $conf = $m->conf;
@@ -175,9 +222,9 @@ sub printAndReadOptions
 }
 
 sub property {
-  my $self = shift;
+  my $m = shift;
   my $key  = shift;
-  my $val  = $self->{properties}{$key};
+  my $val  = $m->{properties}{$key};
   $val     =~ s/^$key=//;
   return $val;
 }
@@ -192,9 +239,34 @@ sub conf {
   return $self->{conf};
 }
 
+sub _loaded {
+  my $m = shift;
+  my $conf = $m->conf;
+  my ($file,$touch) = @_;
+  $file .= '_'. $conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+
+  if($touch){
+	open(T,'>'.$file);
+    print T "\n";
+	close(T);
+	return 1;
+  } else {
+	return 1 if -f $file;
+	return 0;
+  }
+}
+
 sub _mirror {
-  my $self = shift;
+  my $m = shift;
+  my $conf = $m->conf;
   my ($remote,$local) = @_;
+  $local = $conf->{'path'}{'data'} .'/'. $local;
+
+  if( $m->_loaded($local) ){
+	print "  already loaded, remove touchfile to reload.  skipping\n";
+	return 0;
+  }
+
   #mirror the file
   my $rc = mirror($remote, $local);
 
