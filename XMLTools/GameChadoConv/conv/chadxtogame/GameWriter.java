@@ -2,6 +2,7 @@
 package conv.chadxtogame;
 
 import java.io.*;
+//import conv.util.*;
 
 /****
 //JAVA3
@@ -733,14 +734,14 @@ private boolean m_geneOnly = false;
 
 	public void makeAuthPropComm(
 			Element the_Node,Document the_DOC,
-			GenFeat the_gf,boolean the_isAnnotation){
+			Feature the_gf,boolean the_isAnnotation){
 		System.out.println("FEATPROP makeAuthPropComm()!!!");
 
 		//  DATE
-		//if(the_gf.getDate()!=null){
-		//	the_Node.appendChild(makeDateNode(
-		//		the_DOC,null,the_gf.getDate());
-		//}
+		if(the_gf.gettimeaccessioned()!=null){
+			the_Node.appendChild(makeDateNode(
+				the_DOC,the_gf.gettimeaccessioned()));
+		}
 
 		for(int i=0;i<((Feature)the_gf).getFeatSynCount();i++){
 			FeatSyn fs = ((Feature)the_gf).getFeatSyn(i);
@@ -893,22 +894,24 @@ private boolean m_geneOnly = false;
 			personNode.appendChild(the_DOC.createTextNode(the_personTxt));
 			attrNode.appendChild(personNode);
 		}
-		if((the_timestampTxt!=null)&&(the_dateTxt!=null)){
+		//IGNORE TIMESTAMP AS IT CAN BE REGENERATED
+		if(the_dateTxt!=null){
 			attrNode.appendChild(
-				makeDateNode(the_DOC,
-					the_timestampTxt,the_dateTxt));
+				makeDateNode(the_DOC,the_dateTxt));
 		}
 		return attrNode;
 	}
 
-	public Element makeDateNode(Document the_DOC,
-			String the_timestamp,String the_date){
+	public Element makeDateNode(Document the_DOC,String the_chadodate){
 		Element dateNode = (Element)the_DOC.createElement("date");
-		if(the_timestamp!=null){
-			dateNode.setAttribute("timestamp",the_timestamp);
+		String gametimestamp = DateConv.ChadoDateToGameTimestamp(
+				the_chadodate);
+		if(gametimestamp!=null){
+			dateNode.setAttribute("timestamp",gametimestamp);
 		}
-		if(the_date!=null){
-			dateNode.appendChild(the_DOC.createTextNode(the_date));
+		String gamedate = DateConv.ChadoDateToGameDate(the_chadodate);
+		if(gamedate!=null){
+			dateNode.appendChild(the_DOC.createTextNode(gamedate));
 		}
 		return dateNode;
 	}
@@ -943,8 +946,7 @@ private boolean m_geneOnly = false;
 		System.out.println("SHOULDBEWRITINGTIMEACCESSIONED");
 		if(the_ca.gettimeaccessioned()!=null){
 			compAnalNode.appendChild(makeDateNode(
-					the_DOC,null,
-					the_ca.gettimeaccessioned()));
+					the_DOC,the_ca.gettimeaccessioned()));
 		}
 		System.out.println("NEW REF SPAN<"+m_NewREFSPAN.getStart()
 				+".."+m_NewREFSPAN.getEnd()+">");
@@ -1290,7 +1292,6 @@ private boolean m_geneOnly = false;
 				}
 			}
 			return makeGameComment(the_DOC,txtTxt,
-					//the_fp.getpub_id(),
 					the_fp.getPubId(),
 					dateTxt,tsTxt);
 

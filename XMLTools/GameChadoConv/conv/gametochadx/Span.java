@@ -1,20 +1,24 @@
 //Span
-package conv.gametochadx;
+package conv.chadxtogame;
 
 import java.util.*;
 
 public class Span {
 private int m_start=0;
 private int m_end=0;
-private String m_src = null;
+private String m_src;
 
 	public Span(String the_start,String the_end){
 		try{
 			m_start = Integer.decode(the_start).intValue();
+		}catch(Exception ex){
+			System.out.println("ERROR SPAN STR <"+the_start+">");
+			ex.printStackTrace();
+		}
+		try{
 			m_end = Integer.decode(the_end).intValue();
 		}catch(Exception ex){
-			System.out.println("SPAN STR ERROR <"
-					+the_start+"><"+the_end+">");
+			System.out.println("ERROR SPAN STR <"+the_end+">");
 			ex.printStackTrace();
 		}
 	}
@@ -29,11 +33,6 @@ private String m_src = null;
 		m_end = the_end;
 	}
 
-	public Span(int the_start,int the_end,String the_src){
-		this(the_start,the_end);
-		m_src = the_src;
-	}
-
 	public int getStart(){
 		return m_start;
 	}
@@ -42,23 +41,15 @@ private String m_src = null;
 		return m_end;
 	}
 
-	public void setSrc(String the_src){
-		m_src = the_src;
-	}
-
 	public String getSrc(){
 		return m_src;
 	}
 
 	public int getLength(){
 		if(m_start<m_end){
-//PEILI
-			return (m_end-m_start);
-			//return (m_end-m_start+1);
+			return (m_end-m_start+1);
 		}else{
-//PEILI
-			return (m_start-m_end);
-			//return (m_start-m_end+1);
+			return (m_start-m_end+1);
 		}
 	}
 
@@ -70,85 +61,66 @@ private String m_src = null;
 		}
 	}
 
+	public boolean precedes(Span the_sp){
+		if(the_sp==null){
+			return false;
+		}
+		if((isForward())&&(the_sp.isForward())){
+			if(getStart()<the_sp.getStart()){
+				return true;
+			//}else if(getStart()==the_sp.getStart()){
+			//	if(getEnd()<the_sp.getEnd()){
+			//		return true;
+			//	}
+			}
+		}else if((!isForward())&&(!isForward())){
+			if(getStart()>the_sp.getStart()){
+				return true;
+			}
+		}else if((isForward())&&(!the_sp.isForward())){
+			System.out.println("FEATLOC PRECEDES() MIX1");
+		}else if((!isForward())&&(the_sp.isForward())){
+			System.out.println("FEATLOC PRECEDES() MIX2");
+		}
+		return false;
+	}
+
+	public void grow(Span the_sp){
+		if(the_sp==null){
+			return;
+		}
+		if((m_start==0)&&(m_end==0)){ //FIRST ONE
+			m_start = the_sp.getStart();
+			m_end = the_sp.getEnd();
+		}else{
+			if(the_sp.isForward()){
+				if(the_sp.getStart()<m_start){
+					m_start = the_sp.getStart();
+				}
+				if(the_sp.getEnd()>m_end){
+					m_end = the_sp.getEnd();
+				}
+			}else{
+				if(the_sp.getStart()>m_start){
+					m_start = the_sp.getStart();
+				}
+				if(the_sp.getEnd()<m_end){
+					m_end = the_sp.getEnd();
+				}
+			}
+		}
+	}
+
 	public String toString(){
 		return (m_start+".."+m_end);
 	}
 
 	public Span advance(int the_amt){
-		if(m_end>m_start){
-			return (new Span((m_start+the_amt-1),(m_end+the_amt),m_src));
-		}else{
-			return (new Span((m_start+the_amt),(m_end+the_amt-1),m_src));
-		}
+		return (new Span((m_start+the_amt),(m_end+the_amt)));
 	}
 
 	public Span retreat(int the_amt){
-		if(m_end>m_start){
-			return (new Span((m_start-the_amt+1),(m_end-the_amt),m_src));
-		}else{
-			return (new Span((m_start-the_amt),(m_end-the_amt+1),m_src));
-		}
-	}
-
-	public Span union(Span the_sp){
-		int minStart = m_start;
-		int maxEnd = m_end;
-		if(the_sp.isForward()){
-			if(minStart>the_sp.getStart()){
-				minStart = the_sp.getStart();
-			}
-			if(maxEnd<the_sp.getEnd()){
-				maxEnd = the_sp.getEnd();
-			}
-		}else{
-			if(minStart<the_sp.getStart()){
-				minStart = the_sp.getStart();
-			}
-			if(maxEnd>the_sp.getEnd()){
-				maxEnd = the_sp.getEnd();
-			}
-		}
-		return new Span(minStart,maxEnd,m_src);
-	}
-
-	public boolean precedes(Span the_sp){
-                if(the_sp==null){
-                        return false;
-                }
-                if((isForward())&&(the_sp.isForward())){
-                        if(getStart()<the_sp.getStart()){
-                                return true;
-                        }
-                }else if((!isForward())&&(!isForward())){
-                        if(getStart()>the_sp.getStart()){
-                                return true;
-                        }
-                }else if((isForward())&&(!the_sp.isForward())){
-                        System.out.println("FEATLOC PRECEDES() MIX1");
-                }else if((!isForward())&&(the_sp.isForward())){
-                        System.out.println("FEATLOC PRECEDES() MIX2");
-                }
-                return false;
-	}
-
-	public boolean contains(Span the_sp){
-		if(the_sp==null){
-			return false;
-		}
-		int min = getStart();
-		int max = getEnd();
-		if(min>max){
-			int tmp = min;
-			min = max;
-			max = tmp;
-		}
-		if((the_sp.getStart()>=min)
-				&&(the_sp.getStart()<=max)
-				&&(the_sp.getEnd()>=min)
-				&&(the_sp.getEnd()<=max)){
-			return true;
-		}
-		return false;
+		return (new Span((m_start-the_amt),(m_end-the_amt)));
 	}
 
 	public void Display(int the_depth){
@@ -159,5 +131,6 @@ private String m_src = null;
 		System.out.println(offsetTxt+" Span <"+toString()+">");
 	}
 }
+
 
 
