@@ -248,6 +248,7 @@ sub get_features {
 sub get_analysis {
     my $self = shift;
     my $constr = shift;
+    my $opts = shift;
 
     my ($progs, $dbs) = $self->_get_progs_dbs($constr);
     my $prog_str = join(",", map{sql_q($_)}@{$progs || []});
@@ -275,13 +276,14 @@ sub get_analysis {
     foreach my $h (@{$hl || []}) {
         my $node = $node_h{$h->{analysis_id}};
         my ($t,$v) = ($h->{type},$h->{value});
+        next if (!$t && $opts->{typed_analysis_only});
         delete $h->{type}; delete $h->{value};
         unless ($node) {
             $node = SOI::Feature->new($h);
             $node->hash->{type} = 'companalysis';
             $node_h{$h->{analysis_id}} = $node;
         }
-        $node->add_property({type=>$t,value=>$v});
+        $node->add_property({type=>$t,value=>$v}) if ($t);
     }
     return [values %node_h];
 }
@@ -534,7 +536,7 @@ sub get_results {
     my $hl = $self->_select_hashlist($sql2) unless ($opts->{noresidues});
     foreach my $h (@{$hl || []}) {
         my $sec_locs = $sec_loc_h{$h->{feature_id}};
-        map{$_->seq(SOI::Feature->new($h))}@{$sec_locs || []};
+        map{$_->sseq(SOI::Feature->new($h))}@{$sec_locs || []};
     }
     undef %sec_loc_h;
 
@@ -990,13 +992,42 @@ sub _get_auxillaries {
     $sql = sprintf("$sql WHERE %s", $where) if ($where);
     $self->_get_properties($sql, \%node_h);
 
-    #get GO ontology
+    #get synonyms
+    $sql =
+      qq
+        (
+         select
+         f.feature_id,
+         t.name as type,
+         fs.name as value,
+         fs.synonym_sgml
+         FROM
+         feature f
+         INNER join
+         featureloc fl ON (f.feature_id = fl.feature_id)
+         INNER join
+         feature src ON (src.feature_id = fl.srcfeature_id)
+         INNER join
+         feature_synonym fsym ON (fsym.feature_id = f.feature_id and fsym.is_current = 'f' AND fsym.is_internal = 'f')
+         INNER join
+         synonym fs ON (fs.synonym_id = fsym.synonym_id)
+         INNER join
+         cvterm t ON (t.cvterm_id = fs.type_id)
+         INNER join
+         (
+          $soi
+         ) as q ON (f.type_id = q.cvterm_id)
+        );
+    $sql = sprintf("$sql WHERE %s", $where) if ($where);
+    $self->_get_synonyms($sql, \%node_h);
+
+    #get ontology (GO or any ontology attached to feature
     $sql =
       qq(
          select
          f.feature_id,
-         gf.name,
-         gfx.accession,
+         font.name,
+         fontx.accession,
          db.name as dbname,
          cv.name as cv
          FROM
@@ -1008,13 +1039,13 @@ sub _get_auxillaries {
          INNER join
          feature_cvterm fcvt ON (f.feature_id = fcvt.feature_id)
          INNER join
-         cvterm gf ON (gf.cvterm_id = fcvt.cvterm_id)
+         cvterm font ON (font.cvterm_id = fcvt.cvterm_id)
          INNER join
-         dbxref gfx ON (gf.dbxref_id = gfx.dbxref_id)
+         dbxref fontx ON (font.dbxref_id = fontx.dbxref_id)
          INNER join
-         db ON (gfx.db_id = db.db_id AND db.name = 'GO')
+         db ON (fontx.db_id = db.db_id)
          INNER join
-         cv ON (gf.cv_id = cv.cv_id)
+         cv ON (font.cv_id = cv.cv_id)
          INNER join
          (
           $soi
@@ -1023,7 +1054,7 @@ sub _get_auxillaries {
     $sql = sprintf("$sql WHERE %s", $where) if ($where);
 
 #use cvterm.dbxref_id
-#         cvterm_dbxref cvtx ON (gf.cvterm_id = cvtx.cvterm_id)
+#         cvterm_dbxref cvtx ON (font.cvterm_id = cvtx.cvterm_id)
 #         INNER join
     $self->_get_ontologies($sql, \%node_h);
     return %node_h;
@@ -1055,6 +1086,20 @@ sub _get_properties {
         }
     }
 }
+sub _get_synonyms {
+    my $self = shift;
+    my $sql = shift || return;
+    my $fhref = shift || {};
+
+    my %node_h = %{$fhref};
+    my $hl = $self->_select_hashlist($sql);
+    foreach my $h (@{$hl || []}) {
+        my $nodes = $node_h{$h->{feature_id}};
+        foreach my $node (@{$nodes}) {
+            $node->add_synonym($h);
+        }
+    }
+}
 sub _get_dbxrefs {
     my $self = shift;
     my $sql = shift || return;
@@ -1078,6 +1123,7 @@ sub _get_auxillaries4features {
 
     #get dbxref: assumption is dbxref on gene level feature
     my (%top_h, %node_h);
+    #note: same feature_id can have >1 feature obj (e.g. sharing exons)
     map{$top_h{$_->id}++; push @{$node_h{$_->id}}, $_}@{$lfl || []};
     my $f_ids = join(",",(keys %top_h));
     $sql =
@@ -1098,6 +1144,7 @@ sub _get_auxillaries4features {
     $self->_get_dbxrefs($sql) if ($f_ids, \%node_h);
 
     #get properties: assumption: on gene and transcript level
+    #only add transcript to $node_h!!
     my %sec_h;
     map{map{$sec_h{$_->id}++; push @{$node_h{$_->id}}, $_}@{$_->nodes || []}}@{$lfl || []};
     my $fp_ids = join(",",(keys %top_h, keys %sec_h));
@@ -1117,13 +1164,32 @@ sub _get_auxillaries4features {
         );
     $self->_get_properties($sql, \%node_h) if ($fp_ids);
 
-    #get GO ontology: assumption: on gene level
+    #get synonyms: assumption: on gene level
+    $sql =
+      qq(select
+         f.feature_id,
+         t.name as type,
+         fs.name as value,
+         fs.synonym_sgml
+         FROM
+         feature f
+         INNER join
+         feature_synonym fsym ON (fsym.feature_id = f.feature_id AND fsym.is_current = 'f' AND fsym.is_internal = 'f')
+         INNER join
+         synonym fs ON (fs.synonym_id = fsym.synonym_id)
+         INNER join
+         cvterm t ON (t.cvterm_id = fs.type_id)
+         WHERE f.feature_id IN ($f_ids)
+        );
+    $self->_get_properties($sql, \%node_h) if ($f_ids);
+
+    #get ontology (GO or any ontology attached to feature): assumption: on gene level
     $sql =
       qq(
          select
          f.feature_id,
-         gf.name,
-         gfx.accession,
+         font.name,
+         fontx.accession,
          db.name as dbname,
          cv.name as cv
          FROM
@@ -1131,17 +1197,17 @@ sub _get_auxillaries4features {
          INNER join
          feature_cvterm fcvt ON (f.feature_id = fcvt.feature_id)
          INNER join
-         cvterm gf ON (gf.cvterm_id = fcvt.cvterm_id)
+         cvterm font ON (font.cvterm_id = fcvt.cvterm_id)
          INNER join
-         dbxref gfx ON (gf.dbxref_id = gfx.dbxref_id)
+         dbxref fontx ON (font.dbxref_id = fontx.dbxref_id)
          INNER join
-         db ON (gfx.db_id = db.db_id)
+         db ON (fontx.db_id = db.db_id)
          INNER join
-         cv ON (gf.cv_id = cv.cv_id)
-         WHERE db.name = 'GO' and f.feature_id IN ($f_ids)
+         cv ON (font.cv_id = cv.cv_id)
+         WHERE f.feature_id IN ($f_ids)
         );
 #use cvterm.dbxref_id
-#         cvterm_dbxref cvtx ON (gf.cvterm_id = cvtx.cvterm_id)
+#         cvterm_dbxref cvtx ON (font.cvterm_id = cvtx.cvterm_id)
 #         INNER join
     $self->_get_ontologies($sql, \%node_h) if ($f_ids);
     return $lfl;

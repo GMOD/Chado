@@ -366,7 +366,7 @@ sub feature {
                         $res =~ s/\n//g;
                         $res =~ s/\s+//g;
                         $seq->residues($res);
-                        $span->secondary_node->seq($seq);
+                        $span->secondary_node->sseq($seq);
                     }
                 }
             }

@@ -51,8 +51,8 @@ properties, dbxrefs, and ontologies, all are a list of hash refs, nodes for chil
 
 =head2 subject seq
 
-  adapter by default get subject seq residues and all subject seq data are in $sec_loc->{seq},
-  which will have subject seq length as $sec_loc->{seq}->{seqlen}, if database has it.
+  adapter by default get subject seq residues and all subject seq data are in $sec_loc->sseq (source seq),
+  which will have subject seq length as $sec_loc->sseq->seqlen, if database has it.
   secondary_location will have rank, right now FlyBase use loc rank 1 to indicate span is subject
 
 =cut
@@ -199,7 +199,14 @@ sub length {
     }
     return $self->{length};
 }
-
+#read only
+sub seqlen {
+    my $self = shift;
+    unless ($self->hash->{seqlen}) {
+        $self->hash->{seqlen} = length($self->residues) if ($self->residues);
+    }
+    return $self->hash->{seqlen};
+}
 sub strand {
     my $self = shift;
     $self->hash->{strand} = shift if (@_);
@@ -334,7 +341,7 @@ sub add_comment {
         push @{$self->{comments}}, shift;
     }
 }
-#it has a seq that is hashref to a chado feature (name,residues,etc, plus SO-type,genus, species)
+#it has a sseq that is a Feature obj with a chado feature (name,residues,etc, plus SO-type,genus, species)
 sub secondary_locations {
     my $self = shift;
     if (@_) {
@@ -584,7 +591,8 @@ sub _min_attr {
         my %att_h;
         map{$att_h{$_}=1}keys %{$self->hash};
         #some of them alread have method that is ok since it is for autoload method (see below)
-        map{$att_h{$_}=1}qw(type relationship_type depth name uniquename feature_id genus species residues seqlen md5checksum srcfeature_id src_seq fmin fmax strand residue_info phase is_fmin_partial is_fmax_partial rank locgroup organism program database);
+        #sseq is diff from src_seq, latter is a name and former is feature obj
+        map{$att_h{$_}=1}qw(type relationship_type depth name uniquename feature_id genus species residues seqlen md5checksum srcfeature_id src_seq sseq fmin fmax strand residue_info phase is_fmin_partial is_fmax_partial rank locgroup organism program database);
         #add game fields (seqtype: temp holder for sequence type as seq is feature type in GAME parsing)
         map{$att_h{$_}=1}qw(produces_seq focus seq author date timestamp version description score seqtype);
         $self->{_min_attr} = [keys %att_h];

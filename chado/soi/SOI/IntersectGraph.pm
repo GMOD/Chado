@@ -8,7 +8,7 @@ package SOI::IntersectGraph;
 
 stores/finds the intersection graph between two sets of features.
 
-the algorithm (smaller/bigger (which is a Set): num of elements):
+the algorithm (smaller/bigger (which is a Set) implies the number of elements):
 
 foreach I in smaller(Set1, Set2):
 
@@ -22,13 +22,13 @@ it has O(N x k) instead of O(N^2).
 
 set i: smaller set, set j: bigger set.
 
-Both sets are sorted on fmin. J is from a set of item in set j with index
-between smallest index of set j whose range ov with the previous item
-of set i to that of set j whose range ov with current item of set i.
+Both sets are sorted on fmin. J is from a set of item in set j and J index
+is between smallest index of set j whose range ov with the previous item
+of set i and that of set j whose range ov with current item of set i.
 
-for this to work efficiently, location intersection comparing node's parent
+for this to work efficiently, location intersection comparing node parent
 must have fmin and fmax and src_seq. because chado [early FlyBase version]
-did not have resultset loc'ed, you may have to manufacture its location:
+did not have resultset located, you may have to manufacture its location:
 src_seq, fmin, and fmax from its spans/match_part (see Visitor module)
 
 soi tree has undeterministic depth and mixed types at one level, to find intersections, feature type
@@ -36,7 +36,7 @@ must be specified (see property below). If no depth specified, top node (depth 0
 
 furthermore, 2 sets depth has the same sematics(same level has similar types of features):
 transcript vs transcript(resultset), NOT transcript vs exon(span/match_part), NOR translation vs exon
-although this is no enforced. API user should be clear on what is compared to when pass in 2 sets
+although this is no enforced. API user should be clear on what is compared to when passing in 2 sets
 and options (hashref) as property (see below) to find intersection
 
 =cut
@@ -53,11 +53,19 @@ property can be set before call find_intersects or passed in as hashref (3rd arg
 
 =item subject_type
 
-(required) feature type at the depth specified of subject side (2nd arg in find_intersects
+(required) feature type at the depth specified of subject side (2nd arg in find_intersects)
+
+NOTE: theoretically, mixed types at the same depth could work by passing in array ref of types
 
 =item depth
 
-feature depth for intersecting determination, default to 0
+feature depth for intersecting determination, without specifying depth, it will zigzag
+to go to right level (controlled by query_type, subject_type) to do comparison.
+
+=item query_depth, subject_depth
+
+feature depth for comparison can be different, but comparing feature at the same depth
+is much faster as it does not need to zigzag instead of diving into both graphs at the same time
 
 =item overlap
 
@@ -65,7 +73,7 @@ min percentage overlaping (span length) to be intersecting
 
 =item overlap_length
 
-min overlap length to be intersecting
+min overlap length to be intersecting per span
 
 =item attach_ov_coords
 
@@ -81,7 +89,13 @@ min percentage overlaping (seq length) to be intersecting
 
 =item lt_threshold
 
-max percentage overlapping (seq length) to be intersecting
+max percentage overlapping (seq length) to be intersecting, this is for getting
+set of not threshold
+
+WARNING: when specify threshold or lt_threshold, both sets of features have to be flatten
+ones like transcript or resultset (match). In other words, children of feature must be
+component_part_of, eg for gene, it may over-count overlaps since a gene may have >1
+overlapping transcripts.
 
 =item query_compare
 
@@ -148,7 +162,7 @@ sub properties {
 }
 
 sub property_key_list {
-    qw(boundary check depth query_type subject_type both_type query_compare subject_compare
+    qw(boundary check depth query_depth subject_depth query_type subject_type both_type query_compare subject_compare
        overlap overlap_length attach_ov_coords has_overlaps same_strand
        profile n_comparisons threshold lt_threshold);
 }
@@ -269,7 +283,7 @@ sub find_intersects {
         } keys %$opts;
     }
     unless ($self->get_property('query_type') && $self->get_property('subject_type')) {
-        confess("must pass in query_type and subject_type");
+        confess("must pass in query_type and subject_type in options hash");
     }
     my %sfh1 = ();
     my %sfh2 = ();
@@ -355,7 +369,7 @@ sub find_intersects_on_same_seq {
                 last;
             }
 
-            #keep $sf1 straight by using alias!
+            #keep $sf1 straight by using alias because we have to swap sf in some cases!
             my ($c1, $c2) = ($sf1, $sf2);
             if ($sets_order_flipped) {
                 ($c1, $c2) = ($sf2, $sf1);
@@ -371,11 +385,11 @@ sub find_intersects_on_same_seq {
             if ($is_overlap) {
                 if ($self->get_property("check")) {
                     # user doesn't care about list of
-                    # overlaps;
+                    # overlaps, use ig to find if overlap (has_overlaps)?
                     $self->set_property("has_overlaps", 1);
                     return;
                 }
-                trace(sprintf("%s:%d-%d %s ov %s:%d-%d %s",$sf1->src_seq,$sf1->fmin,$sf1->fmax,$c1->name, $sf2->src_seq,$sf2->fmin,$sf2->fmax, $c2->name));
+                trace(sprintf("%s:%d-%d %s ov %s:%d-%d %s",$sf1->src_seq,$sf1->fmin,$sf1->fmax,$c1->name || "", $sf2->src_seq,$sf2->fmin,$sf2->fmax, $c2->name || ""));
                 push(@ovs, [$c1, $c2, $is_overlap]);
             } else {
                 trace(sprintf("%s:%d-%d %s(d=%d) not ov %s:%d-%d %s(d=%d)",$sf1->src_seq,$sf1->fmin,$sf1->fmax,$c1->type,$c1->depth,$sf2->src_seq,$sf2->fmin,$sf2->fmax, $c2->type, $c2->depth));
@@ -400,78 +414,144 @@ sub _icheck {
     my $self = shift;
     my $sf1 = shift; #must be from set of user's first arg
     my $sf2 = shift;
+
+    local *sf_ov = sub {
+        my $f1 = shift;
+        my $f2 = shift;
+        my $ov_lap = $self->overlaps($f1, $f2);
+        my $is_overlap = $ov_lap->[0];
+        my $overlap = $self->get_property('overlap');#span overlap percentage
+        my $ov_len = $self->get_property('overlap_length');
+        if ($overlap) {
+            if ($is_overlap/($f2->length || 1) < $overlap) {
+                $is_overlap = 0;
+            }
+        }
+        elsif ($ov_len) {
+            if ($is_overlap < $ov_len) {
+                $is_overlap = 0;
+            }
+        }
+        if ($is_overlap && $self->get_property('attach_ov_coords')) {
+            my $ov_fmin_term = $self->get_property('subject_compare') eq 'secondary_location' ?
+              'ov_sec_loc_fmin' : 'ov_fmin';
+            my $ov_fmax_term = $self->get_property('subject_compare') eq 'secondary_location' ?
+              'ov_sec_loc_fmax' : 'ov_fmax';
+            $f2->add_property($ov_fmin_term, $ov_lap->[1]);
+            $f2->add_property($ov_fmax_term, $ov_lap->[2]);
+        }
+        return $is_overlap;
+    };
+
+    local *further_down = sub {
+        my $leaf1 = shift;
+        my $leaf2 = shift;
+        my $f2 = shift; #parent of $leaf2
+
+        return unless (scalar(@{$leaf1 || []}) && scalar(@{$leaf2 || []}));
+        # do a recursive check on next level nodes
+        my $inner_ov = ref($self)->new;
+        $inner_ov->properties({%{$self->properties}});
+        my $inovs =
+          $inner_ov->find_intersects_on_same_seq($leaf1,
+                                                 $leaf2);
+        # this assumes that both sf sets are flattened
+        # eg it will work for transcripts (result set or match), but not genes
+        #well, for genes, you may over-count overlaps as a gene may have >1 overlapping tr
+        my $is_overlap = 0; #both flag and ov length (ov length is added up for next level node of $sf1, $sf2)
+        foreach my $inov (@{$inovs || []}) {
+            #arc (third item) is ov length
+            $is_overlap += $inov->[2];
+        }
+        my $thresh = $self->get_property("threshold");
+        my $ltthresh = $self->get_property("lt_threshold");
+        if ($thresh || $ltthresh) {
+            my $seq_len = 0;
+            my $types = $self->get_property('subject_type');
+            $types = [$types] unless (ref($types) eq 'ARRAY');
+            my @parts;
+            map{my $p = $_; push @parts, $p if (grep{$p->type eq $_}@$types)}@{$leaf2};
+            map{$seq_len += $_->length}@parts;
+
+            if ($ltthresh && $is_overlap / $seq_len >= $ltthresh) {
+                print STDERR "NOT GETTING >= $ltthresh\n";
+                $is_overlap = 0; #filter out
+            } else {
+                if ($is_overlap / $seq_len < $thresh) {
+                    $is_overlap = 0;
+                }
+            }
+        }
+        return $is_overlap;
+    };
+
+    #both sf are on the same src
     my $strand_test_passed = 1;
     if ($self->get_property("same_strand")) {
         $strand_test_passed = 0 unless ($sf1->strand == $sf2->strand);
     }
     if ($sf1->uniquename eq $sf2->uniquename || ($strand_test_passed)) {
-        my $is_overlap;
-        my $depth = $self->get_property('depth') || 0;
-        unless ($sf1->depth == $depth && $sf2->depth == $depth) {
-            # do a recursive check on next level nodes
-            my $inner_ov = ref($self)->new;
-            $inner_ov->properties({%{$self->properties}});
-            #get next level feature
-            my $leaf1 = $sf1->nodes;
-            my $leaf2 = $sf2->nodes;
-            my $inovs =
-              $inner_ov->find_intersects_on_same_seq($leaf1,
-                                                         $leaf2);
-            # this assumes that both sf sets are flattened
-            # eg it will work for transcripts, but not genes (may not the way you think)
-            #well, for genes, you get ov of tr (tr depth = your depth) which may have introns
-            $is_overlap = 0; #effectively add up ov only for secondary level to leaf (desired depth)
-            foreach my $inov (@{$inovs || []}) {
-                #arc third item is ov length
-                $is_overlap += $inov->[2];
+        my $overlap;
+        my $depth = $self->get_property('depth');
+        my ($qd, $sd) = ($self->get_property('query_depth'),$self->get_property('subject_depth'));
+        #same depth of said types (a type can appear at diff level of the tree)
+        if (defined($depth)) {
+            if ($sf1->depth == $depth && $sf2->depth == $depth) {
+                $overlap = sf_ov($sf1,$sf2);
             }
-            my $thresh = $self->get_property("threshold");
-            my $ltthresh = $self->get_property("lt_threshold");
-            #threshold only apply to compu results
-            if ($thresh || $ltthresh) {
-                if (@{$sf2->secondary_nodes || []}) {
-                    #how to check mixed seq?
-                    #what level are we checking? (composite type feature length is not really seq length!!)
-                    #get homol seq length if we could
-                    my $homol_seq_len = $sf2->secondary_node->fmax - $sf2->secondary_node->fmin;
-                    if ($sf2->secondary_node->seq && $sf2->secondary_node->seq->seqlen) {
-                        $homol_seq_len = $sf2->secondary_node->seq->seqlen;
-                    }
-                    if ($ltthresh && $is_overlap / $homol_seq_len >= $ltthresh) {
-                        print STDERR "NOT GETTING >= $ltthresh\n";
-                        $is_overlap = 0; #filter out
-                    } else {
-                        if ($is_overlap / $sf2->length < $thresh) {
-                            $is_overlap = 0;
-                        }
-                    }
-                }
-            }
-        } else {
-            my $ov_lap = $self->overlaps($sf1, $sf2);
-            $is_overlap = $ov_lap->[0];
-            my $overlap = $self->get_property('overlap');#span overlap percentage
-            my $ov_len = $self->get_property('overlap_length');
-            if ($overlap) {
-                if ($is_overlap/($sf2->length || 1) < $overlap) {
-                    $is_overlap = 0;
-                }
-            }
-            elsif ($ov_len) {
-                if ($is_overlap < $ov_len) {
-                    $is_overlap = 0;
-                }
-            }
-            if ($is_overlap && $self->get_property('attach_ov_coords')) {
-                my $ov_fmin_term = $self->get_property('subject_compare') eq 'secondary_location' ?
-                  'ov_sec_loc_fmin' : 'ov_fmin';
-                my $ov_fmax_term = $self->get_property('subject_compare') eq 'secondary_location' ?
-                  'ov_sec_loc_fmax' : 'ov_fmax';
-                $sf2->add_property($ov_fmin_term, $ov_lap->[1]);
-                $sf2->add_property($ov_fmax_term, $ov_lap->[2]);
+            else {
+                # do a recursive check on next level nodes
+                my $leaf1 = $sf1->nodes;
+                my $leaf2 = $sf2->nodes;
+                $overlap = further_down($leaf1,$leaf2,$sf2);
             }
         }
-        return $is_overlap;
+        #said depth of said types
+        elsif (defined($qd) || defined($sd)) {
+            confess("must specify both query and subject depth when a depth is specified")
+              unless (defined($qd) && defined($sd));
+            if ($sf1->depth == $qd && $sf2->depth == $sd) {
+                $overlap = sf_ov($sf1,$sf2);
+            }
+            elsif ($sf1->depth == $qd) {
+                my $leaf2 = $sf2->nodes;
+                $overlap = further_down([$sf1],$leaf2,$sf2);
+            }
+            elsif ($sf2->depth == $sd) {
+                my $leaf1 = $sf1->nodes;
+                $overlap = further_down($leaf1,[$sf2],$sf2);
+            }
+            else {
+                # do a recursive check on next level nodes
+                my $leaf1 = $sf1->nodes;
+                my $leaf2 = $sf2->nodes;
+                $overlap = further_down($leaf1,$leaf2,$sf2);
+            }
+        }
+        #any depth of said types, the type must be unique in the tree
+        #in other words, the type SHOUD NOT be at diff depth or you WILL get wrong answer
+        else {
+            my ($qtype, $stype) = ($self->get_property('query_type'),$self->get_property('subject_type'));
+            $qtype = [$qtype] unless (ref($qtype) eq 'ARRAY');
+            $stype = [$stype] unless (ref($stype) eq 'ARRAY');
+            if (grep{$sf1->type eq $_}@$qtype and grep{$sf2->type eq $_}@$stype) {
+                $overlap = sf_ov($sf1,$sf2);
+            }
+            elsif (grep{$sf1->type eq $_}@$qtype) {
+                my $leaf2 = $sf2->nodes;
+                $overlap = further_down([$sf1],$leaf2,$sf2);
+            }
+            elsif (grep{$sf2->type eq $_}@$stype) {
+                my $leaf1 = $sf1->nodes;
+                $overlap = further_down($leaf1,[$sf2],$sf2);
+            }
+            else {
+                my $leaf1 = $sf1->nodes;
+                my $leaf2 = $sf2->nodes;
+                $overlap = further_down($leaf1,$leaf2,$sf2);
+            }
+        }
+        return $overlap;
     }
 }
 
@@ -481,9 +561,11 @@ sub overlaps {
     my $self = shift;
     my $sf1 = shift;
     my $sf2 = shift;
-    confess("To check overlaps, both feature must be on the same level") unless ($sf1->depth == $sf2->depth);
-    return unless ($sf1->type eq $self->get_property('query_type')
-                   && $sf2->type eq $self->get_property('subject_type')); #not right type, no overlap
+
+    my ($qtype, $stype) = ($self->get_property('query_type'),$self->get_property('subject_type'));
+    $qtype = [$qtype] unless (ref($qtype) eq 'ARRAY');
+    $stype = [$stype] unless (ref($stype) eq 'ARRAY');
+    return unless (grep{$sf1->type eq $_}@$qtype and grep{$sf2->type eq $_}@$stype); #not right feature type
 
     if ($self->get_property('query_compare')|| "" eq 'secondary_location') {
         $sf1 = $sf1->secondary_loc;
