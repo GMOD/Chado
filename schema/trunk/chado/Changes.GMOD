@@ -4,6 +4,9 @@
           * Fixed modules/expression/rad.sql to work with PG 7.4
           * Added yeast GFF3 file to use as sample data
           * created AutoDBI.PL, which makes Makefile.PL independent of sqlfairy
+          * parameterized LOCAL_TMP, the place where downloaded ontologies are
+            stored.
+          * Added a make target to remove ontology lock files
 
 0.001     Initial release
 
