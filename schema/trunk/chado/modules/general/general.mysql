@@ -1,7 +1,24 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Mar  3 13:09:25 2003
+-- Created on Mon Mar  3 16:41:14 2003
 --
+
+--
+-- Table: tableinfo
+--
+CREATE TABLE tableinfo (
+  table_id serial(4) NOT NULL,
+  name varchar(30) NOT NULL,
+  table_type varchar(40) NOT NULL,
+  primary_key_column varchar(30),
+  database_id integer(4) NOT NULL,
+  is_versioned integer(4) NOT NULL,
+  is_view integer(4) NOT NULL,
+  view_on_table_id integer(4),
+  superclass_table_id integer(4),
+  is_updateable integer(4) NOT NULL,
+  modification_date date NOT NULL
+);
 
 --
 -- Table: dbxref
