@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.24 2004-05-06 16:13:37 scottcain Exp $
+$Id: INSTALL,v 1.25 2004-05-06 19:53:59 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -36,9 +36,9 @@ Prerequisites:
         
         # createuser --createdb <your username> 
 
-    * tell postgres that it can use the plpgsql language (either as user
-      postgres or as the user created above; createlang is a commandline
-      program that comes with the PostgreSQL package):
+    * tell postgres that it can use the plpgsql language (as user
+      postgres; createlang is a commandline program that comes with
+      the PostgreSQL package):
 
         # createlang plpgsql template1
 
