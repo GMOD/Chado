@@ -27,41 +27,50 @@
 # gbrowse config file for  genome maps
 
 [GENERAL]
-description = ${species} ${relfull} ${date}
+description = ${species} ${rel}
 datapath    = ${gnomapdir}
 
 browser title = Genome Browser
-help = /maps/gbrowse
 
-# adaptor     = flybase::gmod::FFFdb
-adaptor     =  
+adaptor     = flybase::gmod::FFFdb
 
 default_name = ${default_location} 
 # X:100000-200000
 default_range = 1-500000
 
 # examples to show in the introduction
-examples =  ${examples}
+# examples =  ${examples}
+chromosomes = ${examples}
+ 
+header = 
+  <!--#include virtual="/templates/header.html" -->
+  <h1>FlyBase Genome Browser: <i>${species}</i>
+  <br><small>Release ${rel}; ${date}</small>
+  </h1>
 
-header = Genome Browser
 footer = <hr>
  Adapted from GBrowse of the <a href="http://www.gmod.org/">
  Generic Model Organism Database Project.</a>
+  <!--#include virtual="/templates/footer.html" -->
 
-debug = 0
+plugins = BatchDumper TextMapDumper FeatureFastaDumper FastaDumper GFFDumper 
+# GFFDumper - not as good as BatchDumper
+# OligoFinder  - requires Bio::DB::GFF sql calls
 
-plugins = BatchDumper FastaDumper
+uploads = 1
 
 #fixme ...
-default features =  rev_ruler cytoband gene  tRNA noncodingRNA golden_path segment BAC transposable_element pseudogene
+default features = rev_ruler cytoband gene  tRNA noncodingRNA  pseudogene
+  syntenic_region  scaffold BAC transposable_element 
 primary_feature = gene
 scale_feature = cytoband
 
-dumpviews = FastA GenBank GFF
+dumpviews = FastA GenBank GFF FFF
 dataviews = "Default" "Collapse All" "Expand All" 
 
 # Web site configuration info
-stylesheet  = /templates/gbrowse.css
+help        = /common/perl/gbrowse_fb/htdocs
+stylesheet  = /common/perl/gbrowse_fb/gbrowse.css
 buttons     = /common/perl/gbrowse_fb/images/buttons
 tmpimages   = /tmp/gbrowse_fb
 
@@ -79,25 +88,29 @@ searchhelp = Search using Chromosome:base_start..end or FlyBase Gene ID.
 #panel property
 pad_left    = 20
 pad_right   = 30
-key_style = bottom
+key_style = between
 key bgcolor = whitesmoke
-grid = 1
 overview bgcolor = whitesmoke
+grid = 1
 
+# put reversed features on same track or below ?
+mix_strand = 1
 
 # # where to link to when user clicks in detaild view
+# # default dummy link to get popup title view
+link = sub { return "#"; }
 
-link = sub {
- my $f= shift;
- my $d= $f->primary_id() if $f->can('primary_id');
- $d= $f->source() unless($d);
- if ($d) {
- if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
- elsif ($d =~ /^C[GR]/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
- elsif ($d =~ /\-\w+/ ){ return '/cgi-bin/fbannq.html?'.$d; }
- }
- if ($f->name()) { return '/cgi-bin/fbsymq.html?'.$f->name(); }
- return '' ; }
+# link = sub {
+#  my $f= shift;
+#  my $d= $f->primary_id() if $f->can('primary_id');
+#  $d= $f->source() unless($d);
+#  if ($d) {
+#  if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
+#  elsif ($d =~ /^C[GR]/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
+#  elsif ($d =~ /\-\w+/ ){ return '/cgi-bin/fbannq.html?'.$d; }
+#  }
+#  if ($f->name()) { return '/cgi-bin/fbsymq.html?'.$f->name(); }
+#  return '' ; }
 
 title = sub { my $f= shift;
 	return $f->class .":". $f->info . " ". $f->seq_id .':'.$f->start."..".$f->end;
@@ -106,8 +119,6 @@ title = sub { my $f= shift;
 # "automatic" classes to try when an unqualified identifier is given
 automatic classes = Symbol Gene Clone
 
-# put reversed features on same track or below ?
-mix_strand = 1
 
 # Default glyph settings
 glyph       = generic
@@ -142,7 +153,6 @@ fgcolor  = black
 key      = GENERIC
 citation = GENERIC
 keygroup = "Analysis features"
-link     =
 ]]></fdef>
 
 
@@ -241,7 +251,6 @@ label = 1
 key  = CDS
 citation     = Protein coding sequence (CDS or translation; annotation DB ; Chado)
 keygroup = "  Genomic features"
-link =
 ]]></fdef>
 
 
@@ -570,7 +579,6 @@ label         = 0
 key           = Genscan prediction
 citation     = Genscan (gene prediction) (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <fdef name="mRNA_piecegenie"><![CDATA[
@@ -586,7 +594,6 @@ label         = 0
 key           = Genie prediction 
 citation     = PieceGenie (gene prediction) (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <fdef name="match_fgenesh"><![CDATA[
@@ -602,7 +609,6 @@ label         = 0
 key           = fgenesh prediction 
 citation     = match_fgenesh (gene prediction) (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <fdef name="match_HDP"><![CDATA[
@@ -618,7 +624,6 @@ label         = 0
 key           =HDP prediction 
 citation     = HDP  (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <fdef name="match_RNAiHDP"><![CDATA[
@@ -634,7 +639,6 @@ label         = 0
 key           = RNAiHDP prediction 
 citation     = RNAiHDP  (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 
@@ -650,7 +654,6 @@ label         = 0
 key           = tRNAscan prediction
 citation     = tRNAscan (tRNA prediction) (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <fdef name="transposable_element_pred"><![CDATA[
@@ -663,7 +666,6 @@ glyph         = anchored_arrow
 key           = Transposon prediction
 citation     = Transposon prediction (annotation DB ; Chado)
 keygroup = "Analysis features"
-link =
 ]]></fdef>
 
 <!-- ============  Genome reagents  =========== -->
@@ -718,7 +720,6 @@ key           = Blast hit
 height        = 8
 citation      = BLAST alignment hit
 keygroup = "hidden"
-link =
 ]]></fdef>
 
 <fdef name="BAC"><![CDATA[
@@ -739,10 +740,19 @@ link = sub { my $f= shift;
  return ($f->name())?'/cgi-bin/fbannq.html?DBX='.$f->name() : ''; }
 ]]></fdef>
 
-<fdef name="golden_path" feature="golden_path segment"><![CDATA[
-[golden_path]
-## aug04 - renamed to SO equivalent golden_path
-feature  = golden_path segment 
+<!--
+name="golden_path"   
+alt_name0 = "golden_path_region" 
+alt_name1 = "golden_path_fragment" 
+alt_name2 = "databank_scaffold"
+alt_name3 = "scaffold"
+alt_name4 = "supercontig"
+-->
+<fdef name="scaffold" feature="scaffold  golden_path_fragment segment"><![CDATA[
+[scaffold]
+## aug04 - renamed to SO equivalent golden_path; 
+## sep04 - golden_path_fragment is better, or supercontig ?
+feature  = scaffold golden_path_fragment 
 glyph         = anchored_arrow
 no_arrows     = 1
 base          = 0
@@ -753,7 +763,7 @@ bump          = 1
 label         = 1
 height        = 4
 key           = GenBank Scaffold
-citation     = golden_path segment (annotation DB ; Chado)
+citation     = genbank submission unit, a golden_path_fragment  (annotation DB ; Chado)
 keygroup = " Genome reagents"
 link = sub { my $f= shift;
  return ($f->name())?'/cgi-bin/fbannq.html?ARM='.$f->name() : ''; }

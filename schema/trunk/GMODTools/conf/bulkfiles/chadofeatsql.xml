@@ -25,22 +25,54 @@
   </about>
   
   
-  <feature_sql name="fbids" type="list" output="chado-fb.ids">
+  <feature_sql id="countfeats" type="list" output="chadofeats.count">
+  <sql>
+  -- use for overview of chado feature contents
+  SELECT featcv.name, featcv.cvterm_id, count(armft.feature_id)
+  FROM feature armft, cvterm featcv
+  WHERE armft.type_id = featcv.cvterm_id
+  GROUP by featcv.name;
+  </sql>
+  </feature_sql>
+  
+  <feature_sql id="fbids" type="list" output="chado-fb.ids">
   <sql>
     -- used for flybase to exclude cytologic features with same genome feature id
     SELECT accession FROM dbxref 
-    WHERE accession like '%FBgn%' or accession like '%FBti%';
+    WHERE accession like '%FBgn%' or accession like '%FBti%'
+    ;
   </sql>
   </feature_sql>
 
-
-  <feature_sql name="chromosomes" type="feature_table" output="chromosomes.tsv">
+<!-- ? add organism table output and use organism_id in all feature_tables ? -->
+  <feature_sql id="organism" type="organism_table" output="organism.tsv">
   <sql>
+  SELECT organism_id,abbreviation,genus,species,common_name,comment FROM organism;
+  </sql>
+  
+  <script name="orgtab" type="IGNORE_postprocess" shell="perl -ni.old" language="perl">
+<![CDATA[
+  #? create genus_species column ?
+  print unless (/Computational/i);
+]]>
+  </script>
+
+  </feature_sql>
+
+<!-- dmel r4 note: uniquename == chromosome name; name == genbank accession  -->
+
+  <feature_sql id="chromosomes" type="feature_table" output="chromosomes.tsv">
+  <sql>
+<![CDATA[
 -- get chromosome/arm/supercontig/... lengths/names
+-- need ENV/other subsitution Variable for 'chromosome', 'chromosome_arm', 'ultra_scaffold'
 -- add get-residues to file 
+-- made chr == uniqname nov04; new dmel4r uses name == genbank accession
 SELECT 
-  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armft.uniquename as arm,
   '1' as fmin, armft.seqlen as fmax, '0' as strand,
+  armft.organism_id,
   featcv.name as type,
   armft.name as name,
   armft.uniquename as id,
@@ -50,22 +82,75 @@ SELECT
 FROM 
   feature armft, organism org, cvterm featcv, cv socv
 WHERE 
-  featcv.name in ( 'chromosome', 'chromosome_arm')  --  need more choices 
+  featcv.name in ( ${golden_path} ) -- 'chromosome_arm', 'ultra_scaffold'   
   and featcv.cv_id = socv.cv_id and socv.name = 'SO'
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
 ORDER BY arm ;
+]]>
   </sql>
+    
+  <script name="remapunk" type="postprocess" shell="perl -i.old" language="perl">
+<![CDATA[
+# remap dpse Unknown ultra_scaffold singletons and groups to one bag U chromosome
+# need to impose artificial ordering; rewrite start/stop locations after sort by name
+# species set in release.xml as ENV variable ; Drosophila_pseudoobscura
+
+BEGIN { @r=(); $Uchr= "${unknown_chr}" || "U"; }  
+while(<>) { 
+  if (/^arm\t/) { print $_; next; } #header
+  my @v= split "\t"; # [0] == arm; [-1] == species
+  if ($v[-1] =~ /${species}/ && $v[0] =~ /^(Unknown\D*)(\d*)$/) { 
+    my ($t,$n)= ($1,$2); $n= 0 unless($n);
+    $v[0]= sprintf("$t%08d",$n);  # make sortable
+    push(@r, \@v); 
+    }
+  else { 
+    if ($v[-1] =~ /${species}/ && $v[0] =~ /group/) {
+      $v[5] = 'golden_path'; 
+      }
+    elsif ($v[-1] =~ /${species}/) {
+      $v[5] = 'chromosome_arm'; 
+      }
+    print join("\t",@v);
+    }
+ } 
+END { mapunk(); }
+
+sub mapunk {
+  if (@r) {
+    open(ARGVOUT, ">>$ARGV"); select(ARGVOUT); # perl closes before this
+    @r= sort{ $$a[0] cmp $$b[0] } @r; # sort by arm name
+    my ($cmin,$orgid, $spp)= (0,0,'unknown');
+    foreach my $r (@r) {
+      $$r[0] =  $Uchr; # or "U" ?
+      $$r[1] += $cmin;
+      $$r[2] += $cmin;
+      $orgid = $$r[4];
+      $spp   = $$r[-1];
+      $$r[5] = 'golden_path_fragment'; # need new type for part of unknown...
+      $cmin  = $$r[2];
+      }
+    print join("\t", $Uchr, 1, $cmin, 0, $orgid, "golden_path", 0, "species",$spp), "\n";
+    foreach my $r (@r) { print join("\t",@$r); } ## put fragments at end 
+    }
+  @r=(); 
+} 
+
+]]>
+  </script>
 
   </feature_sql>
 
   
-  <feature_sql name="features" type="feature_table" output="features.tsv">
+  <feature_sql id="features" type="feature_table" output="features.tsv">
   <sql>
 -- standard features (excluding matches, analyses)
 SELECT  distinct
-  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armft.uniquename as arm,
   armloc.fmin, armloc.fmax, armloc.strand,
+  armft.organism_id,
   targcv.name as type,
   targft.name as name,
   targft.uniquename as id,
@@ -80,26 +165,101 @@ FROM
   cvterm targcv
 
 WHERE
-  NOT (targcv.name in ('match')) --  add orthologous_region, syntenic_region
+  NOT (targcv.name in ('match', 'syntenic_region', 'orthologous_region')) --  add orthologous_region, syntenic_region
   and targft.type_id = targcv.cvterm_id 
   and armft.feature_id = armloc.srcfeature_id  
   and targft.feature_id = armloc.feature_id  
   
-ORDER BY
-   arm, armloc.fmin, targcv.name
+-- dont need ORDER clause? but see below
+ORDER BY arm, armloc.fmin --, targcv.name
 ;
+
+-- add this arm type restriction ?
+-- , cvterm armcv, cv socv
+--   and armcv.name in ( ${golden_path} )  
+--   and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+--   and armcv.cvterm_id = armft.type_id  
+
   </sql>
   </feature_sql>
   
+<!--
+# make gnomap/synteny-idmap.tsv for gbrowse ;
+# idmap for use w/ dpse gbrowse table like
+# synt:id   dmel-chr  dmel-range
+# ortho:id  ... use dpse synt/ortho 'name' field, not id field for now.
+# lookup by FFFdb.pm is hashmap by synt:id, ortho:id ...
+
+egrep 'to_species.3' synteny.tsv | perl -ne \
+'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b..$e\n";' \
+> dmel-synt-idmap.tsv
+
+egrep 'to_species.1' synteny.tsv | perl -ne \
+'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b..$e\n";' \
+> dpse-synt-idmap.tsv
+
+-->
+
+  <feature_sql id="synteny" type="feature_table"  output="synteny.tsv">
+  <sql>
+  -- dpse-synteny.sql for cross-species features (syntenic_region, orthologous_region)
+  -- split output by species ? 
+  -- this feature_table has extra column for species,to_species, no strand
+  -- need other type="synteny_table"? or  use attr: species2=Dpse  ?
   
-  <feature_sql name="matches" type="feature_table"  output="matches.tsv">
+SELECT distinct
+  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armft.uniquename as arm,
+  armloc.fmin, armloc.fmax, armloc.strand, 
+  armft.organism_id,
+  matchcv.name as type,
+  matchft.name as name,
+  matchft.uniquename as id,
+  matchft.feature_id as oid,
+  attr.type AS attr_type,
+  attr.attribute AS attribute
+
+FROM
+  feature matchft, 
+  feature armft,
+  feature targft left outer join gffattr_synt2 attr 
+    on (targft.feature_id = attr.feature_id),
+  featureloc armloc, featureloc targloc,
+  cvterm matchcv, cvterm armcv, cv socv
+
+WHERE
+  matchcv.name in ( 'syntenic_region', 'orthologous_region' )
+  and matchcv.cvterm_id = matchft.type_id 
+
+  and armcv.name in ( ${golden_path} ) -- 'chromosome_arm', 'ultra_scaffold' 
+  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.cvterm_id = armft.type_id  
+  and armft.organism_id != targft.organism_id
+    
+  -- separate paired features here - keep chr-arm loc, target types/attr
+  and matchft.feature_id = armloc.feature_id  
+  and armft.feature_id = armloc.srcfeature_id
+  and matchft.feature_id = targloc.feature_id  
+  and targft.feature_id = targloc.srcfeature_id 
+
+-- DO need ORDER clause
+ORDER BY arm, armloc.fmin --, matchcv.name
+;
+  </sql>
+  </feature_sql>
+
+
+
+  <feature_sql id="matches" type="feature_table"  output="matches.tsv">
   <sql>
 -- use this to get the paired genome/target match items w/ attr (or null) --
 -- jun04 - need to filter out apollo dupl. evidence for
 -- match features, type = transposable_element_insertion_site
 SELECT distinct
-  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armft.uniquename as arm,
   armloc.fmin, armloc.fmax, armloc.strand,
+  armft.organism_id,
   targcv.name as type, 
   targft.name as name,
   targft.uniquename as id,
@@ -118,7 +278,7 @@ FROM
 WHERE
   matchcv.name = 'match' 
   and matchcv.cvterm_id = matchft.type_id 
-  and armcv.name in ( 'chromosome', 'chromosome_arm')
+  and armcv.name in ( ${golden_path} ) -- 'chromosome', 'chromosome_arm', 'ultra_scaffold')
   and armcv.cv_id = socv.cv_id and socv.name = 'SO'
   and armcv.cvterm_id = armft.type_id  
 
@@ -132,14 +292,14 @@ WHERE
   and matchft.feature_id = targloc.feature_id  
   and targft.feature_id = targloc.srcfeature_id 
    
-ORDER BY
-   arm, armloc.fmin, targcv.name
+-- dont need ORDER clause?? but see below
+ORDER BY arm, armloc.fmin
 ;
   </sql>
   </feature_sql>
 
   
-  <feature_sql name="analysis" type="feature_table" output="analysis.tsv">
+  <feature_sql id="analysis" type="feature_table" output="analysis.tsv">
   
   <!-- ant-like ; is this usable? -->
   <target name="main" depends="query,postprocess"/> 
@@ -157,7 +317,12 @@ while(<>) {
   rdump() if ($loid && $oid ne $loid);  
   push(@r,\@v); $loid= $oid; 
   } 
+open(ARGVOUT, ">>$ARGV"); select(ARGVOUT); # perl closes before this
 rdump();
+
+# nov04 bug in logic: can have dupl., successive oids on diff chromosomes: ortho matches !
+# see below reinstated ORDER clause should fix; 
+## ! NO - Order is bad; the ones needing fixing lack arm,fmin
 
 sub rdump() {
   if (@r > 1) {
@@ -165,25 +330,23 @@ sub rdump() {
     unless ($$par[0] && $$par[1] && $$par[2]) {
       # add kid range to parent if missing (likely)
       my $kid= $r[1]; #? check that $par oid == kids parent_oid ?
-      my($a,$b,$e,$s)= @{$kid}[0..3];
+      my($a,$b,$e,$st,$org)= @{$kid}[0..4];
       foreach $kid (@r[2..$#r]) {
         my ($kb,$ke)= @{$kid}[1..2]; 
         $b=$kb if ($kb<$b); 
         $e=$ke if ($ke>$e); 
         }
-      @{$par}[0..3] = ($a,$b,$e,$s);
+      @{$par}[0..4] = ($a,$b,$e,$st,$org);
       if ($$par[-2] eq 'object_oid') { pop(@$par);  $$par[-1]="\n"; }  
       $r[0]= $par;
       }
     
-    foreach my $i (1..$#r) { $r[$i]->[4] =~ s/^match:/match_part:/; }
+    foreach my $i (1..$#r) { $r[$i]->[5] =~ s/^match:/match_part:/; }
     }
   foreach my $r (@r) { print join("\t",@$r); } 
   @r=(); 
 } 
 
-##was##  foreach $i (1..$#r) { $r[$i]->[4] =~ s/^match_/match_part_/; }
-##sep04 -- was BAD .. dropping armloc for promoter, other.
 ]]>
   </script>
   
@@ -192,10 +355,13 @@ sub rdump() {
 -- select all an features of right type, with arm featureloc when avail
 -- add analysis.sourcename where needed (ignore 'dummy');
 -- change 'match_' leading type ; drop or make option?
+-- ? problem for null sourcename? got an.program = pinsertion, null source, no type output
+--  WHEN an.sourcename = 'dummy' THEN 'match:' || an.program
 SELECT 
   armft.arm, armft.fmin, armft.fmax, armft.strand, 
+  armft.organism_id,  
   CASE  
-    WHEN an.sourcename = 'dummy' THEN 'match:' || an.program
+    WHEN (an.sourcename IS NULL or an.sourcename = 'dummy') THEN 'match:' || an.program
     ELSE 'match:' || an.program || ':' || an.sourcename
   END 
   AS type, 
@@ -215,14 +381,17 @@ FROM
 WHERE
   an.analysis_id = anf.analysis_id
   and anf.feature_id = targft.feature_id
-  -- and an.program in ('HDP','RNAiHDP','fgenesh') --  drop this; want all an feats
+
+-- NEED ORDER to get parent/match_part oids aligned
+-- NO, cant use ORDER cause of missing arm, fmin for parent feats fixed in rdump above
+-- ORDER BY armft.arm, armft.fmin
 ;
   </sql>
   </feature_sql>
 
 
 
-  <feature_sql name="views" type="view">
+  <feature_sql id="views" type="view">
   <sql>
 -- from sequence-gff-views.sql 
 -- dont need all of these attribs;
@@ -290,12 +459,12 @@ UNION ALL
 ;
 GRANT SELECT ON gffattr_match TO PUBLIC;
 
--- attrib view for cross-species feats (synteny, orthology)
+-- attrib view for cross-species feats (syntenic_region, orthology)
 CREATE OR REPLACE VIEW gffattr_synteny (
     feature_id, type,  attribute
 ) AS
   --  parent feat ids for source supercontigs, etc.
-  SELECT pk.subject_id, 'parent_oid' as type, 
+  SELECT pk.subject_id, text('parent_oid') as type, 
     CASE  
       WHEN pk.rank IS NULL THEN text(pk.object_id)
       ELSE pk.object_id || ':' || pk.rank
@@ -304,21 +473,39 @@ CREATE OR REPLACE VIEW gffattr_synteny (
 ;
 GRANT SELECT ON gffattr_synteny TO PUBLIC;
 
+-- use this one instead of above
+CREATE OR REPLACE VIEW gffattr_synt2 (
+    feature_id,  type,  attribute
+) AS
+  SELECT feature_id, text('to_species') AS type, text(targ.organism_id) AS attribute
+  FROM feature targ
+
+UNION ALL
+  SELECT feature_id, text('to_name') AS type, targ.name AS attribute
+  FROM feature targ
+  WHERE NOT( targ.type_id IN (
+    select cvterm_id from cvterm 
+    where name in ( ${golden_path} ) -- ('chromosome_arm', 'ultra_scaffold')
+    ) )
+;
+GRANT SELECT ON gffattr_synt2 TO PUBLIC;
+
 
 -- for analysis features
 -- problem where w/ some analysis features - promotor, transposon
 -- ? need to restrict armcv to cv_id = SO id - e.g. find chromosome in 4 cv's
 CREATE OR REPLACE VIEW gffatts_anfloc (
-    feature_id, arm, fmin, fmax, strand
+    feature_id, arm, fmin, fmax, strand, organism_id
   ) AS
   SELECT 
     armloc.feature_id,  
-    CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm,
-    armloc.fmin, armloc.fmax, armloc.strand
+    -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm,
+    armft.uniquename as arm,
+    armloc.fmin, armloc.fmax, armloc.strand, armft.organism_id
   FROM  feature armft, featureloc armloc, cvterm armcv, cv socv
   WHERE 
     armft.type_id = armcv.cvterm_id
-    and armcv.name in ( 'chromosome', 'chromosome_arm')
+    and armcv.name in ( ${golden_path} ) -- ('chromosome_arm', 'ultra_scaffold')
     and armcv.cv_id = socv.cv_id and socv.name = 'SO'
     and armft.feature_id = armloc.srcfeature_id
 ;

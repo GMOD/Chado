@@ -1,6 +1,7 @@
 <opt
   name="filesets"
   date="20040821"
+  filepart_delimiter="-"
   >
  
   <title>Bulkfiles fileset definitions</title>
@@ -25,7 +26,6 @@
 
   </about>
 
-
   <!-- change these dump tags to fileset tags ?? 
     Bulkfiles is current handler for dnadump, featdump ; change? -->
   <dnadump
@@ -40,14 +40,16 @@
     type="feature_table"
     splitname="chadofeat"
     >
+    <ENV 
+      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
+      dummy="dummy"
+      />
 <!--     <target>fbids</target> // accessory table ; fixme -->
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
-<!--     <target>matches</target> -->
-    
-    <!-- ? use this for sql arguments ? -->
-    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
+    <!-- <target>matches</target> -->
+    <target>synteny</target>
   </featdump>
   
   <!-- rewrite of featdump -->
@@ -58,10 +60,16 @@
     tag="feature_sql"
     splitname="chadofeat"
     >
+    <ENV 
+      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
+      dummy="dummy"
+      />
+
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
-<!--     <target>matches</target> -->
+    <!-- <target>matches</target> -->
+    <!-- <target>synteny</target> -->
   </fileset>
 
 
@@ -131,5 +139,18 @@
     handler="BlastWriter"
     title="Blast indices" 
     />
+
+  <fileset
+    name="acode"
+    path="fbobs/.+\.acode"
+    input="fff"
+    config="toacode"
+    handler="AcodeWriter"
+    makeall="1"
+    perchr="0"
+    dogzip="0"
+    title="Gene objects (acode)" 
+    />
+    
 
 </opt>

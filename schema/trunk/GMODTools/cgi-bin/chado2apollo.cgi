@@ -66,6 +66,21 @@ Chado database lookups with GAME.xml output
     returns scaffold xml for matching scaffold ID.
 
 =head1 NOTES
+    -- 1jul04 : need start+1 fix somewhere: chado has 0-based positions
+      (but seq starts at 1 :(), i.e. feature.start+1 is visible start value
+      but indexing uses start(0).
+      game uses 1-based positions(?); 
+      fix needed for sequence map_position
+  <map_position type="tile" seq="2L:16266112-16329185">
+    <arm>2L</arm>
+    <span>
+      <start>16266112</start>
+      <end>16329185</end>
+    </span>
+  </map_position>
+      
+      need correct anything else? 
+      -- featurelocs are all from game.xml, should not need correcting.
 
     -- Apr 2004: added fast search/retrieval using 
        LuceGene/Lucene indexed game.xml files. E.g.  15 sec to search and
@@ -130,10 +145,12 @@ use POSIX;
 my $servicename    = "chado2apollo, http://flybase.net/apollo/";
 my $chado2gamejar  = 'GameChadoConv.jar';
 my $dump_spec_file = 'dumpspec_apollo.xml';
-my $scaffold_type  = 'golden_path_region';
+my $scaffold_type  = 'golden_path_region'; 
+   # this one is up in air: golden_path_region  golden_path_fragment databank_scaffold golden_path
 my $gene_type      = 'gene';
 my $arm_type       = 'chromosome_arm';
 my ($java_path, $dump_spec)= (undef,undef);
+my $organism       = "Drosophila melanogaster";
 
 my $DEBUG= $ENV{DEBUG} || 0;
 my $mybin=  File::Basename::dirname($0);
@@ -358,10 +375,12 @@ sub callXort2Game {
   my $file_chado= "$tmp/chado2apollo$$.chado.xml";
   my $file_game=  "$tmp/chado2apollo$$.game.xml";
   
-  my $xml_obj= XML::XORT::Dumper::DumperXML->new( $dbname, $DEBUG);
+  my $xml_obj= XML::XORT::Dumper::DumperXML->new( $dbname, 0); ## $DEBUG -- very verbose
 
+  ##print "<!-- XORT::Generate_XML($file_chado, $dump_spec, $appdata) -->\n" if $DEBUG;
    #NOTE Generate_XML ERASES $file_chado each call
-  my $ok= $xml_obj->Generate_XML(
+  my $ok;
+  $ok= eval { $xml_obj->Generate_XML(
           -file=>$file_chado,  
           -format_type=>'no_local_id', 
           -op_type=>'' , 
@@ -369,12 +388,24 @@ sub callXort2Game {
           -dump_spec=>$dump_spec,  
           -app_data=>$appdata
           );
+    };
+  if ($@) { warn "XORT::Generate_XML error: $@\n"; }
+  ##print "<!-- done XORT::Generate_XML() -->\n" if $DEBUG;
   
   $ok= 0;
   ## sendXmlToCaller($file_chado);
-  if (-r $file_chado) {
+  if (-e $file_chado) {
     httpheader('text/plain');# text/xml or plain ?
-    my $err= `java -mx200M -ms200M -cp $java_path CTG $file_chado $file_game`;
+    
+    my $JAVA_FLAGS="-Xmx200M -Xms200M";
+    my @cmd= ("java", $JAVA_FLAGS, "-cp", $java_path, "CTG", ##$JAVA_APP,
+      $file_chado,
+      $file_game,
+      );
+    my $cmd= join(" ",@cmd);
+
+    ##print "<!-- $cmd -->\n" if $DEBUG;
+    my $err= `$cmd`;
     unlink($file_chado);
     if (open(F,$file_game)) { while(<F>) {print ;}  close(F); $ok=1; }
     unlink($file_game);
@@ -481,7 +512,9 @@ sub dumpLocation {
   #range=X:10000-20000; range = chrom:start:end
   my ($arm,$start,$end)= @_;
   if ($arm =~ m/(\w+):(\d+)[-\.]{1,2}(\d+)/) {
-    $arm=$1; $start=$2; $end=$3;
+    my $start1; # convert 1-based to 0-based
+    $arm=$1; $start1=$2; $end=$3;
+    $start= $start1 - 1;
     }
   
   my $ok= 0;
@@ -569,7 +602,9 @@ chado_r3.2_18-#   and fl.fmin <= 3000000 and fl.fmax >= 3100000
 sub findScafAtLoc {
   my ($arm,$start,$end,$findall)= @_;
   if ($arm =~ m/(\w+):(\d+)[-\.]{1,2}(\d+)/) {
-    $arm=$1; $start=$2; $end=$3;
+    my $start1; # convert 1-based to 0-based
+    $arm=$1; $start1=$2; $end=$3;
+    $start= $start1 - 1;
     }
 
   my $ok= 0;
@@ -874,7 +909,9 @@ bin/lucegene-search.sh -l gamexml -p dbs/lucegene/gamexml.properties \
 sub lucegameAtLoc {
   my ($arm,$start,$end)= @_;
   
-  my $name= $arm.":".$start."-".$end; #"$arm:$start-$end";
+    ## start+1 here ?
+  my $start1= $start + 1 ;
+  my $name= $arm.":".$start1."-".$end; #"$arm:$start-$end";
   httpheader('text/plain');# text/xml or plain ?
   print "<!-- lucegene search name=$name -->\n" if ($DEBUG);
   
@@ -939,7 +976,7 @@ sub lucegameAtLoc {
     );
     
   if ($DEBUG) { print "<!-- ",join(", ",@cmd)," -->\n"; }
-  my ($inspan,$ingenspan,$inscaf,$inresultset, $resultset);
+  my ($inspan,$indupheader,$ingenspan,$inscaf,$inresultset, $resultset);
   my $curscaf= $scafname;
   my $inbounds=1;
   
@@ -949,7 +986,8 @@ sub lucegameAtLoc {
   while(<F>) { 
     # need to rewrite span.start,end to be relative query start,end
     # for that need scaffold file start,end
-
+    
+    my $doccomment=0;
     ## this check for gbunit in native game xml doc streams not good enough
     ## lucene is returning doc parts from various scaffolds that match range quer
     ## but not all these have gbunit field for right scaffold; need to add from doc url/file ?
@@ -969,7 +1007,7 @@ sub lucegameAtLoc {
       
     elsif (m,<!-- docurl="([^"]+)" -->,) {  #? special case comment from lucegene
       # url:AE003800.game.xml,6717521-6857562 -- may have leading path prefix
-      my $docurl=$1; 
+      my $docurl=$1;  $doccomment=1;
       s,<!-- docurl=[^>]+>,,;  
       $curscaf = $1 if $docurl =~ m/(AE\d+)/;
       my $trow= $scafhash{$curscaf};
@@ -992,7 +1030,7 @@ sub lucegameAtLoc {
       print $resultset.$_ if($inbounds >= 0); 
       $inresultset=0; $resultset=''; $_='';
       }
-
+      
        ## need $arm in this test, not just type="query" --
        ## NO - other type=query are genscan/genie with query span == scaffold loc
        #  <seq_relationship type="query" seq="2R">
@@ -1008,15 +1046,29 @@ sub lucegameAtLoc {
       $v = $v - $start;
       s,>([\d\-]+)<,>$v<,;
       }
-   
+      ## oct04; trap embedded docs that have duplicate top <?xml .. <game .. residues ..
+    elsif (m,<.xml\s|<game>, && $nout>0) { 
+      $indupheader=1; 
+      }
+      
     if ($inresultset) {
       $resultset .= $_; $_=''; 
       }
+      
+#    if (m,<game>|<.xml\s, && $nout>0) { $_=''; } # trap duplicate <game> tags
+#<!-- docurl="AE003458.game.xml,0-356792" --> #<game>
+# also trap 2nd: <?xml version="1.0" encoding="ISO-8859-1"?>
+# -- need to do more - skip on past top of game header/seq
+    if ($indupheader) { $_=''; }
+    if ($indupheader && (m,</seq>, || $doccomment)) { #? <annotation|
+      $indupheader=0; 
+      }
+
     print ;
     
     # need to include <seq ...> <residues> ... for this range 
-    if (m,<game>,) { printRawSeq($DNA_LIB, $arm,$start,$end); $nout++; }
-    elsif (m,</game>,) { $nout++; }
+    if (m,<game>, && $nout==0) { printRawSeq($DNA_LIB, $arm,$start,$end); $nout++; }
+    elsif (m,</game>,) { $nout++; last; } # and exit here to keep xml valid ?
     }  
   close(F);  
   return 0 unless($nout>0);
@@ -1068,22 +1120,25 @@ recreate this game.xml genome seq dump from gnomap/dna-chr.raw files
 sub printRawSeq {
   my ($DNA_LIB, $arm,$start,$end)= @_;
   
-  my $name= $arm.":".$start."-".$end; #"$arm:$start-$end";
+    # start+1 here?
+  my $start1= $start + 1 ;
+  my $name= $arm.":".$start1."-".$end; #"$arm:$start-$end";
   ## my $seqid= $arm; # this is what rest of game-xml scaf uses; 
   my $seqid= $name;
   ## but apollo devs want full name; will it confuse readers if not changed elswhere?
   print $outputComment if ($outputComment);
   
-  my $len=($end-$start); # +1 ??
+  my $len=($end-$start); # +1 ?? no, start is 0-based here
   my $t=1;
   print "\t"x$t,"<seq id=\"$seqid\" length=\"$len\" focus=\"true\">\n";
   $t++;
   print "\t"x$t,"<name>$name</name>\n";
+  print "\t"x$t,"<organism>$organism</organism>\n";
 
   my $dnafile="$DNA_LIB/dna-$arm.raw";
   if (-f $dnafile) {
     open(DNA,$dnafile);
-    seek(DNA,$start,0);
+    seek(DNA,$start,0);  # start is 0-based here
     print "\t"x$t,"<residues>\n";
     $t++;
     my ($buf,$sz)=('',50); 
@@ -1099,11 +1154,12 @@ sub printRawSeq {
   $t--;
   print "\t"x$t,"</seq>\n";
   
+  ##? start+1 fix here? for display only
   print qq(
   <map_position type="tile" seq="$seqid">
     <arm>$arm</arm>
     <span>
-      <start>$start</start>
+      <start>$start1</start>
       <end>$end</end>
     </span>
   </map_position>

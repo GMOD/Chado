@@ -3,95 +3,52 @@
   relid="4"
   ROOT="${GMOD_ROOT}/"
   TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Drosophila_melanogaster"
+  datadir="data/genomes/Drosophila_melanogaster"
 >
 <!--   datadir="data2/fban" -->
 
-  <title>FlyBase Chado DB r4.0 test</title>
+  <title>FlyBase Chado DB r4.0</title>
   <about>
    Configurations to extract feature and sequence data for
    bulk files from FlyBase chado databases, including various
    release information.
   </about>
-  <doc name="README">
-    D. melanogaster euchromatin genome data from FlyBase
-    Release 4.0t.  See http://flybase.net/annot/dmel_4.txt
-  </doc>
-   
-   
-  <!-- change this to use include="flybase-releasedb.xml" -->
   
-  <release id="4" 
-    rel="r4.0t"  
-    dbname="dmel_chado"  
-    relfull="dmel_r4_0t_20040821"
-    date="20040821" 
-    release_url="/annot/release4.html"
-    />
-  <release id="3" 
-    rel="r3.2.1" 
-    relfull="dmel_r3.2.1_07212004"
-    dbname="chado_r3_2_27" 
-    date="20040804" 
-    release_url="/annot/release3.2.1.html"
-    />
-  <release id="2" 
-    rel="r3.2.0" 
-    relfull="dmel_r3.2.0_03162004"
-    dbname="chado_r3.2_18" 
-    date="20040321" 
-    release_url="/annot/release3.2.html"
-    />
-  <release id="1" 
-    rel="r3.1.0" 
-    relfull="dmel_r3.1.0_12182003"
-    dbname="chado_r3.1" 
-    date="20031218" 
-    release_url="/annot/release3.1.html"
-    />
-  <release id="h3" 
-    rel="r3_2h"  
-    dbname="chadohet_081604" 
-    relfull="dmel_hetr3_2_08162004"
-    date="20040821" 
-    release_url="/annot/het-release3.2.html"
-    />
-  <release id="p1" 
-    rel="dpse_r1.0"  
-    relfull="dpse_r1_0_20040821"
-    dbname="dmelr3_2_dpser1_0" 
-    date="20040821" 
-    release_url="/annot/dpse-release1.html"
-    />
+  <doc name="README"><![CDATA[
+    D. melanogaster euchromatin genome data from FlyBase
+    Release  ${rel}, dated ${date}.
+    This release provides new chromosomal dna from release 3, and associated features.
+    
+    See release notes at <a href="http://flybase.net${release_url}">
+    http://flybase.net${release_url}</a>
+  ]]></doc>
+   
 
+  <include>fbreleases</include>
 
-  <!-- db.name  is release-dependent ; use above -->
+  <!-- db is release-dependent ; use fbreleases info 
+    this is standard public access to curren dmel_chado
+  -->
   <db
     driver="Pg"
     name="dmel_chado"
     host="localhost"
     port="7302"
-    user="flybase"
+    user=""
     password=""
     />
 
-
   <org>dmel</org>
   <species>Drosophila melanogaster</species>
+  <include>organisms</include>
   
-  <!-- get chromosomes from featdump chromosomes -->
-  <chromosomes>X</chromosomes>
-  <chromosomes>2L</chromosomes>
-  <chromosomes>2R</chromosomes>
-  <chromosomes>3L</chromosomes>
-  <chromosomes>3R</chromosomes>
-  <chromosomes>4</chromosomes>
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
 
-  <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
-  <dnadump
-    path="dna/.+\.raw"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    />
+  <include>filesets</include>
 
   <featdump
     path="tmp/featdump/\w+.tsv"
@@ -100,141 +57,39 @@
     type="feature_table"
     splitname="chadofeat"
     >
-<!--     <target>fbids</target> // accessory table ; fixme -->
+    <ENV 
+      golden_path="'chromosome_arm'"
+      dummy="dummy"
+      />
     <target>chromosomes</target>
     <target>features</target>
-    <target>matches</target>
     <target>analysis</target>
-    
-    <!-- ? use this for sql arguments ? -->
-    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
+    <!-- <target>matches</target> -->
+    <target>synteny</target>
   </featdump>
-  
 
-  <!-- change this to use include="filesets.xml" -->
-
-  <fileset
-    name="dna"
-    path="dna/.+\.raw"
-    input="dna_dump"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    title="Chromosome dna"
-    />
-
-  <fileset
-    name="fff"
-    path="fff/.+\.fff"
-    input="feature_table"
-    title="FFF Genome features"
-    config="chadofeatconv"
-    handler="FeatureWriter"
-    dogzip="1"
-    />
-  <fileset
-    name="gff"
-    path="gff/.+\.gff"
-    input="feature_table"
-    title="GFF Genome features"
-    dogzip="1"
-    />
-
-  <fileset
-    name="gnomap"
-    path="gnomap/.+\.tsv"
-    input="fff"
-    config="tognomap"
-    handler="GnomapWriter"
-    title="GnoMap features"
-    indexonly="0"
-    />
-  <fileset
-    name="gbrowse"
-    path="gnomap/gbrowse.conf"
-    config="gbrowseconf" 
-    handler="GnomapWriter"
-    withvars="1"
-    />
-
-  <fileset
-    name="fasta"
-    path="fasta/.+\.fasta"
-    input="fff"
-    config="tofasta"
-    handler="FastaWriter"
-    dropnotes="synonym_2nd,synonym"
-    makeall="1"
-    perchr="1"
-    dogzip="1"
-    title="Genome feature sequence fasta" 
-    />
-  <fileset
-    name="blast"
-    path="blast/.+\.*"
-    input="fasta"
-    config="blastfiles"
-    handler="BlastWriter"
-    title="Blast indices" 
-    />
-  
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 
-  <!-- FIXME  
-    new parse steps put all individual feats to fasta ; 
-    change back to use featset info
-  -->
-
   <!-- feature sets to make fasta bulk files -->
-  <!-- ?? do we want mRNA = computed AND transcript = curated dna ? -->  
-  <featset>gene</featset>
-  <featset>mRNA</featset>
-  <featset>CDS</featset>
-  <featset>transcript</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
-  <featset>transposon</featset>
-  <featset>pseudogene</featset>
-  <featset>gene_extended2000</featset>
-  <featset>five_prime_UTR</featset>
-  <featset>three_prime_UTR</featset>
-  <featset>intron</featset>
-  <featset>intergenic</featset>
+  <include>featuresets</include>
 
-  <featset>golden_path</featset>
-  <featset>chromosome</featset>
-
-  <!-- featmap moved to common bulkfiles/chadofeatconv
-    but can override here if desired to add/replace/delete -->
-
+  <!-- note 19nov04 - override scaffold default featmap.
+      fb dmel chado scaffold residues come from
+      chromosome dna; but had out-of-date errors, safer to use
+      chromosome, not fromdb for these? 
+  -->
   <featmap
-    name="golden_path"  old_name="scaffold"
-    types="golden_path"
-    typelabel="golden_path"
-    fromdb="1"
+    name="scaffold"   
+    alt_name0 = "golden_path_region" 
+    alt_name1 = "golden_path_fragment" 
+    alt_name2 = "databank_scaffold"
+    alt_name3 = "scaffold"
+    alt_name4 = "supercontig"
+    types="golden_path_region scaffold"
+    typelabel="scaffold"
+    NOT_fromdb="1"
     />
-
-  <featmap
-    name="translation"
-    types="CDS"
-    typelabel="protein"
-    fromdb="1"
-    />
-  <featmap
-    name="miscRNA"
-    types="ncRNA snRNA snoRNA rRNA" 
-    />
-  <featmap
-    name="gene_extended2000"
-    types="gene"
-    typelabel="gene_ex2000"
-    subrange="-2000..2000"
-    />
-  <featmap
-    name="intergenic"
-    types="gene"
-    typelabel="intergenic"
-    method="between"
-    />
+  <featmap name="dummy" note="here for xml parser" />
 
 </opt>

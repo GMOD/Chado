@@ -381,7 +381,8 @@ sub fastaFromFFFloop
   my $sconfig= $self->handler->{config};
   $self->{ffformat}= 0; 
   my %lastfff= ();
-  
+  my $org= $self->{org} || $self->handler()->{config}->{org};
+
   my $allowanyfeat= 
     (!$featset || $featset =~ /^(any|all)/i) ? 1 
     : (defined $self->{allowanyfeat}) ?  $self->{allowanyfeat} 
@@ -441,6 +442,7 @@ sub fastaFromFFFloop
       my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
           name => $name, chr => $chr, location => $baseloc, 
           ID => $id, db_xref => $dbxref, 
+          $org ? (species => $org) : (),
           @notes  
           );
       
@@ -503,6 +505,7 @@ sub fastaFromFFF
       : 0;
   
   # print STDERR "fastaFromFFF: 1\n" if $DEBUG>1;
+  my $org= $self->{org} || $self->handler()->{config}->{org};
   
   my($types_ok,$retype,$usedb,$subrange,$types_info)
         = $self->get_feature_set( $featset, undef, $allowanyfeat);
@@ -510,7 +513,7 @@ sub fastaFromFFF
   return "" unless( ref $types_ok );
   
   my ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes,$chr)
-        = $self->handler()->splitFFF($_, $chrIn);
+        = $self->handler()->splitFFF($fffeature, $chrIn);
 
   return "" unless( $allowanyfeat || $types_ok->{$type} );
   # print STDERR "fastaFromFFF: 2\n" if $DEBUG>1;
@@ -523,6 +526,7 @@ sub fastaFromFFF
   my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
       name => $name, chr => $chr, location => $baseloc, 
       ID => $id, db_xref => $dbxref, 
+      $org ? (species => $org) : (),
       @notes  
       );
   

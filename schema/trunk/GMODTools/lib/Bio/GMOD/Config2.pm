@@ -60,7 +60,7 @@ our $VERSION = "0.4";
 
 BEGIN {
 ### @ISA = qw/ Bio::GMOD::Config /;  ## DO WE NEED THIS base package at all?
-$DEBUG = 0;
+#? $DEBUG = 0;
 $ROOT= "GMOD_ROOT";  
 $INIT= "GMOD_INIT";
 $BASE= undef;

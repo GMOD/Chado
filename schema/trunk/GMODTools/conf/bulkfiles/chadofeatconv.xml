@@ -28,7 +28,7 @@
   
   <noforwards_gff>1</noforwards_gff>
   
-  <!-- remapType: append this name pattern to type -->
+  <!-- remapType: append this name pattern to type; works with maptype below -->
   <name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan)</name2type_pattern>
 
   <!-- drop lengthy program.source from match name 
@@ -42,22 +42,62 @@
 
   -->
   
+<!-- 
+      add dpse name patches
+      gene00028109_GENSCAN_predicted_peptide_1 -> gene00028109
+  ## clean out dpse unwieldy predictor names: contig...contig...
+  elsif ($type =~ /^(gene|mRNA)/ && $name =~ s/Contig[_\d]+//g) { 
+    if ($name =~ m/^(twinscan|genewise|genscan)/i) { $name= "${id}_${name}"; }
+    }
+-->
+
   <mapname_pattern name="1match" type="^(match|oligo)" cuttype="1" from="null" to="null"/>
   <mapname_pattern name="2match" type="^(match|oligo)" from="\-AE\d\S+$" to=""/>
   <mapname_pattern name="3match" type="^match.*" from="\-?(2L|2R|3L|3R|4|X)[_\.].*$" to=""/>
+  <mapname_pattern name="6match" type="^match.*" from=";$" to=""/>
   <mapname_pattern name="bac" type="^BAC" from="(hit\-|\-cl\-scaffoldBACs)" to=""/>
+
+  <mapname_pattern name="7match" type="^match.*" from="(\..prime)-.*$" to="$1"/>
+
+  <mapname_pattern name="genscann" type="genscan" from="_GENSCAN_predicted_peptide.*" to=""/>
+  <mapname_pattern name="pinsert"  type="pinsertion" from="\-insertion\-on\-.*$" to=""/>
 
   <mapname_pattern name="dum" from="\-dummy\-" to=""/>
   <mapname_pattern name="tep" type="transposable_element_pred" 
     from="JOSHTRANSPOSON\-" to=""/>
 
+<!--
+  dmel r4 ugly match names: all the data appended  ! see above cuttype=1
+match:tblastxwrap_masked:na_baylorf1_scfchunk.dpse 
+Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d 
+
+assembly:path-AE002603.4
+-->
+    <!-- dpse data ; move to dpse config ? -->
+  <maptype_pattern name="1match" from=":rui.chen" to=""/>
+  <maptype_pattern name="2match" from=":Brian.Bettencourt" to=""/>
+  <maptype_pattern name="3masked" from="_masked" to=""/>
+  <!-- <maptype_pattern name="3match" from=":Dmel r3.1" to="dmel_r31"/> -->
 
 <!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
-<!--   <maptype_pattern name="null" from="null" to="null"/> -->
+  <maptype_pattern name="null" typename="noname" from="null" to="null"/> -->
 
+<!--
+  dmel r4 ugly match types: see below maptype changes
+   
+match:sim4:na_DGC.in_process.dros=match:sim4:na_DGC.dros
+match:sim4:na_HDP_RNAi.dmel=match_RNAiHDP 
+match:sim4:na_HDP_mRNA.dmel=match_HDP
+match:sim4:na_gadfly.dros.RELEASE2=match:sim4:na_gadfly.dmel_r2
+match:sim4:na_transcript.dmel.RELEASE31=match:sim4:na_transcript.dmel_r31
+match:sim4:na_transcript.dmel.RELEASE32=match:sim4:na_transcript.dmel_r32
+match:tblastxwrap_masked:na_baylorf1_scfchunk.dpse=match:tblastx:na_dpse
+match:tblastxwrap_masked:na_scf_chunk_agambiae.fa=match:tblastx:na_agambiae
+-->
 
 <!--
 ## SONG/so Revision: 1.45
+## !date:                 Tue May 11 15:18:44 PDT 2004
 ##     @is_a@oligo ; SO:0000696 ; SOFA:SOFA ; synonym:oligonucleotide
 ## 'so' is no longer valid
 ##   old value: @is_a@so ; SO:1000000
@@ -78,21 +118,45 @@
 ## - need to join together by object_oid/parent_oid and compute parent feature (has name)
 ## SO type.subtype should be match.program
 ## SONG: match, match_part match_set nucleotide_match cross_genome_match cDNA_match EST_match
-
 #? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
+
+## Sep04 - Dpse chado r2.1 uses 'ultra_scaffold' as name of chromosomes
+  >> recode to ? golden_path / no that is for Genbank Units (scaffolds)
+  
+Date: Thu, 30 Sep 2004 18:06:05 -0500 (EST)
+From: Don Gilbert <gilbertd@bio.indiana.edu>
+To: song-devel@lists.sourceforge.net, suzi@fruitfly.org
+
+This is what it looks like to me, but you all have more experience:
+
+contig
+  => supercontig/scaffold/golden_path_fragment 
+   [  databank_scaffold  ]
+    => golden_path/ultracontig 
+      => chromosome/chromosome_arm
+
+Here is a suggested term:
+  databank_scaffold ; def: A golden_path_fragment unit for genbank/embl/ddbj databank
+ submission ; syn: genbank_entry, embl_entry, ddbj_entry
+  
 -->
 
-  
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
+  <!-- oct04 : intron here only temp. till fix chadodb intron calculator; offbyone now 
+    is 5/3prime like calc-feature offbyone?
+    -->
   <origin_one
     chromosome_arm="1"
     chromosome_band="1"
     chromosome="1"
+    golden_path="1"
+    NOTNOWintron="1"
     />
 
   <topsort
     chromosome_arm="1"
     chromosome="1"
+    golden_path="1"
     />
     
   <segmentfeats 
@@ -101,9 +165,13 @@
     chromosome_band="1"
     chromosome="1"
     golden_path_region="1"
+    golden_path_fragment="1"
     golden_path="1"
+    databank_scaffold="1"
+    scaffold="1"
     segment="1"
     source="1"
+    syntenic_region="1"
     />
   <!-- 
       ## segment no longer valid SO; supercontig or golden_path are best
@@ -112,23 +180,27 @@
   <!-- simplefeat == segmentfeats + others 
     not mature_peptide="1" which has structure  
     gene is problematic - flybase = simple start/stop, sgd == mrna
+    NOT_gene="1" NOT_pseudogene="1" DONT include these; messes mrna assigments
     -->
   <simplefeat 
     BAC="1"
     chromosome_arm="1"
     chromosome_band="1"
     chromosome="1"
-    gene="1"
     golden_path_region="1"
+    golden_path_fragment="1"
     golden_path="1"
+    databank_scaffold="1"
+    scaffold="1"
     oligo="1" oligonucleotide="1"
     point_mutation="1"
-    pseudogene="1"
     region="1"
     repeat_region="1"
     segment="1"
     source="1"
     transcription_start_site="1"
+    orthologous_region="1"
+    syntenic_region="1"
     />
     
     <!-- skipaskid is subset of simplefeat ; drop -->
@@ -136,7 +208,7 @@
     point_mutation="1"
     region="1"
     repeat_region="1"
-    transcription_start_site="1"
+    pinsertion="1"
     />
 
   <dropname 
@@ -148,6 +220,9 @@
     tRNA_trnascan="1"
     match_trnascan="1"
     repeat_region="1"
+    
+    match_blastn_na_dbEST_dpse="1"
+    match_blastz="1"
     />
     
   <dropid 
@@ -178,51 +253,115 @@
     remark="1"
     />
 
-  
   <hasdups 
     three_prime_UTR="1" 
     intron="1" 
     five_prime_UTR="1" 
     exon="1" 
     repeat_region="1"
+    match_blastn_na_dbEST_dpse="1"
     />
+    
+ <!--  <duptype_pattern>(match_sim4|match_blast|match_tblast)</duptype_pattern> -->
+ 
+<!--  not good ; problem is each has diff name; need to keep that
+  many of the match: things are at same loc given no id/name are dups 
+    
+    match_blastn_na_dbEST_dpse="1"
+    match_sim4_na_dbEST_same_dmel="1"
+    match_sim4_na_dbEST_diff_dmel="1"
+    match_sim4_na_transcript_dmel_r31="1"
+    match_sim4_na_gadfly_dmel_r2="1"
+
+-->
+
+<!-- 
+name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan
+-->
     
   <maptype 
     protein="CDS"
     CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
-    golden_path_region="golden_path"
+    golden_path_region="scaffold"
     oligonucleotide="oligo"
     three_prime_untranslated_region="three_prime_UTR"
     transposable_element_pred="transposable_element_pred"
     
-    mRNA_genscan="mRNA_genscan"
-    mRNA_piecegenie="mRNA_piecegenie"
-    mRNA_trnascan="tRNA_trnascan"
+    mRNA_genewise="mRNA:genewise"
+    mRNA_twinscan="mRNA:twinscan"
+    mRNA_genscan="mRNA:genscan"
+    mRNA_piecegenie="mRNA:piecegenie"
+
+    gene_genewise="gene:genewise"
+    gene_twinscan="gene:twinscan"
+    gene_genscan="gene:genscan"
+    gene_piecegenie="gene:piecegenie"
     
+    mRNA_trnascan="tRNA:trnascan"
+    gene_trnascan="tRNA:trnascan"
+    match_tRNAscan_SE="tRNA:trnascan"
+
     match_clonelocator_scaffoldBACs="BAC"
     match_part_clonelocator_scaffoldBACs="skip"
+    
+    match_promoter="transcription_start_site"
     
     match_locator_cytology="chromosome_band"
     match_part_locator_cytology="skip"
 
     match_JOSHTRANSPOSON_Sept="transposable_element_pred"
+    match_repeatmasker="repeat_region"
     _repeatmasker="repeat_region"
+    match_repeat_runner_seg="repeat_region"
 
+    pinsertion="skip"
     match_sim4_na_affy_oligo_dros="oligo"
     
     match_sim4_na_users_i_dros="skip"
     match_part_sim4_na_users_i_dros="skip"
     match_sim4_aa_users_i_dros="skip"
     match_part_sim4_aa_users_i_dros="skip"
+
+    match_sim4_na_DGC_in_process_dros="match:sim4:na_DGC_dros"
+    match_sim4_na_HDP_RNAi_dmel="match:RNAiHDP"
+    match_sim4_na_HDP_mRNA_dmel="match:HDP"
+    match_sim4_na_gadfly_dros_RELEASE2="match:sim4:na_gadfly_dmel_r2"
+    match_sim4_na_transcript_dmel_RELEASE31="match:sim4:na_transcript_dmel_r31"
+    match_sim4_na_transcript_dmel_RELEASE32="match:sim4:na_transcript_dmel_r32"
+    match_tblastxwrap_na_baylorf1_scfchunk_dpse="match:tblastx:na_dpse"
+    match_tblastxwrap_na_scf_chunk_agambiae_fa="match:tblastx:na_agambiae"
+
+    match_part_sim4_na_DGC_in_process_dros="match_part:sim4:na_DGC_dros"
+    match_part_sim4_na_HDP_RNAi_dmel="match_part:RNAiHDP"
+    match_part_sim4_na_HDP_mRNA_dmel="match_part:HDP"
+    match_part_sim4_na_gadfly_dros_RELEASE2="match_part:sim4:na_gadfly_dmel_r2"
+    match_part_sim4_na_transcript_dmel_RELEASE31="match_part:sim4:na_transcript_dmel_r31"
+    match_part_sim4_na_transcript_dmel_RELEASE32="match_part:sim4:na_transcript_dmel_r32"
+    match_part_tblastxwrap_na_baylorf1_scfchunk_dpse="match_part:tblastx:na_dpse"
+    match_part_tblastxwrap_na_scf_chunk_agambiae_fa="match_part:tblastx:na_agambiae"
+
     />
+  
+  <!-- nov04; dmel rel4 changes
+    NOT_match_promoter="skip" .. becomes transcription_start_site
+    fix messy names .. match:tblastxwrap:na_baylorf1_scfchunk.dpse  
+  -->
+
+  <!-- oct04; dmel_chado: this may be a skip; may be same ; yes.
+     as  transposable_element_insertion_site ::   pinsertion="1"
+    match:promoter == transcription_start_site; keep 2nd or retype 1st
+   -->
   <!--
+    match_fgenesh="match:fgenesh"
+    match_HDP="match:HDP"
+    match_RNAiHDP="match:RNAiHDP"
+
     match_fgenesh="match_fgenesh"
     match_HDP="match_HDP"
     match_RNAiHDP="match_RNAiHDP"
     match_promoter="promoter"
        match:sim4:na_affy_oligo.dros
-
 
   .. analysis sql  bug - repeatmasker dumped w/ NO type ???
   .. change above older match_ and _genscan/piecegenie/.. to newer match:prog:db format ..
@@ -230,23 +369,35 @@
   so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
   -->
 
-<!--   <maptype_pattern name="null" from="null" to="null"/> -->
-<!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
-    
   <maptype_gff>
     <!-- FIXME: ordered arrays here .. $type, $gffsource -->
-    <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
     <transposable_element_pred>transposable_element</transposable_element_pred>
     <transposable_element_pred>predicted</transposable_element_pred>
+    <tRNA_trnascan>tRNA</tRNA_trnascan>
+    <tRNA_trnascan>trnascan</tRNA_trnascan>
+    
+  </maptype_gff>
+
+  <!-- old gff typing
+      ? drop this; software handles?
     <mRNA_piecegenie>mRNA</mRNA_piecegenie>
     <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
     <mRNA_genscan>mRNA</mRNA_genscan>
     <mRNA_genscan>genscan</mRNA_genscan>
-    <tRNA_trnascan>tRNA</tRNA_trnascan>
-    <tRNA_trnascan>trnascan</tRNA_trnascan>
-  </maptype_gff>
+    <mRNA_twinscan>mRNA</mRNA_twinscan>
+    <mRNA_twinscan>twinscan</mRNA_twinscan>
+    <mRNA_genewise>mRNA</mRNA_genewise>
+    <mRNA_genewise>genewise</mRNA_genewise>
 
-  <!-- old gff typing
+    <gene_piecegenie>gene</gene_piecegenie>
+    <gene_piecegenie>piecegenie</gene_piecegenie>
+    <gene_genscan>gene</gene_genscan>
+    <gene_genscan>genscan</gene_genscan>
+    <gene_twinscan>gene</gene_twinscan>
+    <gene_twinscan>twinscan</gene_twinscan>
+    <gene_genewise>gene</gene_genewise>
+    <gene_genewise>genewise</gene_genewise>
+
     <match_part_fgenesh>match_part</match_part_fgenesh>
     <match_part_fgenesh>fgenesh</match_part_fgenesh>
     <match_part_RNAiHDP>match_part</match_part_RNAiHDP>

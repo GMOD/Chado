@@ -1,0 +1,25 @@
+<opt
+  name="organisms"
+  date="20041002"
+  >
+
+  <about>
+  Table of organism species, abbreviation-id values.
+  Cannot assume chado organism table has values we need.
+  
+  Added for D.pseudoobscura db which has 2 species (others have one;
+  may not need this then).
+  
+  Can optionally add other attributes here.
+  Note that species == Genus_species; all spaces are underscored.
+  </about>
+  
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
+
+  <organism id="scer" species="Saccharomyces_cerevisiae" />
+
+</opt>

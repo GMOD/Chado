@@ -387,9 +387,15 @@ sub updateformat
   foreach my $fa (@fastafiles) {
 
     my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($fa);
-      ## keep release  in blast db name
+
+      ## keep release  in blast db name -- ???
       ## check here if have 'all' $chr input, if so skip any other $chr in same set
-    my $blname= $self->handler->get_filename($org,'all',$featn,$rel,$format);
+      ## nov04 - drop release to avoid hassles w/ updates needed all blast config
+      ##  to be regenerated -- also leave out 'all'
+      
+    ##my $blrel=''; #= $rel;  
+    ##my $blname= $self->handler->get_filename($org,'all',$featn,$blrel,$format);
+    my $blname= $self->handler->get_filename($org,'',$featn,'',$format);
     $blname= $self->blastname($blname);
     $alldata{$blname}= $fa if ($chr eq 'all');
     

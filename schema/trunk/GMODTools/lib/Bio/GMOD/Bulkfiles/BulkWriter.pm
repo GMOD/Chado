@@ -127,8 +127,6 @@ sub readConfig
         showtags => \@showtags, # another debug/verbose option - print these if found
         read_includes => 1, # process include = 'conf.file'
         #gmod_root => $ROOT,
-        #confdir => 'conf', ## << change to conf/bulkfiles ?
-        #confpatt => '(gmod|[\w_\-]+db)\.conf$',
         } ); 
       }
      
@@ -158,15 +156,45 @@ sub initData
   my $config = $self->{config};
   my $sconfig= $self->handler()->{config};
   my $oroot= $sconfig->{rootpath};
- 
+  
+  $self->{failonerror}= $sconfig->{failonerror} unless defined $self->{failonerror};
+    
     ## use instead $self->handler()->{config} values here?
   $self->{org}= $sconfig->{org} || $config->{org} || 'noname';
   $self->{rel}= $sconfig->{rel} || $config->{rel} || 'noname';  
   $self->{sourcetitle}= $sconfig->{title} || $config->{title} || 'untitled'; 
   $self->{sourcefile} = $config->{input}  || '';  
   $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+
+  # copy any fsets to handler for those functions
+  foreach my $type ( keys %{$config->{fileset}} ) {
+    $sconfig->{fileset}->{$type}= $config->{fileset}->{$type}
+      unless(defined $sconfig->{fileset}->{$type});
+    }
+
+  #?? copy any release-specific additions/changes to config from sconfig
+  foreach my $key ( keys %{$config} ) {
+    my $sc= $sconfig->{$key};
+    if ($sc) {  $config->{$key}= _mergevars($config->{$key},$sc); }
+    }
+  
 }
 
+sub _mergevars {
+  my($v,$add)= @_;
+  if (!$add) { return $v; }
+  elsif (!$v) { return $add; }
+  elsif (ref($v) =~ /HASH/ && ref($add) =~ /HASH/) {
+    foreach my $k (keys %$add) {
+      $v->{$k}= $add->{$k};
+      }
+    }
+  elsif (ref($v) =~ /ARRAY/) {
+    if (ref($add) =~ /ARRAY/) { push(@$v, @$add); }
+    else { push(@$v, $add); }
+    }
+  return $v;
+}  
 
 #-------------- subs -------------
 
@@ -260,6 +288,97 @@ sub resetInput
   else { seek($inh,0,0); }
   $infile->{inh}= $inh;
   return $inh;
+}
+
+# for base class ...
+
+=item makeSymlinks( $fileset, $intype, $toname_patt, $fromdir, $todir )
+
+  make file symlinks;
+  input parameters:
+    $fileset, $intype, $toname_patt, $fromdir, $todir
+  $toname_patt = pattern for todir/name with substitutions
+  from fileset-> $name, $type, $chr, $format, $rel, $org
+  e.g., toname_patt = 'dna-$chr.raw' 
+   or "\$org-\$chr-\$type-\$rel.\$format"
+  
+=cut
+
+sub makeSymlinks
+{
+	my $self= shift;
+  my( $fileset, $intype, $toname_patt, $fromdir, $todir )= @_; # do per-csome/name
+  
+  foreach my $fs (@$fileset) {
+#     my $fp= $fs->{path};
+#     my $name= $fs->{name};
+#     my $type= $fs->{type};  
+#     my $chr= $fs->{chr};  
+    my($fp,$name,$type,$chr,$format,$rel,$org)= 
+      ($fs->{path},$fs->{name},$fs->{type},$fs->{chr},
+       $fs->{format},$fs->{rel},$fs->{org} );
+       # can we do () = $fs->{qw(path name ... org)} ? 
+    next unless(!$intype || $fs->{type} =~ /$intype/);  
+    ## unless(-e $fp) { warn "missing intype file $fp"; next; }
+    my($filename, $dir) = File::Basename::fileparse($fp);
+    
+    my $toname = $toname_patt; # 'dna-$chr.raw'
+    $toname =~ s/\$name/$name/;
+    $toname =~ s/\$type/$type/;
+    $toname =~ s/\$chr/$chr/;
+    $toname =~ s/\$format/$format/;
+    $toname =~ s/\$rel/$rel/;
+    $toname =~ s/\$org/$org/;
+    
+    my $relpath= catfile($fromdir, $filename); 
+    my $symname= catfile($todir, $toname);
+    symlink( $relpath, $symname);
+    print STDERR "symlink $toname -> $relpath\n" if $DEBUG; 
+    }
+ #return error/ok ?
+}
+
+
+=item copyFiles( $fileset, $intype, $toname_patt, $todir )
+
+  copy files;
+  input parameters:
+    $fileset, $intype, $toname_patt, $todir
+  $toname_patt = pattern for todir/name with substitutions
+  from fileset-> $name, $type, $chr, $format, $rel, $org
+  e.g., toname_patt = 'dna-$chr.raw' 
+   or "\$org-\$chr-\$type-\$rel.\$format"
+  
+=cut
+
+sub copyFiles
+{
+	my $self= shift;
+  my( $fileset, $intype, $toname_patt, $todir )= @_; # do per-csome/name
+  
+  foreach my $fs (@$fileset) {
+    my($fp,$name,$type,$chr,$format,$rel,$org)= 
+      ($fs->{path},$fs->{name},$fs->{type},$fs->{chr},
+       $fs->{format},$fs->{rel},$fs->{org} );
+       # can we do () = $fs->{qw(path name ... org)} ? 
+    next unless( !$intype || $fs->{type} =~ m/$intype/);  
+    ## unless(-e $fp) { warn "missing intype file $fp"; next; }
+    ## my($filename, $dir) = File::Basename::fileparse($fp);
+    
+    my $toname = $toname_patt || $name;  
+    $toname =~ s/\$name/$name/;
+    $toname =~ s/\$type/$type/;
+    $toname =~ s/\$chr/$chr/;
+    $toname =~ s/\$format/$format/;
+    $toname =~ s/\$rel/$rel/;
+    $toname =~ s/\$org/$org/;
+    
+    my $frompath= $fp; ##catfile($fromdir, $filename); 
+    my $topath  = catfile($todir, $toname);
+    system('/bin/cp', '-p', $frompath, $topath);
+    print STDERR "copy $frompath to $toname\n" if $DEBUG; 
+    }
+ #return error/ok ?
 }
 
 
