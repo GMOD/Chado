@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.61 2004-04-30 21:00:48 scottcain Exp $
+# $Id: Makefile.PL,v 1.62 2004-05-13 02:50:40 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -365,6 +365,7 @@ if ($O{'SIMPLE'} =~ /^[Yy]/) {
 print join("\n", 
   '', 
   'Building with the following database options:',
+  "  GMOD_ROOT=$O{'GMOD_ROOT'}",
   "  DBDRIVER=$DBDRIVER",
   "  DBNAME=$DBNAME",
   "  DBUSER=$DBUSER",
@@ -489,6 +490,7 @@ WriteMakefile(
 #          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
           'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
           'load/bin/load_ontology.PLS'   => 'load/bin/gmod_load_ontology.pl',
+          'install/conf_install.PLS'     => 'install/conf_install.pl',
     },
     EXE_FILES             => [
            'load/bin/gmod_genbank2gff3.pl',
@@ -545,6 +547,14 @@ sub MY::clean {
   $inherited;
 }
 
+sub MY::install {
+  package MY;
+  my $inherited = shift->SUPER::install(@_);
+  $inherited =~ s/doc_install/doc_install conf_install/;
+  $inherited;
+}
+
+
 #sub MY::install {
 #  package MY;
 #  my $inherited = shift->SUPER::install(@_);
@@ -557,7 +567,10 @@ sub MY::c_o {
 }
 
 sub MY::postamble {
+  my $root = "'GMOD_ROOT=$O{GMOD_ROOT}'";
   qq{
+conf_install ::
+	\$(PERL) \"$working_dir/install/conf_install.pl\" $root
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh

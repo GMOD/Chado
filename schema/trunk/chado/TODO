@@ -1,6 +1,4 @@
 TODO for the next alpha release (SOON!)
-* fix the gff loader for ambigous cvterms like 'centromere'
-(ie, check both the name and the cv_id)
 
 * Have things install in GMOD_ROOT:
    - in src/  
