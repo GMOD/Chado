@@ -355,8 +355,6 @@ DECLARE
 
 BEGIN
 
-    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
-
     query := ''SELECT DISTINCT fprop.feature_id 
         FROM featureprop fprop, cvterm t WHERE t.cvterm_id = fprop.type_id AND t.name = '' ||
         quote_literal(p_type) || '' AND fprop.value = '' || quote_literal(p_val) || '';'';
