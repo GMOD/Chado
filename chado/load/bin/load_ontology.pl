@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use lib '/raid5a/boconnor/cvsroot/gmod-schema/chado/lib';
+use lib 'lib';
 use DBI;
 use Data::Dumper;
 #use Chado::LoadDBI;
