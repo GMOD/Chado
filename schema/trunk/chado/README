@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.8 2003-12-04 17:14:17 kycl4rk Exp $
+$Id: README,v 1.9 2003-12-04 23:08:49 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -80,7 +80,7 @@ The Chado Makefile currently supports:
 
 Target			Purpose
 --------------- -----------------------------------------------------------
-all				makes cdbi, see below
+all			makes cdbi, see below
 cdbi			make Class::DBI interface classes (Chado::*) from sql source
 diagram			make ER diagrams, one per module
 graphviz		make graphviz diagrams, one per module
