@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.51 2004-03-02 03:21:37 scottcain Exp $
+# $Id: Makefile.PL,v 1.52 2004-03-15 18:58:33 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -178,6 +178,10 @@ my %db_lookup = reverse %VALID_DBS;
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
   $SQLFILES, $EXTERNAL_DDL );
 
+$O{'SIMPLE'} = prompt(
+   "Use the simple install (uses default database schema)", 'Y'
+  );
+
 if ( ! @argv && %conf ) {
   my $answer = prompt(
     "Previous configuration detected.\nUse values in '$build_config'?", 'Y'
@@ -254,81 +258,88 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
 
 #
 # Now figure out which schema modules to include.
+# or just go with the default
 #
-my $rebuild_complete = 0;
-open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
+
 my @sqlfiles;
-while (<CORE>) {
-  next if /^\s*#/; # allow comment lines
-  chomp;
-  my $file = $working_dir . '/modules/' . $_;
-  if (-M "$working_dir/modules/complete.sql" > -M $file) {
-    $rebuild_complete++;
+my $external;
+my @funcfiles;
+my $rebuild_complete = 0;
+unless ($O{'SIMPLE'} =~ /^[Yy]/) {
+
+  open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
+  while (<CORE>) {
+    next if /^\s*#/; # allow comment lines
+    chomp;
+    my $file = $working_dir . '/modules/' . $_;
+    if (-M "$working_dir/modules/complete.sql" > -M $file) {
+      $rebuild_complete++;
+    }
+    push @sqlfiles, $file;
   }
-  push @sqlfiles, $file;
-}
-close CORE;
+  close CORE;
 
 #
 # Ask about available extensions to core.
 #
-print "\nAvailable extensions to the core schema:\n";
-open EXT, $O{EXTDEF} or die "Unable to read file '$O{EXTDEF}': $!\n";
-my @extfiles = ( 0 );
-my $i = 0;
-while (<EXT>) {
-  next if /^\s*#/; # allow comment lines
-  $i++;
-  print "[$i] $_";
-  chomp;
-  my $file = "$working_dir/modules/".$_;
-  if (-M "$working_dir/modules/complete.sql" > -M $file) {
-    $rebuild_complete++;
+  print "\nAvailable extensions to the core schema:\n";
+  open EXT, $O{EXTDEF} or die "Unable to read file '$O{EXTDEF}': $!\n";
+  my @extfiles = ( 0 );
+  my $i = 0;
+  while (<EXT>) {
+    next if /^\s*#/; # allow comment lines
+    $i++;
+    print "[$i] $_";
+    chomp;
+    my $file = "$working_dir/modules/".$_;
+    if (-M "$working_dir/modules/complete.sql" > -M $file) {
+      $rebuild_complete++;
+    }
+    push @extfiles, $file;
   }
-  push @extfiles, $file;
-}
-close EXT;
+  close EXT;
 
-print "\nWhat extensions to the core schema would you like?\n",
-  "(Note that selecting any of these will force the\n",
-  "rebuilding of Class::DBI classes.)\n";
-my $extstr = prompt("(Comma-delimited)?","0");
+  print "\nWhat extensions to the core schema would you like?\n",
+    "(Note that selecting any of these will force the\n",
+    "rebuilding of Class::DBI classes.)\n";
+  my $extstr = prompt("(Comma-delimited)?","0");
 
-if ($extstr) {
-  $rebuild_complete++; 
-  my @extindex = split /,/, $extstr;
-  foreach my $index (@extindex) {
-    next unless defined $extfiles[$index];
-    push @sqlfiles, $extfiles[$index];
+  if ($extstr) {
+    $rebuild_complete++; 
+    my @extindex = split /,/, $extstr;
+    foreach my $index (@extindex) {
+      next unless defined $extfiles[$index];
+      push @sqlfiles, $extfiles[$index];
+    }
   }
-}
 
-my $external = prompt("Enter the full path of an external DDL file", 'none');
-unless ($external eq 'none') {
-  if (-e $external) {
-    push @sqlfiles, $external; 
-  } else {
-    die "The file $external couldn't be found.  Quitting...\n";
+  $external = prompt("Enter the full path of an external DDL file", 'none');
+  unless ($external eq 'none') {
+    if (-e $external) {
+      push @sqlfiles, $external; 
+    } else {
+      die "The file $external couldn't be found.  Quitting...\n";
+    }
   }
-}
 
-print "\nAvailable function extensions to the core schema:\n";
-open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
-my @funcfiles = ( );
-my $i = 0;
-while (<EXT>) {
-  next if /^\s*#/; # allow comment lines
-  $i++;
-  print "[$i] $_";
-  chomp;
-  my $file = "$working_dir/modules/".$_;
-  push @funcfiles, $file;
-}
-close EXT;
+  print "\nAvailable function extensions to the core schema:\n";
+  open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
+  @funcfiles = ( );
+  my $i = 0;
+  while (<EXT>) {
+    next if /^\s*#/; # allow comment lines
+    $i++;
+    print "[$i] $_";
+    chomp;
+    my $file = "$working_dir/modules/".$_;
+    push @funcfiles, $file;
+  }
+  close EXT;
                                                                                     
-print "\nWhat function extensions to the core schema would you like?\n";
-my $funcstr = prompt("(Comma-delimited)?","0");
+  print "\nWhat function extensions to the core schema would you like?\n";
+  my $funcstr = prompt("(Comma-delimited)?","0");
 
+} #closes the "nonsimple" unless option
 
 #
 # Show the user the options (esp. if using RECONFIGURE or DEFAULTS).
@@ -343,8 +354,8 @@ print join("\n",
   "  DBHOST=$DBHOST",
   "  DBPORT=$DBPORT",
   '',
-  'And the following core modules and extensions:', 
-  ( map { "  $_" } @sqlfiles ), 
+  $O{'SIMPLE'}!~ /^[Yy]/ ? 'And the following core modules and extensions:' : ''  , 
+  $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
   ''
 );
 
@@ -390,52 +401,59 @@ else {
   warn "Template '$config_template' doesn't exist\n";
 }
 
-my $complete_sql = "$working_dir/modules/complete.sql";
-if ($rebuild_complete || !-e $complete_sql) {
-  open OUT, ">$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
-  foreach my $file (@sqlfiles) {
-    open IN, $file or die "Couldn't read file '$file': $!\n";
-    while (<IN>) {
-      print OUT;
-    }
-    close IN;
-  }
-  close OUT;
-
-  print "Creating Class::DBI classes in '$chado_dir'\n",
-    "(This could take a while) ...\n"; 
-
-  system(
-    "$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
-    "$working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm"
-  ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
-
-  system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
+my $complete_sql;
+if ($O{'SIMPLE'} =~ /^[Yy]/) {
+  system('perl', 'bin/AutoDBI.PL');
 }
+else {
 
-if (@funcfiles > 0) {
-  open OUT, ">>$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
-  foreach my $file (@funcfiles) {
-    open IN, $file or die "Couldn't read file '$file': $!\n";
-    while (<IN>) {
-      print OUT;
+  $complete_sql = "$working_dir/modules/complete.sql";
+  if ($rebuild_complete || !-e $complete_sql ) {
+    open OUT, ">$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
+    foreach my $file (@sqlfiles) {
+      open IN, $file or die "Couldn't read file '$file': $!\n";
+      while (<IN>) {
+        print OUT;
+      }
+      close IN;
     }
-    close IN;
+    close OUT;
+
+    print "Creating Class::DBI classes in '$chado_dir'\n",
+      "(This could take a while) ...\n"; 
+
+    system(
+      "$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
+      "$working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm"
+    ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
+
+    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
   }
-  close OUT;
-}
+
+  if (@funcfiles > 0) {
+    open OUT, ">>$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
+    foreach my $file (@funcfiles) {
+      open IN, $file or die "Couldn't read file '$file': $!\n";
+      while (<IN>) {
+        print OUT;
+      }
+      close IN;
+    }
+    close OUT;
+  }
+} # close "not simple" else to make AutoDBI.pm
 
 WriteMakefile(
     'NAME'		            => 'chado',
     'VERSION'             => 0.001,
     'PREREQ_PM'		        => { 
-      'SQL::Translator'   => 0.04,
+      #'SQL::Translator'   => 0.05,
       'Class::DBI'        => 0.94,
       'Class::DBI::Pager' => 0,
       'Class::DBI::Pg'    => 0.02,
       'Module::Build'     => 0.20,
       'Template'          => 2.10,
-      'Term::ProgressBar' => 0,   #fluff, but make sure you check load/bin/*
+      'Term::ProgressBar' => 2.06, #fluff, but make sure you check load/bin/*
                                   #if this prereq is removed
       'DBI'               => 0,
       'DBD::Pg'           => 0,
