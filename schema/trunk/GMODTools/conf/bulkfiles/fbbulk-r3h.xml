@@ -38,7 +38,7 @@
   <db
     driver="Pg"
     name="dmelhet_chado"
-    host="bugbane.bio.indiana.edu"
+    host="localhost"
     port="7302"
     user="flybase"
     password=""
@@ -48,7 +48,7 @@
   <species>Drosophila melanogaster</species>
   
   <dnadump
-    path="dna/[\w\-\_]+.raw"
+    path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"
     type="dna_dump"
     />
@@ -90,7 +90,7 @@
     
   <fileset
     name="dna"
-    path="dna/[\w\-\_]+.raw"
+    path="dna/.+\.raw"
     input="dna_dump"
     sql="select feature_id, residues from feature where uniquename = ?"
     title="Chromosome dna"
@@ -98,7 +98,7 @@
 
   <fileset
     name="fff"
-    path="fff/[\w\-\_]+.fff"
+    path="fff/.+\.fff"
     input="feature_table"
     title="FFF Genome features"
     config="dmelhetfeatconv"
@@ -108,14 +108,15 @@
 
   <fileset
     name="gff"
-    path="gff/[\w\-\_]+.gff"
+    path="gff/.+\.gff"
+    input="feature_table"
     title="GFF Genome features"
     dogzip="1"
     />
 
   <fileset
     name="gnomap"
-    path="gnomap/[\w\-\_]+.tsv"
+    path="gnomap/.+\.tsv"
     input="fff"
     config="tognomap"
     handler="GnomapWriter"
@@ -132,7 +133,7 @@
 
   <fileset
     name="fasta"
-    path="fasta/[\w\-\_]+.fasta"
+    path="fasta/.+\.fasta"
     input="fff"
     config="tofasta"
     handler="FastaWriter"
@@ -144,7 +145,7 @@
     />
   <fileset
     name="blast"
-    path="blast/[\w\-\_]+.*"
+    path="blast/.+\.*"
     input="fasta"
     config="blastfiles"
     handler="BlastWriter"

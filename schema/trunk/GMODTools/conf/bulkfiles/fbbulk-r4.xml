@@ -18,6 +18,9 @@
     Release 4.0t.  See http://flybase.net/annot/dmel_4.txt
   </doc>
    
+   
+  <!-- change this to use include="flybase-releasedb.xml" -->
+  
   <release id="4" 
     rel="r4.0t"  
     dbname="dmel_chado"  
@@ -66,7 +69,7 @@
   <db
     driver="Pg"
     name="dmel_chado"
-    host="bugbane.bio.indiana.edu"
+    host="localhost"
     port="7302"
     user="flybase"
     password=""
@@ -86,7 +89,7 @@
 
   <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
   <dnadump
-    path="dna/[\w\-\_]+.raw"
+    path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"
     />
 
@@ -108,25 +111,20 @@
   </featdump>
   
 
-<!--   <dnafiles -->
-<!--     path="dna/[\w\-\_]+.raw" -->
-<!--     name="Chromosome dna"  -->
-<!--   /> -->
+  <!-- change this to use include="filesets.xml" -->
+
   <fileset
     name="dna"
-    path="dna/[\w\-\_]+.raw"
+    path="dna/.+\.raw"
+    input="dna_dump"
     sql="select feature_id, residues from feature where uniquename = ?"
     title="Chromosome dna"
     />
 
-<!--   <featfiles -->
-<!--     path="fff/[\w\-\_]+.fff" -->
-<!--     name="Genome features"  -->
-<!--     config="chadofeatconv" -->
-<!--   /> -->
   <fileset
     name="fff"
-    path="fff/[\w\-\_]+.fff"
+    path="fff/.+\.fff"
+    input="feature_table"
     title="FFF Genome features"
     config="chadofeatconv"
     handler="FeatureWriter"
@@ -134,14 +132,16 @@
     />
   <fileset
     name="gff"
-    path="gff/[\w\-\_]+.gff"
+    path="gff/.+\.gff"
+    input="feature_table"
     title="GFF Genome features"
     dogzip="1"
     />
 
   <fileset
     name="gnomap"
-    path="gnomap/[\w\-\_]+.tsv"
+    path="gnomap/.+\.tsv"
+    input="fff"
     config="tognomap"
     handler="GnomapWriter"
     title="GnoMap features"
@@ -155,20 +155,10 @@
     withvars="1"
     />
 
-<!--   <fastafiles -->
-<!--     path="fasta/[\w\-\_]+.fasta" -->
-<!--     name="Genome feature sequence fasta"  -->
-<!--     dropnotes="synonym_2nd,synonym" -->
-<!--     dogzip="1" -->
-<!--   /> -->
-<!--   <blastfiles -->
-<!--     path="blast/[\w\-\_]+.*" -->
-<!--     name="Blast indices"  -->
-<!--     config="blastfiles" -->
-<!--   /> -->
   <fileset
     name="fasta"
-    path="fasta/[\w\-\_]+.fasta"
+    path="fasta/.+\.fasta"
+    input="fff"
     config="tofasta"
     handler="FastaWriter"
     dropnotes="synonym_2nd,synonym"
@@ -179,7 +169,8 @@
     />
   <fileset
     name="blast"
-    path="blast/[\w\-\_]+.*"
+    path="blast/.+\.*"
+    input="fasta"
     config="blastfiles"
     handler="BlastWriter"
     title="Blast indices" 
@@ -209,10 +200,19 @@
   <featset>three_prime_UTR</featset>
   <featset>intron</featset>
   <featset>intergenic</featset>
-  <featset>scaffold</featset>
+
+  <featset>golden_path</featset>
+  <featset>chromosome</featset>
 
   <!-- featmap moved to common bulkfiles/chadofeatconv
     but can override here if desired to add/replace/delete -->
+
+  <featmap
+    name="golden_path"  old_name="scaffold"
+    types="golden_path"
+    typelabel="golden_path"
+    fromdb="1"
+    />
 
   <featmap
     name="translation"

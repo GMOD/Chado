@@ -1,0 +1,104 @@
+<opt
+  name="featuresets"
+  date="20040821"
+  >
+ 
+  <title>Chado Feature mapping info</title>
+ 
+  <about>
+    Use as include="featmap" to data release config file. (?)
+    
+    These are configurations for converting chado feature table dumps to
+    standard feature/sequence files. Much of below specifies how to
+    process different features (tied to methods in ChadoFeatDump.pm
+    
+    These configs are mostly data-set independent, but may
+    need changing for some genome data sets.
+    
+    Used mostly now by Bulkfiles/FastaWriter.pm
+
+   featmap for feature sets that need reprocessing, attributes: 
+    name = feature set name
+    types = feature types, space delimited (in fff/gff)
+    typelabel = type to use in output header, paired with types list
+    subrange = expansion/extraction range to add to feature location;
+             readseq syntax not yet supported, i.e. {start,end}+/-offset)
+    fromdb = extract from chado database feature.residues field
+             rather than chromosome dna file,
+             for curated residues - transcript, translation)
+    get_id = save id, dbxref fields for add to other (genemodel) features
+    add_id = add id of parent feature (genemodel)
+    note: translation type=protein is coded into various seq fetch programs
+
+  </about>
+
+  <!-- feature sets to make fasta bulk files -->
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>gene_extended2000</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+  <featset>intergenic</featset>
+  
+  <featset>golden_path</featset>
+  <featset>chromosome</featset>
+
+  
+  <featmap name="gene" get_id="1" />
+  <featmap name="five_prime_UTR" add_id="gene" />
+  <featmap name="three_prime_UTR" add_id="gene" />
+  <featmap name="intron" add_id="gene" />
+  <featmap name="mRNA" add_id="gene" />
+  <featmap name="CDS" add_id="gene" />
+
+  <featmap
+    name="translation"
+    types="CDS"
+    typelabel="protein"
+    fromdb="1"
+    />
+  <featmap
+    name="transcript"
+    types="mRNA"
+    typelabel="transcript"
+    fromdb="1"
+    />
+  <featmap
+    name="transposon"
+    types="transposable_element"
+    typelabel="transposable_element"
+    />
+  <featmap
+    name="miscRNA"
+    types="ncRNA snRNA snoRNA rRNA" 
+    />
+  <featmap
+    name="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+  <featmap
+    name="intergenic"
+    types="gene"
+    typelabel="intergenic"
+    method="between"
+    />
+
+  <!-- golden_path_region may be alternate, or super_contig -->
+  <featmap
+    name="golden_path"  old_name="scaffold"
+    types="golden_path"
+    typelabel="golden_path"
+    fromdb="1"
+    />
+
+</opt>

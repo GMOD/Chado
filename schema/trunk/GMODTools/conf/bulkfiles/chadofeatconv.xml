@@ -6,11 +6,10 @@
   <title>Chado DB Feature info</title>
   <about>
     These are configurations for converting chado feature table dumps to
-    standard feature/sequence files. Much of below specifies how to
-    process different features (tied to methods in ChadoFeatDump.pm
-    
-    These configs should be data-set independent.
-    This works with, but is independent of SeqUtil2 configs.
+    standard feature/sequence files. Most of these configs specify how to
+    process and convert various features extracted from chado db.
+    These are tied to methods in Bulkfiles::FeatureWriter.pm)
+
   </about>
   
   <informat>feature_table</informat>  
@@ -22,89 +21,40 @@
   <!-- copied from db-release config files .. this is mostly common info,
     but db-release config can override @featset, %featmap -->
 
-  <!-- feature sets to make fasta bulk files -->
-  <featset>gene</featset>
-  <featset>mRNA</featset>
-  <featset>CDS</featset>
-  <featset>transcript</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
-  <featset>transposon</featset>
-  <featset>pseudogene</featset>
-  <featset>gene_extended2000</featset>
-  <featset>five_prime_UTR</featset>
-  <featset>three_prime_UTR</featset>
-  <featset>intron</featset>
-  <featset>intergenic</featset>
-  <featset>scaffold</featset>
-
-  <!-- 
-   featmap for feature sets that need reprocessing, attributes: 
-    name = feature set name
-    types = feature types, space delimited (in fff/gff)
-    typelabel = type to use in output header, paired with types list
-    subrange = expansion/extraction range to add to feature location;
-             readseq syntax not yet supported, i.e. {start,end}+/-offset)
-    fromdb = extract from chado database feature.residues field
-             rather than chromosome dna file,
-             for curated residues - transcript, translation)
-    get_id = save id, dbxref fields for add to other (genemodel) features
-    add_id = add id of parent feature (genemodel)
-    note: translation type=protein is coded into various seq fetch programs
-  -->
-  
-  
-  <featmap name="gene" get_id="1" />
-  <featmap name="five_prime_UTR" add_id="gene" />
-  <featmap name="three_prime_UTR" add_id="gene" />
-  <featmap name="intron" add_id="gene" />
-  <featmap name="mRNA" add_id="gene" />
-  <featmap name="CDS" add_id="gene" />
-
-  <featmap
-    name="translation"
-    types="CDS"
-    typelabel="protein"
-    fromdb="1"
-    />
-  <featmap
-    name="transcript"
-    types="mRNA"
-    typelabel="transcript"
-    fromdb="1"
-    />
-  <featmap
-    name="scaffold"
-    types="golden_path_region"
-    typelabel="scaffold"
-    fromdb="1"
-    />
-  <featmap
-    name="transposon"
-    types="transposable_element"
-    typelabel="transposable_element"
-    />
-  <featmap
-    name="miscRNA"
-    types="ncRNA snRNA snoRNA rRNA" 
-    />
-  <featmap
-    name="gene_extended2000"
-    types="gene"
-    typelabel="gene_ex2000"
-    subrange="-2000..2000"
-    />
-  <featmap
-    name="intergenic"
-    types="gene"
-    typelabel="intergenic"
-    method="between"
-    />
-
+  <!--  moved featset/featmap tags to separate config file -->
     
   <rename_child_type>pseudogene|\w+RNA</rename_child_type>
   <mergematch></mergematch>
+  
+  <noforwards_gff>1</noforwards_gff>
+  
+  <!-- remapType: append this name pattern to type -->
+  <name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan)</name2type_pattern>
+
+  <!-- drop lengthy program.source from match name 
+  
+  |pred
+  
+  match_sim4_na_EST_complete_dros RE37642.5prime-2L_wgs2cex-na_EST.complete.dros
+  also fix these ugly names repeating feature types;
+  match:sim4:na_STS.dros  BACN11E12-T7-211000022278175-na_STS.dros-sim4
+    cuttype=1
+
+  -->
+  
+  <mapname_pattern name="1match" type="^(match|oligo)" cuttype="1" from="null" to="null"/>
+  <mapname_pattern name="2match" type="^(match|oligo)" from="\-AE\d\S+$" to=""/>
+  <mapname_pattern name="3match" type="^match.*" from="\-?(2L|2R|3L|3R|4|X)[_\.].*$" to=""/>
+  <mapname_pattern name="bac" type="^BAC" from="(hit\-|\-cl\-scaffoldBACs)" to=""/>
+
+  <mapname_pattern name="dum" from="\-dummy\-" to=""/>
+  <mapname_pattern name="tep" type="transposable_element_pred" 
+    from="JOSHTRANSPOSON\-" to=""/>
+
+
+<!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
+<!--   <maptype_pattern name="null" from="null" to="null"/> -->
+
 
 <!--
 ## SONG/so Revision: 1.45
@@ -132,8 +82,6 @@
 #? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
 -->
 
-  <!-- remapType: append this name pattern to type -->
-  <name2type_pattern>[-_](genscan|piecegenie|twinscan|genewise|pred|trnascan)</name2type_pattern>
   
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
@@ -161,7 +109,10 @@
       ## segment no longer valid SO; supercontig or golden_path are best
   -->
   
-  <!-- simplefeat == segmentfeats + others -->
+  <!-- simplefeat == segmentfeats + others 
+    not mature_peptide="1" which has structure  
+    gene is problematic - flybase = simple start/stop, sgd == mrna
+    -->
   <simplefeat 
     BAC="1"
     chromosome_arm="1"
@@ -170,8 +121,7 @@
     gene="1"
     golden_path_region="1"
     golden_path="1"
-    mature_peptide="1"
-    oligonucleotide="1"
+    oligo="1" oligonucleotide="1"
     point_mutation="1"
     pseudogene="1"
     region="1"
@@ -181,11 +131,23 @@
     transcription_start_site="1"
     />
     
-  <dropname 
-    mRNA_genscan="1"
-    mRNA_piecegenie="1"
+    <!-- skipaskid is subset of simplefeat ; drop -->
+  <skipaskid 
+    point_mutation="1"
+    region="1"
+    repeat_region="1"
     transcription_start_site="1"
+    />
+
+  <dropname 
+    transcription_start_site="1"
+    mRNA_genscan="1"
+    match_genscan="1"
+    mRNA_piecegenie="1"
+    match_piecegenie="1"
     tRNA_trnascan="1"
+    match_trnascan="1"
+    repeat_region="1"
     />
     
   <dropid 
@@ -194,7 +156,7 @@
     EST="1"
     exon="1"
     intron="1"
-    oligonucleotide="1"
+    oligo="1" oligonucleotide="1"
     processed_transcript="1"
     repeat_region="1"
     transcription_start_site="1"
@@ -216,19 +178,13 @@
     remark="1"
     />
 
-  <skipaskid 
-    point_mutation="1"
-    region="1"
-    repeat_region="1"
-    transcription_start_site="1"
-    />
-
   
   <hasdups 
     three_prime_UTR="1" 
     intron="1" 
     five_prime_UTR="1" 
     exon="1" 
+    repeat_region="1"
     />
     
   <maptype 
@@ -236,52 +192,74 @@
     CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="golden_path"
-    match_fgenesh="match_fgenesh"
-    match_HDP="match_HDP"
-    match_RNAiHDP="match_RNAiHDP"
-    mRNA_genscan="mRNA_genscan"
-    mRNA_piecegenie="mRNA_piecegenie"
-    mRNA_trnascan="tRNA_trnascan"
     oligonucleotide="oligo"
     three_prime_untranslated_region="three_prime_UTR"
     transposable_element_pred="transposable_element_pred"
+    
+    mRNA_genscan="mRNA_genscan"
+    mRNA_piecegenie="mRNA_piecegenie"
+    mRNA_trnascan="tRNA_trnascan"
+    
+    match_clonelocator_scaffoldBACs="BAC"
+    match_part_clonelocator_scaffoldBACs="skip"
+    
+    match_locator_cytology="chromosome_band"
+    match_part_locator_cytology="skip"
+
+    match_JOSHTRANSPOSON_Sept="transposable_element_pred"
+    _repeatmasker="repeat_region"
+
+    match_sim4_na_affy_oligo_dros="oligo"
+    
+    match_sim4_na_users_i_dros="skip"
+    match_part_sim4_na_users_i_dros="skip"
+    match_sim4_aa_users_i_dros="skip"
+    match_part_sim4_aa_users_i_dros="skip"
     />
   <!--
+    match_fgenesh="match_fgenesh"
+    match_HDP="match_HDP"
+    match_RNAiHDP="match_RNAiHDP"
+    match_promoter="promoter"
+       match:sim4:na_affy_oligo.dros
+
+
+  .. analysis sql  bug - repeatmasker dumped w/ NO type ???
+  .. change above older match_ and _genscan/piecegenie/.. to newer match:prog:db format ..
+  .. also fix maptype_gff ..
   so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
   -->
 
-    <mapname_pattern name="null" from="null" to="null"/>
-    <mapname_pattern name="dum" from="\-dummy\-" to=""/>
-    <mapname_pattern name="tep" type="transposable_element_pred" 
-      from="JOSHTRANSPOSON\-" to=""/>
-    
 <!--   <maptype_pattern name="null" from="null" to="null"/> -->
 <!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
     
   <maptype_gff>
     <!-- FIXME: ordered arrays here .. $type, $gffsource -->
     <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
+    <transposable_element_pred>transposable_element</transposable_element_pred>
+    <transposable_element_pred>predicted</transposable_element_pred>
+    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
+    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
+    <mRNA_genscan>mRNA</mRNA_genscan>
+    <mRNA_genscan>genscan</mRNA_genscan>
+    <tRNA_trnascan>tRNA</tRNA_trnascan>
+    <tRNA_trnascan>trnascan</tRNA_trnascan>
+  </maptype_gff>
+
+  <!-- old gff typing
     <match_part_fgenesh>match_part</match_part_fgenesh>
     <match_part_fgenesh>fgenesh</match_part_fgenesh>
     <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
     <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
-    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
-    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
     <match_part_HDP>match_part</match_part_HDP>
     <match_part_HDP>HDP</match_part_HDP>
     <match_HDP>match</match_HDP>
     <match_HDP>HDP</match_HDP>
-    <transposable_element_pred>transposable_element</transposable_element_pred>
-    <transposable_element_pred>predicted</transposable_element_pred>
-    <tRNA_trnascan>tRNA</tRNA_trnascan>
-    <tRNA_trnascan>trnascan</tRNA_trnascan>
     <match_fgenesh>match</match_fgenesh>
     <match_fgenesh>fgenesh</match_fgenesh>
-    <mRNA_genscan>mRNA</mRNA_genscan>
-    <mRNA_genscan>genscan</mRNA_genscan>
     <match_RNAiHDP>match</match_RNAiHDP>
     <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
-  </maptype_gff>
-
+  -->
+  
   
 </opt>

@@ -58,9 +58,14 @@ my $ok= Getopt::Long::GetOptions(
 'failonerror!' => \$failonerror,
 'makeout!' => \$makeout,
 'debug!' => \$debug,
+'bugger=s' => \$debug, # more debug levels
 'showconfig!' => \$showconfig,
 );
 
+@chr = split(/,/,join(',',@chr));
+@formats = split(/,/,join(',',@formats));
+
+warn " ** Specify -config=config-name\n" unless($config);
 die <<"USAGE" unless ($ok && $config);
 Generate genome bulk files from Chado database.
 Usage: $0 [ -conf fbbulk-r4 -chr X -format fff -make -nodna -nofeatdump ]

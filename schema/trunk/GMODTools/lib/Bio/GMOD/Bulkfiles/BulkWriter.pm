@@ -121,8 +121,11 @@ sub readConfig
     ## >> no good unless(ref $self->{config2}) { $self->{config2}= $self->{sequtil}->{config2}; }
     unless(ref $self->{config2}) { 
       require Bio::GMOD::Config2; 
+      my @showtags= ($self->{verbose}) ? qw(name title about) : qw(name title);
       $self->{config2}= Bio::GMOD::Config2->new( {
         searchpath => [ 'conf/bulkfiles', 'bulkfiles', 'conf' ],
+        showtags => \@showtags, # another debug/verbose option - print these if found
+        read_includes => 1, # process include = 'conf.file'
         #gmod_root => $ROOT,
         #confdir => 'conf', ## << change to conf/bulkfiles ?
         #confpatt => '(gmod|[\w_\-]+db)\.conf$',

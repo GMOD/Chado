@@ -152,14 +152,14 @@
 
   <fileset
     name="dna"
-    path="dna/[\w\-\_]+.raw"
+    path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"
     title="Chromosome dna"
     />
 
   <fileset
     name="fff"
-    path="fff/[\w\-\_]+.fff"
+    path="fff/.+\.fff"
     title="FFF Genome features"
     config="sgdfeatconf"
     handler="FeatureWriter"
@@ -167,14 +167,14 @@
     />
   <fileset
     name="gff"
-    path="gff/[\w\-\_]+.gff"
+    path="gff/.+\.gff"
     title="GFF Genome features"
     dogzip="1"
     />
 
   <fileset
     name="gnomap"
-    path="gnomap/[\w\-\_]+.tsv"
+    path="gnomap/.+\.tsv"
     config="tognomap"
     handler="GnomapWriter"
     title="GnoMap features"
@@ -189,7 +189,7 @@
 
   <fileset
     name="fasta"
-    path="fasta/[\w\-\_]+.fasta"
+    path="fasta/.+\.fasta"
     config="tofasta"
     handler="FastaWriter"
     dropnotes="synonym_2nd,synonym"
@@ -200,7 +200,7 @@
     />
   <fileset
     name="blast"
-    path="blast/[\w\-\_]+.*"
+    path="blast/.+\.*"
     config="blastfiles"
     handler="BlastWriter"
     title="Blast indices" 

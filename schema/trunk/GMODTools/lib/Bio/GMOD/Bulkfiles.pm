@@ -421,10 +421,14 @@ sub readConfig
 	my ($configfile)= @_;
   eval {  
     unless(ref $self->{config2}) { 
+      my @showtags= ($self->{verbose}) ? qw(name title about) : qw(name title);
+      
       require Bio::GMOD::Config2; 
       $self->{config2}= Bio::GMOD::Config2->new( {
         searchpath => [ 'conf/bulkfiles', 'bulkfiles', 'conf' ],
         debug => $DEBUG,
+        read_includes => 1, # process include = 'conf.file'
+        showtags => \@showtags, # another debug/verbose option - print these if found
         #gmod_root => $ROOT,
         #confdir => 'conf', ## << change to conf/bulkfiles ?
         #confpatt => '(gmod|[\w_\-]+db)\.conf$',
@@ -432,6 +436,8 @@ sub readConfig
       }
      
     $self->{config}= $self->{config2}->readConfig( $configfile); 
+    ## add processing of include="include.conf" keys ?
+    
     print STDERR $self->{config2}->showConfig( $self->{config}, { debug => $DEBUG }) 
       if ($self->{showconfig}); ##if $DEBUG;
     }; 
@@ -816,7 +822,7 @@ sub gzipFiles
       my $fileset= $self->getFiles($type, $chromosomes);
       print STDERR "gzipping $finfo->{path}\n" if $DEBUG;
       foreach my $fs (@$fileset) {
-        system("gzip ".$fs->{path}) if -e $fs->{path};
+        system("gzip -f ".$fs->{path}) if (-e $fs->{path});
         }
       }
     }
@@ -1021,7 +1027,7 @@ sub makeFiles
     my $writer= $self->getWriter('fasta');
     # my $writer= $self->getFastaWriter();  
     $result .= $writer->makeFiles(%args, 
-      infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes);
+      infiles =>  $featfiles, chromosomes => $chromosomes);
     }
     
   if (grep /blast/, @outformats) {
@@ -1673,6 +1679,9 @@ sub getBasesFromFiles
     my ($start,$stop,$strand)= $self->maxrange($baseloc);
     my ($subrb,$subre,$rs)=(0,0,0);
     if ($subrange) { 
+      # need some more logic in $subrange to get just upstream or downstream sections
+      # readseq's: start +/- offset1, stop +/- offset2; eg. (start-2000,start); (stop,stop+2000); (start-2000,stop); (start,stop+2000)
+      
       my $maxseq= $dnaseq->length();
       ($subrb,$subre,$rs)= $self->maxrange($subrange); 
       if ($subrb) { $start += $subrb ; $start=1 if $start<=0; } # need dnaseq min/max !
@@ -1858,11 +1867,13 @@ sub initData
   #$config->{allfeats}= \@allfeats;
 
       # add all featset?
-  @featset= (ref $config->{featset}) ? @{$config->{featset}}
-    : qw(gene mRNA CDS transcript translation 
+  if (ref $config->{featset}) { @featset= @{$config->{featset}}; }
+  elsif ($config->{featset})  { @featset=  ($config->{featset}); } # singleton
+  else { @featset=  qw(gene mRNA CDS transcript translation 
       tRNA miscRNA transposon pseudogene gene_extended2000 
       five_prime_UTR three_prime_UTR intron 
       );
+     }
   $config->{featset}= \@featset;
   
   my @fastafeatok=();
