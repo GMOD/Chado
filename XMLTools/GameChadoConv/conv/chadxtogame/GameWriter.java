@@ -390,7 +390,8 @@ private int m_readMode = 0;
 		StringBuffer sb = new StringBuffer();
 		while((the_res!=null)&&(the_res.length()>50)){
 			sb.append("\n        "+the_res.substring(0,50));
-			the_res = the_res.substring(51);
+			//the_res = the_res.substring(51);
+			the_res = the_res.substring(50);
 		}
 		if(the_res!=null){
 			sb.append("\n        "+the_res);
@@ -434,9 +435,9 @@ private int m_readMode = 0;
 	}
 
 	public Element makeAnnotation(Document the_DOC,Feature the_gf){
-		//System.out.println("START ANNOTATION <"+the_gf.getId()
-		//		+"> TYPE<"+the_gf.getTypeId()
-		//		+"> SIZE<"+the_gf.getGenFeatCount()+">");
+		System.out.println("START ANNOTATION <"+the_gf.getId()
+				+"> TYPE<"+the_gf.getTypeId()
+				+"> SIZE<"+the_gf.getGenFeatCount()+">");
 		Element annotNode = (Element)the_DOC.createElement(
 				"annotation");
 		if(the_gf.getUniqueName()!=null){
@@ -490,8 +491,8 @@ private int m_readMode = 0;
 	}
 
 	public Element makeFeatureSet(Document the_DOC,Feature the_gf){
-		//System.out.println("\tSTART FEATURE_SET ID<"+the_gf.getId()
-		//		+"> SIZE<"+the_gf.getGenFeatCount()+">");
+		System.out.println("\tSTART FEATURE_SET ID<"+the_gf.getId()
+				+"> SIZE<"+the_gf.getGenFeatCount()+">");
 		if(the_gf.getUniqueName()!=null){
 			the_gf.setId(the_gf.getUniqueName());
 		}
@@ -557,8 +558,16 @@ private int m_readMode = 0;
 		//WRITE START_CODON
 		for(int i=0;i<protList.size();i++){
 			Feature gf = (Feature)protList.get(i);
-			Feature ngf = new Feature(gf.getId());
-			ngf.setName(gf.getName());
+			String scID = the_gf.getId();
+			//scID = gf.getId();
+			scID = textReplace(scID,"_seq","").trim();
+			System.out.println("FSS START_CODON ID<"+scID
+					+"> NAME<"+gf.getName()+">");
+			Feature ngf = new Feature(scID);
+			String scNAME = gf.getName();
+			scNAME = textReplace(scNAME,"_seq","").trim();
+			scNAME = textReplace(scNAME,"-P","-R");
+			ngf.setName(scNAME);
 			ngf.setTypeId("start_codon");
 			ngf.setFeatLoc(gf.getFeatLoc());
 			if(gf.getFeatLoc()!=null){
@@ -573,6 +582,10 @@ private int m_readMode = 0;
 						tmpSpan.getStart(),
 						tmpSpan.getStart()-2);
 					}
+					tmpSpan = tmpSpan.retreat(
+							(m_NewREFSPAN.getStart()-2));
+					System.out.println("\t\tSTART_CODON<"
+							+tmpSpan+">");
 					ngf.getFeatLoc().setSpan(tmpSpan);
 				}
 			}
@@ -605,6 +618,15 @@ private int m_readMode = 0;
 			//System.out.println("\tCOMP FEAT<"
 			//		+gf.getId()+"> OF TYPE<"
 			//		+gf.getTypeId()+">");
+
+			Span sp = gf.getFeatLoc().getSpan();
+			Span spRet = sp.retreat((m_NewREFSPAN.getStart()-1));
+			//INTERBASE COMPENSATION
+			spRet = new Span(spRet.getStart()+1,spRet.getEnd());
+			gf.getFeatLoc().setSpan(spRet);
+
+			System.out.println("\t\tEXON<"+gf.getId()
+					+"> SP<"+gf.getFeatLoc().getSpan()+">");
 			featureSetNode.appendChild(
 					makeFeatureSpan(the_DOC,gf));
 		}
@@ -618,18 +640,24 @@ private int m_readMode = 0;
 					the_gf.getResidues(),
 					the_gf.getTypeId(),
 					the_gf.getMd5()));
+			System.out.println("\t\tCDNA<"+the_gf.getId()
+					+"> SP<"+the_gf.getFeatLoc().getSpan()+">");
 		}
 
 		//WRITE PROTEIN SEQUENCE
-		for(int i=0;i<protList.size();i++){
+		String protID = textReplace(the_gf.getId(),"-R","-P");
+		for(int i=0;i<protList.size();i++){ //SHOULD ONLY BE ONE
 			Feature gf = (Feature)protList.get(i);
+			//protID = gf.getId();
 			featureSetNode.appendChild(
 					makeGameSeq(the_DOC,
-							gf.getId(),
-							gf.getId(),
+							protID,
+							protID,
 							gf.getResidues(),
 							gf.getTypeId(),
 							gf.getMd5()));
+			System.out.println("\t\tPROT<"+protID
+					+"> SP<"+gf.getFeatLoc().getSpan()+">");
 		}
 		//System.out.println("\tEND FEATURE_SET");
 		return featureSetNode;
@@ -674,9 +702,14 @@ private int m_readMode = 0;
 		if((the_gf.getFeatLoc()!=null)
 				&&(the_gf.getFeatLoc().getSpan()!=null)){
 			Span sp = the_gf.getFeatLoc().getSpan();
-			Span spRet = sp.retreat((m_NewREFSPAN.getStart()-1));
+
+			//Span spRet = sp.retreat((m_NewREFSPAN.getStart()-1));
 			//INTERBASE COMPENSATION
-			spRet = new Span(spRet.getStart()+1,spRet.getEnd());
+			//spRet = new Span(spRet.getStart()+1,spRet.getEnd());
+			/**/
+			Span spRet = sp;
+			/**/
+
 			//System.out.println("RETREATING ID<"+the_gf.getId()
 			//		+">\tSP<"+sp+">\tTO<"+spRet+">");
 
@@ -795,6 +828,8 @@ private int m_readMode = 0;
 		Vector propList = new Vector();
 		Vector commentList = new Vector();
 		Vector authorList = new Vector();
+
+		/*******************************
 		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
 			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
 			if((fs!=null)&&(fs instanceof FeatProp)){
@@ -819,6 +854,51 @@ private int m_readMode = 0;
 				}
 			}
 		}
+		*******************************/
+
+		/*******************************/
+		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
+			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
+			if((fs!=null)&&(fs instanceof FeatProp)){
+				FeatProp fp = (FeatProp)fs;
+				//System.out.print(" KEY<"+fp.getPkeyId()
+				//		+"> VAL<"+fp.getpval()+">");
+				if(fp==null){
+				}else if(fp.getPkeyId()==null){
+					//DO NOTHING
+				}else if(fp.getPkeyId().equals("comment")){
+					commentList.add(
+						makeGameFeatPropComment(
+							the_DOC,fp));
+				}else if(fp.getPkeyId().equals("author")){
+					authorList.add(
+						makeGenericNode(the_DOC,
+							"author",fp.getpval()));
+				}else if(fp.getPkeyId().equals("protein_id")){
+					propList.add(
+						makeGameFeatPropReg(the_DOC,fp));
+				}
+			}
+		}
+
+		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
+			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
+			if((fs!=null)&&(fs instanceof FeatProp)){
+				FeatProp fp = (FeatProp)fs;
+				//System.out.print(" KEY<"+fp.getPkeyId()
+				//		+"> VAL<"+fp.getpval()+">");
+				if(fp==null){
+				}else if(fp.getPkeyId()==null){
+					//DO NOTHING
+				}else if(fp.getPkeyId().equals("comment")){
+				}else if(fp.getPkeyId().equals("author")){
+				}else if(!(fp.getPkeyId().equals("protein_id"))){
+					propList.add(
+						makeGameFeatPropReg(the_DOC,fp));
+				}
+			}
+		}
+		/*******************************/
 
 		//  AUTHOR
 		for(int i=0;i<authorList.size();i++){
@@ -1462,6 +1542,7 @@ private int m_readMode = 0;
 		//System.out.println("FEATPROP makeGameFeatPropReg()!!!");
 		String pkeyIdTxt = the_fp.getPkeyId();
 		String pvalTxt = the_fp.getpval();
+		//System.out.println("KEY ID<"+pkeyIdTxt+"> VAL<"+pvalTxt+">");
 		if(pvalTxt.startsWith("SP:")){
 			//System.out.println("STARTS WITH SP: <"+pvalTxt+">");
 			//pkeyIdTxt = "protein_id";
@@ -1518,6 +1599,20 @@ private int m_readMode = 0;
 		return makeGameComment(the_DOC,txtTxt,
 				the_fp.getPubId(),
 				dateTxt,tsTxt);
+	}
+
+	public String textReplace(String the_str,String the_old,
+			String the_new){
+		if((the_str==null)||(the_old==null)||(the_new==null)){
+			return null;
+		}
+		int indx = the_str.lastIndexOf(the_old);
+		if(indx>=0){
+			String firstPart = the_str.substring(0,indx);
+			String lastPart = the_str.substring(indx+the_old.length());
+			return firstPart+the_new+lastPart;
+		}
+		return the_str;
 	}
 }
 

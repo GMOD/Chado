@@ -314,30 +314,30 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("date")){
 			if(m_SB.toString()!=null){
 				m_CurrDate.setdate(m_SB.toString().trim());
-				//System.out.println("FOUND DATE STR <"
-				//		+m_CurrDate.getdate()+">");
+				System.out.println("FOUND DATE STR <"
+						+m_CurrDate.getdate()+">");
 			}
-			if(m_CurrAttr!=null){
-				//System.out.println(" IN ATTR <"+m_CurrAttr.gettype()+">");
+			if(m_CurrDate.getdate()==null){
+			}else if(m_CurrAttr!=null){
+				System.out.println(" IN ATTR <"+m_CurrAttr.gettype()+">");
 				m_CurrAttr.setdate(m_CurrDate.getdate());
 				m_CurrAttr.settimestamp(m_CurrDate.gettimestamp());
 			}else if(m_CurrFeat!=null){
+				System.out.println(" IN FEAT <"+m_CurrFeat.getId()+">");
 				m_CurrFeat.setdate(m_CurrDate.getdate());
 				m_CurrFeat.settimestamp(m_CurrDate.gettimestamp());
-				//System.out.println("DATE <"
-				//		+m_CurrDate.getdate()
-				//		+"> PUT INTO Feature <"
-				//		+m_CurrFeat.getId()
-				//		+"> OF TYPE <"
-				//		+m_CurrFeat.getType()+">");
-				if((m_CurrAnnot!=null)&&(m_CurrDate.getdate()!=null)){
-					//PUSH UP TO ANNOTATION ALSO
-					m_CurrAnnot.setdate(
-							m_CurrDate.getdate());
-					m_CurrAnnot.settimestamp(
-							m_CurrDate.gettimestamp());
-				//	System.out.println("\tALSO PUT IN ANNOT<"+m_CurrAnnot.getId()+">");
-				}
+				//if((m_CurrAnnot!=null)&&(m_CurrDate.getdate()!=null)){
+				//	//PUSH UP TO ANNOTATION ALSO
+				//	m_CurrAnnot.setdate(
+				//			m_CurrDate.getdate());
+				//	m_CurrAnnot.settimestamp(
+				//			m_CurrDate.gettimestamp());
+				//}
+			}else if(m_CurrAnnot!=null){
+				System.out.println(" IN ANNOT <"+m_CurrAnnot.getId()+">");
+				//PUSH UP TO ANNOTATION ALSO
+				m_CurrAnnot.setdate(m_CurrDate.getdate());
+				m_CurrAnnot.settimestamp(m_CurrDate.gettimestamp());
 			}
 			m_CurrDate = null;
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("annotation"))){
