@@ -1,4 +1,4 @@
-CREATE VIEW biomaterial_annotations
+CREATE OR REPLACE VIEW biomaterial_annotations
 AS SELECT
   b.biomaterial_id,
   b.description,
@@ -21,7 +21,7 @@ LEFT JOIN (
 )
 ON (b.biomaterial_id = bp3.biomaterial_id);
 
-CREATE VIEW affymetrixcel
+CREATE OR REPLACE VIEW affymetrixcel
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
   elementresult.element_id AS element_id,
@@ -33,7 +33,7 @@ AS SELECT
 FROM elementresult
 WHERE subclass_view = 'affymetrixcel';
 
-CREATE RULE "_RuleI_affymetrixcel" AS
+CREATE OR REPLACE RULE "_RuleI_affymetrixcel" AS
   ON INSERT TO affymetrixcel
   DO INSTEAD
     INSERT INTO elementresult
@@ -41,7 +41,7 @@ CREATE RULE "_RuleI_affymetrixcel" AS
     VALUES
     ('affymetrixcel',NEW.element_id,NEW.quantification_id,NEW.mean,NEW.stdv,NEW.npixels);
 
-CREATE RULE "_RuleU_affymetrixcel" AS
+CREATE OR REPLACE RULE "_RuleU_affymetrixcel" AS
   ON UPDATE TO affymetrixcel
   DO INSTEAD
     UPDATE elementresult
@@ -54,14 +54,14 @@ CREATE RULE "_RuleU_affymetrixcel" AS
     int3 = NEW.npixels
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE RULE "_RuleD_affymetrixcel" AS
+CREATE OR REPLACE RULE "_RuleD_affymetrixcel" AS
   ON DELETE TO affymetrixcel
   DO INSTEAD
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id
     AND subclass_view = 'affymetrixcel';
 
---CREATE VIEW affymetrixmas4
+--CREATE OR REPLACE VIEW affymetrixmas4
 --AS SELECT
 --  elementresult.elementresult_id AS elementresult_id,
 --  elementresult.element_id AS element_id,
@@ -77,7 +77,7 @@ CREATE RULE "_RuleD_affymetrixcel" AS
 --FROM elementresult
 --WHERE subclass_view = 'affymetrixmas4';
 
---CREATE RULE "_RuleI_affymetrixmas4" AS
+--CREATE OR REPLACE RULE "_RuleI_affymetrixmas4" AS
 --  ON INSERT TO affymetrixmas4
 --  DO INSTEAD
 --    INSERT INTO elementresult
@@ -85,7 +85,7 @@ CREATE RULE "_RuleD_affymetrixcel" AS
 --    VALUES
 --    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.positiveprobepairs,NEW.negativeprobepairs,NEW.numprobepairsused,NEW.pairsinaverage,NEW.logaverageratio,NEW.averagedifference,NEW.absolutecall);
 
---CREATE RULE "_RuleU_affymetrixmas4" AS
+--CREATE OR REPLACE RULE "_RuleU_affymetrixmas4" AS
 --  ON UPDATE TO affymetrixmas4
 --  DO INSTEAD
 --    UPDATE elementresult
@@ -102,13 +102,13 @@ CREATE RULE "_RuleD_affymetrixcel" AS
 --    string1 = NEW.absolutecall
 --    WHERE elementresult_id = OLD.elementresult_id;
 
---CREATE RULE "_RuleD_affymetrixmas4" AS
+--CREATE OR REPLACE RULE "_RuleD_affymetrixmas4" AS
 --  ON DELETE TO affymetrixmas4
 --  DO INSTEAD
 --    DELETE FROM elementresult
 --    WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE VIEW affymetrixmas5
+CREATE OR REPLACE VIEW affymetrixmas5
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
   elementresult.subclass_view AS subclass_view,
@@ -117,20 +117,21 @@ AS SELECT
   elementresult.float1 AS signal,
   elementresult.char1 AS detection,
   elementresult.float2 AS detectionpvalue,
+  elementresult.float3 AS z,
   elementresult.smallint1 AS statpairs,
   elementresult.smallint2 AS statpairsused
 FROM elementresult
 WHERE SUBCLASS_VIEW = 'affymetrixmas5';
 
-CREATE RULE "_RuleI_affymetrixmas5" AS
+CREATE OR REPLACE RULE "_RuleI_affymetrixmas5" AS
   ON INSERT TO affymetrixmas5
   DO INSTEAD
     INSERT INTO elementresult
-    (subclass_view,element_id,quantification_id,float1,char1,float2,smallint1,smallint2)
+    (subclass_view,element_id,quantification_id,float1,char1,float2,float3,smallint1,smallint2)
     VALUES
-    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.signal,NEW.detection,NEW.detectionpvalue,NEW.statpairs,NEW.statpairsused);
+    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.signal,NEW.detection,NEW.detectionpvalue,NEW.z,NEW.statpairs,NEW.statpairsused);
 
-CREATE RULE "_RuleU_affymetrixmas5" AS
+CREATE OR REPLACE RULE "_RuleU_affymetrixmas5" AS
   ON UPDATE TO affymetrixmas5
   DO INSTEAD
     UPDATE elementresult
@@ -141,17 +142,18 @@ CREATE RULE "_RuleU_affymetrixmas5" AS
     float1 = NEW.signal,
     char1 = NEW.detection,
     float2 = NEW.detectionpvalue,
+    float3 = NEW.z,
     smallint1 = NEW.statpairs,
     smallint2 = NEW.statpairsused
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE RULE "_RuleD_affymetrixmas5" AS
+CREATE OR REPLACE RULE "_RuleD_affymetrixmas5" AS
   ON DELETE TO affymetrixmas5
   DO INSTEAD
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE VIEW affymetrixdchip
+CREATE OR REPLACE VIEW affymetrixdchip
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
   elementresult.subclass_view AS subclass_view,
@@ -159,6 +161,7 @@ AS SELECT
   elementresult.quantification_id AS quantification_id,
   elementresult.float1 AS signal,
   elementresult.float2 AS se,
+  elementresult.float3 AS z,
   elementresult.char1 AS apcall
 FROM elementresult
 WHERE SUBCLASS_VIEW = 'affymetrixdchip';
@@ -167,11 +170,11 @@ CREATE OR REPLACE RULE "_RuleI_affymetrixdchip" AS
   ON INSERT TO affymetrixdchip
   DO INSTEAD
     INSERT INTO elementresult
-    (subclass_view,element_id,quantification_id,float1,float2,char1)
+    (subclass_view,element_id,quantification_id,float1,float2,float3,char1)
     VALUES
-    ('affymetrixdchip',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.apcall);
+    ('affymetrixdchip',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
 
-CREATE RULE "_RuleU_affymetrixdchip" AS
+CREATE OR REPLACE RULE "_RuleU_affymetrixdchip" AS
   ON UPDATE TO affymetrixdchip
   DO INSTEAD
     UPDATE elementresult
@@ -181,16 +184,17 @@ CREATE RULE "_RuleU_affymetrixdchip" AS
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
     float2 = NEW.se,
+    float2 = NEW.z,
     char1 = NEW.apcall
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE RULE "_RuleD_affymetrixdchip" AS
+CREATE OR REPLACE RULE "_RuleD_affymetrixdchip" AS
   ON DELETE TO affymetrixdchip
   DO INSTEAD
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE VIEW elementstat
+CREATE OR REPLACE VIEW elementstat
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
   elementresult.subclass_view AS subclass_view,
@@ -213,7 +217,7 @@ CREATE OR REPLACE RULE "_RuleI_elementstat" AS
     VALUES
     ('elementstat',NEW.element_id,NEW.quantification_id,NEW.mean,NEW.median,NEW.quartile1,NEW.quartile3,NEW.sd,NEW.n);
 
-CREATE RULE "_RuleU_elementstat" AS
+CREATE OR REPLACE RULE "_RuleU_elementstat" AS
   ON UPDATE TO elementstat
   DO INSTEAD
     UPDATE elementresult
@@ -229,14 +233,14 @@ CREATE RULE "_RuleU_elementstat" AS
     int1   = NEW.n
     WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE RULE "_RuleD_elementstat" AS
+CREATE OR REPLACE RULE "_RuleD_elementstat" AS
   ON DELETE TO elementstat
   DO INSTEAD
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
 
 
---CREATE VIEW &&rad3..ARRAYVISIONELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..ARRAYVISIONELEMENTRESULT
 --AS SELECT
 --  elementresultimp.element_result_id AS element_result_id,
 --  elementresultimp.subclass_view AS subclass_view,
@@ -272,7 +276,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp
 --WHERE subclass_view = 'ArrayVisionElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..BIOMATERIAL
+--CREATE OR REPLACE VIEW &&rad3..BIOMATERIAL
 --AS SELECT
 --  biomaterialimp.bio_material_id AS bio_material_id,
 --  biomaterialimp.subclass_view AS subclass_view,
@@ -292,7 +296,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM BioMaterialImp
 --where subclass_view = 'BioMaterial' with check option;
 
---CREATE VIEW &&rad3..BIOSAMPLE
+--CREATE OR REPLACE VIEW &&rad3..BIOSAMPLE
 --AS SELECT
 --  biomaterialimp.bio_material_id AS bio_material_id,
 --  biomaterialimp.subclass_view AS subclass_view,
@@ -314,7 +318,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM BioMaterialImp
 --where subclass_view = 'BioSample' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..BIOSOURCE
+--CREATE OR REPLACE VIEW &&rad3..BIOSOURCE
 --AS SELECT
 --  biomaterialimp.bio_material_id AS bio_material_id,
 --  biomaterialimp.subclass_view AS subclass_view,
@@ -338,7 +342,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM BioMaterialImp
 --where subclass_view='BioSource' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..ELEMENT
+--CREATE OR REPLACE VIEW &&rad3..ELEMENT
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -360,7 +364,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --where subclass_view = 'Element' with check option;
 
---CREATE VIEW &&rad3..ELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..ELEMENTRESULT
 --AS SELECT
 --  elementresultimp.element_result_id AS element_result_id,
 --  elementresultimp.subclass_view AS subclass_view,
@@ -380,7 +384,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp
 --WHERE ElementResultImp.SUBCLASS_VIEW = 'ElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..ELEMENT
+--CREATE OR REPLACE VIEW &&rad3..ELEMENT
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -403,7 +407,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --where subclass_view = 'Element' with check option;
 
---CREATE VIEW &&rad3..ELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..ELEMENTRESULT
 --AS SELECT
 --  elementresultimp.element_result_id AS element_result_id,
 --  elementresultimp.subclass_view AS subclass_view,
@@ -428,7 +432,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp
 --WHERE subclass_view = 'ElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..GEMTOOLSELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..GEMTOOLSELEMENTRESULT
 --AS SELECT ElementResultImp.element_result_id AS element_result_id,
 --ElementResultImp.element_id AS element_id,
 --ElementResultImp.element_result_id AS element_result_id,
@@ -451,7 +455,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --ElementResultImp.row_alg_invocation_id AS row_alg_invocation_id
 --FROM ElementResultImp WHERE subclass_view = 'GEMToolsElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..GENEPIXELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..GENEPIXELEMENTRESULT
 --AS SELECT
 --  element_result_id,
 --  element_id,
@@ -488,7 +492,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp
 --WHERE subclass_view = 'GenePixElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..LABELEDEXTRACT
+--CREATE OR REPLACE VIEW &&rad3..LABELEDEXTRACT
 --( BIO_MATERIAL_ID,
 --  SUBCLASS_VIEW,
 --  LABEL_METHOD_ID,
@@ -529,7 +533,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --WHERE LABEL_METHOD_ID is not null
 --AND SUBCLASS_VIEW = 'LabeledExtract' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..MOIDRESULT
+--CREATE OR REPLACE VIEW &&rad3..MOIDRESULT
 --AS SELECT ElementResultImp.element_result_id AS element_result_id,
 --ElementResultImp.element_id AS element_id,
 --ElementResultImp.quantification_id AS quantification_id,
@@ -552,7 +556,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp WHERE subclass_view = 'MOIDResult'
 --WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SAGETAG
+--CREATE OR REPLACE VIEW &&rad3..SAGETAG
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -573,7 +577,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --WHERE subclass_view = 'SAGETag' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SAGETAGMAPPING
+--CREATE OR REPLACE VIEW &&rad3..SAGETAGMAPPING
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -595,7 +599,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --WHERE subclass_view = 'SAGETagMapping' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SAGETAGRESULT
+--CREATE OR REPLACE VIEW &&rad3..SAGETAGRESULT
 --AS SELECT ElementResultImp.element_result_id AS element_result_id,
 --ElementResultImp.element_id AS element_id,
 --ElementResultImp.quantification_id AS quantification_id,
@@ -615,7 +619,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp WHERE subclass_view = 'SAGETagResult'
 --WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SCANALYZEELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..SCANALYZEELEMENTRESULT
 --AS SELECT
 --  elementresultimp.element_result_id AS element_result_id,
 --  elementresultimp.element_id AS element_id,
@@ -655,7 +659,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp
 --WHERE subclass_view = 'ScanAlyzeElementResult' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SHORTOLIGO
+--CREATE OR REPLACE VIEW &&rad3..SHORTOLIGO
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -682,7 +686,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --WHERE subclass_view = 'ShortOligo' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SHORTOLIGOFAMILY
+--CREATE OR REPLACE VIEW &&rad3..SHORTOLIGOFAMILY
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -706,7 +710,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --WHERE subclass_view = 'ShortOligoFamily' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SPOT
+--CREATE OR REPLACE VIEW &&rad3..SPOT
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
@@ -738,7 +742,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementImp
 --WHERE subclass_view = 'Spot' WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SPOTELEMENTRESULT
+--CREATE OR REPLACE VIEW &&rad3..SPOTELEMENTRESULT
 --AS SELECT ElementResultImp.element_result_id AS element_result_id,
 --ElementResultImp.element_id AS element_id,
 --ElementResultImp.element_result_id AS element_result_id,
@@ -773,7 +777,7 @@ CREATE RULE "_RuleD_elementstat" AS
 --FROM ElementResultImp WHERE subclass_view = 'SpotElementResult'
 --WITH CHECK OPTION;
 
---CREATE VIEW &&rad3..SPOTFAMILY
+--CREATE OR REPLACE VIEW &&rad3..SPOTFAMILY
 --AS SELECT
 --  elementimp.element_id AS element_id,
 --  elementimp.subclass_view AS subclass_view,
