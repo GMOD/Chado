@@ -129,6 +129,78 @@ map module
 	fragmented a.gambiae genome, but I'd bet what I did can be 
 	improved upon.
 
+VERSION 0.04
+============
+
+	GENERAL CHANGES
+	---------------
+
+	added Makefile
+
+	*prop tables have been made uniform: pkey_id has been changed to 
+	type_id.  all fk references to the cvterm table should now either be
+	type_id or cvterm_id.  pval field has been changed to value, and prank
+	has been changed to rank.  no pranks here!
+
+	all subject/predicate/object using tables previously used
+	subjterm_id/reltype_id/objterm_id.  this has been changed to
+	subject_id/type_id/object_id to be more generally applicable and consistent
+	with other uses of cvterm references.
 
 
+	MODULE CHANGES
+	--------------
 
+	audit module
+		no changes
+
+	bin
+		added of scripts to autogenerate graphviz and "diagram"
+		ER diagrams from schema.
+
+		added script to autogenerate Class::DBI middleware layer.
+		this introduces an SQL::Translator dependency
+
+	companalysis
+		no changes
+
+	cv
+		cv.cvname is now cv.name.  cv.cvdefinition is now cv.definition.
+		cvterm.termdefinition is now cvterm.definition.
+		tables cvrelationship and cvpath have been renamed as cvtermrelationship
+		and cvtermpath, and the appropariate field and index names have changed.
+
+	expression
+		no changes
+
+	general
+		contact table has been added.  data should start moving over from
+		pub.author soon, and the contact table should be fleshed out by 
+		one of the pub projects (ie pubsearch)
+
+		db table pk is now a serial int, rather than a varchar.  dbxref
+		now references db.db_id as dbxref.db_id instead of dbxref.dbname
+
+		dbxrefprop and dbxrefrelationship are commented out pending review
+
+	genetic
+		no changes
+
+	map
+		no changes
+
+	organism
+		organism.abbrev changed to organism.abbreviation
+
+	pub
+		introduced a fk from author table to contact table in general module
+
+
+	sequence
+		no changes
+
+	www
+		added for gmod-web.  this is likely to have many of the link
+		tables removed in favor of using the general-purpose "contact"
+		table in general module, and using a new tag-value based approach
+		to storing user bookmarks/lists/preferences/etc
