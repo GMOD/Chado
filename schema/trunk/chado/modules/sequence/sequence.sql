@@ -310,7 +310,8 @@ create index feature_cvterm_idx3 on feature_cvterm (pub_id);
 -- TABLE: feature_cvtermprop
 -- ================================================
 -- store attributes of feature_cvterm relationships, for instance GO evidence
--- codes
+-- codes; qualifiers; metadata such as the date on which the entry was
+-- curated and the source of the association
 
 create table feature_cvtermprop (
     feature_cvtermprop_id serial not null,
@@ -325,6 +326,25 @@ create table feature_cvtermprop (
 );
 create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_cvterm_id);
 create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
+
+-- ================================================
+-- TABLE: feature_cvterm_dbxref
+-- ================================================
+
+create table feature_cvterm_dbxref (
+    feature_cvterm_dbxref_id serial not null,
+    primary key (feature_cvterm_dbxref_id),
+    feature_cvterm_id int not null,
+    foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint feature_cvterm_dbxref_c1 unique (feature_cvterm_id,dbxref_id)
+);
+create index feature_cvterm_dbxref_idx1 on feature_cvterm_dbxref (feature_cvterm_id);
+create index feature_cvterm_dbxref_idx2 on feature_cvterm_dbxref (dbxref_id);
+
+COMMENT ON TABLE feature_cvterm_dbxref IS
+ 'Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details';
 
 
 -- ================================================
