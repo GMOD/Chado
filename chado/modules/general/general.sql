@@ -1,13 +1,13 @@
-## ================================================
-## TABLE: dbxref
-## ================================================
+-- ================================================
+-- TABLE: dbxref
+-- ================================================
 
 create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
        dbname varchar(255) not null,
        accession varchar(255) not null,
-## accession_version is unique key
+-- accession_version is unique key
        version varchar(255) not null default '',
        dbxrefdescription text,
        timeentered timestamp not null default current_timestamp,
@@ -16,9 +16,9 @@ create table dbxref (
        unique (dbname, accession, version)
 );
 
-## ================================================
-## TABLE: synonym
-## ================================================
+-- ================================================
+-- TABLE: synonym
+-- ================================================
 
 create table synonym (
        synonym_id serial not null,

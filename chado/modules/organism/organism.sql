@@ -1,6 +1,6 @@
-## ================================================
-## TABLE: organism
-## ================================================
+-- ================================================
+-- TABLE: organism
+-- ================================================
 
 create table organism (
 	organism_id serial not null,
@@ -17,19 +17,19 @@ create table organism (
 	unique(abbrev),
 	unique(taxgroup, genus, species, comment)
 );
-## Compared to mol5..Species, organism table lacks "approved char(1) null".  
-## We need to work w/ Aubrey & Michael to ensure that we don't need this in 
-## future [dave]
-##
-## in response: this is very specific to a limited use case I think;
-## if it's really necessary we can have an organismprop table
-## for adding internal project specific data
-## [cjm]
+-- Compared to mol5..Species, organism table lacks "approved char(1) null".  
+-- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
+-- future [dave]
+--
+-- in response: this is very specific to a limited use case I think;
+-- if it's really necessary we can have an organismprop table
+-- for adding internal project specific data
+-- [cjm]
 
 
-## ================================================
-## TABLE: organism_dbxref
-## ================================================
+-- ================================================
+-- TABLE: organism_dbxref
+-- ================================================
 
 create table organism_dbxref (
        organism_dbxref_id serial not null,

@@ -1,28 +1,28 @@
-## We should take a look in OMG for a standard representation we might use 
-## instead of this.
+-- We should take a look in OMG for a standard representation we might use 
+-- instead of this.
 
-## ================================================
-## TABLE: pub
-## ================================================
+-- ================================================
+-- TABLE: pub
+-- ================================================
 
 create table pub (
        pub_id serial not null,
        primary key (pub_id),
-## title of paper, chapter of book, journal, etc
+-- title of paper, chapter of book, journal, etc
        title text,
-## title of part if one of a series
+-- title of part if one of a series
        volumetitle text,
        volume  varchar(255),
-## full name of (journal) series
+-- full name of (journal) series
        series_name varchar(255),
        issue  varchar(255),
        pyear  varchar(255),
-## page number range[s], eg, 457--459, viii + 664pp, lv--lvii
+-- page number range[s], eg, 457--459, viii + 664pp, lv--lvii
        pages  varchar(255),
-## the type of the publication (book, journal, poem, graffiti, etc)
+-- the type of the publication (book, journal, poem, graffiti, etc)
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
-## do we want this even though we have the relationship in pub_relationship?
+-- do we want this even though we have the relationship in pub_relationship?
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -30,14 +30,14 @@ create table pub (
        timelastmod timestamp not null default current_timestamp
 );
 
-## ================================================
-## TABLE: pub_relationship
-## ================================================
+-- ================================================
+-- TABLE: pub_relationship
+-- ================================================
 
-## Handle relationships between publications, eg, when one publication
-## makes others obsolete, when one publication contains errata with
-## respect to other publication(s), or when one publication also 
-## appears in another pub (I think these three are it - at least for fb)
+-- Handle relationships between publications, eg, when one publication
+-- makes others obsolete, when one publication contains errata with
+-- respect to other publication(s), or when one publication also 
+-- appears in another pub (I think these three are it - at least for fb)
 
 create table pub_relationship (
        subj_pub_id int not null,
@@ -52,11 +52,11 @@ create table pub_relationship (
        unique(subj_pub_id, obj_pub_id, type_id)
 );
 
-## ================================================
-## TABLE: pub_dbxref
-## ================================================
+-- ================================================
+-- TABLE: pub_dbxref
+-- ================================================
 
-## Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
+-- Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
 
 create table pub_dbxref (
        pub_id int not null,
@@ -72,44 +72,44 @@ create table pub_dbxref (
 create index pub_dbxref_ind1 on pub_dbxref (dbxref_id);
 
 
-## ================================================
-## TABLE: author
-## ================================================
+-- ================================================
+-- TABLE: author
+-- ================================================
 
-## using the FB author table columns
+-- using the FB author table columns
 
 create table author (
        author_id serial not null,
        primary key (author_id),
        surname varchar(255) not null,
-## first name, initials
+-- first name, initials
        givennames varchar(255),
-## Jr., Sr., etc       
+-- Jr., Sr., etc       
        suffix varchar(255),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp
 );
 
-## ================================================
-## TABLE: pub_author
-## ================================================
+-- ================================================
+-- TABLE: pub_author
+-- ================================================
 
 create table pub_author (
        author_id int not null,
        foreign key (author_id) references author (author_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-## order of author in author list for this pub
+-- order of author in author list for this pub
        arank int not null,
-## indicates whether the author is an editor for linked publication
+-- indicates whether the author is an editor for linked publication
        editor boolean default 'false',
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp
 );
 
-## ================================================
-## TABLE: pubprop
-## ================================================
+-- ================================================
+-- TABLE: pubprop
+-- ================================================
 
 create table pubprop (
        pub_id int not null,
