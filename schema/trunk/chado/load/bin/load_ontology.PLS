@@ -22,6 +22,7 @@ use Data::Dumper;
 use Chado::LoadDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
+use Term::ProgressBar;
 
 use constant DEBUG=>0;
 
@@ -67,6 +68,7 @@ my $ontname = $ontology_file2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Onto
               $ontology_file2 =~ /^cell/            ? "Cell Ontology" :
               $ontology_file2 =~ /^pathology/       ? "eVOC Pathology Ontology" :
               $ontology_file2 =~ /^SO[FD]A|so\./    ? "Sequence Ontology" :
+              $ontology_file2 =~ /^MPheno/          ? "Mammalian Phenotype Ontology" :
               undef;
 
 die "no ontology name defined for $ontology_file2!" unless defined($ontname);
@@ -129,10 +131,27 @@ my %allterms;
 my %predicateterms;
 my %allrels;
 
+my $progress;
+my $loaded = 0;
+
 #parse the ontologies
 while (my $ont = $parser->next_ontology()) {
 
-warn "parsing ontology...\n" if DEBUG;
+  my $termcount = $ont->get_all_terms();
+  my $ontname   = $ont->name();
+
+  $progress = Term::ProgressBar->new(
+                                     {
+                                      name => "Terms: $termcount",
+                                      count => $termcount,
+                                      ETA => 'linear',
+                                     }
+                                    );
+
+  $progress->message("loading $ontname...");
+  $progress->max_update_rate(0.5);
+
+  warn "parsing ontology...\n" if DEBUG;
   $ont->relationship_factory($relfact);
   warn "...terms...\n" if DEBUG;
   load_ontologyterms($ont);
@@ -155,7 +174,13 @@ sub load_ontologyterms{
 
   #load edge terms
   foreach my $predicate (@predicates) {
+    $progress->update(++$loaded);
 	warn "this is a predicate: ", $oborelmap{ predmap($predicate->name) }, "\n" if DEBUG;
+
+    #create new predicates and dbxrefs as necessary
+    if(!$oborelmap{predmap($predicate->name)}){
+      $oborelmap{lc($predicate->name)} = lc($predicate->name);
+    }
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
 	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
@@ -183,22 +208,21 @@ sub load_ontologyterms{
 
   #load root terms
   foreach my $root (@roots) {
-        my($root_db) = Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
+    $progress->update(++$loaded);
+    my($root_db) = Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
 
         if(!$root_db){
-#warn 3.0;
-#warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
-  next unless $root->name;
-		my $dbxref = Chado::Dbxref->find_or_create({
+          #warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
+          next unless $root->name;
+		  my $dbxref = Chado::Dbxref->find_or_create({
 				db_id => $db->id,
 				accession => $root->identifier,
 							   });
-		$root_db = Chado::Cvterm->find_or_create({
+		  $root_db = Chado::Cvterm->find_or_create({
 				 name => $root->name || $oborelmap{ predmap($root->identifier) },
 				 cv_id => $cv->id,
 				 dbxref_id => $dbxref->id,
 							});
-#warn 3.1;
 	}
 	$root_db->definition($root->definition) unless defined($root_db->definition);
 
@@ -218,6 +242,7 @@ sub load_ontologyterms{
 
 #usage: load_ontologytermsR($ontref, $root)
 sub load_ontologytermsR {
+  $progress->update(++$loaded);
   my $ontref = shift;
   my $parent = shift;
   my $tab = shift;
@@ -258,6 +283,7 @@ sub load_ontologytermsR {
 }
 
 sub load_ontologyrels {
+  $progress->update(++$loaded);
   my $ontref = shift;
 
   my @relationships = $ontref->get_relationships();
@@ -313,7 +339,7 @@ sub load_dblinks {
   foreach my $term_link (@term_links) {
 
     if(length($term_link) > 255){
-      warn("definition for term '".$term->name()."' too long, truncating to length 255");
+      $progress->message("definition for term '".$term->name()."' too long, truncating to length 255");
       $term_link = substr($term_link, 0, 255);
     }
 

@@ -40,6 +40,12 @@
   <!--            -->
   <!-- ontologies -->
   <!--            -->
+  <ontology name="Relationship Ontology" order="1">
+    <file type="ontology"    local="obo/OBO_REL/rel.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.ontology?rev=HEAD" method="lwp-mirror"/>
+    <file type="definitions" local="obo/OBO_REL/rel.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.definitions?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+
   <ontology name="Sequence Ontology" order="2">
     <file type="ontology"    local="song/so.ontology"   remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.ontology?rev=HEAD"   method="lwp-mirror"/>
     <file type="definitions" local="song/so.definition" remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.definition?rev=HEAD" method="lwp-mirror"/>
@@ -60,19 +66,19 @@
     <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
-  <ontology name="Mouse Pathology Ontology (Pathbase)" order="6">
+  <ontology name="Mammalian Phenotype Ontology" order="6">
+    <file type="ontology" local="obo/phenotype/MPheno.ontology" remote="ftp://ftp.informatics.jax.org/pub/reports/MPheno.ontology" method="lwp-mirror"/>
+    <file type="definitions" local="obo/phenotype/MPheno.defs" remote="ftp://ftp.informatics.jax.org/pub/reports/MP.defs" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Mouse Pathology Ontology (Pathbase)" order="7">
     <file type="ontology" local="obo/phenotype/mouse_pathology/mouse_pathology.ontology" remote="http://eulep.anat.cam.ac.uk/Pathology_Ontology/mpath_obo.php" method="lwp-mirror"/>
     <file type="definitions" local="obo/phenotype/mouse_pathology/mouse_pathology.defs" remote="http://eulep.anat.cam.ac.uk/Pathology_Ontology/mpath_obo_defs.php" method="lwp-mirror"/>
   </ontology>
 
-  <ontology name="Cell Ontology" order="7">
+  <ontology name="Cell Ontology" order="8">
     <file type="ontology" local="obo/anatomy/cell_type/cell.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.ontology?rev=HEAD" method="lwp-mirror"/>
     <file type="definitions" local="obo/anatomy/cell_type/cell.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.definitions?rev=HEAD" method="lwp-mirror"/>
-  </ontology>
-
-  <ontology name="Relationship Ontology" order="1">
-    <file type="ontology"    local="obo/OBO_REL/rel.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.ontology?rev=HEAD" method="lwp-mirror"/>
-    <file type="definitions" local="obo/OBO_REL/rel.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.definitions?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
   <!--            -->
