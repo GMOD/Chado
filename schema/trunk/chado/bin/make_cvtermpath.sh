@@ -22,6 +22,9 @@ echo "Cell Ontology"
 echo "eVOC Pathology Ontology"
 ./bin/make_cvtermpath.pl $USER $DBNAME 'eVOC Pathology Ontology'       | psql -q $DBNAME
 
+echo "Mouse Pathology Ontology (Pathbase)"
+./bin/make_cvtermpath.pl $USER $DBNAME 'Mouse Pathology Ontology (Pathbase)' | psql -q $DBNAME
+
 true;
 
 
