@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.7 2002-11-09 02:36:08 cmungall Exp $
+## $Id: companalysis.sql,v 1.8 2002-11-11 19:11:43 cwiel Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -36,7 +36,7 @@ create table analysis (
     algorithm varchar(255),
     sourcename varchar(255),
     sourceversion varchar(255),
-    queryfeature_id,
+    queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
 
     timeentered timestamp not null default current_timestamp,
@@ -48,9 +48,9 @@ create table analysis (
 create table analysisprop (
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
-    apkey_id int not null,
-    foreign key (apkey_id) references cvterm (cvterm_id),
-    apval text,
+    pkey_id int not null,
+    foreign key (pkey_id) references cvterm (cvterm_id),
+    pval text,
 
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
@@ -110,14 +110,14 @@ create table analysisresult (
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
 
-    parentresult_id int not null,
+    parentresult_id int,
     foreign key (parentresult_id) references analysisresult (analysisresult_id),
     type_id int,
     foreign key (type_id) references cvterm (cvterm_id),
 
-    rawscore double,
-    normscore double,
-    significance double
+    rawscore double precision,
+    normscore double precision,
+    significance double precision,
 
     timeentered timestamp not null default current_timestamp
 );
