@@ -12,7 +12,6 @@ create table organism (
 	common_name varchar(255) null,
 	comment text null,
 
-	unique(abbrev),
 	unique(taxgroup, genus, species)
 );
 -- Compared to mol5..Species, organism table lacks "approved char(1) null".  
