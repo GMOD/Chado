@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.7 2004-01-03 04:59:32 allenday Exp $
+$Id: README.H_sapiens,v 1.8 2004-04-12 19:19:10 boconnor Exp $
 
 INTRODUCTION
 ------------
@@ -30,7 +30,7 @@ LOAD GENOMIC DATA
 1. Download chromosome data.  The following URL provides a GFF describing
 the chromosomes given in UCSC Build 16 (hg16) of the Human genome.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.chromosome.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/images/chado/Hg16.chromosome.gff
 
 Load the GFF file as below.  Make sure you are in your chado distribution
 directory.
@@ -62,7 +62,7 @@ and the chromosome DNA is loaded.
 records available from UCSC Hg16.  Each gene model has extra data attached
 to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.knownGene.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/images/chado/Hg16.knownGene.gff
 
 Now load the GFF file as:
 
@@ -72,8 +72,8 @@ This will take several hours to complete.
 
 4. Download Affymetrix probeset DesignElement alignments to UCSC Hg16.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.U133.gff
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.U95.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/images/chado/Hg16.U133.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/images/chado/Hg16.U95.gff
 
 and load the GFF files as:
 
@@ -91,8 +91,8 @@ for "Bio::Expression::MicroarrayIO").
 
 2. Download gene expression data:
 
-  wget http://sumo/~allenday/chado/13138-13134-MA0000411,MPATH458,adult%20testis%20ucla%20133A.xls
-  wget http://sumo/~allenday/chado/14168-14160-MA0000384,MPATH458,adult%20ovary%20ucla%20133A.xls
+  wget http://sumo/~allenday/images/chado/13138-13134-MA0000411,MPATH458,adult%20testis%20ucla%20133A.xls
+  wget http://sumo/~allenday/images/chado/14168-14160-MA0000384,MPATH458,adult%20ovary%20ucla%20133A.xls
 
 and load it as:
 
