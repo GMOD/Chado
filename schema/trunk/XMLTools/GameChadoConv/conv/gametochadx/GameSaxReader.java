@@ -551,9 +551,15 @@ private StringBuffer m_SB;
 			if(m_SB.toString()!=null){
 				m_componentTxt = m_SB.toString().trim();
 			}
-		}else if(qualifiedName.equals("synonym")){
+		}else if((qualifiedName.equals("synonym"))
+				||(qualifiedName.equals("internal_synonym"))){
 			if(m_SB.toString()!=null){
 				m_synonymTxt = m_SB.toString().trim();
+				System.out.println("READ SYNONYM<"+m_synonymTxt+">");
+				Attrib tmp = new Attrib("property");
+				tmp.settype("synonym");
+				tmp.setvalue(m_synonymTxt);
+				m_CurrFeat.addAttrib(tmp);
 			}
 		}else if(qualifiedName.equals("organism")){
 			if(m_SB.toString()!=null){

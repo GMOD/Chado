@@ -79,11 +79,15 @@ private SMTPTR m_CurrEvidenceId,m_CurrAnalysisId,m_CurrSynonymId;
 
 private String m_iscurrentTxt = null;
 
+private boolean m_GeneOnly = true;
+private boolean m_inAnalysis = false;
+
 	public ChadoSaxReader(){
 		super();
 	}
 
-	public void parse(String the_FilePathName){
+	public void parse(String the_FilePathName,boolean the_GeneOnly){
+		m_GeneOnly = the_GeneOnly;
 		try {
 			SAXParserFactory sFact = SAXParserFactory.newInstance();
 			parser = sFact.newSAXParser();
@@ -282,22 +286,34 @@ private String m_iscurrentTxt = null;
 			//System.out.println("PTD");
 			if(surroundingFeature instanceof Feature){
 				//System.out.println("PTE");
-				Mapping.Add(endingFeature.getId(),endingFeature);
-				//System.out.println("PTEA");
-				if(m_CurrFEATID!=null){
-					m_CurrFEATID.setkey(endingFeature.getId());
+				if((m_GeneOnly)&&(m_inAnalysis)){
+					System.out.println("===========IS ANALYSIS, NOT SAVED");
+				}else{
+					System.out.println("===========IS GENE, IS SAVED");
+					Mapping.Add(endingFeature.getId(),endingFeature);
+					//System.out.println("PTEA");
+					if(m_CurrFEATID!=null){
+						m_CurrFEATID.setkey(endingFeature.getId());
+					}
+					//System.out.println("PTEB");
+					m_CurrFeature = (Feature)surroundingFeature;
+					System.out.println("-RETURNTO FEATURE<"
+							+m_CurrFeature.getId()
+							+"> TYPE<"
+							+m_CurrFeature.getTypeId()+">");
 				}
-				//System.out.println("PTEB");
-				m_CurrFeature = (Feature)surroundingFeature;
-				System.out.println("-RETURNTO FEATURE<"
-						+m_CurrFeature.getId()
-						+"> TYPE<"
-						+m_CurrFeature.getTypeId()+">");
 				m_CurrTypeStack.pop();
 				//displayType("FEATURE");
 			}else if(surroundingFeature instanceof Chado){
 				//System.out.println("PTF");
-				Mapping.Add(endingFeature.getId(),endingFeature);
+				if((m_GeneOnly)&&(endingFeature.isMatch())){
+					System.out.println("=======TOP MATCH BEING IGNORED");
+					m_inAnalysis = true;
+				}else{
+					System.out.println("=======TOP NON MATCH BEING ADDED TO MAPPING");
+					Mapping.Add(endingFeature.getId(),endingFeature);
+					m_inAnalysis = false;
+				}
 				System.out.println("RETURNING TO CURR_CHADO");
 			}else{
 				//System.out.println("PTG");
@@ -752,15 +768,19 @@ private String m_iscurrentTxt = null;
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("timeaccessioned")){
+			System.out.println("SHOULDBESTORING TIMEACC");
 			if(m_SB.toString()!=null){
 				m_CurrFeature.settimeaccessioned(
 						m_SB.toString().trim());
+				System.out.println("<<"+m_SB.toString().trim()+">>");
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("timelastmodified")){
+			System.out.println("SHOULDBESTORING TIMELASTMOD");
 			if(m_SB.toString()!=null){
 				m_CurrFeature.settimelastmodified(
 						m_SB.toString().trim());
+				System.out.println("<<"+m_SB.toString().trim()+">>");
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("seqlen")){
@@ -1011,7 +1031,7 @@ private String m_iscurrentTxt = null;
 	public static void main(String args[]){
 		ChadoSaxReader pd = new ChadoSaxReader();
 		String fn = "../OUT/test.xml.chado1";
-		pd.parse(fn);
+		pd.parse(fn,true);
 		GenFeat topnode = pd.getTopNode();
 		topnode.Display(0);
 	}
