@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.5 2003-12-24 07:17:35 allenday Exp $
+$Id: README.H_sapiens,v 1.6 2003-12-24 07:29:08 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -35,7 +35,7 @@ the chromosomes given in UCSC Build 16 (hg16) of the Human genome.
 Load the GFF file as below.  Make sure you are in your chado distribution
 directory.
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile Hg16.chromosome.gff
+  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile Hg16.chromosome.gff
 
 If you look at the data loaded into the feature table at this point,
 you will notice that the chromosomes have been loaded as objects of
@@ -52,7 +52,7 @@ Now do something akin to this tcsh script:
   > unzip chromFa.zip
   > foreach i (*.fa)
   ? echo $i
-  ? ./load/bin/load_gff3.pl --srcdb 'DB:ucsc' --organism Human --gfffile $i
+  ? ./load/bin/gmod_load_gff3.pl --srcdb 'DB:ucsc' --organism Human --gfffile $i
   ? end
   >
 
@@ -66,7 +66,7 @@ to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
 
 Now load the GFF file as:
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile Hg16.knownGene.gff
+  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile Hg16.knownGene.gff
 
 This will take several hours to complete.
 
@@ -77,8 +77,8 @@ This will take several hours to complete.
 
 and load the GFF files as:
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:affy:U133' --cache 10000 --gfffile Hg16.U133.gff
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:affy:U95' --cache 10000 --gfffile Hg16.U95.gff
+  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:affy:U133' --cache 10000 --gfffile Hg16.U133.gff
+  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:affy:U95' --cache 10000 --gfffile Hg16.U95.gff
 
 This may take a few hours to complete.
 
