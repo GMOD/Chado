@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/perl
                                                                                 
 use Config;
 use File::Basename qw(&basename &dirname);
@@ -58,6 +58,16 @@ while ( my $seq = $seqio->next_seq() ) {
 
     #my @top_sfs = $unflattener->get_SeqFeatures;
     my @skipped_lines;
+    
+
+    # print a GFF header
+    my $date = localtime;
+    my $sname = $seq->accession || $seq->display_name;
+    my $end   = length $seq->seq;
+    print OUT "##gff-version 3\n",
+              "##date $date\n",
+              "##sequence-region ",join(' ', $sname, 1, $end),"\n";
+
     foreach my $sf (@sfs) {
 
         $sf->seq_id($acc);
@@ -238,7 +248,10 @@ sub validate_ID {
         $idcount++;
     }
 }
+
 !NO!SUBS!
+
+
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 chdir $origdir;
