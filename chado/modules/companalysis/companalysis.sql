@@ -151,7 +151,7 @@ create table analysisfeature (
     primary key (analysisfeature_id),
     feature_id int not null,
     foreign key (feature_id) references feature (feature_id),
-    analysis_id int,
+    analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
     rawscore double precision,
     normscore double precision,
