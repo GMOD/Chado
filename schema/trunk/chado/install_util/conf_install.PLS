@@ -67,16 +67,14 @@ print GMODCONF "CONF=$gmod_root/conf\n";
 print GMODCONF "TMP=$gmod_root/tmp\n";
 close GMODCONF;
 
-open DEFAULT, ">$defaultconf" or die "unable to open $defaultconf: $!";
 open DBCONF,  ">$dbconf" or die "unable to open $dbconf: $!";
 foreach my $key (keys %confitems) {
-    print DEFAULT "$key=$confitems{$key}\n";
     print DBCONF  "$key=$confitems{$key}\n";
 }
-print DEFAULT "SQLFILE=$gmod_root/src/chado/modules/complete.sql";
-print DBCONF  "SQLFILE=$gmod_root/src/chado/modules/complete.sql";
-close DEFAULT;
+print DBCONF  "SQLFILE=$gmod_root/src/chado/modules/complete.sql\n";
 close DBCONF;
+
+symlink($dbconf,$defaultconf);
 
 chdir $origdir;
 
