@@ -108,7 +108,6 @@ GetOptions('organism:s'       => \$ORGANISM,
 
 $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
-$SRC_DB   ="$SRC_DB";
 $GFFFILE  ||='test.gff';
 
 Chado::LoadDBI->init();
@@ -171,26 +170,60 @@ unless ($note_type) {
 die "Unable to create note type in cvterm table."
     unless $note_type;
 
+my ($pub_type) = Chado::Cvterm->search(name => 'gff_file');
+unless ($pub_type) {
+  my ($cv_entry) = Chado::Cv->find_or_create({
+                    name       => 'autocreated',
+                    definition => 'auto created by load_gff3.pl'
+                                             });
+  ($pub_type) = Chado::Cvterm->find_or_create({
+                    name       => 'gff_file',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+}
+die "Unable to find or create pub type in cvterm table"
+    unless $pub_type;
+
+my $mtime = (stat($GFFFILE))[9];
+my ($pub) = Chado::Pub->search(title => $GFFFILE." ".$mtime);
+if ($pub) {
+  print "It appears that you have already loaded this exact file\n";
+  print "Do you want to continue [no]? ";
+  chomp (my $response = <STDIN>);
+  unless ($response =~ /^[Yy]/) {
+    print "OK--bye.\n";
+    exit 0;
+  }
+} else {
+  $pub = Chado::Pub->find_or_create({
+                    title      => $GFFFILE." ".$mtime,
+                    miniref    => $GFFFILE." ".$mtime,
+                    type_id    => $pub_type->cvterm_id
+                                   });
+}
+die "unable to find or create a pub entry in the pub table"
+    unless $pub;
 
 while(my $gff_segment = $gffio->next_segment()) {
 warn $gff_segment;
   my $segment = Chado::Feature->search({name => $gff_segment->display_id});
   if(!$segment){
 
-	if(!$typemap{'region'}){
-	  ($typemap{'region'}) = Chado::Cvterm->search( name => 'region' );
-	}
-	die "Sequence Ontology term \"region\" could not be found in your cvterm table.\nAre you sure the Sequence Ontology was correctly loaded?\n" unless $typemap{'region'};
+    if(!$typemap{'region'}){
+      ($typemap{'region'}) = Chado::Cvterm->search( name => 'region' );
+    }
+    die "Sequence Ontology term \"region\" could not be found in your cvterm table.\nAre you sure the Sequence Ontology was correctly loaded?\n" unless $typemap{'region'};
 
-	Chado::Feature->create({
-							organism_id => $chado_organism,
-							name => $gff_segment->display_id,
-							uniquename => $gff_segment->display_id .'_region',
-							type_id => $typemap{'region'},
-							seqlen => abs($gff_segment->end - $gff_segment->start), #who knows? spec doesn't specify start < end
-						   });
+    Chado::Feature->create({
+	organism_id => $chado_organism,
+	name        => $gff_segment->display_id,
+	uniquename  => $gff_segment->display_id .'_region',
+	type_id => $typemap{'region'},
+	seqlen => abs($gff_segment->end - $gff_segment->start), #who knows? spec doesn't specify start < end
+			   });
 
-	$feature_count++;
+    $feature_count++;
   }
 }
 
@@ -294,11 +327,10 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $id,
                       type_id      => $synonym_type->cvterm_id
                                                    });
-	
     Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => $nullpub
+                      pub_id     => $pub->pub_id
                                             });
   }
 
@@ -322,11 +354,10 @@ while(my $gff_feature = $gffio->next_feature()) {
                       type_id      => $synonym_type->cvterm_id
                                                      });
 	  
-	  
       Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => $nullpub,
+                      pub_id     => $pub->pub_id,
                                               });
     }
   }
@@ -339,12 +370,10 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $name,
                       type_id      => $synonym_type->cvterm_id
                                                    });
-	  
-	  
       Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => $nullpub,
+                      pub_id     => $pub->pub_id,
                                             });
     }
   }
@@ -356,7 +385,7 @@ while(my $gff_feature = $gffio->next_feature()) {
       Chado::Featureprop->find_or_create({
                       feature_id => $chado_feature->feature_id,
                       type_id    => $note_type->cvterm_id,
-                      value      => $note,
+                      value      => $note
                                          });
     }
   } 
