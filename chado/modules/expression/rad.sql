@@ -129,7 +129,7 @@ create table assay (
 	foreign key (array_id) references array (array_id) on delete cascade,
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
-    assaydate date null,
+    assaydate timestamp null default current_timestamp,
     arrayidentifier varchar(100) null,
     arraybatchidentifier varchar(100) null,
     operator_id int not null,
@@ -274,7 +274,7 @@ create table acquisition (
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     channel_id int null,
 	foreign key (channel_id) references channel (channel_id) on delete set null,
-    acquisitiondate date null,
+    acquisitiondate timestamp null default current_timestamp,
     name varchar(100) null,
     uri varchar(255) null,
     unique(name)
@@ -327,7 +327,7 @@ create table quantification (
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     analysis_id int not null,
 	foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
-    quantificationdate date null,
+    quantificationdate timestamp null default current_timestamp,
     name varchar(100) null,
     uri varchar(500) null,
     unique(name,analysis_id)
