@@ -109,7 +109,10 @@ sub makeFiles
   unless(ref $fileset) { 
     my $intype= $self->{config}->{informat} || 'fff'; #? maybe array
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
-    # warn "makeFiles: no infiles => \@filesets given"; return;  
+    }
+  unless(ref $fileset) { 
+    warn "FastaWriter: no input 'fff' feature files found\n"; 
+    return;  
     }
  
   my $featset= $self->handler->{config}->{featset} || []; #? or default set ?
@@ -382,6 +385,7 @@ sub fastaFromFFFloop
   $self->{ffformat}= 0; 
   my %lastfff= ();
   my $org= $self->{org} || $self->handler()->{config}->{org};
+  my $rel= $self->{rel} || $self->handler()->{config}->{rel};
 
   my $allowanyfeat= 
     (!$featset || $featset =~ /^(any|all)/i) ? 1 
@@ -443,6 +447,7 @@ sub fastaFromFFFloop
           name => $name, chr => $chr, location => $baseloc, 
           ID => $id, db_xref => $dbxref, 
           $org ? (species => $org) : (),
+          $rel ? (release => $rel) : (),
           @notes  
           );
       
@@ -506,6 +511,7 @@ sub fastaFromFFF
   
   # print STDERR "fastaFromFFF: 1\n" if $DEBUG>1;
   my $org= $self->{org} || $self->handler()->{config}->{org};
+  my $rel= $self->{rel} || $self->handler()->{config}->{rel};
   
   my($types_ok,$retype,$usedb,$subrange,$types_info)
         = $self->get_feature_set( $featset, undef, $allowanyfeat);
@@ -527,6 +533,7 @@ sub fastaFromFFF
       name => $name, chr => $chr, location => $baseloc, 
       ID => $id, db_xref => $dbxref, 
       $org ? (species => $org) : (),
+      $rel ? (release => $rel) : (),
       @notes  
       );
   

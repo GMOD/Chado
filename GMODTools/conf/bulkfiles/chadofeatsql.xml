@@ -26,29 +26,29 @@
   
   
   <feature_sql id="countfeats" type="list" output="chadofeats.count">
-  <sql>
+  <sql><![CDATA[
   -- use for overview of chado feature contents
   SELECT featcv.name, featcv.cvterm_id, count(armft.feature_id)
   FROM feature armft, cvterm featcv
   WHERE armft.type_id = featcv.cvterm_id
   GROUP by featcv.name;
-  </sql>
+  ]]></sql>
   </feature_sql>
   
   <feature_sql id="fbids" type="list" output="chado-fb.ids">
-  <sql>
+  <sql><![CDATA[
     -- used for flybase to exclude cytologic features with same genome feature id
     SELECT accession FROM dbxref 
     WHERE accession like '%FBgn%' or accession like '%FBti%'
     ;
-  </sql>
+  ]]></sql>
   </feature_sql>
 
 <!-- ? add organism table output and use organism_id in all feature_tables ? -->
   <feature_sql id="organism" type="organism_table" output="organism.tsv">
-  <sql>
+  <sql><![CDATA[
   SELECT organism_id,abbreviation,genus,species,common_name,comment FROM organism;
-  </sql>
+  ]]></sql>
   
   <script name="orgtab" type="IGNORE_postprocess" shell="perl -ni.old" language="perl">
 <![CDATA[
@@ -62,8 +62,7 @@
 <!-- dmel r4 note: uniquename == chromosome name; name == genbank accession  -->
 
   <feature_sql id="chromosomes" type="feature_table" output="chromosomes.tsv">
-  <sql>
-<![CDATA[
+  <sql><![CDATA[
 -- get chromosome/arm/supercontig/... lengths/names
 -- need ENV/other subsitution Variable for 'chromosome', 'chromosome_arm', 'ultra_scaffold'
 -- add get-residues to file 
@@ -87,8 +86,7 @@ WHERE
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
 ORDER BY arm ;
-]]>
-  </sql>
+]]></sql>
     
   <script name="remapunk" type="postprocess" shell="perl -i.old" language="perl">
 <![CDATA[
@@ -144,7 +142,7 @@ sub mapunk {
 
   
   <feature_sql id="features" type="feature_table" output="features.tsv">
-  <sql>
+  <sql><![CDATA[
 -- standard features (excluding matches, analyses)
 SELECT  distinct
   -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
@@ -165,7 +163,7 @@ FROM
   cvterm targcv
 
 WHERE
-  NOT (targcv.name in ('match', 'syntenic_region', 'orthologous_region')) --  add orthologous_region, syntenic_region
+  NOT (targcv.name in ('match', 'syntenic_region', 'orthologous_region')) 
   and targft.type_id = targcv.cvterm_id 
   and armft.feature_id = armloc.srcfeature_id  
   and targft.feature_id = armloc.feature_id  
@@ -180,7 +178,7 @@ ORDER BY arm, armloc.fmin --, targcv.name
 --   and armcv.cv_id = socv.cv_id and socv.name = 'SO'
 --   and armcv.cvterm_id = armft.type_id  
 
-  </sql>
+  ]]></sql>
   </feature_sql>
   
 <!--
@@ -201,7 +199,7 @@ egrep 'to_species.1' synteny.tsv | perl -ne \
 -->
 
   <feature_sql id="synteny" type="feature_table"  output="synteny.tsv">
-  <sql>
+  <sql><![CDATA[
   -- dpse-synteny.sql for cross-species features (syntenic_region, orthologous_region)
   -- split output by species ? 
   -- this feature_table has extra column for species,to_species, no strand
@@ -245,13 +243,14 @@ WHERE
 -- DO need ORDER clause
 ORDER BY arm, armloc.fmin --, matchcv.name
 ;
-  </sql>
+  ]]></sql>
   </feature_sql>
 
 
 
   <feature_sql id="matches" type="feature_table"  output="matches.tsv">
 
+  <!-- see below ests target; better than this -->
   <script name="matchfilt" type="postprocess" shell="perl -ni.old" language="perl">
 <![CDATA[
   #filter matches that exist in analysis set; keep EST/cDNAs matches; RE60666.5prime, LD02891.5prime and like
@@ -259,7 +258,7 @@ ORDER BY arm, armloc.fmin --, matchcv.name
 ]]>
   </script>
 
-  <sql>
+  <sql><![CDATA[
 -- use this to get the paired genome/target match items w/ attr (or null) --
 -- jun04 - need to filter out apollo dupl. evidence for
 -- match features, type = transposable_element_insertion_site
@@ -307,9 +306,108 @@ WHERE
 -- dont need ORDER clause?? but see below
 ORDER BY arm, armloc.fmin
 ;
-  </sql>
+  ]]></sql>
   </feature_sql>
 
+
+  <feature_sql id="ests" type="feature_table"  output="ests.tsv">
+  <script name="estaddpar" type="postprocess" shell="perl -pi.old" language="perl">
+<![CDATA[
+  #add dummy parent row for each new 'parent_oid nnn' line 
+  if (/parent_oid\t(\S+)/ && !$didp{$1})  
+    { $p=$1; $v=$_; $v=~s/(\S+)\tparent_oid/$p\tobject_oid/; $v=~s/match_part/match/; print $v; $didp{$p}=1; }
+]]>
+  </script>
+
+  <sql><![CDATA[
+-- feb05: chado est sql; separate from match & analysis 
+-- AND exclude these feat types from analysis.tsv
+-- match:,match_part: sim4:na_dbEST.same.dmel,sim4:na_dbEST.diff.dmel,sim4:na_DGC.in_process.dros
+
+SELECT distinct
+  armft.uniquename as arm,
+  armloc.fmin, armloc.fmax, armloc.strand,
+  armft.organism_id,
+  'match_part:' || an.program || ':' || an.sourcename as type, 
+  estft.name as name,
+  estft.uniquename as id,   -- causing problems cuz not uniq among locations 
+  partloc.feature_id AS oid, --  anfr.subject_id 
+  text('parent_oid') AS attr_type, 
+  anfr.object_id || partloc.srcfeature_id AS attribute
+  -- partloc.srcfeature_id AS attribute -- this is not right == EST oid, same for all named est
+
+FROM 
+  feature armft, feature estft,
+  featureloc armloc, featureloc partloc, 
+  analysis an, analysisfeature anft, 
+  feature_relationship anfr, 
+  cvterm armcv, cv socv
+
+WHERE 
+  -- armft.name = '4' and armft.type_id = 210 -- TEST
+  armcv.name in ( ${golden_path} ) 
+  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.cvterm_id = armft.type_id  
+  
+  ${est_where_clause} 
+  -- should be inverse of analysis_where_clause
+  -- and an.analysis_id in (40,48,42)  -- na_dbEST*dmel, drop 42,na_DGC ??
+  
+  and anft.analysis_id = an.analysis_id
+  and anft.feature_id = anfr.object_id
+  and anfr.subject_id = armloc.feature_id  
+  and armft.feature_id = armloc.srcfeature_id
+  
+  and anfr.subject_id = partloc.feature_id  
+  and estft.feature_id = partloc.srcfeature_id
+  and estft.type_id != armft.type_id  
+  
+ORDER BY arm, armloc.fmin
+;
+  ]]></sql>
+
+<sqlold1><![CDATA[
+SELECT distinct
+  armft.uniquename as arm,
+  armloc.fmin, armloc.fmax, armloc.strand,
+  armft.organism_id,
+  estcv.name as type, 
+  estft.name as name,
+  estft.uniquename as id,
+  estft.feature_id as oid, -- this is bad; postprocess joins all w/ same oid
+                  -- need instead analysisfeature.feature_id as above
+  attr.type as attr_type, attr.attribute
+ 
+FROM
+  feature partft, feature armft, 
+  feature estft 
+    left outer join gffattr_match attr
+    on (estft.feature_id = attr.feature_id),
+  featureloc armloc, featureloc partloc,
+  cvterm partcv, cvterm estcv, cvterm armcv, cv socv
+   
+WHERE
+  estcv.name in ('EST') -- 'cDNA_clone' also ??
+  and estcv.cvterm_id = estft.type_id 
+  
+  and armcv.name in ( ${golden_path} ) -- 'chromosome_arm'
+  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.cvterm_id = armft.type_id  
+
+  and partcv.name = 'match' and partft.type_id = partcv.cvterm_id 
+  
+  and armft.feature_id  = armloc.srcfeature_id
+  and partft.feature_id = armloc.feature_id  
+    
+  and estft.feature_id  = partloc.srcfeature_id  
+  and partft.feature_id = partloc.feature_id 
+
+ORDER BY arm, armloc.fmin
+;
+  ]]></sqlold1>
+  </feature_sql>
+  
+  
   
   <feature_sql id="analysis" type="feature_table" output="analysis.tsv">
   
@@ -363,7 +461,7 @@ sub rdump() {
   </script>
   
   <!-- want sql tag at top level of feature_sql like others -->
-  <sql>
+  <sql><![CDATA[
 -- select all an features of right type, with arm featureloc when avail
 -- add analysis.sourcename where needed (ignore 'dummy');
 -- change 'match_' leading type ; drop or make option?
@@ -373,7 +471,7 @@ SELECT
   armft.arm, armft.fmin, armft.fmax, armft.strand, 
   armft.organism_id,  
   CASE  
-    WHEN (an.sourcename IS NULL or an.sourcename = 'dummy') THEN 'match:' || an.program
+    WHEN (an.sourcename IS NULL OR an.sourcename = 'dummy') THEN 'match:' || an.program
     ELSE 'match:' || an.program || ':' || an.sourcename
   END 
   AS type, 
@@ -394,17 +492,21 @@ WHERE
   an.analysis_id = anf.analysis_id
   and anf.feature_id = targft.feature_id
 
+  ${analysis_where_clause}
+-- feb05: exclude ests; see above est_where_clause  
+-- AND NOT (an.sourcename = 'sim4' AND an.program IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros') )
+
 -- NEED ORDER to get parent/match_part oids aligned
 -- NO, cant use ORDER cause of missing arm, fmin for parent feats fixed in rdump above
 -- ORDER BY armft.arm, armft.fmin
 ;
-  </sql>
+  ]]></sql>
   </feature_sql>
 
 
 
   <feature_sql id="views" type="view">
-  <sql>
+  <sql><![CDATA[
 -- from sequence-gff-views.sql 
 -- dont need all of these attribs;
 --   dbxref: yes, cvterm: no, synonym: no?, pub: no, 
@@ -511,7 +613,6 @@ CREATE OR REPLACE VIEW gffatts_anfloc (
   ) AS
   SELECT 
     armloc.feature_id,  
-    -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm,
     armft.uniquename as arm,
     armloc.fmin, armloc.fmax, armloc.strand, armft.organism_id
   FROM  feature armft, featureloc armloc, cvterm armcv, cv socv
@@ -532,6 +633,6 @@ CREATE OR REPLACE VIEW gffatts_evid (
 ;
 GRANT SELECT ON gffatts_evid TO PUBLIC;
 
-  </sql>
+  ]]></sql>
   </feature_sql>
 </opt>

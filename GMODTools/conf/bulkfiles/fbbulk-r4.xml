@@ -59,6 +59,7 @@
     >
     <ENV 
       golden_path="'chromosome_arm'"
+      analysis_where_clause=""
       dummy="dummy"
       />
     <target>chromosomes</target>

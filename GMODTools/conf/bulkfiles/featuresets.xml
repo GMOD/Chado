@@ -32,9 +32,11 @@
 
   </about>
 
-  <!-- feature sets to make fasta bulk files -->
+  <!-- feature sets to make fasta bulk files 
+    feb05: drop mRNA fasta(only?) as confusing duplicate to transcript set
+  -->
   <featset>gene</featset>
-  <featset>mRNA</featset>
+<!--   <featset>mRNA</featset> -->
   <featset>CDS</featset>
   <featset>transcript</featset>
   <featset>translation</featset>
@@ -66,6 +68,10 @@
     typelabel="protein"
     fromdb="1"
     />
+  <!-- feb05: problems here with mRNA vs ncRNA snRNA snoRNA rRNA tRNA 
+    need a 'transcript' equivalent type in input data - fff ? 
+    but for gff, other public files, need to use real RNA type.
+    -->
   <featmap
     name="transcript"
     types="mRNA"

@@ -120,6 +120,10 @@ sub makeFiles
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
     # warn "makeFiles: no infiles => \@filesets given"; return;  
     }
+  unless(ref $fileset) { 
+    warn "GnomapWriter: no input 'fasta' files found\n"; 
+    return;  
+    }
  
   my @seqfiles= $self->openInput( $fileset );
   my $res= $self->processBlastInput( \@seqfiles);

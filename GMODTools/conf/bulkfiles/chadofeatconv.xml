@@ -43,19 +43,38 @@
   -->
   
 <!-- 
-      add dpse name patches
+add dpse name patches
       gene00028109_GENSCAN_predicted_peptide_1 -> gene00028109
   ## clean out dpse unwieldy predictor names: contig...contig...
   elsif ($type =~ /^(gene|mRNA)/ && $name =~ s/Contig[_\d]+//g) { 
     if ($name =~ m/^(twinscan|genewise|genscan)/i) { $name= "${id}_${name}"; }
     }
+    
+feb05: dmelr4.1 fixes; new name for matches oligos .. cytology .. BAC
+2L    dmel_r3_to_dmel_r4_migration:dmel_r3_affy_oligos        match   83300   83324   .       
+-       .       ID=145509_at_1026-hsp:34277
+
+2L    aubrey_cytolocator:cytology     match   -204333 -153714 .        ID=band-21A1-hsp
+
+2L      175979  match:bdgp_unknown_clonelocator:scaffoldBACs    BACR22C14-hsp   -       175979..
+339439  BACR22C14-hsp           
+
+  mapname_pattern name="bac2" type="^BAC" from="(\-hsp.*)" to=""
+
 -->
 
   <mapname_pattern name="1match" type="^(match|oligo)" cuttype="1" from="null" to="null"/>
   <mapname_pattern name="2match" type="^(match|oligo)" from="\-AE\d\S+$" to=""/>
-  <mapname_pattern name="3match" type="^match.*" from="\-?(2L|2R|3L|3R|4|X)[_\.].*$" to=""/>
   <mapname_pattern name="6match" type="^match.*" from=";$" to=""/>
-  <mapname_pattern name="bac" type="^BAC" from="(hit\-|\-cl\-scaffoldBACs)" to=""/>
+
+  <!-- this is bad pattern ; cuts names like Name1234.5prime  
+  .. drop .. no need in dmel41 for this; 2match cuts junk 
+  <mapname_pattern name="3match" type="^match.*" from="\-?(2L|2R|3L|3R|4|X)[_\.].*$" to=""/>
+  -->
+  
+  <mapname_pattern name="4oligo" type="^oligo" from="\-hsp\S*$" to=""/>
+  <mapname_pattern name="4cytol" type="(chromosome_band|cytology)" from="\-hsp\S*$" to=""/>
+  <mapname_pattern name="bac" type="^BAC" from="(hit\-|\-hsp|\-cl\-scaffoldBACs)" to=""/>
 
   <mapname_pattern name="7match" type="^match.*" from="(\..prime)-.*$" to="$1"/>
 
@@ -227,12 +246,31 @@ ti0039584       4548312 synonym P{EPgy2}EY09207
     tRNA_trnascan="1"
     match_trnascan="1"
     repeat_region="1"
+    match_repeatmasker="1"
     
     match_blastn_na_dbEST_dpse="1"
     match_blastz="1"
     />
     
+    <!-- nameisid include ones with only id => name ; similar to dropid ; NOT for gff ? -->
+  <nameisid 
+    BAC="1"
+    chromosome_band="1"
+    oligo="1" oligonucleotide="1"
+    />
+    
+  <!-- feb05: need for ESTs with same id at diff locs -->  
+  <oidisid_gff 
+    match_sim4_na_dbEST_same_dmel="1"
+    match_sim4_na_dbEST_diff_dmel="1"
+    match_sim4_na_DGC_dros="1"
+    match_part_sim4_na_dbEST_same_dmel="1"
+    match_part_sim4_na_dbEST_diff_dmel="1"
+    match_part_sim4_na_DGC_dros="1"
+    />
+     
   <dropid 
+    BAC="1"
     cDNA_clone="1"
     chromosome_band="1"
     EST="1"
@@ -260,6 +298,19 @@ ti0039584       4548312 synonym P{EPgy2}EY09207
     remark="1"
     />
 
+    
+    <!-- 
+      keepstrand features: must preserve -1,0,+1 values in fff/gnomap which
+      uses GenBank/EMBL feature loc syntax: join() = [0,1]; complement() = [-1]
+      distinguish 0 from 1 with note: strand=0
+      .. possibly more/many features belong here
+    -->
+  <keepstrand 
+    pinsertion="1"
+    transposable_element_insertion_site="1"
+    transcription_start_site="1"
+    />
+
   <hasdups 
     three_prime_UTR="1" 
     intron="1" 
@@ -284,6 +335,14 @@ ti0039584       4548312 synonym P{EPgy2}EY09207
 
 <!-- 
 name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan
+
+2L      9043    9068    1       match:dmel_r3_to_dmel_r4_migration:dmel_r3_affy_oligos          
+145501_at_1338-hsp:33875        8419290 parent_oid      8419291
+2L      22221   324485  0       match:aubrey_cytolocator:cytology               band-21B-hsp    
+8342450 parent_oid      8342451
+2L      22221   98619   0       match:aubrey_cytolocator:cytology               band-21B1-hsp   
+8331270 parent_oid      8331271
+
 -->
     
   <maptype 
@@ -311,12 +370,19 @@ name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnasca
 
     match_clonelocator_scaffoldBACs="BAC"
     match_part_clonelocator_scaffoldBACs="skip"
-    
+
+    match_bdgp_unknown_clonelocator_scaffoldBACs="BAC"
+    match_part_bdgp_unknown_clonelocator_scaffoldBACs="skip"
+
     match_promoter="transcription_start_site"
+    match_part_promoter="skip"
     
     match_locator_cytology="chromosome_band"
     match_part_locator_cytology="skip"
 
+    match_aubrey_cytolocator_cytology="chromosome_band"
+    match_part_aubrey_cytolocator_cytology="skip"
+     
     match_JOSHTRANSPOSON_Sept="transposable_element_pred"
     match_repeatmasker="repeat_region"
     _repeatmasker="repeat_region"
@@ -324,6 +390,7 @@ name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnasca
 
     pinsertion="skip"
     match_sim4_na_affy_oligo_dros="oligo"
+    match_dmel_r3_to_dmel_r4_migration_dmel_r3_affy_oligos="oligo"
     
     match_sim4_na_users_i_dros="skip"
     match_part_sim4_na_users_i_dros="skip"

@@ -81,7 +81,7 @@ sub printObj {
     }
     
   foreach my $k (@keys) {
-    next if ($k =~ /^(tag|attr|handler)$/);
+    next if ($k =~ /^(tag|attr|handler|parnode)$/);
     my $v= $self->{$k};
     ($k,$v)= $self->id2name($k,$v); 
     $v= $self->cleanval($v);

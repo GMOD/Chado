@@ -112,7 +112,7 @@ sub printObj { ## was toString
   
   ## print "# Keys\n";
   foreach my $k (sort keys %$self) {
-    next if ($k =~ /^(id|tag|handler)$/);
+    next if ($k =~ /^(id|tag|handler|parnode)$/);
     my $v= $self->{$k};
 
     # check type_id|.. here and change $k if need be ?

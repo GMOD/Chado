@@ -42,6 +42,7 @@
     >
     <ENV 
       golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
+      analysis_where_clause=""
       dummy="dummy"
       />
 <!--     <target>fbids</target> // accessory table ; fixme -->

@@ -216,7 +216,7 @@ sub makeFiles
   my %args= @_;  
   print STDERR "makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
-  unless(ref $fileset) { warn "makeFiles: no infiles => \@filesets given"; return; }
+  unless(ref $fileset) { warn "makeFiles: needs infiles => \@filesets "; return; }
  
 #   my @seqfiles= $self->openInput( $fileset );
 #   my $res= $self->processBlastInput( \@seqfiles);
