@@ -28,14 +28,6 @@ It does very limited parsing of the group column (column 9).  Notes are not pars
 Nor are similarity/match/target data parsed.  Sequence is not handled yet either,
 though it shouldn't be to hard to add.
 
-=item Base coordinates
-
-Note that at the moment, this script assumes and uses base coordinates,
-though this is at odds with the flybase development group's and the
-gbrowse chado adaptor's use of interbase coordinates.  Therefore, 
-until this is fixed, there will be off by one errors in gbrowse 
-displays.
-
 =item The ORGANISM table
 
 This script assumes that the organism table is populated with information
