@@ -1,7 +1,7 @@
 --- create ontology that has instantiated located_sequence_feature part of SO
 --- way as it is written, the function can not be execute more than once in one connection
 --- when you get error like ERROR:  relation with OID NNNNN does not exist
---- as this is not meant to execute >1 time in one session so it should never happen
+--- as this is not meant to execute >1 times in one session so it should never happen
 --- except at testing and test failed
 --- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
 --- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
@@ -28,7 +28,7 @@ DECLARE
 
 BEGIN
 
-    RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
+    --RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
     SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
     --- longest path
     IF (exist_c > 0) THEN
@@ -56,7 +56,7 @@ DECLARE
 BEGIN
     
     SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
-    RAISE NOTICE ''got ttype %'',ttype;
+    --RAISE NOTICE ''got ttype %'',ttype;
     PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
     FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
         PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
@@ -77,7 +77,6 @@ CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
 DECLARE
     parent soi_type%ROWTYPE;
     isa_id cvterm.cvterm_id%TYPE;
-    so_term TEXT := ''so'';
     soi_term TEXT := ''soi'';
     soi_def TEXT := ''ontology of SO feature instantiated in database'';
     soi_cvid INTEGER;

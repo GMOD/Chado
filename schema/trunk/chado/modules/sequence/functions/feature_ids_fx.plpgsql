@@ -10,25 +10,6 @@ CREATE TYPE feature_by_fx_type AS (
     depth INT
 );
 
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    root alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-    FOR myrc IN SELECT DISTINCT subject_id AS feature_id FROM feature_relationship WHERE object_id = root LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
 CREATE OR REPLACE FUNCTION get_sub_feature_ids(text) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
@@ -89,6 +70,25 @@ END;
 '
 LANGUAGE 'plpgsql';
 
+
+CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
+'
+DECLARE
+    root alias for $1;
+    myrc feature_by_fx_type%ROWTYPE;
+    myrc2 feature_by_fx_type%ROWTYPE;
+
+BEGIN
+    FOR myrc IN SELECT DISTINCT subject_id AS feature_id FROM feature_relationship WHERE object_id = root LOOP
+        RETURN NEXT myrc;
+        FOR myrc2 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id) LOOP
+            RETURN NEXT myrc2;
+        END LOOP;
+    END LOOP;
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION get_up_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
 '
@@ -278,9 +278,6 @@ END;
 LANGUAGE 'plpgsql';
 
 --- get all feature ids (including children) for feature that has an ontology term (say GO function)
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the aspect and cvterm
-
 CREATE OR REPLACE FUNCTION get_feature_ids_by_ont(cv.name%TYPE,cvterm.name%TYPE) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
@@ -341,9 +338,6 @@ END;
 LANGUAGE 'plpgsql';
 
 --- get all feature ids (including children) for feature with the property (type, val)
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the typed val
-
 CREATE OR REPLACE FUNCTION get_feature_ids_by_property(cvterm.name%TYPE,varchar) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
@@ -373,9 +367,6 @@ END;
 LANGUAGE 'plpgsql';
 
 --- get all feature ids (including children) for feature with the property val
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the property value
-
 CREATE OR REPLACE FUNCTION get_feature_ids_by_propval(varchar) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
@@ -405,7 +396,6 @@ LANGUAGE 'plpgsql';
 ---4 args: ptype, ctype, count, operator (valid SQL number comparison operator), and is_analysis 
 ---get feature ids for any node with type = ptype whose child node type = ctype
 ---and child node feature count comparing (using operator) to ccount
-
 CREATE OR REPLACE FUNCTION get_feature_ids_by_child_count(cvterm.name%TYPE, cvterm.name%TYPE, INTEGER, varchar, char(1)) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
