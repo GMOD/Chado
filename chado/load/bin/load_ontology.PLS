@@ -2,6 +2,7 @@
 
 use Config;
 use File::Basename qw(&basename &dirname);
+use FindBin '$Bin';
 use Cwd;
 
 
@@ -10,8 +11,26 @@ chdir dirname($0);
 $file = basename($0, '.PL','.PLS');
 $file = "gmod_$file.pl";
 
+my %OPTIONS;
+if (open F,"$Bin/../../build.conf") {
+  while (<F>) {
+    next if /^\#/;
+    chomp;
+    $OPTIONS{$1} = $2 if /^(\w+)\s*=\s*(.+)/;
+  }
+  close F;
+}
+
+
 open OUT,">$file" or die "Can't create $file: $!";
 print OUT "$Config{startperl}\n";
+
+if ($OPTIONS{LIB}) {
+  print OUT "use lib '$OPTIONS{LIB}';\n";
+}
+if ($OPTIONS{PREFIX}) {
+  print OUT "use lib '$OPTIONS{PREFIX}/lib'i\n";
+}
 
 print OUT <<'!NO!SUBS!';
 use strict;
