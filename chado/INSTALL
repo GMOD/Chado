@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
-
-$Id: INSTALL,v 1.20 2004-04-07 18:44:48 allenday Exp $
+ 
+$Id: INSTALL,v 1.21 2004-04-07 18:51:24 allenday Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
