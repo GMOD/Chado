@@ -33,12 +33,12 @@ private SMTPTR m_DbxrefId = new SMTPTR("dbxref");
 	}
 
 	public String getDbxrefId(){
-		System.out.println("FEATURE:getDbxrefId()");
+		//System.out.println("FEATURE:getDbxrefId()");
 		return m_DbxrefId.getValue();
 	}
 
 	public Dbxref getDbxref(){
-		System.out.println("FEATURE:getDbxrefId()");
+		//System.out.println("FEATURE:getDbxrefId()");
 		return (Dbxref)m_DbxrefId.getObjValue();
 	}
 }

@@ -44,12 +44,12 @@ private SMTPTR m_PubId = new SMTPTR("pub");
 	}
 
 	public String getSynonymId(){
-		System.out.println("FEATURE:getSynonymId()");
+		//System.out.println("FEATURE:getSynonymId()");
 		return m_SynonymId.getValue();
 	}
 
 	public Synonym getSynonym(){
-		System.out.println("FEATURE:getSynonym()");
+		//System.out.println("FEATURE:getSynonym()");
 		return (Synonym)m_SynonymId.getObjValue();
 	}
 
@@ -66,12 +66,12 @@ private SMTPTR m_PubId = new SMTPTR("pub");
 	}
 
 	public String getPubId(){
-		System.out.println("FEATURE:getPubId()");
+		//System.out.println("FEATURE:getPubId()");
 		return m_PubId.getValue();
 	}
 
 	public Pub getPub(){
-		System.out.println("FEATURE:getPub()");
+		//System.out.println("FEATURE:getPub()");
 		return (Pub)m_PubId.getObjValue();
 	}
 }

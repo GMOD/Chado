@@ -79,15 +79,20 @@ private SMTPTR m_CurrEvidenceId,m_CurrAnalysisId,m_CurrSynonymId;
 
 private String m_iscurrentTxt = null;
 
-private boolean m_GeneOnly = true;
+//private boolean m_GeneOnly = true;
+private int m_readMode = GameWriter.CONVERT_ALL;
 private boolean m_inAnalysis = false;
+private boolean m_isUseful = true;
 
 	public ChadoSaxReader(){
 		super();
 	}
 
-	public void parse(String the_FilePathName,boolean the_GeneOnly){
-		m_GeneOnly = the_GeneOnly;
+	public void parse(String the_FilePathName,
+			//boolean the_GeneOnly){
+			int the_readMode){
+		//m_GeneOnly = the_GeneOnly;
+		m_readMode = the_readMode;
 		try {
 			SAXParserFactory sFact = SAXParserFactory.newInstance();
 			parser = sFact.newSAXParser();
@@ -109,38 +114,40 @@ private boolean m_inAnalysis = false;
 		return m_CurrChado;
 	}
 
+
 	public void startElement (String namespaceUri, String localName,
 			String qualifiedName, Attributes attributes)
 			throws SAXException {
 		//System.out.println("MyHandler startElement");
 		//System.out.println("NameSpaceURI<"+namespaceUri+">");
 		//System.out.println("LocalName<"+localName+">");
-		System.out.println("START QualifiedName<"+qualifiedName+">");
+		//System.out.println("START QualifiedName<"+qualifiedName+">");
 		//System.out.println("Attributes<"+attributes.toString()+">");
 		m_SB = new StringBuffer();
 
 		if(qualifiedName.equals("chado")){
-			System.out.println("MAKE Chado NODE");
 			m_CurrGenFeat = m_CurrChado = new Feature("currentchado");
 			m_Stack.push(m_CurrChado);//BOTTOM OF THE STACK
-
+			
 		}else if(qualifiedName.equals("_appdata")){
 			String idTxt = attributes.getValue("name");
-			System.out.println("=MAKE APPDATA NODE<"+idTxt+">");
 			m_CurrAppdata = new Appdata(idTxt);
 
 		}else if(qualifiedName.equals("feature")){
 			String idTxt = attributes.getValue("id");
+			//String m_OFFSET = "";
+			//for(int i=0;i<m_Stack.size();i++){
+			//	m_OFFSET += "\t";
+			//}
+			//System.out.println(m_OFFSET+"STARTING FEATURE ID<"+idTxt+">");
 			if(idTxt==null){
 				idTxt = attributes.getValue("ref");
 			}
-			System.out.println("=MAKE Feature ID<"+idTxt+">");
 			m_CurrGenFeat = m_CurrFeature = new Feature(idTxt);
 			m_Stack.push(m_CurrFeature);
 			m_CurrTypeStack.push(m_CurrFeature);
 			if(m_CurrSrcFeatureId!=null){
 				m_CurrSrcFeatureIdTxt = m_CurrFeature.getId();
-				System.out.println("SRC FEAT ID<"+m_CurrSrcFeatureIdTxt+">");
 			}
 
 		}else if(qualifiedName.equals("feature_relationship")){
@@ -151,44 +158,42 @@ private boolean m_inAnalysis = false;
 		}else if(qualifiedName.equals("feature_dbxref")){
 			String idTxt = attributes.getValue("id");
 			m_CurrFeatDbxref = new FeatDbxref(idTxt);
-			System.out.println("=MAKE Feature_dbxref ID<"+idTxt+">");
+
 		}else if(qualifiedName.equals("feature_synonym")){
 			String idTxt = attributes.getValue("id");
 			m_CurrFEATSUB = m_CurrFeatSyn = new FeatSyn(idTxt);
-			System.out.println("=MAKE Feature_Synonym ID<"+idTxt+">");
+			//System.out.println("START FEATURE_SYNONYM");
+
 		}else if(qualifiedName.equals("feature_cvterm")){
 			String idTxt = attributes.getValue("id");
 			m_CurrFEATSUB = m_CurrFeatCVTerm = new FeatSub(idTxt);
 
 		}else if(qualifiedName.equals("analysis")){
 			m_CurrFeatAnal = new FeatAnal("analysis");
-			System.out.println("***CREATE CURR_FEAT_ANAL");
-//FSS
 			m_Stack.push(m_CurrFeature);
 
 		}else if(qualifiedName.equals("synonym")){
 			String idTxt = attributes.getValue("id");
 			m_CurrSynonym = new Synonym(idTxt);
-			System.out.println("=MAKE Synonym ID<"+idTxt+">");
 			m_CurrTypeStack.push(m_CurrSynonym);
-			//SYNONYM_ID
+			//System.out.println("  START SYNONYM");
 
 		}else if(qualifiedName.equals("featureloc")){
 			String idTxt = attributes.getValue("id");
 			m_CurrFeatLoc = new FeatLoc(idTxt);
-			System.out.println("=MAKE Featureloc ID<"+idTxt+">");
 			m_CurrTypeStack.push(m_CurrFeatLoc);
 
 		}else if(qualifiedName.equals("featureprop")){
 			String idTxt = attributes.getValue("id");
 			m_CurrFeatProp = new FeatProp(idTxt);
-			System.out.println("=MAKE Featureprop ID<"+idTxt+">");
 			m_CurrTypeStack.push(m_CurrFeatProp);
+
 		}else if(qualifiedName.equals("featureprop_pub")){
 			//DO NOTHING
+
 		}else if(qualifiedName.equals("srcfeature_id")){
 			m_CurrFEATID = m_CurrSrcFeatureId = new SMTPTR("feature");
-			//FEATURELOC
+
 		}else if(qualifiedName.equals("subject_id")){
 			m_CurrFEATID = m_CurrSubjectId = new SMTPTR("feature");
 			//FEATURE_RELATIONSHIP
@@ -202,6 +207,7 @@ private boolean m_inAnalysis = false;
 			m_CurrFEATID = m_CurrAnalysisId = new SMTPTR("analysis");
 			//ANALYSISFEATURE
 		}else if(qualifiedName.equals("synonym_id")){
+			//System.out.println(" START SYNONYM_ID");
 			m_CurrFEATID = m_CurrSynonymId = new SMTPTR("synonym");
 			//FEATURE_SYNONYM
 
@@ -222,9 +228,12 @@ private boolean m_inAnalysis = false;
 
 //CV
 		}else if(qualifiedName.equals("cv_id")){
+			//System.out.println("START CV_ID");
 			m_CurrCVId = new SMTPTR("cv");
+
 		}else if(qualifiedName.equals("cv")){
 			String idTxt = attributes.getValue("id");
+			//System.out.println("START CV");
 			m_CurrCV = new CV(idTxt);
 
 //DB
@@ -253,7 +262,7 @@ private boolean m_inAnalysis = false;
 			m_CurrPubId = new SMTPTR("pub");
 		}else if(qualifiedName.equals("pub")){
 			String idTxt = attributes.getValue("id");
-			System.out.println("=MAKE PUB <"+idTxt+">");
+			//System.out.println("=MAKE PUB <"+idTxt+">");
 			m_CurrPub = new Pub(idTxt);
 		}
 	}
@@ -263,9 +272,7 @@ private boolean m_inAnalysis = false;
 		//System.out.println("LEAVING QualifiedName<"+qualifiedName+">");
 
 		if(qualifiedName.equals("chado")){
-			System.out.println("DISPLAYING CHADO");
 			m_CurrChado.Display(0);
-			System.out.println("DONE DISPLAYING CHADO");
 			//DO NOTHING
 
 		}else if(qualifiedName.equals("_appdata")){
@@ -275,74 +282,78 @@ private boolean m_inAnalysis = false;
 			m_CurrChado.addGenFeat(m_CurrAppdata);
 
 		}else if(qualifiedName.equals("feature")){
-			//System.out.println("PTA");
 			GenFeat endingFeature = (GenFeat)m_Stack.pop();
-			//System.out.println("PTB");
 			GenFeat surroundingFeature = (GenFeat)m_Stack.peek();
-			//System.out.println("PTC");
 
 			//STACK STUFF
-			surroundingFeature.addGenFeat(endingFeature);
-			//System.out.println("PTD");
+			if(m_isUseful){
+				surroundingFeature.addGenFeat(endingFeature);
+			}
 			if(surroundingFeature instanceof Feature){
-				//System.out.println("PTE");
-				if((m_GeneOnly)&&(m_inAnalysis)){
-					System.out.println("===========IS ANALYSIS, NOT SAVED");
+				if((m_readMode==GameWriter.CONVERT_GENE)&&(m_inAnalysis)){
+					//System.out.println("===========IS ANALYSIS, NOT SAVED");
 				}else{
-					System.out.println("===========IS GENE, IS SAVED");
-					Mapping.Add(endingFeature.getId(),endingFeature);
-					//System.out.println("PTEA");
+					//System.out.println("===========IS GENE, IS SAVED");
+					if(m_isUseful){
+						Mapping.Add(endingFeature.getId(),endingFeature);
+						//System.out.println(" SAVING");
+					}else{
+						//System.out.println(" NOT SAVING");
+					}
 					if(m_CurrFEATID!=null){
 						m_CurrFEATID.setkey(endingFeature.getId());
 					}
-					//System.out.println("PTEB");
 					m_CurrFeature = (Feature)surroundingFeature;
-					System.out.println("-RETURNTO FEATURE<"
-							+m_CurrFeature.getId()
-							+"> TYPE<"
-							+m_CurrFeature.getTypeId()+">");
 				}
 				m_CurrTypeStack.pop();
-				//displayType("FEATURE");
 			}else if(surroundingFeature instanceof Chado){
-				//System.out.println("PTF");
-				if((m_GeneOnly)&&(endingFeature.isMatch())){
-					System.out.println("=======TOP MATCH BEING IGNORED");
+				//if((m_readMode==GameWriter.CONVERT_GENE)&&(endingFeature.isMatch())){
+				if(endingFeature.isMatch()){
 					m_inAnalysis = true;
 				}else{
-					System.out.println("=======TOP NON MATCH BEING ADDED TO MAPPING");
-					Mapping.Add(endingFeature.getId(),endingFeature);
+					if(m_isUseful){
+						Mapping.Add(endingFeature.getId(),endingFeature);
+						//System.out.println(" SAVING");
+					}else{
+						//System.out.println(" NOT SAVING");
+					}
 					m_inAnalysis = false;
 				}
-				System.out.println("RETURNING TO CURR_CHADO");
 			}else{
-				//System.out.println("PTG");
 				System.out.println("RETURNING TO UNKNOWN");
 			}
-			//System.out.println("PTH");
 
 
 			//SMTPTR
-			if(m_CurrSubjectId!=null){
-				System.out.println("INSERTING <"+endingFeature.getId()+"> INTO CurrFeature<"+m_CurrFeature.getId()+">");
-				m_CurrFeature.addCompFeat(endingFeature.getId());
+			if(m_isUseful){
+				if(m_CurrSubjectId!=null){
+					m_CurrFeature.addCompFeat(endingFeature.getId());
+				}
+				//System.out.println(" SAVING");
+			}else{
+				System.out.println(" NOT SAVING");
 			}
+			//String m_OFFSET = "";
+			//for(int i=0;i<m_Stack.size();i++){
+			//	m_OFFSET += "\t";
+			//}
+			//System.out.println(m_OFFSET+"ENDING FEATURE ID<"+endingFeature.getId()
+			//		+"> DEPTH<"+m_Stack.size()
+			//		+"> IS_ANALYSIS<"+endingFeature.getisanalysis()
+			//		+">");
 
 		}else if(qualifiedName.equals("analysis")){
-//FSS
-			/***********/
 			GenFeat endingFeature = (GenFeat)m_Stack.pop();
 			GenFeat surroundingFeature = (GenFeat)m_Stack.peek();
-			surroundingFeature.addGenFeat(endingFeature);
+
+			if(m_isUseful){
+				surroundingFeature.addGenFeat(endingFeature);
+			}
+
 			if(surroundingFeature instanceof Feature){
 				m_CurrFeature = (Feature)surroundingFeature;
 			}
-			System.out.print("ADDING ANALYSISFEATURE<"+endingFeature.getId()+">");
-			System.out.println(" TO<"+surroundingFeature.getId()+">");
-			/***********/
 			if(m_CurrFeatAnal!=null){
-				//m_CurrFeature.setrawscore(
-				//		m_CurrFeatAnal.getrawscore());
 				m_CurrFeature.setsourcename(
 						m_CurrFeatAnal.getsourcename());
 				m_CurrFeature.setprogram(
@@ -350,34 +361,27 @@ private boolean m_inAnalysis = false;
 				m_CurrFeature.setprogramversion(
 						m_CurrFeatAnal.getprogramversion());
 				m_CurrFeatAnal = null;
-				System.out.println("***REMOVE CURR_FEAT_ANAL");
 			}
 
 		}else if(qualifiedName.equals("synonym")){
+			//System.out.println("  FINISH SYNONYM");
 			m_CurrSynonym = (Synonym)m_CurrTypeStack.pop();
-			//System.out.println("-RETURNFROM Synonym <"
-			//		+m_CurrSynonym.getId()+">");
-			System.out.println("-RETURNFROM Synonym");
 			//SYNONYM_ID
 			if(m_CurrSynonymId!=null){
+				//System.out.println("PUTTING SYNONYM (name)<"
+				//		+m_CurrSynonym.getname()
+				//		+">  IN SYNONYMID");
 				m_CurrSynonymId.setGF(m_CurrSynonym);
 				m_CurrSynonym = null;//CONSUME
 			}
 
 		}else if(qualifiedName.equals("feature_relationship")){
 			m_CurrFeatRel = (FeatRel)m_CurrTypeStack.pop();
-			System.out.println("-RETURNFROM Feature_Relationship");
 			//FEATURE
 
-//FEATSUBS
 		}else if(qualifiedName.equals("featureloc")){
 			Span tmpSpan = new Span(m_SpanStartTxt,m_SpanEndTxt);
-			System.out.println("SPAN<"+tmpSpan.toString()+">");
-			//displayType("FEATURELOC");
-//FSSMOD
-			//m_CurrFeatLoc = (FeatLoc)m_CurrTypeStack.peek();
 			m_CurrFeatLoc = (FeatLoc)m_CurrTypeStack.pop();
-			System.out.println("-RETURNFROM FeatureLoc<"+m_CurrFeatLoc.getId()+">");
 			//BUILD
 			if(m_CurrFeatLoc.getSpan()==null){
 				m_CurrFeatLoc.setSpan(tmpSpan);
@@ -386,61 +390,31 @@ private boolean m_inAnalysis = false;
 				m_CurrFeatLoc.setAlign(
 						m_CurrFeature.getResidues());
 			}
-				System.out.print("FEATURELOC SRC<");
 			if(m_CurrSrcFeatureIdTxt!=null){
-				m_CurrFeatLoc.setSrcFeatureId(m_CurrSrcFeatureIdTxt);
-				System.out.println(m_CurrSrcFeatureIdTxt+">");
-			}else{
-				System.out.println("NULL>");
+				m_CurrFeatLoc.setSrcFeatureId(
+						m_CurrSrcFeatureIdTxt);
+			//}else{
+			//	System.out.println("NULL SRC FEATURE ID");
 			}
 			//LOCATE
 			if(m_CurrFeature!=null){
-				System.out.println("END FEATURELOC <"+m_CurrFeatLoc.getId()+">");
 				if(m_CurrFeature.getFeatLoc()==null){
 					m_CurrFeature.setFeatLoc(m_CurrFeatLoc);
-					System.out.println(" BECOMES FEAT_LOC FOR FEATURE<"+m_CurrFeature.getId()+">");
 				}else{
 					m_CurrFeature.setAltFeatLoc(m_CurrFeatLoc);
-					System.out.println(" BECOMES ALT_FEAT_LOC FOR FEATURE<"+m_CurrFeature.getId()+">");
 				}
 				m_CurrFeatLoc = null;
 			}
 
 		}else if(qualifiedName.equals("featureprop")){
 			m_CurrFeatProp = (FeatProp)m_CurrTypeStack.pop();
-			System.out.println("-RETURNFROM FeatureProp<"
-					+m_CurrFeatProp.getId()+">");
-		/**********
-		//FOR INFO
-			if(m_CurrTypeId.getGF()==null){
-				m_CurrTypeId.setkey(m_SB.toString().trim());
-				System.out.println("\n=ASSIGNING TYPE_ID <"
-						+m_CurrTypeId.getkey()+">");
-			}else{
-				System.out.println("\n=ASSIGNING TYPE_ID <"
-						+m_CurrTypeId.getValue()+">");
-			}
-		**********/
-			//BUILD
-			//if(m_CurrPkeyId!=null){
-			//	m_CurrFeatProp.setPkeyId(m_CurrPkeyId);
-			//	m_CurrPkeyId = null;//CONSUME
-			//}
-//FSSNEW
-			//if(m_CurrTypeId!=null){
-			//	m_CurrFeatProp.setPkeyId(m_CurrTypeId.getkey());
-			//	m_CurrTypeId = null;//CONSUME
-			//}
+
 			if(m_CurrPubId!=null){
 				m_CurrFeatProp.setPubId(m_CurrPubId);
 				m_CurrPubId = null;//CONSUME
 			}
 			//LOCATE
-			System.out.println("FEATUREPROP_END");
 			if(m_CurrFeature!=null){
-				System.out.println("PUTTING FEATPROP OF TYPE<"
-					+m_CurrFeatProp.getTypeId()+"> INTO<"
-					+m_CurrFeature.getUniqueName()+">");
 				m_CurrFeature.addFeatSub(m_CurrFeatProp);
 				m_CurrFeatProp = null;
 			}
@@ -448,7 +422,6 @@ private boolean m_inAnalysis = false;
 		}else if(qualifiedName.equals("featureprop_pub")){
 			//HOLDS A PUB_ID FOR FEATUREPROP
 		}else if(qualifiedName.equals("feature_dbxref")){
-			System.out.println("-RETURNFROM Feature_dbxref");
 			//BUILD
 			if(m_iscurrentTxt!=null){
 				m_CurrFeatDbxref.setiscurrent(
@@ -462,7 +435,7 @@ private boolean m_inAnalysis = false;
 			}
 
 		}else if(qualifiedName.equals("feature_synonym")){
-			System.out.println("-RETURNFROM Feature_Synonym");
+			//System.out.println("FINISH FEATURE_SYNONYM");
 			//BUILD
 			if(m_iscurrentTxt!=null){
 				m_CurrFeatSyn.setiscurrent(
@@ -475,7 +448,6 @@ private boolean m_inAnalysis = false;
 				m_CurrFeatSyn = null;//CONSUME
 			}
 		}else if(qualifiedName.equals("feature_evidence")){
-			System.out.println("-RETURNFROM Feature_evidence");
 			//LOCATE
 			//if(m_CurrFeature!=null){
 			//	m_CurrFeature.addFeatEvid(m_CurrFeatEvid);
@@ -514,16 +486,24 @@ private boolean m_inAnalysis = false;
 			//m_CurrFEATID = null;
 			//ANALYSISFEATURE
 		}else if(qualifiedName.equals("synonym_id")){
+			//System.out.println(" FINISH SYNONYM_ID");
 			//m_CurrFEATID = null;
 			//FEATURE_SYNONYM
 			//BUILD
+			//System.out.println("GONNA PUT SYNONYM_ID IN FEATURE_SYNONYM");
 			if(m_CurrSynonymId.getGF()==null){
+				//System.out.println("1 NOT NULL");
 				m_CurrSynonymId.setkey(m_SB.toString().trim());
+			}else{
+				//System.out.println("1 IS NULL");
 			}
 			//LOCATE
 			if(m_CurrFeatSyn!=null){
+				//System.out.println("2 NOT NULL");
 				m_CurrFeatSyn.setSynonymId(m_CurrSynonymId);
 				m_CurrSynonymId = null;//CONSUME
+			}else{
+				//System.out.println("2 IS NULL");
 			}
 
 //START CVTERM,TYPE_ID,PKEY_ID
@@ -548,11 +528,11 @@ private boolean m_inAnalysis = false;
 			//BUILD
 			if(m_CurrTypeId.getGF()==null){
 				m_CurrTypeId.setkey(m_SB.toString().trim());
-				System.out.println("\n=ASSIGNING TYPE_ID <"
-						+m_CurrTypeId.getkey()+">");
+				//System.out.println("\n=ASSIGNING TYPE_ID <"
+				//		+m_CurrTypeId.getkey()+">");
 			}else{
-				System.out.println("\n=ASSIGNING TYPE_ID <"
-						+m_CurrTypeId.getValue()+">");
+				//System.out.println("\n=ASSIGNING TYPE_ID <"
+				//		+m_CurrTypeId.getValue()+">");
 			}
 			//LOCATE
 			Object o = null;
@@ -566,14 +546,13 @@ private boolean m_inAnalysis = false;
 				m_CurrFeature.setTypeId(m_CurrTypeId);
 				m_CurrTypeId = null;//CONSUME
 			 }else if(o instanceof Synonym){
-				System.out.println("TO Synonym");
+				//System.out.println("TO Synonym");
 			 }else if(o instanceof FeatRel){
-				System.out.println("TO Feature_Relationship");
+				//System.out.println("TO Feature_Relationship");
 			 }else if(o instanceof FeatProp){
-				System.out.println("TO FSS FeatProp");
 				m_CurrFeatProp.setPkeyId(m_CurrTypeId);
 				m_CurrTypeId = null;//CONSUME
-				System.out.println("FILL<"+m_CurrFeatProp.getPkeyId()+">");
+				//System.out.println("FILL<"+m_CurrFeatProp.getPkeyId()+">");
 			 }else{
 				System.out.println("TO UNKNOWN");
 				m_CurrTypeId = null;//CONSUME
@@ -596,6 +575,7 @@ private boolean m_inAnalysis = false;
 
 //CV
 		}else if(qualifiedName.equals("cv_id")){
+			//System.out.println("FINISH CV_ID");
 			//BUILD
 			//EITHER CONTAINS TEXT OR A PUB
 			if(m_CurrCVId.getGF()==null){
@@ -606,15 +586,23 @@ private boolean m_inAnalysis = false;
 			if(m_CurrCVTerm!=null){
 				m_CurrCVTerm.setCVId(m_CurrCVId);
 				m_CurrCVId = null;//CONSUME
+			}else{
+				//System.out.println("CV_ID NOT PUT HERE, SO WHERE?");
 			}
 		}else if(qualifiedName.equals("cv")){
+			//System.out.println("FINISH CV");
 			//BUILD
 			//LOCATE
 			if(m_CurrCVId!=null){
+				//System.out.println("PUT IN CV_ID");
 				//PUT IN SMART POINTER
 				m_CurrCVId.setGF(m_CurrCV);
-				m_CurrCV = null;//CONSUME
+//EEE
+				//m_CurrCV = null;//CONSUME
+			}else{
+				//System.out.println("PUT ELSEWHERE");
 			}
+			m_CurrCV = null;//CONSUME
 
 //DB
 		}else if(qualifiedName.equals("db_id")){
@@ -627,6 +615,7 @@ private boolean m_inAnalysis = false;
 			//ONLY APPEARS IN A DBXREF
 			if(m_CurrDbxref!=null){
 				m_CurrDbxref.setDBId(m_CurrDBId);
+//EEE
 				m_CurrDBId = null;//CONSUME
 			}
 		}else if(qualifiedName.equals("db")){
@@ -635,8 +624,10 @@ private boolean m_inAnalysis = false;
 			if(m_CurrDBId!=null){
 				//PUT IN SMART POINTER
 				m_CurrDBId.setGF(m_CurrDB);
-				m_CurrDB = null;//CONSUME
+//EEE
+				//m_CurrDB = null;//CONSUME
 			}
+			m_CurrDB = null;//CONSUME
 
 //DBXREF 
 		}else if(qualifiedName.equals("dbxref_id")){
@@ -703,7 +694,6 @@ private boolean m_inAnalysis = false;
 				m_CurrPubId = null;//CONSUME
 			}
 		}else if(qualifiedName.equals("pub")){
-			System.out.println("-RETURNFROM Pub");
 			//BUILD
 			//LOCATE
 			if(m_CurrPubId!=null){
@@ -727,19 +717,22 @@ private boolean m_inAnalysis = false;
 			if(m_SB.toString()!=null){
 				String nameStr = m_SB.toString().trim();
 				//System.out.print("NAME<"+nameStr+"> OF ");
+				/****/
 				if(m_CurrCV!=null){
 					//System.out.println("CV");
 					m_CurrCV.setcvname(nameStr);
-				}else if(m_CurrDB!=null){
-					//System.out.println("DB");
-					m_CurrDB.setdbname(nameStr);
 				}else if(m_CurrCVTerm!=null){
 					//System.out.println("CVTERM");
 					m_CurrCVTerm.setname(nameStr);
-				}else if(m_CurrFeatSyn!=null){
-					System.out.println("FEATSYN");
-					//m_CurrFeatSyn.setname(nameStr);
+				}else if(m_CurrSynonym!=null){
+					//System.out.println("SYNONYM");
 					m_CurrSynonym.setname(nameStr);
+				}else if(m_CurrDB!=null){
+					//System.out.println("DB");
+					m_CurrDB.setdbname(nameStr);
+				//}else if(m_CurrFeatSyn!=null){
+				//	System.out.println("FEATSYN");
+				//	m_CurrSynonym.setname(nameStr);
 				}else if(m_CurrFeature!=null){
 					//System.out.println("FEATURE");
 					m_CurrFeature.setName(nameStr);
@@ -768,19 +761,19 @@ private boolean m_inAnalysis = false;
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("timeaccessioned")){
-			System.out.println("SHOULDBESTORING TIMEACC");
 			if(m_SB.toString()!=null){
 				m_CurrFeature.settimeaccessioned(
 						m_SB.toString().trim());
-				System.out.println("<<"+m_SB.toString().trim()+">>");
+				//System.out.println("<<"
+				//		+m_SB.toString().trim()+">>");
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("timelastmodified")){
-			System.out.println("SHOULDBESTORING TIMELASTMOD");
 			if(m_SB.toString()!=null){
 				m_CurrFeature.settimelastmodified(
 						m_SB.toString().trim());
-				System.out.println("<<"+m_SB.toString().trim()+">>");
+				//System.out.println("<<"
+				//		+m_SB.toString().trim()+">>");
 			}
 	//FEATURE
 		}else if(qualifiedName.equals("seqlen")){
@@ -790,24 +783,16 @@ private boolean m_inAnalysis = false;
 			}
 
 		}else if(qualifiedName.equals("rawscore")){
-			System.out.println("\tRAWSCORE_START");
 			if(m_SB.toString()!=null){
-				System.out.println("\tRAWSCORE_A");
 				if(m_CurrFeature!=null){
-					System.out.println("\tRAWSCORE_B");
 					m_CurrFeature.setrawscore(
-							m_SB.toString().trim());
-					System.out.println("\tRAWSCORE_C");
-				}else{
-					System.out.println("\tRAWSCORE_D");
+						m_SB.toString().trim());
 				}
 			}
-			System.out.println("\tRAWSCORE_FINISH");
 		}else if(qualifiedName.equals("program")){
 			if(m_SB.toString()!=null){
 				m_CurrFeatAnal.setprogram(
 						m_SB.toString().trim());
-				System.out.println("PROGRAM<"+m_CurrFeatAnal.getprogram()+">");
 			}
 		}else if(qualifiedName.equals("sourcename")){
 			if(m_SB.toString()!=null){
@@ -823,15 +808,28 @@ private boolean m_inAnalysis = false;
 			if(m_SB.toString()!=null){
 				m_CurrFeature.setisanalysis(
 						m_SB.toString().trim());
+				//String m_OFFSET = "";
+				//for(int i=0;i<(m_Stack.size()-1);i++){
+				//	m_OFFSET += "\t";
+				//}
+				//System.out.println(m_OFFSET+" IS_ANALYSIS<"
+				//		+m_CurrFeature.getisanalysis()
+				//		+"> AT DEPTH<"+m_Stack.size()+">");
+				if(m_Stack.size()==2){
+					if((m_readMode==GameWriter.CONVERT_GENE)&&(m_CurrFeature.getisanalysis().equals("1"))){
+						System.out.println("++++SUPPRESS THIS!");
+						m_isUseful = false;
+					}else{
+						m_isUseful = true;
+					}
+				}
 			}
 
 	//FEATURELOC AND SPAN
-		//}else if(qualifiedName.equals("nbeg")){
 		}else if(qualifiedName.equals("fmin")){
 			if(m_SB.toString()!=null){
 				m_SpanStartTxt = m_SB.toString().trim();
 			}
-		//}else if(qualifiedName.equals("nend")){
 		}else if(qualifiedName.equals("fmax")){
 			if(m_SB.toString()!=null){
 				m_SpanEndTxt = m_SB.toString().trim();
@@ -846,23 +844,22 @@ private boolean m_inAnalysis = false;
 			//displayType("FeatLoc:locgroup");
 			if(m_SB.toString()!=null){
 				m_CurrFeatLoc = (FeatLoc)m_CurrTypeStack.peek();
-				System.out.println("LOCGROUP PUT INTO <"
-						+m_CurrFeatLoc.getId()+">");
 				m_CurrFeatLoc.setlocgroup(
 						m_SB.toString().trim());
 			}
-		//}else if(qualifiedName.equals("is_nbeg_partial")){
+
 		}else if(qualifiedName.equals("is_fmin_partial")){
 			if(m_SB.toString()!=null){
 				m_CurrFeatLoc.setnbegpart(
 						m_SB.toString().trim());
 			}
-		//}else if(qualifiedName.equals("is_nend_partial")){
+
 		}else if(qualifiedName.equals("is_fmax_partial")){
 			if(m_SB.toString()!=null){
 				m_CurrFeatLoc.setnendpart(
 						m_SB.toString().trim());
 			}
+
 		}else if(qualifiedName.equals("rank")){
 			//COULD BE EITHER
 			//featureloc, feature_relationship, or featureprop
@@ -879,15 +876,6 @@ private boolean m_inAnalysis = false;
 					//System.out.println("rank IN feature_relationship");
 				}
 			}
-			/*************
-			//OLD WAY - FROM WHEN rank ONLY WAS IN featureloc
-			if(m_SB.toString()!=null){
-				if(m_CurrFeatLoc!=null){
-					m_CurrFeatLoc.setrank(
-							m_SB.toString().trim());
-				}
-			}
-			*************/
 		}else if(qualifiedName.equals("min")){
 			if(m_SB.toString()!=null){
 				m_CurrFeatLoc.setmin(
@@ -903,15 +891,6 @@ private boolean m_inAnalysis = false;
 		}else if(qualifiedName.equals("is_current")){
 			//IS EITHER feature_dbxref,feature_synonym
 			if(m_SB.toString()!=null){
-				/******************
-				if(m_CurrFeatDbxref!=null){
-					m_CurrFeatDbxref.setiscurrent(
-							m_SB.toString().trim());
-				}else if(m_CurrFeatSyn!=null){
-					((FeatSyn)m_CurrFeatSyn).setiscurrent(
-							m_SB.toString().trim());
-				}
-				******************/
 				m_iscurrentTxt = m_SB.toString().trim();
 			}
 
@@ -928,37 +907,8 @@ private boolean m_inAnalysis = false;
 			if(m_SB.toString()!=null){
 				m_CurrFeatProp.setpval(
 						m_SB.toString().trim());
-				System.out.println("FILL1<"
-						+m_CurrFeatProp.getpval()+">");
 			}
 
-	//FEATUREPROP
-		/*************
-		//NOW 'rank'
-		}else if(qualifiedName.equals("prank")){
-			if(m_SB.toString()!=null){
-				m_CurrFeatProp.setprank(
-						m_SB.toString().trim());
-			}
-		*************/
-	//CV
-		/************
-		//NOW 'name'
-		}else if(qualifiedName.equals("cvname")){
-			if(m_SB.toString()!=null){
-				m_CurrCV.setcvname(
-						m_SB.toString().trim());
-			}
-		************/
-	//DBXREF
-		/************
-		//DEFUNCT DUE TO CHANGES TO THE WAY DBXREF IS PRESENTED
-		}else if(qualifiedName.equals("db_id")){
-			if(m_SB.toString()!=null){
-				m_CurrDbxref.setdbname(
-						m_SB.toString().trim());
-			}
-		************/
 	//DBXREF
 		}else if(qualifiedName.equals("accession")){
 			if(m_SB.toString()!=null){
@@ -991,8 +941,8 @@ private boolean m_inAnalysis = false;
 			}
 	//UNUSED
 		}else{
-			System.out.println("----UNUSED CHADO ELEMENT<"
-					+qualifiedName+">");
+			//System.out.println("----UNUSED CHADO ELEMENT<"
+			//		+qualifiedName+">");
 		}
 	}
 
@@ -1031,7 +981,7 @@ private boolean m_inAnalysis = false;
 	public static void main(String args[]){
 		ChadoSaxReader pd = new ChadoSaxReader();
 		String fn = "../OUT/test.xml.chado1";
-		pd.parse(fn,true);
+		pd.parse(fn,GameWriter.CONVERT_ALL);
 		GenFeat topnode = pd.getTopNode();
 		topnode.Display(0);
 	}

@@ -13,17 +13,6 @@ private String m_accession;
 		super(the_id);
 	}
 
-	/**************
-	public void setdbname(String the_dbname){
-		m_dbname = the_dbname;
-	}
-
-	public String getdbname(){
-		return m_dbname;
-	}
-	**************/
-
-	/**************/
 	public void setDBId(String the_DBId){
 		m_DBId.setkey(the_DBId);
 	}
@@ -37,15 +26,14 @@ private String m_accession;
 	}
 
 	public String getDBId(){
-		System.out.println("FEATURE:getDBId()");
+		//System.out.println("FEATURE:getDBId()");
 		return m_DBId.getValue();
 	}
 
 	public DB getDB(){
-		System.out.println("FEATURE:getDB()");
+		//System.out.println("FEATURE:getDB()");
 		return (DB)m_DBId.getObjValue();
 	}
-	/**************/
 
 	public void setaccession(String the_accession){
 		m_accession = the_accession;

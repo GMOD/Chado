@@ -57,7 +57,8 @@ upgradelocal:
 	echo "now run make from " ${GMODLOCAL_PATH}
 
 runjar	:
-	jar -cvf ${GTCTOP}.jar -C ${CONVPATH} .
+	rm -f ./GameChadoConv.jar
+	jar -cvf GameChadoConv.jar -C ${CONVPATH} .
 
 
 docs	:

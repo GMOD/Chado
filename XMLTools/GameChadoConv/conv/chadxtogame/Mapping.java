@@ -35,7 +35,7 @@ private static HashMap m_FeatSubMap = new HashMap(10);
 			FeatSub fs = (FeatSub)(m_FeatSubMap.get(the_id));
 			if(fs.isMatch()){
 				m_FeatSubMap.remove(the_id);
-				System.out.println("========REMOVING FEATSUB<"+the_id+"> OF TYPE<"+fs.getTypeId()+">");
+				//System.out.println("========REMOVING FEATSUB<"+the_id+"> OF TYPE<"+fs.getTypeId()+">");
 			}
 		}
 	}
@@ -45,7 +45,7 @@ private static HashMap m_FeatSubMap = new HashMap(10);
 		Iterator it = m_FeatSubMap.keySet().iterator();
 		while(it.hasNext()){
 			String keyTxt = (String)it.next();
-			//System.out.println("  <"+keyTxt+">");
+			//System.out.println("-FEATSUB KEY <"+keyTxt+">");
 			FeatSub at = Lookup(keyTxt);
 			at.Display(1);
 			//System.out.println("");
