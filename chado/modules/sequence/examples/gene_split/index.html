@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title></title>
+  </head>
+
+  <body>
+    <h1>Example of a gene split</h1>
+
+<h2>Background</h2>
+
+    This is meant to illustrate the chado schema, and also to illustrate
+    possible dataflow.
+
+    <br>
+
+    For a full discussion of the schema, please see the relevant
+    directory. For the purposes of illustration, we will assume the
+    existence of a DTD or XML-schema derived directly from the
+    relational schema. The mapping between these should be fairly
+    obvious (hopefully). Note there are a huge number of possible DTDs
+    derivable from any relational schema, the implicit DTD presented
+    here is not meant to be the canonical one, it's just an expedient
+    one for the purposes of illustration.
+
+    <br>
+
+    In some cases, joins are flattened - for instance, instead of
+    presenting "dbxref"s as elements in their own right, they have
+    been combined with the table that has a corresponding foreign key
+    index. If it helps, you can imagine the XML as being on top of a
+    thin "view layer" on top of the database, in which we are looking
+    at the natural join between each table and the dbxref table.
+
+    <br>
+
+    For each state of the database, I'll present the corresponding
+    XML, both as standard XML and also as a simple text based tree
+    representation. In my opinion, the latter is much better for
+    editing and browsing.
+
+    <br>
+
+    I will also present a network-graph image showing the connection
+    between the rows in the database at that time state. Every node in
+    the graph represents a row. The arcs represent foreign key
+    relations. In some cases, "linking tables" are turned into arcs,
+    in order to keep the diagram simple.
+
+    Alleles/gene-structure-instances will be grouped with the
+    corresponding gene row/element; you will see a box surrounding
+    these.
+
+    <br>
+
+    Key:
+
+    GREEN ELLIPSE: feature
+
+    PURPLE RECTANGLE: gene
+
+    <br>
+
+    REMEMBER: An entry in the gene table means a gene in the sense of
+    a 'collection of alleles', or in the sense of a set of gene models
+    across all possible instances of the organism in question. An
+    entry in the feature table of SO (Sequence Ontology) type 'gene'
+    (or any subtype of 'gene') means a particular INSTANCE of a gene
+    model, on one particular INSTANCE of a chromosome. One can also
+    think of this as an 'allele'. For a more detailed discussion of
+    this please read the chado docs.
+    
+
+    <h2>Time: T1</h2>
+
+    <h3>Our Data</h3>
+
+    A single imaginary gene called 'motorhead'. Motorhead has two mutant
+    alleles, one of which has been characterised molecularly (a P
+    insertion), the other has been characterised genetically. The
+    phenotypes are 'curly wings' and 'lethal'.
+
+    <br>
+
+    The wildtype motorhead gene has an annotated gene model consisting
+    of one transcript which has two exons. This is a bog standard
+    monocistronic gene, so there is one corresponding CDS and translation.
+    We have chosen to instantiate (SO) CDS_Exon features as well as the
+    normal (SO) Exon features, although there is some redundancy
+    here. We have not instantiated UTR features or intron features.
+
+    <br>
+
+    this gene functions as a motor, and the protein has a kinesin
+    motor domain on it. The domain is represented as a feature located
+    on the translation feature.
+
+    <br>
+
+    There is a P insertion which is responsible for one of the mutant
+    phenotypes - this is a feature, so it is included also. From the
+    coordinates we can see the insertion lands inside the first CDS
+    exon.
+    
+    <br>
+
+    You can examine this data as
+
+    <br>
+    <table border=1>
+        <tr>
+          <td>
+            <A HREF="split-t0.itxt">CHADO INDENTED TEXT</A> (with comments)
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <A HREF="split-t0.xml">CHADO XML</A>
+          </td>
+        </tr>
+    </table>
+
+    <br>
+    Or you can visualise it as a PNG:
+
+    <table border=1>
+        <tr>
+          <td>
+            <A HREF="split-t0.pl.png">Full</A> (shows phenotypes and location)
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <A HREF="split-t0.png">Concise</A> (hides phenotypes and location data)
+          </td>
+        </tr>
+    </table>
+
+    
+    
+
+    <hr>
+    <address><a href="mailto:cjm@fruitfly.berkeley.edu">chris mungall</a></address>
+<!-- Created: Wed Oct 23 12:38:32 PDT 2002 -->
+<!-- hhmts start -->
+Last modified: Thu Oct 24 09:14:46 PDT 2002
+<!-- hhmts end -->
+  </body>
+</html>
