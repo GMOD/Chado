@@ -25,7 +25,7 @@
 -- it is related via an "allele-of" feature_relationship; eg
 -- [id:FBgn001, type:gene] <-- [id:FBal001, type:gene]
 --
--- with the genetic module, features can either be attached
+-- with the genetic module, phenotypes can either be attached
 -- to features of type sequence_variation, or to features of
 -- type 'gene' (in the case of mutant alleles).
 --
