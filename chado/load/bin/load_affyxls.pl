@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Chado::Affymetrixdchip;
-use lib 'lib';#, '/raid5a/allenday/cvsroot/bioperl-microarray';
+use lib 'lib';
 use Chado::AutoDBI;
 use base 'Chado::DBI';
 use Class::DBI::View qw(TemporaryTable);
@@ -43,6 +43,10 @@ use strict;
 use Bio::Expression::MicroarrayIO;
 use Data::Dumper;
 use Term::ProgressBar;
+use Log::Log4perl;
+Log::Log4perl::init('load/etc/log.conf');
+
+my $LOG = Log::Log4perl->get_logger('load_affyxls');
 
 my $arraytype = shift @ARGV; $arraytype ||= 'U133';
 my $arrayfile = shift @ARGV;
@@ -57,23 +61,32 @@ my $affx = Bio::Expression::MicroarrayIO->new(
 						-format   => 'dchipxls', #dchipxls
 					   );
 
+$LOG->debug("created new Bio::Expression::MicroarrayIO $affx");
+
 while(my $arrayio = $affx->next_array){
   my @txn = ();
-#  last unless $arrayio->id;
+  #last unless $arrayio->id;
 
   print STDERR "loading array ".$arrayio->id."\n";
+  $LOG->info("loading array: ".$arrayio->id);
 
   my $cvterms;
   my $sample_id;
   my $chip_id;
-#  if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
-  if($arrayfile =~ /^(\d+)\-(\d+)\-(\S+)/){
+
+  #we can do this on filename or arrayname.
+  #if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
+  if($arrayfile =~ /^.*\/?(\d+)\-(\d+)\-(\S+)/){
 	$chip_id   = $1;
 	$sample_id = $2;
 	$cvterms   = $3;
   }
 
+  $LOG->info("chip_id: $chip_id");
+  $LOG->info("sample_id: $sample_id");
+
   my %cvterm = make_cvterms($cvterms);
+  $LOG->info("cvterms: ".join(', ', keys %cvterm));
   #might want to break here if %cvterm is undef (likely due to missing/malformed cvterm line in array file)
 
   ##############################

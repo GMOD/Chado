@@ -12,6 +12,7 @@ insert into cvterm (name,cv_id) values ('adult_old',  (select cv_id from cv wher
 insert into cvterm (name,cv_id) values ('adult_young',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,cv_id) values ('child',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,cv_id) values ('fetus',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
+insert into cvterm (name,cv_id) values ('survival_time',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
