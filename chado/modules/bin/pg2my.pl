@@ -3,7 +3,7 @@
 use SQL::Translator;
 use Data::Dumper;   
 
-$SQL::Translator::DEBUG = 1;
+$SQL::Translator::DEBUG = 0;
 
 my $in = shift;
 open(IN,$in) || die "couldn't open $in: $!";
