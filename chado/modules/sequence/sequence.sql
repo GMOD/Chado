@@ -260,14 +260,14 @@ create index feature_cvterm_idx3 on feature_cvterm (pub_id);
 create table synonym (
        synonym_id serial not null,
        primary key (synonym_id),
-       synonym varchar(255) not null,
+       name varchar(255) not null,
 -- types would be symbol and fullname for now
        type_id int not null,
 -- sgml-ized version of symbols
        synonym_sgml varchar(255) not null,
        foreign key (type_id) references cvterm (cvterm_id),
 
-       unique(synonym,type_id)
+       unique(name,type_id)
 );
 create index synonym_idx1 on synonym (type_id);
 
