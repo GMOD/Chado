@@ -6,9 +6,9 @@ use Chado::LoadDBI;
 #use Bio::Tools::GFF;
 use Bio::FeatureIO;
 use Getopt::Long;
+use Data::Dumper;
 
 # parents come before features
-# no dbxref_id allowed
 # no residues allowed
 # reference sequences already in db!
 
@@ -291,29 +291,29 @@ while(my $feature = $gffio->next_feature()){
   }
   die "no cvterm for ".$featuretype unless $type;
 
-  my $src = $src{$feature->seq_id};
+  my $src = $src{$feature->seqid->value};
   if(!$src){
-    if($feature->seq_id eq '.'){
+    if($feature->seqid->value eq '.'){
       $src = '\N';
     } else {
-      ($src) = Chado::Feature->search( uniquename => $feature->seq_id )
-            || Chado::Feature->search( name => $feature->seq_id );
-      die "Unable to find srcfeature ",$feature->seq_id," in the database\n" 
+      ($src) = Chado::Feature->search( uniquename => $feature->seqid->value )
+            || Chado::Feature->search( name => $feature->seqid->value );
+      die "Unable to find srcfeature ",$feature->seqid->value," in the database\n" 
             unless $src;
       if ($src->isa('Class::DBI::Iterator')) {
         my @sources;
         while (my $tmp = $src->next) {
           push @sources, $tmp;
         }
-        die "more that one source for ".$feature->seq_id if (@sources>1);
-        $src{$feature->seq_id} = $sources[0]->id;
+        die "more that one source for ".$feature->seqid->value if (@sources>1);
+        $src{$feature->seqid->value} = $sources[0]->id;
       } else {
-        $src{$feature->seq_id} = $src->id;
+        $src{$feature->seqid->value} = $src->id;
       }
-      $src = $src{$feature->seq_id};
+      $src = $src{$feature->seqid->value};
     }
   }
-  die "no feature for ".$feature->seq_id unless $src;
+  die "no feature for ".$feature->seqid->value unless $src;
 
   if($feature->annotation->get_Annotations('Parent')){
     my $pname = undef;
@@ -330,7 +330,7 @@ while(my $feature = $gffio->next_feature()){
     $nextfeaturerel++;
   }
 
-  my $source = $feature->source;
+  my $source = $feature->source->value;
   my $is_FgenesH = 1 if $source eq 'FgenesH_Monocot';
   my $is_analysis = $is_FgenesH ? 1 : 0;
 
@@ -353,7 +353,7 @@ while(my $feature = $gffio->next_feature()){
 #need to convert from base to interbase coords
   my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
   my $end   = $feature->end   eq '.' ? '\N' : $feature->end;
-  my $phase = ($feature->phase eq '.' or $feature->phase eq '') ? '\N' : $feature->phase;
+  my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
 
   print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $phase,'0')),"\n";
 
@@ -468,7 +468,7 @@ while(my $feature = $gffio->next_feature()){
 
   if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
     my $source = $feature->source->value;
-    my $score = $feature->score ? $feature->score : '\N';
+    my $score = $feature->score->value ? $feature->score->value : '\N';
     $score    = '.' eq $score   ? '\N'            : $score;
 
     my $featuretype = $feature->type->name;
@@ -479,6 +479,7 @@ while(my $feature = $gffio->next_feature()){
                                                                                 
     unless ($analysis{$ankey}) {
       my ($ana) = Chado::Analysis->search( name => $ankey );
+      die "couldn't find $ankey in analysis table\n" unless $ana;
       $analysis{$ankey} = $ana->id;
       die unless $analysis{$ankey};
     }
@@ -528,7 +529,7 @@ while(my $feature = $gffio->next_feature()){
               $tstart, $tend, $tstrand, '\N',$rank)),"\n";
       }
 
-      my $score = $feature->score ? $feature->score : '\N';
+      my $score = $feature->score->value ? $feature->score->value : '\N';
       $score    = '.' eq $score   ? '\N'            : $score;
 
       my $featuretype = $feature->type->name;
