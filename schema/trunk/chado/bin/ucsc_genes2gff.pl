@@ -19,8 +19,8 @@ GetOptions('srcdb:s'       => \$SRCDB,
            'origin:i'      => \$ORIGIN,
            'annotations:s' => \$ANNOTATIONS,
            'center:s'      => \$CENTER,
-          ) or die <<USAGE;
-Usage: $0 [options]
+          ) and $ANNOTATIONS or die <<USAGE;
+Usage: $0 -annotations <dir> [options]
 
 Convert UCSC Genome Browser-format gene files into GFF3 version files.
 Only the gene IDs and their locations come through.  You have to get
@@ -65,7 +65,7 @@ parseKnownPfam(\%xref,$KNOWNPFAM);
 # need to pull in the omim and other annotations too
 
 print "##gff-version 3\n";
-if(1){ #for debugging
+#if(1){ #for debugging
 open(KG,$KNOWNGENE) or die "couldn't open('$KNOWNGENE'): $!";
 while (<KG>) {
   chomp;
@@ -88,14 +88,18 @@ while (<KG>) {
     foreach my $annotation_set (map {($_ !~ /^sequence/) ? $_ : undef} keys %{$xref{$id}}) {
       next unless $annotation_set;
       print "$annotation_set=". join(",", keys %{$xref{$id}{$annotation_set}}) .';';
+
     }
     print "\n";
 
     foreach my $annotation_set (map {($_ !~ /^sequence/ and $_ =~ /genbank:protein/) ? $_ : undef} keys %{$xref{$id}}){
       next unless $annotation_set;
-      print join ("\t",'.', $SRCDB,'protein','.','.','.','.',
-                  "ID=". join(",", keys %{$xref{$id}{$annotation_set}}) .";Parent=$id"
-                 ), "\n";
+
+      #there may be multiple protein IDs associated with a given mRNA.  list them separately.
+      #there is nothing in the spec saying only one ID tag per line, but it seems sensible.
+      foreach my $i (keys %{$xref{$id}{$annotation_set}}){
+        print join ("\t",'.',$SRCDB,'protein','.','.','.','.','.',"ID=$i;Parent=$id"), "\n";
+      }
     }
   }
 
@@ -221,13 +225,15 @@ foreach my $kg (keys %xref){
   my $seq_prot = $xref{$kg}{'sequence:protein'};
 
   if($seq_mrna){
-    print '>'. join(',',keys(%{$xref{$kg}{'db:genbank:mrna'}})) ."\n";
-    print wrap('','',$seq_mrna) ."\n";
+    foreach my $k (keys %{$xref{$kg}{'db:genbank:mrna'}}){
+      print ">$k\n". wrap('','',$seq_mrna) ."\n";
+    }
   }
 
   if($seq_prot){
-    print '>'. join(',',keys(%{$xref{$kg}{'db:genbank:protein'}})) ."\n";
-    print wrap('','',$seq_prot) ."\n";
+    foreach my $k (keys %{$xref{$kg}{'db:genbank:protein'}}){
+      print ">$k\n". wrap('','',$seq_prot) ."\n";
+    }
   }
 }
 
@@ -249,11 +255,22 @@ sub parseLocAcc {
     chomp;
     next if /^#/;
 	my @line = split /\t/;
-	$line[1] =~ /(.*)\.\d/;
-	my $gene = $1;
-	$line[4] =~ /(.*)\.\d/;
-	my $protein = $1;
-	if($protein ne '-') { $xref->{$gene}{'db:genbank:protein'}{$protein} = 1; }
+
+    #note: this doesn't work b/c if the second regex doesn't match, $1 is still
+    #leftover from the first regex.  a better method is given below.
+	#$line[1] =~ /(.*)\.\d/;
+	#my $gene = $1;
+	#$line[4] =~ /(.*)\.\d/;
+	#my $protein = $1;
+
+    my $gene    = $line[1];
+    my $protein = $line[4];
+    $gene    =~ s/\.\d+$//;
+    $protein =~ s/\.\d+$//;
+
+    next if $gene eq 'none';
+
+	$xref->{$gene}{'db:genbank:protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-');
   }
   close ANNFILE;
 }
@@ -320,15 +337,18 @@ sub parseKnownPfam {
 
 sub parseKnownAffy {
   my $xref = shift @_;
+
+  my $i = 0;
   foreach my $filename (@_){
     open  ANNFILE, $filename or die "Can't open file $filename: $!";
     while(<ANNFILE>) {
       chomp;
       next if /^#/;
       my ($accession,$probeset) = split /\t/;
-      $xref->{$accession}{'db:affy'}{$probeset} = 1;
+      $xref->{$accession}{'db:affy:'.($i?'U95':'U133')}{$probeset} = 1;
     }
     close ANNFILE;
+    $i++;
   }
 }
 
@@ -447,7 +467,7 @@ sub parseKgXref {
     $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA;
     $xref->{$key}{'db:swissprot'}{$spID}                = 1 if $spID;
     $xref->{$key}{'db:swissprot:display'}{$spDisplayID} = 1 if $spDisplayID;
-    $xref->{$key}{'genesymbol'}{$geneSymbol}            = 1 if $geneSymbol;
+    $xref->{$key}{'Alias'}{$geneSymbol}                 = 1 if $geneSymbol;
     $xref->{$key}{'db:refseq:mrna'}{$refseq}            = 1 if $refseq;
     $xref->{$key}{'db:refseq:protein'}{$protAcc}        = 1 if $protAcc;
     $xref->{$key}{'description'}{$description}          = 1 if $description;
