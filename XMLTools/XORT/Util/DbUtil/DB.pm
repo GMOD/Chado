@@ -14,10 +14,13 @@ package XORT::Util::DbUtil::DB;
  use Carp;
  use DBI;
 
-my $DEBUG=0;
 
 my %hash_ddl;
+# if there are triggers which may change the unique_key value, then retrieve id after insertion will be DB specific.
+my $TRIGGER=1;
 
+#set switch for whether output debug message
+my $DEBUG=0;
 
 #usage XORT::Util::DbUtil::DB->new(-db_type=>'mysql', -db=>'flydb',-host=>"localhost", -port=>'3036', -user=>'pinglei', -passsword=>'pinglei')
 sub new {
@@ -160,24 +163,27 @@ sub execute_sql(){
 # This method is used to get all the data (rows) to be returned from the SQL statement. It returns a reference to an
 #      array of arrays of references to each row. You access/print the data by using a nested loop. Example: 
 #    my($i, $j); 
-#    my $table = $sth->get_all_arrayref; 
+#    my $table = $sth->get_all_arrayref;
 #      for $i ( 0 .. $#{$table} ) { 
-#          for $j ( 0 .. $#{$table->[$i]} ) { 
-#              print "$table->[$i][$j]\t"; 
-#          } 
-#      print "\n"; 
-#      } 
+#          for $j ( 0 .. $#{$table->[$i]} ) {
+#              print "$table->[$i][$j]\t";
+#          }
+#      print "\n";
+#      }
 
 
 sub get_all_arrayref(){
     my $self=shift;
     my $stm=shift;
+
     my $ref_array;
     my $dbh=$self->{'dbh'};
     my $query=$dbh->prepare($stm);
+    print "\nstm in DB.pm:$stm:" if ($DEBUG==1);;
     $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
     $ref_array=$query->fetchall_arrayref;
     $query->finish();
+    print "\nsize of reutrn result:$#{$ref_array}\n" if ($DEBUG==1);
     return $ref_array;
 }
 
@@ -312,7 +318,7 @@ sub db_select(){
           $row_array = $query->fetchrow_arrayref;
           $db_id= $row_array->[0];
           if ($db_id){
-             print "\ndb_id is:$db_id" if ($DEBUG>0);
+             #print "\ndb_id is:$db_id";
              $query->finish();
              return $db_id;
           }
@@ -396,14 +402,14 @@ sub db_lookup(){
     #in case it is not in the database, we may first insert, then return the 
      my ($data_list, $col_list);
      foreach my $key(keys %$data_hash_ref){
-       if (defined $data_list){
+       if ($data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if (defined $col_list){
+      if ($col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -416,7 +422,7 @@ sub db_lookup(){
     }
 
 
-   print "\n\nlookup stm:$stm_select\n" if ($DEBUG>0);
+   print "\n\nlookup stm:$stm_select\n" if ($DEBUG==1);
 
    if ($stm_select && $stm_insert){
           # here start the database work, first check, if not in db, then insert
@@ -474,7 +480,7 @@ sub db_update(){
   my ($data_list, $where_list, $stm_select, $stm_update);
      # here to get the data_list from $new_hash_ref
      foreach my $key(keys %$new_hash_ref){
-       if (defined $data_list){
+       if ($data_list){
                    if ($new_hash_ref->{$key}){
 		        $data_list=$data_list." , ".$key."=".$new_hash_ref->{$key};
 	           }
@@ -726,16 +732,21 @@ sub db_insert(){
      my $id=$hash_ddl{$table_id_string};
      my $data_hash_ref=&_data_type_checker($ref, $table);
 
+     #here we need this because trigger will change the unique_key value, so can't get the id using ORIGINAL unique_key values
+     my $table_seq=$table."_".$id."_seq";
+     my $stm_select_seq=sprintf("select last_value from $table_seq");
+
+
      my ($data_list, $col_list, $stm_insert, $stm_select, $db_id);
      foreach my $key(keys %$data_hash_ref){
-       if (defined $data_list){
+       if ($data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if (defined $col_list){
+      if ($col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -767,7 +778,7 @@ sub db_insert(){
      my ($where_list);
      foreach my $key(keys %hash_unique){
         if (defined $data_hash_ref->{$key}){
-           print "\ninsert unique of $table:$key" if ($DEBUG>0);
+           print "\ninsert unique of $table:$key";
            if ($where_list){
                $where_list=$where_list." and ".$key."=".$data_hash_ref->{$key};
            }
@@ -798,7 +809,7 @@ sub db_insert(){
        $stm_select="select $id from $table where $where_list";
     }
 
-    #print "\ninsert: stm_select:$stm_select\nstm_insert:$stm_insert";
+    #print "\ninsert: stm_select:$stm_select\nstm_insert:$stm_insert" if ($DEBUG==1);
 
     if ($stm_insert && $stm_select){
           my $rs;
@@ -819,7 +830,12 @@ sub db_insert(){
                   &create_log($hash_trans, $hash_local_id, $log_file);
                   die "could not execute $stm_insert\n";
             }
-            $query=$dbh->prepare($stm_select);
+            if ($TRIGGER==1){
+               $query=$dbh->prepare($stm_select_seq);
+	     }
+            else {
+               $query=$dbh->prepare($stm_select);
+            }
             $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
             $row_array = $query->fetchrow_arrayref;
             $db_id= $row_array->[0];
@@ -833,7 +849,29 @@ sub db_insert(){
  return ;
 }
 
+sub get_last_id (){
+  $self=shift;
+  my $table=shift;
+  my $table_id_string=$table."_primary_key";
+  my $id=$hash_ddl{$table_id_string};
+  my $table_seq=$table."_".$id."_seq";
+  my $dbh=$self->{'dbh'}; 
+  my $stm_select_seq=sprintf("select last_value from $table_seq");
+  my          $query=$dbh->prepare($stm_select_seq);
+            $rs=$query->execute;
 
+            $rs= $query->execute;
+            if (! $rs ) {
+                  die "could not execute $stm_stm\n";
+            }
+           my  $row_array = $query->fetchrow_arrayref;
+           my  $db_id= $row_array->[0];
+            if ($db_id){
+               $query->finish();
+               return $db_id;
+            }
+  return;
+}
 
 # two type of force: create if look up can't find the data, and update if it already exist and have new data
 # usage: db_obj->db_insert(-data_hash=>\%hash_data, -table=$table_name)
@@ -850,16 +888,24 @@ sub db_force(){
      my ($data_list, $col_list, $stm_insert, $stm_select, $db_id, $stm_update);
      my $update_need;
 
+     #here we need this because trigger will change the unique_key value, so can't get the id using ORIGINAL unique_key values
+     my $table_seq=$table."_".$id."_seq";
+     my $stm_select_seq=sprintf("select last_value from $table_seq");
+
+    foreach my $key (keys %$data_hash_ref){
+     	print "\nin db_force,key:$key:\tvalue:$data_hash_ref->{$key}" if ($DEBUG==1);
+    }
+
      #format the insert statement
      foreach my $key(keys %$data_hash_ref){
-       if (defined $data_list){
+       if ($data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if (defined $col_list){
+      if ($col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -960,10 +1006,9 @@ sub db_force(){
   }
 
 
-   print "\ndb_force: stm_select:$stm_select\nstm_insert:$stm_insert\nstm_update:$stm_update" if ($DEBUG>0);
+   print "\ndb_force: stm_select:$stm_select\nstm_insert:$stm_insert\nstm_update:$stm_update" if ($DEBUG==1);
     my $rs;
     if ($stm_insert && $stm_select && $stm_update){
-          $db_id= '';
           my $dbh=$self->{'dbh'}; 
           $query=$dbh->prepare($stm_select);
           # $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
@@ -973,7 +1018,7 @@ sub db_force(){
               die "could not execute $stm_select\n";
           } 
           $row_array = $query->fetchrow_arrayref;
-          $db_id= $row_array->[0] if ($row_array);
+          $db_id= $row_array->[0];
           if ($db_id){
             if ($update_need eq 'true'){
                $query=$dbh->prepare($stm_update);
@@ -994,8 +1039,14 @@ sub db_force(){
                &create_log($hash_trans, $hash_local_id, $log_file);
                die "unable to execute:$stm_insert\n";
              }
- 
-            $query=$dbh->prepare($stm_select);
+
+            if ($TRIGGER==1){
+               $query=$dbh->prepare($stm_select_seq);
+	     }
+            else {
+               $query=$dbh->prepare($stm_select);
+            }
+
            # $query->execute || (  &create_log() && die);
             $rs= $query->execute;
             if (! $rs ) {
@@ -1194,13 +1245,13 @@ sub insertTableHashSerial {
 sub _data_type_checker(){
     my $hash_ref=shift;
     my $table=shift;
-    my %hash_boolean= (
-          0=>'true',
-          1=>'false',
-    );
+    my %hash_boolean={
+          0=>TRUE,
+          1=>FALSE,
+    };
 
     foreach my $key (keys %$hash_ref){
-     #	print "\nbefore type check key:$key:\tvalue:$hash_ref->{$key}";
+     	print "\nin DB, before type check key:$key:\tvalue:$hash_ref->{$key}" if ($DEBUG==1);
     }
 
   #  print "\ndata_type:$data_type";
@@ -1225,26 +1276,19 @@ sub _data_type_checker(){
     my @temp=split(/;/, $data_type);
     for my $i(0..$#temp){
         my @temp1=split(/:/, $temp[$i]);
-        
-  # dgg
-  if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){ 
-    $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
-    }
-  elsif # dgg
-  ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
+	if ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
            
-#             if ($temp1[1] =~  /boolean/ && defined $hash_boolean{$hash_ref->{$temp1[0]}} && defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
-#                   $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
-#             }
-# 	    elsif
-	    if ( defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
+            if ($temp1[1] =~  /boolean/ && defined $hash_boolean{$hash_ref->{$temp1[0]}} && defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
+                  $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
+            }
+	    elsif ( defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
               $hash_ref->{$temp1[0]}="\'".$hash_ref->{$temp1[0]}."\'";
             }
        	}
              # in case of boolean type, need to replace 0/1 with f/t ?
-#             if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){
-#                $hash_ref->{$temp1[0]}=$hash_boolean{$hash_ref->{$temp1[0]}};
-# 	    }
+            if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){
+               $hash_ref->{$temp1[0]}=$hash_boolean{$hash_ref->{$temp1[0]}};
+	    }
     }
 
    return $hash_ref;

@@ -1,7 +1,8 @@
 create table contact (
        contact_id serial not null,
        primary key (contact_id),
-       description varchar(255) null
+       description varchar(255) null,
+       unique (description)
 );
 GRANT ALL on contact_contact_id_seq to PUBLIC;
 GRANT ALL on contact to PUBLIC;

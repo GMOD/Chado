@@ -93,6 +93,7 @@ my $P_pseudo=-1;
 # all the table which has dbxref_id, and primary key can be retrieved by accession
 my %hash_accession_entry=(
 dbxref=>1,
+pub=>1,
 feature=>1,
 );
 
@@ -248,28 +249,26 @@ for my $i(0..$#temp){
      my $op=$element->{'Attributes'}->{$ATTRIBUTE_OP};
      my $ref=$element->{'Attributes'}->{$ATTRIBUTE_REF};
     if ($local_id&& $local_id ne ''){
-       $local_id =~ s/\&/\&amp;/g;
-       $local_id =~ s/</\&lt;/g;
-       $local_id =~ s/>/\&gt;/g;
-       $local_id =~ s/\"/\&quot;/g;
-       $local_id =~ s/\'/\&apos;/g;
+      $local_id=~ s/\&amp;/\&/g;
+      $local_id=~ s/\&lt;/</g;
+      $local_id=~ s/\&gt;/>/g;
+      $local_id=~ s/\&quot;/\"/g;
+      $local_id=~ s/\&apos;/\'/g;
+      $local_id=~ s/\\\\/\\/g;
        $hash_level_id{$level}=$local_id;
        $AoH_local_id[$level]{$element_name}=$local_id;
-       if ($local_id eq 'dbxref_49378'){
-               # &create_log(\%hash_trans, \%hash_id, $log_file);
-               # exit(1);
-       }
     }
     else {
        delete $hash_level_id{$level};
        delete $AoH_local_id[$level]{$element_name};
     }
     if ($op && $op ne ''){
-       $op =~ s/\&/\&amp;/g;
-       $op =~ s/</\&lt;/g;
-       $op =~ s/>/\&gt;/g;
-       $op =~ s/\"/\&quot;/g;
-       $op =~ s/\'/\&apos;/g;
+      $op=~ s/\&amp;/\&/g;
+      $op=~ s/\&lt;/</g;
+      $op=~ s/\&gt;/>/g;
+      $op=~ s/\&quot;/\"/g;
+      $op=~ s/\&apos;/\'/g;
+      $op=~ s/\\\\/\\/g;
        $hash_level_op{$level}=$op;
        $AoH_op[$level]{$element_name}=$op;
     }
@@ -279,11 +278,12 @@ for my $i(0..$#temp){
     }
 
     if ($ref && $ref ne ''){
-       $ref =~ s/\&/\&amp;/g;
-       $ref =~ s/</\&lt;/g;
-       $ref =~ s/>/\&gt;/g;
-       $ref =~ s/\"/\&quot;/g;
-       $ref =~ s/\'/\&apos;/g;
+      $ref=~ s/\&amp;/\&/g;
+      $ref=~ s/\&lt;/</g;
+      $ref=~ s/\&gt;/>/g;
+      $ref=~ s/\&quot;/\"/g;
+      $ref=~ s/\&apos;/\'/g;
+      $ref=~ s/\\\\/\\/g;
        $hash_level_ref{$level}=$ref;
        $AoH_ref[$level]{$element_name}=$ref;
        print "\nref for this element:$element_name is :$ref" if ($DEBUG==1);
@@ -324,7 +324,8 @@ for my $i(0..$#temp){
           # if has 'ref' attribute, it will retrieve the data(all non_null cols) from db. 
           # the difference between this and the one using as foreign_obj refering is that, here we may have addition 'update' data to be updated, or to 
           # be deleted, so we need to get real data, then decide how to op it
-          if (defined $AoH_ref[$level-1]{$hash_level_name{$level-1}} && !(%$hash_data_ref)){
+          #if (defined $AoH_ref[$level-1]{$hash_level_name{$level-1}} && !(defined $hash_data_ref)){
+          if (defined $AoH_ref[$level-1]{$hash_level_name{$level-1}} ){
                my $hash_id_key=$hash_level_name{$level-1}.":".$AoH_ref[$level-1]{$hash_level_name{$level-1}};
                if (defined $hash_id{$hash_id_key}){
                   $hash_data_ref=&_get_ref_data($hash_level_name{$level-1}, $hash_id{$hash_id_key});
@@ -332,10 +333,10 @@ for my $i(0..$#temp){
                else {
                  my $temp_db_id=&_get_accession( $AoH_ref[$level-1]{$hash_level_name{$level-1}},$hash_level_name{$level-1}, $level-1);
                  if (defined $temp_db_id){
-                      $hash_data_ref=&_get_ref_data($element_name, $temp_db_id );
+                      $hash_data_ref=&_get_ref_data($hash_level_name{$level-1}, $temp_db_id );
 		 }
                  else {
-                   print "\nunable to retrieve record for this ref:$AoH_ref[$level-1]{$hash_level_name{$level-1}}";
+                   print "\nunable to rerieve record for this ref:$AoH_ref[$level-1]{$hash_level_name{$level-1}}";
                  }
                }
 	  }
@@ -646,8 +647,8 @@ sub end_element {
 	      }
               else {
                  print "\nunable to retrieve the record based on the ref:$AoH_ref[$level]{$hash_level_name{$level}}";
-                 &create_log(\%hash_trans, \%hash_id, $log_file);
-                 exit(1);
+
+                 exit(1) if ($hash_level_op{$level} ne $OP_DELETE);
               }
           }
 
@@ -716,10 +717,10 @@ sub end_element {
            my $key=$hash_level_name{$level-2}.".".$hash_level_name{$level-1};
 	   if ($hash_level_op{$level-2} eq 'update'){
                if ($hash_level_op{$level-1} eq 'update'){
-                   $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
+                   $AoH_data_new[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
 	       }
                else {
-                   $AoH_data_new[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
+                   $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
                }
 	    }
            else {
@@ -943,27 +944,17 @@ sub _data_check(){
     }
 
     foreach my $key (keys %$hash_ref){
-      print "\nin data_check col:$key\tvalue:$hash_ref->{$key}:" if ($DEBUG==1);
+      print "\nin data_check col of table:$table:$key\tvalue:$hash_ref->{$key}:" if ($DEBUG==1) ;
     }
 
     my $table_non_null=$table."_non_null_cols";
     my @temp=split(/\s+/, $hash_ddl{$table_non_null});
     my $table_id_string=$table."_primary_key";
     my $table_id=$hash_ddl{$table_id_string};
-
-    ## dgg here - add check for serial value type - skip failure for missing serial which we can create
-    ## contact_data_type=description:varchar;contact_id:serial; ...
-    my $data_type_name=$table."_data_type";
-    my $data_type=$hash_ddl{$data_type_name};
-    my %data_types= map { split /:/; } split(/;/, $data_type);
-    print "\n$table data_types: $data_type\n"  if ($DEBUG==1);
-
     #my $table_id=$table."_id";
     for my $i(0..$#temp){
       my $foreign_key=$table.":".$temp[$i];
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
-      next if ($data_types{$temp[$i]} eq 'serial'); ## dgg
-
       if ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && (defined $hash_foreign_key{$temp[$i]} )){
          my $temp_key=$table.":".$temp[$i]."_ref_table";
          print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}" if ($DEBUG==1);

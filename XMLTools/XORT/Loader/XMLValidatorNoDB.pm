@@ -17,6 +17,8 @@ use strict;
 my %hash_ddl;
 my $level=1;
 
+
+
 my $element_name;
 my $table_name;
 my %hash_table_col;
@@ -192,7 +194,7 @@ sub validate (){
      $level++;
      $hash_level_sub_detect{$level}=1;
      $element_name=$element->{'Name'};
-     print "\nstart_element:$element_name";
+     print "\nstart_element:$element_name" if ($DEBUG==1);
 
     # store the transaction information
     if (defined $hash_ddl{$element_name} && $hash_level_name{$level-1} eq $root_element){
@@ -269,7 +271,7 @@ sub validate (){
        # when come to subordinary table(e.g cvrelationship), and previous sibling element is not table column(if is, it alread out it)  output primary table(e.g cvterm)
        $table_name=$element_name;
        if (  defined $hash_ddl{$hash_level_name{$level-1}}){
-	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name";
+	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name" if ($DEBUG==1);
           my  $hash_data_ref;
           # here test for 'ref' attribute
           if (defined $AoH_ref[$level-1]{$hash_level_name{$level-1}}){
@@ -430,8 +432,8 @@ sub validate (){
      if (!(exists $col_ref->{$element_name})){
         print LOG0 "\n invalid element...... element:$element_name";
         print LOG0 "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
-        print  "\n invalid element...... element:$element_name";
-        print  "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
+        print  "\n invalid element...... element:$element_name" if ($DEBUG==1);
+        print  "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name"  if ($DEBUG==1);
         #&create_log(\%hash_trans, \%hash_id, $log_file);
         foreach my $key(keys %$col_ref){
             print "\ncharacter invalid column, key:$key:value:$col_ref->{$key}";
@@ -553,11 +555,11 @@ sub end_element {
   my $table_name_id=$table_name."_id";
   my $hash_ref;
 
-  print "\nend_element_name:$element_name";
+  print "\nend_element_name:$element_name"  if ($DEBUG==1);
    # come to end of document
   if ($element_name eq $root_element){
     print "\n\nbingo ....you finishe validating the file,  check log file:$log_file to see the result!....\n";
-    exit(1);
+    return;
   }
 
 
@@ -692,8 +694,8 @@ sub end_element {
              if ($db_id){
                  $AoH_db_id[$level]{$element_name}=$db_id;
 	     }
-             print "\nend_element is $element_name table element, and sub element is col of this table";
-             print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+             print "\nend_element is $element_name table element, and sub element is col of this table"  if ($DEBUG==1);
+             print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:"  if ($DEBUG==1);
           }
         }
         #for case using ref attribuate to ref object, self is still table_element. Key difference: use ref to retrieve $hash_data_ref
@@ -813,8 +815,8 @@ sub end_element {
             if ($db_id){
                $AoH_db_id[$level]{$element_name}=$db_id;
 	    }
-               print "\nend_element is $element_name table element, and sub element is col of this table";
-               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+               print "\nend_element is $element_name table element, and sub element is col of this table"  if ($DEBUG==1);
+               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:"  if ($DEBUG==1);
          }
 	}
 
@@ -832,7 +834,7 @@ sub end_element {
            else {
                $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
            }
-          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:";
+          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:" if ($DEBUG==1);
 	}
    } # end of self: table element
    # self: column element
@@ -840,8 +842,8 @@ sub end_element {
       my $temp_foreign=$hash_level_name{$level-1}.":".$element_name."_ref_table";
       my $key=$hash_level_name{$level-1}.".".$element_name;
       my $primary_table=$hash_ddl{$temp_foreign};
-      print "\n$element_name is column_element";
-       #if is foreign key, and next level element is the primary table
+      print "\n$element_name is column_element"  if ($DEBUG==1);
+       #if is foreign key, and next level eleme nt is the primary table
       if ($hash_ddl{$temp_foreign} eq $hash_level_name{$level+1} && defined $hash_ddl{$temp_foreign} ne '' && (defined $hash_level_sub_detect{$level+1})){
         # my $key=$hash_level_name{$level-1}.".".$element_name;
         # print "\nforeign key, next level element:$hash_level_name{$level+1} is the primary table";
@@ -888,7 +890,7 @@ sub end_element {
                 print LOG0 "\n$element_name:$AoH_data[$level]{$key}: is not accession, or local_id:$AoH_data[$level]{$key} is not defined yet";
                # &create_log(\%hash_trans, \%hash_id , $log_file );
           }
-           print "\nend_element: self:col, table_op:not update";
+           print "\nend_element: self:col, table_op:not update"  if ($DEBUG==1);
        	}
         #table:update, col:update
         elsif ($hash_level_op{$level-1} eq 'update' && $hash_level_op{$level} eq 'update' ){
@@ -915,7 +917,7 @@ sub end_element {
                 print LOG0 "\n$element_name:$AoH_data_new[$level]{$key} is not accession, or local_id:$AoH_data_new[$level]{$key} is not defined yet";
                 #&create_log(\%hash_trans, \%hash_id, $log_file);
           }
-          print "\nend_element: self:col, table_op:update, col_op:update";
+          print "\nend_element: self:col, table_op:update, col_op:update"  if ($DEBUG==1);
         }
         #table: update, col: not upate
         else {
@@ -943,10 +945,10 @@ sub end_element {
                 # &create_log(\%hash_trans, \%hash_id, $log_file);
 
           }
-         print "\nend_element: self:col, table_op:update, col_op:not update";
+         print "\nend_element: self:col, table_op:update, col_op:not update" if ($DEBUG==1);
         }
-       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}";
-       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}";
+       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}" if ($DEBUG==1);
+       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}" if ($DEBUG==1);
       }
       # foreign key, no sub element, but NO data, error .......
       elsif ($hash_ddl{$temp_foreign} ne $hash_level_name{$level+1} && $hash_ddl{$temp_foreign} ne '' && !$AoH_db_id[$level+1]{$primary_table} && ($AoH_data[$level]{$key} eq '')) {
@@ -1051,7 +1053,7 @@ sub _data_check(){
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
       if ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && (defined $hash_foreign_key{$temp[$i]} )){
          my $temp_key=$table.":".$temp[$i]."_ref_table";
-         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}";
+         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}" if ($DEBUG==1);
          my $retrieved_value=&_context_retrieve($level,  $hash_ddl{$temp_key}, $hash_level_name_ref);
          if ($retrieved_value){
             $hash_ref->{$temp[$i]}=$retrieved_value;
@@ -1087,12 +1089,12 @@ sub _context_retrieve(){
     for ( my $i=$level-1; $i>=0; $i--){
   #    print "\ncontext check hash_level_name:$hash_level_name_ref->{$i}";
       if ($primary_table eq $hash_level_name_ref->{$i}){
-        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}"; 
+        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}" if ($DEBUG==1); 
         $result= $AoH_db_id[$i]{$primary_table};
         last;
       }
     }
-    print "\nresult is:$result";
+    print "\nresult is:$result"  if ($DEBUG==1);
     return $result;
 }
 
@@ -1289,7 +1291,7 @@ sub create_log(){
    my $hash_trans=shift;
    my $hash_data=shift;
    my $table=shift;
-   print "\nit will use this log_file:$log_file: to recover the process if you set the -is_recovery=1";
+   print "\nit will use this log_file:$log_file: to recover the process if you set the -is_recovery=1" if ($DEBUG==1);
 
 
    print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
