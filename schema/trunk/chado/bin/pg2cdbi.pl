@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-use lib '/home1/allenday/cvsroot/sqlfairy/lib';
 use strict;
 use SQL::Translator;
 use SQL::Translator::Producer::ClassDBI;

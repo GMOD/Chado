@@ -21,11 +21,16 @@ $O{PACKAGE_HOME}   = $O{GMOD_HOME}.'/lib/schema';
 $O{COREDEF}        = 'modules/idb-full.modules';
 $O{EXTDEF}         = 'modules/extension.modules';
 
+my $rebuild_complete = 0;
 open CORE, $O{COREDEF} or die "unable to open $O{COREDEF}: $!\n";
 my @sqlfiles;
 while (<CORE>) {
   chomp;
-  push @sqlfiles, 'modules/'.$_;
+  my $file = 'modules/'.$_;
+  if (-M 'modules/complete.sql' > -M $file) {
+    $rebuild_complete++;
+  }
+  push @sqlfiles, $file;
 }
 close CORE;
 
@@ -42,7 +47,11 @@ while (<EXT>) {
   $i++;
   print "[$i] $_";
   chomp;
-  push @extfiles, 'modules/'.$_;
+  my $file = 'modules/'.$_;
+  if (-M 'modules/complete.sql' > -M $file) {
+    $rebuild_complete++;
+  }
+  push @extfiles, $file;
 }
 close EXT;
 
@@ -68,7 +77,7 @@ close OUT;
 
 warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n";
 system("./bin/pg2cdbi.pl ./modules/complete.sql > ./lib/Chado/AutoDBI.pm")==0
-  or die "bin/pg2cdbi.pl failed";
+  or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 
 
 WriteMakefile(
@@ -96,16 +105,32 @@ HINT: you probably want to run (at least) "make test_load"
 HERE
 ;
 
+sub MY::install {
+  package MY;
+  my $inherited = shift->SUPER::install(@_);
+  $inherited =~ s/doc_install/doc_install song go/;
+  $inherited;
+}
+
+sub MY::c_o {
+  return ".SUFFIXES : .gz .loaded .ontology .go_loaded .so_loaded .unpacked";
+}
+
+
 sub MY::postamble {
   my $uninterp =  q{
+.gz.unpacked:
+	cp $< $<.tmp
+	gunzip -f $<
+	mv $<.tmp $<
+	touch $@
+
 song ::
-	make obo/OBO_REL/rel.rel_loaded
 	make song/SODA.defs.unpacked
 	make song/SODA.ontology.unpacked
 	make song/SODA.so_loaded
 
 go ::
-	make obo/OBO_REL/rel.rel_loaded
 	make go/component.go_loaded
 	make go/function.go_loaded
 	make go/process.go_loaded
@@ -173,12 +198,12 @@ test_load ::
 	\$(SHELL) bin/test_load.sh
 
 %.go_loaded: %.ontology
-	./bin/load_ontology.pl $USER $DBNAME $< go/GO.defs
-	touch $@
+	./bin/load_ontology.pl $USER $DBNAME \$< go/GO.defs
+	touch \$@
 
 %.so_loaded: %.ontology
-	./bin/load_ontology.pl $USER $DBNAME $< song/SODA.defs
-	touch $@
+	./bin/load_ontology.pl $USER $DBNAME \$< song/SODA.defs
+	touch \$@
 
 $uninterp
   };  
