@@ -14,5 +14,3 @@ create table dbxref (
 );
 
 
-
-
