@@ -1,0 +1,155 @@
+[rough notes... just a sketch of some dieas for now... cjm]
+
+IDB IMPLEMENTATION
+------------------
+
+DBMS
+====
+
+It is expected that IDB will initially be implemented in
+postgres. Care has been taken to keep the schema itself as DBMS
+neutral as possible. The tables are easily converted from postgres
+dialect into other dialects (we may later distribute these; email cjm
+for scripts for conversion).
+
+Although DBMS neutrality is a laudable goal, most DBMSs provide useful
+functionality that is outwith the scope of the SQL92 standard. It is
+the authors' intention to explore some of this functionality, and
+perhaps implement an extra optional layer around the schema. It is
+expected that this layer will prove extremely useful for writing
+robust tools, data management, querying etc.
+
+SQL Views
+=========
+
+Although views are not necessary for using IDB, they are highly
+convenient and promote good software design. Furthermore, the ability
+to selectively materialise views can be an excellent query
+optimisation strategy.
+
+Although views are SQL standard, note that MySQL does not yet
+implement them. The view layer can still be used by MySQL users
+though, as a warehouse version of the db with all views materialized
+can be provided for read-only use.
+
+Due to the heavily normalised nature of the IDB, it may be beneficial
+to materialise some views used in queries that would otherwise involve
+joining many tables.
+
+Views also help immensely with interoperability. For instance, a group
+may wish to adopt IDB but switch in their own tables in certain
+places. views can be used to provide the bridge layer. IDB used in
+this wider context would not be a monolothic schema, but rather a
+stack of standardised relations.
+
+Software
+========
+
+At this stage we do not wish to dictate anything of the software
+architecture; IDB can be deployed in a variety of ways. It is worth
+speculating on some of the ways in which IDB could fit in to a variety
+of architectures.
+
+Curation tools (eg in java) are anticipated; some will be tied to
+specific modules; others will need to be aware of multiple modules. A
+component-based architecture would allow module-specific widgets to be
+slotted together in a pan-database application. It is one author's
+hope (cjm) that high-level DBMS code layers (views, triggers,
+functions) can be used to keep the client applications as thin as
+possible, and as far as possible untied to specific object models or
+programming languages.
+
+Existing tools (particularly genome style applications); examples
+being apollo and gbrowse. New adapters could be written that translate
+between the native object model and IDB. Where possible, adapters
+should be avoided in this author's opinion, as they are maintenance
+sinks and allow dangerous disjuncts between data models to grow. Some
+adapters (eg the gbrowse database adpater) target a specific schema
+already. In these cases it would be possible to provide an SQL level
+transform (eg views or materialised views) to allow interoperability.
+
+XML; we may provide a DTD or XML schema specification of IDB (most
+likely on a per-module basis). This is likely to be tightly coupled to
+the relational schema. This could hopefully turn out to be the
+lingua-franca of flybase, and other groups. Note that there a number
+of biological XML specifications already out there (eg game, tigr,
+agave). The IDB-XML format is *not* intended as
+competition/replacement. The IDB-XML format is there purely as a
+*direct* representation of the relational schema. XSLT transforms
+could be used for conversion between the different XMLs. The IDB-XML
+would also be a useful load/save mechanism eg for merging IDBs (say
+you want to combine fly and anopheles into one database). Curation and
+other data entry tools could work via an XML intermediary - either
+IDB-XML or a tool specific XML that can be easily transformed. This
+kind of decoupled architecture is a good thing.
+
+Data mining; either through direct SQL querying, or lightweight
+scripts, or export of views of the data as e.g. tab delimited text
+files. Whilst use of XML is growing, the text file will always be
+immensely useful. A variety of data should be exportable with the
+minimum of fuss (ie no complicated APIs or protocols); again views
+will prove useful here, and are surprisingly powerful [prove this;
+examples of views that give e.g. all 3'UTRs as FASTA etc etc]
+
+Loading
+=======
+
+As well as entering data via curation tools, we will need to be able
+to populate via bulkloading from a variety of other sources.
+
+GAME XML - we already have a huge amount of annotation and in silico
+analysis data available in XML. We may write XSLTs; or it should be
+easy to write lightweight GAME XML handlers that turn events directly
+into SQL (inserts or function calls).
+
+BioSQL   - either via direct database to database loading, or via a
+bio* language object model; see next...
+
+BioPerl  - going via the bioperl object model provides a useful bridge
+to a variety of formats, and the biosql database.
+
+BioJava  - as bioperl (less formats/parsers supported)
+
+StarCode - flybase format for a variety of genetic and molecular
+data. very rich and expressive but unfortunately much closer to
+loosely structured natural language than a computable format. Ping-lei
+is working on a starcode parser that generates XML, which will be vital.
+
+GadFly   - either direct db to db loading via SQL, or via GAME XML
+
+Ensembl  - standard for genome annotation data; again direct SQL to
+SQL; can we go via bioperl? or genbank flat files?
+
+Querying
+========
+
+eg gbrowse for the sequence module
+DAS
+Apollo
+imago for the expression module
+amigo for the cv module
+??? for the pub module
+
+these are all CGIs so they can be loosely coupled together; hopefully
+it may be possible soon to adapt the above tools to work within some
+kind of bean like framework in order to develop an application that
+allows seamless querying of the whole database; or a monolithic pan-db
+application will have to be written.
+
+again, to keep hammering my opinion home, lightweight client code, be
+it perl-cgi, java servlets or PHP is key. it may or may not go via an
+xml intermediary.
+
+Data Management - FlyBase issues
+===============
+
+It is expected having all flybase data housed in one relational source
+will solve many dataflow problems. Much of the current dataflow will
+become unnecessary; eg making sure that allele-allele relationships
+have their inverse reflected in the other record. As the schema is
+normalised with respect to this, the allele relationship is only
+stored once.
+
+It will be interesting to see if other crucial project specific logic
+- for instance, reflecting symbol changes throughout all records - are
+solved either directly via the normalised structure, or via db triggers.

@@ -1,0 +1,782 @@
+Monday AM
+---------
+
+Outlined modules + possible extension modules
+
+CORE:
+
+generic [eg dbxref]
+sequence [locations features residues]
+genetics [could be broken into alleles and phenotypes and interactions]
+cv/ontology [GO and others eg phenotypic]
+Pubs [authors, publications]
+Expression
+Organism
+
+EXTENSIONS:
+
+Comparative
+Network/Pathways
+Pipeline/LIMs
+
+---
+
+discussed modular approach
+
+linking modules is as challenging as modules themselves; each module
+should only "expose" a few of their tables, these are the ones that
+are cross-linked.
+
+discussed relevance to GMOD
+
+Focused on SequenceModule this AM
+
+outline biosql - feeling its not suitable too genbank oriented dave
+agreed
+
+outlined gadfly - generic approach
+
+outlined mol5 - maps
+
+semantics of start & end: actual start and end OR min/max? base or
+space centric
+
+ISSUE1: audits and time travel
+
+often it's useful to undo eg merges
+
+BUT full time travel is V DIFFICULT in a db (posgres had it then
+abandoned it)
+
+BUT we need to be able to support limited use cases:
+
+eg track old symbols as synonyms  - VITAL
+
+undo merges - possible when merging genetically defined gene with
+annoteted gene, BUT very hard when, say, undoing sequence based merge
+in DB
+
+solution - audit trail within db; eg embl shadow tables; can't do full
+undo, but someone familar with schema could reconstruct manually
+
+AND non db auditing; eg for apollo loads, all xml is always audited in
+filesystem
+
+ISSUE2: multi locations vs single seq locations
+
+eg mRNA may be localised to two assemblies OR have different seqlocs
+on different strains
+
+do we have 1 mRNA entity with multi locations on different seqs?
+
+I argued strongly that this is bad and mRNA should be *definied by* a
+*single* seqlocation; otherwise you have >1 mRNA seq per mRNA and then
+you have to track which seq came from which
+assembly/strain... nightmare
+
+much better to say that these are *distinct* mRNAs and link them
+somehow
+
+open question - return when we do alleles; eg we could have one gene
+entity with >1 mRNA each mRNA having a different allele which would
+solve the strain case.
+
+This issue is especially important w.r.t strains; we'll come back to
+this when discussing alleles
+
+We definitely need to able to record/query e.g. how does this gene
+model differ between these two strains? how does that correspond to
+the phenotype?
+
+my opinion - this question is less important w.r.t to differences
+between different assemblies; when it is it should be answered in ways
+outside the schema; e.g. different instantiations of the db
+
+taking [poor quality] digital camera images of blackboard.
+
+Another approach - fold seqfeature and seq into one table
+
+pros:
+
+reduces redundancy, joins
+
+simple
+
+ties well with SO
+
+cons:
+
+lots of nulled columns a lot of the time
+
+A note on views:
+
+views can be used to project biospecific relations from generic
+tables; eg genefeature, exonfeature etc
+
+A note on general design approach -
+
+iterative, cycle through all the modules outlining the key design
+decisions at each point, in successive cycles make more decisions;
+decisions on 'exposed' relations more important than non-exposed ones,
+as they affect how everything links together.
+
+sf_property table - add foreign key to pub so everything is
+attributable
+
+sf_property - give it it's own primary key; that way we can have an
+intermodule linking table sf_property_pub, so that we can have many to
+many relationships between publications and the synonyms/names they
+use. also reduces intermodule dependency.
+
+--------
+
+discussed compaurative data; syntenic level dna level peptide level etc
+
+revisited strains & mutant refsequence
+
+my view is the genomic seq should be wildtype by r4, even if it means
+making it virtual [d huen agrees i think]
+
+but, we still may want to store different strains
+
+continuum -
+
+mutant Dms, v divergent mutant Dms [?], other drosopholipds,
+anopheles, etc
+
+sometimes we can get away with storing mutants as diffs [variation
+features] vs storing another contig feature.
+
+-----------------------
+
+MAPS
+
+partial order vs full order
+
+eg cyto vs linkage
+
+gene orders are just another instance of map where the units are
+"rank" as opposed to cM/cR
+
+flybase also stores estimated kb maps - keep these, again just unit kb
+
+cyto - range table
+
+fk to subject entity 
+2 fks to left/right entities
+pk - so we can attach pub data
+map id?
+
+aberations - store these as ranges of ranges? store breakpoints as
+features themselves?
+
+OR - inner range / outer range for aberations - allows us to do normal
+cyto queries on aberations THEN burrow down for detailed info
+
+inner range has fk to normal range
+
+ALSO - denormalize/redundant extra varchar field for storing range as
+string eg 20A-21F;22A-23F
+
+triggers
+
+
+fmap(fmap_id, mapname, mapdesc, mapunit)
+frange(frange_id, feature_id, leftfeature_id, rightfeature_id, fmap_id, str)
+finrange(frange_id, leftfeature_id, rightfeature_id)
+fmappos(fmappos_id, feature_id, mappos[float], fmap_id)
+
+fmap_pub(fmap_id, pub_id)
+
+dave had good point - curators still want to use dreaded fuzzies, eg
+if feature defined by restr map; could use map tables OR why not just
+feat_prop
+
+cvOR treat it just like a cyto map, use frange, but features are type
+RestrFragment
+
+*************
+
+Tuesday AM
+
+Map module - rethink; treat all ranges as 4 point
+
+featuremap(featuremap_id, mapname, mapdesc, mapunit)
+featurerange(featurerange_id, featuremap_id, feature_id, leftstartf_id, leftendf_id, rightstartf_id, rightendf_id, rangestr)
+featurepos(featurepos_id, featuremap_id, feature_id, mappos)
+
+featuremap_pub(featuremap_id, pub_id)
+
+# note on naming; entities should be AllOneWord; linking tables use underscore
+
+ARGS - genbank evidence is stored as fbrfs linked to gene - preserve this?
+
+lets just pub feature_pub - obvious from context
+
+eg FBrf "flybase reannation" links to every CG; obvious from context
+it refers to sequence localisation of the gene [or even transcript or
+exon! if desired]
+
+WHAT ABOUT.....
+
+    |-------|
+-------------------
+  [ a ]        [ b ]
+
+ie in(fleft, a)
+   leftof(fright, b)
+
+we could invent a fake anonymous feature x, do a full order axb, use that...
+
+what is the danger in overestimating error bar and adding a comment somewhere?
+
+otherwise too difficult to answer simple range based queries
+
+hmmm, what about mol5 left/right schema
+
+loc(a, all, leftof, b, map1)
+loc(b, all, leftof, c, map1)
+
+loc(ab, start, rightof, 21A, map1)
+loc(ab, start, leftof, 22F, map1)
+loc(ab, end, rightof, 25A, map1)
+loc(ab, end, leftof, 26F, map1)
+
+GENETICS MODULE
+
+introduced feature_allele table
+
+example cases - variation feature pinpoints allele
+
+y mutant on mutant chromosome feature
+
+see photos for network drawings of how this pans out
+
+use alleles to group/partition features into sets
+
+dave raised good objection to treating gene as feature; unlike mRNA
+say, gene is not quite real. revisisted decorator table idea. decided
+to go with gene as feature idea for now [for one thing we avoid
+multiplying link tables]
+
+allele table:
+
+need to introduce many:many mutagen to allele (mutagen may be in
+debate;different calls attributed to different authors). could use
+this table for general cv for allele, allele_ontology
+
+q: what cvs are linked to allele, and which are linked to alleleset eg
+- is dominance the property of the allele or phenotype? presumably
+allele but this is manifested through phenotype.
+
+aberations - currently mutant cv is in aberation proforma; but surely
+this is a property of the allele, and all aberations have/cause
+alleles?
+
+NO - rethink; alleles must be attached to gene(s)
+
+if an aberation knocks out ten genes, it is ten alleles...?
+
+hhmm this means we have to have a feature_mutagen table...
+
+maybe have all mutagens etc go through var features; force every
+allele to have a var feature even if it isn't mol characterised;
+
+decorator table - 
+variation(feature_id, mutagen_id)
+
+or add it to feature_allele
+feature_allele(feature_id, allele_id, mutagen_id) naaah
+
+OK, got it:
+
+fundamental rule
+================
+
+all alleles MUST have a corresponding feature representing some kind
+of genomic variation; even if not charactised, it is presumably
+POTENTIALLY there.
+
+mutagen gets attached via varfeature
+
+engineered genes:
+
+if[minigene]
+
+transposon gets generated representing engineered gene
+
+hmmm, the fact minigene has had introns removed IS NOT THERE [oh wait
+it is] - IS ONLY THERE IN COMMENTS
+
+where do we add this... as a gene attached to transposon.. a SO type
+pre/post mrna
+
+use case: find all genes that may have regulatory regions in introns
+as opposed to UTR
+
+progenitor alleles??? allele relationship?
+
+Transgenes:
+
+PROMOTER ANALYSIS:
+
+q: if we attach regregions from genes a,b,c,d,e.. to EcoLacZ,
+what alleles do we get?
+
+do we get
+
+EcoLacZ[a]
+EcoLacZ[b]
+EcoLacZ[c]
+
+[99% sure yes]
+
+but not
+
+a[EcoLacZ]
+
+BUT no insertion record created in flybase
+
+ENHANCER TRAPS:
+
+TODO
+
+---
+
+Genotypes
+
+q: is a genotype a set of alleles, a set of alleles + features or a set of
+allele pairs + features
+
+allele pairs unnecessary - obvious eg if we have a[2] and a[3] then
+obiously one from each parent
+ 
+
+dissent... dave raised objections about genes as features; attempted
+to sketch out case involving alternate splicing with a sequence
+variation using alleles as features; IMHO there were difficulties with this.
+
+my pos: genes as features are necessary as ways of collecting
+transcripts for both alternate splicing and different flies.
+
+preserving order of features/alleles in genotype - guess its necessary
+for uniquenly generating name
+
+IMPORTANT - demonstrate via use cases translatable to SQL
+
+Another module - stocks
+
+q for rachel - are the only entities that give rise to a phenotype
+alleles; could we also have, say n alleles plus an aberation, where
+the aberation has no allele because it is not near a gene.
+
+hmmm, rethought dave's...
+
+i like it like this:
+
+[allele:x+] -> [transcript:x-ra+] -> [exon:x-1+]
+
+alleles as features
+
+but then we need
+
+[gene:x] -> [allele:x+] -> [transcript:x-ra+] -> [exon:x-1+]
+
+as lots of juicy stuff (GO, cyto, fbgn etc) attached at gene level
+
+this forces a 4 layer graph rather than 3 layer graph onto SeqModule software
+
+te advantage of keeping alleles in sep modules is canonical SeqModule
+s/w eg apollo can just focus on gene/transcript/exon + variation as
+features
+
+apollo [substitute fave SeqModule s/w here] can assume wild type
+
+
+8pm - dave and my heads explode
+
+dave make a do not erase the chalkboard sign
+
+---------
+
+Wednesday AM
+
+been thinking about genes/alleles non stop....
+
+ARGHH
+
+take SO
+
+gene/transcript/exon
+
+means
+
+gene-instance/transcript-instance/exon-instance in the context of
+annotation/sequence
+
+maybe we need
+
+locus()
+allele()
+feature()
+
+the gene:feature is really just an instance, usually related to a
+wildtype allele
+
+so we could use a locus/gene table to store gene info, as per GAME
+gene tag
+
+BUT if we treat this gene table as meaning "all variations of this
+gene instance feature" DO WE also need a transcriptset, exonset etc
+tables... that would be mad. i think not - only need one top level
+grouping
+
+gene()
+gene_synonym()
+gene_symbol()  - eg dpp; the symbol covers all gene instances
+feature_prop() - eg CG10000 - covers just the annotated gene instance
+gene_feature() - usually just 1:1, as per gene tag in game
+feature_allele()
+gene_allele()
+
+q: can transposon insertion be treated as an 'allele' of the
+tpn... mad but allows consistency re game annotations and gene
+elements
+
+
+LETS LEAVE THIS FOR NOW....
+
+modules to go - 
+
+cv/ontology [GO and others eg phenotypic]
+Pubs [authors, publications]
+Expression
+Organism
+
+CV/ONTOLOGIES
+
+outlined GO - which parts make sense to directly include
+
+oterm(oterm_id*, accession, termname, termdefinition, termtype_id)
+orelationship(orelationship_id*, reltype_id, subjterm_id, objterm_id)
+opath(opath_id*, reltype_id, subjterm_id, objterm_id, pathdistance)
+oterm_synonym(oterm_id, termsynonym)
+
+feature_oterm(feature_oterm_id, feature_id, oterm_id, pub_id, evidterm_id)
+
+
+************************
+
+general policy - all FBzzs go in an "accession" field; should we
+instead have unique key dbxref_id?
+
+solves prob of FB:FBgn000000 vs just FBgn00000000
+
+************************
+
+PUBS
+
+just get something down consequences of revision of this module are
+minimal; so long as link to pub_id
+
+we agreed to look at OMG? bibliographic services/model - who to talk
+to? Martin Senger at EBI? we should stick to standards here [normally
+OMG standards eg for sequence are rubbish because it is so hard to
+standardise something complex but OMG standard for biblio is good i
+think]
+
+CREATE TABLE dbxref (
+    dbxref_id              INTEGER         DEFAULT (NEXTVAL ( 'dbxref_pk_seq' )) PRIMARY KEY,
+    dbname               CHAR(64)        ,
+    accession            CHAR(64)        ,
+    dbxrefdesc             CHAR(64)        ,
+);
+
+
+MODULE DEPENDENCIES
+
+general <
+cd < general
+Sequence < cv
+Sequence < general
+genetics < Sequence
+genetics < cv
+genetics < general
+
+We did organism - easy
+
+AUDITS
+
+100% orthogonal; purely a dbadmin issue [eg triggers for shadow tables
+allow full time travel if we have terabytes of storage]
+
+
+EUREKA!!!!!!!!!!!!!!!
+
+vuclan mind meld we do it; we have unified genetic and sequence
+oriented views of the world
+
+3 distinct tables
+
+allele
+gene
+feature
+
+features are typed by SO; SO have stuff like gene, transcript,
+exon. for each of these, imagine "-instance" or "-model" suffixed to
+the end, because in a sequence context, these necessarily MUST refer
+to a PARTICULAR model/instance ie on a particluar sequence
+
+the 'gene model' is necessarily distinct from the 'gene'; a gene model
+always gets boiled down to a particular fly strain/instance.
+
+core fact: a gene model ALWAYS corresponds to ONE allele; usually the
+wild type allele, but this needn't be the case. we could instantiate
+gene models in the database for all molecularly characterized alleles
+if we really wanted to (may be useful for say answering questions
+about what mutations affect particular protein domains say...)
+
+what defines an allele? an allele belongs to a particular gene [sensu
+genetics]. ie a gene [sensu genetics] has multiple alleles. an allele
+ALWAYS has a causative feature [sensu sequence], although the
+causative feature may not be known. typical causative features may be
+aberations, definiciencies, transposon insertions, snps, generic
+variation features.... should correspond to one single supertype in
+SO.
+
+an allele is also defined by a feature of type gene [ie also including
+subtypes in SO, eg tRNA]. again, this feature may not need to be
+instantiated; take the p [pink] gene for example. here we have two
+alleles [say + and -], no molecular characterisation. the alleles are
+defined purely by the relationship to the entry in the gene table for
+"p/pink"; no features exist either of type gene or type
+variation. note that if we wish to attach biological info about pink,
+we must create a pink feature of type gene, which will represent the
+wildtype.
+
+the gene table is there purely as a grouping mechanism for alleles; a
+gene is a fictitious entity in some respects - it exists in the mental
+world, as such it only has mental data attached to it: identifiers
+[accession, symbol, fullname, and synonyms plus history of synonym usage
+in the literature]
+
+q: do we have a redundant link between feature and gene [or for
+linking the gene model and it's corresponding gene] or just have this
+as a query/view going via allele; the thing about going via allele is
+that is forces alleles into the sequence module; one nice thing about
+all this is that the canonical genome piece of software, or me data
+mining in the db, can be in 1-fly / genome / sequence mode and not
+need the genetics component.
+
+mutagens - attach at feature level [eg aberation may not cause alleles
+not near genes you see]
+
+THURSDAY AM
+-----------
+
+duplications; can cause differnt phenotype eg overexpression - are new
+alleles created?
+
+q: how is homo vs heterozygous mutation stored currently - cv on aberation?
+
+dave led with use cases rather that getting bogged down in detailed cases
+
+dave noticed our current cytorange table isn't good enough for an aberation like this:
+
+a b c d e
+- - - - -
+  |----|     aberration
+
+ie the right side lies *between* d and e
+
+hmm it seems we have a surfeit of maps; first of all we have a map for
+saying how the aberration relates to teh normal chromosome eg diagram
+above; then map of what genes end up on the aberration in the
+mutant. think this is ok. note also deficiency mapping, using
+aberations to cytologically locate genes.
+
+progenitor aberations - do this with feature_relationship
+
+decided on pheno table and many:may between allele and phen and m:m
+between phen and cv. this should allow cases like
+
+phenotype is from single allele
+
+phenotype is from a combination of alleles (and we have no redundancy
+as per current allele records)
+
+phenotype is from GAL4/UAS system or from reporter construct
+
+phenotype is a certaun allele against a certain background genotype
+
+q: if we want to record which allele came from where, do we add anothr
+colun to allele_phenotpye; eg a cvterm qualifier or a text note.
+
+phenotpye has free text
+
+q: recording difference between 'subject' allele and 'background' genotype/alleles
+
+q: is the genotype recordable purely by a mix of alleles; or do we
+need features too. eg if the genotype also has an aberration that
+doesnt cause alleles in the mix do we record this...?
+
+From the proforma:
+
+
+
+COMPLEMENTATION... just do this in allele_relationship with cv
+
+transheterozygous combinations e.g.  faf[BX3]/faf[FO8] eye phenotype
+was suppressed by lqf[bE25]
+
+hmmm - are genetic interactions best described as between alleles or
+as how an allele affects a phenotype; eg for the above
+
+faf[BX3] + faf[F08] = PhenX
+
+lqf[bE25] SUPPRESSES PhenX
+
+partial rescue;
+
+what we are saying is alleleX [partially rescues] phenotype
+
+gain of function when expressed in other organism
+
+PM
+
+we've solved it
+
+phenotype table - really means pheno plus underlying biochemistry
+
+ie if  x[1] produces "defective wing" and z[3] produces "defective
+wing", these are NECESSARILY different entries in the phen table
+
+now we have "allele(s)" + "background genotype[0..1]" => phenotype
+
+and
+
+allele(s) + "background genotype[0..1]" => interaction, 
+interaction has relationship:[cv(s)] to phenotype
+
+complementation:
+
+use case: x[1] complements y[2]
+
+x[1] --[causes]--> P(lethal recessive) 
+                          ^
+                          |
+                      [complements]
+                          |
+                         y[2]
+
+is this correct - no need to instantiate other P???
+
+NO - 
+
+q: are all complementation relationships binary?
+
+...
+Dave solved ythis, see schema...
+
+thinking....
+
+Enhancer traps & promoter analysis
+
+enhancer traps may more may not cause alleles of the genes they jump into
+
+promoter analysis
+
+allele of reporter gene; eg LacZ[arm.PX]; this is an implicit gene model
+
+gene model for lacZ instance:
+
+  PX   LacZ
+  ===--========
+
+gene model for arm+:
+
+  PX   arm
+  ===--=====
+
+instantiate promoter as entity and attach it to both....? overkill?
+
+GAL4/UAS
+
+eg "dpp expression drives Ras85D giving hyperplastic wing discs"
+
+currently this must be in as
+
+<GAL4>  ---> <GAL4[dpp]>
+<Ras85D> --> <Ras85D[GAL4/UAS]>
+
+<GAL4[dpp]> + <Ras85D[GAL4/UAS]> = hyperplastic
+
+q: how the fuck do i query for "find any alleles/genes driven in expression
+pattern of dpp affect the wings?"
+
+implict gene models
+
+GAL4[dpp]
+
+ Pdpp  GAL4[-]
+ ====--====
+
+Ras85D[GAL4/UAS]
+
+ PUAS  Ras85D[-]
+ ====--======
+
+dpp[+]
+
+ Pdpp  dpp[+]
+ ====--======
+
+again - why not instantiate promoter?
+
+q: do we really need foreign genes; i guess GAL4[dpp] can't be an
+allele of dpp as def of allele doesn't cover promoter...
+
+what about adding 'dpp' as causative feature of <GAL4[dpp]> allele?
+
+/////////
+
+dx24 suppresses *dominant* H2 wingvein phenotype
+
+a:H2/+ -> wingvein <- dx24 suppr 
+
+
+what about this for compl:
+
+a[1] -> lethal
+a[2] -> lethal
+
+a[1] + a[2] -> compl
+
+rescue:
+
+a[1] -> P <- x[9] rescue
+
+if[B4] -> amorphic  <- if[+tBA] rescues
+                    <- if[minigene] partially rescues
+
+lets call all alleles allelesets; usually of order 1 but may be more; features too?
+
+FRIDAY AM
+
+ok, ignore all the above, it's all groovy;
+
+we can have a denormalized v of flybase currently using tables defined
+so far; we can also augment it with a table that helps us record the
+source of constructs (eg if the allele was from a construct with
+introns removed; or if it's a Scer\Gal4 construct that came from the
+promoter of another feature)
+
+allele_feature_construct - see tables
+
+3 fks;
+q: use SO cv or a related one?
+also use cv to record experiment type, eg "GAL4/UAS system"
+
+solved two use cases; see Rachel's paper - Ras85D in pattern of
+dpp/sev, and inflated. see photos.
+
