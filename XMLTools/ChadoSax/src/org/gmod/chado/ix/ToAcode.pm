@@ -113,7 +113,7 @@ use constant IDXRECSIZE => length(pack("NN", 1, 50000)); # store as unsigned lon
 
 $debug= 0;
 $VERSION = "0.1";
-$DATA_VERSION = "3.1";
+$DATA_VERSION = "3.2";
 
 
 =head1 Public METHODS
@@ -128,6 +128,7 @@ $DATA_VERSION = "3.1";
   -outfile = output.acode [or STDOUT]
   -featfile = feature.tsv [or null]
   -index = index output.acode
+  -version = 3.2 [$DATA_VERSION]
   -[no]debug     
    
 =cut
@@ -145,6 +146,7 @@ sub acode {
     'index!' => \$doindex,
     'outfile=s' => \$outf,
     'featfile=s' => \$ftoutf,
+    'version=s' => \$DATA_VERSION,
     );
   unless($optok) {
     die "Usage
@@ -153,6 +155,7 @@ sub acode {
   options:
   -outfile = output.acode [or STDOUT]
   -featfile = feature.tsv [or null]
+  -version = 3.2 [$DATA_VERSION]
   -index = index output.acode
   -[no]debug     
   ";
@@ -745,6 +748,7 @@ sub fbanAcode {
     $gensr .= "ID|$tid\n}\n";
     push(@re,"ID 1 $anid");
     push(@re,"SYM 1 $gsym");
+    push(@re,"CGSYM 1 $cgsym") if ($cgsym); # dup of SYM !
     }
   
   ## check here if GID = FBti other data class, write proper subrecord?
@@ -752,6 +756,7 @@ sub fbanAcode {
     push(@re,"ID 1 $anid");
     push(@re,"GID 1 $gid");
     push(@re,"GSYM 1 $gsym");
+    push(@re,"CGSYM 1 $cgsym");
     $gensr= "GENSR\n{\n";
     $gensr .= "GSYM|$gsym\n";
     $gensr .= "ID|$h{GID}\n}\n";
@@ -759,20 +764,25 @@ sub fbanAcode {
   else {
     push(@re,"ID 1 $anid") if ($anid);
     push(@re,"SYM 1 $gsym") if ($gsym);
+    push(@re,"CGSYM 1 $cgsym") if ($cgsym);
     }
   push(@re,"CLA 1 $type") if $type;
   push(@re,"ARM 1 $arm") if $arm;
-  push(@re,"CLOC 1 $h{CLOCC}") if $h{CLOCC}; 
+  push(@re,"CLOC 1 $h{CLOCC}") if $h{CLOCC};
 
+  push(@re,"SCAF 1 $h{SCAF}") if $h{SCAF}; 
+  ## re = add BLOC? or use FBid for gbrowse map / cytomap?
+  
 # $h{GO} -> acode flds now are FNC/ENZ/CEL - use GO field 
 # now have goterm == goid ; goterm2 == goid2 ...
+# ?? drop single FNC - confusing - add count of FNC ?
 		my $go;
 		if( $h{GO} ) {
     	$go= $h{GO}; 
-    	#(my $topgo= $go) =~ s/\s*(==|;|\n).+$//m; push(@re,'FNC 1 '.$topgo);
     	$go =~ s/ == / ; /g;
-			my @headgo= split("\n",$go); $headgo[0] =~ s/^([^;\n]+)[;\n].+$/$1/; 
-			push(@re,'FNC 1 '.$headgo[0]); 
+			my @headgo= split("\n",$go); 
+			$headgo[0] =~ s/^([^;\n]+)[;\n].+$/$1/; 
+			push(@re,"FNC ".scalar(@headgo)." ".$headgo[0]); 
     	}
     	
 		my @trn= split(/$fsplit/,$h{CTSYM});
@@ -784,6 +794,8 @@ sub fbanAcode {
 		my @cds= split(/$fsplit/,$h{CDS});
 		my @dt= split(/$fsplit/,$h{DT}); #? is there a date field in each ct rec?
 		push(@re,"TRREC ".scalar(@trn)) if @trn;  
+		
+		## drop these two lengths from RETE - confusing?
 		push(@re,"AALEN ".scalar(@aa)." ".$aa[0]) if @aa;  
 		push(@re,"SQLEN ".scalar(@sl)." ".$sl[0]) if @sl;  #gene $sqlen ??
 		

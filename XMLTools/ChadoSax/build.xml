@@ -18,7 +18,7 @@
                              image files), including the WEB-INF subdirectory
                              and its configuration file contents.
 
-     $Id: build.xml,v 1.1.1.1 2003-06-09 19:22:50 dongilbert Exp $
+     $Id: build.xml,v 1.2 2003-11-25 21:53:30 dongilbert Exp $
 -->
 
 
@@ -32,6 +32,11 @@
 
 <project name="ChadoSax" default="compile" basedir=".">
 
+<description>
+  This ant build.xml will make ChadoSax source;
+  part of http://www.gmod.org/ chado.xml parsers.
+  It requires java release 1.4+ to use Sun standard xml parsers (alternates are possible)
+</description> 
 
 
 <!-- ===================== Property Definitions =========================== -->
@@ -111,7 +116,7 @@
 
   <property name="app.name"      value="ChadoSax"/>
   <property name="app.path"      value="/${app.name}"/>
-  <property name="app.version"   value="0.1-dev"/>
+  <property name="app.version"   value="0.2-dev"/>
   <property name="build.home"    value="${basedir}/build"/>
   <property name="catalina.home" value="/bio/biodb/common/servers/tomcat"/> <!-- UPDATE THIS! -->
   <property name="dist.home"     value="${basedir}/dist"/>
@@ -119,6 +124,7 @@
   <property name="manager.url"   value="http://localhost:8080/manager"/>
   <property name="src.home"      value="${basedir}/src"/>
   <property name="web.home"      value="${basedir}/web"/>
+  <property name="appsrc.jar"   value="${build.home}/${app.name}-${app.version}-src.jar"/>
 
 
 <!-- ================== Custom Ant Task Definitions ======================= -->
@@ -300,6 +306,18 @@
 
 <!-- ==================== Dist Target ===================================== -->
 
+  <target name="jar" depends="compile"
+   			description="create application JAR file">
+    <jar jarfile="${build.home}/WEB-INF/lib/${app.name}.jar"
+         basedir="${build.home}/WEB-INF/classes/"/>
+  </target>
+
+  <target name="jarsrc" depends="jar" description="create source JAR file">
+    <zip  destfile="${appsrc.jar}" >
+    <zipfileset dir="${src.home}"      prefix="src"/>
+    <!-- zipfileset dir="${webapps.home}"   prefix="webapps"/ -->
+    </zip>
+  </target>
 
 <!--
 
@@ -314,7 +332,7 @@
 
 -->
 
-  <target name="dist" depends="compile,javadoc"
+  <target name="dist" depends="compile,javadoc,jar"
    description="Create binary distribution">
 
     <!-- Copy documentation subdirectories -->
@@ -323,9 +341,10 @@
       <fileset dir="${docs.home}"/>
     </copy>
 
-    <!-- Create application JAR file -->
+    <!-- Create webapp WAR file -->
     <jar jarfile="${dist.home}/${app.name}-${app.version}.war"
-         basedir="${build.home}"/>
+      	  excludes="**/classes/"
+        basedir="${build.home}"/>
 
     <!-- Copy additional files to ${dist.home} as necessary -->
 
@@ -403,6 +422,7 @@
 <!-- ==================== Install Target ================================== -->
 
 <!--
+dgg: later
 
   The "install" target tells the specified Tomcat 4 installation to dynamically
   install this web application and make it available for execution.  It does
@@ -419,7 +439,6 @@
 
   NOTE:  This is the logical opposite of the "remove" target.
 
--->
 
   <target name="install" depends="compile"
    description="Install application to servlet container">
@@ -431,17 +450,18 @@
              war="file://${build.home}"/>
 
   </target>
+-->
 
 <!-- ====================== List Target =================================== -->
 
 <!--
+dgg: later
 
   The "list" target asks the specified Tomcat 4 installation to list the
   currently running web applications, either loaded at startup time or
   installed dynamically.  It is useful to determine whether or not the
   application you are currently developing has been installed.
 
--->
 
   <target name="list"
    description="List installed applications on servlet container">
@@ -451,17 +471,18 @@
         password="${manager.password}"/>
 
   </target>
+-->
 
 
 <!-- ==================== Reload Target =================================== -->
 
 <!--
+dgg: later
 
   The "reload" target tells the specified Tomcat 4 installation to dynamically
   reload this web application, to reflect changes in the underlying classes or
   the "web.xml" deployment descriptor.
 
--->
 
   <target name="reload" depends="compile"
    description="Reload application on servlet container">
@@ -472,18 +493,19 @@
            path="${app.path}"/>
 
   </target>
+-->
 
 
 <!-- ==================== Remove Target =================================== -->
 
 <!--
+dgg: later
 
   The "remove" target tells the specified Tomcat 4 installation to dynamically
   remove this web application from service.
 
   NOTE:  This is the logical opposite of the "install" target.
 
--->
 
   <target name="remove"
    description="Remove application on servlet container">
@@ -494,6 +516,7 @@
            path="${app.path}"/>
 
   </target>
+-->
 
 
 </project>
