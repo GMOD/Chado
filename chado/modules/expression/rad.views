@@ -1,3 +1,26 @@
+CREATE VIEW biomaterial_annotations
+AS SELECT
+  b.biomaterial_id,
+  b.description,
+  c1.name AS tissue,
+  c2.name AS cell,
+  c3.name AS pathology
+FROM biomaterial b
+LEFT JOIN (
+  ( biomaterialprop bp3 JOIN cvterm c3 ON (bp3.type_id = c3.cvterm_id AND c3.cv_id =
+    (select cv_id from cv where name = 'Mouse Pathology Ontology (Pathbase)')) )
+  LEFT JOIN (
+    ( biomaterialprop bp1 JOIN cvterm c1 ON (bp1.type_id = c1.cvterm_id AND c1.cv_id =
+      (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')) )
+      FULL JOIN
+    ( biomaterialprop bp2 JOIN cvterm c2 ON (bp2.type_id = c2.cvterm_id AND c2.cv_id =
+      (select cv_id from cv where name = 'Cell Ontology')) )
+      ON (bp1.biomaterial_id = bp2.biomaterial_id)
+  )
+  ON (bp1.biomaterial_id = bp3.biomaterial_id OR bp2.biomaterial_id = bp3.biomaterial_id)
+)
+ON (b.biomaterial_id = bp3.biomaterial_id);
+
 CREATE VIEW affymetrixcel
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
