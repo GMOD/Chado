@@ -439,15 +439,17 @@ sub load_custom_tags {
             $progress->message("Data with the $tag tag are being placed in the featureprop table");
         }
 
+        my $rank = 0;
         foreach my $d (@d) {
             my ($featureprop) = Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
                     type_id    => $cvterm{$tag}->id,
                     value      => $d,
+                    rank       => $rank,
                 }
             );
-
+            $rank++;
             push @transaction, $featureprop;
         }
     }
@@ -1173,7 +1175,8 @@ sub cache_cvterm {
                                                   cv_id=> $soid } ) 
                       || Chado::Cvterm->search( {
                                                   name => ucfirst($name),
-                                                  cv_id=> $soid } );
+                                                  cv_id=> $soid } )
+                      || Chado::Cvterm->search( { name => $name } );
 
     $cvterm{$name} = $cvterm{$name}->next()
       if defined( $cvterm{$name} )
