@@ -233,6 +233,47 @@ END;
 '
 LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION feature_ids_by_type_name(cvterm.name%TYPE, feature.uniquename%TYPE, char(1)) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    gtype alias for $1;
+    name alias for $2;
+    is_an alias for $3;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+        FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
+        WHERE t.name = '' || quote_literal(gtype) || '' AND f.uniquename = '' || quote_literal(name)
+        || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+ 
+    IF (STRPOS(name, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+            FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
+            WHERE t.name = '' || quote_literal(gtype) || '' AND f.uniquename like '' || quote_literal(name)
+            || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+    END IF;
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    FOR myrc IN SELECT * FROM _feature_ids_parents() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
 --- get all feature ids (including children) for feature that has an ontology term (say GO function)
 --- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
 --- this function returns a set of feature_id for feature with the aspect and cvterm
