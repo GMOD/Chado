@@ -1,4 +1,4 @@
-# $Id: Root.pm,v 1.1 2004-06-16 02:46:50 cmungall Exp $
+# $Id: Root.pm,v 1.2 2004-07-08 23:12:44 cmungall Exp $
 #
 #
 
@@ -87,7 +87,7 @@ sub freak {
 sub dd {
     my $self = shift;
     my $obj = shift;
-    use Data::Dumper;
+    require "Data/Dumper.pm";
     return Dumper($obj);
 }
 *dump = \&dd;
