@@ -7,7 +7,7 @@
 create table cv (
     cv_id serial not null,
     primary key (cv_id),
-    name varchar(1024) not null,
+    name varchar(255) not null,
    definition text,
    constraint cv_c1 unique (name)
 );
@@ -25,6 +25,8 @@ create table cvterm (
     definition text,
     dbxref_id int,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
+    is_obsolete int not null default 0,
+    is_relationshiptype int not null default 0,
     constraint cvterm_c1 unique (name,cv_id)
 );
 create index cvterm_idx1 on cvterm (cv_id);
@@ -87,6 +89,8 @@ create table cvtermsynonym (
     cvterm_id int not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     synonym varchar(1024) not null,
+    type_id int,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade  INITIALLY DEFERRED,
     constraint cvtermsynonym_c1 unique (cvterm_id,synonym)
 );
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
@@ -102,10 +106,28 @@ create table cvterm_dbxref (
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id int not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    is_for_definition int not null default 0,
     constraint cvterm_dbxref_c1 unique (cvterm_id,dbxref_id)
 );
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
 create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
+
+-- ================================================
+-- TABLE: cvtermprop 	 
+-- ================================================ 	 
+
+create table cvtermprop ( 
+    cvtermprop_id serial not null, 
+    primary key (cvtermprop_id), 
+    cvterm_id int not null, 
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade, 
+    type_id int not null, 
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade, 
+    value text not null default '', 
+    rank int not null default 0,
+
+    unique(cvterm_id, type_id, value, rank) 
+);
 
 -- ================================================
 -- TABLE: dbxrefprop
@@ -118,7 +140,7 @@ create table dbxrefprop (
     foreign key (dbxref_id) references dbxref (dbxref_id) INITIALLY DEFERRED,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    value text null,
+    value text not null default '',
     rank int not null default 0,
     constraint dbxrefprop_c1 unique (dbxref_id,type_id,rank)
 );
