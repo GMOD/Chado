@@ -18,6 +18,10 @@ all modules
 		  will make that available soon
 	changed all dbxrefstr foreign keys to dbxref_id
 	added indexes for every foreign key column in every table
+	all linking tables:
+		Added primary keys to all linking tables, for consistency's 
+		sake, since we already had primary keys in some linking tables.
+		I hope nobody objects...?
 
 general module:
 
@@ -34,11 +38,17 @@ cv module:
 	cvpath
 		changed accordingly	
 
+	cvterm_synonym
+		changed the name of table cvterm_synonym to cvtermsynonym, 
+		since this isn't a linking table.
+
 
 organism module:
 
 	organism_dbxref
 		added unique key (organism_id,dbxref_id)
+	organism
+		made genus, species, taxgroup fields not null
 
 pub module
 
@@ -67,7 +77,8 @@ sequence module
 			- was (feature_dbxref_id, dbxref_id)  OK???
 	feature_relationship
 		changed type_id int attribute to not null
-
+	synonym
+		added 'type_id' to the unique key (synonym,type_id)
 
 genetic module
 
@@ -117,5 +128,7 @@ map module
 	examples of how I use a rejigged featurepos table to manage the
 	fragmented a.gambiae genome, but I'd bet what I did can be 
 	improved upon.
+
+
 
 
