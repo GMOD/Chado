@@ -135,7 +135,11 @@ while(my $arrayio = $affx->next_array){
   push @txn, $protocol_quantification;
 
   my $biomaterial = Chado::Biomaterial->find_or_create({ name => $sample_id , taxon_id => $human});
-  $biomaterial->description($arrayio->id) and $newchip++ unless $biomaterial->description;
+  if(!$biomaterial->description and $arrayio->id){
+    $biomaterial->description($arrayio->id);
+    $biomaterial->update;
+    $newchip++ ;
+  }
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
@@ -165,7 +169,11 @@ while(my $arrayio = $affx->next_array){
                                     name => $chip_id,
 									protocol_id => $protocol_assay->id,
 								   });
-  $assay->description($arrayio->id) and $newchip++ unless $assay->description;
+  if($arrayio->id and !$assay->description){
+    $assay->description($arrayio->id);
+    $assay->update;
+    $newchip++;
+  }
   push @txn, $assay;
 
   my $assay_biomaterial = Chado::Assay_Biomaterial->find_or_create({
@@ -178,7 +186,11 @@ while(my $arrayio = $affx->next_array){
 												assay_id => $assay->id,
 												protocol_id => $protocol_acquisition->id,
 											   });
-  $acquisition->name($arrayio->id) and $newchip++ unless $acquisition->name;
+  if($arrayio->id and !$acquisition->name){
+    $acquisition->name($arrayio->id);
+    $acquisition->update;
+    $newchip++;
+  }
   push @txn, $acquisition;
 
   my $quantification = Chado::Quantification->find_or_create({
@@ -187,7 +199,11 @@ while(my $arrayio = $affx->next_array){
 													  operator_id => $operator_quantification->id,
 													  analysis_id => $analysis->id,
 													 });
-  $quantification->name($arrayio->id) and $newchip++ unless $quantification->name;
+  if($arrayio->id and !$quantification->name){
+    $quantification->name($arrayio->id);
+    $quantification->update;
+    $newchip++;
+  }
   push @txn, $quantification;
 
 
