@@ -1,34 +1,67 @@
-create view tfeature as
- select * from feature, ontology
- where feature.type_id = ontology.ontology_id;
+--------------------------------
+---- f_type --------------------
+--------------------------------
+DROP VIEW f_type;
+CREATE VIEW f_type
+AS
+  SELECT  f.feature_id,
+          f.name,
+          f.dbxrefstr,
+          c.termname AS type,
+          f.residues,
+          f.seqlen,
+          f.md5checksum,
+          f.type_id,
+          f.timeentered,
+          f.timelastmod
+    FROM  feature f, cvterm c
+   WHERE  f.type_id = c.cvterm_id;
 
-create view fgene as
- select * from tfeature where term_name = 'gene';
+--------------------------------
+---- fnr_type ------------------
+--------------------------------
+DROP VIEW fnr_type;
+CREATE VIEW fnr_type
+AS
+  SELECT  f.feature_id,
+          f.name,
+          f.dbxrefstr,
+          c.termname AS type,
+          f.residues,
+          f.seqlen,
+          f.md5checksum,
+          f.type_id,
+          f.timeentered,
+          f.timelastmod
+    FROM  feature f left outer join analysisfeature af
+          on (f.feature_id = af.feature_id), cvterm c
+   WHERE  f.type_id = c.cvterm_id
+          and af.feature_id is null;
 
-create view fexon as
- select * from tfeature where term_name = 'exon';
+--------------------------------
+---- f_loc ---------------------
+--------------------------------
+DROP VIEW f_loc;
+CREATE VIEW f_loc
+AS
+  SELECT  f.feature_id,
+          f.name,
+          f.dbxrefstr,
+          fl.nbeg,
+          fl.nend,
+          fl.strand
+    FROM  featureloc fl, f_type f
+   WHERE  f.feature_id = fl.feature_id;
 
-create view ftranscript as
- select * from tfeature where term_name = 'transcript';
-
-create view gene2transcript as
- select * from fgene, ftranscript, feature_relationship r
- where fgene.feature_id = r.obj_feature_id
- and ftranscript.feature_id = r.subj_feature_id;
-
-create view transcript2exon as
- select * from ftranscript, fexon, feature_relationship r
- where ftranscript.feature_id = r.obj_feature_id
- and   fexon.feature_id = r.subj_feature_id;
-
-
-create view genemodel as
- select * from fgene, tfeature1, tfeature2, 
-          feature_relationship r1, feature_relationship r2
- where fgene.feature_id = r1.obj_feature_id
- and tfeature1.feature_id = r1.subj_feature_id
- and r1.obj_feature_id = r2.subj_feature_id
- and r2.obj_feature_id = tfeature2.feature_id;
-
-
+--------------------------------
+---- fp_key -------------------
+--------------------------------
+DROP VIEW fp_key;
+CREATE VIEW fp_key
+AS
+  SELECT  fp.feature_id,
+          c.termname AS pkey,
+          fp.pval
+    FROM  featureprop fp, cvterm c
+   WHERE  fp.pkey_id = c.cvterm_id;
 
