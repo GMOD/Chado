@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.21 2004-04-07 18:51:24 allenday Exp $
+$Id: INSTALL,v 1.22 2004-04-07 20:11:09 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -31,6 +31,17 @@ Prerequisites:
     * tell postgres that it can use the plpgsql language (either as user
       postgres or as the user created above):
         # /usr/bin/createlang plpgsql template1
+
+    * edit the pg_hba.conf (either as the user 'root' or 'postgres') to give
+      the user created above permission to access the database.  Read
+      the comments in pg_hba.conf regarding permissions.  My pg_hba.conf looks
+      like this (which is very loose permissions):
+
+# TYPE  DATABASE    USER        IP-ADDRESS        IP-MASK           METHOD
+                                                                                
+local   all         all                                             trust
+host    all         all         127.0.0.1         255.255.255.255   trust
+
 
     * for information on tuning postgres for performance, see
 
