@@ -72,6 +72,12 @@ dghome2% /usr/bin/time \
 
 
 
+....
+  set ix=~/bio/dev/gmod/schema/XMLTools/ChadoSax/
+  set ch=~/bio/flybase/chado/chado7-aug03/
+  
+  perl -I $ix/src -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- $ch/AE003430v7.chado.xml
+  perl -I $ix/src -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- $ch/AE003430v7.chado.xml
 
 ----------------------------        
 

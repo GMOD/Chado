@@ -31,11 +31,20 @@ sub init {
 	$self->{tag}= 'IxBase' unless (exists $self->{tag} );
 }
 
+# sub clear {
+# 	my $self= shift;
+# 	#?? clear all set() tags, others?
+# }
+
 sub set {
 	my $self= shift;
 	my $key= shift;
 	my $val= shift;
-	$self->{$key}= $val;
+  my %flags = @_;   
+
+	# sep03 - dont overwrite prior val !?
+	if ($self->{$key} && $flags{replace}!=1) { $self->{$key} .= ";".$val; } 
+	else { $self->{$key}= $val; }
 }
 
 sub get {
@@ -43,6 +52,15 @@ sub get {
 	my $key= shift;
 	return $self->{$key};
 }
+
+sub topnode {
+	my $self= shift;
+	if (ref($self->{handler}) && $self->{handler}->can('topnode')) {
+    return $self->{handler}->topnode();
+    }
+  return undef;#??
+}
+
 
 sub name {
 	my $self= shift;
@@ -55,6 +73,13 @@ sub name {
 	  if ($a && !(ref $a)) { return $a; }
 	  }
 	return $self->{id}; #always ?
+}
+
+sub getid {
+	my $self= shift;
+	my ($v)= @_;
+  my $ft= $self->{handler}->{idhash}{$v};
+  return $ft;
 }
 
 sub id2name {
@@ -94,7 +119,7 @@ sub printObj { ## was toString
     ($k,$v)= $self->id2name($k,$v);
 
     print $tab."$k";
-    next unless($v =~ /\S/);
+    if($v =~ /\S/) {
     print "=";
     if (ref $v && $v->can('printObj')) {
       print  $v->printObj($depth);
@@ -122,10 +147,38 @@ sub printObj { ## was toString
       print "]\n";
       }
     else { print $v; }
+    }
     print "\n";
     }
 
   return $sb;
+}
+
+sub handleObj {  
+	my $self= shift;
+	my $depth= shift;
+	my $handler= shift;
+
+  $handler->handleObj($depth,$self);
+  
+  foreach my $k (sort keys %$self) ## need to let handler decide sort order
+  { 
+    next if ($k =~ /^(handler)$/); # ($k =~ /^(id|tag|handler)$/);
+    my $v= $self->{$k};
+    ($k,$v)= $self->id2name($k,$v);
+
+    if($v !~ /\S/) {
+      $handler->handleVal($depth,$self,$k,undef);
+      
+    } elsif (ref $v && $v->can('handleObj')) {
+      $v->handleObj( 1+$depth, $handler);
+      
+    } else { 
+      $handler->handleVal($depth,$self,$k,$v); 
+      }
+    
+    }
+
 }
 
 

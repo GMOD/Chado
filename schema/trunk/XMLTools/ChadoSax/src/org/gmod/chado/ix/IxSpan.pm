@@ -39,12 +39,26 @@ sub init {
   $self->{tag}= 'IxSpan' unless (exists $self->{tag} );
 }
 
-sub reversed { my $self= shift; return ($self->{nbeg} > $self->{nend}); }
+sub reversed { 
+  my $self= shift; 
+  if (defined $self->{strand}) { return ($self->{strand}<0);  }
+  else { return ($self->{nbeg} > $self->{nend}); }
+  }
 sub isForward { my $self= shift; return !$self->reversed(); }
+
+##  jun03 - fmin,fmax replace nbeg,nend ; fmin always < fmax ? and use 'strand'
+##  chado uses odd 'interbase' begin value == -1 of starting base
+##  presumably to save cost of -1 in calculating length = fmax - fmin  
+
+sub start {my $self= shift; return (defined $self->{fmin}) ? $self->{fmin} + 1 : $self->{nbeg}; }
+sub stop { my $self= shift; return (defined $self->{fmax}) ? $self->{fmax} : $self->{nend}; }
 
 sub length {
 	my $self= shift;
-  if ($self->{nbeg} > $self->{nend}) { 
+	if (defined $self->{fmax}) {
+	  return $self->{fmax} - $self->{fmin};
+	  }
+  elsif ($self->{nbeg} > $self->{nend}) { 
     return $self->{nbeg} - $self->{nend} + 1; 
     }  
   else {
@@ -55,7 +69,8 @@ sub length {
 
 sub toString {
 	my $self= shift;
-  return $self->{nbeg} ."..". $self->{nend};
+  return $self->start() ."..". $self->stop();
+  # return $self->{nbeg} ."..". $self->{nend};
 }
 
   
