@@ -484,11 +484,7 @@ sub seq{
 sub featureloc_rank{
    my ($self,$feature_id) = @_;
 
-   if(!$self->{'featureloc_rank'}{$feature_id}){
-     $self->{'featureloc_rank'}{$feature_id} = 0;
-   }
-
-   my $r = $self->{'featureloc_rank'}{$feature_id};
+   my $r = $self->{'featureloc_rank'}{$feature_id} || 0;
    $self->{'featureloc_rank'}{$feature_id}++;
    return $r;
 }
