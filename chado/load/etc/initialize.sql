@@ -42,6 +42,15 @@ insert into db (name, contact_id) values ('DB:TIGR'     ,(select contact_id from
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucla'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
+
+insert into db (name, contact_id) values ('DB:PFAM',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:SUPERFAMILY',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:PROFILE',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:PRODOM',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:PRINTS',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:SMART',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:TIGRFAMs',(select contact_id from contact where name = 'null'));
+
 insert into db (name, contact_id,description) values ('DB:GR',(select contact_id from contact where name = 'null'),'Gramene');
 insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot',(select contact_id from contact where name = 'null'),'SwissProt','http://us.expasy.org/cgi-bin/niceprot.pl?');
 insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:mrna',(select contact_id from contact where name = 'null'),'RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
