@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.4 2004-12-23 16:43:55 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.5 2005-01-14 01:20:42 cmungall Exp $
 #
 #
 
@@ -529,10 +529,11 @@ sub get_features_containing {
 sub feature_relationships_for_subject {
     my $self = shift;
     my $f = shift;
+    my $fid = ref($f) ? $f->get_feature_id : $f;
 
     my $g = $self->graph;
 
-    my @e = $g->in_edges(ref($f) ? $f->get_feature_id : $f);
+    my @e = $g->in_edges($fid);
     my @frs = ();
     while (@e) {
 	if (!$e[0] || !$e[1]) {
@@ -566,7 +567,10 @@ sub get_all_contained_features {
 
     my $iterator = $self->feature_iterator($topfid);
     my @cfids = ();
+    my %got_idh = ();
     while (my $fid = $iterator->next_vertex) {
+        next if $got_idh{$fid};
+        $got_idh{$fid} = 1;
 	push(@cfids, $fid) unless $fid eq $topfid;
     }
     return [map {$fidx->{$_}} @cfids];
@@ -633,7 +637,7 @@ sub make_island {
         logtime();
         printf "Making island $island_name\n";
     }
-   my $island =
+    my $island =
       $self->new_feature(
 			 feature_id=>$island_id,
 			 name=>$island_name,
