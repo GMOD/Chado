@@ -302,22 +302,22 @@ BEGIN
                   INSERT INTO dbxref(db_id, accession ) values(d_id, NEW.uniquename);
                   SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;
                END IF;
+               SELECT INTO maxid to_number(substring(max(uniquename) from (length(f_type)+2) for 6),''999999'') from feature where uniquename like f_type||'':%'';
+               IF maxid IS NULL THEN
+                 maxid:=1;
+               ELSE
+                 maxid:=maxid+1;
+               END IF;
+               id:=lpad(maxid, 6, ''000000'');
+               f_uniquename:=CAST(f_type||'':''||id as TEXT);
+               RAISE NOTICE ''new uniquename:%, old uniquename is:%'', f_uniquename, NEW.uniquename;
+
                IF f_row_t.name like ''%temp%'' or f_row_t.name IS NULL THEN
--- adding stuff here to create new names in a way similar to remark
-                  SELECT INTO maxid to_number(substring(max(uniquename) from (length(f_type)+2) for 6),''999999'') from feature where uniquename like f_type||'':%'';
-                  IF maxid IS NULL THEN
-                    maxid:=1;
-                  ELSE
-                    maxid:=maxid+1;
-                  END IF;
-                  id:=lpad(maxid, 6, ''000000'');
-                  f_uniquename:=CAST(f_type||'':''||id as TEXT);
-                  RAISE NOTICE ''new uniquename:%, old uniquename is:%'', f_uniquename, NEW.uniquename;
                   UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=NEW.feature_id;
---
 --                 UPDATE feature set dbxref_id=f_dbxref_id, name=NEW.uniquename where feature_id=f_row_t.feature_id;
                ELSE
-                 UPDATE feature set dbxref_id=f_dbxref_id  where feature_id=f_row_t.feature_id;
+                  UPDATE feature set uniquename=f_uniquename, name=f_row_t.name where feature_id=NEW.feature_id;
+--                 UPDATE feature set dbxref_id=f_dbxref_id  where feature_id=f_row_t.feature_id;
                END IF;
             ELSE
                f_dbxref_id:=f_row_t.dbxref_id;
