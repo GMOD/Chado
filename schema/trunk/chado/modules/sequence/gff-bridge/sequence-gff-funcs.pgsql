@@ -69,5 +69,4 @@ CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
 LANGUAGE 'sql';
 
 --functional index that depends on the above functions
-DROP INDEX binloc_boxrange;
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
