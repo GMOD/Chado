@@ -34,3 +34,11 @@ For following releases:
 - write a bulk load utility that will quickly load GFF3 data to chado
 - write a utility that will delete data from the database with a GFF
 file as a template
+--
+Load order needs to change.  I have started adding "bridge" relationships between
+ontologies to the prepdb step, and this has to happen after the ontologies have
+already been entered so the INSERT statement can find the terms.
+
+Documentation needs to reflect this, of course.
+
+We should start using the bug tracker on SF

@@ -26,3 +26,11 @@ insert into array (name,manufacturer_id,platformtype_id,substratetype_id,num_of_
 insert into array (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133B',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
 insert into array (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95A' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
 
+/* we need to have the ontologies loaded before we can do this.  "make prepdb" now needs to come after "make ontologies" */
+insert into cvterm_relationship (subject_id,object_id,type_id) values (
+  (select cvterm_id from cvterm where name = 'blood_cell' and cv_id = (select cv_id from cv where name = 'Cell Ontology')),
+  (select cvterm_id from cvterm where name = 'blood' and cv_id = (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')),
+  (select cvterm_id from cvterm where name = 'part_of' and cv_id = (select cv_id from cv where name = 'Relationship Ontology'))
+);
+
+
