@@ -108,7 +108,7 @@ GetOptions('organism:s'       => \$ORGANISM,
 
 $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
-$SRC_DB   ="DB:$SRC_DB";
+$SRC_DB   ="$SRC_DB";
 $GFFFILE  ||='test.gff';
 
 Chado::LoadDBI->init();
@@ -169,6 +169,29 @@ unless ($note_type) {
 }
 die "Unable to create note type in cvterm table."
     unless $note_type;
+
+
+while(my $gff_segment = $gffio->next_segment()) {
+warn $gff_segment;
+  my $segment = Chado::Feature->search({name => $gff_segment->display_id});
+  if(!$segment){
+
+	if(!$typemap{'region'}){
+	  ($typemap{'region'}) = Chado::Cvterm->search( name => 'region' );
+	}
+	die "Sequence Ontology term \"region\" could not be found in your cvterm table.\nAre you sure the Sequence Ontology was correctly loaded?\n" unless $typemap{'region'};
+
+	Chado::Feature->create({
+							organism_id => $chado_organism,
+							name => $gff_segment->display_id,
+							uniquename => $gff_segment->display_id .'_region',
+							type_id => $typemap{'region'},
+							seqlen => abs($gff_segment->end - $gff_segment->start), #who knows? spec doesn't specify start < end
+						   });
+
+	$feature_count++;
+  }
+}
 
 while(my $gff_feature = $gffio->next_feature()) {
 
