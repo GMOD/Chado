@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+# vim: set ft=perl ts=2 expandtab:
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -8,10 +9,13 @@ use ExtUtils::MakeMaker;
 #      so that it can be put in lib/Class/DBI)
 #
 
+use strict;
 use Cwd;
+use Config;
 
 my $working_dir = cwd;
-#$working_dir .= '/';
+my $PERL        =  $Config{'startperl'};
+$PERL           =~ s/^#!//;
 
 unless( -d "$working_dir/lib" ) { mkdir "$working_dir/lib" }
 unless( -d "$working_dir/lib/Chado" ) { mkdir "$working_dir/lib/Chado" }
@@ -27,10 +31,20 @@ $O{PACKAGE_HOME}   = $O{GMOD_HOME}.'/lib/schema';
 $O{COREDEF}        = "$working_dir/modules/idb-full.modules";
 $O{EXTDEF}         = "$working_dir/modules/extension.modules";
 
+#
+# What database server? (Assume Pg for now)
+#
+my $db = prompt("What database server will you be using?",'PostgreSQL');
+die "Really only PostgreSQL is well supported right now" unless $db =~ /^[Pp]/;
+$DBNAME = prompt("Database name?", 'chado');
+$DBUSER = prompt("What is your username?", $ENV{USER});
+$DBPASS = prompt("What is your password?", '');
+
 my $rebuild_complete = 0;
-open CORE, $O{COREDEF} or die "unable to open $O{COREDEF}: $!\n";
+open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
 my @sqlfiles;
 while (<CORE>) {
+  next if /^\s*#/; # allow comment lines
   chomp;
   my $file = $working_dir . '/modules/' . $_;
   if (-M "$working_dir/modules/complete.sql" > -M $file) {
@@ -40,19 +54,15 @@ while (<CORE>) {
 }
 close CORE;
 
-#what server? (Assume Pg for now)
-my $db = prompt("What database server will you be using?",'PostgreSQL');
-die "Really only PostgreSQL is well supported right now" unless $db =~ /^[Pp]/;
-$DBNAME = prompt("Database name?", 'chado');
-$DBUSER = prompt("What is your username?", $ENV{USER});
-$DBPASS = prompt("What is your password?", '');
-
-# get available extensions to core and ask if any are to be used.
+#
+# Get available extensions to core and ask if any are to be used.
+#
 print "\nAvailable extensions to the core schema:\n";
-open EXT, $O{EXTDEF} or die "unable to open $O{EXTDEF}: $!\n";
+open EXT, $O{EXTDEF} or die "Unable to read file '$O{EXTDEF}': $!\n";
 my @extfiles = ( 0 );
 my $i = 0;
 while (<EXT>) {
+  next if /^\s*#/; # allow comment lines
   $i++;
   print "[$i] $_";
   chomp;
@@ -70,13 +80,26 @@ my $extstr = prompt("(Comma delimited)?","0");
 
 if ($extstr) {
   $rebuild_complete++; 
-  my @extindex = split /,/, $extstr;
+  my %numbers =
+    # make a unique lookup 
+    map  { $_, 1 }
+    # take only numbers
+    grep { /\d+/ }
+    # look for ranges
+    map  { $_ =~ m/(\d+)-(\d+)/ ? ( $1..$2 ) : $_ }
+    # split on space or comma
+    split /[,\s]+/, $extstr
+  ;
+
+  my @extindex = keys %numbers;
   foreach my $index (@extindex) {
+    next unless defined $extfiles[$index];
     push @sqlfiles, $extfiles[$index];
   }
 }
 
 my $external = prompt("Enter the full path of an external DDL file",'none');
+my @seqfiles;
 unless ($external eq 'none') {
   if (-e $external) {
     push @seqfiles, $external; 
@@ -85,12 +108,15 @@ unless ($external eq 'none') {
   }
 }
 
+print join("\n", 
+  '', 'Building with the following core modules and extensions:', @sqlfiles, ''
+);
 
-if ($rebuild_complete) {
-  my $sqlout = "$working_dir/modules/complete.sql";
-  open OUT, ">$sqlout" or die "couldn't open $sqlout: $!\n";
+my $complete_sql = "$working_dir/modules/complete.sql";
+if ($rebuild_complete || !-e $complete_sql) {
+  open OUT, ">$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
   foreach my $file (@sqlfiles) {
-    open IN, $file or die "couldn't open $file: $!\n";
+    open IN, $file or die "Couldn't read file '$file': $!\n";
     while (<IN>) {
       print OUT;
     }
@@ -98,25 +124,26 @@ if ($rebuild_complete) {
   }
   close OUT;
 
-  warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n";
+  warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n"; 
   system("$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' $working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm")==0
     or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 }
 
 WriteMakefile(
-    'NAME'		=> 'chado',
-    'PREREQ_PM'		=> { SQL::Translator   => 0.04,
-                             Class::DBI        => 0.94,
-                             Class::DBI::Pager => 0,
-                             Class::DBI::Pg    => 0.02,
-                             Module::Build     => 0.20,
-                             Template          => 2.10,
-			     Term::ProgressBar => 0,
-                             DBI               => 0,
-                             DBD::Pg           => 0,
-                             XML::Simple       => 2.09,
-                             Log::Log4perl     => 0.39,
-                            }, 
+    'NAME'		            => 'chado',
+    'PREREQ_PM'		        => { 
+      'SQL::Translator'   => 0.04,
+      'Class::DBI'        => 0.94,
+      'Class::DBI::Pager' => 0,
+      'Class::DBI::Pg'    => 0.02,
+      'Module::Build'     => 0.20,
+      'Template'          => 2.10,
+			'Term::ProgressBar' => 0,
+      'DBI'               => 0,
+      'DBD::Pg'           => 0,
+      'XML::Simple'       => 2.09,
+      'Log::Log4perl'     => 0.39,
+    }, 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
        AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()),
@@ -253,12 +280,15 @@ metadata: $working_dir/bin/ddltrans
 test_load ::
 	\$(SHELL) $working_dir/bin/test_load.sh $DBNAME
 
+test_load_pl ::
+	$PERL $working_dir/bin/test_load.pl $DBNAME
+
 %.go_loaded: %.ontology
-	$working_dir/bin/load_ontology.pl $USER $DBNAME \$< $working_dir/go/GO.defs
+	$working_dir/bin/load_ontology.pl $DBUSER $DBNAME \$< $working_dir/go/GO.defs
 	touch \$@
 
 %.so_loaded: %.ontology
-	$working_dir/bin/load_ontology.pl $USER $DBNAME \$< $working_dir/song/SODA.defs
+	$working_dir/bin/load_ontology.pl $DBUSER $DBNAME \$< $working_dir/song/SODA.defs
 	touch \$@
   };  
 }
