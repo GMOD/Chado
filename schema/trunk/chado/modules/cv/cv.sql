@@ -8,10 +8,9 @@ create table cv (
        cv_id serial not null,
        primary key (cv_id),
        name varchar(255) not null,
-       definition text,
-
-       unique(name)
+       definition text
 );
+create unique index cv_idx1 on cv (name);
 
 -- ================================================
 -- TABLE: cvterm
@@ -25,11 +24,13 @@ create table cvterm (
        name varchar(255) not null,
        definition text,
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-
-       unique(name, cv_id)
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED
 );
 create index cvterm_idx1 on cvterm (cv_id);
+create index cvterm_idx2 on cvterm (name);
+create index cvterm_idx3 on cvterm (dbxref_id);
+create unique index cvterm_idx4 on cvterm (name,cv_id);
+
 -- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
 -- The unique key on termname, cv_id ensures that all terms are 
 -- unique within a given cv
@@ -47,13 +48,12 @@ create table cvterm_relationship (
        subject_id int not null,
        foreign key (subject_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-
-       unique(type_id, subject_id, object_id)
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
 create index cvterm_relationship_idx2 on cvterm_relationship (subject_id);
 create index cvterm_relationship_idx3 on cvterm_relationship (object_id);
+create unique index cvterm_relationship_idx4 on cvterm_relationship (type_id,subject_id,object_id);
 
 
 -- ================================================
@@ -89,12 +89,10 @@ create table cvtermsynonym (
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-       synonym varchar(255) not null,
-
-       unique(cvterm_id, synonym)
+       synonym varchar(255) not null
 );
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
-
+create unique index cvtermsynonym_idx2 on cvtermsynonym (cvterm_id,synonym);
 
 -- ================================================
 -- TABLE: cvterm_dbxref
@@ -106,12 +104,11 @@ create table cvterm_dbxref (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
-
-       unique(cvterm_id, dbxref_id)
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
 );
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
 create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
+create unique index cvterm_dbxref_idx3 on cvterm_dbxref (cvterm_id,dbxref_id);
 
 -- ================================================
 -- TABLE: dbxrefprop
@@ -124,10 +121,9 @@ create table dbxrefprop (
        foreign key (dbxref_id) references dbxref (dbxref_id) INITIALLY DEFERRED,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-       value text not null default '',
-       rank int not null default 0,
-
-       unique(dbxref_id, type_id, value, rank)
+       value text null,
+       rank int not null default 0
 );
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
+create index dbxrefprop_idx3 on dbxrefprop (dbxref_id,type_id,rank);

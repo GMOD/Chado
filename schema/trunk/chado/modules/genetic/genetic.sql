@@ -198,11 +198,10 @@ create table gcontext (
 	uniquename	varchar(255) not null,
 	description	text,
 	pub_id	int not null,
-	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-
-	unique(uniquename)
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED
 );
-create index gcontext_idx1 on gcontext(uniquename);
+create unique index gcontext_idx1 on gcontext(uniquename);
+
 -- ****************************************
 
 
@@ -217,18 +216,17 @@ create index gcontext_idx1 on gcontext(uniquename);
 create table gcontext_relationship (
 	gcontext_relationship_id	serial not null,
 	primary key (gcontext_relationship_id),
-	subjectgc_id	int not null,
-	foreign key (subjectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	objectgc_id	int not null, 
-	foreign key (objectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	subject_id	int not null,
+	foreign key (subject_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	object_id	int not null, 
+	foreign key (object_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
  	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-
-	unique(subjectgc_id, objectgc_id, type_id)
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
-create index gcontext_relationship_idx1 on gcontext_relationship (subjectgc_id);
-create index gcontext_relationship_idx2 on gcontext_relationship (objectgc_id);
+create index gcontext_relationship_idx1 on gcontext_relationship (subject_id);
+create index gcontext_relationship_idx2 on gcontext_relationship (object_id);
 create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
+create unique index gcontext_relationship_idx4 on gcontext_relationship (subject_id,object_id,type_id);
 -- ****************************************
 
 
@@ -264,12 +262,11 @@ create table feature_gcontext (
 	rank	int not null,
 	cgroup	int not null,
 	cvterm_id	int not null,
-	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED,
-
-	unique(feature_id, gcontext_id, cvterm_id)
+	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 create index feature_gcontext_idx1 on feature_gcontext (feature_id);
 create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
+create unique index feature_gcontext_idx3 on feature_gcontext (feature_id,gcontext_id,cvterm_id);
 -- ****************************************
 
 
@@ -287,12 +284,12 @@ create table gcontextprop (
 	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	type_id	int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text not null,
-
-	unique(gcontext_id, type_id, value)
+	value	text null,
+	rank int not null default 0
 );
 create index gcontextprop_idx1 on gcontextprop (gcontext_id);
 create index gcontextprop_idx2 on gcontextprop (type_id);
+create unique index gcontextprop_idx3 on gcontextprop (gcontext_id,type_id,rank);
 -- ****************************************
 
 
@@ -328,13 +325,12 @@ create table phenstatement (
 	cvalue_id	int,
 	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
 	assay_id	int,
-	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-
-	unique(gcontext_id, dbxref_id, observable_id)	
+	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED
 );
 create index phenstatement_idx1 on phenstatement (gcontext_id);
 create index phenstatement_idx2 on phenstatement (observable_id);
 create index phenstatement_idx3 on phenstatement (attr_id);
+create unique index phenstatement_idx4 on phenstatement (gcontext_id,dbxref_id,observable_id);
 -- ****************************************
 
 
@@ -350,11 +346,10 @@ create table phendesc (
 	primary key (phendesc_id),
 	gcontext_id	int not null,
 	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	description	text not null,
-
-	unique(gcontext_id, description)
+	description	text not null
 );
 create index phendesc_idx1 on phendesc (gcontext_id);
+create unique index phendesc_idx2 on phendesc (gcontext_id,description);
 -- ****************************************
 
 
@@ -374,13 +369,12 @@ create table phenstatement_relationship (
 	type_id	int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	comment_id	int not null,
-	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-
-	unique(subject_id, object_id, type_id)
+	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 create index phenstatement_relationship_idx1 on phenstatement_relationship (subject_id);
-create index phenstatement_relationship_idx2 on phenstatement_relationship (subject_id);
+create index phenstatement_relationship_idx2 on phenstatement_relationship (object_id);
 create index phenstatement_relationship_idx3 on phenstatement_relationship (type_id);
+create index phenstatement_relationship_idx4 on phenstatement_relationship (subject_id,object_id,type_id);
 -- ****************************************
 
 
@@ -396,12 +390,11 @@ create table phenstatement_cvterm (
 	phenstatement_id	int not null,
 	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	cvterm_id	int not null,
-	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-
-	unique(phenstatement_id, cvterm_id)
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 create index phenstatement_cvterm_idx1 on phenstatement_cvterm (phenstatement_id);	
 create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);	
+create unique index phenstatement_cvterm_idx3 on phenstatement_cvterm (phenstatement_id,cvterm_id);
 -- ****************************************
 
 
@@ -419,10 +412,10 @@ create table phenstatementprop (
 	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	type_id	int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text not null,
-
-	unique(phenstatement_id, type_id, value)
+	value	text null,
+	rank int not null default 0
 );
 create index phenstatementprop_idx1 on phenstatementprop (phenstatement_id);
 create index phenstatementprop_idx2 on phenstatementprop (type_id);
+create unique index phenstatementprop_idx3 on phenstatementprop (phenstatement_id,type_id,rank);
 -- ****************************************

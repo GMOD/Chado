@@ -23,13 +23,12 @@
 create table featuremap (
        featuremap_id serial not null,
        primary key (featuremap_id),
-       mapname varchar(255),
-       mapdesc varchar(255),
-       mapunit varchar(255),
-
-       unique(mapname)
+       name varchar(255),
+       description text,
+       unittype_id int null,
+       foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED
 );
-
+create unique index featuremap_idx1 on featuremap (name);
 
 -- ================================================
 -- TABLE: featurerange
@@ -99,8 +98,8 @@ create table featuremap_pub (
        featuremap_id int not null,
        foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade
- INITIALLY DEFERRED);
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED
+);
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
