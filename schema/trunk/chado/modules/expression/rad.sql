@@ -621,7 +621,7 @@ create table study (
     study_id                           																		serial not null,
 	primary key (study_id),
     contact_id                         																		int not null,
-	foreign key (contact_id) references author (author_id),
+	foreign key (contact_id) references contact (contact_id),
    	pub_id         																							int null,
 	foreign key (pub_id) references pub (pub_id),
     dbxref_id                          																		int null,
