@@ -20,6 +20,13 @@ begin-transaction/cache/flush/end-transaction/analyze strategy.
 where to start?
 
 For the next release:
+- add documentation for loading ontologies when the files are already present
+locally.
+- create pre-created Class::DBI classes for a 'default' install, eliminating
+the need for S::T.
+- either make Term::ProgressBar optional or submit a patch to give back a 
+default width when the XS module fails to find a terminal width (or both).
+- remove hard coded passwords and other conf stuff from Class::DBI classes.
 - integrate Apollo
 - integrate a web front end (probably turnkey)
 - provide a custom tag processing module for load_gff3.pl
