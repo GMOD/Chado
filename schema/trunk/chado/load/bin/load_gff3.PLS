@@ -246,7 +246,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         }
 
         #is this general, or what should really be done here?
-        if ( !$dbxref{$id} ) {
+        if ( $id && !$dbxref{$id} ) {
             my ($chado_dbxref) = Chado::Dbxref->find_or_create(
                 {
                     db_id     => $chado_db->id,
@@ -738,7 +738,7 @@ sub initialize {
     # sequence, it also fixes Allen's method of tracking progress
     die "$GFFFILE does not exist" unless ( -e $GFFFILE );
 
-    my $linenumber = `grep -m 1 -n "^>" $GFFFILE`;
+    my $linenumber = `grep -n "^>" $GFFFILE`;
     if ( $linenumber =~ /^(\d+)/ ) {
         $linenumber = $1;
         system("tail +$linenumber $GFFFILE > $TMPFASTA");
