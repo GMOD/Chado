@@ -1,4 +1,5 @@
 --- get non-analysis feature of the type specified along with its children, optionally constraining by src [location]
+--- WARNING: rely on soi is created in database
 --- WARNING: can not use it for chromosome_arm type feature as they don't have featureloc entry
 
 SQL:
