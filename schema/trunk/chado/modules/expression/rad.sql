@@ -100,7 +100,7 @@ create table array (
     description varchar(500) null,
     array_dimensions varchar(50) null,
     element_dimensions varchar(50) null,
-    number_of_elements int null,
+    num_of_elements int null,
     num_array_columns int null,
     num_array_rows int null,
     num_grid_columns int null,
