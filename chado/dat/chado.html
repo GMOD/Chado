@@ -1,4 +1,4 @@
-<em>Schema metadata produced by ddltrans on Thu May 29 10:39:50 EDT 2003</em>
+<em>Schema metadata produced by ddltrans on Thu May 29 15:08:25 EDT 2003</em>
 
 <html>
 <h2>acquisition</h2>
@@ -1044,8 +1044,13 @@ ok drop table if exists treatment;
 </table>
 
 <h2>wwwuser</h2>
-
+------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  keep track of www users.  this may also be useful  in an audit module at some point (?).
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>email</td><td>varchar(128)</td><td>no</td><td></td><td></td></tr>
+<tr><td>username</td><td>varchar(32)</td><td>no</td><td></td><td></td></tr>
+<tr><td>wwwuser_id</td><td>serial</td><td>no</td><td></td><td><li>wwwuser_feature.wwwuser_id<li>wwwuser_cvterm.wwwuser_id<li>wwwuser_project.wwwuser_id<li>wwwuser_organism.wwwuser_id<li>wwwuser_genotype.wwwuser_id<li>wwwuser_author.wwwuser_id<li>wwwuser_interaction.wwwuser_id<li>wwwuser_phenotype.wwwuser_id<li>wwwuser_pub.wwwuser_id<li>wwwuser_expression.wwwuser_id<li>wwwuserrelationship.objwwwuser_id<li>wwwuserrelationship.subjwwwuser_id</td></tr>
+<tr><td>profile</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>password</td><td>varchar(32)</td><td>no</td><td></td><td></td></tr>
 </table>
 
 <h2>wwwuser_author</h2>
@@ -1121,7 +1126,7 @@ track wwwuser interest in phenotypes
 </table>
 
 <h2>wwwuser_project</h2>
------------------------------- -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  link wwwuser accounts to projects
+link wwwuser accounts to projects
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>wwwuser_id</td><td>int</td><td>no</td><td></td><td>wwwuser.wwwuser_id</td></tr>
 <tr><td>world_read</td><td>smallint</td><td>no</td><td></td><td></td></tr>
