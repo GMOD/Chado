@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.19 2004-04-07 02:54:44 scottcain Exp $
+$Id: INSTALL,v 1.20 2004-04-07 18:44:48 allenday Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -35,6 +35,11 @@ Prerequisites:
     * for information on tuning postgres for performance, see
 
          http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
+
+      the two most critical parameters to tune are shared_buffers and
+      effective_cache size.  adjusting these parameters may require
+      modification of memory settings in /etc/sysctl.conf, see the sysctl
+      manpage for details.
 
   Apache (1.3.*)
 
