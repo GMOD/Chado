@@ -35,8 +35,6 @@ Chado::DBI->set_db('Main',
 		   {AutoCommit => 1}
 		  ) or die "set_db failed";
 
-warn "ontology_file:$ontology_file\n";
-
 #######################################
 # SET UP GLOBAL VARS
 #######################################
@@ -55,7 +53,7 @@ my $ontname = $ontology_file2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Onto
               $ontology_file2 =~ /^cell_type/       ? "eVOC Cell Type Ontology" :
               $ontology_file2 =~ /^cell/            ? "Cell Ontology" :
               $ontology_file2 =~ /^pathology/       ? "eVOC Pathology Ontology" :
-              $ontology_file2 =~ /^SODA/            ? "Sequence Ontology" :
+              $ontology_file2 =~ /^SO[FD]A|so\./    ? "Sequence Ontology" :
               undef;
 
 die "no ontology name defined for $ontology_file2!" unless defined($ontname);
@@ -63,36 +61,36 @@ die "no ontology name defined for $ontology_file2!" unless defined($ontname);
 #we see all of these, apparently it's not standardized yet.  map relationship
 #types to stable Relationship Ontology IDs
 
-my %predmap = ( 'isa'           => 'OBO_REL:0002',
-		'is_a'          => 'OBO_REL:0002',
-		'is a'          => 'OBO_REL:0002',
-		'partof'        => 'OBO_REL:0003',
-		'part_of'       => 'OBO_REL:0003',
-		'part of'       => 'OBO_REL:0003',
-		'developsfrom'  => 'OBO_REL:0004',
-		'develops_from' => 'OBO_REL:0004',
-		'develops from' => 'OBO_REL:0004',
-		'REL:0005'      => 'OBO_REL:0005',
-		'rel:0005'      => 'OBO_REL:0005',
-		'REL:0001'      => 'OBO_REL:0001',
-		'rel:0001'      => 'OBO_REL:0001',
-	      );
+my %oborelmap = (
+				 'transitive_relationship' => 'OBO_REL:0001',
+				 'is_a'                    => 'OBO_REL:0002',
+				 'part_of'                 => 'OBO_REL:0003',
+				 'develops_from'           => 'OBO_REL:0004',
+				 'covered_by'              => 'OBO_REL:0005',
+				 'relationship'            => 'OBO_REL:0006',
+				);
+
+my %predmap = (
+		'isa'           => 'is_a',
+		'is_a'          => 'is_a',
+		'is a'          => 'is_a',
+		'partof'        => 'part_of',
+		'part_of'       => 'part_of',
+		'part of'       => 'part_of',
+		'developsfrom'  => 'develops_from',
+		'develops_from' => 'develops_from',
+		'develops from' => 'develops_from',
+		'REL:0005'      => 'covered_by',
+		'rel:0005'      => 'covered_by',
+		'REL:0001'      => 'transitive_relationship',
+		'rel:0001'      => 'transitive_relationship',
+			  );
 
 #create some default entries to satisfy chado FK requirements of ontology on contact and db tables
 
-warn "getting info from Class::DBI\n";
-
 my($nullcontact) = Chado::Contact->find_or_create({ name => 'null', description => 'null' });
-
-warn "getting db\n";
-
 my($db) = Chado::Db->find_or_create({name => $ontname, contact_id => $nullcontact->id});
-
-warn "getting cv_db\n";
-
-my($cv_db) = Chado::Cv->find_or_create({name => $ontname});
-
-warn "Creating Ontology objects...\n";
+my($cv) = Chado::Cv->find_or_create({name => $ontname});
 
 my $termfact = Bio::Ontology::TermFactory->new();
 my $relfact = Bio::Ontology::RelationshipFactory->new();
@@ -139,36 +137,48 @@ sub load_ontologyterms{
 
   #load edge terms
   foreach my $predicate (@predicates) {
-	print STDERR "this is a predicate: ", lc($predicate->identifier) , "\n";
+	print STDERR "this is a predicate: ", $oborelmap{ predmap($predicate->name) }, "\n";
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
-
-	my($predicate_db) = Chado::Cvterm->search(name =>predmap($predicate->name));
+	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
 	if(!$predicate_db){
+		my $dbxref = Chado::Dbxref->find_or_create({
+													db_id => $db->id,
+													accession => $oborelmap{ predmap($predicate->name) },
+												   });
 		$predicate_db = Chado::Cvterm->create({
-		  name =>predmap($predicate->name),
-		  cv_id => $cv_db->id,
-		 });
+											   name => predmap($predicate->name),
+											   cv_id => $cv->id,
+											   dbxref_id => $dbxref->id,
+											  });
+
 	}
 	
-	$predicateterms{predmap($predicate->name)} = $predicate_db->id;
-	$predicate_db->definition($predicate->name) unless defined($predicate_db->definition);
+	$predicateterms{ predmap($predicate->name) } = $predicate_db->id;
+	$predicate_db->definition($predicate->definition) unless defined($predicate_db->definition);
 	$predicate_db->update;
-
 	load_synonyms($predicate,$predicate_db);
 	load_dblinks($predicate,$predicate_db);
   }
 
   #load root terms
   foreach my $root (@roots) {
-	my $root_db = Chado::Cvterm->find_or_create ({
-		  name => predmap($root->identifier),
-		  cv_id => $cv_db->id
-		 });
-	$root_db->definition($root->name) unless defined($root_db->definition);
-	$root_db->update;
+	my $dbxref = Chado::Dbxref->find_or_create({
+												db_id => $db->id,
+												accession => $root->identifier,
+											   });
+	my $root_db = Chado::Cvterm->find_or_create({
+												 name => $root->name || $oborelmap{ predmap($root->identifier) },
+												 cv_id => $cv->id,
+												 dbxref_id => $dbxref->id,
+												});
+
+	$root_db->definition($root->definition) unless defined($root_db->definition);
+
 
 	$allterms{$root->name} = $root_db->id;
+
+	$root_db->update;
 
 	load_synonyms($root,$root_db);
 	load_dblinks($root,$root_db);
@@ -187,16 +197,22 @@ sub load_ontologytermsR {
   my @children = $ontref->get_child_terms($parent);
   foreach my $child (@children) {
 	if (!(exists $allterms{$child->name})) {
-	print "$tab", $child->name , "\n";
-	  my $child_db = Chado::Cvterm->find_or_create({
-		name => predmap($child->identifier),
-		cv_id => $cv_db->id,
-	   });
+	  print "$tab", $child->name , "\n";
 
-	  $child_db->definition($child->name) unless defined($child_db->definition);
-	  $child_db->update;
+	  my $dbxref = Chado::Dbxref->find_or_create({
+												  db_id => $db->id,
+												  accession => $child->identifier,
+												 });
+	  my $child_db = Chado::Cvterm->find_or_create({
+													name => $child->name,
+													cv_id => $cv->id,
+													dbxref_id => $dbxref->id,
+												   });
+	  $child_db->definition($child->definition) unless defined($child_db->definition);
 
 	  $allterms{$child->name} = $child_db->id;
+
+	  $child_db->update;
 
 	  load_synonyms($child,$child_db);
 	  load_dblinks($child,$child_db);
