@@ -1,5 +1,4 @@
--- For an overview of this module, see cv-intro.txt
---
+-- See cv-intro.txt
 
 -- ================================================
 -- TABLE: cv
@@ -27,9 +26,7 @@ create table cvterm (
        definition text,
        dbxref_id int,
        foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-       is_obsolete int not null default 0,
-       is_relationshiptype int not null default 0,
-       
+
        unique(name, cv_id)
 );
 create index cvterm_idx1 on cvterm (cv_id);
@@ -37,11 +34,6 @@ create index cvterm_idx1 on cvterm (cv_id);
 -- The unique key on termname, cv_id ensures that all terms are 
 -- unique within a given cv
 
--- all relationship types are extensible, and have user-defined semantics.
--- the exception is the 'is_a' (subtyping or subclassing) relationship,
--- which MUST be present, and has fixed semantics)
-INSERT INTO cv (name) VALUES ('__axiomatic');
-INSERT INTO cvterm (name, is_relationshiptype, cv_id) SELECT 'is_a', 1, cv_id FROM cv WHERE name = '__internal';
 
 -- ================================================
 -- TABLE: cvterm_relationship
@@ -92,16 +84,12 @@ create unique index cvtermpath_idx5 on cvtermpath (subject_id, object_id, type_i
 -- TABLE: cvtermsynonym
 -- ================================================
 
--- synonyms can have optional types: e.g. narrower_than, exact
-
 create table cvtermsynonym (
        cvtermsynonym_id serial not null,
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        synonym varchar(255) not null,
-       type_id int,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
        unique(cvterm_id, synonym)
 );
@@ -119,29 +107,11 @@ create table cvterm_dbxref (
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        dbxref_id int not null,
        foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
-       is_for_definition int not null default 0,
 
        unique(cvterm_id, dbxref_id)
 );
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
 create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
-
--- ================================================
--- TABLE: cvtermprop
--- ================================================
-
-create table cvtermprop (
-       cvtermprop_id serial not null,
-       primary key (cvtermprop_id),
-       cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
-       type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-       value text not null default '',
-       rank int not null default 0,
-
-       unique(cvterm_id, type_id, value, rank)
-);
 
 -- ================================================
 -- TABLE: dbxrefprop
@@ -161,4 +131,3 @@ create table dbxrefprop (
 );
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
-
