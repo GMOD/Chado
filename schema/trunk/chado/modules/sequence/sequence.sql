@@ -283,7 +283,7 @@ create table feature_cvtermprop (
     rank int not null default 0,
     constraint feature_cvtermprop_c1 unique (feature_cvterm_id,type_id,rank)
 );
-create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_id);
+create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_cvtermprop_id);
 create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
 
 
