@@ -5,8 +5,6 @@
 create table library (
     library_id serial not null,
     primary key (library_id),
-    feature_id int not null,
-    foreign key (feature_id) references feature (feature_id),
     organism_id int not null,
     foreign key (organism_id) references organism (organism_id),
     name varchar(255),
@@ -15,12 +13,6 @@ create table library (
     foreign key (type_id) references cvterm (cvterm_id),
     constraint library_c1 unique (organism_id,uniquename,type_id)
 );
--- The feature_id foreign key links the library a feature for the vector which 
--- was used for the library.  In cases where more than one vector was used in
--- a library, two library records should be created, one for each vector.  
--- library_synonym could be used to relate a single library name to the two
--- library records
---
 -- The type_id foreign key links to a controlled vocabulary of library types.
 -- examples of this would be: 'cDNA_library' or 'genomic_library'
 create index library_name_ind1 on library(name);
