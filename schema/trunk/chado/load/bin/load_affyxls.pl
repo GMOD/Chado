@@ -48,12 +48,12 @@ Log::Log4perl::init('load/etc/log.conf');
 
 my $LOG = Log::Log4perl->get_logger('load_affyxls');
 
-my $arraytype = shift @ARGV; $arraytype ||= 'U133';
+my $arraydesigntype = shift @ARGV; $arraydesigntype ||= 'U133';
 my $arrayfile = shift @ARGV;
 
 Chado::Feature->set_sql(affy_probesets => qq{
-  SELECT feature.name,feature.feature_id,element.element_id FROM feature,element,array WHERE
-  array.name = '$arraytype' and feature.feature_id = element.feature_id
+  SELECT feature.name,feature.feature_id,element.element_id FROM feature,element,arraydesign WHERE
+  arraydesign.name = '$arraydesigntype' and feature.feature_id = element.feature_id
 });
 
 my $affx = Bio::Expression::MicroarrayIO->new(
@@ -123,8 +123,8 @@ while(my $arrayio = $affx->next_array){
   }
   $LOG->debug("cached features: ".scalar(keys %feature));
 
-  my($array)     = Chado::Array->search(name => $arraytype);
-  ($array)     ||= Chado::Array->search(name => 'unknown');
+  my($array)     = Chado::Arraydesign->search(name => $arraytype);
+  ($array)     ||= Chado::Arraydesign->search(name => 'unknown');
   $LOG->debug("loaded record for array type: ".$array->name);
 
   my($nulltype)               = Chado::Cvterm->search( name => 'null' );
@@ -261,7 +261,7 @@ while(my $arrayio = $affx->next_array){
                                                    organism_id => $human,
                                                    type_id => $oligo,
                                                    name => $featuregroup->id,
-                                                   uniquename => 'Affy:Transcript:HG-'. $arraytype .':'. $featuregroup->id,
+                                                   uniquename => 'Affy:Transcript:HG-'. $arraydesigntype .':'. $featuregroup->id,
                                                   });
 
         $progress->message("creating feature: ".$featuregroup->id);
