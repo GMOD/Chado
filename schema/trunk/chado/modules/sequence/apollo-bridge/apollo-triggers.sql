@@ -513,7 +513,7 @@ BEGIN
          --generate a new name based on the gene name
          SELECT INTO f_name_gene name from feature where feature_id=NEW.object_id;
 
-         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+length(f_type)))), ''99999'') FROM feature where name like f_name_gene||''-''||f_type||''%'';
+         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+length(f_type_temp)))), ''99999'') FROM feature where name like f_name_gene||''-''||f_type||''%'';
          IF maxid IS NULL THEN
              maxid = 1;
          ELSE
