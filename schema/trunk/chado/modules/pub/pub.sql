@@ -8,28 +8,28 @@
 create table pub (
        pub_id serial not null,
        primary key (pub_id),
--- title of paper, chapter of book, journal, etc
        title text,
--- title of part if one of a series
        volumetitle text,
        volume  varchar(255),
--- full name of (journal) series
        series_name varchar(255),
        issue  varchar(255),
        pyear  varchar(255),
--- page number range[s], eg, 457--459, viii + 664pp, lv--lvii
        pages  varchar(255),
        miniref varchar(255) not null,
--- the type of the publication (book, journal, poem, graffiti, etc)
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
--- do we want this even though we have the relationship in pub_relationship?
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
 
        unique(miniref)
 );
+-- title: title of paper, chapter of book, journal, etc
+-- volumetitle: title of part if one of a series
+-- series_name: full name of (journal) series
+-- pages: page number range[s], eg, 457--459, viii + 664pp, lv--lvii
+-- type_id: the type of the publication (book, journal, poem, graffiti, etc)
+-- is_obsolete: do we want this even though we have the relationship in pub_relationship?
 create index pub_idx1 on pub (type_id);
 
 -- ================================================
@@ -88,13 +88,13 @@ create table author (
        author_id serial not null,
        primary key (author_id),
        surname varchar(255) not null,
--- first name, initials
        givennames varchar(255),
--- Jr., Sr., etc       
        suffix varchar(255),
 
        unique(surname,givennames,suffix)
 );
+-- givennames: first name, initials
+-- suffix: Jr., Sr., etc       
 
 
 -- ================================================
@@ -108,13 +108,13 @@ create table pub_author (
        foreign key (author_id) references author (author_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
--- order of author in author list for this pub
        arank int not null,
--- indicates whether the author is an editor for linked publication
        editor boolean default 'false',
 
        unique(author_id,pub_id)
 );
+-- arank: order of author in author list for this pub
+-- editor: indicates whether the author is an editor for linked publication
 create index pub_author_idx1 on pub_author (author_id);
 create index pub_author_idx2 on pub_author (pub_id);
 

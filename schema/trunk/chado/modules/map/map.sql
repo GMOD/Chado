@@ -78,12 +78,12 @@ create table featurepos (
        foreign key (featuremap_id) references featuremap (featuremap_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
--- map_feature_id links to the feature (map) upon which the feature is
--- being localized
        map_feature_id int not null,
        foreign key (map_feature_id) references feature (feature_id),
        mappos float not null
 );
+-- map_feature_id links to the feature (map) upon which the feature is
+-- being localized
 create index featurepos_idx1 on featurepos (featuremap_id);
 create index featurepos_idx2 on featurepos (feature_id);
 create index featurepos_idx3 on featurepos (map_feature_id);

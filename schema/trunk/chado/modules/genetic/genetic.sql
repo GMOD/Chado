@@ -39,17 +39,17 @@ create table phenotype (
        phenotype_id serial not null,
        primary key (phenotype_id),
        description text,
--- type of phenotypic statement  [Chris, we need this or something like it
--- for FB where we have three types of statement in *k: "Phenotypic class:",
--- "Phenotype manifest in:", and free-text]
        statement_type int not null,
        foreign key (statement_type) references cvterm (cvterm_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
--- Do we want to call this simply genotype_id to allow natural joins?
        background_genotype_id int,
        foreign key (background_genotype_id) references genotype (genotype_id)
 );
+-- type of phenotypic statement  [Chris, we need this or something like it
+-- for FB where we have three types of statement in *k: "Phenotypic class:",
+-- "Phenotype manifest in:", and free-text]
+-- Do we want to call this simply genotype_id to allow natural joins?
 create index phenotype_idx1 on phenotype (statement_type);
 create index phenotype_idx2 on phenotype (pub_id);
 create index phenotype_idx3 on phenotype (background_genotype_id);
