@@ -6,5 +6,4 @@ sequence/sequence.sql
 genetic/genetic.sql
 companalysis/companalysis.sql
 expression/expression.sql
-expression/rad.sql
 map/map.sql
