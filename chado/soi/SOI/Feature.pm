@@ -509,7 +509,7 @@ sub stitch_child_segments {
     $new->hash($nh);
     $self->nodes([$new]);
 #    $new->dbxrefs([]);$new->properties([]);
-    return ($new, [@nodes]);
+    return ([@nodes], $new);
 }
 sub _rsetup_coord {
     my $self = shift;
