@@ -26,9 +26,9 @@ create table feature_expression (
        feature_expression_id serial not null,
        primary key (feature_expression_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
        unique(expression_id,feature_id)       
 );
@@ -63,9 +63,9 @@ create table expression_cvterm (
        expression_cvterm_id serial not null,
        primary key (expression_cvterm_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        rank int not null,
 	   cvterm_type varchar(255),
 
@@ -83,9 +83,9 @@ create table expression_pub (
        expression_pub_id serial not null,
        primary key (expression_pub_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique(expression_id,pub_id)       
 );
@@ -116,9 +116,9 @@ create table expression_image (
        expression_image_id serial not null,
        primary key (expression_image_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        eimage_id int not null,
-       foreign key (eimage_id) references eimage (eimage_id) on delete cascade,
+       foreign key (eimage_id) references eimage (eimage_id) on delete cascade INITIALLY DEFERRED,
 
        unique(expression_id,eimage_id)
 );

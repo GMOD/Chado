@@ -194,6 +194,88 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixdchip" AS
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
 
+CREATE OR REPLACE VIEW affymetrixrma
+AS SELECT
+  elementresult.elementresult_id AS elementresult_id,
+  elementresult.subclass_view AS subclass_view,
+  elementresult.element_id AS element_id,
+  elementresult.quantification_id AS quantification_id,
+  elementresult.float1 AS signal,
+  elementresult.float2 AS se,
+  elementresult.float3 AS z,
+  elementresult.char1 AS apcall
+FROM elementresult
+WHERE SUBCLASS_VIEW = 'affymetrixrma';
+
+CREATE OR REPLACE RULE "_RuleI_affymetrixrma" AS
+  ON INSERT TO affymetrixrma
+  DO INSTEAD
+    INSERT INTO elementresult
+    (subclass_view,element_id,quantification_id,float1,float2,float3,char1)
+    VALUES
+    ('affymetrixrma',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
+
+CREATE OR REPLACE RULE "_RuleU_affymetrixrma" AS
+  ON UPDATE TO affymetrixrma
+  DO INSTEAD
+    UPDATE elementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    element_id = NEW.element_id,
+    quantification_id = NEW.quantification_id,
+    float1 = NEW.signal,
+    float2 = NEW.se,
+    float3 = NEW.z,
+    char1 = NEW.apcall
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE OR REPLACE RULE "_RuleD_affymetrixrma" AS
+  ON DELETE TO affymetrixrma
+  DO INSTEAD
+    DELETE FROM elementresult
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE OR REPLACE VIEW affymetrixgcrma
+AS SELECT
+  elementresult.elementresult_id AS elementresult_id,
+  elementresult.subclass_view AS subclass_view,
+  elementresult.element_id AS element_id,
+  elementresult.quantification_id AS quantification_id,
+  elementresult.float1 AS signal,
+  elementresult.float2 AS se,
+  elementresult.float3 AS z,
+  elementresult.char1 AS apcall
+FROM elementresult
+WHERE SUBCLASS_VIEW = 'affymetrixgcrma';
+
+CREATE OR REPLACE RULE "_RuleI_affymetrixgcrma" AS
+  ON INSERT TO affymetrixgcrma
+  DO INSTEAD
+    INSERT INTO elementresult
+    (subclass_view,element_id,quantification_id,float1,float2,float3,char1)
+    VALUES
+    ('affymetrixgcrma',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
+
+CREATE OR REPLACE RULE "_RuleU_affymetrixgcrma" AS
+  ON UPDATE TO affymetrixgcrma
+  DO INSTEAD
+    UPDATE elementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    element_id = NEW.element_id,
+    quantification_id = NEW.quantification_id,
+    float1 = NEW.signal,
+    float2 = NEW.se,
+    float3 = NEW.z,
+    char1 = NEW.apcall
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE OR REPLACE RULE "_RuleD_affymetrixgcrma" AS
+  ON DELETE TO affymetrixgcrma
+  DO INSTEAD
+    DELETE FROM elementresult
+    WHERE elementresult_id = OLD.elementresult_id;
+
 CREATE OR REPLACE VIEW elementstat
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,

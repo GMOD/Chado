@@ -43,7 +43,7 @@ create table db (
        primary key (db_id),
        name varchar(255) not null,
        contact_id int not null,
-       foreign key (contact_id) references contact (contact_id) on delete cascade,
+       foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
        description varchar(255) null,
        urlprefix varchar(255) null,
        url varchar(255) null,
@@ -61,7 +61,7 @@ create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
        db_id int not null,
-       foreign key (db_id) references db (db_id) on delete cascade,
+       foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
        accession varchar(255) not null,
        version varchar(255) not null default '',
        description text,
@@ -112,11 +112,11 @@ create table cvterm (
        cvterm_id serial not null,
        primary key (cvterm_id),
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id) on delete cascade,
+       foreign key (cv_id) references cv (cv_id) on delete cascade INITIALLY DEFERRED,
        name varchar(255) not null,
        definition text,
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
 
        unique(name, cv_id)
 );
@@ -134,11 +134,11 @@ create table cvterm_relationship (
        cvterm_relationship_id serial not null,
        primary key (cvterm_relationship_id),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        subject_id int not null,
-       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
        unique(type_id, subject_id, object_id)
 );
@@ -155,13 +155,13 @@ create table cvtermpath (
        cvtermpath_id serial not null,
        primary key (cvtermpath_id),
        type_id int,
-       foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
        subject_id int not null,
-       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id) on delete cascade,
+       foreign key (cv_id) references cv (cv_id) on delete cascade INITIALLY DEFERRED,
        pathdistance int
 );
 create index cvtermpath_idx1 on cvtermpath (type_id);
@@ -179,7 +179,7 @@ create table cvtermsynonym (
        cvtermsynonym_id serial not null,
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        synonym varchar(255) not null,
 
        unique(cvterm_id, synonym)
@@ -195,9 +195,9 @@ create table cvterm_dbxref (
        cvterm_dbxref_id serial not null,
        primary key (cvterm_dbxref_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 
        unique(cvterm_id, dbxref_id)
 );
@@ -212,9 +212,9 @@ create table dbxrefprop (
        dbxrefprop_id serial not null,
        primary key (dbxrefprop_id),
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
 
@@ -256,9 +256,9 @@ create table organism_dbxref (
        organism_dbxref_id serial not null,
        primary key (organism_dbxref_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 
        unique(organism_id,dbxref_id)
 );
@@ -273,9 +273,9 @@ create table organismprop (
        organismprop_id serial not null,
        primary key (organismprop_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
 
@@ -304,7 +304,7 @@ create table pub (
        miniref varchar(255),
        uniquename text not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -332,11 +332,11 @@ create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
        subject_id int not null,
-       foreign key (subject_id) references pub (pub_id) on delete cascade,
+       foreign key (subject_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references pub (pub_id) on delete cascade,
+       foreign key (object_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
        unique(subject_id, object_id, type_id)
 );
@@ -355,9 +355,9 @@ create table pub_dbxref (
        pub_dbxref_id serial not null,
        primary key (pub_dbxref_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 
        unique(pub_id,dbxref_id)
 );
@@ -375,7 +375,7 @@ create table author (
        author_id serial not null,
        primary key (author_id),
        contact_id int null,
-       foreign key (contact_id) references contact (contact_id),
+       foreign key (contact_id) references contact (contact_id) INITIALLY DEFERRED,
        surname varchar(100) not null,
        givennames varchar(100),
        suffix varchar(100),
@@ -394,9 +394,9 @@ create table pub_author (
        pub_author_id serial not null,
        primary key (pub_author_id),
        author_id int not null,
-       foreign key (author_id) references author (author_id) on delete cascade,
+       foreign key (author_id) references author (author_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        rank int not null,
        editor boolean default 'false',
 
@@ -416,9 +416,9 @@ create table pubprop (
        pubprop_id serial not null,
        primary key (pubprop_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null,
        rank integer,
 
@@ -435,16 +435,16 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        name varchar(255),
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	is_analysis boolean not null default 'false',
 -- timeaccessioned and timelastmodified are for handling object accession/
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
@@ -548,9 +548,9 @@ create table featureloc (
        primary key (featureloc_id),
 
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        srcfeature_id int,
-       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
 
        fmin int,
        is_fmin_partial boolean not null default 'false',
@@ -579,9 +579,9 @@ create table feature_pub (
        feature_pub_id serial not null,
        primary key (feature_pub_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique(feature_id, pub_id)
 );
@@ -597,9 +597,9 @@ create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
 
@@ -617,9 +617,9 @@ create table featureprop_pub (
        featureprop_pub_id serial not null,
        primary key (featureprop_pub_id),
        featureprop_id int not null,
-       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique(featureprop_id, pub_id)
 );
@@ -636,9 +636,9 @@ create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
        is_current boolean not null default 'true',
 
        unique(feature_id, dbxref_id)
@@ -666,11 +666,11 @@ create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
        subject_id int not null,
-       foreign key (subject_id) references feature (feature_id) on delete cascade,
+       foreign key (subject_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references feature (feature_id) on delete cascade,
+       foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        rank int,
 
        unique(subject_id, object_id, type_id)
@@ -688,11 +688,11 @@ create table feature_cvterm (
        feature_cvterm_id serial not null,
        primary key (feature_cvterm_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique (feature_id, cvterm_id, pub_id)
 
@@ -711,7 +711,7 @@ create table synonym (
        primary key (synonym_id),
        name varchar(255) not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        synonym_sgml varchar(255) not null,
        unique(name,type_id)
 );
@@ -728,11 +728,11 @@ create table feature_synonym (
        feature_synonym_id serial not null,
        primary key (feature_synonym_id),
        synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        is_current boolean not null default 'true',
        is_internal boolean not null default 'false',
 
@@ -1182,9 +1182,9 @@ create table analysisprop (
     analysisprop_id serial not null,
     primary key (analysisprop_id),
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
 
     unique(analysis_id, type_id, value)
@@ -1253,9 +1253,9 @@ create table analysisfeature (
     analysisfeature_id serial not null,
     primary key (analysisfeature_id),
     feature_id int not null,
-    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     rawscore double precision,
     normscore double precision,
     significance double precision,
@@ -1313,17 +1313,17 @@ create table featurerange (
        featurerange_id serial not null,
        primary key (featurerange_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        leftstartf_id int not null,
-       foreign key (leftstartf_id) references feature (feature_id) on delete cascade,
+       foreign key (leftstartf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        leftendf_id int,
-       foreign key (leftendf_id) references feature (feature_id) on delete set null,
+       foreign key (leftendf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
        rightstartf_id int,
-       foreign key (rightstartf_id) references feature (feature_id) on delete set null,
+       foreign key (rightstartf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
        rightendf_id int not null,
-       foreign key (rightendf_id) references feature (feature_id) on delete cascade,
+       foreign key (rightendf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        rangestr varchar(255)
 );
 create index featurerange_idx1 on featurerange (featuremap_id);
@@ -1342,11 +1342,11 @@ create table featurepos (
        featurepos_id serial not null,
        primary key (featurepos_id),
        featuremap_id serial not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        map_feature_id int not null,
-       foreign key (map_feature_id) references feature (feature_id) on delete cascade,
+       foreign key (map_feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        mappos float not null
 );
 -- map_feature_id links to the feature (map) upon which the feature is
@@ -1364,10 +1364,10 @@ create table featuremap_pub (
        featuremap_pub_id serial not null,
        primary key (featuremap_pub_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade
-);
+ INITIALLY DEFERRED);
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
@@ -1431,9 +1431,9 @@ create table magedocumentation (
     magedocumentation_id serial not null,
 	primary key (magedocumentation_id),
     mageml_id int not null,
-	foreign key (mageml_id) references mageml (mageml_id) on delete cascade,
+	foreign key (mageml_id) references mageml (mageml_id) on delete cascade INITIALLY DEFERRED,
     tableinfo_id int not null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
     row_id int not null,
     mageidentifier varchar(100) not null
 );
@@ -1447,11 +1447,11 @@ create table protocol (
     protocol_id serial not null,
 	primary key (protocol_id),
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     pub_id int null,
-	foreign key (pub_id) references pub (pub_id) on delete set null,
+	foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) not null,
     uri varchar(100) null,
     protocoldescription varchar(4000) null,
@@ -1469,12 +1469,12 @@ create table protocolparam (
     protocolparam_id serial not null,
 	primary key (protocolparam_id),
     protocol_id int not null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete cascade,
+	foreign key (protocol_id) references protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
     name varchar(100) not null,
     datatype_id int null,
-	foreign key (datatype_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (datatype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     unittype_id int null,
-	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     value varchar(100) null
 );
 create index protocolparam_idx1 on protocolparam (protocol_id);
@@ -1497,15 +1497,15 @@ create table arraydesign (
     arraydesign_id serial not null,
 	primary key (arraydesign_id),
     manufacturer_id int not null,
-	foreign key (manufacturer_id) references contact (contact_id) on delete cascade,
+	foreign key (manufacturer_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     platformtype_id int not null,
-	foreign key (platformtype_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (platformtype_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     substratetype_id int null,
-	foreign key (substratetype_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (substratetype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     protocol_id int null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) not null,
     version varchar(50) null,
     description varchar(500) null,
@@ -1532,9 +1532,9 @@ create table arrayprop (
     arrayprop_id serial not null,
 	primary key (arrayprop_id),
     arraydesign_id int not null,
-	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(100) not null
 );
 create index arrayprop_idx1 on arrayprop (arraydesign_id);
@@ -1546,16 +1546,16 @@ create table assay (
     assay_id serial not null,
 	primary key (assay_id),
     arraydesign_id int not null,
-	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     protocol_id int null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     assaydate timestamp null default current_timestamp,
     arrayidentifier varchar(100) null,
     arraybatchidentifier varchar(100) null,
     operator_id int not null,
-	foreign key (operator_id) references contact (contact_id) on delete cascade,
+	foreign key (operator_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) null,
     description varchar(500) null,
     unique(name)
@@ -1571,9 +1571,9 @@ create table assayprop (
     assayprop_id serial not null,
 	primary key (assayprop_id),
     assay_id int not null,
-	foreign key (assay_id) references assay (assay_id) on delete cascade,
+	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(100) not null
 );
 create index assayprop_idx1 on assayprop (assay_id);
@@ -1585,9 +1585,9 @@ create table assay_project (
     assay_project_id serial not null,
         primary key (assay_project_id),
     assay_id int not null,
-        foreign key (assay_id) references assay (assay_id),
+        foreign key (assay_id) references assay (assay_id) INITIALLY DEFERRED,
     project_id int not null,
-        foreign key (project_id) references project (project_id),
+        foreign key (project_id) references project (project_id) INITIALLY DEFERRED,
     unique(assay_id,project_id)
 );
 create index assay_project_idx1 on assay_project (assay_id);
@@ -1599,11 +1599,11 @@ create table biomaterial (
     biomaterial_id serial not null,
 	primary key (biomaterial_id),
     taxon_id int null,
-	foreign key (taxon_id) references organism (organism_id) on delete set null,
+	foreign key (taxon_id) references organism (organism_id) on delete set null INITIALLY DEFERRED,
     biosourceprovider_id int null,
-	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null,
+	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
     dbxref_id varchar(50) null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) null,
     description varchar(500) null,
     unique(name)
@@ -1618,11 +1618,11 @@ create table biomaterial_relationship (
     biomaterial_relationship_id serial not null,
         primary key (biomaterial_relationship_id),
     subject_id int not null,
-        foreign key (subject_id) references biomaterial (biomaterial_id),
+        foreign key (subject_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
     type_id int not null,
-        foreign key (type_id) references cvterm (cvterm_id),
+        foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     object_id int not null,
-        foreign key (object_id) references biomaterial (biomaterial_id),
+        foreign key (object_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
     unique(subject_id,type_id,object_id)
 );
 create index biomaterial_relationship_idx1 on biomaterial_relationship (subject_id);
@@ -1635,9 +1635,9 @@ create table biomaterialprop (
     biomaterialprop_id serial not null,
 	primary key (biomaterialprop_id),
     biomaterial_id int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(100) null,
     unique(biomaterial_id,type_id,value)
 );
@@ -1651,11 +1651,11 @@ create table treatment (
 	primary key (treatment_id),
     rank int not null default 0,
     biomaterial_id int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     protocol_id int null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) null
 );
 create index treatment_idx1 on treatment (biomaterial_id);
@@ -1668,11 +1668,11 @@ create table biomaterial_treatment (
     biomaterial_treatment_id serial not null,
         primary key (biomaterial_treatment_id),
     biomaterial_id int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     treatment_id int not null,
-	foreign key (treatment_id) references treatment (treatment_id) on delete cascade,
+	foreign key (treatment_id) references treatment (treatment_id) on delete cascade INITIALLY DEFERRED,
     unittype_id int null,
-	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     value float(15) null,
     rank int not null default 0
 );
@@ -1686,11 +1686,11 @@ create table assay_biomaterial (
     assay_biomaterial_id serial not null,
 	primary key (assay_biomaterial_id),
     assay_id int not null,
-	foreign key (assay_id) references assay (assay_id) on delete cascade,
+	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     biomaterial_id int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     channel_id int null,
-	foreign key (channel_id) references channel (channel_id) on delete set null,
+	foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
     unique(assay_id,biomaterial_id,channel_id)
 );
 create index assay_biomaterial_idx1 on assay_biomaterial (assay_id);
@@ -1703,11 +1703,11 @@ create table acquisition (
     acquisition_id serial not null,
 	primary key (acquisition_id),
     assay_id int not null,
-	foreign key (assay_id) references  assay (assay_id) on delete cascade,
+	foreign key (assay_id) references  assay (assay_id) on delete cascade INITIALLY DEFERRED,
     protocol_id int null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     channel_id int null,
-	foreign key (channel_id) references channel (channel_id) on delete set null,
+	foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
     acquisitiondate timestamp null default current_timestamp,
     name varchar(100) null,
     uri varchar(255) null,
@@ -1723,9 +1723,9 @@ create table acquisitionprop (
     acquisitionprop_id serial not null,
 	primary key (acquisitionprop_id),
     acquisition_id int not null,
-	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
+	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(50) not null
 );
 create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
@@ -1737,11 +1737,11 @@ create table acquisition_relationship (
     acquisition_relationship_id serial not null,
 	primary key (acquisition_relationship_id),
     subject_id int not null,
-	foreign key (subject_id) references acquisition (acquisition_id) on delete cascade,
+	foreign key (subject_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     object_id int not null,
-	foreign key (object_id) references acquisition (acquisition_id) on delete cascade,
+	foreign key (object_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     unique(subject_id,type_id,object_id)
 );
 create index acquisition_relationship_idx1 on acquisition_relationship (subject_id);
@@ -1754,13 +1754,13 @@ create table quantification (
     quantification_id serial not null,
 	primary key (quantification_id),
     acquisition_id int not null,
-	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
+	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     operator_id int null,
-	foreign key (operator_id) references contact (contact_id) on delete set null,
+	foreign key (operator_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
     protocol_id int null,
-	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     analysis_id int not null,
-	foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+	foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     quantificationdate timestamp null default current_timestamp,
     name varchar(100) null,
     uri varchar(500) null,
@@ -1777,9 +1777,9 @@ create table quantificationprop (
     quantificationprop_id serial not null,
 	primary key (quantificationprop_id),
     quantification_id int not null,
-	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(50) not null
 );
 create index quantificationprop_idx1 on quantificationprop (quantification_id);
@@ -1791,11 +1791,11 @@ create table quantification_relationship (
     quantification_relationship_id serial not null,
 	primary key (quantification_relationship_id),
     subject_id int not null,
-	foreign key (subject_id) references quantification (quantification_id) on delete cascade,
+	foreign key (subject_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     object_id int not null,
-	foreign key (object_id) references quantification (quantification_id) on delete cascade,
+	foreign key (object_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     unique(subject_id,type_id,object_id)
 );
 create index quantification_relationship_idx1 on quantification_relationship (subject_id);
@@ -1808,11 +1808,11 @@ create table control (
     control_id serial not null,
 	primary key (control_id),
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     assay_id int not null,
-	foreign key (assay_id) references assay (assay_id) on delete cascade,
+	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     tableinfo_id int not null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
     row_id int not null,
     name varchar(100) null,
     value varchar(255) null
@@ -1828,13 +1828,13 @@ create table element (
     element_id serial not null,
 	primary key (element_id),
     feature_id int null,
-	foreign key (feature_id) references feature (feature_id) on delete set null,
+	foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
     arraydesign_id int not null,
-	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     subclass_view varchar(27) not null,
     tinyint1 int null,
     smallint1 int null,
@@ -1864,9 +1864,9 @@ create table elementresult (
     elementresult_id serial not null,
 	primary key (elementresult_id),
     element_id int not null,
-	foreign key (element_id) references element (element_id) on delete cascade,
+	foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
     quantification_id int not null,
-	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     subclass_view varchar(27) not null,
     foreground float(15) null,
     background float(15) null,
@@ -1917,11 +1917,11 @@ create table elementresult_relationship (
     elementresult_relationship_id serial not null,
         primary key (elementresult_relationship_id),
     subject_id int not null,
-        foreign key (subject_id) references elementresult (elementresult_id),
+        foreign key (subject_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
     type_id int not null,
-        foreign key (type_id) references cvterm (cvterm_id),
+        foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     object_id int not null,
-        foreign key (object_id) references elementresult (elementresult_id),
+        foreign key (object_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
     value varchar(255),
     unique(subject_id,type_id,object_id,value)
 );
@@ -1936,11 +1936,11 @@ create table study (
     study_id serial not null,
 	primary key (study_id),
     contact_id int not null,
-	foreign key (contact_id) references contact (contact_id) on delete cascade,
+	foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     pub_id int null,
-	foreign key (pub_id) references pub (pub_id) on delete set null,
+	foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) not null,
     description varchar(4000) null,
     unique(name)
@@ -1955,9 +1955,9 @@ create table study_assay (
     study_assay_id serial not null,
 	primary key (study_assay_id),
     study_id int not null,
-	foreign key (study_id) references study (study_id) on delete cascade,
+	foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
     assay_id int not null,
-	foreign key (assay_id) references assay (assay_id) on delete cascade,
+	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     unique(study_id,assay_id)
 );
 create index study_assay_idx1 on study_assay (study_id);
@@ -1969,7 +1969,7 @@ create table studydesign (
     studydesign_id serial not null,
 	primary key (studydesign_id),
     study_id int not null,
-	foreign key (study_id) references study (study_id) on delete cascade,
+	foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
     description varchar(4000) null
 );
 create index studydesign_idx1 on studydesign (study_id);
@@ -1980,9 +1980,9 @@ create table studydesignprop (
     studydesignprop_id serial not null,
 	primary key (studydesignprop_id),
     studydesign_id int not null,
-	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
+	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value varchar(500) not null
 );
 create index studydesignprop_idx1 on studydesignprop (studydesign_id);
@@ -1994,9 +1994,9 @@ create table studyfactor (
     studyfactor_id serial not null,
 	primary key (studyfactor_id),
     studydesign_id int not null,
-	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
+	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     name varchar(100) not null,
     description varchar(500) null
 );
@@ -2009,9 +2009,9 @@ create table studyfactorvalue (
     studyfactorvalue_id serial not null,
 	primary key (studyfactorvalue_id),
     studyfactor_id int not null,
-	foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade,
+	foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade INITIALLY DEFERRED,
     assay_id int not null,
-	foreign key (assay_id) references assay (assay_id) on delete cascade,
+	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     factorvalue varchar(100) not null,
     name varchar(100) null
 );
