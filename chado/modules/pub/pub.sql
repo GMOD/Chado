@@ -87,9 +87,9 @@ create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 create table author (
        author_id serial not null,
        primary key (author_id),
-       surname varchar(255) not null,
-       givennames varchar(255),
-       suffix varchar(255),
+       surname varchar(100) not null,
+       givennames varchar(100),
+       suffix varchar(100),
 
        unique(surname,givennames,suffix)
 );

@@ -1,0 +1,65 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Feb 24 19:14:36 2003
+--
+
+--
+-- Table: featurerange
+--
+CREATE TABLE featurerange (
+  featurerange_id int NOT NULL,
+  featuremap_id int NOT NULL,
+  feature_id int NOT NULL,
+  leftstartf_id int NOT NULL,
+  leftendf_id int,
+  rightstartf_id int,
+  rightendf_id int NOT NULL,
+  rangestr varchar(255),
+  PRIMARY KEY  (featurerange_id),
+  UNIQUE KEY featurerange_idx1 (featuremap_id),
+  UNIQUE KEY featurerange_idx2 (feature_id),
+  UNIQUE KEY featurerange_idx3 (leftstartf_id),
+  UNIQUE KEY featurerange_idx4 (leftendf_id),
+  UNIQUE KEY featurerange_idx5 (rightstartf_id),
+  UNIQUE KEY featurerange_idx6 (rightendf_id)
+);
+
+--
+-- Table: featurepos
+--
+CREATE TABLE featurepos (
+  featurepos_id int NOT NULL,
+  featuremap_id int NOT NULL,
+  feature_id int NOT NULL,
+  map_feature_id int NOT NULL,
+  mappos float NOT NULL,
+  PRIMARY KEY  (featurepos_id),
+  UNIQUE KEY featurepos_idx1 (featuremap_id),
+  UNIQUE KEY featurepos_idx2 (feature_id),
+  UNIQUE KEY featurepos_idx3 (map_feature_id)
+);
+
+--
+-- Table: featuremap_pub
+--
+CREATE TABLE featuremap_pub (
+  featuremap_pub_id int NOT NULL,
+  featuremap_id int NOT NULL,
+  pub_id int NOT NULL,
+  PRIMARY KEY  (featuremap_pub_id),
+  UNIQUE KEY featuremap_pub_idx1 (featuremap_id),
+  UNIQUE KEY featuremap_pub_idx2 (pub_id)
+);
+
+--
+-- Table: featuremap
+--
+CREATE TABLE featuremap (
+  featuremap_id int NOT NULL,
+  mapname varchar(255),
+  mapdesc varchar(255),
+  mapunit varchar(255),
+  PRIMARY KEY  (featuremap_id),
+  UNIQUE KEY  (mapname)
+);
+

@@ -1,0 +1,78 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Feb 24 19:10:34 2003
+--
+
+--
+-- Table: eimage
+--
+CREATE TABLE eimage (
+  eimage_id int NOT NULL,
+  eimage_data text,
+  eimage_type varchar(255) NOT NULL,
+  image_uri varchar(255),
+  PRIMARY KEY  (eimage_id)
+);
+
+--
+-- Table: expression_pub
+--
+CREATE TABLE expression_pub (
+  expression_pub_id int NOT NULL,
+  expression_id int NOT NULL,
+  pub_id int NOT NULL,
+  PRIMARY KEY  (expression_pub_id),
+  UNIQUE KEY  (expression_id, pub_id),
+  UNIQUE KEY expression_pub_idx1 (expression_id),
+  UNIQUE KEY expression_pub_idx2 (pub_id)
+);
+
+--
+-- Table: feature_expression
+--
+CREATE TABLE feature_expression (
+  feature_expression_id int NOT NULL,
+  expression_id int NOT NULL,
+  feature_id int NOT NULL,
+  PRIMARY KEY  (feature_expression_id),
+  UNIQUE KEY  (expression_id, feature_id),
+  UNIQUE KEY feature_expression_idx1 (expression_id),
+  UNIQUE KEY feature_expression_idx2 (feature_id)
+);
+
+--
+-- Table: expression
+--
+CREATE TABLE expression (
+  expression_id int NOT NULL,
+  description text,
+  PRIMARY KEY  (expression_id)
+);
+
+--
+-- Table: expression_image
+--
+CREATE TABLE expression_image (
+  expression_image_id int NOT NULL,
+  expression_id int NOT NULL,
+  eimage_id int NOT NULL,
+  PRIMARY KEY  (expression_image_id),
+  UNIQUE KEY  (expression_id, eimage_id),
+  UNIQUE KEY expression_image_idx1 (expression_id),
+  UNIQUE KEY expression_image_idx2 (eimage_id)
+);
+
+--
+-- Table: expression_cvterm
+--
+CREATE TABLE expression_cvterm (
+  expression_cvterm_id int NOT NULL,
+  expression_id int NOT NULL,
+  cvterm_id int NOT NULL,
+  rank int NOT NULL,
+  PRIMARY KEY  (expression_cvterm_id),
+  UNIQUE KEY  (expression_id, cvterm_id),
+  UNIQUE KEY expression_cvterm_idx1 (expression_id),
+  UNIQUE KEY expression_cvterm_idx2 (cvterm_id)
+);
+

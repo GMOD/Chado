@@ -1,0 +1,18 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Feb 24 19:13:03 2003
+--
+
+--
+-- Table: dbxref
+--
+CREATE TABLE dbxref (
+  dbxref_id int NOT NULL,
+  dbname varchar(85) NOT NULL,
+  accession varchar(85) NOT NULL,
+  version varchar(85) NOT NULL DEFAULT '',
+  dbxrefdescription text,
+  PRIMARY KEY  (dbxref_id),
+  UNIQUE KEY  (dbname, accession, version)
+);
+

@@ -1,0 +1,69 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Feb 24 19:13:41 2003
+--
+
+--
+-- Table: phenotype_cvterm
+--
+CREATE TABLE phenotype_cvterm (
+  phenotype_cvterm_id int NOT NULL,
+  phenotype_id int NOT NULL,
+  cvterm_id int NOT NULL,
+  prank int NOT NULL,
+  PRIMARY KEY  (phenotype_cvterm_id),
+  UNIQUE KEY  (phenotype_id, cvterm_id, prank),
+  UNIQUE KEY phenotype_cvterm_idx1 (phenotype_id),
+  UNIQUE KEY phenotype_cvterm_idx2 (cvterm_id)
+);
+
+--
+-- Table: phenotype
+--
+CREATE TABLE phenotype (
+  phenotype_id int NOT NULL,
+  description text,
+  statement_type int NOT NULL,
+  pub_id int NOT NULL,
+  background_genotype_id int,
+  PRIMARY KEY  (phenotype_id),
+  UNIQUE KEY phenotype_idx1 (statement_type),
+  UNIQUE KEY phenotype_idx2 (pub_id),
+  UNIQUE KEY phenotype_idx3 (background_genotype_id)
+);
+
+--
+-- Table: feature_phenotype
+--
+CREATE TABLE feature_phenotype (
+  feature_phenotype_id int NOT NULL,
+  feature_id int NOT NULL,
+  phenotype_id int NOT NULL,
+  PRIMARY KEY  (feature_phenotype_id),
+  UNIQUE KEY  (feature_id, phenotype_id),
+  UNIQUE KEY feature_phenotype_idx1 (feature_id),
+  UNIQUE KEY feature_phenotype_idx2 (phenotype_id)
+);
+
+--
+-- Table: genotype
+--
+CREATE TABLE genotype (
+  genotype_id int NOT NULL,
+  description varchar(255),
+  PRIMARY KEY  (genotype_id)
+);
+
+--
+-- Table: feature_genotype
+--
+CREATE TABLE feature_genotype (
+  feature_genotype_id int NOT NULL,
+  feature_id int NOT NULL,
+  genotype_id int NOT NULL,
+  PRIMARY KEY  (feature_genotype_id),
+  UNIQUE KEY  (feature_id, genotype_id),
+  UNIQUE KEY feature_genotype_idx1 (feature_id),
+  UNIQUE KEY feature_genotype_idx2 (genotype_id)
+);
+
