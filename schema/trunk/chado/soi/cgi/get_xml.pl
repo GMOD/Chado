@@ -42,7 +42,7 @@ if ($type) {
     if (@{$features || []}) {
         my $arm = $ad->get_f({range=>$range}, {feature_types=>'chromosome_arm',noauxillaries=>1});
         my ($fmin, $fmax) = ($range->{fmin},$range->{fmax});
-        my ($new_f, $segs) = $arm->stitch_child_segments($fmin,$fmax);
+        my ($segs, $new_f) = $arm->stitch_child_segments($fmin,$fmax);
         $arm->hash->{residues} = "";
         my $rsets = $ad->get_results({range=>$range});
         map{$_->transform($new_f)}(@{$features},@{$rsets || []}, @{$segs || []});
@@ -67,7 +67,8 @@ if ($type) {
             $g_path->nodes([$span]);
             $span->secondary_nodes([SOI::Feature->new({src_seq=>$g_path->name,fmin=>0,fmax=>$g_path->length,strand=>1})]);
         }@{$segs || []};
-        $arm->nodes([@{$arm->nodes || []}, @{$features}, $g_an, @{$ans || []}]);
+        push @$ans, $g_an;
+        $arm->nodes([@{$arm->nodes || []}, @{$features}, @{$ans || []}]);
         $arm->to_game_xml;
     }
     else {
