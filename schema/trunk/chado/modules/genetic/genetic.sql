@@ -192,7 +192,7 @@
 -- uniquename          : a human-readable unique identifier
 --
 CREATE TABLE gcontext (
-    gcontext_id          SERIAL       NOT NULL,
+    gcontext_id          SERIAL PRIMARY KEY NOT NULL,
     uniquename           VARCHAR(255) NOT NULL,
     description          TEXT,
     pub_id               INTEGER      NOT NULL REFERENCES pub(pub_id)
@@ -209,7 +209,7 @@ CREATE TABLE gcontext (
 -- 
 --
 CREATE TABLE gcontext_relationship (
-    gcontext_relationship_id SERIAL       NOT NULL,
+    gcontext_relationship_id SERIAL PRIMARY KEY NOT NULL,
     subjectgc_id         INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     objectgc_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
@@ -242,7 +242,7 @@ CREATE TABLE feature_gcontext (
     gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     chromosome_id        INTEGER      REFERENCES feature(feature_id),
     rank                 INTEGER      NOT NULL,
-    group                INTEGER      NOT NULL,
+    cgroup               INTEGER      NOT NULL,
     cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
 );
 -- ****************************************
@@ -281,7 +281,7 @@ CREATE TABLE gcontextprop (
 -- assay_id            : e.g. name of specific test
 --
 CREATE TABLE phenstatement (
-    phenstatement_id     SERIAL       NOT NULL,
+    phenstatement_id     SERIAL PRIMARY KEY NOT NULL,
     gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     dbxref_id            INTEGER      NOT NULL REFERENCES dbxref(dbxref_id),
     observable_id        INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
@@ -314,7 +314,7 @@ CREATE TABLE phendesc (
 -- 
 --
 CREATE TABLE phenstatement_relationship (
-    phenstatement_relationship_id SERIAL       NOT NULL,
+    phenstatement_relationship_id SERIAL PRIMARY KEY NOT NULL,
     subject_id           INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
     object_id            INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
     type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
