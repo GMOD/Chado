@@ -488,11 +488,13 @@ create table elementresult_relationship (
         foreign key (type_id) references cvterm (cvterm_id),
     object_id int not null,
         foreign key (object_id) references elementresult (elementresult_id),
-    unique(subject_id,type_id,object_id)
+    value varchar(255),
+    unique(subject_id,type_id,object_id,value)
 );
 create index elementresult_relationship_idx1 on elementresult_relationship (subject_id);
 create index elementresult_relationship_idx2 on elementresult_relationship (type_id);
 create index elementresult_relationship_idx3 on elementresult_relationship (object_id);
+create index elementresult_relationship_idx4 on elementresult_relationship (value);
 
 COMMENT ON TABLE elementresult_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
 

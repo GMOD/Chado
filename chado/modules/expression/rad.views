@@ -166,7 +166,52 @@ CREATE RULE "_RuleD_affymetrixdchip" AS
   DO INSTEAD
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
-    
+
+CREATE VIEW affymetrixdchipcomposite
+AS SELECT
+  elementresult.elementresult_id AS elementresult_id,
+  elementresult.subclass_view AS subclass_view,
+  elementresult.element_id AS element_id,
+  elementresult.float1 AS mean,
+  elementresult.float2 AS median,
+  elementresult.float3 AS quartile1,
+  elementresult.float4 AS quartile3,
+  elementresult.float5 AS sd,
+  elementresult.int1   AS n,
+  elementresult.int2   AS version
+FROM elementresult
+WHERE SUBCLASS_VIEW = 'affymetrixdchipcomposite';
+
+CREATE RULE "_RuleI_affymetrixdchipcomposite" AS
+  ON INSERT TO affymetrixdchipcomposite
+  DO INSTEAD
+    INSERT INTO elementresult
+    (subclass_view,element_id,quantification_id,float1,float2,float3,float4,float5,int1,int2)
+    VALUES
+    (NEW.subclass_view,NEW.element_id,1,NEW.mean,NEW.median,NEW.quartile1,NEW.quartile3,NEW.sd,NEW.n,NEW.version);
+
+CREATE RULE "_RuleU_affymetrixdchipcomposite" AS
+  ON UPDATE TO affymetrixdchipcomposite
+  DO INSTEAD
+    UPDATE elementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    element_id = NEW.element_id,
+    float1 = NEW.mean,
+    float2 = NEW.median,
+    float3 = NEW.quartile1,
+    float4 = NEW.quartile3,
+    float5 = NEW.sd,
+    int1   = NEW.n,
+    int1   = NEW.version
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE RULE "_RuleD_affymetrixdchipcomposite" AS
+  ON DELETE TO affymetrixdchipcomposite
+  DO INSTEAD
+    DELETE FROM elementresult
+    WHERE elementresult_id = OLD.elementresult_id;
+
 
 --CREATE VIEW &&rad3..ARRAYVISIONELEMENTRESULT
 --AS SELECT
