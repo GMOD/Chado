@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.12 2002-12-03 08:05:46 cmungall Exp $
+## $Id: companalysis.sql,v 1.13 2002-12-23 20:13:13 cwiel Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -73,7 +73,9 @@ create table analysisprop (
     pval text,
 
     timeentered timestamp not null default current_timestamp,
-    timelastmod timestamp not null default current_timestamp
+    timelastmod timestamp not null default current_timestamp,
+    
+    unique(analysis_id, pkey_id, pval)
 );
 
 -- ================================================
@@ -143,7 +145,7 @@ create table analysisfeature (
     rawscore double precision,
     normscore double precision,
     significance double precision,
-    identity double precision
+    identity double precision,
 
     unique (feature_id)
 );
