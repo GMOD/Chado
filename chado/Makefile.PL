@@ -105,7 +105,7 @@ if ($rebuild_complete) {
 
 WriteMakefile(
     'NAME'		=> 'chado',
-    'PREREQ_PM'		=> { SQL::Translator   => 0.03,
+    'PREREQ_PM'		=> { SQL::Translator   => 0.04,
                              Class::DBI        => 0.94,
                              Class::DBI::Pager => 0,
                              Class::DBI::Pg    => 0.02,
