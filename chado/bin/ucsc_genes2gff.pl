@@ -282,7 +282,7 @@ sub parseLocAcc {
 
     push @{ $loc2mrna{$loc} }, $gene;
 
-	$xref->{$gene}{'db:genbank:protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-');
+	$xref->{$gene}{'db:genbank:protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-' || $protein !~ /^[A-Z]{3}\d/ || $protein =~ /_/);
   }
   close ANNFILE;
 }
@@ -557,7 +557,7 @@ sub parseGenbank {
     chomp;
     next if /^#/;
     my ($mrna, $prot) = split /\t/;
-    $xref->{$mrna}{'db:genbank:protein'}{$prot} = 1;
+    $xref->{$mrna}{'db:genbank:protein'}{$prot} = 1 if $prot =~ /^[A-Z]{3}\d/ and $prot !~ /_/;
 #    $annotations->{$mrna} = $prot;
   }
   close ANNFILE;
@@ -594,13 +594,17 @@ sub parseKgXref {
 
     push @{ $ref2mrna{$refseq} }, $kgID;
 
-    $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID;
-    $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA;
+    #http://www.ncbi.nlm.nih.gov/RefSeq/key.html#accessions
+    #http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html#AccessionB
+    #http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html#ProteinIDB
+
+    $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID and $kgID =~ /^[A-Z]{1,2}\d/ and $kgID !~ /_/;
+    $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA and $mRNA =~ /^[A-Z]{1,2}\d/ and $mRNA !~ /_/ and $mRNA ne $kgID;
     $xref->{$key}{'db:swissprot'}{$spID}                = 1 if $spID;
-    $xref->{$key}{'db:swissprot:display'}{$spDisplayID} = 1 if $spDisplayID;
+    $xref->{$key}{'db:swissprot:display'}{$spDisplayID} = 1 if $spDisplayID and $spDisplayID ne $spID;
     $xref->{$key}{'Alias'}{$geneSymbol}                 = 1 if $geneSymbol;
-    $xref->{$key}{'db:refseq:mrna'}{$refseq}            = 1 if $refseq;
-    $xref->{$key}{'db:refseq:protein'}{$protAcc}        = 1 if $protAcc;
+    $xref->{$key}{'db:refseq:mrna'}{$refseq}            = 1 if $refseq and $refseq =~ /^(NC|NG|NM|NR|NT|NW|XM|XR|NZ)_/;
+    $xref->{$key}{'db:refseq:protein'}{$protAcc}        = 1 if $protAcc and $protAcc =~ /^(NP|XP|ZP)_/;
     $xref->{$key}{'description'}{$description}          = 1 if $description;
   }
   close(ANNFILE);
