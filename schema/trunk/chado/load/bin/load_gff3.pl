@@ -115,6 +115,7 @@ Chado::LoadDBI->init();
 my %typemap;
 
 my %feature = ();
+my %featureloc_rank = ();
 my %srcfeature = ();
 my %dbxref = ();
 
@@ -206,7 +207,7 @@ die "unable to find or create a pub entry in the pub table"
     unless $pub;
 
 while(my $gff_segment = $gffio->next_segment()) {
-warn $gff_segment;
+#warn $gff_segment;
   my $segment = Chado::Feature->search({name => $gff_segment->display_id});
   if(!$segment){
 
@@ -267,7 +268,7 @@ while(my $gff_feature = $gffio->next_feature()) {
     ($chado_type) = $typemap{$gff_feature->primary_tag}; 
   }
 
-  die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
+ die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
 
 
   ## GFF features are base-oriented, so we must add 1 to the diff
@@ -316,9 +317,11 @@ while(my $gff_feature = $gffio->next_feature()) {
       fmax          => $fmax,
       strand        => $gff_feature->strand,
       phase         => $frame,
+      rank          => $featureloc_rank{$chado_feature->id} || 0,
       srcfeature_id => $srcfeature{$id}->id,
                                       });
 
+  $featureloc_rank{$chado_feature->id}++;
   $feature{$id} = $chado_feature if $gff_feature->has_tag('ID');
 
   if($gff_feature->has_tag('ID')){
