@@ -837,17 +837,21 @@ qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?}
                 $f->dbi_commit;
 
                 my $dna       = $seq->seq;
+                undef $seq;                     #get this thing out of here ASAP, it's using memory
+
                 my $shredsize = 100_000_000;    #don't increase this...
                 my $offset    = 0;
                 my $dnalen    = length($dna);
 
                 while ( $offset < $dnalen ) {
                     my $shred = substr( $dna, $offset, $shredsize );
+                    $progress->message("${offset}bp loaded") if $offset > 0;
                     $sth->execute( $shred, $f->id );
 
                     $offset += $shredsize;
                 }
 
+                $progress->message("${dnalen}bp loaded");
                 $f->update;
                 $f->dbi_commit;
 
