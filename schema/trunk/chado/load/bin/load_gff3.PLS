@@ -746,7 +746,13 @@ sub initialize {
         cache_cvterm($n);
     }
 
-    ($chado_organism) = Chado::Organism->search( common_name => $ORGANISM );
+    ($chado_organism) = Chado::Organism->search( common_name => lc($ORGANISM))
+        unless $chado_organism;
+    ($chado_organism) = Chado::Organism->search( abbreviation => ucfirst($ORGANISM))
+        unless($chado_organism);
+    ($chado_organism) = Chado::Organism->search( genus => $ORGANISM  )
+        unless($chado_organism);
+
     ($chado_db)       = Chado::Db->search( name              => $SRC_DB );
     ($nullpub)        = Chado::Pub->search( miniref          => 'null' );
     ($nullcontact)    = Chado::Contact->search( name         => 'null' );
