@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.30 2004-07-16 19:44:17 scottcain Exp $
+$Id: INSTALL,v 1.31 2004-07-26 17:08:49 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -69,7 +69,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
 
   Apache (1.3.*)
 
-  BioPerl (1.4 or bioperl-live)
+  BioPerl (bioperl-live or greater than 1.4)
           (-microarray 0.1 --required for microarray data)
 
   Standard Perl modules:

@@ -71,7 +71,6 @@ modules/expression/readme
 modules/extension.modules
 modules/function.modules
 modules/general/general.sql
-modules/general/metadata.sql
 modules/genetic/genetic.sql
 modules/idb-full.modules
 modules/map/map.sql
