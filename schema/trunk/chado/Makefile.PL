@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.68 2004-07-16 18:24:48 scottcain Exp $
+# $Id: Makefile.PL,v 1.69 2004-07-16 19:44:17 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -456,10 +456,17 @@ else {
   warn "Template '$config_template' doesn't exist\n";
 }
 
+#create load/log/ if it doesn't exist already
+if (! (-e 'load/logs') ) {
+    mkdir ('load/logs', 0777) or die "unable to mkdir load/logs: $!\n";
+}
+
 my $complete_sql;
 if ($O{'SIMPLE'} =~ /^[Yy]/) {
-    system(  $PERL, 'bin/AutoDBI.PL');
-    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
+    system(  $PERL, 'bin/AutoDBI.PL') == 0
+        or die "unable to run bin/AutoDBI.PL: $!\n";
+    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
+        or die "unable to create Build from load/Build.PL: $!\n";
 }
 else {
 

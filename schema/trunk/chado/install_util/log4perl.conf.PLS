@@ -58,7 +58,7 @@ log4perl.appender.Turnkey_Render.layout.ConversionPattern       =%c - [%d{HH:mm}
 );
 
 if (-e '/etc/log4perl.conf') {
-    warn "You appear to already have a log4perl.conf file in /etc\n";
+    warn "\n\nYou appear to already have a log4perl.conf file in /etc\n";
     warn "Append the following to your conf file:\n";
     warn "#--------------------------------------------------------------#\n";
     warn "$conf_text\n";
