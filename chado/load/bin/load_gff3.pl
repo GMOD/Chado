@@ -107,7 +107,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $SRC_DB, $GFFFILE);
+my ($ORGANISM, $SRC_DB, $GFFFILE, $CACHE_SIZE);
 
 GetOptions('organism:s'       => \$ORGANISM,
            'srcdb:s'          => \$SRC_DB,
