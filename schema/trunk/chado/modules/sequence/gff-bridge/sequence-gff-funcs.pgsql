@@ -13,18 +13,22 @@ UNION
 SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
-UNION
+--UNION
 --SELECT feature_id, ''expression'' AS type, s.description AS attribute
 --FROM expression s, feature_expression fs
 --WHERE fs.feature_id= $1 AND fs.expression_id = s.expression_id
---UNION
-SELECT feature_id, ''genotype'' AS type, s.description AS attribute
-FROM genotype s, feature_genotype fs
-WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
 UNION
-SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
-FROM phenotype s, feature_phenotype fs
-WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
+SELECT fg.feature_id, ''genotype'' AS type, g.uniquename||'': ''||g.description AS attribute
+FROM gcontext g, feature_gcontext fg
+WHERE fg.feature_id= $1 AND g.gcontext_id = fg.gcontext_id
+--UNION
+--SELECT feature_id, ''genotype'' AS type, s.description AS attribute
+--FROM genotype s, feature_genotype fs
+--WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
+--UNION
+--SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
+--FROM phenotype s, feature_phenotype fs
+--WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
 UNION
 SELECT feature_id, ''synonym'' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs
