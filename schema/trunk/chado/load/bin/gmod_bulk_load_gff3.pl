@@ -2,7 +2,8 @@
 use strict;
 use DBI;
 use Chado::LoadDBI;
-use Bio::Tools::GFF;
+#use Bio::Tools::GFF;
+use Bio::FeatureIO;
 use Getopt::Long;
 
 # parents come before features
@@ -252,15 +253,17 @@ open SYN,   ">$files{synonym}";
 open FS,    ">$files{feature_synonym}";
 open FDBX,  ">$files{feature_dbxref}";
 
-my $gffio = Bio::Tools::GFF->new(-fh => \*STDIN, -gff_version => 3);
+my $gffio = Bio::FeatureIO->new(-fh => \*STDIN , -format => 'gff');
 
 while(my $feature = $gffio->next_feature()){
-  my $type = $type{$feature->primary_tag};
+  my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+
+  my $type = $type{$featuretype};
   if(!$type){
-    ($type) = Chado::Cvterm->search( name => $feature->primary_tag );
-    $type{$feature->primary_tag} = $type->id;
+    ($type) = Chado::Cvterm->search( name => $featuretype );
+    $type{$featuretype} = $type->id;
   }
-  die "no cvterm for ".$feature->primary_tag unless $type;
+  die "no cvterm for ".$featuretype unless $type;
 
   my $src = $src{$feature->seq_id};
   if(!$src){
@@ -284,9 +287,9 @@ while(my $feature = $gffio->next_feature()){
   }
   die "no feature for ".$feature->seq_id unless $src;
 
-  if($feature->has_tag('Parent')){
+  if($feature->annotation->get_Annotations('Parent')){
     my $pname = undef;
-    my($pname) = $feature->get_tag_values('Parent');
+    my($pname) = ($feature->annotation->get_Annotations('Parent'))[0]->value;
     my $parent = $src{$pname};
     if(!$parent){
       ($parent) = Chado::Feature->search( uniquename => $pname )
@@ -299,8 +302,11 @@ while(my $feature = $gffio->next_feature()){
     $nextfeaturerel++;
   }
 
-  my($name) = $feature->has_tag('Name') ? $feature->get_tag_values('Name') : '\N';
-  my($uniquename) = $feature->has_tag('ID') ? $feature->get_tag_values('ID') : $nextfeature;
+  my($name) = ($feature->annotation->get_Annotations('Name'))[0] || '\N';
+  my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || $nextfeature;
+  $name = $name->value if ref($name);
+  $uniquename = $uniquename->value if ref($uniquename);
+
   #my $uniquename = $nextfeature;
   $src{$uniquename} = $nextfeature;
   print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type)),"\n";
@@ -312,10 +318,8 @@ while(my $feature = $gffio->next_feature()){
 
   print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $frame)),"\n";
 
-  if ($feature->has_tag('Note') or $feature->has_tag('note')) {
-    my @notes;
-    push @notes, $feature->get_tag_values('Note') if $feature->has_tag('Note');
-    push @notes, $feature->get_tag_values('note') if $feature->has_tag('note');
+  if ($feature->annotation->get_Annotations('Note')) {
+    my @notes = map {$_->value} $feature->annotation->get_Annotations('Note');
     my $rank = 0;
     foreach my $note (@notes) {
 
@@ -329,7 +333,7 @@ while(my $feature = $gffio->next_feature()){
     }
   }
 
-  my $source = $feature->source_tag;
+  my $source = $feature->source;
   if ( $source_success && $source && $source ne '.') {
     unless ($gff_source_db) {
       ($gff_source_db) = Chado::Db->search({ name => 'GFF_source' });
@@ -351,8 +355,8 @@ while(my $feature = $gffio->next_feature()){
     }
   }
 
-  if ($feature->has_tag('Ontology_term')) {
-    my @cvterms = $feature->get_tag_values('Ontology_term');
+  if ($feature->annotation->get_Annotations('Ontology_term')) {
+    my @cvterms = map {$_->name} $feature->annotation->get_Annotations('Ontology_term');
     my %count;
     my @ucvterms = grep {++$count{$_} < 2} @cvterms;
     foreach my $term (@ucvterms) {
@@ -374,8 +378,8 @@ while(my $feature = $gffio->next_feature()){
   }
 
   my @aliases;
-  if ($feature->has_tag('Alias')) {
-    @aliases =   $feature->get_tag_values('Alias');
+  if ($feature->annotation->get_Annotations('Alias')) {
+    @aliases = map {$_->value} $feature->annotation->get_Annotations('Alias');
   }
   if ($name ne '\N') {
     push @aliases, $name;
@@ -449,7 +453,6 @@ close FCV;
 close SYN;
 close FS;
 close FDBX;
-
 
 foreach my $table (@tables) {
     copy_from_stdin($db,$table,
