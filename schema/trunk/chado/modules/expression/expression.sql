@@ -55,6 +55,9 @@ create index feature_expression_idx2 on feature_expression (feature_id);
 -- parts *always* from different vocabularies in proforma.CV?   If not,
 -- we'll need to have some kind of type qualifier telling us whether the
 -- cvterm used is <t>, <a>, or <p>
+-- yes we should have a type qualifier as a cv term can be from diff vocab
+-- e.g. blastoderm can be body part and stage terms in dros anatomy
+-- but cvterm_type needs to be a cv instead of a free text type here?
 
 create table expression_cvterm (
        expression_cvterm_id serial not null,
@@ -64,6 +67,7 @@ create table expression_cvterm (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
        rank int not null,
+	   cvterm_type varchar(255),
 
        unique(expression_id,cvterm_id)
 );
