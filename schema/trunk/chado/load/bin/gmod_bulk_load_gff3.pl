@@ -326,10 +326,15 @@ open DBX,   ">$files{dbxref}";
 open AF,    ">$files{analysisfeature}";
 
 my $gffio;
+#could add a flag for validate terms...
 if ($GFFFILE eq 'stdin') {
-    $gffio = Bio::FeatureIO->new(-fh   => \*STDIN , -format => 'gff');
+    $gffio = Bio::FeatureIO->new(-fh   => \*STDIN , 
+                                 -format => 'gff', 
+                                 -validate_terms => 0);
 } else {
-    $gffio = Bio::FeatureIO->new(-file => $GFFFILE, -format => 'gff');
+    $gffio = Bio::FeatureIO->new(-file => $GFFFILE, 
+                                 -format => 'gff', 
+                                 -validate_terms => 0);
 }
 
 while(my $feature = $gffio->next_feature()){
@@ -386,7 +391,7 @@ while(my $feature = $gffio->next_feature()){
   my $is_FgenesH = 1 if $source eq 'FgenesH_Monocot';
   my $is_analysis = $is_FgenesH ? 1 : 0;
 
-  my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || $nextfeature;
+  my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || "auto$nextfeature";
   $uniquename = $uniquename->value if ref($uniquename);
   my($name) = ($feature->annotation->get_Annotations('Name'))[0] || "$featuretype-$uniquename";
   $name = $name->value if ref($name);
