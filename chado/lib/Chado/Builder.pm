@@ -155,7 +155,7 @@ sub ACTION_ontologies {
       print "  +",$ontfile->{remote},"\n";
 
       $load = 1 if $m->_mirror($ontfile->{remote},$ontfile->{local});
-	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->local);
+	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->{'local'});
 
 	  next unless $load;
 
