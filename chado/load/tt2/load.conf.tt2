@@ -11,29 +11,20 @@
   <build>
     <working_dir>[% working_dir %]</working_dir>
     <external_ddl>[% external_ddl %]</external_ddl>
+    <load_touchext>[% db_name %]</load_touchext>
     [% FOREACH f=sql_files %]<sql_files>[% f %]</sql_files>
     [% END %]
   </build>
 
   <path name="data" value="/tmp/chado_load"/>
 
+ 
   <!--                 -->
   <!-- setup templates -->
   <!--                 -->
-  <tt2 input="load/tt2/Makefile.tt2" output="load/Makefile">
-   <token name="touch_ext" value="[% db_name %]"/>
-   <token name="dbname" value="[% db_name %]"/>
-   <token name="datapath" value="/tmp/chado_load"/>
-  </tt2>
-  <tt2 input="load/tt2/LoadDBI.tt2" output="lib/Chado/LoadDBI.pm">
-   <token name="chado_path" value="[% working_dir %]"/>
-   <token name="db_username" value="[% db_username %]"/>
-   <token name="db_password" value="[% db_password %]"/>
-   <token name="db_name" value="[% db_name %]"/>
-   <token name="db_host" value="[% db_host %]"/>
-   <token name="db_port" value="[% db_port %]"/>
-   <token name="db_vendor" value="[% db_driver %]"/>
-  </tt2>
+  <template>
+    <file name="LoadDBI" type="tt2" in="load/tt2/LoadDBI.tt2" out="lib/Chado/LoadDBI.pm"/>
+  </template>
 
   <!--            -->
   <!-- NCBI       -->

@@ -99,18 +99,15 @@ Returns the configuration information as parsed by XML::Simple.
 
 sub config {
     my $self = shift;
-
     unless ( defined $self->{'config'} ) {
         my $file = $self->filename;
-
         $self->{'config'} = XMLin(  
             $file,
-            ForceArray => [ qw( token path file ) ],
-            KeyAttr    => [ qw( tt2 input token name file ) ],
+#            ForceArray => [ qw( template token path file) ],
+#            KeyAttr    => [ qw( token name file) ],
             ContentKey => '-value',
         );
     }
-
     return $self->{'config'};
 }
 

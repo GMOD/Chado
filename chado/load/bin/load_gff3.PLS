@@ -109,6 +109,8 @@ can be abbreviated to one letter.
   --cache    <# of features> The number of features to cache before
                                 committing to the database
                                 (default: 1000)
+  --force                    Force the file to load, even if it has already been
+                                loaded before
 
 =head1 AUTHORS
 
@@ -121,12 +123,13 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $SRC_DB, $GFFFILE, $CACHE_SIZE);
+my ($ORGANISM, $SRC_DB, $GFFFILE, $CACHE_SIZE, $FORCE_LOAD);
 
 GetOptions('organism:s'       => \$ORGANISM,
            'srcdb:s'          => \$SRC_DB,
            'gfffile:s'        => \$GFFFILE,
            'cache:s'          => \$CACHE_SIZE,
+           'force'            => \$FORCE_LOAD,
           ) or (system('pod2text',$0), exit -1); 
 
 $ORGANISM   ||='Human';
@@ -234,8 +237,8 @@ die "Unable to find or create pub type in cvterm table"
 
 my $mtime = (stat($GFFFILE))[9];
 my ($pub) = Chado::Pub->search(title => $GFFFILE." ".$mtime);
-if ($pub) {
-  print "It appears that you have already loaded this exact file\n";
+if ($pub and !$FORCE_LOAD) {
+  print "\nIt appears that you have already loaded this exact file\n";
   print "Do you want to continue [no]? ";
   chomp (my $response = <STDIN>);
   unless ($response =~ /^[Yy]/) {
