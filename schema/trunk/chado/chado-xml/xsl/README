@@ -14,9 +14,9 @@ You can use any xslt processor you like with these; both Xalan and
 xsltproc can be run from the command line. For integrating with an
 application, you can use Xalan (java) or Lib::XSLT (perl).
 
-Xalan can be downloaded from...
+Xalan can be downloaded from ...[TODO INSTRUCTIONS]
 
-xsltproc is part of libxslt, available from http://www.xmlsoft
+xsltproc is part of libxslt, available from http://xmlsoft.org/XSLT/
 
 To run on the command line with xsltproc:
 
@@ -33,3 +33,4 @@ From a perl application:
 
 From a java application:
 [TO BE WRITTEN]
+
