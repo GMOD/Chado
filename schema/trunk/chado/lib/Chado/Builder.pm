@@ -27,9 +27,23 @@ platform-specific variable values
 
 =cut
 
+# create an ACTION_whatever method to implement a particular build target
 sub ACTION_foo {
   print "I'm fooing to death!\n";
-} 
+}
+
+sub ACTION_refseq
+{
+  # the build object $m
+  my $m = shift;
+  # the XML config object
+  my $conf = $m->conf;
+
+  # print out the available refseq datasets
+  my %refseqs = printAndReadOptions($m,$conf,"refseq");
+  #print Dumper(%refseqs);
+
+}
 
 sub ACTION_ontologies {
   my $m = shift;
@@ -68,7 +82,16 @@ sub ACTION_ontologies {
       $load = 1 if $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
     }
 
-    my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
+    my($deffile) = grep {$_ if $_->{type} eq '  print "Available ontologies:\n";
+
+  my $i = 1;
+  my %ont = ();
+  foreach my $ontology (sort keys %{ $conf->{ontology} }) {
+    $ont{$i} = $ontology;
+    print "[$i] $ontology\n";
+    $i++;
+  }
+  print "\n";definitions'} @{ $ontologies{$ontology}{file} };
     foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
       print "  +",$ontfile->{remote},"\n";
 
@@ -117,6 +140,39 @@ sub ACTION_tokenize {
 =head1 NON-ACTIONS
 
 =cut
+
+=head2 printAndReadOptions
+
+ Title   : printAndReadOptions
+ Usage   : prints out and reads options from the XML file
+ Function:
+ Example :
+ Returns :
+ Args    : m=build obj, conf=conf obj, option=which option to pull from the conf XML file
+
+
+=cut
+sub printAndReadOptions
+{
+   my ($m,$conf,$option) = @_;
+   print "Available $option Items:\n";
+
+   my $i = 1;
+   my %itm = ();
+   foreach my $item (sort keys %{ $conf->{$option} })
+   {
+     $itm{$i} = $item;
+     print "[$i] $item\n";
+     $i++;
+   }
+   print "\n";
+
+   my $chosen = $m->prompt("Which items would you like to load (Comma delimited)? [0]");
+   $m->notes("$option"."s" => $chosen);
+
+   my %options = map {$itm{$_} => $conf->{$option}{$itm{$_}}} split ',',$chosen;
+   return(%options);
+}
 
 sub property {
   my $self = shift;
