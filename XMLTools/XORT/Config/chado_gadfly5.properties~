@@ -1,0 +1,6 @@
+db_type=postgres
+db=chado_gadfly5
+host=gonzalez.flybase.harvard.edu
+port=5432
+user=zhou
+password=zhoupgsql
