@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.78 2005-03-05 10:26:40 scottcain Exp $
+# $Id: Makefile.PL,v 1.79 2005-03-09 17:33:25 allenday Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -87,11 +87,14 @@ my %args    =  (
 );
 
 my %env2arg = (
-  CHADO_DB_NAME     => 'DBNAME',
-  CHADO_DB_USERNAME => 'DBUSER',
-  CHADO_DB_PASSWORD => 'DBPASS',
-  CHADO_DB_HOST     => 'DBHOST',
-  CHADO_DB_PORT     => 'DBPORT',
+  CHADO_DB_NAME      => 'DBNAME',
+  CHADO_DB_USERNAME  => 'DBUSER',
+  CHADO_DB_PASSWORD  => 'DBPASS',
+  CHADO_DB_HOST      => 'DBHOST',
+  CHADO_DB_PORT      => 'DBPORT',
+  PREFIX             => 'PREFIX',
+  INSTALLSITEMAN1DIR => 'INSTALLSITEMAN1DIR',
+  INSTALLSITEMAN3DIR => 'INSTALLSITEMAN3DIR',
 );
 
 my $usage = <<"END";
@@ -145,7 +148,7 @@ my $chado_dir    = catdir $lib_dir, 'Chado';
 my $build_config = catfile $working_dir, 'build.conf';
 my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
 
-my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS ], keys %args );
+my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS PREFIX INSTALLSITEMAN1DIR INSTALLSITEMAN3DIR ], keys %args );
 my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #CHADO_DB_PASSWORD is valid if undefined
 my $all_envs = join( '|', keys %env_required );
 
@@ -180,7 +183,6 @@ if ( -e $build_config && -r _ ) {
 #
 my %opts;
 my @argv = @ARGV;
-@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get 
 foreach ( @argv ) {
   if ( /^--?h(elp)?$/i ) {
     die $usage;
@@ -192,6 +194,10 @@ foreach ( @argv ) {
     $args{ $env2arg{$1} }{ default } = $2;
   }
 }
+@ARGV = ();
+push @ARGV, "PREFIX=$opts{PREFIX}" if $opts{PREFIX};
+push @ARGV, "INSTALLSITEMAN1DIR=$opts{INSTALLSITEMAN1DIR}" if $opts{INSTALLSITEMAN1DIR};
+push @ARGV, "INSTALLSITEMAN3DIR=$opts{INSTALLSITEMAN3DIR}" if $opts{INSTALLSITEMAN3DIR};
 
 #
 # Check to see if the enviroment is there, mostly to make sure
@@ -580,7 +586,7 @@ WriteMakefile(
            'load/bin/gmod_load_ontology.pl',
            'load/bin/gmod_bulk_load_gff3.pl',
            'bin/gmod_dump_gff3.pl',
-           'bin/gmod_apollo_triggers.pl',
+#file not in CVS !           'bin/gmod_apollo_triggers.pl',
     ],
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
@@ -622,16 +628,16 @@ sub MY::c_o {
 }
 
 sub MY::postamble {
-  my $root = "'GMOD_ROOT=$O{GMOD_ROOT}'";
+  my $root = "GMOD_ROOT=$O{GMOD_ROOT}";
   qq{
 conf_install ::
-	\$(PERL) \"$working_dir/install_util/conf_install.pl\" $root
+	$root \$(PERL) \"$working_dir/install_util/conf_install.pl\" '$root'
 
 src_install ::
-	\$(PERL) \"$working_dir/install_util/src_install.pl\"
+	$root \$(PERL) \"$working_dir/install_util/src_install.pl\" '$root'
 
 log4perl.conf ::
-	\$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" $root
+	$root \$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" '$root'
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh
