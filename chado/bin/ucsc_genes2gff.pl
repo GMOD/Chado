@@ -7,6 +7,7 @@ use File::Basename 'basename';
 use Getopt::Long;
 use URI::Escape;
 use Text::Wrap;
+$Text::Wrap::columns = 79;
 use Bio::SeqIO;
 use Bio::SeqFeature::Generic;
 use Data::Dumper;
@@ -43,19 +44,28 @@ my $KNOWNGENE      = $ANNOTATIONS.'/knownGene.txt';
 my $KNOWNGENEPEP   = $ANNOTATIONS.'/knownGenePep.txt';
 my $KNOWNGENEMRNA  = $ANNOTATIONS.'/knownGeneMrna.txt';
 my $KNOWNLOCUSLINK = $ANNOTATIONS.'/knownToLocusLink.txt';
+my $KNOWNPFAM      = $ANNOTATIONS.'/knownToPfam.txt';
+my $KNOWNU133      = $ANNOTATIONS.'/knownToU133.txt';
+my $KNOWNU95       = $ANNOTATIONS.'/knownToU95.txt';
 my $GENBANK        = $ANNOTATIONS.'/genbank2accessions.txt';
 my $LOCACC         = $ANNOTATIONS.'/loc2acc';
 
-my $mrna2protein = parseGenbank($GENBANK);
-my $kgxref = parseKgXref($KGXREF);
-my $loc2acc = parseLocAcc($LOCACC); # the best way I've found so far to link Genbank mRNA accession to Genbank protein accession
-my $knowngenepep = parseKnownGenePep($KNOWNGENEPEP);
-my $knowngenemrna = parseKnownGeneMrna($KNOWNGENEMRNA);
-my $knownlocuslink = parseKnownLocusLink($KNOWNLOCUSLINK);
+my %xref;
+
+parseGenbank(\%xref,$GENBANK);
+parseKnownGenePep(\%xref,$KNOWNGENEPEP);
+parseKnownGeneMrna(\%xref,$KNOWNGENEMRNA);
+parseKgXref(\%xref,$KGXREF);
+parseLocAcc(\%xref,$LOCACC); # the best way I've found so far
+                                                  # to link Genbank mRNA accession to
+                                                  # Genbank protein accession
+parseKnownLocusLink(\%xref,$KNOWNLOCUSLINK);
+parseKnownAffy(\%xref,$KNOWNU133,$KNOWNU95);
+parseKnownPfam(\%xref,$KNOWNPFAM);
 # need to pull in the omim and other annotations too
 
 print "##gff-version 3\n";
-
+if(0){
 open(KG,$KNOWNGENE) or die "couldn't open('$KNOWNGENE'): $!";
 while (<KG>) {
   chomp;
@@ -74,24 +84,18 @@ while (<KG>) {
 
   # print the transcript
   print join ("\t",$chrom,$SRCDB,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id;");
-  if(defined($kgxref->{$id})) {
-    foreach my $annotation_set (keys %{$kgxref->{$id}}) {
-      print "$annotation_set=". join (",", keys %{$kgxref->{$id}->{$annotation_set}}) .';';
-		 
+  if(defined($xref{$id})) {
+    foreach my $annotation_set (map {($_ !~ /^sequence/) ? $_ : undef} keys %{$xref{$id}}) {
+      next unless $annotation_set;
+      print "$annotation_set=". join(",", keys %{$xref{$id}{$annotation_set}}) .';';
     }
-    if(defined $knownlocuslink->{$id}) {
-      print "db:locus=", $knownlocuslink->{$id};
-    }
-
     print "\n";
 
-    # now write out stuff for protein
-
-    my @protGenBank = keys (%{$kgxref->{$id}->{'db:genbank:protein'}});
-    my $protGenBank = $protGenBank[0];
-
-    if(defined ($protGenBank)) {
-      print join ("\t",'.', $SRCDB,'protein','.','.','.','.',"ID=$protGenBank;Parent=$id"), "\n";
+    foreach my $annotation_set (map {($_ !~ /^sequence/ and $_ =~ /genbank:protein/) ? $_ : undef} keys %{$xref{$id}}){
+      next unless $annotation_set;
+      print join ("\t",'.', $SRCDB,'protein','.','.','.','.',
+                  "ID=". join(",", keys %{$xref{$id}{$annotation_set}}) .";Parent=$id"
+                 ), "\n";
     }
   }
 
@@ -208,23 +212,22 @@ while (<KG>) {
   }
 }
 close(KG) or die "couldn't close('$KNOWNGENE'): $!";
+}
 
-# for protein/mrna printing
-if(defined($kgxref) && (defined($knowngenepep) || defined($knowngenemrna))) {
-  print "##FASTA\n";
-  # now print all my lovely protein sequence
-  foreach my $protein (keys %{$knowngenepep}) {
-	print ">".$protein."\n";
-	$Text::Wrap::columns = 79;
-	print wrap('', '', $knowngenepep->{$protein});
-	print "\n";
+print "##FASTA\n";
+
+foreach my $kg (keys %xref){
+  my $seq_mrna = $xref{$kg}{'sequence:mrna'};
+  my $seq_prot = $xref{$kg}{'sequence:protein'};
+
+  if($seq_mrna){
+    print '>'. join(',',keys(%{$xref{$kg}{'db:genbank:mrna'}})) ."\n";
+    print wrap('','',$seq_mrna) ."\n";
   }
-  # now all the mRNA sequence
-  foreach my $mrna (keys %{$knowngenemrna}) {
-	print ">".$mrna."\n";
-	$Text::Wrap::columns = 79;
-	print wrap('', '', $knowngenemrna->{$mrna});
-	print "\n";
+
+  if($seq_prot){
+    print '>'. join(',',keys(%{$xref{$kg}{'db:genbank:protein'}})) ."\n";
+    print wrap('','',$seq_prot) ."\n";
   }
 }
 
@@ -240,8 +243,7 @@ if(defined($kgxref) && (defined($knowngenepep) || defined($knowngenemrna))) {
 =cut
 
 sub parseLocAcc {
-  my $filename = shift;
-  my $annotations = {};
+  my($xref,$filename) = @_;
   open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
@@ -251,10 +253,9 @@ sub parseLocAcc {
 	my $gene = $1;
 	$line[4] =~ /(.*)\.\d/;
 	my $protein = $1;
-	if($protein ne '-') { $annotations->{$gene} = $protein; }
+	if($protein ne '-') { $xref->{$gene}{'db:genbank:protein'}{$protein} = 1; }
   }
   close ANNFILE;
-  return ($annotations);
 }
 
 
@@ -270,17 +271,65 @@ sub parseLocAcc {
 =cut
 
 sub parseKnownLocusLink {
-  my $filename = shift;
-  my $annotations = {};
+  my($xref,$filename) = @_;
   open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
     next if /^#/;
 	my ($accession,$locuslink) = split /\t/;
-	$annotations->{$accession} = $locuslink;
+	$xref->{$accession}{'db:locuslink'}{$locuslink} = 1;
   }
   close ANNFILE;
-  return ($annotations);
+}
+
+=head2 parseKnownPfam
+
+ Title   : parseKnownPfam
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub parseKnownPfam {
+  my($xref,$filename) = @_;
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+	my ($accession,$pfam) = split /\t/;
+	$xref->{$accession}{'db:pfam'}{$pfam} = 1;
+  }
+  close ANNFILE;
+}
+
+=head2 parseKnownAffy
+
+ Title   : parseKnownAffy
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub parseKnownAffy {
+  my $xref = shift @_;
+  foreach my $filename (@_){
+    open  ANNFILE, $filename or die "Can't open file $filename: $!";
+    while(<ANNFILE>) {
+      chomp;
+      next if /^#/;
+      my ($accession,$probeset) = split /\t/;
+      $xref->{$accession}{'db:affy'}{$probeset} = 1;
+    }
+    close ANNFILE;
+  }
 }
 
 
@@ -296,17 +345,15 @@ sub parseKnownLocusLink {
 =cut
 
 sub parseKnownGeneMrna {
-  my $filename = shift;
-  my $annotations = {};
+  my($xref,$filename) = @_;
   open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
     next if /^#/;
 	my ($accession,$sequence) = split /\t/;
-	$annotations->{$accession} = $sequence;
+	$xref->{$accession}{'sequence:mrna'} = $sequence;
   }
   close ANNFILE;
-  return ($annotations);
 }
 
 =head2 parseKnownGenePep
@@ -323,24 +370,25 @@ sub parseKnownGeneMrna {
 =cut
 
 sub parseKnownGenePep {
-  my $filename = shift;
-  my $annotations = {};
+  my($xref,$filename) = @_;
   open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
     next if /^#/;
 	my ($accession,$sequence) = split /\t/;
-	my $protGenbankId = $mrna2protein->{$accession};
-	$annotations->{$protGenbankId} = $sequence;
+
+    $xref->{$accession}{'sequence:protein'} = $sequence;
+#	$xref->{$protGenbankId}{'sequence:protein'} = $sequence;
   }
   close ANNFILE;
-  return ($annotations);
 }
 
 =head2 mrna2protein
 
  Title   : mrna2protein
- Usage   : creates a hash between the mRNA genbank accession (used in UCSC DB to key everything) and the proper genbank protein accession
+ Usage   : creates a hash between the mRNA genbank accession
+           (used in UCSC DB to key everything) and the proper
+           genbank protein accession
  Function:
  Example :
  Returns : 
@@ -350,17 +398,19 @@ sub parseKnownGenePep {
 =cut
 
 sub parseGenbank {
-   my $file = shift;
-   my $annotations = {}; # stores the mRNA genbank id as key, protein genbank id as value
-   open ANNFILE, $file or die "Can't open file $file: $!";
-   while(<ANNFILE>) {
-	 chomp;
-	 next if /^#/;
-	 my ($mrna, $prot) = split /\t/;
-	 $annotations->{$mrna} = $prot;
-   }
-   close ANNFILE;
-   return($annotations);
+  my($xref,$filename) = @_;
+#  my $file = shift;
+#  my $annotations = {}; # stores the mRNA genbank id as key, protein genbank id as value
+  open ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+    my ($mrna, $prot) = split /\t/;
+    $xref->{$mrna}{'db:genbank:protein'}{$prot} = 1;
+#    $annotations->{$mrna} = $prot;
+  }
+  close ANNFILE;
+#  return($annotations);
 }
 
 
@@ -378,9 +428,9 @@ sub parseGenbank {
 =cut
 
 sub parseKgXref {
-  my $filename = shift;
-  my $annotations = {};
-  open ANNFILE, $filename or die "Can't open file $filename: $!";
+  my($xref,$filename) = @_;
+
+  open(ANNFILE, $filename) or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
     next if /^#/;
@@ -393,20 +443,19 @@ sub parseKgXref {
     $key = uri_escape($key);
     $description = uri_escape($description);
 
-    my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
+#    my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
 
-    $annotations->{$key}->{'db:genbank:protein'}->{$protAccession} = 1 if $protAccession;
-    $annotations->{$key}->{'db:genbank:mrna'}->{$kgID}             = 1 if $kgID;
-    $annotations->{$key}->{'db:genbank:mrna'}->{$mRNA}             = 1 if $mRNA;
-    $annotations->{$key}->{'db:swissprot'}->{$spID}                = 1 if $spID;
-    $annotations->{$key}->{'db:swissprot:display'}->{$spDisplayID} = 1 if $spDisplayID;
-    $annotations->{$key}->{'genesymbol'}->{$geneSymbol}            = 1 if $geneSymbol;
-    $annotations->{$key}->{'db:refseq:mrna'}->{$refseq}            = 1 if $refseq;
-    $annotations->{$key}->{'db:refseq:protein'}->{$protAcc}        = 1 if $protAcc;
-    $annotations->{$key}->{'description'}->{$description}          = 1 if $description;
+#    $xref->{$key}{'db:genbank:protein'}{$protAccession} = 1 if $protAccession;
+    $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID;
+    $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA;
+    $xref->{$key}{'db:swissprot'}{$spID}                = 1 if $spID;
+    $xref->{$key}{'db:swissprot:display'}{$spDisplayID} = 1 if $spDisplayID;
+    $xref->{$key}{'genesymbol'}{$geneSymbol}            = 1 if $geneSymbol;
+    $xref->{$key}{'db:refseq:mrna'}{$refseq}            = 1 if $refseq;
+    $xref->{$key}{'db:refseq:protein'}{$protAcc}        = 1 if $protAcc;
+    $xref->{$key}{'description'}{$description}          = 1 if $description;
   }
-  close ANNFILE;
-  return($annotations);
+  close(ANNFILE);
 }
 
 
