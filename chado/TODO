@@ -28,6 +28,7 @@ For the next release:
   skipping the prompting for them
 - create a method for populating cvtermpath (make_cvtermpath.pl is a starting
 point).
+- add support for relative coordinates in gff3 and the gbrowse adaptor
 
 For following releases:
 - incorporate Pub*
@@ -41,4 +42,4 @@ already been entered so the INSERT statement can find the terms.
 
 Documentation needs to reflect this, of course.
 
-We should start using the bug tracker on SF
+We should start using the bug tracker on SF  --start using 'Bugs' in http://sourceforge.net/tracker/?group_id=27707
