@@ -1,5 +1,5 @@
 #!/bin/sh
-DBNAME=chado_gonzo;
+DBNAME=test;
 
 dropdb $DBNAME;
 createdb $DBNAME;
