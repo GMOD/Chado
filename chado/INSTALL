@@ -1,12 +1,12 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.28 2004-07-16 16:21:01 scottcain Exp $
+$Id: INSTALL,v 1.29 2004-07-16 17:31:23 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
 considered alpha software, so expect there to be bumps in the road.  When
 you experience problems, please email them to the gmod-devel mailing list
-at gmod-devel@lists.sourceforge.net.  This release is will work with the
+at gmod-devel@lists.sourceforge.net.  This release will work with the
 most recent release of the Generic Genome Browser (gbrowse) version 1.62,
 which has had several improvements to its chado adaptor since the last 
 release.  The installation instructions for gbrowse are included

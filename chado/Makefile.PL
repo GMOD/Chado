@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.66 2004-07-02 05:33:13 allenday Exp $
+# $Id: Makefile.PL,v 1.67 2004-07-16 17:31:23 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -501,7 +501,7 @@ else {
 WriteMakefile(
 #    'NAME'		            => 'chado',
     'NAME'                => 'gmod',
-    'VERSION'             => 0.002,
+    'VERSION'             => 0.003,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       'Class::DBI'        => 0.94,
