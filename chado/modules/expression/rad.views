@@ -178,7 +178,7 @@ AS SELECT
   elementresult.float3 AS quartile1,
   elementresult.float4 AS quartile3,
   elementresult.float5 AS sd,
-  elementresult.int1   AS n,
+  elementresult.int1   AS n
 FROM elementresult
 WHERE SUBCLASS_VIEW = 'elementstat';
 
@@ -203,7 +203,7 @@ CREATE RULE "_RuleU_elementstat" AS
     float3 = NEW.quartile1,
     float4 = NEW.quartile3,
     float5 = NEW.sd,
-    int1   = NEW.n,
+    int1   = NEW.n
     WHERE elementresult_id = OLD.elementresult_id;
 
 CREATE RULE "_RuleD_elementstat" AS
