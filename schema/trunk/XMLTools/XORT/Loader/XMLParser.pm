@@ -950,10 +950,20 @@ sub _data_check(){
     my @temp=split(/\s+/, $hash_ddl{$table_non_null});
     my $table_id_string=$table."_primary_key";
     my $table_id=$hash_ddl{$table_id_string};
+
+    ## dgg here - add check for serial value type - skip failure for missing serial which we can create
+    ## contact_data_type=description:varchar;contact_id:serial; ...
+    my $data_type_name=$table."_data_type";
+    my $data_type=$hash_ddl{$data_type_name};
+    my %data_types= map { split /:/; } split(/;/, $data_type);
+    print "\n$table data_types: $data_type\n"  if ($DEBUG==1);
+
     #my $table_id=$table."_id";
     for my $i(0..$#temp){
       my $foreign_key=$table.":".$temp[$i];
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
+      next if ($data_types{$temp[$i]} eq 'serial'); ## dgg
+
       if ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && (defined $hash_foreign_key{$temp[$i]} )){
          my $temp_key=$table.":".$temp[$i]."_ref_table";
          print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}" if ($DEBUG==1);
