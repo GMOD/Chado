@@ -78,12 +78,12 @@ create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 
 
 -- ================================================
--- TABLE: pub_author
+-- TABLE: pubauthor
 -- ================================================
 
-create table pub_author (
-    pub_author_id serial not null,
-    primary key (pub_author_id),
+create table pubauthor (
+    pubauthor_id serial not null,
+    primary key (pubauthor_id),
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     rank int not null,
@@ -92,13 +92,13 @@ create table pub_author (
     givennames varchar(100),
     suffix varchar(100),
 
-    constraint pub_author_c1 unique (pub_id, rank)
+    constraint pubauthor_c1 unique (pub_id, rank)
 );
 -- givennames: first name, initials
 -- suffix: Jr., Sr., etc       
 -- rank: order of author in author list for this pub
 -- editor: indicates whether the author is an editor for linked publication
-create index pub_author_idx2 on pub_author (pub_id);
+create index pubauthor_idx2 on pubauthor (pub_id);
 
 
 -- ================================================
