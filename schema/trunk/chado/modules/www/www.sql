@@ -1,233 +1,215 @@
 -- ================================================
--- TABLE: user
+-- TABLE: wwwuser
 -- ================================================
 -- keep track of www users.  this may also be useful
 -- in an audit module at some point (?).
 
-create table user (
-	user_id serial not null,
-	primary key (user_id),
+create table wwwuser (
+	wwwuser_id serial not null,
+	primary key (wwwuser_id),
 	username varchar(32) not null,
 	unique(username),
 	password varchar(32) not null,
 	email varchar(128) not null,
 	profile text null
 );
-create index user_idx1 on user (username);
+create index wwwuser_idx1 on wwwuser (username);
 
 -- ================================================
--- TABLE: user
+-- TABLE: wwwuser
 -- ================================================
--- link user accounts to projects
+-- link wwwuser accounts to projects
 
-create table user_project (
-	user_project_id serial not null,
-	primary key (user_project_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_project (
+	wwwuser_project_id serial not null,
+	primary key (wwwuser_project_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	project_id int not null,
 	foreign key (project_id) references project (project_id),
 	world_read smallint not null default 1,
-	unique(user_id,project_id)
+	unique(wwwuser_id,project_id)
 );
-create index user_project_idx1 on user_project(user_id);
-create index user_project_idx2 on user_project(project_id);
+create index wwwuser_project_idx1 on wwwuser_project(wwwuser_id);
+create index wwwuser_project_idx2 on wwwuser_project(project_id);
 
 -- ================================================
--- TABLE: user_author
+-- TABLE: wwwuser_author
 -- ================================================
--- track user interest in authors
+-- track wwwuser interest in authors
 
-create table user_author (
-	user_author_id serial not null,
-	primary key (user_author_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_author (
+	wwwuser_author_id serial not null,
+	primary key (wwwuser_author_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	author_id int not null,
 	foreign key (author_id) references author (author_id),
 	world_read smallint not null default 1,
-	unique(user_id,author_id)
+	unique(wwwuser_id,author_id)
 );
-create index user_author_idx1 on user_author(user_id);
-create index user_author_idx2 on user_author(author_id);
+create index wwwuser_author_idx1 on wwwuser_author(wwwuser_id);
+create index wwwuser_author_idx2 on wwwuser_author(author_id);
 
 -- ================================================
--- TABLE: user_cvterm
+-- TABLE: wwwuser_cvterm
 -- ================================================
--- track user interest in cvterms
+-- track wwwuser interest in cvterms
 
-create table user_cvterm (
-	user_cvterm_id serial not null,
-	primary key (user_cvterm_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_cvterm (
+	wwwuser_cvterm_id serial not null,
+	primary key (wwwuser_cvterm_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	cvterm_id int not null,
 	foreign key (cvterm_id) references cvterm (cvterm_id),
 	world_read smallint not null default 1,
-	unique(user_id,cvterm_id)
+	unique(wwwuser_id,cvterm_id)
 );
-create index user_cvterm_idx1 on user_cvterm(user_id);
-create index user_cvterm_idx2 on user_cvterm(cvterm_id);
+create index wwwuser_cvterm_idx1 on wwwuser_cvterm(wwwuser_id);
+create index wwwuser_cvterm_idx2 on wwwuser_cvterm(cvterm_id);
 
 -- ================================================
--- TABLE: user_expression
+-- TABLE: wwwuser_expression
 -- ================================================
--- track user interest in expressions
+-- track wwwuser interest in expressions
 
-create table user_expression (
-	user_expression_id serial not null,
-	primary key (user_expression_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_expression (
+	wwwuser_expression_id serial not null,
+	primary key (wwwuser_expression_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	expression_id int not null,
 	foreign key (expression_id) references expression (expression_id),
 	world_read smallint not null default 1,
-	unique(user_id,expression_id)
+	unique(wwwuser_id,expression_id)
 );
-create index user_expression_idx1 on user_expression(user_id);
-create index user_expression_idx2 on user_expression(expression_id);
+create index wwwuser_expression_idx1 on wwwuser_expression(wwwuser_id);
+create index wwwuser_expression_idx2 on wwwuser_expression(expression_id);
 
 -- ================================================
--- TABLE: user_feature
+-- TABLE: wwwuser_feature
 -- ================================================
--- track user interest in features
+-- track wwwuser interest in features
 
-create table user_feature (
-	user_feature_id serial not null,
-	primary key (user_feature_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_feature (
+	wwwuser_feature_id serial not null,
+	primary key (wwwuser_feature_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	feature_id int not null,
 	foreign key (feature_id) references feature (feature_id),
 	world_read smallint not null default 1,
-	unique(user_id,feature_id)
+	unique(wwwuser_id,feature_id)
 );
-create index user_feature_idx1 on user_feature(user_id);
-create index user_feature_idx2 on user_feature(feature_id);
+create index wwwuser_feature_idx1 on wwwuser_feature(wwwuser_id);
+create index wwwuser_feature_idx2 on wwwuser_feature(feature_id);
 
 -- ================================================
--- TABLE: user_gene
+-- TABLE: wwwuser_genotype
 -- ================================================
--- track user interest in genes
+-- track wwwuser interest in genotypes
 
-create table user_gene (
-	user_gene_id serial not null,
-	primary key (user_gene_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
-	gene_id int not null,
-	foreign key (gene_id) references gene (gene_id),
-	world_read smallint not null default 1,
-	unique(user_id,gene_id)
-);
-create index user_gene_idx1 on user_gene(user_id);
-create index user_gene_idx2 on user_gene(gene_id);
-
--- ================================================
--- TABLE: user_genotype
--- ================================================
--- track user interest in genotypes
-
-create table user_genotype (
-	user_genotype_id serial not null,
-	primary key (user_genotype_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_genotype (
+	wwwuser_genotype_id serial not null,
+	primary key (wwwuser_genotype_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	genotype_id int not null,
 	foreign key (genotype_id) references genotype (genotype_id),
 	world_read smallint not null default 1,
-	unique(user_id,genotype_id)
+	unique(wwwuser_id,genotype_id)
 );
-create index user_genotype_idx1 on user_genotype(user_id);
-create index user_genotype_idx2 on user_genotype(genotype_id);
+create index wwwuser_genotype_idx1 on wwwuser_genotype(wwwuser_id);
+create index wwwuser_genotype_idx2 on wwwuser_genotype(genotype_id);
 
 -- ================================================
--- TABLE: user_interaction
+-- TABLE: wwwuser_interaction
 -- ================================================
--- track user interest in interactions
+-- track wwwuser interest in interactions
 
-create table user_interaction (
-	user_interaction_id serial not null,
-	primary key (user_interaction_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_interaction (
+	wwwuser_interaction_id serial not null,
+	primary key (wwwuser_interaction_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	interaction_id int not null,
 	foreign key (interaction_id) references interaction (interaction_id),
 	world_read smallint not null default 1,
-	unique(user_id,interaction_id)
+	unique(wwwuser_id,interaction_id)
 );
-create index user_interaction_idx1 on user_interaction(user_id);
-create index user_interaction_idx2 on user_interaction(interaction_id);
+create index wwwuser_interaction_idx1 on wwwuser_interaction(wwwuser_id);
+create index wwwuser_interaction_idx2 on wwwuser_interaction(interaction_id);
 
 -- ================================================
--- TABLE: user_organism
+-- TABLE: wwwuser_organism
 -- ================================================
--- track user interest in organisms
+-- track wwwuser interest in organisms
 
-create table user_organism (
-	user_organism_id serial not null,
-	primary key (user_organism_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_organism (
+	wwwuser_organism_id serial not null,
+	primary key (wwwuser_organism_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	organism_id int not null,
 	foreign key (organism_id) references organism (organism_id),
 	world_read smallint not null default 1,
-	unique(user_id,organism_id)
+	unique(wwwuser_id,organism_id)
 );
-create index user_organism_idx1 on user_organism(user_id);
-create index user_organism_idx2 on user_organism(organism_id);
+create index wwwuser_organism_idx1 on wwwuser_organism(wwwuser_id);
+create index wwwuser_organism_idx2 on wwwuser_organism(organism_id);
 
 -- ================================================
--- TABLE: user_phenotype
+-- TABLE: wwwuser_phenotype
 -- ================================================
--- track user interest in phenotypes
+-- track wwwuser interest in phenotypes
 
-create table user_phenotype (
-	user_phenotype_id serial not null,
-	primary key (user_phenotype_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_phenotype (
+	wwwuser_phenotype_id serial not null,
+	primary key (wwwuser_phenotype_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	phenotype_id int not null,
 	foreign key (phenotype_id) references phenotype (phenotype_id),
 	world_read smallint not null default 1,
-	unique(user_id,phenotype_id)
+	unique(wwwuser_id,phenotype_id)
 );
-create index user_phenotype_idx1 on user_phenotype(user_id);
-create index user_phenotype_idx2 on user_phenotype(phenotype_id);
+create index wwwuser_phenotype_idx1 on wwwuser_phenotype(wwwuser_id);
+create index wwwuser_phenotype_idx2 on wwwuser_phenotype(phenotype_id);
 
 -- ================================================
--- TABLE: user_pub
+-- TABLE: wwwuser_pub
 -- ================================================
--- track user interest in publications
+-- track wwwuser interest in publications
 
-create table user_pub (
-	user_pub_id serial not null,
-	primary key (user_pub_id),
-	user_id int not null,
-	foreign key (user_id) references user (user_id),
+create table wwwuser_pub (
+	wwwuser_pub_id serial not null,
+	primary key (wwwuser_pub_id),
+	wwwuser_id int not null,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
 	pub_id int not null,
 	foreign key (pub_id) references pub (pub_id),
 	world_read smallint not null default 1,
-	unique(user_id,pub_id)
+	unique(wwwuser_id,pub_id)
 );
-create index user_pub_idx1 on user_pub(user_id);
-create index user_pub_idx2 on user_pub(pub_id);
+create index wwwuser_pub_idx1 on wwwuser_pub(wwwuser_id);
+create index wwwuser_pub_idx2 on wwwuser_pub(pub_id);
 
 -- ================================================
--- TABLE: userrelationship
+-- TABLE: wwwuserrelationship
 -- ================================================
--- track user interest in other users
+-- track wwwuser interest in other wwwusers
 
-create table userrelationship (
-	userrelationship_id serial not null,
-	primary key (userrelationship_id),
-	objuser_id int not null,
-	foreign key (objuser_id) references user (user_id),
-	subjuser_id int not null,
-	foreign key (subjuser_id) references user (user_id),
+create table wwwuserrelationship (
+	wwwuserrelationship_id serial not null,
+	primary key (wwwuserrelationship_id),
+	objwwwuser_id int not null,
+	foreign key (objwwwuser_id) references wwwuser (wwwuser_id),
+	subjwwwuser_id int not null,
+	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id),
 	world_read smallint not null default 1,
-	unique(objuser_id,subjuser_id)
+	unique(objwwwuser_id,subjwwwuser_id)
 );
-create index userrelationship_idx1 on userrelationship(subjuser_id);
-create index userrelationship_idx2 on userrelationship(objuser_id);
+create index wwwuserrelationship_idx1 on wwwuserrelationship(subjwwwuser_id);
+create index wwwuserrelationship_idx2 on wwwuserrelationship(objwwwuser_id);
 
