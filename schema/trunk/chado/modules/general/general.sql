@@ -48,6 +48,26 @@ create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (pkey_id);
 
 -- ================================================
+-- TABLE: dbxrefrelationship
+-- ================================================
+
+create table dbxrefrelationship (
+       dbxrefrelationship_id serial not null,
+       primary key (dbxrefrelationship_id),
+       reltype_id int not null,
+       foreign key (reltype_id) references cvterm (cvterm_id),
+       subjterm_id int not null,
+       foreign key (subjterm_id) references dbxref (dbxref_id),
+       objterm_id int not null,
+       foreign key (objterm_id) references dbxref (dbxref_id),
+       
+       unique(reltype_id, subjterm_id, objterm_id)
+);
+create index dbxrefrelationship_idx1 on dbxrefrelationship (reltype_id);
+create index dbxrefrelationship_idx2 on dbxrefrelationship (subjterm_id);
+create index dbxrefrelationship_idx3 on dbxrefrelationship (objterm_id);
+
+-- ================================================
 -- TABLE: tableinfo
 -- ================================================
 
