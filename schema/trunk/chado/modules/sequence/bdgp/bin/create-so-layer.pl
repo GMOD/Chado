@@ -30,7 +30,7 @@ GetOptions(
 	   "user|u=s"=>\$user,
 	   "pass|p=s"=>\$pass,
 	   "id_based|i"=>\$id_based,
-           "count|c"=>\$count,
+           "count|c"=>\$counts,
 	   "drop"=>\$drop,
 	   "ptype_id=s"=>\$PROPTYPE_ID,
 	   "rtype|r=s"=>\$RTYPE,
@@ -49,21 +49,26 @@ my $dbh;
 my $DBI = 'DBIx::DBStag';
 eval {
     require "DBIx/DBStag.pm";
+    msg("Connecting via DBStag");
     my $sdbh = 
       DBIx::DBStag->connect($db, $user, $pass);
     $dbh = $sdbh->dbh;
 };
 if ($@) {
     # stag not installed - use DBI
+    msg("Connecting via DBI");
     $dbh =
       DBI->connect($db, $user, $pass);
 }
-
+msg("Connected");
 $dbh->{RaiseError} = 1;
 
 # ==============================================================
 # GET FEATURE TYPES
 # ==============================================================
+# this is only the feature types for which a feature exists within
+# the particular chado implementation
+msg("getting ftypes");
 my $ftypes =
   $dbh->selectall_arrayref(q[SELECT DISTINCT cvterm.cvterm_id, cvterm.name
 			     FROM feature INNER JOIN cvterm ON (cvterm_id=type_id)
@@ -71,6 +76,8 @@ my $ftypes =
 # ==============================================================
 # GET FEATURE PROPERTY TAG NAMES
 # ==============================================================
+# featureprops are tag=value pairs; the tags are cvterms
+msg("getting prop types");
 my $ptypes =
   $dbh->selectall_arrayref("SELECT DISTINCT cvterm.cvterm_id, cvterm.name
 			     FROM featureprop INNER JOIN cvterm ON (cvterm_id=$PROPTYPE_ID)");
@@ -78,20 +85,39 @@ my $ptypes =
 # ==============================================================
 # GET FEATURE TYPE TO PROPERTY MAPPING
 # ==============================================================
-# some feature types only have some kind of property
+# some feature types only have some kind of property;
+# for example, the cvterm 'Ka/Ks' may only apply to exon features
+#  this produces a mapping of feature type => property type
+#  based on internal database surrogate ids
+msg("getting type to prop mappings");
 my $ft2ps =
-  $dbh->selectall_arrayref("SELECT DISTINCT  feature.type_id, featureprop.cvterm_id
+  $dbh->selectall_arrayref("SELECT DISTINCT  feature.type_id, featureprop.type_id
 			     FROM featureprop INNER JOIN feature USING (feature_id)");
 
 
 # ==============================================================
-# GET FEATURE FEATURE RELATIONSHIPS
+# GET FEATURE RELATIONSHIPS
 # ==============================================================
-# treat them all indiscriminately for now
-my $partofs =
+# by type - for example, (mRNA, gene) (exon, mRNA)
+msg("getting feature rels");
+my $featurerels =
   $dbh->selectall_arrayref(q[SELECT DISTINCT subjf.type_id, objf.type_id
 			     FROM feature_relationship INNER JOIN feature AS subjf ON (subjf.feature_id =subject_id)
 			     INNER JOIN feature AS objf ON (objf.feature_id = object_id)
+			    ]);
+
+# ==============================================================
+# GET FEATURE TRIPLE RELATIONSHIPS
+# ==============================================================
+# for example (exon,mRNA,gene)
+msg("getting feature triple-rels");
+my $featurereltriples =
+  $dbh->selectall_arrayref(q[SELECT DISTINCT f1.type_id, f2.type_id, f3.type_id
+			     FROM feature_relationship AS fr1 
+                             INNER JOIN feature AS f1 ON (f1.feature_id = fr1.subject_id)
+			     INNER JOIN feature AS f2 ON (f2.feature_id = fr1.object_id)
+			     INNER JOIN feature_relationship AS fr2 INNER JOIN ON (f2.feature_id = fr2.subject_id)
+			     INNER JOIN feature AS f3 ON (f3.feature_id = fr2.object_id)
 			    ]);
 
 # ftypes and ptypes are two columns; id and name
@@ -107,6 +133,9 @@ my @names = map {$_->[1]} (@$ftypes, @$ptypes);
 # make them database-safe (remove certain characters)
 my @safenames = map {safename($_)} @names;
 
+my @so_relations = ();
+
+msg("generating SO layer....");
 foreach my $type (@$ftypes) {
     my $tname = $type->[1];
     my $vname = $namemap{lc($tname)} || die("nothing for @$type");
@@ -185,6 +214,7 @@ foreach my $type (@$ftypes) {
 	   "\n".
 	   "$vsql;\n\n",
 	  $vname);
+    push(@so_relations, $vname);
 
     if ($RTYPE eq 'TABLE') {
 	print "\n\n--- *** Auto-generated indexes ***\n";
@@ -195,9 +225,11 @@ foreach my $type (@$ftypes) {
 
     # PAIRS
 
-    foreach my $is_consecutive (0 1) {
-        my $pref = $is_consecutive ? 
-        my $pvname = 'sib_'.$vname;
+    foreach my $is_consecutive (0, 1) {
+        my $prefix = $is_consecutive ? 'c':'';
+        my $pvname = $prefix.'sib_'.$vname;
+        my $where = $is_consecutive ? "  WHERE fr2.rank - fr1.rank = 1\n" : "";
+
         if ($drop) {
             print"DROP $RTYPE $pvname  CASCADE;\n";
         }
@@ -245,8 +277,11 @@ foreach my $type (@$ftypes) {
                "    feature_relationship AS fr2 ON (fr2.object_id = fr1.object_id)\n".
                "    INNER JOIN\n".
                "    $vname AS $vname2 ON ($vname1.$vname"."_id = fr2.subject_id);\n".
+               $where.
                "\n\n",
                $pvname);
+
+        push(@so_relations, $pvname);
 
         if ($RTYPE eq 'TABLE') {
             print "\n\n--- *** Auto-generated indexes ***\n";
@@ -254,71 +289,73 @@ foreach my $type (@$ftypes) {
                 print "CREATE INDEX $pvname"."_idx_$col ON $pvname ($col);\n";
             }
         }
-    }
 
-    # INVERSE PAIRS
 
-    $pvname = $vname . '_invpair';
-    if ($drop) {
-	print"DROP $RTYPE $pvname  CASCADE;\n";
-    }
-    @cols = ();
-    @selcols =
-      map {
-	  my $n = $_;
-	  map {
-	      my $alias = "$_$n";
-	      #		   if (/(.*)_id/) {
-	      #		       $alias = "$1$n"."_id";
-	      #		   }
-	      push(@cols, $alias);
-	      "    $vname$n.$_ AS $alias" 
-	  } @fcols
-      } qw(1 2);
+        # INVERSE PAIRS
+
+        $pvname = $prefix . $vname . '_invsib';
+        if ($drop) {
+            print"DROP $RTYPE $pvname  CASCADE;\n";
+        }
+        @cols = ();
+        @selcols =
+          map {
+              my $n = $_;
+              map {
+                  my $alias = "$_$n";
+                  #		   if (/(.*)_id/) {
+                  #		       $alias = "$1$n"."_id";
+                  #		   }
+                  push(@cols, $alias);
+                  "    $vname$n.$_ AS $alias" 
+              } @fcols
+          } qw(1 2);
     
-    $sel =
-      join(",\n", @selcols);
-    $vname1 = $vname . '1';
-    $vname2 = $vname . '2';
-    printf("--- ************************************************\n".
-	   "--- *** relation: %-31s***\n".
-	   "--- *** relation type: $RTYPE                      ***\n".
-	   "--- ***                                          ***\n".
-	   "--- *** Sequence Ontology Feature Inverse Pair   ***\n".
-	   "--- *** features linked by common contained      ***\n".
-	   "--- *** child feature                            ***\n".
-	   "--- ************************************************\n".
-	   "---\n".
-	   "--- SO Term:\n".
-	   "--- \"$tname\"\n".
-	   "CREATE $RTYPE $pvname AS\n".
-	   "  SELECT\n".
-	   "    fr1.subject_id,\n".
-	   "    fr1.rank AS rank1,\n".
-	   "    fr2.rank AS rank2,\n".
-	   "    fr2.rank - fr1.rank AS rankdiff,\n".
-	   "$sel\n".
-	   "  FROM\n".
-	   "    $vname AS $vname1 INNER JOIN\n". 
-	   "    feature_relationship AS fr1 ON ($vname1.$vname"."_id = fr1.object_id)\n".
-	   "    INNER JOIN\n".
-	   "    feature_relationship AS fr2 ON (fr2.subject_id = fr1.subject_id)\n".
-	   "    INNER JOIN\n".
-	   "    $vname AS $vname2 ON ($vname1.$vname"."_id = fr2.object_id);\n".
-	   "\n\n",
-	  $pvname);
+        $sel =
+          join(",\n", @selcols);
+        $vname1 = $vname . '1';
+        $vname2 = $vname . '2';
+        printf("--- ************************************************\n".
+               "--- *** relation: %-31s***\n".
+               "--- *** relation type: $RTYPE                      ***\n".
+               "--- ***                                          ***\n".
+               "--- *** Sequence Ontology Feature Inverse Pair   ***\n".
+               "--- *** features linked by common contained      ***\n".
+               "--- *** child feature                            ***\n".
+               "--- ************************************************\n".
+               "---\n".
+               "--- SO Term:\n".
+               "--- \"$tname\"\n".
+               "CREATE $RTYPE $pvname AS\n".
+               "  SELECT\n".
+               "    fr1.subject_id,\n".
+               "    fr1.rank AS rank1,\n".
+               "    fr2.rank AS rank2,\n".
+               "    fr2.rank - fr1.rank AS rankdiff,\n".
+               "$sel\n".
+               "  FROM\n".
+               "    $vname AS $vname1 INNER JOIN\n". 
+               "    feature_relationship AS fr1 ON ($vname1.$vname"."_id = fr1.object_id)\n".
+               "    INNER JOIN\n".
+               "    feature_relationship AS fr2 ON (fr2.subject_id = fr1.subject_id)\n".
+               "    INNER JOIN\n".
+               "    $vname AS $vname2 ON ($vname1.$vname"."_id = fr2.object_id);\n".
+               "\n\n",
+               $pvname);
+        push(@so_relations, $pvname);
 
-    if ($RTYPE eq 'TABLE') {
-	print "\n\n--- *** Auto-generated indexes ***\n";
-	foreach my $col (@cols) {
-	    print "CREATE INDEX $pvname"."_idx_$col ON $pvname ($col);\n";
-	}
+        if ($RTYPE eq 'TABLE') {
+            print "\n\n--- *** Auto-generated indexes ***\n";
+            foreach my $col (@cols) {
+                print "CREATE INDEX $pvname"."_idx_$col ON $pvname ($col);\n";
+            }
+        }
     }
-
 }
 
-foreach my $po (@$partofs) {
-    my ($stid, $otid) = @$po;
+# FEATURE RELATIONSHIPS
+foreach my $fr (@$featurerels) {
+    my ($stid, $otid) = @$fr;
     my $st1 = $typemap{$stid} || die "no type for $stid";
     my $ot1 = $typemap{$otid} || die "no type for $otid";
     my $st = $namemap{lc($st1)} || die "no namemap for $st1";
@@ -366,6 +403,67 @@ foreach my $po (@$partofs) {
 	   "\n".
 	   "$vsql;\n\n",
 	  $vname);
+    push(@so_relations, $vname);
+
+    if ($RTYPE eq 'TABLE') {
+	print "\n\n--- *** Auto-generated indexes ***\n";
+	foreach my $col (@cols) {
+	    print "CREATE INDEX $vname"."_idx_$col ON $vname ($col);\n";
+	}
+    }
+
+
+}
+
+# FEATURE RELATIONSHIP TRIPLES
+foreach my $fr (@$featurereltriples) {
+    my ($tid1, $tid2, $tid3) = @$fr;
+    my $t1x = $typemap{$tid1} || die "no type for $tid1";
+    my $t2x = $typemap{$tid2} || die "no type for $tid2";
+    my $t3x = $typemap{$tid3} || die "no type for $tid3";
+    my $t1 = $namemap{lc($t1x)} || die "no namemap for $t1x";
+    my $t2 = $namemap{lc($t2x)} || die "no namemap for $t2x";
+    my $t3 = $namemap{lc($t3x)} || die "no namemap for $t3x";
+    my $vname = $t3."2".$t2."2".$t1;
+
+    my @cols = 
+      (
+       $t1.'_id',
+       $t2.'_id',
+       $t3.'_id',
+      );
+
+		  
+    my $vsql =
+      join("\n",
+	   "CREATE $RTYPE $vname AS",
+	   "  SELECT",
+	   "    $t1.feature_id AS $t1"."_id,",
+	   "    $t2.feature_id AS $t2"."_id,",
+	   "    $t3.feature_id AS $t3"."_id,",
+	   "    fr1.type_id AS fr1_type_id,",
+	   "    fr2.type_id AS fr2_type_id",
+	   "  FROM",
+	   "    $t1 INNER JOIN feature_relationship AS fr1 ON ($t1.feature_id = fr1.subject_id)",
+	   "        INNER JOIN $t2 ON ($t2.feature_id = fr1.object_id)",
+	   "        INNER JOIN feature_relationship AS fr2 ON ($t2.feature_id = fr2.subject_id)",
+	   "        INNER JOIN $t3 ON ($t3.feature_id = fr2.object_id)",
+	  );
+
+    if ($drop) {
+	print"DROP $RTYPE $vname CASCADE;\n";
+    }
+    printf("--- ************************************************\n".
+	   "--- *** relation: %-31s***\n".
+	   "--- *** relation type: $RTYPE                      ***\n".
+	   "--- ***                                          ***\n".
+	   "--- *** Sequence Ontology TRIPLE-REL view        ***\n".
+	   "--- ************************************************\n".
+	   "---\n".
+	   "\n".
+	   "$vsql;\n\n",
+	  $vname);
+    push(@so_relations, $vname);
 
     if ($RTYPE eq 'TABLE') {
 	print "\n\n--- *** Auto-generated indexes ***\n";
@@ -380,6 +478,11 @@ foreach my $po (@$partofs) {
 $dbh->disconnect;
 print STDERR "Done!\n";
 exit 0;
+
+sub msg {
+    return unless $verbose;
+    print STDERR "@_\n";
+}
 
 # ==============================================================
 # safename(string): returns string
