@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.1 2003-12-09 22:16:21 allenday Exp $
+$Id: README.H_sapiens,v 1.2 2003-12-09 23:57:59 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -42,7 +42,22 @@ you will notice that the chromosomes have been loaded as objects of
 sequence-ontology type "sequence-region".  This is a nuance of the GFF3
 spec, and isn't an error.
 
-2. Download gene model data.  The following URL provides all GenBank mRNA
+2. Load chromosomal sequence.  Download chromFa.zip from UCSC here:
+
+  wget http://www.genome.ucsc.edu/goldenPath/hg16/bigZips/chromFa.zip
+
+Now do something akin to this tcsh script:
+
+  > unzip chromFa.zip
+  > foreach i (*.fa)
+  ? echo $i
+  ? ./load/bin/load_gff3.pl --srcdb 'DB:ucsc' --organism Human --gfffile $i
+  ? end
+  >
+
+and the chromosome DNA is loaded.
+
+3. Download gene model data.  The following URL provides all GenBank mRNA
 records available from UCSC hg16.  Each gene model has extra data attached
 to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
 
