@@ -27,6 +27,7 @@ insert into cv (name,definition) values ('Statistical Terms','Locally created te
 insert into cvterm (name,cv_id) values ('null',       (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('Note', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('synonym', (select cv_id from cv where name = 'null'));
+insert into cvterm (name,cv_id) values ('score', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
@@ -34,10 +35,12 @@ insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvter
 insert into db (name, contact_id,description) values ('GFF_source', (select contact_id from contact where name = 'null'), 'A collection of sources (ie, column 2) from GFF files');
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:EMBL'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:TIGR'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucla'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id,description) values ('DB:GR',(select contact_id from contact where name = 'null'),'Gramene');
 insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot',(select contact_id from contact where name = 'null'),'SwissProt','http://us.expasy.org/cgi-bin/niceprot.pl?');
 insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:mrna',(select contact_id from contact where name = 'null'),'RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
 insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:protein',(select contact_id from contact where name = 'null'),'RefSeq Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
