@@ -8,7 +8,7 @@ use Chado::LoadDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 
-use constant DEBUG=>1;
+use constant DEBUG=>0;
 
 #######################################
 # COPYRIGHT
@@ -142,8 +142,6 @@ sub load_ontologyterms{
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
 	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
-
-           warn $db->id.", ". $oborelmap{ predmap($predicate->name) }."\n";
 
 	if(!$predicate_db){
 		my $dbxref = Chado::Dbxref->find_or_create({
