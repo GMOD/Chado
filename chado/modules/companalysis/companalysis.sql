@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.17 2003-02-03 18:28:48 emmert Exp $
+## $Id: companalysis.sql,v 1.18 2003-02-04 18:53:39 cwiel Exp $
 
 -- ================================================
 -- TABLE: analysis
@@ -62,6 +62,7 @@ create table analysis (
     sourceuri text,
     queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
+    timeexecuted timestamp not null default current_timestamp,
 
     unique(program, programversion, sourcename)
 );
