@@ -1,0 +1,103 @@
+The cvtermpath is for calculating the reflexive transitive closure of
+a relationship, and any derived relationships
+
+Normal (direct) relationships are stored in the cvterm_relationship
+table. A entry in this table represents a relationship R over some
+type T.
+
+ R = Subj T Obj
+
+For example
+
+ r = "cardioblast" develops_from "mesodermal cell"
+
+The relationship type "is_a" represents a special kind of relationship
+- subsumption, or inheritance.
+
+If X is_a Y, then it follows that all of Y's relationships are
+inherited by X
+
+[Rule 1]
+If   X is_a Y
+and  Y T Z
+then X T(inh) Z
+
+For example
+     "cilium axoneme"  is_a    "axoneme"
+     "axoneme"         part_of "cell projection"
+THEREFORE
+     "cilium axoneme"  part_of(inh) "cell projection"
+
+Here we use T(inh) to represent an inherited relationship.
+
+POPULATING CVTERMPATH
+
+The cvtermpath table stores the reflexive transitive closure of a
+relationship, taking into account subsumption/inheritance. The number
+of intermediate relationships is represented in the 'distance' column
+of the table.
+
+Here we use T(path) to represent the 'path' or closure of a
+relationship. Every T(path) is stored in cvtermpath. We use the same
+cvterm for T, the fact that it is a path is implicit.
+
+We use these rules:
+
+Reflexive relationships:
+
+for all relationship types T,
+  X T(path) X 
+
+In this case the distance=0
+
+Direct relationships:
+
+these are also included in the cvtermpath table, distance=1
+
+ If   X T       Y
+ Then X T(path) Y
+
+Transitive relationships:
+
+these have distance > 1; these also make use of inheritance rule,
+[Rule1], which gives us T(inh)
+
+If   X T(inh)     Y
+and  Y T(path)    Z
+Then X T(path)    Z
+
+Note that this rule is recursive.
+
+These rules should be used for populating cvtermpath. Attempting to
+calculate a more general closure where all relationship types are
+treated equally or ignored will produce combinatorial explosions over
+certain ontologies (eg flybase anatomy ontology)
+
+What does this mean in practice?
+
+For a typical database, which may only have relationship types is_a,
+part_of and develops_from, we will end up with 3 sets of paths.
+
+The "is_a" closure, is_a(path) will include paths over
+cvterm_relationships that look like this:
+
+a is_a b is_a c is_a d is_a e
+
+The "part_of" closure, part_of(path) will include paths over
+cvterm_relationships that look like this:
+
+a is_a b part_of c part_of d is_a e part_of f
+
+The "develops_from" closure, develops_from(path) will include paths over
+cvterm_relationships that look like this:
+
+a develops_from b develops_from c is_a d is_a e develops_from f
+
+It may be tempting to mix different non-is_a relationships in the same
+path, but this should NEVER be done - there will be an unacceptable
+combinatorial explosion in many cases. Besides, there is no use for
+such a cvtermpath; it is meaningless.
+
+Note that for amigolike query behaviour, it is necessary only to query
+cvtermpath ignoring cvtermpath.type_id (these are obtained by querying
+cvterm_relationship)
