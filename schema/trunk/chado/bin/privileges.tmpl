@@ -1,0 +1,12 @@
+--create sql to grant permissions on tables in the database
+-- sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>privileges.sql
+
+--since this opens up the database to all users, it should be used with
+--caution.  Another option would be to change "PUBLIC" below to a 
+--specific user or group to whom you want to grant privileges, or
+--change the "ALL" to something more restrictive, like "SELECT."
+
+[% FOREACH table IN schema.get_tables %]
+GRANT ALL ON TABLE [% table.name %] TO PUBLIC;
+[% END %]
+
