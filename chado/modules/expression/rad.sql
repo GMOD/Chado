@@ -517,8 +517,8 @@ create table processresult (
 create table projectlink (
     projectlink_id           																				serial not null,
 	primary key (projectlink_id),
-    projectinfo_id               																			int not null,
-	foreign key (projectinfo_id) references projectinfo (projectinfo_id),
+    project_id               																			int not null,
+	foreign key (project_id) references project (project_id),
     tableinfo_id                 																			int not null,
 	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
     id                       																				int not null,
