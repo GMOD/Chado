@@ -54,10 +54,8 @@ sub ACTION_ontologies {
   foreach my $ontology (keys %ontologies){
     print "fetching files for $ontology\n";
 
-	my $load = 0;
-    foreach my $file (@{ $ontologies{$ontology}{file} }){
-      print "  +",$file->{remote},"\n";
-
+    my $load = 0;
+    foreach my $file (grep {$_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} }){
       my $fullpath = $conf->{path}{data}.'/'.$file->{local};
       $fullpath =~ s!^(.+)/[^/]*!$1!;
 
@@ -65,35 +63,27 @@ sub ACTION_ontologies {
         system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
       }
 
-      #mirror the file
-      my $rc = mirror($file->{remote}, $conf->{path}{data} .'/'. $file->{local});
-
-      if ($rc == 304) {
-        print "    ". $file->{local} ." is up to date\n";
-      } elsif (!is_success($rc)) {
-        print "    $rc ", status_message($rc), "   (",$file->{remote},")\n";
-        next;
-      } else {
-		#file is new, load it
-        print "    updated\n";
-		$load = 1;
-      }
+      print "  +",$file->{remote},"\n";
+      $load = 1 if $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
+#      $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
     }
-	next unless $load;
 
-	my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
-	foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
+    my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
+    foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
+      print "  +",$ontfile->{remote},"\n";
+
+      $load = 1 if $m->_mirror($ontfile->{remote},$conf->{path}{data} .'/'. $ontfile->{local});
+      next unless $load;
+
       print "    loading...";
-	  system('./bin/load_ontology.pl',
-			 $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_username'},
-			 $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_name'},
-			 $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
-			 $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
-			) && (print "failed: $!\n" and die);
-	  print "done!\n";
-
-#warn Dumper($conf);
-	}
+      system('./bin/load_ontology.pl',
+             $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_username'},
+             $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_name'},
+             $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
+             $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
+            ) && (print "failed: $!\n" and die);
+      print "done!\n";
+    }
   }
 }
   
@@ -136,6 +126,25 @@ sub conf {
   $self->{conf} = XMLin($file, forcearray => ['token','path','file'], keyattr => [qw(tt2 input token name file)], ContentKey => '-value');
 #warn Dumper($self->{conf});
   return $self->{conf};
+}
+
+sub _mirror {
+  my $self = shift;
+  my ($remote,$local) = @_;
+  #mirror the file
+  my $rc = mirror($remote, $local);
+
+  if ($rc == 304) {
+    print "    ". $local ." is up to date\n";
+    return 0;
+  } elsif (!is_success($rc)) {
+    print "    $rc ", status_message($rc), "   (",$remote,")\n";
+    return 0;
+  } else {
+    #file is new, load it
+    print "    updated\n";
+    return 1;
+  }
 }
 
 1;
