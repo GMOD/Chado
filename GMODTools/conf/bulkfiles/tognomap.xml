@@ -11,6 +11,18 @@
     Add these to per-release-db configs.
     Cut from mergeflyfeats4.pl and .xml config, d.gilbert, aug04
   </about>
+
+  <noIDmap>_fragment|_junction|_mutation|_peptide|_site|_UTR|_variant
+    chromosome|golden_path\b|source
+    enhancer|EST|cDNA|intron
+    misc|match|motif|sim4
+    mRNA|CDS|oligo|processed|protein|
+    repeat|regulatory_region|repeat_region
+    transposable_element_pred</noIDmap>
+  <indexidtype>^(gene|pseudogene|\w+RNA)</indexidtype>
+  <indexidpattern>[A-Z]{2}gn\d+</indexidpattern>
+  <nameisid>BAC</nameisid>
+  <idcutdb>^(FlyBase|Gadfly|GB_protein|GO):</idcutdb>
   
   <informat>fff</informat>  
   <informat>dna</informat>  
@@ -18,9 +30,6 @@
   <seqids
     path="tmp/chado-fb.ids"
     date="20040721" 
-    noIDmap="cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4"
-    indexidtype="^(gene|pseudogene|\w+RNA)"
-    indexidpattern="[A-Z]{2}gn\d+"
   />
 
   <seqfeat
@@ -36,17 +45,39 @@
   
   
   <cytofeat
-    path="cytomap/(cyto-features|cytofeat)-[\w\-\_].tsv"
+    path="tmp/cytomap/(cyto-features|cytofeat)-[\w\-\_]+.tsv"
     name="cyto-feature parts" 
     cytofeat="1"
     date="20040707" 
   />
-  
-  
   <sorsa
-    path="cytomap/sorsa.txt"
+    path="tmp/cytomap/sorsa.txt"
     name="Table of genome:cytology mapping"
+    note="replaced by cytomap-chr.tsv files"
     date="20020817" 
+  />
+  
+  <!-- replace above w/ these forms cyto-features-2L.tsv 
+    // dang; bulkfiles split_filename requires name format
+    $org-$chr-$type-$release.$format now; rename cyto-features
+    to that pattern. dmel-2L-cytofeat-r3.tsv
+    Also change cytomap-chr to dmel-chr-cytomap-r1.tsv 
+    
+  -->
+  <fileset
+    name="cytofeat"
+    path="tmp/cytomap/dmel\-[\w\-\_]+\-cytofeat.*.fff"
+    oldpath="tmp/cytomap/cyto-features-[\w\-\_]+.tsv"
+    title="cyto-feature parts" 
+    cytofeat="1"
+    date="20041021" 
+  />
+  <fileset
+    name="cytomap"
+    path="tmp/cytomap/cytomap-[\w\-\_]+.tsv"
+    title="cyto-feature parts" 
+    copy="1"
+    date="20041021" 
   />
   
 

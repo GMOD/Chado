@@ -1,0 +1,50 @@
+<opt
+  name="toacode"
+  date="20041121"
+  >
+ 
+  <title>Gene acode objects</title>
+  <about>
+    
+  </about>
+
+  <noIDmap>chromosome|golden_path\b|source|misc|match|motif|sim4
+    oligo|processed|protein|repeat|regulatory_region|repeat_region</noIDmap>
+  <!-- mRNA|CDS|EST|cDNA|intron|enhancer|
+   _fragment|_junction|_mutation|_peptide|_site|_UTR|_variant 
+   -->
+ 
+  <indexidtype>^(gene|pseudogene|\w+RNA)</indexidtype>
+  <indexsubtype>^(mRNA|CDS)</indexsubtype>
+  <indexidpattern>[A-Z]{2}gn\d+</indexidpattern>
+
+  <idcutdb>^(FlyBase|Gadfly|GB_protein|GO):</idcutdb>
+  
+  <informat>fff</informat>  
+
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+  <featset>syntenic_region</featset> 
+
+  <!--
+  <fileset
+    name="cytofeat"
+    path="tmp/cytomap/dmel\-[\w\-\_]+\-cytofeat.*.fff"
+    oldpath="tmp/cytomap/cyto-features-[\w\-\_]+.tsv"
+    title="cyto-feature parts" 
+    cytofeat="1"
+    date="20041021" 
+  />
+  --> 
+
+</opt>

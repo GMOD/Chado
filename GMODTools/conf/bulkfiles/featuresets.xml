@@ -48,7 +48,8 @@
   <featset>intron</featset>
   <featset>intergenic</featset>
   
-  <featset>golden_path</featset>
+  <featset>syntenic_region</featset> 
+  <featset>scaffold</featset> <!-- see below confusion -->
   <featset>chromosome</featset>
 
   
@@ -93,12 +94,17 @@
     method="between"
     />
 
-  <!-- golden_path_region may be alternate, or super_contig -->
+  <!-- golden_path_region may be alternate, or supercontig -->
   <featmap
-    name="golden_path"  old_name="scaffold"
-    types="golden_path"
-    typelabel="golden_path"
-    fromdb="1"
+    name="scaffold"   
+    alt_name0 = "golden_path_region" 
+    alt_name1 = "golden_path_fragment" 
+    alt_name2 = "databank_scaffold"
+    alt_name3 = "scaffold"
+    alt_name4 = "supercontig"
+    types="golden_path_region scaffold"
+    typelabel="scaffold"
+    NOT_fromdb="1"
     />
 
 </opt>

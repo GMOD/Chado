@@ -28,8 +28,14 @@
 <!--   <blastset>transposon</blastset> -->
   <blastset>pseudogene</blastset>
   <blastset>intergenic</blastset>
-  <blastset>golden_path</blastset>
+  <blastset>syntenic_region</blastset>
+  <blastset>scaffold</blastset>
   <blastset>chromosome</blastset>
+  <blastset>syntenic_region</blastset>
+<!-- need aliases or consensus feature names here: 
+    golden_path_fragment/databank_scaffold/scaffold/supercontig
+    chromosome/golden_path/ultracontig
+-->
 
   <blastmap
     name="miscRNA"
@@ -116,28 +122,28 @@ tblastx
   </db> 
 
     <!-- these are generic for any organism -->
-  <db name="chromosome" title="  All genome chromosome arms (NT)"
+  <db name="chromosome" title="  All ${species} genome chromosome arms (NT)"
       nalfile="na_all"
   ><![CDATA[  
     Whole genome by chromosome arms
   ]]>
   </db> 
 
-  <db name="transcript" title="  Predicted genes (NT)"
+  <db name="transcript" title="  Predicted ${species} genes (NT)"
     nalfile="na_all"
     ><![CDATA[
     Complete transcript (CDS + UTR) for all of the genes 
    ]]>
   </db> 
 
-  <db name="translation" title="  Predicted proteins (AA)"><![CDATA[
+  <db name="translation" title="  Predicted ${species} proteins (AA)"><![CDATA[
     Peptide translations for all of the genes 
   ]]>
   </db> 
 
   <!-- fixme; need to extract scaffold dna from chado db -->
   <db name="golden_path" old_name="scaffold"
-    title=" Euchromatin and heterochromatin scaffolds (NT)"
+    title=" Euchromatin and heterochromatin ${species} scaffolds (NT)"
     nalfile="na_all"
     ><![CDATA[
     Genomic sequence for the euchromatic chromosome arms, 
@@ -146,7 +152,7 @@ tblastx
   ]]>
   </db> 
 
-  <db name="intergenic" title="Intergenic sequence (NT)"
+  <db name="intergenic" title="Intergenic ${species} sequence (NT)"
     nalfile="na_all"
     ><![CDATA[
   Intergeneic regions -- genome sequence between genes  

@@ -1,0 +1,123 @@
+<opt
+  name="dpsebulk-r2" 
+  relid="p3"
+  ROOT="${GMOD_ROOT}/"
+  TMP="${GMOD_ROOT}/tmp"
+  datadir="genomes/Drosophila_pseudoobscura"
+>
+ 
+  <title>FlyBase Chado Dpse r1.0.3</title>
+  <about>
+   Configurations to extract feature and sequence data for
+   bulk files from FlyBase chado databases, for data release r1.0
+  </about>
+
+  <org>dpse</org>
+  <species>Drosophila pseudoobscura</species>
+  <organism id="dpse" species="Drosophila_pseudoobscura"/>
+  <organism id="dmel" species="Drosophila_melanogaster"/>
+  <!-- <include>organisms</include> -->
+  
+  <doc name="README"><![CDATA[
+    D. pseudoobscura genome data from FlyBase 
+    Release ${rel}. 
+    NOTE: prerelease of this data was erroneously labelled r2.1.
+
+    See release notes at <a href="http://flybase.net/${release_url}">
+    http://flybase.net/${release_url}</a>
+  ]]></doc>
+
+  <include>fbreleases</include>
+
+  <!-- oct04: patch for utr fmax < fmin when 0 length -->
+  <utrpatch>1</utrpatch>
+  <!-- oct04: patch for intron  fmin - no+1,fmax, add+1 -->
+  <intronpatch>1</intronpatch>
+
+  <!-- db.name  is release-dependent ; use fbreleases -->
+  <db
+    driver="Pg"
+    no_name=""
+    host="localhost"
+    port="7302"
+    user=""
+    password=""
+    />
+  
+  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+
+  <include>filesets</include>
+
+  <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
+  <dnadump
+    path="dna/.+\.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    />
+
+  
+  <chr_pattern>^(chromosome_arm|golden_path|ultra_scaffold)$</chr_pattern>
+  <chrpart_pattern>^(golden_path_fragment)$</chrpart_pattern>
+
+  <unknown_chr>U</unknown_chr>
+  <!-- Unknown_group and Unknown_singleton go to one bag chromosome U -->
+  <mapchr_pattern name="1unknown" from="Unknown\S+" to="U"/>
+  <mapchr_pattern name="2contig"  from="^Contig[^_]+_Contig\w+" to="ctg2"/>
+  <mapchr_pattern name="3contig"  from="^Contig\w+" to="ctg1"/>
+  <mapchr_pattern name="null" from="" to=""/>
+  
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <!-- need to put in ENV for subsequent chadofeatsql.xml config -->
+    <ENV 
+      golden_path="'chromosome_arm','ultra_scaffold'"
+      species="Drosophila_pseudoobscura"
+      unknown_chr="U"
+      />
+    
+    <target>chromosomes</target>
+    <target>features</target>
+    <!-- <target>matches</target> -->
+    <target>synteny</target>
+    <target>analysis</target>
+  </featdump>
+
+    <!-- this match tblastn == orthology feature duplicate, same oid -->
+  <maptype_pattern name="orthodup" from="match:tblastn:Dmel.*" to="skip"/>
+  <maptype_pattern name="orthodup2" from="match_part:tblastn:Dmel.*" to="skip"/>
+  <maptype_pattern name="null" from="null" to="null"/>
+
+  <include>featuresets</include>
+  
+  <!-- feature sets to make fasta bulk files; 
+    needs update for dpse syntenic_block and homology features
+  -->
+  <!-- feature sets to make fasta bulk files -->
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <!-- <featset>tRNA</featset> -->
+  <!-- <featset>miscRNA</featset> -->
+  <!-- <featset>transposon</featset> -->
+  <!-- <featset>pseudogene</featset> -->
+  <featset>gene_extended2000</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+  <featset>intergenic</featset>
+
+  <featset>syntenic_region</featset>
+
+  <featset>scaffold</featset> <!-- see below confusion -->
+  <featset>chromosome</featset>
+
+
+</opt>
+

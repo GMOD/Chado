@@ -8,12 +8,13 @@
   
   <title>DHGP/FlyBase Heterochromatin rel 3.2</title>
   
-  <doc name="README">
+  <doc name="README"><![CDATA[
     D. melanogaster heterochomatin genome data from 
     Drosophila Heterochromatin Genome Project, www.dhgp.org
     Release 3.2
-    See http://flybase.net/annot/dmel_het_release3.2.txt
-  </doc>
+    See release notes at <a href="http://flybase.net/${release_url}">
+    http://flybase.net/${release_url}</a>
+  ]]></doc>
   
   <!-- this could/should be from include flybase-release.xml 
     want default release/db xml that this overrides where needed?
@@ -35,18 +36,27 @@
     />
 
 
+  <include>fbreleases</include>
+
+  <!-- oct04: patch for utr fmax < fmin when 0 length -->
+  <utrpatch>1</utrpatch>
+  <!-- oct04: patch for intron  fmin - no+1,fmax, add+1 -->
+  <intronpatch>1</intronpatch>
+
+
   <db
     driver="Pg"
     name="dmelhet_chado"
     host="localhost"
     port="7302"
-    user="flybase"
+    user=""
     password=""
     />
 
   <org>dmel</org>
   <species>Drosophila melanogaster</species>
-  
+  <include>organisms</include>
+
   <dnadump
     path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"

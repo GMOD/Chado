@@ -36,7 +36,7 @@ D.G. Gilbert, 2004, gilbertd@indiana.edu
 
 
 # debug
-use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
+# use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
 
 use POSIX;
 use FileHandle;
@@ -56,7 +56,7 @@ my $kMissingValue= -99999999;
 my $kMaxValue= 999999999;
 my $kMinValue= $kMissingValue+1;
 
-use vars qw/ %flycsomebands $noIDmap $indexidtype $indexidpattern /;
+use vars qw/ %flycsomebands $noIDmap $nameIsId $nameIsSpeciesId $cutdbpattern $indexidtype $indexidpattern /;
 
 sub init 
 {
@@ -78,7 +78,9 @@ sub initData
 {
   my($self)= @_;
   $self->SUPER::initData();
+  
   my $config = $self->{config};
+  my $sconfig= $self->handler()->{config};
 
   ##  gnomapfiles
   my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo('gnomap');
@@ -86,9 +88,38 @@ sub initData
 
   $self->{indexonly} = $finfo->{indexonly};
 
-  $noIDmap = $finfo->{noidmap} 
-    || $config->{noidmap} 
-    || 'cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4';
+#   $noIDmap = $finfo->{noidmap} 
+#     || $config->{noidmap} 
+#     || 'cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4';
+  $noIDmap =  $finfo->{noidmap} || $config->{noidmap};
+  unless($noIDmap) {
+  $noIDmap= join '|',
+  qw(cytowalk 
+    _fragment 
+    _junction 
+    _mutation 
+    _site  
+    _UTR 
+    _variant 
+    misc
+    chromosome 
+    enhancer  
+    EST cDNA 
+    intron 
+    match motif sim4
+    mRNA CDS 
+    oligo processed 
+    protein _peptide
+    repeat
+    regulatory_region repeat_region
+    transposable_element_pred 
+    );
+  }
+  $noIDmap =~ s/\s+/|/g;
+  $noIDmap .= '|\bregion';
+  $nameIsId= $finfo->{nameisid} || $config->{nameisid} || '^(BAC)';
+  $nameIsSpeciesId= $finfo->{nameisorgid} || $config->{nameisorgid} || '^(gene)$';  # others? rnas?
+  $cutdbpattern=  $finfo->{idcutdb} || $config->{idcutdb} || '^(FlyBase|GadFly|GB_protein|GO):';
 
   $indexidtype= $finfo->{indexidtype} 
     || $config->{indexidtype} 
@@ -121,12 +152,21 @@ sub initData
     # or $finfo->{summaryfile} || $config->{summaryfile}
   $self->{summaryfile} = $sumfile;
 
+  my @copytypes=();  
+  foreach my $type ( keys %{$config->{fileset}} ) {
+    my $fs= $config->{fileset}->{$type};
+    push(@copytypes, $type) if ($fs->{copy});
+    }
+  $self->{copytypes}= \@copytypes;
+  
   ## dont create subdir - use only if exists .. 
-  my $cytomapdir= $self->handler()->getReleaseSubdir( 
-      $config->{cytofeat}->{path} || 'cytomap/', 'nocreate');
-      ## use <fileset name=cytomap ??
-  $self->{cytomapdir} = $cytomapdir;
+  ## change to $config->{fileset}->{cytofeat} // <fileset name=cytofeat ??
+#   my $cytomapdir= $self->handler()->getReleaseSubdir( 
+#       $config->{cytofeat}->{path} || 'cytomap/', 'nocreate');
+#   $self->{cytomapdir} = $cytomapdir;
 
+    ## this is replaced by fileset.cytomap split by chr
+    ## need sep. package for flybase cytology map methods (various users)
   my $sorsa= $config->{sorsa}->{path};
   if ($sorsa) {
     $sorsa= catfile( $self->handler()->getReleaseDir(),  $sorsa);
@@ -195,10 +235,10 @@ sub makeFiles
 	##	  my ($nr, $nk)= cytosort( $fset_h, $dir.$hf, $csome, *FO);
 
   my $addcyto= 0;
-  if (-d $self->{cytomapdir}) {
-    #  $config->{cytofeat}->{path} OR fileset->cytomap
-    my $cytoset= $self->handler->getFiles('cytomap', $chromosomes);  
-    if ($cytoset) { $fileset= [ @$fileset, @$cytoset ]; $addcyto=1; }
+  ##if (-d $self->{cytomapdir}) {
+    #  $config->{cytofeat}->{path} OR fileset->cytofeat/cytomap
+  my $cytoset= $self->handler->getFiles('cytofeat', $chromosomes);  
+  if ($cytoset) { $fileset= [ @$fileset, @$cytoset ]; $addcyto=1; }
     
     #? add to $fileset
     # require cytomapdir to have tables in fffformat==2, split by chr
@@ -207,15 +247,22 @@ sub makeFiles
     #  2. filter cytomap fff by seq ids
     #  3. cat seq,cyto fff | sort | write to gnomapdir
     # $addcyto= 1;
-    }
+  ##}
 
 ## ---------- get sequence set ----------
   # == fff/ folder
 
     # 1. symlink dnafiles to gnomap/dna-$chr.raw 
     # 2. copy fff/release-$chr.fff to gnomap/features-$chr.tsv , stripping lead 2 cols
-  $self->addDnaSymlinks($fileset);
 
+  # $self->addDnaSymlinks($fileset);
+  $self->makeSymlinks( $fileset, 'dna/raw', "dna-\$chr.raw", $self->{dnareldir}, $self->{gnomapdir});
+ 
+  if (@{$self->{copytypes}}) {
+    my $fset= $self->handler->getFiles( $self->{copytypes}, $chromosomes);  
+    $self->copyFiles( $fset, '', '',  $self->{gnomapdir});
+    }
+  
   if($addcyto) {
     $self->mergeFeats($fileset);
   } else {
@@ -245,6 +292,7 @@ sub mergeFeats
   my $filterids= 1; #?? config
   my $gnomapdir= $self->{gnomapdir};
   my $sorter=`which sort`; chomp($sorter); ## '/bin/sort'; '/usr/bin/sort';
+  print STDERR "mergeFeats\n" if $DEBUG; 
   
   for (my $ipart= 0; $ok; $ipart++) {
     $ok= 0;
@@ -272,7 +320,7 @@ sub mergeFeats
 
       foreach my $fs (@$fileset) {
         my $fp  = $fs->{path};
-        next unless($fs->{type} =~ /cytomap/);  
+        next unless($fs->{type} =~ /cytofeat/); ## cytomap > type => "$featn/$type",
         next unless($fs->{chr} eq $chr);  
         $inmerge = $fs;
         last;
@@ -329,34 +377,37 @@ sub merge2gnomap
       $self->{featnames}->{all}->{$fname}++; # save for gbrowse...
       $self->{featnames}->{$chr}->{$fname}++; # save for gbrowse...
       }
-    else { print OUT $_; }
+    else { print $outh $_; }
     }
   ##$self->printSummary( $self->{summaryfile}, $self->{featnames});
 }
 
-sub addDnaSymlinks
-{
-	my $self= shift;
-  my( $fileset )= @_; # do per-csome/name
-  my $intype =   'dna/raw';  
-  my $gnomapdir= $self->{gnomapdir};
-  my $dnareldir= $self->{dnareldir};
-  
-  foreach my $fs (@$fileset) {
-    my $fp= $fs->{path};
-    my $name= $fs->{name};
-    my $type= $fs->{type};  
-    my $chr= $fs->{chr};  
-    next unless( $fs->{type} eq $intype);  
-    ## unless(-e $fp) { warn "missing intype file $fp"; next; }
-    my($filename, $dir) = File::Basename::fileparse($fp);
-    
-    my $relpath= catfile($dnareldir, $filename); #?
-    my $symname= catfile($gnomapdir,"dna-$chr.raw");
-    symlink( $relpath, $symname);
-    print STDERR "symlink dna-$chr.raw -> $relpath\n" if $DEBUG; 
-    }
-}
+# sub addDnaSymlinks
+# {
+# 	my $self= shift;
+#   my( $fileset )= @_; # do per-csome/name
+#   my $intype =   'dna/raw';  
+#   my $gnomapdir= $self->{gnomapdir};
+#   my $dnareldir= $self->{dnareldir};
+# 
+#   $self->makeSymlinks($fileset, $intype, "dna-\$chr.raw", $dnareldir, $gnomapdir);
+#   
+# #   foreach my $fs (@$fileset) {
+# #     my $fp= $fs->{path};
+# #     my $name= $fs->{name};
+# #     my $type= $fs->{type};  
+# #     my $chr= $fs->{chr};  
+# #     next unless( $fs->{type} eq $intype);  
+# #     ## unless(-e $fp) { warn "missing intype file $fp"; next; }
+# #     my($filename, $dir) = File::Basename::fileparse($fp);
+# #     
+# #     my $relpath= catfile($dnareldir, $filename); #?
+# #     my $symname= catfile($gnomapdir,"dna-$chr.raw");
+# #     symlink( $relpath, $symname);
+# #     print STDERR "symlink dna-$chr.raw -> $relpath\n" if $DEBUG; 
+# #     }
+# 
+# }
 
 
 sub copyFFF2Gnomap
@@ -367,6 +418,7 @@ sub copyFFF2Gnomap
   my $gnomapdir= $self->{gnomapdir};
   # my %csomefeats=();
   $self->{featnames}= {};
+  print STDERR "copyFFF2Gnomap\n" if $DEBUG; 
 
   foreach my $fs (@$fileset) {
     my $fp= $fs->{path};
@@ -556,17 +608,17 @@ sub processToOutput
 #   $sorsaf= join("",getFiles( $mconf->{sorsa}->{path} ));
 # }
 
-sub getFiles {
-	my $self= shift;
-  my($path)= @_;
-  my $file;
-  if ($path =~ s,([^/]+)$,,) { $file= $1;  }
-  else { $file= $path; $path="./"; }
-  opendir(D,$path);
-  my @file= grep(/$file/,readdir(D));
-  closedir(D);
-  return $path,@file;
-}
+# sub getFiles {
+# 	my $self= shift;
+#   my($path)= @_;
+#   my $file;
+#   if ($path =~ s,([^/]+)$,,) { $file= $1;  }
+#   else { $file= $path; $path="./"; }
+#   opendir(D,$path);
+#   my @file= grep(/$file/,readdir(D));
+#   closedir(D);
+#   return $path,@file;
+# }
 
 
 sub readflysorsa 
@@ -783,36 +835,106 @@ sub indexfeatdir
 	local(*IMAP,*IMAPX);
 	open(IMAP,">$dir/idmap.tsv");
 	open(IMAPX,">$dir/idmap.tsv.idx");
-	
+	my %idfh=();
 	foreach my $file (sort @files) {
 		my $sfile= catfile($dir, $file);
 		my $csome= ($file =~ /^features-(\w+)/) ? $1 : 'UNK';
+    my $infh= new FileHandle($sfile);
+    unless($infh) {
+      warn "Can't read $sfile";
+      $self->{failonerror} ? die : next;
+      }
 		## warn "indexing chr-$csome, $sfile\n" if $DEBUG;
-		print $self->indexFeatures( $sfile, 'index',  $csome);  
-		print $self->indexIds( $sfile, 'idindex', $csome, *IMAP, *IMAPX);  
+		$infh->seek(0,0);
+		print $self->indexFeatures( $sfile, $infh, 'index',  $csome);  
+		$infh->seek(0,0);
+		print $self->indexIds( $sfile,  $infh, 'idindex', $csome, *IMAP, *IMAPX);  
+		$infh->seek(0,0);
+		print $self->makeAllIdmaps( $sfile,  $infh, $dir, $csome, \%idfh);  
 		}
 	close(IMAP); close(IMAPX);
+	foreach my $idfh (values %idfh) { $idfh->close(); }
 }
  
+sub makeAllIdmaps 
+{
+	my $self= shift;
+  my( $file, $fin, $dir, $csome, $idfh)= @_;
+  my ($nd)=(0); my %didid=();
+  my $indexidpattern='^[A-Za-z]{2,}';  
+  my $indexdbpattern='^[A-Za-z]{2,}';  # FIXME - config
+  #die "Can't read $file" unless (open(FIN,$file));
+  my $org   = ucfirst( $self->{config}->{org} || 'Any');
+  # fixme for ortholog to_name in $notes
+  
+  while(<$fin>) {
+    my ($class,$sym,$map,$range,$idv,$dbx,$notes)= split "\t";
+    next unless( $range && $range ne '-' );
+    next if ($class =~ /$noIDmap/); ## ?? drop or keep
+    
+    my @ids= (split(/[,;\s]/,$idv),split(/[,;\s]/,$dbx));  
+    if ($class =~ /$nameIsId/) { # fixme for fff output - put in ID field
+      $sym =~ s/\-hit$//; # bad BAC names
+      unshift(@ids,$sym);
+      }
+    elsif ($class =~ /$nameIsSpeciesId/) {  
+      $sym = "$org\\$sym" unless($sym =~ m,\\,);  
+      unshift(@ids,$sym);
+      }
+    elsif ($notes && $notes =~ /to_name=([^;,\s]+)/ ) {  
+      my $tosym = $1; $tosym =~ s/\-\w\w$//; # drop prot suffix
+      my $toorg = ($notes =~ /to_species=([^;,\s]+)/) ? $1 : $org;
+      unshift(@ids,ucfirst($toorg).'\\'.$tosym);
+      }
+    my $needid=1;
+    IDINDEX:
+    while ($needid && (my $tid = shift @ids)) {
+      next if ($tid eq '-');
+      
+      my $db='';
+      if ($tid =~ s/$cutdbpattern//i) { $db= $1; } 
+      next unless ($db =~ /$indexdbpattern/ || $tid =~ /$indexidpattern/);
+      
+      my($start, $stop)= $self->maxrange($range); #$self->
+      my $idkey="$tid.$csome.$start";
+      next if ($didid{$idkey});
+      
+      my $idf= 'idmap-all.tsv';
+      if ( $tid =~ m/^([A-Za-z]+)/ ) { $idf= "idmap-$1.tsv"; }
+      my $fh= $idfh->{$idf};
+      unless($fh) { 		
+        my $sfile= catfile($dir, $idf);
+        $fh= new FileHandle(">$sfile"); $idfh->{$idf}= $fh; 
+        }
+      if ($fh) {
+        print $fh "$tid\t$csome\t$start\t$stop\n"; $nd++;
+        $didid{$idkey}++;
+        }  
+      }
+  }
+  #close(FIN);
+  return "makeAllIdmaps n=$nd\n";
+}
+
 
 sub indexIds 
 {
 	my $self= shift;
-  my($file, $kind, $csome, $idmapf, $idmapx)= @_;
+  my($file, $fin, $kind, $csome, $idmapf, $idmapx)= @_;
   local(*FIN,*FIDX);
   my ( $n, $nl)= (0,0);
   $kind= 'idindex' unless($kind);
 
   my $idx= $file . ".idx";
-  die "Can't read $file" unless (open(FIN,$file));
+  # die "Can't read $file" unless (open(FIN,$file));
   die "Can't write $idx" unless (open(FIDX,">$idx"));
 	# my $recsize = length(pack("NN", 1, 500));  ## a constant -- 2 long integers
 	my %didid= ();
 
 	my ($at,$ate)= (0,0);
-	while (<FIN>) {
+	while (<$fin>) {
 		$at = $ate;
-	  $ate= tell(FIN);
+	  $ate= tell($fin);
     if (/^\w/) {
     	$nl++;
     	chomp();
@@ -831,8 +953,9 @@ sub indexIds
         ## FIXME - need another index method to mix FBgn/FBan/FBxx
 			  next unless ($tid =~ /$indexidpattern/);
 			  
+      my $db=''; #default?
       if ($tid =~ s/([^:]+)://) {
-      	my $db= $1; ## skip not-our-id ids
+        $db= $1; ## skip not-our-id ids
       	## $tid= '' unless ($db =~ m/FlyBase|MEOW|euGenes/i);
       	## ? do we need to check db, if matches $indexidpattern ?
       	}
@@ -876,7 +999,8 @@ sub indexIds
 		  }
 		##$at = $ate;
 		}
-	close(FIDX); close(FIN);
+	close(FIDX); 
+	# close(FIN);
   return "indexIds $file = $n / $nl\n";
 }
 
@@ -887,14 +1011,14 @@ sub indexIds
 
 sub indexFeatures {
 	my $self= shift;
-  my($file, $kind, $csome)= @_;
+  my($file, $fin, $kind, $csome)= @_;
   local(*FIN,*FIDX);
   my $n= 0;
   $kind= 'index' unless($kind);
   ##return if ($kind ne 'index');
 
   my $idx= $file . ".ranges";
-  die "Can't read $file" unless (open(FIN,$file));
+  # die "Can't read $file" unless (open(FIN,$file));
   die "Can't write $idx" unless (open(FIDX,">$idx"));
   print FIDX "# $idx\n";
   print FIDX "# base range -> file index, and source, scaffold ranges\n";
@@ -905,7 +1029,7 @@ sub indexFeatures {
   my $nextstep= -666;
   my $stepsize= 100000;
   my @csomerange= (0,0);
-  while (<FIN>) {
+  while (<$fin>) {
     # my $blength= length($_);
     if (/^\w/) {
       chomp();
@@ -937,11 +1061,12 @@ sub indexFeatures {
         }
       }
     # $bindex += $blength;
-    $bindex= tell(FIN); ##? off by one ??
+    $bindex= tell($fin); ##? off by one ??
     }
   print FIDX "$csomerange[1]\t$bindex\n";
 
-  close(FIN); close(FIDX);
+  #close(FIN); 
+  close(FIDX);
   return "indexFeatures $file = $n\n";
 }
 

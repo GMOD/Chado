@@ -1,26 +1,46 @@
 <opt
-  name="fbbulk-r3" 
-  relid="3"
+  name="fbbulk-r3b" 
+  relid="3b"
   ROOT="${GMOD_ROOT}/"
   TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Drosophila_melanogaster"
+  datadir="data/genomes/Drosophila_melanogaster"
 >
 
-  <title>FlyBase Chado DB r3.2</title>
+  <title>FlyBase Chado DB r3.2.2</title>
   <about>
    Configurations to extract feature and sequence data for
-   bulk files from FlyBase chado databases, for data release 3.2.1
+   bulk files from FlyBase chado databases, including various
+   release information.
   </about>
+
+  <doc name="README"><![CDATA[
+    D. melanogaster euchromatin genome data from FlyBase
+    Release  ${rel}.   This release is data maintenance,
+    correcting intron and UTR positions (off-by-1), 
+    and adds D.pseudoobscura r2.1 synteny and ortholog features. 
+    See release notes at <a href="http://flybase.net/${release_url}">
+    http://flybase.net/${release_url}</a>
+  ]]></doc>
+
+  <include>fbreleases</include>
 
   <org>dmel</org>
   <species>Drosophila melanogaster</species>
+  <include>organisms</include>
   
-  <doc name="README">
-    D. melanogaster euchromatin genome data from FlyBase
-    Release 3.2.1.  See http://flybase.net/annot/dmel_r3.2.1.txt
-  </doc>
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
 
-  <include>fbreleases</include>
+  <!-- oct04: patch for utr fmax < fmin when 0 length -->
+  <utrpatch>1</utrpatch>
+  <!-- oct04: patch for intron  fmin - no+1,fmax, add+1 -->
+  <intronpatch>1</intronpatch>
+  
+  <!-- this featurewriter patt failed to retype pseudogenes .. why? -->
+  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
 
   <!-- db.name  is release-dependent ; use fbreleases -->
   <db
@@ -28,7 +48,7 @@
     name="dmel_chado"
     host="localhost"
     port="7302"
-    user="flybase"
+    user=""
     password=""
     />
   
@@ -38,122 +58,24 @@
   <include>filesets</include>
   
   <include>featuresets</include>
-  
-  <!-- feature sets to make fasta bulk files; see include -->
-<!--
-  <featset>gene</featset>
-  <featset>mRNA</featset>
-  <featset>CDS</featset>
-  <featset>transcript</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
-  <featset>transposon</featset>
-  <featset>pseudogene</featset>
 
-  <featset>gene_extended2000</featset>
-  <featset>five_prime_UTR</featset>
-  <featset>three_prime_UTR</featset>
-  <featset>intron</featset>
-  <featset>intergenic</featset>
-
-  <featset>chromosome</featset>
-  <featset>golden_path</featset>
--->
+  <!-- note 19nov04 - override scaffold default featmap.
+      fb dmel chado scaffold residues come from
+      chromosome dna; but had out-of-date errors, safer to use
+      chromosome, not fromdb for these? 
+  -->
+  <featmap
+    name="scaffold"   
+    alt_name0 = "golden_path_region" 
+    alt_name1 = "golden_path_fragment" 
+    alt_name2 = "databank_scaffold"
+    alt_name3 = "scaffold"
+    alt_name4 = "supercontig"
+    types="golden_path_region scaffold"
+    typelabel="scaffold"
+    NOT_fromdb="1"
+    />
+  <featmap name="dummy" note="here for xml parser" />
 
 </opt>
 
-<!--
-
-analysis types - feature_sql = analysis
-
-chipmunk% 
-cat $an/tmp/featdump/analy*tsv | perl -ne \
-'@v=split("\t"); $f{$v[4]}++; $a{$v[0]||"u"}++; $u{$v[4]}++ unless($v[0]); END{ print "arms....\n";foreach(sort keys %a){print"$_\t$a{$_}\n";} print "\nfeats....\n";foreach(sort keys %f){print"$_\t$f{$_}\n";} print "\nunlocated....\n";foreach(sort keys %u){print"$_\t$u{$_}\n";}}'
- 
-arms
-2L      434070
-2R      516836
-3L      437559
-3R      642952
-4       30400
-X       385403
-u       37316     << no gffatts_anfloc view link to featureloc; FIXME
-          .. includes promoter; 
-
-feats.....
-        15667
-match:HDP       2448
-match:JOSHTRANSPOSON:Sept       1572
-match:RNAiHDP   40
-match:blastx_masked:aa_SP.hyp.dros      354
-match:blastx_masked:aa_SP.real.dros     22163
-match:blastx_masked:aa_SPTR.dros        68846
-match:blastx_masked:aa_SPTR.insect      7492
-match:blastx_masked:aa_SPTR.othinv      12471
-match:blastx_masked:aa_SPTR.othvert     11774
-match:blastx_masked:aa_SPTR.plant       9609
-match:blastx_masked:aa_SPTR.primate     16345
-match:blastx_masked:aa_SPTR.rodent      16081
-match:blastx_masked:aa_SPTR.worm        12679
-match:blastx_masked:aa_SPTR.yeast       5211
-match:blastx_masked:aa_TR.real.dros     43823
-match:blastx_masked:aa_users_i.dros     4633
-match:clonelocator:scaffoldBACs 949
-match:fgenesh   14838
-match:genscan   19189
-match:locator:cytology  5715
-match:piecegenie        13794
-match:promoter  35737
-match:sim4:na_DGC.dros  15270
-match:sim4:na_EST.all_nr.dros   267828
-match:sim4:na_adh.cDNAs.dros    51
-match:sim4:na_affy_oligo.dros   197726
-match:sim4:na_cDNA.dros 10319
-match:sim4:na_gadfly.dros.RELEASE2      14389
-match:sim4:na_gb.dros   14979
-match:sim4:na_pe.dros   3201
-match:sim4:na_users_i.dros      737
-match:tblastx:na_dbEST.insect   16818
-match:tblastx:na_unigene.rodent 11707
-
-match_part:HDP  6710
-match_part:RNAiHDP      120
-match_part:blastx_masked:aa_SP.hyp.dros 702
-match_part:blastx_masked:aa_SP.real.dros        31704
-match_part:blastx_masked:aa_SPTR.dros   121630
-match_part:blastx_masked:aa_SPTR.insect 11879
-match_part:blastx_masked:aa_SPTR.othinv 20013
-match_part:blastx_masked:aa_SPTR.othvert        20023
-match_part:blastx_masked:aa_SPTR.plant  15465
-match_part:blastx_masked:aa_SPTR.primate        30639
-match_part:blastx_masked:aa_SPTR.rodent 28957
-match_part:blastx_masked:aa_SPTR.worm   21525
-match_part:blastx_masked:aa_SPTR.yeast  7937
-match_part:blastx_masked:aa_TR.real.dros        66787
-match_part:blastx_masked:aa_users_i.dros        7920
-match_part:clonelocator:scaffoldBACs    949
-match_part:fgenesh      60300
-match_part:genscan      76527
-match_part:locator:cytology     5715
-match_part:piecegenie   50364
-match_part:sim4:na_DGC.dros     42344
-match_part:sim4:na_EST.all_nr.dros      575817   << ~current EST =640011
-match_part:sim4:na_adh.cDNAs.dros       175
-match_part:sim4:na_affy_oligo.dros      197726  << current oligo 197337
-match_part:sim4:na_cDNA.dros    40802         << ~ current cDNA_clone ft
-match_part:sim4:na_gadfly.dros.RELEASE2 58273
-match_part:sim4:na_gb.dros      41543
-match_part:sim4:na_pe.dros      3294
-match_part:sim4:na_users_i.dros 2017
-match_part:tblastx:na_dbEST.insect      21647
-match_part:tblastx:na_unigene.rodent    20577
-
-
-unlocated....
-        5
-match:JOSHTRANSPOSON:Sept       1572
-match:promoter  35737
-match:sim4:na_gb.dros   2
-
--->

@@ -20,17 +20,18 @@
   
 =head1 Quick Start
 
-  # get soft
-  cvs -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gmod co -d GMODTools schema/GMODTools 
+  # get software
+  cvs -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gmod \
+    co -d GMODTools schema/GMODTools 
 
   # load a genome chado db to Postgres
   wget http://http://sgdlite.princeton.edu/download/sgdlite/2004_05_19_sgdlite.sql.gz
   createdb sgdlite_20040519
   (zcat *sgdlite.sql.gz | psql -d sgdlite_20040519 -f - ) >& log.load 
 
-  env GMOD_ROOT=$PWD/GMODTools perl ./bin/bulkfiles.pl -help
-  env GMOD_ROOT=$PWD/GMODTools perl ./bin/bulkfiles.pl \
-    -conf sgdbulk1 -dna -feat -make -debug
+  setenv GMOD_ROOT=$PWD/GMODTools
+  perl ./bin/bulkfiles.pl -help
+  perl ./bin/bulkfiles.pl -conf sgdbulk1 -dnadump -featdump -make -debug
 
 =head1 AUTHOR
 
@@ -43,8 +44,8 @@ use Getopt::Long;
 
 my ($dnadump,$featdump,$makeout,$failonerror,$debug,$showconfig)
   = (0) x 10;
-  
-my $config= undef;  ## 'sgdbulk1' or 'fbbulk-r4', # 'fbbulk-r3h', # 'fbbulk-dpse1'
+my $splitfeat=-1;  
+my $config= undef;  ## 'sgdbulk1' or 'fbbulk-r4' or 'fbbulk-dpse1'
 my @formats= ();
 my @defformats= qw(fff gff fasta blast gnomap);
 my @chr=();
@@ -54,7 +55,8 @@ my $ok= Getopt::Long::GetOptions(
 'formats=s' => \@formats,  
 'chromosome=s' => \@chr,
 'dnadump!' => \$dnadump,
-'featdump!' => \$featdump,
+'featdump!' => \$featdump, 
+'splitfeat!' => \$splitfeat,  
 'failonerror!' => \$failonerror,
 'makeout!' => \$makeout,
 'debug!' => \$debug,
@@ -62,13 +64,16 @@ my $ok= Getopt::Long::GetOptions(
 'showconfig!' => \$showconfig,
 );
 
+if ($splitfeat == -1) { $splitfeat= $featdump; }
+
 @chr = split(/,/,join(',',@chr));
 @formats = split(/,/,join(',',@formats));
+@formats= @defformats unless(@formats);
 
 warn " ** Specify -config=config-name\n" unless($config);
 die <<"USAGE" unless ($ok && $config);
 Generate genome bulk files from Chado database.
-Usage: $0 [ -conf fbbulk-r4 -chr X -format fff -make -nodna -nofeatdump ]
+Usage: $0 [ -conf fbbulk-r4 -chr X -format fff -make  ]
   -config=bulkfile-config 
     A Bio::GMOD::Bulkfiles config file pointing to genome data files,
     e.g., sgdbulk1, conf/bulkfiles/fbbulk-r4
@@ -81,6 +86,7 @@ Usage: $0 [ -conf fbbulk-r4 -chr X -format fff -make -nodna -nofeatdump ]
     extract chromosome dna from database [default $dnadump]
   -featdump  
     extract features from database [default $featdump]
+    ( -[no]splitfeat = split by chromosome [default with -featdump] )
   -failonerror  
     die if error is encountered (otherwise read log to see it)
   -make  
@@ -98,28 +104,22 @@ NOTES:
    making fff and gff are the time consuming steps and may be split
    by chromosome across processors ( ~3 hr / chr for drosophila)
 USAGE
-
   
-@formats= @defformats unless(@formats);
-my ($feattables,$dnafiles,$chrfeats,$fafiles);
+my $result= 'none';
 
 my $sequtil= Bio::GMOD::Bulkfiles->new( configfile => $config, 
   debug => $debug, showconfig => $showconfig,
   failonerror => $failonerror,
   );
 
-if ($featdump) { 
-  $feattables = $sequtil->dumpFeatures(); 
-  $chrfeats= $sequtil->sortNSplitByChromosome( $feattables) ; 
-  }
-if ($dnadump) { $dnafiles = $sequtil->dumpChromosomeBases(); }
+$sequtil->dumpFeatures() if ($featdump); 
+$sequtil->sortNSplitByChromosome() if ($splitfeat); 
+$sequtil->dumpChromosomeBases() if ($dnadump);
 
-# this part takes processing time - split among computers by chromosomes ?
-if ( $makeout ) {
-  my $result= $sequtil->makeFiles(  
-    formats => \@formats, chromosomes => \@chr );
+$result= $sequtil->makeFiles( formats => \@formats, chromosomes => \@chr ) 
+  if ( $makeout );
     
-  print STDERR "done make. result=",$result,"\n" if $result;  
-}
+print STDERR "Bulkfiles done. result=",$result,"\n";   
+
 
 

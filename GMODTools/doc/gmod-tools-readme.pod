@@ -5,8 +5,7 @@
   databases, primarily at this point for loading and extracting
   miscellaneous sequences.
 
-  August 2004: Added Bio::GMOD::Bulkfiles package from FlyBase file
-  dumper
+  Bio::GMOD::Bulkfiles package created from FlyBase file dumper (August 2004)
   
   Other sequence functions are in library module
   GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
@@ -23,13 +22,13 @@
 
   This generates Fasta, GFF, DNA and other bulk genome annotation files at
     ftp://flybase.net/genomes/Drosophila_melanogaster/current/ ..
-    (and other species soon)
-  It is tested with flybase chado dbs, and with SGDLite chado db
+    (and other species)
+  It works with several FlyBase chado dbs, and with SGDLite chado db
 
   Bulkfiles is mostly self-contained, but uses a few
   BioPerl parts plus XML::Simple for configuration files.  All of
   the organism/database-specific logic should be in these configuration
-  files (see GMODTools/conf/)
+  files (see GMODTools/conf/bulkfiles/)
     fbbulk-r4.xml, sgdbulk1.xml .. -- organism/database/release specific options
     chadofeatsql.xml  --  chado db sql calls to dump features
     chadofeatconv.xml --  feature conversion options
@@ -42,24 +41,27 @@
      using GenBank/EMBL locations)
   Fasta sequence for each selected feature set,
      with headers from feature files
+  BLAST Index files (NCBI)
+
   
 =head1 USAGE
   
   use Bio::GMOD::Bulkfiles;    
   
-  my $sequtil= Bio::GMOD::Bulkfiles->new( 
-    configfile => 'sgdbulk1',   # data-release config file
-    debug => 1, showconfig => 0, );
-  
-  my $feattables = $sequtil->dumpFeatures(); 
-  my $chrfeats   = $sequtil->sortNSplitByChromosome( $feattables) ; 
-  my $seqfiles   = $sequtil->dumpChromosomeBases();  
-  
-  my $featwriter= $sequtil->getFeatureWriter();
-  my $result= $featwriter->makeFiles( 
-    infiles => [ @$seqfiles, @$chrfeats ], # required
-    formats => [qw(fff gff fasta)] , # optional
+  my $bulkfiles= Bio::GMOD::Bulkfiles->new( 
+    configfile => 'fbbulk-r4',   # data-release config file, required param
+    debug => 1, showconfig => 0,
+    failonerror => 1,
     );
+  
+  $bulkfiles->dumpFeatures(); # extract feature tables from chado sql db
+  $bulkfiles->sortNSplitByChromosome(); # collate and separate by chromosome
+  $bulkfiles->dumpChromosomeBases();    # extract chromosome dna files
+  
+     # produce various output format bulk files from above
+  my $result= $bulkfiles->makeFiles(
+        formats => [qw(fff gff fasta blast gnomap)], 
+        chromosomes => [qw(all)] );
   
     
 =head1 WHY Bulkfiles? 
@@ -102,7 +104,13 @@
     f. need fairly complex and data specific configurations - moving
       that to config files keeps code reusable.
       
-
+    g. each genome chado database has different policy and choices with
+      respect to feature, vocabulary and other data.  A highly configurable
+      tool, with data extraction and correction methods that are separate
+      and tunable is needed to adapt to such variation in genome databases.
+      
+      
+      
  ==========================================================================  
 
 

@@ -6,14 +6,15 @@
 #n this format is key=value usable from perl, shell, java programs
 
 #n basic ARGOS parts - also defined in Argos configs
+## FIXME - Config2.pm requires ${envkey} not $envkey for env values
 ARGOS_ROOT=/bio/argos
 ARGOS_SERVICE=flybase
-ARGOS_SERVICE_ROOT=$ARGOS_ROOT/flybase
+ARGOS_SERVICE_ROOT=${ARGOS_ROOT}/flybase
 
 #n Path to installation 
 #n for Argos, this is better: GMOD_ROOT=$ARGOS_ROOT/gmod
 GMOD_ROOT=/bio/argos/flybase
-#or# GMOD_ROOT=$ARGOS_ROOT/flybase
+#or# GMOD_ROOT=${ARGOS_ROOT}/flybase
 
 #n Chado (Postgres) Database name
 CHADO_DB_NAME=chado001
@@ -32,7 +33,7 @@ CHADO_DB_HOST=localhost
 CHADO_DB_PORT=7302
 
 #n need local PERL lib .. should go elsewhere?
-PERL5LIB=$GMOD_ROOT/lib:$PERL5LIB
+PERL5LIB=${GMOD_ROOT}/lib:${PERL5LIB}
 
 #n for XORT Chado tools (perl modules)
 XORT_CONF=$ARGOS_SERVICE_ROOT/conf/xort
