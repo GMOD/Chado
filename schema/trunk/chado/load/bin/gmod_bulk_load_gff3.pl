@@ -476,20 +476,24 @@ while(my $feature = $gffio->next_feature()){
       my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
 
       #enforcing the unique index on dbxref table
-      next if $cache{dbxref}{"$database|$accession|$version"};
-      $cache{dbxref}{"$database|$accession|$version"} = 1;
+      if {$cache{dbxref}{"$database|$accession|$version"}){
+          print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
+          $nextfeaturedbxref++;
+      } else {
+          $cache{dbxref}{"$database|$accession|$version"} = 1;
 
-      unless ($cache{db}{$database}) {
-        my($db_id) = Chado::Db->search( name => "DB:$database" );
-        warn "couldn't find database 'DB:$database' in db table"
-          and next unless $db_id;
-        $cache{db}{$database} = $db_id;
+          unless ($cache{db}{$database}) {
+              my($db_id) = Chado::Db->search( name => "DB:$database" );
+              warn "couldn't find database 'DB:$database' in db table"
+                 and next unless $db_id;
+              $cache{db}{$database} = $db_id;
+          }
+
+          print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
+          $nextfeaturedbxref++;
+          print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
+          $nextdbxref++;
       }
-
-      print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
-      $nextfeaturedbxref++;
-      print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
-      $nextdbxref++;
     }
   }
 
