@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.15 2004-03-02 03:21:37 scottcain Exp $
+$Id: INSTALL,v 1.16 2004-03-15 18:58:32 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -32,9 +32,13 @@ Prerequisites:
       postgres or as the user created above):
         # /usr/bin/createlang plpgsql template1
 
+    * for information on tuning postgres for performance, see
+
+         http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
+
   Apache (1.3.*)
 
-  BioPerl (1.4 when available)
+  BioPerl (1.4 or bioperl-live)
           (-microarray 0.1 --required for microarray data)
 
   Standard Perl modules:
@@ -42,7 +46,7 @@ Prerequisites:
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
     * DBD::Pg                  (GBrowse,chado)
-    * SQL::Translator (0.05 or cvs) (chado)
+    * SQL::Translator (0.05 or cvs) (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
     * Module::Build            (chado)
@@ -55,7 +59,7 @@ Prerequisites:
     * XML::Parser::PerlSAX     (chado<->Apollo)
     * LWP                      (chado)
     * Log::Log4perl            (chado)
-    * Term::ProgressBar        (chado)
+    * Term::ProgressBar (2.06 or better)  (chado)
   
 
 This document describes how to install the Chado schema:

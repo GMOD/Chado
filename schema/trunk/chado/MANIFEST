@@ -1,3 +1,4 @@
+bin/AutoDBI.PL
 bin/addcascades
 bin/ddltrans
 bin/make_cvtermpath.pl
@@ -41,6 +42,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
+modules/default_schema.sql
 modules/audit/audit.doc
 modules/audit/make_audit_ddl
 modules/bin/mk.pl

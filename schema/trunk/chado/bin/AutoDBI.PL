@@ -6,7 +6,7 @@ use FindBin '$Bin';
 use Cwd;
   
 my %OPTIONS;
-if (open F,"$Bin/../../build.conf") {
+if (open F,"$Bin/../build.conf") {
   while (<F>) {
     next if /^\#/;
     chomp;
@@ -15,9 +15,8 @@ if (open F,"$Bin/../../build.conf") {
   close F;
 }
 
-my $dir = dirname($0);
-$file   = File::Spec->catfile($dir,basename($0, '.PL','.PLS'));
-$file   =.'.pm';
+$file   = basename($0, '.PL','.PLS');
+$file   = "$Bin/../lib/Chado/$file.pm";
 
 open OUT,">$file" or die "Can't create $file: $!";
         
