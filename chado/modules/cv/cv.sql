@@ -81,10 +81,10 @@ create index cvpath_idx4 on cvpath (cv_id);
 
 
 -- ================================================
--- TABLE: cvterm_synonym
+-- TABLE: cvtermsynonym
 -- ================================================
 
-create table cvterm_synonym (
+create table cvtermsynonym (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
        termsynonym varchar(255) not null,
@@ -99,9 +99,11 @@ create index cvterm_synonym_idx1 on cvterm_synonym (cvterm_id);
 -- ================================================
 
 create table cvterm_dbxref (
+       cvterm_dbxref_id serial not null,
+       primary key (cvterm_dbxref_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
-       dbxref_id varchar(255) not null,
+       dbxref_id int not null,
        foreign key (dbxref_id) references dbxref (dbxref_id),
 
        unique(cvterm_id, dbxref_id)

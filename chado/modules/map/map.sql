@@ -72,6 +72,8 @@ create index featurerange_idx6 on featurerange (rightendf_id);
 -- ================================================
 
 create table featurepos (
+       featurepos_id serial not null,
+       primary key (featurepos_id),
        featuremap_id serial not null,
        foreign key (featuremap_id) references featuremap (featuremap_id),
        feature_id int not null,
@@ -92,6 +94,8 @@ create index featurepos_idx3 on featurepos (map_feature_id);
 -- ================================================
 
 create table featuremap_pub (
+       featuremap_pub_id serial not null,
+       primary key (featuremap_pub_id),
        featuremap_id int not null,
        foreign key (featuremap_id) references featuremap (featuremap_id),
        pub_id int not null,

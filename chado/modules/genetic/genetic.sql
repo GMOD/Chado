@@ -18,9 +18,11 @@ create table genotype (
 -- ================================================
 
 create table feature_genotype (
-       feature_id int,
+       feature_genotype_id serial not null,
+       primary key (feature_genotype_id),
+       feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
-       genotype_id int,
+       genotype_id int not null,
        foreign key (genotype_id) references genotype (genotype_id),
 
        unique(feature_id,genotype_id)
@@ -58,6 +60,8 @@ create index phenotype_idx3 on phenotype (background_genotype_id);
 -- ================================================
 
 create table feature_phenotype (
+       feature_phenotype_id serial not null,
+       primary key (feature_phenotype_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        phenotype_id int not null,
@@ -74,6 +78,8 @@ create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
 -- ================================================
 
 create table phenotype_cvterm (
+       phenotype_cvterm_id serial not null,
+       primary key (phenotype_cvterm_id),
        phenotype_id int not null,
        foreign key (phenotype_id) references phenotype (phenotype_id),
        cvterm_id int not null,
@@ -112,6 +118,8 @@ create index interaction_idx3 on interaction (phenotype_id);
 -- ================================================
 
 create table interaction_subj (
+       interaction_subj_id serial not null,
+       primary key (interaction_subj_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,
@@ -128,6 +136,8 @@ create index interaction_subj_idx2 on interaction_subj (interaction_id);
 -- ================================================
 
 create table interaction_obj (
+       interaction_obj_id serial not null,
+       primary key (interaction_obj_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,

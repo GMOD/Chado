@@ -6,9 +6,9 @@ create table organism (
 	organism_id serial not null,
 	primary key (organism_id),
 	abbrev varchar(255) null,
-	genus varchar(255) null,
-	taxgroup varchar(255) null,
-	species varchar(255) null,
+	genus varchar(255) not null,
+	taxgroup varchar(255) not null,
+	species varchar(255) not null,
 	common_name varchar(255) null,
 	comment text null,
 
@@ -32,7 +32,7 @@ create table organism (
 create table organism_dbxref (
        organism_dbxref_id serial not null,
        primary key (organism_dbxref_id),
-       organism_id int,
+       organism_id int not null,
        foreign key (organism_id) references organism (organism_id),
        dbxref_id int not null,
        foreign key (dbxref_id) references dbxref (dbxref_id),

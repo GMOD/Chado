@@ -23,6 +23,8 @@ create table expression (
 -- ================================================
 
 create table feature_expression (
+       feature_expression_id serial not null,
+       primary key (feature_expression_id),
        expression_id int not null,
        foreign key (expression_id) references expression (expression_id),
        feature_id int not null,
@@ -55,6 +57,8 @@ create index feature_expression_idx2 on feature_expression (feature_id);
 -- cvterm used is <t>, <a>, or <p>
 
 create table expression_cvterm (
+       expression_cvterm_id serial not null,
+       primary key (expression_cvterm_id),
        expression_id int not null,
        foreign key (expression_id) references expression (expression_id),
        cvterm_id int not null,
@@ -72,6 +76,8 @@ create index expression_cvterm_idx2 on expression_cvterm (cvterm_id);
 -- ================================================
 
 create table expression_pub (
+       expression_pub_id serial not null,
+       primary key (expression_pub_id),
        expression_id int not null,
        foreign key (expression_id) references expression (expression_id),
        pub_id int not null,
@@ -103,6 +109,8 @@ create table eimage (
 -- ================================================
 
 create table expression_image (
+       expression_image_id serial not null,
+       primary key (expression_image_id),
        expression_id int not null,
        foreign key (expression_id) references expression (expression_id),
        eimage_id int not null,

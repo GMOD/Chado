@@ -42,6 +42,8 @@ create index pub_idx1 on pub (type_id);
 -- appears in another pub (I think these three are it - at least for fb)
 
 create table pub_relationship (
+       pub_relationship_id serial not null,
+       primary key (pub_relationship_id),
        subj_pub_id int not null,
        foreign key (subj_pub_id) references pub (pub_id),
        obj_pub_id int not null,
@@ -63,6 +65,8 @@ create index pub_relationship_idx3 on pub_relationship (type_id);
 -- Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
 
 create table pub_dbxref (
+       pub_dbxref_id serial not null,
+       primary key (pub_dbxref_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
        dbxref_id int not null,
@@ -98,6 +102,8 @@ create table author (
 -- ================================================
 
 create table pub_author (
+       pub_author_id serial not null,
+       primary key (pub_author_id),
        author_id int not null,
        foreign key (author_id) references author (author_id),
        pub_id int not null,
