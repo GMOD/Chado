@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE chado SYSTEM "/users/zhou/work/flybase/xml/chado_stan.dtd">
+<!-- config file to control how to refer/autocreate global_id from/in database, same table, can have different pattern, path, ranked by rank, it will parse the global_id in that order-->
+<chado>
+  <global_id>
+     <table>dbxref</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+        <dbxref op="force" dump="all">
+           <db_id test="yes">
+              <db>
+                <name>$1</name>
+               </db>
+           </db_id>
+           <accession test="yes">$2</accession>
+           <version test="yes">$3</version>
+        </dbxref>
+      </path>
+      <rank>1</rank>
+      <!--  select dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name='$'1 and db.accession='$'2 and db.version='$3' -->
+  </global_id>
+  <global_id>
+     <table>cvterm</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+        <cvterm op="force"> 
+           <cv_id test="yes">
+              <cv>
+                <name>$1</name>
+              </cv>
+           </cv_id>
+           <name test="yes">$2</name>
+        </cvterm>
+      </path>
+      <rank>0</rank>
+      <!--  select cvterm_id from cvterm ct, cv c where c.name='$1' and cv.name='$2' -->
+  </global_id>
+  <global_id>
+     <table>dbxref</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+        <dbxref op="lookup" dump="all">
+           <db_id test="yes">
+              <db>
+                <name>$1</name>
+               </db>
+           </db_id>
+           <accession test="yes">$2</accession>
+           <version test="yes">$3</version>
+        </dbxref>
+      </path>
+      <rank>0</rank>
+      <!--  select dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name='$'1 and db.accession='$'2 and db.version='$3' -->
+  </global_id>
+  <global_id>
+     <table>feature</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+        <feature op="lookup" dump="select">
+          <dbxref_id test="yes">
+            <dbxref>
+              <db_id>
+                <db>
+                  <name>$1</name>
+                </db>
+              </db_id>
+              <accession>$2</accession>
+              <version>$3</version>
+            </dbxref>
+          </dbxref_id>
+        </feature>
+     </path>
+     <rank>0</rank>
+   </global_id>
+<!-- select f.feature_id from feature f, dbxref dx, db d where f.dbxref_id=dx.dbxref_id and dx.db_id=d.db_id and d.name='$1' and dx.accession='$2' and dx.version='$3'  -->
+   <global_id>
+     <table>feature</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+       <feature op="lookup" dump="select">
+         <feature_dbxref test="yes"> 
+          <dbxref_id>
+            <dbxref>
+              <db_id>
+                <db>
+                  <name>$1</name>
+                </db>
+              </db_id>
+              <accession>$2</accession>
+              <version>$3</version>
+            </dbxref>
+          </dbxref_id>
+          <is_current>1</is_current>
+         </feature_dbxref>
+       </feature>
+     </path>
+     <rank>4</rank>
+     <!-- select f.feature_id from feature f where exist (select * from feature_dbxref fd, dbxref dx, db d  where fd.feature_id=f.feature_id and fd.dbxref_id=dx.dbxref_id and dx.accession='$2' and dx.version='$3' and dx.dbxref_id=d.db_id and d.name='$1'  -->
+   </global_id>
+   <global_id>
+     <table>feature</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+       <feature op="lookup" dump="select">
+         <uniquename test="yes">$2</uniquename>
+         <organism_id test="yes">
+           <organism>
+             <genus>UNKNOWN</genus>
+             <species>UNKNOWN</species>
+           </organism>
+         </organism_id>
+         <dbxref_id>
+            <dbxref>
+              <db_id>
+                <db>
+                  <name>$1</name>
+                </db>
+              </db_id>
+              <accession>$2</accession>
+              <version>$3</version>
+            </dbxref>
+         </dbxref_id>
+         <type_id>
+           <cvterm>
+              <name>UNKNOWN</name>
+              <cv_id>
+                <cv>
+                  <name>UNKNOWN</name>
+                </cv>
+              </cv_id>
+           </cvterm>
+         </type_id>
+       </feature>
+     </path>
+     <rank>5</rank>
+     <!-- select feature_0.feature_id from organism organism_0 , feature feature_0 where  organism_0.genus='UNKNOWN' and feature_0.organism_id=organism_0.organism_id and organism_0.species='UNKNOWN' and feature_0.uniquename='$2' -->
+   </global_id>
+</chado>
+   
