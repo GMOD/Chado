@@ -25,7 +25,6 @@ my @chain = qw(cx-chado-to-chaos);
 unshift @chain, qw(chado-expand-macros) unless $expanded;
 Bio::Chaos::XSLTHelper->xsltchain($file, $out, @chain);
 
-
 exit 0;
 
 __END__
