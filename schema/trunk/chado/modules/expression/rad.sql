@@ -73,9 +73,9 @@ create table channel (
 
 COMMENT ON TABLE channel IS 'different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but affy uses only one)';
 
-create table array (
-    array_id serial not null,
-	primary key (array_id),
+create table arraydesign (
+    arraydesign_id serial not null,
+	primary key (arraydesign_id),
     manufacturer_id int not null,
 	foreign key (manufacturer_id) references contact (contact_id) on delete cascade,
     platformtype_id int not null,
@@ -100,24 +100,24 @@ create table array (
     num_sub_rows int null,
     unique(name)
 );
-create index array_idx1 on array (manufacturer_id);
-create index array_idx2 on array (platformtype_id);
-create index array_idx3 on array (substratetype_id);
-create index array_idx4 on array (protocol_id);
-create index array_idx5 on array (dbxref_id);
+create index arraydesign_idx1 on arraydesign (manufacturer_id);
+create index arraydesign_idx2 on arraydesign (platformtype_id);
+create index arraydesign_idx3 on arraydesign (substratetype_id);
+create index arraydesign_idx4 on arraydesign (protocol_id);
+create index arraydesign_idx5 on arraydesign (dbxref_id);
 
-COMMENT ON TABLE array IS 'general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns).';
+COMMENT ON TABLE arraydesign IS 'general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns).';
 
 create table arrayprop (
     arrayprop_id serial not null,
 	primary key (arrayprop_id),
-    array_id int not null,
-	foreign key (array_id) references array (array_id) on delete cascade,
+    arraydesign_id int not null,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(100) not null
 );
-create index arrayprop_idx1 on arrayprop (array_id);
+create index arrayprop_idx1 on arrayprop (arraydesign_id);
 create index arrayprop_idx2 on arrayprop (type_id);
 
 COMMENT ON TABLE arrayprop IS 'extra array properties that are not accounted for in array';
@@ -125,8 +125,8 @@ COMMENT ON TABLE arrayprop IS 'extra array properties that are not accounted for
 create table assay (
     assay_id serial not null,
 	primary key (assay_id),
-    array_id int not null,
-	foreign key (array_id) references array (array_id) on delete cascade,
+    arraydesign_id int not null,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     assaydate timestamp null default current_timestamp,
@@ -140,7 +140,7 @@ create table assay (
     description varchar(500) null,
     unique(name)
 );
-create index assay_idx1 on assay (array_id);
+create index assay_idx1 on assay (arraydesign_id);
 create index assay_idx2 on assay (protocol_id);
 create index assay_idx3 on assay (operator_id);
 create index assay_idx4 on assay (dbxref_id);
@@ -409,8 +409,8 @@ create table element (
 	primary key (element_id),
     feature_id int null,
 	foreign key (feature_id) references feature (feature_id) on delete set null,
-    array_id int not null,
-	foreign key (array_id) references array (array_id) on delete cascade,
+    arraydesign_id int not null,
+	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
     type_id int null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete set null,
     dbxref_id int null,
@@ -433,7 +433,7 @@ create table element (
     string2 varchar(500) null
 );
 create index element_idx1 on element (feature_id);
-create index element_idx2 on element (array_id);
+create index element_idx2 on element (arraydesign_id);
 create index element_idx3 on element (type_id);
 create index element_idx4 on element (dbxref_id);
 create index element_idx5 on element (subclass_view);

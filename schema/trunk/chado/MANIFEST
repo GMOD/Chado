@@ -19,6 +19,7 @@ dat/chado.html
 dat/chado.pl
 dat/chado.xml
 dat/NC_000913.gff
+dat/yeast.gff3.bz2
 doc/Chado_Schema_Documentation.doc
 doc/ChadoCSHMay03Slides.pdf
 doc/cjm-notes.txt
