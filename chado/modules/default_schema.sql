@@ -89,7 +89,7 @@ COMMENT ON TABLE project IS NULL;
 create table cv (
     cv_id serial not null,
     primary key (cv_id),
-    name varchar(255) not null,
+    name varchar(1024) not null,
    definition text,
    constraint cv_c1 unique (name)
 );
@@ -103,7 +103,7 @@ create table cvterm (
     primary key (cvterm_id),
     cv_id int not null,
     foreign key (cv_id) references cv (cv_id) on delete cascade INITIALLY DEFERRED,
-    name varchar(255) not null,
+    name varchar(1024) not null,
     definition text,
     dbxref_id int,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
@@ -168,7 +168,7 @@ create table cvtermsynonym (
     primary key (cvtermsynonym_id),
     cvterm_id int not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    synonym varchar(255) not null,
+    synonym varchar(1024) not null,
     constraint cvtermsynonym_c1 unique (cvterm_id,synonym)
 );
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
