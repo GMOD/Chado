@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.42 2003-12-06 06:21:07 allenday Exp $
+# $Id: Makefile.PL,v 1.43 2003-12-09 21:24:51 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -428,8 +428,9 @@ Makefile written.  Now you should do the following, in order:
 
   1. make             (creates necessary build files)
   2. make load_schema (loads SQL schema into database)
-  3. make prepdb      (loads basic data)
-  4. make ontologies  (loads data for various ontologies)
+  3. make radviews    (create views for gene expression data)
+  4. make prepdb      (loads basic data)
+  5. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
 
@@ -528,6 +529,9 @@ prepdb ::
 
 ontologies ::
 	./Build ontologies
+
+radviews ::
+	./Build radviews
 
   };  
 }
