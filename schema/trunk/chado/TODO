@@ -2,8 +2,8 @@ TODO for the next alpha release (SOON!)
 
 Done! - test load_gff.pl
 Done! - roll yeast gff3 file into distribution
-- add a make target to remove ontology lock files
-- change tmp space for ontologies to $GMOD_ROOT/tmp
+Done! - add a make target to remove ontology lock files
+Done! - change tmp space for ontologies to $GMOD_ROOT/tmp
 Done! - update AutoDBI.PLS
 Done! - fix the prepdb thing (are the inserts that fail generic or specific to
    Allen's stuff?)
@@ -30,17 +30,13 @@ begin-transaction/cache/flush/end-transaction/analyze strategy.
 where to start?
 
 For the next release:
-- fix Makefile.PL to install scripts in $GMOD_ROOT/bin
+- fix Makefile.PL to install scripts in $GMOD_ROOT/bin (i'm not convinced I want this; I think /usr/local/bin is fine sc-3/26/04)
 - add documentation for creating Class::DBI classes for an existing schema--
 this will no doubt be necessary for future upgrade paths (I'm thinking the way
 to suggest doing this is dumping the schema from the existing database, via
 `pg_dump -s DBNAME > sqlfile`; `pg2cdbi.pl DBNAME USERNAME PASSWORD sqlfile`
 - add documentation for loading ontologies when the files are already present
 locally.
-- create pre-created Class::DBI classes for a 'default' install, eliminating
-the need for S::T.
-- either make Term::ProgressBar optional or submit a patch to give back a 
-default width when the XS module fails to find a terminal width (or both).
 - remove hard coded passwords and other conf stuff from Class::DBI classes.
 - integrate Apollo
 - integrate a web front end (probably turnkey)
