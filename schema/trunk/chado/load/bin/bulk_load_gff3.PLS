@@ -33,10 +33,10 @@ if ($OPTIONS{PREFIX}) {
 print OUT <<'!NO!SUBS!';
 use strict;
 use DBI;
-use Chado::LoadDBI;
+#use Chado::LoadDBI;
 use Bio::FeatureIO;
 use Getopt::Long;
-use Data::Dumper;
+#use Data::Dumper;
 use URI::Escape;
 
 # parents come before features
@@ -213,7 +213,7 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
   $ANALYSIS = 0;
 }
 
-Chado::DBI->set_db('Main',"dbi:Pg:dbname=$DBNAME;host=$DBHOST",$DBUSER,$DBPASS,{AutoCommit=>0});
+#Chado::DBI->set_db('Main',"dbi:Pg:dbname=$DBNAME;host=$DBHOST",$DBUSER,$DBPASS,{AutoCommit=>0});
 
 my %cache = (
              analysis => {},
@@ -394,9 +394,43 @@ if(!defined($sofa_id)){
 $sth->finish;
 ########################
 
-my($organism) = Chado::Organism->search( common_name => "$ORGANISM" );
+#######################################################
+#prepare a bunch of sql queries to be used in the loop:
+#
+my $search_uniquename 
+   = $db->prepare("SELECT feature_id FROM feature WHERE uniquename=?");
+my $search_name
+   = $db->prepare("SELECT feature_id FROM feature WHERE name=?");
+my $count_name
+   = $db->prepare("SELECT COUNT(*) FROM feature WHERE name=?");
+my $search_cvterm_id
+   = $db->prepare("SELECT cvterm_id FROM cvterm WHERE name=? AND cv_id=?");
+my $search_source_dbxref
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? and db_id=?");
+my $search_dbxref
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=?");
+my $search_cvterm_id_w_dbxref
+   = $db->prepare("SELECT cvterm_id FROM cvterm WHERE dbxref_id=?");
+my $search_db
+   = $db->prepare("SELECT db_id FROM db WHERE name =?");
+my $search_long_dbxref
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession =? 
+                                                  AND version =?
+                                                  AND db_id =?");
+my $search_analysis
+   = $db->prepare("SELECT analysis_id FROM analysis WHERE name=?");
+my $search_synonym
+   = $db->prepare("SELECT synonym_id FROM synonym WHERE name=? 
+                                                    AND type_id=?");
 
-$organism or die "organism not found in the database";
+$sth = $db->prepare("SELECT organism_id FROM organism WHERE common_name = ?");
+$sth->execute($ORGANISM);
+my @row_array = $sth->fetchrow_array;
+my $organism = $row_array[0];
+undef $sth;
+undef @row_array;
+
+$organism or die "$ORGANISM organism not found in the database";
 
 open F   ,  ">$files{feature}";
 open FLOC,  ">$files{featureloc}";
@@ -427,8 +461,8 @@ while(my $feature = $gffio->next_feature()){
 
   my $type = $cache{type}{$featuretype};
   if(!$type){
-    ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
-    $cache{type}{$featuretype} = $type->id;
+    $search_cvterm_id->execute($featuretype, $sofa_id);
+    $type = ($cache{type}{$featuretype}) = $search_cvterm_id->fetchrow_array;
   }
   die "no cvterm for ".$featuretype unless $type;
 
@@ -438,19 +472,25 @@ while(my $feature = $gffio->next_feature()){
     if($feature->seq_id->value eq '.'){
       $src = '\N';
     } else {
-      ($src) = Chado::Feature->search( uniquename => $feature->seq_id->value )
-            || Chado::Feature->search( name => $feature->seq_id->value );
-      die "Unable to find srcfeature ",$feature->seq_id->value," in the database\n" 
-            unless $src;
-      if ($src->isa('Class::DBI::Iterator')) {
-        my @sources;
-        while (my $tmp = $src->next) {
-          push @sources, $tmp;
+      $search_uniquename->execute($feature->seq_id->value) or die;
+
+      ($cache{parent}{$feature->seq_id->value})
+            = $search_uniquename->fetchrow_array;
+
+      unless ($cache{parent}{$feature->seq_id->value}) {
+        $count_name->execute($feature->seq_id->value);
+        my ($n_rows) = $count_name->fetchrow_array;
+        if (1 < $n_rows) {
+          die "more that one source for ".$feature->seq_id->value;
+        } elsif ( 1==$n_rows) {
+          $search_name->execute($feature->seq_id->value);
+          ($cache{parent}{$feature->seq_id->value})
+              = $search_name->fetchrow_array;
+        } else {
+          die "Unable to find srcfeature "
+               .$feature->seq_id->value
+               ." in the database\n";
         }
-        die "more that one source for ".$feature->seq_id->value if (@sources>1);
-        $cache{parent}{$feature->seq_id->value} = $sources[0]->id;
-      } else {
-        $cache{parent}{$feature->seq_id->value} = $src->id;
       }
       $src = $cache{parent}{$feature->seq_id->value};
     }
@@ -461,11 +501,6 @@ while(my $feature = $gffio->next_feature()){
     my $pname = undef;
     my($pname) = ($feature->annotation->get_Annotations('Parent'))[0]->value;
     my $parent = $cache{parent}{$pname};
-    if(!$parent){
-      ($parent) = Chado::Feature->search( uniquename => $pname )
-        || Chado::Feature->search( name => $pname );
-      $cache{parent}{$pname} = $parent->id;
-    }
     die "no parent ".$pname unless $parent;
 
     print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$part_of)),"\n";
@@ -511,13 +546,19 @@ while(my $feature = $gffio->next_feature()){
     my @notes = map {$_->value} $feature->annotation->get_Annotations('Note');
     my $rank = 0;
     foreach my $note (@notes) {
+      unless ($cache{type}{'Note'}) {
+          my $sth = 
+              $db->prepare("SELECT cvterm_id FROM cvterm WHERE name='Note'
+                            AND cv_id in
+                              (SELECT cv_id FROM cv WHERE name='null' OR
+                                                          name='local')");
+          $sth->execute();
+          ($cache{type}{'Note'}) = $sth->fetchrow_array;
+      }
 
-      ($cache{type}{'Note'}) = Chado::Cvterm->search( name => 'Note')
-          unless $cache{type}{'Note'};
-
-      if ( !$constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}->id }{ $rank } ) {
-        $constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}->id }{ $rank }++;
-        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Note'}->id,uri_unescape($note),$rank)),"\n";
+      if ( !$constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}}{ $rank } ) {
+        $constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}}{ $rank }++;
+        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Note'},uri_unescape($note),$rank)),"\n";
         $rank++;
         $nextfeatureprop++;
       }
@@ -537,17 +578,16 @@ while(my $feature = $gffio->next_feature()){
       my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
 
       unless ($auto_cv_id){
-        my ($cv_obj) = Chado::Cv->search( name=>'autocreated');
-        $auto_cv_id  = $cv_obj->id;
+        my $sth = $db->prepare("SELECT cv_id FROM cv WHERE name='autocreated'");
+        $sth->execute;
+        ($auto_cv_id) = $sth->fetchrow_array;
       }
 
       unless ( $cache{type}{$tag} ) {
-        my ($tag_cvterm) = Chado::Cvterm->search(
-                             name => $tag,
-                             cv_id=> $auto_cv_id);
+        $search_cvterm_id->execute($tag, $auto_cv_id);
+        my ($tag_cvterm) = $search_cvterm_id->fetchrow_array;
         if ($tag_cvterm) { #good, the term is already there
-          print "tag:$tag\n";
-          $cache{type}{$tag} = $tag_cvterm->id;
+          $cache{type}{$tag} = $tag_cvterm;
         } else { #bad! the term is not there for now we die with a helpful message
           die <<END;
 Your GFF3 file uses a tag called '$tag', but this term is not
@@ -583,19 +623,20 @@ END
 
   if ( $source_success && $source && $source ne '.') {
     unless ($gff_source_db) {
-      ($gff_source_db) = Chado::Db->search({ name => 'GFF_source' });
+      my $sth = $db->prepare("SELECT db_id FROM db WHERE name='GFF_source'");
+      $sth->execute;
+      ($gff_source_db) = $sth->fetchrow_array;
     }
 
     if ($gff_source_db) {
       unless ($cache{dbxref}{$source}) {
         #first, check if this source is already in the database
 
-        my ($chado_source) = Chado::Dbxref->search(
-                                    db_id => $gff_source_db->id,
-                                    accession => $source);
+        $search_source_dbxref->execute($source, $gff_source_db);
+        my ($chado_source) = $search_source_dbxref->fetchrow_array;
 
         if ($chado_source) {
-          $cache{dbxref}{$source} = $chado_source->id;
+          $cache{dbxref}{$source} = $chado_source;
         } else {
           $cache{dbxref}{$source} = $nextdbxref;
           print DBX join("\t",($nextdbxref,$gff_source_db->id,$source,1,'\N')),"\n";
@@ -620,15 +661,18 @@ END
     foreach my $term (@ucvterms) {
       next unless $term;
       unless ($cache{type}{$term}) {
-        my ($dbxref) = Chado::Dbxref->search( accession => $term );
+        $search_dbxref->execute($term);
+        my ($dbxref) = $search_dbxref->fetchrow_array;
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
-        ($cache{type}{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+        $search_cvterm_id_w_dbxref->execute($dbxref);
+        ($cache{type}{$term}) = $search_cvterm_id_w_dbxref->fetchrow_array;
         warn "couldn't find $term's cvterm_id in cvterm table\n" 
           and next unless $cache{type}{$term}; 
       }
       unless ($pub) {
-        ($pub) = Chado::Pub->search( miniref => 'null' );
-        $pub = $pub->id; #no need to keep whole object when all we want is the id
+        my $sth = $db->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
+        $sth->execute;
+        ($pub) = $sth->fetchrow_array;
       }
 
       print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term}->id,$pub)),"\n";
@@ -658,18 +702,17 @@ END
         }
       } else {
           unless ($cache{db}{$database}) {
-              my($db_id) = Chado::Db->search( name => "DB:$database" );
+              $search_db->execute("DB:$database");
+              my($db_id) = $search_db->fetchrow_arrary;
               warn "couldn't find database 'DB:$database' in db table"
                  and next unless $db_id;
               $cache{db}{$database} = $db_id;
           }
 
           #check for an existing dbxref--this could slow things down a lot!
-          my ($existing_dbxref) = Chado::Dbxref->search(
-                                   db_id     => $cache{db}{$database},
-                                   accession => $accession,
-                                   version   => $version);
-
+          $search_long_dbxref->execute($accession,
+                                       $version,$cache{db}{$database});
+          my ($existing_dbxref) = $search_long_dbxref->fetchrow_array;
           if ($existing_dbxref) {
             if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}){
               $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}++;
@@ -719,7 +762,8 @@ END
                 $source .'_'. $featuretype;
 
     unless ($cache{analysis}{$ankey}) {
-      my ($ana) = Chado::Analysis->search( name => $ankey );
+      $search_analysis->execute($ankey);
+      my ($ana) = $search_analysis->fetchrow_array;
       dump_ana_contents($ankey) unless $ana;
       $cache{analysis}{$ankey} = $ana->id;
     }
@@ -797,7 +841,8 @@ END
                   $tsource .'_'. $featuretype;
 
       unless($cache{analysis}{$ankey}) {
-        my ($ana) = Chado::Analysis->search( name => $ankey );
+        $search_analysis->execute($ankey);
+        my ($ana) = $search_analysis->fetchrow_array;
         dump_ana_contents($ankey) unless $ana;
         $cache{analysis}{$ankey} = $ana->id;
       }
@@ -917,21 +962,25 @@ sub synonyms  {
     my $feature_id = shift;
     unless ($cache{synonym}{$alias}) {
       unless ($cache{type}{'synonym'}) {
-        ($cache{type}{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
+        my $sth 
+          = $db->prepare("SELECT cvterm_id FROM cvterm WHERE name='synonym'");
+        $sth->execute;
+        ($cache{type}{'synonym'}) = $sth->fetchrow_array;
         warn "unable to find synonym type in cvterm table"
             and next unless $cache{type}{'synonym'};
       }
 
       #check for pre-existing synonyms with this name
-      my ($synonym) = Chado::Synonym->search(
-                             name => $alias,
-                             type_id => $cache{type}{'synonym'}->id);
+      $search_synonym->execute($alias,$cache{type}{'synonym'});
+      my ($synonym) = $search_synonym->$sth->fetchrow_array;
 
       if ($synonym) {
         unless ($pub) {
-          ($pub) = Chado::Pub->search( miniref => 'null' );
-          $pub = $pub->id; #no need to keep whole object when all we want is the id
+          my $sth = $db->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
+          $sth->execute;
+          ($pub) = $sth->fetchrow_array;
         }
+
 
         if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id } ) {
           $constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id }++;
@@ -945,8 +994,10 @@ sub synonyms  {
         print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'}->id,$alias)),"\n";
 
         unless ($pub) {
-          ($pub) = Chado::Pub->search( miniref => 'null' );
-          $pub = $pub->id; #no need to keep whole object when all we want is the id
+            my $sth = $db->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
+            $sth->execute;
+            my @row_array = $sth->fetchrow_array;
+            $pub = $row_array[0];
         }
 
         if( !$constraint{feature_synonym_c1}{ $feature_id }{ $nextsynonym } ) { 
@@ -974,13 +1025,14 @@ sub dump_ana_contents {
   print STDERR "\n\nCouldn't find $anakey in analysis table\n";
   print STDERR "The current contents of the analysis table is:\n\n";
 
-  my @all_columns = Chado::Analysis->columns;
-  printf STDERR "%10s %11s %12s %30s %10s %10s\n\n", sort @all_columns;
+  my $sth 
+    = $db->prepare("SELECT analysis_id,name,description,program FROM analysis");
+  printf STDERR "%10s %25s %30s %10s\n\n", 
+    ('analysis_id','name','description','program');
 
-  my $analysis_iterator = Chado::Analysis->retrieve_all();
-  while (my $analysis = $analysis_iterator->next) {
-    my @cols = map {$analysis->$_} sort $analysis->columns;
-    printf STDERR "%10s %11s %12s %30s %10s %10s\n", @cols;
+  $sth->execute;
+  while (my $array_ref = $sth->fetchrow_arrayref) {
+    printf STDERR "%10s %25s %30s %10s\n", @$array_ref;
   }
 
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
