@@ -1,5 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -10,27 +11,110 @@ use ExtUtils::MakeMaker;
 #
 
 use strict;
+use re 'taint';
 use Config;
 use Cwd;
 use XML::Simple;
-use File::Spec::Functions qw[ curdir catfile catdir ];
-use Template;
+use File::Spec::Functions qw[ catfile catdir ];
+
+my %args    =  (
+  DBDRIVER  => {
+    default => 'PostgreSQL',
+  },
+  DBNAME    => {
+    default => 'chado',
+  },
+  DBUSER    => {
+    default => $ENV{'USER'} || getlogin() || scalar getpwuid( $< )
+  },
+  DBPASS    => {
+    default => '',
+  },
+  DBHOST    => {
+    default => 'localhost',
+  },
+  DBPORT    => {
+    default => '',
+  },
+);
+
+my $usage = <<"END";
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+                         CHADO INSTALLATION
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+To customize installation options, provide one or more of the options
+(default values in parentheses):
+
+DBDRIVER The RDBMS vendor ($args{'DBDRIVER'}{'default'})
+DBNAME   The name of the Chado database ($args{'DBNAME'}{'default'})
+DBUSER   The username to use when connecting to the database ($args{'DBUSER'}{'default'})
+DBPASS   The password for connecting ($args{'DBPASS'}{'default'})
+DBHOST   The machine name where the database is running ($args{'DBHOST'}{'default'})
+DBPORT   The port on which the database is listening ($args{'DBPORT'}{'default'})
+
+e.g., perl Makefile.PL DBDRIVER=PostgreSQL DBNAME=chado [...]
+
+Optionally, if the file "load.conf" can be found from a previous run
+of the Makefile.PL, you will be prompted to confirm the values saved 
+in this file.  
+
+If you wish to use the previous values without being prompted, then
+provide the argument "RECONFIGURE=1."  
+
+If you wish to disregard any values in "load.conf" and be prompted for
+new arguments, provide the argument "RECONFIGURE=0."  
+
+If you wish to use the defaults without being prompted, provide the 
+argument "DEFAULTS=1."
+
+END
+
+#
+# Parse arguments.
+#
+my $all_args = join( '|', qw[RECONFIGURE DEFAULTS], keys %args );
+my %opts;
+my @argv = @ARGV;
+@ARGV    = (); # empty out @ARGV so MakeMaker doesn't get confused
+foreach ( @argv ) {
+  if ( /^--?h(elp)?$/i ) {
+    die $usage;
+  }
+  elsif ( /^($all_args)=(.+)$/ ) {
+    $opts{ $1 } = $2;
+  }
+}
 
 my %VALID_DBS = (
   Pg => 'PostgreSQL',
   #Oracle => 'Oracle',
 );
+my %db_lookup = reverse %VALID_DBS;
 
-my $PERL        =  $Config{'startperl'};
-$PERL           =~ s/^\s*#!\s*//;
-my $working_dir = cwd;
-my $lib_dir     = catdir $working_dir, 'lib';
-my $chado_dir   = catdir $lib_dir, 'Chado';
-my $config_file = catfile $working_dir, 'load', 'etc', 'load.conf';
+#
+# Establish some globals.
+#
+my $PERL         =  $Config{'startperl'};
+$PERL            =~ s/^\s*#!\s*//;
+my $working_dir  = cwd;
+my $lib_dir      = catdir $working_dir, 'lib';
+my $chado_dir    = catdir $lib_dir, 'Chado';
+my $config_file  = catfile $working_dir, 'load', 'etc', 'load.conf';
+
+my %O;
+$O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
+$O{PACKAGE_HOME} = catfile $O{GMOD_HOME}, 'lib', 'schema';
+$O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
+$O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
 
 mkdir $lib_dir   unless -d $lib_dir;
 mkdir $chado_dir unless -d $chado_dir;
 
+#
+# Look for load config file from a previous run ...
+#
 my $load_conf;
 if ( -e $config_file ) {
   open CONF, "<$config_file" or die "Can't read file '$config_file': $!\n";
@@ -38,17 +122,24 @@ if ( -e $config_file ) {
   $load_conf = <CONF>;
   close CONF or die "Can't close file '$config_file': $!\n";
 }
+#
+# Or the template to create a new one.
+#
 else {
-  my $t = Template->new( ABSOLUTE => 1 );
   my $config_template = catfile( $working_dir, 'load', 'tt2', 'load.conf.tt2' );
-  if ( -e $config_template ) {
-    $t->process( $config_template, {}, \$load_conf ) or die $t->error;
+  if ( open CONF, "<$config_template" ) {
+    local $/;
+    $load_conf = <CONF>;
+    close CONF or die "Can't close '$config_template': $!\n";
   }
   else {
-    warn "Template '$config_template' doesn't exist\n";
+    warn "Can't read config template '$config_template': $!\n";
   }
 }
 
+#
+# If there is a configuration, read it in.
+#
 my $conf = $load_conf 
   ? XMLin( 
     $load_conf, 
@@ -59,67 +150,90 @@ my $conf = $load_conf
   : {}
 ;
 
-my %O;
-$O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
-$O{PACKAGE_HOME} = catfile $O{GMOD_HOME}, 'lib', 'schema';
-$O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
-$O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
-
 #
-# What database server? (Assume Pg for now)
+# Now figure out where the values are coming from -- load.conf, 
+# command-line, or prompt().
 #
-my $DBDRIVER = prompt(
-  'What database server will you be using?', 
-  $conf->{'database'}{'db_driver'} 
-  ? $VALID_DBS{ $conf->{'database'}{'db_driver'} }
-  : 'PostgreSQL'
-);
+my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
+  $SQLFILES, $EXTERNAL_DDL );
 
-my %db_lookup = reverse %VALID_DBS;
-unless ( exists $db_lookup{ $DBDRIVER } ) {
-  print join("\n",
-    "Sorry, '$DBDRIVER' isn't valid. Please choose from the following:",
-    ( map { "  $_" } sort values %VALID_DBS ),
-    ''
+unless ( @argv ) {
+  my $answer = prompt(
+    "Previous configuration detected.\nUse values in '$config_file'?", 'Y'
   );
-  exit;
+
+  $opts{'RECONFIGURE'} = $answer =~ /^[Yy]/ ? 1 : 0;
 }
 
-my $DBNAME = prompt( 'What is the Chado database name?', 
-  $conf->{'database'}{'db_name'} || 'chado' 
-);
-
-my $DBUSER = prompt( 'What is the database username?', 
-  $conf->{'database'}{'db_username'} || $ENV{'USER'} 
-);
-
-my $DBPASS = prompt( "What is the password for '$DBUSER'?", 
-  $conf->{'database'}{'db_password'} 
-);
-
-my $DBHOST = prompt( 'What is the database host?', 
-  $conf->{'database'}{'db_host'} || 'localhost' 
-);
-
-my $DBPORT = prompt( 'What is your database port?', 
-  $conf->{'database'}{'db_port'} || '' 
-);
-
-#
-# Save database config options.
-#
-if ( open CONF, ">$config_file" ) {
-  $conf->{'database'}{'db_driver'}   = $db_lookup{ $DBDRIVER };
-  $conf->{'database'}{'db_name'}     = $DBNAME;
-  $conf->{'database'}{'db_username'} = $DBUSER;
-  $conf->{'database'}{'db_password'} = $DBPASS;
-  $conf->{'database'}{'db_host'}     = $DBHOST;
-  $conf->{'database'}{'db_port'}     = $DBPORT;
-
-  print CONF XMLout( $conf, RootName => 'load' );
-  close CONF or die "Can't write file '$config_file': $!\n";
+if ( $opts{'RECONFIGURE'} && $conf->{'database'} ) {
+  $DBDRIVER = $conf->{'database'}{'db_driver'} || '';
+  $DBNAME   = $conf->{'database'}{'db_name'}   || '';
+  $DBUSER   = $conf->{'database'}{'db_user'}   || '';
+  $DBPASS   = $conf->{'database'}{'db_pass'}   || '';
+  $DBHOST   = $conf->{'database'}{'db_host'}   || '';
+  $DBPORT   = $conf->{'database'}{'db_port'}   || '';
+}
+elsif ( $opts{'DEFAULTS'} ) {
+  $DBDRIVER = $args{'DBDRIVER'}{'default'};
+  $DBNAME   = $args{'DBNAME'}{'default'};
+  $DBUSER   = $args{'DBUSER'}{'default'};
+  $DBPASS   = $args{'DBPASS'}{'default'};
+  $DBHOST   = $args{'DBHOST'}{'default'};
+  $DBPORT   = $args{'DBPORT'}{'default'};
+}
+elsif ( %opts ) {
+  $DBDRIVER = $opts{'DBDRIVER'} || '';
+  $DBNAME   = $opts{'DBNAME'}   || '';
+  $DBUSER   = $opts{'DBUSER'}   || '';
+  $DBPASS   = $opts{'DBPASS'}   || '';
+  $DBHOST   = $opts{'DBHOST'}   || '';
+  $DBPORT   = $opts{'DBPORT'}   || '';
 }
 
+if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
+  #
+  # Make sure everything has a value and looks kosher.
+  #
+  $DBDRIVER ||= prompt(
+    'What database server will you be using?', 
+    $VALID_DBS{ $conf->{'database'}{'db_driver'} }
+    ? $VALID_DBS{ $conf->{'database'}{'db_driver'} }
+    : $args{'DBDRIVER'}{'default'}
+  );
+  
+  unless ( exists $db_lookup{ $DBDRIVER } ) {
+    print join("\n",
+      "Sorry, '$DBDRIVER' isn't valid. Please choose from the following:",
+      ( map { "  $_" } sort values %VALID_DBS ),
+      ''
+    );
+    exit;
+  }
+  
+  $DBNAME ||= prompt( 'What is the Chado database name?', 
+    $conf->{'database'}{'db_name'} || $args{'DBNAME'}{'default'}
+  );
+  
+  $DBUSER ||= prompt( 'What is the database username?', 
+    $conf->{'database'}{'db_username'} || $args{'DBUSER'}{'default'}
+  );
+  
+  $DBPASS ||= prompt( "What is the password for '$DBUSER'?", 
+    $conf->{'database'}{'db_password'} || $args{'DBPASS'}{'default'}
+  );
+  
+  $DBHOST ||= prompt( 'What is the database host?', 
+    $conf->{'database'}{'db_host'} || $args{'DBHOST'}{'default'}
+  );
+  
+  $DBPORT ||= prompt( 'What is your database port?', 
+    $conf->{'database'}{'db_port'} || $args{'DBPORT'}{'default'}
+  );
+}
+
+#
+# Now figure out which schema modules to include.
+#
 my $rebuild_complete = 0;
 open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
 my @sqlfiles;
@@ -135,7 +249,7 @@ while (<CORE>) {
 close CORE;
 
 #
-# Get available extensions to core and ask if any are to be used.
+# Ask about available extensions to core.
 #
 print "\nAvailable extensions to the core schema:\n";
 open EXT, $O{EXTDEF} or die "Unable to read file '$O{EXTDEF}': $!\n";
@@ -154,9 +268,10 @@ while (<EXT>) {
 }
 close EXT;
 
-print "\nWhat extensions to the core schema do you need (Note that selecting any\n";
-print "of these will force the rebuilding of Class::DBI classes.)\n";
-my $extstr = prompt("(Comma delimited)?","0");
+print "\nWhat extensions to the core schema would you like?\n",
+  "(Note that selecting any of these will force the\n",
+  "rebuilding of Class::DBI classes.)\n";
+my $extstr = prompt("(e.g. 1-3,5)?","0");
 
 if ($extstr) {
   $rebuild_complete++; 
@@ -178,7 +293,7 @@ if ($extstr) {
   }
 }
 
-my $external = prompt("Enter the full path of an external DDL file",'none');
+my $external = prompt("Enter the full path of an external DDL file", 'none');
 my @seqfiles;
 unless ($external eq 'none') {
   if (-e $external) {
@@ -188,9 +303,41 @@ unless ($external eq 'none') {
   }
 }
 
+#
+# Show the user the options (esp. if using RECONFIGURE or DEFAULTS).
+#
 print join("\n", 
-  '', 'Building with the following core modules and extensions:', @sqlfiles, ''
+  '', 
+  'Building with the following database options:',
+  "DBDRIVER=$DBDRIVER",
+  "DBNAME=$DBNAME",
+  "DBUSER=$DBUSER",
+  "DBPASS=$DBPASS",
+  "DBHOST=$DBHOST",
+  "DBPORT=$DBPORT",
+  '',
+  'And the following core modules and extensions:', 
+  @sqlfiles, 
+  ''
 );
+
+#
+# Save build options.
+#
+if ( open CONF, ">$config_file" ) {
+  $conf->{'database'}{'db_driver'}   = $db_lookup{ $DBDRIVER };
+  $conf->{'database'}{'db_name'}     = $DBNAME;
+  $conf->{'database'}{'db_username'} = $DBUSER;
+  $conf->{'database'}{'db_password'} = $DBPASS;
+  $conf->{'database'}{'db_host'}     = $DBHOST;
+  $conf->{'database'}{'db_port'}     = $DBPORT;
+  $conf->{'build'}{'working_dir'}    = $working_dir;
+  $conf->{'build'}{'external_ddl'}   = $external;
+  $conf->{'build'}{'sqlfiles'}       = \@sqlfiles;
+
+  print CONF XMLout( $conf, RootName => 'load' );
+  close CONF or die "Can't write file '$config_file': $!\n";
+}
 
 my $complete_sql = "$working_dir/modules/complete.sql";
 if ($rebuild_complete || !-e $complete_sql) {
@@ -204,9 +351,13 @@ if ($rebuild_complete || !-e $complete_sql) {
   }
   close OUT;
 
-  warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n"; 
-  system("$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' $working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm")==0
-    or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
+  print "Creating Class::DBI classes in '$chado_dir'\n",
+    "(This could take a while) ...\n"; 
+
+  system(
+    "$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
+    "$working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm"
+  ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 }
 
 WriteMakefile(
@@ -226,20 +377,23 @@ WriteMakefile(
     }, 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
-       AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()),
+       AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()
+    ),
 );
 
 print <<HERE
 
---------------------------------------------------------------
-possible targets of makefile:
-  images    - generate images of the schema in several formats
-  metadata  - ???
-  mysql     - convert postgres sql files to mysql sql files
-  test_load - test database CREATE TABLE statements
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Makefile written.  Possible targets of Makefile:
 
-HINT: you probably want to run (at least) "make test_load"
---------------------------------------------------------------
+  images    - Generate images of the schema in several formats
+  metadata  - ???
+  mysql     - Convert postgres sql files to mysql sql files
+  test_load - Test database CREATE TABLE statements
+
+HINT: You probably want to run (at least) "make test_load"
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 HERE
 ;
 
