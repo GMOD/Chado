@@ -407,8 +407,8 @@ sub load_custom_tags {
             my $add_db = 0;
             my ($db) = Chado::Db->search( name => $tag );
             if ( !$db ) {
+                $add_db = 1;
                 $db = Chado::Db->find_or_create(
-                    $add_db = 1;
                     {
                         name       => $tag,
                         contact_id => $nullcontact,
