@@ -6,6 +6,10 @@
 --mapped contact links to author table
 --mapped bibliographic references to pub table
 --source_id changed to dbxref_id
+--dropped analysis in favor of companalysis/analysis
+--dropped analysisimplementation in favor of companalysis/analysis
+--dropped analysisimplementationparam in favor of companalysis/analysis
+--dropped analysisinvocation in favor of companalysis/analysisinvocation
 
 --ok
 --drop table acquisition;
@@ -32,84 +36,6 @@ create table acquisitionparam (
 	foreign key (acquisition_id) references acquisition (acquisition_id),
     name                     																				varchar(100) not null,
     value                    																				varchar(50) not null
-);
-
---ok
---drop table if exists analysis;
-create table analysis (
-    analysis_id              																				serial not null,
-	primary key (analysis_id),
-    name                     																				varchar(100) not null,
-    description              																				varchar(500) null
-);
-
---ok
---drop table if exists analysisimplementation;
-create table analysisimplementation (
-    analysisimplementation_id          																		serial not null,
-	primary key (analysisimplementation_id),
-    analysis_id                        																		int not null,
-	foreign key (analysis_id) references analysis (analysis_id),
-    name                               																		varchar(100) not null,
-    description  																		         			varchar(500) null
-);
-
---ok
---drop table if exists analysisimplementationparam;
-create table analysisimplementationparam (
-    analysisimplementationparam_id     																		serial not null,
-	primary key (analysisimplementationparam_id),
-    analysisimplementation_id          																		int not null,
-	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id),
-    name                               																		varchar(100) not null,
-    value                              																		varchar(100) not null
-);
-
---ok
---drop table if exists analysisinput;
-create table analysisinput (
-    analysisinput_id         																				serial not null,
-	primary key (analysisinput_id),
-    analysisinvocation_id    																				int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
-    tableinfo_id                 																			int null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
-    inputrow_id             																				int null,
-    inputvalue              																				varchar(50) null
-);
-
---ok
---drop table if exists analysisinvocation;
-create table analysisinvocation (
-    analysisinvocation_id              																		serial not null,
-	primary key (analysisinvocation_id),
-    analysisimplementation_id          																		int not null,
-	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id),
-    name                               																		varchar(100) not null,
-    description                        																		varchar(500) null
-);
-
---ok
---drop table if exists analysisinvocationparam;
-create table analysisinvocationparam (
-    analysisinvocationparam_id         																		serial not null,
-	primary key (analysisinvocationparam_id),
-    analysisinvocation_id              																		int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
-    name                               																		varchar(100) not null,
-    value                            																		varchar(100) not null
-);
-
---ok
---drop table if exists analysisoutput;
-create table analysisoutput (
-    analysisoutput_id       																				serial not null,
-	primary key (analysisoutput_id),
-    analysisinvocation_id   																				int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
-    name                    																				varchar(100) not null,
-    type                    																				varchar(50) not null,
-    value                   																				int not null
 );
 
 --ok
