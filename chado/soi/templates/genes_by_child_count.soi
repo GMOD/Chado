@@ -1,6 +1,6 @@
---- get gene model, need 1 arguement, type (tRNA, etc)
---- maybe with OPTIONS section to tell SOI adapter to get auxillaries, get by default?
---- not very good example, it is very slow
+--- get gene model, 
+---4 args: ptype, ctype, count, operator (valid SQL number comparison operator)
+---ctype must be immediate child of ptype
 
 SQL:
 select * FROM
@@ -71,6 +71,10 @@ INNER join
 featureprop fp ON (fp.feature_id = f.feature_id)
 INNER join
 cvterm t ON (t.cvterm_id = fp.type_id)
+INNER join
+featureloc fl ON (f.feature_id = fl.feature_id)
+INNER join
+feature src ON (src.feature_id = fl.srcfeature_id)
 WHERE f.is_analysis = 'f' [and src.name IN (&&src&&)];
 
 ONTOLOLGY-SQL:
@@ -94,6 +98,10 @@ INNER join
 db ON (gfx.db_id = db.db_id)
 INNER join
 cv ON (gf.cv_id = cv.cv_id)
+INNER join
+featureloc fl ON (f.feature_id = fl.feature_id)
+INNER join
+feature src ON (src.feature_id = fl.srcfeature_id)
 WHERE db.name = 'GO' and f.is_analysis = 'f' [and src.name IN (&&src&&)];
 
 DBXREF-SQL:
@@ -111,4 +119,8 @@ INNER join
 dbxref xref ON (fxref.dbxref_id = xref.dbxref_id)
 INNER join
 db ON (db.db_id = xref.db_id)
+INNER join
+featureloc fl ON (f.feature_id = fl.feature_id)
+INNER join
+feature src ON (src.feature_id = fl.srcfeature_id)
 WHERE f.is_analysis = 'f' [and src.name IN (&&src&&)];
