@@ -738,7 +738,7 @@ sub initialize {
     # sequence, it also fixes Allen's method of tracking progress
     die "$GFFFILE does not exist" unless ( -e $GFFFILE );
 
-    my $linenumber = `grep -n "^>" $GFFFILE`;
+    my $linenumber = `grep -m 1 -n "^>" $GFFFILE`;
     if ( $linenumber =~ /^(\d+)/ ) {
         $linenumber = $1;
         system("tail +$linenumber $GFFFILE > $TMPFASTA");
@@ -900,6 +900,34 @@ sub load_sequences {
         while ( my $seq = $in->next_seq() ) {
             my $name          = $seq->id;
             my @chado_feature = Chado::Feature->search( { 'name' => $name , organism_id => $chado_organism} );
+
+            unless (@chado_feature) { #check synonym and dbxref
+                my ($dbh) = Chado::DBI->db_handles();
+                my $sth = $dbh->prepare(
+                        "SELECT feature_id 
+                         FROM feature_dbxref fd join dbxref d using (dbxref_id)
+                         WHERE d.accession = ?"
+                          );
+                $sth->execute($name) or die $sth->errstr;
+
+                my $rows = $sth->rows;
+ 
+                if ($rows < 1) {
+                    $sth = $dbh->prepare(
+                      "SELECT feature_id
+                       FROM feature_synonym fs join synonym s using (synonym_id)
+                       WHERE s.name = ?"
+                           );
+                    $sth->execute($name) or die $sth->errstr;
+                } 
+
+                my @feature_ids = @{ $sth->fetchall_arrayref };
+
+                foreach my $id (@feature_ids) {
+                    my @temp_feat = Chado::Feature->search( {'feature_id' => $$id[0]} );
+                    push @chado_feature, @temp_feat;
+                }
+            }
 
             #no, let's just load the sequence into all of them
             #die "couldn't uniquely identify the sequence identified by $name"

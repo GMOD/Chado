@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.37 2004-10-20 17:48:01 scottcain Exp $
+$Id: INSTALL,v 1.38 2004-12-15 21:13:44 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -292,7 +292,7 @@ to load data into the database is to use a GFF3 file and the script
 gmod_load_gff3.pl.  A nice set of sample data is the GFF3 file prepared
 by the nice folks at the Saccraromyces Genome Database, at
 
-    ftp://ftp.yeastgenome.org//pub/yeast/data_download/chromosomal_feature/saccharomyces_cerevisiae.gff
+    ftp://ftp.yeastgenome.org/pub/yeast/data_download/chromosomal_feature/saccharomyces_cerevisiae.gff
 
 (Note that this ftp server requires reverse DNS lookup, so you may have
 a hard time connecting; for example, I can't connect from home, but I

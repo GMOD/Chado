@@ -486,6 +486,8 @@ while(my $feature = $gffio->next_feature()){
         $cache{db}{$database} = $db_id;
       }
 
+      print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
+      $nextfeaturedbxref++;
       print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
       $nextdbxref++;
     }
@@ -671,7 +673,7 @@ $db->disconnect;
 
 warn "Deleting temporary files\n";
 foreach (@tables) {
-#  unlink $files{$_};
+  unlink $files{$_};
 }
 
 warn "\nWhile this script has made an effort to optimize the database, you\n"
