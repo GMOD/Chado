@@ -46,12 +46,12 @@
   </ontology>
 
 
-  <ontology name="Sequence Ontology" order="2">
+  <ontology name="Sequence Ontology" order="3">
     <file type="ontology"    local="song/so.ontology"   remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.ontology?rev=HEAD"   method="lwp-mirror"/>
     <file type="definitions" local="song/so.definition" remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.definition?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
-  <ontology name="Sequence Ontology Feature Annotation" order="3">
+  <ontology name="Sequence Ontology Feature Annotation" order="2">
     <file type="ontology"    local="sofa/sofa.ontology"   remote="http://voxel.dl.sourceforge.net/sourceforge/song/sofa.ontology"   method="lwp-mirror"/>
     <file type="definitions" local="sofa/so.definition" remote="http://voxel.dl.sourceforge.net/sourceforge/song/sofa.definition" method="lwp-mirror"/>
   </ontology>

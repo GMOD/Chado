@@ -237,6 +237,10 @@ $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Feature Annotation'");
+$sth->execute;
+my($sofa_id) =  $sth->fetchrow_array();
+
 $sth->finish;
 ########################
 
@@ -260,7 +264,7 @@ while(my $feature = $gffio->next_feature()){
 
   my $type = $type{$featuretype};
   if(!$type){
-    ($type) = Chado::Cvterm->search( name => $featuretype );
+    ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
     $type{$featuretype} = $type->id;
   }
   die "no cvterm for ".$featuretype unless $type;
