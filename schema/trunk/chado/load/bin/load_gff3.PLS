@@ -332,7 +332,7 @@ sub load_custom_tags {
    } else {
         unless (defined $cvterm{$tag}) {
             cache_cvterm($tag);
-            warn "Data with the $tag tag are being placed in the featureprop table\n";
+            $progress->message("Data with the $tag tag are being placed in the featureprop table\n");
         }
 
         foreach my $d (@d) {
@@ -458,6 +458,8 @@ sub load_Parent_tag {
       my $reltype = $gff_feature->primary_tag eq 'protein' ? $cvterm{develops_from} : $cvterm{part_of};
 
       #unhandled exception: what if $feature{$parent} hasn't been seen yet?
+      ($feature{$parent}) = Chado::Feature->search(name => $parent) unless $feature{$parent};
+
       my $chado_feature_relationship = Chado::Feature_Relationship->find_or_create({
                                                                                     subject_id => $chado_feature->id,
                                                                                     object_id => $feature{$parent}->id,
@@ -642,8 +644,8 @@ sub load_sequences {
       #no, let's just load the sequence into all of them
       #die "couldn't uniquely identify the sequence identified by $name"
       #  unless (scalar @chado_feature == 1);
-      print STDERR "no feature for sequence $name\n" unless scalar(@chado_feature);
-      print STDERR "multiple features for sequence $name\n" if scalar(@chado_feature) > 1;
+      $progress->message("no feature for sequence $name") unless scalar(@chado_feature);
+      $progress->message("multiple features for sequence $name\n") if scalar(@chado_feature) > 1;
 
       foreach my $f (@chado_feature){
 
@@ -741,6 +743,7 @@ sub load_feature_locations {
 
   my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
 
+  ($feature{$id}) = Chado::Feature->search(name => $id) unless $feature{$id};
   # add feature location
   my $chado_featureloc = Chado::Featureloc->find_or_create({
       feature_id    => $chado_feature->id,
