@@ -10,35 +10,115 @@ use ExtUtils::MakeMaker;
 #
 
 use strict;
-use Cwd;
 use Config;
+use Cwd;
+use XML::Simple;
+use File::Spec::Functions qw[ curdir catfile catdir ];
+use Template;
 
-my $working_dir = cwd;
+my %VALID_DBS = (
+  Pg => 'PostgreSQL',
+  #Oracle => 'Oracle',
+);
+
 my $PERL        =  $Config{'startperl'};
-$PERL           =~ s/^#!//;
+$PERL           =~ s/^\s*#!\s*//;
+my $working_dir = cwd;
+my $lib_dir     = catdir $working_dir, 'lib';
+my $chado_dir   = catdir $lib_dir, 'Chado';
+my $config_file = catfile $working_dir, 'load', 'etc', 'load.conf';
 
-unless( -d "$working_dir/lib" ) { mkdir "$working_dir/lib" }
-unless( -d "$working_dir/lib/Chado" ) { mkdir "$working_dir/lib/Chado" }
+mkdir $lib_dir   unless -d $lib_dir;
+mkdir $chado_dir unless -d $chado_dir;
+
+my $load_conf;
+if ( -e $config_file ) {
+  open CONF, "<$config_file" or die "Can't read file '$config_file': $!\n";
+  local $/;
+  $load_conf = <CONF>;
+  close CONF or die "Can't close file '$config_file': $!\n";
+}
+else {
+  my $t = Template->new( ABSOLUTE => 1 );
+  my $config_template = catfile( $working_dir, 'load', 'tt2', 'load.conf.tt2' );
+  if ( -e $config_template ) {
+    $t->process( $config_template, {}, \$load_conf ) or die $t->error;
+  }
+  else {
+    warn "Template '$config_template' doesn't exist\n";
+  }
+}
+
+my $conf = $load_conf 
+  ? XMLin( 
+    $load_conf, 
+    ForceArray => [ qw( token path file ) ],
+    KeyAttr    => [ qw( tt2 input token name file ) ],
+    ContentKey => '-value',
+  )
+  : {}
+;
 
 my %O;
-
-#hard code these for the moment for testing
-my $DBNAME         = "";
-my $DBUSER         = "";
-my $DBPASS         = "";
-$O{GMOD_HOME}      = $ENV{GMOD_HOME} || '/usr/local/gmod';
-$O{PACKAGE_HOME}   = $O{GMOD_HOME}.'/lib/schema';
-$O{COREDEF}        = "$working_dir/modules/idb-full.modules";
-$O{EXTDEF}         = "$working_dir/modules/extension.modules";
+$O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
+$O{PACKAGE_HOME} = catfile $O{GMOD_HOME}, 'lib', 'schema';
+$O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
+$O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
 
 #
 # What database server? (Assume Pg for now)
 #
-my $db = prompt("What database server will you be using?",'PostgreSQL');
-die "Really only PostgreSQL is well supported right now" unless $db =~ /^[Pp]/;
-$DBNAME = prompt("Database name?", 'chado');
-$DBUSER = prompt("What is your username?", $ENV{USER});
-$DBPASS = prompt("What is your password?", '');
+my $DBDRIVER = prompt(
+  'What database server will you be using?', 
+  $conf->{'database'}{'db_driver'} 
+  ? $VALID_DBS{ $conf->{'database'}{'db_driver'} }
+  : 'PostgreSQL'
+);
+
+my %db_lookup = reverse %VALID_DBS;
+unless ( exists $db_lookup{ $DBDRIVER } ) {
+  print join("\n",
+    "Sorry, '$DBDRIVER' isn't valid. Please choose from the following:",
+    ( map { "  $_" } sort values %VALID_DBS ),
+    ''
+  );
+  exit;
+}
+
+my $DBNAME = prompt( 'What is the Chado database name?', 
+  $conf->{'database'}{'db_name'} || 'chado' 
+);
+
+my $DBUSER = prompt( 'What is the database username?', 
+  $conf->{'database'}{'db_username'} || $ENV{'USER'} 
+);
+
+my $DBPASS = prompt( "What is the password for '$DBUSER'?", 
+  $conf->{'database'}{'db_password'} 
+);
+
+my $DBHOST = prompt( 'What is the database host?', 
+  $conf->{'database'}{'db_host'} || 'localhost' 
+);
+
+my $DBPORT = prompt( 'What is your database port?', 
+  $conf->{'database'}{'db_port'} || '' 
+);
+
+#
+# Save database config options.
+#
+if ( open CONF, ">$config_file" ) {
+  $conf->{'database'}{'db_driver'}   = $db_lookup{ $DBDRIVER };
+  $conf->{'database'}{'db_name'}     = $DBNAME;
+  $conf->{'database'}{'db_username'} = $DBUSER;
+  $conf->{'database'}{'db_password'} = $DBPASS;
+  $conf->{'database'}{'db_host'}     = $DBHOST;
+  $conf->{'database'}{'db_port'}     = $DBPORT;
+
+  print CONF XMLout( $conf, RootName => 'load' );
+  close CONF or die "Can't write file '$config_file': $!\n";
+}
 
 my $rebuild_complete = 0;
 open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
