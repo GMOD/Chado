@@ -3,11 +3,147 @@ use strict;
 use DBI;
 use Chado::LoadDBI;
 use Bio::Tools::GFF;
+use Getopt::Long;
 
 # parents come before features
 # no dbxref_id allowed
 # no residues allowed
 # reference sequences already in db!
+
+=head1 NAME
+
+gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
+
+=head1 SYNOPSIS
+
+  % gmod_bulk_load.pl 
+
+=head1 COMMAND-LINE OPTIONS
+
+ --gfffile     The file containing GFF3 (optional, can read from stdin)
+ --organism    The organism for the data
+ --dbname      Database name
+ --dbuser      Database user name
+ --dbpass      Database password
+ --dbhost      Database host
+ --dbport      Database port
+
+Note that all of the arguments that begin 'db' can be provided by default
+by Bio::GMOD::Config, which was installed when 'make install' was run.
+
+=head1 DESCRIPTION
+
+=head2 NOTES
+
+=over
+
+=item The ORGANISM table
+
+This script assumes that the organism table is populated with information
+about your organism.  If you are unsure if that is the case, you can
+execute this command from the psql command-line:
+
+  select * from organism;
+
+If you do not see your organism listed, execute this command to insert it:
+
+  insert into organism (abbreviation, genus, species, common_name)
+                values ('H.sapiens', 'Homo','sapiens','Human');
+
+substituting in the appropriate values for your organism.
+
+=item GFF3
+
+The GFF in the datafile must be version 3 due to its tighter control of
+the specification and use of controlled vocabulary.  Accordingly, the names
+of feature types must be exactly those in the Sequence Ontology, not the
+synonyms and not the accession numbers (SO accession numbers may be
+supported in future versions of this script).  There are several caveates
+about the GFF3 that will work with this bulk loader:
+
+=over
+
+=item Reference sequences
+
+This loader requires that the reference sequence features be already
+loaded into the database (for instance, by using gmod_load_gff3.pl).
+Future versions of this bulk loader will not have this restriction.
+
+=item Parents/children order
+
+Parents must come before children in the GFF file.
+
+=item Several GFF tags (both reserved and custom) not supported
+
+These include:
+
+=over
+
+=item Dbxref
+
+=item Target
+
+=item Gap
+
+=item Any custom (ie, lowercase-first) tag
+
+=back
+
+=item No sequences
+
+This loader does not load DNA sequences, though chromosome sequences
+can be loaded with gmod_load_gff3 when the reference sequence features
+are loaded.
+
+=back
+
+=back
+
+=head1 AUTHORS
+
+Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>cain@cshl.orgE<gt>
+
+Copyright (c) 2004
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT);
+
+if (eval {require Bio::GMOD::Config;
+          Bio::GMOD::Config->import();
+          require Bio::GMOD::DB::Config;
+          Bio::GMOD::DB::Config->import();
+          1;  } ) {
+    my $gmod_conf = $ENV{'GMOD_ROOT'} ?
+                    Bio::GMOD::Config->new($ENV{'GMOD_ROOT'}) :
+                    Bio::GMOD::Config->new();
+    my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,'default');
+    $DBNAME = $db_conf->name();
+    $DBUSER = $db_conf->user();
+    $DBPASS = $db_conf->password();
+    $DBHOST = $db_conf->host();
+    $DBPORT = $db_conf->port();
+}
+
+GetOptions(
+    'organism:s' => \$ORGANISM,
+    'gfffile:s'  => \$GFFFILE,
+    'dbname:s'   => \$DBNAME,
+    'dbuser:s'   => \$DBUSER,
+    'dbpass:s'   => \$DBPASS,
+    'dbhost:s'   => \$DBHOST,
+    'dbport:s'   => \$DBPORT,
+) or ( system( 'pod2text', $0 ), exit -1 );;
+
+$ORGANISM ||='human';
+$GFFFILE  ||='stdin';  #nobody better name their file 'stdin'
+$DBNAME   ||='chado';
+$DBPASS   ||='';
+$DBHOST   ||='localhost';
+$DBPORT   ||='5432';
 
 my %src = ();
 my %type = ();
@@ -59,8 +195,8 @@ my %copystring = (
 
 
 ########################
-#my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
-my $db = DBI->connect('dbi:Pg:dbname=chado','scott','', {AutoCommit => 0});
+my $db = DBI->connect("dbi:Pg:dbname=$DBNAME;port=$DBPORT;host=$DBHOST",
+                       $DBUSER,$DBPASS, {AutoCommit => 0});
 
 my $sth = $db->prepare("select nextval('$sequences{feature}')");
 $sth->execute;
@@ -102,8 +238,9 @@ my($part_of) = $sth->fetchrow_array();
 $sth->finish;
 ########################
 
-#my($organism) = Chado::Organism->search( common_name => 'human' ); #FIXME
-my($organism) = Chado::Organism->search( common_name => 'yeast' ); #FIXME--I will
+my($organism) = Chado::Organism->search( common_name => "$ORGANISM" );
+
+$organism or die "organism not found in the database";
 
 open F   ,  ">$files{feature}";
 open FLOC,  ">$files{featureloc}";
