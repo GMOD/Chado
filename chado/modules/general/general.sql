@@ -19,20 +19,6 @@ create table dbxref (
        unique (dbxrefstr)
 );
 
--- ================================================
--- TABLE: synonym
--- ================================================
-
-create table synonym (
-       synonym_id serial not null,
-       primary key (synonym_id),
-       synonym varchar(255) not null,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
-
-       unique(synonym)
-);
-
 
 
 
