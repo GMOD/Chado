@@ -1,19 +1,52 @@
+                            CHADO INSTALLATION
+
+$Id: INSTALL,v 1.2 2003-12-03 23:26:12 kycl4rk Exp $
+
 This document describes how to install the Chado schema:
 
-perl Makefile.PL   
-     #creates AutoDBI.pm 
-make test_load
-     #creates database, installs schema
-perl load/Build.PL load_conf=load/etc/load.conf
-     #creates Build (part of Module::Build)
-./Build
-     #to move the just created LoadDBI.pm to blib
-     # edit load/etc/load.conf and load/etc/initialize.sql
-./Build prepdb
-     #inserts a few useful items into fundamental chado tables
-rm -rf /tmp/chado_load/*
-./Build ontologies
-     #gets and installs various ontologies
-     #edit lib/Chado/LoadDBI.pm to remove Autocommit
-load/bin/load_gff3.pl --organism Ecoli --srcdb DB:genbank --gfffile dat/NC_000913.gff
-     #loads gff file
+1.  First, you must set the following variables in your environment:
+
+*   GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
+
+*   CHADO_DB_NAME: The name of your Chado database
+
+*   CHADO_DB_USERNAME: The username to connect to Chado
+
+*   CHADO_DB_PASSWORD: The password for the database user
+
+*   CHADO_DB_HOST: The host on which the database runs (e.g. "localhost") [opt]
+
+*   CHADO_DB_PORT: The port on which the database is listening [opt]
+
+As indicated, the host and port are optional.
+
+2.  Next, run the following commands:
+
+*   perl Makefile.PL   
+    Creates AutoDBI.pm.
+
+*   make test_load
+    Creates database, installs schema.  Note: this is a destructive load
+    as it will first drop the Chado database.
+
+*   perl load/Build.PL load_conf=load/etc/load.conf
+    Creates Build (part of Module::Build).
+
+*   ./Build
+    To move the just created LoadDBI.pm to blib
+    Edit "load/etc/load.conf" (not necessary now, right?)
+    and "load/etc/initialize.sql" (really?)
+
+*   ./Build prepdb
+    Inserts a few useful items into fundamental Chado tables.
+
+*   rm -rf /tmp/chado_load/*
+    Only necessary if rebuilding -- shouldn't the code do this automatically?
+
+*   ./Build ontologies
+    Gets and installs various ontologies
+    Edit "lib/Chado/LoadDBI.pm" to remove Autocommit (really?)
+
+*   load/bin/load_gff3.pl --organism Ecoli --srcdb DB:genbank \
+    --gfffile dat/NC_000913.gff
+    Loads GFF file
