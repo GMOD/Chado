@@ -177,6 +177,25 @@ sub sqlfile {
     shift->get_tag_value('SQLFILE');
 }
 
+=head2 organism
+                                                                                
+ Title   : organism
+ Usage   : $organism = $dbconf->organism();
+ Function: Returns the common name of the "default" organism of the database,
+           if there is one
+ Returns : A species common name, or undef
+ Args    : none
+ Status  : Public
+                                                                                
+=cut
+                                                                                
+sub organism {
+    my $self = shift;
+    my $org = $self->get_tag_value('DBORGANISM');
+    return $org if $org;
+    return undef;
+}
+
 
 =head2 dbh
                                                                                 

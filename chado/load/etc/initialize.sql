@@ -25,7 +25,7 @@ insert into cv (name) values ('null');
 insert into cv (name,definition) values ('Ad Hoc Ontology','Locally created terms');
 insert into cv (name,definition) values ('Statistical Terms','Locally created terms for statistics');
 insert into cvterm (name,cv_id) values ('null',       (select cv_id from cv where name = 'null'));
-insert into cvterm (name,cv_id) values ('note', (select cv_id from cv where name = 'null'));
+insert into cvterm (name,cv_id) values ('Note', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('synonym', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));

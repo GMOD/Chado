@@ -126,6 +126,7 @@ if (eval {require Bio::GMOD::Config;
     $DBPASS = $db_conf->password();
     $DBHOST = $db_conf->host();
     $DBPORT = $db_conf->port();
+    $ORGANISM=$db_conf->organism();
 }
 
 GetOptions(
@@ -304,7 +305,8 @@ while(my $feature = $gffio->next_feature()){
   $src{$uniquename} = $nextfeature;
   print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type)),"\n";
 
-  my $start = $feature->start eq '.' ? '\N' : $feature->start;
+#need to convert from base to interbase coords
+  my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
   my $end   = $feature->end   eq '.' ? '\N' : $feature->end;
   my $frame = $feature->frame eq '.' ? '\N' : $feature->frame;
 
@@ -317,7 +319,7 @@ while(my $feature = $gffio->next_feature()){
     my $rank = 0;
     foreach my $note (@notes) {
 
-      ($type{'Note'}) = Chado::Cvterm->search( name => 'note')
+      ($type{'Note'}) = Chado::Cvterm->search( name => 'Note')
           unless $type{'Note'};
 
       print FPROP join("\t",($nextfeatureprop,$nextfeature,$type{'Note'}->id,$note,$rank)),"\n";

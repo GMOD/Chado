@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.72 2004-08-13 15:29:33 scottcain Exp $
+# $Id: Makefile.PL,v 1.73 2004-09-09 14:23:38 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -76,6 +76,9 @@ my %args    =  (
   },
   LOCAL_TMP => {
     default => './tmp'
+  },
+  DBORGANISM  => {
+    default => ''
   },
 );
 
@@ -216,7 +219,7 @@ my %db_lookup = reverse %VALID_DBS;
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
-  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP );
+  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM );
 
 $O{'SIMPLE'} = prompt(
    "Use the simple install (uses default database schema)", 'Y'
@@ -238,6 +241,7 @@ if ( $opts{'RECONFIGURE'} && %conf ) {
   $DBHOST   = $conf{'DBHOST'}   || '';
   $DBPORT   = $conf{'DBPORT'}   || '';
   $LOCAL_TMP= $conf{'LOCAL_TMP'}|| '';
+  $DBORGANISM=$conf{'DBORGANISM'}|| '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -247,6 +251,7 @@ elsif ( $opts{'DEFAULTS'} ) {
   $DBHOST   = $args{'DBHOST'}{'default'};
   $DBPORT   = $args{'DBPORT'}{'default'};
   $LOCAL_TMP= $args{'LOCAL_TMP'}{'default'};
+  $DBORGANISM=$args{'DBORGANISM'}{'default'};
 }
 elsif ( %opts ) {
   $DBDRIVER = $opts{'DBDRIVER'} || '';
@@ -256,6 +261,7 @@ elsif ( %opts ) {
   $DBHOST   = $opts{'DBHOST'}   || '';
   $DBPORT   = $opts{'DBPORT'}   || '';
   $LOCAL_TMP= $opts{'LOCAL_TMP'}|| '';
+  $DBORGANISM=$opts{'DBORGANISM'}|| '';
 }
 
 if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
@@ -301,8 +307,13 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   $LOCAL_TMP ||= prompt( 'Where shall downloaded ontologies go?',
     $conf{'LOCAL_TMP'} || $args{'LOCAL_TMP'}{'default'}
   );
+
+  $DBORGANISM||=prompt('What is the default organism (common name, or "none")?',
+    $conf{'DBORGANISM'} || $args{'DBORGANISM'}{'default'}
+  );
 }
 
+$DBORGANISM = '' if $DBORGANISM =~ /none/i;
 #
 # Now figure out which schema modules to include.
 # or just go with the default
@@ -406,6 +417,7 @@ print join("\n",
   "  DBHOST=$DBHOST",
   "  DBPORT=$DBPORT",
   "  LOCAL_TMP=$LOCAL_TMP",
+  "  DBORGANISM=$DBORGANISM",
   '',
   $O{'SIMPLE'}!~ /^[Yy]/ ? 'And the following core modules and extensions:' : ''  , 
   $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
@@ -423,6 +435,7 @@ if ( open CONF, ">$build_config" ) {
   $conf{'DBHOST'}   = $DBHOST;
   $conf{'DBPORT'}   = $DBPORT;
   $conf{'LOCAL_TMP'}= $LOCAL_TMP;
+  $conf{'DBORGANISM'}=$DBORGANISM;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";
