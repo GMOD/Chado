@@ -6,8 +6,8 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
        name varchar(255) not null,
-       end5 int,
-       end3 int,
+       fnbeg int,
+       fnend int,
        strand smallint,
        residues text,
        seqlen int,
@@ -23,17 +23,16 @@ create table feature (
 );
 ## dbxref should be unique; does that work w/ null values?
 ## every feature has to have an accession (dbxref_id)
-## IMPORTANT: fmin and fmax are space-based coordinates
+## IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
 ## this is vital as it allows us to represent zero-length
 ## features eg splice sites, insertion points without
 ## an awkward fuzzy system
 
-## by using min and max rather than start/end we make
-## intersection queries faster/easier, but we also make
-## queries involing up/downstream more difficult.
-## min and max is good as it is unambiguous - many systems
-## (eg bioperl, gff) use "start" and "end" whereas what they actually
-## mean is min and max, NOT 5', 3'
+## fnbeg, fnend are for feature natural begin/end
+## by natural begin, end we mean these are the actual
+## beginning (5' position) and actual end (3' position)
+## rather than the low position and high position, as
+## these terms are sometimes erroneously used
 
 ## seqlen is redundant except for transcripts (where we're being ambiguous)
 
