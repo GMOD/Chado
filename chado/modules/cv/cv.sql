@@ -7,7 +7,7 @@
 create table cv (
        cv_id serial not null,
        primary key (cv_id),
-       cvname varchar not null,
+       cvname varchar(255) not null,
        cvdefinition text,
 
        unique(cvname)
@@ -27,7 +27,7 @@ create table cvterm (
        dbxref_id int,
        foreign key (dbxref_id) references dbxref (dbxref_id),
 
-       unique(termname, cv_id)
+       unique(name, cv_id)
 );
 create index cvterm_idx1 on cvterm (cv_id);
 -- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
@@ -92,7 +92,7 @@ create table cvtermsynonym (
 
        unique(cvterm_id, termsynonym)
 );
-create index cvterm_synonym_idx1 on cvterm_synonym (cvterm_id);
+create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
 
 
 -- ================================================
