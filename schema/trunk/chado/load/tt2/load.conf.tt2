@@ -21,7 +21,7 @@
   <!-- setup templates -->
   <!--                 -->
   <tt2 input="load/tt2/Makefile.tt2" output="load/Makefile">
-   <token name="touch_ext" value="dev_chado_allenday_03"/>
+   <token name="touch_ext" value="[% db_name %]"/>
    <token name="dbname" value="[% db_name %]"/>
    <token name="datapath" value="/tmp/chado_load"/>
   </tt2>
