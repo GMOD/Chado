@@ -22,7 +22,7 @@ create table cvterm (
        primary key (cvterm_id),
        cv_id int not null,
        foreign key (cv_id) references cv (cv_id),
-       termname varchar(255) not null,
+       name varchar(255) not null,
        termdefinition text,
 -- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
        dbxref_id int,
