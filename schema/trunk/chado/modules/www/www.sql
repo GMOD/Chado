@@ -24,9 +24,9 @@ create table wwwuser_project (
 	wwwuser_project_id serial not null,
 	primary key (wwwuser_project_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	project_id int not null,
-	foreign key (project_id) references project (project_id) on delete cascade,
+	foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,project_id)
 );
@@ -42,9 +42,9 @@ create table wwwuser_author (
 	wwwuser_author_id serial not null,
 	primary key (wwwuser_author_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	author_id int not null,
-	foreign key (author_id) references author (author_id) on delete cascade,
+	foreign key (author_id) references author (author_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,author_id)
 );
@@ -60,9 +60,9 @@ create table wwwuser_cvterm (
 	wwwuser_cvterm_id serial not null,
 	primary key (wwwuser_cvterm_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	cvterm_id int not null,
-	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,cvterm_id)
 );
@@ -78,9 +78,9 @@ create table wwwuser_expression (
 	wwwuser_expression_id serial not null,
 	primary key (wwwuser_expression_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	expression_id int not null,
-	foreign key (expression_id) references expression (expression_id) on delete cascade,
+	foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,expression_id)
 );
@@ -96,9 +96,9 @@ create table wwwuser_feature (
 	wwwuser_feature_id serial not null,
 	primary key (wwwuser_feature_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	feature_id int not null,
-	foreign key (feature_id) references feature (feature_id) on delete cascade,
+	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,feature_id)
 );
@@ -114,9 +114,9 @@ create table wwwuser_genotype (
 	wwwuser_genotype_id serial not null,
 	primary key (wwwuser_genotype_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	genotype_id int not null,
-	foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+	foreign key (genotype_id) references genotype (genotype_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,genotype_id)
 );
@@ -132,9 +132,9 @@ create table wwwuser_interaction (
 	wwwuser_interaction_id serial not null,
 	primary key (wwwuser_interaction_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	interaction_id int not null,
-	foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
+	foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,interaction_id)
 );
@@ -150,9 +150,9 @@ create table wwwuser_organism (
 	wwwuser_organism_id serial not null,
 	primary key (wwwuser_organism_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	organism_id int not null,
-	foreign key (organism_id) references organism (organism_id) on delete cascade,
+	foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,organism_id)
 );
@@ -168,9 +168,9 @@ create table wwwuser_phenotype (
 	wwwuser_phenotype_id serial not null,
 	primary key (wwwuser_phenotype_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	phenotype_id int not null,
-	foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+	foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,phenotype_id)
 );
@@ -186,9 +186,9 @@ create table wwwuser_pub (
 	wwwuser_pub_id serial not null,
 	primary key (wwwuser_pub_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	pub_id int not null,
-	foreign key (pub_id) references pub (pub_id) on delete cascade,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,pub_id)
 );
@@ -204,9 +204,9 @@ create table wwwuserrelationship (
 	wwwuserrelationship_id serial not null,
 	primary key (wwwuserrelationship_id),
 	objwwwuser_id int not null,
-	foreign key (objwwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (objwwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	subjwwwuser_id int not null,
-	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
+	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(objwwwuser_id,subjwwwuser_id)
 );

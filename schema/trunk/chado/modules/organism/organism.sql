@@ -32,9 +32,9 @@ create table organism_dbxref (
        organism_dbxref_id serial not null,
        primary key (organism_dbxref_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 
        unique(organism_id,dbxref_id)
 );
@@ -49,9 +49,9 @@ create table organismprop (
        organismprop_id serial not null,
        primary key (organismprop_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
 

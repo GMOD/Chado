@@ -6,16 +6,16 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        name varchar(255),
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	is_analysis boolean not null default 'false',
 -- timeaccessioned and timelastmodified are for handling object accession/
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
@@ -119,9 +119,9 @@ create table featureloc (
        primary key (featureloc_id),
 
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        srcfeature_id int,
-       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
 
        fmin int,
        is_fmin_partial boolean not null default 'false',
@@ -150,9 +150,9 @@ create table feature_pub (
        feature_pub_id serial not null,
        primary key (feature_pub_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique(feature_id, pub_id)
 );
@@ -168,9 +168,9 @@ create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
        unique(feature_id, type_id, value, rank)
@@ -187,9 +187,9 @@ create table featureprop_pub (
        featureprop_pub_id serial not null,
        primary key (featureprop_pub_id),
        featureprop_id int not null,
-       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique(featureprop_id, pub_id)
 );
@@ -206,9 +206,9 @@ create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
        is_current boolean not null default 'true',
 
        unique(feature_id, dbxref_id)
@@ -236,11 +236,11 @@ create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
        subject_id int not null,
-       foreign key (subject_id) references feature (feature_id) on delete cascade,
+       foreign key (subject_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references feature (feature_id) on delete cascade,
+       foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
        unique(subject_id, object_id, type_id, rank)
@@ -258,9 +258,9 @@ create table feature_relationship_pub (
 	feature_relationship_pub_id serial not null,
 	primary key (feature_relationship_pub_id),
 	feature_relationship_id int not null,
-	foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade,
+	foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade INITIALLY DEFERRED,
 	pub_id int not null,
-	foreign key (pub_id) references pub (pub_id) on delete cascade,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
  
 	unique(feature_relationship_id, pub_id)
  );
@@ -275,11 +275,11 @@ create table feature_cvterm (
        feature_cvterm_id serial not null,
        primary key (feature_cvterm_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
        unique (feature_id, cvterm_id, pub_id)
 
@@ -298,7 +298,7 @@ create table synonym (
        primary key (synonym_id),
        name varchar(255) not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        synonym_sgml varchar(255) not null,
        unique(name,type_id)
 );
@@ -315,11 +315,11 @@ create table feature_synonym (
        feature_synonym_id serial not null,
        primary key (feature_synonym_id),
        synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        is_current boolean not null default 'true',
        is_internal boolean not null default 'false',
 

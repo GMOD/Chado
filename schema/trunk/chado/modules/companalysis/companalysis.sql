@@ -71,9 +71,9 @@ create table analysisprop (
     analysisprop_id serial not null,
     primary key (analysisprop_id),
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
 
     unique(analysis_id, type_id, value)
@@ -142,9 +142,9 @@ create table analysisfeature (
     analysisfeature_id serial not null,
     primary key (analysisfeature_id),
     feature_id int not null,
-    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     rawscore double precision,
     normscore double precision,
     significance double precision,

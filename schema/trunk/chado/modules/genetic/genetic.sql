@@ -198,7 +198,7 @@ create table gcontext (
 	uniquename	varchar(255) not null,
 	description	text,
 	pub_id	int not null,
-	foreign key (pub_id) references pub (pub_id) on delete cascade,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 
 	unique(uniquename)
 );
@@ -218,11 +218,11 @@ create table gcontext_relationship (
 	gcontext_relationship_id	serial not null,
 	primary key (gcontext_relationship_id),
 	subjectgc_id	int not null,
-	foreign key (subjectgc_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (subjectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	objectgc_id	int not null, 
-	foreign key (objectgc_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (objectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
  	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
 	unique(subjectgc_id, objectgc_id, type_id)
 );
@@ -256,15 +256,15 @@ create table feature_gcontext (
 	feature_gcontext_id	serial not null,
 	primary key (feature_gcontext_id),
 	feature_id	int not null,
-	foreign key (feature_id) references feature (feature_id) on delete cascade,
+	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	chromosome_id	int,
-	foreign key (chromosome_id) references feature(feature_id) on delete set null,
+	foreign key (chromosome_id) references feature(feature_id) on delete set null INITIALLY DEFERRED,
 	rank	int not null,
 	cgroup	int not null,
 	cvterm_id	int not null,
-	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade,
+	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED,
 
 	unique(feature_id, gcontext_id, cvterm_id)
 );
@@ -284,9 +284,9 @@ create table gcontextprop (
 	gcontextprop_id	serial not null,
 	primary key (gcontextprop_id),
 	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value	text not null,
 
 	unique(gcontext_id, type_id, value)
@@ -317,18 +317,18 @@ create table phenstatement (
 	phenstatement_id	serial not null,
 	primary key (phenstatement_id),
 	gcontext_id int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	dbxref_id	int not null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 	observable_id	int not null,
-	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	attr_id	int,
-	foreign key (attr_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (attr_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
 	value	text,
 	cvalue_id	int,
-	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
 	assay_id	int,
-	foreign key (assay_id) references cvterm (cvterm_id) on delete set null,
+	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
 
 	unique(gcontext_id, dbxref_id, observable_id)	
 );
@@ -349,7 +349,7 @@ create table phendesc (
 	phendesc_id	serial not null,
 	primary key (phendesc_id),
 	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
 	description	text not null,
 
 	unique(gcontext_id, description)
@@ -368,13 +368,13 @@ create table phenstatement_relationship (
 	phenstatement_relationship_id serial not null,
 	primary key (phenstatement_relationship_id),
 	subject_id	int not null,
-	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade,
+	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	object_id	int not null,
-	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade,
+	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	comment_id	int not null,
-	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
 	unique(subject_id, object_id, type_id)
 );
@@ -394,9 +394,9 @@ create table phenstatement_cvterm (
 	phenstatement_cvterm_id	serial not null,
 	primary key (phenstatement_cvterm_id),
 	phenstatement_id	int not null,
-	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	cvterm_id	int not null,
-	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
 	unique(phenstatement_id, cvterm_id)
 );
@@ -416,9 +416,9 @@ create table phenstatementprop (
 	phenstatementprop_id	serial not null,
 	primary key (phenstatementprop_id),
 	phenstatement_id	int not null,
-	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
 	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value	text not null,
 
 	unique(phenstatement_id, type_id, value)

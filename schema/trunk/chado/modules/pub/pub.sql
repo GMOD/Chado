@@ -18,7 +18,7 @@ create table pub (
        miniref varchar(255),
        uniquename text not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -46,11 +46,11 @@ create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
        subject_id int not null,
-       foreign key (subject_id) references pub (pub_id) on delete cascade,
+       foreign key (subject_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        object_id int not null,
-       foreign key (object_id) references pub (pub_id) on delete cascade,
+       foreign key (object_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
        unique(subject_id, object_id, type_id)
 );
@@ -69,9 +69,9 @@ create table pub_dbxref (
        pub_dbxref_id serial not null,
        primary key (pub_dbxref_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 
        unique(pub_id,dbxref_id)
 );
@@ -89,7 +89,7 @@ create table author (
        author_id serial not null,
        primary key (author_id),
        contact_id int null,
-       foreign key (contact_id) references contact (contact_id),
+       foreign key (contact_id) references contact (contact_id) INITIALLY DEFERRED,
        surname varchar(100) not null,
        givennames varchar(100),
        suffix varchar(100),
@@ -108,9 +108,9 @@ create table pub_author (
        pub_author_id serial not null,
        primary key (pub_author_id),
        author_id int not null,
-       foreign key (author_id) references author (author_id) on delete cascade,
+       foreign key (author_id) references author (author_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        rank int not null,
        editor boolean default 'false',
 
@@ -130,9 +130,9 @@ create table pubprop (
        pubprop_id serial not null,
        primary key (pubprop_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null,
        rank integer,
 
