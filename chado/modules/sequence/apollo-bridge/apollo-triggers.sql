@@ -7,6 +7,34 @@
 --* remove the portion creating a flybase dbxref.
 --* probably 20 more things I haven't thought of yet.
 
+CREATE OR REPLACE FUNCTION next_uniquename() RETURNS varchar AS '
+DECLARE
+  prename      varchar;
+  f_uniquename varchar;
+  prefix       varchar;
+  suffix       varchar;
+  id           varchar;
+  maxid        int;
+BEGIN
+  SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv
+                             WHERE cvterm.name = ''prefix'' and
+                                   cp.cvterm_id = cvterm.cvterm_id and
+                                   cvterm.cv_id = cv.cv_id and
+                                   cv.name = ''apollo'';
+  SELECT INTO suffix cp.value FROM cvtermprop cp, cvterm, cv
+                             WHERE cvterm.name = ''suffix'' and
+                                   cp.cvterm_id = cvterm.cvterm_id and
+                                   cvterm.cv_id = cv.cv_id and
+                                   cv.name = ''apollo'';
+
+  SELECT INTO maxid nextval(''uniquename_id_generator'');
+  RAISE NOTICE ''maxid is:%'', maxid;
+  id:=lpad(maxid, 6, ''000000'');
+  f_uniquename:=CAST(prefix||id||suffix as VARCHAR);
+  RETURN f_uniquename;
+END
+'LANGUAGE plpgsql;
+
 DROP TRIGGER tr_feature_del  ON feature;
 CREATE OR REPLACE function fn_feature_del() RETURNS TRIGGER AS '
 DECLARE 
