@@ -36,9 +36,11 @@ CREATE OR REPLACE VIEW xcvterm AS
  SELECT cvterm.*,
         dbxrefd.dbname,
         dbxrefd.accession,
-        dbxrefd.version
+        dbxrefd.version,
+        cv.name AS cvname
  FROM
-  cvterm INNER JOIN dbxrefd USING (dbxref_id);
+  cvterm INNER JOIN dbxrefd USING (dbxref_id)
+         INNER JOIN cv USING (cv_id);
 
 -- ================================================
 -- tfeature = feature * cvterm
