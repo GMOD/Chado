@@ -10,6 +10,9 @@ sub id   { return shift->cvterm_id }
 sub name { return shift->termname  }
 
 
+#are these methods correct to do it this way? i'm not
+#sure anymore after a thread on gmod-schema list with DE.
+
 sub parent {
   my $self = shift;
   my $cvr = Chado::Cvrelationship->search(objterm_id => $self->id);
