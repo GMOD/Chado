@@ -139,12 +139,12 @@ if ($linenumber =~ /^(\d+)/) {
 Chado::LoadDBI->init();
 
 #count the file lines.  we need this to track load progress
-open(WC,"/usr/bin/wc -l $GFFFILE |");
+open(WC,"grep -c -v '^#' $GFFFILE |");
 my $linecount = <WC>; chomp $linecount;
 close(WC);
 ($linecount) = $linecount =~ /^\s*?(\d+)/;
 
-my $progress = Term::ProgressBar->new({name => "Features ($linecount)", count => $linecount,
+my $progress = Term::ProgressBar->new({name => "Approx $linecount features", count => $linecount,
                                        ETA => 'linear', });
 $progress->max_update_rate(1);
 my $next_update = 0;
@@ -331,9 +331,9 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   my($chado_feature) = Chado::Feature->find_or_create({
     organism_id  => $chado_organism,
-    name         => $gff_feature->has_tag('ID') ? $gff_feature->get_tag_values('ID')
-                                                : ' ',
-#    name         => $id,
+#    name         => $gff_feature->has_tag('ID') ? $gff_feature->get_tag_values('ID')
+#                                                : ' ',
+    name         => $id,
     uniquename   => $id .'_'. $gff_feature->primary_tag
                         .'_'. $gff_feature->seq_id .':'
                             . $fmin .'..'. $fmax,
@@ -534,7 +534,8 @@ print "$feature_count features added\n";
 if (-e $TMPFASTA) {
   warn "loading sequence data...\n";
   my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
- 
+
+  my $seqs_loaded = 0; 
   while (my $seq = $in->next_seq() ) {
     my $name = $seq->id;
     my @chado_feature = Chado::Feature->search({'name' => $name});
@@ -544,9 +545,14 @@ if (-e $TMPFASTA) {
     $chado_feature[0]->residues($seq->seq);
     $chado_feature[0]->update;
     $chado_feature[0]->dbi_commit;
+
+    $seqs_loaded++;
   }
 
   unlink $TMPFASTA;
   unlink $TMPGFF;
+
+  warn "Loaded $seqs_loaded sequence(s)\n";
 }
 
+warn "Done\n";

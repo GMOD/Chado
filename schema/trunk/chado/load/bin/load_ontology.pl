@@ -86,8 +86,11 @@ my %predmap = (
 #create some default entries to satisfy chado FK requirements of ontology on contact and db tables
 
 my($nullcontact) = Chado::Contact->find_or_create({ name => 'null', description => 'null' });
+$nullcontact->dbi_commit;
 my($db) = Chado::Db->find_or_create({name => $ontname, contact_id => $nullcontact->id});
+$db->dbi_commit;
 my($cv) = Chado::Cv->find_or_create({name => $ontname});
+$cv->dbi_commit;
 
 my $termfact = Bio::Ontology::TermFactory->new();
 my $relfact = Bio::Ontology::RelationshipFactory->new();
@@ -141,20 +144,21 @@ sub load_ontologyterms{
 	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
 	if(!$predicate_db){
 		my $dbxref = Chado::Dbxref->find_or_create({
-													db_id => $db->id,
-													accession => $oborelmap{ predmap($predicate->name) },
-												   });
+				db_id => $db->id,
+				accession => $oborelmap{ predmap($predicate->name) },
+							   });
 		$predicate_db = Chado::Cvterm->create({
-											   name => predmap($predicate->name),
-											   cv_id => $cv->id,
-											   dbxref_id => $dbxref->id,
-											  });
-
+			   name => predmap($predicate->name),
+			   cv_id => $cv->id,
+			   dbxref_id => $dbxref->id,
+						  });
 	}
 	
 	$predicateterms{ predmap($predicate->name) } = $predicate_db->id;
 	$predicate_db->definition($predicate->definition) unless defined($predicate_db->definition);
 	$predicate_db->update;
+        $predicate_db->dbi_commit;
+
 	load_synonyms($predicate,$predicate_db);
 	load_dblinks($predicate,$predicate_db);
   }
@@ -166,16 +170,16 @@ sub load_ontologyterms{
         if(!$root_db){
 #warn 3.0;
 #warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
-next unless $root->name;
+  next unless $root->name;
 		my $dbxref = Chado::Dbxref->find_or_create({
-												db_id => $db->id,
-												accession => $root->identifier,
-											   });
+				db_id => $db->id,
+				accession => $root->identifier,
+							   });
 		$root_db = Chado::Cvterm->find_or_create({
-												 name => $root->name || $oborelmap{ predmap($root->identifier) },
-												 cv_id => $cv->id,
-												 dbxref_id => $dbxref->id,
-												});
+				 name => $root->name || $oborelmap{ predmap($root->identifier) },
+				 cv_id => $cv->id,
+				 dbxref_id => $dbxref->id,
+							});
 #warn 3.1;
 	}
 	$root_db->definition($root->definition) unless defined($root_db->definition);
@@ -184,6 +188,7 @@ next unless $root->name;
 	$allterms{$root->name} = $root_db->id;
 
 	$root_db->update;
+        $root_db->dbi_commit;
 
 	load_synonyms($root,$root_db);
 	load_dblinks($root,$root_db);
@@ -208,22 +213,23 @@ sub load_ontologytermsR {
 	if(!$child_db){
 
 #warn "oops! ".join '*', ($child->name, $child->identifier, $cv->id) unless $child->name;
-next unless $child->name;
+    next unless $child->name;
 	  my $dbxref = Chado::Dbxref->find_or_create({
-												  db_id => $db->id,
-												  accession => $child->identifier,
-												 });
+				  db_id => $db->id,
+				  accession => $child->identifier,
+						 });
 	  $child_db = Chado::Cvterm->find_or_create({
-													name => $child->name,
-													cv_id => $cv->id,
-													dbxref_id => $dbxref->id,
-												   });
+				name => $child->name,
+				cv_id => $cv->id,
+				dbxref_id => $dbxref->id,
+						   });
 	}
 	  $child_db->definition($child->definition) unless defined($child_db->definition);
 
 	  $allterms{$child->name} = $child_db->id;
 
 	  $child_db->update;
+          $child_db->dbi_commit;
 
 	  load_synonyms($child,$child_db);
 	  load_dblinks($child,$child_db);
@@ -266,11 +272,12 @@ sub load_ontologyrels {
 	  $skip++ unless defined $subj_id;
 
 	  next if $skip;
-	  Chado::Cvterm_Relationship->find_or_create ({
-										  subject_id => $subj_id,
-										  object_id => $obj_id,
-										  type_id => $pred_id,
-										 });
+	  my ($cvtermrel) = Chado::Cvterm_Relationship->find_or_create ({
+					  subject_id => $subj_id,
+					  object_id => $obj_id,
+					  type_id => $pred_id,
+						 });
+          $cvtermrel->dbi_commit; 
 	}								
   }
 }
@@ -287,15 +294,17 @@ sub load_dblinks {
   my @term_links = $term->get_dblinks();
   foreach my $term_link (@term_links) {
 	my $dbxref_db = Chado::Dbxref->find_or_create ({
-													accession => $term_link,
-													db_id => $db->id,
-													version => 0
-												   });
+				accession => $term_link,
+				db_id => $db->id,
+				version => 0
+						   });
+        $dbxref_db->dbi_commit;
 
-	Chado::Cvterm_Dbxref->find_or_create ({
-										   cvterm_id => $term_db->id,
-										   dbxref_id => $dbxref_db->id
-										  });
+	my ($cvtermdbxref) = Chado::Cvterm_Dbxref->find_or_create ({
+			   cvterm_id => $term_db->id,
+			   dbxref_id => $dbxref_db->id
+						  });
+        $cvtermdbxref->dbi_commit; 
   }
 }
 
@@ -310,10 +319,11 @@ sub load_synonyms {
 #						cvterm_id => $term_db->id,
 #						synonym => $term_syn,
 #					     });
-	Chado::Cvtermsynonym->find_or_create ({
+	my ($synonym) = Chado::Cvtermsynonym->find_or_create ({
 						cvterm_id => $term_db->id,
 						synonym => $term_syn,
 					     });
+        $synonym->dbi_commit;
   }
 }
 
