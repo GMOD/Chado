@@ -19,7 +19,7 @@ use Carp;
 use base qw(Exporter);
 use vars qw($AUTOLOAD);
 
-@EXPORT_OK = qw(chaos_xml soi_xml game_xml);
+@EXPORT_OK = qw(chaos_xml soi_xml game_xml gff3);
 %EXPORT_TAGS = (all=> [@EXPORT_OK]);
 
 use strict;
@@ -37,6 +37,14 @@ sub _analysis_params {
 }
 sub _chaos_hidden_params {
     return qw(analysis_id parent_id featureloc_id analysisfeature_id organism_id dbxref_id type_id nbeg nend start end fmin fmax depth timelastmodified timeaccessioned relationship_type locgroup);
+}
+#if not in the list, field value to property in gff3
+sub _gff_hidden_prop_params {
+   my @a1 = &_chaos_hidden_params;
+   my @a2 = &_out_params;
+   my %uniq;
+   map{$uniq{$_}=1}(@a1, @a2, qw(srcfeature_id species genus is_analysis type strand rank phase feature_id seqlen orderrank md5checksum is_fmin_partial is_fmax_partial));
+   return keys %uniq;
 }
 sub _soi_hidden_params {
     return (grep{$_ ne 'fmin' && $_ ne 'fmax' && $_ ne 'relationship_type'}(_chaos_hidden_params),
@@ -585,6 +593,87 @@ sub _an_game_xml {
     map{_an_game_xml($_, $w)}@{$node->nodes || []};
 
     $w->endTag($game_t);
+}
+
+sub gff3 {
+    my $top = shift;
+    my $fh = shift;
+    my $opts = shift || {};
+
+    my $opath = $fh;
+    unless ($opath) {
+        $opath ||= ">-"; #default to STDOUT
+    }
+    $fh = new IO::File(">$opath");
+
+    require SOI::Visitor;
+    SOI::Visitor->set_loc($top);
+    &_gff3($top,$fh, $opts);
+    printf $fh "###EOF\n" if ($opts->{EOF});
+    $fh->close;
+}
+
+sub _gff3 {
+    my $node = shift || return;
+    my $fh = shift;
+    my $opts = shift || {};
+    my $parent_id = shift;
+
+    my $fasta_out= $opts->{fasta};
+    my $terminator_depth = $opts->{terminator_depth};
+
+    #use node type as parent ID is a hack here!!!
+    my $id = $node->uniquename || $node->id || $node->type;
+    my @magic9 = ();
+    push @magic9, sprintf("ID=%s", $id);
+    push @magic9, sprintf("Name=%s", $node->name) if ($node->name);
+    push @magic9, sprintf("Parent=%s", $parent_id) if ($parent_id);
+
+    my $secs = $node->secondary_nodes;
+    push @magic9, sprintf("Target=%s",join(",",map{sprintf("%s+%d+%d",$_->src_seq,$_->start,$_->end)}@{$secs || []})) if (@{$secs || []});
+
+    #WARNING: property value HAS NOT BEEN URL escaped for the following characters: ",=;" and whitespace
+    my $props = $node->properties;
+    my $h = $node->hash;
+    foreach my $k (keys %{$h || {}}) {
+        unless (grep{$k eq $_}&_gff_hidden_prop_params) {
+            push @{$props}, {type=>$k,value=>$h->{$k}} if (defined($h->{$k}));
+        }
+    }
+    my ($s, $e) = ($node->fmin, $node->fmax);
+    unless (defined($s) && $e) {
+        if ($node->seqlen && !$node->src_seq) {
+            push @{$props}, {type=>'seqlen',value=>$node->seqlen};
+        }
+    }
+    $s++ if (defined($s));
+
+    push @magic9, join(";", map{$_->{type}."=".$_->{value}}@{$props || []}) if (@{$props || []});
+    my $dbxrefs = $node->dbxrefs;
+    push @magic9, sprintf("Dbxref=%s",join(",",map{$_->{dbname}.":".$_->{accession}}@{$dbxrefs || []})) if (@{$dbxrefs || []});
+    my $syns = $node->synonyms;
+    push @magic9, sprintf("Alias=%s",join(",",map{$_->{type}."=".$_->{value}}@{$syns || []})) if (@{$syns || []});
+    my $onts = $node->ontologies;
+    push @magic9, sprintf("Ontology_term=%s",join(",",map{$_->{dbname}.":".$_->{accession}}@{$onts || []})) if (@{$onts || []});
+    print $fh sprintf("%s\n",join("\t", ($node->src_seq || ".", ".", $node->type, $s || ".", $e || ".", ".", $node->strand || ".", ".", join(";",@magic9))));
+    #no homology (secondary_node) seq fasta??
+    if ($fasta_out) {
+        my ($descr, $res) = (undef, $node->residues);
+        ($descr) = $node->get_property('description');
+        if ($descr || $res) {
+            print $fh "##FASTA\n";
+            printf $fh sprintf(">%s\n",$descr || $id);
+            if ($res) {
+                $res =~ s/(.{80})/$1\n/g;
+                chomp $res;
+                print $fh "$res\n";
+            }
+            printf $fh "###\n";
+        }
+    }
+    map{_gff3($_, $fh, $opts, $id)}@{$node->nodes || []};
+    #terminator could be the end of FASTA or the end of a feature (complex feature)
+    printf $fh "###\n" if ($terminator_depth && $terminator_depth == ($node->depth || -1)); #depth 0 is root
 }
 
 1;
