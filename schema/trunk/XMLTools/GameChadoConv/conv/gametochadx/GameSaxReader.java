@@ -34,7 +34,7 @@ private Attrib m_CurrCommentAttr;
 private GenFeat m_CurrGame,m_CurrSeq,m_CurrAnnot,m_CurrFeatSet,m_CurrFeatSpan;
 private GenFeat m_CurrResultSet,m_CurrResultSpan;
 private GenFeat m_CurrCompAnal;
-private Date m_CurrDate;
+private GDate m_CurrDate;
 
 private Aspect m_CurrAspect;
 private SeqRel m_CurrSeqRel;
@@ -129,7 +129,7 @@ private StringBuffer m_SB;
 			//System.out.println("READ DELETED_TRANSCRIPT<"+idTxt+">");
 		}else if(qualifiedName.equals("date")){
 			String timestampTxt = attributes.getValue("timestamp");
-			m_CurrDate = new Date(timestampTxt);
+			m_CurrDate = new GDate(timestampTxt);
 		//GENE MODEL
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("annotation"))){
 			m_AnnotCount++;
@@ -374,12 +374,12 @@ private StringBuffer m_SB;
 				if((m_CurrSeq.getResidueType()!=null)&&(m_CurrSeq.getResidueType().equals("cdna"))){
 					m_CurrSeq.setType("cdna");
 				}else if((m_CurrSeq.getResidueType()!=null)&&(m_CurrSeq.getResidueType().equals("aa"))){
-					Span sp = calcCDSSpan(
-						m_CurrSeq.getResidueLength(),
-						m_CurrFeatSet);
-					if(sp!=null){
-						m_CurrSeq.setSpan(sp);
-					}
+					//Span sp = calcCDSSpan(
+					//	m_CurrSeq.getResidueLength(),
+					//	m_CurrFeatSet);
+					//if(sp!=null){
+					//	m_CurrSeq.setSpan(sp);
+					//}
 					m_CurrSeq.setType("aa");
 				}
 				m_CurrFeatSet.addGenFeat(m_CurrSeq);
@@ -557,7 +557,8 @@ private StringBuffer m_SB;
 				m_synonymTxt = m_SB.toString().trim();
 				System.out.println("READ SYNONYM<"+m_synonymTxt+">");
 				Attrib tmp = new Attrib("property");
-				tmp.settype("synonym");
+				//tmp.settype("synonym");
+				tmp.settype("internal_synonym");
 				tmp.setvalue(m_synonymTxt);
 				m_CurrFeat.addAttrib(tmp);
 			}
@@ -587,13 +588,17 @@ private StringBuffer m_SB;
 		m_SB.append(new String(ch,start,length));
 	}
 
+
+//FSSPEILI
 	public Span calcCDSSpan(String the_DeclResidueLength,
 			GenFeat the_CurrFeatSet){
+		System.out.println("CALC CDS SPAN");
 		Vector SpanList = new Vector();
 		Span TSSSpan = null;
 		int protlen = 0;
 		try{
-			if((the_DeclResidueLength!=null)&&(the_DeclResidueLength.length()>0)){
+			if((the_DeclResidueLength!=null)
+					&&(the_DeclResidueLength.length()>0)){
 				String numStr = the_DeclResidueLength.replace('"',' ').trim();
 				protlen = (Integer.decode(numStr)).intValue();
 			}
@@ -602,8 +607,9 @@ private StringBuffer m_SB;
 		int bplen = (protlen*3);
 		for(int i=0;i<the_CurrFeatSet.getGenFeatCount();i++){
 			GenFeat gf = the_CurrFeatSet.getGenFeat(i);
-			if((gf.getType()==null)||(gf.getType().startsWith("translate"))
-					||(gf.getType().startsWith("start_codon"))){
+			if((gf.getType()==null)
+				||(gf.getType().startsWith("translate"))
+				||(gf.getType().startsWith("start_codon"))){
 				TSSSpan = gf.getSpan();
 			}else if(gf.getType().startsWith("exon")){
 				SpanList.add(gf.getSpan());
@@ -612,12 +618,16 @@ private StringBuffer m_SB;
 		if(TSSSpan!=null){
 			int startpos = TSSSpan.getStart();
 			int endpos = getEndpoint(SpanList,startpos,bplen);
+			System.out.println("CALC CDS SPAN<"+startpos+".."
+					+endpos+">");
 			return new Span(startpos,endpos);
 		}else{
+			System.out.println("CALC CDS SPAN<null>");
 			return null;
 		}
 	}
 
+//FSSPEILI
 	private int getEndpoint(Vector the_SpanList,int the_start,int the_len){
 		int endPos = 0;
 		int i=0;

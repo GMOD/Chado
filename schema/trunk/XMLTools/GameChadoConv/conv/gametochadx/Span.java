@@ -52,11 +52,13 @@ private String m_src = null;
 
 	public int getLength(){
 		if(m_start<m_end){
-			//return (m_end-m_start+1);
+//PEILI
 			return (m_end-m_start);
+			//return (m_end-m_start+1);
 		}else{
-			//return (m_start-m_end+1);
+//PEILI
 			return (m_start-m_end);
+			//return (m_start-m_end+1);
 		}
 	}
 

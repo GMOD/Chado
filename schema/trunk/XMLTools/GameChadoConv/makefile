@@ -45,7 +45,7 @@ upgrade:
 	cp -r ./CTG.java ${GMOD_PATH}/CTG.java
 	cp -r ./GTC.java ${GMOD_PATH}/GTC.java
 	cp -r ./makefile ${GMOD_PATH}/makefile
-
+	echo "now run update from /users/smutniak/gmod/schema/XMLTools/"
 
 runjar	:
 	jar -cvf ${GTCTOP}.jar -C ${CONVPATH} .
