@@ -37,6 +37,7 @@ load/bin/load_gff3.pl
 load/bin/load_ontology.pl
 load/etc/initialize.sql
 load/etc/log.conf
+load/logs/load.log
 load/tt2/LoadDBI.tt2
 load/tt2/Makefile.tt2
 load/tt2/load.conf.tt2
