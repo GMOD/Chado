@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.40 2003-12-04 23:10:51 allenday Exp $
+# $Id: Makefile.PL,v 1.41 2003-12-05 00:54:58 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -498,9 +498,6 @@ diagram :: \
 
 %.diagram.png: %.sql
 	$working_dir/bin/pg2diagram.pl \$< > \$@
-
-cdbi:
-	$working_dir/bin/pg2cdbi.pl $working_dir/modules/complete.sql > $working_dir/src/pgsql/Chado/AutoDBI.pm
 
 metadata: $working_dir/bin/ddltrans
 	cat \`find . -name \\*.sql -print\` > $working_dir/dat/chado.ddl
