@@ -188,7 +188,7 @@ sub load_ontologyterms{
 	if(!$predicate_db){
 		my $dbxref = Chado::Dbxref->find_or_create({
 				db_id => $db->id,
-				accession => $oborelmap{ predmap($predicate->name) },
+				accession => $oborelmap{ predmap($predicate->name) } || predmap($predicate->name),
 							   });
 		$predicate_db = Chado::Cvterm->create({
 			   name => predmap($predicate->name),
