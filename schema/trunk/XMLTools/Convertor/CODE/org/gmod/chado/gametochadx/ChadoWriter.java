@@ -377,11 +377,11 @@ private int m_ExonCount = 0;
 				Span tranSpan = null;
 				for(int j=0;j<tran.getGenFeatCount();j++){
 					GenFeat exon = tran.getGenFeat(j);
+					System.out.println("EXON TYPE<"+exon.getType()+"> ID<"+exon.getId()+">");
 					if(exon instanceof FeatureSpan){
+					System.out.println("IS INDEED EXON");
 					if(exon.getType()==null){
-						if(tran.getType()!=null){
-							exon.setType(tran.getType());
-						}
+						exon.setType("exon");
 					}
 					if(exon.getType().equals("start_codon")){
 						Span protSpan = exon.getSpan();
@@ -552,16 +552,6 @@ private int m_ExonCount = 0;
 			}
 		}
 
-		if(firstSpan!=null){
-			seqFeatNode.appendChild(makeFeatureLoc(
-					the_DOC,firstSpan));
-		}
-
-		if(secondSpan!=null){
-			seqFeatNode.appendChild(makeFeatureLoc(
-					the_DOC,secondSpan));
-		}
-
 		//RESIDUES
 		if(the_gf.getResidues()!=null){
 			//System.out.println("\tRESIDUES OF LEN<"
@@ -580,6 +570,21 @@ private int m_ExonCount = 0;
 						the_gf.getResidueLength()));
 *********************************/
 		}
+
+		//SPANS
+		if(firstSpan!=null){
+			seqFeatNode.appendChild(makeFeatureLoc(
+					the_DOC,firstSpan));
+		}
+
+		/************
+		//DISABLED FOR NOW
+		if(secondSpan!=null){
+			seqFeatNode.appendChild(makeFeatureLoc(
+					the_DOC,secondSpan));
+		}
+		************/
+
 
 		//DESCRIPTION
 		if(the_gf.getDescription()!=null){
@@ -753,7 +758,7 @@ private int m_ExonCount = 0;
 		String transRes = null;
 		for(int i=0;i<the_gf.getGenFeatCount();i++){
 			GenFeat gf = the_gf.getGenFeat(i);
-			if((gf instanceof Annot)){ //SHOULD NEVER SEE HERE
+			if(gf instanceof Annot){ //SHOULD NEVER SEE HERE
 				System.out.println("SHOULDNOTSEETHISEITHER");
 				FeatNode.appendChild(
 						makeFeatRel(the_DOC,"contains",
@@ -774,10 +779,12 @@ private int m_ExonCount = 0;
 					if(the_gf.getType().equals("transposable_element")){
 						//PARENT IS TYPE 'TE'
 						gf.setType(the_gf.getType());
+						System.out.println("PTAA");
 					}else if(gf.getId().startsWith("TE")){
 						//PARENT IS TYPE 'TE' BY NAME
 						gf.setType("transposable_element");
-					if(the_gf.getType().equals("transcript")){
+						System.out.println("PTBB");
+					}else if(the_gf.getType().equals("transcript")){
 						//PARENT IS transcript
 						//EITHER exon OR start_codon
 						if(gf.getSpan().getLength()==3){
@@ -785,12 +792,15 @@ private int m_ExonCount = 0;
 						}else{
 							gf.setType("exon");
 						}
+						System.out.println("PTCC");
 					}else{
 						//SOL
 						System.out.println("SHOULDNOTSEE");
 						gf.setType("UNKNOWN_TYPE");
+						System.out.println("PTDD");
 					}
 				}
+				System.out.println("TYPENOW<"+gf.getType()+">");
 
 				if(gf.getType().equals("start_codon")){
 					Span startCodonSpan = gf.getSpan();
@@ -834,6 +844,7 @@ private int m_ExonCount = 0;
 			
 					}
 				}
+				System.out.println("SEQTYPE<"+gf.getType()+">");
 
 				if(gf.getType().equals("cdna")){
 					transRes = cleanString(gf.getResidues());
@@ -878,7 +889,6 @@ private int m_ExonCount = 0;
 						FeatNode.appendChild(
 							makeFeatRel(the_DOC,"produces",
 							makeSeqNode(the_DOC,gf,the_gf.getName(),wrtArmSpan,wrtTransSpan)));
-						}
 					}
 				}else{
 					System.out.println("SHLDNTSEE UNK TYPE");
@@ -1153,9 +1163,9 @@ private int m_ExonCount = 0;
 		//PUB_ID
 		String pubId = "curated genome annotation";
 		if(the_Author!=null){
-			pubId = the_Author+" "+pubId;
+			pubId = the_Author;//+" "+pubId;
 		}else{
-			pubId = "GadFly "+pubId;
+			pubId = "GadFly";//+" "+pubId;
 		}
 		fsNode.appendChild(makeGenericNode(the_DOC,"pub_id",pubId));
 		fsNode.appendChild(makeGenericNode(the_DOC,"is_current","1"));
