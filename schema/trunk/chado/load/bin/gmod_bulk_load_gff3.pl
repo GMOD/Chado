@@ -28,6 +28,7 @@ gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
  --dbpass      Database password
  --dbhost      Database host
  --dbport      Database port
+ --analysis    The GFF data is from computational analysis
 
 Note that all of the arguments that begin 'db' can be provided by default
 by Bio::GMOD::Config, which was installed when 'make install' was run.
@@ -80,10 +81,6 @@ These include:
 
 =over
 
-=item Dbxref
-
-=item Target
-
 =item Gap
 
 =item Any custom (ie, lowercase-first) tag
@@ -111,7 +108,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -138,6 +135,7 @@ GetOptions(
     'dbpass:s'   => \$DBPASS,
     'dbhost:s'   => \$DBHOST,
     'dbport:s'   => \$DBPORT,
+    'analysis'   => \$ANALYSIS,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -146,11 +144,17 @@ $DBNAME   ||='chado';
 $DBPASS   ||='';
 $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
+$ANALYSIS ||=0;
 
+my %feature_cache; 
+my %db_id;   #for caching db_ids
+my %dbxref_cache;
+my %t_unique_count;
 my %src = ();
 my %type = ();
 my $pub; # for holding null pub object
 my %synonym;
+my %analysis;
 my $gff_source_db;
 my %gff_source;
 my $source_success = 1; #indicates that GFF_source is in db table
@@ -162,7 +166,9 @@ my @tables = (
    "feature_cvterm",
    "synonym",
    "feature_synonym",
-   "feature_dbxref"
+   "feature_dbxref",
+   "dbxref",
+   "analysisfeature",
 );
 my %files = (
    feature              => "feature.tmp",
@@ -173,6 +179,8 @@ my %files = (
    synonym              => "synonym.tmp",
    feature_synonym      => "featuresynonym.tmp",
    feature_dbxref       => "featuredbxref.tmp",
+   dbxref               => "dbxref.tmp",
+   analysisfeature      => "analysisfeature.tmp",
 );
 my %sequences = (
    feature              => "feature_feature_id_seq",
@@ -183,16 +191,20 @@ my %sequences = (
    synonym              => "synonym_synonym_id_seq",
    feature_synonym      => "feature_synonym_feature_synonym_id_seq",
    feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
+   dbxref               => "dbxref_dbxref_id_seq",
+   analysisfeature      => "analysisfeature_analysisfeature_id_seq"
 );
 my %copystring = (
-   feature              => "(feature_id,organism_id,name,uniquename,type_id)",
-   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase)",
+   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis)",
+   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank)",
    feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
    featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
    feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
    synonym              => "(synonym_id,name,type_id,synonym_sgml)",
    feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
    feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
+   dbxref               => "(dbxref_id,db_id,accession,version,description)",
+   analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance)",
 );
 
 
@@ -232,6 +244,13 @@ $sth = $db->prepare("select nextval('$sequences{feature_dbxref}')");
 $sth->execute;
 my($nextfeaturedbxref) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select nextval('$sequences{dbxref}')");
+$sth->execute;
+my($nextdbxref) = $sth->fetchrow_array();
+
+$sth = $db->prepare("select nextval('$sequences{analysisfeature}')");
+$sth->execute;
+my($nextanalysisfeature) = $sth->fetchrow_array();
 
 $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
@@ -256,6 +275,8 @@ open FCV,   ">$files{feature_cvterm}";
 open SYN,   ">$files{synonym}";
 open FS,    ">$files{feature_synonym}";
 open FDBX,  ">$files{feature_dbxref}";
+open DBX,   ">$files{dbxref}";
+open AF,    ">$files{analysisfeature}";
 
 my $gffio = Bio::FeatureIO->new(-fh => \*STDIN , -format => 'gff');
 
@@ -306,21 +327,32 @@ while(my $feature = $gffio->next_feature()){
     $nextfeaturerel++;
   }
 
-  my($name) = ($feature->annotation->get_Annotations('Name'))[0] || '\N';
+  my $source = $feature->source;
+  my $is_FgenesH = 1 if $source eq 'FgenesH_Monocot';
+  my $is_analysis = $is_FgenesH ? 1 : 0;
+
   my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || $nextfeature;
-  $name = $name->value if ref($name);
   $uniquename = $uniquename->value if ref($uniquename);
+  my($name) = ($feature->annotation->get_Annotations('Name'))[0] || "$featuretype-$uniquename";
+  $name = $name->value if ref($name);
 
   #my $uniquename = $nextfeature;
   $src{$uniquename} = $nextfeature;
-  print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type)),"\n";
+  print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type, $ANALYSIS)),"\n";
+
+  if ($ANALYSIS 
+      && $featuretype =~ /match/  
+      && !$feature->annotation->get_Annotations('Target')) {
+    $feature_cache{($feature->annotation->get_Annotations('ID'))[0]->value} = $nextfeature;
+  }
+
 
 #need to convert from base to interbase coords
   my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
   my $end   = $feature->end   eq '.' ? '\N' : $feature->end;
-  my $frame = $feature->frame eq '.' ? '\N' : $feature->frame;
+  my $phase = ($feature->phase eq '.' or $feature->phase eq '') ? '\N' : $feature->phase;
 
-  print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $frame)),"\n";
+  print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $phase,'0')),"\n";
 
   if ($feature->annotation->get_Annotations('Note')) {
     my @notes = map {$_->value} $feature->annotation->get_Annotations('Note');
@@ -337,7 +369,6 @@ while(my $feature = $gffio->next_feature()){
     }
   }
 
-  my $source = $feature->source;
   if ( $source_success && $source && $source ne '.') {
     unless ($gff_source_db) {
       ($gff_source_db) = Chado::Db->search({ name => 'GFF_source' });
@@ -345,13 +376,18 @@ while(my $feature = $gffio->next_feature()){
 
     if ($gff_source_db) {
       unless ($gff_source{$source}) {
-        $gff_source{$source} = Chado::Dbxref->find_or_create( {
-            db_id     => $gff_source_db->id,
-            accession => $source,
-        } );
-        $gff_source{$source}->dbi_commit;
+#        $gff_source{$source} = Chado::Dbxref->find_or_create( {
+#            db_id     => $gff_source_db->id,
+#            accession => $source,
+#        } );
+
+        $gff_source{$source} = $nextdbxref;
+        print DBX join("\t",($nextdbxref,$gff_source_db->id,$source,1,'\N')),"\n";
+        $nextdbxref++; 
+
+#        $gff_source{$source}->dbi_commit;
       }
-      my $dbxref_id = $gff_source{$source}->id;
+      my $dbxref_id = $gff_source{$source};
       print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$dbxref_id)),"\n";
       $nextfeaturedbxref++;
     } else {
@@ -377,8 +413,37 @@ while(my $feature = $gffio->next_feature()){
         $pub = $pub->id; #no need to keep whole object when all we want is the id
       }
 
-      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";;
+      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";
       $nextfeaturecvterm++;
+    }
+  }
+
+  if ($feature->annotation->get_Annotations('Dbxref')) {
+    my @dbxrefs = $feature->annotation->get_Annotations('Dbxref');
+    foreach my $dbxref (@dbxrefs) {
+      my $database  = $dbxref->database;
+      my $accession = $dbxref->primary_id;
+      my $version;
+      if ($accession =~ /\S+\.(\d+)$/) {
+        $version    = $1;
+      } else {
+        $version    = 1; 
+      }
+      my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
+
+      #enforcing the unique index on dbxref table
+      next if $dbxref_cache{"$database|$accession|$version"};
+      $dbxref_cache{"$database|$accession|$version"} = 1;
+
+      unless ($db_id{$database}) {
+        my($db_id) = Chado::Db->search( name => "DB:$database" );
+        warn "couldn't find database 'DB:$database' in db table"
+          and next unless $db_id;
+        $db_id{$database} = $db_id;
+      }
+
+      print DBX join("\t",($nextdbxref,$db_id{$database},$accession,$version,$desc)),"\n";
+      $nextdbxref++;
     }
   }
 
@@ -395,39 +460,101 @@ while(my $feature = $gffio->next_feature()){
   my @ualiases = grep {++$count{$_} < 2} @aliases;
 
   foreach my $alias (@ualiases) {
-    unless ($synonym{$alias}) {
-      unless ($type{'synonym'}) {
-        ($type{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
-        warn "unable to find synonym type in cvterm table" 
-            and next unless $type{'synonym'};
-      }
-
-      print SYN join("\t", ($nextsynonym,$alias,$type{'synonym'}->id,$alias)),"\n";
-
-      unless ($pub) {
-        ($pub) = Chado::Pub->search( miniref => 'null' );
-        $pub = $pub->id; #no need to keep whole object when all we want is the id
-      }
-
-      print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$nextfeature,$pub)),"\n";
-
-#        warn "alias:$alias,name:$name\n";
-
-      $nextfeaturesynonym++;
-      $synonym{$alias} = $nextsynonym;
-      $nextsynonym++;
-
-    } else {
-      print FS join("\t", ($nextfeaturesynonym,$synonym{$alias},$nextfeature,$pub)),"\n";
-
-#        warn "in seenit, alias:$alias, name:$name\n";
-
-      $nextfeaturesynonym++;
-    }
+    synonyms($alias);
   }
 
-  $nextfeature++;
+  if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
+    my $source = $feature->source;
+    my $score = $feature->score ? $feature->score : '\N';
+    my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+                                                                                
+    my $ankey = $is_FgenesH ?
+                'FgenesH_Monocot' :
+                $source .'_'. $featuretype;
+                                                                                
+    unless ($analysis{$ankey}) {
+      my ($ana) = Chado::Analysis->search( name => $ankey );
+      $analysis{$ankey} = $ana->id;
+      die unless $analysis{$ankey};
+    }
+                                                                                
+    print AF join("\t", ($nextanalysisfeature,$nextfeature,$analysis{$ankey},$score)), "\n";
+    $nextanalysisfeature++;
+  }
+
   $nextfeatureloc++;
+  #now deal with creating another feature for targets
+
+  if (!$ANALYSIS && $feature->annotation->get_Annotations('Target')) {
+    die "Features in this GFF file have Target tags, but you did not indicate\n"
+    ."--analysis on the command line";
+  }
+  elsif ($feature->annotation->get_Annotations('Target')) {
+    # get the targets, which are Bio::Annotation::SimpleValue, which in
+    # turn are Bio::Location::Simple
+    my @targets = $feature->annotation->get_Annotations('Target');
+    my $rank = 1;
+    foreach my $target (@targets) {
+      my $target_id = $target->value->seq_id;
+      my $tstart    = $target->value->start -1; #convert to interbase
+      my $tend      = $target->value->end;
+      my $tstrand   = $target->value->strand ? $target->value->strand : '\N';
+      my $tsource   = $feature->source;
+
+      synonyms($target_id);
+
+      #warn join("\t", (($feature->annotation->get_Annotations('Parent'))[0]->value,$target_id,$tstart,$tend )) if $feature->annotation->get_Annotations('Parent');
+
+      if ($feature->annotation->get_Annotations('Parent') 
+         && $feature_cache{($feature->annotation->get_Annotations('Parent'))[0]->value}) { 
+        print FLOC join("\t", (
+             $nextfeatureloc, 
+             $nextfeature,
+             $feature_cache{($feature->annotation->get_Annotations('Parent'))[0]->value},
+             $tstart, $tend, $tstrand, '\N',$rank)),"\n";
+      } else { #this Target needs a feature too
+        $nextfeature++;
+        $name ||= "$featuretype-$uniquename";
+        print F join("\t", ($nextfeature, $organism->id, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS)),"\n";
+        print FLOC join("\t", (
+              $nextfeatureloc,
+              $nextfeature-1,
+              $nextfeature,
+              $tstart, $tend, $tstrand, '\N',$rank)),"\n";
+      }
+
+      my $score = $feature->score ? $feature->score : '\N';
+
+      my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+
+      my $type = $type{$featuretype};
+ #     if(!$type){
+ #       ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
+ #       $type{$featuretype} = $type->id;
+ #     }
+ #     die "no cvterm for ".$featuretype unless $type;
+
+      my $ankey = $tsource .'_'. $featuretype;
+
+      unless($analysis{$ankey}) {
+        my ($ana) = Chado::Analysis->search( name => $ankey );
+        $analysis{$ankey} = $ana->id;
+      }
+      die unless $analysis{$ankey};
+
+      print AF join("\t", ($nextanalysisfeature,$nextfeature,$analysis{$ankey},$score)), "\n"; 
+      $nextanalysisfeature++;
+
+ #     my $target_unique = "target_$target_id";
+ #     $t_unique_count{$target_unique}++;
+ #     $target_unique .= "_part_$t_unique_count{$target_unique}";
+ #     print F join("\t", ($nextfeature, $organism->id, $target_id, $target_unique, $type, $ANALYSIS)),"\n";
+
+      $nextfeatureloc++;
+      $rank++;
+    }
+  }
+  $nextfeature++;
 }
 
 my %nextvalue = (
@@ -439,6 +566,8 @@ my %nextvalue = (
    "synonym"              => $nextsynonym,
    "feature_synonym"      => $nextfeaturesynonym,
    "feature_dbxref"       => $nextfeaturedbxref,
+   "dbxref"               => $nextdbxref,
+   "analysisfeature"      => $nextanalysisfeature,
 );
 
 print F    "\\.\n\n";
@@ -449,6 +578,8 @@ print FCV "\\.\n\n";
 print SYN "\\.\n\n";
 print FS "\\.\n\n";
 print FDBX "\\.\n\n";
+print DBX "\\.\n\n";
+print AF "\\.\n\n";
 
 close F;
 close FLOC;
@@ -458,6 +589,8 @@ close FCV;
 close SYN;
 close FS;
 close FDBX;
+close DBX;
+close AF;
 
 foreach my $table (@tables) {
     copy_from_stdin($db,$table,
@@ -481,7 +614,7 @@ $db->disconnect;
 
 warn "Deleting temporary files\n";
 foreach (@tables) {
-  unlink $files{$_};
+#  unlink $files{$_};
 }
 
 warn "\nWhile this script has made an effort to optimize the database, you\n"
@@ -512,4 +645,37 @@ sub copy_from_stdin {
   $sth->finish;
   #update the sequence so that later inserts will work 
   $dbh->do("SELECT setval('public.$sequence', $nextval) FROM $table"); 
+}
+
+sub synonyms  {
+    my $alias = shift;
+    unless ($synonym{$alias}) {
+      unless ($type{'synonym'}) {
+        ($type{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
+        warn "unable to find synonym type in cvterm table"
+            and next unless $type{'synonym'};
+      }
+
+      print SYN join("\t", ($nextsynonym,$alias,$type{'synonym'}->id,$alias)),"\n";
+
+      unless ($pub) {
+        ($pub) = Chado::Pub->search( miniref => 'null' );
+        $pub = $pub->id; #no need to keep whole object when all we want is the id
+      }
+
+      print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$nextfeature,$pub)),"\n";
+
+#        warn "alias:$alias,name:$name\n";
+
+      $nextfeaturesynonym++;
+      $synonym{$alias} = $nextsynonym;
+      $nextsynonym++;
+
+    } else {
+      print FS join("\t", ($nextfeaturesynonym,$synonym{$alias},$nextfeature,$pub)),"\n";
+
+#        warn "in seenit, alias:$alias, name:$name\n";
+
+      $nextfeaturesynonym++;
+    }
 }

@@ -26,12 +26,14 @@ insert into cv (name,definition) values ('Ad Hoc Ontology','Locally created term
 insert into cv (name,definition) values ('Statistical Terms','Locally created terms for statistics');
 insert into cvterm (name,cv_id) values ('null',       (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('Note', (select cv_id from cv where name = 'null'));
+insert into cvterm (name,cv_id) values ('computer file', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('synonym', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,cv_id) values ('score', (select cv_id from cv where name = 'null'));
 insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
 insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
+insert into db (name, contact_id,description) values ('null',(select contact_id from contact where name = 'null'),'a fake db to make the flybase triggers happy');
 insert into db (name, contact_id,description) values ('GFF_source', (select contact_id from contact where name = 'null'), 'A collection of sources (ie, column 2) from GFF files');
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));

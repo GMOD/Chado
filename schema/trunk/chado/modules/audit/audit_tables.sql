@@ -1,5 +1,5 @@
 --audit tables generated from 
--- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>audits.sql
+-- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>audit_tables.sql
 
 
    DROP TABLE audit_tableinfo;
@@ -1416,6 +1416,7 @@
        md5checksum char(32), 
        type_id integer, 
        is_analysis boolean, 
+       is_obsolete boolean, 
        timeaccessioned timestamp, 
        timelastmodified timestamp, 
        transaction_date timestamp not null default now(),
@@ -1436,6 +1437,7 @@
        md5checksum_var char(32); 
        type_id_var integer; 
        is_analysis_var boolean; 
+       is_obsolete_var boolean; 
        timeaccessioned_var timestamp; 
        timelastmodified_var timestamp; 
        
@@ -1451,6 +1453,7 @@
        md5checksum_var = OLD.md5checksum;
        type_id_var = OLD.type_id;
        is_analysis_var = OLD.is_analysis;
+       is_obsolete_var = OLD.is_obsolete;
        timeaccessioned_var = OLD.timeaccessioned;
        timelastmodified_var = OLD.timelastmodified;
        
@@ -1471,6 +1474,7 @@
              md5checksum, 
              type_id, 
              is_analysis, 
+             is_obsolete, 
              timeaccessioned, 
              timelastmodified, 
              transaction_type
@@ -1485,6 +1489,7 @@
              md5checksum_var, 
              type_id_var, 
              is_analysis_var, 
+             is_obsolete_var, 
              timeaccessioned_var, 
              timelastmodified_var, 
              transaction_type_var
