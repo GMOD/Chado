@@ -1,0 +1,25 @@
+:SELECT 
+  tfeature.*,
+  object.*,
+  subject.*
+
+:FROM
+  tfeature
+  LEFT OUTER JOIN feature_relationship AS subjfr ON (tfeature.feature_id = subjfr.object_id)
+  LEFT OUTER JOIN feature_relationship AS objfr ON (tfeature.feature_id = objfr.subject_id)
+  LEFT OUTER JOIN tfeature AS object ON (object.feature_id = objfr.object_id)
+  LEFT OUTER JOIN tfeature AS subject ON (subject.feature_id = subjfr.subject_id)
+
+:WHERE   
+  [tfeature.name = &name&]
+
+:USE NESTING (set (tfeature(object)(subject)))
+
+// -------------------------------------------
+
+schema: chado
+
+desc: for any feature, this will fetch the contextual features in the
+      feature graph; gets both subject and object features
+
+example_input: name => SELECT name FROM feature

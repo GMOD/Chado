@@ -1,0 +1,27 @@
+:SELECT *
+
+:FROM
+  tfeature 
+  LEFT OUTER JOIN featureloc ON (tfeature.feature_id = featureloc.feature_id)
+  LEFT OUTER JOIN feature AS srcfeature ON (featureloc.srcfeature_id = srcfeature.feature_id)
+  LEFT OUTER JOIN feature_relationship ON (tfeature.feature_id = object_id)
+  LEFT OUTER JOIN dbxrefd ON (tfeature.dbxref_id = dbxrefd.dbxref_id)
+  LEFT OUTER JOIN featurepropd ON (tfeature.feature_id = featurepropd.feature_id)
+  LEFT OUTER JOIN feature_cvterm ON (tfeature.feature_id = feature_cvterm.feature_id)
+  LEFT OUTER JOIN cvterm USING (cvterm_id)
+
+:WHERE   
+  [tfeature.name => &name&]
+  [tfeature.feature_id => &feature_id&]
+
+:USE NESTING (set (tfeature(dbxrefd)(featurepropd)(featureloc(srcfeature))(feature_relationship(subject))))
+
+// -------------------------------------------
+
+schema: chado
+desc: fetches a single feature by name
+      does not get related features - this basic query must be used
+      iteratively to build the full feature graph
+see_also:
+
+example_input: name => SELECT name FROM feature

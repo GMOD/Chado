@@ -1,0 +1,91 @@
+CHADO STAG TEMPLATES
+====================
+
+[note: this part of chado is NOT YET FULLY SUPPORTED]
+
+This directory contains SQL Templates for querying chado in stag
+format. The templates can either be browsed as a resource in their own
+right, or they can be used in conjunction with the DBStag library.
+
+PREREQUISITES
+=============
+
+You need a local chado database, AND you need to define the BDGP views
+over them; see 
+
+  chado/modules/sequence/bdgp/bdgp-views.sql
+
+  You also need
+
+  Data::Stag
+  DBIx::DBStag (version 0.02 or higher)
+
+UNERSTANDING STAG SQL TEMPLATES
+===============================
+
+A stag SQL template is fairly simple - the first part is basically an
+SQL query with placeholder variables, and the second part is optional
+metadata.
+
+A placeholder variable (typically in the WHERE part of the query) looks like this
+
+  [ feature.name => &name& ]
+
+This means the template user can optionally fill in a value for &name&
+- this can be a string match (in which case LIKE will be used) or an
+exact match.
+
+DBStag utilises one extension to SQL - the "USE NESTING" clause.
+
+This is for constructing hierarchical XML from the query results -
+DBStag will decompose the results of any SQL query back into the
+original relations
+
+For full documentation on templates, install DBIx::DBStag and read the
+pod docs for DBIx::DBStag::SQLTemplate
+
+USING STAG TEMPLATES
+====================
+
+Stag templates can either be used on the command line or via a WWW
+interface. Both give the option of returning either row data or
+hierarchical data (eg XML).
+
+The WWW interface to chado via stag templates may or may not be running here:
+
+  http://www.godatabase.org/cgi-bin/ubiq/ubiq.cgi
+
+Select one of the chado databases and you will be presented with a
+list of possible templates; select one and then fill in the
+placeholder variables, or your own SQL.
+
+Alternatively, you can install DBIx::DBStag (use at least version
+0.02) from CPAN or from cvs (http://stag.sf.net), then do this:
+
+  setenv DBSTAG_TEMPLATE_DIRS "$HOME/gmod/schema/chado/stag-templates"
+
+(or wherever this directory resides)
+
+You can use a template by specifying its name after the slash with the
+following script:
+
+  selectall_xml.pl -d chado /basic-feature CG1234
+
+or you can bind specific placeholder variables like this:
+
+  selectall_xml.pl -d chado /basic-feature name=CG1234
+
+You can also generate an individual script for every templates; just type
+
+  make -f make-publish PUBTMPLDIR=/my/template/dir TEMPLATEBINDIR=/my/bin
+
+(substituting appropriately)
+
+then you can just run the templates; try
+
+  basic-feature -h
+
+Have fun! More documentation coming soon
+
+Chris Mungall BDGP
+cjm@fruitfly.org
