@@ -124,6 +124,7 @@ my $feature_count = 0;
 my($chado_organism) = Chado::Organism->search(common_name => $ORGANISM );
 my($chado_db)       = Chado::Db->search(name => $SRC_DB);
 my($part_of)        = Chado::Cvterm->search(name => 'part_of');
+my($nullpub)        = Chado::Pub->search(miniref => 'null');
 
 die "The organism '$ORGANISM' could not be found. Did you spell it correctly?"
      unless $chado_organism;
@@ -293,11 +294,11 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $id,
                       type_id      => $synonym_type->cvterm_id
                                                    });
-                                                                                                                                  
-    Chado::Feature_synonym->find_or_create ({
+	
+    Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => 1 ##what should go here?
+                      pub_id     => $nullpub
                                             });
   }
 
@@ -320,12 +321,12 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $alias,
                       type_id      => $synonym_type->cvterm_id
                                                      });
-                                                                                
-                                                                                
-      Chado::Feature_synonym->find_or_create ({
+	  
+	  
+      Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => 1 ##what should go here?
+                      pub_id     => $nullpub,
                                               });
     }
   }
@@ -338,12 +339,12 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $name,
                       type_id      => $synonym_type->cvterm_id
                                                    });
-                                                                                
-                                                                                
-      Chado::Feature_synonym->find_or_create ({
+	  
+	  
+      Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
-                      pub_id     => 1 ##what should go here?
+                      pub_id     => $nullpub,
                                             });
     }
   }
