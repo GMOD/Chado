@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.38 2003-12-04 22:24:13 allenday Exp $
+# $Id: Makefile.PL,v 1.39 2003-12-04 22:55:11 kycl4rk Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -302,15 +302,15 @@ unless ($external eq 'none') {
 print join("\n", 
   '', 
   'Building with the following database options:',
-  "DBDRIVER=$DBDRIVER",
-  "DBNAME=$DBNAME",
-  "DBUSER=$DBUSER",
-  "DBPASS=$DBPASS",
-  "DBHOST=$DBHOST",
-  "DBPORT=$DBPORT",
+  "  DBDRIVER=$DBDRIVER",
+  "  DBNAME=$DBNAME",
+  "  DBUSER=$DBUSER",
+  "  DBPASS=$DBPASS",
+  "  DBHOST=$DBHOST",
+  "  DBPORT=$DBPORT",
   '',
   'And the following core modules and extensions:', 
-  @sqlfiles, 
+  ( map { "  $_" } @sqlfiles ), 
   ''
 );
 
@@ -410,12 +410,16 @@ WriteMakefile(
 print <<HERE
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-Makefile written.  Possible targets of Makefile:
+Makefile written.  Now you should do the following:
 
-  images      - Generate images of the schema in several formats
-  load_schema - Load SQL schema into database
-  prepdb      - Load basic data
-  ontologies  - Load data for various ontologies
+  make             (creates necessary build files)
+  make load_schema (loads SQL schema into database)
+  make prepdb      (loads basic data)
+  make ontologies  (loads data for various ontologies)
+
+Optional Targets:
+
+  make images      (generates images of the schema in several formats)
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
