@@ -8,7 +8,7 @@
                   <name>gene</name>
            </cvterm>
      </type_id>
-     <uniquename test="yes">CG13339</uniquename>
+     <uniquename test="yes"><or>CG13339</or><or>CG3665</or><or>CG3497</or></uniquename>
      <!-- get all mRNA of those gene -->
      <feature_relationship dump="all">
        <subjfeature_id test="yes">

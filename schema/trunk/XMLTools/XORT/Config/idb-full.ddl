@@ -1,47 +1,44 @@
+create table contact (
+       contact_id serial not null,
+       primary key (contact_id),
+       description varchar(255) null
+);
+GRANT ALL on contact_contact_id_seq to PUBLIC;
+GRANT ALL on contact to PUBLIC;
+
+create table db (
+       db_id serial not null,
+       primary key (db_id),
+       name varchar(255) not null,
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
+       description varchar(255) null,
+       urlprefix varchar(255) null,
+       url varchar(255) null,
+       unique (name)
+);
+GRANT ALL on db_db_id_seq to PUBLIC;
+GRANT ALL on db to PUBLIC;
+
 create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
-       dbname varchar(255) not null,
+       db_id int not null,
+       foreign key (db_id) references db (db_id) on delete cascade,
        accession varchar(255) not null,
        version varchar(255) not null default '',
-       dbxrefdescription text,
-       unique (dbname, accession, version)
+       description text,
+       unique (db_id, accession, version)
 );
 GRANT ALL on dbxref_dbxref_id_seq to PUBLIC;
 GRANT ALL on dbxref to PUBLIC;
 
-create table tableinfo (
-       tableinfo_id serial not null,
-       primary key (tableinfo_id),
-       name varchar(30) not null,
-       table_type varchar(40) not null,
-       primary_key_column varchar(30) null,
-       database_id int not null,
-       is_versioned int not null,
-       is_view int not null,
-       view_on_table_id int null,
-       superclass_table_id int null,
-       is_updateable int not null,
-       modification_date date not null
-);
-GRANT ALL on tableinfo_tableinfo_id_seq to PUBLIC;
-GRANT ALL on tableinfo to PUBLIC;
-
-create table projectinfo (
-       projectinfo_id serial not null,
-       primary key (projectinfo_id),
-       name varchar(255) not null,
-      description varchar(255) not null
-);
-GRANT ALL on projectinfo_projectinfo_id_seq to PUBLIC;
-GRANT ALL on projectinfo to PUBLIC;
-
 create table cv (
        cv_id serial not null,
        primary key (cv_id),
-       cvname varchar(255) not null,
-       cvdefinition text,
-       unique(cvname)
+       name varchar(255) not null,
+       definition text,
+       unique(name)
 );
 GRANT ALL on cv_cv_id_seq to PUBLIC;
 GRANT ALL on cv to PUBLIC;
@@ -50,11 +47,11 @@ create table cvterm (
        cvterm_id serial not null,
        primary key (cvterm_id),
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        name varchar(255) not null,
-       termdefinition text,
+       definition text,
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
        unique(name, cv_id)
 );
 GRANT ALL on cvterm_cvterm_id_seq to PUBLIC;
@@ -63,63 +60,65 @@ GRANT ALL on cvterm to PUBLIC;
 create index cvterm_idx1 on cvterm (cv_id);
 GRANT ALL on cvterm to PUBLIC;
 
-create table cvrelationship (
-       cvrelationship_id serial not null,
-       primary key (cvrelationship_id),
-       reltype_id int not null,
-       foreign key (reltype_id) references cvterm (cvterm_id),
-       subjterm_id int not null,
-       foreign key (subjterm_id) references cvterm (cvterm_id),
-       objterm_id int not null,
-       foreign key (objterm_id) references cvterm (cvterm_id),
-       unique(reltype_id, subjterm_id, objterm_id)
+create table cvterm_relationship (
+       cvterm_relationship_id serial not null,
+       primary key (cvterm_relationship_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
+       unique(type_id, subject_id, object_id)
 );
-GRANT ALL on cvrelationshi_cvrelationshi_seq to PUBLIC;
-GRANT ALL on cvrelationship to PUBLIC;
+GRANT ALL on cvterm_relati_cvterm_relati_seq to PUBLIC;
+GRANT ALL on cvterm_relationship to PUBLIC;
 
-create index cvrelationship_idx1 on cvrelationship (reltype_id);
-GRANT ALL on cvrelationship to PUBLIC;
+create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
+GRANT ALL on cvterm_relationship to PUBLIC;
 
-create index cvrelationship_idx2 on cvrelationship (subjterm_id);
-GRANT ALL on cvrelationship to PUBLIC;
+create index cvterm_relationship_idx2 on cvterm_relationship (subject_id);
+GRANT ALL on cvterm_relationship to PUBLIC;
 
-create index cvrelationship_idx3 on cvrelationship (objterm_id);
-GRANT ALL on cvrelationship to PUBLIC;
+create index cvterm_relationship_idx3 on cvterm_relationship (object_id);
+GRANT ALL on cvterm_relationship to PUBLIC;
 
-create table cvpath (
-       cvpath_id serial not null,
-       primary key (cvpath_id),
-       reltype_id int,
-       foreign key (reltype_id) references cvterm (cvterm_id),
-       subjterm_id int not null,
-       foreign key (subjterm_id) references cvterm (cvterm_id),
-       objterm_id int not null,
-       foreign key (objterm_id) references cvterm (cvterm_id),
+create table cvtermpath (
+       cvtermpath_id serial not null,
+       primary key (cvtermpath_id),
+       type_id int,
+       foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        pathdistance int,
-       unique (subjterm_id, objterm_id)
+       unique (subject_id, object_id)
 );
-GRANT ALL on cvpath_cvpath_id_seq to PUBLIC;
-GRANT ALL on cvpath to PUBLIC;
+GRANT ALL on cvtermpath_cvtermpath_id_seq to PUBLIC;
+GRANT ALL on cvtermpath to PUBLIC;
 
-create index cvpath_idx1 on cvpath (reltype_id);
-GRANT ALL on cvpath to PUBLIC;
+create index cvtermpath_idx1 on cvtermpath (type_id);
+GRANT ALL on cvtermpath to PUBLIC;
 
-create index cvpath_idx2 on cvpath (subjterm_id);
-GRANT ALL on cvpath to PUBLIC;
+create index cvtermpath_idx2 on cvtermpath (subject_id);
+GRANT ALL on cvtermpath to PUBLIC;
 
-create index cvpath_idx3 on cvpath (objterm_id);
-GRANT ALL on cvpath to PUBLIC;
+create index cvtermpath_idx3 on cvtermpath (object_id);
+GRANT ALL on cvtermpath to PUBLIC;
 
-create index cvpath_idx4 on cvpath (cv_id);
-GRANT ALL on cvpath to PUBLIC;
+create index cvtermpath_idx4 on cvtermpath (cv_id);
+GRANT ALL on cvtermpath to PUBLIC;
 
 create table cvtermsynonym (
+       cvtermsynonym_id int not null,
+       primary key (cvtermsynonym_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
-       termsynonym varchar(255) not null,
-       unique(cvterm_id, termsynonym)
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       synonym varchar(255) not null,
+       unique(cvterm_id, synonym)
 );
 GRANT ALL on cvtermsynonym to PUBLIC;
 
@@ -130,9 +129,9 @@ create table cvterm_dbxref (
        cvterm_dbxref_id serial not null,
        primary key (cvterm_dbxref_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        unique(cvterm_id, dbxref_id)
 );
 GRANT ALL on cvterm_dbxref_cvterm_dbxref_seq to PUBLIC;
@@ -147,9 +146,8 @@ GRANT ALL on cvterm_dbxref to PUBLIC;
 create table organism (
 	organism_id serial not null,
 	primary key (organism_id),
-	abbrev varchar(255) null,
+	abbreviation varchar(255) null,
 	genus varchar(255) not null,
-
 	species varchar(255) not null,
 	common_name varchar(255) null,
 	comment text null,
@@ -162,9 +160,9 @@ create table organism_dbxref (
        organism_dbxref_id serial not null,
        primary key (organism_dbxref_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        unique(organism_id,dbxref_id)
 );
 GRANT ALL on organism_dbxr_organism_dbxr_seq to PUBLIC;
@@ -175,6 +173,26 @@ GRANT ALL on organism_dbxref to PUBLIC;
 
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
 GRANT ALL on organism_dbxref to PUBLIC;
+
+create table organismprop (
+       organismprop_id serial not null,
+       primary key (organismprop_id),
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
+       unique(organism_id, type_id, value, rank)
+);
+GRANT ALL on organismprop_organismprop_i_seq to PUBLIC;
+GRANT ALL on organismprop to PUBLIC;
+
+create index organismprop_idx1 on organismprop (organism_id);
+GRANT ALL on organismprop to PUBLIC;
+
+create index organismprop_idx2 on organismprop (type_id);
+GRANT ALL on organismprop to PUBLIC;
 
 create table pub (
        pub_id serial not null,
@@ -188,7 +206,7 @@ create table pub (
        pages  varchar(255),
        miniref varchar(255) not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -204,11 +222,11 @@ create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
        subj_pub_id int not null,
-       foreign key (subj_pub_id) references pub (pub_id),
+       foreign key (subj_pub_id) references pub (pub_id) on delete cascade,
        obj_pub_id int not null,
-       foreign key (obj_pub_id) references pub (pub_id),
+       foreign key (obj_pub_id) references pub (pub_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        unique(subj_pub_id, obj_pub_id, type_id)
 );
 GRANT ALL on pub_relations_pub_relations_seq to PUBLIC;
@@ -227,9 +245,9 @@ create table pub_dbxref (
        pub_dbxref_id serial not null,
        primary key (pub_dbxref_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        unique(pub_id,dbxref_id)
 );
 GRANT ALL on pub_dbxref_pub_dbxref_id_seq to PUBLIC;
@@ -256,9 +274,9 @@ create table pub_author (
        pub_author_id serial not null,
        primary key (pub_author_id),
        author_id int not null,
-       foreign key (author_id) references author (author_id),
+       foreign key (author_id) references author (author_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        arank int not null,
        editor boolean default 'false',
        unique(author_id,pub_id)
@@ -273,40 +291,43 @@ create index pub_author_idx2 on pub_author (pub_id);
 GRANT ALL on pub_author to PUBLIC;
 
 create table pubprop (
+       pubprop_id serial not null,
+       primary key (pubprop_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null,
-       prank integer,
-       unique(pub_id,pkey_id,pval)
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null,
+       rank integer,
+       unique(pub_id,type_id,value)
 );
+GRANT ALL on pubprop_pubprop_id_seq to PUBLIC;
 GRANT ALL on pubprop to PUBLIC;
 
 create index pubprop_idx1 on pubprop (pub_id);
 GRANT ALL on pubprop to PUBLIC;
 
-create index pubprop_idx2 on pubprop (pkey_id);
+create index pubprop_idx2 on pubprop (type_id);
 GRANT ALL on pubprop to PUBLIC;
 
 create table feature (
        feature_id serial not null,
        primary key (feature_id),
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
        name varchar(255),
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 	is_analysis boolean not null default 'false',
        timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
-       unique(organism_id,uniquename)
+       unique(organism_id,uniquename, type_id)
 );
 GRANT ALL on feature_feature_id_seq to PUBLIC;
 GRANT ALL on feature to PUBLIC;
@@ -334,13 +355,13 @@ create table featureloc (
        featureloc_id serial not null,
        primary key (featureloc_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        srcfeature_id int,
-       foreign key (srcfeature_id) references feature (feature_id),
-       nbeg int,
-       is_nbeg_partial boolean not null default 'false',
-       nend int,
-       is_nend_partial boolean not null default 'false',
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
+       fmin int,
+       is_fmin_partial boolean not null default 'false',
+       fmax int,
+       is_fmax_partial boolean not null default 'false',
        strand smallint,
        phase int,
        residue_info text,
@@ -357,16 +378,16 @@ GRANT ALL on featureloc to PUBLIC;
 create index featureloc_idx2 on featureloc (srcfeature_id);
 GRANT ALL on featureloc to PUBLIC;
 
-create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
+create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
 GRANT ALL on featureloc to PUBLIC;
 
 create table feature_pub (
        feature_pub_id serial not null,
        primary key (feature_pub_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        unique(feature_id, pub_id)
 );
 GRANT ALL on feature_pub_feature_pub_id_seq to PUBLIC;
@@ -382,12 +403,12 @@ create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null default '',
-       prank int not null default 0,
-       unique(feature_id, pkey_id, pval, prank)
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
+       unique(feature_id, type_id, value, rank)
 );
 GRANT ALL on featureprop_featureprop_id_seq to PUBLIC;
 GRANT ALL on featureprop to PUBLIC;
@@ -395,16 +416,16 @@ GRANT ALL on featureprop to PUBLIC;
 create index featureprop_idx1 on featureprop (feature_id);
 GRANT ALL on featureprop to PUBLIC;
 
-create index featureprop_idx2 on featureprop (pkey_id);
+create index featureprop_idx2 on featureprop (type_id);
 GRANT ALL on featureprop to PUBLIC;
 
 create table featureprop_pub (
        featureprop_pub_id serial not null,
        primary key (featureprop_pub_id),
        featureprop_id int not null,
-       foreign key (featureprop_id) references featureprop (featureprop_id),
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        unique(featureprop_id, pub_id)
 );
 GRANT ALL on featureprop_p_featureprop_p_seq to PUBLIC;
@@ -420,9 +441,9 @@ create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        is_current boolean not null default 'true',
        unique(feature_id, dbxref_id)
 );
@@ -438,22 +459,22 @@ GRANT ALL on feature_dbxref to PUBLIC;
 create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
-       subjfeature_id int not null,
-       foreign key (subjfeature_id) references feature (feature_id),
-       objfeature_id int not null,
-       foreign key (objfeature_id) references feature (feature_id),
+       subject_id int not null,
+       foreign key (subject_id) references feature (feature_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references feature (feature_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
-       relrank int,
-       unique(subjfeature_id, objfeature_id, type_id)
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       rank int,
+       unique(subject_id, object_id, type_id)
 );
 GRANT ALL on feature_relat_feature_relat_seq to PUBLIC;
 GRANT ALL on feature_relationship to PUBLIC;
 
-create index feature_relationship_idx1 on feature_relationship (subjfeature_id);
+create index feature_relationship_idx1 on feature_relationship (subject_id);
 GRANT ALL on feature_relationship to PUBLIC;
 
-create index feature_relationship_idx2 on feature_relationship (objfeature_id);
+create index feature_relationship_idx2 on feature_relationship (object_id);
 GRANT ALL on feature_relationship to PUBLIC;
 
 create index feature_relationship_idx3 on feature_relationship (type_id);
@@ -463,12 +484,12 @@ create table feature_cvterm (
        feature_cvterm_id serial not null,
        primary key (feature_cvterm_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-       unique(feature_id, cvterm_id, pub_id)
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       unique (feature_id, cvterm_id, pub_id)
 );
 GRANT ALL on feature_cvter_feature_cvter_seq to PUBLIC;
 GRANT ALL on feature_cvterm to PUBLIC;
@@ -487,8 +508,8 @@ create table synonym (
        primary key (synonym_id),
        name varchar(255) not null,
        type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        synonym_sgml varchar(255) not null,
-       foreign key (type_id) references cvterm (cvterm_id),
        unique(name,type_id)
 );
 GRANT ALL on synonym_synonym_id_seq to PUBLIC;
@@ -501,11 +522,11 @@ create table feature_synonym (
        feature_synonym_id serial not null,
        primary key (feature_synonym_id),
        synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        is_current boolean not null,
        is_internal boolean not null default 'false',
        unique(synonym_id, feature_id, pub_id)
@@ -522,24 +543,6 @@ GRANT ALL on feature_synonym to PUBLIC;
 create index feature_synonym_idx3 on feature_synonym (pub_id);
 GRANT ALL on feature_synonym to PUBLIC;
 
-create table synonym_pub (
-       synonym_pub_id serial not null,
-       primary key (synonym_pub_id),
-       synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
-       pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-       unique(synonym_id, pub_id)
-);
-GRANT ALL on synonym_pub_synonym_pub_id_seq to PUBLIC;
-GRANT ALL on synonym_pub to PUBLIC;
-
-create index synonym_pub_idx1 on synonym_pub (synonym_id);
-GRANT ALL on synonym_pub to PUBLIC;
-
-create index synonym_pub_idx2 on synonym_pub (pub_id);
-GRANT ALL on synonym_pub to PUBLIC;
-
 create table genotype (
        genotype_id serial not null,
        primary key (genotype_id),
@@ -552,9 +555,9 @@ create table feature_genotype (
        feature_genotype_id serial not null,
        primary key (feature_genotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        genotype_id int not null,
-       foreign key (genotype_id) references genotype (genotype_id),
+       foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
        unique(feature_id,genotype_id)
 );
 GRANT ALL on feature_genot_feature_genot_seq to PUBLIC;
@@ -570,17 +573,17 @@ create table phenotype (
        phenotype_id serial not null,
        primary key (phenotype_id),
        description text,
-       statement_type int not null,
-       foreign key (statement_type) references cvterm (cvterm_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id)
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null
 );
 GRANT ALL on phenotype_phenotype_id_seq to PUBLIC;
 GRANT ALL on phenotype to PUBLIC;
 
-create index phenotype_idx1 on phenotype (statement_type);
+create index phenotype_idx1 on phenotype (type_id);
 GRANT ALL on phenotype to PUBLIC;
 
 create index phenotype_idx2 on phenotype (pub_id);
@@ -593,9 +596,9 @@ create table feature_phenotype (
        feature_phenotype_id serial not null,
        primary key (feature_phenotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
        unique(feature_id,phenotype_id)       
 );
 GRANT ALL on feature_pheno_feature_pheno_seq to PUBLIC;
@@ -611,11 +614,11 @@ create table phenotype_cvterm (
        phenotype_cvterm_id serial not null,
        primary key (phenotype_cvterm_id),
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
-       prank int not null,
-       unique(phenotype_id,cvterm_id,prank)
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       rank int not null,
+       unique(phenotype_id,cvterm_id,rank)
 );
 GRANT ALL on phenotype_cvt_phenotype_cvt_seq to PUBLIC;
 GRANT ALL on phenotype_cvterm to PUBLIC;
@@ -631,11 +634,11 @@ create table interaction (
        primary key (interaction_id),
        description text,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id),
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null,
        phenotype_id int,
-       foreign key (phenotype_id) references phenotype (phenotype_id)
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete set null
 );
 GRANT ALL on interaction_interaction_id_seq to PUBLIC;
 GRANT ALL on interaction to PUBLIC;
@@ -649,41 +652,41 @@ GRANT ALL on interaction to PUBLIC;
 create index interaction_idx3 on interaction (phenotype_id);
 GRANT ALL on interaction to PUBLIC;
 
-create table interaction_subj (
-       interaction_subj_id serial not null,
-       primary key (interaction_subj_id),
+create table interactionsubject (
+       interactionsubject_id serial not null,
+       primary key (interactionsubject_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
        unique(feature_id,interaction_id)
 );
-GRANT ALL on interaction_s_interaction_s_seq to PUBLIC;
-GRANT ALL on interaction_subj to PUBLIC;
+GRANT ALL on interactionsu_interactionsu_seq to PUBLIC;
+GRANT ALL on interactionsubject to PUBLIC;
 
-create index interaction_subj_idx1 on interaction_subj (feature_id);
-GRANT ALL on interaction_subj to PUBLIC;
+create index interactionsubject_idx1 on interactionsubject (feature_id);
+GRANT ALL on interactionsubject to PUBLIC;
 
-create index interaction_subj_idx2 on interaction_subj (interaction_id);
-GRANT ALL on interaction_subj to PUBLIC;
+create index interactionsubject_idx2 on interactionsubject (interaction_id);
+GRANT ALL on interactionsubject to PUBLIC;
 
-create table interaction_obj (
-       interaction_obj_id serial not null,
-       primary key (interaction_obj_id),
+create table interactionobject (
+       interactionobject_id serial not null,
+       primary key (interactionobject_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
        unique(feature_id,interaction_id)
 );
-GRANT ALL on interaction_o_interaction_o_seq to PUBLIC;
-GRANT ALL on interaction_obj to PUBLIC;
+GRANT ALL on interactionob_interactionob_seq to PUBLIC;
+GRANT ALL on interactionobject to PUBLIC;
 
-create index interaction_obj_idx1 on interaction_obj (feature_id);
-GRANT ALL on interaction_obj to PUBLIC;
+create index interactionobject_idx1 on interactionobject (feature_id);
+GRANT ALL on interactionobject to PUBLIC;
 
-create index interaction_obj_idx2 on interaction_obj (interaction_id);
-GRANT ALL on interaction_obj to PUBLIC;
+create index interactionobject_idx2 on interactionobject (interaction_id);
+GRANT ALL on interactionobject to PUBLIC;
 
 create table analysis (
     analysis_id serial not null,
@@ -696,26 +699,21 @@ create table analysis (
     sourcename varchar(255),
     sourceversion varchar(255),
     sourceuri text,
-    queryfeature_id int,
-    foreign key (queryfeature_id) references feature (feature_id),
     timeexecuted timestamp not null default current_timestamp,
     unique(program, programversion, sourcename)
 );
 GRANT ALL on analysis_analysis_id_seq to PUBLIC;
 GRANT ALL on analysis to PUBLIC;
 
-create index analysis_idx1 on analysis (queryfeature_id);
-GRANT ALL on analysis to PUBLIC;
-
 create table analysisprop (
     analysisprop_id serial not null,
     primary key (analysisprop_id),
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
-    pkey_id int not null,
-    foreign key (pkey_id) references cvterm (cvterm_id),
-    pval text,
-    unique(analysis_id, pkey_id, pval)
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    value text,
+    unique(analysis_id, type_id, value)
 );
 GRANT ALL on analysisprop_analysisprop_i_seq to PUBLIC;
 GRANT ALL on analysisprop to PUBLIC;
@@ -723,16 +721,16 @@ GRANT ALL on analysisprop to PUBLIC;
 create index analysisprop_idx1 on analysisprop (analysis_id);
 GRANT ALL on analysisprop to PUBLIC;
 
-create index analysisprop_idx2 on analysisprop (pkey_id);
+create index analysisprop_idx2 on analysisprop (type_id);
 GRANT ALL on analysisprop to PUBLIC;
 
 create table analysisfeature (
     analysisfeature_id serial not null,
     primary key (analysisfeature_id),
     feature_id int not null,
-    foreign key (feature_id) references feature (feature_id),
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     rawscore double precision,
     normscore double precision,
     significance double precision,
@@ -760,9 +758,9 @@ create table feature_expression (
        feature_expression_id serial not null,
        primary key (feature_expression_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        unique(expression_id,feature_id)       
 );
 GRANT ALL on feature_expre_feature_expre_seq to PUBLIC;
@@ -778,10 +776,11 @@ create table expression_cvterm (
        expression_cvterm_id serial not null,
        primary key (expression_cvterm_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        rank int not null,
+	   cvterm_type varchar(255),
        unique(expression_id,cvterm_id)
 );
 GRANT ALL on expression_cv_expression_cv_seq to PUBLIC;
@@ -797,9 +796,9 @@ create table expression_pub (
        expression_pub_id serial not null,
        primary key (expression_pub_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        unique(expression_id,pub_id)       
 );
 GRANT ALL on expression_pu_expression_pu_seq to PUBLIC;
@@ -825,9 +824,9 @@ create table expression_image (
        expression_image_id serial not null,
        primary key (expression_image_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        eimage_id int not null,
-       foreign key (eimage_id) references eimage (eimage_id),
+       foreign key (eimage_id) references eimage (eimage_id) on delete cascade,
        unique(expression_id,eimage_id)
 );
 GRANT ALL on expression_im_expression_im_seq to PUBLIC;
@@ -854,17 +853,17 @@ create table featurerange (
        featurerange_id serial not null,
        primary key (featurerange_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        leftstartf_id int not null,
-       foreign key (leftstartf_id) references feature (feature_id),       
+       foreign key (leftstartf_id) references feature (feature_id) on delete cascade,
        leftendf_id int,
-       foreign key (leftendf_id) references feature (feature_id),       
+       foreign key (leftendf_id) references feature (feature_id) on delete set null,
        rightstartf_id int,
-       foreign key (rightstartf_id) references feature (feature_id),       
+       foreign key (rightstartf_id) references feature (feature_id) on delete set null,
        rightendf_id int not null,
-       foreign key (rightendf_id) references feature (feature_id),
+       foreign key (rightendf_id) references feature (feature_id) on delete cascade,
        rangestr varchar(255)
 );
 GRANT ALL on featurerange_featurerange_i_seq to PUBLIC;
@@ -892,11 +891,11 @@ create table featurepos (
        featurepos_id serial not null,
        primary key (featurepos_id),
        featuremap_id serial not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        map_feature_id int not null,
-       foreign key (map_feature_id) references feature (feature_id),
+       foreign key (map_feature_id) references feature (feature_id) on delete cascade,
        mappos float not null
 );
 GRANT ALL on featurepos_featuremap_id_seq to PUBLIC;
@@ -915,9 +914,9 @@ create table featuremap_pub (
        featuremap_pub_id serial not null,
        primary key (featuremap_pub_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id)
+       foreign key (pub_id) references pub (pub_id) on delete cascade
 );
 GRANT ALL on featuremap_pu_featuremap_pu_seq to PUBLIC;
 GRANT ALL on featuremap_pub to PUBLIC;

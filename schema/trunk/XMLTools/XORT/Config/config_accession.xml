@@ -94,7 +94,7 @@
          </feature_dbxref>
        </feature>
      </path>
-     <rank>4</rank>
+     <rank>1</rank>
      <!-- select f.feature_id from feature f where exist (select * from feature_dbxref fd, dbxref dx, db d  where fd.feature_id=f.feature_id and fd.dbxref_id=dx.dbxref_id and dx.accession='$2' and dx.version='$3' and dx.dbxref_id=d.db_id and d.name='$1'  -->
    </global_id>
    <global_id>
@@ -132,7 +132,7 @@
          </type_id>
        </feature>
      </path>
-     <rank>5</rank>
+     <rank>2</rank>
      <!-- select feature_0.feature_id from organism organism_0 , feature feature_0 where  organism_0.genus='UNKNOWN' and feature_0.organism_id=organism_0.organism_id and organism_0.species='UNKNOWN' and feature_0.uniquename='$2' -->
    </global_id>
 </chado>

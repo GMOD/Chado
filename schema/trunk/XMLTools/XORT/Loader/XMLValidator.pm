@@ -6,6 +6,7 @@ package XORT::Loader::XMLValidator;
 use lib $ENV{CodeBase};
 use XML::Parser::PerlSAX;
 use XORT::Util::DbUtil::DB;
+use XORT::Loader::XMLAccession;
 use strict;
 
 #level 1 validate: no db connection at all
@@ -24,6 +25,7 @@ my $element_name;
 my $table_name;
 my $dbh_obj;
 my %hash_table_col;
+my $db;
 
 # this hash will have the pair of local_id/db_id, eg. cvterm_99 from xml file, id from cvterm_id 88, the key format: table_name:local_id
 # value format: table_name:db_id  ?????? different from XMLParser.pm
@@ -58,13 +60,14 @@ my $root_element='chado';
 my $APP_DATA_NODE='_appdata';
 my $SQL_NODE='_sql';
 
+my $DEBUG=0;
 
 # all the operator
 my $OP_FORCE='force';
 my $OP_UPDATE='update';
 my $OP_INSERT='insert';
 my $OP_DELETE='delete';
-my $OP_lookup='lookup';
+my $OP_LOOKUP='lookup';
 
 # all attribute
 my $ATTRIBUTE_ID='id';
@@ -107,9 +110,29 @@ sub new (){
  my $self={};
  $self->{'db'}=shift;
  $self->{'file'}=shift;
+ $DEBUG=shift;
+ $db=$self->{db};
     my $pro=XORT::Util::GeneralUtil::Properties->new('ddl');
     %hash_ddl=$pro->get_properties_hash();
  print "\n start to validate xml file with DB connection.....:db:$self->{db} \tfile:$self->{file}";
+
+# under all thos hash and arrary, otherwise, it will intervense for batch executing
+
+undef $level;
+undef %hash_table_col;
+undef %hash_id;
+undef @AoH_data;
+undef @AoH_data_new;
+undef @AoH_db_id;
+undef @AoH_local_id;
+undef @AoH_op;
+undef @AoH_ref;
+undef %hash_level_id;
+undef %hash_level_name;
+undef %hash_level_op;
+undef %hash_level_ref;
+undef %hash_level_sub_detect;
+
  bless $self, $type;
  return $self;
 }
@@ -130,7 +153,7 @@ sub validate_db (){
    }
 
    my $file=$self->{file};
-   my $db=$self->{db};
+
    my $dbh_pro=XORT::Util::GeneralUtil::Properties->new($db);
    my %dbh_hash=$dbh_pro->get_dbh_hash();
    $dbh_obj=XORT::Util::DbUtil::DB->_new(\%dbh_hash)  ;
@@ -610,7 +633,7 @@ sub characters {
     # ----------------------------------------------------------------------------------
     if (defined $hash_ddl{$parent_element}){
         my $hash_ref_cols=&_get_table_columns($parent_element);
-        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w/) && $data ne "\t"){
+        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w/ ||  $data eq '-') && $data ne "\t"){
            my  $key=$hash_level_name{$level-1}.".".$element_name;
              # treat differently for update and other operation
                 if ($AoH_op[$level-1]{$parent_element} eq 'update'){
@@ -1313,7 +1336,7 @@ sub _data_check(){
     my $hash_ref=shift;
     my $table=shift;
     my $level=shift;
-    my $hash_level_id=shift;
+    my $hash_level_id_ref=shift;
     my $hash_level_name_ref=shift;
     my %result;
 
@@ -1321,7 +1344,6 @@ sub _data_check(){
     my @array_foreign_key=split(/\s+/, $hash_ddl{foreign_key});
     for (@array_foreign_key){
        $hash_foreign_key{$_}++;
-
     }
 
     my %hash_non_null_default;
@@ -1331,28 +1353,93 @@ sub _data_check(){
       $hash_non_null_default{$_}++;
     }
 
+    my %hash_unique_key;
+    my $table_unique_key=$table."_unique";
+    my @unique_key=split(/\s+/, $hash_ddl{$table_unique_key});
+    for (@unique_key){
+      $hash_unique_key{$_}++;
+    }
+
+    foreach my $key (keys %$hash_ref){
+      print "\nin data_check col:$key\tvalue:$hash_ref->{$key}:" if ($DEBUG==1);
+    }
+
     my $table_non_null=$table."_non_null_cols";
     my @temp=split(/\s+/, $hash_ddl{$table_non_null});
-    my $table_id=$table."_id";
+    my $table_id_string=$table."_primary_key";
+    my $table_id=$hash_ddl{$table_id_string};
+    #my $table_id=$table."_id";
     for my $i(0..$#temp){
       my $foreign_key=$table.":".$temp[$i];
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
       if ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && (defined $hash_foreign_key{$temp[$i]} )){
          my $temp_key=$table.":".$temp[$i]."_ref_table";
-         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}";
+         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}" if ($DEBUG==1);
          my $retrieved_value=&_context_retrieve($level,  $hash_ddl{$temp_key}, $hash_level_name_ref);
          if ($retrieved_value){
             $hash_ref->{$temp[$i]}=$retrieved_value;
 	  }
          elsif (!(defined $hash_non_null_default{$temp[$i]})) {
-             print LOG0 "\n\ncan not find the value for required element:$temp[$i] of table:$table from context .....";
-             &create_log(\%hash_trans, $hash_ref, $table); 
-          }
-      }
-      elsif ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && !(defined $hash_foreign_key{$temp[$i]}) && !(defined $hash_non_null_default{$temp[$i]})) {
-          print LOG0 "\n\nyou missed the required element:$temp[$i] for table:$table, also it is not foreign key";
-          &create_log(\%hash_trans, $hash_ref, $table);
+	   if (exists $hash_unique_key{$temp[$i]}){
+             print "\n\ncan not find the value for required element(unique key):$temp[$i] of table:$table from context .....";
+             &create_log(\%hash_trans, \%hash_id, $log_file);
+             #exit(1);
+	   }
+           #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force if already exist in DB, NOT ok for insert
+           else {
+               my $op=$hash_level_op{$level-1};
+               if ($op eq $OP_INSERT){
+                    print "\n\ncan not find the value for required element(foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    #exit(1);
+	       }
+               elsif ($op eq $OP_FORCE){
+                  my %hash_temp;
+                  foreach my $key(keys %$hash_ref){
+                     $hash_temp{$key}=$hash_ref->{$key};
+		  }
 
+
+                  my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
+                  if (!($db_id)){
+                    print "\n\n$temp[$i]: is foreign_key, unique_key, unable to retrieve from context, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    #exit(1);
+
+		  }
+               }
+	    }
+
+         }
+      }   # end of is foreign_key, try to retrieve from context
+      elsif ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && !(defined $hash_foreign_key{$temp[$i]}) && !(defined $hash_non_null_default{$temp[$i]})) {
+	if (exists $hash_unique_key{$temp[$i]}){
+          print "\n\nyou missed the required element:$temp[$i] for table:$table, also it is not foreign key";
+          &create_log(\%hash_trans, \%hash_id, $log_file);
+          exit(1);
+        }
+        else {
+               my $op=$hash_level_op{$level-1};
+               if ($op eq $OP_INSERT){
+                    print "\n\ncan not find the value for required element(not foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    #exit(1);
+	       }
+                #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force is already exist in DB, NOT ok for insert
+               elsif ($op eq $OP_FORCE){
+                  my %hash_temp;
+                  foreach my $key(keys %$hash_ref){
+                     $hash_temp{$key}=$hash_ref->{$key};
+		  }
+                  my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
+                  if (!($db_id)){
+                    print "\n\n$temp[$i]: not  foreign_key, unique_key, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    #exit(1);
+
+		  }
+               }
+        }
       }
     }
 
@@ -1361,6 +1448,7 @@ sub _data_check(){
 
     return $hash_ref;
 }
+
 
 
 # This util method will retrieve the missed value based on the context check: nearest outer of correct type
@@ -1412,76 +1500,25 @@ sub _get_accession(){
   my $table=shift;
   my $level=shift;
 
+  #for validation, only LOOKUP, no other operation allow.
+  my $op=$OP_LOOKUP;
   my ($dbname, $acc, $version, $db_id, $stm_select, $stm_insert);
+  print "\nstart the _get_accession in XMLParse.pm....";
 
-
-  if ($accession =~ /([a-zA-Z]+)\:([a-zA-Z0-9]+)(\.\d)*/){
-      my @temp=split(/\:/, $accession);
-      $dbname=$temp[0];
-      if ($temp[1] =~/\./){
-      my @temp1=split(/\./, $temp[1]);
-      $acc=$temp1[0];
-      $version=$temp1[1];
-    }
-    else {
-      $acc=$temp[1];
-      $version='';
-    }
-
-    my $organism_id;
-    #create a pseudo organism record GAME xml loading
-    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
-    if (! $organism_id) {
-      $dbh_obj->execute_sql("insert into organism (genus, species) values('Drosophila', 'melanogaster')");
-      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
-    }
-
-   my $type_id;
-   # create pseudo cvterm record for GAME xml loading
-    $type_id=$dbh_obj->get_one_value("select cvterm_id from cvterm, cv where name='curator note' and cvname='pub type' and cv.cv_id=cvterm.cv_id");
-    if (! $type_id) {
-      my $cv_id;
-      $cv_id=$dbh_obj->get_one_value("select cv_id from cv where cvname='pub type'");
-      if (!$cv_id) {
-          $dbh_obj->execute_sql("insert into cv(cvname) values('pub type')");
-          $cv_id=$dbh_obj->get_one_value("select cv_id from cv where cvname='pub type'");
-      }
-      $dbh_obj->execute_sql(sprintf("insert into cvterm(name, cv_id) values('curator note', $cv_id) "));
-      $type_id=$dbh_obj->get_one_value("select cvterm_id from cvterm, cv where name='curator note' and cvname='pub type' and cv.cv_id=cvterm.cv_id");
-    }
-
-
-    # here to figure out eg. feature_id, table will be feature
-    if ($table =~/\_id/){
-       my @temp2=split(/\_id/, $table);
-       $table=$temp2[0];
-    }
-
-    my $table_id=$table."_id";
-    if ($table eq 'dbxref'){
-      $stm_select=sprintf("select $table_id from $table where dbname='%s' and accession='%s' and version='%s'", $dbname, $acc, $version);
-      $stm_insert=sprintf("insert into $table (dbname, accession, version) values('%s', '%s', '%s')", $dbname, $acc, $version);
-    }
-    elsif ($table eq 'feature' ){ 
-       $stm_select=sprintf("select $table_id from $table where uniquename='%s' and organism_id=%s", $accession, $organism_id);
-       $stm_insert=sprintf("insert into feature (organism_id, uniquename, type_id) values(%s, '%s', 3)", $organism_id, $accession);
-    }
-
-     print "\nget_accession:$stm_select\n$stm_insert";
-    $db_id=$dbh_obj->get_one_value($stm_select);
-   # if (!$db_id){
-   #     $dbh_obj->execute_sql($stm_insert);
-   #     $db_id=$dbh_obj->get_one_value($stm_select);
-   # }
-
-     # (/[a-zA-Z]+\:([a-Z0-9]+))
+  my $config_acc_file=$ENV{CodeBase}."/XORT/Config/config_accession.xml";
+  if (-e $config_acc_file) {
+     $dbh_obj->close();
+     my $acc_parser=XORT::Loader::XMLAccession->new($db, $config_acc_file, $DEBUG);
+     my $acc_id=$acc_parser->parse_accession($table, $accession, $op);
+     print "\nget global_id:$acc_id: for this accession:$accession";
+      $dbh_obj->open();
+     print "\nend the _get_accession....";
+     return $acc_id;
   }
   else {
-        print "\nsorry, the accession:$accession is not correct format as: db:acc[.version]";
-          &create_log(\%hash_trans, \%hash_id, $table);
-          #exit(1);
+    print "\nunable to find configureation file:$config_acc_file";
+    return;
   }
-  return $db_id;
 }
 
 
@@ -1611,7 +1648,7 @@ sub create_log(){
    print "\nit will use this log_file:$log_file: to recover the process if you set the -is_recovery=1";
 
 
- #  print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
+   print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
    foreach my $key (keys %$hash_trans){
      if ($key ne 'table'){
          print LOG0 "\nelement:$key\tvalue:$hash_trans->{$key}";
