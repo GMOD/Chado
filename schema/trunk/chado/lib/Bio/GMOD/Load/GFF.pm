@@ -40,13 +40,19 @@ use vars qw( @ISA );
 
 @ISA = qw( Bio::GMOD::Load );
 
-use constant DEBUG => 0;
+use constant DEBUG => 1;
 
 sub new {
     my $proto = shift;
     my $self = bless {}, ref($proto) || $proto;
 
     my %arg = @_;
+
+    foreach my $key (keys %arg) {
+        warn "B::G::L::GFF args: $key, $arg{$key}\n" if DEBUG;
+    }
+
+    warn "gfffile: $arg{'gfffile'}" if DEBUG;
 
     $self->gfffile($arg{'gfffile'});
     $self->organism($arg{'organism'});
@@ -176,6 +182,9 @@ new value of gfffile (to set)
 
 sub gfffile {
     my $self = shift;
+
+      warn "in sub gfffile: @_" if DEBUG;
+
     return $self->{'gfffile'} = shift if defined(@_);
     return $self->{'gfffile'};
 }
@@ -681,7 +690,9 @@ sub load_Name_tag {
 sub initialize {
     my $self = shift;
 
-    my $linenumber = `grep -n "^>" $self->gfffile()`;
+    my $gfffile = $self->gfffile();
+    warn "gfffile: $gfffile" if DEBUG;
+    my $linenumber = `grep -n "^>" $gfffile`;
     if ( $linenumber =~ /^(\d+)/ ) {
         $linenumber = $1;
         system("tail +$linenumber $self->gfffile() > ".$self->tmpfasta() );
