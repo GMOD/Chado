@@ -19,9 +19,8 @@ create table db (
        db_id serial not null,
        primary key (db_id),
        name varchar(255) not null,
-       contact int not null,
--- this table doesn't exist yet.
-       foreign key (contact) references contact (contact_id),
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id),
        description varchar(255) null,
        urlprefix varchar(255) null,
        url varchar(255) null,
