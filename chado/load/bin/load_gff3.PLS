@@ -730,10 +730,11 @@ sub initialize {
 
     # find needed cvterm and other pieces of information
     my @needed_cvterms =
-      qw(description synonym region note develops_from part_of gff_file score protein);
+      qw(description synonym note develops_from part_of gff_file score protein);
     foreach my $n (@needed_cvterms) {
         cache_cvterm($n);
     }
+    cache_cvterm('region',$so->id); #make sure to get the SO region term
 
     ($chado_organism) = Chado::Organism->search( common_name => lc($ORGANISM))
         unless $chado_organism;
