@@ -77,9 +77,11 @@ sub ACTION_radviews {
 
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
   my $db_host   = $conf->{'database'}{'db_host'}  || '';
+  my $db_port   = $conf->{'database'}{'db_port'}  || '';
+  my $db_user   = $conf->{'database'}{'db_username'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
   my $init_sql  = catfile( $build_dir, 'modules', 'expression', 'rad.views' );
-  my $sys_call  = "psql -h $db_host -f $init_sql $db_name";
+  my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
 
   $m->log->debug("system call: $sys_call");
 
@@ -109,9 +111,11 @@ sub ACTION_prepdb {
 
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
   my $db_host   = $conf->{'database'}{'db_host'}  || '';
+  my $db_port   = $conf->{'database'}{'db_port'}  || '';
+  my $db_user   = $conf->{'database'}{'db_username'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
   my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
-  my $sys_call  = "psql -h $db_host -f $init_sql $db_name";
+  my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
 
   $m->log->debug("system call: $sys_call");
 
