@@ -14,10 +14,10 @@ SELECT feature_id, 'dbxref' AS type, d.name || ':' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
 UNION ALL
-SELECT feature_id, 'expression' AS type, s.description AS attribute
-FROM expression s, feature_expression fs
-WHERE fs.expression_id = s.expression_id
-UNION ALL
+--SELECT feature_id, 'expression' AS type, s.description AS attribute
+--FROM expression s, feature_expression fs
+--WHERE fs.expression_id = s.expression_id
+--UNION ALL
 SELECT feature_id, 'genotype' AS type, s.description AS attribute
 FROM genotype s, feature_genotype fs
 WHERE fs.genotype_id = s.genotype_id
