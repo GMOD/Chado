@@ -30,6 +30,8 @@ Generic-Genome-Browser-1.61.tar.gz
 INSTALL
 lib/Chado/Builder.pm
 lib/Chado/Config.pm
+lib/Bio/GMOD/Config.pm
+lib/Bio/GMOD/DB/Config.pm
 load/bin/genbank2gff3.PLS
 load/bin/load_gff3.PLS
 load/bin/load_ontology.PLS
