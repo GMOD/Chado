@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.7 2003-12-04 02:24:28 allenday Exp $
+$Id: README,v 1.8 2003-12-04 17:14:17 kycl4rk Exp $
 
 INTRODUCTION
 ------------
@@ -89,11 +89,16 @@ These transforms depend on the Perl scripts in "chado/bin" and the
 SQL::Translator module (with all of its dependencies), which is
 available on CPAN.
 
-CHADO WEBSITE
+CHADO SUPPORT
 -------------
 
-Please see http://www.gmod.org/ for more information on Chado and
-GMOD.
+Please see our website for more information on Chado and the GMOD project:
+
+    http://www.gmod.org/
+
+You can send questions to the Chado mailing list:
+
+    gmod-schema@lists.sourceforge.net
 
 You can browse the schema CVS repository here:
 
