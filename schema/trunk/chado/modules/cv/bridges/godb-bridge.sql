@@ -5,9 +5,9 @@ SELECT
  cvterm_id AS id,
 --is this correct?  what is acc? -allen
  termdefinition AS acc,
- name      AS name,
- 0         AS is_obsolete,
- 0         AS is_root
+ name           AS name,
+ is_obsolete    AS is_obsolete,
+ 0              AS is_root
 FROM cvterm;
 
 CREATE RULE "_RuleI_term" AS
