@@ -38,52 +38,52 @@ CREATE RULE "_RuleD_affymetrixcel" AS
     WHERE elementresult_id = OLD.elementresult_id
     AND subclass_view = 'affymetrixcel';
 
-CREATE VIEW affymetrixmas4
-AS SELECT
-  elementresult.elementresult_id AS elementresult_id,
-  elementresult.element_id AS element_id,
-  elementresult.quantification_id AS quantification_id,
-  elementresult.subclass_view AS subclass_view,
-  elementresult.tinyint1 AS positiveprobepairs,
-  elementresult.tinyint2 AS negativeprobepairs,
-  elementresult.tinyint3 AS numprobepairsused,
-  elementresult.smallint1 AS pairsinaverage,
-  elementresult.float1 AS logaverageratio,
-  elementresult.float2 AS averagedifference,
-  elementresult.string1 AS absolutecall
-FROM elementresult
-WHERE subclass_view = 'affymetrixmas4';
+--CREATE VIEW affymetrixmas4
+--AS SELECT
+--  elementresult.elementresult_id AS elementresult_id,
+--  elementresult.element_id AS element_id,
+--  elementresult.quantification_id AS quantification_id,
+--  elementresult.subclass_view AS subclass_view,
+--  elementresult.tinyint1 AS positiveprobepairs,
+--  elementresult.tinyint2 AS negativeprobepairs,
+--  elementresult.tinyint3 AS numprobepairsused,
+--  elementresult.smallint1 AS pairsinaverage,
+--  elementresult.float1 AS logaverageratio,
+--  elementresult.float2 AS averagedifference,
+--  elementresult.string1 AS absolutecall
+--FROM elementresult
+--WHERE subclass_view = 'affymetrixmas4';
 
-CREATE RULE "_RuleI_affymetrixmas4" AS
-  ON INSERT TO affymetrixmas4
-  DO INSTEAD
-    INSERT INTO elementresult
-    (subclass_view,element_id,quantification_id,tinyint1,tinyint2,tinyint3,smallint1,float1,float2,string1)
-    VALUES
-    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.positiveprobepairs,NEW.negativeprobepairs,NEW.numprobepairsused,NEW.pairsinaverage,NEW.logaverageratio,NEW.averagedifference,NEW.absolutecall);
+--CREATE RULE "_RuleI_affymetrixmas4" AS
+--  ON INSERT TO affymetrixmas4
+--  DO INSTEAD
+--    INSERT INTO elementresult
+--    (subclass_view,element_id,quantification_id,tinyint1,tinyint2,tinyint3,smallint1,float1,float2,string1)
+--    VALUES
+--    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.positiveprobepairs,NEW.negativeprobepairs,NEW.numprobepairsused,NEW.pairsinaverage,NEW.logaverageratio,NEW.averagedifference,NEW.absolutecall);
 
-CREATE RULE "_RuleU_affymetrixmas4" AS
-  ON UPDATE TO affymetrixmas4
-  DO INSTEAD
-    UPDATE elementresult
-    SET
-    subclass_view = NEW.subclass_view,
-    element_id = NEW.element_id,
-    quantification_id = NEW.quantification_id,
-    tinyint1 = NEW.positiveprobepairs,
-    tinyint2 = NEW.negativeprobepairs,
-    tinyint3 = NEW.numprobepairsused,
-    smallint1 = NEW.pairsinaverage,
-    float1 = NEW.logaverageratio,
-    float2 = NEW.averagedifference,
-    string1 = NEW.absolutecall
-    WHERE elementresult_id = OLD.elementresult_id;
+--CREATE RULE "_RuleU_affymetrixmas4" AS
+--  ON UPDATE TO affymetrixmas4
+--  DO INSTEAD
+--    UPDATE elementresult
+--    SET
+--    subclass_view = NEW.subclass_view,
+--    element_id = NEW.element_id,
+--    quantification_id = NEW.quantification_id,
+--    tinyint1 = NEW.positiveprobepairs,
+--    tinyint2 = NEW.negativeprobepairs,
+--    tinyint3 = NEW.numprobepairsused,
+--    smallint1 = NEW.pairsinaverage,
+--    float1 = NEW.logaverageratio,
+--    float2 = NEW.averagedifference,
+--    string1 = NEW.absolutecall
+--    WHERE elementresult_id = OLD.elementresult_id;
 
-CREATE RULE "_RuleD_affymetrixmas4" AS
-  ON DELETE TO affymetrixmas4
-  DO INSTEAD
-    DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+--CREATE RULE "_RuleD_affymetrixmas4" AS
+--  ON DELETE TO affymetrixmas4
+--  DO INSTEAD
+--    DELETE FROM elementresult
+--    WHERE elementresult_id = OLD.elementresult_id;
 
 CREATE VIEW affymetrixmas5
 AS SELECT
