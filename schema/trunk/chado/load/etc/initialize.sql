@@ -16,6 +16,8 @@ insert into organism (abbreviation, genus, species, common_name)
 insert into organism (abbreviation, genus, species, common_name)
        values ('D.rerio', 'Danio','rerio','zebrafish');
 insert into organism (abbreviation, genus, species, common_name)
+       values ('O.sativa', 'Oryza','sativa','rice');
+insert into organism (abbreviation, genus, species, common_name)
        values ('S.cerevisiae', 'Saccharomyces','cerevisiae','yeast');
 insert into contact (name) values ('Affymetrix');
 insert into contact (name,description) values ('null','null');
@@ -29,6 +31,7 @@ insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-sit
 insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:TIGR'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucla'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
