@@ -218,7 +218,7 @@ create table biomaterialprop (
 	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(100) null,
+    value varchar(100) not null default 'NA',
     unique(biomaterial_id,type_id,value)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
