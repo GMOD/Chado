@@ -1,4 +1,4 @@
---# $Id: companalysis.sql,v 1.4 2002-11-01 18:09:35 cwiel Exp $
+--# $Id: companalysis.sql,v 1.5 2002-11-05 23:10:42 cwiel Exp $
 
 -- an analysis is a particular execution of a computational analysis;
 -- it may be a blast of one sequence against another, or an all by all
@@ -36,8 +36,9 @@ create table analysis (
     algorithm varchar(255),
     sourcename varchar(255) not null,
     sourceversion varchar(255) not null,
-    queryfeature_id,
+    queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
+    unique (program, programversion, sourcename, sourceversion),
 
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
@@ -51,6 +52,7 @@ create table analysisprop (
     apkey_id int not null,
     foreign key (apkey_id) references cvterm (cvterm_id),
     apval text,
+    unique (apkey_id, apval),
 
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
@@ -59,16 +61,16 @@ create table analysisprop (
 -- MAPPING (bioperl): Bio::Search::Hit::HitI
 create table hitpair (
     hitpair_id serial not null,
-    primary key (featurepair_id),
+    primary key (hitpair_id),
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
     qfeature_id int not null,
     foreign key (qfeature_id) references feature (feature_id),
     sfeature_id int not null,
     foreign key (sfeature_id) references feature (feature_id),
-    hitrawscore double,
-    hitnormscore double,
-    hitsignificance double,
+    hitrawscore double precision,
+    hitnormscore double precision,
+    hitsignificance double precision,
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
 );
@@ -77,17 +79,16 @@ create table hitpair (
 create table hsp (
     hsp_id serial not null,
     hitpair_id int not null,
-    foreign key (hitpair_id) references feature (hitpair_id),
-    # beg/end 1,2
+    foreign key (hitpair_id) references hitpair (hitpair_id),
     qnbeg int not null,
     qnend int not null,
     qstrand smallint not null,
     snbeg int not null,
     snend int not null,
     sstrand smallint not null,
-    hsprawscore double,
-    hspnormscore double,
-    hspsignificance double,
+    hsprawscore double precision,
+    hspnormscore double precision,
+    hspsignificance double precision,
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
 );
@@ -95,11 +96,10 @@ create table hsp (
 create table scoredfeature (
     feature_id int not null,
     foreign key (feature_id) references feature (feature_id),
-    primary_key(feature_id),
-
-    rawscore double,
-    normscore double,
-    significance double
+    rawscore double precision,
+    normscore double precision,
+    significance double precision,
+    unique (feature_id)
 );
 
 create table hspprop (
