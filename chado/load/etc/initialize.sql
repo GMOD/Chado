@@ -18,6 +18,7 @@ insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-sit
 
 insert into pub (miniref,type_id) values ('null',(select cvterm_id from cvterm where name = 'null'));
 insert into db (name, contact_id) values ('DB:refseq',1);
+insert into db (name, contact_id) values ('DB:genbank',1);
 insert into db (name, contact_id) values ('DB:ucsc',1);
 
 insert into array (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
