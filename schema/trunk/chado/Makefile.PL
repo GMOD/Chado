@@ -114,6 +114,7 @@ WriteMakefile(
                              DBI               => 0,
                              DBD::Pg           => 0,
                              XML::Simple       => 2.09,
+                             Log::Log4perl     => 0.39,
                             }, 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
