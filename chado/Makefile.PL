@@ -18,25 +18,28 @@ use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
 use Template;
 
+die "*******************************************************\n\$GMOD_ROOT not detected\nPlease read install docs and set required environment variables\n*******************************************************\n"
+    unless $ENV{'GMOD_ROOT'};
+
 my %args    =  (
   DBDRIVER  => {
-    default => 'PostgreSQL',
+    default => 'PostgreSQL'
   },
   DBNAME    => {
-    default => 'chado',
+    default => $ENV{'CHADO_DB_NAME'}
   },
   DBUSER    => {
-    default => $ENV{'USER'} || getlogin() || scalar getpwuid( $< )
+    default => $ENV{'CHADO_DB_USERNAME'}
   },
   DBPASS    => {
-    default => '',
+    default => $ENV{'CHADO_DB_PASSWORD'}
   },
   DBHOST    => {
-    default => 'localhost',
+    default => $ENV{'CHADO_DB_HOST'}
   },
   DBPORT    => {
-    default => '',
-  },
+    default => $ENV{'CHADO_DB_PORT'}
+  }
 );
 
 my $usage = <<"END";
