@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.75 2004-10-23 20:27:55 cmungall Exp $
+# $Id: Makefile.PL,v 1.76 2005-02-21 20:58:32 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -80,6 +80,9 @@ my %args    =  (
   },
   DBORGANISM  => {
     default => ''
+  },
+  APOLLO    => {
+    default => 'n'
   },
 );
 
@@ -220,7 +223,7 @@ my %db_lookup = reverse %VALID_DBS;
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
-  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM );
+  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO );
 
 $O{'SIMPLE'} = prompt(
    "Use the simple install (uses default database schema)", 'Y'
@@ -243,6 +246,7 @@ if ( $opts{'RECONFIGURE'} && %conf ) {
   $DBPORT   = $conf{'DBPORT'}   || '';
   $LOCAL_TMP= $conf{'LOCAL_TMP'}|| '';
   $DBORGANISM=$conf{'DBORGANISM'}|| '';
+  $APOLLO   = $conf{'APOLLP'}   || '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -253,6 +257,7 @@ elsif ( $opts{'DEFAULTS'} ) {
   $DBPORT   = $args{'DBPORT'}{'default'};
   $LOCAL_TMP= $args{'LOCAL_TMP'}{'default'};
   $DBORGANISM=$args{'DBORGANISM'}{'default'};
+  $APOLLO   = $args{'APOLLO'}{'default'};
 }
 elsif ( %opts ) {
   $DBDRIVER = $opts{'DBDRIVER'} || '';
@@ -263,6 +268,7 @@ elsif ( %opts ) {
   $DBPORT   = $opts{'DBPORT'}   || '';
   $LOCAL_TMP= $opts{'LOCAL_TMP'}|| '';
   $DBORGANISM=$opts{'DBORGANISM'}|| '';
+  $APOLLO   = $opts{'APOLLO'}   || '';
 }
 
 if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
@@ -312,6 +318,9 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   $DBORGANISM||=prompt('What is the default organism (common name, or "none")?',
     $conf{'DBORGANISM'} || $args{'DBORGANISM'}{'default'}
   );
+
+  $APOLLO||=prompt('Create files to use Apollo with chado?'),
+    $conf{'APOLLO'} || $args{'APOLLO'}{'default'}
 }
 
 $DBORGANISM = '' if $DBORGANISM =~ /none/i;
