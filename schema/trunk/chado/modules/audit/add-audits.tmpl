@@ -1,0 +1,52 @@
+--audit tables generated from 
+-- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql > \
+--        audits.sql
+
+[% FOREACH table IN schema.get_tables %]
+   DROP TABLE audit_[% table.name %];
+   CREATE TABLE audit_[% table.name %] ( [% FOREACH field IN table.get_fields %]
+       [% field.name %] [% IF field.data_type == 'serial'; 'int'; ELSE; field.data_type; END %][% IF field.size AND (field.data_type == 'char' OR field.data_type == 'varchar') %]([% field.size.join(', ') %])[% END %], [% END %]
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_[% table.name %] to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_[% table.name %]() RETURNS trigger AS
+   '
+   DECLARE
+       [% FOREACH field IN table.get_fields %][% field.name %]_var [% IF field.data_type == 'serial'; 'int'; ELSE; field.data_type; END %][% IF field.size AND (field.data_type == 'char' OR field.data_type == 'varchar') %]([% field.size.join(', ') %])[% END %]; 
+       [% END %]
+       transaction_type_var char;
+   BEGIN
+       [% FOREACH field IN table.get_fields %][% field.name %]_var = OLD.[% field.name %];
+       [% END %]
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_[% table.name %] ( [% FOREACH field IN table.get_fields %]
+             [% field.name %], [% END %]
+             transaction_type
+       ) VALUES ( [% FOREACH field IN table.get_fields %]
+             [% field.name %]_var, [% END %]
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER [% table.name %]_audit_ud ON [% table.name %];
+   CREATE TRIGGER [% table.name %]_audit_ud
+       BEFORE UPDATE OR DELETE ON [% table.name %]
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_[% table.name %] ();
+
+[% END %]
