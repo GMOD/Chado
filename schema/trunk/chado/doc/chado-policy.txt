@@ -1,0 +1,146 @@
+CHADO POLICY LAYER
+==================
+
+                       Chris Mungall BDGP
+
+Chado is a generic schema, which means anyone writing software to
+query or write to chado (either middleware or applications) should be
+aware of the different ways in which data can be stored. We want to
+strike a nice balance between flexibility and extensibility on the one
+hand, and strong typing and rigor on the other. We want to avoid the
+situation we have with GenBank entries where there are a dozen ways of
+representing a gene model, but we need to be able to cope with the
+constant surprises biology throws at us in an attempt to confound our
+nice computable models.
+
+I am suggesting a layered model - this is tried and tested in software
+engineering. Some generic software can be targeted at the lower layers
+and be guaranteed to work no matter what. Other more specific software
+needs a more tightly defined rigorous model and should be targeted at
+the upper layers.
+
+We require validation software and more formal/computable descriptions
+of these layers and policies - for now natural language descriptions
+will have to suffice.
+
+LAYERS
+------
+
+  Level 0 conformance basically means the schema is adhered
+  to. Obviously, this is enforced by the DBMS.
+
+  Level 1 conformance is minimal conformance to SO - all feature.types
+  must be SO terms, and all feature_relationship.types must be SO
+  relationship types.
+
+  Level 2 conformance is graph conformance to SO - all
+  feature_relationships between a feature of type X and Y must
+  correspond to relationship of that type in SO; for example, mRNA can
+  be part_of gene, but mRNA can not be part_of
+  golden_path_region. [more detailed/formal explanation to come]. In
+  practice Level 2 conformance may be undesirable, we may need to make
+  modifications to SO.
+
+Orthogonal to these layers are various additional policy
+decisions. Some of these are more tolerant of non-conformance than
+others. (there is also some overlaps with levels 1/2).
+
+I have listed how FB implements each policy choice - other chado
+instances feel free to add....
+
+POLICY CHOICES
+--------------
+
+* SO terms used for standard central-dogma gene model
+
+FB: gene mRNA exon protein [other types are derivable]
+TIGR: ?
+
+  NOTE: we should be using 'polypeptide' instead of 'protein'. For
+  now, software should be tolerant of both these uses.
+
+* SO terms used for storing alignments
+
+FB: match
+TIGR: ?
+
+  NOTE: we want to use the new more specific SO types for match_set,
+  match_part, for hits and hsps respectively. For now, software should
+  be tolerant of either usage.
+
+* feature_relationship.types
+
+FB: partof (for mRNA to gene and exon to mRNA)
+    producedby (for protein to mRNA)
+TIGR: ?
+
+  NOTE: this should be "part_of" and "derived_from" to conform to
+  SO. Most read-only software should be able to safely ignore
+  feature_relationship.type anyway.
+
+* featureloc policy
+
+FB: all constituent parts of a central dogma gene model are located
+relative to the same srcfeature (the chromosome arm). No redundant
+locations (ie featureloc.group > 0) are used
+
+TIGR: I believe TIGR were interested in redundant locations - for
+example, locating gene model parts on both clones/contigs and
+chromosomes. The derivable redundant localisations would be indicated
+with featureloc.group set to > 0
+
+  NOTE: we want to allow some flexibility with this policy. I believe
+  that the constituent parts linked located relative to the feature
+  should always be followed. This can be stated more formally as:
+
+    IF   X is linked to Y via feature_relationship
+    AND  X is located relative to Z via featureloc.srcfeature_id
+    THEN Y must also be located relative to Z via featureloc.srcfeature_id 
+
+  We should also expect that the fmin/fmax boundaries of a feature be
+  defined the the outermost boundaries of the outermost constituent
+  part features (this rule may require refinement when we have
+  promoters, enhancers and so on - but for now we don't).
+
+  As to what the srcfeature should be, it could be a contig, and
+  assembly or a top-level locatable feature such as chromosome or
+  chromosome arm. Software should be tolerant of different choices
+  here. Whilst it is generally always best to locate relative to the
+  topmost feature (ie the arm/chromosome), sometimes this is not
+  possible or desirable (eg low coverage, heterochromatin). 
+
+* non-central dogma gene models
+
+FB: we store a lot of non-central dogma gene models; noncoding gene
+models and pseudogenes [need to fill in more details here]
+TIGR: ?
+
+* other features
+
+FB: the FlyBase implementation includes many other feature types,
+including polyA_site and sequence_variant [need to fill in details]
+
+* derivable features types
+
+FB: derivable features (introns, UTRs, intergenic_region) are not
+included. Feature typing is always done to the most specific,
+non-derivale level. For example, we never use types "5_prime_exon",
+"dicistronic_gene", "coding_exon" as these are always inferrable. We
+always use type "gene" - the specific type of gene is inferred from
+the child type (mRNA, tRNA, snRNA, etc).
+
+  NOTE: whilst it is perfectly permissable to include redundant
+  derivable features (useful for warehouse-style querying), you should
+  not write software that expects to find these if you want the
+  software to work on different chado db instances.
+
+* sequence_variants
+
+FB: these are included in chado, but they are lacking full detail
+
+  NOTE: variation features should specify the edit that makes one
+  feature (such as the reference/wild-type) from another (the
+  variant/mutant/non-reference). There were perhaps 2 proposals for
+  this [more details required...]
+
+//
