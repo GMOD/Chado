@@ -1,0 +1,98 @@
+
+----
+Hi Don,
+The CTG03 directory contains the code for reading Chado
+and writing Game.  GTC03 has the code for reading Game
+and writing chado.  The code is kludgy in places and
+I need to merge the datamodels (and perhaps get rid of
+or better use some inheriting classe), so the code will likely
+change.  But if all you want is a Chado SAX parser,
+CTG03/ChadoSaxReader.java has what you need.
+
+f
+----
+Frank,
+
+Thanks much, this will help.  Would you consider adding
+package namespace to your source, to let others more easily
+incorporate it?
+...
+- Don
+----
+
+28may03 - added packages:
+ package org.gmod.parse.chado; // CTG03
+ package org.gmod.parse.game; // GTC03
+
+# move original java source from Frank Smutniak
+sftp ftpsite@flybase.harvard.edu 
+# get chado_tmp/ChadoXmlSource.tar  == .jar file
+jar -xf ChadoXmlSource.tar
+
+mkdir -p org/gmod/parse
+mv CTG03 org/gmod/parse/chado
+mv GTC03 org/gmod/parse/game
+pushd org/gmod/parse/chado
+perl -pi.old -e 'print "package org.gmod.parse.;\n" \
+ if ($ARGV ne $oldargv); $oldargv=$ARGV;' *.java
+popd; pushd org/gmod/parse/game 
+perl -pi.old -e 'print "package org.gmod.parse.game;\n" \
+ if ($ARGV ne $oldargv); $oldargv=$ARGV;' *.java
+popd
+
+# make java
+find org -name "*.java" -exec javac {} \;
+
+----
+
+Chado XML parsers (ChadoSax)           
+30May03 - d. gilbert
+ - parses output of gmod/schema/XMLTools/XORT/
+ - java version from Frank Smutniak, april 03
+ - repackaged java as org.gmod.parse.{chado,game} and edited some
+ - added perl equivalent to Frank Smutniak's java chado xml parser
+
+  org.gmod.parse.chado.ChadoSaxReader.java (now behind perl version)
+  org::gmod::parse::chado::ChadoSaxReader.pm
+
+Get the cvs repos. files at
+  rsync rsync://flybase.net/flybasecvs/gmod/schema/XMLTools/ChadoSax/
+ (includes Frank's original and my edits)
+ 
+Checkout source from
+set cv=':pserver:anonymous@flybase.net:/bio/cvs'
+cvs -d $cv login
+CVS password: [no password]
+cvs -d $cv co gmod/schema/XMLTools/ChadoSax/
+cvs -d $cv co gmod/schema/XMLTools/XORT/Config/dump_gene_local_id.xml   
+ --  for test data
+
+ cd gmod/schema/XMLTools/ChadoSax/
+# java version - use ant to build, or "find src/ -name "*.java" -exec javac {} \;"
+ ant
+
+# run
+ java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoSaxReader \
+    ../XORT/Config/dump_gene_local_id.xml
+
+# java version 2 (same algo. as perl version)
+  java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoRead \
+    ../XORT/Config/dump_gene_local_id.xml
+
+# perl version
+  perl -I src -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- \
+    ../XORT/Config/dump_gene_local_id.xml
+    
+  perldoc src/org::gmod::parse::chado::ChadoSaxReader 
+  perldoc src/org::gmod::parse::chado::GenFeat 
+
+
+
+## times
+dghome2% /usr/bin/time java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoRead \
+   $ch/fas2.xml > fas2j.xpar
+        5.17 real         4.49 user         0.65 sys
+dghome2% /usr/bin/time perl -I src -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' \
+  -- $ch/fas2.xml > fas2p.xpar
+        9.14 real         9.10 user         0.05 sys
+        

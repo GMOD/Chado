@@ -1,0 +1,409 @@
+SLetovsky@aol.com smutniak@morgan.harvard.edu emmert@morgan.harvard.edu zhou@morgan.harvard.edu
+
+ 
+Chado XML parsers (ChadoSax)           
+30May03 - d. gilbert
+ - parses output of gmod/schema/XMLTools/XORT/
+ - java version from Frank Smutniak, april 03
+ - repackaged java as org.gmod.parse.{chado,game} and edited some
+ - added perl equivalent to Frank Smutniak's java chado xml parser
+
+  org.gmod.parse.chado.ChadoSaxReader.java (now behind perl version)
+  org::gmod::parse::chado::ChadoSaxReader.pm
+
+Get the cvs repos. files at
+  rsync rsync://flybase.net/flybasecvs/gmod/schema/XMLTools/ChadoSax/
+ (includes Frank's original and my edits)
+ 
+Checkout source from
+set cv=':pserver:anonymous@flybase.net:/bio/cvs'
+cvs -d $cv login
+CVS password: [no password]
+cvs -d $cv co gmod/schema/XMLTools/ChadoSax/
+cvs -d $cv co gmod/schema/XMLTools/XORT/Config/dump_gene_local_id.xml   
+ --  for test data
+
+ cd gmod/schema/XMLTools/ChadoSax/
+# java version - use ant to build, or "find src/ -name "*.java" -exec javac {} \;"
+ ant
+
+# run
+ java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoSaxReader \
+    ../XORT/Config/dump_gene_local_id.xml
+
+# java version 2 (same algo. as perl version)
+  java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoRead \
+    ../XORT/Config/dump_gene_local_id.xml
+
+# perl version
+  perl -I src -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- \
+    ../XORT/Config/dump_gene_local_id.xml
+    
+  perldoc src/org::gmod::parse::chado::ChadoSaxReader 
+  perldoc src/org::gmod::parse::chado::GenFeat 
+
+## times
+dghome2% /usr/bin/time \
+java -cp build/WEB-INF/classes org.gmod.parse.chado.ChadoRead \
+   $ch/fas2.xml > fas2j.xpar
+        5.17 real         4.49 user         0.65 sys
+dghome2% /usr/bin/time \
+ perl -I src -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- \
+  $ch/fas2.xml > fas2p.xpar
+        9.14 real         9.10 user         0.05 sys
+
+-
+## renamed package to distinguish - org.gmod.chado.ix { IxReadSax, .. }
+  perl -I src -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- \
+    ../XORT/Config/dump_gene_local_id.xml
+
+  java -cp build/WEB-INF/classes org.gmod.chado.ix.IxReadSax \
+    ../XORT/Config/dump_gene_local_id.xml
+
+.. same times as before ..
+
+ /usr/bin/time \
+  java -cp build/WEB-INF/classes org.gmod.chado.ix.IxReadSax \
+   tests/fas2.xml > fas2j.xpar
+
+ /usr/bin/time \
+  perl -I src -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- \
+   tests/fas2.xml > fas2p.xpar
+
+
+
+
+----------------------------        
+
+
+NAME
+    org::gmod::parse::chado::ChadoSaxReader
+
+DESCRIPTION
+    Read Chado XML into data records.
+
+SYNOPSIS
+      perl -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- \
+        XORT/Config/dump_gene_local_id.xml
+
+      use org::gmod::parse::chado::ChadoSaxReader;
+      my $rd= new org::gmod::parse::chado::ChadoSaxReader(
+        [ skip => [residues,md5checksum], ]
+        );
+      $rd->parse('mychado.xml');
+
+      my $top= $rd->topnode();
+      $top->printObj(0);
+      my @allrecs= $top->getfeats();
+      my @feats= $top->getfeats('feature');
+   
+    ChadoSaxReader.java provided initial parsing structure, and with effort
+    and luck will be co-developed with the Perl modules to do equivalent for
+    Java.
+
+    This parses input chado.xml into a structure of GenFeat objects. Top
+    level 'chado' record is now assumed, containing a list of main 'feature'
+    records (gene annotations, features, etc.) The object structure is held
+    in
+
+      org::gmod::parse::chado::BaseObj; - ancestor object
+      org::gmod::parse::chado::GenFeat; - 'feature' record contains
+           (a) hash of single value fields (id,name,..)
+           (b) list of child sub-features
+           (c) list of attributes (Attrib)
+           (d) list of feature locations (Span)
+       
+      org::gmod::parse::chado::Attrib;  - attribute (values)
+      org::gmod::parse::chado::Span; - simple feature location attribute (nbeg,nend)
+
+    Parsing moves some general definitions (cvterms, organisms,
+    publications, analysis records, ...) which are constant references to
+    all records to the top level chado node. Feature node contents are
+    rearranged to make them a bit more usable objects.
+
+SEE ALSO
+      org.gmod.parse.chado.ChadoSaxReader.java
+      org::gmod::parse::chado::GenFeat.pm;
+      XORT::Dumper::DumperXML.pm;
+      http://www.gmod.org/ 
+
+AUTHOR
+    D.G. Gilbert, May 2003, gilbertd@indiana.edu
+
+METHODS
+    view(inputChado.xml)
+      Example main callable method
+     - makes new ChadoSaxReader with input filename 
+     - parses and dumps output in pseudo-asn1 for reading data structure
+
+      perl -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- mychado.xml
+
+      sample test with GMOD XORT (test data from may03)
+      curl  'http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/XMLTools/XORT/Config/dump_gene_local_id.xml?rev=1.1&content-type=text/plain' \
+        > dump_gene_local_id.xml
+
+      perl -M'org::gmod::parse::chado::ChadoSaxReader' -e 'view;' -- dump_gene_local_id.xml
+
+    parse(@args)
+      read and parse files or other input
+      uses XML::Parser::PerlSAX::parse($args[0])
+  
+    getfeats([classTypes])
+      return list of child sub-feature  
+      classTypes - optional list of feature types to return
+      getfeats('feature') - returns main feature list (e.g. gene records)
+  
+    $obj= topnode()
+      return top node of object hierachy; should be 'chado' feature now
+   
+    parsing notes
+     started from Java apr03 version parser, made major changes
+     to account for new schema fields or missing data needed.
+ 
+     added cv_id,cv,cvname handling for cvterm --
+        <cvterm id="cvterm_4">
+               <cv_id>
+                      <cv id="cv_1">
+                             <cvname>SO</cvname>
+                      </cv>
+               </cv_id>
+               <name>mRNA</name>
+        </cvterm>
+
+    note2: these are grouping 'features' not now checked:
+    feature_evidence/evidence_id feature_evidence/../feature_relationship
+    feature_cvterm == go terms for gene-feature
+    feature_evidence/../analysisfeature == scores for analyses
+    feature_evidence/../featureloc/../srcfeature_id/feature/featureloc* ==
+    many parts
+
+      skip these: featureloc/feature_id/feature/...
+  
+    XML handlers
+    handlers define for PerlSAX and subs used in xml parsing
+
+------------------------------
+
+
+NAME
+    org::gmod::parse::chado::GenFeat
+
+DESCRIPTION
+    Describe generic feature. See also org.gmod.parse.chado.GenFeat.java
+
+      org::gmod::parse::chado::GenFeat; - 'feature' record contains
+           (a) hash of single value fields (tag==class,id,name,..)
+           (b) list of child sub-features
+           (c) list of attributes (Attrib)
+           (d) list of feature locations (Span)
+
+    inherits from org::gmod::parse::chado::Baseob
+
+    note: want to use method names consistent w/ Java standard? getBob
+    instead of getbob
+
+AUTHOR
+    D.G. Gilbert, May 2003, gilbertd@indiana.edu
+
+METHODS
+  add
+
+      add(GenFeat) - add child sub-feature record to list
+  
+  getfeats([classTypes])
+
+      return list of child sub-feature  
+      classTypes - optional list of feature types to return
+  
+  getfeattypes
+
+      getfeattypes() - return list of child sub-feature field types
+      note: want an iterator class to handle multiple methods per feature ?
+  
+  addattr
+
+      addattr(Attrib) - add Attrib to list
+
+  getattrs()
+
+      get Attrib list
+
+  addloc(Span)
+
+      add Span(nbeg,nend,src)
+
+  getlocs()
+
+      return hash by source id of ordered Spans
+
+  printObj()
+
+    Basic display method - mostly tuned to printing readable, asn1-like
+    structure this may well change. For this sample print out
+    (GenFeat::printObj()), the definition IDs embedded in fields are
+    replaced by def. names.
+
+SAMPLE printObj
+      chado = {
+      unused_analysis_id=177
+      unused_analysisfeature=177
+      -- top level list of definitions (mostly cvterms)
+      cv = {
+        id=cv_1
+        cvname=SO
+        }
+      cvterm = {
+        id=cvterm_4
+        cv_name=SO
+        name=mRNA
+        }
+      organism = {
+        id=organism_1
+        genus=Drosophila species=melanogaster taxgroup=drosophilid 
+        }
+      analysis = {
+        id=analysis_24
+        program=blastx_masked
+        programversion=1.0
+        sourcename=aa_SPTR.rodent 
+        }
+    
+        -- this is a primary (top-level) gene annotation record
+        -- all following subrecords are nested inside this feature
+      feature = {
+        id=feature_110661
+        name=Fas2
+        type_name=synonym
+        -- ^ primary record keys from obj->{keyname}
+            note obj->{type_id} is converted on output to type_name from top cvterm list
+        -- there is no field which indicates this is a gene annotation structure !?
+        
+        loc.feature_6=3946706..3874987
+        -- ^ from obj->getlocs()
+    
+        subjfeature_name=CG3665-RC subjfeature_name=CG3665-RB dbxref_name=FlyBase:FBgn0000635 
+        dbxref_id=dbxref={ Gadfly:CG3665, id=dbxref_58074 }  
+        dbxref_id=dbxref={ flybase:FBan0003665, id=dbxref_58075 }  
+        featureprop={ AE003430, id=featureprop_26868, pkey_name=gbunit, pub_name=pub_1 } featureprop={ 'Perfect match to SwissProt real (computational)', id=featureprop_26866, pkey_name=sp_status, pub_name=pub_1 } 
+        featureprop={ 4B1-4B3, id=featureprop_26867, pkey_name=cyto_range, pub_name=pub_1 } 
+        cvterm_name='learning and/or memory' cvterm_name='homophilic cell adhesion' 
+        is_internal=0 
+        -- ^ attribute list from obj->getattrs()
+    
+        -- start 1st transcript record
+        feature = {
+          id=feature_110662
+          name=CG3665-RA
+          type_name=synonym
+          loc.feature_6=3946706..3874987
+          dbxref_id=dbxref={ Gadfly:CG3665-RA, id=dbxref_58076 }  
+          seqlen=71719 dbxref_name=Gadfly:CG3665-RA featureprop={ AAF45925, id=featureprop_26869, pkey_name=protein_id } 
+          featureprop={ 'Perfect match to REAL SP with corresponding FBgn', id=featureprop_26870, pkey_name=sp_comment } 
+          featureprop={ campbell, id=featureprop_26871, pkey_name=owner } is_internal=0 
+
+          -- first exon1 subrecord for transcript
+          feature = {
+            id=feature_110671
+            name=CG3665:9
+            type_name=exon
+            loc.feature_6=3876113..3876026
+            dbxref_id=dbxref={ Gadfly:CG3665:9, id=dbxref_58085 }  
+            seqlen=87 dbxref_name=Gadfly:CG3665:9 
+        
+            -- this is where chado xml nesting is confusing; this
+            -- feature_6 is the global X chromosome record that many records refer to
+            -- but is nested 3 levels into structure
+            -- should move to top or main feat level for human readability
+            feature = {
+              id=feature_6
+              uniquename=X
+              }
+            }
+        
+          -- second exon2 record more confusion 
+          -- additional transcripts now are nested inside transcript1/exon2
+          -- should be promoted to same level
+          feature = {
+            id=feature_110664
+            name=CG3665:2
+            type_name=exon
+            loc.feature_6=3944102..3943806
+            dbxref_id=dbxref={ Gadfly:CG3665:2, id=dbxref_58078 }  
+            seqlen=296 dbxref_name=Gadfly:CG3665:2 
+            -- transcript2 defined
+            feature = {
+              id=feature_110674
+              uniquename=CG3665-RB
+              }
+            -- transcript3 defined
+            feature = {
+              id=feature_110677
+              uniquename=CG3665-RC
+              }
+            }
+        
+          -- this sample exon is nested in transcript1 and is referenced
+          -- by tr2 and tr3, so belongs to all
+          feature = {
+            id=feature_110666
+            name=CG3665:4
+            type_name=exon
+            loc.feature_6=3890167..3890003
+            dbxref_id=dbxref={ Gadfly:CG3665:4, id=dbxref_58080 }  
+            seqlen=164 dbxref_name=Gadfly:CG3665:4 objfeature_name=CG3665-RB 
+            objfeature_name=CG3665-RC 
+            }
+        
+         }
+        -- end transcript records
+    
+        -- a feature evidence record - analysis and locations of matches
+        feature_evidence = {
+          id=feature_evidence_110661:115629
+          feature = {
+            id=feature_115629
+            rawscore=183
+            type_name=alignment_hsp
+            uniquename=NULL:87474
+            loc.feature_28828=301..518
+            loc.feature_6=3884117..3883415
+            -- ^ locations of source and object/target matches
+            -- loc.feature_id is syntax now 
+            seqlen=701 analysis_name=blastx_masked
+            -- this subfeature probably should be promoted to part of parent record
+            feature = {
+              id=feature_28828
+              name=P20241
+              type_name=protein
+              loc.=0..27,17..436,24..68,26..517,41..164,47..216,53..133,55..436,56..336,57..217,68..1006,78..423,155..631,193..335,237..447,249..472,251..417,264..563,271..333,275..512,281..428,300..517,301..518,302..518,302..444,312..508,327..515,327..518,329..487,332..430,334..619,334..436,336..430,338..563,338..428,342..705,382..621,392..517,394..480,396..952,403..518,417..548,427..508,427..507,428..695,428..643,431..518,444..596,444..537,444..596,444..530,445..522,445..1100,448..616,454..1004,458..1106,477..877,479..713,501..660,508..651,514..807,524..804,527..799,551..1100,552..809,552..660,552..809,554..1100,555..799,557..1110,571..1100,574..1096,576..854,578..807,614..960,712..1114,731..1004,779..1069,783..1120,915..1006,915..1122,915..1006,1006..1067,1056..1188,1188..1223,1222..1302
+              seqlen=1302 dbxref_name=SMART:SM00060 dbxref_id=dbxref={ EMBL:X76243, id=dbxref_49862 }  
+              dbxref_name=PRINTS:PR00014 dbxref_name=SMART:SM00408 dbxref_id=dbxref={ PDB:1CFB, id=dbxref_49858 }  
+              dbxref_id=dbxref={ EMBL:M28231, id=dbxref_49869 }  
+              dbxref_name=InterPro:IPR003006 dbxref_name=InterPro:IPR001777 dbxref_name=SMART:SM00410 
+              dbxref_id=dbxref={ FlyBase:FBgn0002968, id=dbxref_49861 }  
+              dbxref_name=InterPro:IPR003598 dbxref_id=dbxref={ SPTR:P20241;, id=dbxref_49864 }  
+
+              dbxref_name=Pfam:PF00047 dbxref_name=Pfam:PF00041 dbxref_name=InterPro:IPR003600 
+              featureprop={ 'Neuroglian precursor.', id=featureprop_6948, pkey_name=description, pub_name=pub_1 } 
+              }
+            feature = {
+              id=feature_115628
+              uniquename=NULL:87473
+              }
+            }
+          }
+
+        feature_evidence = {
+          id=feature_evidence_110661:113321
+          feature = {
+            id=feature_113321
+            rawscore=381.49
+            type_name=exon
+            uniquename=NULL:85821
+            loc.feature_6=3877474..3877184
+            seqlen=289 analysis_name=piecegenie objfeature_name=NULL:85820 
+            }
+          }
+        }
+      }
+  
