@@ -7,8 +7,8 @@
 use lib $ENV{Flybase_API};
 
 use XORT::Util::GeneralUtil::Properties; 
-use XORT::Loader::XMLValidatorNoDB;
-use XORT::Loader::XMLValidator;
+
+
 use strict;
 
 use Getopt::Std;
@@ -21,7 +21,7 @@ getopts('h:d:v:f:', \%opt) or usage() and exit;
 
 usage() and exit if $opt{h};
 
-$opt{v}='0' if !($opt{v});
+$opt{v}=$VALIDATION_NO_DB if !($opt{v});
 
 
 foreach my $key(keys %opt){
@@ -37,13 +37,14 @@ my $validate_no_db_obj;
 
 if ($opt{v} eq $VALIDATION_DB){
    print "\nuse connection......";
-
+   use XORT::Loader::XMLValidator;
    $validate_db_obj=XORT::Loader::XMLValidator->new($opt{d}, $opt{f});
-   $validate_db_obj->validate(-validate_level=>$opt{v});
+   $validate_db_obj->validate_db(-validate_level=>$opt{v});
 }
-else{
+elsif ($opt{v} eq $VALIDATION_NO_DB){
    print "\nnot use connection......";
 
+   use XORT::Loader::XMLValidatorNoDB;
    $validate_no_db_obj=XORT::Loader::XMLValidatorNoDB->new($opt{f});
    $validate_no_db_obj->validate(-validate_level=>$opt{v});
 }

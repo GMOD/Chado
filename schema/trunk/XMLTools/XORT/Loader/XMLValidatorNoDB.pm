@@ -103,7 +103,7 @@ sub new (){
  $self->{'file'}=shift;
     my $pro=XORT::Util::GeneralUtil::Properties->new('ddl');
     %hash_ddl=$pro->get_properties_hash();
- print "\n start to validate xml file .....";
+ print "\n start to validate xml file without DB connection.....";
  bless $self, $type;
  return $self;
 }
@@ -134,7 +134,7 @@ sub validate (){
 
    my $parser = XML::Parser::PerlSAX->new(Handler=>MyHandler->_new( ));
    $parser->parse (Source=>{SystemId=>$file});
-   print "\n start to validate the  xml file .....";
+   print "\n start to validate the  xml file .....:$log_file\n";
 }
 
  package MyHandler;
@@ -163,8 +163,10 @@ sub validate (){
   open (LOG0, $log_file) or die "unable to open the log file for validator_no_db:$log_file";
  }
 
- sub start_element {
 
+
+
+ sub start_element {
     my ($self, $element) = @_;
     #characters() may be called more than once for each element because of entity
      $level++;
@@ -405,10 +407,16 @@ sub validate (){
      #  print "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
      my $col_ref=&_get_table_columns($hash_level_name{$level-1});
      #not column element name
-     if (!$col_ref->{$element_name}){
+     if (!(exists $col_ref->{$element_name})){
         print LOG0 "\n invalid element...... element:$element_name";
-        print LOG0 "\ntable:$hash_level_name{$level}:\tcolumn:$element_name";
+        print LOG0 "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
+        print  "\n invalid element...... element:$element_name";
+        print  "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
         #&create_log(\%hash_trans, \%hash_id, $log_file);
+        foreach my $key(keys %$col_ref){
+            print "\ncharacter invalid column, key:$key:value:$col_ref->{$key}";
+	}
+       exit(1);
 
      }
      #column element
@@ -432,11 +440,14 @@ sub validate (){
 sub characters {
     my( $self, $properties ) = @_;
      my $data = $properties->{'Data'};
-     $data =~ s/\&/\&amp;/g;
-     $data =~ s/</\&lt;/g;
-     $data =~ s/>/\&gt;/g;
-     $data =~ s/\"/\&quot;/g;
-     $data =~ s/\'/\&apos;/g;   
+
+     $data =~ s/\&amp;/\&/g;
+     $data =~ s/\&lt;/</g;
+     $data =~ s/\&gt;/>/g;
+     $data =~ s/\&quot;/\"/g;
+     $data =~ s/\&apos;/\'/g;
+     $data =~ s/\\\\/\\/g;
+     #$data =~ s/\&amp;nbsp;/\s/g;
     chomp($data);
     my $data_length=length $data;
   #  while (substr($data, $data_length-1) eq ' '){
@@ -525,7 +536,7 @@ sub end_element {
   print "\nend_element_name:$element_name";
    # come to end of document
   if ($element_name eq $root_element){
-    print "\n\nbingo ....you finishe validating the file,  check log file to see the result!....";
+    print "\n\nbingo ....you finishe validating the file,  check log file:$log_file to see the result!....\n";
     exit(1);
   }
 
@@ -1070,7 +1081,8 @@ sub _context_retrieve(){
 # This util will return a hash ref which contains all the columns of this table
 sub _get_table_columns(){
   my $table=shift;
-  my $table_col=$hash_ddl{$table_name};
+
+  my $table_col=$hash_ddl{$table};
 
   my @array_col=split(/\s+/, $table_col);
   my $hash_table_column_ref=undef;
@@ -1239,7 +1251,7 @@ sub _check_local_db(){
           $db_id=$db_id_temp;
           my $hash_ref_temp=$HoH_data{$key1};
           foreach my $key2 (keys %$hash_ref_input) {
-  	      if (!(defined $hash_ref_input->{$key2} && ($hash_ref_temp->{$key2} eq $hash_ref_input->{$key2} || $hash_ref_temp->{$key2} == $hash_ref_input->{$key2}))){
+  	      if (!(defined $hash_ref_input->{$key2}) && ($hash_ref_temp->{$key2} eq $hash_ref_input->{$key2} || $hash_ref_temp->{$key2} == $hash_ref_input->{$key2})){
                  undef $db_id;
                  last ;
    	      }

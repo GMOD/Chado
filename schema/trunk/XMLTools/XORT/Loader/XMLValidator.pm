@@ -116,7 +116,7 @@ sub new (){
 
 
 # usage: $dbh_obj->load();
-sub validate (){
+sub validate_db (){
    my $self=shift;
    my ($validate) =
      XORT::Util::GeneralUtil::Structure::rearrange(['validate_level'], @_);
@@ -141,13 +141,13 @@ sub validate (){
     my @temp=split(/\/+/, $file);
     my $temp_file=$temp[$#temp];
     $log_file=">".$API_location."/XORT/Log/".'validator_'.$temp_file.".log";
-
-   my $parser = XML::Parser::PerlSAX->new(Handler=>MyHandler->_new( ));
+   print "\n start to validator the  xml file .....:$log_file\n";
+   my $parser = XML::Parser::PerlSAX->new(Handler=>MyHandler_DB->_new( ));
    $parser->parse (Source=>{SystemId=>$file});
-   print "\n start to validator the  xml file .....";
+
 }
 
- package MyHandler;
+ package MyHandler_DB;
  use XORT::Util::DbUtil::DB;
 
  # keys: all the foreign keys
@@ -170,7 +170,7 @@ sub validate (){
    # so here is good place to initiate some varables
     my (@temp,$is_symbol, $db_xref, $op_table, $op_column, %hash_table_col);
 
-  open (LOG0, $log_file) or die "unable to open the log file for validator";
+  open (LOG0, $log_file) or die "unable to open the log file for validator:$log_file";
  }
 
  sub start_element {
@@ -561,11 +561,13 @@ sub validate (){
 sub characters {
     my( $self, $properties ) = @_;
      my $data = $properties->{'Data'};
-     $data =~ s/\&/\&amp;/g;
-     $data =~ s/</\&lt;/g;
-     $data =~ s/>/\&gt;/g;
-     $data =~ s/\"/\&quot;/g;
-     $data =~ s/\'/\&apos;/g;   
+
+     $data =~ s/\&amp;/\&/g;
+     $data =~ s/\&lt;/</g;
+     $data =~ s/\&gt;/>/g;
+     $data =~ s/\&quot;/\"/g;
+     $data =~ s/\&apos;/\'/g;
+     $data =~ s/\\\\/\\/g;
     chomp($data);
     my $data_length=length $data;
   #  while (substr($data, $data_length-1) eq ' '){
@@ -655,7 +657,7 @@ sub end_element {
   print "\nend_element_name:$element_name";
    # come to end of document
   if ($element_name eq $root_element){
-    print "\n\nbingo ....you finishe validating the file,  check log file to see the result!....";
+    print "\n\nbingo ....you finishe validating the file,  check log file:$log_file to see the result!....\n";
     exit(1);
   }
 
@@ -1387,7 +1389,7 @@ sub _context_retrieve(){
 # This util will return a hash ref which contains all the columns of this table
 sub _get_table_columns(){
   my $table=shift;
-  my $table_col=$hash_ddl{$table_name};
+  my $table_col=$hash_ddl{$table};
 
   my @array_col=split(/\s+/, $table_col);
   my $hash_table_column_ref=undef;
@@ -1609,7 +1611,7 @@ sub create_log(){
    print "\nit will use this log_file:$log_file: to recover the process if you set the -is_recovery=1";
 
 
-   print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
+ #  print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
    foreach my $key (keys %$hash_trans){
      if ($key ne 'table'){
          print LOG0 "\nelement:$key\tvalue:$hash_trans->{$key}";

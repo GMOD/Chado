@@ -144,19 +144,15 @@ sub load (){
     my $temp_file=$temp[$#temp];
     $log_file=$API_location."/XORT/Log/".'load_'.$temp_file.".log";
     print "\n start to load the  xml file .....\nand write log file to:$log_file";
-   my $parser = XML::Parser::PerlSAX->new(Handler=>MyHandler->_new( ));
+   my $parser = XML::Parser::PerlSAX->new(Handler=>MyHandler_Parser->_new( ));
   $parser->parse (Source=>{SystemId=>$file});
 
 }
 
 
 
- package MyHandler;
+ package MyHandler_Parser;
  use XORT::Util::DbUtil::DB;
-
-
-
-
 
 # keys: all the foreign keys
 my %hash_foreign_key;
@@ -290,7 +286,7 @@ for my $i(0..$#temp){
     # if self is table_element
     if (defined $hash_ddl{$element_name} ){
        # check if parent_element is table_element
-       # when come to subordinary table(e.g cvrelationship), and previous sibling element is not table column(if is, it alread out out it  output primary table(e.g cvterm)
+       # when come to subordinary table(e.g cvrelationship), and previous sibling element is not table column(if is, it alread out) out it  output primary table(e.g cvterm)
        $table_name=$element_name;
        if (  defined $hash_ddl{$hash_level_name{$level-1}}){
 	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name";
@@ -314,10 +310,10 @@ for my $i(0..$#temp){
                }
 	  }
 
-          # for empty hash_ref, will do nothing(other way to test undefined hash ? )
+          # for empty hash_ref, will do nothing(other way to test undefined hash ? ) if (%hash)  ????
           my @temp;
           foreach my $key (%$hash_data_ref){
-            if (defined $key && $key ne ''){
+            if (defined $key && $key ne '' && $hash_data_ref->{$key} =~/\w|\W/){
                push @temp, $key;
 	     }
 	  }
@@ -468,39 +464,37 @@ sub characters {
     my $data_length=length $data;
 
     # data will be in @AoH_data: index of array: $level, key of hash: $table_name.$column
-    my $table_name_id=$table_name."_id";    
+    #my $table_name_id=$table_name."_id";    
     my $parent_element=$hash_level_name{$level-1};
 
-    my $parent_element_id;
-    if ($parent_element =~ /_id/){
-	$parent_element_id=$parent_element;
-    }
-    else {
-       $parent_element_id=$parent_element."_id";
-    }
-   
+    #my $parent_element_id;
+    #if ($parent_element =~ /_id/){
+#	$parent_element_id=$parent_element;
+#    }
+#    else {
+#       $parent_element_id=$parent_element."_id";
+#   }
+
     # ----------------------------------------------------------------------------------
     # For any element which is column of table, it will be saved into hash_data(in here every element)
     # ----------------------------------------------------------------------------------
     if (defined $hash_ddl{$parent_element}){
         my $hash_ref_cols=&_get_table_columns($parent_element);
-        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w|\W/ || $data eq '-') && $data ne "\t"){
+        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w/ || $data eq '-') && $data ne "\t" ){
+        #if  (defined $hash_ref_cols->{$element_name} && $data !~/\t/){
            my  $key=$hash_level_name{$level-1}.".".$element_name;
                 # treat differently for update and other operation
                 if ($AoH_op[$level-1]{$parent_element} eq 'update'){
 		  if ($AoH_op[$level]{$element_name} eq 'update'){
                       $AoH_data_new[$level]{$key}= $AoH_data_new[$level]{$key}.$data;
-                      # $AoH_data_new[$level]{$key}=~ s/&nbsp;/\s/g;
 		  }
                   else {
                       $AoH_data[$level]{$key}= $AoH_data[$level]{$key}.$data;
-                      # $AoH_data[$level]{$key}=~ s/&nbsp;/\s/g;
                   }
 		}
                 else {
 		  if ($AoH_op[$level]{$element_name} ne 'update'){
                       $AoH_data[$level]{$key}= $AoH_data[$level]{$key}.$data;
-                      # $AoH_data[$level]{$key}=~ s/&nbsp;/\s/g;
 		    }
                    else {
                       print "\nTry to update a column which the op for table is not update.....";
@@ -508,7 +502,7 @@ sub characters {
                       exit(1);
                   }
 	        }
-         print "\n\nkey:$key\tvalue:$AoH_data[$level]{$key}:\tlevel:$level";
+         #print "\n\nin characters key:$key\tvalue:$AoH_data[$level]{$key}:\tlevel:$level";
 
 
           #here to save all the currrent transaction information in case of abnormal transaction happen, and undef at end of each trans
@@ -528,7 +522,7 @@ sub end_element {
   my $parent_element=$hash_level_name{$level-1};
   my $element_name=$element->{Name};
   my $table;
-  my $table_name_id=$table_name."_id";
+  #my $table_name_id=$table_name."_id";
   my $hash_ref;
 
   print "\nend_element_name:$element_name";
@@ -545,7 +539,6 @@ sub end_element {
       undef %hash_trans;
    }
 
- 
 
    # ------------------------------------------------------------
    # here come to the end of table
@@ -557,11 +550,13 @@ sub end_element {
         my $db_id;
         my $hash_ref_cols=&_get_table_columns($element_name);
         my  $hash_data_ref=&_extract_hash($AoH_data[$level+1], $element_name);
-        # if sub_element is not table_element, and is col of this table, and no 'ref' attribute,  extract data
+        #here derefer to hash, so can test whether there is any data:if (%hash)
+        my %hash_data_temp=\$hash_data_ref;
+        # if sub_element is not table_element, and is col of this table, and no 'ref' attribute for this element,  extract data
         # for nesting case, which $hash_level_name{$level+1} is table_element already done in start_element
-        if (defined $hash_ref_cols->{$hash_level_name{$level+1}} && !$hash_ddl{$hash_level_name{$level+1}}  && %$hash_data_ref){
+        if (defined $hash_ref_cols->{$hash_level_name{$level+1}} && !$hash_ddl{$hash_level_name{$level+1}}  && %hash_data_temp){
  
-          # for empty hash_ref, do nothing
+          # for empty hash_ref, do nothing (already test in last step ???)
           if (defined $hash_data_ref){
             my  $hash_ref=&_data_check($hash_data_ref, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
             # here for different type of op, deal with the $hash_data_ref and return the $db_id
@@ -602,12 +597,12 @@ sub end_element {
             if ($db_id && $hash_level_op{$level} ne 'delete'){
                $AoH_db_id[$level]{$element_name}=$db_id;
 	    }
-               print "\nend_element is $element_name table element, and sub element is col of this table";
+               print "\nend_element:$element_name is table element, and sub element is col of this table";
                print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
          }
        }
         #for case using ref attribuate to ref object
-	elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && !(%$hash_data_ref)){
+	elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && !(%hash_data_temp)){
           my  $hash_id_key=$element_name.":".$AoH_ref[$level]{$hash_level_name{$level}};
 
           if (defined $hash_id{$hash_id_key}){
@@ -621,7 +616,7 @@ sub end_element {
           }
 
           # for empty hash_ref, do nothing
-          if (%$hash_data_ref){
+          if (%hash_data_temp){
             my  $hash_ref=&_data_check($hash_data_ref, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
             # here for different type of op, deal with the $hash_data_ref and return the $db_id
             if ($hash_level_op{$level} eq 'update'){
@@ -668,8 +663,8 @@ sub end_element {
 	    }
                print "\nend_element is $element_name table element, and sub element is col of this table";
                print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
-         }
-	}
+         } # end of if (%hash_data_temp)
+	} # end of using ref attribute to refer object
 
 
         #if parent: column element, substitute the foreign key value with db_id
@@ -695,7 +690,7 @@ sub end_element {
       my $key=$hash_level_name{$level-1}.".".$element_name;
       my $primary_table=$hash_ddl{$temp_foreign};
       print "\n$element_name is column_element";
-       #if is foreign key, and next level element is the primary table, it has done in last step
+       #if is foreign key, and next level element is the primary table, it has done in last step, ie. <type_id><cvterm>...</cvterm></type_id>
       if ($hash_ddl{$temp_foreign} eq $hash_level_name{$level+1} && defined $hash_ddl{$temp_foreign} ne '' && (defined $hash_level_sub_detect{$level+1})){
         # my $key=$hash_level_name{$level-1}.".".$element_name;
         # print "\nforeign key, next level element:$hash_level_name{$level+1} is the primary table";
@@ -740,7 +735,7 @@ sub end_element {
                 &create_log(\%hash_trans, \%hash_id , $log_file );
                 exit(1);
           }
-           print "\nend_element: self:col, table_op:not update";
+           print "\nend_element:$element_name is col, table_op:not update";
        	}
         #table:update, col:update
         elsif ($hash_level_op{$level-1} eq 'update' && $hash_level_op{$level} eq 'update' ){
@@ -814,7 +809,6 @@ sub end_element {
   if (defined $hash_tables_pseudo{$element_name}){
      $P_pseudo --;
   }
-  print "\nP_seudo:$P_pseudo\n";
 }
 
 
@@ -840,28 +834,26 @@ sub _extract_hash(){
     my $element=shift;
     my $result;
 
-
     my $content=$element.".";
     foreach my $value (keys %$hash_ref){
+            print "\nextract_hash before:key:$value:value:$hash_ref->{$value}:";
 	if (index($value, $content) ==0 ){
             my $start=length $content;
             my $key=substr($value, $start);
+            print "\nextract_hash:content:$content:value:$value:key:$key:$hash_ref->{$value}:";
+           # if ($hash_ref->{$value} =~/\w/){
+             $result->{$key}=$hash_ref->{$value};
 
-            #here we modify to get space as value since standard xml will be empty element, so &amp;nbsp; will represent ' '
-            $hash_ref->{$value}=~ s/&nbsp;/ /g;
-            $result->{$key}=$hash_ref->{$value};
-            delete $hash_ref->{$value};
+	   #}
+             delete $hash_ref->{$value};
 	}
     }
 
-    if (!(defined %$result)){
-     #  return ;
-    }
 
-    foreach my $key (keys %$hash_ref){
+
+    #foreach my $key (keys %$hash_ref){
       # print "\nleft key:$key:\tvalue:$hash_ref{$key}:";
-    }
-   # print "\n\nelement_name:$element";
+    #}
     return $result;
 }
 
@@ -893,12 +885,14 @@ sub _data_check(){
     }
 
     foreach my $key (keys %$hash_ref){
-      #print "\ncol:$key\tvalue:$hash_ref->{$key}";
+      print "\nin data_check col:$key\tvalue:$hash_ref->{$key}:";
     }
 
     my $table_non_null=$table."_non_null_cols";
     my @temp=split(/\s+/, $hash_ddl{$table_non_null});
-    my $table_id=$table."_id";
+    my $table_id_string=$table."_primary_key";
+    my $table_id=$hash_ddl{$table_id_string};
+    #my $table_id=$table."_id";
     for my $i(0..$#temp){
       my $foreign_key=$table.":".$temp[$i];
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
@@ -1023,7 +1017,9 @@ sub _get_accession(){
        $table=$temp2[0];
     }
 
-    my $table_id=$table."_id";
+    #my $table_id=$table."_id";
+    my $table_id_string=$table."_primary_key";
+    my $table_id=$hash_ddl{$table_id_string};
     my $dbxref_id;
     my $stm_select_dbxref=sprintf("select dbxref_id from dbxref where dbname='%s' and accession='%s' and version='%s'", $dbname, $acc, $version);
     my $stm_insert_dbxref=sprintf("insert into dbxref (dbname, accession, version) values('%s', '%s', '%s')", $dbname, $acc, $version);
@@ -1089,7 +1085,9 @@ sub _get_ref_data(){
  my $id=shift;
 
  my $hash_ref;
- my $table_id=$table."_id";
+ #my $table_id=$table."_id";
+ my $table_id_string=$table."_primary_key";
+ my $table_id=$hash_ddl{$table_id_string};
  my $table_unique=$table."_non_null_cols";
  my @array_table_cols=split(/\s+/, $hash_ddl{$table_unique});
  my $data_list;
