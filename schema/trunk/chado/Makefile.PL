@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.76 2005-02-21 20:58:32 scottcain Exp $
+# $Id: Makefile.PL,v 1.77 2005-02-23 15:17:52 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -411,6 +411,14 @@ if ($O{'SIMPLE'} =~ /^[Yy]/) {
   print "\nWhat function extensions to the core schema would you like?\n";
   my $funcstr = prompt("(Comma-delimited)?","0");
 
+  my @indexes = split /,\s*/, $funcstr;
+
+  my @temparray = @funcfiles;
+  @funcfiles = ();
+  foreach my $index (@indexes) {
+    push @funcfiles, $temparray[$index-1];
+  }
+
 } #closes the "nonsimple" unless option
 
 #
@@ -636,7 +644,6 @@ graphviz :: \
 	make $working_dir/modules/organism/organism.graphviz.png \
 	make $working_dir/modules/pub/pub.graphviz.png \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
-	make $working_dir/modules/pathway/pathway.graphviz.png \
 	make $working_dir/modules/www/www.graphviz.png \
 	make $working_dir/modules/complete.graphviz.png
 
@@ -651,7 +658,6 @@ graphviz_svg :: \
 	make $working_dir/modules/organism/organism.graphviz.svg \
 	make $working_dir/modules/pub/pub.graphviz.svg \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
-	make $working_dir/modules/pathway/pathway.graphviz.svg \
 	make $working_dir/modules/www/www.graphviz.svg \
 	make $working_dir/modules/complete.graphviz.svg
 
@@ -666,7 +672,6 @@ diagram :: \
 	make $working_dir/modules/organism/organism.diagram.png \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
-	make $working_dir/modules/pathway/pathway.diagram.png \
 	make $working_dir/modules/www/www.diagram.png \
 	make $working_dir/modules/complete.diagram.png
 
@@ -682,7 +687,6 @@ html :: \
 	make $working_dir/modules/organism/organism.html \
 	make $working_dir/modules/pub/pub.html \
 	make $working_dir/modules/sequence/sequence.html \
-	make $working_dir/modules/pathway/pathway.html \
 	make $working_dir/modules/www/www.html \
 	make $working_dir/modules/complete.html
 
