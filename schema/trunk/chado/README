@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.10 2003-12-09 22:16:20 allenday Exp $
+$Id: README,v 1.11 2004-03-26 19:28:47 scottcain Exp $
 
 INTRODUCTION
 ------------
@@ -23,7 +23,7 @@ sequence     - dna, rna and protein features
 companalysis - computational analyses
 genetic      - genetic and phenotypic data
 expression   - rna or protein expression data
-organism     - 
+organism     - organisms
 pub          - publication and references
 
 Other modules are possible; the existing modules cover a very large
@@ -76,21 +76,6 @@ install the Chado schema.
 You might also want to have a look at the README.* files in this directory
 for instructions on how to deal with specific types of data.
 
-AUTOGENERATION OF SCHEMA FILES, CODE, ETC
------------------------------------------
-
-The Chado Makefile currently supports:
-
-Target			Purpose
---------------- -----------------------------------------------------------
-all			makes cdbi, see below
-cdbi			make Class::DBI interface classes (Chado::*) from sql source
-diagram			make ER diagrams, one per module
-graphviz		make graphviz diagrams, one per module
-
-These transforms depend on the Perl scripts in "chado/bin" and the
-SQL::Translator module (with all of its dependencies), which is
-available on CPAN.
 
 CHADO SUPPORT
 -------------
