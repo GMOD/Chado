@@ -80,17 +80,7 @@ HERE
 sub MY::postamble {
   my $uninterp =  q{
 mysql :: \
-                ./modules/companalysis/companalysis.mysql \
-                ./modules/cv/cv.mysql \
-                ./modules/expression/expression.mysql \
-                ./modules/expression/rad.mysql \
-                ./modules/general/general.mysql \
-                ./modules/genetic/genetic.mysql \
-                ./modules/map/map.mysql \
-                ./modules/organism/organism.mysql \
-                ./modules/pub/pub.mysql \
-                ./modules/sequence/sequence.mysql \
-                ./modules/www/www.mysql \
+		./modules/complete.mysql
 
 graphviz :: \
                 ./modules/companalysis/companalysis.graphviz.png \
@@ -128,8 +118,8 @@ diagram :: \
 	./bin/pg2diagram.pl $< > $@
 
 cdbi:
-	./bin/pg2cdbi.pl ./modules/*/*.sql > ./src/pgsql/Chado/AutoDBI.pm
-	./bin/my2cdbi.pl ./modules/*/*.mysql > ./src/mysql/Chado/AutoDBI.pm
+	./bin/pg2cdbi.pl ./modules/complete.sql > ./src/pgsql/Chado/AutoDBI.pm
+	./bin/my2cdbi.pl ./modules/complete.mysql > ./src/mysql/Chado/AutoDBI.pm
 
 metadata: ./bin/ddltrans
 	cat `find . -name \*.sql -print` > ./dat/chado.ddl
