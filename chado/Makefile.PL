@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.55 2004-03-26 04:01:38 scottcain Exp $
+# $Id: Makefile.PL,v 1.56 2004-03-26 17:04:53 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -40,7 +40,10 @@ my %args    =  (
   },
   DBPORT    => {
     default => $ENV{'CHADO_DB_PORT'} || 5432
-  }
+  },
+  LOCAL_TMP => {
+    default => './tmp'
+  },
 );
 
 my %env2arg = (
@@ -71,6 +74,10 @@ DBHOST   The machine name where the database is running ($args{'DBHOST'}{'defaul
 DBPORT   The port on which the database is listening ($args{'DBPORT'}{'default'})
 
 e.g., perl Makefile.PL DBDRIVER=PostgreSQL DBNAME=chado [...]
+
+In addition to the "global" variables above, you can also specify LOCAL_TMP, 
+which indicates where ontology files will be stored.  The default is
+'./tmp'.
 
 Optionally, if the file "build.conf" can be found from a previous run
 of the Makefile.PL, you will be prompted to confirm the values saved 
@@ -176,7 +183,7 @@ my %db_lookup = reverse %VALID_DBS;
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
-  $SQLFILES, $EXTERNAL_DDL );
+  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP );
 
 $O{'SIMPLE'} = prompt(
    "Use the simple install (uses default database schema)", 'Y'
@@ -197,6 +204,7 @@ if ( $opts{'RECONFIGURE'} && %conf ) {
   $DBPASS   = $conf{'DBPASS'}   || '';
   $DBHOST   = $conf{'DBHOST'}   || '';
   $DBPORT   = $conf{'DBPORT'}   || '';
+  $LOCAL_TMP= $conf{'LOCAL_TMP'}|| '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -205,6 +213,7 @@ elsif ( $opts{'DEFAULTS'} ) {
   $DBPASS   = $args{'DBPASS'}{'default'};
   $DBHOST   = $args{'DBHOST'}{'default'};
   $DBPORT   = $args{'DBPORT'}{'default'};
+  $LOCAL_TMP= $args{'LOCAL_TMP'}{'default'};
 }
 elsif ( %opts ) {
   $DBDRIVER = $opts{'DBDRIVER'} || '';
@@ -213,6 +222,7 @@ elsif ( %opts ) {
   $DBPASS   = $opts{'DBPASS'}   || '';
   $DBHOST   = $opts{'DBHOST'}   || '';
   $DBPORT   = $opts{'DBPORT'}   || '';
+  $LOCAL_TMP= $opts{'LOCAL_TMP'}|| '';
 }
 
 if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
@@ -253,6 +263,10 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   
   $DBPORT ||= prompt( 'What is your database port?', 
     $conf{'DBPORT'} || $args{'DBPORT'}{'default'}
+  );
+
+  $LOCAL_TMP ||= prompt( 'Where shall downloaded ontologies go?',
+    $conf{'LOCAL_TMP'} || $args{'LOCAL_TMP'}{'default'}
   );
 }
 
@@ -357,6 +371,7 @@ print join("\n",
   "  DBPASS=$DBPASS",
   "  DBHOST=$DBHOST",
   "  DBPORT=$DBPORT",
+  "  LOCAL_TMP=$LOCAL_TMP",
   '',
   $O{'SIMPLE'}!~ /^[Yy]/ ? 'And the following core modules and extensions:' : ''  , 
   $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
@@ -373,6 +388,7 @@ if ( open CONF, ">$build_config" ) {
   $conf{'DBPASS'}   = $DBPASS;
   $conf{'DBHOST'}   = $DBHOST;
   $conf{'DBPORT'}   = $DBPORT;
+  $conf{'LOCAL_TMP'}= $LOCAL_TMP;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";
@@ -394,6 +410,7 @@ if ( -e $config_template ) {
       db_password  => $DBPASS,
       db_host      => $DBHOST,
       db_port      => $DBPORT,
+      local_tmp    => $LOCAL_TMP,
       working_dir  => $working_dir,
       external_ddl => $external,
       sql_files    => \@sqlfiles,
