@@ -437,7 +437,7 @@ DECLARE
   f_dbxref_id          feature.dbxref_id%TYPE;
   fb_accession         dbxref.accession%TYPE;
   d_accession          dbxref.accession%TYPE;
-  f_uniquename_gene    feature.uniquename%TYPE;
+  f_name_gene          feature.name%TYPE;
   f_name               feature.name%TYPE;
   f_d_id               feature_dbxref.feature_dbxref_id%TYPE;
   dx_id                dbxref.dbxref_id%TYPE;
@@ -511,18 +511,18 @@ BEGIN
          f_type_temp=f_type_repeat_region) THEN
 
          --generate a new name based on the gene name
-         SELECT INTO f_uniquename_gene  uniquename from feature where feature_id=NEW.object_id;
+         SELECT INTO f_name_gene name from feature where feature_id=NEW.object_id;
 
-         SELECT INTO maxid to_number(max(substring(name from (length(f_uniquename_gene)+1+length(f_type)))), ''99999'') FROM feature where name like f_uniquename_gene||''-''||f_type||''%'';
+         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+length(f_type)))), ''99999'') FROM feature where name like f_name_gene||''-''||f_type||''%'';
          IF maxid IS NULL THEN
              maxid = 1;
          ELSE
              maxid = maxid + 1;
          END IF;
 
-         f_name:=CAST(f_uniquename_gene||''-''||f_type_temp||maxid AS TEXT);
+         f_name:=CAST(f_name_gene||''-''||f_type_temp||maxid AS TEXT);
 
-         RAISE NOTICE ''start to update feature, gene uniquename:%, new feature name:%'', f_uniquename_gene, f_name;
+         RAISE NOTICE ''start to update feature, gene name:%, new feature name:%'', f_name_gene, f_name;
          UPDATE feature set name=f_name where feature_id=NEW.subject_id;
 
          SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
@@ -550,25 +550,25 @@ BEGIN
            f_type=f_type_transposable_element or 
            f_type=f_type_promoter or 
            f_type=f_type_repeat_region) )  THEN
-     SELECT INTO f_uniquename_gene f.uniquename from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=NEW.object_id and f.type_id=c.cvterm_id and c.name=f_type_gene;
+     SELECT INTO f_name_gene f.name from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=NEW.object_id and f.type_id=c.cvterm_id and c.name=f_type_gene;
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
 
      --adding a protein to a transcript
      IF f_type_temp=f_type_protein THEN
-         IF f_uniquename_gene IS NOT NULL THEN
+         IF f_name_gene IS NOT NULL THEN
              SELECT INTO f_row_p * from feature where feature_id=NEW.subject_id;
 
              --create a new name for this protein (again repeating code in assign_names)
-             SELECT INTO maxid to_number(max(substring(name from (length(f_uniquename_gene)+1+8))), ''99999'') FROM feature where name like f_uniquename_gene||''-protein%'';
+             SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+8))), ''99999'') FROM feature where name like f_name_gene||''-protein%'';
              IF maxid IS NULL THEN
                  maxid = 1;
              ELSE
                  maxid = maxid + 1;
              END IF;
 
-             f_name:=CAST(f_uniquename_gene||''-protein''||maxid AS TEXT);
+             f_name:=CAST(f_name_gene||''-protein''||maxid AS TEXT);
 
-             RAISE NOTICE ''update name of protein:% to new name:%'',f_row_p.uniquename, f_name;
+             RAISE NOTICE ''update name of protein:% to new name:%'',f_row_p.name, f_name;
              UPDATE feature set name=f_name where feature_id=NEW.subject_id;
 
              SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
@@ -587,15 +587,15 @@ BEGIN
 
      --adding an exon to a transcript
      ELSIF f_type_temp=f_type_exon THEN
-         IF f_uniquename_gene IS NOT NULL THEN
+         IF f_name_gene IS NOT NULL THEN
 
              SELECT INTO f_row_e * from feature where feature_id=NEW.subject_id;
              SELECT INTO fl_row_e * from featureloc where feature_id = NEW.subject_id and rank=0;
              IF fl_row_e.fmin IS NULL OR fl_row_e.fmax IS NULL THEN
-                 RAISE NOTICE ''cant create exon uniquename for feature_id % since there is no featureloc entry'', NEW.subject_id;
+                 RAISE NOTICE ''cant create exon name for feature_id % since there is no featureloc entry'', NEW.subject_id;
                  RETURN NEW;
              ELSE
-                 f_name:=CAST(f_uniquename_gene||'':''||fl_row_e.fmin||''-''||fl_row_e.fmax  AS TEXT);
+                 f_name:=CAST(f_name_gene||'':''||fl_row_e.fmin||''-''||fl_row_e.fmax  AS TEXT);
              END IF;
              RAISE NOTICE ''exon new name:%'', f_name;
              UPDATE feature set name=f_name where feature_id=NEW.subject_id;
