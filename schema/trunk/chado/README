@@ -1,22 +1,21 @@
-$Id: README,v 1.4 2003-10-02 19:23:53 scottcain Exp $
+                            CHADO README
 
-[this is temporary placeholder documentation until someone writes
-something better - cjm@fruitfly.org]
+$Id: README,v 1.5 2003-12-03 23:17:20 kycl4rk Exp $
 
-INTRO
-=====
+INTRODUCTION
+------------
 
-chado is a modular schema for handling all kinds of biological
-data. it is intended to be used as both a primary datastore schema as
+Chado is a modular schema for handling all kinds of biological
+data.  It is intended to be used as both a primary datastore schema as
 well as a warehouse style schema.
 
-chado was originally conceived as the next generation flybase
+Chado was originally conceived as the next generation flybase
 database, combining the sequence annotation database gadfly with the
-harvard and cambridge databases. we have endeavoured to avoid organism
+Harvard and Cambridge databases.  We have endeavoured to avoid organism
 or project specificity in the schema, and we hope it will be of use to
 other projects.
 
-the modules currently in chado are:
+The modules currently in chado are:
 
 general
 cv           - controlled vocabularies and ontologies
@@ -27,60 +26,67 @@ expression   - rna or protein expression data
 organism     - 
 pub          - publication and references
 
-other modules are possible; the existing modules cover a very large
+Other modules are possible; the existing modules cover a very large
 variety of use cases, documented elsewhere (?).
 
-chado has a fairly abstract schema, ontologies and CVs are utilised
-where their use is favourable to relational modeling. in particular,
-the sequence ontology is vital to the sequence module.
+Chado has a fairly abstract schema, ontologies and controlled
+vocabularies (CVs) are utilised where their use is favourable to
+relational modeling.  In particular, the sequence ontology is vital to
+the sequence module.
 
-some (but not all) of the use cases we have discussed are:
+Some (but not all) of the use cases we have discussed are:
 
-* central dogma genome annotations
+* Central dogma genome annotations
 
-* genes that break the central dogma (of which there are many
-* annotated in fly, including polycistronic transcripts, transplicing,
-* selenocysteine readthroughs, rna editing, ....)
+* Genes that break the central dogma (of which there are many
+  Annotated in fly, including polycistronic transcripts, transplicing,
+  selenocysteine readthroughs, rna editing, ....)
 
-* sequence variation data, including snps, transposable element
-* insertions, indels, ... how this relates to phenotypes, how these
-* effect the central dogma....
+* Sequence variation data, including SNPs, transposable element
+  insertions, indels, ... how this relates to phenotypes, how these
+  effect the central dogma....
 
-* non-wildtype data, including representing a wildtype transcriptome
-* and proteome on a non wildtype genome; implicit and explicit central
-* dogma examples for mutant strains
+* Non-wildtype data, including representing a wildtype transcriptome
+  and proteome on a non wildtype genome; implicit and explicit central
+  dogma examples for mutant strains
 
-* complex phenotypic data
+* Complex phenotypic data
 
-* ontologies structured as graphs; querying over graph ontologies
-* non-recursively by precimputing the closure
+* Ontologies structured as graphs; querying over graph ontologies
+  non-recursively by precimputing the closure
 
-* sequence ontology
+* Sequence ontology
 
-* comparative data
+* Comparative data
 
-* genetic interactions
+* Genetic interactions
 
-* transgene constructs, complex genetic experiments and their results
+* Transgene constructs, complex genetic experiments and their results
 
-The core schema is DBMS independent. The SQL table create files can
-be found in the chado/modules directory.  The main chado developers
-are currently using postgresql.
+The core schema is DBMS independent.  The SQL table create files can
+be found in the chado/modules directory.  The main Chado developers
+are currently using PostgreSQL.
 
-A NOTE FOR NON-PostgreSQL USERS
-===============================
+A NOTE FOR NON-POSTGRESQL USERS
+-------------------------------
 
-While the core developers may be using postgres, we realize that this
+While the core developers may be using PostgreSQL, we realize that this
 database platform is not an option for all users.  We don't support use
-of a non-pg platform, but we do provide a tool that is able to convert
+of a non-PG platform, but we do provide a tool that is able to convert
 the schema to be compatible with other DBMS vendors.  Currently we
 generate a MySQL equivalent of the schema.
 
 There may be additional optional layers that use views, triggers,
 procedures, constraints etc which may be postgresql specific.
 
+INSTALLATION
+------------
+
+Please read the included INSTALL document for instructions on how to
+install the Chado schema.
+
 AUTOGENERATION OF SCHEMA FILES, CODE, ETC
-=========================================
+-----------------------------------------
 
 The Chado Makefile currently supports:
 
@@ -94,23 +100,23 @@ graphviz		make graphviz diagrams, one per module
 mysql			create mysql schema (sql) files from postgres sql files
 
 
-These transforms depend on a set of Perl scripts in chado/bin , and
+These transforms depend on a set of Perl scripts in "chado/bin," and
 Ken Clark's SQL::Translator module (with all of its dependencies),
 available on CPAN.
 
 CHADO WEBSITE
-=============
+-------------
 
-see http://www.gmod.org
+See http://www.gmod.org
 
-currently minimal docs
+Currently minimal docs
 
-you can browse the schema:
+You can browse the schema:
 
 http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
 
 COPYRIGHT
-=========
+---------
 This software is free.  You can use it under the terms of the
 Perl Artistic License.
 
