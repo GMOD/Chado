@@ -48,6 +48,7 @@ publications, analysis records, ...) which are constant references to
 all records to the top level chado node.  Feature node contents are
 rearranged to make them a bit more usable objects.  
 
+  
 =head1 SEE ALSO
 
   org.gmod.chado.ix.IxReadSax.java
@@ -74,15 +75,21 @@ use org::gmod::chado::ix::IxSpan;
 use Getopt::Long;    
 use XML::Parser::PerlSAX;
 use Exporter;
-use vars qw/$VERSION $ROOT_NODE $debug @skipKeys @ISA @EXPORT /;
+use vars qw/$VERSION $ROOT_NODE $debug @skipKeys $featmainpatt $featgenpatt @ISA @EXPORT /;
 @ISA = qw(Exporter);
 @EXPORT = qw(&view);
 
-$VERSION = "0.5";
+$VERSION = "0.6";
 $ROOT_NODE='chado';
 $debug= 0;
 
 BEGIN {
+  $featmainpatt='feature|feature_evidence|prediction_evidence|alignment_evidence';
+  $featgenpatt='analysis|feature_cvterm|cvterm|cv|db|pub|synonym|organism';
+  ## jan05 added feature_relationship
+  # 	/^(analysis|feature_cvterm|cvterm|cv|db|pub|synonym|organism |feature_relationship)$/ &&  do {  
+  # analysis|feature_cvterm|cvterm|cv|db|pub|synonym|organism
+  
   # some of these are useful - later // timelastmodified 
   # dec03 - drop residues  from skipset - let user decide w/ -skip opt
   ## need is_current for valid/old ids/dbxref/other
@@ -97,9 +104,9 @@ BEGIN {
     is_nend_partial is_nbeg_partial
     is_fmin_partial is_fmax_partial
     evidence_id
-    organism_id 
     _appdata
     /;
+    # organism_id
 }
 
 =head1 METHODS
@@ -255,6 +262,13 @@ sub topnode {
   return $top;
 }
 
+sub parent_node {
+	my $self= shift;
+	my $upto= shift; $upto= -1 unless(defined $upto);
+  my $parft= @{$self->{featstack}}[$upto]; 
+  return $parft;
+}
+
 sub getTopNode; *getTopNode = \&topnode; # java alias
 
 
@@ -286,11 +300,21 @@ JUNE 03 variants:
   prediction_evidence, alignment_evidence replace feature_evidence
   added fmin, fmax replacements for nbeg, nend
   need to catch these containers:
-     feature_synonym feature_relationship  feature_dbxref ? feature_cvterm ?  
+     feature_synonym  feature_dbxref ? feature_cvterm ?  
 
      feature_synonym > should become an attribute of parent feature ?
        (encloses synonym, synonym_id tags)
 
+JAN 05: 
+  for synteny features, handle 'gene_syntenic_block' like 
+    prediction_evidence alignment_evidence ?
+    
+  need  feature_relationship for cv type_id = putative_ortholog_of
+    with data in object_id/feature/
+    feature_relationship/
+      object_id/feature/ organism=xxx, cvterm=gene, uniquename=geneID
+      type_id/ name=putative_ortholog_of
+      
 =item XML handlers
 
 handlers define for PerlSAX
@@ -341,7 +365,7 @@ sub end_document {
     pop( @{$self->{genfeatstack}});
     $self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
     
-    ## test sep03
+    ##  sep03
     if ( $self->{handleObj} && $parft == $self->{$ROOT_NODE} ) {
       $self->{handleObj}->handleObj(0, $ft, $err);
       }
@@ -369,8 +393,8 @@ sub clear {
    $ROOT_NODE 
    feature feature_evidence prediction_evidence alignment_evidence
    analysis feature_cvterm cvterm cv db pub 
-   synonym organism
-   dbxref featureprop feature_synonym feature_dbxref
+   synonym organism feature_relationship
+   dbxref featureprop feature_synonym feature_dbxref 
    );
    
   foreach (@k) { delete $self->{$_}; }
@@ -387,11 +411,11 @@ sub start_element {
   $self->{vals}{$_}= '';
   $self->{elcount}{$_}++; # debug only
   return if ($self->{skipkids});
-
+  
   my $nada= 0;
   SWITCH: {
   
-		/^($ROOT_NODE|feature|feature_evidence|prediction_evidence|alignment_evidence|analysis|feature_cvterm|cvterm|cv|db|pub|synonym|organism)$/ &&  do { 
+		/^($ROOT_NODE|$featmainpatt|$featgenpatt|feature_relationship)$/ &&  do { #
 		  
       my $atid= $element->{Attributes}->{id}; 
       my $ft;
@@ -399,13 +423,11 @@ sub start_element {
 		    ## dont make another root ... may be handling several docs ??
 		  if (/$ROOT_NODE/ && $self->{$ROOT_NODE}) {
        $ft= $self->{$ROOT_NODE};
-        # $self->{idhash}{$atid}= $self->{$ROOT_NODE} if $atid;  
-		    # last SWITCH;
 		    }
       else {
         $ft= new org::gmod::chado::ix::IxFeat( 
                tag => $_, id => $atid, handler => $self);
-         }
+        }
          
       $self->{$_}= $ft;
          ## atid should be uniq for each ft - keep hash of them in chado object?
@@ -415,13 +437,16 @@ sub start_element {
       push( @{$self->{genfeatstack}}, $ft);
       
         # these are main feature objects...
-      if (/^($ROOT_NODE|feature|feature_evidence|prediction_evidence|alignment_evidence)$/) { #|analysis
+      if (/^($ROOT_NODE|$featmainpatt)$/) { #|analysis
         $self->{curfeat}= $ft;
         push( @{$self->{featstack}}, $ft);
         }
       
       if (/^feature$/ && $elpar eq 'srcfeature_id') {
        $self->{srcfeature_id}= $atid; # save 
+       }
+      if (/^feature$/ && $elpar eq 'object_id') { #?? for odd feature_relationship
+       $self->{object_id}= $atid; # save 
        }
 
 			last SWITCH; 
@@ -432,15 +457,6 @@ sub start_element {
 			last SWITCH; 
 			};  
 
-#		# handle cv_id ref to cv - has id attr if cv/cvname is defined
-# 		/^(cv_id)$/ &&  do { 
-#       my $atid= $element->{Attributes}->{id}; 
-#       if ($atid) {
-#         # my $cv= $self->{cvlist}{$atid}; #??
-#         # my $cvset= $cv->get('cvname'); - need to prefix cvterm/name w/ cvset?
-#         }
-# 			last SWITCH; 
-# 			};  
 	
     /^(featureloc)$/ &&  do { 
       my $span= new org::gmod::chado::ix::IxSpan( tag => $_ , handler => $self);
@@ -458,6 +474,7 @@ sub start_element {
 		  ## jun03 added feature_cvterm, feature_synonym== attributes?
 		  ## feature_cvterm is handled ok by nested cvterm/dbxref == GO terms + ids
 		  ## or handle like featureprop ?
+		  ## organism| was here.. see above genfeat
 		  
 		/^(dbxref|featureprop|feature_synonym|feature_dbxref)$/ &&  do { 
       my $atid= $element->{Attributes}->{id}; 
@@ -509,10 +526,20 @@ sub end_element {
  		    
  		/^(type_id)$/ &&  do {  
  	  # //CAN BE INSIDE  pub OR feature OR feature_relationship OR synonym
-		  if ($hasval ) { # && $val ne 'contains'
-		    if ($elpar eq 'feature_relationship') {
-		      ## skip
+		  if ( $hasval ) { # && $val ne 'contains'
+		  
+		    ##if ($elpar eq 'feature_relationship') {
+		    if ($self->{curgenfeat}->{tag} =~ /(feature_relationship)/) {
+		      ## skip? jan05 : need some of these
+ 		      ##$self->{$elpar}->set( $_ => $val ) ;
+ 		      #if ( $self->{curgenfeat}->get('object_id') ) {
+ 		      $self->{curgenfeat}->set( $_ => $val ) ;
+ 		      #}
 		      }
+# 		    elsif ($elpar =~ /^(feature_relationship)$/) {
+# 		      ## skip? jan05 : need some of these
+# 		      }
+		      
 		    elsif ($elpar =~ /^(dbxref|featureprop|feature_synonym|feature_dbxref)$/) {
 		      ## attributes now use type_id
  		      $self->{$elpar}->set( $_ => $val ) ;
@@ -535,8 +562,9 @@ sub end_element {
  		    }
  		  last SWITCH; };  
  		    
- 		/^(name|uniquename|miniref|program|sourcename|programversion|seqlen|cvterm_id|analysis_id|timelastmodified)$/ &&  do {  
+ 		/^(name|uniquename|miniref|program|sourcename|programversion|seqlen|cvterm_id|object_id|analysis_id|timelastmodified)$/ &&  do {  
  		    ## general feature values - should be only 1/feature
+ 		  unless( $hasval ) { $val= $self->{$_}; $hasval= ($val =~ /\S/);  }
 		  if ($hasval) {
 		    if ($self->{curgenfeat}) {
 		      $self->{curgenfeat}->set( $_ => $val ); #?
@@ -565,13 +593,18 @@ sub end_element {
  		    }
  		  last SWITCH; };  
 
+		/^(genus|species)$/ &&  do {  
+		  if ($hasval && $self->{organism}) {
+ 		    $self->{organism}->set( $_ => $val );
+ 		    }
+ 		  last SWITCH; };  
 
 ## 		//PUTTING PARAMETERS INTO OBJECTS
 ## IxFeat set:
 ##		/^($ROOT_NODE|feature|analysis|cvterm|cv|pub|organism)$/ 
       # synonym not top level...
       
- 		/^(organism|pub|cvterm|cv|db|analysis|feature_cvterm|synonym)$/ &&  do {  
+ 		/^($featgenpatt|feature_relationship)$/ &&  do {  
       ## // top level chado params
  		  ## here, if cvterm and cv_id has id attrib, add link to cv?
  		  ## moved analysis 'feature' to top level chado list ? == organism/pub/...
@@ -584,8 +617,13 @@ sub end_element {
 			unless($self->{vals}{$elpar} =~ /\S/) {
 			  $self->{vals}{$elpar}= $ft->{id};
 			  }
-	
-			if (/(synonym|feature_cvterm)$/) {
+      
+      if (/(feature_relationship)$/) { #
+        my ($tag,$rtype) = $self->{$ROOT_NODE}->id2name('type_id', $ft->{type_id});
+        $self->{curfeat}->add($ft)
+          if (scalar(%$ft) && $rtype !~ /^(partof|producedby)$/);
+			  }	
+			elsif (/(synonym|feature_cvterm)$/) { 
         $self->{curfeat}->add($ft);
 			  }
 			else { 
@@ -598,9 +636,10 @@ sub end_element {
 			$self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
  		  last SWITCH; };  
       
- 		/^(feature|feature_evidence|prediction_evidence|alignment_evidence)$/ &&  do {  #|analysis 
+ 		/^($featmainpatt)$/ &&  do {  #|analysis 
       my $ft= pop( @{$self->{featstack}});
       my $parft= @{$self->{featstack}}[-1]; 
+      $ft->{parnode}= $parft; #??
       $parft->add($ft);
 			$self->{$_}= undef;
 			$self->{curfeat}= $parft; 
@@ -608,7 +647,7 @@ sub end_element {
 			# $self->{curgenfeat}= $parft; #?
 			$self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
 			
-			## test sep03
+			## sep03
 			if ( $self->{handleObj} && $parft == $self->{$ROOT_NODE} ) {
 			  $self->{handleObj}->handleObj(0, $ft);
 			  }
@@ -654,31 +693,6 @@ sub end_element {
 #  		    }
  		  last SWITCH; }; 
 	 	      
-##		//ATTRIB
-
-#  		/^(feature_dbxref)$/ &&  do {  
-# 			$self->{curfeat}->addattr($self->{$_});
-#       $self->{$_}= undef;
-#  		  last SWITCH; };  
-
-#  		/^(dbxref_id)$/ &&  do {  
-#  		  my $attr= $self->{$_};
-#  		  $attr->setattr( $val) if $hasval; #? and not get() ?
-#  		  
-# #  		  my $fattr= $self->{feature_dbxref};
-# #  		  if ($fattr) {
-# #  		    $fattr->set( attr => $attr);
-# # 			  #	//THIS dbxref_id IS INSIDE A feature_dbxref
-# # 			  #	//IT IS NOW SUBSUMED
-# #  		    }
-# #  		  elsif
-#  		  if ( $self->{curfeat} ) {
-# #				//ADD TO FEATURE
-#  			  $self->{curfeat}->addattr($attr);
-#  		    }
-# 	    $self->{$_}= undef;
-#  		  last SWITCH; };  
-
  		/^(dbxref)$/ &&  do {  
       # now also in attrstack
  		  my $attr= $self->{$_};
@@ -695,13 +709,7 @@ sub end_element {
  		  $attr->setattr( $dbid); #  name =>
 
       $self->setAttrs($attr, qw(is_current is_internal is_analysis));
-#  		  my $is_current= $self->{is_current};
-#  		  $attr->set( is_current => $is_current) if defined $is_current;  
-#       $self->{is_current}= undef;
 
-#  		  my $dbxattr= $self->{dbxref_id};
-#   		if ($dbxattr) { $dbxattr->setattr( $attr ); }
-#  		  elsif
  		  if ( $self->{curgenfeat} ) {
  			  $self->{curgenfeat}->addattr($attr);
  		    }
@@ -718,6 +726,7 @@ sub end_element {
  		    }
 	    $self->{$_}= undef;
       last SWITCH; };  
+
 	  
 		/^(feature_synonym)$/ &&  do {  ## or synonym -- done by synonym == par->add(ft)
       # now also in attrstack
@@ -726,21 +735,7 @@ sub end_element {
       $self->setAttrs($attr, qw(synonym_id pub_id is_current is_internal is_analysis));
  		  
  		  ## synonym_id always seems to enclose only synonym struct 
-# # 		  my $synonym_id= $self->{synonym_id};
-#  		  $attr->set( synonym_id => $synonym_id) if $synonym_id;  
-#       $self->{synonym_id}= undef;
-#       ##?? change id=feature_synonym_1894 to id=synonym_1894 
-#       
 #       ## synonym struct is: id,name,type_id
-# #  	    my $synonym= $self->{synonym};
-# #  		  $attr->set( synonym => $synonym) if $synonym;  
-# 
-#  		  my $pub_id= $self->{pub_id};
-#  		  $attr->set( pub_id => $pub_id) if $pub_id;  
-# 
-#  		  my $is_current= $self->{is_current};
-#  		  $attr->set( is_current => $is_current) if defined $is_current;  
-#       $self->{is_current}= undef;
       
  		  if ( $self->{curgenfeat} ) { # was curfeat
  			  $self->{curgenfeat}->addattr($attr);

@@ -27,8 +27,12 @@ echo "output $outf exists; wont overwrite - please remove"
 exit 1
 endif
 
-if ( -d "./ChadoSax/src" ) then
-else
+set csp="./ChadoSax/src"
+if ( ! -d $csp ) then
+set csp="./src"
+endif
+
+if ( ! -d $csp ) then
 echo "need ChadoSax/src library"
 echo "from cvs -d ':pserver:anonymous@flybase.net:/bio/cvs' co gmod/schema/XMLTools/ChadoSax"
 exit 1
@@ -38,10 +42,10 @@ touch $outf
 
 # new options ToAcode::acode -debug -index -featfile=f -outfile=o
 foreach xml ( $* )
-perl -I./ChadoSax/src -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- \
+perl -I$csp -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- \
  $args -feat=$outf.feats $xml  >> $outf
 end
 
-perl -I./ChadoSax/src -M'org::gmod::chado::ix::ToAcode' -e 'acodeindex;' -- $outf
+perl -I$csp -M'org::gmod::chado::ix::ToAcode' -e 'acodeindex;' -- $outf
 
 
