@@ -615,27 +615,33 @@ sub load_Name_tag {
     my $gff_feature   = shift;
     my $chado_feature = shift;
 
+    my @names;
     if ( $gff_feature->has_tag('Name') ) {
-        my @names = $gff_feature->get_tag_values('Name');
-        foreach my $name (@names) {
-            my ($chado_synonym1) = Chado::Synonym->find_or_create(
-                {
-                    name         => $name,
-                    synonym_sgml => $name,
-                    type_id      => $cvterm{synonym}->id
-                }
-            );
+        @names = $gff_feature->get_tag_values('Name');
+    } elsif ($gff_feature->has_tag('ID') ) {
+        @names = $gff_feature->get_tag_values('ID');
+    } else {
+        return;
+    }
 
-            my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
-                {
-                    synonym_id => $chado_synonym1->id,
-                    feature_id => $chado_feature->id,
-                    pub_id     => $pub->id,
-                }
-            );
-            push @transaction, $chado_synonym1;
-            push @transaction, $chado_synonym2;
-        }
+    foreach my $name (@names) {
+        my ($chado_synonym1) = Chado::Synonym->find_or_create(
+            {
+                name         => $name,
+                synonym_sgml => $name,
+                type_id      => $cvterm{synonym}->id
+            }
+        );
+
+        my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
+            {
+                synonym_id => $chado_synonym1->id,
+                feature_id => $chado_feature->id,
+                pub_id     => $pub->id,
+            }
+        );
+        push @transaction, $chado_synonym1;
+        push @transaction, $chado_synonym2;
     }
 }
 
@@ -956,12 +962,14 @@ sub load_feature_locations {
         uniquename => $uniquename,
     );
 
+    my $used_ID_for_Name = 0;
     if ( $gff_feature->has_tag('Name') ) {
         ($name) = $gff_feature->get_tag_values('Name');
         $feature_attributes{name} = $name;
     } elsif ( $gff_feature->has_tag('ID') ) {
         ($name) = $gff_feature->get_tag_values('ID');
         $feature_attributes{name} = $name;
+        $used_ID_for_Name = 1;
     }
 
     my $chado_feature;
@@ -976,6 +984,10 @@ sub load_feature_locations {
     $chado_feature->seqlen($seqlen);
 
     push @transaction, $chado_feature;
+
+    if ($used_ID_for_Name)   {
+        load_Name_tag ($gff_feature, $chado_feature);
+    }
 
     if ( $id eq $gff_feature->seq_id
         or $gff_feature->seq_id eq '.' ) {
