@@ -1049,19 +1049,19 @@ sub load_feature_locations {
     my $locgroup =  $featureloc_locgroup{ $chado_feature->id };
     my($parent) = $gff_feature->has_tag('Parent') ? $gff_feature->get_tag_values('Parent') : ();
 
-    if($parent){
+    if($parent && $featureloc_locgroup{ $feature{$parent} }){
         $locgroup = $featureloc_locgroup{ $feature{$parent} };
     }
 
     $locgroup ||= 0;
 
     if (DEBUG) {
-        print STDERR "adding featureloc for gff string:\n";
-        print STDERR $gff_feature->gff_string . "\n";
-	print STDERR $chado_feature->id , "\t" , $locgroup , "\n";
+        $progress->message("adding featureloc for gff string:");
+        $progress->message("\t".$gff_feature->gff_string);
+#	print STDERR $chado_feature->id , "\t" , $locgroup , "\n";
 
         if($parent){
-            print STDERR "srcfeature_id: " . Dumper($feature{$parent}) . "\n";
+            $progress->message("srcfeature_id: " . Dumper($feature{$parent}));
         }
     }
 
