@@ -40,12 +40,12 @@
   <!--            -->
   <!-- ontologies -->
   <!--            -->
-  <ontology name="Sequence Ontology" order="3">
+  <ontology name="Sequence Ontology" order="2">
     <file type="ontology"    local="song/so.ontology"   remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.ontology?rev=HEAD"   method="lwp-mirror"/>
     <file type="definitions" local="song/so.definition" remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.definition?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
-  <ontology name="Gene Ontology" order="2">
+  <ontology name="Gene Ontology" order="3">
     <file type="ontology"    local="go/component.ontology" remote="http://www.geneontology.org/ontology/component.ontology" method="/usr/bin/lwp-mirror"/>
     <file type="ontology"    local="go/function.ontology"  remote="http://www.geneontology.org/ontology/function.ontology"  method="/usr/bin/lwp-mirror"/>
     <file type="ontology"    local="go/process.ontology"   remote="http://www.geneontology.org/ontology/process.ontology"   method="/usr/bin/lwp-mirror"/>
