@@ -154,7 +154,7 @@ die "Unable to create a synonym type in cvterm table."
     unless $synonym_type;
 
 my ($note_type) = Chado::Cvterm->search(name => 'note');
-my ($note_type  = Chado::Cvterm->search(name => 'Note') unless $note_type;
+my ($note_type) = Chado::Cvterm->search(name => 'Note') unless $note_type;
 unless ($note_type) {
   my ($cv_entry) = Chado::Cv->find_or_create({
                     name       => 'autocreated',
@@ -277,53 +277,61 @@ while(my $gff_feature = $gffio->next_feature()) {
   }
 
   if($gff_feature->has_tag('Parent')){
-    my($parent) = $gff_feature->get_tag_values('Parent');
-
-    Chado::Feature_Relationship->find_or_create({
-      subject_id => $chado_feature->id,
-      object_id => $feature{$parent}->id,
-      type_id => $part_of
-                                              });
-
+    my @parents = $gff_feature->get_tag_values('Parent');
+    foreach my $parent (@parents) {
+      Chado::Feature_Relationship->find_or_create({
+        subject_id => $chado_feature->id,
+        object_id => $feature{$parent}->id,
+        type_id => $part_of
+                                                  });
+    }
   }
 
   if($gff_feature->has_tag('Alias')) {
-    my ($synonym) = Chado::Synonym->find_or_create({
-                      name    => $gff_feature->get_tag_values('Alias'),
+    my @aliases = $gff_feature->get_tag_values('Alias');
+    foreach my $alias (@aliases) {
+      my ($synonym) = Chado::Synonym->find_or_create({
+                      name    => $alias,
                       type_id => $synonym_type->cvterm_id
-                                                   });
+                                                     });
                                                                                 
                                                                                 
-    Chado::Feature_synonym->find_or_create ({
+      Chado::Feature_synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
                       pub_id     => 1 ##what should go here?
-                                            });
- 
+                                              });
+    }
   }
 
   if($gff_feature->has_tag('Name')) {
-    my ($synonym) = Chado::Synonym->find_or_create({
-                      name    => $gff_feature->get_tag_values('Name'),
+    my @names = $gff_feature->get_tag_values('Name');
+    foreach my $name (@names) {
+      my ($synonym) = Chado::Synonym->find_or_create({
+                      name    => $name,
                       type_id => $synonym_type->cvterm_id
                                                    });
                                                                                 
                                                                                 
-    Chado::Feature_synonym->find_or_create ({
+      Chado::Feature_synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
                       pub_id     => 1 ##what should go here?
                                             });
+    }
   }
 
-  if($gff_feature->has_tag('note')) {
-    Chado::Featureprop->find_or_create({
+  if($gff_feature->has_tag('note') or $gff_feature->has_tag('Note')) {
+    my @notes = $gff_feature->get_tag_values('note');
+    push @notes, $gff_feature->get_tag_values('Note');
+    foreach my $note (@notes) {
+      Chado::Featureprop->find_or_create({
                       feature_id => $chado_feature->feature_id,
                       type_id    => $note_type->cvterm_id,
-                      value      => $gff_feature->get_tag_values('note');
-                                       });
+                      value      => $note;
+                                         });
+    }
   } 
-
 }
 $gffio->close();
 
