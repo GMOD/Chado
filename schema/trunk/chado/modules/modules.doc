@@ -67,3 +67,4 @@ cv              sequence        feature_cvterm
 organism        sequence        feature_organism
 general		sequence	feature_synonym
 general		sequence	gene_synonym
+

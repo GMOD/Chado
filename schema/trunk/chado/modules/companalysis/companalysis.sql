@@ -58,9 +58,9 @@ create table analysis (
     sourcename varchar(255),
     sourceversion varchar(255),
     sourceuri text,
-    timeexecuted timestamp not null default current_timestamp
+    timeexecuted timestamp not null default current_timestamp,
+    constraint analysis_c1 unique (program,programversion,sourcename)
 );
-create unique index analysis_idx1 on analysis (program,programversion,sourcename);
 
 -- ================================================
 -- TABLE: analysisprop
@@ -73,11 +73,11 @@ create table analysisprop (
     foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text
+    value text,
+    constraint analysisprop_c1 unique (analysis_id,type_id,value)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
 create index analysisprop_idx2 on analysisprop (type_id);
-create unique index analysisprop_idx3 on analysisprop (analysis_id,type_id,value);
 
 -- ================================================
 -- TABLE: analysisfeature
@@ -146,8 +146,8 @@ create table analysisfeature (
     rawscore double precision,
     normscore double precision,
     significance double precision,
-    identity double precision
+    identity double precision,
+    constraint analysisfeature_c1 unique (feature_id,analysis_id)
 );
 create index analysisfeature_idx1 on analysisfeature (feature_id);
 create index analysisfeature_idx2 on analysisfeature (analysis_id);
-create unique index analysisfeature_idx3 on analysisfeature (feature_id,analysis_id);

@@ -9,9 +9,9 @@ create table organism (
 	genus varchar(255) not null,
 	species varchar(255) not null,
 	common_name varchar(255) null,
-	comment text null
+	comment text null,
+    constraint organism_c1 unique (genus,species)
 );
-create unique index organism_idx1 on organism (genus,species);
 
 -- Compared to mol5..Species, organism table lacks "approved char(1) null".  
 -- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
@@ -29,31 +29,31 @@ create unique index organism_idx1 on organism (genus,species);
 -- ================================================
 
 create table organism_dbxref (
-       organism_dbxref_id serial not null,
-       primary key (organism_dbxref_id),
-       organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-       dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
+    organism_dbxref_id serial not null,
+    primary key (organism_dbxref_id),
+    organism_id int not null,
+    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint organism_dbxref_c1 unique (organism_id,dbxref_id)
 );
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
-create unique index organism_dbxref_idx3 on organism_dbxref (organism_id,dbxref_id);
 
 -- ================================================
 -- TABLE: organismprop
 -- ================================================
 
 create table organismprop (
-       organismprop_id serial not null,
-       primary key (organismprop_id),
-       organism_id int not null,
-       foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-       type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-       value text null,
-       rank int not null default 0
+    organismprop_id serial not null,
+    primary key (organismprop_id),
+    organism_id int not null,
+    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint organismprop_c1 unique (organism_id,type_id,rank)
 );
 create index organismprop_idx1 on organismprop (organism_id);
 create index organismprop_idx2 on organismprop (type_id);
-create unique index organismprop_idx3 on organismprop (organism_id,type_id,rank);
