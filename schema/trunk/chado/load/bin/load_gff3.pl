@@ -22,6 +22,11 @@ See the notes; there is plenty there.
 
 =over
 
+=item What this script doesn't do yet
+
+It does very limited parsing of the group column (column 9).  Notes are not parsed.
+Nor are similarity/match/target data.
+
 =item Base coordinates
 
 Note that at the moment, this script assumes and uses base coordinates,
@@ -229,6 +234,7 @@ while(my $gff_feature = $gffio->next_feature()) {
       type_id => $part_of,
                                               });
   }
+
 }
 $gffio->close();
 
