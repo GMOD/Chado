@@ -13,6 +13,9 @@ my %src = ();
 my %type = ();
 my $pub; # for holding null pub object
 my %synonym;
+my $gff_source_db;
+my %gff_source;
+my $source_success = 1; #indicates that GFF_source is in db table
 my @tables = (
    "feature",
    "featureloc",
@@ -20,7 +23,8 @@ my @tables = (
    "featureprop",
    "feature_cvterm",
    "synonym",
-   "feature_synonym"
+   "feature_synonym",
+   "feature_dbxref"
 );
 my %files = (
    feature              => "feature.tmp",
@@ -30,6 +34,7 @@ my %files = (
    feature_cvterm       => "featurecvterm.tmp",
    synonym              => "synonym.tmp",
    feature_synonym      => "featuresynonym.tmp",
+   feature_dbxref       => "featuredbxref.tmp",
 );
 my %sequences = (
    feature              => "feature_feature_id_seq",
@@ -39,6 +44,7 @@ my %sequences = (
    feature_cvterm       => "feature_cvterm_feature_cvterm_id_seq",
    synonym              => "synonym_synonym_id_seq",
    feature_synonym      => "feature_synonym_feature_synonym_id_seq",
+   feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
 );
 my %copystring = (
    feature              => "(feature_id,organism_id,name,uniquename,type_id)",
@@ -48,6 +54,7 @@ my %copystring = (
    feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
    synonym              => "(synonym_id,name,type_id,synonym_sgml)",
    feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
+   feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
 );
 
 
@@ -83,6 +90,11 @@ $sth = $db->prepare("select nextval('$sequences{feature_synonym}')");
 $sth->execute;
 my($nextfeaturesynonym) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select nextval('$sequences{feature_dbxref}')");
+$sth->execute;
+my($nextfeaturedbxref) = $sth->fetchrow_array();
+
+
 $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
@@ -100,6 +112,7 @@ open FPROP, ">$files{featureprop}";
 open FCV,   ">$files{feature_cvterm}";
 open SYN,   ">$files{synonym}";
 open FS,    ">$files{feature_synonym}";
+open FDBX,  ">$files{feature_dbxref}";
 
 my $gffio = Bio::Tools::GFF->new(-fh => \*STDIN, -gff_version => 3);
 
@@ -174,6 +187,28 @@ while(my $feature = $gffio->next_feature()){
 
       $rank++;
       $nextfeatureprop++;
+    }
+  }
+
+  my $source = $feature->source_tag;
+  if ( $source_success && $source && $source ne '.') {
+    unless ($gff_source_db) {
+      ($gff_source_db) = Chado::Db->search({ name => 'GFF_source' });
+    }
+
+    if ($gff_source_db) {
+      unless ($gff_source{$source}) {
+        $gff_source{$source} = Chado::Dbxref->find_or_create( {
+            db_id     => $gff_source_db->id,
+            accession => $source,
+        } );
+        $gff_source{$source}->dbi_commit;
+      }
+      my $dbxref_id = $gff_source{$source}->id;
+      print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$dbxref_id)),"\n";
+      $nextfeaturedbxref++;
+    } else {
+      $source_success = 0; #geting GFF_source failed, so don't try anymore
     }
   }
 
@@ -253,6 +288,7 @@ my %nextvalue = (
    "feature_cvterm"       => $nextfeaturecvterm,
    "synonym"              => $nextsynonym,
    "feature_synonym"      => $nextfeaturesynonym,
+   "feature_dbxref"       => $nextfeaturedbxref,
 );
 
 print F    "\\.\n\n";
@@ -262,6 +298,7 @@ print FPROP "\\.\n\n";
 print FCV "\\.\n\n";
 print SYN "\\.\n\n";
 print FS "\\.\n\n";
+print FDBX "\\.\n\n";
 
 close F;
 close FLOC;
@@ -270,6 +307,7 @@ close FPROP;
 close FCV;
 close SYN;
 close FS;
+close FDBX;
 
 
 foreach my $table (@tables) {
@@ -284,14 +322,21 @@ $db->commit;
 $db->{AutoCommit}=1;
 
 warn "Optimizing database (this may take a while) ...\n";
+print STDERR "  (";
 foreach (@tables) {
+  print STDERR "$_ "; 
   $db->do("VACUUM ANALYZE $_");
 }
+print STDERR ") Done.\n";
 $db->disconnect;
 
+warn "Deleting temporary files\n";
 foreach (@tables) {
   unlink $files{$_};
 }
+
+warn "\nWhile this script has made an effort to optimize the database, you\n"
+    ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
 
 exit(0);
 
