@@ -1,7 +1,5 @@
 perl Makefile.PL   
      #creates AutoDBI.pm 
-make
-     #moves AutoDBI.pm to blib
 make test_load
      #creates database, installs schema
 perl load/Build.PL load_conf=load/etc/load.conf
