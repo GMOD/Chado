@@ -166,16 +166,23 @@ sub load_ontologyterms{
 
   #load root terms
   foreach my $root (@roots) {
-	my $dbxref = Chado::Dbxref->find_or_create({
+        my($root_db) = Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
+
+        if(!$root_db){
+#warn 3.0;
+#warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
+next unless $root->name;
+		my $dbxref = Chado::Dbxref->find_or_create({
 												db_id => $db->id,
 												accession => $root->identifier,
 											   });
-	my $root_db = Chado::Cvterm->find_or_create({
+		$root_db = Chado::Cvterm->find_or_create({
 												 name => $root->name || $oborelmap{ predmap($root->identifier) },
 												 cv_id => $cv->id,
 												 dbxref_id => $dbxref->id,
 												});
-
+#warn 3.1;
+	}
 	$root_db->definition($root->definition) unless defined($root_db->definition);
 
 
@@ -202,15 +209,21 @@ sub load_ontologytermsR {
 	if (!(exists $allterms{$child->name})) {
 	  warn  "$tab", $child->name , "\n" if DEBUG;
 
+        my($child_db) = Chado::Cvterm->search({name => $child->name, cv_id => $cv->id});
+	if(!$child_db){
+
+#warn "oops! ".join '*', ($child->name, $child->identifier, $cv->id) unless $child->name;
+next unless $child->name;
 	  my $dbxref = Chado::Dbxref->find_or_create({
 												  db_id => $db->id,
 												  accession => $child->identifier,
 												 });
-	  my $child_db = Chado::Cvterm->find_or_create({
+	  $child_db = Chado::Cvterm->find_or_create({
 													name => $child->name,
 													cv_id => $cv->id,
 													dbxref_id => $dbxref->id,
 												   });
+	}
 	  $child_db->definition($child->definition) unless defined($child_db->definition);
 
 	  $allterms{$child->name} = $child_db->id;
@@ -252,11 +265,12 @@ sub load_ontologyrels {
 
 	  $allrels{$obj->name . $subj->name . $pred->name} = $relationship;
 
-	  warn "subj! ".$subj->name and $skip++ unless defined $subj_id; # if DEBUG;
-	  warn "obj!  ".$obj->name  and $skip++ unless defined $obj_id; # if DEBUG;
+	  warn("subj! ".$subj->name .join('*',($subj->name,$subj->identifier))) if DEBUG and !defined $subj_id;
+	  warn("obj! " .$obj->name  .join('*',($obj->name,$obj->identifier)))   if DEBUG and !defined $obj_id;
+	  $skip++ unless defined $obj_id;
+	  $skip++ unless defined $subj_id;
 
 	  next if $skip;
-
 	  Chado::Cvterm_Relationship->find_or_create ({
 										  subject_id => $subj_id,
 										  object_id => $obj_id,
