@@ -3,9 +3,20 @@ use strict;
 use SQL::Translator;
 use SQL::Translator::Producer::ClassDBI;
 
+print "USAGE: $0 <dbname> <username> <password> <sql file> [<sql files>]\n" and exit unless scalar(@ARGV) > 3;
+
+my $dbname   = shift @ARGV;
+my $username = shift @ARGV;
+my $password = shift @ARGV;
 my @files = @ARGV;
 
-my $translator     = SQL::Translator->new();
+my $translator     = SQL::Translator->new(
+						producer_args => {
+							db_user => $username,
+							db_pass => $password,
+							dsn     => "dbi:Pg:dbname=$dbname",
+						},
+					 );
 
 my $config = { from       => "PostgreSQL", 
 	       to         => "ClassDBI",

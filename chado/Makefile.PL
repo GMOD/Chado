@@ -19,8 +19,9 @@ unless( -d "$working_dir/lib/Chado" ) { mkdir "$working_dir/lib/Chado" }
 my %O;
 
 #hard code these for the moment for testing
-my $DBNAME            = "";
-my $USER              = "";
+my $DBNAME         = "";
+my $DBUSER         = "";
+my $DBPASS         = "";
 $O{GMOD_HOME}      = $ENV{GMOD_HOME} || '/usr/local/gmod';
 $O{PACKAGE_HOME}   = $O{GMOD_HOME}.'/lib/schema';
 $O{COREDEF}        = "$working_dir/modules/idb-full.modules";
@@ -43,7 +44,8 @@ close CORE;
 my $db = prompt("What database server will you be using?",'PostgreSQL');
 die "Really only PostgreSQL is well supported right now" unless $db =~ /^[Pp]/;
 $DBNAME = prompt("Database name?", 'chado');
-$USER   = prompt("What is your username?", 'user');
+$DBUSER = prompt("What is your username?", $ENV{USER});
+$DBPASS = prompt("What is your password?", '');
 
 # get available extensions to core and ask if any are to be used.
 print "\nAvailable extensions to the core schema:\n";
@@ -87,7 +89,7 @@ if ($rebuild_complete) {
   close OUT;
 
   warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n";
-  system("$working_dir/bin/pg2cdbi.pl $working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm")==0
+  system("$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' $working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm")==0
     or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 }
 
