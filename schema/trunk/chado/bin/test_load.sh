@@ -1,6 +1,5 @@
 #!/bin/sh
-DBNAME=test;
-#DBNAME=gadfly07;
+DBNAME=$1;
 
 dropdb $DBNAME;
 createdb $DBNAME;
