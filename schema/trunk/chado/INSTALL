@@ -1,6 +1,35 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.5 2003-12-06 06:21:07 allenday Exp $
+$Id: INSTALL,v 1.6 2003-12-10 16:04:38 scottcain Exp $
+
+Prerequisites:
+
+  PostgreSQL (currently, developers are using 7.3.2, but should transition to
+  7.4 soon).
+
+  Apache (1.3.*)
+
+  BioPerl (-live or 1.4 when available)
+
+  Standard Perl modules:
+    * CGI                      (GBrowse)
+    * GD                       (GBrowse)
+    * DBI                      (GBrowse,chado)
+    * DBD::Pg                  (GBrowse,chado)
+    * SQL::Translator          (chado)
+    * Digest::MD5              (GBrowse)
+    * Text::Shellwords         (GBrowse)
+    * Class::DBI               (chado)
+    * Class::DBI::Pg           (chado)
+    * Class::DBI::Pager        (chado)
+    * XML::Simple              (chado)
+    * XML::DOM                 (chado<->Apollo)
+    * XML::Parser              (chado<->Apollo)
+    * XML::Parser::PerlSAX     (chado<->Apollo)
+    * LWP                      (chado)
+    * Log::Log4perl            (chado)
+    * Term::ProgressBar        (chado)
+  
 
 This document describes how to install the Chado schema:
 
