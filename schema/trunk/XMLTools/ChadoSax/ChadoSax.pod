@@ -79,6 +79,15 @@ dghome2% /usr/bin/time \
   perl -I $ix/src -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- $ch/AE003430v7.chado.xml
   perl -I $ix/src -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- $ch/AE003430v7.chado.xml
 
+  perl -I $ix/src -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- \
+     $ch/ch4s/AE003844_v7.0_0728.chado.xml > $ch/ch4s/AE003844_v7.0_0728.xpar
+
+  perl -I$ix/src -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- \
+    -out=AE003639_v7.0_0728.acode \
+    -feat=AE003639_v7.0_0728.feats \
+    -debug -index \
+    AE003639_v7.0_0728.chado.xml.bz2 
+
 ----------------------------        
 
 

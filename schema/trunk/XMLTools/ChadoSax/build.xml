@@ -18,7 +18,7 @@
                              image files), including the WEB-INF subdirectory
                              and its configuration file contents.
 
-     $Id: build.xml,v 1.2 2003-11-25 21:53:30 dongilbert Exp $
+     $Id: build.xml,v 1.3 2004-04-19 21:23:16 dongilbert Exp $
 -->
 
 
@@ -117,15 +117,31 @@
   <property name="app.name"      value="ChadoSax"/>
   <property name="app.path"      value="/${app.name}"/>
   <property name="app.version"   value="0.2-dev"/>
+  
   <property name="build.home"    value="${basedir}/build"/>
-  <property name="catalina.home" value="/bio/biodb/common/servers/tomcat"/> <!-- UPDATE THIS! -->
   <property name="dist.home"     value="${basedir}/dist"/>
   <property name="docs.home"     value="${basedir}/docs"/>
-  <property name="manager.url"   value="http://localhost:8080/manager"/>
   <property name="src.home"      value="${basedir}/src"/>
   <property name="web.home"      value="${basedir}/web"/>
+
+  <property name="catalina.home" value="NOT/bio/biodb/common/servers/tomcat"/> <!-- UPDATE THIS! -->
+
+  <property name="manager.url"   value="http://localhost:8080/manager"/>
   <property name="appsrc.jar"   value="${build.home}/${app.name}-${app.version}-src.jar"/>
 
+<!--
+add ant build targets for schema/XMLTools/Convertor
+  org/gmod/chado/gametochadx,org/gmod/chado/gametochadx
+
+// as of nov03 this java source doesn't compile - missing gametochadx Attrib.java
+
+GTC_SRCPATH = org/gmod/chado/gametochadx
+CTG_SRCPATH = org/gmod/chado/chadxtogame
+
+  <property name="app2.name"       value="ChadoConvertor"/>
+  <property name="convertor.base"  value="../Convertor"/>
+  <property name="convertor.src"   value="${convertor.base}/CODE"/>
+-->
 
 <!-- ================== Custom Ant Task Definitions ======================= -->
 
@@ -224,6 +240,7 @@
 -->
 
     <!-- Include all elements that Tomcat exposes to applications -->
+    <!--
     <pathelement location="${catalina.home}/common/classes"/>
     <fileset dir="${catalina.home}/common/endorsed">
       <include name="*.jar"/>
@@ -235,9 +252,31 @@
     <fileset dir="${catalina.home}/shared/lib">
       <include name="*.jar"/>
     </fileset>
-
+  -->
   </path>
 
+  <target name="init2">
+   <available file="${catalina.home}" property="catalina.present" /> 
+   <echo>init1: catalina: ${catalina.home} = ${catalina.present}  </echo>
+  </target>
+  
+  <target name="init1" depends="init2" if="catalina.present">
+    <path id="compile.classpath">
+        <!-- Include all elements that Tomcat exposes to applications -->
+        <pathelement location="${catalina.home}/common/classes"/>
+        <fileset dir="${catalina.home}/common/endorsed">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${catalina.home}/common/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${catalina.home}/shared/classes"/>
+        <fileset dir="${catalina.home}/shared/lib">
+          <include name="*.jar"/>
+        </fileset>
+      </path>
+   <echo>init1: catalina = ${catalina.home}   </echo>
+  </target>
 
 
 <!-- ==================== All Target ====================================== -->
@@ -302,7 +341,25 @@
 
   </target>
 
+<!-- // not ready //
+  <target name="compile2" depends="prepare"
+   description="Compile Java Convertor  sources">
 
+    <mkdir    dir="${build.home}/WEB-INF/classes"/>
+    <javac srcdir="${convertor.src}"
+          destdir="${build.home}/WEB-INF/classes"
+            debug="${compile.debug}"
+      deprecation="${compile.deprecation}"
+         optimize="${compile.optimize}">
+        <classpath refid="compile.classpath"/>
+    </javac>
+
+    <copy  todir="${build.home}/WEB-INF/classes">
+      <fileset dir="${convertor.src}" excludes="**/*.java"/>
+    </copy>
+
+  </target>
+-->
 
 <!-- ==================== Dist Target ===================================== -->
 
@@ -315,6 +372,7 @@
   <target name="jarsrc" depends="jar" description="create source JAR file">
     <zip  destfile="${appsrc.jar}" >
     <zipfileset dir="${src.home}"      prefix="src"/>
+    <zipfileset dir="${convertor.src}"      prefix="src"/>
     <!-- zipfileset dir="${webapps.home}"   prefix="webapps"/ -->
     </zip>
   </target>
@@ -391,7 +449,7 @@
 
 -->
 
-  <target name="prepare">
+  <target name="prepare" > <!-- depends="init1" -->
 
     <!-- Create build directories as needed -->
     <mkdir  dir="${build.home}"/>
