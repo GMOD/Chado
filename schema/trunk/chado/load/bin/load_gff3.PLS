@@ -947,10 +947,11 @@ sub load_feature_locations {
 
     } elsif( $gff_feature->primary_tag and $gff_feature->seq_id ) {
 
-        my $position = $fmax eq '.' ? '' : ":$fmin..$fmax";
+        my $position    = $fmax eq '.' ? '' : ":$fmin..$fmax";
+        my($parentname) = $gff_feature->has_tag('Parent') ? $gff_feature->get_tag_values('Parent') : '';
 
-        $uniquename = sprintf("_%s_%s%s",
-                              $gff_feature->primary_tag, $gff_feature->seq_id, $position
+        $uniquename = sprintf("_%s_%s_%s%s",
+                              $parentname, $gff_feature->primary_tag, $gff_feature->seq_id, $position
                              );
     } else {
         die("not enough information available to make a uniquename for $gff_feature");
@@ -1016,6 +1017,7 @@ sub load_feature_locations {
     if (DEBUG) {
         print STDERR "adding featureloc for gff string:\n";
         print STDERR $gff_feature->gff_string . "\n";
+	print STDERR $chado_feature->id , "\t" , $locgroup , "\n";
 
         if($parent){
             print STDERR "srcfeature_id: " . Dumper($feature{$parent}) . "\n";
