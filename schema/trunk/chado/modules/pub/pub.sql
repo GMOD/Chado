@@ -124,6 +124,8 @@ create index pub_author_idx2 on pub_author (pub_id);
 -- ================================================
 
 create table pubprop (
+       pubprop_id serial not null,
+       primary key (pubprop_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
        pkey_id int not null,
