@@ -502,15 +502,18 @@ sub load_Note_tag {
     cache_cvterm('Note') unless ( defined $cvterm{'Note'} );
 
     my @d = $gff_feature->get_tag_values('Note');
-
+    my $rank = 0;
     foreach my $d (@d) {
         my ($featureprop) = Chado::Featureprop->find_or_create(
             {
                 feature_id => $chado_feature->id,
                 type_id    => $cvterm{'Note'}->id,
                 value      => $d,
+                rank       => $rank,
             }
         );
+        push @transaction, $featureprop;
+        $rank++;
     }
 }
 
