@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.35 2004-10-18 18:13:51 scottcain Exp $
+$Id: INSTALL,v 1.36 2004-10-19 17:04:24 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -265,6 +265,16 @@ As indicated, the host, port, and password are optional.
     ontology and its definition file (if it exists) is this:
 
         $ gmod_load_ontology.pl /path/to/onto_file [/path/to/def_file]
+
+    It is not a bad idea at this point to make a back up of the database,
+    particularly if you loaded a large ontology like GO.  To make a complete
+    dump of the database, issue this command:
+
+        $ pg_dump <database name>  >   <ontologies only sql filename>
+
+    and to restore the database, issue this command:
+
+        $ psql <database name>     <   <ontologies only sql filename>
 
 
 With that, the installation of the schema is complete.  The easiest way
