@@ -102,16 +102,15 @@ WriteMakefile(
 
 print <<HERE
 
-----------------------------------------------------------
+--------------------------------------------------------------
 possible targets of makefile:
-  diagram   - make diagram images of schema
-  graphviz  - make graphviz images of schema
+  images    - generate images of the schema in several formats
   metadata  - ???
-  mysql     - convert postgres sql files to mysql sql
+  mysql     - convert postgres sql files to mysql sql files
   test_load - test database CREATE TABLE statements
 
 HINT: you probably want to run (at least) "make test_load"
-----------------------------------------------------------
+--------------------------------------------------------------
 HERE
 ;
 
@@ -159,37 +158,58 @@ websync ::
 mysql :: \
 		$working_dir/modules/complete.mysql
 
+images :: graphviz graphviz_svg diagram
+
 graphviz :: \
-		$working_dir/modules/companalysis/companalysis.graphviz.png \
-		$working_dir/modules/cv/cv.graphviz.png \
-		$working_dir/modules/expression/expression.graphviz.png \
-		$working_dir/modules/expression/rad.graphviz.png \
-		$working_dir/modules/general/general.graphviz.png \
-		$working_dir/modules/genetic/genetic.graphviz.png \
-		$working_dir/modules/map/map.graphviz.png \
-		$working_dir/modules/organism/organism.graphviz.png \
-		$working_dir/modules/pub/pub.graphviz.png \
-		$working_dir/modules/sequence/sequence.graphviz.png \
-		$working_dir/modules/www/www.graphviz.png
+	make $working_dir/modules/companalysis/companalysis.graphviz.png \
+	make $working_dir/modules/cv/cv.graphviz.png \
+	make $working_dir/modules/expression/expression.graphviz.png \
+	make $working_dir/modules/expression/rad.graphviz.png \
+	make $working_dir/modules/general/general.graphviz.png \
+	make $working_dir/modules/genetic/genetic.graphviz.png \
+	make $working_dir/modules/map/map.graphviz.png \
+	make $working_dir/modules/organism/organism.graphviz.png \
+	make $working_dir/modules/pub/pub.graphviz.png \
+	make $working_dir/modules/sequence/sequence.graphviz.png \
+	make $working_dir/modules/pathway/pathway.graphviz.png \
+	make $working_dir/modules/www/www.graphviz.png \
+
+graphviz_svg :: \
+	make $working_dir/modules/companalysis/companalysis.graphviz.svg \
+	make $working_dir/modules/cv/cv.graphviz.svg \
+	make $working_dir/modules/expression/expression.graphviz.svg \
+	make $working_dir/modules/expression/rad.graphviz.svg \
+	make $working_dir/modules/general/general.graphviz.svg \
+	make $working_dir/modules/genetic/genetic.graphviz.svg \
+	make $working_dir/modules/map/map.graphviz.svg \
+	make $working_dir/modules/organism/organism.graphviz.svg \
+	make $working_dir/modules/pub/pub.graphviz.svg \
+	make $working_dir/modules/sequence/sequence.graphviz.svg \
+	make $working_dir/modules/pathway/pathway.graphviz.svg \
+	make $working_dir/modules/www/www.graphviz.svg \
 
 diagram :: \
-		$working_dir/modules/companalysis/companalysis.diagram.png \
-		$working_dir/modules/cv/cv.diagram.png \
-		$working_dir/modules/expression/expression.diagram.png \
-		$working_dir/modules/expression/rad.diagram.png \
-		$working_dir/modules/general/general.diagram.png \
-		$working_dir/modules/genetic/genetic.diagram.png \
-		$working_dir/modules/map/map.diagram.png \
-		$working_dir/modules/organism/organism.diagram.png \
-		$working_dir/modules/pub/pub.diagram.png \
-		$working_dir/modules/sequence/sequence.diagram.png \
-		$working_dir/modules/www/www.diagram.png
+	make $working_dir/modules/companalysis/companalysis.diagram.png \
+	make $working_dir/modules/cv/cv.diagram.png \
+	make $working_dir/modules/expression/expression.diagram.png \
+	make $working_dir/modules/expression/rad.diagram.png \
+	make $working_dir/modules/general/general.diagram.png \
+	make $working_dir/modules/genetic/genetic.diagram.png \
+	make $working_dir/modules/map/map.diagram.png \
+	make $working_dir/modules/organism/organism.diagram.png \
+	make $working_dir/modules/pub/pub.diagram.png \
+	make $working_dir/modules/sequence/sequence.diagram.png \
+	make $working_dir/modules/pathway/pathway.diagram.png \
+	make $working_dir/modules/www/www.diagram.png
 
 %.mysql: %.sql
 	$working_dir/bin/pg2my.pl \$< > \$@
 
 %.graphviz.png: %.sql
 	$working_dir/bin/pg2graphviz.pl \$< > \$@
+
+%.graphviz.svg: %.sql
+	$working_dir/bin/pg2graphviz_svg.pl \$< > \$@
 
 %.diagram.png: %.sql
 	$working_dir/bin/pg2diagram.pl \$< > \$@
