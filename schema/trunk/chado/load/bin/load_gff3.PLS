@@ -1175,8 +1175,12 @@ sub cache_cvterm {
                                                   cv_id=> $soid } ) 
                       || Chado::Cvterm->search( {
                                                   name => ucfirst($name),
-                                                  cv_id=> $soid } )
-                      || Chado::Cvterm->search( { name => $name } );
+                                                  cv_id=> $soid } );
+
+    if (!$cvterm{$name} and !$soid) {
+        ( $cvterm{$name} )=Chado::Cvterm->search( { name => $name } )
+                         ||Chado::Cvterm->search( { name => ucfirst($name) } );
+    }
 
     $cvterm{$name} = $cvterm{$name}->next()
       if defined( $cvterm{$name} )
