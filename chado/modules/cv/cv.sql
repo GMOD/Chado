@@ -114,3 +114,22 @@ create table cvterm_dbxref (
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
 create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
 
+-- ================================================
+-- TABLE: dbxrefprop
+-- ================================================
+
+create table dbxrefprop (
+       dbxrefprop_id serial not null,
+       primary key (dbxrefprop_id),
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       value text not null default '',
+       rank int not null default 0,
+
+       unique(dbxref_id, type_id, rank)
+);
+create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
+create index dbxrefprop_idx2 on dbxrefprop (type_id);
+
