@@ -1,8 +1,8 @@
 create table mageml (
     mageml_id serial not null,
 	primary key (mageml_id),
-    mage_package varchar(100) not null,
-    mage_ml varchar not null
+    mage_package text not null,
+    mage_ml text not null
 );
 
 COMMENT ON TABLE mageml IS 'this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables';
@@ -15,7 +15,7 @@ create table magedocumentation (
     tableinfo_id int not null,
 	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     row_id int not null,
-    mageidentifier varchar(100) not null
+    mageidentifier text not null
 );
 create index magedocumentation_idx1 on magedocumentation (mageml_id);
 create index magedocumentation_idx2 on magedocumentation (tableinfo_id);
@@ -32,11 +32,11 @@ create table protocol (
 	foreign key (pub_id) references pub (pub_id) on delete set null,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-    name varchar(100) not null,
-    uri varchar(100) null,
-    protocoldescription varchar(4000) null,
-    hardwaredescription varchar(500) null,
-    softwaredescription varchar(500) null,
+    name text not null,
+    uri text null,
+    protocoldescription text null,
+    hardwaredescription text null,
+    softwaredescription text null,
     unique(name)
 );
 create index protocol_idx1 on protocol (type_id);
@@ -50,12 +50,13 @@ create table protocolparam (
 	primary key (protocolparam_id),
     protocol_id int not null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete cascade,
-    name varchar(100) not null,
+    name text not null,
     datatype_id int null,
 	foreign key (datatype_id) references cvterm (cvterm_id) on delete set null,
     unittype_id int null,
 	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
-    value varchar(100) null
+    value text null,
+    rank int not null default 0
 );
 create index protocolparam_idx1 on protocolparam (protocol_id);
 create index protocolparam_idx2 on protocolparam (datatype_id);
@@ -66,8 +67,8 @@ COMMENT ON TABLE protocolparam IS 'parameters related to a protocol.  if the pro
 create table channel (
     channel_id serial not null,
 	primary key (channel_id),
-    name varchar(100) not null,
-    definition varchar(500) not null,
+    name text not null,
+    definition text not null,
     unique(name)
 );
 
@@ -86,11 +87,11 @@ create table arraydesign (
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-    name varchar(100) not null,
-    version varchar(50) null,
-    description varchar(500) null,
-    array_dimensions varchar(50) null,
-    element_dimensions varchar(50) null,
+    name text not null,
+    version text null,
+    description text null,
+    array_dimensions text null,
+    element_dimensions text null,
     num_of_elements int null,
     num_array_columns int null,
     num_array_rows int null,
@@ -115,7 +116,9 @@ create table arrayprop (
 	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(100) not null
+    value text not null,
+    rank int not null default 0,
+    unique(arraydesign_id, type_id, rank)
 );
 create index arrayprop_idx1 on arrayprop (arraydesign_id);
 create index arrayprop_idx2 on arrayprop (type_id);
@@ -130,14 +133,14 @@ create table assay (
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     assaydate timestamp null default current_timestamp,
-    arrayidentifier varchar(100) null,
-    arraybatchidentifier varchar(100) null,
+    arrayidentifier text null,
+    arraybatchidentifier text null,
     operator_id int not null,
 	foreign key (operator_id) references contact (contact_id) on delete cascade,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-    name varchar(100) null,
-    description varchar(500) null,
+    name text null,
+    description text null,
     unique(name)
 );
 create index assay_idx1 on assay (arraydesign_id);
@@ -154,7 +157,9 @@ create table assayprop (
 	foreign key (assay_id) references assay (assay_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(100) not null
+    value text not null,
+    rank int not null default 0,
+    unique(assay_id, type_id, rank)
 );
 create index assayprop_idx1 on assayprop (assay_id);
 create index assayprop_idx2 on assayprop (type_id);
@@ -182,10 +187,10 @@ create table biomaterial (
 	foreign key (taxon_id) references organism (organism_id) on delete set null,
     biosourceprovider_id int null,
 	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null,
-    dbxref_id varchar(50) null,
+    dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-    name varchar(100) null,
-    description varchar(500) null,
+    name text null,
+    description text null,
     unique(name)
 );
 create index biomaterial_idx1 on biomaterial (taxon_id);
@@ -218,8 +223,9 @@ create table biomaterialprop (
 	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(100) not null default 'NA',
-    unique(biomaterial_id,type_id,value)
+    value text null,
+    rank int not null,
+    unique(biomaterial_id,type_id,rank)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
 create index biomaterialprop_idx2 on biomaterialprop (type_id);
@@ -236,7 +242,7 @@ create table treatment (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
-    name varchar(100) null
+    name text null
 );
 create index treatment_idx1 on treatment (biomaterial_id);
 create index treatment_idx2 on treatment (type_id);
@@ -289,8 +295,8 @@ create table acquisition (
     channel_id int null,
 	foreign key (channel_id) references channel (channel_id) on delete set null,
     acquisitiondate timestamp null default current_timestamp,
-    name varchar(100) null,
-    uri varchar(255) null,
+    name text null,
+    uri text null,
     unique(name)
 );
 create index acquisition_idx1 on acquisition (assay_id);
@@ -306,7 +312,9 @@ create table acquisitionprop (
 	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
     type_id int not null,
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(50) not null
+    value text null,
+    rank int not null default 0,
+    unique(acquisition_id, type_id, rank)
 );
 create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
 create index acquisitionprop_idx2 on acquisitionprop (type_id);
@@ -322,7 +330,9 @@ create table acquisition_relationship (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     object_id int not null,
 	foreign key (object_id) references acquisition (acquisition_id) on delete cascade,
-    unique(subject_id,type_id,object_id)
+    value text null,
+    rank int not null default 0,
+    unique(subject_id, type_id, object_id, rank)
 );
 create index acquisition_relationship_idx1 on acquisition_relationship (subject_id);
 create index acquisition_relationship_idx2 on acquisition_relationship (type_id);
@@ -342,8 +352,8 @@ create table quantification (
     analysis_id int not null,
 	foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     quantificationdate timestamp null default current_timestamp,
-    name varchar(100) null,
-    uri varchar(500) null,
+    name text null,
+    uri text null,
     unique(name,analysis_id)
 );
 create index quantification_idx1 on quantification (acquisition_id);
@@ -360,7 +370,9 @@ create table quantificationprop (
 	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(50) not null
+    value text null,
+    rank int not null default 0,
+    unique(quantification_id, type_id, rank)
 );
 create index quantificationprop_idx1 on quantificationprop (quantification_id);
 create index quantificationprop_idx2 on quantificationprop (type_id);
@@ -394,8 +406,9 @@ create table control (
     tableinfo_id int not null,
 	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     row_id int not null,
-    name varchar(100) null,
-    value varchar(255) null
+    name text null,
+    value text null,
+    rank int not null default 0
 );
 create index control_idx1 on control (type_id);
 create index control_idx2 on control (assay_id);
@@ -503,8 +516,9 @@ create table elementresult_relationship (
         foreign key (type_id) references cvterm (cvterm_id),
     object_id int not null,
         foreign key (object_id) references elementresult (elementresult_id),
-    value varchar(255),
-    unique(subject_id,type_id,object_id,value)
+    value text null,
+    rank int not null default 0,
+    unique(subject_id,type_id,object_id,rank)
 );
 create index elementresult_relationship_idx1 on elementresult_relationship (subject_id);
 create index elementresult_relationship_idx2 on elementresult_relationship (type_id);
@@ -522,8 +536,8 @@ create table study (
 	foreign key (pub_id) references pub (pub_id) on delete set null,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
-    name varchar(100) not null,
-    description varchar(4000) null,
+    name text not null,
+    description text null,
     unique(name)
 );
 create index study_idx1 on study (contact_id);
@@ -551,7 +565,7 @@ create table studydesign (
 	primary key (studydesign_id),
     study_id int not null,
 	foreign key (study_id) references study (study_id) on delete cascade,
-    description varchar(4000) null
+    description text null
 );
 create index studydesign_idx1 on studydesign (study_id);
 
@@ -564,7 +578,9 @@ create table studydesignprop (
 	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    value varchar(500) not null
+    value text null,
+    rank int not null default 0,
+    unique(studydesign_id, type_id, rank)
 );
 create index studydesignprop_idx1 on studydesignprop (studydesign_id);
 create index studydesignprop_idx2 on studydesignprop (type_id);
@@ -578,8 +594,8 @@ create table studyfactor (
 	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
     type_id int null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete set null,
-    name varchar(100) not null,
-    description varchar(500) null
+    name text not null,
+    description text null
 );
 create index studyfactor_idx1 on studyfactor (studydesign_id);
 create index studyfactor_idx2 on studyfactor (type_id);
@@ -593,8 +609,9 @@ create table studyfactorvalue (
 	foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade,
     assay_id int not null,
 	foreign key (assay_id) references assay (assay_id) on delete cascade,
-    factorvalue varchar(100) not null,
-    name varchar(100) null
+    factorvalue text null,
+    name text null,
+    rank int not null default 0
 );
 create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
