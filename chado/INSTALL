@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.6 2003-12-10 16:04:38 scottcain Exp $
+$Id: INSTALL,v 1.7 2003-12-10 16:11:13 scottcain Exp $
 
 Prerequisites:
 
@@ -16,7 +16,7 @@ Prerequisites:
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
     * DBD::Pg                  (GBrowse,chado)
-    * SQL::Translator          (chado)
+    * SQL::Translator (0.05 or cvs) (chado)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
     * Class::DBI               (chado)
