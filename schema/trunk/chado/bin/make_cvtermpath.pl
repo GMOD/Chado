@@ -12,10 +12,10 @@ my ($user, $dbname, $cvname) = @ARGV;
 die "USAGE: $0 <username> <dbname> <cvname>" unless $user and $dbname and $cvname;
 
 my $db = DBI->connect("dbi:Pg:dbname=$dbname",$user,'');
-my $sth_objects     = $db->prepare("select object_id from cvtermrelationship where subject_id = ? and type_id = ?");
-my $sth_subjects    = $db->prepare("select subject_id from cvtermrelationship where object_id = ? and type_id = ?");
-my $sth_allobjects  = $db->prepare("select object_id from cvtermrelationship where subject_id = ?");
-my $sth_allsubjects = $db->prepare("select subject_id from cvtermrelationship where object_id = ?");
+my $sth_objects     = $db->prepare("select object_id from cvterm_relationship where subject_id = ? and type_id = ?");
+my $sth_subjects    = $db->prepare("select subject_id from cvterm_relationship where object_id = ? and type_id = ?");
+my $sth_allobjects  = $db->prepare("select object_id from cvterm_relationship where subject_id = ?");
+my $sth_allsubjects = $db->prepare("select subject_id from cvterm_relationship where object_id = ?");
 
 my %type;
 my %subject;
@@ -49,14 +49,14 @@ while(my $cv = $sth_cv->fetchrow_hashref){
 
 die "no cv_id for '$cvname'" unless defined $cv_id;
 
-#my $sth_cvtermrelationship = $db->prepare("select subject_id,type_id,object_id from cvtermrelationship");
+#my $sth_cvterm_relationship = $db->prepare("select subject_id,type_id,object_id from cvterm_relationship");
 
-my $sth_cvtermrelationship = $db->prepare("select subject_id,type_id,object_id from cvtermrelationship,cvterm where cvtermrelationship.subject_id = cvterm.cvterm_id and cvterm.cv_id = $cv_id");
-$sth_cvtermrelationship->execute;
-while(my $cvtermrelationship = $sth_cvtermrelationship->fetchrow_hashref){
-  $subject{$cvtermrelationship->{subject_id}}++;
-  $object{$cvtermrelationship->{object_id}}++;
-  $sot{$cvtermrelationship->{subject_id}}{$cvtermrelationship->{object_id}}{$cvtermrelationship->{type_id}}++;
+my $sth_cvterm_relationship = $db->prepare("select subject_id,type_id,object_id from cvterm_relationship,cvterm where cvterm_relationship.subject_id = cvterm.cvterm_id and cvterm.cv_id = $cv_id");
+$sth_cvterm_relationship->execute;
+while(my $cvterm_relationship = $sth_cvterm_relationship->fetchrow_hashref){
+  $subject{$cvterm_relationship->{subject_id}}++;
+  $object{$cvterm_relationship->{object_id}}++;
+  $sot{$cvterm_relationship->{subject_id}}{$cvterm_relationship->{object_id}}{$cvterm_relationship->{type_id}}++;
 }
 
 foreach my $cvterm (keys %cvterm){
