@@ -787,7 +787,7 @@ sub load_segments {
     # creates the features for each gff segment
     while ( my $gff_segment = $gffio->next_segment() ) {
         my ($segment) =
-          Chado::Feature->search( { name => $gff_segment->display_id } );
+          Chado::Feature->search( { name => $gff_segment->display_id , organism_id => $chado_organism } );
         if ( !$segment ) {
 
 # about uniquenames here: since these are coming from ##sequence_region
@@ -846,7 +846,7 @@ sub load_sequences {
         my $in = Bio::SeqIO->new( -file => $TMPFASTA, '-format' => 'Fasta' );
         while ( my $seq = $in->next_seq() ) {
             my $name          = $seq->id;
-            my @chado_feature = Chado::Feature->search( { 'name' => $name } );
+            my @chado_feature = Chado::Feature->search( { 'name' => $name , organism_id => $chado_organism} );
 
             #no, let's just load the sequence into all of them
             #die "couldn't uniquely identify the sequence identified by $name"
