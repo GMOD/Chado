@@ -1,5 +1,4 @@
 //Ribosome.java
-//package javasean.DataModel;
 package conv.gametochadx;
 
 import java.util.TreeMap;
@@ -338,16 +337,6 @@ public boolean m_isReadthrough = false;
 
 		return AltMap;
 	}
-
-	public String getTranscript(String the_residues,
-			int the_start,int the_end){
-		String res = null;
-		if((the_residues!=null)&&(the_residues.length()>=the_end)){
-			res = the_residues.substring(the_start,the_end);
-		}
-		return res;
-	}
-
 
 /**
 * Simple test main().

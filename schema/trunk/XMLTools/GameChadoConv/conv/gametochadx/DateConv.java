@@ -1,7 +1,7 @@
 //DateConv
-//REDUNDANT WITH FILE IN conv.gametochadx for convenience
+//REDUNDANT WITH FILE IN conv.chadxtogame for convenience
 //package conv.util;
-package conv.chadxtogame;
+package conv.gametochadx;
 
 import java.util.*;
 import java.io.*;
@@ -65,17 +65,17 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 		}
 	}
 
-	public static String GameDateToTimestamp(String the_GameDate){
-		System.out.println("CONVERTING GAMEDATE<"+
-				the_GameDate+"> TO TIMESTAMP");
+	public static String GameDateToTimestamp(String the_ChadoDate){
+		//System.out.println("CONVERTING GAMEDATE<"+
+		//		the_ChadoDate+"> TO TIMESTAMP");
 		ParsePosition pos = new ParsePosition(0);
-		Date dt = GameFormat.parse(the_GameDate,pos);
+		Date dt = GameFormat.parse(the_ChadoDate,pos);
 		if(dt!=null){
 			String tmp = (""+dt.getTime());
-			System.out.println("\t"+tmp);
+			//System.out.println("\t"+tmp);
 			return tmp;
 		}else{
-			System.out.println("\t0 BECAUSE ITS NULL");
+			//System.out.println("\t0");
 			return "0";
 		}
 	}
