@@ -1,0 +1,6 @@
+cd classes
+java GTC -g /users/smutniak/Chado1/OUT/AE003650.changed.xml /users/smutniak/Chado1/OUT/AE003650.xml.chado1
+java CTG -a /users/smutniak/Chado1/OUT/AE003650.xml.chado1 /users/smutniak/Chado1/OUT/AE003650.xml.game2 -D16059772,16334867,AE003650.Sept
+#java GTC /users/smutniak/Chado1/OUT/AE003650.xml.game2 /users/smutniak/Chado1/OUT/AE003650.xml.chado3
+#java CTG -a /users/smutniak/Chado1/OUT/AE003650.xml.chado3 /users/smutniak/Chado1/OUT/AE003650.xml.game4 -D16059772,16334867,AE003650.Sept
+cd /users/smutniak/Chado1

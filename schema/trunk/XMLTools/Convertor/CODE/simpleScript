@@ -1,0 +1,5 @@
+cd classes
+#java GTC -c /users/smutniak/Chado1/OUT/CG10077.crosby.complete.xml /users/smutniak/Chado1/OUT/test.xml.chado1
+java GTC /users/smutniak/Chado1/OUT/CG10077.crosby.complete.xml /users/smutniak/Chado1/OUT/test.xml.chado1
+java CTG /users/smutniak/Chado1/OUT/test.xml.chado1 /users/smutniak/Chado1/OUT/test.xml.game2 -D6899016,6925433,CG10077-region-ext10000 
+cd /users/smutniak/Chado1
