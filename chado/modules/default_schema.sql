@@ -423,6 +423,7 @@ create table feature (
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     is_analysis boolean not null default 'false',
+    is_obsolete boolean not null default 'false',
     timeaccessioned timestamp not null default current_timestamp,
     timelastmodified timestamp not null default current_timestamp,
     constraint feature_c1 unique (organism_id,uniquename,type_id)
@@ -436,6 +437,8 @@ create table feature (
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
 -- The expectation is that these fields would be available to software 
 -- interacting with chado.
+-- is_obsolete is for marking records obsolete which none the less need to 
+-- remain in the table. 
 create sequence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
 create index feature_idx1 on feature (dbxref_id);

@@ -14,7 +14,8 @@ make html and copy resulting file to www.gmod.org
 
 create nofuncs.sql (by removing functions from default_schema--this
    is required because SQL::Translator sometimes has a hard time parsing them)
-       sqlt -f PostgreSQL -t TTSchema --template modules/audit/add-audits.tmpl modules/nofuncs.sql > modules/audit/audit_tables.sql
+
+sqlt -f PostgreSQL -t TTSchema --template modules/audit/add-audits.tmpl modules/nofuncs.sql > modules/audit/audit_tables.sql
 
 edit bin/AutoDBI.PL
    delete everything in the non-substituting HEREDOC
