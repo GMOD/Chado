@@ -12,11 +12,19 @@ the algorithm (smaller/bigger (which is a Set): num of elements):
 
 foreach I in smaller(Set1, Set2):
 
-   foreach J in Set(J.fmin between I.fmin and I.fmax in bigger(Set1, Set2)):
+   foreach J in Set(J.range ov w I.range in bigger(Set1, Set2)):
 
       if ov(I, J):
 
          add to ov list
+
+it has O(N x k) instead of O(N^2).
+
+set i: smaller set, set j: bigger set.
+
+Both sets are sorted on fmin. J is from a set of item in set j with index
+between smallest index of set j whose range ov with the previous item
+of set i to that of set j whose range ov with current item of set i.
 
 for this to work efficiently, location intersection comparing node's parent
 must have fmin and fmax and src_seq. because chado [early FlyBase version]
@@ -140,7 +148,7 @@ sub properties {
 }
 
 sub property_key_list {
-    qw(boundary check depth query_type subject_type query_compare subject_compare
+    qw(boundary check depth query_type subject_type both_type query_compare subject_compare
        overlap overlap_length attach_ov_coords has_overlaps same_strand
        profile n_comparisons threshold lt_threshold);
 }
@@ -251,7 +259,14 @@ sub find_intersects {
         my $p = $self->properties || {};
         %old = %$p;
         $self->properties({});
-        map {$self->set_property($_, $opts->{$_})} keys %$opts;
+        map {
+            if ($_ eq 'both_type') {
+                $self->set_property('query_type', $opts->{$_});
+                $self->set_property('subject_type', $opts->{$_});
+            } else {
+                $self->set_property($_, $opts->{$_});
+            }
+        } keys %$opts;
     }
     unless ($self->get_property('query_type') && $self->get_property('subject_type')) {
         confess("must pass in query_type and subject_type");
@@ -261,7 +276,7 @@ sub find_intersects {
 
     foreach (@$sfs1) {
         my $c = $_;
-        if ($self->get_property('query_compare') eq 'secondary_location') {
+        if ($self->get_property('query_compare')|| "" eq 'secondary_location') {
             $c = $_->secondary_loc;
             $self->_qsec2sf_h($c, $_);
         }
@@ -271,7 +286,7 @@ sub find_intersects {
     }
     foreach (@$sfs2) {
         my $c = $_;
-        if ($self->get_property('subject_compare') eq 'secondary_location') {
+        if ($self->get_property('subject_compare')|| "" eq 'secondary_location') {
             $c = $_->secondary_loc;
             $self->_ssec2sf_h($c, $_);
         }
@@ -305,139 +320,53 @@ sub find_intersects_on_same_seq {
 
     return [] unless (@{$sfs1 || []} && @{$sfs2 || []});
 
-    #since indexing bigger set, use the flag to indicate I (smaller set) is first set of the args or not
+    #use the flag to indicate I (smaller set) is first set of the args or not
     my $sets_order_flipped = 0;
     my ($small, $big) = ($sfs1, $sfs2);
     if (@{$sfs1} > @{$sfs2}) {
         ($small, $big) = ($sfs2, $sfs1);
         $sets_order_flipped = 1;
     }
-    # INDEX of low coords
     $small = [sort{$a->fmin <=> $b->fmin}@$small];
     $big = [sort{$a->fmin <=> $b->fmin}@$big];
-    my %big_index_h; #key is fmin and value is big set index (lowest index of those same fmins)
-    my %big_index_h2; #key is fmin and value is big set index (highest index of those same fmins)
-    for (my $i = 0; $i < scalar(@$big); $i++) {
-        my $f = $big->[$i];
-        confess("feature must have fmin and fmax to find intersection") unless (defined($f->fmin) && defined($f->fmax));
-        unless (exists $big_index_h{$f->fmin}) {
-            $big_index_h{$f->fmin} = $i;
-        }
-        $big_index_h2{$f->fmin} = $i;
-    }
-    my @big_coords = ();
-    map{push @big_coords, [$_->fmin, $_->fmax]}@$big; #@big_coords is sorted in fmin as well
 
     my @ovs = ();
 
     my $nc = 0;
 
-    # declare subroutine as local,
-    # as we don't want lexical closure
-    # over the above variables
-    local *icheck = sub {
-        my $sf1 = shift; #must be from set of user's first arg
-        my $sf2 = shift;
-        my $strand_test_passed = 1;
-        if ($self->get_property("same_strand")) {
-            $strand_test_passed = 0 unless ($sf1->strand == $sf2->strand);
-        }
-        if ($sf1->uniquename eq $sf2->uniquename || ($strand_test_passed)) {
-            my $is_overlap;
-            my $depth = $self->get_property('depth') || 0;
-            unless ($sf1->depth == $depth && $sf2->depth == $depth) {
-                # do a recursive check on next level nodes
-                my $inner_ov = ref($self)->new;
-                $inner_ov->properties({%{$self->properties}});
-                #get next level feature
-                my $leaf1 = $sf1->nodes;
-                my $leaf2 = $sf2->nodes;
-                my $inovs =
-                  $inner_ov->find_intersects_on_same_seq($leaf1,
-                                                         $leaf2);
-                # this assumes that both sf sets are flattened
-                # eg it will work for transcripts, but not genes (may not the way you think)
-                #well, for genes, you get ov of tr (tr depth = your depth) which may have introns
-                $is_overlap = 0; #effectively add up ov only for secondary level to leaf (desired depth)
-                foreach my $inov (@{$inovs || []}) {
-                    #arc third item is ov length
-                    $is_overlap += $inov->[2];
-                }
-                my $thresh = $self->get_property("threshold");
-                my $ltthresh = $self->get_property("lt_threshold");
-                #threshold only apply to compu results
-                if ($thresh || $ltthresh) {
-                    if (@{$sf2->secondary_locations || []}) {
-                        #how to check mixed seq?
-                        #what level are we checking? (composite type feature length is not really seq length!!)
-                        #get homol seq length if we could
-                        my $homol_seq_len = $sf2->secondary_locations->[0]->{fmax} - $sf2->secondary_location->[0]->{fmin};
-                        if ($sf2->secondary_location->[0]->{seq}->{seqlen}) {
-                            $homol_seq_len = $sf2->secondary_location->[0]->{seq}->{seqlen};
-                        }
-                        if ($ltthresh && $is_overlap / $homol_seq_len >= $ltthresh) {
-                            print STDERR "NOT GETTING >= $ltthresh\n";
-                            $is_overlap = 0; #filter out
-                        } else {
-                            if ($is_overlap / $sf2->length < $thresh) {
-                                $is_overlap = 0;
-                            }
-                        }
-                    }
+    my $k = 0;
+    for (my $i = 0; $i < scalar(@{$small}); $i++) {
+        my $sf1 = $small->[$i];
+        #trace(sprintf("\nexamined one round: %s:%d-%d",$sf1->type." ".($sf1->secondary_loc?$sf1->secondary_loc->src_seq:$sf1->name),$sf1->fmin,$sf1->fmax));
+        my $pointer_moved;
+        for (my $j = $k; $j < scalar(@{$big}); $j++) {
+            my $sf2 = $big->[$j];
+            if ($sf2->fmax < $sf1->fmin) {
+                #sf2 left of sf1: sf2 moves right
+                next;
+            }
+            elsif ($sf1->fmin <= $sf2->fmax && $sf1->fmax >= $sf2->fmin) {
+                unless ($pointer_moved) {
+                    $k = $j;
+                    $pointer_moved = 1;
                 }
             } else {
-                 my $ov_lap = $self->overlaps($sf1, $sf2);
-                 $is_overlap = $ov_lap->[0];
-                 my $overlap = $self->get_property('overlap');#span overlap percentage
-                 my $ov_len = $self->get_property('overlap_length');
-                 if ($overlap) {
-                     if ($is_overlap/($sf2->length || 1) < $overlap) {
-                         $is_overlap = 0;
-                     }
-                 }
-                 elsif ($ov_len) {
-                     if ($is_overlap < $ov_len) {
-                         $is_overlap = 0;
-                     }
-                 }
-                 if ($is_overlap && $self->get_property('attach_ov_coords')) {
-                     my $ov_fmin_term = $self->get_property('subject_compare') eq 'secondary_location' ?
-                       'ov_sec_loc_fmin' : 'ov_fmin';
-                     my $ov_fmax_term = $self->get_property('subject_compare') eq 'secondary_location' ?
-                       'ov_sec_loc_fmax' : 'ov_fmax';
-                     $sf2->add_property($ov_fmin_term, $ov_lap->[1]);
-                     $sf2->add_property($ov_fmax_term, $ov_lap->[2]);
-                 }
+                #sf2 right of sf1: no possible ov
+                last;
             }
-            return $is_overlap;
-        }
-    };
 
-    for (my $i = 0; $i < scalar(@{$small}); $i++) {
-        my $sf = $small->[$i];
-        #trace(sprintf("\nexamined one round: %s:%d-%d",$sf->type." ".($sf->secondary_loc?$sf->secondary_loc->src_seq:$sf->name),$sf->fmin,$sf->fmax));
-        my @fmins = ();
-        foreach my $big (@big_coords) {
-            if ($sf->fmin <= $big->[1] && $sf->fmax >= $big->[0]) {
-                push @fmins, $big->[0];
-            }
-        }
-        next unless (@fmins);
-        #@fmins is sorted as @big_coords is sorted
-        my ($init, $term) = ($big_index_h{$fmins[0]},$big_index_h2{$fmins[-1]});
-        for (my $j = $init; $j <= $term; $j++) {
-            my ($sf1, $sf2) = ($sf, $big->[$j]);
-            if ($sets_order_flipped) {
-                ($sf1, $sf2) = ($sf2, $sf1);
-            }
+            #keep $sf1 straight by using alias!
             my ($c1, $c2) = ($sf1, $sf2);
-            if ($self->get_property('query_compare') eq 'secondary_location') {
+            if ($sets_order_flipped) {
+                ($c1, $c2) = ($sf2, $sf1);
+            }
+            if ($self->get_property('query_compare')|| "" eq 'secondary_location') {
                 $c1 = $self->_qsec2sf_h($c1);
             }
-            if ($self->get_property('subject_compare') eq 'secondary_location') {
+            if ($self->get_property('subject_compare')|| "" eq 'secondary_location') {
                 $c2 = $self->_ssec2sf_h($c2);
             }
-            my $is_overlap = icheck($c1, $c2);
+            my $is_overlap = $self->_icheck($c1, $c2);
             $nc++;
             if ($is_overlap) {
                 if ($self->get_property("check")) {
@@ -446,10 +375,10 @@ sub find_intersects_on_same_seq {
                     $self->set_property("has_overlaps", 1);
                     return;
                 }
-                #trace(sprintf("%s:%d-%d overlap %s:%d-%d",$sf1->name,$sf1->fmin,$sf1->fmax,$sf2->name,$sf2->fmin,$sf2->fmax));
+                trace(sprintf("%s:%d-%d %s ov %s:%d-%d %s",$sf1->src_seq,$sf1->fmin,$sf1->fmax,$c1->name, $sf2->src_seq,$sf2->fmin,$sf2->fmax, $c2->name));
                 push(@ovs, [$c1, $c2, $is_overlap]);
             } else {
-                #trace(sprintf("%d-%d %s(d=%d) not ov %d-%d %s(d=%d)",$sf1->fmin,$sf1->fmax,$sf1->type." ".$sf1->name,$sf1->depth,$sf2->fmin,$sf2->fmax, $sf2->type." ".($sf2->secondary_loc?$sf2->secondary_loc->src_seq:$sf2->name), $sf2->depth));
+                trace(sprintf("%s:%d-%d %s(d=%d) not ov %s:%d-%d %s(d=%d)",$sf1->src_seq,$sf1->fmin,$sf1->fmax,$c1->type,$c1->depth,$sf2->src_seq,$sf2->fmin,$sf2->fmax, $c2->type, $c2->depth));
             }
         }
     }
@@ -464,6 +393,88 @@ sub find_intersects_on_same_seq {
     trace('n overlaps = ', scalar(@ovs));
     $self->overlap_list;
 }
+
+
+
+sub _icheck {
+    my $self = shift;
+    my $sf1 = shift; #must be from set of user's first arg
+    my $sf2 = shift;
+    my $strand_test_passed = 1;
+    if ($self->get_property("same_strand")) {
+        $strand_test_passed = 0 unless ($sf1->strand == $sf2->strand);
+    }
+    if ($sf1->uniquename eq $sf2->uniquename || ($strand_test_passed)) {
+        my $is_overlap;
+        my $depth = $self->get_property('depth') || 0;
+        unless ($sf1->depth == $depth && $sf2->depth == $depth) {
+            # do a recursive check on next level nodes
+            my $inner_ov = ref($self)->new;
+            $inner_ov->properties({%{$self->properties}});
+            #get next level feature
+            my $leaf1 = $sf1->nodes;
+            my $leaf2 = $sf2->nodes;
+            my $inovs =
+              $inner_ov->find_intersects_on_same_seq($leaf1,
+                                                         $leaf2);
+            # this assumes that both sf sets are flattened
+            # eg it will work for transcripts, but not genes (may not the way you think)
+            #well, for genes, you get ov of tr (tr depth = your depth) which may have introns
+            $is_overlap = 0; #effectively add up ov only for secondary level to leaf (desired depth)
+            foreach my $inov (@{$inovs || []}) {
+                #arc third item is ov length
+                $is_overlap += $inov->[2];
+            }
+            my $thresh = $self->get_property("threshold");
+            my $ltthresh = $self->get_property("lt_threshold");
+            #threshold only apply to compu results
+            if ($thresh || $ltthresh) {
+                if (@{$sf2->secondary_nodes || []}) {
+                    #how to check mixed seq?
+                    #what level are we checking? (composite type feature length is not really seq length!!)
+                    #get homol seq length if we could
+                    my $homol_seq_len = $sf2->secondary_node->fmax - $sf2->secondary_node->fmin;
+                    if ($sf2->secondary_node->seq && $sf2->secondary_node->seq->seqlen) {
+                        $homol_seq_len = $sf2->secondary_node->seq->seqlen;
+                    }
+                    if ($ltthresh && $is_overlap / $homol_seq_len >= $ltthresh) {
+                        print STDERR "NOT GETTING >= $ltthresh\n";
+                        $is_overlap = 0; #filter out
+                    } else {
+                        if ($is_overlap / $sf2->length < $thresh) {
+                            $is_overlap = 0;
+                        }
+                    }
+                }
+            }
+        } else {
+            my $ov_lap = $self->overlaps($sf1, $sf2);
+            $is_overlap = $ov_lap->[0];
+            my $overlap = $self->get_property('overlap');#span overlap percentage
+            my $ov_len = $self->get_property('overlap_length');
+            if ($overlap) {
+                if ($is_overlap/($sf2->length || 1) < $overlap) {
+                    $is_overlap = 0;
+                }
+            }
+            elsif ($ov_len) {
+                if ($is_overlap < $ov_len) {
+                    $is_overlap = 0;
+                }
+            }
+            if ($is_overlap && $self->get_property('attach_ov_coords')) {
+                my $ov_fmin_term = $self->get_property('subject_compare') eq 'secondary_location' ?
+                  'ov_sec_loc_fmin' : 'ov_fmin';
+                my $ov_fmax_term = $self->get_property('subject_compare') eq 'secondary_location' ?
+                  'ov_sec_loc_fmax' : 'ov_fmax';
+                $sf2->add_property($ov_fmin_term, $ov_lap->[1]);
+                $sf2->add_property($ov_fmax_term, $ov_lap->[2]);
+            }
+        }
+        return $is_overlap;
+    }
+}
+
 #prerequisite: first arg is from query/user's first arg
 #return array ref: ov length, ov_fmin, ov_fmax
 sub overlaps {
@@ -474,10 +485,10 @@ sub overlaps {
     return unless ($sf1->type eq $self->get_property('query_type')
                    && $sf2->type eq $self->get_property('subject_type')); #not right type, no overlap
 
-    if ($self->get_property('query_compare') eq 'secondary_location') {
+    if ($self->get_property('query_compare')|| "" eq 'secondary_location') {
         $sf1 = $sf1->secondary_loc;
     }
-    if ($self->get_property('subject_compare') eq 'secondary_location') {
+    if ($self->get_property('subject_compare')|| "" eq 'secondary_location') {
         $sf2 = $sf2->secondary_loc;
     }
     my ($ov, $fmin, $fmax);
@@ -670,20 +681,5 @@ sub trace {
     print STDERR join(" ", @_),"\n" if ($debug || $ENV{DEBUG});
 }
 
-#=head2 get_distance
-
-#  Usage   -
-#  Returns -
-#  Args    - SOI::Feature, SOI::Feature
-
-#=cut
-
-#sub get_distance {
-#    my $self = shift;
-#    my $sf1 = shift;
-#    my $sf2 = shift;
-#    my $ovs = $self->{lookup}->{$sf1->uniquename} || [];
-    
-#}
 
 1;
