@@ -26,7 +26,10 @@ DECLARE
   f_type_snRNA CONSTANT varchar :=''snRNA'';
   f_type_tRNA CONSTANT varchar :=''tRNA'';
   f_type_rRNA CONSTANT varchar :=''rRNA'';
-  f_type_miRNA CONSTANT varchar :=''nuclear_micro_RNA_coding_gene'';
+  f_type_promoter CONSTANT varchar :=''promoter'';
+  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
+  f_type_miRNA CONSTANT varchar :=''miRNA'';
+  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
   f_type_pseudo CONSTANT varchar :=''pseudogene'';
   f_type_protein CONSTANT varchar :=''protein'';
   f_type_allele CONSTANT varchar :=''alleleof'';
@@ -44,7 +47,7 @@ BEGIN
      SELECT INTO f_id_allele fr.subject_id from  feature_relationship fr, cvterm c where  (fr.object_id=OLD.feature_id or fr.subject_id=OLD.feature_id)  and fr.type_id=c.cvterm_id and c.name=f_type_allele;
      IF NOT FOUND THEN 
        FOR fr_row_transcript IN SELECT * from feature_relationship fr where fr.object_id=OLD.feature_id LOOP
-         SELECT INTO f_id_transcript  f.feature_id from feature f, cvterm c where f.feature_id=fr_row_transcript.subject_id and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA  or c.name=f_type_pseudo  or c.name=f_type_miRNA); 
+         SELECT INTO f_id_transcript  f.feature_id from feature f, cvterm c where f.feature_id=fr_row_transcript.subject_id and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA  or c.name=f_type_pseudo  or c.name=f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region); 
          SELECT INTO f_id_gene f.feature_id from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=f_id_transcript and f.type_id=c.cvterm_id and c.name=f_type_gene and f.feature_id !=OLD.feature_id;
          IF f_id_gene IS NULL and f_id_transcript IS NOT NULL THEN
             RAISE NOTICE ''delete lonely transcript:%'', f_id_transcript;
@@ -64,10 +67,10 @@ BEGIN
             insert into trigger_log(value, table_name, id) values(message, ''feature'', f_id_transcript);
      return NULL;
     END IF;
-  ELSIF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA  or f_type=f_type_rRNA or f_type=f_type_pseudo or  f_type=f_type_miRNA) THEN
+  ELSIF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA  or f_type=f_type_rRNA or f_type=f_type_pseudo or  f_type=f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
      FOR fr_row_exon IN SELECT * from feature_relationship fr where fr.object_id=OLD.feature_id LOOP
         select INTO f_id_exon f.feature_id from feature f, cvterm c where f.feature_id=fr_row_exon.subject_id and f.type_id=c.cvterm_id and c.name=f_type_exon;
-        SELECT INTO f_id_transcript f.feature_id from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=f_id_exon and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA  or c.name=f_type_pseudo  or c.name=f_type_miRNA) and f.feature_id!=OLD.feature_id;
+        SELECT INTO f_id_transcript f.feature_id from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=f_id_exon and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA  or c.name=f_type_pseudo  or c.name=f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) and f.feature_id!=OLD.feature_id;
         IF f_id_transcript IS NULL and f_id_exon IS NOT NULL THEN
             RAISE NOTICE ''delete lonely exon:%'', f_id_exon;
            delete from feature where feature_id=f_id_exon; 
@@ -82,7 +85,7 @@ BEGIN
 
      FOR fr_row_protein IN SELECT * from feature_relationship fr where fr.object_id=OLD.feature_id LOOP
         SELECT INTO f_id_protein f.feature_id from feature f, cvterm c where f.feature_id=fr_row_protein.subject_id and f.type_id=c.cvterm_id and c.name=f_type_protein;
-        SELECT INTO f_id_transcript f.feature_id from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=f_id_protein and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA   or c.name=f_type_pseudo or  c.name=f_type_miRNA) and f.feature_id !=OLD.feature_id;
+        SELECT INTO f_id_transcript f.feature_id from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=f_id_protein and f.type_id=c.cvterm_id and (c.name=f_type_transcript or c.name=f_type_ncRNA or c.name=f_type_snoRNA or c.name=f_type_snRNA or c.name=f_type_tRNA  or c.name=f_type_rRNA   or c.name=f_type_pseudo or  c.name=f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) and f.feature_id !=OLD.feature_id;
         IF f_id_transcript IS NULL and f_id_protein IS NOT NULL THEN
                   RAISE NOTICE ''delete lonely protein:%'', f_id_protein;
                   delete from feature where feature_id=f_id_protein;
@@ -157,7 +160,10 @@ DECLARE
   f_type_snRNA CONSTANT varchar :=''snRNA'';
   f_type_tRNA CONSTANT varchar :=''tRNA'';
   f_type_rRNA CONSTANT varchar :=''rRNA'';
-  f_type_miRNA CONSTANT varchar :=''nuclear_micro_RNA_coding_gene'';
+  f_type_promoter CONSTANT varchar :=''promoter'';
+  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
+  f_type_miRNA CONSTANT varchar :=''miRNA'';
+  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
   f_type_pseudo CONSTANT varchar :=''pseudogene'';
   f_type_protein CONSTANT varchar :=''protein'';
   f_type_allele CONSTANT varchar :=''alleleof'';
@@ -286,7 +292,7 @@ BEGIN
       IF f_type is NOT NULL THEN
         RAISE NOTICE ''in f_i, type of this feature is:%'', f_type;
       END IF;
-      IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA) THEN
+      IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
           SELECT INTO f_row_t * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
             IF f_row_t.dbxref_id IS  NULL THEN  
                RAISE NOTICE ''dbxref_id for this feature is null, NEW.uniquename:%'',NEW.uniquename;
@@ -590,7 +596,10 @@ DECLARE
   f_type_snRNA CONSTANT varchar :=''snRNA'';
   f_type_tRNA CONSTANT varchar :=''tRNA'';
   f_type_rRNA CONSTANT varchar :=''rRNA'';
-  f_type_miRNA CONSTANT varchar :=''nuclear_micro_RNA_coding_gene'';
+  f_type_promoter CONSTANT varchar :=''promoter'';
+  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
+  f_type_miRNA CONSTANT varchar :=''miRNA'';
+  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
   f_type_pseudo CONSTANT varchar :=''pseudogene'';
   f_type_protein CONSTANT varchar :=''protein'';
   f_type_allele CONSTANT varchar :=''alleleof'';
@@ -608,7 +617,7 @@ BEGIN
    SELECT INTO f_type c.name from feature f, cvterm c  where f.type_id=c.cvterm_id and f.feature_id=OLD.object_id;
    IF f_type=f_type_gene THEN 
       SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=OLD.subject_id and f.type_id=c.cvterm_id;
-      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snoRNA  or f_type_temp=f_type_snRNA  or f_type_temp=f_type_tRNA  or f_type_temp=f_type_rRNA  or f_type_temp=f_type_miRNA  or f_type_temp=f_type_pseudo ) THEN
+      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snoRNA  or f_type_temp=f_type_snRNA  or f_type_temp=f_type_tRNA  or f_type_temp=f_type_rRNA  or f_type_temp=f_type_miRNA  or f_type_temp=f_type_pseudo or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region ) THEN
           SELECT INTO fr_row * from feature_relationship where object_id<>OLD.object_id and subject_id=OLD.subject_id;
              if fr_row.object_id IS NULL THEN
                 RAISE NOTICE ''delete this lonely transcript:%'', OLD.subject_id;
@@ -617,7 +626,7 @@ BEGIN
       ELSE
            RAISE NOTICE ''wrong feature_relationship: gene->NO_transcript:object_id:%, subject_id:%'', OLD.object_id, OLD.subject_id;
       END IF;
-   ELSIF (f_type=f_type_transcript or f_type=f_type_snoRNA or f_type=f_type_ncRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_miRNA or f_type=f_type_rRNA or f_type=f_type_pseudo) THEN
+   ELSIF (f_type=f_type_transcript or f_type=f_type_snoRNA or f_type=f_type_ncRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_miRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
       SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=OLD.subject_id and f.type_id=c.cvterm_id;
       IF f_type_temp=f_type_protein or f_type_temp=f_type_exon THEN
           SELECT INTO fr_row * from feature_relationship where subject_id=OLD.subject_id and object_id<>OLD.object_id;  
@@ -685,7 +694,10 @@ DECLARE
   f_type_ncRNA CONSTANT varchar :=''ncRNA'';
   f_type_snRNA CONSTANT varchar :=''snRNA'';
   f_type_tRNA CONSTANT varchar :=''tRNA'';
-  f_type_miRNA CONSTANT varchar :=''nuclear_micro_RNA_coding_gene'';
+  f_type_promoter CONSTANT varchar :=''promoter'';
+  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
+  f_type_miRNA CONSTANT varchar :=''miRNA'';
+  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
   f_type_rRNA CONSTANT varchar :=''rRNA'';
   f_type_pseudo CONSTANT varchar :=''pseudogene'';
   f_type_protein CONSTANT varchar :=''protein'';
@@ -726,7 +738,7 @@ BEGIN
    SELECT INTO f_type c.name from feature f, cvterm c  where f.type_id=c.cvterm_id and f.feature_id=NEW.object_id;
    IF f_type=f_type_gene THEN 
       SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
-      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_snoRNA or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snRNA or f_type_temp=f_type_tRNA or f_type_temp=f_type_rRNA or f_type_temp=f_type_miRNA or f_type_temp=f_type_pseudo) THEN
+      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_snoRNA or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snRNA or f_type_temp=f_type_tRNA or f_type_temp=f_type_rRNA or f_type_temp=f_type_miRNA or f_type_temp=f_type_pseudo or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
           SELECT INTO f_row_t * from feature where feature_id=NEW.subject_id;
           IF f_row_t.uniquename like ''CG:temp%'' or f_row_t.uniquename like ''CR:temp%'' THEN
              SELECT INTO f_uniquename_gene uniquename from feature where feature_id=NEW.object_id;
@@ -809,7 +821,7 @@ BEGIN
               RAISE NOTICE ''wrong feature_relationship: gene->NO_transcript:object_id:%, subject_id:%'', NEW.object_id, NEW.subject_id;
       END IF;
 
-   ELSIF (f_type=f_type_transcript or f_type=f_type_ncRNA  or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_miRNA or f_type=f_type_pseudo)   THEN
+   ELSIF (f_type=f_type_transcript or f_type=f_type_ncRNA  or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_miRNA or f_type=f_type_pseudo or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region)   THEN
       SELECT INTO f_uniquename_gene f.uniquename from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=NEW.object_id and f.type_id=c.cvterm_id and c.name=f_type_gene;
       SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
       IF f_type_temp=f_type_protein and f_uniquename_gene IS NOT NULL THEN
@@ -1017,7 +1029,10 @@ p_id                 pub.pub_id%TYPE;
   f_type_snRNA CONSTANT varchar :=''snRNA'';
   f_type_tRNA CONSTANT varchar :=''tRNA'';
   f_type_rRNA CONSTANT varchar :=''rRNA'';
-  f_type_miRNA CONSTANT varchar :=''nuclear_micro_RNA_coding_gene'';
+  f_type_promoter CONSTANT varchar :=''promoter'';
+  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
+  f_type_miRNA CONSTANT varchar :=''miRNA'';
+  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
   f_type_pseudo CONSTANT varchar :=''pseudogene'';
   f_type_protein CONSTANT varchar :=''protein'';
   f_type_allele CONSTANT varchar :=''allele'';
@@ -1040,7 +1055,7 @@ BEGIN
         RAISE NOTICE ''in f_u, synchronize the transcript uniquename with genes'';
         FOR fr_row IN SELECT * from feature_relationship where object_id=OLD.feature_id LOOP
            SELECT INTO f_type c.name from feature f, cvterm c where f.type_id=c.cvterm_id and f.feature_id=fr_row.subject_id;
-           IF (f_type =f_type_transcript or f_type =f_type_ncRNA or f_type =f_type_snoRNA or f_type =f_type_snRNA or f_type =f_type_tRNA  or f_type =f_type_rRNA or f_type =f_type_pseudo or f_type =f_type_miRNA) THEN
+           IF (f_type =f_type_transcript or f_type =f_type_ncRNA or f_type =f_type_snoRNA or f_type =f_type_snRNA or f_type =f_type_tRNA  or f_type =f_type_rRNA or f_type =f_type_pseudo or f_type =f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
               SELECT INTO f_uniquename_temp uniquename from feature where feature_id=fr_row.subject_id; 
               len:=length (f_uniquename_temp);                        
               letter_t:=substring(f_uniquename_temp from len );             
@@ -1053,7 +1068,7 @@ BEGIN
               insert into trigger_log(value, table_name, id) values(message, ''feature_relationship'', fr_row.feature_relationship_id);
            END IF;
         END LOOP;
-      ELSIF (f_type =f_type_transcript or f_type =f_type_ncRNA or f_type =f_type_snoRNA or f_type =f_type_snRNA or f_type =f_type_tRNA or f_type =f_type_rRNA  or f_type =f_type_pseudo or f_type =f_type_miRNA) THEN
+      ELSIF (f_type =f_type_transcript or f_type =f_type_ncRNA or f_type =f_type_snoRNA or f_type =f_type_snRNA or f_type =f_type_tRNA or f_type =f_type_rRNA  or f_type =f_type_pseudo or f_type =f_type_miRNA or c.name=f_type_transposable_element or c.name=f_type_promoter or c.name=f_type_repeat_region) THEN
         select INTO f_uniquename f.uniquename from feature f, feature_relationship fr where f.feature_id=fr.object_id and fr.subject_id=OLD.feature_id;
         IF f_uniquename IS NOT NULL THEN
           FOR fr_row IN SELECT * from feature_relationship where object_id=OLD.feature_id LOOP
