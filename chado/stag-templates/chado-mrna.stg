@@ -1,0 +1,44 @@
+:SELECT 
+  gene.*,
+  mrna.*,
+  exon.*,
+  protein.*,
+  mrnaprop.*,
+  mptype.name AS mrnaprop__type
+:FROM
+  feature AS gene 
+    INNER JOIN 
+  feature_relationship AS gene2mrna ON (gene.feature_id = gene2mrna.object_id)
+    INNER JOIN 
+  feature AS mrna ON (mrna.feature_id = gene2mrna.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2exon ON (mrna.feature_id = mrna2exon.object_id)
+    INNER JOIN
+  feature AS exon ON (exon.feature_id = mrna2exon.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2protein ON (mrna.feature_id = mrna2protein.object_id)
+    INNER JOIN
+  feature AS protein ON (protein.feature_id = mrna2protein.subject_id)
+    LEFT OUTER JOIN
+  featureprop AS mrnaprop ON (mrna.feature_id = mrnaprop.feature_id)
+    LEFT OUTER JOIN
+  cvterm AS mptype ON (mrnaprop.type_id = mptype.cvterm_id)
+    INNER JOIN
+  cvterm AS proteintype ON (protein.type_id = proteintype.cvterm_id)
+    INNER JOIN
+  cvterm AS exontype ON (exon.type_id = exontype.cvterm_id)
+:WHERE 
+  [proteintype.name = 'protein']
+  [exontype.name = 'exon']
+  [mrna.name => &mrna_name&]
+  [protein.name => &protein_name&]
+  [gene.name => &gene_name&]
+
+:USE NESTING (set(mrna(mrnaprop)(gene)(protein)(exon)))
+
+//
+schema: chado
+desc: protein details: proteins and propertioes, plus
+      the containing mRNA and gene
+
+example_input: protein_name => SELECT name FROM protein
