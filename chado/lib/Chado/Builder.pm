@@ -193,10 +193,6 @@ sub ACTION_ontologies {
   my %ontologies = map { $_ => $conf->{ontology}{ $ont{$_} } } split ',',
     $chosen;
 
-  if ( -e $conf->{'path'}{'data'} ) {
-    rmtree $conf->{'path'}{'data'}; 
-  }
-
   foreach my $ontology ( sort keys %ontologies ) {
     print "fetching files for ", $ont{$ontology}, "\n";
 
