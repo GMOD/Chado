@@ -35,7 +35,7 @@ package Chado::DBI;
 use strict;
 no warnings 'redefine';
 use base qw(Class::DBI::Pg);
-Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'}', '$OPTIONS{'DBUSER'}', '$OPTIONS{'DBPASS'}');
+Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHOST'}', '$OPTIONS{'DBUSER'}', '$OPTIONS{'DBPASS'}');
 
 #sub search_ilike { shift->_do_search(ILIKE => \@_ ) }
 
