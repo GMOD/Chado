@@ -175,7 +175,7 @@ create table featureprop_pub (
 create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
-       feature_id int,
+       feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        dbxrefstr varchar(255),
        foreign key (dbxrefstr) references dbxref (dbxrefstr),
@@ -310,58 +310,4 @@ create table synonym_pub (
 
        unique(synonym_id, pub_id)
 );
-
--- [this needs moved to a different file]
--- typed feature
-create view tfeature as
- select * from feature, cvterm
- where feature.type_id = cvterm.cvterm_id;
-
-create view fgene as
- select * from tfeature where term_name = 'gene';
-
-create view fexon as
- select * from tfeature where term_name = 'exon';
-
-create view ftranscript as
- select * from tfeature where term_name = 'transcript';
-
-create view gene2transcript as
- select * from fgene, ftranscript, feature_relationship r
- where fgene.feature_id = r.objfeature_id
- and ftranscript.feature_id = r.subjfeature_id;
-
-create view transcript2exon as
- select * from ftranscript, fexon, feature_relationship r
- where ftranscript.feature_id = r.objfeature_id
- and   fexon.feature_id = r.subjfeature_id;
-
--- everything related to a gene; assumes the 'gene graph'
--- goes to depth 2 maximum; will get everything up to 2 nodes
--- away, eg transcripts, exons, translations; but also 
--- other features we may want to associate - variations, regulatory
--- regions, pre/post mRNA distinctions, introns etc
-
-create view genemodel as
- select * from fgene, tfeature1, tfeature2, 
-          feature_relationship r1, feature_relationship r2
- where fgene.feature_id = r1.objfeature_id
- and tfeature1.feature_id = r1.subjfeature_id
- and r1.objfeature_id = r2.subjfeature_id
- and r2.objfeature_id = tfeature2.feature_id;
-
---  How do we attribute the statement that such and such a feature is at 
---  a certain location on a sequence?  This is captured in the link between
---  the feature and a publication.   
-
--- TODO: make a use-case where a regulatory region is included
--- in the graph.   Can mutations in the reg_region be included?
-
--- TODO:  decorator tables linked to feature (eg GeneData, InsertionData)?
---  instead of using feature_prop...
-
--- references from other modules:
---	      expression: feature_expression
-
-
 
