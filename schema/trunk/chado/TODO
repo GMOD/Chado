@@ -1,12 +1,18 @@
 TODO for the next alpha release (SOON!)
 
-Done! - test load_gff.pl
-Done! - roll yeast gff3 file into distribution
-Done! - add a make target to remove ontology lock files
-Done! - change tmp space for ontologies to $GMOD_ROOT/tmp
-Done! - update AutoDBI.PLS
-Done! - fix the prepdb thing (are the inserts that fail generic or specific to
-   Allen's stuff?)
+* Have things install in GMOD_ROOT:
+   - in src/  
+            chado/modules
+   - in doc/
+            chado/READMEs, INSTALL, doc/
+   - in conf/
+            create gmod.conf, chado.conf
+   - in examples/
+            chado/data  sample data
+   - in bin/
+            gmod_*.pl (including what is in load/bin)
+  in docs, suggest that distribution directory be moved to /usr/local/gmod/src.
+
 
 Tue Jan  6 01:34:51 PST 2004 - allenday
 
