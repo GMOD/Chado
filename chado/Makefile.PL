@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.65 2004-07-02 05:15:37 allenday Exp $
+# $Id: Makefile.PL,v 1.66 2004-07-02 05:33:13 allenday Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -586,7 +586,7 @@ cvtermpath ::
 images :: graphviz graphviz_svg diagram
 
 instructions ::
-	@cat Makefile.PL | head -33 | tail -24
+	\@cat Makefile.PL | head -33 | tail -24
 
 graphviz :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.png \
