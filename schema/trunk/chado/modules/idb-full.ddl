@@ -224,7 +224,7 @@ create table feature (
        foreign key (source_feature_id) references feature (feature_id),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
-       unique(name, fmin, fmax, fstrand, seqlen, md5checksum, type_id)
+       unique(name, end5, end3, strand, seqlen, md5checksum, type_id)
 );
 GRANT ALL on feature_feature_id_seq to PUBLIC;
 GRANT ALL on feature to PUBLIC;
