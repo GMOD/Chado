@@ -40,14 +40,23 @@ gmod_load_gff3.pl - Load gff3 files into a chado database.
 The following command line options are available.  Note that they
 can be abbreviated to one letter.
 
-  --cache      (optional, defaults to 1000)         The number of features to cache before
+  --cache      (optional, defaults to 1000)         The number of features
+                                                    to cache before
                                                     committing to the database
-  --force      (optional, defaults to false)        Force the file to load, even if it has already
+  --force      (optional, defaults to false)        Force the file to load,
+                                                    even if it has already
                                                     been loaded before
   --gfffile    (required)                           The name of the GFF3 file
   --organism   (optional, defaults to 'Human')      Common name of the organism
-  --srcdb      (optional, defaults to 'DB:refseq')  The name of the source database
-  --uniquename (optional                            The tag to use to provide feature.uniquename
+  --srcdb      (optional, defaults to 'DB:refseq')  The name of the source
+                                                    database
+  --uniquename (optional)                           The tag to use to provide
+                                                    feature.uniquename
+  --ontology   (optional)                           Ontology to use instead
+                                                    of the default.  Note that
+                                                    this should be detected
+                                                    automatically, but isn't
+                                                    yet.
 
 =head1 DESCRIPTION
 
@@ -155,7 +164,7 @@ my ( undef, $TMPGFF )   = tempfile( "XXXXXX", ".gff", SUFFIX => '.gff' );
 warn $TMPFASTA if DEBUG;
 warn $TMPGFF if DEBUG;
 
-my ( $ORGANISM, $SRC_DB, $GFFFILE, $UNIQUENAME, $CACHE_SIZE, $FORCE_LOAD );
+my ( $ORGANISM,$SRC_DB,$GFFFILE,$UNIQUENAME,$CACHE_SIZE,$FORCE_LOAD,$ONTOLOGY );
 my ( $progress, $next_update, $linecount ) =
   ( undef, undef, undef );    #progressbar;
 my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
@@ -724,12 +733,14 @@ sub initialize {
         'uniquename:s'=>\$UNIQUENAME,
         'cache:s'    => \$CACHE_SIZE,
         'force'      => \$FORCE_LOAD,
+        'ontology:s' => \$ONTOLOGY,
       )
       or ( system( 'pod2text', $0 ), exit -1 );
 
     $ORGANISM   ||= 'Human';
     $SRC_DB     ||= 'DB:refseq';
     $CACHE_SIZE ||= 1000;
+    $ONTOLOGY   ||= 'Sequence Ontology Feature Annotation';
 
     die "\nYou must specify a GFF file\n" unless $GFFFILE;
 
@@ -778,8 +789,8 @@ sub initialize {
             definition => 'auto created by load_gff3.pl'
         }
     );
-    ($so) = Chado::Cv->search( { name => 'Sequence Ontology Feature Annotation' } );
-    die "Unable to find SOFA in cv table; that is a pretty big problem" unless $so;
+    ($so) = Chado::Cv->search( { name => $ONTOLOGY } );
+    die "Unable to find $ONTOLOGY in cv table; that is a pretty big problem" unless $so;
 
     # find needed cvterm and other pieces of information
     my @needed_cvterms =
