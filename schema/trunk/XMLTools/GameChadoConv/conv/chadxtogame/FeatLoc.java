@@ -33,55 +33,6 @@ private String m_Align = null;
 		return m_Span;
 	}
 
-/**************************
-//MOVED TO SPAN
-	public boolean precedes(FeatLoc the_fl){
-		if((getstrand()>0)&&(the_fl.getstrand()>0)){
-			if(getmin()<the_fl.getmin()){
-				return true;
-			//}else if(getmin()==the_fl.getmin()){
-			//	if(getmax()<the_fl.getmax()){
-			//		return true;
-			//	}
-			}
-		}else if((getstrand()<0)&&(the_fl.getstrand()<0)){
-			if(getmin()>the_fl.getmin()){
-				return true;
-			}
-		}else if((getstrand()>0)&&(the_fl.getstrand()<0)){
-			System.out.println("FEATLOC PRECEDES() MIX1");
-		}else if((getstrand()<0)&&(the_fl.getstrand()>0)){
-			System.out.println("FEATLOC PRECEDES() MIX2");
-		}
-		return false;
-	}
-**************************/
-
-/****************
-	public void setSrcFeatureId(String the_SrcFeatureId){
-		m_SrcFeatureId.setkey(the_SrcFeatureId);
-	}
-
-	public void setSrcFeatureId(Attrib the_gf){
-		m_SrcFeatureId.setGF(the_gf);
-	}
-
-	public void setSrcFeatureId(SMTPTR the_SMTPTR){
-		m_SrcFeatureId = the_SMTPTR;
-	}
-
-	public String getSrcFeatureId(){
-		System.out.println("FEATURE:getSrcFeatureId()");
-		return m_SrcFeatureId.getValue();
-	}
-
-	//public Feature getSrcFeature(){
-	//	System.out.println("FEATURE:getSrcFeature()");
-	//	return (Feature)m_SrcFeatureId.getObjValue();
-	//}
-****************/
-
-/****************/
 //USE DUMMY STRING FOR NOW
 	public void setSrcFeatureId(String the_SrcFeatureId){
 		m_SrcFeatureId = the_SrcFeatureId;
@@ -90,15 +41,10 @@ private String m_Align = null;
 	public String getSrcFeatureId(){
 		return m_SrcFeatureId;
 	}
-/****************/
 
 	public void setstrand(String the_strand){
 		m_strand = the_strand;
 	}
-
-	//public String getstrand(){
-	//	return m_strand;
-	//}
 
 	public int getstrand(){
 		if(m_strand.equals("-1")){

@@ -11,7 +11,8 @@ public class CTG {
 		String infile=null,outfile=null;
 		int DistStart = 0;
 		int DistEnd = 0;
-		boolean geneOnly = false;
+		//boolean geneOnly = false;
+		int readMode = GameWriter.CONVERT_ALL;
 		String NewSeqName = null;
 		for(int i=0;i<argv.length;i++){
                         if(argv[i]!=null){
@@ -36,8 +37,15 @@ public class CTG {
 						if(stok.hasMoreTokens()){
 							NewSeqName = stok.nextToken();
 						}
+					}else if(argv[i].startsWith("-a")){
+						//geneOnly = true;
+						readMode = GameWriter.CONVERT_ALL;
 					}else if(argv[i].startsWith("-g")){
-						geneOnly = true;
+						//geneOnly = true;
+						readMode = GameWriter.CONVERT_GENE;
+					}else if(argv[i].startsWith("-c")){
+						//geneOnly = true;
+						readMode = GameWriter.CONVERT_COMP;
                                         }
 				}else{
 					if(infile==null){//FIRST
@@ -48,9 +56,10 @@ public class CTG {
 				}
 			}
 		}
-		GameWriter rd = new GameWriter(infile,outfile,DistStart,DistEnd,NewSeqName,geneOnly);
+		GameWriter rd = new GameWriter(infile,outfile,DistStart,DistEnd,NewSeqName,readMode);
 		rd.ChadoToGame();
 	}
 }
+
 
 

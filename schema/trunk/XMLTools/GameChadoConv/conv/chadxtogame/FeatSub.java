@@ -76,19 +76,19 @@ public String m_isanalysis = "0";
 	}
 
 	public void Display(int the_depth){
-		System.out.println("DISPLAY");
 		if(this instanceof FeatProp){
 			((FeatProp)this).Display(the_depth);
 		}else if(this instanceof FeatProp){
 			((FeatDbxref)this).Display(the_depth);
 		}else if(this instanceof FeatSub){
-			System.out.println("FeatSub TYPE<"+getTypeId()+">");
+			System.out.println("\tFeatSub ID<"+getId()
+					+"> TYPE<"+getTypeId()+">");
 		}else if(this instanceof Feature){
-			System.out.println("Feature");
+			System.out.println("\tFeature");
 		}else if(this instanceof GenFeat){
-			System.out.println("GenFeat");
+			System.out.println("\tGenFeat");
 		}else{
-			System.out.println("UNK");
+			System.out.println("\tUNKNOWN");
 		}
 	}
 }

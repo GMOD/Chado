@@ -48,11 +48,17 @@ String GAMERES_OFFSET_END = "\n        ";
 //THEY NEED TO BE COLLECTED ALONG THE WAY AND
 //PRINTED OUT IN THE END
 private Vector m_AnalysisList = null;
-private boolean m_geneOnly = false;
+//private boolean m_geneOnly = false;
+
+public static int CONVERT_ALL = 0;
+public static int CONVERT_GENE = 1;
+public static int CONVERT_COMP = 2;
+private int m_readMode = 0;
 
 	public GameWriter(String the_infile,String the_outfile,
 			int the_DistStart,int the_DistEnd,
-			String the_NewREFSTRING,boolean the_geneOnly){
+			//String the_NewREFSTRING,boolean the_geneOnly){
+			String the_NewREFSTRING,int the_readMode){
 		if(the_infile==null){
 			System.exit(0);
 		}
@@ -60,7 +66,8 @@ private boolean m_geneOnly = false;
 		m_OutFile = the_outfile;
 		m_NewREFSPAN = new Span(the_DistStart,the_DistEnd);
 		m_NewREFSTRING = the_NewREFSTRING;
-		m_geneOnly = the_geneOnly;
+		//m_geneOnly = the_geneOnly;
+		m_readMode = the_readMode;
 		if(m_OutFile!=null){
 			System.out.println("START C->G INFILE<"+m_InFile
 					+"> OUTFILE<"+m_OutFile
@@ -73,7 +80,7 @@ private boolean m_geneOnly = false;
 	public void ChadoToGame(){
 		//PARSE CHADO FILE
 		ChadoSaxReader csr = new ChadoSaxReader();
-		csr.parse(m_InFile,m_geneOnly);
+		csr.parse(m_InFile,m_readMode);
 		GenFeat TopNode = csr.getTopNode();
 		System.out.println("=============DONE READING FILE - WRITE GAME FILE\n");
 		writeFile(TopNode,m_OutFile);
@@ -127,6 +134,7 @@ private boolean m_geneOnly = false;
 	public Element makeGameDoc(Document the_DOC,GenFeat the_TopNode){
 		Element root = the_DOC.getDocumentElement();
 
+		System.out.println("START READING METADATA");
 		//USE METADATA FROM _APPDATA
 		String mdARM=null,mdTITLE=null;
 		String mdMIN=null,mdMAX=null,mdRESIDUES=null;
@@ -134,26 +142,26 @@ private boolean m_geneOnly = false;
 		for(int i=0;i<the_TopNode.getGenFeatCount();i++){
 			FeatSub gf = the_TopNode.getGenFeat(i);
 			if(gf instanceof Appdata){
-				System.out.println("FOUND appdata<"
-						+gf.getId()+">");
+				//System.out.println("FOUND appdata<"
+				//		+gf.getId()+">");
 				if(gf.getId().equals("arm")){
 					mdARM = ((Appdata)gf).getText();
-					System.out.println("ARM<"+mdARM+">");
+					System.out.println("\tARM<"+mdARM+">");
 				}else if(gf.getId().equals("title")){
 					mdTITLE = ((Appdata)gf).getText();
-					System.out.println("TITLE<"
+					System.out.println("\tTITLE<"
 						+mdTITLE+">");
 				}else if(gf.getId().equals("fmin")){
 					mdMIN = ((Appdata)gf).getText();
-					System.out.println("MIN<"
+					System.out.println("\tMIN<"
 						+mdMIN+">");
 				}else if(gf.getId().equals("fmax")){
 					mdMAX = ((Appdata)gf).getText();
-					System.out.println("MAX<"
+					System.out.println("\tMAX<"
 						+mdMAX+">");
 				}else if(gf.getId().equals("residues")){
 					mdRESIDUES = ((Appdata)gf).getText();
-					System.out.println("RESIDUES LEN<"
+					System.out.println("\tRESIDUES LEN<"
 						+mdRESIDUES.length()+">");
 				}else{
 				}
@@ -186,13 +194,13 @@ private boolean m_geneOnly = false;
 			}
 		}
 
-		System.out.println("START WRITING NON ANNOT SEQ FEAT FROM METADATA");
+		System.out.println("START WRITING METADATA RELATED FEATURES");
 		root.appendChild(makeNonAnnotSeqFeatFromMetadata(the_DOC,
 				annotSeqName,mdRESIDUES,"true"));
 
 		//MAP_POSITION
-		/***************/
 		if(mdARM!=null){
+			System.out.println("\tFOUND ARM STRING<"+mdARM+">");
 			root.appendChild(makeMapPos(the_DOC,
 					annotSeqName,
 					mdARM,
@@ -201,6 +209,8 @@ private boolean m_geneOnly = false;
 		}else{
 			for(int i=0;i<the_TopNode.getGenFeatCount();i++){
 				FeatSub gf = the_TopNode.getGenFeat(i);
+				System.out.println("\tFEATSUB TYPE<"+gf.getTypeId()
+						+"><"+gf.getId()+">");
 				if((gf.getTypeId()!=null)
 						&&(gf.getTypeId().startsWith("arm"))){
 					System.out.println("MAP_POS FEATURE<"
@@ -214,48 +224,51 @@ private boolean m_geneOnly = false;
 				}
 			}
 		}
-		/***************/
+		System.out.println("DONE WRITING METADATA RELATED FEATURES");
 
-	/************/
-		System.out.println("START WRITING ANNOT FEATURES");
-		System.out.println("CURR ANNOT NAME<"+annotSeqName
-				+"> OLD<"+m_OldREFSTRING
-				+"> NEW<"+m_NewREFSTRING+">");
-		//ANNOTATION, SEQUENCE FEATURES
-		for(int i=0;i<the_TopNode.getGenFeatCount();i++){
-			FeatSub gf = (FeatSub)the_TopNode.getGenFeat(i);
-			if(gf.getTypeId()==null){
-				System.out.println("SHOULD THIS BE NULL FOR<"+gf.getId()+">");
-			}else if(gf.getTypeId().startsWith("gene")){
-				root.appendChild(makeAnnotation(the_DOC,(Feature)gf));
-//FSSNEW
-			}else if(gf.getTypeId().startsWith("sequence")){
-				root.appendChild(makeNonAnnotSeqFeat(the_DOC,
-						(Feature)gf,"false"));
-			}else{
-				//System.out.println("\tNOT WRITTEN SINCE UNKNOWN TYPE<"+gf.getTypeId()+">");
+		if((m_readMode==CONVERT_ALL)||(m_readMode==CONVERT_GENE)){
+			System.out.println("START WRITING ANNOT FEATURES");
+			System.out.println("CURR ANNOT NAME<"+annotSeqName
+					+"> OLD<"+m_OldREFSTRING
+					+"> NEW<"+m_NewREFSTRING+">");
+			//ANNOTATION, SEQUENCE FEATURES
+			for(int i=0;i<the_TopNode.getGenFeatCount();i++){
+				FeatSub gf = (FeatSub)the_TopNode.getGenFeat(i);
+				if(gf.getTypeId()==null){
+					//MUST BE METADATA STFF
+				}else if(gf.getTypeId().startsWith("gene")){
+					root.appendChild(makeAnnotation(the_DOC,
+							(Feature)gf));
+				}else if(gf.getTypeId().startsWith("sequence")){
+					root.appendChild(makeNonAnnotSeqFeat(the_DOC,
+							(Feature)gf,"false"));
+				}else{
+					//System.out.println("\tNOT WRITTEN SINCE UNKNOWN TYPE<"+gf.getTypeId()+">");
+				}
 			}
+			System.out.println("DONE WRITING ANNOTATION FEATURES");
 		}
-		System.out.println("DONE WRITING ANNOTATION FEATURES");
+		System.out.println("--------------------------------");
 
-	/************/
-		if(m_geneOnly==false){
-			System.out.println("START WRITING ANALYSIS FEATURES");
+		if((m_readMode==CONVERT_ALL)||(m_readMode==CONVERT_COMP)){
+			System.out.println("START WRITING ANALYSIS FEATURE");
 			//COMP_ANAL FEATURES
 			for(int i=0;i<the_TopNode.getGenFeatCount();i++){
 				FeatSub gf = (FeatSub)the_TopNode.getGenFeat(i);
-				System.out.println("COMPANAL<"+gf.getisanalysis()+">");
 				if(gf.getisanalysis().equals("1")){
-					System.out.println("IS_ANALYSIS=1");
+					//System.out.println("\tIS_ANALYSIS=1");
+					System.out.println("ANALYSIS<"
+						+((Feature)gf).getName()
+						+"> TYPE<"
+						+((Feature)gf).getTypeId()+">");
 					m_AnalysisList.add(makeCompAnalysis(
 							the_DOC,(Feature)gf));
 				}else{
-					System.out.println("IS_ANALYSIS=0");
-					gf.Display(1);
+					//System.out.println("\tIS_ANALYSIS=0");
+					//gf.Display(1);
 				}
 			}
 		}
-	/************/
 
 		for(int i=0;i<m_AnalysisList.size();i++){
 			System.out.println("\tWRITE ANALFEAT<"+i+">");
@@ -264,23 +277,23 @@ private boolean m_geneOnly = false;
 		}
 		System.out.println("DONE WRITING ANALYSIS FEATURES");
 
-		System.out.println("START WRITING DELETE FEATURES");
+		System.out.println("START WRITING CHANGED/DELETED FEATURES");
 		//DELETE FEATURES
 		for(int i=0;i<the_TopNode.getGenFeatCount();i++){
 			FeatSub gf = the_TopNode.getGenFeat(i);
 			if((gf.getTypeId()!=null)
 				&&((gf.getTypeId().startsWith("deleted_"))
 				||(gf.getTypeId().startsWith("changed_")))){
-					System.out.println("WRITING DELETE FEATURE <"+gf.getId()+"> OF TYPE<"+gf.getTypeId()+">");
+					System.out.println("WRITING CHANGE/DELETE FEATURE <"+gf.getId()+"> OF TYPE<"+gf.getTypeId()+">");
 					root.appendChild(
 						makeModFeat(the_DOC,(GenFeat)gf));
 			}
 		}
 	/*************/
-		System.out.println("DONE WRITING DELETE FEATURES");
-		System.out.println("VIEW MAPPING");
-		Mapping.Display();
-		System.out.println("DONE VIEWING MAPPING");
+		System.out.println("DONE WRITING CHANGED/DELETED FEATURES");
+		//System.out.println("VIEW MAPPING");
+		//Mapping.Display();
+		//System.out.println("DONE VIEWING MAPPING");
 		return root;
 	}
 
@@ -290,10 +303,7 @@ private boolean m_geneOnly = false;
 				the_gf.getTypeId());
 		String idStr = the_gf.getId();
 		if(idStr!=null){
-			int indx = idStr.indexOf(":");
-			if(indx>0){
-				idStr = idStr.substring(indx+1);
-			}
+			//idStr = deNullString(idStr);
 			modfeatNode.setAttribute("id",idStr);
 		}
 		return modfeatNode;
@@ -424,18 +434,32 @@ private boolean m_geneOnly = false;
 	}
 
 	public Element makeAnnotation(Document the_DOC,Feature the_gf){
-		System.out.println("START ANNOTATION");
-		Element annotNode = (Element)the_DOC.createElement("annotation");
-//FSSNEW
+		//System.out.println("START ANNOTATION <"+the_gf.getId()
+		//		+"> TYPE<"+the_gf.getTypeId()
+		//		+"> SIZE<"+the_gf.getGenFeatCount()+">");
+		Element annotNode = (Element)the_DOC.createElement(
+				"annotation");
 		if(the_gf.getUniqueName()!=null){
 			the_gf.setId(the_gf.getUniqueName());
 		}
 
 		if(the_gf.getId()!=null){
 			annotNode.setAttribute("id",the_gf.getId());
-			System.out.println("\tWRITING GAME ANNOT ID<"
-					+the_gf.getId()+"> TYPE<"+the_gf.getTypeId()+">");
 		}
+
+		//IS_PROBLEM
+		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
+			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
+			if((fs!=null)&&(fs instanceof FeatProp)){
+				FeatProp fp = (FeatProp)fs;
+				if(fp==null){
+				}else if(fp.getPkeyId().equals("problem")){
+					annotNode.setAttribute("problem",
+							fp.getpval());
+				}
+			}
+		}
+
 		if(the_gf.getName()!=null){
 			annotNode.appendChild(makeGenericNode(
 					the_DOC,"name",the_gf.getName()));
@@ -449,12 +473,10 @@ private boolean m_geneOnly = false;
 		makeAuthPropComm(annotNode,the_DOC,the_gf,true);
 
 		//FEATURE_SET
-		System.out.println("GENFEAT LIST FOR ANNOTATION <"+the_gf.getId()
-				+"> SIZE<"+the_gf.getGenFeatCount()+">");
 		for(int i=0;i<the_gf.getGenFeatCount();i++){
 			Feature FSgf = (Feature)the_gf.getGenFeat(i);
-			System.out.println("\tTRANSCR COMPID<"+FSgf.getId()
-					+"> OF TYPE<"+FSgf.getTypeId()+">");
+			//System.out.println("\tTRANSCR COMPID<"+FSgf.getId()
+			//		+"> OF TYPE<"+FSgf.getTypeId()+">");
 
 			if(FSgf.getTypeId().equals("chromosome_arm")){
 			}else{
@@ -463,13 +485,13 @@ private boolean m_geneOnly = false;
 			}
 		}
 
-		System.out.println("END ANNOTATION");
+		//System.out.println("END ANNOTATION");
 		return annotNode;
 	}
 
 	public Element makeFeatureSet(Document the_DOC,Feature the_gf){
-		System.out.println("START FEATURE_SET");
-//FSSNEW
+		//System.out.println("\tSTART FEATURE_SET ID<"+the_gf.getId()
+		//		+"> SIZE<"+the_gf.getGenFeatCount()+">");
 		if(the_gf.getUniqueName()!=null){
 			the_gf.setId(the_gf.getUniqueName());
 		}
@@ -477,6 +499,19 @@ private boolean m_geneOnly = false;
 		Element featureSetNode = (Element)the_DOC.createElement("feature_set");
 		//name,type,author,date,property
 		featureSetNode.setAttribute("id",the_gf.getId());
+
+		//IS_PROBLEM
+		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
+			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
+			if((fs!=null)&&(fs instanceof FeatProp)){
+				FeatProp fp = (FeatProp)fs;
+				if(fp==null){
+				}else if(fp.getPkeyId().equals("problem")){
+					featureSetNode.setAttribute("problem",
+							fp.getpval());
+				}
+			}
+		}
 
 		//PRODUCED SEQ HAS SAME NAME
 		String producesSeq = null;
@@ -508,8 +543,6 @@ private boolean m_geneOnly = false;
 		Vector protList = new Vector();
 
 		//GEN_FEATs
-		System.out.println("GENLIST FOR FEATURE_SET <"+the_gf.getId()
-				+"> SIZE<"+the_gf.getGenFeatCount()+">");
 		for(int i=0;i<the_gf.getGenFeatCount();i++){
 			Feature gf = (Feature)the_gf.getGenFeat(i);
 			if((gf!=null)&&(gf.getTypeId()!=null)&&(gf.getFeatLoc()!=null)){
@@ -524,7 +557,6 @@ private boolean m_geneOnly = false;
 		//WRITE START_CODON
 		for(int i=0;i<protList.size();i++){
 			Feature gf = (Feature)protList.get(i);
-			System.out.println("THE START CODON<"+gf.getId()+">");
 			Feature ngf = new Feature(gf.getId());
 			ngf.setName(gf.getName());
 			ngf.setTypeId("start_codon");
@@ -570,9 +602,9 @@ private boolean m_geneOnly = false;
 		//WRITE EXONS
 		for(int i=0;i<exonList.size();i++){
 			Feature gf = (Feature)exonList.get(i);
-			System.out.println("\tCOMP FEAT<"
-					+gf.getId()+"> OF TYPE<"
-					+gf.getTypeId()+">");
+			//System.out.println("\tCOMP FEAT<"
+			//		+gf.getId()+"> OF TYPE<"
+			//		+gf.getTypeId()+">");
 			featureSetNode.appendChild(
 					makeFeatureSpan(the_DOC,gf));
 		}
@@ -591,7 +623,6 @@ private boolean m_geneOnly = false;
 		//WRITE PROTEIN SEQUENCE
 		for(int i=0;i<protList.size();i++){
 			Feature gf = (Feature)protList.get(i);
-			System.out.println("THE PROTEINS<"+gf.getId()+">");
 			featureSetNode.appendChild(
 					makeGameSeq(the_DOC,
 							gf.getId(),
@@ -600,7 +631,7 @@ private boolean m_geneOnly = false;
 							gf.getTypeId(),
 							gf.getMd5()));
 		}
-		System.out.println("END FEATURE_SET");
+		//System.out.println("\tEND FEATURE_SET");
 		return featureSetNode;
 	}
 
@@ -614,21 +645,19 @@ private boolean m_geneOnly = false;
 		Element featureSpanNode = (Element)
 				the_DOC.createElement("feature_span");
 
-		System.out.println("THISFEATSPANID<"+the_gf.getId()
-				+"> UN<"+the_gf.getUniqueName()+">");
 //YYYYY - NEED TO DIFFERENTIATE BETWEEN A SEQUENCE INSIDE A FEATURE_SET 
 //AND A REGULAR FEATURE_SPAN (exon)
 		//name,type,seq_relationship,span
-		System.out.println("WRITING FEATURESPAN<"+the_gf.getId()+">");
+		//System.out.println("\t\tWRITING FEATURESPAN<"
+		//		+the_gf.getId()+">");
 		if(the_gf.getId()!=null){
 			featureSpanNode.setAttribute("id",the_gf.getId());
 			//PRODUCED SEQ HAS SAME NAME
 			if((the_gf.getTypeId()!=null)
-//					&&(the_gf.getTypeId().equals("start_codon"))){
 					&&(the_gf.getTypeId().equals("protein"))){
-				System.out.println("MYFEATAREHERE<"+the_gf.getId()+">");
 				featureSpanNode.setAttribute(
-					"produces_seq",the_gf.getId()+"_seq");
+						"produces_seq",
+						the_gf.getId()+"_seq");
 				featSpanName = the_gf.getId();
 			}
 		}
@@ -639,19 +668,23 @@ private boolean m_geneOnly = false;
 		}
 		if(the_gf.getTypeId()!=null){
 			featureSpanNode.appendChild(makeGenericNode(
-					//the_DOC,"type",the_gf.getTypeId()));
-					the_DOC,"type",translateCVTERM(the_gf.getTypeId())));
+					the_DOC,"type",
+					translateCVTERM(the_gf.getTypeId())));
 		}
 		if((the_gf.getFeatLoc()!=null)
 				&&(the_gf.getFeatLoc().getSpan()!=null)){
-			System.out.print("WRITE GAME FEATSPAN<"+the_gf.getFeatLoc().getSpan()+">");
-			Span sp = the_gf.getFeatLoc().getSpan().retreat(
-					m_NewREFSPAN.getStart());
+			Span sp = the_gf.getFeatLoc().getSpan();
+			Span spRet = sp.retreat((m_NewREFSPAN.getStart()-1));
+			//INTERBASE COMPENSATION
+			spRet = new Span(spRet.getStart()+1,spRet.getEnd());
+			//System.out.println("RETREATING ID<"+the_gf.getId()
+			//		+">\tSP<"+sp+">\tTO<"+spRet+">");
+
 			int strand = the_gf.getFeatLoc().getstrand();
-			the_gf.getFeatLoc().setSpan(sp);
-			System.out.println(" AS RETREATED<"+sp+">");
+			the_gf.getFeatLoc().setSpan(spRet);
 			featureSpanNode.appendChild(makeSeqRelNode(
-					the_DOC,the_gf,sp,strand,m_OldREFSTRING,"query",null));
+					the_DOC,the_gf,spRet,strand,
+					m_OldREFSTRING,"query",null));
 		}
 		return featureSpanNode;
 	}
@@ -735,7 +768,6 @@ private boolean m_geneOnly = false;
 	public void makeAuthPropComm(
 			Element the_Node,Document the_DOC,
 			Feature the_gf,boolean the_isAnnotation){
-		System.out.println("FEATPROP makeAuthPropComm()!!!");
 
 		//  DATE
 		if(the_gf.gettimeaccessioned()!=null){
@@ -745,8 +777,18 @@ private boolean m_geneOnly = false;
 
 		for(int i=0;i<((Feature)the_gf).getFeatSynCount();i++){
 			FeatSyn fs = ((Feature)the_gf).getFeatSyn(i);
-			System.out.println("SYNONYM<"+fs.getSynonym().getname()+">");
-			the_Node.appendChild(makeGameProperty(the_DOC,"internal_synonym",fs.getSynonym().getname()));
+			//System.out.println("GAMEWRITER FEATSYN<"
+			//		+fs.getSynonym().getname()
+			//		+"> INTERNAL<"+fs.getisinternal()+">");
+			if(fs.getisinternal().equals("1")){
+				the_Node.appendChild(makeGameProperty(the_DOC,
+						"internal_synonym",
+						fs.getSynonym().getname()));
+			}else{
+				the_Node.appendChild(makeGenericNode(
+						the_DOC,"synonym",
+						fs.getSynonym().getname()));
+			}
 		}
 
 		//  AUTHOR,PROPERTIES,COMMENTS
@@ -755,13 +797,11 @@ private boolean m_geneOnly = false;
 		Vector authorList = new Vector();
 		for(int i=0;i<((Feature)the_gf).getFeatSubCount();i++){
 			FeatSub fs = ((Feature)the_gf).getFeatSub(i);
-			System.out.print("\tFP<"+i+">");
 			if((fs!=null)&&(fs instanceof FeatProp)){
 				FeatProp fp = (FeatProp)fs;
-				System.out.print(" KEY<"+fp.getPkeyId()
-						+"> VAL<"+fp.getpval()+">");
+				//System.out.print(" KEY<"+fp.getPkeyId()
+				//		+"> VAL<"+fp.getpval()+">");
 				if(fp==null){
-					System.out.println("SSSSNOTHERE");
 				}else if(fp.getPkeyId()==null){
 					//DO NOTHING
 				}else if(fp.getPkeyId().equals("comment")){
@@ -772,12 +812,12 @@ private boolean m_geneOnly = false;
 					authorList.add(
 						makeGenericNode(the_DOC,
 							"author",fp.getpval()));
+				//}else if(fp.getPkeyId().equals("problem")){
 				}else{
 					propList.add(
 						makeGameFeatPropReg(the_DOC,fp));
 				}
 			}
-			System.out.println("");
 		}
 
 		//  AUTHOR
@@ -815,10 +855,8 @@ private boolean m_geneOnly = false;
 				//THEN PROVIDE DBXREF, ELSE DONT
 		//  DBXREF
 		String tmpdbname = "";
-		//String tmpaccession = "";
 		if(((Feature)the_gf).getDbxrefId()!=null){
 			Dbxref d = ((Feature)the_gf).getDbxref();
-			//tmpdbname = d.getdbname();
 			tmpdbname = d.getDBId();
 			if((tmpdbname!=null)&&(d.getaccession()!=null)){
 				the_Node.appendChild(makeGameDbxref(the_DOC,
@@ -896,15 +934,44 @@ private boolean m_geneOnly = false;
 		}
 		//IGNORE TIMESTAMP AS IT CAN BE REGENERATED
 		if(the_dateTxt!=null){
+			//DONT CONVERT IT, AS IS A LEGACY GAME DATE
 			attrNode.appendChild(
-				makeDateNode(the_DOC,the_dateTxt));
+				makeUnchangedDateNode(the_DOC,the_dateTxt));
 		}
 		return attrNode;
 	}
 
+	public Element makeUnchangedDateNode(Document the_DOC,
+			String the_gamedate){
+		Element dateNode = (Element)the_DOC.createElement("date");
+		//String gametimestamp = DateConv.GameDateToTimestamp(
+		//		the_gamedate);
+		//System.out.println("UNCHANGED GAME<"+gametimestamp+">");
+		//if(gametimestamp!=null){
+		//	dateNode.setAttribute("timestamp",gametimestamp);
+		//}
+		String chadotimestamp = DateConv.ChadoDateToTimestamp(
+				the_gamedate);
+		//System.out.println("UNCHANGED CHADO<"+chadotimestamp+">");
+		if(chadotimestamp!=null){
+			dateNode.setAttribute("timestamp",chadotimestamp);
+		}
+		//if(the_gamedate!=null){
+		//	dateNode.appendChild(the_DOC.createTextNode(
+		//		the_gamedate));
+		//}
+		String chadoDate = DateConv.GameTimestampToChadoDate(
+				chadotimestamp);
+		if(chadoDate!=null){
+			dateNode.appendChild(the_DOC.createTextNode(
+				chadoDate));
+		}
+		return dateNode;
+	}
+
 	public Element makeDateNode(Document the_DOC,String the_chadodate){
 		Element dateNode = (Element)the_DOC.createElement("date");
-		String gametimestamp = DateConv.ChadoDateToGameTimestamp(
+		String gametimestamp = DateConv.ChadoDateToTimestamp(
 				the_chadodate);
 		if(gametimestamp!=null){
 			dateNode.setAttribute("timestamp",gametimestamp);
@@ -916,11 +983,15 @@ private boolean m_geneOnly = false;
 		return dateNode;
 	}
 
-	public Element makeSeqRelNode(Document the_DOC,GenFeat the_gf,Span the_Span,int the_strand,String the_refName,String the_typeName,String the_Align){
+	public Element makeSeqRelNode(Document the_DOC,
+			GenFeat the_gf,Span the_Span,int the_strand,
+			String the_refName,String the_typeName,
+			String the_Align){
 		//System.out.println("MAKING SEQRELNODE");
 		//BECAUSE SOMETIMES ITS THE 'ALT' SPAN
 		//SO NEED TO ACTUALLY PASS IN THE SPAN
-		Element seqRelNode = (Element)the_DOC.createElement("seq_relationship");
+		Element seqRelNode = (Element)the_DOC.createElement(
+				"seq_relationship");
 		if(the_typeName!=null){
 			seqRelNode.setAttribute("type",the_typeName);
 		}else{
@@ -941,87 +1012,141 @@ private boolean m_geneOnly = false;
 	}
 
 	public Element makeCompAnalysis(Document the_DOC,Feature the_ca){
-		Element compAnalNode = (Element)the_DOC.createElement("computational_analysis");
+		//Each feature with is_analysis = 1 is a comp_anal feature.
+		//It is either a match, transposable_element, or an exon?
+		Element compAnalNode = (Element)the_DOC.createElement(
+				"computational_analysis");
 
-		System.out.println("SHOULDBEWRITINGTIMEACCESSIONED");
-		if(the_ca.gettimeaccessioned()!=null){
-			compAnalNode.appendChild(makeDateNode(
-					the_DOC,the_ca.gettimeaccessioned()));
-		}
-		System.out.println("NEW REF SPAN<"+m_NewREFSPAN.getStart()
-				+".."+m_NewREFSPAN.getEnd()+">");
-
+		String resSpanType = "";
 		if(the_ca.getprogram()!=null){
-			System.out.println("COMP_ANAL PROGRAM<"+
+			System.out.println("\tCOMP_ANAL PROGRAM<"+
 					the_ca.getprogram()+">");
 			compAnalNode.appendChild(makeGenericNode(the_DOC,
 					"program",the_ca.getprogram()));
+			resSpanType = the_ca.getprogram();
 		}
+		resSpanType += ":";
+
 		if(the_ca.getsourcename()!=null){
-			System.out.println("COMP_ANAL SOURCENAME<"+
+			System.out.println("\tCOMP_ANAL SOURCENAME<"+
 					the_ca.getsourcename()+">");
 			compAnalNode.appendChild(makeGenericNode(the_DOC,
 					"database",the_ca.getsourcename()));
+			resSpanType += the_ca.getsourcename();
 		}
 
-		if(the_ca.getprogramversion()!=null){
-			System.out.println("COMP_ANAL PROGRAMVERSION<"+
-					the_ca.getprogramversion()+">");
-			compAnalNode.appendChild(makeGenericNode(the_DOC,
-					"version",the_ca.getprogramversion()));
-		}
+		//if(the_ca.getprogramversion()!=null){
+		//	System.out.println("\tCOMP_ANAL PROGRAMVERSION<"+
+		//			the_ca.getprogramversion()+">");
+		//	compAnalNode.appendChild(makeGenericNode(the_DOC,
+		//			"version",the_ca.getprogramversion()));
+		//}
 
 		compAnalNode.appendChild(makeGameProperty(the_DOC,
 				"qseq_type","genomic"));
-		compAnalNode.appendChild(makeGameProperty(the_DOC,
-				"type","Gene Prediction"));
 
+		if(the_ca.getTypeId().equals("match")){
+			System.out.println("+++++++++++++++MATCH");
+			String prog = the_ca.getprogram();
+			if(prog.startsWith("promotor")){
+				compAnalNode.appendChild(makeGameProperty(
+						the_DOC,
+						"type","Promotor Prediction"));
+			}else if((prog.startsWith("genscan"))
+					||(prog.startsWith("piecegenie"))){
+				compAnalNode.appendChild(makeGameProperty(
+						the_DOC,
+						"type","Gene Prediction"));
+			}else{
+				System.out.println("+++++++++++++++SOMENEWPROGRAM<"+prog+">");
+			}
+			if(the_ca.gettimeaccessioned()!=null){
+				compAnalNode.appendChild(makeDateNode(the_DOC,
+						the_ca.gettimeaccessioned()));
+			}
+			Element resultSetNode = makeResultSetForMatch(
+					the_DOC,the_ca,resSpanType);
+			compAnalNode.appendChild(resultSetNode);
 
+		}else{// if(the_ca.getTypeId().equals("transposable_element")){
+			System.out.println("+++++++++++++++TRANSPOSON");
+			compAnalNode.appendChild(makeGameProperty(the_DOC,
+					"type","Transposon"));
+			if(the_ca.gettimeaccessioned()!=null){
+				compAnalNode.appendChild(makeDateNode(the_DOC,
+						the_ca.gettimeaccessioned()));
+			}
+			Element resultSetNode = makeResultSetForTransposon(
+					the_DOC,the_ca,"transposon");
+			compAnalNode.appendChild(resultSetNode);
+		//}else{
+		//	System.out.println("+++++++++++++++OTHER<"+the_ca.getTypeId()+">");
+		}
+
+		System.out.println("\n");
+		return compAnalNode;
+	}
+
+	public Element makeResultSetForMatch(Document the_DOC,
+			Feature the_ca,String the_resSpanType){
 		Element resultSetNode = (Element)the_DOC.createElement(
 				"result_set");
 
-		if(the_ca.getId()!=null){
-			System.out.println("RESULT_SET ID<"
-					+the_ca.getId()+">");
-			resultSetNode.setAttribute("id",the_ca.getId());
+		//if(the_ca.getId()!=null){
+		//	System.out.println("\tRESULT_SET ID<"
+		//			+the_ca.getId()+">");
+		//	resultSetNode.setAttribute("id",the_ca.getId());
+		//}
+
+		if(the_ca.getUniqueName()!=null){
+			System.out.println("\tRESULT_SET UNIQUENAME<"
+					+the_ca.getUniqueName()+">");
+			resultSetNode.setAttribute("id",the_ca.getUniqueName());
 		}
+
 		if(the_ca.getName()!=null){
-			System.out.println("RESULT_SET NAME<"
+			System.out.println("\tRESULT_SET NAME<"
 					+the_ca.getName()+">");
 			resultSetNode.appendChild(makeGenericNode(the_DOC,
 					"name",the_ca.getName()));
 		}
-		System.out.println("COMP_ANAL SCORE <"
+
+
+		System.out.println("\tCOMP_ANAL SCORE <"
 				+the_ca.getrawscore()+">");
 
 		Vector rSpanList = new Vector();
 		//BUILD SPAN LIST
-		/***********/
 		for(int i=0;i<the_ca.getGenFeatCount();i++){
+			//EACH ONE OF THESE IS A RESULT_SPAN CORRESPONDING
+			//TO A FEATURE_RELATIONSHIP IN CHADO
 			GenFeat CAgf = (GenFeat)the_ca.getGenFeat(i);
-			System.out.println("WOULDBE<"+((Feature)CAgf).gettimeaccessioned()+">");
-			System.out.println("XXXYYY START");
-			CAgf.Display(2);
+			System.out.println("\t\tRESULT_SPAN ID<"+CAgf.getId()
+					+"> TYPE<"+CAgf.getTypeId()+">:");
+			System.out.println("\t\tRESULT_SPAN UN<"
+					+CAgf.getUniqueName()+">");
+			System.out.println("RESULT_SPAN TYPE SHOULD BE<"
+					+the_resSpanType+">");
+			if(CAgf.getFeatLoc()!=null){
+				System.out.println("\t\t\tQUERY SEQ_REL<"
+					+CAgf.getFeatLoc().getSpan()+">");
+			}
+			if(CAgf.getAltFeatLoc()!=null){
+				System.out.println("\t\t\tSBJCT SEQ_REL<"
+					+CAgf.getAltFeatLoc().getSpan()+">");
+			}
 			rSpanList.add(CAgf);
 		}
-		/***********/
-		/***********
-		for(int i=0;i<the_ca.getCompFeatCount();i++){
-			String compId = (String)the_ca.getCompFeat(i);
-			Feature CAgf = (Feature)Mapping.Lookup(compId);
-			System.out.println("XXX START");
-			CAgf.Display();
-			System.out.println("XXX END");
-			rSpanList.add(CAgf);
-		}
-		***********/
 
 		//SORT SPAN LIST
 		for(int i=0;i<rSpanList.size();i++){
 			Feature cai = (Feature)rSpanList.get(i);
 			for(int j=(i+1);j<rSpanList.size();j++){
 				Feature caj = (Feature)rSpanList.get(j);
-				if((cai.getFeatLoc()!=null)&&(cai.getFeatLoc().getSpan()!=null)&&(caj.getFeatLoc()!=null)&&(caj.getFeatLoc().getSpan()!=null)){
+				if((cai.getFeatLoc()!=null)
+					&&(cai.getFeatLoc().getSpan()!=null)
+					&&(caj.getFeatLoc()!=null)
+					&&(caj.getFeatLoc().getSpan()!=null)){
 					if(caj.getFeatLoc().getSpan().precedes(cai.getFeatLoc().getSpan())){
 						caj = (Feature)rSpanList.set(j,cai);
 						rSpanList.set(i,caj);
@@ -1034,43 +1159,49 @@ private boolean m_geneOnly = false;
 		}
 
 		//DISPLAY FOR TEST
-		System.out.println("DISPLAY RESULT_SET");
 		Span resultSetSpan = new Span(0,0);
 		for(int i=0;i<rSpanList.size();i++){
 			Feature ca = (Feature)rSpanList.get(i);
 			if((ca!=null)&&(ca.getFeatLoc()!=null)){
-	//ARF
 				Span sp = ca.getFeatLoc().getSpan();
 				String sfi = ca.getFeatLoc().getSrcFeatureId();
 				System.out.println("SRC_FEAT FEATID<"+sfi+">");
-			Feature tmp = (Feature)Mapping.Lookup(sfi);
-				if(tmp!=null){
-					System.out.println("TMP<"+tmp.getResidues()+">");
-				}else{
-					System.out.println("TMP<null>");
-				}
+				Feature tmp = (Feature)Mapping.Lookup(sfi);
 				//INTERBASE CONVERSION
 				sp = new Span(sp.getStart()+1,sp.getEnd());
-
 				resultSetSpan.grow(sp);
 				ca.getFeatLoc().setSpan(sp);
-				System.out.println("\tRESULT_SPAN<"
-					+ca.getFeatLoc().getSpan().toString()+">");
 			}else{
 				System.out.println("MISSING FEATLOC!!!");
 			}
 		}
 
-		int strand = -1;
-		if(resultSetSpan.isForward()){
-			strand = 1;
+		int strand = 1;
+
+		//ONLY ADD A SEQ_REL WHEN THERE ARE MULTIPLE RESULT_SPANS
+		//THE SEQ IS THE SAME AS THE QUERY STRING
+		System.out.println("RESSPANSIZE<"+rSpanList.size()+">");
+		if(rSpanList.size()>3){//INCLUDING DUMMY ONE WITH NO FEATLOC
+			//GET QUERY NAME FROM QUERY RESULT_SPAN FOR RESULT_SET
+//VERYVERYKLUDGY - FIX LATER
+			String queryName = "";
+			for(int i=0;i<rSpanList.size();i++){
+				Feature ca = (Feature)rSpanList.get(i);
+				if((ca!=null)&&(ca.getFeatLoc()!=null)){
+				for(int j=0;j<ca.getGenFeatCount();j++){
+					GenFeat gf = (GenFeat)ca.getGenFeat(j);
+					if(j==1){
+						queryName = gf.getUniqueName();
+						break;
+					}
+				}
+				}
+			}
+			resultSetNode.appendChild(makeSeqRelNode(
+					the_DOC,the_ca,
+					resultSetSpan,
+					strand,queryName,"query",null));
 		}
-		System.out.println("PROBLEM COMP_ANALYSIS<"+m_OldREFSTRING+">");
-		//TTT
-		resultSetNode.appendChild(makeSeqRelNode(
-				the_DOC,the_ca,
-				resultSetSpan,
-				strand,m_OldREFSTRING,"query",null));
 
 		//WRITE SPAN LIST
 		for(int i=0;i<rSpanList.size();i++){
@@ -1078,34 +1209,143 @@ private boolean m_geneOnly = false;
 			if((ca!=null)&&(ca.getFeatLoc()!=null)){
 				Element caresSpan = makeNewResultSpan(
 						the_DOC,ca,
-						ca.getTypeId(),
-						ca.getrawscore());
+						the_resSpanType,
+						ca.getrawscore(),true);
 				resultSetNode.appendChild(caresSpan);
 			}
 		}
-		compAnalNode.appendChild(resultSetNode);
+		return resultSetNode;
+	}
 
-		System.out.println("\n");
-		return compAnalNode;
+	public Element makeResultSetForTransposon(Document the_DOC,
+			Feature the_ca,String the_resSpanType){
+		Element resultSetNode = (Element)the_DOC.createElement(
+				"result_set");
+
+		if(the_ca.getId()!=null){
+			System.out.println("\tTRANSP RESULT_SET ID<"
+					+the_ca.getId()+">");
+			resultSetNode.setAttribute("id",the_ca.getId());
+		}
+
+		if(the_ca.getName()!=null){
+			System.out.println("\tTRANSP RESULT_SET NAME<"
+					+the_ca.getName()+">");
+			resultSetNode.appendChild(makeGenericNode(the_DOC,
+					"name",the_ca.getName()));
+		}
+		System.out.println("\tTRANSP COMP_ANAL SCORE <"
+				+the_ca.getrawscore()+">");
+
+		Vector rSpanList = new Vector();
+		//BUILD SPAN LIST
+		for(int i=0;i<the_ca.getGenFeatCount();i++){
+			//EACH ONE OF THESE IS A RESULT_SPAN CORRESPONDING
+			//TO A FEATURE_RELATIONSHIP IN CHADO
+			GenFeat CAgf = (GenFeat)the_ca.getGenFeat(i);
+			System.out.println("\t\tTRANSP RESULT_SPAN ID<"+CAgf.getId()
+					+"> TYPE<"+CAgf.getTypeId()+">:");
+			System.out.println("\t\tTRANSP RESULT_SPAN UN<"
+					+CAgf.getUniqueName()+">");
+			System.out.println("TRANSP RESULT_SPAN TYPE SHOULD BE<"
+					+the_resSpanType+">");
+			if(CAgf.getFeatLoc()!=null){
+				System.out.println("\t\t\tTRANSP QUERY SEQ_REL<"
+					+CAgf.getFeatLoc().getSpan()+">");
+			}
+			if(CAgf.getAltFeatLoc()!=null){
+				System.out.println("\t\t\tTRANSP SBJCT SEQ_REL<"
+					+CAgf.getAltFeatLoc().getSpan()+">");
+			}
+			rSpanList.add(CAgf);
+		}
+
+		//SORT SPAN LIST
+		for(int i=0;i<rSpanList.size();i++){
+			Feature cai = (Feature)rSpanList.get(i);
+			for(int j=(i+1);j<rSpanList.size();j++){
+				Feature caj = (Feature)rSpanList.get(j);
+				if((cai.getFeatLoc()!=null)
+					&&(cai.getFeatLoc().getSpan()!=null)
+					&&(caj.getFeatLoc()!=null)
+					&&(caj.getFeatLoc().getSpan()!=null)){
+					if(caj.getFeatLoc().getSpan().precedes(cai.getFeatLoc().getSpan())){
+						caj = (Feature)rSpanList.set(j,cai);
+						rSpanList.set(i,caj);
+						cai = caj;
+					}
+				}else{
+					System.out.println("SHOULD NOT SEE COMP_ANAL NULL SPAN");
+				}
+			}
+		}
+
+		//DISPLAY FOR TEST
+		Span resultSetSpan = new Span(0,0);
+		for(int i=0;i<rSpanList.size();i++){
+			Feature ca = (Feature)rSpanList.get(i);
+			if((ca!=null)&&(ca.getFeatLoc()!=null)){
+				Span sp = ca.getFeatLoc().getSpan();
+				String sfi = ca.getFeatLoc().getSrcFeatureId();
+				System.out.println("SRC_FEAT FEATID<"+sfi+">");
+				Feature tmp = (Feature)Mapping.Lookup(sfi);
+				//INTERBASE CONVERSION
+				sp = new Span(sp.getStart()+1,sp.getEnd());
+				resultSetSpan.grow(sp);
+				ca.getFeatLoc().setSpan(sp);
+			}else{
+				System.out.println("MISSING FEATLOC!!!");
+			}
+		}
+
+		//WRITE SPAN LIST
+		//FOR TRANSPOSONS, THE RAWSCORE IS STORED IN TOP <ANAL_FEAT>
+		String rawscore = the_ca.getrawscore();
+		for(int i=0;i<rSpanList.size();i++){
+			Feature ca = (Feature)rSpanList.get(i);
+			if((ca!=null)&&(ca.getFeatLoc()!=null)){
+				Element caresSpan = makeNewResultSpan(
+						the_DOC,ca,
+						//ca.getTypeId(),
+						the_resSpanType,
+						rawscore,false);
+				resultSetNode.appendChild(caresSpan);
+			}
+		}
+		return resultSetNode;
 	}
 
 	public Element makeNewResultSpan(Document the_DOC,Feature the_ca,
-			String the_typeId,String the_score){
-		System.out.println("makeNewResultSpan()");
+			String the_typeId,String the_score,boolean m_isMatch){
+		System.out.println("\tRESULT_SPAN TYPE<"+the_typeId+">");
 		Element resultSpanNode = (Element)the_DOC.createElement("result_span");
-		if(the_ca.getId()!=null){
-			resultSpanNode.setAttribute("id",the_ca.getId());
+		//if(the_ca.getId()!=null){
+		//	resultSpanNode.setAttribute("id",the_ca.getId());
+		//}
+		if(the_ca.getUniqueName()!=null){
+			String unm = the_ca.getUniqueName();
+			//FFF
+			//unm = deNullString(unm);
+			//int indx = unm.indexOf(":");
+			//if(indx>0){
+			//	System.out.print("CHANGING <"+unm+"> TO<");
+			//	unm = unm.substring(indx);
+			//	System.out.println(unm+">");
+			//}
+			resultSpanNode.setAttribute("id",unm);
 		}
+
 		if(the_ca.getName()!=null){
 			resultSpanNode.appendChild(makeGenericNode(
 					the_DOC,"name",the_ca.getName()));
 		}
-		System.out.println("\tRESULT_SPAN TYPE<"
-				+the_typeId+">");
+
 		if(the_typeId!=null){
+			String catypeId = convertCompAnalType(the_typeId);
 			resultSpanNode.appendChild(makeGenericNode(
-					the_DOC,"type",the_typeId));
+					the_DOC,"type",catypeId));
 		}
+
 		System.out.println("\tRESULT_SPAN SCORE <"+the_score+">");
 		if(the_score!=null){
 			resultSpanNode.appendChild(makeGenericNode(
@@ -1119,18 +1359,14 @@ private boolean m_geneOnly = false;
 			resultSpanNode.appendChild(outputNode);
 		}
 
-		//String queryName = m_OldREFSTRING;
 		String queryName = "";
 		String queryResidues = "";
 		String subjName = "";
 		String subjResidues = "";
 		for(int i=0;i<the_ca.getGenFeatCount();i++){
 			GenFeat gf = (GenFeat)the_ca.getGenFeat(i);
-			System.out.println("GGGGF<"+gf.getName()+">");
-			System.out.println("GGGGFFFF<"+((Feature)gf).getResidues()+">");
-			//subjName = gf.getUniqueName();
-			//subjResidues = ((Feature)gf).getResidues();
-//KLUDGE - FIX
+			//System.out.println("GGGGF<"+gf.getName()+">");
+			//System.out.println("GGGGFF<"+((Feature)gf).getResidues()+">");
 			if(i==0){
 				subjName = gf.getUniqueName();
 				subjResidues = ((Feature)gf).getResidues();
@@ -1138,75 +1374,92 @@ private boolean m_geneOnly = false;
 				queryName = gf.getUniqueName();
 				queryResidues = ((Feature)gf).getResidues();
 			}
-			//if(subjName!=null){
-			//	break;
-			//}
 		}
-		System.out.println("FSS SUBJ NAME <"+subjName+"> RES<"+subjResidues+">");
-		System.out.println("FSS QUERY NAME <"+queryName+"> RES<"+queryResidues+">");
+		System.out.println("\tSUBJ NAME <"+subjName
+				+"> RES<"+subjResidues+">");
+		System.out.println("\tQUERY NAME <"+queryName
+				+"> RES<"+queryResidues+">");
 
 		//SUBJECT
+		if(m_isMatch){
 		if(the_ca.getAltFeatLoc()!=null){
 			Span altsp = the_ca.getAltFeatLoc().getSpan();
-	//ARF
-			Span altspRet = altsp.retreat(m_NewREFSPAN.getStart());
+			Span altspRet = altsp.retreat(m_NewREFSPAN.getStart()-1);
 			//INTERBASE CONVERSION
 			altspRet = new Span(altspRet.getStart()+1,altspRet.getEnd());
-			System.out.println("\tRESULT_SET ALTFEATLOC <"
-				+altsp.toString()+"> RET <"+altspRet.toString()
-				+"> LEN<"+altsp.getLength()
-				+"> STRAND<"+the_ca.getAltFeatLoc().getstrand()+">");
 			int strand = the_ca.getAltFeatLoc().getstrand();
-			System.out.println("PROBLEM NEW_RESULT_SPAN_ALT<"+subjName+">");
+			//queryName = deNullString(queryName);
 			resultSpanNode.appendChild(makeSeqRelNode(
 					the_DOC,the_ca,altspRet,strand,
 					queryName,"query",
 					queryResidues));
-					//the_ca.getFeatLoc().getAlign()));
-			System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
 		}
 		
 		if(the_ca.getFeatLoc()!=null){
 			Span sp = the_ca.getFeatLoc().getSpan();
-
-	//ARF
-			//Span spAdv = sp.retreat(m_NewREFSPAN.getStart());
-			//Span spAdv = sp;
-			//Span spAdv = sp.advance(m_NewREFSPAN.getStart());
-
-			System.out.println("\tRESULT_SET FEATLOC <"
-				+sp.toString()
-				//+"> ADV <"+spAdv.toString()
-				+"> LEN<"+sp.getLength()
-				+"> STRAND<"+the_ca.getFeatLoc().getstrand()+">");
-			int strand = 1;
-			if(the_ca.getAltFeatLoc()!=null){
-				strand = the_ca.getAltFeatLoc().getstrand();
-			}
-			System.out.println("PROBLEM NEW_RESULT_SPAN<"+queryName+">");
+			//if(the_ca.getAltFeatLoc()!=null){
+			//	strand = the_ca.getAltFeatLoc().getstrand();
+			//}
+			int strand = the_ca.getFeatLoc().getstrand();
+			//subjName = deNullString(subjName);
 			resultSpanNode.appendChild(makeSeqRelNode(
 					the_DOC,the_ca,sp,strand,
 					subjName,"subject",
-					//the_ca.getFeatLoc().getAlign()));
 					subjResidues));
-			//System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
+		}
+		}else{
+			if(the_ca.getFeatLoc()!=null){
+				Span sp = the_ca.getFeatLoc().getSpan();
+				Span spRet = sp.retreat(m_NewREFSPAN.getStart()-1);
+				//INTERBASE CONVERSION
+				spRet = new Span(spRet.getStart()+1,spRet.getEnd());
+				int strand = the_ca.getFeatLoc().getstrand();
+				//subjName = deNullString(subjName);
+				resultSpanNode.appendChild(makeSeqRelNode(
+						the_DOC,the_ca,spRet,strand,
+						subjName,"query",
+						subjResidues));
+			}
 		}
 
 		return resultSpanNode;
 	}
 
+	public String deNullString(String the_str){
+		int indx = the_str.indexOf(":");
+		if(indx>0){
+			the_str = the_str.substring(indx+1);
+		}
+		return the_str;
+	}
+
+	public String convertCompAnalType(String the_typeId){
+		String res = the_typeId;
+		System.out.println("CONVERTING COMP_ANAL TYPE<"
+				+the_typeId+"> TO<"+res+">");
+		res = "alignment";
+		return res;
+	}
+
 	public Element makeGameSpan(Document the_DOC,Span testSpan,int the_strand){
 		Element gameSpanNode = (Element)the_DOC.createElement("span");
 		//System.out.println("+++GAMESPAN STRAND<"+the_strand+">");
-		gameSpanNode.appendChild(makeGenericNode(
+		if(the_strand==-1){
+			gameSpanNode.appendChild(makeGenericNode(
+				the_DOC,"start",(""+testSpan.getEnd())));
+			gameSpanNode.appendChild(makeGenericNode(
+				the_DOC,"end",(""+testSpan.getStart())));
+		}else{
+			gameSpanNode.appendChild(makeGenericNode(
 				the_DOC,"start",(""+testSpan.getStart())));
-		gameSpanNode.appendChild(makeGenericNode(
+			gameSpanNode.appendChild(makeGenericNode(
 				the_DOC,"end",(""+testSpan.getEnd())));
+		}
 		return gameSpanNode;
 	}
 
 	public Element makeGameFeatPropReg(Document the_DOC,FeatProp the_fp){
-		System.out.println("FEATPROP makeGameFeatPropReg()!!!");
+		//System.out.println("FEATPROP makeGameFeatPropReg()!!!");
 		String pkeyIdTxt = the_fp.getPkeyId();
 		String pvalTxt = the_fp.getpval();
 		if(pvalTxt.startsWith("SP:")){
@@ -1226,7 +1479,7 @@ private boolean m_geneOnly = false;
 
 	public Element makeGameProperty(Document the_DOC,
 			String the_typeTxt,String the_valueTxt){
-		System.out.println("FEATPROP makeGameProperty()!!!");
+		//System.out.println("FEATPROP makeGameProperty()!!!");
 		Element attrNode = (Element)the_DOC.createElement("property");
 
 		if(the_typeTxt!=null){
@@ -1244,7 +1497,7 @@ private boolean m_geneOnly = false;
 
 	public Element makeGameFeatPropComment(Document the_DOC,
 			FeatProp the_fp){
-		System.out.println("FEATPROP makeGameFeatPropComment()!!!");
+		//System.out.println("FEATPROP makeGameFeatPropComment()!!!");
 		String txtTxt = the_fp.getpval();
 		String dateTxt = null;
 		String tsTxt = null;
@@ -1267,57 +1520,5 @@ private boolean m_geneOnly = false;
 				dateTxt,tsTxt);
 	}
 }
-
-/**********************
-	public Element makeGameFeatProp(Document the_DOC,FeatProp the_fp){
-		if(the_fp.getPkeyId()==null){
-			System.out.println("==========SHOULDNT BE NULL EITHER");
-			return null;
-		}else if(the_fp.getPkeyId().equals("comment")){
-			String txtTxt = the_fp.getpval();
-			String dateTxt = null;
-			String tsTxt = null;
-			if(txtTxt!=null){
-				int indx = txtTxt.indexOf("::DATE:");
-				if(indx>0){
-					dateTxt = txtTxt.substring(indx+7);
-					txtTxt = txtTxt.substring(0,indx);
-				}
-				if(dateTxt!=null){
-					int dindx = dateTxt.indexOf("::TS:");
-					if(dindx>0){
-						tsTxt = dateTxt.substring(dindx+5);
-						dateTxt = dateTxt.substring(0,dindx);
-					}
-				}
-			}
-			return makeGameComment(the_DOC,txtTxt,
-					the_fp.getPubId(),
-					dateTxt,tsTxt);
-
-		}else if(the_fp.getPkeyId().equals("author")){
-			Element authNode = (Element)the_DOC.createElement("author");
-			authNode.appendChild(the_DOC.createTextNode(
-					the_fp.getpval()));
-			return authNode;
-		}else{
-			String pkeyIdTxt = the_fp.getPkeyId();
-			String pvalTxt = the_fp.getpval();
-			if(pvalTxt.startsWith("SP:")){
-				//System.out.println("STARTS WITH SP: <"+pvalTxt+">");
-				//pkeyIdTxt = "protein_id";
-				pvalTxt = pvalTxt.substring(3);
-				//System.out.println("TRUNCATED TO <"+pvalTxt+">");
-			}else if(pvalTxt.startsWith("GB:")){
-				//pkeyIdTxt = "genbank_id";
-				pvalTxt = pvalTxt.substring(3);
-			}else if(pvalTxt.startsWith("FB:")){
-				//pkeyIdTxt = "flybase_id";
-				pvalTxt = pvalTxt.substring(3);
-			}
-			return makeGameProperty(the_DOC,pkeyIdTxt,pvalTxt);
-		}
-	}
-**********************/
 
 

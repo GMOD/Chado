@@ -120,7 +120,10 @@ private String m_src;
 	}
 
 	public Span retreat(int the_amt){
-		return (new Span((m_start-the_amt),(m_end-the_amt)));
+		//System.out.println("RETREAT Span <"+toString()+">");
+		Span sp = new Span((m_start-the_amt),(m_end-the_amt));
+		//System.out.println("         TO  <"+sp.toString()+">");
+		return sp;
 	}
 
 	public void Display(int the_depth){

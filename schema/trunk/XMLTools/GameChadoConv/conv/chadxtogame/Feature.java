@@ -109,25 +109,6 @@ private String m_programversion = null;
 		return m_Md5;
 	}
 
-/*************
-//FEATLOC
-	public void setFeatLoc(FeatLoc the_FeatLoc){
-		m_FeatLoc = the_FeatLoc;
-	}
-
-	public FeatLoc getFeatLoc(){
-		return m_FeatLoc;
-	}
-
-	public void setAltFeatLoc(FeatLoc the_AltFeatLoc){
-		m_AltFeatLoc = the_AltFeatLoc;
-	}
-
-	public FeatLoc getAltFeatLoc(){
-		return m_AltFeatLoc;
-	}
-*************/
-
 //DBXREF_ID
 	public void setDbxrefId(String the_DbxrefId){
 		m_DbxrefId.setkey(the_DbxrefId);
@@ -142,12 +123,12 @@ private String m_programversion = null;
 	}
 
 	public String getDbxrefId(){
-		System.out.println("FEATURE:getDbxrefId()");
+		//System.out.println("FEATURE:getDbxrefId()");
 		return m_DbxrefId.getValue();
 	}
 
 	public Dbxref getDbxref(){
-		System.out.println("FEATURE:getDbxrefId()");
+		//System.out.println("FEATURE:getDbxrefId()");
 		return (Dbxref)m_DbxrefId.getObjValue();
 	}
 
@@ -165,7 +146,7 @@ private String m_programversion = null;
 	}
 
 	public String getOrganismId(){
-		System.out.println("GENFEAT:getOrganismId()");
+		//System.out.println("GENFEAT:getOrganismId()");
 		return m_OrganismId.getValue();
 	}
 
@@ -199,7 +180,7 @@ private String m_programversion = null;
 	}
 
 	public FeatDbxref getFeatDbxref(int the_indx){
-		System.out.println("FEATURE:getFeatDbxref("+the_indx+")");
+		//System.out.println("FEATURE:getFeatDbxref("+the_indx+")");
 		if((the_indx>=0)&&(the_indx<m_FeatDbxrefList.size())){
 			return (FeatDbxref)m_FeatDbxrefList.get(the_indx);
 		}
@@ -216,7 +197,7 @@ private String m_programversion = null;
 	}
 
 	public FeatSyn getFeatSyn(int the_indx){
-		System.out.println("FEATURE:getFeatSyn("+the_indx+")");
+		//System.out.println("FEATURE:getFeatSyn("+the_indx+")");
 		if((the_indx>=0)&&(the_indx<m_FeatSynList.size())){
 			return (FeatSyn)m_FeatSynList.get(the_indx);
 		}
