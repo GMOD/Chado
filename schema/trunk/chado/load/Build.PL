@@ -14,7 +14,7 @@ my $m = Chado::Builder->new(dist_name => '', dist_version => $VERSION, load_conf
 #print Dumper $m->properties;
 
 print "initializing load scripts...\n";
-#$m->dispatch('tokenize');
+$m->dispatch('tokenize');
 
 #$m->dispatch('ontologies');
 

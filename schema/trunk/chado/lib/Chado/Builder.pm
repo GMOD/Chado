@@ -5,6 +5,7 @@ use Data::Dumper;
 use Template;
 use XML::Simple;
 use LWP::Simple qw(mirror is_success status_message);
+no warnings;
 
 =head1 ACTIONS
 
@@ -65,24 +66,31 @@ sub ACTION_ontologies {
 
       print "  +",$file->{remote},"\n";
       $load = 1 if $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
-#      $m->_mirror($file->{remote},$conf->{path}{data} .'/'. $file->{local});
     }
 
     my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
     foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
       print "  +",$ontfile->{remote},"\n";
 
+      print "    already loaded, remove touchfile to reload.  skipping\n" and next if -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+
       $load = 1 if $m->_mirror($ontfile->{remote},$conf->{path}{data} .'/'. $ontfile->{local});
-      next unless $load;
+      #if there was an error downloading
+      print "    error downloading!\n" and next if ! -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'};
+
+      $load = 1 if ! -f $conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
 
       print "    loading...";
-      system('./bin/load_ontology.pl',
-             $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_username'},
-             $conf->{'tt2'}{'load/tt2/AutoDB.tt2'}{'token'}{'db_name'},
+
+      system('./load/bin/load_ontology.pl',
+             $conf->{'tt2'}{'load/tt2/LoadDBI.tt2'}{'token'}{'db_username'},
+             $conf->{'tt2'}{'load/tt2/LoadDBI.tt2'}{'token'}{'db_name'},
              $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
              $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
             ) && (print "failed: $!\n" and die);
-      print "done!\n";
+      print "done!\n"
+        and open(T,'>'.$conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.'_'.$conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'})
+        and print T "\n" and close(T);
     }
   }
 }
