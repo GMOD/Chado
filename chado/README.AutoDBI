@@ -1,0 +1,15 @@
+Process for makeing AutoDBI.PL:
+
+Run Makefile.PL and select all sql and function extensions.
+   This creates a new AuotDBI.pm and complete.sql defining the current schema.
+
+diff modules/complete.sql  modules/default_schema.sql
+  to see if the schema has changed since the last time AutoDBI.PL has been
+  updated.
+
+cp modules/complete.sql  modules/default_schema.sql
+
+edit bin/AutoDBI.PL
+   delete everything in the non-substituting HEREDOC
+   insert the corresponding section from the corresponding
+       blib/lib/Chado/AutoDBI.pm

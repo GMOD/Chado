@@ -4,8 +4,8 @@ Done! - test load_gff.pl
 Done! - roll yeast gff3 file into distribution
 - add a make target to remove ontology lock files
 - change tmp space for ontologies to $GMOD_ROOT/tmp
-- update AutoDBI.PLS
-- fix the prepdb thing (are the inserts that fail generic or specific to
+Done! - update AutoDBI.PLS
+Done! - fix the prepdb thing (are the inserts that fail generic or specific to
    Allen's stuff?)
 
 Tue Jan  6 01:34:51 PST 2004 - allenday
