@@ -1,6 +1,6 @@
-## ================================================
-## TABLE: feature
-## ================================================
+-- ================================================
+-- TABLE: feature
+-- ================================================
 
 create table feature (
        feature_id serial not null,
@@ -26,22 +26,22 @@ create table feature (
        unique(dbxref_id),
        unique(name, fnbeg, fnend, strand, source_feature_id, type_id)
 );
-## IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
-## this is vital as it allows us to represent zero-length
-## features eg splice sites, insertion points without
-## an awkward fuzzy system
+-- IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
+-- this is vital as it allows us to represent zero-length
+-- features eg splice sites, insertion points without
+-- an awkward fuzzy system
 
-## fnbeg, fnend are for feature natural begin/end
-## by natural begin, end we mean these are the actual
-## beginning (5' position) and actual end (3' position)
-## rather than the low position and high position, as
-## these terms are sometimes erroneously used
+-- fnbeg, fnend are for feature natural begin/end
+-- by natural begin, end we mean these are the actual
+-- beginning (5' position) and actual end (3' position)
+-- rather than the low position and high position, as
+-- these terms are sometimes erroneously used
 
-## seqlen is redundant except for transcripts (where we're being ambiguous)
+-- seqlen is redundant except for transcripts (where we're being ambiguous)
 
-## ================================================
-## TABLE: feature_pub
-## ================================================
+-- ================================================
+-- TABLE: feature_pub
+-- ================================================
 
 create table feature_pub (
        feature_id int not null,
@@ -55,9 +55,9 @@ create table feature_pub (
 );
 
 
-## ================================================
-## TABLE: featureprop
-## ================================================
+-- ================================================
+-- TABLE: featureprop
+-- ================================================
 
 create table featureprop (
        featureprop_id serial not null,
@@ -73,14 +73,14 @@ create table featureprop (
 
        unique(feature_id, pkey_id, pval, prank)
 );
-## feature_prop_id allows us to link a featureprop record to a publication
-## ARE WE BEING CONSISTENT IN HOW WE LINK PROPERTIES TO PUBLICATIONS?  LOOK
-## AT ALL OTHER PROPERTY TABLES!!!
+-- feature_prop_id allows us to link a featureprop record to a publication
+-- ARE WE BEING CONSISTENT IN HOW WE LINK PROPERTIES TO PUBLICATIONS?  LOOK
+-- AT ALL OTHER PROPERTY TABLES!!!
 
 
-## ================================================
-## TABLE: featureprop_pub
-## ================================================
+-- ================================================
+-- TABLE: featureprop_pub
+-- ================================================
 
 create table featureprop_pub (
        featureprop_id int not null,
@@ -93,9 +93,9 @@ create table featureprop_pub (
        unique(featureprop_id, pub_id)
 );
 
-## ================================================
-## TABLE: feature_dbxref
-## ================================================
+-- ================================================
+-- TABLE: feature_dbxref
+-- ================================================
 
 create table feature_dbxref (
        feature_dbxref_id serial not null,
@@ -109,12 +109,12 @@ create table feature_dbxref (
 
        unique(feature_dbxref_id, dbxref_id)
 );
-## each feature can be linked to multiple external dbs
+-- each feature can be linked to multiple external dbs
 
 
-## ================================================
-## TABLE: feature_relationship
-## ================================================
+-- ================================================
+-- TABLE: feature_relationship
+-- ================================================
 
 create table feature_relationship (
        feature_relationship_id serial not null,
@@ -132,20 +132,20 @@ create table feature_relationship (
        unique(subjfeature_id, objfeature_id, type_id)
 );
 
-# features can be arranged in graphs, eg exon partof transcript 
-# partof gene; translation madeby transcript
-# if type is thought of as a verb, each arc makes a statement
-# [SUBJECT VERB OBJECT]
-# object can also be thought of as parent, and subject as child
-#
-# we include the relationship rank/order, because even though
-# most of the time we can order things implicitly by sequence
-# coordinates, we can't always do this - eg transpliced genes.
-# it's also useful for quickly getting implicit introns
+-- features can be arranged in graphs, eg exon partof transcript 
+-- partof gene; translation madeby transcript
+-- if type is thought of as a verb, each arc makes a statement
+-- [SUBJECT VERB OBJECT]
+-- object can also be thought of as parent, and subject as child
+--
+-- we include the relationship rank/order, because even though
+-- most of the time we can order things implicitly by sequence
+-- coordinates, we can't always do this - eg transpliced genes.
+-- it's also useful for quickly getting implicit introns
 
-## ================================================
-## TABLE: feature_cvterm
-## ================================================
+-- ================================================
+-- TABLE: feature_cvterm
+-- ================================================
 
 create table feature_cvterm (
        feature_cvterm_id serial not null,
@@ -161,20 +161,20 @@ create table feature_cvterm (
 
        unique(feature_id, cvterm_id, pub_id)
 );
-## Link to cvterm module from feature
+-- Link to cvterm module from feature
 
-## ================================================
-## TABLE: gene
-## ================================================
+-- ================================================
+-- TABLE: gene
+-- ================================================
 
 create table gene (
        gene_id serial not null,
        primary key (gene_id),
-## in FlyBase, the gene symbol
+-- in FlyBase, the gene symbol
        name varchar(255) not null,
        type_id int,
        foreign key (type_id) references cvterm (cvterm_id),
-## accession holds the FBgn in FlyBase
+-- accession holds the FBgn in FlyBase
        dbxref_id int,
        foreign key (dbxref_id) references dbxref(dbxref_id),
        timeentered timestamp not null default current_timestamp,
@@ -183,17 +183,17 @@ create table gene (
        unique(name),
        unique(dbxref_id)
 );
-## the set of tables handling genes, which here are exclusively grouping
-## objects.  All FlyBase data currently stored under "Gene" and associated
-## tables will need to be moved under the wildtype allele
+-- the set of tables handling genes, which here are exclusively grouping
+-- objects.  All FlyBase data currently stored under "Gene" and associated
+-- tables will need to be moved under the wildtype allele
 
-## The localization of gene in the sequence module, combinded with moving
-## of all data in FlyBase currently under "Gene" under the wild-type allele
-## constitutes a large  part of the "integration".
+-- The localization of gene in the sequence module, combinded with moving
+-- of all data in FlyBase currently under "Gene" under the wild-type allele
+-- constitutes a large  part of the "integration".
 
-## ================================================
-## TABLE: gene_synonym
-## ================================================
+-- ================================================
+-- TABLE: gene_synonym
+-- ================================================
 
 create table gene_synonym (
        synonym_id int not null,
@@ -202,14 +202,14 @@ create table gene_synonym (
        foreign key (gene_id) references gene (gene_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-## typically a synonym exists so that somebody querying the db with an
-## obsolete name can find the object they're looking for (under its current
-## name.  If the synonym has been used publicly & deliberately (eg in a 
-## paper), it my also be listed in reports as a synonym.   If the synonym 
-## was not used deliberately (eg, there was a typo which went public), then 
-## the is_internal bit may be set to 'true' so that it is known that the 
-## synonym is "internal" and should be queryable but should not be listed 
-## in reports as a valid synonym.
+-- typically a synonym exists so that somebody querying the db with an
+-- obsolete name can find the object they're looking for (under its current
+-- name.  If the synonym has been used publicly & deliberately (eg in a 
+-- paper), it my also be listed in reports as a synonym.   If the synonym 
+-- was not used deliberately (eg, there was a typo which went public), then 
+-- the is_internal bit may be set to 'true' so that it is known that the 
+-- synonym is "internal" and should be queryable but should not be listed 
+-- in reports as a valid synonym.
        is_internal boolean not null default 'false',
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
@@ -217,9 +217,9 @@ create table gene_synonym (
        unique(synonym_id, gene_id, pub_id)
 );
 
-## ================================================
-## TABLE: gene_feature
-## ================================================
+-- ================================================
+-- TABLE: gene_feature
+-- ================================================
 
 create table gene_feature (
        gene_id int not null,
@@ -233,9 +233,9 @@ create table gene_feature (
 );
 
 
-## ================================================
-## TABLE: feature_organism
-## ================================================
+-- ================================================
+-- TABLE: feature_organism
+-- ================================================
 
 create table feature_organism (
        feature_id int not null,
@@ -246,9 +246,9 @@ create table feature_organism (
        timelastmod timestamp not null default current_timestamp
 );
 
-## ================================================
-## TABLE: feature_synonym
-## ================================================
+-- ================================================
+-- TABLE: feature_synonym
+-- ================================================
 
 create table feature_synonym (
        synonym_id int not null,
@@ -257,14 +257,14 @@ create table feature_synonym (
        foreign key (feature_id) references feature (feature_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-## typically a synonym exists so that somebody querying the db with an
-## obsolete name can find the object they're looking for (under its current
-## name.  If the synonym has been used publicly & deliberately (eg in a 
-## paper), it my also be listed in reports as a synonym.   If the synonym 
-## was not used deliberately (eg, there was a typo which went public), then 
-## the is_internal bit may be set to 'true' so that it is known that the 
-## synonym is "internal" and should be queryable but should not be listed 
-## in reports as a valid synonym.
+-- typically a synonym exists so that somebody querying the db with an
+-- obsolete name can find the object they're looking for (under its current
+-- name.  If the synonym has been used publicly & deliberately (eg in a 
+-- paper), it my also be listed in reports as a synonym.   If the synonym 
+-- was not used deliberately (eg, there was a typo which went public), then 
+-- the is_internal bit may be set to 'true' so that it is known that the 
+-- synonym is "internal" and should be queryable but should not be listed 
+-- in reports as a valid synonym.
        is_internal boolean not null default 'false',
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
@@ -272,8 +272,8 @@ create table feature_synonym (
        unique(synonym_id, feature_id, pub_id)
 );
 
-# [this needs moved to a different file]
-# typed feature
+-- [this needs moved to a different file]
+-- typed feature
 create view tfeature as
  select * from feature, cvterm
  where feature.type_id = cvterm.cvterm_id;
@@ -297,11 +297,11 @@ create view transcript2exon as
  where ftranscript.feature_id = r.objfeature_id
  and   fexon.feature_id = r.subjfeature_id;
 
-# everything related to a gene; assumes the 'gene graph'
-# goes to depth 2 maximum; will get everything up to 2 nodes
-# away, eg transcripts, exons, translations; but also 
-# other features we may want to associate - variations, regulatory
-# regions, pre/post mRNA distinctions, introns etc
+-- everything related to a gene; assumes the 'gene graph'
+-- goes to depth 2 maximum; will get everything up to 2 nodes
+-- away, eg transcripts, exons, translations; but also 
+-- other features we may want to associate - variations, regulatory
+-- regions, pre/post mRNA distinctions, introns etc
 
 create view genemodel as
  select * from fgene, tfeature1, tfeature2, 
@@ -311,16 +311,16 @@ create view genemodel as
  and r1.objfeature_id = r2.subjfeature_id
  and r2.objfeature_id = tfeature2.feature_id;
 
-##  How do we attribute the statement that such and such a feature is at 
-##  a certain location on a sequence?  This is captured in the link between
-##  the feature and a publication.   
+--  How do we attribute the statement that such and such a feature is at 
+--  a certain location on a sequence?  This is captured in the link between
+--  the feature and a publication.   
 
-## TODO: make a use-case where a regulatory region is included
-## in the graph.   Can mutations in the reg_region be included?
+-- TODO: make a use-case where a regulatory region is included
+-- in the graph.   Can mutations in the reg_region be included?
 
-## TODO:  decorator tables linked to feature (eg GeneData, InsertionData)?
-##  instead of using feature_prop...
+-- TODO:  decorator tables linked to feature (eg GeneData, InsertionData)?
+--  instead of using feature_prop...
 
 
-## references from other modules:
-##	      expression: feature_expression
+-- references from other modules:
+--	      expression: feature_expression
