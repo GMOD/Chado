@@ -107,6 +107,8 @@ insert into cvterm (name, cv_id) values ('null pub', (select cv_id from cv where
 insert into cvterm (name, cv_id) values ('submitted', (select cv_id from cv where name='pub type'));
 
 
+insert into pub (uniquename, title, type_id) values ('none', 'none', (select cvterm_id from cvterm where name = 'null pub' and cv_id in (select cv_id from cv where name='pub type') ) );
+
 insert into cv (name) values ('pub relationship type');
 insert into cvterm (name, cv_id) values('also_in', (select cv_id from cv where name='pub relationship type'));
 insert into cvterm (name, cv_id) values('corrects', (select cv_id from cv where name='pub relationship type'));
