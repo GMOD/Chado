@@ -20,9 +20,17 @@ no warnings;
 
 this is an example target
 
+=item radviews()
+
+Calls the psql command and pipes in the contents of the
+modules/expression/rad.views file.  This creates several views
+on the elementresult table for representing different types of
+gene expression data.  This is a prerequisite for loading
+gene expression data.
+
 = item prepdb()
 
-Simply calls the psql command and pipes in the contents of the 
+Calls the psql command and pipes in the contents of the 
 load/etc/initialize.sql file.  Put any insert statements that
 your data load needs here.
 
@@ -48,6 +56,37 @@ platform-specific variable values
 
 =cut
 
+=head2 ACTION_radviews
+
+ Title   : ACTION_radviews
+ Usage   :
+ Function: Executes any SQL statements in the modules/expression/rad.views file.
+ Example :
+ Returns : 
+ Args    :
+
+=cut
+
+sub ACTION_radviews {
+  # the build object $m
+  my $m = shift;
+  # the XML config object
+  my $conf = $m->conf;
+
+  $m->log->info("entering ACTION_radviews");
+
+  my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $build_dir = $conf->{'build'}{'working_dir'} || '';
+  my $init_sql  = catfile( $build_dir, 'modules', 'expression', 'rad.views' );
+  my $sys_call  = "psql -f $init_sql $db_name";
+
+  $m->log->debug("system call: $sys_call");
+
+  system( $sys_call ) == 0 or croak "Error executing '$sys_call': $?";
+
+  $m->log->info("leaving ACTION_radviews");
+}
+
 =head2 ACTION_prepdb
 
  Title   : ACTION_prepdb
@@ -58,6 +97,7 @@ platform-specific variable values
  Args    :
 
 =cut
+
 sub ACTION_prepdb {
   # the build object $m
   my $m = shift;

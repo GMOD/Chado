@@ -552,7 +552,7 @@ if (-e $TMPFASTA) {
   unlink $TMPFASTA;
   unlink $TMPGFF;
 
-  warn "Loaded $seqs_loaded sequence(s)\n";
+  print "$seqs_loaded sequences added\n";
 }
 
 warn "Done\n";
