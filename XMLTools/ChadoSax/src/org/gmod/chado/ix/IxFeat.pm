@@ -10,9 +10,9 @@ See also org.gmod.chado.ix.IxFeat.java
 
   org::gmod::chado::ix::IxFeat; - 'feature' record contains
        (a) hash of single value fields (tag==class,id,name,..)
-       (b) list of child sub-features
-       (c) list of attributes (IxAttr)
-       (d) list of feature locations (IxSpan)
+       (b) list of child sub-features (IxFeat; tagged; should have id)
+       (c) list of attributes (IxAttr; tagged; may have id)
+       (d) list of feature locations (IxSpan; no id)
 
 inherits from org::gmod::chado::ix::IxBase
 
@@ -37,8 +37,11 @@ sub isGenFeat() { return 1; }
 
 sub init {
 	my $self= shift;
+	# $self->SUPER::init();
 	$self->{tag}= 'IxFeat' unless (exists $self->{tag} );
-	# @{$self->{list}}= ();
+  $self->{list}= [];
+  $self->{attrlist}= [];
+	$self->{loclist}= [];
 }
 
 
@@ -56,17 +59,48 @@ sub add {
   push(@{$self->{list}}, $val);
 }
 
+=head2 addattr
+
+  addattr(IxAttr) - add IxAttr to list
+
+=cut
+  
+sub addattr {
+	my $self= shift;
+	my $val= shift;
+  push(@{$self->{attrlist}}, $val); ## attrlist
+}
+
 =head2 getfeats([classTypes])
   
-  return list of child sub-feature  
+  return list of IxFeat sub-features  
   classTypes - optional list of feature types to return
   
 =cut
 
 sub getfeats {
 	my $self= shift;
+	return $self->getFeatsOrAttrs($self->{list},@_);
+}
+
+=head2 getattrs([classTypes])
+
+  get IxAttr list
+  classTypes - optional list of feature types to return
+
+=cut
+  
+
+sub getattrs {
+	my $self= shift;
+	return $self->getFeatsOrAttrs($self->{attrlist},@_);
+}
+
+sub getFeatsOrAttrs {
+	my $self= shift;
+	my $atftlist= shift;
 	my @cl= @_;
-  my @fts= @{$self->{list}};
+  my @fts= @{$atftlist};
   if (@cl) {
     my %tags=  map { $_,1; } @cl;
     my @ft2= ();
@@ -76,6 +110,23 @@ sub getfeats {
     return @ft2;
     }
   return @fts;
+}
+
+=head2 getfeatbyid
+  
+  getfeatbyid() - return child feature with given id
+  see also IxBase::getid(id) using handler->{idhash}
+  
+=cut
+
+sub getfeatbyid {
+	my $self= shift;
+	my $id= shift;
+  my @fts= @{$self->{list}};
+  foreach my $ft (@fts) {
+    return $ft if ( $ft->{id} eq $id );
+    }
+  return undef;
 }
 
 =head2 getfeattypes
@@ -96,36 +147,16 @@ sub getfeattypes {
   return @cl;
 }
 
-=head2 addattr
-
-  addattr(IxAttr) - add IxAttr to list
-
-=cut
-  
-sub addattr {
-	my $self= shift;
-	my $val= shift;
-  push(@{$self->{attrlist}}, $val); ## attrlist
-}
-
-=head2 getattrs()
-
-  get IxAttr list
-
-=cut
-  
-sub getattrs {
-	my $self= shift;
-  return undef unless(defined $self->{attrlist});
-  my @attr= @{$self->{attrlist}};
-  return @attr;
-}
 
 
 =head2 addloc(IxSpan)
 
   add IxSpan(nbeg,nend,src)
 
+=item NOTE
+  
+  move location handling to new IxBase/IxAttr subclass ? not IxSpan
+  
 =cut
   
 sub addloc {
@@ -137,14 +168,16 @@ sub addloc {
 =head2 getlocs()
 
   return hash by source id of ordered Spans
-
+  drop for getlocations() ?
+  
 =cut
   
 sub getlocs {
 	my $self= shift;
-  return undef unless(defined $self->{loclist});
+	
   my %sp=();
   my @list= @{$self->{loclist}};
+  return undef unless(  @list);
   
   foreach (@list) { 
     my $src= $_->get('src');
@@ -156,13 +189,180 @@ sub getlocs {
     my $lp;
     foreach (@sp) {
       if ($_ ne $lp) { push(@ps,$_); $lp=$_; }
-      ##if (eq) { $_= undef; }# else { push(@ps,$_); }
-      ##else { $lp= $_; }
       }
     @{$sp{$src}}= @ps;
     }
   # $self->{locs}= \%sp;
   return %sp;
+}
+
+
+#?? here? need  to deal with mRNA/CDS subfeature - exon joining...
+## if which == sublocs:type_name=>exon get compound location from exon feature sublocs
+## ditto for analysis feature, type_name => match, ..
+
+=head2 getlocations( [$sublocs] )
+
+  replacement for getlocs()
+  
+  $sublocs - use subfeatures of this feature type_id/name (optional)
+    e.g. %srclocs= $mrna_feature->getlocations('exon')
+    returns join of exon spans
+    
+  return hash by source id of 
+    srclocs{src}->{locs} = @array of IxSpan()->toString() == 10..20
+    srclocs{src}->{rev}  = true if reversed 
+    srclocs{src}->{loc}  = join of locs
+    srclocs{src}->{i}    = source index (0..n-1)
+    
+  should be part of IxLoc subclass?
+
+=cut
+
+sub getlocations {
+	my $self= shift;
+	my $sublocs= shift || undef;
+  
+  #return undef unless(  @{$self->{loclist}});
+  my @list= ();
+  @list= @{$self->{loclist}};
+	
+	if ($sublocs =~ /\S/) {
+	  @list= ();
+	  my @subft= $self->getfeats("feature"); #? locs only in this type
+	  foreach my $sf (@subft) {
+	    my ($t,$nm)= $sf->id2name('type_id',$sf->{type_id});
+	    push(@list, @{$sf->{loclist}}) if($nm eq $sublocs);
+	    }
+	  }
+	
+  return undef unless(@list);
+  my %sp=();
+  my $dorev= 0;
+  my @srcs= ();
+  
+  foreach (@list) { 
+    my $src= $_->get('src');
+    push( @srcs, $src);# for sort order
+    $sp{$src}->{rev} = $_->reversed();
+    push( @{$sp{$src}->{locs}}, $_->toString());
+    }
+    
+  for my $i (0..$#srcs) {
+    my $src= $srcs[$i];
+    my @sp= sort { $a <=> $b } @{$sp{$src}->{locs}}; #{$sp{$src}}; #? ok
+    my @ps= ();
+    my $lp;
+    foreach (@sp) {
+      if ($_ ne $lp) { push(@ps,$_); $lp=$_; }
+      }
+    # @{$sp{$src}->{locs}}= @ps;
+    $sp{$src}->{locs} = \@ps;
+    $sp{$src}->{i}= $i;
+#       # move this to getlocation() !?
+#     my $loc= join(",",@ps);
+#     if ($sp{$src}->{rev}) { $loc= 'complement('.$loc.')'; }
+#     elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
+#     $sp{$src}->{loc}= $loc;
+    }
+  return %sp;
+}
+
+## FIXME ##
+=head2 getlocation( [$which] [$sublocs] )
+  
+  returns string of location == complement(10..20,30..40)
+  params:
+  $which = which source, may be source name or index, default is 0/1st
+  $sublocs = subfeature type_name, if present, uses these
+    e.g. $locstring= $mrna->getlocation( $src_id, 'exon')
+  should be part of IxLoc subclass?
+  
+=cut 
+
+sub getlocation {
+	my $self = shift;
+	# my $which= shift || 0;
+	# my $sublocs= shift || undef;
+  # my %sp= $self->getlocations($sublocs);
+  my $spi= $self->getlocationSrc(@_);# ($which, $sublocs);
+  return $self->getlocationString($spi);
+}
+
+sub getlocationSrc {
+	my $self = shift;
+	my $which= shift || 0;
+	my $sublocs= shift || undef;
+  my %sp= $self->getlocations($sublocs);
+  return undef unless(%sp);
+  
+  my ($src, $spi);
+  my @srcs= keys %sp;  
+  if ($which =~ /\D/) { #name
+    ($src)= grep(/$which/, @srcs);   
+    $spi= $sp{$src} if ($src); # $loc= $sp{$src}->{loc} || undef;
+    }
+  else {
+    foreach $src (@srcs) {
+      if ($sp{$src}->{i} == $which) {
+        $spi= $sp{$src}; last;
+        }
+      # $loc= $sp{$src}->{loc};    
+      # return $loc if ($sp{$src}->{i} == $which);
+      }
+    }
+  return $spi;
+}
+  
+sub getlocationString {
+	my $self = shift;
+	my $spi  = shift;
+	return undef unless(defined $spi && defined $spi->{locs});
+  my @ps= @{$spi->{locs}};
+  my $loc= join(",",@ps);
+  if ($spi->{rev}) { $loc= 'complement('.$loc.')'; }
+  elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
+  return $loc;
+}
+
+## FIXME = messy; move to IxLoc
+sub insertlocations {
+	my $self = shift;
+	my $loca  = shift; # amino start .. end
+	my $locb  = shift; # mrna  a..b,c..d,e..f
+	return undef unless(ref $loca);
+  my @a= @{$loca->{locs}}; # should be 1 only; if more ??
+  my @r= @{$locb->{locs}};
+  my @al= ();  
+  my $a= shift @a;
+  my ($b,$e)= split(/\.\./,$a);
+  foreach my $r (@r) {
+    my ($rb,$re)= split(/\.\./,$r);
+    if ($re < $b) { next; }
+    elsif ($rb > $e) { last; }
+    elsif ($rb<=$b && $re>=$b) {
+      push(@al,"$b..$re");
+      }
+    elsif ($rb<=$e && $re>=$e) {
+      push(@al,"$rb..$e"); last;
+      }
+    else { push(@al,$r); }
+    }
+  unless(@al) { push(@al,"$b..$e"); }
+  $loca->{locs}= \@al; 
+  return $loca;
+}
+
+sub getlocsources {
+	my $self= shift;
+  return undef unless(defined $self->{loclist});
+  my @srcs;
+  my @list= @{$self->{loclist}};
+  foreach (@list) { 
+    my $src= $_->get('src');
+    push( @srcs, $src);
+    }
+  return @srcs; #?? sort/ these are ugly feature_### names
 }
 
 
@@ -195,7 +395,7 @@ sub printObj { ## was toString
     ($k,$v)= $self->id2name($k,$v);
 
     print $tab."$k";
-    next unless($v =~ /\S/);
+    if($v =~ /\S/) {
     print "=";
     if (ref $v && $v->can('printObj')) {
       $v->printObj($depth);
@@ -224,21 +424,23 @@ sub printObj { ## was toString
       print "]\n";
       }
     else { print $v; }
+    }
     print "\n";
     }
     
     ## need to order spans; check on source_id to see if all are same?
   if ( defined $self->{loclist} ) {
-    my %sp= $self->getlocs();
-#     foreach (@{$self->{loclist}}) { 
-#       my $src= $_->get('src');
-#       push( @{$sp{$src}}, $_->toString());
-#       }
+    my %sp= $self->getlocations();
     foreach my $src (sort keys %sp) {
-#       my @sp= sort { $a <=> $b } @{$sp{$src}}; #? ok
-      my @sp= @{$sp{$src}};
-      print $tab."loc.$src=".join(",",@sp)."\n" if (@sp);
+      ##my $loc= $sp{$src}->{loc}; # ${$sp{$src}}{loc};
+      my $loc= $self->getlocationString( $sp{$src} ); 
+      print $tab."loc.$src=".$loc."\n" if ($loc);
       }
+#     my %sp= $self->getlocs();
+#     foreach my $src (sort keys %sp) {
+#       my @sp= @{$sp{$src}};
+#       print $tab."loc.$src=".join(",",@sp)."\n" if (@sp);
+#       }
     }
   
   if ( defined $self->{attrlist} ) {

@@ -78,20 +78,21 @@ use vars qw/$VERSION $ROOT_NODE $debug @skipKeys @ISA @EXPORT /;
 @ISA = qw(Exporter);
 @EXPORT = qw(&view);
 
-$VERSION = "0.1";
+$VERSION = "0.3";
 $ROOT_NODE='chado';
 $debug= 0;
 
 BEGIN {
-  # some of these are useful - later
+  # some of these are useful - later // timelastmodified 
  @skipKeys= qw/
     locgroup 
-    timelastmodified timeaccessioned 
+    timeaccessioned 
     residues md5checksum 
     rank prank strand
-    is_nend_partial is_nbeg_partial
     min max
-    is_current is_analysis
+    is_nend_partial is_nbeg_partial
+    is_fmin_partial is_fmax_partial
+    is_current is_analysis is_internal
     evidence_id
     organism_id 
     _appdata
@@ -117,11 +118,15 @@ BEGIN {
 =cut
 
 sub view {
-  # my $fn= shift @main::ARGV;  
-  my $handler= new org::gmod::chado::ix::IxReadSax(); # (@_)
+  
+  my $handler= new org::gmod::chado::ix::IxReadSax( 
+    METHOD => 'view', # cant do like handleObj; need to wait till doc is finished
+    );  
+
   $handler->parse(@main::ARGV);
-  my $topnode= $handler->topnode();
-  $topnode->printObj(0);
+  
+ # my $topnode= $handler->topnode();
+ # $topnode->printObj(0);
 }
 
 
@@ -134,20 +139,46 @@ sub view {
 
 sub parse {
 	my $self= shift;
-  my $parser = XML::Parser::PerlSAX->new( Handler => $self );
-
-  my ($infile)= @_;
-#   warn("parsing <"+$infile+">\n") if ($debug);
-
-  local(*XFILE);
-	if ($infile =~ /\.(gz|Z)$/ && open(XFILE,"gzcat $infile|")) {
-		$parser->parse( Source => { ByteStream => *XFILE} ); 
-		close(XFILE);
-		}
-	else { 
-	  $parser->parse( Source=>{SystemId=>$infile} ); # calls parsefile(filename)
-		# $parser->parse( @_ );  # nogood
-		}
+        
+  if (my($arg)= grep(/debug/,@_)) { $debug= ($arg=~/nodebug/) ? 0 : 1; }
+  ## need flag for NO_CLEAR - keep all parsed docs ?
+  ## probably too much for large docs
+  
+  foreach my $infile ( @_ ) {
+    next if ($infile =~ m/^\-/); # option?
+    warn "# IxReadSax parse <$infile>\n" if ($debug);
+    my $err;
+    local(*XFILE);
+      ## new instance for each file, in case of eval{} errors
+    my $parser = XML::Parser::PerlSAX->new( Handler => $self );
+    $self->{infile}= $infile;
+      
+    if ($infile =~ /\.(gz|Z)$/ && open(XFILE,"gzcat $infile|")) {
+      eval { $parser->parse( Source => { ByteStream => *XFILE} ); }; 
+      $err= $@;
+      close(XFILE);
+      }
+    elsif ($infile =~ /\.(bz2)$/ && open(XFILE,"bzcat $infile|")) {
+      eval { $parser->parse( Source => { ByteStream => *XFILE} ); };
+      $err= $@;
+      close(XFILE);
+      }
+    else { 
+      eval { $parser->parse( Source => { SystemId => $infile } ); };
+      $err= $@;
+      # $parser->parse( @_ );  # nogood
+      }
+    if ($err) {
+      warn "#>> IxReadSax XML parse($infile) error: $err\n";
+      $self->end_document();
+      }	
+    
+    ## need to do here if have multiple files  
+    if ($self->{METHOD} eq 'view' || $self->{METHOD} eq 'printObj' ) 
+        { $self->topnode()->printObj(0); }
+    
+    }
+	
 }
 
 
@@ -231,7 +262,15 @@ note2: these are grouping 'features' not now checked:
   feature_evidence/../featureloc/../srcfeature_id/feature/featureloc* == many parts
   
   skip these: featureloc/feature_id/feature/...
-  
+
+JUNE 03 variants:
+  prediction_evidence, alignment_evidence replace feature_evidence
+  added fmin, fmax replacements for nbeg, nend
+  need to catch these containers:
+     feature_synonym feature_relationship  feature_dbxref ? feature_cvterm ?  
+
+     feature_synonym > should become an attribute of parent feature ?
+       (encloses synonym, synonym_id tags)
 
 =item XML handlers
 
@@ -256,18 +295,68 @@ sub path {
 
 sub start_document {
 	my ($self)= @_;
+  $self->clear() unless($self->{NO_CLEAR});
 
+  if ($self->{handleObj}) {
+    $self->{handleObj}->comment("parser: ".$self->{handleObj});
+    my $fn= $self->{infile};
+    $fn =~ s,^.*/,,;
+    $self->{handleObj}->comment("source: $fn");
+    #if (-r $fn) {
+    #  # my $dt= POSIX::strftime($t);
+    #  # $self->{handleObj}->comment("source-date: $dt");
+    #  }
+    }
 }
 
 sub end_document {
 	my ($self)= @_;
+  ## need error handling - this is called on bad XML ??
 
+## 		/^(feature|feature_evidence|prediction_evidence|alignment_evidence)$/ &&  do {  #|analysis 
+  while (defined $self->{featstack} && @{$self->{featstack}}>1 ) {
+    my $ft= pop( @{$self->{featstack}});
+    warn "end_document pop: ".$ft->name()."/".$ft->{id}."\n" if $debug;
+    my $parft= @{$self->{featstack}}[-1]; 
+    $parft->add($ft);
+    pop( @{$self->{genfeatstack}});
+    $self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
+    
+    ## test sep03
+    if ( $self->{handleObj} && $parft == $self->{$ROOT_NODE} ) {
+      $self->{handleObj}->handleObj(0, $ft);
+      }
+		}	
+		
+  ## delete some of current document?? or wait for start if doing another ??
+  		
 }
 
 sub characters {
 	my ($self, $element)= @_;
 	$self->{vals}{$self->{inel}} .= $element->{Data};
 }
+
+sub clear {
+ 	my ($self)= @_;
+  
+    ## more than these... fix me
+    ## change storage of parsed elements to self->{els}->{$elname} ?
+    ## keep main self->{main} vars limited to: idhash, featstack, vals, root, ..
+    
+  my @k= qw(
+   idhash genfeatstack featstack
+   curfeat curgenfeat vals
+   $ROOT_NODE 
+   feature feature_evidence prediction_evidence alignment_evidence
+   analysis feature_cvterm cvterm cv db pub 
+   synonym organism
+   dbxref featureprop feature_synonym
+   );
+   
+  foreach (@k) { delete $self->{$_}; }
+}
+
 
 sub start_element {
 	my ( $self, $element)= @_;
@@ -283,20 +372,34 @@ sub start_element {
   my $nada= 0;
   SWITCH: {
   
-		/^($ROOT_NODE|feature|feature_evidence|analysis|cvterm|cv|pub|organism)$/ &&  do { 
+		/^($ROOT_NODE|feature|feature_evidence|prediction_evidence|alignment_evidence|analysis|feature_cvterm|cvterm|cv|db|pub|synonym|organism)$/ &&  do { 
 		  
       my $atid= $element->{Attributes}->{id}; 
-      my $ft= new org::gmod::chado::ix::IxFeat( 
+      my $ft;
+      
+		    ## dont make another root ... may be handling several docs ??
+		  if (/$ROOT_NODE/ && $self->{$ROOT_NODE}) {
+       $ft= $self->{$ROOT_NODE};
+        # $self->{idhash}{$atid}= $self->{$ROOT_NODE} if $atid;  
+		    # last SWITCH;
+		    }
+      else {
+        $ft= new org::gmod::chado::ix::IxFeat( 
                tag => $_, id => $atid, handler => $self);
-      $self->{$_}= $ft; #??
+         }
+         
+      $self->{$_}= $ft;
+         ## atid should be uniq for each ft - keep hash of them in chado object?
+      $self->{idhash}{$atid}= $ft if ($atid); #mostly for cvterm->name
+      
       $self->{curgenfeat}= $ft;
       push( @{$self->{genfeatstack}}, $ft);
-      if (/^($ROOT_NODE|feature|feature_evidence)$/) { #|analysis
+      
+        # these are main feature objects...
+      if (/^($ROOT_NODE|feature|feature_evidence|prediction_evidence|alignment_evidence)$/) { #|analysis
         $self->{curfeat}= $ft;
         push( @{$self->{featstack}}, $ft);
         }
-      ## atid should be uniq for each ft - keep hash of them in chado object?
-      $self->{idhash}{$atid}= $ft; #mostly for cvterm->name
       
       if (/^feature$/ && $elpar eq 'srcfeature_id') {
        $self->{srcfeature_id}= $atid; # save 
@@ -328,20 +431,25 @@ sub start_element {
 			};  
 			
  		/^(dbname|accession|pkey_id|pval|pub_id)$/ &&  do { 
+			## summer03 -- xml dropped pkey_id, pval, dbname -- cvterm_id/cvterm instead
 		  $self->{$_}= undef;
 			last SWITCH; 
 			};  
 		  
-		/^(dbxref|dbxref_id|featureprop)$/ &&  do { #feature_dbxref|
+		  ## jun03 added feature_cvterm, feature_synonym== attributes?
+		  ## feature_cvterm is handled ok by nested cvterm/dbxref == GO terms + ids
+		  ## or handle like featureprop ?
+		  
+		/^(dbxref|featureprop|feature_synonym)$/ &&  do { #feature_dbxref|dbxref_id|
       my $atid= $element->{Attributes}->{id}; 
       my $attr= new org::gmod::chado::ix::IxAttr( tag => $_ , handler => $self);
       if ($atid) { 
         $attr->set( id => $atid); 
         $self->{idhash}{$atid}= $attr;  
         }
-      # push( @$self->{attr}, $attr);
-      # $self->{curattr}= $attr;
       $self->{$_}= $attr; #??
+      # $self->{curattr}= $attr; #??
+      # push( @{$self->{attrstack}}, $attr); #??  
 			last SWITCH; 
 			};  
 
@@ -366,19 +474,23 @@ sub end_element {
   my $nada= 0;
   SWITCH: {
 		
-#	  //SINGLE PARAMETER ELEMENTS
-
  		/^(uniquename|organism_id|rawscore)$/  &&  do { ##|program|programversion
 		  $self->{curfeat}->set( $_ => $val ) if ($hasval && !$self->{skipkeys}->{$_});
  		  last SWITCH; };  
  		    
  		/^(type_id)$/ &&  do {  
- 	  # //CAN BE EITHER INSIDE A pub OR A feature OR a feature_relationship
-		  if ($hasval && $val ne 'contains') {
+ 	  # //CAN BE INSIDE  pub OR feature OR feature_relationship OR synonym
+		  if ($hasval ) { # && $val ne 'contains'
 		    if ($elpar eq 'feature_relationship') {
 		      ## skip
 		      }
-		    elsif ($self->{curgenfeat}->{tag} =~ /(pub|feature)/) {
+		    elsif ($elpar =~ /^(dbxref|featureprop|feature_synonym)$/) {
+		      ## attributes now use type_id
+ 		      $self->{$elpar}->set( $_ => $val ) ;
+		      }
+		    
+		    elsif ($self->{curgenfeat}->{tag} =~ /(pub|synonym|feature)/) {
+		      #?? check for existing val? getting bad type_id vals for main feature
  		      $self->{curgenfeat}->set( $_ => $val ) ;
  		      }
  		    else {
@@ -394,8 +506,8 @@ sub end_element {
  		    }
  		  last SWITCH; };  
  		    
+ 		/^(name|miniref|program|sourcename|programversion|seqlen|cvterm_id|analysis_id|timelastmodified)$/ &&  do {  
  		    ## general feature values - should be only 1/feature
- 		/^(name|miniref|program|programversion)$/ &&  do {  
 		  if ($hasval) {
 		    if ($self->{curgenfeat}) {
 		      $self->{curgenfeat}->set( $_ => $val ); #?
@@ -406,7 +518,7 @@ sub end_element {
  		    }
  		  last SWITCH; };  
  		  
- 		/^(cvname)$/ &&  do {  
+ 		/^(cvname)$/ &&  do {  ## changed from cvname to name; summer'03
 		  if ($hasval && $self->{cv}) {
  		    $self->{cv}->set( $_ => $val );
  		    }
@@ -418,12 +530,19 @@ sub end_element {
  		    }
  		  last SWITCH; };  
 
+		/^(db_id)$/ &&  do {  
+		  if ($hasval && $self->{dbxref}) {
+ 		    $self->{dbxref}->set( $_ => $val );
+ 		    }
+ 		  last SWITCH; };  
+
 
 ## 		//PUTTING PARAMETERS INTO OBJECTS
 ## IxFeat set:
 ##		/^($ROOT_NODE|feature|analysis|cvterm|cv|pub|organism)$/ 
-
- 		/^(organism|pub|cvterm|cv|analysis)$/ &&  do {  
+      # synonym not top level...
+      
+ 		/^(organism|pub|cvterm|cv|db|analysis|feature_cvterm|synonym)$/ &&  do {  
       ## // top level chado params
  		  ## here, if cvterm and cv_id has id attrib, add link to cv?
  		  ## moved analysis 'feature' to top level chado list ? == organism/pub/...
@@ -436,23 +555,46 @@ sub end_element {
 			unless($self->{vals}{$elpar} =~ /\S/) {
 			  $self->{vals}{$elpar}= $ft->{id};
 			  }
+	
+			if (/(synonym|feature_cvterm)$/) {
+        $self->{curfeat}->add($ft);
+			  }
+			else { 
+			  ## there are some 'stutters' in XORT output - got lots of duplicate cvterm defs for
+			  ## chromosome_arm == cvterm_210 
 			  
-			$self->{$ROOT_NODE}->add($ft);
-			$self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; #? need to pop last
+			  $self->{$ROOT_NODE}->add($ft); 
+			  }
+			
+			$self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
  		  last SWITCH; };  
       
- 		/^(feature|feature_evidence)$/ &&  do {  #|analysis 
+ 		/^(feature|feature_evidence|prediction_evidence|alignment_evidence)$/ &&  do {  #|analysis 
       my $ft= pop( @{$self->{featstack}});
       my $parft= @{$self->{featstack}}[-1]; 
       $parft->add($ft);
 			$self->{$_}= undef;
 			$self->{curfeat}= $parft; 
 			pop( @{$self->{genfeatstack}});
-			$self->{curgenfeat}= $parft; #?
+			# $self->{curgenfeat}= $parft; #?
+			$self->{curgenfeat}= @{$self->{genfeatstack}}[-1]; 
+			
+			## test sep03
+			if ( $self->{handleObj} && $parft == $self->{$ROOT_NODE} ) {
+			  $self->{handleObj}->handleObj(0, $ft);
+			  }
+			  
+			  ## cant do printObj till all of doc read and ROOT has all toplevel items
+# 			elsif ( $self->{printObj} && $parft == $self->{$ROOT_NODE} ) {
+# 			  $ft->printObj(1);
+# 			  }
+			  
  		  last SWITCH; };  
 
+
+ 		/^(fmin|fmax|strand|nbeg|nend|srcfeature_id)$/ &&  do { 
 ##		//FEATURELOC 		  
- 		/^(nbeg|nend|srcfeature_id)$/ &&  do { 
+##  jun02 - fmin,fmax replace nbeg,nend
  		  unless( $hasval ) {
  		    $val= $self->{$_}; $hasval= ($val =~ /\S/);
  		    }
@@ -489,59 +631,98 @@ sub end_element {
 #       $self->{$_}= undef;
 #  		  last SWITCH; };  
 
- 		/^(dbxref_id)$/ &&  do {  
- 		  my $attr= $self->{$_};
- 		  $attr->setattr( $val) if $hasval; #? and not get() ?
- 		  
-#  		  my $fattr= $self->{feature_dbxref};
-#  		  if ($fattr) {
-#  		    $fattr->set( attr => $attr);
-# 			  #	//THIS dbxref_id IS INSIDE A feature_dbxref
-# 			  #	//IT IS NOW SUBSUMED
+#  		/^(dbxref_id)$/ &&  do {  
+#  		  my $attr= $self->{$_};
+#  		  $attr->setattr( $val) if $hasval; #? and not get() ?
+#  		  
+# #  		  my $fattr= $self->{feature_dbxref};
+# #  		  if ($fattr) {
+# #  		    $fattr->set( attr => $attr);
+# # 			  #	//THIS dbxref_id IS INSIDE A feature_dbxref
+# # 			  #	//IT IS NOW SUBSUMED
+# #  		    }
+# #  		  elsif
+#  		  if ( $self->{curfeat} ) {
+# #				//ADD TO FEATURE
+#  			  $self->{curfeat}->addattr($attr);
 #  		    }
-#  		  elsif
- 		  if ( $self->{curfeat} ) {
-#				//ADD TO FEATURE
- 			  $self->{curfeat}->addattr($attr);
- 		    }
-	    $self->{$_}= undef;
- 		  last SWITCH; };  
+# 	    $self->{$_}= undef;
+#  		  last SWITCH; };  
 
  		/^(dbxref)$/ &&  do {  
+      # now also in attrstack
  		  my $attr= $self->{$_};
- 		  my $db = $self->{dbname};
  		  my $acc= $self->{accession};
+
+ 		  my $db = $self->{dbname}; ## change to db/db_id
+ 		  unless ($db) { 
+ 		    my $key="db_id"; 
+ 		    my $val= $self->{$key}; 
+ 		    if ($val) { ($key,$db)= $self->{$ROOT_NODE}->id2name($key,$val); }
+ 		    }
+
  		  my $dbid= ($db) ? "$db:$acc" : $acc;
  		  $attr->setattr( $dbid); #  name =>
 
- 		  my $dbxattr= $self->{dbxref_id};
-  		if ($dbxattr) { $dbxattr->setattr( $attr ); }
- 		  elsif ( $self->{curfeat} ) {
-#				//ADD TO FEATURE
- 			  $self->{curfeat}->addattr($attr);
+#  		  my $dbxattr= $self->{dbxref_id};
+#   		if ($dbxattr) { $dbxattr->setattr( $attr ); }
+#  		  elsif
+ 		  if ( $self->{curgenfeat} ) {
+#				//ADD TO FEATURE - was curfeat 
+ 			  $self->{curgenfeat}->addattr($attr);
  		    }
 	    $self->{$_}= undef;
  		  last SWITCH; };  
+      
 
- 		/^(featureprop)$/ &&  do {  
+		/^(feature_synonym)$/ &&  do {  ## or synonym -- done by synonym == par->add(ft)
+      # now also in attrstack
  		  my $attr= $self->{$_};
- 		  my $pkey_id= $self->{pkey_id};
- 		  $attr->set( pkey_id => $pkey_id) if $pkey_id;  
- 		  my $pval= $self->{pval};
- 		  $attr->setattr( $pval) if $pval;  # pval => $pval
+ 		  
+ 		  ## synonym_id always seems to enclose only synonym struct 
+ 		  my $synonym_id= $self->{synonym_id};
+ 		  $attr->set( synonym_id => $synonym_id) if $synonym_id;  
+      $self->{synonym_id}= undef;
+      ##?? change id=feature_synonym_1894 to id=synonym_1894 
+      
+      ## synonym struct is: id,name,type_id
+#  	    my $synonym= $self->{synonym};
+#  		  $attr->set( synonym => $synonym) if $synonym;  
+
  		  my $pub_id= $self->{pub_id};
  		  $attr->set( pub_id => $pub_id) if $pub_id;  
 
- 		  if ( $self->{curfeat} ) {
-#				//ADD TO FEATURE
- 			  $self->{curfeat}->addattr($attr);
+ 		  if ( $self->{curgenfeat} ) { # was curfeat
+ 			  $self->{curgenfeat}->addattr($attr);
+ 		    }
+	    $self->{$_}= undef;
+ 		  last SWITCH; };  
+      
+ 		/^(featureprop)$/ &&  do {  
+       # now also in attrstack
+		  my $attr= $self->{$_};
+ 		  
+ 		  my $pkey_id= $self->{type_id}; ## new
+ 		  unless($pkey_id) { $pkey_id= $self->{pkey_id}; } ## old
+ 		  $attr->set( pkey_id => $pkey_id) if $pkey_id;  
+ 		  
+ 		  my $pval= $self->{value};
+ 		  unless($pval) { $pval= $self->{pval}; } # now is 'value'
+ 		  $attr->setattr( $pval) if $pval;  # pval => $pval
+ 		  
+ 		  my $pub_id= $self->{pub_id};
+ 		  $attr->set( pub_id => $pub_id) if $pub_id;  
+
+ 		  if ( $self->{curgenfeat} ) {
+#				//ADD TO FEATURE -- was curfeat - use curgenfeat instead?
+ 			  $self->{curgenfeat}->addattr($attr);
  		    }
 	    $self->{$_}= undef;
  		  last SWITCH; };  
 
 
-##		//ATTRIB FIELDS
- 		/^(dbname|accession|pkey_id|pval|pub_id)$/ &&  do { 
+ 		/^(dbname|accession|value|pkey_id|pval|pub_id|synonym_id)$/ &&  do { 
+##		//ATTRIB FIELDS -- dbname, pkey, pval have gone
  		  $self->{$_}= $val if ($hasval); ## ($hasval) ? $val : ''; 
  		  # urk, some have cvterm inside - need to keep
  		  last SWITCH; }; 
@@ -551,7 +732,7 @@ sub end_element {
 		
 		
   if ($nada && ! $self->{skipkeys}->{$name}) { ##&& $hasval
-    $self->{$ROOT_NODE}->set('unused_'.$name => $self->{elcount}{$name}); #??
+    $self->{$ROOT_NODE}->set('unused_'.$name => $self->{elcount}{$name},  replace=>1); #??
     if ($hasval) {
       my $attr= new org::gmod::chado::ix::IxAttr( tag => $name, handler => $self);
  	    $attr->setattr( $val);
