@@ -453,7 +453,7 @@ create table feature (
        timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
 
-       unique(organism_id,uniquename, type_id)
+       unique(organism_id, uniquename, type_id)
 );
 -- dbxref_id here is intended for the primary dbxref for this feature.   
 -- Additional dbxref links are made via feature_dbxref
@@ -602,7 +602,6 @@ create table featureprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text not null default '',
        rank int not null default 0,
-
        unique(feature_id, type_id, value, rank)
 );
 create index featureprop_idx1 on featureprop (feature_id);
@@ -671,15 +670,32 @@ create table feature_relationship (
        foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-       rank int,
-
-       unique(subject_id, object_id, type_id)
+       value text null,
+       rank int not null default 0,
+       unique(subject_id, object_id, type_id, rank)
 );
 create index feature_relationship_idx1 on feature_relationship (subject_id);
 create index feature_relationship_idx2 on feature_relationship (object_id);
 create index feature_relationship_idx3 on feature_relationship (type_id);
 
 
+-- ================================================
+-- TABLE: feature_relationship_pub
+-- ================================================
+ 
+create table feature_relationship_pub (
+	feature_relationship_pub_id serial not null,
+	primary key (feature_relationship_pub_id),
+	feature_relationship_id int not null,
+	foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade INITIALLY DEFERRED,
+	pub_id int not null,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+ 
+	unique(feature_relationship_id, pub_id)
+ );
+ create index feature_relationship_pub_idx1 on feature_relationship_pub (feature_relationship_id);
+ create index feature_relationship_pub_idx2 on feature_relationship_pub (pub_id);
+ 
 -- ================================================
 -- TABLE: feature_cvterm
 -- ================================================
@@ -759,10 +775,10 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- redesigned 2003-10-28
 --
 -- changes 2003-11-10:
---   incorporating suggestions to make everything a gcontext; use gcontext_relationship
---   to make some gcontexts derivable from others. we would incorporate environment
---   this way - just add the environment descriptors as properties of the child
---   gcontext
+--   incorporating suggestions to make everything a gcontext; use 
+--   gcontext_relationship to make some gcontexts derivable from others. we 
+--   would incorporate environment this way - just add the environment 
+--   descriptors as properties of the child gcontext
 --
 -- for modeling simple or complex genetic screens
 --
@@ -780,7 +796,7 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- it is related via an "allele-of" feature_relationship; eg
 -- [id:FBgn001, type:gene] <-- [id:FBal001, type:gene]
 --
--- with the genetic module, phenotypes can either be attached
+-- with the genetic module, features can either be attached
 -- to features of type sequence_variation, or to features of
 -- type 'gene' (in the case of mutant alleles).
 --
@@ -946,12 +962,18 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- 
 -- uniquename          : a human-readable unique identifier
 --
-CREATE TABLE gcontext (
-    gcontext_id          SERIAL PRIMARY KEY NOT NULL,
-    uniquename           VARCHAR(255) NOT NULL,
-    description          TEXT,
-    pub_id               INTEGER      NOT NULL REFERENCES pub(pub_id)
+
+create table gcontext (
+	gcontext_id	serial not null,
+	primary key (gcontext_id),
+	uniquename	varchar(255) not null,
+	description	text,
+	pub_id	int not null,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+
+	unique(uniquename)
 );
+create index gcontext_idx1 on gcontext(uniquename);
 -- ****************************************
 
 
@@ -963,12 +985,21 @@ CREATE TABLE gcontext (
 -- they would all be descended from the same parent gcontext
 -- 
 --
-CREATE TABLE gcontext_relationship (
-    gcontext_relationship_id SERIAL PRIMARY KEY NOT NULL,
-    subjectgc_id         INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    objectgc_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+create table gcontext_relationship (
+	gcontext_relationship_id	serial not null,
+	primary key (gcontext_relationship_id),
+	subjectgc_id	int not null,
+	foreign key (subjectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	objectgc_id	int not null, 
+	foreign key (objectgc_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+ 	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+
+	unique(subjectgc_id, objectgc_id, type_id)
 );
+create index gcontext_relationship_idx1 on gcontext_relationship (subjectgc_id);
+create index gcontext_relationship_idx2 on gcontext_relationship (objectgc_id);
+create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
 -- ****************************************
 
 
@@ -992,15 +1023,24 @@ CREATE TABLE gcontext_relationship (
 -- rank                : preserves order
 -- group               : spatially distinguishable group
 --
-CREATE TABLE feature_gcontext (
-    feature_gcontext_id               SERIAL PRIMARY KEY NOT NULL,
-    feature_id           INTEGER      NOT NULL REFERENCES feature(feature_id),
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    chromosome_id        INTEGER      REFERENCES feature(feature_id),
-    rank                 INTEGER      NOT NULL,
-    cgroup               INTEGER      NOT NULL,
-    cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+create table feature_gcontext (
+	feature_gcontext_id	serial not null,
+	primary key (feature_gcontext_id),
+	feature_id	int not null,
+	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	chromosome_id	int,
+	foreign key (chromosome_id) references feature(feature_id) on delete set null INITIALLY DEFERRED,
+	rank	int not null,
+	cgroup	int not null,
+	cvterm_id	int not null,
+	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED,
+
+	unique(feature_id, gcontext_id, cvterm_id)
 );
+create index feature_gcontext_idx1 on feature_gcontext (feature_id);
+create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
 -- ****************************************
 
 
@@ -1011,12 +1051,19 @@ CREATE TABLE feature_gcontext (
 -- 
 -- value               : unconstrained free text value
 --
-CREATE TABLE gcontextprop (
-    gcontextprop_id                   SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    value                TEXT         NOT NULL
+create table gcontextprop (
+	gcontextprop_id	serial not null,
+	primary key (gcontextprop_id),
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+	value	text not null,
+
+	unique(gcontext_id, type_id, value)
 );
+create index gcontextprop_idx1 on gcontextprop (gcontext_id);
+create index gcontextprop_idx2 on gcontextprop (type_id);
 -- ****************************************
 
 
@@ -1037,16 +1084,28 @@ CREATE TABLE gcontextprop (
 -- cvalue_id           : constrained value from ontology, e.g. "abnormal", "big"
 -- assay_id            : e.g. name of specific test
 --
-CREATE TABLE phenstatement (
-    phenstatement_id     SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    dbxref_id            INTEGER      NOT NULL REFERENCES dbxref(dbxref_id),
-    observable_id        INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    attr_id              INTEGER      REFERENCES cvterm(cvterm_id),
-    value                TEXT,
-    cvalue_id            INTEGER      REFERENCES cvterm(cvterm_id),
-    assay_id             INTEGER      REFERENCES cvterm(cvterm_id)
+create table phenstatement (
+	phenstatement_id	serial not null,
+	primary key (phenstatement_id),
+	gcontext_id int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	dbxref_id	int not null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+	observable_id	int not null,
+	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+	attr_id	int,
+	foreign key (attr_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+	value	text,
+	cvalue_id	int,
+	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+	assay_id	int,
+	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+
+	unique(gcontext_id, dbxref_id, observable_id)	
 );
+create index phenstatement_idx1 on phenstatement (gcontext_id);
+create index phenstatement_idx2 on phenstatement (observable_id);
+create index phenstatement_idx3 on phenstatement (attr_id);
 -- ****************************************
 
 
@@ -1057,11 +1116,16 @@ CREATE TABLE phenstatement (
 -- publication
 -- 
 --
-CREATE TABLE phendesc (
-    phendesc_id                       SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    description          TEXT         NOT NULL
+create table phendesc (
+	phendesc_id	serial not null,
+	primary key (phendesc_id),
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
+	description	text not null,
+
+	unique(gcontext_id, description)
 );
+create index phendesc_idx1 on phendesc (gcontext_id);
 -- ****************************************
 
 
@@ -1071,13 +1135,23 @@ CREATE TABLE phendesc (
 -- are always relationships between phenstatements
 -- 
 --
-CREATE TABLE phenstatement_relationship (
-    phenstatement_relationship_id SERIAL PRIMARY KEY NOT NULL,
-    subject_id           INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    object_id            INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    comment_id           INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+create table phenstatement_relationship (
+	phenstatement_relationship_id serial not null,
+	primary key (phenstatement_relationship_id),
+	subject_id	int not null,
+	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
+	object_id	int not null,
+	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+	comment_id	int not null,
+	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+
+	unique(subject_id, object_id, type_id)
 );
+create index phenstatement_relationship_idx1 on phenstatement_relationship (subject_id);
+create index phenstatement_relationship_idx2 on phenstatement_relationship (subject_id);
+create index phenstatement_relationship_idx3 on phenstatement_relationship (type_id);
 -- ****************************************
 
 
@@ -1087,27 +1161,41 @@ CREATE TABLE phenstatement_relationship (
 -- for anything that doesn't fit into obs/attr/val model
 -- 
 --
-CREATE TABLE phenstatement_cvterm (
-    phenstatement_cvterm_id           SERIAL PRIMARY KEY NOT NULL,
-    phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+create table phenstatement_cvterm (
+	phenstatement_cvterm_id	serial not null,
+	primary key (phenstatement_cvterm_id),
+	phenstatement_id	int not null,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
+	cvterm_id	int not null,
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+
+	unique(phenstatement_id, cvterm_id)
 );
+create index phenstatement_cvterm_idx1 on phenstatement_cvterm (phenstatement_id);	
+create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);	
 -- ****************************************
 
 
--- RELATION: phenstatement_prop
+-- RELATION: phenstatementprop
 --
 -- arbitrary key=value pairs
 -- e.g. penetrance_pct=80
 -- 
 -- value               : unconstrained free text value
 --
-CREATE TABLE phenstatement_prop (
-    phenstatement_prop_id             SERIAL PRIMARY KEY NOT NULL,
-    phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    value                TEXT         NOT NULL
+create table phenstatementprop (
+	phenstatementprop_id	serial not null,
+	primary key (phenstatementprop_id),
+	phenstatement_id	int not null,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+	value	text not null,
+
+	unique(phenstatement_id, type_id, value)
 );
+create index phenstatementprop_idx1 on phenstatementprop (phenstatement_id);
+create index phenstatementprop_idx2 on phenstatementprop (type_id);
 -- ****************************************
 -- ================================================
 -- TABLE: analysis
@@ -1421,8 +1509,8 @@ WHERE fs.pub_id = s.pub_id;
 create table mageml (
     mageml_id serial not null,
 	primary key (mageml_id),
-    mage_package varchar(100) not null,
-    mage_ml varchar not null
+    mage_package text not null,
+    mage_ml text not null
 );
 
 COMMENT ON TABLE mageml IS 'this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables';
@@ -1435,7 +1523,7 @@ create table magedocumentation (
     tableinfo_id int not null,
 	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
     row_id int not null,
-    mageidentifier varchar(100) not null
+    mageidentifier text not null
 );
 create index magedocumentation_idx1 on magedocumentation (mageml_id);
 create index magedocumentation_idx2 on magedocumentation (tableinfo_id);
@@ -1452,11 +1540,11 @@ create table protocol (
 	foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) not null,
-    uri varchar(100) null,
-    protocoldescription varchar(4000) null,
-    hardwaredescription varchar(500) null,
-    softwaredescription varchar(500) null,
+    name text not null,
+    uri text null,
+    protocoldescription text null,
+    hardwaredescription text null,
+    softwaredescription text null,
     unique(name)
 );
 create index protocol_idx1 on protocol (type_id);
@@ -1470,12 +1558,13 @@ create table protocolparam (
 	primary key (protocolparam_id),
     protocol_id int not null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
-    name varchar(100) not null,
+    name text not null,
     datatype_id int null,
 	foreign key (datatype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     unittype_id int null,
 	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    value varchar(100) null
+    value text null,
+    rank int not null default 0
 );
 create index protocolparam_idx1 on protocolparam (protocol_id);
 create index protocolparam_idx2 on protocolparam (datatype_id);
@@ -1486,8 +1575,8 @@ COMMENT ON TABLE protocolparam IS 'parameters related to a protocol.  if the pro
 create table channel (
     channel_id serial not null,
 	primary key (channel_id),
-    name varchar(100) not null,
-    definition varchar(500) not null,
+    name text not null,
+    definition text not null,
     unique(name)
 );
 
@@ -1506,11 +1595,11 @@ create table arraydesign (
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) not null,
-    version varchar(50) null,
-    description varchar(500) null,
-    array_dimensions varchar(50) null,
-    element_dimensions varchar(50) null,
+    name text not null,
+    version text null,
+    description text null,
+    array_dimensions text null,
+    element_dimensions text null,
     num_of_elements int null,
     num_array_columns int null,
     num_array_rows int null,
@@ -1535,7 +1624,9 @@ create table arrayprop (
 	foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(100) not null
+    value text not null,
+    rank int not null default 0,
+    unique(arraydesign_id, type_id, rank)
 );
 create index arrayprop_idx1 on arrayprop (arraydesign_id);
 create index arrayprop_idx2 on arrayprop (type_id);
@@ -1550,14 +1641,14 @@ create table assay (
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     assaydate timestamp null default current_timestamp,
-    arrayidentifier varchar(100) null,
-    arraybatchidentifier varchar(100) null,
+    arrayidentifier text null,
+    arraybatchidentifier text null,
     operator_id int not null,
 	foreign key (operator_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) null,
-    description varchar(500) null,
+    name text null,
+    description text null,
     unique(name)
 );
 create index assay_idx1 on assay (arraydesign_id);
@@ -1574,7 +1665,9 @@ create table assayprop (
 	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(100) not null
+    value text not null,
+    rank int not null default 0,
+    unique(assay_id, type_id, rank)
 );
 create index assayprop_idx1 on assayprop (assay_id);
 create index assayprop_idx2 on assayprop (type_id);
@@ -1602,10 +1695,10 @@ create table biomaterial (
 	foreign key (taxon_id) references organism (organism_id) on delete set null INITIALLY DEFERRED,
     biosourceprovider_id int null,
 	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id varchar(50) null,
+    dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) null,
-    description varchar(500) null,
+    name text null,
+    description text null,
     unique(name)
 );
 create index biomaterial_idx1 on biomaterial (taxon_id);
@@ -1638,8 +1731,9 @@ create table biomaterialprop (
 	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(100) null,
-    unique(biomaterial_id,type_id,value)
+    value text null,
+    rank int not null,
+    unique(biomaterial_id,type_id,rank)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
 create index biomaterialprop_idx2 on biomaterialprop (type_id);
@@ -1656,7 +1750,7 @@ create table treatment (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     protocol_id int null,
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) null
+    name text null
 );
 create index treatment_idx1 on treatment (biomaterial_id);
 create index treatment_idx2 on treatment (type_id);
@@ -1709,8 +1803,8 @@ create table acquisition (
     channel_id int null,
 	foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
     acquisitiondate timestamp null default current_timestamp,
-    name varchar(100) null,
-    uri varchar(255) null,
+    name text null,
+    uri text null,
     unique(name)
 );
 create index acquisition_idx1 on acquisition (assay_id);
@@ -1726,7 +1820,9 @@ create table acquisitionprop (
 	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(50) not null
+    value text null,
+    rank int not null default 0,
+    unique(acquisition_id, type_id, rank)
 );
 create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
 create index acquisitionprop_idx2 on acquisitionprop (type_id);
@@ -1742,7 +1838,9 @@ create table acquisition_relationship (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     object_id int not null,
 	foreign key (object_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    unique(subject_id,type_id,object_id)
+    value text null,
+    rank int not null default 0,
+    unique(subject_id, type_id, object_id, rank)
 );
 create index acquisition_relationship_idx1 on acquisition_relationship (subject_id);
 create index acquisition_relationship_idx2 on acquisition_relationship (type_id);
@@ -1762,8 +1860,8 @@ create table quantification (
     analysis_id int not null,
 	foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     quantificationdate timestamp null default current_timestamp,
-    name varchar(100) null,
-    uri varchar(500) null,
+    name text null,
+    uri text null,
     unique(name,analysis_id)
 );
 create index quantification_idx1 on quantification (acquisition_id);
@@ -1780,7 +1878,9 @@ create table quantificationprop (
 	foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(50) not null
+    value text null,
+    rank int not null default 0,
+    unique(quantification_id, type_id, rank)
 );
 create index quantificationprop_idx1 on quantificationprop (quantification_id);
 create index quantificationprop_idx2 on quantificationprop (type_id);
@@ -1814,8 +1914,9 @@ create table control (
     tableinfo_id int not null,
 	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
     row_id int not null,
-    name varchar(100) null,
-    value varchar(255) null
+    name text null,
+    value text null,
+    rank int not null default 0
 );
 create index control_idx1 on control (type_id);
 create index control_idx2 on control (assay_id);
@@ -1910,6 +2011,7 @@ create table elementresult (
 create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (subclass_view);
+create unique index elementresult_idx4 on elementresult (element_id,quantification_id,subclass_view);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
 
@@ -1922,8 +2024,9 @@ create table elementresult_relationship (
         foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     object_id int not null,
         foreign key (object_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
-    value varchar(255),
-    unique(subject_id,type_id,object_id,value)
+    value text null,
+    rank int not null default 0,
+    unique(subject_id,type_id,object_id,rank)
 );
 create index elementresult_relationship_idx1 on elementresult_relationship (subject_id);
 create index elementresult_relationship_idx2 on elementresult_relationship (type_id);
@@ -1941,8 +2044,8 @@ create table study (
 	foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
     dbxref_id int null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) not null,
-    description varchar(4000) null,
+    name text not null,
+    description text null,
     unique(name)
 );
 create index study_idx1 on study (contact_id);
@@ -1970,7 +2073,7 @@ create table studydesign (
 	primary key (studydesign_id),
     study_id int not null,
 	foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
-    description varchar(4000) null
+    description text null
 );
 create index studydesign_idx1 on studydesign (study_id);
 
@@ -1983,7 +2086,9 @@ create table studydesignprop (
 	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value varchar(500) not null
+    value text null,
+    rank int not null default 0,
+    unique(studydesign_id, type_id, rank)
 );
 create index studydesignprop_idx1 on studydesignprop (studydesign_id);
 create index studydesignprop_idx2 on studydesignprop (type_id);
@@ -1997,8 +2102,8 @@ create table studyfactor (
 	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id int null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    name varchar(100) not null,
-    description varchar(500) null
+    name text not null,
+    description text null
 );
 create index studyfactor_idx1 on studyfactor (studydesign_id);
 create index studyfactor_idx2 on studyfactor (type_id);
@@ -2012,14 +2117,140 @@ create table studyfactorvalue (
 	foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade INITIALLY DEFERRED,
     assay_id int not null,
 	foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    factorvalue varchar(100) not null,
-    name varchar(100) null
+    factorvalue text null,
+    name text null,
+    rank int not null default 0
 );
 create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
+-- This module is totally dependant on the sequence module.  Objects in the
+-- genetic module cannot connect to expression data except by going via the
+-- sequence module
 
+-- We assume that we'll *always* have a controlled vocabulary for expression 
+-- data.   If an experiment used a set of cv terms different from the ones
+-- FlyBase uses (bodypart cv, bodypart qualifier cv, and the temporal cv
+-- (which is stored in the curaton.doc under GAT6 btw)), they'd have to give
+-- us the cv terms, which we could load into the cv module
+
+-- ================================================
+-- TABLE: expression
+-- ================================================
+
+create table expression (
+       expression_id serial not null,
+       primary key (expression_id),
+       description text
+);
+
+-- ================================================
+-- TABLE: feature_expression
+-- ================================================
+
+create table feature_expression (
+       feature_expression_id serial not null,
+       primary key (feature_expression_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+
+       unique(expression_id,feature_id)       
+);
+create index feature_expression_idx1 on feature_expression (expression_id);
+create index feature_expression_idx2 on feature_expression (feature_id);
+
+
+-- ================================================
+-- TABLE: expression_cvterm
+-- ================================================
+
+-- What are the possibities of combination when more than one cvterm is used
+-- in a field?   
+--
+-- For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal
+-- If the two terms used in a particular field are co-equal (both from the
+-- same CV, is the relation always "&"?   May we find "or"?
+--
+-- Obviously another case is when a bodypart term and a bodypart qualifier
+-- term are used in a specific field, eg:
+--   <t> L | third instar <a> larval antennal segment sensilla | subset <p  
+--
+-- WRT the three-part <t><a><p> statements, are the values in the different 
+-- parts *always* from different vocabularies in proforma.CV?   If not,
+-- we'll need to have some kind of type qualifier telling us whether the
+-- cvterm used is <t>, <a>, or <p>
+-- yes we should have a type qualifier as a cv term can be from diff vocab
+-- e.g. blastoderm can be body part and stage terms in dros anatomy
+-- but cvterm_type needs to be a cv instead of a free text type here?
+
+create table expression_cvterm (
+       expression_cvterm_id serial not null,
+       primary key (expression_cvterm_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+       rank int not null,
+	   cvterm_type varchar(255),
+
+       unique(expression_id,cvterm_id)
+);
+create index expression_cvterm_idx1 on expression_cvterm (expression_id);
+create index expression_cvterm_idx2 on expression_cvterm (cvterm_id);
+
+
+-- ================================================
+-- TABLE: expression_pub
+-- ================================================
+
+create table expression_pub (
+       expression_pub_id serial not null,
+       primary key (expression_pub_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+
+       unique(expression_id,pub_id)       
+);
+create index expression_pub_idx1 on expression_pub (expression_id);
+create index expression_pub_idx2 on expression_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: eimage
+-- ================================================
+
+create table eimage (
+       eimage_id serial not null,
+       primary key (eimage_id),
+       eimage_data text,
+       eimage_type varchar(255) not null,
+       image_uri varchar(255)
+);
+-- we expect images in eimage_data (eg jpegs) to be uuencoded
+-- describes the type of data in eimage_data
+
+
+-- ================================================
+-- TABLE: expression_image
+-- ================================================
+
+create table expression_image (
+       expression_image_id serial not null,
+       primary key (expression_image_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
+       eimage_id int not null,
+       foreign key (eimage_id) references eimage (eimage_id) on delete cascade INITIALLY DEFERRED,
+
+       unique(expression_id,eimage_id)
+);
+create index expression_image_idx1 on expression_image (expression_id);
+create index expression_image_idx2 on expression_image (eimage_id);
 -- FUNCTION gfffeatureatts (integer) is a function to get 
 -- data in the same format as the gffatts view so that 
 -- it can be easily converted to GFF attributes.
