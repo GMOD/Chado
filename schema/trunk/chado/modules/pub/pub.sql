@@ -44,17 +44,17 @@ create index pub_idx1 on pub (type_id);
 create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
-       subj_pub_id int not null,
-       foreign key (subj_pub_id) references pub (pub_id) on delete cascade,
-       obj_pub_id int not null,
-       foreign key (obj_pub_id) references pub (pub_id) on delete cascade,
+       subject_id int not null,
+       foreign key (subject_id) references pub (pub_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references pub (pub_id) on delete cascade,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
-       unique(subj_pub_id, obj_pub_id, type_id)
+       unique(subject_id, object_id, type_id)
 );
-create index pub_relationship_idx1 on pub_relationship (subj_pub_id);
-create index pub_relationship_idx2 on pub_relationship (obj_pub_id);
+create index pub_relationship_idx1 on pub_relationship (subject_id);
+create index pub_relationship_idx2 on pub_relationship (object_id);
 create index pub_relationship_idx3 on pub_relationship (type_id);
 
 
