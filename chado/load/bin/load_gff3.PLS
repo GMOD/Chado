@@ -148,13 +148,11 @@ it under the same terms as Perl itself.
 
 =cut
 
-#my $TMPFASTA = 'tmp.fasta';
-#my $TMPGFF   = 'tmp.gff';
 my ( undef, $TMPFASTA ) = tempfile( "XXXXXX", ".fa",  SUFFIX => '.fa' );
 my ( undef, $TMPGFF )   = tempfile( "XXXXXX", ".gff", SUFFIX => '.gff' );
 
-#warn $TMPFASTA;
-#warn $TMPGFF;
+warn $TMPFASTA if DEBUG;
+warn $TMPGFF if DEBUG;
 
 my ( $ORGANISM, $SRC_DB, $GFFFILE, $UNIQUENAME, $CACHE_SIZE, $FORCE_LOAD );
 my ( $progress, $next_update, $linecount ) =
@@ -949,31 +947,65 @@ sub load_feature_locations {
     my $fmin = $gff_feature->start - 1;    # GFF -> InterBase
     my $fmax = $gff_feature->end;
 
-    my $uniquename = undef;
 
-    if ( $UNIQUENAME ) {
-        if ($gff_feature->has_tag($UNIQUENAME)) {
-            ($uniquename) = $gff_feature->get_tag_values($UNIQUENAME);
-        } else {
-            die
-              "\nThe --uniquename tag was specified, but a feature was found\n"
-              . "without a $UNIQUENAME tag\n";
-        }
+    # logic for creating feature.uniquename and feature.name (040414 allenday):
+    #
+    # if you decide to change the logic, please email the gmod-schema list before committing.
+    # many people depend on the convention outlined here.
+    #
+    # UNIQUENAME
+    #
+    # 1. if --uniquename tag given, use data from that tag, or die if non-existant
+    # 2. else, if ID tag available, use its value
+    # 3. else, use a combination of GFF objects primary tag, seq_id, and, if available,
+    #    positional information.
+    # 4. die, not enough information to generate a uniquename
+    #
+    # NAME
+    #
+    # 1. use Name tag if available
+    # 2. else, use ID tag if available
+    # 3. else, feature has no name
+    #
+    my $uniquename = '';
+    my $name       = '';
+
+    if( defined($UNIQUENAME) and $gff_feature->has_tag($UNIQUENAME) ) {
+        ($uniquename) = $gff_feature->get_tag_values($UNIQUENAME);
+
+    } elsif( defined($UNIQUENAME) ) {
+        die("The --uniquename tag was specified as '$UNIQUENAME, but a feature was found without this tag");
+
+    } elsif( $gff_feature->has_tag('ID') ) {
+      ($uniquename) = $gff_feature->get_tag_values('ID');
+
+    } elsif( $gff_feature->primary_tag and $gff_feature->seq_id ) {
+
+        my $position = $fmax eq '.' ? '' : ":$fmin..$fmax";
+
+        $uniquename = sprintf("_%s_%s%s",
+                              $gff_feature->primary_tag, $gff_feature->seq_id, $position
+                             );
+    } else {
+        die("not enough information available to make a uniquename for $gff_feature");
     }
-    elsif ( $gff_feature->primary_tag &&
-            $gff_feature->seq_id && $fmax ne '.' ) {
-        $uniquename = '_'
-          . $gff_feature->primary_tag . '_'
-          . $gff_feature->seq_id
-          . ":$fmin..$fmax";
-    }
-    elsif ( $gff_feature->primary_tag && $gff_feature->seq_id ) {
-        $uniquename =
-          '_' . $gff_feature->primary_tag . '_' . $gff_feature->seq_id;
+
+    my %feature_attributes = (
+        organism_id => $chado_organism,
+        seqlen => $seqlen,
+        type_id => $chado_type->id,
+        uniquename => $uniquename,
+    );
+
+    if ( $gff_feature->has_tag('Name') ) {
+        ($name) = $gff_feature->get_tag_values('Name');
+        $feature_attributes{name} = $name;
+    } elsif ( $gff_feature->has_tag('ID') ) {
+        ($name) = $gff_feature->get_tag_values('ID');
+        $feature_attributes{name} = $name;
     }
 
     my $chado_feature;
-    my $name;
     if ( $gff_feature->has_tag('Name') ) {
         ($name) = $gff_feature->get_tag_values('Name');
     }
@@ -981,31 +1013,11 @@ sub load_feature_locations {
         ($name) = $gff_feature->get_tag_values('ID');
     }
 
-    if ( $gff_feature->has_tag('Name') || $gff_feature->has_tag('ID') ) {
-        ($chado_feature) = Chado::Feature->find_or_create(
-            {
-                organism_id => $chado_organism,
-                name        => $name,
-                uniquename  => $UNIQUENAME ? $uniquename : $id . $uniquename,
-                type_id     => $chado_type->id,
-                seqlen      => $seqlen
-            }
-        );
-    }
-    else {
-        ($chado_feature) = Chado::Feature->find_or_create(
-            {
-                organism_id => $chado_organism,
-                uniquename  => $uniquename,
-                type_id     => $chado_type->id,
-                seqlen      => $seqlen
-            }
-        );
-    }
+    ($chado_feature) = Chado::Feature->find_or_create(\%feature_attributes);
 
     push @transaction, $chado_feature;
 
-    if (   $id                  eq $gff_feature->seq_id
+    if ( $id eq $gff_feature->seq_id
         or $gff_feature->seq_id eq '.' ) {
       #ie, this is a srcfeature (ie, fref) so only create the feature
         $srcfeature{$gff_feature->seq_id} = $chado_feature; 
