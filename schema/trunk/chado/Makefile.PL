@@ -141,7 +141,7 @@ metadata: ./bin/ddltrans
 
   qq{
 test_load ::
-	\$(SHELL) install/test_load.sh
+	\$(SHELL) bin/test_load.sh
 
 $uninterp
   };  
