@@ -340,7 +340,7 @@
    DROP TABLE audit_cv;
    CREATE TABLE audit_cv ( 
        cv_id integer, 
-       name varchar(1024), 
+       name varchar(255), 
        definition text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -351,7 +351,7 @@
    '
    DECLARE
        cv_id_var integer; 
-       name_var varchar(1024); 
+       name_var varchar(255); 
        definition_var text; 
        
        transaction_type_var char;
@@ -401,6 +401,8 @@
        name varchar(1024), 
        definition text, 
        dbxref_id integer, 
+       is_obsolete integer, 
+       is_relationshiptype integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -414,6 +416,8 @@
        name_var varchar(1024); 
        definition_var text; 
        dbxref_id_var integer; 
+       is_obsolete_var integer; 
+       is_relationshiptype_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -422,6 +426,8 @@
        name_var = OLD.name;
        definition_var = OLD.definition;
        dbxref_id_var = OLD.dbxref_id;
+       is_obsolete_var = OLD.is_obsolete;
+       is_relationshiptype_var = OLD.is_relationshiptype;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -435,6 +441,8 @@
              name, 
              definition, 
              dbxref_id, 
+             is_obsolete, 
+             is_relationshiptype, 
              transaction_type
        ) VALUES ( 
              cvterm_id_var, 
@@ -442,6 +450,8 @@
              name_var, 
              definition_var, 
              dbxref_id_var, 
+             is_obsolete_var, 
+             is_relationshiptype_var, 
              transaction_type_var
        );
 
@@ -600,6 +610,7 @@
        cvtermsynonym_id integer, 
        cvterm_id integer, 
        synonym varchar(1024), 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -611,12 +622,14 @@
        cvtermsynonym_id_var integer; 
        cvterm_id_var integer; 
        synonym_var varchar(1024); 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
        cvtermsynonym_id_var = OLD.cvtermsynonym_id;
        cvterm_id_var = OLD.cvterm_id;
        synonym_var = OLD.synonym;
+       type_id_var = OLD.type_id;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -628,11 +641,13 @@
              cvtermsynonym_id, 
              cvterm_id, 
              synonym, 
+             type_id, 
              transaction_type
        ) VALUES ( 
              cvtermsynonym_id_var, 
              cvterm_id_var, 
              synonym_var, 
+             type_id_var, 
              transaction_type_var
        );
 
@@ -657,6 +672,7 @@
        cvterm_dbxref_id integer, 
        cvterm_id integer, 
        dbxref_id integer, 
+       is_for_definition integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -668,12 +684,14 @@
        cvterm_dbxref_id_var integer; 
        cvterm_id_var integer; 
        dbxref_id_var integer; 
+       is_for_definition_var integer; 
        
        transaction_type_var char;
    BEGIN
        cvterm_dbxref_id_var = OLD.cvterm_dbxref_id;
        cvterm_id_var = OLD.cvterm_id;
        dbxref_id_var = OLD.dbxref_id;
+       is_for_definition_var = OLD.is_for_definition;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -685,11 +703,13 @@
              cvterm_dbxref_id, 
              cvterm_id, 
              dbxref_id, 
+             is_for_definition, 
              transaction_type
        ) VALUES ( 
              cvterm_dbxref_id_var, 
              cvterm_id_var, 
              dbxref_id_var, 
+             is_for_definition_var, 
              transaction_type_var
        );
 
@@ -707,6 +727,73 @@
        BEFORE UPDATE OR DELETE ON cvterm_dbxref
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_cvterm_dbxref ();
+
+
+   DROP TABLE audit_cvtermprop;
+   CREATE TABLE audit_cvtermprop ( 
+       cvtermprop_id integer, 
+       cvterm_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cvtermprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cvtermprop() RETURNS trigger AS
+   '
+   DECLARE
+       cvtermprop_id_var integer; 
+       cvterm_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cvtermprop_id_var = OLD.cvtermprop_id;
+       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cvtermprop ( 
+             cvtermprop_id, 
+             cvterm_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             cvtermprop_id_var, 
+             cvterm_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cvtermprop_audit_ud ON cvtermprop;
+   CREATE TRIGGER cvtermprop_audit_ud
+       BEFORE UPDATE OR DELETE ON cvtermprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cvtermprop ();
 
 
    DROP TABLE audit_dbxrefprop;
