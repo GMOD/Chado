@@ -126,6 +126,7 @@ my %feature = ();
 my %featureloc_rank = ();
 my %srcfeature = ();
 my %dbxref = ();
+my %tagtype = ();
 
 my $feature_count = 0;
 
@@ -148,12 +149,12 @@ my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
 #check for a synonym type in cvterm--if it's not there create it
 #and a corresponding entry in cv
 
-my ($synonym_type) = Chado::Cvterm->search(name => 'synonym');
-unless ($synonym_type) {
-  my ($cv_entry) = Chado::Cv->find_or_create({
+my ($cv_entry) = Chado::Cv->find_or_create({
                     name       => 'autocreated',
                     definition => 'auto created by load_gff3.pl'
-                                             }); 
+                                             });
+my ($synonym_type) = Chado::Cvterm->search(name => 'synonym');
+unless ($synonym_type) {
   ($synonym_type) = Chado::Cvterm->find_or_create({
                     name       => 'synonym',
                     cv_id      => $cv_entry->cv_id,
@@ -166,10 +167,6 @@ die "Unable to create a synonym type in cvterm table."
 my ($note_type) = Chado::Cvterm->search(name => 'note');
 ($note_type) = Chado::Cvterm->search(name => 'Note') unless $note_type;
 unless ($note_type) {
-  my ($cv_entry) = Chado::Cv->find_or_create({
-                    name       => 'autocreated',
-                    definition => 'auto created by load_gff3.pl'
-                                             });
   ($note_type) = Chado::Cvterm->find_or_create({
                     name       => 'note',
                     cv_id      => $cv_entry->cv_id,
@@ -181,10 +178,6 @@ die "Unable to create note type in cvterm table."
 
 my ($pub_type) = Chado::Cvterm->search(name => 'gff_file');
 unless ($pub_type) {
-  my ($cv_entry) = Chado::Cv->find_or_create({
-                    name       => 'autocreated',
-                    definition => 'auto created by load_gff3.pl'
-                                             });
   ($pub_type) = Chado::Cvterm->find_or_create({
                     name       => 'gff_file',
                     cv_id      => $cv_entry->cv_id,
@@ -391,17 +384,45 @@ while(my $gff_feature = $gffio->next_feature()) {
     }
   }
 
-  if($gff_feature->has_tag('note') or $gff_feature->has_tag('Note')) {
-    my @notes = $gff_feature->get_tag_values('note');
-    push @notes, $gff_feature->get_tag_values('Note');
-    foreach my $note (@notes) {
+#  if($gff_feature->has_tag('note') or $gff_feature->has_tag('Note')) {
+#    my @notes;
+#    push @notes, $gff_feature->get_tag_values('note')
+#         if $gff_feature->has_tag('note');
+#    push @notes, $gff_feature->get_tag_values('Note')
+#         if $gff_feature->has_tag('Note');
+#    foreach my $note (@notes) {
+#      Chado::Featureprop->find_or_create({
+#                      feature_id => $chado_feature->feature_id,
+#                      type_id    => $note_type->cvterm_id,
+#                      value      => $note
+#                                         });
+#    }
+#  } 
+
+  my @tags = $gff_feature->all_tags;
+  foreach my $tag (@tags) {
+    next if $tag eq 'ID';
+    next if $tag eq 'Parent';
+    next if $tag eq 'Alias';
+    next if $tag eq 'Name';
+
+    unless (defined $tagtype{$tag}) {
+      $tagtype{$tag} = Chado::Cvterm->find_or_create ({
+                    name       => $tag,
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                      });
+    }
+
+    my @values = $gff_feature->get_tag_values($tag);
+    foreach my $value (@values) {
       Chado::Featureprop->find_or_create({
                       feature_id => $chado_feature->feature_id,
-                      type_id    => $note_type->cvterm_id,
-                      value      => $note
+                      type_id    => $tagtype{$tag}->cvterm_id,
+                      value      => $value
                                          });
     }
-  } 
+  }
 
   if ($feature_count % 1000 == 0) {
     print STDERR "features loaded $feature_count";
