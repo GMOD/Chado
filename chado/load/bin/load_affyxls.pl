@@ -94,6 +94,7 @@ while(my $arrayio = $affx->next_array){
   ##############################
   my($sth,%feature);
   my $sth;
+  $LOG->debug("caching features...");
   $sth = Chado::Feature->sql_affy_probesets;
   $sth->execute;
   while(my $row = $sth->fetchrow_hashref){
@@ -101,6 +102,7 @@ while(my $arrayio = $affx->next_array){
 	$feature{$row->{name}}{feature_id} = $row->{feature_id};
 	$feature{$row->{name}}{element_id} = $row->{element_id};
   }
+  $LOG->debug("cached features: ".scalar(keys %feature));
 
   my($array)     = Chado::Array->search(name => $arraytype);
   ($array)     ||= Chado::Array->search(name => 'unknown');
@@ -130,8 +132,12 @@ while(my $arrayio = $affx->next_array){
     my($chado_cvterm) = Chado::Cvterm->search(name => $cvterm);
     if(!$chado_cvterm){
       my($chado_dbxref) = Chado::Dbxref->search(accession => $cvterm);
+      my $fatal = undef;;
       ($chado_cvterm) = Chado::Cvterm->search(dbxref_id => $chado_dbxref)
-        or die "couldn't find cvterm for $cvterm, you need to create it";
+        or $fatal = "couldn't find cvterm for $cvterm, you need to create it";
+      if($fatal){
+        $LOG->fatal($fatal) and die $fatal;
+      }
     }
 
 	my $biomaterialprop = Chado::Biomaterialprop->create({
@@ -139,6 +145,7 @@ while(my $arrayio = $affx->next_array){
                                                           type_id => $chado_cvterm,
                                                           value => $cvterm{$cvterm},
                                                          });
+    $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: ". $cvterm{$cvterm});
     push @txn, $biomaterialprop;
   }
 
@@ -182,6 +189,7 @@ while(my $arrayio = $affx->next_array){
   my $progress_update = 0;
 
   my $c = 0;
+  $LOG->info("featuregroups loading...");
   foreach my $featuregroup ($arrayio->each_featuregroup){
     $c++;
     $progress_update = $progress->update($c) if($c > $progress_update);
@@ -189,7 +197,6 @@ while(my $arrayio = $affx->next_array){
     $progress->update($total) if($progress_update >= $total);
 
 
-#	print STDERR "$c featuregroups loaded\r" unless ++$c % 10;
 	my $feature  = $feature{$featuregroup->id}{feature_id};
 	my $element  = $feature{$featuregroup->id}{element_id};
 
@@ -225,8 +232,11 @@ while(my $arrayio = $affx->next_array){
 								});
     push @txn, $ad;
   }
+  $LOG->info("featuregroups loaded: ". $c);
 
+  $LOG->info("transaction commiting...");
   $_->dbi_commit foreach @txn;
+  $LOG->info("transaction commited...");
 }
 
 sub make_cvterms {
