@@ -18,7 +18,7 @@ gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
 
 =head1 SYNOPSIS
 
-  % cat <gff-file> | gmod_bulk_load.pl [options]
+  % gmod_bulk_load.pl [options]
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -31,6 +31,8 @@ gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
  --dbport      Database port
  --analysis    The GFF data is from computational analysis
  --noload      Create bulk load files, but don't actually load them.
+ --validate    Validate SOFA terms before attempting insert (can cause
+                 script startup to be slow, 0 (false) by default)
 
 Note that all of the arguments that begin 'db' can be provided by default
 by Bio::GMOD::Config, which was installed when 'make install' was run.
@@ -85,7 +87,7 @@ These include:
 
 =item Gap
 
-=item Any custom (ie, lowercase-first) tag
+=item Any custom (ie, lowercase-first) tag is supported, provided they already have an entry in the cvterm table
 
 =back
 
@@ -94,6 +96,24 @@ These include:
 This loader does not load DNA sequences, though chromosome sequences
 can be loaded with gmod_load_gff3 when the reference sequence features
 are loaded.
+
+=item Analysis
+
+If you are loading analysis results (ie, blat results, gene predictions), 
+you should specify the -a flag.  If no arguments are supplied with the
+-a, then the loader will assume that the results belong to an analysis
+set with a name that is the concatenation of the source (column 2) and
+the method (column 3) with an underscore in between.  Otherwise, the
+argument provided with -a will be taken as the name of the analysis
+set.  Either way, the analysis set must already be in the analysis
+table.  The easist way to do this is to insert it directly in the
+psql shell:
+
+  INSERT INTO analysis (name, program, programversion)
+               VALUES  ('genscan 2005-2-28','genscan','5.4');
+
+There are other columns in the analysis table that are optional; see
+the schema documentation and '\d analysis' in psql for more information.
 
 =back
 
@@ -110,7 +130,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $NOLOAD);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $NOLOAD, $VALIDATE);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -130,15 +150,16 @@ if (eval {require Bio::GMOD::Config;
 }
 
 GetOptions(
-    'organism:s' => \$ORGANISM,
-    'gfffile:s'  => \$GFFFILE,
-    'dbname:s'   => \$DBNAME,
-    'dbuser:s'   => \$DBUSER,
-    'dbpass:s'   => \$DBPASS,
-    'dbhost:s'   => \$DBHOST,
-    'dbport:s'   => \$DBPORT,
-    'analysis'   => \$ANALYSIS,
+    'organism=s' => \$ORGANISM,
+    'gfffile=s'  => \$GFFFILE,
+    'dbname=s'   => \$DBNAME,
+    'dbuser=s'   => \$DBUSER,
+    'dbpass=s'   => \$DBPASS,
+    'dbhost=s'   => \$DBHOST,
+    'dbport=s'   => \$DBPORT,
+    'analysis:s' => \$ANALYSIS, # = means it is required, : means optional
     'noload'     => \$NOLOAD,
+    'validate'   => \$VALIDATE,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -147,7 +168,16 @@ $DBNAME   ||='chado';
 $DBPASS   ||='';
 $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
-$ANALYSIS ||=0;
+$VALIDATE ||=0;
+
+if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
+  $ANALYSIS = 1; #ie, it was specified on the command line with no arg
+} elsif ($ANALYSIS) {
+  $ANALYSIS_GROUP = $ANALYSIS; # analysis group specified on the command line
+  $ANALYSIS = 1;
+} else {
+  $ANALYSIS = 0;
+}
 
 my %cache = (
              analysis => {},
@@ -163,6 +193,7 @@ my %cache = (
 my %t_unique_count;
 my $pub; # for holding null pub object
 my $gff_source_db;
+my $auto_cv_id;
 my $source_success = 1; #indicates that GFF_source is in db table
 my @tables = (
    "feature",#
@@ -326,15 +357,14 @@ open DBX,   ">$files{dbxref}";
 open AF,    ">$files{analysisfeature}";
 
 my $gffio;
-#could add a flag for validate terms...
 if ($GFFFILE eq 'stdin') {
     $gffio = Bio::FeatureIO->new(-fh   => \*STDIN , 
                                  -format => 'gff', 
-                                 -validate_terms => 0);
+                                 -validate_terms => $VALIDATE);
 } else {
     $gffio = Bio::FeatureIO->new(-file => $GFFFILE, 
                                  -format => 'gff', 
-                                 -validate_terms => 0);
+                                 -validate_terms => $VALIDATE);
 }
 
 while(my $feature = $gffio->next_feature()){
@@ -426,6 +456,64 @@ while(my $feature = $gffio->next_feature()){
 
       $rank++;
       $nextfeatureprop++;
+    }
+  }
+
+#try to put unreserved tags in featureprop
+#this requires that the terms exist in cvterm (and therefore that they
+#have a dbxref)
+  my @unreserved_tags = grep {/^[a-z]/} $feature->annotation->get_all_annotation_keys();
+  if ( @unreserved_tags > 0 ) {
+    foreach my $tag (@unreserved_tags) {
+      warn "tag:$tag\n";
+      next unless (ref($feature->annotation) eq 'Bio::Annotation::SimpleValue');
+      next if $tag eq 'source';
+      next if $tag eq 'phase';
+      next if $tag eq 'seq_id';
+      my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
+
+      unless ($auto_cv_id){
+        my ($cv_obj) = Chado::Cv->search( name=>'autocreated');
+        $auto_cv_id  = $cv_obj->id;
+      }
+
+      unless ( $cache{type}{$tag} ) {
+        my ($tag_cvterm) = Chado::Cvterm->search(
+                             name => $tag,
+                             cv_id=> $auto_cv_id);
+        if ($tag_cvterm) { #good, the term is already there
+          print "tag:$tag\n";
+          $cache{type}{$tag} = $tag_cvterm->id;
+        } else { #bad! the term is not there for now we die with a helpful message
+          die <<END;
+Your GFF3 file uses a tag called '$tag', but this term is not
+already in the cvterm table so that it's value can be inserted
+into the featureprop table.  The easiest way to rectify this is
+to execute the following SQL commands in the psql shell:
+
+  INSERT INTO dbxref (db_id,accession) 
+    VALUES ((select db_id from db where name='null'),'autocreated:$tag');
+  INSERT INTO cvterm (cv_id,name,dbxref_id)
+    VALUES ((select cv_id from cv where name='autocreated'), '$tag',
+            (select dbxref_id from dbxref where accession='autocreated:$tag');
+
+and then rerun this loader.  You other main option is to 
+write a special handler for this tag so that it will
+go where you want it in the database.
+
+END
+;
+        }
+      } 
+      
+      #moving on, add this to the featureprop table
+      my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
+      my $rank=0;
+      foreach my $value (@values) {
+        print FPROP join("\t",($nextfeatureprop,$nextfeature,$cache{type}{$tag}->id,$value,$rank)),"\n";
+        $rank++;
+        $nextfeatureprop++;
+      }
     }
   }
 
@@ -550,16 +638,16 @@ while(my $feature = $gffio->next_feature()){
 
     my $featuretype = $feature->type->name;
 
-    my $ankey = $is_FgenesH ?
-                'FgenesH_Monocot' :
+    my $ankey = $ANALYSIS_GROUP ?
+                $ANALYSIS_GROUP :
                 $source .'_'. $featuretype;
 
     unless ($cache{analysis}{$ankey}) {
       my ($ana) = Chado::Analysis->search( name => $ankey );
-      die "couldn't find $ankey in analysis table\n" unless $ana;
+      dump_ana_contents() unless $ana;
       $cache{analysis}{$ankey} = $ana->id;
-      die unless $cache{analysis}{$ankey};
     }
+    dump_ana_contents() unless $cache{analysis}{$ankey};
 
     print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n";
     $nextanalysisfeature++;
@@ -616,22 +704,16 @@ while(my $feature = $gffio->next_feature()){
  #     }
  #     die "no cvterm for ".$featuretype unless $type;
 
-      my $ankey = $tsource .'_'. $featuretype;
+      my $ankey = $ANALYSIS_GROUP ?
+                  $ANALYSIS_GROUP :
+                  $tsource .'_'. $featuretype;
 
       unless($cache{analysis}{$ankey}) {
         my ($ana) = Chado::Analysis->search( name => $ankey );
-        if(!$ana){
-          ($ana) = Chado::Analysis->create({
-                                            name           => $ankey,
-                                            program        => "autocreated by $0",
-                                            programversion => "autocreated by $0",
-                                           });
-          $ana->dbi_commit();
-          warn "created analysis for '$ankey'";
-        }
+        dump_ana_contents() unless $ana;
         $cache{analysis}{$ankey} = $ana->id;
       }
-      die unless $cache{analysis}{$ankey};
+      dump_ana_contents() unless $cache{analysis}{$ankey};
 
       print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n"; 
       $nextanalysisfeature++;
@@ -783,4 +865,21 @@ sub synonyms  {
       print FS join("\t", ($nextfeaturesynonym,$cache{synonym}{$alias},$nextfeature,$pub)),"\n";
       $nextfeaturesynonym++;
     }
+}
+
+sub dump_ana_contents {
+  print STDERR "\n\nCouldn't find $ANALYSIS_GROUP in analysis table\n";
+  print STDERR "The current contents of the analysis table is:\n\n";
+
+  my @all_columns = Chado::Analysis->columns;
+  printf STDERR "%10s %11s %12s %30s %10s %10s\n\n", sort @all_columns;
+
+  my $analysis_iterator = Chado::Analysis->retrieve_all();
+  while (my $analysis = $analysis_iterator->next) {
+    my @cols = map {$analysis->$_} sort $analysis->columns;
+    printf STDERR "%10s %11s %12s %30s %10s %10s\n", @cols;
+  }
+
+  print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
+  exit 1;
 }

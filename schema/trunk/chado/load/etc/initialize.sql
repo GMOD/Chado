@@ -179,3 +179,4 @@ insert into cvterm (name,definition,cv_id,dbxref_id) values ('expectation maximi
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:histogram');
 insert into cvterm (name,definition,cv_id,dbxref_id) values ('histogram','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:histogram'));
 
+insert into cv (name,definition) values ('autocreated','Terms that are automatically inserted by loading software');
