@@ -168,6 +168,8 @@ my %featureloc_locgroup   = ();
 my %dbxref            = ();
 my %cvterm            = ();
 my $so;
+my $gff_source_db;
+my %gff_source;
 
 initialize();
 
@@ -1000,16 +1002,31 @@ sub load_feature_locations {
 
     my $source = $gff_feature->source_tag();
     if ( $source && $source ne '.') { #make source a feature prop
-        my $sourcetype = cache_cvterm("GFF_source"); 
 
-        my ($featureprop) = Chado::Featureprop->find_or_create(
-            {
-                feature_id => $chado_feature->id,
-                type_id    => $cvterm{'GFF_source'}->id,
-                value      => $source,
-            }
-        );
-        push @transaction, ($featureprop);
+        unless ($gff_source_db) {#create a new db for keeping GFF sources
+            $gff_source_db = Chado::Db->find_or_create( {
+                name        => 'GFF_sources',
+                contact_id  => $nullcontact,
+                description => 'A collection of sources (ie, column 2) from GFF files',
+            } );
+
+            push @transaction, $gff_source_db;
+        }
+
+        unless ($gff_source{$source}) { #now make a dbxref for the source
+            $gff_source{$source} = Chado::Dbxref->find_or_create( {
+                db_id     => $gff_source_db->id,
+                accession => $source,
+            } );
+            push @transaction, $gff_source{$source};
+        }
+
+        #now tie feature and source together in feature_dbxref
+        my $feature_dbxref = Chado::Feature_Dbxref->find_or_create( {
+            feature_id => $chado_feature->id,
+            dbxref_id  => $gff_source{$source}->id
+        }); 
+        push @transaction, $feature_dbxref;
     }
 
     if ( $id eq $gff_feature->seq_id
