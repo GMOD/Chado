@@ -1,0 +1,30 @@
+
+This directory contains the makefile, which
+produces 2 java .class files in the 'classes'
+subdirectory.  These files are GTC.class, for
+Game To Chado conversion, and CTG.class for
+Chado To Game conversion.
+
+The file 'testScript' provides a roundtrip
+example of running the two programs.
+
+The first input is the file to be read, and the
+second file is the output.
+
+GTC recognizes '-' parameters.
+'-a' means convert 'all', both features and
+	computational analyses. This is the default.
+'-g' convert gene features, but ignore computational
+	analyses
+'-c' convert computational analyses, but not gene
+	features
+For all parameters, non annotation sequences are
+converted.
+
+CTG recognizes the '-D' parameter.
+CTG '-D' is followed by a comma delimited list
+of START,END,NAME, where START is the start
+bound of NAME with respect to the ARM coordinates
+in the Chado file, and the END with respect to
+the ARM. 
+
