@@ -9,6 +9,10 @@
 --   would incorporate environment this way - just add the environment 
 --   descriptors as properties of the child gcontext
 --
+-- changes 2004-06 (Documented by DE: 10-MAR-2005):
+--   Many, including rename of gcontext to genotype,  split 
+--   phenstatement into phenstatement & phenotype, created environment
+--
 -- for modeling simple or complex genetic screens
 --
 -- most genetic statements are about "alleles", although
@@ -92,8 +96,8 @@
 --
 -- we specify this with an environmental context
 --
--- we use the gxe relation (genetic context X environmental context) to
--- represent the actual organismal context under observation
+-- we use the phendesc relation to represent the actual organismal 
+-- context under observation
 --
 -- for the description of the phenotype, we are using the standard
 -- Observable/Attribute/Value model from the Phenotype Ontology
@@ -161,7 +165,7 @@
 -- STOCKS
 --
 -- this should be in a sub-module of this one; basically we want some
--- kind of linking table between stock and gcontext
+-- kind of linking table between stock and genotype
 --
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ============
@@ -172,65 +176,33 @@
 -- :import pub from pub
 -- :import dbxref from general
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--- ============
--- RELATIONS
--- ============
 
 
--- RELATION: gcontext
---
+-- ================================================
+-- TABLE: genotype
+-- ================================================
 -- genetic context
--- 
--- essentially a combination of genotype and extra-genotype gene
--- products; eg a genotype + some RNAi product
--- 
--- AND ALSO ENVIRONMENT!!!
--- 
--- the uniquename should be derived from the features making
--- up the genetic context(see feature_gcontext)
--- 
--- uniquename          : a human-readable unique identifier
+-- the uniquename should be derived from the features
+-- making up the genoptype
 --
-
-create table gcontext (
-    gcontext_id	serial not null,
-    primary key (gcontext_id),
-    uniquename varchar(255) not null,
-    description	text,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    constraint gcontext_c1 unique (uniquename)
+-- uniquename: a human-readable unique identifier
+--
+create table genotype (
+    genotype_id serial not null,
+    primary key (genotype_id),
+    uniquename text not null,      
+    description varchar(255),
+    constraint genotype_c1 unique (uniquename)
 );
+create index genotype_idx1 on genotype(uniquename);
 
--- ****************************************
+COMMENT ON TABLE genotype IS NULL;
 
 
--- RELATION: gcontext_relationship
---
--- genetic contexts can be related to eachother (eg ISA/derived-from)
--- this means that different authors can talk about essentially the
--- same gcontext, although each would have their own gcontext_id;
--- they would all be descended from the same parent gcontext
--- 
---
-create table gcontext_relationship (
-    gcontext_relationship_id serial not null,
-    primary key (gcontext_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null, 
-    foreign key (object_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint gcontext_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index gcontext_relationship_idx1 on gcontext_relationship (subject_id);
-create index gcontext_relationship_idx2 on gcontext_relationship (object_id);
-create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
-
--- RELATION: feature_gcontext
---
--- A gcontext is defined by a collection of features
+-- ===============================================
+-- TABLE: feature_genotype
+-- ================================================
+-- A genotype is defined by a collection of features
 -- mutations, balancers, deficiencies, haplotype blocks, engineered
 -- constructs
 -- 
@@ -248,47 +220,64 @@ create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
 -- rank                : preserves order
 -- group               : spatially distinguishable group
 --
-create table feature_gcontext (
-	feature_gcontext_id	serial not null,
-	primary key (feature_gcontext_id),
-	feature_id int not null,
-	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	chromosome_id int,
-	foreign key (chromosome_id) references feature(feature_id) on delete set null INITIALLY DEFERRED,
-	rank int not null,
-	cgroup int not null,
-	cvterm_id int not null,
-	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint feature_gcontext_c1 unique (feature_id,gcontext_id,cvterm_id)
+create table feature_genotype (
+    feature_genotype_id serial not null,
+    primary key (feature_genotype_id),
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    chromosome_id int,
+    foreign key (chromosome_id) references feature (feature_id) on delete set null,
+    rank int not null,
+    cgroup     int not null,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id)
 );
-create index feature_gcontext_idx1 on feature_gcontext (feature_id);
-create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
+create index feature_genotype_idx1 on feature_genotype (feature_id);
+create index feature_genotype_idx2 on feature_genotype (genotype_id);
 
--- RELATION: gcontextprop
---
--- key/val pairs for a genetic context
--- can be environmental; eg temperature_degrees_c=36
--- 
--- value               : unconstrained free text value
---
-create table gcontextprop (
-	gcontextprop_id	serial not null,
-	primary key (gcontextprop_id),
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text null,
-	rank int not null default 0,
-    constraint gcontextprop_c1 unique (gcontext_id,type_id,rank)
+COMMENT ON TABLE feature_genotype IS NULL;
+
+
+
+-- ================================================
+-- TABLE: environment
+-- ================================================
+-- The environmental component of a phenotype description
+create table environment (
+    environment_id serial not NULL,
+    primary key  (environment_id),
+    uniquename text not null,
+    description text,
+    constraint environment_c1 unique (uniquename)
 );
-create index gcontextprop_idx1 on gcontextprop (gcontext_id);
-create index gcontextprop_idx2 on gcontextprop (type_id);
+create index environment_idx1 on environment(uniquename);
 
--- RELATION: phenstatement
---
+COMMENT ON TABLE environment IS NULL;
+
+
+-- ================================================
+-- TABLE: environment_cvterm
+-- ================================================
+create table environment_cvterm (
+    environment_cvterm_id serial not null,
+    primary key  (environment_cvterm_id),
+    environment_id int not null,
+    foreign key (environment_id) references environment (environment_id) on delete cascade,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint environment_cvterm_c1 unique (environment_id, cvterm_id)
+);
+create index environment_cvterm_idx1 on environment_cvterm (environment_id);
+create index environment_cvterm_idx2 on environment_cvterm (cvterm_id);
+
+COMMENT ON TABLE environment_cvterm IS NULL;
+
+-- ================================================
+-- TABLE: phenotype
+-- ================================================
 -- a phenotypic statement, or a single atomic phenotypic
 -- observation
 -- 
@@ -304,103 +293,149 @@ create index gcontextprop_idx2 on gcontextprop (type_id);
 -- cvalue_id           : constrained value from ontology, e.g. "abnormal", "big"
 -- assay_id            : e.g. name of specific test
 --
-create table phenstatement (
-	phenstatement_id	serial not null,
-	primary key (phenstatement_id),
-	gcontext_id int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	dbxref_id int not null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
-	observable_id	int not null,
-	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	attr_id	int,
-	foreign key (attr_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-	value text,
-	cvalue_id int,
-	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-	assay_id int,
-	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    constraint phenstatement_c1 unique (gcontext_id,dbxref_id,observable_id)
+create table phenotype (
+    phenotype_id serial not null,
+    primary key (phenotype_id),
+    uniquename text not null,  
+    observable_id int,
+    foreign key (observable_id) references cvterm (cvterm_id) on delete cascade,
+    attr_id int,
+    foreign key (attr_id) references cvterm (cvterm_id) on delete set null,
+    value text,
+    cvalue_id int,
+    foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null,
+    assay_id int,
+    foreign key (assay_id) references cvterm (cvterm_id) on delete set null,
+    constraint phenotype_c1 unique (uniquename)
 );
-create index phenstatement_idx1 on phenstatement (gcontext_id);
-create index phenstatement_idx2 on phenstatement (observable_id);
-create index phenstatement_idx3 on phenstatement (attr_id);
+create index phenotype_idx1 on phenotype (cvalue_id);
+create index phenotype_idx2 on phenotype (observable_id);
+create index phenotype_idx3 on phenotype (attr_id);
 
+COMMENT ON TABLE phenotype IS NULL;
+
+
+-- ================================================
+-- TABLE: phenotype_cvterm
+-- ================================================
+create table phenotype_cvterm (
+    phenotype_cvterm_id serial not null,
+    primary key (phenotype_cvterm_id),
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint phenotype_cvterm_c1 unique (phenotype_id, cvterm_id)
+);
+create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
+create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
+
+COMMENT ON TABLE phenotype_cvterm IS NULL;
+
+
+-- ================================================
+-- TABLE: phenstatement
+-- ================================================
+-- Phenotypes are things like "larval lethal".  Phenstatements are things
+-- like "dpp[1] is recessive larval lethal". So essentially phenstatement
+-- is a linking table expressing the relationship between genotype, environment,
+-- and phenotype.
+-- 
+create table phenstatement (
+    phenstatement_id serial not null,
+    primary key (phenstatement_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    environment_id int not null,
+    foreign key (environment_id) references environment (environment_id) on delete cascade,
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phenstatement_c1 unique (genotype_id,phenotype_id,environment_id,type_id,pub_id)
+);
+create index phenstatement_idx1 on phenstatement (genotype_id);
+create index phenstatement_idx2 on phenstatement (phenotype_id);
+
+COMMENT ON TABLE phenstatement IS NULL;
+
+
+-- ================================================
+-- TABLE: feature_phenotype
+-- ================================================
+create table feature_phenotype (
+    feature_phenotype_id serial not null,
+    primary key (feature_phenotype_id),
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    constraint feature_phenotype_c1 unique (feature_id,phenotype_id)       
+);
+create index feature_phenotype_idx1 on feature_phenotype (feature_id);
+create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
+
+COMMENT ON TABLE feature_phenotype IS NULL;
+
+
+-- ================================================
+-- TABLE: phendesc
+-- ================================================
 -- RELATION: phendesc
 --
 -- a summary of a _set_ of phenotypic statements for any one
 -- gcontext made in any one
 -- publication
 -- 
---
 create table phendesc (
-	phendesc_id	serial not null,
-	primary key (phendesc_id),
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	description	text not null,
-    constraint phendesc_c1 unique (gcontext_id,description)
+    phendesc_id serial not null,
+    primary key (phendesc_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    environment_id int not null,
+    foreign key (environment_id) references environment ( environment_id) on delete cascade,
+    description text not null,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phendesc_c1 unique (genotype_id,environment_id,pub_id)
 );
-create index phendesc_idx1 on phendesc (gcontext_id);
+create index phendesc_idx1 on phendesc (genotype_id);
+create index phendesc_idx2 on phendesc (environment_id);
+create index phendesc_idx3 on phendesc (pub_id);
 
--- RELATION: phenstatement_relationship
---
--- interaction (suppression, enhancement), rescue, complementation
--- are always relationships between phenstatements
--- 
---
-create table phenstatement_relationship (
-	phenstatement_relationship_id serial not null,
-	primary key (phenstatement_relationship_id),
-	subject_id int not null,
-	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	object_id int not null,
-	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	comment_id int not null,
-	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint phenstatement_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index phenstatement_relationship_idx1 on phenstatement_relationship (subject_id);
-create index phenstatement_relationship_idx2 on phenstatement_relationship (object_id);
-create index phenstatement_relationship_idx3 on phenstatement_relationship (type_id);
+COMMENT ON TABLE phendesc IS NULL;
 
--- RELATION: phenstatement_cvterm
---
--- arbitrary qualifiers
--- for anything that doesn't fit into obs/attr/val model
--- 
---
-create table phenstatement_cvterm (
-    phenstatement_cvterm_id serial not null,
-    primary key (phenstatement_cvterm_id),
-    phenstatement_id int not null,
-    foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id int not null,
-    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint phenstatement_cvterm_c1 unique (phenstatement_id,cvterm_id)
-);
-create index phenstatement_cvterm_idx1 on phenstatement_cvterm (phenstatement_id);	
-create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);	
 
--- RELATION: phenstatementprop
---
--- arbitrary key=value pairs
--- e.g. penetrance_pct=80
+-- ================================================
+-- TABLE: phenotype_comparison
+-- ================================================
+-- comparison of phenotypes
+-- eg, genotype1/environment1/phenotype1 "non-suppressible" wrt 
+-- genotype2/environment2/phenotype2
 -- 
--- value               : unconstrained free text value
---
-create table phenstatementprop (
-	phenstatementprop_id	serial not null,
-	primary key (phenstatementprop_id),
-	phenstatement_id	int not null,
-	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text null,
-	rank int not null default 0,
-    constraint phenstatementprop_c1 unique (phenstatement_id,type_id,rank)
+create table phenotype_comparison (
+    phenotype_comparison_id serial not null,
+    primary key (phenotype_comparison_id),
+    genotype1_id int not null,
+        foreign key (genotype1_id) references genotype (genotype_id) on delete cascade,
+    environment1_id int,
+        foreign key (environment1_id) references environment (environment_id) on delete cascade,
+    genotype2_id int not null,
+        foreign key (genotype2_id) references genotype (genotype_id) on delete cascade,
+    environment2_id int,
+        foreign key (environment2_id) references environment (environment_id) on delete cascade,
+    phenotype1_id int not null,
+        foreign key (phenotype1_id) references phenotype (phenotype_id) on delete cascade,
+    phenotype2_id int,
+        foreign key (phenotype2_id) references phenotype (phenotype_id) on delete cascade,
+    type_id int not null,
+        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phenotype_comparison_c1 unique (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,phenotype2_id,type_id,pub_id)
 );
-create index phenstatementprop_idx1 on phenstatementprop (phenstatement_id);
-create index phenstatementprop_idx2 on phenstatementprop (type_id);
+
+COMMENT ON TABLE phenotype_comparison IS NULL;
+

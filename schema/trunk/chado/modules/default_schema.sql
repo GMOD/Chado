@@ -761,7 +761,8 @@ create index feature_cvterm_idx3 on feature_cvterm (pub_id);
 -- TABLE: feature_cvtermprop
 -- ================================================
 -- store attributes of feature_cvterm relationships, for instance GO evidence
--- codes
+-- codes; qualifiers; metadata such as the date on which the entry was
+-- curated and the source of the association
 
 create table feature_cvtermprop (
     feature_cvtermprop_id serial not null,
@@ -776,6 +777,25 @@ create table feature_cvtermprop (
 );
 create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_cvterm_id);
 create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
+
+-- ================================================
+-- TABLE: feature_cvterm_dbxref
+-- ================================================
+
+create table feature_cvterm_dbxref (
+    feature_cvterm_dbxref_id serial not null,
+    primary key (feature_cvterm_dbxref_id),
+    feature_cvterm_id int not null,
+    foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint feature_cvterm_dbxref_c1 unique (feature_cvterm_id,dbxref_id)
+);
+create index feature_cvterm_dbxref_idx1 on feature_cvterm_dbxref (feature_cvterm_id);
+create index feature_cvterm_dbxref_idx2 on feature_cvterm_dbxref (dbxref_id);
+
+COMMENT ON TABLE feature_cvterm_dbxref IS
+ 'Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details';
 
 
 -- ================================================
@@ -837,6 +857,10 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 --   gcontext_relationship to make some gcontexts derivable from others. we 
 --   would incorporate environment this way - just add the environment 
 --   descriptors as properties of the child gcontext
+--
+-- changes 2004-06 (Documented by DE: 10-MAR-2005):
+--   Many, including rename of gcontext to genotype,  split 
+--   phenstatement into phenstatement & phenotype, created environment
 --
 -- for modeling simple or complex genetic screens
 --
@@ -921,8 +945,8 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 --
 -- we specify this with an environmental context
 --
--- we use the gxe relation (genetic context X environmental context) to
--- represent the actual organismal context under observation
+-- we use the phendesc relation to represent the actual organismal 
+-- context under observation
 --
 -- for the description of the phenotype, we are using the standard
 -- Observable/Attribute/Value model from the Phenotype Ontology
@@ -990,7 +1014,7 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- STOCKS
 --
 -- this should be in a sub-module of this one; basically we want some
--- kind of linking table between stock and gcontext
+-- kind of linking table between stock and genotype
 --
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ============
@@ -1001,65 +1025,33 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- :import pub from pub
 -- :import dbxref from general
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--- ============
--- RELATIONS
--- ============
 
 
--- RELATION: gcontext
---
+-- ================================================
+-- TABLE: genotype
+-- ================================================
 -- genetic context
--- 
--- essentially a combination of genotype and extra-genotype gene
--- products; eg a genotype + some RNAi product
--- 
--- AND ALSO ENVIRONMENT!!!
--- 
--- the uniquename should be derived from the features making
--- up the genetic context(see feature_gcontext)
--- 
--- uniquename          : a human-readable unique identifier
+-- the uniquename should be derived from the features
+-- making up the genoptype
 --
-
-create table gcontext (
-    gcontext_id	serial not null,
-    primary key (gcontext_id),
-    uniquename varchar(255) not null,
-    description	text,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    constraint gcontext_c1 unique (uniquename)
+-- uniquename: a human-readable unique identifier
+--
+create table genotype (
+    genotype_id serial not null,
+    primary key (genotype_id),
+    uniquename text not null,      
+    description varchar(255),
+    constraint genotype_c1 unique (uniquename)
 );
+create index genotype_idx1 on genotype(uniquename);
 
--- ****************************************
+COMMENT ON TABLE genotype IS NULL;
 
 
--- RELATION: gcontext_relationship
---
--- genetic contexts can be related to eachother (eg ISA/derived-from)
--- this means that different authors can talk about essentially the
--- same gcontext, although each would have their own gcontext_id;
--- they would all be descended from the same parent gcontext
--- 
---
-create table gcontext_relationship (
-    gcontext_relationship_id serial not null,
-    primary key (gcontext_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null, 
-    foreign key (object_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint gcontext_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index gcontext_relationship_idx1 on gcontext_relationship (subject_id);
-create index gcontext_relationship_idx2 on gcontext_relationship (object_id);
-create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
-
--- RELATION: feature_gcontext
---
--- A gcontext is defined by a collection of features
+-- ===============================================
+-- TABLE: feature_genotype
+-- ================================================
+-- A genotype is defined by a collection of features
 -- mutations, balancers, deficiencies, haplotype blocks, engineered
 -- constructs
 -- 
@@ -1077,47 +1069,64 @@ create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
 -- rank                : preserves order
 -- group               : spatially distinguishable group
 --
-create table feature_gcontext (
-	feature_gcontext_id	serial not null,
-	primary key (feature_gcontext_id),
-	feature_id int not null,
-	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	chromosome_id int,
-	foreign key (chromosome_id) references feature(feature_id) on delete set null INITIALLY DEFERRED,
-	rank int not null,
-	cgroup int not null,
-	cvterm_id int not null,
-	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint feature_gcontext_c1 unique (feature_id,gcontext_id,cvterm_id)
+create table feature_genotype (
+    feature_genotype_id serial not null,
+    primary key (feature_genotype_id),
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    chromosome_id int,
+    foreign key (chromosome_id) references feature (feature_id) on delete set null,
+    rank int not null,
+    cgroup     int not null,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id)
 );
-create index feature_gcontext_idx1 on feature_gcontext (feature_id);
-create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
+create index feature_genotype_idx1 on feature_genotype (feature_id);
+create index feature_genotype_idx2 on feature_genotype (genotype_id);
 
--- RELATION: gcontextprop
---
--- key/val pairs for a genetic context
--- can be environmental; eg temperature_degrees_c=36
--- 
--- value               : unconstrained free text value
---
-create table gcontextprop (
-	gcontextprop_id	serial not null,
-	primary key (gcontextprop_id),
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text null,
-	rank int not null default 0,
-    constraint gcontextprop_c1 unique (gcontext_id,type_id,rank)
+COMMENT ON TABLE feature_genotype IS NULL;
+
+
+
+-- ================================================
+-- TABLE: environment
+-- ================================================
+-- The environmental component of a phenotype description
+create table environment (
+    environment_id serial not NULL,
+    primary key  (environment_id),
+    uniquename text not null,
+    description text,
+    constraint environment_c1 unique (uniquename)
 );
-create index gcontextprop_idx1 on gcontextprop (gcontext_id);
-create index gcontextprop_idx2 on gcontextprop (type_id);
+create index environment_idx1 on environment(uniquename);
 
--- RELATION: phenstatement
---
+COMMENT ON TABLE environment IS NULL;
+
+
+-- ================================================
+-- TABLE: environment_cvterm
+-- ================================================
+create table environment_cvterm (
+    environment_cvterm_id serial not null,
+    primary key  (environment_cvterm_id),
+    environment_id int not null,
+    foreign key (environment_id) references environment (environment_id) on delete cascade,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint environment_cvterm_c1 unique (environment_id, cvterm_id)
+);
+create index environment_cvterm_idx1 on environment_cvterm (environment_id);
+create index environment_cvterm_idx2 on environment_cvterm (cvterm_id);
+
+COMMENT ON TABLE environment_cvterm IS NULL;
+
+-- ================================================
+-- TABLE: phenotype
+-- ================================================
 -- a phenotypic statement, or a single atomic phenotypic
 -- observation
 -- 
@@ -1133,106 +1142,152 @@ create index gcontextprop_idx2 on gcontextprop (type_id);
 -- cvalue_id           : constrained value from ontology, e.g. "abnormal", "big"
 -- assay_id            : e.g. name of specific test
 --
-create table phenstatement (
-	phenstatement_id	serial not null,
-	primary key (phenstatement_id),
-	gcontext_id int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	dbxref_id int not null,
-	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
-	observable_id	int not null,
-	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	attr_id	int,
-	foreign key (attr_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-	value text,
-	cvalue_id int,
-	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-	assay_id int,
-	foreign key (assay_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    constraint phenstatement_c1 unique (gcontext_id,dbxref_id,observable_id)
+create table phenotype (
+    phenotype_id serial not null,
+    primary key (phenotype_id),
+    uniquename text not null,  
+    observable_id int,
+    foreign key (observable_id) references cvterm (cvterm_id) on delete cascade,
+    attr_id int,
+    foreign key (attr_id) references cvterm (cvterm_id) on delete set null,
+    value text,
+    cvalue_id int,
+    foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null,
+    assay_id int,
+    foreign key (assay_id) references cvterm (cvterm_id) on delete set null,
+    constraint phenotype_c1 unique (uniquename)
 );
-create index phenstatement_idx1 on phenstatement (gcontext_id);
-create index phenstatement_idx2 on phenstatement (observable_id);
-create index phenstatement_idx3 on phenstatement (attr_id);
+create index phenotype_idx1 on phenotype (cvalue_id);
+create index phenotype_idx2 on phenotype (observable_id);
+create index phenotype_idx3 on phenotype (attr_id);
 
+COMMENT ON TABLE phenotype IS NULL;
+
+
+-- ================================================
+-- TABLE: phenotype_cvterm
+-- ================================================
+create table phenotype_cvterm (
+    phenotype_cvterm_id serial not null,
+    primary key (phenotype_cvterm_id),
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    constraint phenotype_cvterm_c1 unique (phenotype_id, cvterm_id)
+);
+create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
+create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
+
+COMMENT ON TABLE phenotype_cvterm IS NULL;
+
+
+-- ================================================
+-- TABLE: phenstatement
+-- ================================================
+-- Phenotypes are things like "larval lethal".  Phenstatements are things
+-- like "dpp[1] is recessive larval lethal". So essentially phenstatement
+-- is a linking table expressing the relationship between genotype, environment,
+-- and phenotype.
+-- 
+create table phenstatement (
+    phenstatement_id serial not null,
+    primary key (phenstatement_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    environment_id int not null,
+    foreign key (environment_id) references environment (environment_id) on delete cascade,
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phenstatement_c1 unique (genotype_id,phenotype_id,environment_id,type_id,pub_id)
+);
+create index phenstatement_idx1 on phenstatement (genotype_id);
+create index phenstatement_idx2 on phenstatement (phenotype_id);
+
+COMMENT ON TABLE phenstatement IS NULL;
+
+
+-- ================================================
+-- TABLE: feature_phenotype
+-- ================================================
+create table feature_phenotype (
+    feature_phenotype_id serial not null,
+    primary key (feature_phenotype_id),
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    phenotype_id int not null,
+    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+    constraint feature_phenotype_c1 unique (feature_id,phenotype_id)       
+);
+create index feature_phenotype_idx1 on feature_phenotype (feature_id);
+create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
+
+COMMENT ON TABLE feature_phenotype IS NULL;
+
+
+-- ================================================
+-- TABLE: phendesc
+-- ================================================
 -- RELATION: phendesc
 --
 -- a summary of a _set_ of phenotypic statements for any one
 -- gcontext made in any one
 -- publication
 -- 
---
 create table phendesc (
-	phendesc_id	serial not null,
-	primary key (phendesc_id),
-	gcontext_id	int not null,
-	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade INITIALLY DEFERRED,
-	description	text not null,
-    constraint phendesc_c1 unique (gcontext_id,description)
+    phendesc_id serial not null,
+    primary key (phendesc_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+    environment_id int not null,
+    foreign key (environment_id) references environment ( environment_id) on delete cascade,
+    description text not null,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phendesc_c1 unique (genotype_id,environment_id,pub_id)
 );
-create index phendesc_idx1 on phendesc (gcontext_id);
+create index phendesc_idx1 on phendesc (genotype_id);
+create index phendesc_idx2 on phendesc (environment_id);
+create index phendesc_idx3 on phendesc (pub_id);
 
--- RELATION: phenstatement_relationship
---
--- interaction (suppression, enhancement), rescue, complementation
--- are always relationships between phenstatements
--- 
---
-create table phenstatement_relationship (
-	phenstatement_relationship_id serial not null,
-	primary key (phenstatement_relationship_id),
-	subject_id int not null,
-	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	object_id int not null,
-	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	comment_id int not null,
-	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint phenstatement_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index phenstatement_relationship_idx1 on phenstatement_relationship (subject_id);
-create index phenstatement_relationship_idx2 on phenstatement_relationship (object_id);
-create index phenstatement_relationship_idx3 on phenstatement_relationship (type_id);
+COMMENT ON TABLE phendesc IS NULL;
 
--- RELATION: phenstatement_cvterm
---
--- arbitrary qualifiers
--- for anything that doesn't fit into obs/attr/val model
--- 
---
-create table phenstatement_cvterm (
-    phenstatement_cvterm_id serial not null,
-    primary key (phenstatement_cvterm_id),
-    phenstatement_id int not null,
-    foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id int not null,
-    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    constraint phenstatement_cvterm_c1 unique (phenstatement_id,cvterm_id)
-);
-create index phenstatement_cvterm_idx1 on phenstatement_cvterm (phenstatement_id);	
-create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);	
 
--- RELATION: phenstatementprop
---
--- arbitrary key=value pairs
--- e.g. penetrance_pct=80
+-- ================================================
+-- TABLE: phenotype_comparison
+-- ================================================
+-- comparison of phenotypes
+-- eg, genotype1/environment1/phenotype1 "non-suppressible" wrt 
+-- genotype2/environment2/phenotype2
 -- 
--- value               : unconstrained free text value
---
-create table phenstatementprop (
-	phenstatementprop_id	serial not null,
-	primary key (phenstatementprop_id),
-	phenstatement_id	int not null,
-	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade INITIALLY DEFERRED,
-	type_id	int not null,
-	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-	value	text null,
-	rank int not null default 0,
-    constraint phenstatementprop_c1 unique (phenstatement_id,type_id,rank)
+create table phenotype_comparison (
+    phenotype_comparison_id serial not null,
+    primary key (phenotype_comparison_id),
+    genotype1_id int not null,
+        foreign key (genotype1_id) references genotype (genotype_id) on delete cascade,
+    environment1_id int,
+        foreign key (environment1_id) references environment (environment_id) on delete cascade,
+    genotype2_id int not null,
+        foreign key (genotype2_id) references genotype (genotype_id) on delete cascade,
+    environment2_id int,
+        foreign key (environment2_id) references environment (environment_id) on delete cascade,
+    phenotype1_id int not null,
+        foreign key (phenotype1_id) references phenotype (phenotype_id) on delete cascade,
+    phenotype2_id int,
+        foreign key (phenotype2_id) references phenotype (phenotype_id) on delete cascade,
+    type_id int not null,
+        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade,
+    constraint phenotype_comparison_c1 unique (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,phenotype2_id,type_id,pub_id)
 );
-create index phenstatementprop_idx1 on phenstatementprop (phenstatement_id);
-create index phenstatementprop_idx2 on phenstatementprop (type_id);
+
+COMMENT ON TABLE phenotype_comparison IS NULL;
+
 -- ================================================
 -- TABLE: analysis
 -- ================================================
@@ -1386,774 +1441,6 @@ create table analysisfeature (
 );
 create index analysisfeature_idx1 on analysisfeature (feature_id);
 create index analysisfeature_idx2 on analysisfeature (analysis_id);
--- NOTE: this module is all due for revision...
-
--- A possibly problematic case is where we want to localize an object
--- to the left or right of a feature (but not within it):
---
---                     |---------|  feature-to-map
---        ------------------------------------------------- map
---                |------|         |----------|   features to map wrt
---
--- How do we map the 3' end of the feature-to-map?
-
--- TODO:  Get a comprehensive set of mapping use-cases 
-
--- one set of use-cases is aberrations (which will all be involved with this 
--- module).   Simple aberrations should be do-able, but what about cases where
--- a breakpoint interrupts a gene?  This would be an example of the problematic
--- case above...  (or?)
-
--- ================================================
--- TABLE: featuremap
--- ================================================
-
-create table featuremap (
-    featuremap_id serial not null,
-    primary key (featuremap_id),
-    name varchar(255),
-    description text,
-    unittype_id int null,
-    foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    constraint featuremap_c1 unique (name)
-);
-
--- ================================================
--- TABLE: featurerange
--- ================================================
-
--- In cases where the start and end of a mapped feature is a range, leftendf
--- and rightstartf are populated.  
--- featuremap_id is the id of the feature being mapped
--- leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of
--- features with respect to with the feature is being mapped.  These may
--- be cytological bands.
-
-create table featurerange (
-    featurerange_id serial not null,
-    primary key (featurerange_id),
-    featuremap_id int not null,
-    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
-    feature_id int not null,
-    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    leftstartf_id int not null,
-    foreign key (leftstartf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    leftendf_id int,
-    foreign key (leftendf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    rightstartf_id int,
-    foreign key (rightstartf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    rightendf_id int not null,
-    foreign key (rightendf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    rangestr varchar(255)
-);
-create index featurerange_idx1 on featurerange (featuremap_id);
-create index featurerange_idx2 on featurerange (feature_id);
-create index featurerange_idx3 on featurerange (leftstartf_id);
-create index featurerange_idx4 on featurerange (leftendf_id);
-create index featurerange_idx5 on featurerange (rightstartf_id);
-create index featurerange_idx6 on featurerange (rightendf_id);
-
--- ================================================
--- TABLE: featurepos
--- ================================================
-
-create table featurepos (
-    featurepos_id serial not null,
-    primary key (featurepos_id),
-    featuremap_id serial not null,
-    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
-    feature_id int not null,
-    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    map_feature_id int not null,
-    foreign key (map_feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    mappos float not null
-);
--- map_feature_id links to the feature (map) upon which the feature is
--- being localized
-create index featurepos_idx1 on featurepos (featuremap_id);
-create index featurepos_idx2 on featurepos (feature_id);
-create index featurepos_idx3 on featurepos (map_feature_id);
-
-
--- ================================================
--- TABLE: featuremap_pub
--- ================================================
-
-create table featuremap_pub (
-    featuremap_pub_id serial not null,
-    primary key (featuremap_pub_id),
-    featuremap_id int not null,
-    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED
-);
-create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
-create index featuremap_pub_idx2 on featuremap_pub (pub_id);
-
-
-
-
-
--- VIEW gffatts: a view to get feature attributes in a format that
--- will make it easy to convert them to GFF attributes
-
-CREATE OR REPLACE VIEW gffatts (
-    feature_id,
-    type,
-    attribute
-) AS
-SELECT feature_id, 'cvterm' AS type,  s.name AS attribute
-FROM cvterm s, feature_cvterm fs
-WHERE fs.cvterm_id = s.cvterm_id
-UNION ALL
-SELECT feature_id, 'dbxref' AS type, d.name || ':' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
---SELECT feature_id, 'expression' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.expression_id = s.expression_id
-UNION ALL
-SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
-FROM gcontext g, feature_gcontext fg
-WHERE g.gcontext_id = fg.gcontext_id
---UNION ALL
---SELECT feature_id, 'genotype' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.genotype_id = s.genotype_id
---UNION ALL
---SELECT feature_id, 'phenotype' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.phenotype_id = s.phenotype_id
-UNION ALL
-SELECT feature_id, 'synonym' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.synonym_id = s.synonym_id
-UNION ALL
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.type_id = cv.cvterm_id
-UNION ALL
-SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.pub_id = s.pub_id;
-
---creates a view that can be used to assemble a GFF3 compliant attribute string
-CREATE OR REPLACE VIEW gff3atts (
-    feature_id,
-    type,
-    attribute
-) AS
-SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
-FROM cvterm s, dbxref dbx, feature_cvterm fs
-WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
-UNION ALL
-SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
-      d.name != 'GFF_source'
-UNION ALL
-SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
-FROM gcontext g, feature_gcontext fg
-WHERE g.gcontext_id = fg.gcontext_id
-UNION ALL
-SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs, feature f
-WHERE fs.synonym_id = s.synonym_id and f.feature_id = fs.feature_id and
-      f.name != s.name
-UNION ALL
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.type_id = cv.cvterm_id
-UNION ALL
-SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.pub_id = s.pub_id;
-
-
-create table mageml (
-    mageml_id serial not null,
-    primary key (mageml_id),
-    mage_package text not null,
-    mage_ml text not null
-);
-
-COMMENT ON TABLE mageml IS 'this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables';
-
-create table magedocumentation (
-    magedocumentation_id serial not null,
-    primary key (magedocumentation_id),
-    mageml_id int not null,
-    foreign key (mageml_id) references mageml (mageml_id) on delete cascade INITIALLY DEFERRED,
-    tableinfo_id int not null,
-    foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id int not null,
-    mageidentifier text not null
-);
-create index magedocumentation_idx1 on magedocumentation (mageml_id);
-create index magedocumentation_idx2 on magedocumentation (tableinfo_id);
-create index magedocumentation_idx3 on magedocumentation (row_id);
-
-COMMENT ON TABLE magedocumentation IS NULL;
-
-create table protocol (
-    protocol_id serial not null,
-    primary key (protocol_id),
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int null,
-    foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name text not null,
-    uri text null,
-    protocoldescription text null,
-    hardwaredescription text null,
-    softwaredescription text null,
-    constraint protocol_c1 unique (name)
-);
-create index protocol_idx1 on protocol (type_id);
-create index protocol_idx2 on protocol (pub_id);
-create index protocol_idx3 on protocol (dbxref_id);
-
-COMMENT ON TABLE protocol IS 'procedural notes on how data was prepared and processed';
-
-create table protocolparam (
-    protocolparam_id serial not null,
-    primary key (protocolparam_id),
-    protocol_id int not null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
-    name text not null,
-    datatype_id int null,
-    foreign key (datatype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    unittype_id int null,
-    foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0
-);
-create index protocolparam_idx1 on protocolparam (protocol_id);
-create index protocolparam_idx2 on protocolparam (datatype_id);
-create index protocolparam_idx3 on protocolparam (unittype_id);
-
-COMMENT ON TABLE protocolparam IS 'parameters related to a protocol.  if the protocol is a soak, this might include attributes of bath temperature and duration';
-
-create table channel (
-    channel_id serial not null,
-    primary key (channel_id),
-    name text not null,
-    definition text not null,
-    constraint channel_c1 unique (name)
-);
-
-COMMENT ON TABLE channel IS 'different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but affy uses only one)';
-
-create table arraydesign (
-    arraydesign_id serial not null,
-    primary key (arraydesign_id),
-    manufacturer_id int not null,
-    foreign key (manufacturer_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    platformtype_id int not null,
-    foreign key (platformtype_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    substratetype_id int null,
-    foreign key (substratetype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    protocol_id int null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name text not null,
-    version text null,
-    description text null,
-    array_dimensions text null,
-    element_dimensions text null,
-    num_of_elements int null,
-    num_array_columns int null,
-    num_array_rows int null,
-    num_grid_columns int null,
-    num_grid_rows int null,
-    num_sub_columns int null,
-    num_sub_rows int null,
-    constraint arraydesign_c1 unique (name)
-);
-create index arraydesign_idx1 on arraydesign (manufacturer_id);
-create index arraydesign_idx2 on arraydesign (platformtype_id);
-create index arraydesign_idx3 on arraydesign (substratetype_id);
-create index arraydesign_idx4 on arraydesign (protocol_id);
-create index arraydesign_idx5 on arraydesign (dbxref_id);
-
-COMMENT ON TABLE arraydesign IS 'general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns).';
-
-create table arraydesignprop (
-    arraydesignprop_id serial not null,
-    primary key (arraydesignprop_id),
-    arraydesign_id int not null,
-    foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint arraydesignprop_c1 unique (arraydesign_id,type_id,rank)
-);
-create index arraydesignprop_idx1 on arraydesignprop (arraydesign_id);
-create index arraydesignprop_idx2 on arraydesignprop (type_id);
-
-COMMENT ON TABLE arraydesignprop IS 'extra arraydesign properties that are not accounted for in arraydesign';
-
-create table assay (
-    assay_id serial not null,
-    primary key (assay_id),
-    arraydesign_id int not null,
-    foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    assaydate timestamp null default current_timestamp,
-    arrayidentifier text null,
-    arraybatchidentifier text null,
-    operator_id int not null,
-    foreign key (operator_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name text null,
-    description text null,
-    constraint assay_c1 unique (name)
-);
-create index assay_idx1 on assay (arraydesign_id);
-create index assay_idx2 on assay (protocol_id);
-create index assay_idx3 on assay (operator_id);
-create index assay_idx4 on assay (dbxref_id);
-
-COMMENT ON TABLE assay IS 'an assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician info).  the assay can be thought of as a hybridization';
-
-create table assayprop (
-    assayprop_id serial not null,
-    primary key (assayprop_id),
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint assayprop_c1 unique (assay_id,type_id,rank)
-);
-create index assayprop_idx1 on assayprop (assay_id);
-create index assayprop_idx2 on assayprop (type_id);
-
-COMMENT ON TABLE assayprop IS 'extra assay properties that are not accounted for in assay';
-
-create table assay_project (
-    assay_project_id serial not null,
-    primary key (assay_project_id),
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) INITIALLY DEFERRED,
-    project_id int not null,
-    foreign key (project_id) references project (project_id) INITIALLY DEFERRED,
-    constraint assay_project_c1 unique (assay_id,project_id)
-);
-create index assay_project_idx1 on assay_project (assay_id);
-create index assay_project_idx2 on assay_project (project_id);
-
-COMMENT ON TABLE assay_project IS 'link assays to projects';
-
-create table biomaterial (
-    biomaterial_id serial not null,
-    primary key (biomaterial_id),
-    taxon_id int null,
-    foreign key (taxon_id) references organism (organism_id) on delete set null INITIALLY DEFERRED,
-    biosourceprovider_id int null,
-    foreign key (biosourceprovider_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name text null,
-    description text null,
-    constraint biomaterial_c1 unique (name)
-);
-create index biomaterial_idx1 on biomaterial (taxon_id);
-create index biomaterial_idx2 on biomaterial (biosourceprovider_id);
-create index biomaterial_idx3 on biomaterial (dbxref_id);
-
-COMMENT ON TABLE biomaterial IS 'a biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract.  it is essentially some biological material (tissue, cells, serum) that may have been processed.  processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table.';
-
-create table biomaterial_relationship (
-    biomaterial_relationship_id serial not null,
-    primary key (biomaterial_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
-    foreign key (object_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
-    constraint biomaterial_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index biomaterial_relationship_idx1 on biomaterial_relationship (subject_id);
-create index biomaterial_relationship_idx2 on biomaterial_relationship (object_id);
-create index biomaterial_relationship_idx3 on biomaterial_relationship (type_id);
-
-COMMENT ON TABLE biomaterial_relationship IS 'relate biomaterials to one another.  this is a way to track a series of treatments or material splits/merges, for instance';
-
-create table biomaterialprop (
-    biomaterialprop_id serial not null,
-    primary key (biomaterialprop_id),
-    biomaterial_id int not null,
-    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null,
-    constraint biomaterialprop_c1 unique (biomaterial_id,type_id,rank)
-);
-create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
-create index biomaterialprop_idx2 on biomaterialprop (type_id);
-
-COMMENT ON TABLE biomaterialprop IS 'extra biomaterial properties that are not accounted for in biomaterial';
-
-create table treatment (
-    treatment_id serial not null,
-    primary key (treatment_id),
-    rank int not null default 0,
-    biomaterial_id int not null,
-    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    name text null
-);
-create index treatment_idx1 on treatment (biomaterial_id);
-create index treatment_idx2 on treatment (type_id);
-create index treatment_idx3 on treatment (protocol_id);
-
-COMMENT ON TABLE treatment IS 'a biomaterial may undergo multiple treatments.  this can range from apoxia to fluorophore and biotin labeling';
-
-create table biomaterial_treatment (
-    biomaterial_treatment_id serial not null,
-    primary key (biomaterial_treatment_id),
-    biomaterial_id int not null,
-    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    treatment_id int not null,
-    foreign key (treatment_id) references treatment (treatment_id) on delete cascade INITIALLY DEFERRED,
-    unittype_id int null,
-    foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    value float(15) null,
-    rank int not null default 0,
-    constraint biomaterial_treatment_c1 unique (biomaterial_id,treatment_id)
-);
-create index biomaterial_treatment_idx1 on biomaterial_treatment (biomaterial_id);
-create index biomaterial_treatment_idx2 on biomaterial_treatment (treatment_id);
-create index biomaterial_treatment_idx3 on biomaterial_treatment (unittype_id);
-
-COMMENT ON TABLE biomaterial_treatment IS 'link biomaterials to treatments.  treatments have an order of operations (rank), and associated measurements (unittype_id, value)';
-
-create table assay_biomaterial (
-    assay_biomaterial_id serial not null,
-    primary key (assay_biomaterial_id),
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    biomaterial_id int not null,
-    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    channel_id int null,
-    foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
-    constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id)
-);
-create index assay_biomaterial_idx1 on assay_biomaterial (assay_id);
-create index assay_biomaterial_idx2 on assay_biomaterial (biomaterial_id);
-create index assay_biomaterial_idx3 on assay_biomaterial (channel_id);
-
-COMMENT ON TABLE assay_biomaterial IS 'a biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays)';
-
-create table acquisition (
-    acquisition_id serial not null,
-    primary key (acquisition_id),
-    assay_id int not null,
-    foreign key (assay_id) references  assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    channel_id int null,
-    foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
-    acquisitiondate timestamp null default current_timestamp,
-    name text null,
-    uri text null,
-    constraint acquisition_c1 unique (name)
-);
-create index acquisition_idx1 on acquisition (assay_id);
-create index acquisition_idx2 on acquisition (protocol_id);
-create index acquisition_idx3 on acquisition (channel_id);
-
-COMMENT ON TABLE acquisition IS 'this represents the scanning of hybridized material.  the output of this process is typically a digital image of an array';
-
-create table acquisitionprop (
-    acquisitionprop_id serial not null,
-    primary key (acquisitionprop_id),
-    acquisition_id int not null,
-    foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint acquisitionprop_c1 unique (acquisition_id,type_id,rank)
-);
-create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
-create index acquisitionprop_idx2 on acquisitionprop (type_id);
-
-COMMENT ON TABLE acquisitionprop IS 'parameters associated with image acquisition';
-
-create table acquisition_relationship (
-    acquisition_relationship_id serial not null,
-    primary key (acquisition_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
-    foreign key (object_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint acquisition_relationship_c1 unique (subject_id,object_id,type_id,rank)
-);
-create index acquisition_relationship_idx1 on acquisition_relationship (subject_id);
-create index acquisition_relationship_idx2 on acquisition_relationship (type_id);
-create index acquisition_relationship_idx3 on acquisition_relationship (object_id);
-
-COMMENT ON TABLE acquisition_relationship IS 'multiple monochrome images may be merged to form a multi-color image.  red-green images of 2-channel hybridizations are an example of this';
-
-create table quantification (
-    quantification_id serial not null,
-    primary key (quantification_id),
-    acquisition_id int not null,
-    foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    operator_id int null,
-    foreign key (operator_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
-    protocol_id int null,
-    foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
-    quantificationdate timestamp null default current_timestamp,
-    name text null,
-    uri text null,
-    constraint quantification_c1 unique (name,analysis_id)
-);
-create index quantification_idx1 on quantification (acquisition_id);
-create index quantification_idx2 on quantification (operator_id);
-create index quantification_idx3 on quantification (protocol_id);
-create index quantification_idx4 on quantification (analysis_id);
-
-COMMENT ON TABLE quantification IS 'quantification is the transformation of an image acquisition to numeric data.  this typically involves statistical procedures.';
-
-create table quantificationprop (
-    quantificationprop_id serial not null,
-    primary key (quantificationprop_id),
-    quantification_id int not null,
-    foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint quantificationprop_c1 unique (quantification_id,type_id,rank)
-);
-create index quantificationprop_idx1 on quantificationprop (quantification_id);
-create index quantificationprop_idx2 on quantificationprop (type_id);
-
-COMMENT ON TABLE quantificationprop IS 'extra quantification properties that are not accounted for in quantification';
-
-create table quantification_relationship (
-    quantification_relationship_id serial not null,
-    primary key (quantification_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
-    foreign key (object_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    constraint quantification_relationship_c1 unique (subject_id,object_id,type_id)
-);
-create index quantification_relationship_idx1 on quantification_relationship (subject_id);
-create index quantification_relationship_idx2 on quantification_relationship (type_id);
-create index quantification_relationship_idx3 on quantification_relationship (object_id);
-
-COMMENT ON TABLE quantification_relationship IS 'there may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where';
-
-create table control (
-    control_id serial not null,
-    primary key (control_id),
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    tableinfo_id int not null,
-    foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id int not null,
-    name text null,
-    value text null,
-    rank int not null default 0
-);
-create index control_idx1 on control (type_id);
-create index control_idx2 on control (assay_id);
-create index control_idx3 on control (tableinfo_id);
-create index control_idx4 on control (row_id);
-
-COMMENT ON TABLE control IS NULL;
-
-create table element (
-    element_id serial not null,
-    primary key (element_id),
-    feature_id int null,
-    foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    arraydesign_id int not null,
-    foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    constraint element_c1 unique (feature_id,arraydesign_id)
-);
-create index element_idx1 on element (feature_id);
-create index element_idx2 on element (arraydesign_id);
-create index element_idx3 on element (type_id);
-create index element_idx4 on element (dbxref_id);
-
-COMMENT ON TABLE element IS 'represents a feature of the array.  this is typically a region of the array coated or bound to DNA';
-
-create table elementresult (
-    elementresult_id serial not null,
-    primary key (elementresult_id),
-    element_id int not null,
-    foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
-    quantification_id int not null,
-    foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    constraint elementresult_c1 unique (element_id,quantification_id)
-);
-create index elementresult_idx1 on elementresult (element_id);
-create index elementresult_idx2 on elementresult (quantification_id);
-
-COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit';
-
-create table element_relationship (
-    element_relationship_id serial not null,
-    primary key (element_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references element (element_id) INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
-    foreign key (object_id) references element (element_id) INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint element_relationship_c1 unique (subject_id,object_id,type_id,rank)
-);
-create index element_relationship_idx1 on element_relationship (subject_id);
-create index element_relationship_idx2 on element_relationship (type_id);
-create index element_relationship_idx3 on element_relationship (object_id);
-create index element_relationship_idx4 on element_relationship (value);
-
-COMMENT ON TABLE element_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
-
-create table elementresult_relationship (
-    elementresult_relationship_id serial not null,
-    primary key (elementresult_relationship_id),
-    subject_id int not null,
-    foreign key (subject_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
-    foreign key (object_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint elementresult_relationship_c1 unique (subject_id,object_id,type_id,rank)
-);
-create index elementresult_relationship_idx1 on elementresult_relationship (subject_id);
-create index elementresult_relationship_idx2 on elementresult_relationship (type_id);
-create index elementresult_relationship_idx3 on elementresult_relationship (object_id);
-create index elementresult_relationship_idx4 on elementresult_relationship (value);
-
-COMMENT ON TABLE elementresult_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
-
-create table study (
-    study_id serial not null,
-    primary key (study_id),
-    contact_id int not null,
-    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int null,
-    foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    name text not null,
-    description text null,
-    constraint study_c1 unique (name)
-);
-create index study_idx1 on study (contact_id);
-create index study_idx2 on study (pub_id);
-create index study_idx3 on study (dbxref_id);
-
-COMMENT ON TABLE study IS NULL;
-
-create table study_assay (
-    study_assay_id serial not null,
-    primary key (study_assay_id),
-    study_id int not null,
-    foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    constraint study_assay_c1 unique (study_id,assay_id)
-);
-create index study_assay_idx1 on study_assay (study_id);
-create index study_assay_idx2 on study_assay (assay_id);
-
-COMMENT ON TABLE study_assay IS NULL;
-
-create table studydesign (
-    studydesign_id serial not null,
-    primary key (studydesign_id),
-    study_id int not null,
-    foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
-    description text null
-);
-create index studydesign_idx1 on studydesign (study_id);
-
-COMMENT ON TABLE studydesign IS NULL;
-
-create table studydesignprop (
-    studydesignprop_id serial not null,
-    primary key (studydesignprop_id),
-    studydesign_id int not null,
-    foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint studydesignprop_c1 unique (studydesign_id,type_id,rank)
-);
-create index studydesignprop_idx1 on studydesignprop (studydesign_id);
-create index studydesignprop_idx2 on studydesignprop (type_id);
-
-COMMENT ON TABLE studydesignprop IS NULL;
-
-create table studyfactor (
-    studyfactor_id serial not null,
-    primary key (studyfactor_id),
-    studydesign_id int not null,
-    foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    name text not null,
-    description text null
-);
-create index studyfactor_idx1 on studyfactor (studydesign_id);
-create index studyfactor_idx2 on studyfactor (type_id);
-
-COMMENT ON TABLE studyfactor IS NULL;
-
-create table studyfactorvalue (
-    studyfactorvalue_id serial not null,
-    primary key (studyfactorvalue_id),
-    studyfactor_id int not null,
-    foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
-    foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    factorvalue text null,
-    name text null,
-    rank int not null default 0
-);
-create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
-create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
-
-COMMENT ON TABLE studyfactorvalue IS NULL;
 -- This module is totally dependant on the sequence module.  Objects in the
 -- genetic module cannot connect to expression data except by going via the
 -- sequence module
@@ -2280,1026 +1567,246 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
---- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology whose name is same
---- as in cvterm, and the cvterm term is the root of the ontology.
+-- NOTE: this module is all due for revision...
 
---- fill path from the node to its children and their children
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    origin alias for $1;
-    child_id alias for $2;
-    cvid alias for $3;
-    typeid alias for $4;
-    depth alias for $5;
-    cterm cvterm_relationship%ROWTYPE;
-    exist_c int;
+-- A possibly problematic case is where we want to localize an object
+-- to the left or right of a feature (but not within it):
+--
+--                     |---------|  feature-to-map
+--        ------------------------------------------------- map
+--                |------|         |----------|   features to map wrt
+--
+-- How do we map the 3' end of the feature-to-map?
 
-BEGIN
+-- TODO:  Get a comprehensive set of mapping use-cases 
 
-    ----RAISE NOTICE ''depth=% root=%'', depth,child_id;
-    --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
+-- one set of use-cases is aberrations (which will all be involved with this 
+-- module).   Simple aberrations should be do-able, but what about cases where
+-- a breakpoint interrupts a gene?  This would be an example of the problematic
+-- case above...  (or?)
 
-    IF (exist_c = 0) THEN
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
-    END IF;
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4node(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
+-- ================================================
+-- TABLE: featuremap
+-- ================================================
 
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    rootid alias for $1;
-    cvid alias for $2;
-    ttype int;
-    cterm cvterm_relationship%ROWTYPE;
-    child cvterm_relationship%ROWTYPE;
-
-BEGIN
-
-    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
-    PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
-        RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    cvid alias for $1;
-    root cvterm%ROWTYPE;
-
-BEGIN
-
-    DELETE FROM cvtermpath WHERE cv_id = cvid;
-
-    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
-        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
-'
-DECLARE
-    cvname alias for $1;
-    root cvterm%ROWTYPE;
-BEGIN
-
-    EXECUTE ''DELETE FROM cvtermpath WHERE cv_id IN (SELECT cv_id FROM cv WHERE name = '' || quote_literal(cvname) || '');'';
-    FOR root IN EXECUTE ''SELECT cvterm.* from cv, cvterm WHERE cv.name = cvterm.name AND cv.name = '' || quote_literal(cvname) LOOP
-        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
----arg: parent term id
----return: all children term id and their parent term id with relationship type id
-
-
-CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    root alias for $1;
-    pcount integer := 1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-    exist_c int;
-BEGIN
-
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = root and pathdistance <= 0;
-    IF (exist_c > 0) THEN
-        FOR cterm IN SELECT * FROM cvtermpath WHERE object_id = root and pathdistance > 0 LOOP
-            RETURN NEXT cterm;
-        END LOOP;
-    ELSE
-        FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
-            RETURN NEXT cterm;
-            FOR cterm2 IN SELECT * FROM get_all_subject_ids(cterm.subject_id) LOOP
-                RETURN NEXT cterm2;
-            END LOOP;
-        END LOOP;
-    END IF;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    root alias for $1;
-    pcount integer := 1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM get_all_subject_ids(cterm.subject_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-
-CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    leaf alias for $1;
-    pcount integer := 1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM get_all_object_ids(cterm.object_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
----arg: child term id
----return: all parent term id and their childrent term id with relationship type id
-
-CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    leaf alias for $1;
-    pcount integer := 1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-    exist_c int;
-BEGIN
-
-
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = leaf and pathdistance <= 0;
-    IF (exist_c > 0) THEN
-        FOR cterm IN SELECT * FROM cvtermpath WEHRE subject_id = leaf AND pathdistance > 0 LOOP
-            RETURN NEXT cterm;
-        END LOOP
-    ELSE
-        FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
-            RETURN NEXT cterm;
-            FOR cterm2 IN SELECT * FROM get_all_object_ids(cterm.object_id) LOOP
-                RETURN NEXT cterm2;
-            END LOOP;
-        END LOOP;
-    END IF;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
----arg: sql statement which must be in the form of select cvterm_id from ...
----return: a set of cvterm ids that includes what is in sql statement and their children (subject ids)
-CREATE OR REPLACE FUNCTION get_it_sub_cvterm_ids(text) RETURNS SETOF cvterm AS
-'
-DECLARE
-    query alias for $1;
-    cterm cvterm%ROWTYPE;
-    cterm2 cvterm%ROWTYPE;
-BEGIN
-    FOR cterm IN EXECUTE query LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT subject_id as cvterm_id FROM get_all_subject_ids(cterm.cvterm_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
---- create ontology that has instantiated located_sequence_feature part of SO
---- way as it is written, the function can not be execute more than once in one connection
---- when you get error like ERROR:  relation with OID NNNNN does not exist
---- as this is not meant to execute >1 time in one session so it should never happen
---- except at testing and test failed
---- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
---- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
-
---NOTE: private, don't call directly as relying on having temp table tmpcvtr
-
-DROP TYPE soi_type CASCADE;
-CREATE TYPE soi_type AS (
-    type_id INT,
-    subject_id INT,
-    object_id INT
+create table featuremap (
+    featuremap_id serial not null,
+    primary key (featuremap_id),
+    name varchar(255),
+    description text,
+    unittype_id int null,
+    foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+    constraint featuremap_c1 unique (name)
 );
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    origin alias for $1;
-    child_id alias for $2;
-    cvid alias for $3;
-    typeid alias for $4;
-    depth alias for $5;
-    cterm soi_type%ROWTYPE;
-    exist_c int;
+-- ================================================
+-- TABLE: featurerange
+-- ================================================
 
-BEGIN
+-- In cases where the start and end of a mapped feature is a range, leftendf
+-- and rightstartf are populated.  
+-- featuremap_id is the id of the feature being mapped
+-- leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of
+-- features with respect to with the feature is being mapped.  These may
+-- be cytological bands.
 
-    RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
-    --- longest path
-    IF (exist_c > 0) THEN
-        UPDATE cvtermpath SET pathdistance = depth WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id;
-    ELSE
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
-    END IF;
-
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4soinode(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    rootid alias for $1;
-    cvid alias for $2;
-    ttype int;
-    cterm soi_type%ROWTYPE;
-
-BEGIN
-    
-    SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
-    RAISE NOTICE ''got ttype %'',ttype;
-    PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
-
---- use tmpcvtr to temp store soi (virtural ontology)
---- using tmp tables is faster than using recursive function to create feature type relationship
---- since it gets feature type rel set by set instead of one by one
---- and getting feature type rel is very expensive
---- call _fillcvtermpath4soi to create path for the virtual ontology
-
-CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
-'
-DECLARE
-    parent soi_type%ROWTYPE;
-    isa_id cvterm.cvterm_id%TYPE;
-    so_term TEXT := ''so'';
-    soi_term TEXT := ''soi'';
-    soi_def TEXT := ''ontology of SO feature instantiated in database'';
-    soi_cvid INTEGER;
-    soiterm_id INTEGER;
-    pcount INTEGER;
-    count INTEGER := 0;
-    cquery TEXT;
-BEGIN
-
-    SELECT INTO isa_id cvterm_id FROM cvterm WHERE name = ''isa'';
-
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    IF (soi_cvid > 0) THEN
-        DELETE FROM cvtermpath WHERE cv_id = soi_cvid;
-        DELETE FROM cvterm WHERE cv_id = soi_cvid;
-    ELSE
-        INSERT INTO cv (name, definition) VALUES(soi_term, soi_def);
-    END IF;
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
-    SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
-
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
-    CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
-
-    INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-        SELECT DISTINCT isa_id, soiterm_id, f.type_id, soiterm_id FROM feature f, cvterm t
-        WHERE f.type_id = t.cvterm_id AND f.type_id > 0;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature %'',pcount;
---- do it hard way, delete any child feature type from above (NOT IN clause did not work)
-    FOR parent IN SELECT DISTINCT 0, t.cvterm_id, 0 FROM feature c, feature_relationship fr, cvterm t
-            WHERE t.cvterm_id = c.type_id AND c.feature_id = fr.subject_id LOOP
-        DELETE FROM tmpcvtr WHERE type_id = soiterm_id and object_id = soiterm_id
-            AND subject_id = parent.subject_id;
-    END LOOP;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature after delete child %'',pcount;
-
-    --- create feature type relationship (store in tmpcvtr)
-    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
-    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
-    ---temp use tmpcvtr to hold instantiated SO relationship for speed
-    ---use soterm_id as type_id, will delete from tmpcvtr
-    ---us tmproot for this as well
-    INSERT INTO tmproot (cv_id, cvterm_id, status) SELECT DISTINCT soi_cvid, c.subject_id, 0 FROM tmpcvtr c
-        WHERE c.object_id = soiterm_id;
-    EXECUTE cquery;
-    GET DIAGNOSTICS pcount = ROW_COUNT;
-    WHILE (pcount > 0) LOOP
-        RAISE NOTICE ''num child temp (to be inserted) in tmpcvtr: %'',pcount;
-        INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-            SELECT DISTINCT fr.type_id, soiterm_id, c.type_id, p.cvterm_id FROM feature c, feature_relationship fr,
-            tmproot p, feature pf, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = pf.feature_id
-            AND p.cvterm_id = pf.type_id AND t.cvterm_id = c.type_id AND p.status = 0;
-        UPDATE tmproot SET status = 1 WHERE status = 0;
-        INSERT INTO tmproot (cv_id, cvterm_id, status)
-            SELECT DISTINCT soi_cvid, c.type_id, 0 FROM feature c, feature_relationship fr,
-            tmproot tmp, feature p, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
-            AND tmp.cvterm_id = p.type_id AND t.cvterm_id = c.type_id AND tmp.status = 1;
-        UPDATE tmproot SET status = 2 WHERE status = 1;
-        EXECUTE cquery;
-        GET DIAGNOSTICS pcount = ROW_COUNT; 
-    END LOOP;
-    DELETE FROM tmproot;
-
-    ---get transitive closure for soi
-    PERFORM _fill_cvtermpath4soi(soiterm_id, soi_cvid);
-
-    DROP TABLE tmpcvtr;
-    DROP TABLE tmproot;
-
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
----bad precedence: change customed type name
----drop here to remove old function
-DROP TYPE feature_by_cvt_type CASCADE;
-DROP TYPE fxgsfids_type CASCADE;
-
-DROP TYPE feature_by_fx_type CASCADE;
-CREATE TYPE feature_by_fx_type AS (
-    feature_id INTEGER,
-    depth INT
+create table featurerange (
+    featurerange_id serial not null,
+    primary key (featurerange_id),
+    featuremap_id int not null,
+    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    leftstartf_id int not null,
+    foreign key (leftstartf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    leftendf_id int,
+    foreign key (leftendf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+    rightstartf_id int,
+    foreign key (rightstartf_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+    rightendf_id int not null,
+    foreign key (rightendf_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    rangestr varchar(255)
 );
-
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    root alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-    FOR myrc IN SELECT DISTINCT subject_id AS feature_id FROM feature_relationship WHERE object_id = root LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(text) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    sql alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-    FOR myrc IN EXECUTE sql LOOP
-        FOR myrc2 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_up_feature_ids(text) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    sql alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-    FOR myrc IN EXECUTE sql LOOP
-        FOR myrc2 IN SELECT * FROM get_up_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_feature_ids(text) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    sql alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-    myrc3 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    FOR myrc IN EXECUTE sql LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_up_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-        FOR myrc3 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc3;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    leaf alias for $1;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-BEGIN
-    FOR myrc IN SELECT DISTINCT object_id AS feature_id FROM feature_relationship WHERE subject_id = leaf LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_up_feature_ids(myrc.feature_id) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    root alias for $1;
-    depth alias for $2;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-    FOR myrc IN SELECT DISTINCT subject_id AS feature_id, depth FROM feature_relationship WHERE object_id = root LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_sub_feature_ids(myrc.feature_id,depth+1) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- depth is reversed and meanless when union with results from get_sub_feature_ids
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    leaf alias for $1;
-    depth alias for $2;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-BEGIN
-    FOR myrc IN SELECT DISTINCT object_id AS feature_id, depth FROM feature_relationship WHERE subject_id = leaf LOOP
-        RETURN NEXT myrc;
-        FOR myrc2 IN SELECT * FROM get_up_feature_ids(myrc.feature_id,depth+1) LOOP
-            RETURN NEXT myrc2;
-        END LOOP;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- children feature ids only (not include itself--parent) for SO type and range (src)
-CREATE OR REPLACE FUNCTION get_sub_feature_ids_by_type_src(cvterm.name%TYPE,feature.uniquename%TYPE,char(1)) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    gtype alias for $1;
-    src alias for $2;
-    is_an alias for $3;
-    query text;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT f.feature_id FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
-        INNER join featureloc fl
-        ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
-        WHERE t.name = '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
-        || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
- 
-    IF (STRPOS(gtype, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT f.feature_id FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
-             INNER join featureloc fl
-            ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
-            WHERE t.name like '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
-            || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
-    END IF;
-    FOR myrc IN SELECT * FROM get_sub_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- by SO type, usefull for tRNA, ncRNA, etc
-CREATE OR REPLACE FUNCTION get_feature_ids_by_type(cvterm.name%TYPE, char(1)) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    gtype alias for $1;
-    is_an alias for $2;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT f.feature_id 
-        FROM feature f, cvterm t WHERE t.cvterm_id = f.type_id AND t.name = '' || quote_literal(gtype) ||
-        '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
-    IF (STRPOS(gtype, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT f.feature_id 
-            FROM feature f, cvterm t WHERE t.cvterm_id = f.type_id AND t.name like ''
-            || quote_literal(gtype) || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_type_src(cvterm.name%TYPE, feature.uniquename%TYPE, char(1)) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    gtype alias for $1;
-    src alias for $2;
-    is_an alias for $3;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT f.feature_id 
-        FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
-        ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
-        WHERE t.name = '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
-        || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
- 
-    IF (STRPOS(gtype, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT f.feature_id 
-            FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
-            ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
-            WHERE t.name like '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
-            || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_type_name(cvterm.name%TYPE, feature.uniquename%TYPE, char(1)) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    gtype alias for $1;
-    name alias for $2;
-    is_an alias for $3;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT f.feature_id 
-        FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
-        WHERE t.name = '' || quote_literal(gtype) || '' AND (f.uniquename = '' || quote_literal(name)
-        || '' OR f.name = '' || quote_literal(name) || '') AND f.is_analysis = '' || quote_literal(is_an) || '';'';
- 
-    IF (STRPOS(name, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT f.feature_id 
-            FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id)
-            WHERE t.name = '' || quote_literal(gtype) || '' AND (f.uniquename like '' || quote_literal(name)
-            || '' OR f.name like '' || quote_literal(name) || '') AND f.is_analysis = '' || quote_literal(is_an) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- get all feature ids (including children) for feature that has an ontology term (say GO function)
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the aspect and cvterm
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_ont(cv.name%TYPE,cvterm.name%TYPE) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    aspect alias for $1;
-    term alias for $2;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT fcvt.feature_id 
-        FROM feature_cvterm fcvt, cv, cvterm t WHERE cv.cv_id = t.cv_id AND
-        t.cvterm_id = fcvt.cvterm_id AND cv.name = '' || quote_literal(aspect) ||
-        '' AND t.name = '' || quote_literal(term) || '';'';
-    IF (STRPOS(term, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT fcvt.feature_id 
-            FROM feature_cvterm fcvt, cv, cvterm t WHERE cv.cv_id = t.cv_id AND
-            t.cvterm_id = fcvt.cvterm_id AND cv.name = '' || quote_literal(aspect) ||
-            '' AND t.name like '' || quote_literal(term) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_ont_root(cv.name%TYPE,cvterm.name%TYPE) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    aspect alias for $1;
-    term alias for $2;
-    query TEXT;
-    subquery TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    subquery := ''SELECT t.cvterm_id FROM cv, cvterm t WHERE cv.cv_id = t.cv_id 
-        AND cv.name = '' || quote_literal(aspect) || '' AND t.name = '' || quote_literal(term) || '';'';
-    IF (STRPOS(term, ''%'') > 0) THEN
-        subquery := ''SELECT t.cvterm_id FROM cv, cvterm t WHERE cv.cv_id = t.cv_id 
-            AND cv.name = '' || quote_literal(aspect) || '' AND t.name like '' || quote_literal(term) || '';'';
-    END IF;
-    query := ''SELECT DISTINCT fcvt.feature_id 
-        FROM feature_cvterm fcvt INNER JOIN (SELECT cvterm_id FROM get_it_sub_cvterm_ids('' || quote_literal(subquery) || '')) AS ont ON (fcvt.cvterm_id = ont.cvterm_id);'';
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- get all feature ids (including children) for feature with the property (type, val)
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the typed val
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_property(cvterm.name%TYPE,varchar) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    p_type alias for $1;
-    p_val alias for $2;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT fprop.feature_id 
-        FROM featureprop fprop, cvterm t WHERE t.cvterm_id = fprop.type_id AND t.name = '' ||
-        quote_literal(p_type) || '' AND fprop.value = '' || quote_literal(p_val) || '';'';
-    IF (STRPOS(p_val, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT fprop.feature_id 
-            FROM featureprop fprop, cvterm t WHERE t.cvterm_id = fprop.type_id AND t.name = '' ||
-            quote_literal(p_type) || '' AND fprop.value like '' || quote_literal(p_val) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
---- get all feature ids (including children) for feature with the property val
---- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
---- this function returns a set of feature_id for feature with the property value
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_propval(varchar) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    p_val alias for $1;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type%ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT fprop.feature_id 
-        FROM featureprop fprop WHERE fprop.value = '' || quote_literal(p_val) || '';'';
-    IF (STRPOS(p_val, ''%'') > 0) THEN
-        query := ''SELECT DISTINCT fprop.feature_id 
-            FROM featureprop fprop WHERE fprop.value like '' || quote_literal(p_val) || '';'';
-    END IF;
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-
-
----4 args: ptype, ctype, count, operator (valid SQL number comparison operator), and is_analysis 
----get feature ids for any node with type = ptype whose child node type = ctype
----and child node feature count comparing (using operator) to ccount
-
-CREATE OR REPLACE FUNCTION get_feature_ids_by_child_count(cvterm.name%TYPE, cvterm.name%TYPE, INTEGER, varchar, char(1)) RETURNS SETOF feature_by_fx_type AS
-'
-DECLARE
-    ptype alias for $1;
-    ctype alias for $2;
-    ccount alias for $3;
-    operator alias for $4;
-    is_an alias for $5;
-    query TEXT;
-    myrc feature_by_fx_type%ROWTYPE;
-    myrc2 feature_by_fx_type %ROWTYPE;
-
-BEGIN
-
-    query := ''SELECT DISTINCT f.feature_id
-        FROM feature f INNER join (select count(*) as c, p.feature_id FROM feature p
-        INNER join cvterm pt ON (p.type_id = pt.cvterm_id) INNER join feature_relationship fr
-        ON (p.feature_id = fr.object_id) INNER join feature c ON (c.feature_id = fr.subject_id)
-        INNER join cvterm ct ON (c.type_id = ct.cvterm_id)
-        WHERE pt.name = '' || quote_literal(ptype) || '' AND ct.name = '' || quote_literal(ctype)
-        || '' AND p.is_analysis = '' || quote_literal(is_an) || '' group by p.feature_id) as cq
-        ON (cq.feature_id = f.feature_id) WHERE cq.c '' || operator || ccount || '';'';
-    ---RAISE NOTICE ''%'', query; 
-
-    FOR myrc IN SELECT * FROM get_feature_ids(query) LOOP
-        RETURN NEXT myrc;
-    END LOOP;
-    RETURN NULL;
-END;
-'
-LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
-DECLARE
-  return_data featureloc%ROWTYPE;
-  f_id ALIAS FOR $1;
-  feature_data feature%rowtype;
-  featureloc_data featureloc%rowtype;
-
-  s text;
-
-  fmin integer;
-  slen integer;
-BEGIN
-  --RAISE NOTICE ''feature_id is %'', featureloc_data.feature_id;
-  SELECT INTO feature_data * FROM feature WHERE feature_id = f_id;
-
-  FOR featureloc_data IN SELECT * FROM featureloc WHERE feature_id = f_id LOOP
-
-    --RAISE NOTICE ''fmin is %'', featureloc_data.fmin;
-
-    return_data.feature_id      = f_id;
-    return_data.srcfeature_id   = featureloc_data.srcfeature_id;
-    return_data.is_fmin_partial = featureloc_data.is_fmin_partial;
-    return_data.is_fmax_partial = featureloc_data.is_fmax_partial;
-    return_data.strand          = featureloc_data.strand;
-    return_data.phase           = featureloc_data.phase;
-    return_data.residue_info    = featureloc_data.residue_info;
-    return_data.locgroup        = featureloc_data.locgroup;
-    return_data.rank            = featureloc_data.rank;
-
-    s = feature_data.residues;
-    fmin = featureloc_data.fmin;
-    slen = char_length(s);
-
-    WHILE char_length(s) LOOP
-      --RAISE NOTICE ''residues is %'', s;
-
-      --trim off leading match
-      s = trim(leading ''|ATCGNatcgn'' from s);
-      --if leading match detected
-      IF slen > char_length(s) THEN
-        return_data.fmin = fmin;
-        return_data.fmax = featureloc_data.fmin + (slen - char_length(s));
-
-        --if the string started with a match, return it,
-        --otherwise, trim the gaps first (ie do not return this iteration)
-        RETURN NEXT return_data;
-      END IF;
-
-      --trim off leading gap
-      s = trim(leading ''-'' from s);
-
-      fmin = featureloc_data.fmin + (slen - char_length(s));
-    END LOOP;
-  END LOOP;
-
-  RETURN;
-
-END;
-' LANGUAGE 'plpgsql';
--- FUNCTION gfffeatureatts (integer) is a function to get 
--- data in the same format as the gffatts view so that 
--- it can be easily converted to GFF attributes.
-
-CREATE FUNCTION  gfffeatureatts (integer)
-RETURNS SETOF gffatts
-AS
-'
-SELECT feature_id, ''cvterm'' AS type,  s.name AS attribute
-FROM cvterm s, feature_cvterm fs
-WHERE fs.feature_id= $1 AND fs.cvterm_id = s.cvterm_id
-UNION
-SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
---UNION
---SELECT feature_id, ''expression'' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.feature_id= $1 AND fs.expression_id = s.expression_id
-UNION
-SELECT fg.feature_id, ''genotype'' AS type, g.uniquename||'': ''||g.description AS attribute
-FROM gcontext g, feature_gcontext fg
-WHERE fg.feature_id= $1 AND g.gcontext_id = fg.gcontext_id
---UNION
---SELECT feature_id, ''genotype'' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
---UNION
---SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
-UNION
-SELECT feature_id, ''synonym'' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.feature_id= $1 AND fs.synonym_id = s.synonym_id
-UNION
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.feature_id= $1 AND fp.type_id = cv.cvterm_id 
-UNION
-SELECT feature_id, ''pub'' AS type, s.series_name || '':'' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.feature_id= $1 AND fs.pub_id = s.pub_id
-'
-LANGUAGE SQL;
-
-
---
--- functions for creating coordinate based functions
---
--- create a point
-CREATE OR REPLACE FUNCTION p (int, int) RETURNS point AS
- 'SELECT point ($1, $2)'
-LANGUAGE 'sql';
-
--- create a range box
--- (make this immutable so we can index it)
-CREATE OR REPLACE FUNCTION boxrange (int, int) RETURNS box AS
- 'SELECT box (p(0, $1), p($2,500000000))'
-LANGUAGE 'sql' IMMUTABLE;
-
--- create a query box
-CREATE OR REPLACE FUNCTION boxquery (int, int) RETURNS box AS
- 'SELECT box (p($1, $2), p($1, $2))'
-LANGUAGE 'sql' IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
-  'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
-LANGUAGE 'sql';
-
---functional index that depends on the above functions
-CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
-
---uses the gff3atts to create a GFF3 compliant attribute string
-CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
-'DECLARE
-  return_string      varchar;
-  f_id               ALIAS FOR $1;
-  atts_view          gffatts%ROWTYPE;
-  feature_row        feature%ROWTYPE;
-  name               varchar;
-  uniquename         varchar;
-  parent             varchar;
-                                                                                
-BEGIN
-  --Get name from feature.name
-  --Get ID from feature.uniquename
-                                                                                
-  SELECT INTO feature_row * FROM feature WHERE feature_id = f_id;
-  name  = feature_row.name;
-  return_string = ''ID='' || feature_row.uniquename;
-  IF name IS NOT NULL AND name != ''''
-  THEN
-    return_string = return_string ||'';'' || ''Name='' || name;
-  END IF;
-                                                                                
-  --Get Parent from feature_relationship
-  SELECT INTO feature_row * FROM feature f, feature_relationship fr
-    WHERE fr.subject_id = f_id AND fr.object_id = f.feature_id;
-  IF FOUND
-  THEN
-    return_string = return_string||'';''||''Parent=''||feature_row.uniquename;
-  END IF;
-                                                                                
-  FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
-    return_string = return_string || '';''
-                     || atts_view.type || ''=''
-                     || atts_view.attribute;
-  END LOOP;
-                                                                                
-  RETURN return_string;
-END;
-'
-LANGUAGE plpgsql;
-
---creates a view that is suitable for creating a GFF3 string
-CREATE OR REPLACE VIEW gff3view (
-  feature_id,
-  ref,
-  source,
-  type,
-  fstart,
-  fend,
-  score,
-  strand,
-  phase,
-  attributes,
-  seqlen,
-  name
-) AS
-SELECT
-  f.feature_id   ,
-  sf.name        ,
-  dbx.accession  ,
-  cv.name        ,
-  fl.fmin+1      ,
-  fl.fmax        ,
-  af.significance,
-  fl.strand      ,
-  fl.phase       ,
-  gffattstring(f.feature_id),
-  f.seqlen       ,
-  f.name         ,
-  f.organism_id
-FROM feature f
-     LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
-     LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id) 
-     LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
-     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
-     LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
-     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
-WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
+create index featurerange_idx1 on featurerange (featuremap_id);
+create index featurerange_idx2 on featurerange (feature_id);
+create index featurerange_idx3 on featurerange (leftstartf_id);
+create index featurerange_idx4 on featurerange (leftendf_id);
+create index featurerange_idx5 on featurerange (rightstartf_id);
+create index featurerange_idx6 on featurerange (rightendf_id);
+
+-- ================================================
+-- TABLE: featurepos
+-- ================================================
+
+create table featurepos (
+    featurepos_id serial not null,
+    primary key (featurepos_id),
+    featuremap_id serial not null,
+    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    map_feature_id int not null,
+    foreign key (map_feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    mappos float not null
+);
+-- map_feature_id links to the feature (map) upon which the feature is
+-- being localized
+create index featurepos_idx1 on featurepos (featuremap_id);
+create index featurepos_idx2 on featurepos (feature_id);
+create index featurepos_idx3 on featurepos (map_feature_id);
+
+
+-- ================================================
+-- TABLE: featuremap_pub
+-- ================================================
+
+create table featuremap_pub (
+    featuremap_pub_id serial not null,
+    primary key (featuremap_pub_id),
+    featuremap_id int not null,
+    foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED
+);
+create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
+create index featuremap_pub_idx2 on featuremap_pub (pub_id);
+
+
+
+
+
+-- ================================================
+-- TABLE: library
+-- ================================================
+
+create table library (
+    library_id serial not null,
+    primary key (library_id),
+    organism_id int not null,
+    foreign key (organism_id) references organism (organism_id),
+    name varchar(255),
+    uniquename text not null,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    constraint library_c1 unique (organism_id,uniquename,type_id)
+);
+-- The type_id foreign key links to a controlled vocabulary of library types.
+-- examples of this would be: 'cDNA_library' or 'genomic_library'
+create index library_name_ind1 on library(name);
+create index library_idx1 on library (organism_id);
+create index library_idx2 on library (type_id);
+create index library_idx3 on library (uniquename);
+
+
+-- ================================================
+-- TABLE: feature_synonym
+-- ================================================
+
+create table library_synonym (
+    library_synonym_id serial not null,
+    primary key (library_synonym_id),
+    synonym_id int not null,
+    foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    is_current boolean not null default 'true',
+    is_internal boolean not null default 'false',
+    constraint library_synonym_c1 unique (synonym_id,library_id,pub_id)
+);
+-- pub_id: the pub_id link is for relating the usage of a given synonym to the
+-- publication in which it was used
+-- is_current: the is_current bit indicates whether the linked synonym is the 
+-- current -official- symbol for the linked library
+-- is_internal: typically a synonym exists so that somebody querying the db 
+-- with an obsolete name can find the object they're looking for (under its 
+-- current name.  If the synonym has been used publicly & deliberately (eg in 
+-- a paper), it my also be listed in reports as a synonym.   If the synonym 
+-- was not used deliberately (eg, there was a typo which went public), then 
+-- the is_internal bit may be set to 'true' so that it is known that the 
+-- synonym is "internal" and should be queryable but should not be listed 
+-- in reports as a valid synonym.
+create index library_synonym_idx1 on library_synonym (synonym_id);
+create index library_synonym_idx2 on library_synonym (library_id);
+create index library_synonym_idx3 on library_synonym (pub_id);
+
+
+-- ================================================
+-- TABLE: library_pub
+-- ================================================
+
+create table library_pub (
+    library_pub_id serial not null,
+    primary key (library_pub_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint library_pub_c1 unique (library_id,pub_id)
+);
+create index library_pub_idx1 on library_pub (library_id);
+create index library_pub_idx2 on library_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: libraryprop
+-- ================================================
+
+create table libraryprop (
+    libraryprop_id serial not null,
+    primary key (libraryprop_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    value text null,
+    rank int not null default 0,
+    constraint libraryprop_c1 unique (library_id,type_id,rank)
+);
+create index libraryprop_idx1 on libraryprop (library_id);
+create index libraryprop_idx2 on libraryprop (type_id);
+
+
+-- ================================================
+-- TABLE: library_cvterm
+-- ================================================
+
+create table library_cvterm (
+    library_cvterm_id serial not null,
+    primary key (library_cvterm_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    cvterm_id int not null,
+    foreign key (cvterm_id) references cvterm (cvterm_id),
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id),
+    constraint library_cvterm_c1 unique (library_id,cvterm_id,pub_id)
+);
+-- The table library_cvterm links a library to controlled vocabularies which
+-- describe the library.  For instance, there might be a link to the anatomy
+-- cv for "head" or "testes" for a head or testes library.
+create index library_cvterm_idx1 on library_cvterm (library_id);
+create index library_cvterm_idx2 on library_cvterm (cvterm_id);
+create index library_cvterm_idx3 on library_cvterm (pub_id);
+
+
+-- ================================================
+-- TABLE: library_feature
+-- ================================================
+
+create table library_feature (
+    library_feature_id serial not null,
+    primary key (library_feature_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    constraint library_feature_c1 unique (library_id,feature_id)
+);
+-- library_feature links a library to the clones which are contained in the 
+-- library.  Examples of such linked features might be "cDNA_clone" or 
+-- "genomic_clone".
+create index library_feature_idx1 on library_feature (library_id);
+create index library_feature_idx2 on library_feature (feature_id);
 
