@@ -1290,31 +1290,37 @@
        EXECUTE PROCEDURE audit_update_delete_pub_dbxref ();
 
 
-   DROP TABLE audit_author;
-   CREATE TABLE audit_author ( 
-       author_id integer, 
-       contact_id integer, 
+   DROP TABLE audit_pub_author;
+   CREATE TABLE audit_pub_author ( 
+       pub_author_id integer, 
+       pub_id integer, 
+       rank integer, 
+       editor boolean, 
        surname varchar(100), 
        givennames varchar(100), 
        suffix varchar(100), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
-   GRANT ALL on audit_author to PUBLIC;
+   GRANT ALL on audit_pub_author to PUBLIC;
 
-   CREATE OR REPLACE FUNCTION audit_update_delete_author() RETURNS trigger AS
+   CREATE OR REPLACE FUNCTION audit_update_delete_pub_author() RETURNS trigger AS
    '
    DECLARE
-       author_id_var integer; 
-       contact_id_var integer; 
+       pub_author_id_var integer; 
+       pub_id_var integer; 
+       rank_var integer; 
+       editor_var boolean; 
        surname_var varchar(100); 
        givennames_var varchar(100); 
        suffix_var varchar(100); 
        
        transaction_type_var char;
    BEGIN
-       author_id_var = OLD.author_id;
-       contact_id_var = OLD.contact_id;
+       pub_author_id_var = OLD.pub_author_id;
+       pub_id_var = OLD.pub_id;
+       rank_var = OLD.rank;
+       editor_var = OLD.editor;
        surname_var = OLD.surname;
        givennames_var = OLD.givennames;
        suffix_var = OLD.suffix;
@@ -1325,86 +1331,23 @@
            transaction_type_var = ''U'';
        END IF;
 
-       INSERT INTO audit_author ( 
-             author_id, 
-             contact_id, 
+       INSERT INTO audit_pub_author ( 
+             pub_author_id, 
+             pub_id, 
+             rank, 
+             editor, 
              surname, 
              givennames, 
              suffix, 
              transaction_type
        ) VALUES ( 
-             author_id_var, 
-             contact_id_var, 
-             surname_var, 
-             givennames_var, 
-             suffix_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return null;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER author_audit_ud ON author;
-   CREATE TRIGGER author_audit_ud
-       BEFORE UPDATE OR DELETE ON author
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_author ();
-
-
-   DROP TABLE audit_pub_author;
-   CREATE TABLE audit_pub_author ( 
-       pub_author_id integer, 
-       author_id integer, 
-       pub_id integer, 
-       rank integer, 
-       editor boolean, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_pub_author to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_pub_author() RETURNS trigger AS
-   '
-   DECLARE
-       pub_author_id_var integer; 
-       author_id_var integer; 
-       pub_id_var integer; 
-       rank_var integer; 
-       editor_var boolean; 
-       
-       transaction_type_var char;
-   BEGIN
-       pub_author_id_var = OLD.pub_author_id;
-       author_id_var = OLD.author_id;
-       pub_id_var = OLD.pub_id;
-       rank_var = OLD.rank;
-       editor_var = OLD.editor;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_pub_author ( 
-             pub_author_id, 
-             author_id, 
-             pub_id, 
-             rank, 
-             editor, 
-             transaction_type
-       ) VALUES ( 
              pub_author_id_var, 
-             author_id_var, 
              pub_id_var, 
              rank_var, 
              editor_var, 
+             surname_var, 
+             givennames_var, 
+             suffix_var, 
              transaction_type_var
        );
 
@@ -5239,23 +5182,6 @@
        arraydesign_id integer, 
        type_id integer, 
        dbxref_id integer, 
-       subclass_view varchar(27), 
-       tinyint1 integer, 
-       smallint1 integer, 
-       smallint2 integer, 
-       char1 varchar(5), 
-       char2 varchar(5), 
-       char3 varchar(5), 
-       char4 varchar(5), 
-       char5 varchar(5), 
-       char6 varchar(5), 
-       char7 varchar(5), 
-       tinystring1 varchar(50), 
-       tinystring2 varchar(50), 
-       smallstring1 varchar(100), 
-       smallstring2 varchar(100), 
-       string1 varchar(500), 
-       string2 varchar(500), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5269,23 +5195,6 @@
        arraydesign_id_var integer; 
        type_id_var integer; 
        dbxref_id_var integer; 
-       subclass_view_var varchar(27); 
-       tinyint1_var integer; 
-       smallint1_var integer; 
-       smallint2_var integer; 
-       char1_var varchar(5); 
-       char2_var varchar(5); 
-       char3_var varchar(5); 
-       char4_var varchar(5); 
-       char5_var varchar(5); 
-       char6_var varchar(5); 
-       char7_var varchar(5); 
-       tinystring1_var varchar(50); 
-       tinystring2_var varchar(50); 
-       smallstring1_var varchar(100); 
-       smallstring2_var varchar(100); 
-       string1_var varchar(500); 
-       string2_var varchar(500); 
        
        transaction_type_var char;
    BEGIN
@@ -5294,23 +5203,6 @@
        arraydesign_id_var = OLD.arraydesign_id;
        type_id_var = OLD.type_id;
        dbxref_id_var = OLD.dbxref_id;
-       subclass_view_var = OLD.subclass_view;
-       tinyint1_var = OLD.tinyint1;
-       smallint1_var = OLD.smallint1;
-       smallint2_var = OLD.smallint2;
-       char1_var = OLD.char1;
-       char2_var = OLD.char2;
-       char3_var = OLD.char3;
-       char4_var = OLD.char4;
-       char5_var = OLD.char5;
-       char6_var = OLD.char6;
-       char7_var = OLD.char7;
-       tinystring1_var = OLD.tinystring1;
-       tinystring2_var = OLD.tinystring2;
-       smallstring1_var = OLD.smallstring1;
-       smallstring2_var = OLD.smallstring2;
-       string1_var = OLD.string1;
-       string2_var = OLD.string2;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -5324,23 +5216,6 @@
              arraydesign_id, 
              type_id, 
              dbxref_id, 
-             subclass_view, 
-             tinyint1, 
-             smallint1, 
-             smallint2, 
-             char1, 
-             char2, 
-             char3, 
-             char4, 
-             char5, 
-             char6, 
-             char7, 
-             tinystring1, 
-             tinystring2, 
-             smallstring1, 
-             smallstring2, 
-             string1, 
-             string2, 
              transaction_type
        ) VALUES ( 
              element_id_var, 
@@ -5348,23 +5223,6 @@
              arraydesign_id_var, 
              type_id_var, 
              dbxref_id_var, 
-             subclass_view_var, 
-             tinyint1_var, 
-             smallint1_var, 
-             smallint2_var, 
-             char1_var, 
-             char2_var, 
-             char3_var, 
-             char4_var, 
-             char5_var, 
-             char6_var, 
-             char7_var, 
-             tinystring1_var, 
-             tinystring2_var, 
-             smallstring1_var, 
-             smallstring2_var, 
-             string1_var, 
-             string2_var, 
              transaction_type_var
        );
 
@@ -5389,45 +5247,6 @@
        elementresult_id integer, 
        element_id integer, 
        quantification_id integer, 
-       subclass_view varchar(27), 
-       foreground float, 
-       background float, 
-       foreground_sd float, 
-       background_sd float, 
-       float1 float, 
-       float2 float, 
-       float3 float, 
-       float4 float, 
-       float5 float, 
-       float6 float, 
-       float7 float, 
-       float8 float, 
-       float9 float, 
-       float10 float, 
-       int1 integer, 
-       int2 integer, 
-       int3 integer, 
-       int4 integer, 
-       int5 integer, 
-       int6 integer, 
-       tinyint1 integer, 
-       tinyint2 integer, 
-       tinyint3 integer, 
-       smallint1 integer, 
-       smallint2 integer, 
-       char1 varchar(5), 
-       char2 varchar(5), 
-       char3 varchar(5), 
-       char4 varchar(5), 
-       char5 varchar(5), 
-       char6 varchar(5), 
-       tinystring1 varchar(50), 
-       tinystring2 varchar(50), 
-       tinystring3 varchar(50), 
-       smallstring1 varchar(100), 
-       smallstring2 varchar(100), 
-       string1 varchar(500), 
-       string2 varchar(500), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5439,90 +5258,12 @@
        elementresult_id_var integer; 
        element_id_var integer; 
        quantification_id_var integer; 
-       subclass_view_var varchar(27); 
-       foreground_var float; 
-       background_var float; 
-       foreground_sd_var float; 
-       background_sd_var float; 
-       float1_var float; 
-       float2_var float; 
-       float3_var float; 
-       float4_var float; 
-       float5_var float; 
-       float6_var float; 
-       float7_var float; 
-       float8_var float; 
-       float9_var float; 
-       float10_var float; 
-       int1_var integer; 
-       int2_var integer; 
-       int3_var integer; 
-       int4_var integer; 
-       int5_var integer; 
-       int6_var integer; 
-       tinyint1_var integer; 
-       tinyint2_var integer; 
-       tinyint3_var integer; 
-       smallint1_var integer; 
-       smallint2_var integer; 
-       char1_var varchar(5); 
-       char2_var varchar(5); 
-       char3_var varchar(5); 
-       char4_var varchar(5); 
-       char5_var varchar(5); 
-       char6_var varchar(5); 
-       tinystring1_var varchar(50); 
-       tinystring2_var varchar(50); 
-       tinystring3_var varchar(50); 
-       smallstring1_var varchar(100); 
-       smallstring2_var varchar(100); 
-       string1_var varchar(500); 
-       string2_var varchar(500); 
        
        transaction_type_var char;
    BEGIN
        elementresult_id_var = OLD.elementresult_id;
        element_id_var = OLD.element_id;
        quantification_id_var = OLD.quantification_id;
-       subclass_view_var = OLD.subclass_view;
-       foreground_var = OLD.foreground;
-       background_var = OLD.background;
-       foreground_sd_var = OLD.foreground_sd;
-       background_sd_var = OLD.background_sd;
-       float1_var = OLD.float1;
-       float2_var = OLD.float2;
-       float3_var = OLD.float3;
-       float4_var = OLD.float4;
-       float5_var = OLD.float5;
-       float6_var = OLD.float6;
-       float7_var = OLD.float7;
-       float8_var = OLD.float8;
-       float9_var = OLD.float9;
-       float10_var = OLD.float10;
-       int1_var = OLD.int1;
-       int2_var = OLD.int2;
-       int3_var = OLD.int3;
-       int4_var = OLD.int4;
-       int5_var = OLD.int5;
-       int6_var = OLD.int6;
-       tinyint1_var = OLD.tinyint1;
-       tinyint2_var = OLD.tinyint2;
-       tinyint3_var = OLD.tinyint3;
-       smallint1_var = OLD.smallint1;
-       smallint2_var = OLD.smallint2;
-       char1_var = OLD.char1;
-       char2_var = OLD.char2;
-       char3_var = OLD.char3;
-       char4_var = OLD.char4;
-       char5_var = OLD.char5;
-       char6_var = OLD.char6;
-       tinystring1_var = OLD.tinystring1;
-       tinystring2_var = OLD.tinystring2;
-       tinystring3_var = OLD.tinystring3;
-       smallstring1_var = OLD.smallstring1;
-       smallstring2_var = OLD.smallstring2;
-       string1_var = OLD.string1;
-       string2_var = OLD.string2;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -5534,89 +5275,11 @@
              elementresult_id, 
              element_id, 
              quantification_id, 
-             subclass_view, 
-             foreground, 
-             background, 
-             foreground_sd, 
-             background_sd, 
-             float1, 
-             float2, 
-             float3, 
-             float4, 
-             float5, 
-             float6, 
-             float7, 
-             float8, 
-             float9, 
-             float10, 
-             int1, 
-             int2, 
-             int3, 
-             int4, 
-             int5, 
-             int6, 
-             tinyint1, 
-             tinyint2, 
-             tinyint3, 
-             smallint1, 
-             smallint2, 
-             char1, 
-             char2, 
-             char3, 
-             char4, 
-             char5, 
-             char6, 
-             tinystring1, 
-             tinystring2, 
-             tinystring3, 
-             smallstring1, 
-             smallstring2, 
-             string1, 
-             string2, 
              transaction_type
        ) VALUES ( 
              elementresult_id_var, 
              element_id_var, 
              quantification_id_var, 
-             subclass_view_var, 
-             foreground_var, 
-             background_var, 
-             foreground_sd_var, 
-             background_sd_var, 
-             float1_var, 
-             float2_var, 
-             float3_var, 
-             float4_var, 
-             float5_var, 
-             float6_var, 
-             float7_var, 
-             float8_var, 
-             float9_var, 
-             float10_var, 
-             int1_var, 
-             int2_var, 
-             int3_var, 
-             int4_var, 
-             int5_var, 
-             int6_var, 
-             tinyint1_var, 
-             tinyint2_var, 
-             tinyint3_var, 
-             smallint1_var, 
-             smallint2_var, 
-             char1_var, 
-             char2_var, 
-             char3_var, 
-             char4_var, 
-             char5_var, 
-             char6_var, 
-             tinystring1_var, 
-             tinystring2_var, 
-             tinystring3_var, 
-             smallstring1_var, 
-             smallstring2_var, 
-             string1_var, 
-             string2_var, 
              transaction_type_var
        );
 
