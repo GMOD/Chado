@@ -31,11 +31,11 @@ insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:swissprot',(select contact_id from contact where name = 'null'));
 
-insert into array (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
-insert into array (name,manufacturer_id,platformtype_id) values ('virtual array' ,(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
-insert into array (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133A',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
-insert into array (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133B',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
-insert into array (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95A' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
+insert into arraydesign (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
+insert into arraydesign (name,manufacturer_id,platformtype_id) values ('virtual array' ,(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
+insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133A',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
+insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133B',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
+insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95A' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
 
 /* we need to have the ontologies loaded before we can do this.  "make prepdb" now needs to come after "make ontologies" */
 insert into cvterm_relationship (subject_id,object_id,type_id) values (
