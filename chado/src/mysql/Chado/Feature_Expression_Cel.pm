@@ -1,6 +1,7 @@
 package Chado::Feature_Expression_Cel;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Feature_Expression_Cel->set_up_table('feature_expression_cel');
 Chado::Feature_Expression_Cel->hasa(Chado::Feature => 'feature_id');

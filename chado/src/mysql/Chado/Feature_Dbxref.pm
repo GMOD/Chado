@@ -1,6 +1,7 @@
 package Chado::Feature_Dbxref;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Feature_Dbxref->set_up_table('feature_dbxref');
 Chado::Feature_Dbxref->hasa(Chado::Feature => 'feature_id');

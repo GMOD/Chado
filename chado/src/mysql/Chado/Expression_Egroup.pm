@@ -1,6 +1,7 @@
 package Chado::Expression_Egroup;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Expression_Egroup->set_up_table('expression_egroup');
 Chado::Expression_Egroup->hasa(Chado::Expression => 'expression_id');

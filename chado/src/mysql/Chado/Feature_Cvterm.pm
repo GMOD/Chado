@@ -1,6 +1,7 @@
 package Chado::Feature_Cvterm;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Feature_Cvterm->set_up_table('feature_cvterm');
 Chado::Feature_Cvterm->hasa(Chado::Feature => 'feature_id');
