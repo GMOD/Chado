@@ -15,25 +15,81 @@ Read Chado XML to acode flatfile
   perl -I$ix/src -M'org::gmod::chado::ix::ToAcode' -e 'acodeindex;' -- \
      chado7-sep03/AE003430v7-ix.acode
 
+  perl -I$ix/src -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- \
+    -out=AE003844_v7.0_0728.acode \
+    -feat=AE003844_v7.0_0728.feats \
+    -debug -index \
+    AE003844_v7.0_0728.chado.xml 
+
 =head2 NOTES
 
+  for feature output (got some dup feats), use on output:
+    sort -d +0 -n +1 | uniq |
+    and split by col1 = csome to separate features-csome.tsv files
+     dropping cols 1,2 
+  
+  - this now outputs 'gnomap-version-1' feature tables (used by gnomap
+  and gbrowse_fb); 
+  - add ability to output gff-version-3 and index for use with 
+  gbrowse flatfile-db adaptor
+     
+    ...
+    
   just now (sep03) this is memory-piggy, and doesn't release all
   data once dumped.  Best use by invoking program newly for 
   each scaffold.chado.xml, and catting to > output.acode, 
   then do acodeindex
   
+  set ix=~/bio/dev/gmod/schema/XMLTools/ChadoSax/
+  set ch=~/bio/flybase/chado/chado7-aug03/
   
 =head2 CVS info
 
-  set cvsd=':pserver:anonymous@sf.net:???'
   set cvsd=':pserver:anonymous@flybase.net:/bio/cvs'
   cvs -d $cvsd login
   cvs -d $cvsd co -d ChadoSax gmod/schema/XMLTools/ChadoSax/
 
+  - also in gmod.org sourceforge CVS, same path
+  
 =head1 AUTHOR
 
 D.G. Gilbert, Sep 2003, gilbertd@indiana.edu
 
+
+
+=head1 More notes: feature tables
+
+  create feat tables along with acode using
+    -e  'acode;' -- -featfile=output.feats ...
+  
+  for feature output (got some dup feats), use on output:
+    sort -d +0 -n +1 | uniq |
+    and split by col1 = csome to separate features-csome.tsv files
+     dropping cols 1,2
+   cat *.feats | sort -d +0 -n +1 | uniq | sed -e's/^[A-Z0-9]*.[0-9]*.//'
+ better yet:  
+   cat *.feats | sort -d +0 -n +1 | uniq | ./fsplit.pl
+  
+  # ## /usr/bin/perl 
+  # # fnsplit.pl usage:
+  # # cat chadoxml.acode.feats | sort -d +0 -n +1 | uniq | ./fsplit.pl
+  # use FileHandle; 
+  # while(<>){ 
+  # next unless(/^\w/); 
+  # ($c,$b,$t,$r)=split "\t",$_,4; 
+  # $h{$c}= new FileHandle(">chfeats-$c.tsv") unless($h{$c}); 
+  # $fh= $h{$c};  print $fh "$t\t$r";  $ts{$c}{$t}++; $ts{all}{$t}++; }
+  # print "# Summary of features\n"; #? print to each fh  
+  # foreach $c (sort keys %ts) {
+  #   print "\n# Chr $c\n";
+  #   foreach $t (sort keys %{$ts{$c}}) {
+  #     print "# $t\t$ts{$c}{$t}\n";
+  #     }
+  #   }  
+  # # foreach $fh (values %h) { $fh->close;}
+   
+
+ 
 =cut
 
 #-----------------
@@ -52,73 +108,111 @@ use vars qw/$VERSION $debug @ISA @EXPORT $DATA_VERSION/;
 @ISA = qw(Exporter);
 @EXPORT = qw(&acode &acodeindex);
 
+use Getopt::Long;    
+use constant IDXRECSIZE => length(pack("NN", 1, 50000)); # store as unsigned long, unsigned long
+
 $debug= 0;
 $VERSION = "0.1";
 $DATA_VERSION = "3.1";
 
-BEGIN {
-  # some of these are useful - later
 
-}
+=head1 Public METHODS
 
-=head1 METHODS
-
-=item acode(inputChado.xml)
+=item acode()
  
  main method; writes flybase.net acode format data from chado.xml
-
+ usage:
+  org::gmod::chado::ix::ToAcode  -e'acode;' --  [options] chado.xml[.gz|.bz2] ...
+  creates flybase acode from chado.xml 
+  options:
+  -outfile = output.acode [or STDOUT]
+  -featfile = feature.tsv [or null]
+  -index = index output.acode
+  -[no]debug     
+   
 =cut
 
 sub acode {
 
-  ## add Getopts ?
-  my ($de)= grep(/debug/,@main::ARGV);
-  if ($de) { $debug= ($de =~ /nodebug/) ? 0 : 1 ; }
-  
   my $outfh= *STDOUT;
-  ## need option for -out=outfile
-  ## need option to do acodindex also
+  my $ftout= undef;
+  my $outf= undef;
+  my $ftoutf= undef;
+  my $doindex= 0;
   
+  my $optok= Getopt::Long::GetOptions( 
+    'debug!' => \$debug,
+    'index!' => \$doindex,
+    'outfile=s' => \$outf,
+    'featfile=s' => \$ftoutf,
+    );
+  unless($optok) {
+    die "Usage
+  org::gmod::chado::ix::ToAcode  -e'acode;' --  [options] chado.xml[.gz|.bz2] ...
+  creates flybase acode from chado.xml 
+  options:
+  -outfile = output.acode [or STDOUT]
+  -featfile = feature.tsv [or null]
+  -index = index output.acode
+  -[no]debug     
+  ";
+    }
+    
+  if ($outf) {
+    # if (-r $outf) -- what ? append?
+    open(OUTF,">>$outf") or die "error writing $outf";
+    $outfh= *OUTF;
+    }
+  if ($ftoutf) {
+    # if (-r $ftoutf) -- what ? append?
+    open(FEATF,">>$ftoutf") or die "error writing $ftoutf";
+    $ftout= *FEATF;
+    }
+      
   my $outhand= new org::gmod::chado::ix::ToAcode(
-    outh => $outfh
+    outh => $outfh,
+    ftout => $ftout,
     );  
 
-  my $xmlreader= new org::gmod::chado::ix::IxReadSax(
+  my $readsax= new org::gmod::chado::ix::IxReadSax(
     debug => $debug,
     handleObj => $outhand, # handle only each finished top-level feature?
     );  
-  warn "# ToAcode @main::ARGV .....\n" if $debug;
 
-  $xmlreader->parse(@main::ARGV);
-
+  warn "# ToAcode( @ARGV ).....\n" if $debug;
+  $readsax->parse( @ARGV);
   warn "# ToAcode done ............ \n" if $debug;
   
-#   my $topnode= $xmlreader->topnode();
-#   # $topnode->printObj(0);
-#   my @fts= $topnode->getfeats('feature');
-#   foreach my $ft (@fts) {
-#     warn "# handleObj $ft ......\n" if $debug;
-#     $ft->handleObj( 0, $outhand);
-#     }
-#  warn "# ToAcode done ............ \n" if $debug;
+  close($outfh) if ($outf);
+  close($ftout) if ($ftoutf);
   
+  if ($doindex && $outf) {
+    @ARGV= ($outf);
+    acodeindex();
+    }  
 }
 
-=item acodeindex(input.acode)
+=item acodeindex()
  
  main method; create acode.idx index files for (FBan,FBgn) IDs
+ where @ARGV= (input.acode)
 
 =cut
 
 sub acodeindex {
-  unless(@main::ARGV) { die "usage: acodeindex FBan-data.acode\n"; }
+  unless(@ARGV) { die "usage: acodeindex FBan.acode\n"; }
   #? no need for new ToAcode()
-  my $file= shift @main::ARGV;
+  my $file= shift @ARGV;
   unless(-r $file) { die "acodeindex: cannot index $file\n"; }
   indexAcode( $file, "FBan", "FBgn");
 }
 
 
+=head1 Internal METHODS
+
+=item new() and miscellany subs
+
+=cut
 
 sub new {
 	my $that= shift;
@@ -183,15 +277,29 @@ sub comment {
 =item handleObj($depth,$object)
 
   main method; processes $object
-
+  parses main features (mostly 'gene' type), and their subfeatures, attributes, etc.
+  has a few FlyBase specific checks - FB id
+  some data types may be flybase-specific: 
+    chromosome_arm, cyto_range, various comments
+  otherwise types are from Sequence Ontology (chado std)
+  
+  analysis data is inside gene objects as
+    prediction_evidence
+    alignment_evidence
+   with specific feature structure
+   
+  recursive - calls self handleObj for child objects
+  
 =cut
 
 sub handleObj {  
 	my $self = shift;
 	my $depth= shift;
  	my $ob   = shift;
+ 	
+ 	my $parsestate= shift || undef; #? skip these
+ 	return if ( $parsestate =~ /error/i );
  	  
-  my $outh= $self->{outh};
  	my $ftd= $self->{ftd};
  	my $evd= $self->{evd};
 
@@ -231,6 +339,7 @@ sub handleObj {
       my $dt= cleandate($ob->{timelastmodified}); 
       $ftd->{DT}= $dt if $dt;
       
+      ## need fix here for t/sn/sno/xxx RNA types - non mRNA
       my($tag,$type)= ('type_id', $ob->{type_id});
       ($tag,$type)= $ob->id2name($tag,$type);
       $ftd->{TYPE}= $type;
@@ -249,7 +358,11 @@ sub handleObj {
       
       ## change logic here/for ftd{} to store all of subfeature fields together
       
-      if ($otype  =~ /^(mRNA|protein)$/) {
+      ## URK - the snRNA/tRNA/xxxRNA types are here, nested below 'type=gene' !!!
+      ## are there any other non-RNA types to catch here?
+      # my($tag,$type)= ('type_id', $ob->{type_id});
+      
+      if ($otype  =~ /^(\w+RNA|protein|pseudogene)$/) { # was mRNA
       ## protein is nested in mRNA
       my $loc;
       
@@ -267,7 +380,12 @@ sub handleObj {
         ## $ftd->{CDS} .= $loc . ";";
         }
         
-      elsif ($otype =~ /^(mRNA)$/) { # $depth == 1
+      elsif ($otype =~ /^(\w+RNA|pseudogene)$/) { # $depth == 1
+        my $isgene= ($otype eq 'mRNA');
+        $ftd->{TYPE}= $otype unless ($isgene); #??
+        # if not prot-code-gene, drop these parts & replace above 
+        # TYPE, BLOC, ?
+        
         $ftd->{CTSYM} .= $ob->name() . ";";  
         $ftd->{SQLEN} .= $ob->{seqlen} . ";";
         # $loc= $ob->getlocation(  $ftd->{srcid},'exon'); ## bad for mRNA - need to add exon subfeat locs
@@ -277,7 +395,7 @@ sub handleObj {
         $ftd->{mRNA} .= $loc . ";";
 
          # $ob->{locs}= $locs; #????
-        $loc='';
+        $loc=''; # ok for !isgene ?
         my $aaloc = $ob->getlocationSrc($ftd->{srcid},'protein');
         if ($aaloc) {
           $aaloc = $ob->insertlocations($aaloc, $locs);
@@ -287,7 +405,11 @@ sub handleObj {
         }
 
       }
-      
+      elsif ($otype !~ /^(exon|chromosome_arm)$/) {
+        # MISSED feature=pseudogene [lev=1] CR32747-RA  !!
+        warn "MISSED feature=$otype [lev=$depth] ".$ob->name()." \n" if $debug;
+        }
+        
 			last SWITCH; 
 			};  
 			
@@ -324,20 +446,32 @@ sub handleObj {
     ($otag =~ /^featureprop$/ && $depth<3) && do {
       my($tag,$db,$attr)= ('type_id', $ob->{type_id}, $ob->{attr});
       ($tag,$db)= $ob->id2name($tag,$db);
-      $ftd->{SCAF}= $attr if ($db eq 'gbunit');
+      my $notdone= 0;
       
-      if ($depth == 1) {
-      $ftd->{PEPST} .= $attr.";" if ($db eq 'sp_status');
-      $ftd->{CMT} .= $attr.";" if ($db eq 'sp_comment');
-      $ftd->{CMT} .= $attr.";" if ($db eq 'comment');
-      $ftd->{CLOCC} .= $attr.";" if ($db eq 'cyto_range');
-      }
+      if ($db eq 'gbunit') {
+        $ftd->{SCAF}= $attr;
+        }
+      elsif ($depth == 1) {
+           if ($db eq 'sp_status') { $ftd->{PEPST} .= $attr.";" ; }
+        elsif ($db eq 'sp_comment') { $ftd->{CMT} .= $attr.";" ; }
+        elsif ($db eq 'comment') { $ftd->{CMT} .= $attr.";" ; }
+        elsif ($db eq 'cyto_range') { $ftd->{CLOCC} .= $attr.";" ; }
+        else { $notdone= 1; }
+        }
       else {
-      $ftd->{PEPCMT} .= $attr.";" if ($db eq 'sp_status');
-      $ftd->{PEPCMT} .= $attr.";" if ($db eq 'sp_comment');
-      $ftd->{PEPCMT} .= $attr.";" if ($db eq 'comment');
-      }
+           if ($db eq 'sp_status') { $ftd->{PEPCMT} .= $attr.";" ; }
+        elsif ($db eq 'sp_comment') { $ftd->{PEPCMT} .= $attr.";" ; }
+        elsif ($db eq 'comment') { $ftd->{PEPCMT} .= $attr.";" ; }
+        else { $notdone= 1; }
+        }
       
+      if ($notdone) {
+           if ($db eq 'internal_synonym') { $notdone= 0; }
+        elsif ($db eq 'owner') { $notdone= 0; } #??
+        elsif ($db eq 'problem') { $ftd->{CMT} .= "problem=".$attr.";" ; $notdone= 0;  } #??
+        }
+        
+      warn "featureprop= $attr,$tag,$db\n" if ($notdone && $debug);
       ## add these...
       ## featureprop= AAF45927,type_name,protein_id
       ## featureprop= all done,type_name,status
@@ -345,7 +479,6 @@ sub handleObj {
       ## featureprop= true,type_name,problem
       ##?? featureprop= CG32009,type_name,symbol - have elsewhere
      
-      warn "featureprop= $attr,$tag,$db\n" if $debug;
       # also got 'sp_status', sp_comment 'cyto_range' ..
       
 			last SWITCH; 
@@ -407,14 +540,17 @@ sub handleObj {
       my $dt= cleandate($ft->{timelastmodified}); 
       $anh->{mRNA} .= $loc .';';  
       $anh->{DT}  = "$dt" if $dt;   
+
+        #type for prediction is same feature level as loc; not for alignment
+      my($tag,$type)= $ft->id2name('type_id',$ft->{type_id});
+      $anh->{TYPE}= $type if ($type);
       
       @fts= $ft->getfeats('feature'); # find dbx names
       foreach my $dft (@fts) {
         next if ($dft->{id} eq $ftd->{srcid});
         my $dbname= $dft->name();
-        $anh->{mRNA_dbx} .= $dbname .';'
-          ;# unless($anh->{mRNA_dbx} =~ m/$dbname;/);
-        my($tag,$type)= $ob->id2name('type_id',$dft->{type_id});
+        $anh->{mRNA_dbx} .= $dbname .';';
+        ($tag,$type)= $dft->id2name('type_id',$dft->{type_id});
         $anh->{TYPE}= $type if ($type);
         last;
         }
@@ -490,7 +626,6 @@ sub handleObj {
         $anh->{mRNA_dbx} .= $dbx .';' ; 
         # $anh->{mRNA_dbx2} .= $dbname .';' ; 
 
-
         my($tag,$type)= $dft->id2name('type_id',$dft->{type_id});
         $anh->{TYPE}= $type if ($type);
   
@@ -519,8 +654,9 @@ sub handleObj {
   $nada= 1;
   }
 
-    ## from IxFeat.pm - move back there...
-    ## includes dbxref , featureprop .. ?
+  ## recursion start ......
+  ## from IxFeat.pm - move back there...
+  ## includes dbxref , featureprop .. ?
   if ( $doatts && defined $ob->{attrlist} ) {
     foreach (@{$ob->{attrlist}}) { 
       # $_->handleObj(1+$depth, $self);  
@@ -534,13 +670,15 @@ sub handleObj {
       $self->handleObj(1+$depth, $_);  
       }
     }
+  ## recursion end ......
   
   if ($depth == 0 && scalar(%$ftd)>1) {
-    my %ca= ();      
     my @elist= values( % $evd );
        
+    my $outh= $self->{outh};
+    my $ftout= $self->{ftout};
     $ftd->{VERS}= $self->{VERS}; # data version from where?
-    fbanAcode( $outh, $ftd, undef,\@elist); ##, $FTOUT, \%ca);
+    $self->fbanAcode( $outh, $ftd, $ftout,\@elist); ##, $FTOUT, \%ca);
     
     ## need to delete some $self data here after dump
     # delete $evd->{xxx};
@@ -563,50 +701,68 @@ BEGIN {
 
 =item sub fbanAcode()
 
+acode writer for fly annotation data
+see, eg. ftp://flybase.net/flybase-data/acode/data/FBan*.acode
+
 from  flybase/datagen/parsegame4.pl
 
 =cut
 
 sub fbanAcode {
-    my($outh, $href, $ftout, $ca)= @_; # array refs of keys, values
-    my %h= %$href;
-   
-    #my $fsplit= '\n\|';
-    my $fsplit= ';';	  
-	  ##FIXME## use of ';' or '\n\|' field value seps is bad; change logic
-	  
-		##FIXME## featureTable($ftout,\%h,'\n\|') if ($ftout) ; # splitpat problems here !
+	my $self = shift;
+  my($outh, $href, $ftout, $ca)= @_; # array refs of keys, values
+  my %h= %$href;
+ 
+  #my $fsplit= '\n\|';
+  my $fsplit= ';';	  
+  ##FIXME## use of ';' or '\n\|' field value seps is bad; change logic
+  
+  # cleanup trailing ;
+	foreach my $k
+	  (qw/BLOC mRNA CTSYM DT AALEN AANAM CDS SQLEN GO CLOCC PEPST PEPCMT CMT AFFY EST CDNA/) 
+	  { $h{$k} =~ s/;$// if $h{$k}; }     
 
-		# return unless($h{TYPE} eq 'gene'); ## FIXME for CR ...
-    my $type= ($h{TYPE} eq 'gene') ? '' : $h{TYPE};
-		my $gensr;
-		my $anid = $h{ANID}  || 'null'; #?? what if null?
- 	  my $gsym = $h{GSYM}  || $h{CGSYM}; 
-		my $cgsym= $h{CGSYM} || $gsym;
-    my $sqlen= $h{GNLEN}; ##sqlen($h{BLOC});
-
-    if ($type eq 'transposable_element') {
-      #? is this kosher? cgsym = anid = TE19568
-      $anid = $cgsym;
-      $cgsym= $gsym;
-      my $tid= $anid; $tid =~ s/TE/FBti/;
-			$gensr= "INSR\n{\n"; #?? INSR = TIR subrec ? will this TIRecord cause problems?
-			$gensr .= "SYM|$gsym\n";
-			$gensr .= "ID|$tid\n}\n";
-      }
-		
-		my @re= ("ID 1 $anid"); 
-		## check here if GID = FBti other data class, write proper subrecord?
-		if ($h{GID} =~ /FB..\d/) {
-			push(@re,"GID 1 $h{GID}");
-			push(@re,"GSYM 1 $gsym");
-			$gensr= "GENSR\n{\n";
-			$gensr .= "GSYM|$gsym\n";
-			$gensr .= "ID|$h{GID}\n}\n";
-			}
-		push(@re,"CLA 1 $type") if $type;
-		push(@re,"ARM 1 $h{ARM}") if $h{ARM};
-		push(@re,"CLOC 1 $h{CLOCC}") if $h{CLOCC}; 
+  # return unless($h{TYPE} eq 'gene'); ## FIXME for CR ...
+  my $type= ($h{TYPE} eq 'gene') ? '' : $h{TYPE};
+  my $gensr;
+  my $anid = $h{ANID}  || 'null'; #?? what if null?
+  my $gsym = $h{GSYM}  || $h{CGSYM}; 
+  my $cgsym= $h{CGSYM} || $gsym;
+  my $sqlen= $h{GNLEN}; ##sqlen($h{BLOC});
+  my $gid= $h{GID}; 
+  my $arm= $h{ARM};
+  my @re= ();
+    
+  if ($type eq 'transposable_element') {
+    #? is this kosher? cgsym = anid = TE19568
+    $anid = $cgsym;
+    $cgsym= $gsym;
+    $anid =~ s/TE/FBan/; ## this is a hack - is TE/FBti id distinct from FBan id num range?
+    my $tid =~ s/TE/FBti/;  ## this is accurate, I think
+    $gid= $tid; 
+    $gensr  = "INSR\n{\n"; #?? INSR = TIR subrec ? will this TIRecord cause problems?
+    $gensr .= "SYM|$gsym\n";
+    $gensr .= "ID|$tid\n}\n";
+    push(@re,"ID 1 $anid");
+    push(@re,"SYM 1 $gsym");
+    }
+  
+  ## check here if GID = FBti other data class, write proper subrecord?
+  elsif ($gid =~ /FB..\d/) {
+    push(@re,"ID 1 $anid");
+    push(@re,"GID 1 $gid");
+    push(@re,"GSYM 1 $gsym");
+    $gensr= "GENSR\n{\n";
+    $gensr .= "GSYM|$gsym\n";
+    $gensr .= "ID|$h{GID}\n}\n";
+    }
+  else {
+    push(@re,"ID 1 $anid") if ($anid);
+    push(@re,"SYM 1 $gsym") if ($gsym);
+    }
+  push(@re,"CLA 1 $type") if $type;
+  push(@re,"ARM 1 $arm") if $arm;
+  push(@re,"CLOC 1 $h{CLOCC}") if $h{CLOCC}; 
 
 # $h{GO} -> acode flds now are FNC/ENZ/CEL - use GO field 
 # now have goterm == goid ; goterm2 == goid2 ...
@@ -646,9 +802,10 @@ SYM|$cgsym
 $gensr
 TEOF
 		print $outh "CLA|$type\n" if $type;
-		print $outh "ARM|$h{ARM}\n" if $h{ARM};
+		print $outh "ARM|$arm\n" if $arm;
 		print $outh "SCAF|$h{SCAF}\n" if $h{SCAF};
 		print $outh "BLOC|$h{BLOC}\n" if $h{BLOC};
+		print $outh "CLOCC|$h{CLOCC}\n" if $h{CLOCC};
 		print $outh "SQLEN|$sqlen\n" if $sqlen; ##$h{SQLEN};
 		print $outh "GO|$go\n" if $go;
 		
@@ -656,11 +813,17 @@ TEOF
 		print $outh "EST|".join("\n|",split(/;/,$h{EST}))."\n" if $h{EST};
 		print $outh "AFFY|".join("\n|",split(/;/,$h{AFFY}))."\n" if $h{AFFY};
 
-		print $outh "CLOCC|$h{CLOCC}\n" if $h{CLOCC};
 		print $outh "PEPST|$h{PEPST}\n" if $h{PEPST};
 		print $outh "CMT|$h{CMT}\n" if ($h{CMT} && $h{CMT} !~ /internal view/); # forgot that last
 		print $outh "DT|$dt\n" if $dt;
 		
+    my $dbx ='';
+    $dbx .= 'GadFly:'.$cgsym;
+    $dbx .= ' ; FlyBase:'.$anid if ($anid ne $gid);
+# 		$dbx =~ s/[;\s]+$//;
+    $self->printFeature($ftout, $arm, $type || 'gene', $gsym, $h{CLOCC}, $h{BLOC}, $gid, $dbx) if $ftout;
+ #  print $OUTH "$csome\t$bstart\t$feat\t$gsym\t$cloc\t$range\t$id\t$dbxref\t$note\n";
+
 		foreach my $i (0..$#trn) {
 			my $nm= $trn[$i]; 
 			my $aa= $aa[$i]; my $aan= $aan[$i];
@@ -669,30 +832,41 @@ TEOF
 			my $cds= $cds[$i]; 
 			my $dt= $dt[$i];
 			my $cm= $cm[$i]; $cm =~ s/^\s*//;
+			
+			
       ## need tp split bloc by length -- some are very long
       # $bl= undef; #?
 			$sl .= ' (-)' if ($sl && $bl =~ /complement/);
       $bl = wrapLong($bl);
-      $cds = wrapLong($cds); #? store only translation offset?
+      $cds= wrapLong($cds); #? store only translation offset?
       $cm = wrapLong($cm);
 
 ## want TRREC. CMT other evidence fields
 			print $outh "TRREC\n{\n";
 		  print $outh "NAM|$nm\n" if $nm;
-		  print $outh "AANAM|$aan\n" if $aa;
+		  print $outh "AANAM|$aan\n" if $aan;
 		  print $outh "SQLEN|$sl\n" if $sl;
 		  print $outh "AALEN|$aa\n" if $aa;
 		  print $outh "BLOC|$bl\n" if $bl;
 		  print $outh "CDS|$cds\n" if $cds;
 		  print $outh "CMT|$cm\n" if $cm;
 		  print $outh "DT|$dt\n" if $dt;
+		  print $outh "}\n";
 
       #?? make AAREC subrec for protein ??
+      next if ($type =~ /RNA/);# dont dup features for noncoding RNAs
 
-		  print $outh "}\n";
+      $dbx  = 'GadFly:'.$cgsym;
+      $dbx .= ' ; FlyBase:'.$gid if ($gid);
+      ## need unwrapped $bl, $cds for feats
+
+      $self->printFeature($ftout, $arm, 'mRNA', $nm, '', $bl[$i], 'GadFly:'.$nm, $dbx) 
+        if ($bl && $ftout);
+      $self->printFeature($ftout, $arm, 'CDS', $aan, '', $cds[$i], 'GadFly:'.$aan, $dbx) 
+        if ($cds && $ftout);
 			}
 
-	  if (ref($ca) =~ /ARRAY/) { evidAcode( $outh, $ca ); }
+	  if (ref($ca) =~ /ARRAY/) { $self->evidAcode( $outh, $ca, $ftout, $arm ); }
 #   if ($ca && $ca->{$h{CGSYM}}){ evidAcode( $outh, $ca->{$h{CGSYM}}  ); }
 	  
 	  my %did= map { $_,1; } 
@@ -709,7 +883,8 @@ TEOF
 
 
 sub evidAcode {
-	my($outh, $eref)= @_;  
+	my $self = shift;
+	my($outh, $eref, $ftout, $arm)= @_;  
   my @kv= @$eref;  ## array of evd hash
 #   ## need to use mRNA_dbx ids matched to BLOC's -- turn into subrec??
   
@@ -717,26 +892,39 @@ sub evidAcode {
     my %h= %$v; ##= (); 
     
     next if ($h{PROGRAM} eq 'locator' && $h{DATABASE} eq 'cytology');
-
+    my $earm= $h{ARM} || $arm;
+    my $type= $h{TYPE};
+    unless ($type) {
+      $type= $h{PROGRAM};#?.':'.$h{DATABASE};
+      $type= 'transposable_element' if ($type =~ /JOSHTRANSPOSON/i);
+      }
+      
     print $outh "EVD\n{\n";
     print $outh "NAM|$h{ENAM}\n" if $h{ENAM};
     print $outh "PRG|$h{PROGRAM}\n" if $h{PROGRAM};
     print $outh "DB|$h{DATABASE}\n" if $h{DATABASE};
-    print $outh "CLA|$h{TYPE}\n" if $h{TYPE};
+    print $outh "CLA|$type\n" if $type;
     print $outh "DT|$h{DT}\n" if $h{DT};
     my @bl= split(/;/,$h{mRNA}); # many of these per program/db/type
     my @db= split(/;/,$h{mRNA_dbx}); # many of these per program/db/type
     # my @db2= split(/;/,$h{mRNA_dbx2}); # many of these per program/db/type
     foreach my $bl (@bl) {
+      my $blun= $bl;
       $bl = wrapLong($bl); 
       my $dbx = shift @db;
-#       if (@db2) {
-#         my $dbx2= shift @db2;
-#         if(!$dbx) { $dbx= $dbx2; }
-#         elsif ($dbx !~ m/$dbx2/) { $dbx .= " ; $dbx2 "; }
-#         }
       print $outh "DBX|$dbx\n" if $dbx;
       print $outh "BLOC|$bl\n" if $bl;
+      
+      # DBX|FlyBase:FBti0007364 , EP(X)0448
+      # DBX|GB:X07656
+      my $nm= $dbx; $nm =~ s/^\S+\s*,\s*//;
+      $nm =~ s/_at_\d+/_at/ if ($type eq 'oligonucleotide');
+      #?? or $id == null for many of these?
+      my $id= $dbx; $id =~ s/\s*,.+$//;
+      $id= '' if ($id eq $nm); #??
+      
+      ## noname -- $nm= $h{PROGRAM}.":". $h{DATABASE} unless($nm);
+      $self->printFeature($ftout, $earm, $type, $nm, '', $blun, $id, '') if ($bl && $ftout);
       }
     print $outh "}\n";
     }
@@ -761,19 +949,67 @@ sub wrapLong {
   return $rng;
 }
 
-use vars qw( $idxrecsize );
-BEGIN {
-$idxrecsize = length(pack("LL", 1, 50000)); # store as unsigned long, unsigned long
-}
+
+=head2  printFeature()
+
+  print feature table entry, in gnomap-version-1 format,
+  with addition of leading Chr/Arm and bloc for sorting
+  call:
+    printFeature($ftout, $h{ARM}, 'gene', $gsym, $h{CLOCC}, $h{BLOC}, $gid, $dbx)  
+  output:
+    print "$csome\t$bstart\t$feat\t$gsym\t$cloc\t$range\t$id\t$dbxref\n";
   
+=cut
+
+sub printFeature {
+	my $self = shift;
+	my($ftout,$csome,$feat,$gsym,$cloc,$range,$id,$dbxref,$note)= @_; # array refs of keys, values
+
+  # return unless $ftout;
+  unless($range && $feat) {
+    warn "# feature error: $csome\t$feat\t$gsym\t$range\t$id\n"; # skip bogus features
+    return;
+    }
+  $csome='-' unless($csome);
+  $feat= '-' unless($feat);
+	$gsym= '-' unless($gsym);
+	$cloc= '-' unless($cloc);
+  $range='-' unless($range);
+	$id= '-' unless($id);
+	$dbxref= '-' unless($dbxref);
+  ## ignore $note - not used
+	# $note= '-' unless($note);
+
+  my $bstart= ($range =~ m/([-]?\d+)/) ? $1 : 0;
+  $dbxref =~ s/;*\s*$id// if (index($dbxref,$id)>=0);
+  # my $ftl= "$csome\t$bstart\t$feat\t$gsym\t$cloc\t$range\t$id\t$dbxref\n";
+  # want hash check if this is dupl ... $csome\t$feat\t$gsym\t$range\t$id only?
+  print $ftout "$csome\t$bstart\t$feat\t$gsym\t$cloc\t$range\t$id\t$dbxref\n"; #\t$note
+}
+
+
+  
+# use vars qw( $idxrecsize );
+# BEGIN {
+# $idxrecsize = length(pack("NN", 1, 50000)); # store as unsigned long, unsigned long
+# }
+
+=head2 	putIndex()
+
+=cut
+
 sub putIndex {
 	my($idx,$at,$e2,$idnum)= @_;
 	my $size= $e2 - $at;   
-	my $record= pack("LL", $at, $size); # should be "NN" for platform independent
-	my $idloc = $idnum * $idxrecsize;
+	my $record= pack("NN", $at, $size); # should be "NN" for platform independent
+	my $idloc = int( $idnum * IDXRECSIZE);
 	seek($idx, $idloc, 0);  
 	print $idx $record;
 }
+
+=head2 	indexAcode($acodefile,$idtag,$id2tag)
+
+=cut
 
 sub indexAcode {
 	my($aaf,$idtag,$id2tag)= @_;

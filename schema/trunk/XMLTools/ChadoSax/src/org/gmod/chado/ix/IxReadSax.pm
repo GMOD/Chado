@@ -170,7 +170,7 @@ sub parse {
       }
     if ($err) {
       warn "#>> IxReadSax XML parse($infile) error: $err\n";
-      $self->end_document();
+      $self->end_document('error='.$err);
       }	
     
     ## need to do here if have multiple files  
@@ -310,7 +310,7 @@ sub start_document {
 }
 
 sub end_document {
-	my ($self)= @_;
+	my ($self,$err)= @_;
   ## need error handling - this is called on bad XML ??
 
 ## 		/^(feature|feature_evidence|prediction_evidence|alignment_evidence)$/ &&  do {  #|analysis 
@@ -324,7 +324,7 @@ sub end_document {
     
     ## test sep03
     if ( $self->{handleObj} && $parft == $self->{$ROOT_NODE} ) {
-      $self->{handleObj}->handleObj(0, $ft);
+      $self->{handleObj}->handleObj(0, $ft, $err);
       }
 		}	
 		
@@ -585,6 +585,7 @@ sub end_element {
 			  }
 			  
 			  ## cant do printObj till all of doc read and ROOT has all toplevel items
+			  ## or revise printObj to print as they come (toplevel items)
 # 			elsif ( $self->{printObj} && $parft == $self->{$ROOT_NODE} ) {
 # 			  $ft->printObj(1);
 # 			  }
