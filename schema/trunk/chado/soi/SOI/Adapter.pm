@@ -45,7 +45,7 @@ sub new {
     my $self = {};
     bless $self, $class;
 
-    my $dbh = get_handle(@_);
+    my $dbh = $self->get_handle(@_);
     $self->dbh($dbh);
     return $self;
 }
@@ -1144,7 +1144,7 @@ DBI_TRACE_FILE.
 =cut
 
 sub get_handle {
-
+    my $self = shift;
     my $database_name = shift || confess("You must specify db name");
 
     my $loc = name2locator($database_name);
