@@ -11,11 +11,9 @@ create table tableinfo (
        view_on_table_id int null,
        superclass_table_id int null,
        is_updateable int not null default 1,
-       modification_date date not null default now(),
-
-       unique (name)
+       modification_date date not null default now()
 );
-create index tableinfo_idx1 on tableinfo (name);
+create unique index tableinfo_idx1 on tableinfo (name);
 
 COMMENT ON TABLE tableinfo IS NULL;
 
@@ -26,11 +24,9 @@ create table contact (
        contact_id serial not null,
        primary key (contact_id),
        name varchar(30) not null,
-       description varchar(255) null,
-
-       unique (name)
+       description varchar(255) null
 );
-create index contact_idx1 on contact (name);
+create unique index contact_idx1 on contact (name);
 
 COMMENT ON TABLE contact IS NULL;
 
@@ -46,10 +42,9 @@ create table db (
        foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
        description varchar(255) null,
        urlprefix varchar(255) null,
-       url varchar(255) null,
-       unique (name)
+       url varchar(255) null
 );
-create index db_idx1 on db (name);
+create unique index db_idx1 on db (name);
 
 COMMENT ON TABLE db IS NULL;
 
@@ -64,13 +59,12 @@ create table dbxref (
        foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
        accession varchar(255) not null,
        version varchar(255) not null default '',
-       description text,
-
-       unique (db_id, accession, version)
+       description text
 );
 create index dbxref_idx1 on dbxref (db_id);
 create index dbxref_idx2 on dbxref (accession);
 create index dbxref_idx3 on dbxref (version);
+create unique index dbxref_idx4 on dbxref (db_id,accession,version);
 
 COMMENT ON TABLE dbxref IS NULL;
 
@@ -81,11 +75,8 @@ create table project (
        project_id serial not null,  
        primary key (project_id),
        name varchar(255) not null,
-       description varchar(255) not null,
-
-       unique(name)
+       description varchar(255) not null
 );
-create index project_idx1 on project (name);
+create unique index project_idx1 on project (name);
 
 COMMENT ON TABLE project IS NULL;
-
