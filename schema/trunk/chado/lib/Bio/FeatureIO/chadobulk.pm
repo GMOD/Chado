@@ -181,7 +181,7 @@ sub write_row_featureloc{
 
 # fmin            | integer  |
 
-  my $fmin = $feature->start();
+  my $fmin = $feature->start() || 0;
 
 # is_fmin_partial | boolean  | not null
 
@@ -238,20 +238,20 @@ sub write_row_featureloc{
 =cut
 
 sub write_row_feature_relationship{
-   my ($self,$feature,$feature_id) = @_;
+  my ($self,$feature,$feature_id) = @_;
 
-   my $parent = ($feature->annotation->get_Annotations('Parent'))[0];
-warn $parent;
-   return undef unless $parent;
-   my $parent_id = $self->feature_id($parent->value());
-   my $part_of = $self->cvterm('part_of');
+  my $parent = ($feature->annotation->get_Annotations('Parent'))[0];
+  #warn $parent;
+  return undef unless $parent;
+  my $parent_id = $self->feature_id($parent->value());
+  my $part_of = $self->cvterm('part_of');
 
-   my $feature_relationship_id = $self->seq('feature_relationship');
+  my $feature_relationship_id = $self->seq('feature_relationship');
 
-   my $fh = $self->file('feature_relationship');
-   print $fh join("\t",
-                  $feature_relationship_id,$feature_id,$parent_id,$part_of,'\\N',0
-                 ),"\n";
+  my $fh = $self->file('feature_relationship');
+  print $fh join("\t",
+                 $feature_relationship_id,$feature_id,$parent_id,$part_of,'\\N',0
+                ),"\n";
 }
 
 
