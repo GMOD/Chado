@@ -1,69 +1,113 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Feb 24 19:13:41 2003
+-- Created on Mon Mar  3 13:09:28 2003
 --
+
+--
+-- Table: interaction_subj
+--
+CREATE TABLE interaction_subj (
+  interaction_subj_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  interaction_id integer(4) NOT NULL,
+  KEY interaction_subj_idx1 (feature_id),
+  KEY interaction_subj_idx2 (interaction_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (interaction_id) REFERENCES interaction (interaction_id)
+);
+
+--
+-- Table: interaction
+--
+CREATE TABLE interaction (
+  interaction_id serial(4) NOT NULL,
+  description text,
+  pub_id integer(4) NOT NULL,
+  background_genotype_id integer(4),
+  phenotype_id integer(4),
+  KEY interaction_idx1 (pub_id),
+  KEY interaction_idx2 (background_genotype_id),
+  KEY interaction_idx3 (phenotype_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (background_genotype_id) REFERENCES genotype (genotype_id),
+  FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id)
+);
 
 --
 -- Table: phenotype_cvterm
 --
 CREATE TABLE phenotype_cvterm (
-  phenotype_cvterm_id int NOT NULL,
-  phenotype_id int NOT NULL,
-  cvterm_id int NOT NULL,
-  prank int NOT NULL,
-  PRIMARY KEY  (phenotype_cvterm_id),
-  UNIQUE KEY  (phenotype_id, cvterm_id, prank),
-  UNIQUE KEY phenotype_cvterm_idx1 (phenotype_id),
-  UNIQUE KEY phenotype_cvterm_idx2 (cvterm_id)
+  phenotype_cvterm_id serial(4) NOT NULL,
+  phenotype_id integer(4) NOT NULL,
+  cvterm_id integer(4) NOT NULL,
+  prank integer(4) NOT NULL,
+  KEY phenotype_cvterm_idx1 (phenotype_id),
+  KEY phenotype_cvterm_idx2 (cvterm_id),
+  FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id),
+  FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id)
 );
 
 --
 -- Table: phenotype
 --
 CREATE TABLE phenotype (
-  phenotype_id int NOT NULL,
+  phenotype_id serial(4) NOT NULL,
   description text,
-  statement_type int NOT NULL,
-  pub_id int NOT NULL,
-  background_genotype_id int,
-  PRIMARY KEY  (phenotype_id),
-  UNIQUE KEY phenotype_idx1 (statement_type),
-  UNIQUE KEY phenotype_idx2 (pub_id),
-  UNIQUE KEY phenotype_idx3 (background_genotype_id)
+  statement_type integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  background_genotype_id integer(4),
+  KEY phenotype_idx1 (statement_type),
+  KEY phenotype_idx2 (pub_id),
+  KEY phenotype_idx3 (background_genotype_id),
+  FOREIGN KEY (statement_type) REFERENCES cvterm (cvterm_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (background_genotype_id) REFERENCES genotype (genotype_id)
 );
 
 --
 -- Table: feature_phenotype
 --
 CREATE TABLE feature_phenotype (
-  feature_phenotype_id int NOT NULL,
-  feature_id int NOT NULL,
-  phenotype_id int NOT NULL,
-  PRIMARY KEY  (feature_phenotype_id),
-  UNIQUE KEY  (feature_id, phenotype_id),
-  UNIQUE KEY feature_phenotype_idx1 (feature_id),
-  UNIQUE KEY feature_phenotype_idx2 (phenotype_id)
+  feature_phenotype_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  phenotype_id integer(4) NOT NULL,
+  KEY feature_phenotype_idx1 (feature_id),
+  KEY feature_phenotype_idx2 (phenotype_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id)
 );
 
 --
 -- Table: genotype
 --
 CREATE TABLE genotype (
-  genotype_id int NOT NULL,
-  description varchar(255),
-  PRIMARY KEY  (genotype_id)
+  genotype_id serial(4) NOT NULL,
+  description varchar(255)
+);
+
+--
+-- Table: interaction_obj
+--
+CREATE TABLE interaction_obj (
+  interaction_obj_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  interaction_id integer(4) NOT NULL,
+  KEY interaction_obj_idx1 (feature_id),
+  KEY interaction_obj_idx2 (interaction_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (interaction_id) REFERENCES interaction (interaction_id)
 );
 
 --
 -- Table: feature_genotype
 --
 CREATE TABLE feature_genotype (
-  feature_genotype_id int NOT NULL,
-  feature_id int NOT NULL,
-  genotype_id int NOT NULL,
-  PRIMARY KEY  (feature_genotype_id),
-  UNIQUE KEY  (feature_id, genotype_id),
-  UNIQUE KEY feature_genotype_idx1 (feature_id),
-  UNIQUE KEY feature_genotype_idx2 (genotype_id)
+  feature_genotype_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  genotype_id integer(4) NOT NULL,
+  KEY feature_genotype_idx1 (feature_id),
+  KEY feature_genotype_idx2 (genotype_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (genotype_id) REFERENCES genotype (genotype_id)
 );
 

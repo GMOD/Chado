@@ -1,0 +1,94 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Mar  3 13:09:38 2003
+--
+
+--
+-- Table: pub_author
+--
+CREATE TABLE pub_author (
+  pub_author_id serial(4) NOT NULL,
+  author_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  arank integer(4) NOT NULL,
+  editor boolean DEFAULT 'false',
+  KEY pub_author_idx1 (author_id),
+  KEY pub_author_idx2 (pub_id),
+  FOREIGN KEY (author_id) REFERENCES author (author_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+
+--
+-- Table: pubprop
+--
+CREATE TABLE pubprop (
+  pub_id integer(4) NOT NULL,
+  pkey_id integer(4) NOT NULL,
+  pval text NOT NULL,
+  prank integer(4),
+  KEY pubprop_idx1 (pub_id),
+  KEY pubprop_idx2 (pkey_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (pkey_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: pub_dbxref
+--
+CREATE TABLE pub_dbxref (
+  pub_dbxref_id serial(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  dbxref_id integer(4) NOT NULL,
+  KEY pub_dbxref_idx1 (pub_id),
+  KEY pub_dbxref_idx2 (dbxref_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (dbxref_id) REFERENCES dbxref (dbxref_id)
+);
+
+--
+-- Table: author
+--
+CREATE TABLE author (
+  author_id serial(4) NOT NULL,
+  surname varchar(100) NOT NULL,
+  givennames varchar(100),
+  suffix varchar(100)
+);
+
+--
+-- Table: pub
+--
+CREATE TABLE pub (
+  pub_id serial(4) NOT NULL,
+  title text,
+  volumetitle text,
+  volume varchar(255),
+  series_name varchar(255),
+  issue varchar(255),
+  pyear varchar(255),
+  pages varchar(255),
+  miniref varchar(255) NOT NULL,
+  type_id integer(4) NOT NULL,
+  is_obsolete boolean DEFAULT 'false',
+  publisher varchar(255),
+  pubplace varchar(255),
+  KEY pub_idx1 (type_id),
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: pub_relationship
+--
+CREATE TABLE pub_relationship (
+  pub_relationship_id serial(4) NOT NULL,
+  subj_pub_id integer(4) NOT NULL,
+  obj_pub_id integer(4) NOT NULL,
+  type_id integer(4) NOT NULL,
+  KEY pub_relationship_idx1 (subj_pub_id),
+  KEY pub_relationship_idx2 (obj_pub_id),
+  KEY pub_relationship_idx3 (type_id),
+  FOREIGN KEY (subj_pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (obj_pub_id) REFERENCES pub (pub_id),
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id)
+);
+
