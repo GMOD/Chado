@@ -160,7 +160,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $NOLOAD, $VALIDATE);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -200,9 +200,11 @@ $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
 $VALIDATE ||=0;
 
+$GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
   $ANALYSIS = 1; #ie, it was specified on the command line with no arg
 } elsif ($ANALYSIS) {
+  $GLOBAL_ANALYSIS = 1;
   $ANALYSIS_GROUP = $ANALYSIS; # analysis group specified on the command line
   $ANALYSIS = 1;
 } else {
@@ -448,8 +450,6 @@ while(my $feature = $gffio->next_feature()){
   }
 
   my $source = $feature->source->value;
-  my $is_FgenesH = 1 if $source eq 'FgenesH_Monocot';
-  my $is_analysis = $is_FgenesH ? 1 : 0;
 
   my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || "auto$nextfeature";
   $uniquename = $uniquename->value if ref($uniquename);
@@ -667,16 +667,16 @@ END
 
     my $featuretype = $feature->type->name;
 
-    my $ankey = $ANALYSIS_GROUP ?
+    my $ankey = $GLOBAL_ANALYSIS ?
                 $ANALYSIS_GROUP :
                 $source .'_'. $featuretype;
 
     unless ($cache{analysis}{$ankey}) {
       my ($ana) = Chado::Analysis->search( name => $ankey );
-      dump_ana_contents() unless $ana;
+      dump_ana_contents($ankey) unless $ana;
       $cache{analysis}{$ankey} = $ana->id;
     }
-    dump_ana_contents() unless $cache{analysis}{$ankey};
+    dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
     print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n";
     $nextanalysisfeature++;
@@ -733,16 +733,16 @@ END
  #     }
  #     die "no cvterm for ".$featuretype unless $type;
 
-      my $ankey = $ANALYSIS_GROUP ?
+      my $ankey = $GLOBAL_ANALYSIS ?
                   $ANALYSIS_GROUP :
                   $tsource .'_'. $featuretype;
 
       unless($cache{analysis}{$ankey}) {
         my ($ana) = Chado::Analysis->search( name => $ankey );
-        dump_ana_contents() unless $ana;
+        dump_ana_contents($ankey) unless $ana;
         $cache{analysis}{$ankey} = $ana->id;
       }
-      dump_ana_contents() unless $cache{analysis}{$ankey};
+      dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
       print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n"; 
       $nextanalysisfeature++;
@@ -897,7 +897,8 @@ sub synonyms  {
 }
 
 sub dump_ana_contents {
-  print STDERR "\n\nCouldn't find $ANALYSIS_GROUP in analysis table\n";
+  my $anakey = shift;
+  print STDERR "\n\nCouldn't find $anakey in analysis table\n";
   print STDERR "The current contents of the analysis table is:\n\n";
 
   my @all_columns = Chado::Analysis->columns;
