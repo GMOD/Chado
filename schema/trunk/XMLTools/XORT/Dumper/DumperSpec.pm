@@ -65,9 +65,8 @@ my %hash_op=(
    my @array_pseudo=split(/\s+/, $hash_ddl{$TABLES_PSEUDO});
    foreach my $value(@array_pseudo){
    $hash_tables_pseudo{$value}=1;
-     print "\npseudo:$value";
-   }
 
+   }
 
   bless $self, $type;
   return $self;
@@ -258,6 +257,7 @@ my %hash_op=(
 
     my $attribute_dump=$node->getAttribute("dump");
     my @array_table_cols;
+    print "\nattribute_dump:$attribute_dump:\n" if ($DEBUG==1);
     if (!(defined $attribute_dump) || $attribute_dump eq ''){
        $attribute_dump=$DUMP_ALL;
     }
@@ -1512,7 +1512,7 @@ sub get_app_data(){
    my $node=shift;
    my $app_data_string;
    my $node_name;
-   print "\nnode_name:$node_name:\n";
+   print "\nnode_name:$node_name:\n" if ($DEBUG==1);
    if ($node->getNodeType == ELEMENT_NODE) {
       $node_name=$node->getNodeName();
       if ($node_name eq $ROOT_NODE){

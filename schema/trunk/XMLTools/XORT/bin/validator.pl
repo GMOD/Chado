@@ -10,6 +10,9 @@ use XORT::Util::GeneralUtil::Properties;
 use Getopt::Std;
 use strict;
 
+#set start time
+my $start=time();
+
 my $VALIDATION_NO_DB=0;
 my $VALIDATION_DB=1;
 
@@ -47,6 +50,9 @@ elsif ($opt{v} eq $VALIDATION_NO_DB){
    $validate_no_db_obj->validate(-validate_level=>$opt{v});
 }
 
+my $end=time();
+print "\nvalidator started:", scalar localtime($start),"\n";
+print "\nvalidator   ended:", scalar localtime($end),"\n";
 
 sub usage()
  {

@@ -84,7 +84,7 @@ sub Generate_XML {
    system("/bin/rm $file") if -e $file;
    $file=">>".$file;
    open (LOG, $file) or die "could not write to log file:$file";
-   print LOG "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- created by Pinglei Zhou, Flybase Harvard University -->\n<!--created from Database:$self->{'dbname'} using dump_spec:$dump_spec -->";
+   print LOG "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<!DOCTYPE chado SYSTEM \"/users/zhou/work/flybase/xml/chado.dtd\">\n<!-- created by Pinglei Zhou, Flybase Harvard University -->\n<!--created from Database:$self->{'dbname'} using dump_spec:$dump_spec -->";
    my $app_data=sprintf("\n<$ROOT_NODE>");
    my $temp_dumpspec;
 
@@ -121,7 +121,7 @@ sub Generate_XML {
    my @array_pseudo=split(/\s+/, $hash_ddl{$TABLES_PSEUDO});
    foreach my $value(@array_pseudo){
    $hash_tables_pseudo{$value}=1;
-     print "\npseudo:$value";
+     print "\npseudo:$value" if ($DEBUG==1);
    }
 
    # if there is dumpspec to guide the dumper, then use it
@@ -146,13 +146,13 @@ sub Generate_XML {
                    my $primary_key_string=$node_name."_primary_key";
                    my $table_id=$hash_ddl{$primary_key_string};
 
-                   print "\nstm_dumpspec:$query\n";
+                   print "\nquery_all:$query_all\n" if ($DEBUG==1);
                    my $hash_ref= $dbh->get_all_hashref($query);
-
                     foreach my $key(keys %$hash_ref){
                         my $hash_ref_sub=$hash_ref->{$key};
                         my $query_join=&_join_sql($query_all, $node_name, $$hash_ref_sub{$table_id});
                         print "\nquery_join:$query_join\n" if ($DEBUG==1);
+
                         my $hash_ref_all= $dbh->get_all_hashref($query_join);
 			foreach my $key1(keys %$hash_ref_all){
                             my $hash_ref_sub=$hash_ref_all->{$key1};
@@ -391,7 +391,7 @@ sub _table2xml(){
          my $hash_ref_sub=$dbh->get_row_hashref($stm);
 
          my $object_ref_module;
-         if (defined $nest_node && ($attribute_dump eq $DUMP_ALL ||  $attribute_dump eq $DUMP_SELECT || $attribute_dump eq $DUMP_COL) ){
+         if (defined $nest_node && ($attribute_dump eq $DUMP_ALL ||  $attribute_dump eq $DUMP_SELECT || $attribute_dump eq $DUMP_COL || $attribute_dump eq $DUMP_REF) ){
            $object_ref_module=$MODULE;
 	 }
          else {

@@ -1,97 +1,127 @@
 How to use XORT and related API
 
 1. add the env variable CodeBase to  where you gunzip the package to env,
-i.e in my case, all the code in dir /users/zhou/work/API, so I will add the
+i.e if you check out from cvs into this:/home/scott/schema/XMLTools/XORT so I will add the
 following line to .cshrc file:
 
-  setenv CodeBase /users/zhou/work/API
+  setenv CodeBase /home/scott/schema/XMLTools
 
 or for bash-likes:
 
-  export CodeBase=/users/zhou/work/API
+  export CodeBase=/home/scott/schema/XMLTools
 
-[Where in the schema/XMLTools directory structure does this correspond to, ie,
-if I have /home/scott/schema/XMLTools/XORT, what should CodeBase be? Also, is
-CodeBase used for anything other that executing the commands in this set of
-directions, ie, do I really need to set it, or can I give full path names for 
-the below commands and it still work?]
 
-2. create the ddl.properties file by running
+2. create the ddl.properties (this basically converts the ddl file which you create 
+database into some property file used by XORT modules, for chado, this will be the ddl file:
+ $CodeBase/XORT/Config/idb-full.ddl)
 
-  $ CodeBase/XORT/bin/ddl_properties_creator.pl
+$CodeBase/XORT/bin/ddl_properties_creator.pl `-d <ddl file> [-v <view file> -h]`
 
-[just executing this command gives a usage message, so there needs to be
-something else on that line.  I am guessing it should be something like
-`-d <ddl file> [-v <view file>]` but I don't really know.]
+It will create property file: $CodeBase/XORT/Config/ddl.properties
 
-[This seems to presuppose the existance of a ddl file.  From where would that
-come?  There are no ddl files in the chado directories.  If you expect users
-to create ddl files via something like `pg_dump -s` you should say so 
-explicitly.]
+Notice: 
+  If you have some view/functions which are specific to your project, and you want the 
+XORT modules can RECOGNIZE(if you have view, but just want to ignore it, then -v is optional),
+  e.g you also want to dump view into ChadoXML, or want to load some xml file with view 
+data inside, or you want to diff two chado xml file without view data,   you need to MAKE 
+one create TABLE statement for each view/function in another file(see sample file
+$CodeBase/XORT/Config/function_view.sql & function_view.ddl), this will be
+ argument -v to ddl_properties_creator.pl
 
-It will create the ddl.properties in CodeBase/XORT/Config.
+examples: 
+we have this view  for FlyBase project:
 
-Before going further, view CodeBase.XORT/Config/ddl.properties to see whether
-it makes sense, if not, normally means that your ddl file DOES NOT have same
-format as samle ddl:CodeBase/XORT/Config/idb-full.ddl.
+create or replace view prediction_evidence(prediction_evidence_id, feature_id, 
+evidence_id, analysis_id) as 
+select anchor.feature_id||':'||evloc.feature_id||':'||af.analysis_id, 
+anchor.feature_id, evloc.feature_id, af.analysis_id
+from featureloc anchor, featureloc evloc, analysisfeature af
+where anchor.srcfeature_id=evloc.srcfeature_id 
+and evloc.feature_id = af.feature_id 
+and ((evloc.fmin>=anchor.fmin and evloc.fmax<=anchor.fmax) or
+ (evloc.fmin<=anchor.fmin and evloc.fmax>=anchor.fmax)  or
+ (evloc.fmin<=anchor.fmax and evloc.fmax>=anchor.fmax) or 
+(evloc.fmin<=anchor.fmin and evloc.fmax>=anchor.fmin));
 
-[asking the user for a sanity check at this point seems a little
-pointless--how is the user to know what a valid ddl.properties file looks like?]
+if we want to dump/load/diff chado xml with prediction_evidence using XORT,
+ I will create this view.ddl
+create table prediction_evidence (
+   prediction_evidence_id varchar(50) not null,
+   primary key (prediction_evidence_id), 
+   feature_id int not null,
+   foreign key (feature_id) references feature (feature_id),
+   evidence_id int not null,
+   foreign key (evidence_id) references feature (feature_id),
+   analysis_id int not null,
+   foreign key (analysis_id) references analysis (analysis_id),
+   unique (feature_id, evidence_id, analysis_id)
+);
 
-[the following paragraph is extremely unclear--what is it I need to do?]
-
-For all view/function, you need to MAKE one create TABLE statement
-for each view/function in another file(refer to
-CodeBase/XORT/Config/function_view.sql & function_view.ddl), this will be
-argument -v to ddl_properties_creator.pl
-
+Then XORT tools will treat this view:prediction_evidence like any other tables.
 
 3. Create database properties for each database you intend to use, and put
-those file in CodeBase/XORT/Config, name format: databasename.properties,
-i.e, for chado_gadfly5, the file name will be
-CodeBase/XORT/Config/chado_gadfly5.properties
+those file in CodeBase/XORT/Config, name format: database_alias.properties,
+i.e, for alias 'fg8' , the file name will be fg5.properties
+CodeBase/XORT/Config/fg8.properties
 
-[How?  You say to create the properties, but don't show how.]
+it contains all necessary information for database connection, e.g fg8.properties contains:
 
-4. Log into the target database and execute
+db_type=postgres
+db=chado_gadfly8
+host=gonzalez.flybase.harvard.edu
+port=5432
+user=zhou
+password=*******
 
-  $ CodeBase/XORT/Config/function_view.sql
-[is this the same as $ psql <database> < CodeBase/XORT/Config/function_view.sql?]
+4. now you are ready to give a try:
+  $CodeBase/XORT/bin/dump.pl
+  $CodeBase/XORT/bin/loader.pl
+  $CodeBase/XORT/bin/validator.pl
+  $CodeBase/XORT/bin/XORTDiff.pl
 
-to synchronize the database.
 
-Here you will create the necessary view, also because the current dump from
-Berkeley didn't have featureloc.min and featureloc.max, so need to add those
-two cols, if in the future you get the dump which already implement those
-change, then you can comment those sql statement which modify featureloc
-table. Refering CodeBase/XORT/Config/function_view.sql and function_view.ddl
-for how convert function and view into ddl format.
+More on specific modules:
+1. Loader module
+   it will load chado xml into database. 
+   Norally, before loading, you may want to check whether this xml will cause any 
+   problem for loading or whether this is valid ChadoXML file. run  CodeBase/XORT/validator.pl
+   will help you debug corrut data. It will catch 99% errors. The result will be written to
+   log file CodeBase/XORT/Log/validator_input_loadfile_name.log
+  execute $CodeBase/XORT/bin/loader.pl  to try this module
 
-[what, if any of that, is general and not specific to flybase?]
+2. Dump module,
+      This module will dump objects from database into ChadoXML file. 
+ 2.1. The behavor of dumping can be guided by a dumpspec file, eg. we may nest
+    all exons within transcripts, and all transcripts within gene, or we also want 
+    to dump some evidnece to specific gene modelz(see $CodeBase/XORT/Config/dumpspec_gene.xml
+    to see what dumpspec file look like, create one for your own purpose). 
+ 2.2. sometime, we may prefer use some global ID to refer a object, ig. CG# for a object in 
+    FlyBase project, this is Project specific strategy, then you can edit this property file
+     for your own purpose:   $CodeBase/XORT/Config/config_accession.xml
+ 2.3. If you try to use 'local_id' mechanism to represent an object, the dumper
+   will use this format to represent it: 'table_name'.'_'.'primary_key', it will
+   garantee the uniqueness. However, it is not necessary at all to use this
+   format for loader, as long as its uniqueness, loader can handle it. 
+   execute $CodeBase/XORT/bin/dump.pl  to try this module
+  
 
-5. Run
+3. XORTTreeDiff module: this module will compare two ChadoXML(essential can
+   work for any XML as long as follow similar rules as ChadoXML) files. 
+  Significant different from other generic tree comparison tools is that, 
+  this is SCHEMA-AWARE comparison, that means, it only compare two objects
+  that have same identity(here means same set of unique key col(s)). 
+  There are three level of comparison: ref/all/custom
+  for custom level, edit CodeBase/XORT/Config/XORTTreeDiffConfig.xml 
+  for your project purpose.
+   execute $CodeBase/XORT/bin/XORTDiff.pl  to try this module
 
-  $ CodeBase/XORT/bin/dump.pl -h
-  $ CodeBase/XORT/bin/loader.pl -h
-  $ CodeBase/XORT/bin/validator.pl -h
 
-for how to use it. [Does this mean that these should be executed in this order
-at this point? If not, there should be a section of "Notes" that are separate
-from the numbered steps to set up the use of XORT]
 
-6. Use
 
-  $ CodeBase/XORT/Config/dumpspec_gene.xml
 
-for sample dumpspec file, and dump output from this
-dumpspec(dump_gene_local_id.xml)
 
-7. If you use global_id mechanism to refer any object, then you need create
-config file to guide the behavior of GLOBAL_ID loading/refering/autocreating.
-Put this file in CodeBase/XORT/Config/config_accession.xml
- 
-8. If you try to use 'local_id' mechanism to represent an object, the dumper
-will use this format to represent it: 'table_name'.'_'.'primary_key', it will
-garantee the uniqueness. However, it is not necessary at all to use this
-format for loader, as long as its uniqueness, loader can handle it. 
+
+
+
+
 

@@ -10,6 +10,9 @@ use XORT::Util::GeneralUtil::Properties;
 use XORT::Loader::XMLParser;
 use Getopt::Std;
 
+#set start time
+my $start=time();
+
 my %opt;
 getopts('h:d:f:d:i:b:', \%opt) or usage() and exit;
 
@@ -26,6 +29,11 @@ usage() and exit if (!$opt{d} || !$opt{f});
 
 my $parse_obj=XORT::Loader::XMLParser->new($opt{d}, $opt{f}, $opt{b});
    $parse_obj->load(-is_recovery=>$opt{i});
+
+my $end=time();
+print "\n$0 started:", scalar localtime($start),"\n";
+print "\n$0   ended:", scalar localtime($end),"\n";
+
 
 sub usage()
  {

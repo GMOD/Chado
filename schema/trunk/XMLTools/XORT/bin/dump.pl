@@ -12,6 +12,9 @@ use XORT::Util::DbUtil::DB;
 use Getopt::Std;
 use strict;
 
+#set the start time
+my $start=time();
+
 my $LOCAL_ID="local_id";
 my $NO_LOCAL_ID='xml';
 my $MODULE="module";
@@ -26,9 +29,6 @@ getopts('h:s:d:t:f:o:p:b:g:l:a:', \%opt) or usage() and exit;
 
 usage() and exit if $opt{h};
 
-foreach my $key(keys %opt){
- print "\nkey:$key, value:$opt{$key}\n";
-}
 
 usage() and exit if (!$opt{d} || !$opt{p});
 
@@ -42,6 +42,11 @@ $opt{b}=0 if !(defined $opt{b});
 
  my $xml_obj=XORT::Dumper::DumperXML->new($opt{d}, $opt{b});
 $xml_obj->Generate_XML(-tables=>$opt{t},-file=>$opt{p}, -struct_type=>$opt{s}, -format_type=>$opt{f}, -op_type=>$opt{o}, -dump_spec=>$opt{g}, -loadable=>$opt{l}, -app_data=>$opt{a});
+
+
+my $end=time();
+print "\n$0 started:", scalar localtime($start),"\n";
+print "\n$0   ended:", scalar localtime($end),"\n";
 
 
 

@@ -203,7 +203,7 @@ sub validate_db (){
      $level++;
      $hash_level_sub_detect{$level}=1;
      $element_name=$element->{'Name'};
-     print "\nstart_element:$element_name";
+     print "\nstart_element:$element_name" if ($DEBUG==1);
 
     # store the transaction information
     if (defined $hash_ddl{$element_name} && $hash_level_name{$level-1} eq $root_element){
@@ -216,11 +216,17 @@ sub validate_db (){
      my $op=$element->{'Attributes'}->{$ATTRIBUTE_OP};
      my $ref=$element->{'Attributes'}->{$ATTRIBUTE_REF};
     if ($local_id && $local_id ne ''){
-       $local_id =~ s/\&/\&amp;/g;
-       $local_id =~ s/</\&lt;/g;
-       $local_id =~ s/>/\&gt;/g;
-       $local_id =~ s/\"/\&quot;/g;
-       $local_id =~ s/\'/\&apos;/g;
+     #  $local_id =~ s/\&/\&amp;/g;
+     #  $local_id =~ s/</\&lt;/g;
+     #  $local_id =~ s/>/\&gt;/g;
+     #  $local_id =~ s/\"/\&quot;/g;
+     #  $local_id =~ s/\'/\&apos;/g;
+      $local_id=~ s/\&amp;/\&/g;
+      $local_id=~ s/\&lt;/</g;
+      $local_id=~ s/\&gt;/>/g;
+      $local_id=~ s/\&quot;/\"/g;
+      $local_id=~ s/\&apos;/\'/g;
+      $local_id=~ s/\\\\/\\/g;
       $hash_level_id{$level}=$local_id;
       $AoH_local_id[$level]{$element_name}=$local_id;
     }
@@ -229,11 +235,17 @@ sub validate_db (){
       delete $AoH_local_id[$level]{$element_name};
     }
     if ($op && $op ne ''){
-       $op =~ s/\&/\&amp;/g;
-       $op =~ s/</\&lt;/g;
-       $op =~ s/>/\&gt;/g;
-       $op =~ s/\"/\&quot;/g;
-       $op =~ s/\'/\&apos;/g;
+     #  $op =~ s/\&/\&amp;/g;
+     #  $op =~ s/</\&lt;/g;
+     #  $op =~ s/>/\&gt;/g;
+     #  $op =~ s/\"/\&quot;/g;
+     #  $op =~ s/\'/\&apos;/g;
+      $op=~ s/\&amp;/\&/g;
+      $op=~ s/\&lt;/</g;
+      $op=~ s/\&gt;/>/g;
+      $op=~ s/\&quot;/\"/g;
+      $op=~ s/\&apos;/\'/g;
+      $op=~ s/\\\\/\\/g;
        $hash_level_op{$level}=$op;
        $AoH_op[$level]{$element_name}=$op;
     }
@@ -243,11 +255,17 @@ sub validate_db (){
     }
 
     if ($ref && $ref ne ''){
-       $ref =~ s/\&/\&amp;/g;
-       $ref =~ s/</\&lt;/g;
-       $ref =~ s/>/\&gt;/g;
-       $ref =~ s/\"/\&quot;/g;
-       $ref =~ s/\'/\&apos;/g;
+     #  $ref =~ s/\&/\&amp;/g;
+     #  $ref =~ s/</\&lt;/g;
+     #  $ref =~ s/>/\&gt;/g;
+     #  $ref =~ s/\"/\&quot;/g;
+     #  $ref =~ s/\'/\&apos;/g;
+      $ref=~ s/\&amp;/\&/g;
+      $ref=~ s/\&lt;/</g;
+      $ref=~ s/\&gt;/>/g;
+      $ref=~ s/\&quot;/\"/g;
+      $ref=~ s/\&apos;/\'/g;
+      $ref=~ s/\\\\/\\/g;
        $hash_level_ref{$level}=$ref;
        $AoH_ref[$level]{$element_name}=$ref;
     }
@@ -280,7 +298,7 @@ sub validate_db (){
         # when come to subordinary table(e.g cvrelationship), and previous sibling element is not table column(if is, it alread out it)  output primary table(e.g cvterm)
        $table_name=$element_name;
        if (  defined $hash_ddl{$hash_level_name{$level-1}}){
-	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name";
+	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name"  if ($DEBUG==1);
           my  $hash_data_ref;
           # here test for 'ref' attribute
           if (defined $AoH_ref[$level-1]{$hash_level_name{$level-1}}){
@@ -350,7 +368,7 @@ sub validate_db (){
                  &create_log(\%hash_trans, $hash_ref, $hash_level_name{$level-1});
               }
            }
-           elsif ($hash_level_op{$level-1} eq 'delete'){
+           elsif ($hash_level_op{$level-1} eq $OP_DELETE){
              my $db_id_key;
 	     if ($validate_level == $validate_db){
                 $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$hash_level_name{$level-1}, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -370,8 +388,8 @@ sub validate_db (){
 	               }
 		   }
                    else {
-                       print LOG0 "\nyou try to delete a record not exist in db";
-                      &create_log(\%hash_trans, $hash_ref, $hash_level_name{$level-1});
+                       print "\nWarning:you try to delete a record not exist in db" ;
+
                    }
 		}
                 #in the local db, to see whether already delete by previous transaction or not
@@ -380,8 +398,8 @@ sub validate_db (){
                    if (defined $hash_db_id_deleted{$db_id_key}){
                        $db_id=&_check_local_db($hash_ref, $hash_level_name{$level-1});
                        if (!$db_id){
-                         print LOG0 "\nyou try to delete a record not exist in db";
-                         &create_log(\%hash_trans, $hash_ref, $hash_level_name{$level-1});
+                         print  "\nwarning:you try to delete a record not exist in db" if ($DEBUG==1);
+
 		       }
                        else {
                          $db_id_key=$hash_level_name{$level-1}.":".$db_id;
@@ -412,7 +430,7 @@ sub validate_db (){
 	       }
 	    }
           }
-          elsif ($hash_level_op{$level-1} eq 'insert'){
+          elsif ($hash_level_op{$level-1} eq $OP_INSERT){
 
              if ($validate_level == $validate_db ) {
                  $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$hash_level_name{$level-1},-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -459,7 +477,7 @@ sub validate_db (){
                  }
 	     }
           }
-          elsif ($hash_level_op{$level-1} eq 'lookup'){
+          elsif ($hash_level_op{$level-1} eq $OP_LOOKUP){
             $db_id=$replace_db_id;
             if ($validate_level == $validate_db){
                 $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$hash_level_name{$level-1},-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -501,7 +519,7 @@ sub validate_db (){
                 }
 	     }
           }
-          elsif ($hash_level_op{$level-1} eq 'force'){
+          elsif ($hash_level_op{$level-1} eq $OP_FORCE){
              my $db_id_key;
              if ($validate_level == $validate_db) {
                $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$hash_level_name{$level-1}, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -677,11 +695,11 @@ sub end_element {
   my $table_name_id=$table_name."_id";
   my $hash_ref;
 
-  print "\nend_element_name:$element_name";
+  print "\nend_element_name:$element_name" if ($DEBUG==1);
    # come to end of document
   if ($element_name eq $root_element){
     print "\n\nbingo ....you finishe validating the file,  check log file:$log_file to see the result!....\n";
-    exit(1);
+    return;
   }
 
 
@@ -707,7 +725,7 @@ sub end_element {
             if ($hash_data_ref){
                my  $hash_ref=&_data_check($hash_data_ref, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
                # here for different type of op, deal with the $hash_data_ref and return the $db_id
-               if ($hash_level_op{$level} eq 'update'){
+               if ($hash_level_op{$level} eq $OP_UPDATE){
                   my  $hash_data_ref_new=&_extract_hash($AoH_data_new[$level+1], $element_name);
                   #  my  $hash_data_ref_new=&_data_check($hash_ref_new_temp, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
                   if ($validate_level == $validate_db) {
@@ -738,15 +756,15 @@ sub end_element {
 	               }
                   }
             } # end of 'update'
-            elsif ($hash_level_op{$level} eq 'delete'){
+            elsif ($hash_level_op{$level} eq $OP_DELETE){
 	      if ($validate_level == $validate_db){
                   my $db_id_key;
                   $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
                   if (!$db_id){
                        $db_id=&_check_local_db($hash_ref, $element_name);
                        if (!$db_id){
-                           print LOG0 "\nwarning: try to delete a record that not exist in db";
-                           &create_log(\%hash_trans, $hash_ref, $element_name);
+                           print  "\nwarning: try to delete a record that not exist in db";
+
 		       }
                        else {
                            $db_id_key=$element_name.":".$db_id;
@@ -760,8 +778,7 @@ sub end_element {
                        if (defined $hash_db_id_deleted{$db_id_key}){
                            $db_id=&_check_local_db($hash_ref, $element_name);
                            if (!$db_id){
-                               print LOG0 "\nwarning: try to delete a record that not exist in db";
-                               &create_log(\%hash_trans, $hash_ref, $element_name);
+                               print "\nwarning: try to delete a record that not exist in db";
 		           }
                            else {
                                $db_id_key=$element_name.":".$db_id;
@@ -787,11 +804,10 @@ sub end_element {
 	         }
 	       }
                else {
-                 print LOG0 "\ntry to delete a record which not exist in DB";
-                       &create_log(\%hash_trans, $hash_ref, $element_name);
+                 print  "\nwarning:try to delete a record which not exist in DB";
                }
              } #end of  'delete'
-             elsif ($hash_level_op{$level} eq 'insert'){
+             elsif ($hash_level_op{$level} eq $OP_INSERT){
                   if ($validate_level == $validate_db) {
                      my $db_id_key;
                      $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -841,7 +857,7 @@ sub end_element {
                       $db_id=$replace_db_id;
                   }
              } # end of 'insert'
-             elsif ($hash_level_op{$level} eq 'lookup'){
+             elsif ($hash_level_op{$level} eq $OP_LOOKUP){
                  if ($validate_level == $validate_db){
                      my $db_id_key;
                      $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -879,7 +895,7 @@ sub end_element {
 		     }
 		 }
              } # end of 'lookup'
-             elsif ($hash_level_op{$level} eq 'force'){
+             elsif ($hash_level_op{$level} eq $OP_FORCE){
                 if ($validate_level == $validate_db){
                    my $db_id_key;
                    $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -934,8 +950,8 @@ sub end_element {
              if ($db_id){
                  $AoH_db_id[$level]{$element_name}=$db_id;
 	     }
-             print "\nend_element is $element_name table element, and sub element is col of this table";
-             print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+             print "\nend_element is $element_name table element, and sub element is col of this table"  if ($DEBUG==1);
+             print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:" if ($DEBUG==1);
           }
         }
         #for case using ref attribuate to ref object, self is still table_element. Key difference: use ref to retrieve $hash_data_ref
@@ -961,7 +977,7 @@ sub end_element {
           if ($hash_data_ref){
             my  $hash_ref=&_data_check($hash_data_ref, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
             # here for different type of op, deal with the $hash_data_ref and return the $db_id
-            if ($hash_level_op{$level} eq 'update'){
+            if ($hash_level_op{$level} eq $OP_UPDATE){
                my  $hash_data_ref_new=&_extract_hash($AoH_data_new[$level+1], $element_name);
                #  my  $hash_data_ref_new=&_data_check($hash_ref_new_temp, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
                if ($validate_level == $validate_db){
@@ -992,15 +1008,14 @@ sub end_element {
 	               }
                }
             }
-            elsif ($hash_level_op{$level} eq 'delete'){
+            elsif ($hash_level_op{$level} eq $OP_DELETE){
 	      if ($validate_level == $validate_db){
                   my $db_id_key;
                   $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
                   if (!$db_id){
                        $db_id=&_check_local_db($hash_ref, $element_name);
                        if (!$db_id){
-                           print LOG0 "\nwarning: try to delete a record that not exist in db";
-                           &create_log(\%hash_trans, $hash_ref, $element_name);
+                           print  "\nwarning: try to delete a record that not exist in db";
 		       }
                        else {
                            $db_id_key=$element_name.":".$db_id;
@@ -1014,8 +1029,7 @@ sub end_element {
                        if (defined $hash_db_id_deleted{$db_id_key}){
                            $db_id=&_check_local_db($hash_ref, $element_name);
                            if (!$db_id){
-                               print LOG0 "\nwarning: try to delete a record that not exist in db";
-                               &create_log(\%hash_trans, $hash_ref, $element_name);
+                               print  "\nwarning: try to delete a record that not exist in db";
 		           }
                            else {
                                $db_id_key=$element_name.":".$db_id;
@@ -1041,15 +1055,14 @@ sub end_element {
 	         }
 	       }
                else {
-                 print LOG0 "\ntry to delete a record which not exist in DB";
-                       &create_log(\%hash_trans, $hash_ref, $element_name);
+                 print  "\ntry to delete a record which not exist in DB";
                }
             }
-            elsif ($hash_level_op{$level} eq 'insert'){
+            elsif ($hash_level_op{$level} eq $OP_INSERT){
                print LOG0 "\nit is invalid xml to have 'insert' and 'ref' appear together";
                &create_log(\%hash_trans, $hash_ref, $element_name);
             }
-            elsif ($hash_level_op{$level} eq 'lookup'){
+            elsif ($hash_level_op{$level} eq $OP_LOOKUP){
                  if ($validate_level == $validate_db){
                      my $db_id_key;
                      $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -1079,7 +1092,7 @@ sub end_element {
 		 }
 
            }
-            elsif ($hash_level_op{$level} eq 'force'){
+            elsif ($hash_level_op{$level} eq $OP_FORCE){
                 if ($validate_level == $validate_db){
                    my $db_id_key;
                    $db_id=$dbh_obj->db_select(-data_hash=>$hash_ref, -table=>$element_name, -hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
@@ -1124,8 +1137,8 @@ sub end_element {
             if ($db_id){
                $AoH_db_id[$level]{$element_name}=$db_id;
 	    }
-               print "\nend_element is $element_name table element, and sub element is col of this table";
-               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+               print "\nend_element is $element_name table element, and sub element is col of this table" if ($DEBUG==1);
+               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:" if ($DEBUG==1);
          }
 	}
 
@@ -1134,16 +1147,16 @@ sub end_element {
            my $key=$hash_level_name{$level-2}.".".$hash_level_name{$level-1};
 	   if ($hash_level_op{$level-2} eq 'update'){
                if ($hash_level_op{$level-1} eq 'update'){
-                   $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
+                   $AoH_data_new[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
 	       }
                else {
-                   $AoH_data_new[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
+                   $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
                }
 	    }
            else {
                $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
            }
-          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:";
+          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:" if ($DEBUG==1);
 	}
    } # end of self: table element
    # self: column element
@@ -1151,7 +1164,7 @@ sub end_element {
       my $temp_foreign=$hash_level_name{$level-1}.":".$element_name."_ref_table";
       my $key=$hash_level_name{$level-1}.".".$element_name;
       my $primary_table=$hash_ddl{$temp_foreign};
-      print "\n$element_name is column_element";
+      print "\n$element_name is column_element" if ($DEBUG==1);
        #if is foreign key, and next level element is the primary table
       if ($hash_ddl{$temp_foreign} eq $hash_level_name{$level+1} && defined $hash_ddl{$temp_foreign} ne '' && (defined $hash_level_sub_detect{$level+1})){
         # my $key=$hash_level_name{$level-1}.".".$element_name;
@@ -1175,7 +1188,7 @@ sub end_element {
       # foreign key, no sub element, but have data, then it is local_id or accession, replace it  with db_id
       elsif (defined $hash_ddl{$temp_foreign} && !(defined $hash_level_sub_detect{$level+1}) &&  ((defined  $AoH_data[$level]{$key}) && ($AoH_data[$level]{$key} ne '')|| (defined  $AoH_data_new[$level]{$key}) && ($AoH_data_new[$level]{$key} ne ''))){
          #table: not update
-        if ($hash_level_op{$level-1} ne 'update'){
+        if ($hash_level_op{$level-1} ne $OP_UPDATE){
           my $hash_id_key=$hash_ddl{$temp_foreign}.":".$AoH_data[$level]{$key};
 	  if (defined $hash_id{$hash_id_key}){
               $AoH_data[$level]{$key}=$hash_id{$hash_id_key};
@@ -1199,10 +1212,10 @@ sub end_element {
                 print LOG0 "\n$element_name:$AoH_data[$level]{$key}: is not accession, or local_id:$AoH_data[$level]{$key} is not defined yet";
                # &create_log(\%hash_trans, \%hash_id , $log_file );
           }
-           print "\nend_element: self:col, table_op:not update";
+           print "\nend_element: self:col, table_op:not update"  if ($DEBUG==1);
        	}
         #table:update, col:update
-        elsif ($hash_level_op{$level-1} eq 'update' && $hash_level_op{$level} eq 'update' ){
+        elsif ($hash_level_op{$level-1} eq $OP_UPDATE && $hash_level_op{$level} eq $OP_UPDATE ){
           my $hash_id_key=$hash_ddl{$temp_foreign}.":".$AoH_data_new[$level]{$key};
 	  if (defined $hash_id{$hash_id_key}){
               $AoH_data_new[$level]{$key}=$hash_id{$hash_id_key};
@@ -1226,7 +1239,7 @@ sub end_element {
                 print LOG0 "\n$element_name:$AoH_data_new[$level]{$key} is not accession, or local_id:$AoH_data_new[$level]{$key} is not defined yet";
                 #&create_log(\%hash_trans, \%hash_id, $log_file);
           }
-          print "\nend_element: self:col, table_op:update, col_op:update";
+          print "\nend_element: self:col, table_op:update, col_op:update" if ($DEBUG==1);
         }
         #table: update, col: not upate
         else {
@@ -1256,8 +1269,8 @@ sub end_element {
           }
          print "\nend_element: self:col, table_op:update, col_op:not update";
         }
-       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}";
-       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}";
+       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}" if ($DEBUG==1);
+       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}" if ($DEBUG==1);
       }
       # foreign key, no sub element, but NO data, error .......
       elsif ($hash_ddl{$temp_foreign} ne $hash_level_name{$level+1} && $hash_ddl{$temp_foreign} ne '' && !$AoH_db_id[$level+1]{$primary_table} && ($AoH_data[$level]{$key} eq '')) {
@@ -1381,17 +1394,17 @@ sub _data_check(){
 	  }
          elsif (!(defined $hash_non_null_default{$temp[$i]})) {
 	   if (exists $hash_unique_key{$temp[$i]}){
-             print "\n\ncan not find the value for required element(unique key):$temp[$i] of table:$table from context .....";
-             &create_log(\%hash_trans, \%hash_id, $log_file);
-             #exit(1);
+             print LOG0 "\n\ncan not find the value for required element(unique key):$temp[$i] of table:$table from context .....";
+             &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
 	   }
            #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force if already exist in DB, NOT ok for insert
            else {
                my $op=$hash_level_op{$level-1};
                if ($op eq $OP_INSERT){
-                    print "\n\ncan not find the value for required element(foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
-                    &create_log(\%hash_trans, \%hash_id, $log_file);
-                    #exit(1);
+                    print LOG0 "\n\ncan not find the value for required element(foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
 	       }
                elsif ($op eq $OP_FORCE){
                   my %hash_temp;
@@ -1402,9 +1415,9 @@ sub _data_check(){
 
                   my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
                   if (!($db_id)){
-                    print "\n\n$temp[$i]: is foreign_key, unique_key, unable to retrieve from context, op is $OP_FORCE, and this record is not in DB yet";
-                    &create_log(\%hash_trans, \%hash_id, $log_file);
-                    #exit(1);
+                    print LOG0 "\n\n$temp[$i]: is foreign_key, unique_key, unable to retrieve from context, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
 
 		  }
                }
@@ -1414,16 +1427,16 @@ sub _data_check(){
       }   # end of is foreign_key, try to retrieve from context
       elsif ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && !(defined $hash_foreign_key{$temp[$i]}) && !(defined $hash_non_null_default{$temp[$i]})) {
 	if (exists $hash_unique_key{$temp[$i]}){
-          print "\n\nyou missed the required element:$temp[$i] for table:$table, also it is not foreign key";
-          &create_log(\%hash_trans, \%hash_id, $log_file);
-          exit(1);
+          print LOG0 "\n\nyou missed the required element:$temp[$i] for table:$table, also it is not foreign key";
+          &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
         }
         else {
                my $op=$hash_level_op{$level-1};
                if ($op eq $OP_INSERT){
-                    print "\n\ncan not find the value for required element(not foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
-                    &create_log(\%hash_trans, \%hash_id, $log_file);
-                    #exit(1);
+                    print LOG0 "\n\ncan not find the value for required element(not foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
 	       }
                 #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force is already exist in DB, NOT ok for insert
                elsif ($op eq $OP_FORCE){
@@ -1433,9 +1446,9 @@ sub _data_check(){
 		  }
                   my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
                   if (!($db_id)){
-                    print "\n\n$temp[$i]: not  foreign_key, unique_key, op is $OP_FORCE, and this record is not in DB yet";
-                    &create_log(\%hash_trans, \%hash_id, $log_file);
-                    #exit(1);
+                    print LOG0 "\n\n$temp[$i]: not  foreign_key, unique_key, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file) if ($DEBUG==1);
+
 
 		  }
                }
@@ -1463,12 +1476,12 @@ sub _context_retrieve(){
     for ( my $i=$level-1; $i>=0; $i--){
   #    print "\ncontext check hash_level_name:$hash_level_name_ref->{$i}";
       if ($primary_table eq $hash_level_name_ref->{$i}){
-        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}"; 
+        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}" if ($DEBUG==1); 
         $result= $AoH_db_id[$i]{$primary_table};
         last;
       }
     }
-    print "\nresult is:$result";
+    print "\nresult is:$result" if ($DEBUG==1);
     return $result;
 }
 
@@ -1575,7 +1588,7 @@ sub _get_ref_data(){
  if (defined $array_ref){
    for my $i (0..$#{$array_ref->[0]}){
         $hash_ref->{$array_table_cols[$i]}=$array_ref->[0][$i];
-        print "\nfrom ref:$table:$array_table_cols[$i]:$array_ref->[0][$i]";
+        print "\nfrom ref:$table:$array_table_cols[$i]:$array_ref->[0][$i]" if ($DEBUG==1);
    }
   return $hash_ref;
  }
@@ -1645,8 +1658,6 @@ sub create_log(){
    my $hash_trans=shift;
    my $hash_data=shift;
    my $table=shift;
-   print "\nit will use this log_file:$log_file: to recover the process if you set the -is_recovery=1";
-
 
    print LOG0 "\nsorry, for some reason, this process stop before finish the following main transaction(child of root):$hash_trans->{table}";
    foreach my $key (keys %$hash_trans){

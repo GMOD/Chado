@@ -37,7 +37,7 @@ my $GLOBAL_ID="global_id";
 my $RANK="rank";
 my @save;
 my $dumpspec_obj;
-my $global_id;
+
 my $node_path;
 my $node_table;
 my $config_acc_temp;
@@ -73,11 +73,22 @@ my $DEBUG=1;
     my $op=shift;
 
     my $table;
+my $global_id;
+my @array_op;
+    if ($op eq $OP_FORCE ){
+         @array_op=($OP_LOOKUP, $OP_INSERT);
+    }
+    else {
+         @array_op=($op);
+    }
 
-    print "\nmax rank for table feature is:", &_get_max_rank($table_input);
-    for $i(0..&_get_max_rank($table_input)){
-       &_pattern_match($table_input, $i);
-      $node_table=&_get_rank_node($table_input, $i);
+ print "\nmax rank for table $table_input is:", &_get_max_rank($table_input);
+ for $i(0..&_get_max_rank($table_input)){
+   &_pattern_match($table_input, $i);
+   for my $j (0..$#array_op){
+      $op=$array_op[$j];
+      $node_table=&_get_rank_node($table_input, $i, $op);
+      print "\nnode_name:",$node_table->getNodeName() if (defined $node_table);
       if (defined $node_table){
           my $op_config=$node_table->getAttribute($OP);
           print "\nop_config:$op_config:" if ($DEBUG==1);
@@ -85,16 +96,18 @@ my $DEBUG=1;
           my $query=$dumpspec_obj->format_sql_id($node_table);
           print "\nquery to retrieve record for global id:\n$query\n" if ($DEBUG==1);
           my $ref_array=$dbh->get_all_arrayref($query);
-          print "\nnumber of return record for this reference:",$#{$ref_array}+1 if ($DEBUG==1);
+          print "\nnumber of return record for this reference:",$#{$ref_array} if ($DEBUG==1);
           if ($#{$ref_array} <0 && ($op eq $OP_FORCE || $op eq $OP_INSERT) && ($op_config eq $OP_FORCE || $op_config eq $OP_INSERT)){
              my $node_string="<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<!DOCTYPE chado SYSTEM \"/users/zhou/work/flybase/xml/chado_stan.dtd\">\n<chado>\n".$node_table->toString()."\n</chado>";
              print "\n\nto_string:\n", $node_string;
              #print "\n\nquery:\n$query";
-             open (OUT1,'>/users/zhou/junk/chado2.xml') or "unable to open file";
+             my $file_write=">".$ENV{CodeBase}."/XORT/Log/config_accession_temp.xml";
+             my $file_read=$ENV{CodeBase}."/XORT/Log/config_accession_temp.xml";
+             open (OUT1, $file_write) or "unable to open file";
              print OUT1 $node_string;
              close(OUT1);
              print "\nstart to load the temp_chadoxml....."  if ($DEBUG==1);
-             my $parse_obj=XORT::Loader::XMLParser->new($self->{'db'}, '/users/zhou/junk/chado2.xml') if ($DEBUG==1);
+             my $parse_obj=XORT::Loader::XMLParser->new($self->{'db'}, $file_read) if ($DEBUG==1);
              $parse_obj->load(-is_recovery=>'0');
              $global_id=$dbh->get_one_value($query);
              last;
@@ -109,7 +122,10 @@ my $DEBUG=1;
              undef $global_id;
 	  }
 	}
-      }
+         return $global_id if defined $global_id;
+       }
+
+    }
 
 
   $dbh->close();
@@ -168,7 +184,7 @@ my $DEBUG=1;
     open (IN, $config_acc) or die "unable to open $config_acc";
     print "\nconfig_acc_temp:$config_acc_temp";
     my $config_acc_temp1=">".$config_acc_temp;
-    open (OUT,$config_acc_temp1) or die "unable to open file";
+    open (OUT,$config_acc_temp1) or "unable to open file";
       my $parser = new XML::DOM::Parser;
       my  $doc = $parser->parsefile ($config_acc);
       my  $root=$doc->getDocumentElement();
@@ -192,12 +208,13 @@ my $DEBUG=1;
                  undef @save;
                  $pattern=($node->getFirstChild())->getData();
                  print "\npattern:$pattern" if ($DEBUG==1);
+                 print "\nbefore match:$acc:";
                  $acc=~ /$pattern/;
-                 print "\n1:$1\t2:$2\t3:$3:\t4:$4\tacc:$acc" if ($DEBUG==1);
+                 print "\n1:$1:\t2:$2:\t3:$3:\t4:$4:\tacc:$acc:" if ($DEBUG==1);
                     push @save, "aaaa";
                     push @save, $1;
                     push @save, $2;
-                    push @save, $4;
+                    push @save, $3;
 	       }
 	       if ($node->getNodeName() eq $TABLE){
                   $table=($node->getFirstChild())->getData();
@@ -234,6 +251,7 @@ my $DEBUG=1;
  sub _get_rank_node(){
    my $table_input=shift;
    my $rank_input=shift;
+   my $op=shift;
    my $rank;
    my $table;
    my $node_table;
@@ -243,7 +261,7 @@ my $DEBUG=1;
    my $doc = $parser->parsefile ($config_acc_temp);
    my $root=$doc->getDocumentElement();
    my $nodes=$root->getElementsByTagName($GLOBAL_ID);
-   for  $i(1..$nodes->getLength()){
+   for my $i(1..$nodes->getLength()){
          my $node=$nodes->item($i-1);
         my $nodes1=$node->getChildNodes();
 	 for $j(1..$nodes1->getLength()){
@@ -254,18 +272,24 @@ my $DEBUG=1;
                $node_path=$node1 if ($node1->getNodeName() eq $PATH);
 	    }
 	 }
-         print "\ntable:$table:input_table:$table_input:node_path:", $node_path->getNodeName() if ($DEBUG==1);
+         print "\ntable:$table:input_table:$table_input:node_path:rank:$rank", $node_path->getNodeName() if ($DEBUG==1);
 	 if ($table eq $table_input && $rank_input eq $rank){
             my $nodes2=$node_path->getChildNodes();
-            for $j(1..$nodes2->getLength()){
+            for my  $j(1..$nodes2->getLength()){
                 $node_table=$nodes2->item($j-1);
                if ($node_table->getNodeType()==ELEMENT_NODE){
 		 if ($node_table->getNodeName() eq $table_input){
-                     last;
+                     my $op_config=$node_table->getAttribute($OP);
+                     print "\nop:$op, op_config:$op_config:node_name:",$node_table->getNodeName() if ($DEBUG==1);
+                     if ($op eq $op_config){
+                       # last;
+                       return $node_table;
 		 }
 	       }
 	    }
+            undef $node_table;
          }
+        }
        }
    return $node_table;
  }
