@@ -1,0 +1,116 @@
+Module: cv
+==========
+
+Chris Mungall, BDGP
+
+This module is for controlled vocabularies (CVs), semantic networks
+and/or ontologies, depending on which terminology you prefer.
+
+It is intended to be rich enough to encapsulate anything in the GO or
+OBO family of ontologies (see http://www.geneontology.org and
+http://obo.sourceforge.net). The schema reflects the datamodel of the
+Dag Edit tool currently used by these projects.
+
+This module is also intended to be extensible to richer formalisms
+such as OWL (Ontology Web Language), but this is outside the current
+requirements.
+
+Similarities to the GO Database schema
+--------------------------------------
+
+The schema is based on the GO Database schema (see
+http://www.godatabase.org/dev/database), which was also developed by
+one of the chado designers.
+
+The GO-DB schema is undergoing constant evolution to reflect the
+changing requirements of the GO and OBO community. The chado cv module
+should be more resilient to these changes.
+
+There is a "bridge" layer in the directory bridges/, which should make
+the chado cv module look like the GO DB, and vice versa. This has not
+yet undergone any testing.
+
+The GO Database developers plan to migrate their code (AmiGO &
+DAG-Edit) to the chado cv module schema.
+
+Overview
+--------
+
+An ontology, or controlled vocabulary is a collection of terms (or
+concepts, or classes, depending on your terminology). These terms are
+housed in the "cvterm" table. A term can only belong to one cv. If the
+same text string is used to describe two different concepts in two
+different cvs, then these are distinct terms.
+
+cvterms are related to one another via cvterm_relationship. This can
+be thought of as a graph, or semantic network. The relationship types
+(the labels on the arcs of the graph) are also stored in the cvterm
+table. The relationship types are extensible, but the type "is_a"
+(subtyping relationship) is assumed to be present.
+
+Most of the OBO and GO ontologies currently only have is_a and part_of
+relationships, although this could change in future.
+
+The cvterm_relationship can be thought of as specifying sentences
+about the cvterms. These sentences have 3 parts - a subject term, an
+object term, and a verb or type. For example in the sentence "exon
+is-part-of transcript" the subject of the sentence is "exon" and the
+object is "transcript". If you prefer to think of it as a DAG
+(Directed Acyclic Graph), then you can think of the subject as the
+child node, and the object as the parent node. This module is not
+limited to DAGs (we may want some relationship types to be cyclic).
+
+Often it is useful to know the "transitive closure" over a
+relationship type, or a collection of relationship types. The closure
+is the result of recursively applying the relationship. For example,
+if A is_a B, B is_a C, then the closure of is_a includes A is_a C.
+
+In particular, we want the reflexive transitive closure. A term is
+always related to itself in a reflexive closure. This makes it easier
+to ask "find me all genes of class X", and to get back genes attached
+to X and subtypes of X.
+
+The closure goes in the cvtermpath table - the closure can also be
+thought of as a path through the graph or semantic network.
+
+Associating features to cvterms
+-------------------------------
+
+This module is used by a variety of modules (eg genetic). But it is
+useful to describe here how this module would be used in the context
+of the sequence module.
+
+Often we want to attach cvterms to features. One example is typing
+features with SO - this is central to the sequence module. Each
+feature has one primary type, stored in feature.type_id
+
+We can also attach an arbitrary number of non-primary cvterms to a
+feature.
+
+For example, we may want to attach GO annotations to gene or protein
+features. We may also want to attach phenotypic terms to gene features
+(although the prefered way to do this is via a genotype using the
+genetics module).
+
+...
+
+Complex annotations
+-------------------
+
+Note that this is something that is not handled by the current GO DB,
+but it is something we may want to allow for in future.
+
+Currently in GO, all annotations are disjunctive; for example, if we have
+
+gene | GO ID
+-----+------
+foo  | GO:001
+foo  | GO:002
+foo  | GO:003
+
+
+
+See also
+--------
+
+http://www.godatabase.org/dev
