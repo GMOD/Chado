@@ -53,7 +53,7 @@ close OUT;
 
 WriteMakefile(
     'NAME'		=> 'chado',
-    'PREREQ_PM'		=> { #SQL::Translator => 0.2,
+    'PREREQ_PM'		=> { SQL::Translator => 0.02,
                              #DBI             => 0,
                              #DBD::Pg         => 0
                             }, 
@@ -61,6 +61,10 @@ WriteMakefile(
       ( # retrieve abstract from module
        AUTHOR     => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>') : ()),
 );
+
+print "-----------------------------------------------------\n";
+print "type 'make test_load' to test database table creation\n";
+print "-----------------------------------------------------\n";
 
 sub MY::postamble {
   my $uninterp =  q{
