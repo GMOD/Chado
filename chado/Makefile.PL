@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.63 2004-05-13 15:28:40 scottcain Exp $
+# $Id: Makefile.PL,v 1.64 2004-05-24 18:54:29 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -490,8 +490,8 @@ WriteMakefile(
 #          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
           'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
           'load/bin/load_ontology.PLS'   => 'load/bin/gmod_load_ontology.pl',
-          'install/conf_install.PLS'     => 'install/conf_install.pl',
-          'install/src_install.PLS'      => 'install/src_install.pl',
+          'install_util/conf_install.PLS'     => 'install_util/conf_install.pl',
+          'install_util/src_install.PLS'      => 'install_util/src_install.pl',
     },
     EXE_FILES             => [
            'load/bin/gmod_genbank2gff3.pl',
@@ -571,10 +571,10 @@ sub MY::postamble {
   my $root = "'GMOD_ROOT=$O{GMOD_ROOT}'";
   qq{
 conf_install ::
-	\$(PERL) \"$working_dir/install/conf_install.pl\" $root
+	\$(PERL) \"$working_dir/install_util/conf_install.pl\" $root
 
 src_install ::
-	\$(PERL) \"$working_dir/install/src_install.pl\"
+	\$(PERL) \"$working_dir/install_util/src_install.pl\"
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh

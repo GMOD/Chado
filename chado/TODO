@@ -1,11 +1,11 @@
 TODO for the next alpha release (SOON!)
 
 * Have things install in GMOD_ROOT:
-   - in src/  
+  DONE   - in src/  
             chado/modules
    - in doc/
             chado/READMEs, INSTALL, doc/
-   - in conf/
+  DONE - in conf/
             create gmod.conf, chado.conf
    - in examples/
             chado/data  sample data
