@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.16 2003-01-27 19:34:34 emmert Exp $
+## $Id: companalysis.sql,v 1.17 2003-02-03 18:28:48 emmert Exp $
 
 -- ================================================
 -- TABLE: analysis
@@ -63,7 +63,7 @@ create table analysis (
     queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
 
-    unique(program, programversion,sourcename)
+    unique(program, programversion, sourcename)
 );
 create index analysis_idx1 on analysis (queryfeature_id);
 
