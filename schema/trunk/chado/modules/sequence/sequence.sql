@@ -99,11 +99,16 @@ create index feature_lc_name on feature (lower(name));
 -- features eg splice sites, insertion points without
 -- an awkward fuzzy system
 
+-- Note that nbeg and nend have been replaced with fmin and fmax,
+-- which are the minimum and maximum coordinates of the feature
+-- relative to the parent feature.  By contrast,
 -- nbeg, nend are for feature natural begin/end
 -- by natural begin, end we mean these are the actual
 -- beginning (5' position) and actual end (3' position)
 -- rather than the low position and high position, as
--- these terms are sometimes erroneously used
+-- these terms are sometimes erroneously used.  To compensate
+-- for the removal of nbeg and nend from featureloc, a view
+-- based on featureloc, dfeatureloc, is provided in sequence_views.sql.
 
 create table featureloc (
        featureloc_id serial not null,
