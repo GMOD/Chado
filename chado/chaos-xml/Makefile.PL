@@ -12,7 +12,7 @@ WriteMakefile(
 	      #'VERSION_FROM' => "Bio/Chaos.pm",
 	      'PREREQ_PM'    => {
 				 'Data::Stag' => 0,
-				 'Bio::Seq'         => 0,
+				 'Bio::Seq'         => '1.5',
                                  'Graph' => 0,
 				},
 	      'EXE_FILES'    => [
