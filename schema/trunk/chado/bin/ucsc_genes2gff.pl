@@ -5,14 +5,19 @@
 use strict;
 use File::Basename 'basename';
 use Getopt::Long;
-use URI::URL;
+use URI::Escape;
+use Text::Wrap;
 
 my $executable = basename($0);
 
-my ($SRC,$ORIGIN,$ANNOTATIONS,$CENTER);
+my ($SRC,$ORIGIN,$KNOWNGENEPEP,$KNOWNGENEMRNA,$KNOWNLOCUSLINK,$KGXREF,$LOCACC,$CENTER);
 GetOptions('src:s'    => \$SRC,
 	   'origin:i' => \$ORIGIN,
-	   'annotations:s' => \$ANNOTATIONS,
+	   'kgXref:s' => \$KGXREF,
+	   'knownGenePep:s' => \$KNOWNGENEPEP,
+	   'knownGeneMrna:s' => \$KNOWNGENEMRNA,
+	   'knownLocusLink:s' => \$KNOWNLOCUSLINK,
+	   'loc2acc:s' => \$LOCACC,
 	   'center:s' => \$CENTER,
 	   ) or die <<USAGE;
 Usage: cat knownGene.txt | $0 [options]
@@ -33,10 +38,19 @@ USAGE
 
 $SRC    ||= 'UCSC';
 $ORIGIN ||= 1;
-$ANNOTATIONS ||='kgXref.txt';
+$KGXREF ||='kgXref.txt';
+$KNOWNGENEPEP ||= 'knownGenePep.txt';
+$KNOWNGENEMRNA ||= 'knownGeneMrna.txt';
+$KNOWNLOCUSLINK ||= 'knownToLocusLink.txt';
+$LOCACC ||= 'loc2acc';
 $CENTER ||= 'unigene';
 
-my $annotation = parseAnnotations($ANNOTATIONS);
+my $kgxref = parseKgXref($KGXREF);
+my $loc2acc = parseLocAcc($LOCACC); # the best way I've found so far to link Genbank mRNA accession to Genbank protein accession
+my $knowngenepep = parseKnownGenePep($KNOWNGENEPEP);
+my $knowngenemrna = parseKnownGeneMrna($KNOWNGENEMRNA);
+my $knownlocuslink = parseKnownLocusLink($KNOWNLOCUSLINK);
+# need to pull in the omim and other annotations too
 
 print "##gff-version 3\n";
 
@@ -57,14 +71,22 @@ while (<>) {
 
   # print the transcript
   print join ("\t",$chrom,$SRC,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id");
-  if(defined($annotation->{$id})){
-      foreach my $annotation_set (@{$annotation->{$id}}){
-	  foreach my $annotation_key (keys %{$annotation_set}){
-	      print ",$annotation_key=".$annotation_set->{$annotation_key};
-	  }
+  #print 
+  if(defined($kgxref->{$id})){
+      foreach my $annotation_set (keys %{$kgxref->{$id}}){
+         print ";";
+		 print "$annotation_set=", join (",", keys %{$kgxref->{$id}->{$annotation_set}});
+		 
+	  #foreach my $annotation_key (keys %{$annotation->{$id}->{$annotation_set}}){
+	  #    print "$annotation_key=", join (",", $annotation->{$id}->{$annotation_set}->{$annotation_key});
+	  #}
       }
+	  if(defined $knownlocuslink->{$id}) { print ";locuslink=", $knownlocuslink->{id}; }
+	  print "\n";
+#	  # now write out stuff for protein
+#	  if(defined ($annotation->{$id}->{protAcc})) { print join ("\t",$chrom, $SRC,'protein','.','.','.','.',"Parent=$id"); }
   }
-  print "\n";
+ # print "\n";
   #print join ("\t","dbxref=".$annotations->{$id}),"\n";
   #print Dumper($annotations->{$id});
   # now handle the CDS entries -- the tricky part is the need to keep
@@ -180,52 +202,176 @@ while (<>) {
       }
 
     }
-    print @lines;
+    print @lines;	
   }
 }
 
-=head2 parseAnnotations
- Title   : parseAnnotations
+# for protein/mrna printing
+  if (defined($kgxref) && (defined($knowngenepep) || defined($knowngenemrna))) {
+  print "##FASTA\n";
+  # now print all my lovely protein sequence
+  foreach my $protein (keys %{$knowngenepep}) {
+	print ">".$protein."\n";
+	$Text::Wrap::columns = 79;
+	print wrap('', '', $knowngenepep->{$protein});
+	print "\n";
+  }
+  # now all the mRNA sequence
+  foreach my $mrna (keys %{$knowngenemrna}) {
+	print ">".$mrna."\n";
+	$Text::Wrap::columns = 79;
+	print wrap('', '', $knowngenemrna->{$mrna});
+	print "\n";
+  }
+}
+
+=head2 parseLocAcc
+
+ Title   : parseLocAcc
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseLocAcc{
+  my $filename = shift;
+  my $annotations = {};
+  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^\#/;;
+	my @line = split /\t/;
+	$line[1] =~ /(.*)\.\d/;
+	my $gene = $1;
+	$line[4] =~ /(.*)\.\d/;
+	my $protein = $1;
+	if($protein ne '-') { $annotations->{$gene} = $protein; }
+  }
+  close ANNFILE;
+  return ($annotations);
+}
+
+
+=head2 parseKnownLocusLink
+
+ Title   : parseKnownLocusLink
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseKnownLocusLink{
+  my $filename = shift;
+  my $annotations = {};
+  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^\#/;;
+	my ($accession,$locuslink) = split /\t/;
+	$annotations->{$accession} = $locuslink;
+  }
+  close ANNFILE;
+  return ($annotations);
+}
+
+
+=head2 parseKnownGeneMrna
+
+ Title   : parseKnownGeneMrna
+ Usage   : Links mRNA sequence to mRNA.
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseKnownGeneMrna{
+  my $filename = shift;
+  my $annotations = {};
+  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^\#/;;
+	my ($accession,$sequence) = split /\t/;
+	$annotations->{$accession} = $sequence;
+  }
+  close ANNFILE;
+  return ($annotations);
+}
+
+=head2 parseKnownGenePep
+
+ Title   : parseKnownGenePep
+ Usage   : This method depends on parseLocAcc being run first so mRNA accessions can
+           be mapped to protein accessions.
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub parseKnownGenePep{
+  my $filename = shift;
+  my $annotations = {};
+  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^\#/;;
+	my ($accession,$sequence) = split /\t/;
+	#my @protAcc = keys %{$kgxref->{$accession}->{protAcc}};
+	#print @protAcc[0]."\n";
+	#$annotations->{@protAcc[0]} = $sequence;
+	$annotations->{$accession} = $sequence;
+  }
+  close ANNFILE;
+  return ($annotations);
+}
+
+
+=head2 parseKgXref
+ Title   : parseKgXref
  Usage   :
  Function:
  Example :
  Returns :
  Args    :
 =cut
-sub parseAnnotations {
+sub parseKgXref {
   my $filename = shift;
-  my %annotations;
+  my $annotations = {};
   open ANNFILE, $filename or die "Can't open file $filename\n";
   while(<ANNFILE>) {
     chomp;
     next if /^\#/;;
 	# first two are the same (genebank) followed by swissprot etc...
     my ($kgID, $mRNA, $spID, $spDisplayID, $geneSymbol, $refseq, $protAcc, $description) = split /\t/;
-	$description = new URI::URL($description)->as_string;
     my $key = "";
     if($CENTER =~ /unigene/i) { $key = $kgID; }
     else { $key = $refseq; }
-   
-    my %a = (kgID => $kgID,
-	     mRNA => $mRNA,
-	     spID => $spID,
-	     spDisplayID => $spDisplayID,
-	     geneSymbol => $geneSymbol,
-	     refseq => $refseq,
-	     protAcc => $protAcc,
-	     description => $description
-	     );
+    # escape certain fields
+    $key = uri_escape($key);
+    $description = uri_escape($description);
 
-    foreach my $k (keys %a){
-	#deletes if "defined but not true".  the cornercase here is refseq
-	#which sometimes contains a 0-length value (weird).
-	delete($a{$k}) unless $a{$k};
-    }
-
-    push @{$annotations{$key}}, \%a;
+    $annotations->{$key}->{kgID}->{$kgID} = 1                if $kgID;
+    $annotations->{$key}->{mRNA}->{$mRNA} = 1                if $mRNA;
+    $annotations->{$key}->{spID}->{$spID} = 1                if $spID;
+    $annotations->{$key}->{spDisplayID}->{$spDisplayID} = 1  if $spDisplayID;
+    $annotations->{$key}->{geneSymbol}->{$geneSymbol} = 1    if $geneSymbol;
+    $annotations->{$key}->{refseq}->{$refseq} = 1            if $refseq;
+    $annotations->{$key}->{protAcc}->{$protAcc} = 1          if $protAcc;
+    $annotations->{$key}->{description}->{$description} = 1  if $description;
   }
   close ANNFILE;
-  return(\%annotations);
+  return($annotations);
 }
 
 
