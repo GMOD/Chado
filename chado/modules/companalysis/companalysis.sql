@@ -79,14 +79,14 @@ create table analysisprop (
     primary key (analysisprop_id),
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
-    pkey_id int not null,
-    foreign key (pkey_id) references cvterm (cvterm_id),
-    pval text,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    value text,
 
-    unique(analysis_id, pkey_id, pval)
+    unique(analysis_id, type_id, value)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
-create index analysisprop_idx2 on analysisprop (pkey_id);
+create index analysisprop_idx2 on analysisprop (type_id);
 
 
 -- ================================================

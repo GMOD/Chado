@@ -71,9 +71,9 @@ CREATE RULE "_RuleD_term_definition" AS
 CREATE VIEW term2term AS
 SELECT
  cvrelationship_id AS id,
- reltype_id        AS relationship_type_id,
- objterm_id        AS term1_id,
- subjterm_id       AS term2_id
+ type_id        AS relationship_type_id,
+ object_id        AS term1_id,
+ subject_id       AS term2_id
 FROM cvrelationship;
 
 CREATE RULE "_RuleI_term2term" AS
@@ -81,9 +81,9 @@ CREATE RULE "_RuleI_term2term" AS
  DO INSTEAD
   INSERT INTO cvrelationship
   (
-   reltype_id,
-   objterm_id,
-   subjterm_id)
+   type_id,
+   object_id,
+   subject_id)
   VALUES
   (
    NEW.relationship_type_id, 
@@ -96,9 +96,9 @@ CREATE RULE "_RuleU_term2term" AS
  DO INSTEAD
   UPDATE cvrelationship
   SET
- reltype_id        = NEW.relationship_type_id,
- objterm_id        = NEW.term1_id,
- subjterm_id       = NEW.term2_id
+ type_id        = NEW.relationship_type_id,
+ object_id        = NEW.term1_id,
+ subject_id       = NEW.term2_id
   WHERE cvrelationship_id = OLD.id;
 
 CREATE RULE "_RuleD_term2term" AS
@@ -113,8 +113,8 @@ CREATE VIEW graph_path AS
 SELECT
  cvpath_id AS id,
  NULL              AS relationship_type_id,
- objterm_id        AS term1_id,
- subjterm_id       AS term2_id,
+ object_id        AS term1_id,
+ subject_id       AS term2_id,
  pathdistance      AS distance
 FROM cvpath;
 
@@ -123,9 +123,9 @@ CREATE RULE "_RuleI_graph_path" AS
  DO INSTEAD
   INSERT INTO cvpath
   (
-   reltype_id,
-   objterm_id,
-   subjterm_id,
+   type_id,
+   object_id,
+   subject_id,
    pathdistance)
   VALUES
   (
@@ -140,9 +140,9 @@ CREATE RULE "_RuleU_graph_path" AS
  DO INSTEAD
   UPDATE cvpath
   SET
- reltype_id        = NULL,
- objterm_id        = NEW.term1_id,
- subjterm_id       = NEW.term2_id,
+ type_id        = NULL,
+ object_id        = NEW.term1_id,
+ subject_id       = NEW.term2_id,
  pathdistance      = NEW.distance
   WHERE cvpath_id = OLD.id;
 

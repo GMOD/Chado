@@ -5,7 +5,7 @@
 create table organism (
 	organism_id serial not null,
 	primary key (organism_id),
-	abbrev varchar(255) null,
+	abbreviation varchar(255) null,
 	genus varchar(255) not null,
 	species varchar(255) not null,
 	common_name varchar(255) null,
@@ -50,13 +50,13 @@ create table organismprop (
        primary key (organismprop_id),
        organism_id int not null,
        foreign key (organism_id) references organism (organism_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null default '',
-       prank int not null default 0,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       value text not null default '',
+       rank int not null default 0,
 
-       unique(organism_id, pkey_id, pval, prank)
+       unique(organism_id, type_id, value, rank)
 );
 create index organismprop_idx1 on organismprop (organism_id);
-create index organismprop_idx2 on organismprop (pkey_id);
+create index organismprop_idx2 on organismprop (type_id);
 
