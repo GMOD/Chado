@@ -22,6 +22,8 @@ use Getopt::Long;
 use Term::ProgressBar;
 use File::Temp qw(tempfile);
 
+use constant DEBUG => 0;
+
 $| = 1;
 
 =head1 NAME
@@ -899,24 +901,31 @@ qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?}
                 $f->update;
                 $f->dbi_commit;
 
+                $progress->message("copying Bio::Seq sequence to simple scalar variable") if DEBUG;
                 my $dna       = $seq->seq;
                 undef $seq;                     #get this thing out of here ASAP, it's using memory
+                $progress->message("copied.  Bio::Seq object purged to conserve memory") if DEBUG;
 
                 my $shredsize = 100_000_000;    #don't increase this...
                 my $offset    = 0;
                 my $dnalen    = length($dna);
 
                 while ( $offset < $dnalen ) {
+                    $progress->message("loading shred.  offset: $offset bp") if DEBUG;
                     my $shred = substr( $dna, $offset, $shredsize );
                     $progress->message("${offset}bp loaded") if $offset > 0;
                     $sth->execute( $shred, $f->id );
+                    $progress->message("loaded shred") if DEBUG;
 
                     $offset += $shredsize;
                 }
 
                 $progress->message("${dnalen}bp loaded");
                 $f->update;
+
+                $progress->message("pre dbi_commit") if DEBUG;
                 $f->dbi_commit;
+                $progress->message("post dbi_commit") if DEBUG;
 
             }
             $seqs_loaded++;
