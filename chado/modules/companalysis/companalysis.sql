@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.9 2002-11-13 02:35:52 cmungall Exp $
+## $Id: companalysis.sql,v 1.10 2002-11-20 18:45:02 cmungall Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -7,22 +7,34 @@
 # were instantiated over differnet query sequences, there would
 # be multiple entries here.
 #
-# the sequence that was used as the query sequence can be
-# optionally included via queryfeature_id - even though this
-# is redundant with the hitpair table below. this can still
-# be useful - for instance, we may have an analysis that blasts
-# contigs against a database. we may then transform those hits
-# into global coordinates; it can still be useful to keep a record
-# of which contig was blasted as the query.
+# name: 
+#   a way of grouping analyses. this should be a handy
+#   short identifier that can help people find an analysis they
+#   want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
+#   it should not be assumed to be unique. for instance, there may
+#   be lots of seperate analyses done against a cDNA database.
 #
-# name: a way of grouping analyses. this should be a handy
-# short identifier that can help people find an analysis they
-# want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
+# program: 
+#   e.g. blastx, blastp, sim4, genscan
 #
-# program: e.g. blastx, blastp, sim4, genscan
-# programversion: e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]
-# algorithm: eg blast
-# sourcename: eg cDNA, SwissProt
+# programversion:
+#   e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]
+#
+# algorithm:
+#   e.g. blast
+#
+# sourcename: 
+#   e.g. cDNA, SwissProt
+#
+# queryfeature_id:
+#   the sequence that was used as the query sequence can be
+#   optionally included via queryfeature_id - even though this
+#   is redundant with the tables below. this can still
+#   be useful - for instance, we may have an analysis that blasts
+#   contigs against a database. we may then transform those hits
+#   into global coordinates; it may be useful to keep a record
+#   of which contig was blasted as the query.
+#
 #
 # MAPPING (bioperl): maps to Bio::Search::Result::ResultI
 
@@ -32,6 +44,7 @@
 #   analysis. The idea is that someone could recreate the analysis
 #   directly by going to this URI and fetching the source data
 #   (eg the blast database, or the training model).
+
 create table analysis (
     analysis_id serial not null,
     primary key (analysis_id),
@@ -63,64 +76,104 @@ create table analysisprop (
     timelastmod timestamp not null default current_timestamp
 );
 
-# An analysis result covers anything that comes out of an analysis,
-# is scorable, and can be locatable on one or more features.
+
+# computational analyses generate features (eg genscan generates
+# transcripts and exons; sim4 alignments generate transcripts and
+# exons; blastx generates CDS/ORFs and coding exons; VISTA generates
+# syntenic-region features; interpro generates protein structure
+# features). These features have two important
+# characteristics - they are scored, and they need to be grouped
+# together (eg in the case of alignments). The scoredset table
+# is used to represent this grouping.
 #
-# analysisresults are different from features in that:
-# - they may have multiple locations (eg in pairwise or multi alignments)
-# - they are managed differently; they don't have stable accessions;
-#   they aren't edited/curated, they are simply bulkloaded deleted or
-#   replaced
-# - they have scores as a fundamental defining property
-#
-# furthermore, storing analysisresults as features could
-# risk overpopulating the feature table
-#
-# analysisresults are hierarchically composed - the parentresult_id
-# points to another analysisresult.
+# score is not an attribute of the feature itself, it is an
+# attribute of the set, which is why it is in this table.
 # 
-# most analyses produce two level hierarchies; for example,
-# blast hits and blast HSPs. genscan genes and genscan exons.
-# however, it is conceivable that there could be more than 2.
-# for instance, gene finders that find alternate spliceforms.
-# this table allows for an arbitrary number of levels in the
-# compositional hierarchy.
+# do a natural join between scoredset, scoredset_feature (see below)
+# and feature to get the grouping relationship.
 #
-# chado instantiations may have a policy that a max of 2 levels
-# is allowed - this makes applications job of querying the database
-# much simpler. alternate spliceforms could be represented as
-# unconnected transcripts.
+# example scoredsets can represent:
 #
-# results are also typed by a controlled vocabulary. this is assumed
-# to be SO, although any feature type ontology would work. in the
-# case of a prediction, the type would be the type of the feature
-# predicted - gene, exon, UTR, tRNA, promoter, etc.
-# in the case of an alignment, the type is determined by the sequence
-# aligned. aligning cDNA sequence will have features of type 'transcript'
-# and 'exon'. becuase this is an analysisresult and not a feature, there
-# is no danger of confusing curated gene models with aligned gene features.
-# what about aligning ESTs? the parent type would be something like
-# 'transcript fragment' or even 'EST'??? Question for SO.
-# for interpro analysis, the type would be a protein feature type,
-# such as 'domain' (not the actual interpro structural class - this
-# would be a cvterm attached to the interpro feature).
-# what about blastp? i guess both parent and child features would be
-# of type 'protein'
-# 
-# scores can be attached at any level in the hierarchy.
+#  Blast hits - in which case they group two features together
+#  Blast HSPs - in which case they group two features together
 #
-# scores:
-# <see note>
-create table analysisresult (
-    analysisresult_id serial not null,
-    primary key (analysisresult_id),
-    analysis_id int not null,
+#  Genscan exons - in which case they hold one feature
+#  Genscan transcripts - in which case they hold one feature
+#
+#  Clustal sets - in which case they group N protein features together
+#  Clustal blocks - in which case they group N sub-protein features together
+#
+#  Note that the main biological information goes in the feature and
+#  feature_relationship tables. 
+#
+#  Example: For instance, aligning genomic to cDNA
+#  would give one transcript containing n exons located on the genomic sequence,
+#  (these would be anonymous features, they have no name or dbxref), and one
+#  transcript containing n exons for the subject alignment. the subject
+#  transcript would have a name and dbxref sourced from the FASTA dataset used,
+#  and would have no location. The subject exons would be anonymous, and would
+#  be located relative to the transcript.
+#  There would be one scoredset, representing the hit, linking the two
+#  transcripts, and n scoredsets, representing the HSPs, linking the exons.
+#  Note that the scoredset table can be ignored, and we can still fetch
+#  transcripts and exons from the db as normal features.
+#
+#  analysis_id:
+#    scoredsets are grouped into analyses
+#
+#  rawscore:
+#    this is the native score generated by the program; for example,
+#    the bitscore generated by blast, sim4 or genscan scores.
+#    one should not assume that high is necessarily better than low.
+#
+#  normscore:
+#    this is the rawscore but semi-normalized. complete normalization
+#    to allow comparison of features generated by different programs
+#    would be nice but too difficult. instead the normalization should
+#    strive to enforce the following semantics:
+#
+#    * normscores are floating point numbers >= 0
+#    * high normscores are better than low one.
+#
+#    for most programs, it would be sufficient to make the normscore
+#    the same as this rawscore, providing these semantics are
+#    satisfied.
+#
+#  significance:
+#    this is some kind of expectation or probability metric,
+#    representing the probability that the scoredset would appear
+#    randomly given the model.
+#    as such, any program or person querying this table can assume
+#    the following semantics:
+#     * 0 <= significance <= n, where n is a positive number, theoretically
+#       unbounded but unlikely to be more than 10
+#     * low numbers are better than high numbers.
+#
+#  note that these 3 metrics do not cover the full range of scores
+#  possible; it would be undesirable to list every score possible, as
+#  this should be kept extensible. instead, for non-standard scores, use
+#  the scoredsetprop table.
+#
+#  parentscoredset_id:
+#    scoredsets are arranged hierarchically; each scoredset points to
+#    its parents (e.g. HSPs point to Hits). The top level scoredset (eg Hit)
+#    is null. note that this is usually redundant information, as the hierarchy
+#    is obtainable from the feature graph of the computed features. however it
+#    is included for two reasons: convenience of querying (at a possible risk
+#    of redundancy), and to allow for hierarchical clustering - for instance,
+#    representing a tree where the root nodes are proteins, and the proteins are
+#    grouped into a tree. Perhaps this is too limiting; for example, it does
+#    not allow unrooted trees. There is a case for removing this field
+#    altogether and dealing with trees in a seperate table.
+#
+create table scoredset (
+    scoredset_id serial not null,
+    primary key (scoredset_id),
+    analysis_id int,
     foreign key (analysis_id) references analysis (analysis_id),
 
-    parentresult_id int,
-    foreign key (parentresult_id) references analysisresult (analysisresult_id),
-    type_id int,
-    foreign key (type_id) references cvterm (cvterm_id),
+    parentscoredset_id int,
+    foreign key (parentscoredset_id) references scoredset (scoredset_id),
 
     rawscore double precision,
     normscore double precision,
@@ -129,78 +182,78 @@ create table analysisresult (
     timeentered timestamp not null default current_timestamp
 );
 
-# note: resultlocation does not have a primary key; this is fine
-# as we don't want to attach any extra information to it.
+# links a scoredset to the contained features
 #
-# any analysisresult can have multiple locations.
+# alignment is a string representing the residue substitutions
+# that need to be made to map to other features in the set. this
+# should only be instantiated for leaf features in the feature
+# graph (for example, with HSP-contained features, but not 
+# hit-contained features)
 #
-# prediction type results (eg genscan) will only have ONE location
-# (note that a prediction of a gene with multiple exons is stored as
-#  multiple exon results plus one parent result)
+# set  align feature.residues
+# 1    A-T-G  ATG
+# 2    A-TCG  ATCG
+# 3    AGTC-  AGTC
 #
-# alignment / pairwise similarity data will have two locations, one
-# on the query, one on the subject.
-# (again - one blast hit with multiple HSPs is stored as one
-#  analysisresult per HSP plus one for the hit)
+# this can be used in conjunction with the feature locations
+# to build a residue to residue mapping betwen features
 #
-# multiple alignments will have multiple locations
+# OPEN QUESTION: should we make the constraints tighter,
+# and force unique(feature_id)? - this makes sure every
+# computed feature comes from one scoredset only
 #
-# the "rank" field is used to store the ordering of the locations
-# across the different sequences the locations are on. for predictions,
-# this will always be 0. We use 0 to mean the reference/query sequence
-# in an analysis.
-#
-# in a pairwise result, the rank will be 0 or 1, depending on whether
-# the location is for the query or subject portion of the HSP/Hit.
-# (Note that this means the database is NON reference-genome-centric)
-#
-# in a multiple alignment, the rank will be 0 to n-1 sequences;
-# there is no semantics to the rank, but presumably the order of
-# sequences analysed should be preserved.
-#
-# please read the docs in the feature module on locations - the
-# same applies here. interbase and (end - start) * strand >= 0.
-#
-# all locations are on a feature - we must instantiate a feature
-# for any sequence aligned. this feature may be a sequence floating
-# in space, or it may be localised, in which case it will have all
-# the normal properties of a feature. this is a good thing, as
-# we can attach all kinds of feature-like properties to the thing
-# that is aligned.
-#
-# the alignment string can also be optionally stored; this can be
-# used to reconstuct an actual residue to residue mapping
-#
-# we use the same definition of 'phase' as in GFF2;
-# see http://www.sanger.ac.uk/Software/formats/GFF/GFF_Spec.shtml
-#
-create table resultlocation (
-       analysisresult_id int,
-       foreign key (analysisresult_id) references analysisresult (analysisresult_id),
-       fnbeg int,
-       fnend int,
-       strand smallint,
-       source_feature_id int not null,
-       foreign key (source_feature_id) references feature (feature_id),
+create table scoredset_feature (
+    scoredset_feature_id serial not null,
+    primary key (scoredset_feature_id),
 
-       alignment text,
+    scoredset_id int not null,
+    foreign key (scoredset_id) references scoredset (scoredset_id),
 
-       rank int not null,
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id),
 
-       phase smallint,
+    alignment text,
 
-       unique (analysisresult_id, fnbeg, fnend, strand),
-       unique (analysisresult_id, rank)
+    unique (scoredset_id, feature_id)
 );
 
-# analysisresults can have properties attached to them
-create table resultprop (
-    analysisresult_id int not null,
-    foreign key (analysisresult_id) references analysisresult (analysisresult_id),
+# scoredsets can have various properties attached - eg non-standard
+# scoring metrics. see the scoredset table for a discussion of
+# the 3 scoring metrics that should NOT be included in here
+
+create table scoredsetprop (
+    scoredset_id int not null,
+    foreign key (scoredset_id) references scoredset (scoredset_id),
     pkey_id int not null,
     foreign key (pkey_id) references cvterm (cvterm_id),
-    pval text
+    pval text,
+
+    timeentered timestamp not null default current_timestamp,
+    timelastmod timestamp not null default current_timestamp
 );
 
-
-
+# OPEN QUESTION:
+# should variation features (eg SNPs, P insertions, aberrations, deletions,...)
+# be treated as standard features located on the wild genome (with residues
+# equivalent to the residues in the mutant - ie location + residues gives the
+# edit instructions to go wild->mutant), 
+# OR should we use the tables above (even though it isn't scored) to link
+# the variation features in each genome (wild, mutants).
+# The former is better and we are not instantiating mutant genomes, we just
+# want edits. the latter is better if we are instantiating mutant genomes,
+# as we want to group the features together.
+# same pattern as gene table: the gene table is a set of similar features
+# just like a scoredset! exactly the same pattern. in this pattern, main
+# data goes in wildtype, mutant can be inferred. same for snp?
+# not quite the same as an alignment; eg for P insert
+#
+# mut  -----------------=====--------------
+#                       \   /
+#                        \ /
+#                         V
+#                         |
+# wild -------------------+----------------
+#
+# not really an alignment between two genomes; better to represent as
+# P insertion feature on wild, with P elt sequence, and if we instantiate
+# mut, as P elt (eg just like transposons in wild); then represent set.
