@@ -8,6 +8,8 @@ use Chado::AutoDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 
+use constant DEBUG=>0;
+
 #######################################
 # COPYRIGHT
 #######################################
@@ -98,7 +100,7 @@ my $relfact = Bio::Ontology::RelationshipFactory->new();
 #decide what format we need.  simple indented file or DAG-Edit ?
 my $format = $ontname =~ 'eVOC' ? 'simplehierarchy' : 'so';
 
-#warn "starting parser...\n";
+warn "starting parser...\n" if DEBUG;
 my $parser = Bio::OntologyIO->new(
 			  -term_factory => $termfact,
 			  -format => $format,
@@ -115,11 +117,11 @@ my %allrels;
 #parse the ontologies
 while (my $ont = $parser->next_ontology()) {
 
-#  warn "parsing ontology...\n";
+warn "parsing ontology...\n" if DEBUG;
   $ont->relationship_factory($relfact);
-#  warn "...terms...\n";
+  warn "...terms...\n" if DEBUG;
   load_ontologyterms($ont);
-#  warn "...relationships...\n";
+  warn "...relationships...\n" if DEBUG;
   load_ontologyrels($ont);
 
 }
@@ -131,14 +133,14 @@ while (my $ont = $parser->next_ontology()) {
 sub load_ontologyterms{
   my $ontref = shift;
 
-#  warn "in loading term\n";
+  warn "in loading term\n" if DEBUG;
 
   my @predicates = $ontref->get_predicate_terms();
   my @roots = $ontref->get_root_terms();
 
   #load edge terms
   foreach my $predicate (@predicates) {
-#	print STDERR "this is a predicate: ", $oborelmap{ predmap($predicate->name) }, "\n";
+	warn "this is a predicate: ", $oborelmap{ predmap($predicate->name) }, "\n" if DEBUG;
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
 	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
@@ -198,7 +200,7 @@ sub load_ontologytermsR {
   my @children = $ontref->get_child_terms($parent);
   foreach my $child (@children) {
 	if (!(exists $allterms{$child->name})) {
-#	  print "$tab", $child->name , "\n";
+	  warn  "$tab", $child->name , "\n" if DEBUG;
 
 	  my $dbxref = Chado::Dbxref->find_or_create({
 												  db_id => $db->id,
@@ -242,7 +244,7 @@ sub load_ontologyrels {
 
 
 	if(!defined $pred_id){
-#		warn "pred! ".$pred->name;
+		warn "pred! ".$pred->name if DEBUG;
 		$skip++;
 	}
 
@@ -250,8 +252,8 @@ sub load_ontologyrels {
 
 	  $allrels{$obj->name . $subj->name . $pred->name} = $relationship;
 
-#	  warn "subj! ".$subj->name and $skip++ unless defined $subj_id;
-#	  warn "obj!  ".$obj->name  and $skip++ unless defined $obj_id;
+	  warn "subj! ".$subj->name and $skip++ unless defined $subj_id; # if DEBUG;
+	  warn "obj!  ".$obj->name  and $skip++ unless defined $obj_id; # if DEBUG;
 
 	  next if $skip;
 
