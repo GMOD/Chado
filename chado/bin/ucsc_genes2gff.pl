@@ -13,18 +13,13 @@ use Data::Dumper;
 
 my $executable = basename($0);
 
-my ($SRC,$ORIGIN,$KNOWNGENEPEP,$KNOWNGENEMRNA,$KNOWNLOCUSLINK,$GENBANK,$KGXREF,$LOCACC,$CENTER);
-GetOptions('src:s'    => \$SRC,
-	   'origin:i' => \$ORIGIN,
-	   'kgXref:s' => \$KGXREF,
-	   'knownGenePep:s' => \$KNOWNGENEPEP,
-	   'knownGeneMrna:s' => \$KNOWNGENEMRNA,
-	   'knownLocusLink:s' => \$KNOWNLOCUSLINK,
-	   'genbank:s' => \$GENBANK,
-	   'loc2acc:s' => \$LOCACC,
-	   'center:s' => \$CENTER,
-	   ) or die <<USAGE;
-Usage: cat knownGene.txt | $0 [options]
+my ($SRCDB,$ORIGIN,$ANNOTATIONS,$CENTER);
+GetOptions('srcdb:s'       => \$SRCDB,
+           'origin:i'      => \$ORIGIN,
+           'annotations:s' => \$ANNOTATIONS,
+           'center:s'      => \$CENTER,
+          ) or die <<USAGE;
+Usage: $0 [options]
 
 Convert UCSC Genome Browser-format gene files into GFF3 version files.
 Only the gene IDs and their locations come through.  You have to get
@@ -33,22 +28,23 @@ as additional application-specific gff tags.
 
 Options:
 
-    -src         <string>   Choose a source for the gene, default "UCSC"
+    -srcdb       <string>   Choose a source for the gene, default "UCSC"
     -origin      <integer>  Choose a relative position to number from, default is "1"
-    -annotations <file>     Annotations file
+    -annotations <dir>      Directory containing UCSC annotation files
     -center      <string>   ???
 
 USAGE
 
-$SRC    ||= 'UCSC';
-$ORIGIN ||= 1;
-$KGXREF ||='kgXref.txt';
-$KNOWNGENEPEP ||= 'knownGenePep.txt';
-$KNOWNGENEMRNA ||= 'knownGeneMrna.txt';
-$KNOWNLOCUSLINK ||= 'knownToLocusLink.txt';
-$GENBANK ||= 'genbank2accessions.txt';
-$LOCACC ||= 'loc2acc';
-$CENTER ||= 'unigene';
+$SRCDB           ||= 'UCSC';
+my $CENTER       ||= 'unigene';
+$ORIGIN          ||= 1;
+my $KGXREF         = $ANNOTATIONS.'/kgXref.txt';
+my $KNOWNGENE      = $ANNOTATIONS.'/knownGene.txt';
+my $KNOWNGENEPEP   = $ANNOTATIONS.'/knownGenePep.txt';
+my $KNOWNGENEMRNA  = $ANNOTATIONS.'/knownGeneMrna.txt';
+my $KNOWNLOCUSLINK = $ANNOTATIONS.'/knownToLocusLink.txt';
+my $GENBANK        = $ANNOTATIONS.'/genbank2accessions.txt';
+my $LOCACC         = $ANNOTATIONS.'/loc2acc';
 
 my $mrna2protein = parseGenbank($GENBANK);
 my $kgxref = parseKgXref($KGXREF);
@@ -60,7 +56,8 @@ my $knownlocuslink = parseKnownLocusLink($KNOWNLOCUSLINK);
 
 print "##gff-version 3\n";
 
-while (<>) {
+open(KG,$KNOWNGENE) or die "couldn't open('$KNOWNGENE'): $!";
+while (<KG>) {
   chomp;
   next if /^\#/;;
   my ($id,$chrom,$strand,$txStart,$txEnd,$cdsStart,$cdsEnd,$exons,$exonStarts,$exonEnds) = split /\t/;
@@ -76,146 +73,144 @@ while (<>) {
   $cdsEnd   -= $ORIGIN;
 
   # print the transcript
-  print join ("\t",$chrom,$SRC,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id");
-  #print 
-  if(defined($kgxref->{$id})){
-      foreach my $annotation_set (keys %{$kgxref->{$id}}){
-         print ";";
-		 print "$annotation_set=", join (",", keys %{$kgxref->{$id}->{$annotation_set}});
+  print join ("\t",$chrom,$SRCDB,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id;");
+  if(defined($kgxref->{$id})) {
+    foreach my $annotation_set (keys %{$kgxref->{$id}}) {
+      print "$annotation_set=". join (",", keys %{$kgxref->{$id}->{$annotation_set}}) .';';
 		 
-	  #foreach my $annotation_key (keys %{$annotation->{$id}->{$annotation_set}}){
-	  #    print "$annotation_key=", join (",", $annotation->{$id}->{$annotation_set}->{$annotation_key});
-	  #}
-      }
-	  if(defined $knownlocuslink->{$id}) { print ";locuslink=", $knownlocuslink->{id}; }
-	  print "\n";
-#	  # now write out stuff for protein
-	  my @protGenBank = keys (%{$kgxref->{$id}->{protein}});
-	  my $protGenBank = $protGenBank[0];
-	  if(defined ($protGenBank)) { print join ("\t",'.', $SRC,'protein','.','.','.','.',"ID=$protGenBank;Parent=$id"), "\n"; }
+    }
+    if(defined $knownlocuslink->{$id}) {
+      print "db:locus=", $knownlocuslink->{$id};
+    }
+
+    print "\n";
+
+    # now write out stuff for protein
+
+    my @protGenBank = keys (%{$kgxref->{$id}->{'db:genbank:protein'}});
+    my $protGenBank = $protGenBank[0];
+
+    if(defined ($protGenBank)) {
+      print join ("\t",'.', $SRCDB,'protein','.','.','.','.',"ID=$protGenBank;Parent=$id"), "\n";
+    }
   }
- # print "\n";
-  #print join ("\t","dbxref=".$annotations->{$id}),"\n";
-  #print Dumper($annotations->{$id});
+
   # now handle the CDS entries -- the tricky part is the need to keep
   # track of phase
   my $phase = 0;
   my @exon_starts = map {$_-$ORIGIN} split ',',$exonStarts;
   my @exon_ends   = map {$_-$ORIGIN} split ',',$exonEnds;
 
-  if ($strand eq '+') {
-    for (my $i=0;$i<@exon_starts;$i++) {
+  if($strand eq '+') {
+    for(my $i=0;$i<scalar(@exon_starts);$i++) {
       my $exon_start = $exon_starts[$i] + 1;
       my $exon_end   = $exon_ends[$i];
       my ($utr_start,$utr_end,$cds_start,$cds_end);
 
-      if ($exon_start < $cdsStart) { # in a 5' UTR
-	$utr_start = $exon_start;
-      } elsif ($exon_start > $cdsEnd) {
-	$utr_start = $exon_start;
+      if($exon_start < $cdsStart) { # in a 5' UTR
+        $utr_start = $exon_start;
+      } elsif($exon_start > $cdsEnd) {
+        $utr_start = $exon_start;
       } else {
-	$cds_start = $exon_start;
+        $cds_start = $exon_start;
       }
 
-      if ($exon_end < $cdsStart) {
-	$utr_end = $exon_end;
-      } elsif ($exon_end > $cdsEnd) {
-	$utr_end = $exon_end;
+      if($exon_end < $cdsStart) {
+        $utr_end = $exon_end;
+      } elsif($exon_end > $cdsEnd) {
+        $utr_end = $exon_end;
       } else {
-	$cds_end = $exon_end;
+        $cds_end = $exon_end;
       }
 
-      if ($utr_start && !$utr_end) { # half in half out on 5' end
-	$utr_end   = $cdsStart - 1;
-	$cds_start = $cdsStart;
-	$cds_end   = $exon_end;
+      if($utr_start && !$utr_end) { # half in half out on 5' end
+        $utr_end   = $cdsStart - 1;
+        $cds_start = $cdsStart;
+        $cds_end   = $exon_end;
       }
 
-      if ($utr_end && !$utr_start) { # half in half out on 3' end
-	$utr_start = $cdsEnd + 1;
-	$cds_end   = $cdsEnd;
-	$cds_start = $exon_start;
+      if($utr_end && !$utr_start) { # half in half out on 3' end
+        $utr_start = $cdsEnd + 1;
+        $cds_end   = $cdsEnd;
+        $cds_start = $exon_start;
       }
 
       die "programmer error, utr_start and no utr_end" unless defined $utr_start == defined $utr_end;
       die "programmer error, cds_start and no cds_end" unless defined $cds_start == defined $cds_end;
 
-      if (defined $utr_start && $utr_start <= $utr_end && $utr_start < $cdsStart) {
-#	print join ("\t",$chrom,$SRC,"5'-UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
-	print join ("\t",$chrom,$SRC,"five_prime_UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
+      if(defined $utr_start && $utr_start <= $utr_end && $utr_start < $cdsStart) {
+        print join ("\t",$chrom,$SRCDB,"five_prime_UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
       }
 
-      if (defined $cds_start && $cds_start <= $cds_end) {
-	print join ("\t",$chrom,$SRC,'CDS',$cds_start,$cds_end,'.',$strand,$phase,"Parent=$id"),"\n";
-	$phase = (($cds_end-$cds_start+1-$phase)) % 3;
+      if(defined $cds_start && $cds_start <= $cds_end) {
+        print join ("\t",$chrom,$SRCDB,'CDS',$cds_start,$cds_end,'.',$strand,$phase,"Parent=$id"),"\n";
+        $phase = (($cds_end-$cds_start+1-$phase)) % 3;
       }
 
-      if (defined $utr_start && $utr_start <= $utr_end && $utr_start > $cdsEnd) {
-#	print join ("\t",$chrom,$SRC,"3'-UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
-	print join ("\t",$chrom,$SRC,"three_prime_UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
+      if(defined $utr_start && $utr_start <= $utr_end && $utr_start > $cdsEnd) {
+        print join ("\t",$chrom,$SRCDB,"three_prime_UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
       }
     }
   }
 
-  if ($strand eq '-') {
+  if($strand eq '-') {
     my @lines;
-    for (my $i=@exon_starts-1; $i>=0; $i--) { # count backwards
+    for(my $i=@exon_starts-1; $i>=0; $i--) { # count backwards
       my $exon_start = $exon_starts[$i] + 1;
       my $exon_end   = $exon_ends[$i];
       my ($utr_start,$utr_end,$cds_start,$cds_end);
 
-      if ($exon_end > $cdsEnd) { # in a 5' UTR
-	$utr_end = $exon_end;
-      } elsif ($exon_end < $cdsStart) {
-	$utr_end = $exon_end;
+      if($exon_end > $cdsEnd) { # in a 5' UTR
+        $utr_end = $exon_end;
+      } elsif($exon_end < $cdsStart) {
+        $utr_end = $exon_end;
       } else {
-	$cds_end = $exon_end;
+        $cds_end = $exon_end;
       }
 
-      if ($exon_start > $cdsEnd) {
-	$utr_start = $exon_start;
-      } elsif ($exon_start < $cdsStart) {
-	$utr_start = $exon_start;
+      if($exon_start > $cdsEnd) {
+        $utr_start = $exon_start;
+      } elsif($exon_start < $cdsStart) {
+        $utr_start = $exon_start;
       } else {
-	$cds_start = $exon_start;
+        $cds_start = $exon_start;
       }
 
-      if ($utr_start && !$utr_end) { # half in half out on 3' end
-	$utr_end   = $cdsStart - 1;
-	$cds_start = $cdsStart;
-	$cds_end   = $exon_end;
+      if($utr_start && !$utr_end) { # half in half out on 3' end
+        $utr_end   = $cdsStart - 1;
+        $cds_start = $cdsStart;
+        $cds_end   = $exon_end;
       }
 
       if ($utr_end && !$utr_start) { # half in half out on 5' end
-	$utr_start = $cdsEnd + 1;
-	$cds_end   = $cdsEnd;
-	$cds_start = $exon_start;
+        $utr_start = $cdsEnd + 1;
+        $cds_end   = $cdsEnd;
+        $cds_start = $exon_start;
       }
 
       die "programmer error, utr_start and no utr_end" unless defined $utr_start == defined $utr_end;
       die "programmer error, cds_start and no cds_end" unless defined $cds_start == defined $cds_end;
 
-      if (defined $utr_start && $utr_start <= $utr_end && $utr_start > $cdsEnd) {
-#	unshift @lines,join ("\t",$chrom,$SRC,"5'-UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
-	unshift @lines,join ("\t",$chrom,$SRC,"five_prime_UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
+      if(defined $utr_start && $utr_start <= $utr_end && $utr_start > $cdsEnd) {
+        unshift @lines,join ("\t",$chrom,$SRCDB,"five_prime_UTR",,$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
       }
-      if (defined $cds_start && $cds_start <= $cds_end) {
-	unshift @lines,join ("\t",$chrom,$SRC,'CDS',$cds_start,$cds_end,'.',$strand,$phase,"Parent=$id"),"\n";
-	$phase = (($cds_end-$cds_start+1-$phase)) % 3;
+      if(defined $cds_start && $cds_start <= $cds_end) {
+        unshift @lines,join ("\t",$chrom,$SRCDB,'CDS',$cds_start,$cds_end,'.',$strand,$phase,"Parent=$id"),"\n";
+        $phase = (($cds_end-$cds_start+1-$phase)) % 3;
       }
 
-      if (defined $utr_start && $utr_start <= $utr_end && $utr_end < $cdsStart) {
-#	unshift @lines,join ("\t",$chrom,$SRC,"3'-UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
-	unshift @lines,join ("\t",$chrom,$SRC,"three_prime_UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
+      if(defined $utr_start && $utr_start <= $utr_end && $utr_end < $cdsStart) {
+        unshift @lines,join ("\t",$chrom,$SRCDB,"three_prime_UTR",$utr_start,$utr_end,'.',$strand,'.',"Parent=$id"),"\n"	
       }
 
     }
     print @lines;	
   }
 }
+close(KG) or die "couldn't close('$KNOWNGENE'): $!";
 
 # for protein/mrna printing
-  if (defined($kgxref) && (defined($knowngenepep) || defined($knowngenemrna))) {
+if(defined($kgxref) && (defined($knowngenepep) || defined($knowngenemrna))) {
   print "##FASTA\n";
   # now print all my lovely protein sequence
   foreach my $protein (keys %{$knowngenepep}) {
@@ -244,13 +239,13 @@ while (<>) {
 
 =cut
 
-sub parseLocAcc{
+sub parseLocAcc {
   my $filename = shift;
   my $annotations = {};
-  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
-    next if /^\#/;;
+    next if /^#/;
 	my @line = split /\t/;
 	$line[1] =~ /(.*)\.\d/;
 	my $gene = $1;
@@ -274,13 +269,13 @@ sub parseLocAcc{
 
 =cut
 
-sub parseKnownLocusLink{
+sub parseKnownLocusLink {
   my $filename = shift;
   my $annotations = {};
-  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
-    next if /^\#/;;
+    next if /^#/;
 	my ($accession,$locuslink) = split /\t/;
 	$annotations->{$accession} = $locuslink;
   }
@@ -300,13 +295,13 @@ sub parseKnownLocusLink{
 
 =cut
 
-sub parseKnownGeneMrna{
+sub parseKnownGeneMrna {
   my $filename = shift;
   my $annotations = {};
-  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
-    next if /^\#/;;
+    next if /^#/;
 	my ($accession,$sequence) = split /\t/;
 	$annotations->{$accession} = $sequence;
   }
@@ -327,17 +322,14 @@ sub parseKnownGeneMrna{
 
 =cut
 
-sub parseKnownGenePep{
+sub parseKnownGenePep {
   my $filename = shift;
   my $annotations = {};
-  open  ANNFILE, $filename or die "Can't open file $filename\n";
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
-    next if /^\#/;;
+    next if /^#/;
 	my ($accession,$sequence) = split /\t/;
-	#my @protAcc = keys %{$kgxref->{$accession}->{protAcc}};
-	#print @protAcc[0]."\n";
-	#$annotations->{@protAcc[0]} = $sequence;
 	my $protGenbankId = $mrna2protein->{$accession};
 	$annotations->{$protGenbankId} = $sequence;
   }
@@ -357,13 +349,13 @@ sub parseKnownGenePep{
 
 =cut
 
-sub parseGenbank{
+sub parseGenbank {
    my $file = shift;
    my $annotations = {}; # stores the mRNA genbank id as key, protein genbank id as value
-   open ANNFILE, $file or die "Can't open file $file\n";
+   open ANNFILE, $file or die "Can't open file $file: $!";
    while(<ANNFILE>) {
 	 chomp;
-	 next if /^\#/;;
+	 next if /^#/;
 	 my ($mrna, $prot) = split /\t/;
 	 $annotations->{$mrna} = $prot;
    }
@@ -374,20 +366,24 @@ sub parseGenbank{
 
 
 =head2 parseKgXref
+
  Title   : parseKgXref
  Usage   :
  Function:
  Example :
  Returns :
  Args    :
+
+
 =cut
+
 sub parseKgXref {
   my $filename = shift;
   my $annotations = {};
-  open ANNFILE, $filename or die "Can't open file $filename\n";
+  open ANNFILE, $filename or die "Can't open file $filename: $!";
   while(<ANNFILE>) {
     chomp;
-    next if /^\#/;;
+    next if /^#/;
 	# first two are the same (genebank) followed by swissprot etc...
     my ($kgID, $mRNA, $spID, $spDisplayID, $geneSymbol, $refseq, $protAcc, $description) = split /\t/;
     my $key = "";
@@ -397,16 +393,17 @@ sub parseKgXref {
     $key = uri_escape($key);
     $description = uri_escape($description);
 
-    $annotations->{$key}->{kgID}->{$kgID} = 1                if $kgID;
-    $annotations->{$key}->{mRNA}->{$mRNA} = 1                if $mRNA;
-    $annotations->{$key}->{spID}->{$spID} = 1                if $spID;
-    $annotations->{$key}->{spDisplayID}->{$spDisplayID} = 1  if $spDisplayID;
-    $annotations->{$key}->{geneSymbol}->{$geneSymbol} = 1    if $geneSymbol;
-    $annotations->{$key}->{refseq}->{$refseq} = 1            if $refseq;
-    $annotations->{$key}->{protAcc}->{$protAcc} = 1          if $protAcc;
-    $annotations->{$key}->{description}->{$description} = 1  if $description;
-	my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
-	$annotations->{$key}->{protein}->{$protAccession} = 1    if $protAccession;
+    my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
+
+    $annotations->{$key}->{'db:genbank:protein'}->{$protAccession} = 1 if $protAccession;
+    $annotations->{$key}->{'db:genbank:mrna'}->{$kgID}             = 1 if $kgID;
+    $annotations->{$key}->{'db:genbank:mrna'}->{$mRNA}             = 1 if $mRNA;
+    $annotations->{$key}->{'db:swissprot'}->{$spID}                = 1 if $spID;
+    $annotations->{$key}->{'db:swissprot:display'}->{$spDisplayID} = 1 if $spDisplayID;
+    $annotations->{$key}->{'genesymbol'}->{$geneSymbol}            = 1 if $geneSymbol;
+    $annotations->{$key}->{'db:refseq:mrna'}->{$refseq}            = 1 if $refseq;
+    $annotations->{$key}->{'db:refseq:protein'}->{$protAcc}        = 1 if $protAcc;
+    $annotations->{$key}->{'description'}->{$description}          = 1 if $description;
   }
   close ANNFILE;
   return($annotations);
