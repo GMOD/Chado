@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.8 2004-04-12 19:19:10 boconnor Exp $
+$Id: README.H_sapiens,v 1.9 2004-04-13 00:27:39 boconnor Exp $
 
 INTRODUCTION
 ------------
@@ -57,6 +57,10 @@ Now do something akin to this tcsh script:
   >
 
 and the chromosome DNA is loaded.
+
+Note, this is a really memory intensive operation.  I've experienced seg faults
+using a computer with less than 1Gb of RAM.  Also, you can adjust the $shredsize
+to try to minimize memory consumption in this script.  Don't go over 100_000_000!!
 
 3. Download gene model data.  The following URL provides all GenBank mRNA
 records available from UCSC Hg16.  Each gene model has extra data attached
