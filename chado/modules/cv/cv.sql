@@ -6,6 +6,7 @@
 
 create table cv (
        cv_id serial not null,
+       primary key (cv_id),
        cvname varchar not null,
        cvdefinition text,
 
