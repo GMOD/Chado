@@ -164,6 +164,7 @@ my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
   ( undef, undef, undef, undef );
 my $feature_count = 0;        #for cache/flush
 my $cv;
+my %srcfeature      = ();
 my %feature         = ();
 my %featureloc_rank = ();
 my %dbxref          = ();
@@ -211,17 +212,29 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     my ($id) =
         $gff_feature->has_tag('ID')
       ? $gff_feature->get_tag_values('ID')
-      : $gff_feature->get_tag_values('Parent');
+      : '';
+
+    my ($parent) = 
+        $gff_feature->has_tag('Parent')
+      ? $gff_feature->get_tag_values('Parent')
+      : '';
 
     # look up the feature
-    if (   $gff_feature->has_tag('ID')
-        && !( $id                  eq $gff_feature->seq_id )
+    # problem here: two places that the reference sequence/srcfeature
+    # might be found: either in the GFF file (in which case, look
+    # for it in a hash here) or in the database already.  If it is
+    # in the database already, it might be very difficult to look up
+    # via seq_id.  I'll solve the first problem and think about the 
+    # second  sjc 3/23/04
+    if (  # $gff_feature->has_tag('ID') &&
+        !( $id                  eq $gff_feature->seq_id )
         && !( $gff_feature->seq_id eq '.' ) )
     {
-        ( $feature{$id} ) =
-          Chado::Feature->search( name => $gff_feature->seq_id );
+        ( $srcfeature{$gff_feature->seq_id} ) =
+          Chado::Feature->search( name => $gff_feature->seq_id )
+          unless $srcfeature{$gff_feature->seq_id};
 
-        unless ( $feature{$id} ) {
+        unless ( $srcfeature{$gff_feature->seq_id} ) {
             warn "\n" . "*" x 72 . "\n";
             warn
 "Unable to find a source feature id for the reference sequence in this line:\n";
@@ -265,7 +278,8 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     my @tags = $gff_feature->all_tags;
     foreach my $tag (@tags) {
         if ( $tag eq 'ID' ) {
-            load_ID_tag( $gff_feature, $chado_feature, $id );
+#                 this currently doesn't do anything
+#            load_ID_tag( $gff_feature, $chado_feature, $id );
         }
         elsif ( $tag eq 'Parent' ) {
             load_Parent_tag( $gff_feature, $chado_feature );
@@ -448,9 +462,9 @@ Loads ID tag values
 =cut
 
 sub load_ID_tag {
-    my $gff_feature   = shift;
-    my $chado_feature = shift;
-    my $id            = shift;
+#    my $gff_feature   = shift;
+#    my $chado_feature = shift;
+#    my $id            = shift;
 
 #i don't think this cost of clogging up
 #the synonym table is worth making searches
@@ -588,7 +602,8 @@ sub load_Parent_tag {
         foreach my $parent (@parents) {
 
             my $reltype =
-                $gff_feature->primary_tag eq 'protein'
+                ( $gff_feature->primary_tag eq 'protein' ||
+                  $gff_feature->primary_tag eq 'polypeptide' )
               ? $cvterm{develops_from}
               : $cvterm{part_of};
 
@@ -828,10 +843,10 @@ sub load_segments {
 
             $i++;
             $f->dbi_commit;
-            $feature{ $f->name } = $f;
+            $srcfeature{ $f->name } = $f;
         }
         else {
-            $feature{ $segment->name } = $segment;
+            $srcfeature{ $segment->name } = $segment;
         }
     }
     return $i;
@@ -970,11 +985,12 @@ sub load_feature_locations {
     }
 
     my $chado_feature;
-    if ( $gff_feature->has_tag('ID') ) {
+    if ( $gff_feature->has_tag('Name') ) {
+        my ($name) = $gff_feature->get_tag_values('Name');
         ($chado_feature) = Chado::Feature->find_or_create(
             {
                 organism_id => $chado_organism,
-                name        => $id,
+                name        => $name,
                 uniquename  => $UNIQUENAME ? $uniquename : $id . $uniquename,
                 type_id     => $chado_type->id,
                 seqlen      => $seqlen
@@ -993,10 +1009,15 @@ sub load_feature_locations {
     }
 
     push @transaction, $chado_feature;
-    return ($chado_feature)
-      if $id                  eq $gff_feature->seq_id
-      or $gff_feature->seq_id eq
-      '.';    #ie, this is a srcfeature (ie, fref) so only create the feature
+
+    if (   $id                  eq $gff_feature->seq_id
+        or $gff_feature->seq_id eq '.' ) {
+      #ie, this is a srcfeature (ie, fref) so only create the feature
+        $srcfeature{$gff_feature->seq_id} = $chado_feature; 
+        return ($chado_feature);
+    }
+
+ 
 
     $chado_feature->dbxref_id( $dbxref{$id} )
       if $gff_feature->has_tag('ID');    # is this the right thing to do here?
@@ -1004,8 +1025,8 @@ sub load_feature_locations {
 
     my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
 
-    ( $feature{$id} ) = Chado::Feature->search( name => $id )
-      unless $feature{$id};
+#    ( $srcfeature{$id} ) = Chado::Feature->search( name => $id )
+#      unless $srcfeature{$id};
 
     # add feature location
     my $chado_featureloc = Chado::Featureloc->find_or_create(
@@ -1016,7 +1037,7 @@ sub load_feature_locations {
             strand        => $gff_feature->strand,
             phase         => $frame,
             rank          => $featureloc_rank{ $chado_feature->id } || 0,
-            srcfeature_id => $feature{$id}->id,
+            srcfeature_id => $srcfeature{$gff_feature->seq_id}->id,
         }
     );
 
