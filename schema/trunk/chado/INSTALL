@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.34 2004-09-16 20:34:24 scottcain Exp $
+$Id: INSTALL,v 1.35 2004-10-18 18:13:51 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -205,49 +205,13 @@ As indicated, the host, port, and password are optional.
 
         *   What is the default organism (common name, or "none")?
 
-        *   Available extensions to the core schema:
-            [1] sequence/gff-bridge/sequence-gff-views.sql
-            [2] expression/rad.sql
-            [3] expression/expression.sql
 
 
-            What extensions to the core schema would you like?
-            (Note that selecting any of these will force the
-            rebuilding of Class::DBI classes.)
-            (Comma-delimited)? [0] 
-
-            Available function extensions to the core schema:
-           [1] sequence/gff-bridge/sequence-gff-funcs.pgsql
-           [2] sequence/functions/feature_subalignments.plpgsql
-
-        !!!!!IMPORTANT!!!!!
-        This section is where you choose optional extensions to the
-        base Chado schema.
-
-        If you plan to use Chado in combination with GBrowse, make
-        sure you select (1) from both menus.
-
-        If you plan to store many alignments with small regions of
-        perfect match, you might want to load the alignment data
-        as an alignment string rather than creating a feature for
-        each aligned block.  Functionality exists for using this
-        method in (2) of the function extentions, and is documented
-        in README.H_sapiens.
-
-        If you plan to represent gene expression data in a way that
-        is compliant with MIAME standards, make sure you select (2) 
-        and (3) from the core schema exentions
-.
-        !!!!!IMPORTANT!!!!!
-
-        *   Enter the full path of an external DDL file [none] 
-
-        Path to a file containing external SQL commands to execute
-        after the database has been created.  This will typically be
-        extra modules/views/tables not distributed with the core schema,
-        or default data to insert into the database to fulfill the
-        specialized needs of a MOD.
-
+        At this point, if you answered "No" to the "use default schema"
+        question, you will be prompted about what database exensions
+        to use; generally, you should answer "Yes" to that question.
+        To see the documentation for this part of the make procedure,
+        see "CUSTOM DATABASE SCHEMAS" at the end of this document.
 
 *   make
     Creates necessary files for the rest of the build process.
@@ -271,37 +235,34 @@ As indicated, the host, port, and password are optional.
     uses load/etc/initialize.sql.  It contains information for several
     common organisms and source databases (eg, genbank). This file
     can be edited to add any organism or source database, using the
-    INSERT statements for the examples as a template.  Also note that
-    if you did not select all of the optional exentions when you executed
-    perl Makefile.PL you may get some errors at this stage and that is
-    normal (they result from trying to insert data into tables that don't
-    exist).  Note also that the prepdb target needs to be executed
-    before the ontologies target, but it can be executed again later,
-    if more insert statements are added (for instance to add a new
-    organism or database).
+    INSERT statements for the examples as a template.  Note also that
+    the prepdb target needs to be executed before the ontologies target,
+    but it can be executed again later, if more insert statements are
+    added (for instance to add a new organism or database).
 
 
 *   make ontologies
     Gets and installs various ontologies.  Requires a network 
     connection.  Absolutely required are the Relationship Ontology and
-    the Sequence Ontology.  All others are optional.  Note retrieved ontology
-    files are stored in the directory specified when perl Makefile.PL was run
-    (the default is ./tmp).  In order to do a repeat installation, lock files
-    need to be removed to allow reinstallation of ontologies.  Those lock files
-    can be removed by executing `make rm_locks`.  Alternatively,
-    deleting everything in the temporary directory will force the
-    re-downloading of the ontology data from their respective sources.
-    Also note that loading a large ontology like the Gene Ontology will take
-    several minutes (perhaps as long as an hour).
+    the Sequence Ontology Feature Annotation (SOFA).  All others are
+    optional.  Note retrieved ontology files are stored in the directory
+    specified when perl Makefile.PL was run (the default is ./tmp).  In
+    order to do a repeat installation, lock files need to be removed to
+    allow reinstallation of ontologies.  Those lock files can be removed
+    by executing `make rm_locks`.  Alternatively, deleting everything in
+    the temporary directory will force the re-downloading of the ontology
+    data from their respective sources.  Also note that loading a large
+    ontology like the Gene Ontology will take several minutes (perhaps
+    as long as an hour).
 
     Note that since `make ontologies` downloads ontology files from their
     online repositories, this step is prone to failure due to network
     problems.  If you already have desired ontology files locally, you
     can execute a command for each file to load it.  Note again that
     the Relationship Ontology is required before all others, and the
-    the Sequence Ontology is absolutely required for proper functioning
-    of the database.  The command to load an ontology and its definition
-    file (if it exists) is this:
+    the Sequence Ontology Feature Annotation (SOFA) is absolutely required
+    for proper functioning of the database.  The command to load an
+    ontology and its definition file (if it exists) is this:
 
         $ gmod_load_ontology.pl /path/to/onto_file [/path/to/def_file]
 
@@ -329,20 +290,21 @@ Then execute gmod_load_gff3.pl:
 
     (note that the '\' is included to allow cutting and pasting to a unix
     command line.)
+    This loads the GFF3 file.  The loading script requires GFF3 as it has
     tighter control of the syntax and requires the use of a controlled
-    vocabulary (from the Sequence Ontology (SO)), allowing mapping to the
-    relational schema.  In addition to supplying the location of the file
-    with the --gfffile flag, the --orgainism tag uses the common name from
-    the organism table and --srcdb uses the database name from the db table.
-    See `perldoc gmod_load_gff.pl` for more information on adding other
-    organisms and databases, as well as other available commandline flags.
+    vocabulary (from Sequence Ontology Feature Annotation (SOFA)), allowing
+    mapping to the relational schema.  In addition to supplying the location
+    of the file with the --gfffile flag, the --orgainism tag uses the common
+    name from the organism table and --srcdb uses the database name from the
+    db table.  See `perldoc gmod_load_gff.pl` for more information on adding
+    other organisms and databases, as well as other available commandline flags.
 
     Alternatively, use gmod_bulk_load_gff3.pl, but bear in mind that this is
     most definitely still alpha software.  It has several limitations that
     make it difficult to use, please see `perldoc gmod_bulk_load_gff3.pl`
     for a description of the bulk loader's short comings.  Breifly, the
     bulk loader can be used like this:
-                                                                                
+
         $ cat <gff-file> | gmod_bulk_load.pl
 
     GFF3 files can also be generated either from the included (and not
@@ -365,7 +327,7 @@ DUMPING GFF3
 The script gmod_dump_gff3.pl can be used to dump GFF3 from a chado
 database.  If executed with no arguments, dump_gff3.pl will dump all
 features for the default organism in the database.  Alternatively,
-you can provide the organism or reference seqeuence to dump.
+you can provide the organism or reference sequence to dump.
 
 GENERIC GENOME BROWSER
 
@@ -382,3 +344,57 @@ After installing GBrowse, go to
   http://localhost/gbrowse/docs/pod/README-chado.html
 
 for more information on configuring GBrowse to work with chado.
+
+
+CUSTOM DATABASE SCHEMAS
+
+        If you answered "No" to the "use default schema" question,
+        you will be prompted about what database exensions
+        to use; generally, you should answer "Yes" to that question.
+        Here are the questions to answer for this section of the 
+        make procedure:
+
+        *   Available extensions to the core schema:
+            [1] sequence/gff-bridge/sequence-gff-views.sql
+            [2] expression/rad.sql
+            [3] expression/expression.sql
+    
+    
+            What extensions to the core schema would you like?
+            (Note that selecting any of these will force the
+            rebuilding of Class::DBI classes.)
+            (Comma-delimited)? [0]
+    
+            Available function extensions to the core schema:
+           [1] sequence/gff-bridge/sequence-gff-funcs.pgsql
+           [2] sequence/functions/feature_subalignments.plpgsql
+    
+        !!!!!IMPORTANT!!!!!
+        This section is where you choose optional extensions to the
+        base Chado schema.
+    
+        If you plan to use Chado in combination with GBrowse, make
+        sure you select (1) from both menus.
+    
+        If you plan to store many alignments with small regions of
+        perfect match, you might want to load the alignment data
+        as an alignment string rather than creating a feature for
+        each aligned block.  Functionality exists for using this
+        method in (2) of the function extentions, and is documented
+        in README.H_sapiens.
+    
+        If you plan to represent gene expression data in a way that
+        is compliant with MIAME standards, make sure you select (2)
+        and (3) from the core schema exentions
+.
+        !!!!!IMPORTANT!!!!!
+    
+        *   Enter the full path of an external DDL file [none]
+    
+        Path to a file containing external SQL commands to execute
+        after the database has been created.  This will typically be
+        extra modules/views/tables not distributed with the core schema,
+        or default data to insert into the database to fulfill the
+        specialized needs of a MOD.
+    
+
