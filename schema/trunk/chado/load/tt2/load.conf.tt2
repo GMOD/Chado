@@ -16,7 +16,7 @@
     [% END %]
   </build>
 
-  <path name="data" value="/tmp/chado_load"/>
+  <path name="data" value="[% local_tmp %]"/>
 
  
   <!--                 -->
