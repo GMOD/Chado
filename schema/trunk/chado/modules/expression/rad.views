@@ -194,6 +194,47 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixdchip" AS
     DELETE FROM elementresult
     WHERE elementresult_id = OLD.elementresult_id;
 
+CREATE OR REPLACE VIEW affymetrixvsn
+AS SELECT
+  elementresult.elementresult_id AS elementresult_id,
+  elementresult.subclass_view AS subclass_view,
+  elementresult.element_id AS element_id,
+  elementresult.quantification_id AS quantification_id,
+  elementresult.float1 AS signal,
+  elementresult.float2 AS se,
+  elementresult.float3 AS z,
+  elementresult.char1 AS apcall
+FROM elementresult
+WHERE SUBCLASS_VIEW = 'affymetrixvsn';
+
+CREATE OR REPLACE RULE "_RuleI_affymetrixvsn" AS
+  ON INSERT TO affymetrixvsn
+  DO INSTEAD
+    INSERT INTO elementresult
+    (subclass_view,element_id,quantification_id,float1,float2,float3,char1)
+    VALUES
+    ('affymetrixdchip',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
+
+CREATE OR REPLACE RULE "_RuleU_affymetrixvsn" AS
+  ON UPDATE TO affymetrixvsn
+  DO INSTEAD
+    UPDATE elementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    element_id = NEW.element_id,
+    quantification_id = NEW.quantification_id,
+    float1 = NEW.signal,
+    float2 = NEW.se,
+    float3 = NEW.z,
+    char1 = NEW.apcall
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE OR REPLACE RULE "_RuleD_affymetrixvsn" AS
+  ON DELETE TO affymetrixvsn
+  DO INSTEAD
+    DELETE FROM elementresult
+    WHERE elementresult_id = OLD.elementresult_id;
+
 CREATE OR REPLACE VIEW affymetrixrma
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
