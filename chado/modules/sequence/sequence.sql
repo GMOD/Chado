@@ -252,6 +252,23 @@ create index feature_relationship_idx3 on feature_relationship (type_id);
 
 
 -- ================================================
+-- TABLE: feature_relationship_pub
+-- ================================================
+ 
+create table feature_relationship_pub (
+	feature_relationship_pub_id serial not null,
+	primary key (feature_relationship_pub_id),
+	feature_relationship_id int not null,
+	foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade,
+	pub_id int not null,
+	foreign key (pub_id) references pub (pub_id) on delete cascade,
+ 
+	unique(feature_relationship_id, pub_id)
+ );
+ create index feature_relationship_pub_idx1 on feature_relationship_pub (feature_relationship_id);
+ create index feature_relationship_pub_idx2 on feature_relationship_pub (pub_id);
+ 
+-- ================================================
 -- TABLE: feature_cvterm
 -- ================================================
 
