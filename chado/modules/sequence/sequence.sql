@@ -66,7 +66,7 @@ create table featureprop (
        foreign key (feature_id) references feature (feature_id),
        pkey_id int not null,
        foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null,
+       pval text not null default '',
        prank integer,
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
@@ -170,8 +170,10 @@ create table feature_cvterm (
 create table gene (
        gene_id serial not null,
        primary key (gene_id),
--- in FlyBase, the gene symbol
+-- the gene symbol
        name varchar(255) not null,
+-- the fullname for a gene (if different from the symbol)
+       fullname varchar(255),
        type_id int,
        foreign key (type_id) references cvterm (cvterm_id),
 -- accession holds the FBgn in FlyBase
