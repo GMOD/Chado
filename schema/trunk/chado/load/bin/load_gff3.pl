@@ -25,7 +25,8 @@ See the notes; there is plenty there.
 =item What this script doesn't do yet
 
 It does very limited parsing of the group column (column 9).  Notes are not parsed.
-Nor are similarity/match/target data.
+Nor are similarity/match/target data parsed.  Sequence is not handled yet either,
+though it shouldn't be to hard to add.
 
 =item Base coordinates
 
