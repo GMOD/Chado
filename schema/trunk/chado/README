@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2002-12-06 22:27:30 cmungall Exp $
+$Id: README,v 1.2 2003-03-06 20:43:33 allenday Exp $
 
 [this is temporary placeholder documentation until someone writes
 something better - cjm@fruitfly.org]
@@ -67,6 +67,12 @@ The core schema is DBMS independent. The main chado developers are
 currently using postgresql. There may be additional optional layers
 that use views, triggers, procedures, constraints etc which may be
 postgresql specific.
+
+The SQL table create files can be found in the chado/modules directory.  
+While these files are for creating a PostgreSQL database, there is also a
+Makefile in chado.  Running 'make all' will autogenerate MySQL
+counterparts to these files.  Note that the transform depends on a Perl
+script, and Ken Clark's SQL::Translator module, available on CPAN.
 
 
 CHADO WEBSITE
