@@ -25,7 +25,7 @@ create table feature (
 -- The expectation is that these fields would be available to software 
 -- interacting with chado.
        timeaccessioned timestamp not null default current_timestamp,
-       timelastmodified timestamp not null default current_timestamp
+       timelastmodified timestamp not null default current_timestamp,
 
        unique(organism_id,uniquename)
 );
