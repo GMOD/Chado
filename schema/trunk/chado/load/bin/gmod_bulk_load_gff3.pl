@@ -360,10 +360,11 @@ while(my $feature = $gffio->next_feature()){
   }
 
   if ($feature->annotation->get_Annotations('Ontology_term')) {
-    my @cvterms = map {$_->value} $feature->annotation->get_Annotations('Ontology_term');
+    my @cvterms = map {$_->identifier} $feature->annotation->get_Annotations('Ontology_term');
     my %count;
     my @ucvterms = grep {++$count{$_} < 2} @cvterms;
     foreach my $term (@ucvterms) {
+      next unless $term;
       unless ($type{$term}) {
         my ($dbxref) = Chado::Dbxref->search( accession => $term );
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
