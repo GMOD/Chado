@@ -10,29 +10,24 @@ Bio::GMOD::Config -- a GMOD utility package for reading config files
     $ export GMOD_ROOT=/usr/local/gmod
     
     my $conf    = Bio::GMOD::Config->new();
-    my $tmpdir  = $conf->tmp();
-    my $confdir = $conf->conf();
-
-    #assume there is a file 'chado.conf' with database connetion info
-    my $dbusername = $conf->db->{'chado'}{'DBNAME'};
-    my $dbhostname = $conf->db->{'chado'}{'DBHOST'};
-    # ...etc...
+    my $tmpdir  = $conf->tmpdir();
+    my $confdir = $conf->confdir();
 
     my @dbnames = $conf->available_dbs();
-    my @dbparams = $conf->available_params($dbnames[0]);
 
 =head1 DESCRIPTION
 
 Bio::GMOD::Config is a module to allow programmatic access to the configuration
 files in GMOD_ROOT/conf.  Typically, these files will be gmod.conf 
 (containing site-wide parameters), and one each configuration file for
-each database, named dbname.conf, containing database connection parameters.
+each database, named dbname.conf, containing database connection parameters,
+which are accessed through Bio::GMOD::Config::DB objects.
 
 =head1 METHODS
 
 =cut
 
-use File::Spec::Functions qw/ catdir /;
+use File::Spec::Functions qw/ catdir catfile /;
 
 =head2 new
 
@@ -69,35 +64,32 @@ sub new {
                                       #gmod.conf since db stuff should go in
                                       #db.conf (per programmers guide)
 
-    my %db;
+    my @db;
     opendir CONFDIR, $confdir
        or die "couldn't open $confdir directory for reading:$!\n";
     my $dbname;
     while (my $dbfile = readdir(CONFDIR) ) {
-        my $tmpconf =  catdir($confdir, $dbfile); 
-        next unless (-f $tmpconf);
         if ($dbfile =~ /^(\w+)\.conf/) {
-            $dbname = $1;
+            push @db, $1;
         } else {
             next;
         }
-        $db{$dbname}{'conf'} = $tmpconf; 
     }
     closedir CONFDIR;
 
-    foreach my $conffile (keys %db) {
-        open CONF, $db{$conffile}{'conf'}
-           or die "Couldn't open $db{$conffile}{'conf'} for reading: $!";
-        while (<CONF>) {
-            next if /^\#/;
-            if (/(\w+)\s*=\s*(\S+)/) {
-                $db{$conffile}{$1} = $2;
-            }
+    my %conf;
+    my $conffile = catfile($confdir, 'gmod.conf');
+    open CONF, $conffile or die "Unable to open $conffile: $!\n";
+    while (<CONF>) {
+        next if /^\#/;
+        if (/(\w+)\s*=\s*(\S.*)$/) {
+            $conf{$1}=$2;
         }
-        close CONF;
     }
+    close CONF;
 
-    return bless {db       => \%db,
+    return bless {db       => \@db,
+                  conf     => \%conf,
                   confdir  => $confdir}, $self;
 }
 
@@ -110,48 +102,85 @@ sub new {
  Args    : none
  Status  : public
 
-This method returns a list of database configuration files available in
-GMOD_ROOT/conf.
+This method returns reference to a list of database configuration
+files available in GMOD_ROOT/conf.
 
 =cut
 
 
 sub available_dbs {
-    my $self = shift;
-    my @dbs;
-    my $dbs = $self->{'db'};
-    foreach (keys %$dbs ) {
-        next if $_ eq 'gmod';
-        push @dbs, $_;    
-    }
-    return @dbs;
+    shift->{'db'};
 }
 
-=head2 available_params
-
- Title   : available_params
- Usage   : @params = $config->available_params('chado');
+=head2 all_tags
+                                                                                
+ Title   : all_tags
+ Usage   : @tags = $config->all_tags();
  Function: returns a list of parameters (ie, hash keys) for a given database
  Returns : see above
- Args    : The name of a database
+ Args    : none
  Status  : public
-
-Returns a list of database connection parameters (ie, hash keys) for 
+                                                                                
+Returns a list of database connection parameters (ie, hash keys) for
 a given database configuration file.
-
+                                                                                
 =cut
 
-
-sub available_params {
+sub all_tags {
     my $self = shift;
-    my $db   = shift;
-
-    my $params = $self->{'db'}{$db};
+                                                                                
+    my $params = $self->{'conf'};
     my @params;
     foreach (keys %$params) {
         push @params, $_;
     }
     return @params;
+}
+
+=head2 has_tag
+
+ Title   : has_tag
+ Usage   : $bool = $conf->has_tag('TMP');
+ Function: Returns true if the tag is contained in the config file
+ Returns : see above
+ Args    : name of tag
+ Status  : public
+
+=cut
+
+sub has_tag{
+    my $self = shift;
+    my $tag  = shift;
+
+    my $conf = $self->{'conf'};
+    if (defined $$conf{$tag}) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+=head2 get_tag_value
+
+ Title   : get_tag_value 
+ Usage   : $value = $conf->get_tag_value($tag);
+ Function: return the value of a config parameter
+ Returns : see above
+ Args    : name of a tag
+ Status  : Public
+                                                                                
+=cut
+
+sub get_tag_value {
+    my $self = shift;
+    my $tag  = shift;
+
+    my $conf = $self->{'conf'};
+    if (defined $$conf{$tag}) {
+        return $$conf{$tag};
+    } else {
+        return;
+    }
 }
 
 =head2 confdir
@@ -168,7 +197,7 @@ sub available_params {
 
 
 sub confdir {
-    shift->{'conf'};
+    shift->{'confdir'};
 }
 
 =head2 tmp
@@ -185,9 +214,8 @@ Returns the path to the GMOD tmp directory.
 =cut
 
 
-sub tmp {
-    my $self = shift;
-    $self->{'db'}->{'gmod'}->{'TMP'};
+sub tmpdir {
+    shift->get_tag_value('TMP');
 }
 
 1;

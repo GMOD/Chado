@@ -995,6 +995,20 @@ sub load_feature_locations {
         load_Name_tag ($gff_feature, $chado_feature);
     }
 
+    my $source = $gff_feature->source_tag();
+    if ( $source && $source ne '.') { #make source a feature prop
+        my $sourcetype = cache_cvterm("GFF_source"); 
+
+        my ($featureprop) = Chado::Featureprop->find_or_create(
+            {
+                feature_id => $chado_feature->id,
+                type_id    => $cvterm{'GFF_source'}->id,
+                value      => $source,
+            }
+        );
+        push @transaction, ($featureprop);
+    }
+
     if ( $id eq $gff_feature->seq_id
         or $gff_feature->seq_id eq '.' ) {
       #ie, this is a srcfeature (ie, fref) so only create the feature
