@@ -1,0 +1,9 @@
+
+/* After deleting an exon
+CREATE OR REPLACE FUNCTION feature_del_tr () RETURNS TRIGGER AS '
+
+
+
+
+
+' LANGUAGE SQL (?);
