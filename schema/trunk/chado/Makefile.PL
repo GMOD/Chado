@@ -11,7 +11,10 @@ use ExtUtils::MakeMaker;
 use Cwd;
 
 my $working_dir = cwd;
-$working_dir .= '/';
+#$working_dir .= '/';
+
+unless( -d "$working_dir/lib" ) { mkdir "$working_dir/lib" }
+unless( -d "$working_dir/lib/Chado" ) { mkdir "$working_dir/lib/Chado" }
 
 my %O;
 
@@ -28,7 +31,7 @@ open CORE, $O{COREDEF} or die "unable to open $O{COREDEF}: $!\n";
 my @sqlfiles;
 while (<CORE>) {
   chomp;
-  my $file = $working_dir . 'modules/' . $_;
+  my $file = $working_dir . '/modules/' . $_;
   if (-M "$working_dir/modules/complete.sql" > -M $file) {
     $rebuild_complete++;
   }
