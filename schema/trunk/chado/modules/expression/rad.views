@@ -11,6 +11,33 @@ AS SELECT
 FROM elementresult
 WHERE subclass_view = 'affymetrixcel';
 
+CREATE RULE "_RuleI_affymetrixcel" AS
+  ON INSERT TO affymetrixcel
+  DO INSTEAD
+    INSERT INTO elementresult
+    (subclass_view,element_id,quantification_id,foreground,float1,int3)
+    VALUES
+    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.mean,NEW.stdv,NEW.npixels);
+
+CREATE RULE "_RuleU_affymetrixcel" AS
+  ON UPDATE TO affymetrixcel
+  DO INSTEAD
+    UPDATE elementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    element_id = NEW.element_id,
+    quantification_id = NEW.quantification_id,
+    foreground = NEW.mean,
+    float1 = NEW.stdv,
+    int3 = NEW.npixels
+    WHERE elementresult_id = OLD.elementresult_id;
+
+CREATE RULE "_RuleD_affymetrixcel" AS
+  ON DELETE TO affymetrixcel
+  DO INSTEAD
+    DELETE FROM elementresult
+    WHERE elementresult_id = OLD.elementresult_id;
+
 CREATE VIEW affymetrixmas4
 AS SELECT
   compositeelementresult.compositeelementresult_id AS compositeelementresult_id,
@@ -27,12 +54,43 @@ AS SELECT
 FROM compositeelementresult
 WHERE subclass_view = 'affymetrixmas4';
 
+CREATE RULE "_RuleI_affymetrixmas4" AS
+  ON INSERT TO affymetrixmas4
+  DO INSTEAD
+    INSERT INTO compositeelementresult
+    (subclass_view,compositeelement_id,quantification_id,tinyint1,tinyint2,tinyint3,smallint1,float1,float2,string1)
+    VALUES
+    (NEW.subclass_view,NEW.compositeelement_id,NEW.quantification_id,NEW.positiveprobepairs,NEW.negativeprobepairs,NEW.numprobepairsused,NEW.pairsinaverage,NEW.logaverageratio,NEW.averagedifference,NEW.absolutecall);
+
+CREATE RULE "_RuleU_affymetrixmas4" AS
+  ON UPDATE TO affymetrixmas4
+  DO INSTEAD
+    UPDATE compositeelementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    compositeelement_id = NEW.compositeelement_id,
+    quantification_id = NEW.quantification_id,
+    tinyint1 = NEW.positiveprobepairs,
+    tinyint2 = NEW.negativeprobepairs,
+    tinyint3 = NEW.numprobepairsused,
+    smallint1 = NEW.pairsinaverage,
+    float1 = NEW.logaverageratio,
+    float2 = NEW.averagedifference,
+    string1 = NEW.absolutecall
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+
+CREATE RULE "_RuleD_affymetrixmas4" AS
+  ON DELETE TO affymetrixmas4
+  DO INSTEAD
+    DELETE FROM compositeelementresult
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+
 CREATE VIEW affymetrixmas5
 AS SELECT
   compositeelementresult.compositeelementresult_id AS compositeelementresult_id,
   compositeelementresult.subclass_view AS subclass_view,
-  compositeelementresult.compositeelement_id AS compositeelementid,
-  compositeelementresult.quantification_id AS quantificationid,
+  compositeelementresult.compositeelement_id AS compositeelement_id,
+  compositeelementresult.quantification_id AS quantification_id,
   compositeelementresult.float1 AS signal,
   compositeelementresult.char1 AS detection,
   compositeelementresult.float2 AS detectionpvalue,
@@ -40,6 +98,75 @@ AS SELECT
   compositeelementresult.smallint2 AS statpairsused
 FROM compositeelementresult
 WHERE SUBCLASS_VIEW = 'affymetrixmas5';
+
+CREATE RULE "_RuleI_affymetrixmas5" AS
+  ON INSERT TO affymetrixmas5
+  DO INSTEAD
+    INSERT INTO compositeelementresult
+    (subclass_view,compositeelement_id,quantification_id,float1,char1,float2,smallint1,smallint2)
+    VALUES
+    (NEW.subclass_view,NEW.compositeelement_id,NEW.quantification_id,NEW.signal,NEW.detection,NEW.detectionpvalue,NEW.statpairs,NEW.statpairsused);
+
+CREATE RULE "_RuleU_affymetrixmas5" AS
+  ON UPDATE TO affymetrixmas5
+  DO INSTEAD
+    UPDATE compositeelementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    compositeelement_id = NEW.compositeelement_id,
+    quantification_id = NEW.quantification_id,
+    float1 = NEW.signal,
+    char1 = NEW.detection,
+    float2 = NEW.detectionpvalue,
+    smallint1 = NEW.statpairs,
+    smallint2 = NEW.statpairsused
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+
+CREATE RULE "_RuleD_affymetrixmas5" AS
+  ON DELETE TO affymetrixmas5
+  DO INSTEAD
+    DELETE FROM compositeelementresult
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+
+CREATE VIEW affymetrixdchip
+AS SELECT
+  compositeelementresult.compositeelementresult_id AS compositeelementresult_id,
+  compositeelementresult.subclass_view AS subclass_view,
+  compositeelementresult.compositeelement_id AS compositeelement_id,
+  compositeelementresult.quantification_id AS quantification_id,
+  compositeelementresult.float1 AS signal,
+  compositeelementresult.float2 AS se,
+  compositeelementresult.char1 AS apcall
+FROM compositeelementresult
+WHERE SUBCLASS_VIEW = 'affymetrixdchip';
+
+CREATE RULE "_RuleI_affymetrixdchip" AS
+  ON INSERT TO affymetrixdchip
+  DO INSTEAD
+    INSERT INTO compositeelementresult
+    (subclass_view,compositeelement_id,quantification_id,float1,float2,char1)
+    VALUES
+    (NEW.subclass_view,NEW.compositeelement_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.apcall);
+
+CREATE RULE "_RuleU_affymetrixdchip" AS
+  ON UPDATE TO affymetrixdchip
+  DO INSTEAD
+    UPDATE compositeelementresult
+    SET
+    subclass_view = NEW.subclass_view,
+    compositeelement_id = NEW.compositeelement_id,
+    quantification_id = NEW.quantification_id,
+    float1 = NEW.signal,
+    float2 = NEW.se,
+    char1 = NEW.apcall
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+
+CREATE RULE "_RuleD_affymetrixdchip" AS
+  ON DELETE TO affymetrixdchip
+  DO INSTEAD
+    DELETE FROM compositeelementresult
+    WHERE compositeelementresult_id = OLD.compositeelementresult_id;
+    
 
 --CREATE VIEW &&rad3..ARRAYVISIONELEMENTRESULT
 --AS SELECT
