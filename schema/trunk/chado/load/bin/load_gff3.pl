@@ -13,7 +13,7 @@ load_gff3.pl - Load gff3 files into a chado database.
 
 =head1 SYNOPSIS
 
-  % load_gff3.pl --organism Human --srcdb refseq --gfffile refseq.gff
+  % load_gff3.pl --organism Human --srcdb 'DB:refseq' --gfffile refseq.gff
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ execute this command:
 
 If you do not see your database listed, execute this command:
 
-  insert into db (name, contact_id) values ('refseq',1);
+  insert into db (name, contact_id) values ('DB:refseq',1);
 
 Substituting for the name of your database.  A more complete insert
 command may be appropriate in your case, but this should work in a pinch.
@@ -107,7 +107,7 @@ GetOptions('organism:s'       => \$ORGANISM,
           ) or (system('pod2text',$0), exit -1); 
 
 $ORGANISM ||='Human';
-$SRC_DB   ||= 'refseq';
+$SRC_DB   ||= 'DB:refseq';
 $SRC_DB   ="DB:$SRC_DB";
 $GFFFILE  ||='test.gff';
 
