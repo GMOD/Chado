@@ -332,7 +332,11 @@ BEGIN
       SELECT INTO maxid nextval(''uniquename_id_generator'');
       id:=lpad(maxid, 6, ''000000'');
       f_uniquename:=CAST(prefix||id||suffix as TEXT);
-      f_name      :=CAST(f_type||'':''||id as TEXT);
+      IF NEW.name IS NULL THEN
+          f_name  :=CAST(f_type||'':''||id as TEXT);
+      ELSE
+          f_name  :=NEW.name;
+      END IF;
       RAISE NOTICE ''new unquename:%, old uniquename is:%, new name is:%'', f_uniquename, NEW.uniquename, f_name;
       UPDATE feature set uniquename=f_uniquename, name=f_name where feature_id=NEW.feature_id;
 
