@@ -309,7 +309,7 @@ sub _remap_cvterm {
 			 268 => 'CL:0000065',#ependymal
 			 323 => 'MA:0001537',
 			 591 => 'unknown',#unknown
-			 629 => 'normal',#normal
+			 629 => 'MPATH:458',#normal
 			 632 => 'Schwannoma',#schwannoma
 			 638 => 'meningioma',#meningioma
 			 647 => 'sarcoma',#sarcoma
