@@ -530,7 +530,7 @@ private Vector m_ProtUNList = null;
 		Span geneSpan = null;
 		//System.out.println("\nCALCULATING UNION FOR<"+gf.getId()+">");
 		m_ExonGeneName = gf.getId();
-		System.out.println("\nGENE_NAME<"+m_ExonGeneName+">");
+		//System.out.println("\nGENE_NAME<"+m_ExonGeneName+">");
 
 		for(int i=0;i<gf.getGenFeatCount();i++){
 			GenFeat tran = gf.getGenFeat(i);
@@ -543,11 +543,18 @@ private Vector m_ProtUNList = null;
 			}
 			//System.out.print("FOR<"+gf.getId()+"> TRAN type <"
 			//		+tran.getType()+"> CONV TO<");
-			tran.setType(convertTYPE(tran.getType()));
+		
+
+			//tran.setType(convertTYPE(tran.getType()));
+			if((gf.getId()!=null)&&(!(gf.getId().startsWith("CR")))){
+				tran.setType(convertTYPE(tran.getType()));
+			}
+
 			//System.out.println(tran.getType()+">");
 	
 			
-			if(isvalidTransTYPE(tran.getType())){
+			if(((gf.getId()!=null)&&(gf.getId().startsWith("CR")))
+					||(isvalidTransTYPE(tran.getType()))){
 				Span tranSpan = null;
 				Span protSpan = null;
 				for(int j=0;j<tran.getGenFeatCount();j++){
@@ -585,15 +592,15 @@ private Vector m_ProtUNList = null;
 						Span exonSpan = exon.getSpan();
 						Span tmpSpan = exonSpan;
 						exonSpan = exonSpan.advance(m_REFSPAN.getStart()-1);
-						System.out.println("ADVANCING ID<"
-							+exon.getId()
-							+">\tSP<"+tmpSpan
-							+">\tTO<"+exonSpan+">");
+						//System.out.println("ADVANCING ID<"
+						//	+exon.getId()
+						//	+">\tSP<"+tmpSpan
+						//	+">\tTO<"+exonSpan+">");
 						exonSpan.setSrc(m_NewREFSTRING);
 						exon.setSpan(exonSpan);
 
 						String re = getRenExonName(exonSpan);
-						System.out.println("NAMED<"+re+">");
+						//System.out.println("NAMED<"+re+">");
 						if(re==null){
 							m_RenExonList.add(
 								new RenEx(
@@ -707,7 +714,9 @@ private Vector m_ProtUNList = null;
 		for(int j=0;j<gf.getGenFeatCount();j++){
 			GenFeat fsgf = gf.getGenFeat(j);
 			if(fsgf instanceof FeatureSet){
-			if(isvalidTransTYPE(fsgf.getType())){
+			if(((gf.getId()!=null)&&(gf.getId().startsWith("CR")))
+					||(isvalidTransTYPE(fsgf.getType()))){
+			//if(isvalidTransTYPE(fsgf.getType())){
 				m_ExonCount = 0;
 				GeneFeatNode.appendChild(
 						makeFeatRel(the_DOC,"partof",0,
@@ -748,6 +757,7 @@ private Vector m_ProtUNList = null;
 			if(seqType.equals("aa")){
 				//System.out.print("TEXTREPLACE<"+seqId);
 				seqId = textReplace(seqId,"-R","-P");
+				textCheck(seqId);
 				//System.out.println("> WITH<"+seqId+">");
 			}
 		}
@@ -771,15 +781,25 @@ private Vector m_ProtUNList = null;
 				&&(seqName.startsWith(the_parentName))){
 			if((seqType.equals("aa"))||(seqType.equals("protein"))){
 				seqName = textReplace(seqName,"-R","-P");
+				textCheck(seqName);
 			}
 		}
 
+		//System.out.println("PROT SEQ_NAME<"+seqName+">");
 		if(seqName!=null){
 			if((seqType.equals("aa"))||(seqType.equals("protein"))){
 				seqName = textReplace(seqName,"-R","-P");
+				textCheck(seqName);
+				//System.out.println("  SEQNAME1<"+seqName
+				//		+"> PAR<"+the_parentName+">");
 				if((the_parentName!=null)&&(seqName.indexOf("temp")>0)){
-					seqName = getBase(the_parentName)
-						+getProtSuffix(seqName);
+					//seqName = getBase(the_parentName)
+					//	+getProtSuffix(seqName);
+					/**/
+					seqName = textReplace(the_parentName,"-R","-P");
+					/**/
+
+					//System.out.println("  SEQNAME2<"+seqName+">");
 				}
 			}
 			seqFeatNode.appendChild(makeGenericNode(
@@ -815,6 +835,7 @@ private Vector m_ProtUNList = null;
 		}
 		if((seqType.equals("aa"))||(seqType.equals("protein"))){
 			uniquename = textReplace(uniquename,"-R","-P");
+			textCheck(uniquename);
 		}
 		seqFeatNode.appendChild(makeGenericNode(
 				the_DOC,"uniquename",uniquename));
@@ -917,6 +938,43 @@ private Vector m_ProtUNList = null;
 			return firstPart+the_new+lastPart;
 		}
 		return the_str;
+	}
+
+	public void textCheck(String the_str){
+		if(the_str!=null){
+			int resp = 0;
+			int strlen = the_str.length();
+			int indx = the_str.lastIndexOf("-R");
+			if((indx>0)&&((indx+2)<strlen)){
+				String suffix = the_str.substring(indx+2,indx+3);
+				//System.out.println("SUFFIX<"+suffix+">");
+				/********/
+				try{
+					resp = Integer.decode(suffix).intValue();
+				}catch(Exception ex){
+				}
+				if(resp>0){
+					System.out.println("WARNING: SUFFIX FOR <"
+							+the_str+"> IS A NUMBER");
+				}
+				/********/
+			}
+			indx = the_str.lastIndexOf("-P");
+			if((indx>0)&&((indx+2)<strlen)){
+				String suffix = the_str.substring(indx+2,indx+3);
+				//System.out.println("SUFFIX<"+suffix+">");
+				/********/
+				try{
+					resp = Integer.decode(suffix).intValue();
+				}catch(Exception ex){
+				}
+				if(resp>0){
+					System.out.println("WARNING: SUFFIX FOR <"
+							+the_str+"> IS A NUMBER");
+				}
+				/********/
+			}
+		}
 	}
 
 	public String baseName(String the_name){
@@ -1112,32 +1170,30 @@ private Vector m_ProtUNList = null;
 					//RETURNS cdnaStr,calcaaStr
 					String cdnaStr = cleanString(
 							gf.getResidues());
-						
-					//System.out.print("ENCOUNTERING CDNA");
+					System.out.println("\nCALC PROTEIN FOR FEATURE_SET ID<"+the_gf.getId()+"> TYPE<"+the_gf.getType()+">");
 					//CALCULATE PROTEIN
-					if((cdnaStr!=null)&&(the_gf.getId()!=null)&&(the_gf.getId().startsWith("CG"))){
-						//boolean testForward = isForward(ExonList);
+					if((cdnaStr!=null)
+						&&(the_gf.getId()!=null)
+						&&(!(the_gf.getId().startsWith("CR")))
+						&&(gf.getId()!=null)
+						&&(!(gf.getId().startsWith("CR")))){
 						int st = 0;
 						if(startCodonSpan!=null){
 							st = calcRelSCPos(
 								startCodonSpan,
 								ExonList);
-							System.out.println("TRANSCRIPT <"+the_gf.getId()+"> HAS A START CODON OF<"+startCodonSpan+"> AND CALC START<"+st+">");
+							//System.out.println("TRANSCRIPT <"+the_gf.getId()+"> HAS A START CODON OF<"+startCodonSpan+"> AND CALC START<"+st+">");
 						}else{
 							//FIND FIRST ATG
 							st = cdnaStr.indexOf("ATG");
 							startCodonSpan = calcStartCodon(cdnaStr,ExonList);
-							System.out.println("TRANSCRIPT <"+the_gf.getId()+"> NO START CODON SO CALC AS <"+startCodonSpan+"> AND START CALC <"+st+">");
+							System.out.println("WARNING:TRANSCRIPT <"+the_gf.getId()+"> NO START CODON SO CALC AS <"+startCodonSpan+"> AND START CALC <"+st+">");
 								
 						}
-						//int test = cdnaStr.indexOf("ATG");
-						//System.out.println("EMPIRICAL TEST<"+test+">");
 						if(st<0){
 							System.out.println("PROBLEM FOR <"+the_gf.getId()+"> CDNA<"+cdnaStr+">");
 						}else{
 						cdnaStr = cdnaStr.substring(st);
-						//System.out.println("TRUNC SEQ<"
-						//	+cdnaStr+">");
 						Ribosome r = new Ribosome();
 						calcaaStr = r.translate(cdnaStr,
 							Ribosome.DEF_TRANS_TYPE);
@@ -1145,11 +1201,14 @@ private Vector m_ProtUNList = null;
 						protGF.setType("aa");
 						protGF.setSpan(startCodonSpan);
 						String protId = textReplace(gf.getId(),"-R","-P");
+						//System.out.println("PROT_ID<"+protId+"> OLD<"+gf.getId()+">");
+						textCheck(protId);
 						protGF.setId(protId);
 						protGF.setName(protId);
+						calcaaStr = cleanProt(calcaaStr);
 						calcaaStr = cleanString(calcaaStr);
-						System.out.println("COMPUTED PROTEIN<"
-								+calcaaStr+">");
+						//System.out.println("COMPUTED PROTEIN<"
+						//		+calcaaStr+">");
 						if(calcaaStr!=null){
 							protGF.setResidues(calcaaStr);
 							protGF.setResidueLength(""+calcaaStr.length());
@@ -1167,41 +1226,36 @@ private Vector m_ProtUNList = null;
 								the_gf.getId())));
 						}
 					}else{
-						System.out.println("I CANT BELIEVE ITS NULL! <"+the_gf.getId()+"> SC<"+startCodonSpan+">");
+						System.out.println("\nPROTEIN NOT COMPUTED FOR <"+the_gf.getId()+"> StartCodon <"+startCodonSpan+"> FEATURE_SET TYPE<"+the_gf.getType()+">");
+						if((the_gf.getType()!=null)&&(the_gf.getType().equals("mRNA"))){
+							System.out.println("WARNING: SHOULD HAVE BEEN A PROTEIN COMPUTED");
+						}
+						if(cdnaStr!=null){
+							System.out.println("CDNASTR HAS LEN<"+cdnaStr.length()+">");
+						}else{
+							System.out.println("CDNASTR IS NULL");
+						}
 					}
 				}else if(gf.getType().equals("aa")){
-					/****************/
 					String givenaaStr= cleanString(
 							gf.getResidues());
-					//System.out.println("GIVEN PROTEIN<"
-					//		+givenaaStr+">");
+					if(calcaaStr!=null){
 					int cmp = calcaaStr.compareTo(givenaaStr);
-					System.out.println("PROTCOMPARE<"+cmp+">");
-					/****************/
-					/****************
-					System.out.println("CALCULATING PROTEIN");
-					//NEEDS   startCodonSpan,ExonList,gf,the_gf
-					//RETURNS SeqNode
-					if(startCodonSpan!=null){
-						gf.setSpan(startCodonSpan);
-					}
-					if(gf.getSpan()!=null){
-						String givenaaStr= cleanString(
-							gf.getResidues());
+					if(cmp!=0){
+						System.out.println("CALCULATED PROTEIN DIFFERS FROM GIVEN PROTEIN IN feature_set<"+the_gf.getId()+">");
 						System.out.println("GIVEN PROTEIN<"
 								+givenaaStr+">");
-						Span newSpan = ProtCalc.calcNewProtSpan(
-								gf.getSpan(),
-								givenaaStr.length(),
-								ExonList);
-						newSpan.setSrc(m_NewREFSTRING);
-						FeatNode.appendChild(
-							makeFeatRel(the_DOC,"producedby",0,
-								makeSeqNode(the_DOC,gf,newSpan,the_gf.getName(),the_gf.getId())));
-					}else{
-						System.out.println("DOING SOMETHING BAD");
+						if(givenaaStr!=null){
+							System.out.println("LEN<"+givenaaStr.length()+">\n");
+						}
+						System.out.println("CALC PROTEIN<"
+								+calcaaStr+">");
+						if(calcaaStr!=null){
+							System.out.println("LEN<"+calcaaStr.length()+">\n");
+						}
 					}
-					****************/
+					}
+					//System.out.println("PROTCOMPARE<"+cmp+">");
 				}else{
 					System.out.println("SHOULDNOTSEE UNK TYPE<"+gf.getType()+">");
 				}
@@ -1213,6 +1267,16 @@ private Vector m_ProtUNList = null;
 		}
 		//System.out.println("PTB");
 		return FeatNode;
+	}
+
+	private String cleanProt(String the_prot){
+		if(the_prot!=null){
+			int indx = the_prot.indexOf("@");
+			if(indx>0){
+				the_prot = the_prot.substring(0,indx);
+			}
+		}
+		return the_prot;
 	}
 
 	private boolean isForward(Vector the_spanList){
@@ -1272,12 +1336,12 @@ private Vector m_ProtUNList = null;
 	}
 
 	private int calcRelSCPos(Span the_sc,Vector the_spanList){
-		System.out.print("CalcRelSCPos ");
-		if(the_spanList!=null){
-			System.out.println("<"+the_spanList.size()+">");
-		}else{
-			System.out.println("<0>\n");
-		}
+		//System.out.print("CalcRelSCPos ");
+		//if(the_spanList!=null){
+		//	System.out.println("<"+the_spanList.size()+">");
+		//}else{
+		//	System.out.println("<0>\n");
+		//}
 		boolean isForward = true;
 		//JUST FOR TEST OF LOCATION WITHIN AN EXON, THE SC IS MADE SMALLER
 		Span scSpan = new Span(the_sc.getStart(),the_sc.getStart());
@@ -1287,32 +1351,32 @@ private Vector m_ProtUNList = null;
 		}
 		int deductionLen = 0;
 		if(isForward){
-			System.out.println("\tIS FORWARD");
+			//System.out.println("\tIS FORWARD");
 			for(int i=0;i<the_spanList.size();i++){
 				Span ex = (Span)the_spanList.get(i);
-				System.out.print("\tEXON SP<"+ex.toString()+">");
+				//System.out.print("\tEXON SP<"+ex.toString()+">");
 				if(ex.contains(scSpan)){
-					System.out.println(" CONTAINS <"
-							+scSpan.toString()+">");
+					//System.out.println(" CONTAINS <"
+					//		+scSpan.toString()+">");
 					deductionLen += (scSpan.getStart()-ex.getStart());
 					return deductionLen;
 				}else{
-					System.out.println(" HAS NO START CODON");
+					//System.out.println(" HAS NO START CODON");
 					deductionLen += ex.getLength();
 				}
 			}
 		}else{
-			System.out.println("\tIS REVERSE");
+			//System.out.println("\tIS REVERSE");
 			for(int i=0;i<the_spanList.size();i++){
 				Span ex = (Span)the_spanList.get(i);
-				System.out.print("\tEXON SP<"+ex.toString()+">");
+				//System.out.print("\tEXON SP<"+ex.toString()+">");
 				if(ex.contains(scSpan)){
-					System.out.println("CONTAINS <"
-							+scSpan.toString()+">");
+					//System.out.println("CONTAINS <"
+					//		+scSpan.toString()+">");
 					deductionLen += (-scSpan.getStart()+ex.getStart());
 					return deductionLen;
 				}else{
-					System.out.println("HAS NO START CODON");
+					//System.out.println("HAS NO START CODON");
 					deductionLen += ex.getLength();
 				}
 			}
@@ -1340,6 +1404,7 @@ private Vector m_ProtUNList = null;
 			String the_parentName,String the_parentType,
 			String the_parentId){
 
+		//System.out.println("FEAT HEADER FOR ID<"+the_gf.getId()+"> TYPE<"+the_gf.getType()+"> P_NAME<"+the_parentName+"> P_ID<"+the_parentId+"> P_TYPE<"+the_parentType+">");
 		//UNIVERSAL HEADER (NAME, UNIQUENAME, FEATUREPROP,DBXREF,etc FOR
 		//ALL FEATURES REPRESENTING ANNOTATION,FEATURE_SET,FEATURE_SPAN
 		//ID PROCESSING
@@ -1355,6 +1420,7 @@ private Vector m_ProtUNList = null;
 
 		//PREPROCESS TYPE_ID
 		String tmpTypeId = the_gf.getType();
+		//System.out.println("GIVEN TYPE<"+tmpTypeId+">");
 		if(tmpTypeId==null){
 			//GUESS AT TYPE
 			if(idTxt.indexOf("-R")>0){
@@ -1366,23 +1432,38 @@ private Vector m_ProtUNList = null;
 				the_gf.setType(tmpTypeId);
 			}
 		}
+		//System.out.println("MOD1 TYPE<"+tmpTypeId+">");
 
-		if((idTxt!=null)&&(idTxt.startsWith("CR"))){
+		//SPECIAL FOR CR's WITH FeatureSets of type 'transcript'
+		String specialTypeId = null;
+		if((the_gf instanceof Annot)
+				&&(idTxt!=null)&&(idTxt.startsWith("CR"))){
 			if(the_gf instanceof Annot){
 				if(tmpTypeId.startsWith("miscell")){
 					tmpTypeId = "remark";
 				}else{
-					tmpTypeId = "gene";
-				}
-			}else if(the_gf instanceof FeatureSet){
-				if(the_parentType.equals("gene")){
-				}else{
-					tmpTypeId = the_parentType;
+					specialTypeId = "gene";
 				}
 			}
 		}
 
+		if((the_gf instanceof FeatureSet)
+				&&(tmpTypeId.equals("transcript"))){
+			//System.out.println("FOUND FEATURE_SET <"+the_gf.getId()+"> IN<"+the_parentId+"> OF TYPE TRANSCRIPT");
+			tmpTypeId = "mRNA";
+			if(!the_parentType.equals("gene")){
+				//System.out.println("PARENT IS NOT GENE - USE SPECIAL");
+				//PREEMPT THE REPRESENTATION OF THIS TRANSCRIPT
+				//AS AN mRNA FOR THIS SPECIAL CASE
+				specialTypeId = the_parentType;
+			}else{
+				//System.out.println("PARENT TYPE<"+the_parentType+"> - DONT USE SPECIAL");
+			}
+		}
+		//System.out.println("MOD3 TYPE<"+tmpTypeId+">");
+
 		tmpTypeId = convertTYPE(tmpTypeId);
+		//System.out.println("MOD4 TYPE<"+tmpTypeId+">");
 
 
 		//CORRECT FOR PROTEIN IDs HAVING A '-R'
@@ -1390,6 +1471,7 @@ private Vector m_ProtUNList = null;
 		if(tmpTypeId.equals("aa")){
 			if(idTxt.lastIndexOf("-R")>0){
 				idTxt = textReplace(idTxt,"-R","-P");
+				textCheck(idTxt);
 			}
 		}
 
@@ -1405,6 +1487,14 @@ private Vector m_ProtUNList = null;
 		String uniquename = null;
 		//UN = ID unless its a transcript with a 'temp' ID
 		if(tmpTypeId.equals("remark")){
+			uniquename = idTxt;
+		}else if((the_gf instanceof Annot)
+				&&(the_gf.getId()!=null)
+				&&(the_gf.getId().startsWith("CR"))){
+			uniquename = idTxt;
+		}else if((the_gf instanceof FeatureSet)
+				&&(the_parentId!=null)
+				&&(the_parentId.startsWith("CR"))){
 			uniquename = idTxt;
 		}else if(tmpTypeId.equals("exon")){
 			m_ExonCount++;
@@ -1446,6 +1536,8 @@ private Vector m_ProtUNList = null;
 		if((uniquename==null)||(uniquename.equals(""))){
 			uniquename = "UNKNOWN_UNIQUENAME";
 		}
+
+		//System.out.println("YIELD UN<"+uniquename+"> FOR TYPE<"+tmpTypeId+"> SPEC<"+specialTypeId+">");
 /***********************/
 
 		//WRITE HEADER ATTRIBUTES
@@ -1519,7 +1611,10 @@ private Vector m_ProtUNList = null;
 		}
 
 		//TYPE_ID
-		if(tmpTypeId!=null){
+		if(specialTypeId!=null){
+			the_FeatNode.appendChild(makeGenericNode(
+					the_DOC,"type_id",specialTypeId));
+		}else if(tmpTypeId!=null){
 			the_FeatNode.appendChild(makeGenericNode(
 					the_DOC,"type_id",tmpTypeId));
 		}
@@ -2814,8 +2909,8 @@ private Vector m_ProtUNList = null;
 	private void DisplayRenExon(){
 		for(int i=0;i<m_RenExonList.size();i++){
 			RenEx re = (RenEx)m_RenExonList.get(i);
-			System.out.println("\tEXON<"+re.getName()
-					+"> SPAN<"+re.getSpan()+">");
+			//System.out.println("\tEXON<"+re.getName()
+			//		+"> SPAN<"+re.getSpan()+">");
 		}
 	}
 
