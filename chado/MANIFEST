@@ -1,6 +1,6 @@
 Changes
 INSTALL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
 README
@@ -14,7 +14,6 @@ bin/pg2diagram.pl
 bin/pg2graphviz.pl
 bin/pg2graphviz_svg.pl
 bin/test_load.pl
-bin/test_load.sh
 bin/ucsc_genes2gff.pl
 dat/NC_000913.gff
 dat/chado.ddl
@@ -28,10 +27,8 @@ doc/cjm-notes.txt
 doc/design.txt
 doc/implementation.txt
 doc/snps.txt
-lib/Chado/AutoDBI.pm
 lib/Chado/Builder.pm
 lib/Chado/Config.pm
-lib/Chado/LoadDBI.pm
 load/Build.PL
 load/Makefile
 load/bin/load_affymetrix.pl
