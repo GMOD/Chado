@@ -1,13 +1,13 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Mar  3 16:41:14 2003
+-- Created on Mon Mar  3 19:57:31 2003
 --
 
 --
 -- Table: tableinfo
 --
 CREATE TABLE tableinfo (
-  table_id serial(4) NOT NULL,
+  tableinfo_id serial(4) NOT NULL,
   name varchar(30) NOT NULL,
   table_type varchar(40) NOT NULL,
   primary_key_column varchar(30),
