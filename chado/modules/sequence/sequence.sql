@@ -20,6 +20,12 @@ create table feature (
        md5checksum char(32),
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
+-- timeaccessioned and timelastmodified are for handling object accession/
+-- modification timestamps (as opposed to db auditing info, handled elsewhere).
+-- The expectation is that these fields would be available to software 
+-- interacting with chado.
+       timeaccessioned timestamp not null default current_timestamp,
+       timelastmodified timestamp not null default current_timestamp
 
        unique(organism_id,uniquename)
 );
