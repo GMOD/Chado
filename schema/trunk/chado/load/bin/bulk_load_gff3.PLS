@@ -27,7 +27,7 @@ if ($OPTIONS{LIB}) {
   print OUT "use lib '$OPTIONS{LIB}';\n";
 }
 if ($OPTIONS{PREFIX}) {
-  print OUT "use lib '$OPTIONS{PREFIX}/lib'i\n";
+  print OUT "use lib '$OPTIONS{PREFIX}/lib'\n";
 }
 
 print OUT <<'!NO!SUBS!';
