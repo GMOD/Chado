@@ -5,30 +5,31 @@
 create table feature (
        feature_id serial not null,
        primary key (feature_id),
--- dbxref_id here is intended for the primary dbxref for this feature.   
--- Additional dbxref links are made via feature_dbxref
        dbxref_id int,
        foreign key (dbxref_id) references dbxref (dbxref_id),
        organism_id int not null,
        foreign key (organism_id) references organism (organism_id),
--- the human-readable common name for a feature, for display
        name varchar(255),
--- the unique name for a feature; may not be particularly human-readable
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
--- timeaccessioned and timelastmodified are for handling object accession/
--- modification timestamps (as opposed to db auditing info, handled elsewhere).
--- The expectation is that these fields would be available to software 
--- interacting with chado.
        timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
 
        unique(organism_id,uniquename)
 );
+-- dbxref_id here is intended for the primary dbxref for this feature.   
+-- Additional dbxref links are made via feature_dbxref
+-- name: the human-readable common name for a feature, for display
+-- uniquename: the unique name for a feature; may not be particularly human-readable
+
+-- timeaccessioned and timelastmodified are for handling object accession/
+-- modification timestamps (as opposed to db auditing info, handled elsewhere).
+-- The expectation is that these fields would be available to software 
+-- interacting with chado.
 create seuqence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
 create index feature_idx1 on feature (dbxref_id);
@@ -113,7 +114,6 @@ create table featureloc (
        nend int,
        is_nend_partial boolean not null default 'false',
        strand smallint,
--- phase of translation wrt srcfeature_id.  Values are 0,1,2
        phase int,
 
        residue_info text,
@@ -123,6 +123,7 @@ create table featureloc (
 
        unique (feature_id, locgroup, rank)
 );
+-- phase: phase of translation wrt srcfeature_id.  Values are 0,1,2
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
 create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
@@ -265,14 +266,14 @@ create table synonym (
        synonym_id serial not null,
        primary key (synonym_id),
        name varchar(255) not null,
--- types would be symbol and fullname for now
        type_id int not null,
--- sgml-ized version of symbols
        synonym_sgml varchar(255) not null,
        foreign key (type_id) references cvterm (cvterm_id),
 
        unique(name,type_id)
 );
+-- type_id: types would be symbol and fullname for now
+-- synonym_sgml: sgml-ized version of symbols
 create index synonym_idx1 on synonym (type_id);
 
 
@@ -287,14 +288,18 @@ create table feature_synonym (
        foreign key (synonym_id) references synonym (synonym_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
--- the pub_id link is for relating the usage of a given synonym to the
--- publication in which it was used
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
--- the is_current bit indicates whether the linked synonym is the 
--- current -official- symbol for the linked feature
        is_current boolean not null,
--- typically a synonym exists so that somebody querying the db with an
+       is_internal boolean not null default 'false',
+
+       unique(synonym_id, feature_id, pub_id)
+);
+-- pub_id: the pub_id link is for relating the usage of a given synonym to the
+-- publication in which it was used
+-- is_current: the is_current bit indicates whether the linked synonym is the 
+-- current -official- symbol for the linked feature
+-- is_internal: typically a synonym exists so that somebody querying the db with an
 -- obsolete name can find the object they're looking for (under its current
 -- name.  If the synonym has been used publicly & deliberately (eg in a 
 -- paper), it my also be listed in reports as a synonym.   If the synonym 
@@ -302,10 +307,6 @@ create table feature_synonym (
 -- the is_internal bit may be set to 'true' so that it is known that the 
 -- synonym is "internal" and should be queryable but should not be listed 
 -- in reports as a valid synonym.
-       is_internal boolean not null default 'false',
-
-       unique(synonym_id, feature_id, pub_id)
-);
 create index feature_synonym_idx1 on feature_synonym (synonym_id);
 create index feature_synonym_idx2 on feature_synonym (feature_id);
 create index feature_synonym_idx3 on feature_synonym (pub_id);

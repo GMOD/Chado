@@ -96,12 +96,12 @@ create index expression_pub_idx2 on expression_pub (pub_id);
 create table eimage (
        eimage_id serial not null,
        primary key (eimage_id),
--- we expect images in eimage_data (eg jpegs) to be uuencoded
        eimage_data text,
--- describes the type of data in eimage_data
        eimage_type varchar(255) not null,
        image_uri varchar(255)
 );
+-- we expect images in eimage_data (eg jpegs) to be uuencoded
+-- describes the type of data in eimage_data
 
 
 -- ================================================
