@@ -1,0 +1,86 @@
+                            CHADO README
+
+$Id: README.H_sapiens,v 1.1 2003-12-09 22:16:21 allenday Exp $
+
+INTRODUCTION
+------------
+
+This document describes a basic data load process used by the developers
+of the UCLA Human Genetics / Microarray Core Facility.
+
+PREREQUISITES
+-------------
+
+The instructions in this document assume you have already read README and
+INSTALL, followed the instructions, and have a functional chado database.
+It also assumes that you've already done a "make prepdb" and "make ontologies",
+and installed, at a minimum, the Relationship and Sequence ontologies.
+
+To be able to follow all instructions here, it's important that during the
+"perl Makefile.PL" step, you chose to install the expression/rad.sql
+gene expression module.  If you're not interested in loading gene expression
+data, don't worry about this option.  Loading gene expression data further
+requires that the Mouse Anatomy and Mouse Pathology ontologies be loaded,
+as biological samples are annotated with tissue type and disease state.
+It also requires an install of bioperl-microarray 0.01 or later.
+
+LOAD GENOMIC DATA
+-----------------
+
+1. Download chromosome data.  The following URL provides a GFF describing
+the chromosomes given in UCSC Build 16 (hg16) of the Human genome.
+
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/chromosomes.gff
+
+Load the GFF file as below.  Make sure you are in your chado distribution
+directory.
+
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile chromosomes.gff
+
+If you look at the data loaded into the feature table at this point,
+you will notice that the chromosomes have been loaded as objects of
+sequence-ontology type "sequence-region".  This is a nuance of the GFF3
+spec, and isn't an error.
+
+2. Download gene model data.  The following URL provides all GenBank mRNA
+records available from UCSC hg16.  Each gene model has extra data attached
+to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
+
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/knownGene.gff
+
+Now load the GFF file as:
+
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile knownGene.gff
+
+This will take several hours to complete.
+
+LOAD TRANSCRIPTOMIC DATA
+------------------------
+
+1. If you haven't already done so, install bioperl-microarray, version 0.01 or later.
+You can download this from http://bioperl.org/ or from http://search.cpan.org/ (search
+for "Bio::Expression::MicroarrayIO").
+
+3. Download gene expression data:
+
+  wget http://sumo/~allenday/chado/13138-13134-MA0000411,MPATH458,adult%20testis%20ucla%20133A.xls
+  wget http://sumo/~allenday/chado/14168-14160-MA0000384,MPATH458,adult%20ovary%20ucla%20133A.xls
+
+and load it as:
+
+  ./load/bin/load_affyxls.pl U133A 13138-13134-MA0000411,MPATH458,adult\ testis\ ucla\ 133A.xls
+  ./load/bin/load_affyxls.pl U133A 14168-14160-MA0000411,MPATH458,adult\ ovary\ ucla\ 133A.xls
+
+Now you have two Affymetrix U133A arrays loaded, one from a normal adult testis sample, and one from
+a normal adult ovary sample.  Contact the author of this document for details about how the data was
+prepared.
+
+COPYRIGHT
+---------
+This software is free.  You can use it under the terms of the
+Perl Artistic License.
+
+AUTHORS
+-------
+Allen Day, <allenday@ucla.edu>
+2002-2003

@@ -4,6 +4,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
 README
+README.H_sapiens
+README.gene_expression
 bin/addcascades
 bin/ddltrans
 bin/make_cvtermpath.pl
