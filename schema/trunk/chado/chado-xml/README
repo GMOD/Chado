@@ -1,0 +1,44 @@
+Chado-XML
+=========
+
+Chado-XML is a direct mapping of the Chado relational schema into
+XML. Currently the only tool for performing this mapping is XML::XORT,
+which can dump or save Chado-XML to and from a chado db.
+
+Contents:
+---
+chado-xml
+        README
+        xsl/                    -- useful transforms
+        dtd/                    -- DTDs/XSDs defining the xml model
+        examples/               -- example XML files
+        doc/                    -- documentation
+---
+
+Documentation in asciidoc - can use asciidoc.py to convert to HTML,
+PDF, RTF etc
+
+See:
+
+        SourceForge: http://sourceforge.net/projects/asciidoc/
+        Main website: http://www.methods.co.nz/asciidoc/
+
+
+
+Macros
+------
+
+The basic chado-xml expansion can be extremely verbose - this is
+because chado-xml uses the unique keys from the chado db, yet it does
+not database internal foreign keys.
+
+Macros can be used to capture repeated nodes in the xml and give them
+XML IDs that are valid within a particular document.
+
+
+
+
+See also
+--------
+
+gmod/XML-XORT
