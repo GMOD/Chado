@@ -6,6 +6,38 @@ use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 use Getopt::Long;
 
+=head1 NAME
+                                                                                
+dump_gff3.pl - Dump gff3 from a chado database.
+                                                                                
+=head1 SYNOPSIS
+                                                                                
+  % dump_gff3.pl [--organism human] [--refseq Chr_1] > out.gff
+                                                                                
+=head1 COMMAND-LINE OPTIONS
+
+If no arguments are provided, dump_gff3.pl will dump all features
+for the default organism in the database.  The command line options
+are these:
+
+  --organism          specifies the organism for the dump (common name)
+  --refseq            reference sequece (eg, chromosome) to dump
+
+If there is no default organism for the database or one is not
+specified on the command line, the program will exit with no output.
+
+=head1 AUTHOR
+
+Scott Cain E<lt>cain@cshl.orgE<gt>
+
+Copyright (c) 2004
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+                                                                                
+=cut
+
+
 my ($ORGANISM,$REFSEQ);
 
 GetOptions(
@@ -27,7 +59,12 @@ my $organism_id = $dbh->prepare("select organism_id from organism
 $organism_id->execute($ORGANISM);
 my $arrayref = $organism_id->fetchrow_arrayref();
 $organism_id    = $$arrayref[0];
-die "couldn't find $ORGANISM in organism table" unless $organism_id;
+
+unless ($organism_id) {
+    system( 'pod2text', $0 );
+    warn "Organism:$ORGANISM not found in database\n";
+    exit 1;
+}
 
 my $ref_seq_part = "";
 if ($REFSEQ) {
