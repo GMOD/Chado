@@ -119,12 +119,8 @@ DROP TRIGGER feature_assignname_tr_i ON feature;
 CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS '
 DECLARE
   maxid      int;
-  maxid_temp int;
   pos        int;
   id         varchar(255);
-  maxid_fb   int;
-  id_fb      varchar(255);
-  message    varchar(255);
   exon_id    int;
   prefix     constants.value%TYPE;
   suffix     constants.value%TYPE;
@@ -137,11 +133,6 @@ DECLARE
   f_type_id  cvterm.cvterm_id%TYPE;
   letter_t   varchar;
   letter_p   varchar;
-  d_id                 db.db_id%TYPE;
-  f_dbxref_id          feature.dbxref_id%TYPE;
-  f_dbxref_id_temp     feature.dbxref_id%TYPE;
-  fb_accession         dbxref.accession%TYPE;
-  d_accession          dbxref.accession%TYPE;
   f_uniquename_temp    feature.uniquename%TYPE;
   f_uniquename         feature.uniquename%TYPE;
   f_uniquename_tr      feature.uniquename%TYPE;
@@ -150,11 +141,8 @@ DECLARE
   f_name               feature.name%TYPE;
   s_type_id            synonym.type_id%TYPE;
   s_id                 synonym.synonym_id%TYPE;
-  p_id                 pub.pub_id%TYPE;
-  p_type_id            cvterm.cvterm_id%TYPE;
   c_cv_id              cv.cv_id%TYPE;
   f_s_id               feature_synonym.feature_synonym_id%TYPE;
-  f_d_id               feature_dbxref.feature_dbxref_id%TYPE;
   fr_row feature_relationship%ROWTYPE;
   f_type_gene CONSTANT varchar :=''gene'';
   f_type_exon CONSTANT varchar :=''exon'';
@@ -178,35 +166,31 @@ DECLARE
   o_species  CONSTANT varchar:=''sativa'';
   c_name_synonym CONSTANT varchar:=''synonym'';
   cv_cvname_synonym CONSTANT varchar:=''null'';
-  p_miniref         CONSTANT varchar:=''none'';
-  p_cvterm_name     CONSTANT varchar:=''computer file'';
-  p_cv_name         CONSTANT varchar:=''pub type'';
+  p_miniref         CONSTANT varchar:=''null'';
+  p_id  pub.pub_id%TYPE;
 BEGIN
   SELECT INTO prefix c.value FROM constants c, cvterm, cv  
                              WHERE c.name = ''prefix'' and
                                    c.application_id = cvterm.cvterm_id and
                                    cvterm.name = ''apollo'' and 
                                    cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''applications'';
+                                   cv.name = ''application'';
   SELECT INTO suffix c.value FROM constants c, cvterm, cv
                              WHERE c.name = ''suffix'' and
                                    c.application_id = cvterm.cvterm_id and
                                    cvterm.name = ''apollo'' and
                                    cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''applications'';
-
-  RAISE NOTICE ''assigning names, prefix:%, suffix:%'',prefix,suffix;
+                                   cv.name = ''application'';
+  SELECT INTO f_type c.name
+         from feature f, cvterm c
+         where f.type_id=c.cvterm_id and
+               f.uniquename=NEW.uniquename and
+               f.organism_id =NEW.organism_id;
+  SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
+  RAISE NOTICE ''assigning names, prefix:%, suffix:%, type:%'',prefix,suffix,f_type;
 
   RAISE NOTICE ''enter f_i: feature.uniquename:%, feature.type_id:%'', NEW.uniquename, NEW.type_id;
   IF (NEW.uniquename like prefix||'':temp%''||suffix) and  NEW.uniquename not like ''%-%''  THEN
-      SELECT INTO f_type c.name 
-             from feature f, cvterm c, organism o 
-             where f.type_id=c.cvterm_id and 
-                   f.uniquename=NEW.uniquename and 
-                   f.organism_id =NEW.organism_id;
-      IF f_type is NOT NULL THEN
-        RAISE NOTICE ''in feature_assignname_fn_i type of this feature is:%'', f_type;
-      END IF;
       IF f_type=f_type_gene THEN
           RAISE NOTICE ''in f_i, feature type is:%'', f_type;
           SELECT INTO f_row_g * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
@@ -215,117 +199,41 @@ BEGIN
           id:=lpad(maxid, 6, ''000000'');
           f_uniquename:=CAST(prefix||id||suffix as TEXT);
 
-          SELECT INTO d_id db_id from db where name= f_dbname_gadfly;
-          RAISE NOTICE ''db_id:%, uniquename:%, f_dbname_gadfly:%:'', d_id, f_uniquename, f_dbname_gadfly; 
-          SELECT INTO f_dbxref_id dbxref_id from dbxref where db_id=d_id and accession=f_uniquename;
-          IF f_dbxref_id IS NULL THEN 
-              INSERT INTO dbxref (db_id, accession) values(d_id, f_uniquename);
-              SELECT INTO f_dbxref_id dbxref_id from dbxref where db_id=d_id and accession=f_uniquename;
-          END IF;
-          RAISE NOTICE ''dbxref_id:%'', f_dbxref_id;
           IF NEW.name like ''%temp%'' or NEW.name IS NULL THEN
-               UPDATE feature set uniquename=f_uniquename, dbxref_id=f_dbxref_id, name=f_uniquename where feature_id=f_row_g.feature_id;
+               UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=f_row_g.feature_id;
           ELSE
-               UPDATE feature set uniquename=f_uniquename, dbxref_id=f_dbxref_id where feature_id=f_row_g.feature_id;
+               UPDATE feature set uniquename=f_uniquename where feature_id=f_row_g.feature_id;
           END IF;
           RAISE NOTICE ''old uniquename of this feature is:%'', f_row_g.uniquename;
           RAISE NOTICE ''new uniquename of this feature is:%'', f_uniquename;
-          message:=CAST(''old uniquename:''||f_row_g.uniquename||'' new uniquename:''||f_uniquename AS TEXT);
-          RAISE NOTICE ''message:%, f_row_g.feature_id:%, f_dbxref_id:%'', message, f_row_g.feature_id, f_dbxref_id;
-          SELECT INTO f_d_id feature_dbxref_id from feature_dbxref where feature_id=f_row_g.feature_id and dbxref_id=f_dbxref_id;
-          IF f_d_id IS NULL THEN
-              INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(f_row_g.feature_id, f_dbxref_id, ''false'');
-          END IF;
+
+          --insert into synonym, feature_synonym
           SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
           SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
           IF s_id IS NULL THEN
               INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename, f_uniquename, s_type_id);
               SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
           END IF;
-          SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-          IF p_id IS NULL THEN
-              SELECT INTO p_type_id cvterm_id from cvterm where name=p_cvterm_name;
-              IF p_type_id IS NULL THEN
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  IF c_cv_id IS NULL THEN
-                      INSERT INTO cv(name) values(p_cv_name);
-                      SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  END IF;
-                  INSERT INTO cvterm(name, cv_id) values(p_cvterm_name, c_cv_id);
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-              END IF;
-              INSERT INTO pub(uniquename, miniref, type_id) values(p_miniref, p_miniref, p_type_id);
-              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-          END IF;
           SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_g.feature_id and synonym_id=s_id and pub_id=p_id;
           IF f_s_id IS NULL THEN
               INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_g.feature_id, s_id, p_id, ''true'');
           END IF;
-          RAISE NOTICE ''feature_id:%, synonym_id:%, pub_id:%'', f_row_g.feature_id, s_id, p_id;
-          id_fb:=lpad(maxid_fb, 7, ''0000000'');
-          fb_accession:=CAST(''FBgn''||id_fb AS TEXT);
-          RAISE NOTICE ''fb_accession is:%'', fb_accession;
-          SELECT INTO d_id db_id from db where name=f_dbname_FB;
-          INSERT INTO dbxref(db_id, accession) values(d_id, fb_accession);
-          SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_FB and accession=fb_accession;
-          INSERT INTO feature_dbxref(feature_id, dbxref_id) values(f_row_g.feature_id, f_dbxref_id);   
-          RAISE NOTICE ''FBgn for feature:% is:%'', fb_accession, f_uniquename;
-          message:=CAST(''FBgn:''||fb_accession||''for feature:''||f_uniquename AS TEXT);          
+          RAISE NOTICE ''feature_id:%, synonym_id:%'', f_row_g.feature_id, s_id;
       END IF; --ends if gene
   END IF;     --ends if uniquename like temp
 
-  IF (NEW.uniquename like prefix||''%'' and NEW.uniquename not like prefix||'':temp%'' and (NEW.uniquename like ''%-R%'' or NEW.uniquename like ''%-P%'' or NEW.uniquename like ''%:temp%'' ))  THEN
-      SELECT INTO f_type c.name 
-             from feature f, cvterm c, organism o 
-             where f.type_id=c.cvterm_id and 
-                   f.uniquename=NEW.uniquename and 
-                   f.organism_id =NEW.organism_id;
+  --deal with non-gene entries, note the the '%:temp%' is to deal with situations like 'promoter:temp1'
+  IF (NEW.uniquename not like prefix||'':temp%''||suffix and (NEW.uniquename like ''%-R%'' or NEW.uniquename like ''%-P%'' or NEW.uniquename like ''%:temp%'' ))  THEN
       IF f_type is NOT NULL THEN
           RAISE NOTICE ''in f_i, type of this feature is:%'', f_type;
       END IF;
       IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA ) THEN
           SELECT INTO f_row_t * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
-          IF f_row_t.dbxref_id IS  NULL THEN  
-              RAISE NOTICE ''dbxref_id for this feature is null, NEW.uniquename:%'',NEW.uniquename;
-              SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;
-              IF f_dbxref_id IS NULL THEN 
-                  SELECT INTO d_id db_id from db where name=f_dbname_gadfly;
-                  INSERT INTO dbxref(db_id, accession ) values(d_id, NEW.uniquename);
-                  SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;
-              END IF;
-              IF f_row_t.name like ''%temp%'' or f_row_t.name IS NULL THEN
-                  UPDATE feature set dbxref_id=f_dbxref_id, name=NEW.uniquename where feature_id=f_row_t.feature_id;
-              ELSE
-                  UPDATE feature set dbxref_id=f_dbxref_id  where feature_id=f_row_t.feature_id;
-              END IF;
-          ELSE
-              f_dbxref_id:=f_row_t.dbxref_id;
-          END IF;
-          SELECT INTO f_dbxref_id_temp dbxref_id from feature_dbxref where feature_id=f_row_t.feature_id and dbxref_id=f_row_t.dbxref_id;
-          IF f_dbxref_id_temp IS NULL THEN
-              INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(f_row_t.feature_id, f_dbxref_id, ''false'');
-          END IF;
-          RAISE NOTICE ''old uniquename of this feature is:%, dbxref_id is:%'', f_row_t.uniquename, f_dbxref_id;
           SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
           SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
           IF s_id IS NULL THEN
               INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.uniquename, NEW.uniquename, s_type_id);
               SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
-          END IF;
-          SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-          IF p_id IS NULL THEN
-              SELECT INTO p_type_id cvterm_id from cvterm where name=p_cvterm_name;
-              IF p_type_id IS NULL THEN
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  IF c_cv_id IS NULL THEN
-                      INSERT INTO cv(name) values(p_cv_name);
-                      SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  END IF;
-                  INSERT INTO cvterm(name, cv_id) values(p_cvterm_name, c_cv_id);
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-              END IF;
-              INSERT INTO pub(uniquename, miniref, type_id) values(p_miniref, p_miniref, p_type_id);
-              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
           END IF;
           SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_t.feature_id and synonym_id=s_id and pub_id=p_id;
           IF f_s_id IS NULL THEN
@@ -334,51 +242,18 @@ BEGIN
       END IF;  --ends if type = other three level type
       IF f_type=f_type_protein THEN
           SELECT INTO f_row_p * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
-          IF f_row_p.dbxref_id IS  NULL THEN  
-              SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;
-              IF f_dbxref_id IS NULL THEN 
-                  SELECT INTO d_id db_id from db where name=f_dbname_gadfly;
-                  INSERT INTO dbxref(db_id, accession ) values(d_id, NEW.uniquename);
-                  SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d  where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;  
-              END IF; 
-              IF f_row_p.name like ''%temp%'' or f_row_p.name IS NULL THEN
-                  UPDATE feature set dbxref_id=f_dbxref_id, name=NEW.uniquename where feature_id=f_row_p.feature_id;
-              ELSE
-                  UPDATE feature set dbxref_id=f_dbxref_id where feature_id=f_row_p.feature_id;
-              END IF;
-          ELSE
-              f_dbxref_id:=f_row_p.dbxref_id;
-          END IF;
-              SELECT INTO f_dbxref_id_temp dbxref_id from feature_dbxref where feature_id=f_row_p.feature_id and dbxref_id=f_row_p.dbxref_id;
-              IF f_dbxref_id_temp IS NULL THEN
-                  INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(f_row_p.feature_id, f_dbxref_id, ''false'');
-              END IF;
-              RAISE NOTICE ''old uniquename of this feature is:%'', f_row_p.uniquename; 
-              SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+          RAISE NOTICE ''old uniquename of this feature is:%'', f_row_p.uniquename; 
+
+          SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+          SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
+          IF s_id IS NULL THEN
+              INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.uniquename, NEW.uniquename, s_type_id);
               SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
-              IF s_id IS NULL THEN
-                  INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.uniquename, NEW.uniquename, s_type_id);
-                  SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
-              END IF;
-              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-              IF p_id IS NULL THEN
-                  SELECT INTO p_type_id cvterm_id from cvterm where name=p_cvterm_name;
-                  IF p_type_id IS NULL THEN
-                      SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                      IF c_cv_id IS NULL THEN
-                          INSERT INTO cv(name) values(p_cv_name);
-                          SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                      END IF;
-                      INSERT INTO cvterm(name, cv_id) values(p_cvterm_name, c_cv_id);
-                      SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  END IF;
-                  INSERT INTO pub(uniquename, miniref, type_id) values(p_miniref, p_miniref, p_type_id);
-                  SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-              END IF;
-              SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_p.feature_id and synonym_id=s_id and pub_id=p_id;
-              IF f_s_id IS NULL THEN
-                  INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_p.feature_id, s_id, p_id, ''true'');
-              END IF;
+          END IF;
+          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_p.feature_id and synonym_id=s_id and pub_id=p_id;
+          IF f_s_id IS NULL THEN
+              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_p.feature_id, s_id, p_id, ''true'');
+          END IF;
       END IF; --ends if type = protein
       IF f_type=f_type_exon THEN
           SELECT INTO f_row_e * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
@@ -393,46 +268,13 @@ BEGIN
           ELSE
               UPDATE feature set uniquename=f_uniquename_exon where feature_id=f_row_e.feature_id;
           END IF;
-          IF f_row_e.dbxref_id IS  NULL THEN 
-              SELECT INTO d_id db_id from db where name= f_dbname_gadfly;
-              INSERT INTO dbxref(db_id, accession ) values(d_id, f_uniquename_exon);
-              SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=f_uniquename_exon;
-              IF f_row_e.name like ''%temp%'' or f_row_e.name IS NULL THEN
-                  UPDATE feature set name=f_uniquename_exon, dbxref_id=f_dbxref_id where feature_id=f_row_e.feature_id;
-              ELSE
-                  UPDATE feature set dbxref_id=f_dbxref_id where feature_id=f_row_e.feature_id;
-              END IF;
-          ELSE
-              UPDATE dbxref set accession=f_uniquename_exon where dbxref_id=f_row_e.dbxref_id;
-              f_dbxref_id:=f_row_e.dbxref_id;
-              IF f_row_e.name like ''%temp%'' or f_row_e.name IS NULL THEN
-                  UPDATE feature set name=f_uniquename_exon  where feature_id=f_row_e.feature_id;                  
-              END IF;
-          END IF;
           RAISE NOTICE ''new uniquename of this feature is:%'', f_uniquename_exon;
-          INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(f_row_e.feature_id, f_dbxref_id, ''false'');
           SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
           SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
           IF s_id IS NULL THEN
               INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_exon, f_uniquename_exon, s_type_id);
               SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
           END IF;
-          SELECT INTO p_id pub_id from pub p cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id ;
-          IF p_id IS NULL THEN
-              SELECT INTO p_type_id cvterm_id from cvterm where name=p_cvterm_name;
-              IF p_type_id IS NULL THEN
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  IF c_cv_id IS NULL THEN
-                      INSERT INTO cv(name) values(p_cv_name);
-                      SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-                  END IF;
-                  INSERT INTO cvterm(name, cv_id) values(p_cvterm_name, c_cv_id);
-                  SELECT INTO c_cv_id cv_id from cv where name=p_cv_name;
-              END IF;
-              INSERT INTO pub(uniquename, miniref, type_id) values(p_miniref, p_miniref, p_type_id);
-              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
-          END IF;
-
           SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_e.feature_id and synonym_id=s_id and pub_id=p_id;
           IF f_s_id IS NULL THEN
               INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
@@ -440,19 +282,12 @@ BEGIN
       END IF; --ends if type=exon
   END IF;     --ends if misc cases
 
-  SELECT INTO f_type c.name
-         from feature f, cvterm c, organism o
-         where f.type_id=c.cvterm_id and
-               f.uniquename=NEW.uniquename and
-               f.organism_id =NEW.organism_id;
   IF ( f_type=f_type_transposable_element or f_type=f_type_promoter or f_type=f_type_repeat_region or f_type=f_type_remark )  THEN
-      SELECT INTO maxid nextval('uniquename_id_generator');
-      RAISE NOTICE ''maxid:%, text of type:%-'', maxid,f_type;
+      SELECT INTO maxid nextval(''uniquename_id_generator'');
       id:=lpad(maxid, 6, ''000000'');
-      RAISE NOTICE ''id:%'',id;
       f_uniquename:=CAST(prefix||id||suffix as TEXT);
-      f_name      :=CAST(''f_type:''||id as TEXT);
-      RAISE NOTICE ''new unquename:%, old uniquename is:%'', f_uniquename, NEW.uniquename;
+      f_name      :=CAST(f_type||'':''||id as TEXT);
+      RAISE NOTICE ''new unquename:%, old uniquename is:%, new name is:%'', f_uniquename, NEW.uniquename, f_name;
       UPDATE feature set uniquename=f_uniquename, name=f_name where feature_id=NEW.feature_id;
   END IF; --end dealing with one level types
   RAISE NOTICE ''leave f_i .......'';
