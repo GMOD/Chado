@@ -1,4 +1,4 @@
--- $Id: sequence-dbapi.sqli,v 1.1 2005-03-14 19:45:29 cmungall Exp $
+-- $Id: sequence-dbapi.sqli,v 1.2 2005-03-15 21:28:15 sshu Exp $
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- sequence-dbapi.sqli
 --
@@ -7,7 +7,7 @@
 --  this interface describes the functions implemented by
 --  a chado database over the sequence module
 --
--- [at this time, this API specifies functions which do not
+-- [at this time, this API specifies functions some of which do not
 --  yet have an implementation - a default impl will be
 --  provided soon]
 --
@@ -233,6 +233,220 @@ DECLARE FUNCTION
                         rank_by_root                     integer NOT NULL)
  
          RETURNS uniquename                              varchar NOT NULL;
+
+-- ============================================================
+-- FUNCTION: get_sub_feature_ids
+-- ============================================================
+-- return feature's child feature_id and their child feature_id
+-- all way down to leaf nodes
+-- + root_feature_id - root of the feature graph (eg gene)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_sub_feature_ids(root_feature_id                    integer not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_sub_feature_ids
+-- ============================================================
+-- return feature's child feature_id and their child feature_id
+-- all way down to leaf nodes, with depth
+-- + root_feature_id - root of the feature graph (eg gene)
+-- + depth - graph depth (eg 1)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_sub_feature_ids(root_feature_id                    integer not null,
+                    depth                               integer not null)
+        RETURNS setof feature_id, depth;
+
+-- ============================================================
+-- FUNCTION: get_sub_feature_ids
+-- ============================================================
+-- return feature (specified with sql arg) child feature_id
+-- and their child feature_id all way down to leaf nodes
+-- NOTE: sql must be like 'select distinct feature_id from ...'
+-- + sql - to get root_feature_id of the feature graph (eg gene)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_sub_feature_ids(sql                                text not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_up_feature_ids
+-- ============================================================
+-- return feature's parent feature_id and their parent feature_id
+-- all way up to root
+-- + leaf_feature_id - leaf of the feature graph (e.g. exon)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_up_feature_ids(leaf_feature_id                     integer not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_up_feature_ids
+-- ============================================================
+-- return feature's parent feature_id and their parent feature_id
+-- all way up to root, with depth value (in reverse order, leaf node smallest depth)
+-- + leaf_feature_id - leaf of the feature graph (e.g. exon)
+-- + depth - reversed graph depth
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_up_feature_ids(leaf_feature_id                     integer not null,
+                    depth                               integer not null)
+        RETURNS setof feature_id, depth;
+
+-- ============================================================
+-- FUNCTION: get_up_feature_ids
+-- ============================================================
+-- return feature (specified with sql arg) parent feature_id
+-- and their parent feature_id all way up to root
+-- NOTE: sql must be like 'select distinct feature_id from ...'
+-- + sql - to get leaf_feature_id of the feature graph (eg exon)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_up_feature_ids(sql                                text not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids
+-- ============================================================
+-- return all feature ids of the feature graph that feature_id
+-- is in
+-- + feature_id - feature id of the feature graph (e.g. mRNA)
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids(feature_id                             integer not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids
+-- ============================================================
+-- return all feature ids of the feature graph that feature_id
+-- (specified with sql arg) is in
+-- NOTE: sql must be like 'select distinct feature_id from ...'
+-- + sql - get feature_id of a feature graph
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids(sql                                    text not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_sub_feature_ids_by_type_src
+-- ============================================================
+-- return child feature_id and their child feature_id of feature
+-- specified by the feature type and the feature's src feature name
+-- all way down to leaf nodes
+-- + feature_type
+-- + src - feature name that returned features are locateded on
+-- + is_analysis
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_sub_feature_ids_by_type_src(feature_type           varchar not null
+                                src                     varchar not null,
+                                is_analysis             char(1) not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_type
+-- ============================================================
+-- return all feature ids of the feature graph, some of which are
+-- of the feature type and is_analysis value
+-- + feature_type - SO term
+-- + is_analysis
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_type(feature_type                   varchar not null,
+                        is_analysis                     char(1) not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_type_src
+-- ============================================================
+-- return all feature ids of the feature graph, some of which are
+-- of the feature type and is_analysis value
+-- + feature_type - SO term
+-- + src - feature name that returned features are locateded on
+-- + is_analysis
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_type(feature_type                   varchar not null,
+                        src                             varchar not null,
+                        is_analysis                     char(1) not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_type_name
+-- ============================================================
+-- return all feature ids of the feature graph, some of which are
+-- of the specified type and have the feature name
+-- + feature_type - SO term
+-- + feature_name - feature name, sql wild card (%) is allowed
+-- + is_analysis
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_type_name(feature_type              varchar not null,
+                             feature_name               varchar not null,
+                             is_analysis                char(1) not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_ont
+-- ============================================================
+-- return all feature ids of the feature graph, some of which have
+-- assignment of the cvterm of the aspect
+-- + aspect - cv.name
+-- + cvterm_name
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_ont(aspect                          varchar not null,
+                        cvterm_name                     varchar not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_ont_root
+-- ============================================================
+-- return all feature ids of the feature graph, some of which have
+-- assignment of the cvterm of the aspect or have assignment of
+-- cvterms that are sub nodes of the cvterm of the aspect
+-- + aspect - cv.name
+-- + cvterm_name
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_ont_root(aspect                     varchar not null,
+                        cvterm_name                     varchar not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_propval
+-- ============================================================
+-- return all feature ids of the feature graph, some of which have
+-- the property value
+-- + property_val
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_propval(property_val                    varchar not null)
+        RETURNS setof feature_id;
+
+-- ============================================================
+-- FUNCTION: get_feature_ids_by_child_count
+-- ============================================================
+-- return all feature ids of the feature graph, some of which
+-- are of the feature type (parent_feature_type) who has
+-- the specified number of child features of the feature type
+-- (child_feature_type)
+-- + parent_feature_type - SO term
+-- + child_feature_type - SO term
+-- + number
+-- + operator - sql comparison operator string (eg >=, =, <, etc)
+-- + is_analysis
+-- impl: see functions/feature_ids_fx.plpgsql
+DECLARE FUNCTION
+ get_feature_ids_by_child_count(parent_feature_type         varchar not null,
+                                child_feature_type          varchar not null,
+                                number                      integer not null,
+                                operator                    varchar not null,
+                                is_analysis                 char(1) not null)
+        RETURNS setof feature_id;
+
 
 -- ************************************************************
 -- ** Configuration Management                               **
