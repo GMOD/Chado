@@ -61,18 +61,22 @@ insert into cvterm (name,cv_id) values ('adult_old',  (select cv_id from cv wher
 
 insert into cvterm (name,cv_id) values ('survival_time',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
-insert into cvterm (name,definition,cv_id) values ('n','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('minimum','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('maximum','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('modality','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('modality p','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('mean','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('median','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('mode','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('quartile 1','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('quartile 3','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('skewness','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('kurtosis','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('chi square p','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('standard deviation','sensu statistica'  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('n','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('minimum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('maximum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('modality','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('modality p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('median','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('mode','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('quartile 1','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('quartile 3','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('skewness','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('kurtosis','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('chi square p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('standard deviation','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+
+insert into cvterm (name,definition,cv_id) values ('expectation maximization gaussian mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('expectation maximization p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into cvterm (name,definition,cv_id) values ('histogram','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
 
