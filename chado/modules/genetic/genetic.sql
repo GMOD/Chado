@@ -238,6 +238,7 @@ CREATE TABLE gcontext_relationship (
 -- group               : spatially distinguishable group
 --
 CREATE TABLE feature_gcontext (
+    feature_gcontext_id               SERIAL PRIMARY KEY NOT NULL,
     feature_id           INTEGER      NOT NULL REFERENCES feature(feature_id),
     gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     chromosome_id        INTEGER      REFERENCES feature(feature_id),
@@ -256,6 +257,7 @@ CREATE TABLE feature_gcontext (
 -- value               : unconstrained free text value
 --
 CREATE TABLE gcontextprop (
+    gcontextprop_id                   SERIAL PRIMARY KEY NOT NULL,
     gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
     value                TEXT         NOT NULL
@@ -301,6 +303,7 @@ CREATE TABLE phenstatement (
 -- 
 --
 CREATE TABLE phendesc (
+    phendesc_id                       SERIAL PRIMARY KEY NOT NULL,
     gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
     description          TEXT         NOT NULL
 );
@@ -330,6 +333,7 @@ CREATE TABLE phenstatement_relationship (
 -- 
 --
 CREATE TABLE phenstatement_cvterm (
+    phenstatement_cvterm_id           SERIAL PRIMARY KEY NOT NULL,
     phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
     cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
 );
@@ -344,6 +348,7 @@ CREATE TABLE phenstatement_cvterm (
 -- value               : unconstrained free text value
 --
 CREATE TABLE phenstatement_prop (
+    phenstatement_prop_id             SERIAL PRIMARY KEY NOT NULL,
     phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
     type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
     value                TEXT         NOT NULL
