@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.53 2004-03-15 19:16:08 scottcain Exp $
+# $Id: Makefile.PL,v 1.54 2004-03-26 03:53:17 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -407,7 +407,8 @@ else {
 
 my $complete_sql;
 if ($O{'SIMPLE'} =~ /^[Yy]/) {
-  system('perl', 'bin/AutoDBI.PL');
+    system(  $PERL, 'bin/AutoDBI.PL');
+    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
 }
 else {
 
@@ -449,7 +450,7 @@ else {
 
 WriteMakefile(
     'NAME'		            => 'chado',
-    'VERSION'             => 0.001,
+    'VERSION'             => 0.002,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       'Class::DBI'        => 0.94,
