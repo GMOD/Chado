@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.83 2005-03-24 13:51:26 scottcain Exp $
+# $Id: Makefile.PL,v 1.84 2005-03-24 16:09:52 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -586,6 +586,7 @@ WriteMakefile(
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
 #          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
           'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
+          'load/bin/bulk_load_gff3.PLS'       => 'load/bin/gmod_bulk_load_gff3.pl',
           'load/bin/load_ontology.PLS'   => 'load/bin/gmod_load_ontology.pl',
           'install_util/conf_install.PLS'    => 'install_util/conf_install.pl',
           'install_util/src_install.PLS'     => 'install_util/src_install.pl',
