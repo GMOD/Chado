@@ -4,10 +4,10 @@
 -- redesigned 2003-10-28
 --
 -- changes 2003-11-10:
---   incorporating suggestions to make everything a gcontext; use gcontext_relationship
---   to make some gcontexts derivable from others. we would incorporate environment
---   this way - just add the environment descriptors as properties of the child
---   gcontext
+--   incorporating suggestions to make everything a gcontext; use 
+--   gcontext_relationship to make some gcontexts derivable from others. we 
+--   would incorporate environment this way - just add the environment 
+--   descriptors as properties of the child gcontext
 --
 -- for modeling simple or complex genetic screens
 --
@@ -25,7 +25,7 @@
 -- it is related via an "allele-of" feature_relationship; eg
 -- [id:FBgn001, type:gene] <-- [id:FBal001, type:gene]
 --
--- with the genetic module, phenotypes can either be attached
+-- with the genetic module, features can either be attached
 -- to features of type sequence_variation, or to features of
 -- type 'gene' (in the case of mutant alleles).
 --
@@ -191,12 +191,18 @@
 -- 
 -- uniquename          : a human-readable unique identifier
 --
+
 CREATE TABLE gcontext (
-    gcontext_id          SERIAL PRIMARY KEY NOT NULL,
-    uniquename           VARCHAR(255) NOT NULL,
-    description          TEXT,
-    pub_id               INTEGER      NOT NULL REFERENCES pub(pub_id)
+	gcontext_id	serial not null,
+	primary key (gcontext_id),
+	uniquename	varchar(255) not null,
+	description	text,
+	pub_id	int not null,
+	foreign key (pub_id) references pub (pub_id) on delete cascade,
+
+	unique(uniquename)
 );
+create index gcontext_idx1 on gcontext(uniquename);
 -- ****************************************
 
 
@@ -209,11 +215,20 @@ CREATE TABLE gcontext (
 -- 
 --
 CREATE TABLE gcontext_relationship (
-    gcontext_relationship_id SERIAL PRIMARY KEY NOT NULL,
-    subjectgc_id         INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    objectgc_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+	gcontext_relationship_id	serial not null,
+	primary key (gcontext_relationship_id),
+	subjectgc_id	int not null,
+	foreign key (subjectgc_id) references gcontext (gcontext_id) on delete cascade,
+	objectgc_id	int not null, 
+	foreign key (objectgc_id) references gcontext (gcontext_id) on delete cascade,
+ 	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+
+	unique(subjectgc_id, objectgc_id, type_id)
 );
+create index gcontext_relationship_idx1 on gcontext_relationship (subjectgc_id);
+create index gcontext_relationship_idx2 on gcontext_relationship (objectgc_id);
+create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
 -- ****************************************
 
 
@@ -238,14 +253,23 @@ CREATE TABLE gcontext_relationship (
 -- group               : spatially distinguishable group
 --
 CREATE TABLE feature_gcontext (
-    feature_gcontext_id               SERIAL PRIMARY KEY NOT NULL,
-    feature_id           INTEGER      NOT NULL REFERENCES feature(feature_id),
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    chromosome_id        INTEGER      REFERENCES feature(feature_id),
-    rank                 INTEGER      NOT NULL,
-    cgroup               INTEGER      NOT NULL,
-    cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+	feature_gcontext_id	serial not null,
+	primary key (feature_gcontext_id),
+	feature_id	int not null,
+	foreign key (feature_id) references feature (feature_id) on delete cascade,
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	chromosome_id	int,
+	foreign key (chromosome_id) references feature(feature_id) on delete set null,
+	rank	int not null,
+	cgroup	int not null,
+	cvterm_id	int not null,
+	foreign key (cvterm_id) references cvterm(cvterm_id) on delete cascade,
+
+	unique(feature_id, gcontext_id, cvterm_id)
 );
+create index feature_gcontext_idx1 on feature_gcontext (feature_id);
+create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
 -- ****************************************
 
 
@@ -257,11 +281,18 @@ CREATE TABLE feature_gcontext (
 -- value               : unconstrained free text value
 --
 CREATE TABLE gcontextprop (
-    gcontextprop_id                   SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    value                TEXT         NOT NULL
+	gcontextprop_id	serial not null,
+	primary key (gcontextprop_id),
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	value	text not null,
+
+	unique(gcontext_id, type_id, value)
 );
+create index gcontextprop_idx1 on gcontextprop (gcontext_id);
+create index gcontextprop_idx2 on gcontextprop (type_id);
 -- ****************************************
 
 
@@ -283,15 +314,27 @@ CREATE TABLE gcontextprop (
 -- assay_id            : e.g. name of specific test
 --
 CREATE TABLE phenstatement (
-    phenstatement_id     SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    dbxref_id            INTEGER      NOT NULL REFERENCES dbxref(dbxref_id),
-    observable_id        INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    attr_id              INTEGER      REFERENCES cvterm(cvterm_id),
-    value                TEXT,
-    cvalue_id            INTEGER      REFERENCES cvterm(cvterm_id),
-    assay_id             INTEGER      REFERENCES cvterm(cvterm_id)
+	phenstatement_id	serial not null,
+	primary key (phenstatement_id),
+	gcontext_id int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	dbxref_id	int not null,
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+	observable_id	int not null,
+	foreign key (observable_id) references cvterm (cvterm_id) on delete cascade,
+	attr_id	int,
+	foreign key (attr_id) references cvterm (cvterm_id) on delete set null,
+	value	text,
+	cvalue_id	int,
+	foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null,
+	assay_id	int,
+	foreign key (assay_id) references cvterm (cvterm_id) on delete set null,
+
+	unique(gcontext_id, dbxref_id, observable_id)	
 );
+create index phenstatement_idx1 on phenstatement (gcontext_id);
+create index phenstatement_idx2 on phenstatement (observable_id);
+create index phenstatement_idx3 on phenstatement (attr_id);
 -- ****************************************
 
 
@@ -303,10 +346,15 @@ CREATE TABLE phenstatement (
 -- 
 --
 CREATE TABLE phendesc (
-    phendesc_id                       SERIAL PRIMARY KEY NOT NULL,
-    gcontext_id          INTEGER      NOT NULL REFERENCES gcontext(gcontext_id),
-    description          TEXT         NOT NULL
+	phendesc_id	serial not null,
+	primary key (phendesc_id),
+	gcontext_id	int not null,
+	foreign key (gcontext_id) references gcontext (gcontext_id) on delete cascade,
+	description	text not null,
+
+	unique(gcontext_id, description)
 );
+create index phendesc_idx1 on phendesc (gcontext_id);
 -- ****************************************
 
 
@@ -317,12 +365,22 @@ CREATE TABLE phendesc (
 -- 
 --
 CREATE TABLE phenstatement_relationship (
-    phenstatement_relationship_id SERIAL PRIMARY KEY NOT NULL,
-    subject_id           INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    object_id            INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    comment_id           INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+	phenstatement_relationship_id serial not null,
+	primary key (phenstatement_relationship_id),
+	subject_id	int not null,
+	foreign key (subject_id) references phenstatement (phenstatement_id) on delete cascade,
+	object_id	int not null,
+	foreign key (object_id) references phenstatement (phenstatement_id) on delete cascade,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	comment_id	int not null,
+	foreign key (comment_id) references cvterm (cvterm_id) on delete cascade,
+
+	unique(subject_id, object_id, type_id)
 );
+create index phenstatement_relationship_idx1 on phenstatement_relationship (subject_id);
+create index phenstatement_relationship_idx2 on phenstatement_relationship (subject_id);
+create index phenstatement_relationship_idx3 on phenstatement_relationship (type_id);
 -- ****************************************
 
 
@@ -333,24 +391,38 @@ CREATE TABLE phenstatement_relationship (
 -- 
 --
 CREATE TABLE phenstatement_cvterm (
-    phenstatement_cvterm_id           SERIAL PRIMARY KEY NOT NULL,
-    phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    cvterm_id            INTEGER      NOT NULL REFERENCES cvterm(cvterm_id)
+	phenstatement_cvterm_id	serial not null,
+	primary key (phenstatement_cvterm_id),
+	phenstatement_id	int not null,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade,
+	cvterm_id	int not null,
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+
+	unique(phenstatement_id, cvterm_id)
 );
+create index phenstatement_cvterm_idx1 on phenstatement_cvterm (phenstatement_id);	
+create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);	
 -- ****************************************
 
 
--- RELATION: phenstatement_prop
+-- RELATION: phenstatementprop
 --
 -- arbitrary key=value pairs
 -- e.g. penetrance_pct=80
 -- 
 -- value               : unconstrained free text value
 --
-CREATE TABLE phenstatement_prop (
-    phenstatement_prop_id             SERIAL PRIMARY KEY NOT NULL,
-    phenstatement_id     INTEGER      NOT NULL REFERENCES phenstatement(phenstatement_id),
-    type_id              INTEGER      NOT NULL REFERENCES cvterm(cvterm_id),
-    value                TEXT         NOT NULL
+CREATE TABLE phenstatementprop (
+	phenstatementprop_id	serial not null,
+	primary key (phenstatementprop_id),
+	phenstatement_id	int not null,
+	foreign key (phenstatement_id) references phenstatement (phenstatement_id) on delete cascade,
+	type_id	int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	value	text not null,
+
+	unique(phenstatement_id, type_id, value)
 );
+create index phenstatementprop_idx1 on phenstatementprop (phenstatement_id);
+create index phenstatementprop_idx2 on phenstatementprop (type_id);
 -- ****************************************
