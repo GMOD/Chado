@@ -12,8 +12,8 @@ my @create = <IN>;
 my $create = join '', @create;
 
 my $tr = SQL::Translator->new(
-				parser   => "PostgreSQL",
-				producer => "GraphViz",
+				from          => "PostgreSQL",
+				to            => "GraphViz",
                                 producer_args => {
                                                    output_type => 'png',
                                                    width => 10,

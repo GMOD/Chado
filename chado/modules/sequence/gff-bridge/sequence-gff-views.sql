@@ -16,10 +16,10 @@ WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
 --SELECT feature_id, 'expression' AS type, s.description AS attribute
 --FROM expression s, feature_expression fs
 --WHERE fs.expression_id = s.expression_id
-UNION ALL
-SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
-FROM gcontext g, feature_gcontext fg
-WHERE g.gcontext_id = fg.gcontext_id
+--UNION ALL
+--SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+--FROM gcontext g, feature_gcontext fg
+--WHERE g.gcontext_id = fg.gcontext_id
 --UNION ALL
 --SELECT feature_id, 'genotype' AS type, s.description AS attribute
 --FROM genotype s, feature_genotype fs
@@ -55,10 +55,10 @@ SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
       d.name != 'GFF_source'
-UNION ALL
-SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
-FROM gcontext g, feature_gcontext fg
-WHERE g.gcontext_id = fg.gcontext_id
+--UNION ALL
+--SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+--FROM gcontext g, feature_gcontext fg
+--WHERE g.gcontext_id = fg.gcontext_id
 UNION ALL
 SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs, feature f

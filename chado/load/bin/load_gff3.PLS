@@ -785,12 +785,12 @@ sub initialize {
     $next_update = 0;
 
     Chado::LoadDBI->init();
-    ($cv) = Chado::Cv->find_or_create(
+    ($cv) = Chado::Cv->search(
         {
             name       => 'autocreated',
-            definition => 'auto created by load_gff3.pl'
         }
     );
+    die "Unable to find a 'autocreated' cv in the cv table; please add one" unless $cv;
     ($so) = Chado::Cv->search( { name => $ONTOLOGY } );
     die "Unable to find $ONTOLOGY in cv table; that is a pretty big problem" unless $so;
 

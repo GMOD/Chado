@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.80 2005-03-09 17:43:17 scottcain Exp $
+# $Id: Makefile.PL,v 1.81 2005-03-21 21:12:58 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -343,6 +343,10 @@ if ($O{'SIMPLE'} =~ /^[Yy]/) {
   system('cp', 
          "$working_dir/modules/default_schema.sql", 
          "$working_dir/modules/complete.sql");
+    system('cp',
+         "$working_dir/modules/default_nofuncs.sql",
+         "$working_dir/modules/nofuncs.sql");
+
 } else{
 
   open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
@@ -659,7 +663,7 @@ graphviz :: \
 	make $working_dir/modules/pub/pub.graphviz.png \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
 	make $working_dir/modules/www/www.graphviz.png \
-	make $working_dir/modules/complete.graphviz.png
+	make $working_dir/modules/nofuncs.graphviz.png
 
 graphviz_svg :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.svg \
@@ -673,7 +677,7 @@ graphviz_svg :: \
 	make $working_dir/modules/pub/pub.graphviz.svg \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
 	make $working_dir/modules/www/www.graphviz.svg \
-	make $working_dir/modules/complete.graphviz.svg
+	make $working_dir/modules/nofuncs.graphviz.svg
 
 diagram :: \
 	make $working_dir/modules/companalysis/companalysis.diagram.png \
@@ -687,7 +691,7 @@ diagram :: \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
 	make $working_dir/modules/www/www.diagram.png \
-	make $working_dir/modules/complete.diagram.png
+	make $working_dir/modules/nofuncs.diagram.png
 
 
 html :: \
@@ -702,7 +706,7 @@ html :: \
 	make $working_dir/modules/pub/pub.html \
 	make $working_dir/modules/sequence/sequence.html \
 	make $working_dir/modules/www/www.html \
-	make $working_dir/modules/complete.html
+	make $working_dir/modules/nofuncs.html
 
 %.html: %.sql
 	$working_dir/bin/pg2html.pl \$< > \$@

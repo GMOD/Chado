@@ -465,7 +465,6 @@ while(my $feature = $gffio->next_feature()){
   my @unreserved_tags = grep {/^[a-z]/} $feature->annotation->get_all_annotation_keys();
   if ( @unreserved_tags > 0 ) {
     foreach my $tag (@unreserved_tags) {
-      warn "tag:$tag\n";
       next unless (ref($feature->annotation) eq 'Bio::Annotation::SimpleValue');
       next if $tag eq 'source';
       next if $tag eq 'phase';
