@@ -111,6 +111,7 @@ WriteMakefile(
                              Class::DBI::Pg    => 0.02,
                              Module::Build     => 0.20,
                              Template          => 2.10,
+			     Term::ProgressBar => 0,
                              DBI               => 0,
                              DBD::Pg           => 0,
                              XML::Simple       => 2.09,
