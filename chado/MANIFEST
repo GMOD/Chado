@@ -49,6 +49,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 modules/audit/audit.doc
 modules/audit/make_audit_ddl
+modules/audit/add-audits.tmpl
+modules/audit/audit_tables.sql
 modules/bin/mk.pl
 modules/companalysis/companalysis.sql
 modules/companalysis/examples/basic/blast.itxt
