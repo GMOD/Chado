@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.25 2004-05-06 19:53:59 scottcain Exp $
+$Id: INSTALL,v 1.26 2004-05-07 20:11:58 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -136,7 +136,8 @@ As indicated, the host, port, and password are optional.
 
         Answering yes skips questions about what exensions to use, and
         eliminates the need to have SQL::Translator installed.  This
-        is recomended.
+        is recomended, and all that is necessary in order to use the
+        full schema and run GBrowse on top of it.
 
         *   Use values in '/home/scott/schema/chado/build.conf'? [Y]
 
