@@ -300,7 +300,7 @@ create table feature_synonym (
        foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade,
-       is_current boolean not null,
+       is_current boolean not null default 'true',
        is_internal boolean not null default 'false',
 
        unique(synonym_id, feature_id, pub_id)
