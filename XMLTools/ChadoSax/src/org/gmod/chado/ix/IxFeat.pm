@@ -299,7 +299,8 @@ sub getlocationSrc {
   my ($src, $spi);
   my @srcs= keys %sp;  
   if ($which =~ /\D/) { #name
-    ($src)= grep(/$which/, @srcs);   
+    ($src)= grep(/^$which$/, @srcs);   
+    # ($src)= grep(/$which/, @srcs) unless($src);   
     $spi= $sp{$src} if ($src); # $loc= $sp{$src}->{loc} || undef;
     }
   else {
