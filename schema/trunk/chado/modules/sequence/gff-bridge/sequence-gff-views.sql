@@ -60,9 +60,10 @@ SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS a
 FROM gcontext g, feature_gcontext fg
 WHERE g.gcontext_id = fg.gcontext_id
 UNION ALL
-SELECT feature_id, 'Alias' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.synonym_id = s.synonym_id
+SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs, feature f
+WHERE fs.synonym_id = s.synonym_id and f.feature_id = fs.feature_id and
+      f.name != s.name
 UNION ALL
 SELECT fp.feature_id,cv.name,fp.value
 FROM featureprop fp, cvterm cv
