@@ -1,14 +1,30 @@
+
+CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_subject_ids(cterm.subject_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
 ---arg: parent term id
 ---return: all children term id and their parent term id with relationship type id
-
-
 CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
-    pcount integer := 1;
     cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
     exist_c int;
 BEGIN
 
@@ -18,11 +34,8 @@ BEGIN
             RETURN NEXT cterm;
         END LOOP;
     ELSE
-        FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
+        FOR cterm IN SELECT * FROM _get_all_subject_ids(root) LOOP
             RETURN NEXT cterm;
-            FOR cterm2 IN SELECT * FROM get_all_subject_ids(cterm.subject_id) LOOP
-                RETURN NEXT cterm2;
-            END LOOP;
         END LOOP;
     END IF;
     RETURN;
@@ -34,7 +47,6 @@ CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
-    pcount integer := 1;
     cterm cvtermpath%ROWTYPE;
     cterm2 cvtermpath%ROWTYPE;
 
@@ -56,7 +68,6 @@ CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
-    pcount integer := 1;
     cterm cvtermpath%ROWTYPE;
     cterm2 cvtermpath%ROWTYPE;
 
@@ -73,16 +84,32 @@ END;
 '
 LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION _get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_object_ids(cterm.object_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
 ---arg: child term id
 ---return: all parent term id and their childrent term id with relationship type id
-
 CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
-    pcount integer := 1;
     cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
     exist_c int;
 BEGIN
 
@@ -93,12 +120,9 @@ BEGIN
             RETURN NEXT cterm;
         END LOOP
     ELSE
-        FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
+        FOR cterm IN SELECT * FROM _get_all_object_ids(leaf) LOOP
             RETURN NEXT cterm;
-            FOR cterm2 IN SELECT * FROM get_all_object_ids(cterm.object_id) LOOP
-                RETURN NEXT cterm2;
-            END LOOP;
-        END LOOP;
+        END LOOP
     END IF;
     RETURN;
 END;   
