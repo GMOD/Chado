@@ -10,9 +10,9 @@ SELECT feature_id, ''cvterm'' AS type,  s.name AS attribute
 FROM cvterm s, feature_cvterm fs
 WHERE fs.feature_id= $1 AND fs.cvterm_id = s.cvterm_id
 UNION
-SELECT feature_id, ''dbxref'' AS type, dbname || '':'' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs
-WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id
+SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
 UNION
 SELECT feature_id, ''expression'' AS type, s.description AS attribute
 FROM expression s, feature_expression fs
@@ -29,6 +29,10 @@ UNION
 SELECT feature_id, ''synonym'' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs
 WHERE fs.feature_id= $1 AND fs.synonym_id = s.synonym_id
+UNION
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.feature_id= $1 AND fp.type_id = cv.cvterm_id 
 UNION
 SELECT feature_id, ''pub'' AS type, s.series_name || '':'' || s.title AS attribute
 FROM pub s, feature_pub fs
