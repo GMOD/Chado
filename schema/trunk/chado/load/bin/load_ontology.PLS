@@ -197,6 +197,7 @@ sub load_ontologyterms{
 			   name => predmap($predicate->name),
 			   cv_id => $cv->id,
 			   dbxref_id => $dbxref->id,
+                           is_relationshiptype => 1,
 						  });
 	}
 	
@@ -218,13 +219,14 @@ sub load_ontologyterms{
           #warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
           next unless $root->name;
 		  my $dbxref = Chado::Dbxref->find_or_create({
-				db_id => $db->id,
-				accession => $root->identifier,
+			db_id => $db->id,
+			accession => $root->identifier,
 							   });
 		  $root_db = Chado::Cvterm->find_or_create({
-				 name => $root->name || $oborelmap{ predmap($root->identifier) },
-				 cv_id => $cv->id,
-				 dbxref_id => $dbxref->id,
+			 name                => $root->name || $oborelmap{ predmap($root->identifier) },
+			 cv_id               => $cv->id,
+			 dbxref_id           => $dbxref->id,
+                         is_relationshiptype => ($ontname eq "Relationship Ontology") ? 1 : 0,
 							});
 	}
 	$root_db->definition($root->definition) unless defined($root_db->definition);
@@ -268,6 +270,7 @@ sub load_ontologytermsR {
 				name => $child->name,
 				cv_id => $cv->id,
 				dbxref_id => $dbxref->id,
+                                is_relationshiptype => ($ontname eq "Relationship Ontology") ? 1 : 0,
 						   });
 	}
 	  $child_db->definition($child->definition) unless defined($child_db->definition);

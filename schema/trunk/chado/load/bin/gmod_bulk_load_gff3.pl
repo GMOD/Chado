@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+#use lib '~/bioperl-live';
 use DBI;
 use Chado::LoadDBI;
 #use Bio::Tools::GFF;
@@ -281,7 +282,7 @@ open AF,    ">$files{analysisfeature}";
 my $gffio = Bio::FeatureIO->new(-fh => \*STDIN , -format => 'gff');
 
 while(my $feature = $gffio->next_feature()){
-  my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+  my $featuretype = $feature->type->name;
 
   my $type = $type{$featuretype};
   if(!$type){
@@ -297,6 +298,8 @@ while(my $feature = $gffio->next_feature()){
     } else {
       ($src) = Chado::Feature->search( uniquename => $feature->seq_id )
             || Chado::Feature->search( name => $feature->seq_id );
+      die "Unable to find srcfeature ",$feature->seq_id," in the database\n" 
+            unless $src;
       if ($src->isa('Class::DBI::Iterator')) {
         my @sources;
         while (my $tmp = $src->next) {
@@ -464,9 +467,11 @@ while(my $feature = $gffio->next_feature()){
   }
 
   if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
-    my $source = $feature->source;
+    my $source = $feature->source->value;
     my $score = $feature->score ? $feature->score : '\N';
-    my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+    $score    = '.' eq $score   ? '\N'            : $score;
+
+    my $featuretype = $feature->type->name;
                                                                                 
     my $ankey = $is_FgenesH ?
                 'FgenesH_Monocot' :
@@ -495,11 +500,11 @@ while(my $feature = $gffio->next_feature()){
     my @targets = $feature->annotation->get_Annotations('Target');
     my $rank = 1;
     foreach my $target (@targets) {
-      my $target_id = $target->value->seq_id;
-      my $tstart    = $target->value->start -1; #convert to interbase
-      my $tend      = $target->value->end;
-      my $tstrand   = $target->value->strand ? $target->value->strand : '\N';
-      my $tsource   = $feature->source;
+      my $target_id = $target->target_id;
+      my $tstart    = $target->start -1; #convert to interbase
+      my $tend      = $target->end;
+      my $tstrand   = $target->strand ? $target->value->strand : '\N';
+      my $tsource   = $feature->source->value;
 
       synonyms($target_id);
 
@@ -524,8 +529,9 @@ while(my $feature = $gffio->next_feature()){
       }
 
       my $score = $feature->score ? $feature->score : '\N';
+      $score    = '.' eq $score   ? '\N'            : $score;
 
-      my $featuretype = ($feature->annotation->get_Annotations('feature_type'))[0]->name;
+      my $featuretype = $feature->type->name;
 
       my $type = $type{$featuretype};
  #     if(!$type){

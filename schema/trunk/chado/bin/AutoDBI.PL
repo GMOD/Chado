@@ -274,7 +274,9 @@ Chado::Dbxref->has_many(
     'cvterm_dbxref_dbxref_id', 'Chado::Cvterm_Dbxref' => 'dbxref_id'
 );
 
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->cvterm_dbxref_dbxref_id }
+sub cvterms {
+    return shift->cvterm_dbxref_id
+}
 
 Chado::Dbxref->has_many(
     'cvterm_dbxref_id', 'Chado::Cvterm' => 'dbxref_id'
@@ -451,6 +453,10 @@ Chado::Cvterm->has_many(
     'cvtermsynonym_cvterm_id', 'Chado::Cvtermsynonym' => 'cvterm_id'
 );
 
+Chado::Cvterm->has_many(
+    'cvtermsynonym_type_id', 'Chado::Cvtermsynonym' => 'type_id'
+);
+
 sub quantification_relationships { my $self = shift; return $self->quantification_relationship_type_id(@_) }
 
 sub features { my $self = shift; return map $_->feature_id, $self->feature_cvterm_cvterm_id }
@@ -525,6 +531,18 @@ sub feature_relationshipprops {
 
 Chado::Cvterm->has_many(
     'feature_relationshipprop_type_id', 'Chado::Feature_Relationshipprop' => 'type_id'
+);
+
+sub cvtermprops {
+    return shift->cvtermprop_cvterm_id
+}
+
+Chado::Cvterm->has_many(
+    'cvtermprop_cvterm_id', 'Chado::Cvtermprop' => 'cvterm_id'
+);
+
+Chado::Cvterm->has_many(
+    'cvtermprop_type_id', 'Chado::Cvtermprop' => 'type_id'
 );
 
 sub element_relationships {
@@ -679,8 +697,6 @@ Chado::Cvterm->has_many(
     'featureprop_type_id', 'Chado::Featureprop' => 'type_id'
 );
 
-sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->cvterm_dbxref_cvterm_id }
-
 sub assayprops {
     return shift->assayprop_type_id
 }
@@ -769,6 +785,8 @@ Chado::Cvterm->has_many(
     'acquisition_relationship_type_id', 'Chado::Acquisition_Relationship' => 'type_id'
 );
 
+sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
+
 sub phenstatements { my $self = shift; return map $_->phenstatement_id, $self->phenstatement_cvterm_cvterm_id }
 
 Chado::Cvterm->has_many(
@@ -786,8 +804,6 @@ Chado::Cvterm->has_many(
 Chado::Cvterm->has_many(
     'phenstatement_assay_id', 'Chado::Phenstatement' => 'assay_id'
 );
-
-sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
 
 sub pub_relationships {
     return shift->pub_relationship_type_id
@@ -914,6 +930,14 @@ sub cvterm {
     return shift->cvterm_id
 }
 
+Chado::Cvtermsynonym->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
+}
+
 # -------------------------------------------------------------------
 package Chado::Cvterm_Dbxref;
 use base 'Chado::DBI';
@@ -943,6 +967,37 @@ Chado::Cvterm_Dbxref->has_a(
 
 sub dbxref {
     return shift->dbxref_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Cvtermprop;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Cvtermprop->set_up_table('cvtermprop');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->cvtermprop_id
+}
+
+Chado::Cvtermprop->has_a(
+    cvterm_id => 'Chado::Cvterm'
+);
+
+sub cvterm {
+    return shift->cvterm_id
+}
+
+Chado::Cvtermprop->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
 }
 
 # -------------------------------------------------------------------

@@ -127,7 +127,8 @@ create table featureloc (
     residue_info text,
     locgroup int not null default 0,
     rank int not null default 0,
-    constraint featureloc_c1 unique (feature_id,locgroup,rank)
+    constraint featureloc_c1 unique (feature_id,locgroup,rank),
+    constraint featureloc_c2 check (fmin <= fmax)
 );
 -- phase: phase of translation wrt srcfeature_id.  Values are 0,1,2
 create index featureloc_idx1 on featureloc (feature_id);
