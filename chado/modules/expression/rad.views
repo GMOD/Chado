@@ -46,7 +46,6 @@ CREATE OR REPLACE RULE "_RuleU_affymetrixcel" AS
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     foreground = NEW.mean,
@@ -129,14 +128,13 @@ CREATE OR REPLACE RULE "_RuleI_affymetrixmas5" AS
     INSERT INTO elementresult
     (subclass_view,element_id,quantification_id,float1,char1,float2,float3,smallint1,smallint2)
     VALUES
-    (NEW.subclass_view,NEW.element_id,NEW.quantification_id,NEW.signal,NEW.detection,NEW.detectionpvalue,NEW.z,NEW.statpairs,NEW.statpairsused);
+    ('affymetrixmas5',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.detection,NEW.detectionpvalue,NEW.z,NEW.statpairs,NEW.statpairsused);
 
 CREATE OR REPLACE RULE "_RuleU_affymetrixmas5" AS
   ON UPDATE TO affymetrixmas5
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
@@ -151,7 +149,8 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixmas5" AS
   ON DELETE TO affymetrixmas5
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'affymetrixmas5';
 
 CREATE OR REPLACE VIEW affymetrixdchip
 AS SELECT
@@ -179,7 +178,6 @@ CREATE OR REPLACE RULE "_RuleU_affymetrixdchip" AS
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
@@ -192,7 +190,8 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixdchip" AS
   ON DELETE TO affymetrixdchip
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'affymetrixdchip';
 
 CREATE OR REPLACE VIEW affymetrixvsn
 AS SELECT
@@ -213,14 +212,13 @@ CREATE OR REPLACE RULE "_RuleI_affymetrixvsn" AS
     INSERT INTO elementresult
     (subclass_view,element_id,quantification_id,float1,float2,float3,char1)
     VALUES
-    ('affymetrixdchip',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
+    ('affymetrixvsn',NEW.element_id,NEW.quantification_id,NEW.signal,NEW.se,NEW.z,NEW.apcall);
 
 CREATE OR REPLACE RULE "_RuleU_affymetrixvsn" AS
   ON UPDATE TO affymetrixvsn
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
@@ -233,7 +231,8 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixvsn" AS
   ON DELETE TO affymetrixvsn
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'affymetrixvsn';
 
 CREATE OR REPLACE VIEW affymetrixrma
 AS SELECT
@@ -261,7 +260,6 @@ CREATE OR REPLACE RULE "_RuleU_affymetrixrma" AS
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
@@ -274,7 +272,8 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixrma" AS
   ON DELETE TO affymetrixrma
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'affymetrixrma';
 
 CREATE OR REPLACE VIEW affymetrixgcrma
 AS SELECT
@@ -302,7 +301,6 @@ CREATE OR REPLACE RULE "_RuleU_affymetrixgcrma" AS
   DO INSTEAD
     UPDATE elementresult
     SET
-    subclass_view = NEW.subclass_view,
     element_id = NEW.element_id,
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
@@ -315,7 +313,8 @@ CREATE OR REPLACE RULE "_RuleD_affymetrixgcrma" AS
   ON DELETE TO affymetrixgcrma
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'affymetrixgcrma';
 
 CREATE OR REPLACE VIEW elementstat
 AS SELECT
@@ -360,7 +359,8 @@ CREATE OR REPLACE RULE "_RuleD_elementstat" AS
   ON DELETE TO elementstat
   DO INSTEAD
     DELETE FROM elementresult
-    WHERE elementresult_id = OLD.elementresult_id;
+    WHERE elementresult_id = OLD.elementresult_id
+    AND subclass_view = 'elementstat';
 
 
 --CREATE OR REPLACE VIEW &&rad3..ARRAYVISIONELEMENTRESULT
