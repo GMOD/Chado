@@ -4,6 +4,9 @@ use ExtUtils::MakeMaker;
 
 my %O;
 
+#hard code these for the moment for testing
+my $DBNAME            = chadx;
+my $USER              = scott;
 $O{GMOD_HOME}      = $ENV{GMOD_HOME} || '/usr/local/gmod';
 $O{PACKAGE_HOME}   = $O{GMOD_HOME}.'/lib/schema';
 $O{COREDEF}        = 'modules/idb-full.modules';
@@ -74,11 +77,34 @@ possible targets of makefile:
 
 HINT: you probably want to run (at least) "make test_load"
 ----------------------------------------------------------
+--
+NOTE FROM/TO Scott: make sure that if Class::DBI is made, 
+that it also gets moved to blib to be installed!!
 HERE
 ;
 
 sub MY::postamble {
   my $uninterp =  q{
+song ::
+	make obo/OBO_REL/rel.rel_loaded
+	make song/SODA.defs.unpacked
+	make song/SODA.ontology.unpacked
+	make song/SODA.so_loaded
+
+go ::
+	make obo/OBO_REL/rel.rel_loaded
+	make go/component.go_loaded
+	make go/function.go_loaded
+	make go/process.go_loaded
+
+websync :: \
+	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/component.ontology
+	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/function.ontology
+	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/process.ontology
+	wget -nd -N -r -Pgo http://www.geneontology.org/doc/GO.defs
+	wget -nd -N -r -Psong http://heanet.dl.sourceforge.net/sourceforge/song/SODA.defs.gz
+	wget -nd -N -r -Psong http://cesnet.dl.sourceforge.net/sourceforge/song/SODA.ontology.gz
+
 mysql :: \
 		./modules/complete.mysql
 
@@ -132,6 +158,14 @@ metadata: ./bin/ddltrans
   qq{
 test_load ::
 	\$(SHELL) bin/test_load.sh
+
+%.go_loaded: %.ontology
+	./bin/load_ontology.pl $USER $DBNAME $< go/GO.defs
+	touch $@
+
+%.so_loaded: %.ontology
+	./bin/load_ontology.pl $USER $DBNAME $< song/SODA.defs
+	touch $@
 
 $uninterp
   };  
