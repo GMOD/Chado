@@ -530,8 +530,8 @@ create table projectlink (
 create table protocol (
     protocol_id                        																		serial not null,
 	primary key (protocol_id),
-    protocol_type_id                   																		int not null,
-	foreign key (protocol_type_id) references cvterm (cvterm_id),
+    protocoltype_id                   																		int not null,
+	foreign key (protocoltype_id) references cvterm (cvterm_id),
     pub_id         																							int null,
 	foreign key (pub_id) references pub (pub_id),
     dbxref_id                          																		int null,
