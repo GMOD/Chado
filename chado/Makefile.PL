@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.56 2004-03-26 17:04:53 scottcain Exp $
+# $Id: Makefile.PL,v 1.57 2004-03-26 18:34:35 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -524,11 +524,21 @@ Optional Targets:
   make radviews    (creates views for gene expression data.  this is
                     necessary if you chose expression/rad.sql above)
   make images      (generates images of the schema in several formats)
+  make rm_locks    (removes ontology lock files, allowing installation
+                    of ontologies on successive builds of the database
+                    without removing the ontology files altogether)
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 HERE
 ;
+
+sub MY::clean {
+  package MY;
+  my $inherited = shift->SUPER::clean(@_);
+  $inherited =~ s/clean_subdirs/clean_subdirs rm_locks/;
+  $inherited;
+}
 
 #sub MY::install {
 #  package MY;
@@ -621,6 +631,9 @@ ontologies ::
 
 radviews ::
 	./Build radviews
+
+rm_locks ::
+	`find $LOCAL_TMP -name "*_chado" -exec rm -f '{}' ';'`
 
   };  
 }
