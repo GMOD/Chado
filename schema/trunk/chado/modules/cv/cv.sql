@@ -66,7 +66,7 @@ create table cvtermpath (
        type_id int,
        foreign key (type_id) references cvterm (cvterm_id),
        subject_id int not null,
-       foreign key (subjterm_id) references cvterm (cvterm_id),
+       foreign key (subject_id) references cvterm (cvterm_id),
        object_id int not null,
        foreign key (object_id) references cvterm (cvterm_id),
        cv_id int not null,
