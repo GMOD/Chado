@@ -614,7 +614,7 @@ sub load_sequences {
         $f->dbi_commit;
 
         my $dna = $seq->seq;
-        my $shredsize = 100_000_000; #don't increase this...
+        my $shredsize = 20_000_000; #don't increase this above 100MB...
         my $offset = 0;
         my $dnalen = length($dna);
 
@@ -624,6 +624,8 @@ sub load_sequences {
 
           $offset += $shredsize;
         }
+
+	undef $dna;
 
         $f->update;
         $f->dbi_commit;
