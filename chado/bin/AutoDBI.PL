@@ -527,6 +527,14 @@ Chado::Cvterm->has_many(
     'feature_relationshipprop_type_id', 'Chado::Feature_Relationshipprop' => 'type_id'
 );
 
+sub element_relationships {
+    return shift->element_relationship_type_id
+}
+
+Chado::Cvterm->has_many(
+    'element_relationship_type_id', 'Chado::Element_Relationship' => 'type_id'
+);
+
 sub quantification_relationships {
     return shift->quantification_relationship_type_id
 }
@@ -3927,6 +3935,18 @@ Chado::Element->has_many(
     'elementresult_element_id', 'Chado::Elementresult' => 'element_id'
 );
 
+sub element_relationships {
+    return shift->element_relationship_subject_id
+}
+
+Chado::Element->has_many(
+    'element_relationship_subject_id', 'Chado::Element_Relationship' => 'subject_id'
+);
+
+Chado::Element->has_many(
+    'element_relationship_object_id', 'Chado::Element_Relationship' => 'object_id'
+);
+
 # -------------------------------------------------------------------
 package Chado::Elementresult;
 use base 'Chado::DBI';
@@ -3969,6 +3989,45 @@ Chado::Elementresult->has_many(
 Chado::Elementresult->has_many(
     'elementresult_relationship_object_id', 'Chado::Elementresult_Relationship' => 'object_id'
 );
+
+# -------------------------------------------------------------------
+package Chado::Element_Relationship;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Element_Relationship->set_up_table('element_relationship');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->element_relationship_id
+}
+
+Chado::Element_Relationship->has_a(
+    subject_id => 'Chado::Element'
+);
+
+sub subject {
+    return shift->subject_id
+}
+
+Chado::Element_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
+}
+
+Chado::Element_Relationship->has_a(
+    object_id => 'Chado::Element'
+);
+
+sub object {
+    return shift->object_id
+}
 
 # -------------------------------------------------------------------
 package Chado::Elementresult_Relationship;
