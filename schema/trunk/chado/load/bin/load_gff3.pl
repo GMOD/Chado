@@ -1,7 +1,4 @@
-#!/usr/bin/perl
-#copyright stuff: Allen Day, 2003
-# license stuff: Perl Artistic License
-
+#!/usr/bin/perl -w
 
 use strict;
 use Bio::Tools::GFF;
@@ -9,20 +6,106 @@ use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
 
-#
-# Items probably need to be passed in:
-#       filename of GFF file (or stdin)
-#       name of source db for dbxref (could use filename as default)
-#       name of the organism
-#       could provide a flag to skip mitocondrial, although I don't know how to implement generally
-#
+=head1 NAME
+
+load_gff3.pl - Load gff3 files into a chado database.
+
+=head1 SYNOPSIS
+
+  % load_gff3.pl --organism Human --srcdb refseq --gfffile refseq.gff
+
+=head1 DESCRIPTION
+
+See the notes; there is plenty there.
+
+=head2 NOTES
+
+=over
+
+=item Base coordinates
+
+Note that at the moment, this script assumes and uses base coordinates,
+though this is at odds with the flybase development group's and the
+gbrowse chado adaptor's use of interbase coordinates.  Therefore, 
+until this is fixed, there will be off by one errors in gbrowse 
+displays.
+
+=item The ORGANISM table
+
+This script assumes that the organism table is populated with information
+about your organism.  If you are unsure if that is the case, you can
+execute this command from the psql command-line:
+
+  select * from organism;
+
+If you do not see your organism listed, execute this command to insert it:
+
+  insert into organism (abbreviation, genus, species, common_name)
+                values ('H.sapiens', 'Homo','sapiens','Human');
+
+substituting in the appropriate values for your organism.
+
+=item The DB table
+
+This script assumes that the db table is populated with a row describing
+the database that is the source of these annotations.  If you are unsure,
+execute this command:
+
+  select * from db;
+
+If you do not see your database listed, execute this command:
+
+  insert into db (name, contact_id) values ('refseq',1);
+
+Substituting for the name of your database.  A more complete insert
+command may be appropriate in your case, but this should work in a pinch.
+
+=item GFF3
+
+The GFF in the datafile must be version 3 due to its tighter control of
+the specification and use of controlled vocabulary.  Accordingly, the names
+of feature types must be exactly those in the Sequence Ontology, not the
+synonyms and not the accession numbers.  Also, in order for the load
+to be successful, the reference sequences (eg, chromosomes or contigs)
+must be defined in the GFF file before any features on them are listed.
+This can be done either by the reference-sequence meta data specification,
+which would be lines that look like this:
+
+  ##sequence-region chr1 1 246127941  ----except that this isn't supported
+  yet--can I get Bio::Tools::GFF to give me this info?
+
+or with a standard GFF line:
+
+  chr1	NCBI	chromosome	1	246127941	.	.	.	ID=chr1
+
+=back
+
+=head1 COMMAND-LINE OPTIONS
+
+The following command line options are required.  Note that they
+can be abbreviated to one letter.
+
+  --organism <org name>      Common name of the organism
+  --srcdb    <dbname>        The name of the source database
+  --gfffile  <filename>      The name of the GFF3 file
+
+=head1 AUTHOR
+
+Allen Day
+
+Copyright (c) 2003
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  
+
+=cut
 
 my ($ORGANISM, $SRC_DB, $GFFFILE);
 
 GetOptions('organism:s'       => \$ORGANISM,
            'srcdb:s'          => \$SRC_DB,
            'gfffile:s'        => \$GFFFILE
-          ) ; 
+          ) or (system('pod2text',$0), exit -1); 
 
 $ORGANISM ||='Human';
 $SRC_DB   ||= 'refseq';
@@ -71,7 +154,7 @@ while(my $gff_feature = $gffio->next_feature()) {
       warn "Unable to find a source feature id for the reference sequence in this line:\n";
       warn $gff_feature->gff_string . "\n\n";
       warn "That is, ".$gff_feature->seq_id." should either have a entry in the \n";
-      warn "feature table or early in this GFF file and it doesn't.\n\n";
+      warn "feature table or earlier in this GFF file and it doesn't.\n\n";
       warn "*" x 72 ."\n";
       die;
     }
@@ -98,14 +181,16 @@ while(my $gff_feature = $gffio->next_feature()) {
 #warn "*".$gff_feature->has_tag('ID')." ". $dbxref{$id}->id;
 #warn "organism:$chado_organism";
 
+  my $seqlen = $gff_feature->end - $gff_feature->start +1;
+
   my($chado_feature) = Chado::Feature->find_or_create({
-    organism_id => $chado_organism,
-    name => $id,
-    uniquename => $id .'_'. $gff_feature->primary_tag
-                      .'_'. $gff_feature->seq_id .':'
-                          . $gff_feature->start .'..'. $gff_feature->end,
-    type_id => $chado_type->cvterm_id,
-#    dbxref_id => $gff_feature->has_tag('ID') ? $dbxref{$id} : undef,
+    organism_id  => $chado_organism,
+    name         => $id,
+    uniquename   => $id .'_'. $gff_feature->primary_tag
+                        .'_'. $gff_feature->seq_id .':'
+                            . $gff_feature->start .'..'. $gff_feature->end,
+    type_id      => $chado_type->cvterm_id,
+    seqlen       => $seqlen
                                                     });
 
   $line_count++;
