@@ -86,7 +86,7 @@ create index cvtermpath_idx4 on cvtermpath (cv_id);
 -- ================================================
 
 create table cvtermsynonym (
-       cvtermsynonym_id int not null,
+       cvtermsynonym_id serial not null,
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
