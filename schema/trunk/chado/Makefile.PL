@@ -173,6 +173,7 @@ graphviz :: \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
 	make $working_dir/modules/pathway/pathway.graphviz.png \
 	make $working_dir/modules/www/www.graphviz.png \
+	make $working_dir/modules/complete.graphviz.png
 
 graphviz_svg :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.svg \
@@ -187,6 +188,7 @@ graphviz_svg :: \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
 	make $working_dir/modules/pathway/pathway.graphviz.svg \
 	make $working_dir/modules/www/www.graphviz.svg \
+	make $working_dir/modules/complete.graphviz.svg
 
 diagram :: \
 	make $working_dir/modules/companalysis/companalysis.diagram.png \
@@ -200,7 +202,8 @@ diagram :: \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
 	make $working_dir/modules/pathway/pathway.diagram.png \
-	make $working_dir/modules/www/www.diagram.png
+	make $working_dir/modules/www/www.diagram.png \
+	make $working_dir/modules/complete.diagram.png
 
 %.mysql: %.sql
 	$working_dir/bin/pg2my.pl \$< > \$@
