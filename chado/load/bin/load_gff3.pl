@@ -208,14 +208,33 @@ while(my $gff_feature = $gffio->next_feature()) {
 #warn "*".$gff_feature->has_tag('ID')." ". $dbxref{$id}->id;
 #warn "organism:$chado_organism";
 
-  my $seqlen = $gff_feature->end - $gff_feature->start +1;
+  ## GFF features are base-oriented, so we must add 1 to the diff
+  ## between the end base and the start base, to get the number of
+  ## intervening bases between the start and end intervals
+  my $seqlen = ($gff_feature->end - $gff_feature->start) +1;
+
+  ## we must convert between base-oriented coordinates (GFF3) and
+  ## interbase coordinates (chado)
+  ##
+  ## interbase counts *between* bases (starting from 0)
+  ## GFF3 (and blast, bioperl, etc) count the actual bases (origin 1)
+  ##
+  ## 
+  ## 0 1 2 3 4 5 6 7 8 : INTERBASE
+  ##  A T G C G T A T
+  ##  1 2 3 4 5 6 7 8  : BIOPERL/GFF
+  ##
+  ## from the above we can see that we need to add/subtract 1 from fmin
+  ## we don't touch fmax
+  my $fmin = $gff_feature->start -1;    # GFF -> InterBase
+  my $fmax = $gff_feature->end;
 
   my($chado_feature) = Chado::Feature->find_or_create({
     organism_id  => $chado_organism,
     name         => $id,
     uniquename   => $id .'_'. $gff_feature->primary_tag
                         .'_'. $gff_feature->seq_id .':'
-                            . $gff_feature->start .'..'. $gff_feature->end,
+                            . $fmix .'..'. $fmax,
     type_id      => $chado_type->cvterm_id,
     seqlen       => $seqlen
                                                     });
@@ -233,8 +252,8 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   Chado::Featureloc->find_or_create({
       feature_id    => $chado_feature->id,
-      fmin          => $gff_feature->start,
-      fmax          => $gff_feature->end,
+      fmin          => $fmin,
+      fmax          => $fmax,
       strand        => $gff_feature->strand,
       phase         => $frame,
       srcfeature_id => $srcfeature{$id}->id,
