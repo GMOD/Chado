@@ -13,7 +13,7 @@ my $create = join '', @create;
 
 my $tr = SQL::Translator->new(
 				parser   => "PostgreSQL",
-				producer => "GraphViz"
+				producer => "GraphViz",
                                 producer_args => {
                                                    output_type => 'svg',
                                                    width => 10,
