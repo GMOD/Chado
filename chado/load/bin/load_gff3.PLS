@@ -268,10 +268,10 @@ while(my $gff_feature = $gffio->next_feature()) {
 $_->dbi_commit foreach @transaction;
 $gffio->close();
 
-print "$feature_count features added\n";
+print "\n$feature_count features added\n";
 
 my $seqs_loaded = load_sequences();
-print "$seqs_loaded sequences added\n";
+print "\n$seqs_loaded sequences added\n";
 print "Done\n";
 
 
