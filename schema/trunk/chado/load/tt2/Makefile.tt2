@@ -39,35 +39,35 @@ ucla_inserts ::
 	touch $@
 
 %.emap_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $<
+	./bin/gmod_load_ontology.pl $<
 	touch $@
 
 %.csv_pathology_[% touch_ext %]_loaded: %.csv
-	./bin/load_ontology.pl $(USER) $(DBNAME) $<
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $<
 	touch $@
 
 %.cell_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $< $(DATAPATH)/obo/anatomy/cell_type/cell.definitions
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $< $(DATAPATH)/obo/anatomy/cell_type/cell.definitions
 	touch $@
 
 %.ma_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $<
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $<
 	touch $@
 
 %.mpath_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $<
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $<
 	touch $@
 
 %.rel_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $< obo/OBO_REL/rel.definitions
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $< obo/OBO_REL/rel.definitions
 	touch $@
 
 %.go_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $< go/GO.defs
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $< go/GO.defs
 	touch $@
 
 %.so_[% touch_ext %]_loaded: %.ontology
-	./bin/load_ontology.pl $(USER) $(DBNAME) $< song/SODA.defs
+	./bin/gmod_load_ontology.pl $(USER) $(DBNAME) $< song/SODA.defs
 	touch $@
 
 cvtermpath ::
