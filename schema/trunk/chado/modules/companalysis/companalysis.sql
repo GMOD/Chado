@@ -1,3 +1,4 @@
+## $Id: companalysis.sql,v 1.3 2002-10-31 23:07:03 cmungall Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -80,13 +81,25 @@ create table hsp (
     # beg/end 1,2
     qnbeg int not null,
     qnend int not null,
+    qstrand smallint not null,
     snbeg int not null,
     snend int not null,
+    sstrand smallint not null,
     hsprawscore double,
     hspnormscore double,
     hspsignificance double,
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
+);
+
+create table scoredfeature (
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id),
+    primary_key(feature_id),
+
+    rawscore double,
+    normscore double,
+    significance double
 );
 
 create table hspprop (
