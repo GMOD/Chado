@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.35 2003-12-04 02:02:32 allenday Exp $
+# $Id: Makefile.PL,v 1.36 2003-12-04 02:24:27 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -372,15 +372,16 @@ if ($rebuild_complete || !-e $complete_sql) {
 }
 
 WriteMakefile(
-    'NAME'		            => 'chado',
-    'PREREQ_PM'		        => { 
+    'NAME'		  => 'chado',
+    'PREREQ_PM'		  => { 
       'SQL::Translator'   => 0.04,
       'Class::DBI'        => 0.94,
       'Class::DBI::Pager' => 0,
       'Class::DBI::Pg'    => 0.02,
       'Module::Build'     => 0.20,
       'Template'          => 2.10,
-			'Term::ProgressBar' => 0,
+      'Term::ProgressBar' => 0,   #fluff, but make sure you check load/bin/*
+                                  #if this prereq is removed
       'DBI'               => 0,
       'DBD::Pg'           => 0,
       'XML::Simple'       => 2.09,
@@ -399,7 +400,6 @@ Makefile written.  Possible targets of Makefile:
 
   images    - Generate images of the schema in several formats
   metadata  - ???
-  mysql     - Convert postgres sql files to mysql sql files
   test_load - Test database CREATE TABLE statements
 
 HINT: You probably want to run (at least) "make test_load"
@@ -448,9 +448,6 @@ websync ::
 	wget -nd -N -r -P$working_dir/song http://heanet.dl.sourceforge.net/sourceforge/song/SODA.defs.gz
 	wget -nd -N -r -P$working_dir/song http://cesnet.dl.sourceforge.net/sourceforge/song/SODA.ontology.gz
 
-mysql :: \
-		$working_dir/modules/complete.mysql
-
 images :: graphviz graphviz_svg diagram
 
 graphviz :: \
@@ -498,9 +495,6 @@ diagram :: \
 	make $working_dir/modules/www/www.diagram.png \
 	make $working_dir/modules/complete.diagram.png
 
-%.mysql: %.sql
-	$working_dir/bin/pg2my.pl \$< > \$@
-
 %.graphviz.png: %.sql
 	$working_dir/bin/pg2graphviz.pl \$< > \$@
 
@@ -512,7 +506,6 @@ diagram :: \
 
 cdbi:
 	$working_dir/bin/pg2cdbi.pl $working_dir/modules/complete.sql > $working_dir/src/pgsql/Chado/AutoDBI.pm
-	$working_dir/bin/my2cdbi.pl $working_dir/modules/complete.mysql > $working_dir/src/mysql/Chado/AutoDBI.pm
 
 metadata: $working_dir/bin/ddltrans
 	cat \`find . -name \\*.sql -print\` > $working_dir/dat/chado.ddl

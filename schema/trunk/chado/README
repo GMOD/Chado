@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.6 2003-12-04 00:01:35 kycl4rk Exp $
+$Id: README,v 1.7 2003-12-04 02:24:28 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -67,18 +67,6 @@ The core schema is DBMS independent.  The SQL table create files can
 be found in the chado/modules directory.  The main Chado developers
 are currently using PostgreSQL.
 
-A NOTE FOR NON-POSTGRESQL USERS
--------------------------------
-
-While the core developers may be using PostgreSQL, we realize that this
-database platform is not an option for all users.  We don't support use
-of a non-PG platform, but we do provide a tool that is able to convert
-the schema to be compatible with other DBMS vendors.  Currently we
-generate a MySQL equivalent of the schema.
-
-There may be additional optional layers that use views, triggers,
-procedures, constraints etc which may be postgresql specific.
-
 INSTALLATION
 ------------
 
@@ -93,12 +81,9 @@ The Chado Makefile currently supports:
 Target			Purpose
 --------------- -----------------------------------------------------------
 all				makes cdbi, see below
-cdbi			make Class::DBI interface classes (Chado::*) from pgsql and
-				mysql files
+cdbi			make Class::DBI interface classes (Chado::*) from sql source
 diagram			make ER diagrams, one per module
 graphviz		make graphviz diagrams, one per module
-mysql			create mysql schema (sql) files from postgres sql files
-
 
 These transforms depend on the Perl scripts in "chado/bin" and the
 SQL::Translator module (with all of its dependencies), which is
