@@ -70,11 +70,12 @@ foreach my $file (@ARGV) {
         %$seq = ();
         my $stag = $outio->handler->stag;
         $C->init_from_stag($stag);
-
-        #### $C->name_all_features; now handled in bp SeqIO::chaos
 	
         my $seqfs = $C->top_unlocalised_features;
-        if (@$seqfs != 1) {
+        if (@$seqfs == 0) {
+            $C->freak("no top level feature");
+        }
+        if (@$seqfs > 1) {
             $C->freak("top unlocalised feats!=1", @$seqfs);
         }
         my $seqf = shift @$seqfs;
