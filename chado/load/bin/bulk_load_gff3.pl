@@ -8,11 +8,18 @@ use Bio::Tools::GFF;
 # no dbxref_id allowed
 # no residues allowed
 
+#still need to touch for barest of functionality (for me):
+#  featureprop for Notes -- done,not tested
+#  feature_synonym and synonym for Alias and Name
+#  feature_cvterm for Ontology_term -- done, not test
+
 my %src = ();
 my %type = ();
+my $pub; # for holding null pub object
 
 ########################
-my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
+#my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
+my $db = DBI->connect('dbi:Pg:dbname=chado','cain','');
 
 my $sth = $db->prepare("select nextval('feature_feature_id_seq')");
 $sth->execute;
@@ -26,16 +33,28 @@ $sth = $db->prepare("select nextval('feature_relationship_feature_relationship_i
 $sth->execute;
 my($nextfeaturerel) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select nextval('featureprop_featureprop_id_seq')");
+$sth->execute;
+my($nextfeatureprop) = $sth->fetchrow_array();
+
+$sth = $db->prepare("select nextval('feature_cvterm_feature_cvterm_id_seq')");
+$sth->execute;
+my($nextfeaturecvterm) = $sth->fetchrow_array();
+
 $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
 ########################
 
-my($organism) = Chado::Organism->search( common_name => 'human' ); #FIXME
+#my($organism) = Chado::Organism->search( common_name => 'human' ); #FIXME
+my($organism) = Chado::Organism->search( common_name => 'rice' ); #FIXME--I will
+
 
 open F   ,  ">feature.tmp";
 open FLOC,  ">featureloc.tmp";
 open FREL,  ">featurerel.tmp";
+open FPROP, ">featureprop.tmp";
+open FCV,   ">featurecvterm.tmp";
 
 print F    "BEGIN;\n";
 print F    "COPY feature (feature_id,organism_id,name,uniquename,type_id) FROM STDIN;\n";
@@ -45,6 +64,12 @@ print FLOC "COPY featureloc (featureloc_id,feature_id,srcfeature_id,fmin,fmax,st
 
 print FREL "BEGIN;\n";
 print FREL "COPY feature_relationship (feature_relationship_id,subject_id,object_id,type_id) FROM STDIN;\n";
+
+print FPROP "BEGIN;\n";
+print FPROP "COPY featureprop (featureprop_id,feature_id,type_id,value,rank) FROM STDIN;\n";
+
+print FCV "BEGIN;\n";
+print FCV "COPY feature_cvterm (feature_cvterm_id,feature_id,cvterm_id,pub_id) FROM STDIN;\n";
 
 my $gffio = Bio::Tools::GFF->new(-fh => \*STDIN, -gff_version => 3);
 
@@ -97,6 +122,38 @@ warn $feature->seq_id;
 
   print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $frame)),"\n";
 
+  my @notes = $feature->has_tag('Note') ? $feature->get_tag_values('Note') : [];
+  foreach my $note (@notes) {
+    my $rank = 0;
+
+    ($type{'Note'}) = Chado::Cvterm->search( name => 'Note') unless $type{'Note'};
+
+    print FPROP join("\t",($nextfeatureprop,$nextfeature,$$type{'Note'}->id,$note,$rank)),"\n";
+
+    $rank++;
+    $nextfeatureprop++;
+  }
+
+  my @cvterms = $feature->has_tag('Ontology_term') 
+                ? $feature->get_tag_values('Ontology_term')
+                : ();
+  foreach my $term (@cvterms) {
+    unless ($type{$term}) {
+      my ($dbxref) = Chado::Dbxref->search( accession => $term );
+      warn "couldn't find $term in dbxref\n" and next unless $dbxref;
+      ($type{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+      warn "couldn't find $term's cvterm_id in cvterm table\n" 
+        and next unless $type{$term}; 
+    }
+    unless ($pub) {
+      ($pub) = Chado::Pub->search( miniref => 'null' );
+      $pub = $pub->id; #no need to keep whole object when all we want is the id
+    }
+
+    print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub));
+    $nextfeaturecvterm++;
+  }
+
   $nextfeature++;
   $nextfeatureloc++;
 }
@@ -107,7 +164,13 @@ print FLOC "\\.\n";
 print FLOC "COMMIT;\n";
 print FREL "\\.\n";
 print FREL "COMMIT;\n";
+print FPROP "\\.\n";
+print FPROP "COMMIT;\n";
+print FCV "\\.\n";
+print FCV "COMMIT;\n";
 
 close F;
 close FLOC;
 close FREL;
+close FPROP;
+close FCV;
