@@ -58,6 +58,23 @@ public String m_isanalysis = "0";
 		return null;
 	}
 
+	public boolean isMatch(){
+		if(m_isanalysis==null){
+			if(m_TypeId.getValue()!=null){
+				if(m_TypeId.getValue().equals("match")){
+					return true;
+				}else{
+					return false;
+				}
+			}else{
+				return false;
+			}
+		}else if(m_isanalysis.equals("1")){
+			return true;
+		}
+		return false;
+	}
+
 	public void Display(int the_depth){
 		System.out.println("DISPLAY");
 		if(this instanceof FeatProp){

@@ -1666,12 +1666,15 @@ private String m_ExonGeneName = null;
 			}
 		}
 
+		System.out.println("INTERNAL_SYNONYM");
 		//INTERNAL SYNONYM FROM GAME internal_synonym PROPERTY
 		for(int i=0;i<the_gf.getAttribCount();i++){
 			Attrib attr = the_gf.getAttrib(i);
 			if(attr!=null){
 				if(attr.getAttribType().equals("property")){
+					System.out.println("\tCOULDBE TYPE<"+attr.gettype()+"> VAL<"+attr.getvalue()+">");
 					if(attr.gettype().equals("internal_synonym")){
+						System.out.println("\tMADE");
 						the_FeatNode.appendChild(makeFeatureSynonym(the_DOC,attr.getvalue(),"1",the_gf.getAuthor()));
 					}
 				}

@@ -72,7 +72,7 @@ private boolean m_geneOnly = false;
 	public void ChadoToGame(){
 		//PARSE CHADO FILE
 		ChadoSaxReader csr = new ChadoSaxReader();
-		csr.parse(m_InFile);
+		csr.parse(m_InFile,m_geneOnly);
 		GenFeat TopNode = csr.getTopNode();
 		System.out.println("=============DONE READING FILE - WRITE GAME FILE\n");
 		writeFile(TopNode,m_OutFile);
@@ -236,8 +236,8 @@ private boolean m_geneOnly = false;
 			}
 		}
 		System.out.println("DONE WRITING ANNOTATION FEATURES");
-	/************/
 
+	/************/
 		if(m_geneOnly==false){
 			System.out.println("START WRITING ANALYSIS FEATURES");
 			//COMP_ANAL FEATURES
@@ -246,9 +246,6 @@ private boolean m_geneOnly = false;
 				System.out.println("COMPANAL<"+gf.getisanalysis()+">");
 				if(gf.getisanalysis().equals("1")){
 					System.out.println("IS_ANALYSIS=1");
-					if(gf.getTypeId().startsWith("match")){
-					}else{
-					}
 					m_AnalysisList.add(makeCompAnalysis(
 							the_DOC,(Feature)gf));
 				}else{
@@ -258,6 +255,7 @@ private boolean m_geneOnly = false;
 			}
 		}
 	/************/
+
 		for(int i=0;i<m_AnalysisList.size();i++){
 			System.out.println("\tWRITE ANALFEAT<"+i+">");
 			Element el = (Element)m_AnalysisList.get(i);
@@ -741,7 +739,7 @@ private boolean m_geneOnly = false;
 		//  DATE
 		//if(the_gf.getDate()!=null){
 		//	the_Node.appendChild(makeDateNode(
-		//		the_DOC,the_gf.getDate(),the_gf.getDate());
+		//		the_DOC,null,the_gf.getDate());
 		//}
 
 		for(int i=0;i<((Feature)the_gf).getFeatSynCount();i++){
@@ -906,9 +904,9 @@ private boolean m_geneOnly = false;
 	public Element makeDateNode(Document the_DOC,
 			String the_timestamp,String the_date){
 		Element dateNode = (Element)the_DOC.createElement("date");
-		//if(the_timestamp!=null){
-		//	dateNode.setAttribute("timestamp",the_timestamp);
-		//}
+		if(the_timestamp!=null){
+			dateNode.setAttribute("timestamp",the_timestamp);
+		}
 		if(the_date!=null){
 			dateNode.appendChild(the_DOC.createTextNode(the_date));
 		}
@@ -942,9 +940,10 @@ private boolean m_geneOnly = false;
 	public Element makeCompAnalysis(Document the_DOC,Feature the_ca){
 		Element compAnalNode = (Element)the_DOC.createElement("computational_analysis");
 
+		System.out.println("SHOULDBEWRITINGTIMEACCESSIONED");
 		if(the_ca.gettimeaccessioned()!=null){
 			compAnalNode.appendChild(makeDateNode(
-					the_DOC,"TIMESTAMP",
+					the_DOC,null,
 					the_ca.gettimeaccessioned()));
 		}
 		System.out.println("NEW REF SPAN<"+m_NewREFSPAN.getStart()
@@ -998,6 +997,7 @@ private boolean m_geneOnly = false;
 		/***********/
 		for(int i=0;i<the_ca.getGenFeatCount();i++){
 			GenFeat CAgf = (GenFeat)the_ca.getGenFeat(i);
+			System.out.println("WOULDBE<"+((Feature)CAgf).gettimeaccessioned()+">");
 			System.out.println("XXXYYY START");
 			CAgf.Display(2);
 			rSpanList.add(CAgf);
@@ -1038,9 +1038,17 @@ private boolean m_geneOnly = false;
 			Feature ca = (Feature)rSpanList.get(i);
 			if((ca!=null)&&(ca.getFeatLoc()!=null)){
 	//ARF
-				//Span sp = ca.getFeatLoc().getSpan().retreat(
-				//		m_NewREFSPAN.getStart());
 				Span sp = ca.getFeatLoc().getSpan();
+				String sfi = ca.getFeatLoc().getSrcFeatureId();
+				System.out.println("SRC_FEAT FEATID<"+sfi+">");
+			Feature tmp = (Feature)Mapping.Lookup(sfi);
+				if(tmp!=null){
+					System.out.println("TMP<"+tmp.getResidues()+">");
+				}else{
+					System.out.println("TMP<null>");
+				}
+				//INTERBASE CONVERSION
+				sp = new Span(sp.getStart()+1,sp.getEnd());
 
 				resultSetSpan.grow(sp);
 				ca.getFeatLoc().setSpan(sp);
@@ -1056,6 +1064,7 @@ private boolean m_geneOnly = false;
 			strand = 1;
 		}
 		System.out.println("PROBLEM COMP_ANALYSIS<"+m_OldREFSTRING+">");
+		//TTT
 		resultSetNode.appendChild(makeSeqRelNode(
 				the_DOC,the_ca,
 				resultSetSpan,
@@ -1089,22 +1098,70 @@ private boolean m_geneOnly = false;
 			resultSpanNode.appendChild(makeGenericNode(
 					the_DOC,"name",the_ca.getName()));
 		}
-		System.out.println("\tRESULT_SPAN NAME <"
-				+the_ca.getrawscore()+">");
-		System.out.println("\tRESULT_SPAN SCORE <"
-				+the_ca.getrawscore()+">");
+		System.out.println("\tRESULT_SPAN TYPE<"
+				+the_typeId+">");
+		if(the_typeId!=null){
+			resultSpanNode.appendChild(makeGenericNode(
+					the_DOC,"type",the_typeId));
+		}
+		System.out.println("\tRESULT_SPAN SCORE <"+the_score+">");
+		if(the_score!=null){
+			resultSpanNode.appendChild(makeGenericNode(
+					the_DOC,"score",the_score));
+			Element outputNode = (Element)the_DOC.createElement(
+					"output");
+			outputNode.appendChild(makeGenericNode(
+					the_DOC,"type","score"));
+			outputNode.appendChild(makeGenericNode(
+					the_DOC,"value",the_score));
+			resultSpanNode.appendChild(outputNode);
+		}
 
-		String queryName = m_OldREFSTRING;
+		//String queryName = m_OldREFSTRING;
+		String queryName = "";
+		String queryResidues = "";
 		String subjName = "";
+		String subjResidues = "";
 		for(int i=0;i<the_ca.getGenFeatCount();i++){
 			GenFeat gf = (GenFeat)the_ca.getGenFeat(i);
 			System.out.println("GGGGF<"+gf.getName()+">");
-			//subjName = gf.getName();
-			subjName = gf.getUniqueName();
+			System.out.println("GGGGFFFF<"+((Feature)gf).getResidues()+">");
+			//subjName = gf.getUniqueName();
+			//subjResidues = ((Feature)gf).getResidues();
 //KLUDGE - FIX
-			if(subjName!=null){
-				break;
+			if(i==0){
+				subjName = gf.getUniqueName();
+				subjResidues = ((Feature)gf).getResidues();
+			}else if(i==1){
+				queryName = gf.getUniqueName();
+				queryResidues = ((Feature)gf).getResidues();
 			}
+			//if(subjName!=null){
+			//	break;
+			//}
+		}
+		System.out.println("FSS SUBJ NAME <"+subjName+"> RES<"+subjResidues+">");
+		System.out.println("FSS QUERY NAME <"+queryName+"> RES<"+queryResidues+">");
+
+		//SUBJECT
+		if(the_ca.getAltFeatLoc()!=null){
+			Span altsp = the_ca.getAltFeatLoc().getSpan();
+	//ARF
+			Span altspRet = altsp.retreat(m_NewREFSPAN.getStart());
+			//INTERBASE CONVERSION
+			altspRet = new Span(altspRet.getStart()+1,altspRet.getEnd());
+			System.out.println("\tRESULT_SET ALTFEATLOC <"
+				+altsp.toString()+"> RET <"+altspRet.toString()
+				+"> LEN<"+altsp.getLength()
+				+"> STRAND<"+the_ca.getAltFeatLoc().getstrand()+">");
+			int strand = the_ca.getAltFeatLoc().getstrand();
+			System.out.println("PROBLEM NEW_RESULT_SPAN_ALT<"+subjName+">");
+			resultSpanNode.appendChild(makeSeqRelNode(
+					the_DOC,the_ca,altspRet,strand,
+					queryName,"query",
+					queryResidues));
+					//the_ca.getFeatLoc().getAlign()));
+			System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
 		}
 		
 		if(the_ca.getFeatLoc()!=null){
@@ -1113,10 +1170,11 @@ private boolean m_geneOnly = false;
 	//ARF
 			//Span spAdv = sp.retreat(m_NewREFSPAN.getStart());
 			//Span spAdv = sp;
-			Span spAdv = sp.advance(m_NewREFSPAN.getStart());
+			//Span spAdv = sp.advance(m_NewREFSPAN.getStart());
 
 			System.out.println("\tRESULT_SET FEATLOC <"
-				+sp.toString()+"> ADV <"+spAdv.toString()
+				+sp.toString()
+				//+"> ADV <"+spAdv.toString()
 				+"> LEN<"+sp.getLength()
 				+"> STRAND<"+the_ca.getFeatLoc().getstrand()+">");
 			int strand = 1;
@@ -1126,28 +1184,10 @@ private boolean m_geneOnly = false;
 			System.out.println("PROBLEM NEW_RESULT_SPAN<"+queryName+">");
 			resultSpanNode.appendChild(makeSeqRelNode(
 					the_DOC,the_ca,sp,strand,
-					queryName,"query",
-					the_ca.getFeatLoc().getAlign()));
-			System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
-		}
-		//SUBJECT
-		if(the_ca.getAltFeatLoc()!=null){
-			Span altsp = the_ca.getAltFeatLoc().getSpan();
-	//ARF
-			//Span altspRet = altsp.retreat(m_NewREFSPAN.getStart());
-			Span altspRet = altsp;
-			System.out.println("\tRESULT_SET ALTFEATLOC <"
-				+altsp.toString()+"> RET <"+altspRet.toString()
-				+"> LEN<"+altsp.getLength()
-				+"> STRAND<"+the_ca.getAltFeatLoc().getstrand()+">");
-			int strand = the_ca.getAltFeatLoc().getstrand();
-			System.out.println("PROBLEM NEW_RESULT_SPAN_ALT<"+subjName+">");
-			resultSpanNode.appendChild(makeSeqRelNode(
-					//the_DOC,the_ca,altsp,strand,subjName,"subject"));
-					the_DOC,the_ca,altspRet,strand,
 					subjName,"subject",
-					the_ca.getFeatLoc().getAlign()));
-			System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
+					//the_ca.getFeatLoc().getAlign()));
+					subjResidues));
+			//System.out.println("FSS ALIGN<"+the_ca.getFeatLoc().getAlign()+">");
 		}
 
 		return resultSpanNode;

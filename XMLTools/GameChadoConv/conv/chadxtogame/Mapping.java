@@ -30,6 +30,16 @@ private static HashMap m_FeatSubMap = new HashMap(10);
 		}
 	}
 
+	public static void removeIfMatch(String the_id){
+		if(m_FeatSubMap!=null){
+			FeatSub fs = (FeatSub)(m_FeatSubMap.get(the_id));
+			if(fs.isMatch()){
+				m_FeatSubMap.remove(the_id);
+				System.out.println("========REMOVING FEATSUB<"+the_id+"> OF TYPE<"+fs.getTypeId()+">");
+			}
+		}
+	}
+
 	public static void Display(){
 		//System.out.println("MAPPED ATTRIBUTES:");
 		Iterator it = m_FeatSubMap.keySet().iterator();
