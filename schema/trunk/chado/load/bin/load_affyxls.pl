@@ -78,16 +78,26 @@ while(my $arrayio = $affx->next_array){
   #we can do this on filename or arrayname.
   #if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
   if($arrayfile =~ m!/!){
+    #has leading directory and cvterms
     if($arrayfile =~ /^.*\/(\d+)\-(\d+)\-(\S+)/){
       $chip_id   = $1;
       $sample_id = $2;
       $cvterms   = $3;
+    #has leading directory
+    } elsif($arrayfile =~ /^.*\/(\d+)\-(\d+)/){
+      $chip_id   = $1;
+      $sample_id = $2;
     }
   } else {
+    #has cvterms
     if($arrayfile =~ /^(\d+)\-(\d+)\-(\S+)/){
       $chip_id   = $1;
       $sample_id = $2;
       $cvterms   = $3;
+    #has nothing
+    } elsif($arrayfile =~ /^(\d+)\-(\d+)/){
+      $chip_id   = $1;
+      $sample_id = $2;
     }
   }
 
@@ -115,19 +125,26 @@ while(my $arrayio = $affx->next_array){
 
   my($array)     = Chado::Array->search(name => $arraytype);
   ($array)     ||= Chado::Array->search(name => 'unknown');
+  $LOG->debug("loaded record for array type: ".$array->name);
 
   my($nulltype)               = Chado::Cvterm->search( name => 'null' );
   my($oligo)                  = Chado::Cvterm->search( name => 'microarray_oligo' );
   die "couldn't find ontology term 'microarray_oligo', did you load the Sequence Ontology?" unless ref($oligo);
+  $LOG->debug("loaded records for generic cvterms");
 
   my($human)                  = Chado::Organism->search( common_name => 'Human' );
+  $LOG->debug("loaded record for organism");
   my $operator                = Chado::Contact->find_or_create( { name => 'UCLA Microarray Core' });
+  $LOG->debug("loaded record for hybridization operator");
   my $operator_quantification = Chado::Contact->find_or_create( { name => $ENV{USER} });
+  $LOG->debug("loaded record for database operator");
   my $analysis                = Chado::Analysis->find_or_create({ name => 'keystone normalization', program => 'dChip unix', programversion => '1.0'});
+  $LOG->debug("loaded record for normalization algorithm");
 
   my $protocol_assay          = Chado::Protocol->find_or_create({ name => 'default assay protocol', type_id => $nulltype });
   my $protocol_acquisition    = Chado::Protocol->find_or_create({ name => 'default acquisition protocol', type_id => $nulltype });
   my $protocol_quantification = Chado::Protocol->find_or_create({ name => 'default quantification protocol', type_id => $nulltype });
+  $LOG->debug("loaded records for protocols");
 
   push @txn, $operator;
   push @txn, $operator_quantification;
@@ -142,6 +159,7 @@ while(my $arrayio = $affx->next_array){
     $biomaterial->update;
     $newchip++ ;
   }
+  $LOG->debug("biomaterial_id: ".$biomaterial->id);
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
@@ -176,6 +194,7 @@ while(my $arrayio = $affx->next_array){
     $assay->update;
     $newchip++;
   }
+  $LOG->debug("assay_id: ".$assay->id);
   push @txn, $assay;
 
   my $assay_biomaterial = Chado::Assay_Biomaterial->find_or_create({
@@ -312,6 +331,8 @@ sub make_cvterms {
   return %cvterm;
 }
 
+#this is a mapping table for legacy annotation IDs based on GUSDB,
+#and is only for internal use at UCLA.
 sub _remap_cvterm {
   my $cvterm_id = shift;
 
