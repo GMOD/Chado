@@ -7,16 +7,20 @@ use File::Basename 'basename';
 use Getopt::Long;
 use URI::Escape;
 use Text::Wrap;
+use Bio::SeqIO;
+use Bio::SeqFeature::Generic;
+use Data::Dumper;
 
 my $executable = basename($0);
 
-my ($SRC,$ORIGIN,$KNOWNGENEPEP,$KNOWNGENEMRNA,$KNOWNLOCUSLINK,$KGXREF,$LOCACC,$CENTER);
+my ($SRC,$ORIGIN,$KNOWNGENEPEP,$KNOWNGENEMRNA,$KNOWNLOCUSLINK,$GENBANK,$KGXREF,$LOCACC,$CENTER);
 GetOptions('src:s'    => \$SRC,
 	   'origin:i' => \$ORIGIN,
 	   'kgXref:s' => \$KGXREF,
 	   'knownGenePep:s' => \$KNOWNGENEPEP,
 	   'knownGeneMrna:s' => \$KNOWNGENEMRNA,
 	   'knownLocusLink:s' => \$KNOWNLOCUSLINK,
+	   'genbank:s' => \$GENBANK,
 	   'loc2acc:s' => \$LOCACC,
 	   'center:s' => \$CENTER,
 	   ) or die <<USAGE;
@@ -42,9 +46,11 @@ $KGXREF ||='kgXref.txt';
 $KNOWNGENEPEP ||= 'knownGenePep.txt';
 $KNOWNGENEMRNA ||= 'knownGeneMrna.txt';
 $KNOWNLOCUSLINK ||= 'knownToLocusLink.txt';
+$GENBANK ||= 'genbank2accessions.txt';
 $LOCACC ||= 'loc2acc';
 $CENTER ||= 'unigene';
 
+my $mrna2protein = parseGenbank($GENBANK);
 my $kgxref = parseKgXref($KGXREF);
 my $loc2acc = parseLocAcc($LOCACC); # the best way I've found so far to link Genbank mRNA accession to Genbank protein accession
 my $knowngenepep = parseKnownGenePep($KNOWNGENEPEP);
@@ -84,7 +90,9 @@ while (<>) {
 	  if(defined $knownlocuslink->{$id}) { print ";locuslink=", $knownlocuslink->{id}; }
 	  print "\n";
 #	  # now write out stuff for protein
-#	  if(defined ($annotation->{$id}->{protAcc})) { print join ("\t",$chrom, $SRC,'protein','.','.','.','.',"Parent=$id"); }
+	  my @protGenBank = keys (%{$kgxref->{$id}->{protein}});
+	  my $protGenBank = $protGenBank[0];
+	  if(defined ($protGenBank)) { print join ("\t",'.', $SRC,'protein','.','.','.','.',"ID=$protGenBank;Parent=$id"), "\n"; }
   }
  # print "\n";
   #print join ("\t","dbxref=".$annotations->{$id}),"\n";
@@ -330,11 +338,39 @@ sub parseKnownGenePep{
 	#my @protAcc = keys %{$kgxref->{$accession}->{protAcc}};
 	#print @protAcc[0]."\n";
 	#$annotations->{@protAcc[0]} = $sequence;
-	$annotations->{$accession} = $sequence;
+	my $protGenbankId = $mrna2protein->{$accession};
+	$annotations->{$protGenbankId} = $sequence;
   }
   close ANNFILE;
   return ($annotations);
 }
+
+=head2 mrna2protein
+
+ Title   : mrna2protein
+ Usage   : creates a hash between the mRNA genbank accession (used in UCSC DB to key everything) and the proper genbank protein accession
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub parseGenbank{
+   my $file = shift;
+   my $annotations = {}; # stores the mRNA genbank id as key, protein genbank id as value
+   open ANNFILE, $file or die "Can't open file $file\n";
+   while(<ANNFILE>) {
+	 chomp;
+	 next if /^\#/;;
+	 my ($mrna, $prot) = split /\t/;
+	 $annotations->{$mrna} = $prot;
+   }
+   close ANNFILE;
+   return($annotations);
+}
+
 
 
 =head2 parseKgXref
@@ -369,6 +405,8 @@ sub parseKgXref {
     $annotations->{$key}->{refseq}->{$refseq} = 1            if $refseq;
     $annotations->{$key}->{protAcc}->{$protAcc} = 1          if $protAcc;
     $annotations->{$key}->{description}->{$description} = 1  if $description;
+	my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
+	$annotations->{$key}->{protein}->{$protAccession} = 1    if $protAccession;
   }
   close ANNFILE;
   return($annotations);
