@@ -34,6 +34,7 @@ create index feature_name_ind1 on feature(name);
 create index feature_idx1 on feature (dbxref_id);
 create index feature_idx2 on feature (organism_id);
 create index feature_idx3 on feature (type_id);
+create index feature_idx4 on feature (uniquename);
 
 
 
