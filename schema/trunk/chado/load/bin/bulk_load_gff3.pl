@@ -20,7 +20,7 @@ my %synonym;
 
 ########################
 #my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
-my $db = DBI->connect('dbi:Pg:dbname=chado','cain','');
+my $db = DBI->connect('dbi:Pg:dbname=chado','scott','');
 
 my $sth = $db->prepare("select nextval('feature_feature_id_seq')");
 $sth->execute;
@@ -136,9 +136,9 @@ while(my $feature = $gffio->next_feature()){
   }
 
   my($name) = $feature->has_tag('Name') ? $feature->get_tag_values('Name') : '\N';
-  #my($uniquename) = $feature->has_tag('ID') ? $feature->get_tag_values('ID') : $nextfeature;
-  my $uniquename = $nextfeature;
-  $src{$name} = $nextfeature;
+  my($uniquename) = $feature->has_tag('ID') ? $feature->get_tag_values('ID') : $nextfeature;
+  #my $uniquename = $nextfeature;
+  $src{$uniquename} = $nextfeature;
   print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type)),"\n";
 
   my $start = $feature->start eq '.' ? '\N' : $feature->start;
@@ -148,8 +148,8 @@ while(my $feature = $gffio->next_feature()){
   print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $frame)),"\n";
 
   my @notes = $feature->has_tag('Note') ? $feature->get_tag_values('Note') : [];
+  my $rank = 0;
   foreach my $note (@notes) {
-    my $rank = 0;
 
     ($type{'Note'}) = Chado::Cvterm->search( name => 'note') unless $type{'Note'};
 
