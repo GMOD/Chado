@@ -32,7 +32,7 @@ close EXT;
 
 my $extstr = prompt("What extensions to the core schema do you need (comma delimited)?","0");
 
-unless ($extstr) {
+unless ($extstr == 0) {
   my @extindex = split /,/, $extstr;
   foreach my $index (@extindex) {
     push @sqlfiles, $extfiles[$index];
