@@ -18,6 +18,7 @@ use Bio::Tools::GFF;
 use Bio::SeqIO;
 use Chado::AutoDBI;
 use Chado::LoadDBI;
+use Data::Dumper;
 use Getopt::Long;
 use Term::ProgressBar;
 use File::Temp qw(tempfile);
@@ -163,7 +164,7 @@ my $feature_count = 0;        #for cache/flush
 my $cv;
 my %srcfeature        = ();
 my %feature           = ();
-my %featureloc_rank   = ();
+my %featureloc_locgroup   = ();
 my %dbxref            = ();
 my %cvterm            = ();
 
@@ -223,13 +224,10 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     # in the database already, it might be very difficult to look up
     # via seq_id.  I'll solve the first problem and think about the
     # second  sjc 3/23/04
-    if (  # $gff_feature->has_tag('ID') &&
-        !( $id                  eq $gff_feature->seq_id )
-        && !( $gff_feature->seq_id eq '.' ) )
-    {
+    if ( ($id ne $gff_feature->seq_id) && ($gff_feature->seq_id ne '.') ) {
         ( $srcfeature{$gff_feature->seq_id} ) =
-          Chado::Feature->search( name => $gff_feature->seq_id )
-          unless $srcfeature{$gff_feature->seq_id};
+            Chado::Feature->search( name => $gff_feature->seq_id )
+                unless $srcfeature{$gff_feature->seq_id};
 
         unless ( $srcfeature{$gff_feature->seq_id} ) {
             warn "\n" . "*" x 72 . "\n";
@@ -274,8 +272,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     my @tags = $gff_feature->all_tags;
     foreach my $tag (@tags) {
         if ( $tag eq 'ID' ) {
-#                 this currently doesn't do anything
-#            load_ID_tag( $gff_feature, $chado_feature, $id );
+            #this currently doesn't do anything.  ID is used elsewhere though
         }
         elsif ( $tag eq 'Parent' ) {
             load_Parent_tag( $gff_feature, $chado_feature );
@@ -434,45 +431,6 @@ sub load_custom_tags {
 
 =pod
 
-=head1 load_ID_tag
-
-Loads ID tag values
-
-=cut
-
-sub load_ID_tag {
-#    my $gff_feature   = shift;
-#    my $chado_feature = shift;
-#    my $id            = shift;
-
-#i don't think this cost of clogging up
-#the synonym table is worth making searches
-#easier.
-#
-#if you want a synonym, use an Alias tag.
-#searches need to look in two places
-#(feature and synonym) for primary and
-#secondary IDs
-#if($gff_feature->has_tag('ID')){
-#  my($chado_synonym1) = Chado::Synonym->find_or_create({
-#                                                        name         => $id,
-#                                                        synonym_sgml => $id,
-#                                                        type_id      => $cvterm{synonym}->id
-#                                                       });
-#
-#  my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-#                                                                 synonym_id => $chado_synonym1->id,
-#                                                                 feature_id => $chado_feature->id,
-#                                                                 pub_id     => $pub->id
-#                                                                });
-#
-#  push @transaction, $chado_synonym1;
-#  push @transaction, $chado_synonym2;
-#}
-}
-
-=pod
-
 =head1 load_Note_tag
 
 Loads Note tag values to the featureprop table.
@@ -543,7 +501,7 @@ sub load_Target_tag {
                     srcfeature_id => $chado_feature->id,
                     fmin          => $tstart,
                     fmax          => $tend,
-                    rank          => 1
+                    rank          => 1 #potential bug here -allenday
                 }
             );
 
@@ -947,6 +905,8 @@ sub load_feature_locations {
     my $fmin = $gff_feature->start - 1;    # GFF -> InterBase
     my $fmax = $gff_feature->end;
 
+    my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
+
 
     # logic for creating feature.uniquename and feature.name (040414 allenday):
     #
@@ -1020,20 +980,36 @@ sub load_feature_locations {
     if ( $id eq $gff_feature->seq_id
         or $gff_feature->seq_id eq '.' ) {
       #ie, this is a srcfeature (ie, fref) so only create the feature
-        $srcfeature{$gff_feature->seq_id} = $chado_feature; 
+        $srcfeature{$gff_feature->seq_id} = $chado_feature;
         return ($chado_feature);
     }
 
     $chado_feature->dbxref_id( $dbxref{$id} )
-      if $gff_feature->has_tag('ID');    # is this the right thing to do here?
-    $chado_feature->update;              # flush updates to this feature object
+        if $gff_feature->has_tag('ID');         # is this the right thing to do here?
+    $chado_feature->update;                     # flush updates to this feature object
 
-    my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
-
-#    ( $srcfeature{$id} ) = Chado::Feature->search( name => $id )
-#      unless $srcfeature{$id};
 
     # add feature location
+    $featureloc_locgroup{ $chado_feature->id }++;
+
+    my $locgroup =  $featureloc_locgroup{ $chado_feature->id };
+    my($parent) = $gff_feature->has_tag('Parent') ? $gff_feature->get_tag_values('Parent') : ();
+
+    if($parent){
+        $locgroup = $featureloc_locgroup{ $feature{$parent} };
+    }
+
+    $locgroup ||= 0;
+
+    if (DEBUG) {
+        print STDERR "adding featureloc for gff string:\n";
+        print STDERR $gff_feature->gff_string . "\n";
+
+        if($parent){
+            print STDERR "srcfeature_id: " . Dumper($feature{$parent}) . "\n";
+        }
+    }
+
     my $chado_featureloc = Chado::Featureloc->find_or_create(
         {
             feature_id    => $chado_feature->id,
@@ -1041,14 +1017,13 @@ sub load_feature_locations {
             fmax          => $fmax,
             strand        => $gff_feature->strand,
             phase         => $frame,
-            rank          => $featureloc_rank{ $chado_feature->id } || 0,
+            locgroup      => $locgroup,
             srcfeature_id => $srcfeature{$gff_feature->seq_id}->id,
         }
     );
 
     push @transaction, $chado_featureloc;
 
-    $featureloc_rank{ $chado_feature->id }++;
     return ($chado_feature);
 }
 
