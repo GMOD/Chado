@@ -46,10 +46,9 @@ use FileHandle;
 use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
 
-# use Bio::GMOD::Config2; 
-# use Bio::GMOD::Bulkfiles;       
-
-## @ISA= (qw/Bio::GMOD::Bulkfiles::Writer/); ## want interface class
+use vars qw(@ISA);
+use Bio::GMOD::Bulkfiles::BulkWriter;       
+@ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/); ## want interface class
 
 our $DEBUG = 0;
 my $VERSION = "1.0";
@@ -70,6 +69,8 @@ my $fff_mergecols=1; # $self->{fff_mergecols} add chr,start cols for merge
 my $gff_keepoids= 0; # $self->{gff_keepoids}
 my @outformats= (); 
 my @defaultformats= qw(fff gff); # cmap ?? fasta - no
+my %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
+my @GModelParts= qw( CDS  five_prime_UTR three_prime_UTR intron );
 
 my $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
 my $append=0; # $self->{append}
@@ -82,6 +83,8 @@ use constant TOP_SORT => -9999999;
 ## our == global scope; use vars == package scope
 use vars qw/ 
   %maptype      
+  %maptype_pattern
+  %mapname_pattern
   %maptype_gff  
   %segmentfeats 
   %simplefeat   
@@ -93,84 +96,24 @@ use vars qw/
   %mergematch   
   %hasdups  
   $rename_child_type
+  $name2type_pattern
   /;
 
 
-sub new 
+sub init 
 {
-	my $that= shift;
-	my $class= ref($that) || $that;
-	my %fields = @_;   
-	my $self = \%fields; # config should be one
-	bless $self, $class;
-	$self->init();
-	return $self;
-}
-
-
-sub DESTROY 
-{
-  my $self = shift;
-  ## $self->closeit();
-  ## $self->SUPER::DESTROY();
-}
-
-sub init {
 	my $self= shift;
+  $self->SUPER::init();
 	# $self->{tag}= 'Bulkfiles::FeatureWriter' unless (exists $self->{tag} );
 	$self->{outh} = {};
 	$DEBUG= $self->{debug} if defined $self->{debug};
 
-  $self->{configfile}= $configfile unless defined $self->{configfile};
+#  $self->{configfile}= $configfile unless defined $self->{configfile};
   # $self->{failonerror}= 0 unless defined $self->{failonerror};
   $self->setDefaultValues(); #?? use or not?
 
-  if (defined $self->{config}) {
-    $self->initData();  
-  } else {
-    $self->readConfig($self->{configfile});
-  }  
-  
-  unless(ref $self->{sequtil}) {
-    if(ref $self->{bulkfiles}) { $self->{sequtil}= $self->{bulkfiles}; }
-    else { die "Should make ->new(sequtil => Bio::GMOD::Bulkfiles object)"; }
-#     my $sequtil= Bio::GMOD::Bulkfiles->new( debug => $DEBUG, 
-#       ## configfile => 'seqdump-r4',  ## can we call w/o configfile ?
-#       );
-#     $self->{sequtil}= $sequtil;
-    }
 }
 
-=item readConfig($configfile)
-
-read a configuration file - adds to any loaded configs
-
-=cut
-
-sub readConfig
-{
-	my $self= shift;
-	my ($configfile)= @_;
-  eval {  
-    unless(ref $self->{config2}) { 
-      require Bio::GMOD::Config2; 
-      $self->{config2}= Bio::GMOD::Config2->new(); 
-      }
-     
-#     $self->{config}= $self->{config2}->readConfig( $configfile, { Variables => \%ENV } );  
-    $self->{config}= $self->{config2}->readConfDir( 
-      undef, ##$config2->{confdir}, 
-      $configfile, #confpatt
-      undef # confhash
-      );  
-      
-     print STDERR $self->{config2}->showConfig( $self->{config}, { debug => $DEBUG }) 
-      if ($self->{showconfig}); ##if $DEBUG;
-      
-  }; warn "Config2 err: $@" if ($@);
-  
-  $self->initData(); 
-}
 
 =item initData
 
@@ -181,22 +124,20 @@ initialize data from config
 sub initData
 {
   my($self)= @_;
+  $self->SUPER::initData();
   my $config= $self->{config};
-  my $sconfig= $self->{sequtil}->{config};
-  
-    ## use instead $self->{sequtil}->{config} values here?
-  $self->{org}= $sconfig->{org} || $config->{org} || 'noname';
-  $self->{rel}= $sconfig->{rel} || $config->{rel} || 'noname';  
-  $self->{sourcetitle}= $sconfig->{title} || $config->{title} || 'untitled'; 
-  $self->{sourcefile} = $config->{input}  || '';  
-  
+  my $sconfig= $self->handler()->{config};
+ 
+    ## use instead $self->handler()->{config} values here?
+#   $self->{org}= $sconfig->{org} || $config->{org} || 'noname';
+#   $self->{rel}= $sconfig->{rel} || $config->{rel} || 'noname';  
+#   $self->{sourcetitle}= $sconfig->{title} || $config->{title} || 'untitled'; 
+#   $self->{sourcefile} = $config->{input}  || '';  
+#   $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+
+ 
   $self->{idpattern} = $sconfig->{idpattern} || $config->{idpattern} || '';
 
-    #? use sconfig->{date} ??
-  $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
-  
-  ##? use/merge configs from  $self->{sequtil}   ??
-  
   @outformats=  @{ $config->{outformats} || \@defaultformats } ; 
 
   $fff_mergecols= (defined $config->{fff_mergecols} && $config->{fff_mergecols}) || 1; ## add chr,start cols for merge
@@ -206,14 +147,17 @@ sub initData
   if (ref $config->{chromosome}) {
     $chromosome= $config->{chromosome};
     }
-  elsif (defined $self->{sequtil}) {
-    $chromosome= $self->{sequtil}->getChromosomeTable();
+  else {
+    $chromosome= $self->handler()->getChromosomeTable();
     $config->{chromosome}= $chromosome;
     }
     
   $rename_child_type= $config->{rename_child_type};
-
+  $name2type_pattern= $config->{name2type_pattern};
+  
   %maptype      = %{ $config->{'maptype'} } if ref $config->{'maptype'};
+  %maptype_pattern= %{ $config->{'maptype_pattern'} } if ref $config->{'maptype_pattern'};
+  %mapname_pattern= %{ $config->{'mapname_pattern'} } if ref $config->{'mapname_pattern'};
   %maptype_gff  = %{ $config->{'maptype_gff'} } if ref $config->{'maptype_gff'};
   %segmentfeats = %{ $config->{'segmentfeats'} } if ref $config->{'segmentfeats'};
   %simplefeat   = %{ $config->{'simplefeat'} } if ref $config->{'simplefeat'};
@@ -225,8 +169,13 @@ sub initData
   %mergematch   = %{ $config->{'mergematch'} } if ref $config->{'mergematch'};
   %hasdups      = %{ $config->{'hasdups'} } if ref $config->{'hasdups'};
 
+  @GModelParts  = qw( CDS five_prime_UTR three_prime_UTR intron );
+  @GModelParts  = @{ $config->{'gmodel_parts'} } if ref $config->{'gmodel_parts'};
+  
    ## read these also ...
   $config->{maptype}= \%maptype;
+  $config->{maptype_pattern}= \%maptype_pattern;
+  $config->{mapname_pattern}= \%mapname_pattern;
   $config->{maptype_gff}= \%maptype_gff;
   $config->{segmentfeats}= \%segmentfeats;
   $config->{simplefeat}= \%simplefeat;
@@ -239,6 +188,19 @@ sub initData
   $config->{hasdups}= \%hasdups;
   $config->{rename_child_type}= $rename_child_type;
 
+  ## merge config from this INTO handler config ?
+  ## that is best place to keep common <featmap> and <featset>
+  my $fset= $config->{featset};
+  if (ref $fset && !$sconfig->{featset}) {
+    $sconfig->{featset}= $fset;
+    }
+  my $fmap= $config->{featmap};
+  if (ref $fmap) {
+    my $smap= $sconfig->{featmap};
+    unless(ref $smap) { $sconfig->{featmap}= $smap=  {}; }
+    my @keys= keys %$fmap;
+    foreach my $k (@keys) { $smap->{$k}= $fmap->{$k} unless defined $smap->{$k}; } 
+    }
 # $fff_mergecols=1; # add chr,start cols for merge
 # $gff_keepoids= 0; #$DEBUG; #?
 
@@ -256,7 +218,7 @@ sub initData
   
   arguments: 
   infiles => \@fileset,   # required
-  formats => [ 'gff', 'fasta', 'fff' ] # optional
+  formats => [ 'gff', 'fff' ] # optional
 
 =cut
 
@@ -264,18 +226,22 @@ sub makeFiles
 {
 	my $self= shift;
   my %args= @_;  
-
-  print STDERR "makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
-  unless(ref $fileset) { warn "makeFiles: no infiles => \@filesets given"; return; }
-
+  my $chromosomes = $args{chromosomes};
+  unless(ref $fileset) { 
+    my $intype= $self->{config}->{informat} || 'feature_table'; #? maybe array
+    $fileset = $self->handler->getFiles($intype, $chromosomes);  
+    # warn "FeatureWriter::makeFiles: no infiles => \@filesets given"; return;  
+    }
+ 
   my @saveformats= @outformats;
   if ($args{formats}) {
     my $formats= $args{formats};
     if(ref $formats) { @outformats= @$formats; } 
     else { @outformats=($formats); } 
-    print STDERR "makeFiles: outformats= @outformats\n" if $DEBUG; 
     }
+  @outformats= grep { $formatOk{$_}; }  @outformats;
+  print STDERR "FeatureWriter::makeFiles outformats= @outformats\n" if $DEBUG; 
   
   my $ok= 1;
   for (my $ipart= 0; $ok; $ipart++) {
@@ -287,10 +253,10 @@ sub makeFiles
       $ok= 1;
       }
     }
-  print STDERR "makeFiles: done\n" if $DEBUG; 
+    
   @outformats = @saveformats;
-  
-  return; #what?
+  print STDERR "FeatureWriter::makeFiles: done\n" if $DEBUG; 
+  return 1; #what?
 }
 
 =item openInput( $fileset, $ipart )
@@ -306,7 +272,7 @@ sub openInput
   my $inh= undef;
   return undef unless(ref $fileset);
 
-  my $intype= $self->{config}->{informat} || 'feature/table'; #? maybe array
+  my $intype= $self->{config}->{informat} || 'feature_table'; #? maybe array
   my $atpart= 0;
   print STDERR "openInput: type=$intype part=$ipart \n" if $DEBUG; 
   
@@ -314,19 +280,18 @@ sub openInput
     my $fp= $fs->{path};
     my $name= $fs->{name};
     my $type= $fs->{type};
-    ## print STDERR "openInput: TEST $name, $type, $fp\n" if $DEBUG; 
     next unless($fs->{type} eq $intype); 
     unless(-e $fp) { warn "missing dumpfile $fp"; next; }
     $atpart++;
-    next unless($atpart >= $ipart);
+    next unless($atpart > $ipart);
     print STDERR "openInput: name=$name, type=$type, $fp\n" if $DEBUG; 
 
     if ($fp =~ m/\.(gz|Z)$/) { open(INF,"gunzip -c $fp|"); }
     else { open(INF,"$fp"); }
     $inh= *INF;
-    my $ftime= $^T - 24*60*60*(-M $fp);
     
     ## want option to ignore file date, use config date ??
+    ##my $ftime= $^T - 24*60*60*(-M $fp);
     ## $self->{date}= POSIX::strftime("%d-%B-%Y", localtime( $ftime ));
     
     my ($sfile, undef) = File::Basename::fileparse($fp);
@@ -367,9 +332,9 @@ sub openCloseOutput
       if ($outfile) { $fn="$outfile-$chr.$fmt"; }
       else { $fn= $self->get_filename( $self->{org}, $chr, '', $self->{rel}, $fmt); }
 
-      ##? check for $self->{sequtil}
+      ##? check for $self->handler()
       my $subdir= $fmt; ##($fmt eq 'fff') ? 'gnomap' : $fmt; #? fixme 
-      my $featdir= $self->{sequtil}->getReleaseSubdir( $subdir);   
+      my $featdir= $self->handler()->getReleaseSubdir( $subdir);   
       my $fpath = catfile( $featdir, $fn);
       
       my $exists= ($app && -e $fpath) ? 1 : 0;
@@ -379,26 +344,6 @@ sub openCloseOutput
       }
     }
   return $outh;
-}
-
-=item get_filename( $org, $chr, $featn, $rel, $format)
-
-  make standard output file name "${org}_${chr}_${featn}_${rel}.${format}"
-  
-=cut
-
-sub get_filename
-{
-	my $self= shift;
-  return $self->{sequtil}->get_filename( @_);
-#   my( $org, $chr, $featn, $rel, $format)= @_;
-#   if ( $featn ) { $featn="_${featn}"; } else { $featn=''; }
-#   if ( $chr ) { $chr="_${chr}"; } else { $chr=''; }
-#   if ( $rel ) { $rel="_${rel}"; } else { $rel=''; }
-#   if (! $format ) { $format="undef"; }
-#   #?? leave to later# elsif ($format eq 'fff') { $format= 'tsv'; } # preserve old naming ??
-#   my $filename="${org}${chr}${featn}${rel}.${format}";
-#   return $filename;
 }
 
 
@@ -424,13 +369,32 @@ sub remapName
 	my $self= shift;
   my ($type,$name,$id)= @_;
   my $save= $name;
-  if ($dropname{$type} ) { $name= ''; }
-  elsif ($type eq 'transposable_element_pred') { $name =~ s/JOSHTRANSPOSON-//; }
-  ## clean out dpse unwieldy predictor names: contig...contig...
+  if ( $dropname{$type} ) { $name= ''; }
+  #elsif ($type eq 'transposable_element_pred') { $name =~ s/JOSHTRANSPOSON-//; }
+  ## clean unwieldy predictor names: contig...contig...
   elsif ($type =~ /^(gene|mRNA)/ && $name =~ s/Contig[_\d]+//g) { 
     if ($name =~ m/^(twinscan|genewise|genscan)/i) { $name= "${id}_${name}"; }
     }
+  #elsif ($name =~ /dummy/) { $name =~ s/\-dummy\-//; } # from analysis.source default
   elsif (!$name) { $name= $id; } 
+  else {
+    ## this one could be time sink .. use evaled sub {} ?
+    foreach my $mp (sort keys %mapname_pattern) {
+      next if ($mp eq 'null'); # dummy?
+      my $mtype= $mapname_pattern{$mp}->{type};
+      next if ($mtype && $type !~ m/$mtype/);
+      if ($mapname_pattern{$mp}->{cuttype}) {
+        my @tparts= split(/[_]/, $type);
+        foreach my $t (@tparts) { $name =~ s/\W?$t\W?//; }
+        next;
+        }
+      my $from= $mapname_pattern{$mp}->{from}; next unless($from);
+      my $to  = $mapname_pattern{$mp}->{to};
+      if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
+      else { $name =~ s/$from/$to/; }
+      }
+    }
+  
   return ($name,$save);
 }
 
@@ -503,38 +467,86 @@ sub readArmContigs
 }
 
 
-#mRNA    13903,12560-AE003590.Sept-dummy-piecegenie
-#mRNA    15793,12560-AE003590.Sept-dummy-genscan
-#transposable_element Name=JOSHTRANSPOSON-jockey{}277-pred
-#transposable_element DBID=TE19092;Name=jockey{}277;cyto_range=21A3-21A3;Dbxref="FlyBase:FBti0019092";Dbxref="Gadfly:TE19092";gbunit=AE003590
+
+=item remapType 
+
+
+Types from name ... only when needed
+  Dpse uses gene  name_(genscan|genewise|twinscan) ...
+  Dmel uses mRNA  name-(genscan|piecegenie) ...
+    ?? anything with '-dummy-' in name is computed type?
+    for Dpse which has gene ..., need to reType mRNA kids also
+
+  mRNA    13903,12560-AE003590.Sept-dummy-piecegenie
+  mRNA    15793,12560-AE003590.Sept-dummy-genscan
+  transposable_element Name=JOSHTRANSPOSON-jockey{}277-pred
+  transposable_element DBID=TE19092;Name=jockey{}277;cyto_range=21A3-21A3;Dbxref="FlyBase:FBti0019092";Dbxref="Gadfly:TE19092";gbunit=AE003590
+
+
+Handle more complex types
+
+change this to allow complex type:subtype:.. for analysis, other features
+with pseudo-type like 'match:program:source'
+want final gff-type/source 'match',fgenesh{_source} or fgenesh:source
+want final fff-type  match_fgenesh{_source} or match:fgenesh{_source} ?
+check how both gbrowse_fb and gnomap read/handle types
+
+gnomap/annomap -- underscores generally used but '.' also 
+  ## remap FBan.acode PRG:DB choices
+  blastx_masked_aa_SPTR.worm=blastx_otherspp
+  blastx_masked_aa_SP.hyp.dros=blastx_dros
+  sim4_na_EST.all_nr.dros=EST
+  genscan_dummy=genscan
+
+=cut
 
 sub remapType
 {
 	my $self= shift;
   my ($type,$name)= @_;
   my $save= $type;
-
-  # Dpse uses gene  name_(genscan|genewise|twinscan) ...
-  # Dmel uses mRNA  name-(genscan|piecegenie) ...
-  #?? anything with '-dummy-' in name is computed type?
-  ## for Dpse which has gene ..., need to reType mRNA kids also
-  my $nutype= $type;
-  if (defined $name && $name =~ m/[-_](genscan|piecegenie|twinscan|genewise|pred|trnascan)/i) {
+  
+  my $nutype  = $type;
+  # this should be config pattern: ..genscan..
+  ##if (defined $name && $name =~ m/[-_](genscan|piecegenie|twinscan|genewise|pred|trnascan)/i) {
+  if ($name2type_pattern && defined $name && $name =~ m/$name2type_pattern/i) {
     $nutype .= "_".lc($1);
     }
+  $nutype =~ s/[:\.]/_/g; #?
   $type = $maptype{$nutype} || $type;
-  return ($type,$save);
+  
+    ## this one could be time sink .. use evaled sub {} ?
+#   foreach my $mp (keys %maptype_pattern) {
+#     next if ($mp eq 'null');  
+#     my $mname= $maptype_pattern{$mp}->{typename};
+#     next if ($mname && $name !~ m/$mname/);
+#     my $from= $maptype_pattern{$mp}->{from};
+#     my $to  = $maptype_pattern{$mp}->{to};
+#     $type =~ s/$from/$to/;
+#     }
+  
+  my $fulltype = $type; #?? here or what.
+  $type =~ s/[:\.]/_/g; #?
+  
+  return ($type,$fulltype,$save);
 }
 
 
 =item processChadoTable
 
- read input feature table, write bulk output formats
+ Read input feature table, write bulk output formats FFF and GFF 
+ (other formats are derived from these)
+ This step takes longest, e.g. ~ 20 hr on single cpu for D. melangaster.
+ Split by chromosome data among processors to speed up.
  
- chado feature table dump format (see sql)
+ Joins table lines/feature; builds compound features; checks feature names/types, etc.
+ 
+ Input chado feature table dump format (see sql)
  arm     fmin    fmax    strand  type         name       id        oid      attr_type     attribute
  2L      0       305900  1       golden_path  AE003590   AE003590  1273141  various_key   value
 
+ Outputs: FFF (also used for fasta, gnomap), GFF
+ 
 =cut
 
 sub processChadoTable
@@ -559,13 +571,6 @@ sub processChadoTable
   
   ($l_arm,$l_oid,$l_fmin,$max_max)= (0,0,0,1);
   
-#   while(<$fh>){
-#     next unless(/^\w/);
-#     chomp;
-#     @chead= split("\t");
-#     last;
-#     }
-    
   while(<$fh>){
     next unless(/^\w/);
     next if(/^arm\tfmin/); # header from sql out
@@ -576,7 +581,7 @@ sub processChadoTable
  
     my ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute)= @c;
 
-    ## fix data
+    ## data fixes
     unless(defined $fmax) { $fmax=0; }
     unless(defined $fmin) { $fmin=0; }
     else { $fmin += 1 unless ($origin_one{$type}); } # dang -1 chado start 
@@ -584,20 +589,18 @@ sub processChadoTable
     ## this check only for intron,UTR chado-computed locs ??
     if ($fmax < $fmin) { ($fmin,$fmax)= ($fmax,$fmin); $strand= ($strand==0) ? -1 : -$strand; }
     
-    my($s_type, $s_arm, $armfile, $s_name, $s_id);
+    my($s_type, $fulltype, $s_arm, $armfile, $s_name, $s_id);
+    
 #     ($arm,$fmin,$fmax,$strand,$armfile,$s_arm)  
 #       = $self->remapArm($arm,$fmin,$fmax,$strand); # for dpse joined contigs 
-    ($type,$s_type)= $self->remapType($type,$name); #my $transtype= 
-    ##?? dont drop id for GFF ?
+
+    ($type,$fulltype,$s_type)= $self->remapType($type,$name); #my $transtype= 
+    next if ($type eq 'skip'); # or what? undef?
+    
     # ($id,$s_id)= $self->remapId($type,$id,$name); 
+
     ($name,$s_name)= $self->remapName($type,$name,$id); 
 
-#     if ($attribute && $attribute eq 1 && $attr_type eq 'parent_oid') {
-#       $attr_type= undef; $attribute= undef; 
-#       # what is this silly parent = 1 from for segment? - must be chr/arm ID
-#       # drop parent_oid for all 'segment' type ?
-#       }
-      
     ##  problem: processed_transcript  .. dbxref  genbank:FBgn0020497|CT32733|FBan0013387 GO:[protein-nucleus export (GO:0
     if ($type eq 'processed_transcript' && $attribute) {
       $attribute= undef if ($attribute !~ /^FlyBase/);
@@ -608,7 +611,7 @@ sub processChadoTable
       }
 
     my $loc="$fmin\t$fmax\t$strand";
-    ##my $attr= ($attribute) ? "$attr_type\t$attribute" : '';
+
     my @addattr=();
     if ($attribute) {  
       # add dbxref_2nd patch? ; do we want to rename db here - looks like Gadfly from 2ndary/old ids
@@ -699,6 +702,7 @@ sub processChadoTable
       
       $fob->{chr} = $arm;
       $fob->{type}= $type;  
+      $fob->{fulltype}= $fulltype;  # colon-delimited complex type 'match:program:source' 
       $fob->{name}= $name;
       $fob->{id}  = $id;
       $fob->{oid} = $oid;
@@ -725,7 +729,6 @@ sub processChadoTable
       ####push( @{$fob->{attr}}, "rank\t$attribute");  
         # ? need this for exon, utr - but tied to parent_oid
       
-      ##$fob->{paroid} .= $paroid.";"; #?
       $oidobs{$paroid}->{child}= [] unless (ref $oidobs{$paroid}->{child});
       ##? use $rank to position in {child} array ??
       push( @{$oidobs{$paroid}->{child}}, $fob);
@@ -737,11 +740,11 @@ sub processChadoTable
       push( @{$oidobs{$oid}->{parent}}, $paroid);
  
       ## another fixup for  CDS/protein-of-mRNA feature set
-      ## see ChadoSax/... ToAcode chado.xml parser - need more of these changes
-      ## depending on parent/child objects
-      if ($fob->{type} eq 'protein') { $fob->{type}= 'CDS'; }
 
-      elsif ($fob->{type} ne 'mRNA' && $fob->{type} =~ m/^($rename_child_type)/) {
+          ## THIS SHOULD MOVE TO config maptype
+     ## if ($fob->{type} eq 'protein') { $fob->{type}= 'CDS'; } 
+      
+      if ($fob->{type} ne 'mRNA' && $fob->{type} =~ m/^($rename_child_type)/) {
         # this is  bad for real gene subfeatures like point_mutation
         my $ptype= $fob->{type};
         my $parob= $oidobs{$paroid}->{fob};
@@ -786,7 +789,7 @@ sub processChadoTable
   $self->putFeats($outh,\@fobs,\%oidobs, 'final'); @l_fobs= (); @fobs=(); %oidobs=();
   
   $outh= $self->openCloseOutput($outh,'','close');
-  print STDERR "processChadoTable ndone = $ndone\n" if $DEBUG;
+  print STDERR "\nprocessChadoTable ndone = $ndone\n" if $DEBUG;
   return $ndone;
 }
 
@@ -799,6 +802,13 @@ sub keepfeat_fff
   return(!$dropfeat);
 }
 
+sub _debugObj
+{
+  my ($name,$obj)= @_;
+  require Data::Dumper;
+  my $dd = Data::Dumper->new([$obj]); $dd->Terse(1);
+  print STDERR "DEBUG obj: $name=",  $dd->Dump(),"\n";
+}
 
 =item  makeFlatFeats($fobs,$oidobs)
 
@@ -820,6 +830,7 @@ sub  makeFlatFeats
     my ($iskid,$ispar)= (0,0);
     my $oidob= $obs{$oid};
     my $ftype= $fob->{type};
+    my $fulltype= $fob->{fulltype};
     my $id= $fob->{id};
     my $issimple= $simplefeat{$ftype};
      
@@ -853,12 +864,90 @@ sub  makeFlatFeats
       ## some of intron,UTR have swapped locs = 4650373..4650371
     if ($ispar && $ftype eq 'mRNA') {
     
-      foreach my $ftname (qw(five_prime_UTR  CDS  three_prime_UTR intron )) {
+=item  debug parent/kid feature objects
+
+      print STDERR "makeFlatFeats $ftype par=$id check kids\n" ;#if $DEBUG;
+      # got here, missing protein/CDS kids.
+      _debugObj("par=$id objects",$oidob);
+
+makeFlatFeats mRNA par=CG18001-RA check kids
+DEBUG obj: par=CG18001-RA objects={
+          'parent' => [
+                        509313
+                      ],
+          'fob' => {
+                     'writefff' => 1,
+                     'chr' => '2h',
+                     'attr' => [
+                                 'parent_oid    509313'
+                               ],
+                     'name' => 'CG18001-RA',
+                     'id' => 'CG18001-RA',
+                     'oid' => 509314,
+                     'type' => 'mRNA',
+                     'loc' => [
+                                '42592  43051   -1'
+                              ]
+                   },
+          'child' => [
+                       {
+                         'writefff' => 1,
+                         'chr' => '2h',
+                         'attr' => [
+                                     'parent_oid        509314:2'
+                                   ],
+                         'name' => 'CG18001:2',
+                         'id' => 'CG18001:2',
+                         'oid' => 509316,
+                         'type' => 'exon',
+                         'loc' => [
+                                    '42592      42914   -1'
+                                  ]
+                       },
+                       {
+                         'oid' => 509317,
+                         'id' => 'CG18001-PA',
+                         'chr' => '2h',
+                         'loc' => [
+                                    '42705      42914   -1'
+                                  ],
+                         'type' => 'CDS',   << ok here but no CDS_exons
+                         'attr' => [
+                                     'parent_oid        509314'
+                                   ],
+                         'name' => 'CG18001-PA'
+                       },
+                       {
+                         'writefff' => 1,
+                         'chr' => '2h',
+                         'attr' => [
+                                     'parent_oid        509314:1'
+                                   ],
+                         'name' => 'CG18001:1',
+                         'id' => 'CG18001:1',
+                         'oid' => 509315,
+                         'type' => 'exon',
+                         'loc' => [
+                                    '42973      43051   -1'
+                                  ]
+                       }
+                     ]
+        }
+
+=cut
+
+
+      foreach my $ftname (@GModelParts) {
         my $utrob= undef;
         my $exonobs=[];
+        my $mrnaexons=[];
         my $kidobs=[];
         foreach my $kidob (@{$oidob->{child}}) {  
  
+          if ($ftname eq 'CDS' && $kidob->{type} eq 'exon') {
+            push(@$mrnaexons, $kidob); # save in case missing CDS_exon
+            }
+            
           if ($ftname eq 'CDS' && $kidob->{type} eq 'CDS') {
             $utrob= $kidob unless($utrob);
             ## urk - need to keep loc:start/stop to adjust CDS_exon end points !
@@ -867,8 +956,9 @@ sub  makeFlatFeats
             ## patch for mdg4 bug
             push(@$exonobs, $kidob);
             }
-         elsif ($ftname eq 'CDS' && $kidob->{type} eq 'CDS_exon') {
+          elsif ($ftname eq 'CDS' && $kidob->{type} eq 'CDS_exon') {
             push(@$kidobs, $kidob);
+            ## missing this for het db ... FIXME 
             # bad CDS_exon for transspliced mdg4 ... sigh ... need to keep also regular exons?
             }
 
@@ -897,12 +987,22 @@ sub  makeFlatFeats
               }
             }
           }
+        
+          ## ERROR -  CDS/protein w/o CDS_exon parts - not harvard chado 'reporting' db
+          ## fixme ... recreate from cds start/stop + mrna location ?
+        if ($utrob && !@$kidobs) {
+          if ($ftname eq 'CDS' && @$mrnaexons) {
+            $kidobs= $self->getCDSexons($utrob, $mrnaexons);
+            }
+          }
           
-        if (@$kidobs) {
+        if ($utrob) { ## @$kidobs < do even if no kidobs ???
+          
+          ##print STDERR "makeCompound $ftname par=$id, kid=",$utrob->{id},  "\n" if $DEBUG;
           # below # if ($ftname eq 'CDS') { $kidobs= adjustCDSendpoints( $utrob, $kidobs); }
           my $cob= $self->makeCompound( $utrob, $kidobs, $ftname); 
           
-            # patch bad data
+            # patch bad data -- use getCDSexons above ??
           if ($id =~ /CG32491/ && $ftname eq 'CDS') {  
             my @exlocs=();
             foreach my $kid (@$exonobs) {
@@ -922,6 +1022,32 @@ sub  makeFlatFeats
 }
 
 
+=item  getCDSexons($cdsob,$exonobs,$ftype)
+
+  create compound feature from parent, kids (e.g., mRNA + exons)
+  
+=cut
+
+sub getCDSexons
+{
+	my $self= shift;
+  my ($cdsob,$exonobs,$ftype)= @_;
+
+  my $offsetloc = $cdsob->{loc}->[0]; # only 1 we hope
+  my ($offstart,$offstop,$offstrand) = split("\t",$offsetloc);
+  if ($offstart > $offstop) { ($offstart,$offstop)= ($offstop,$offstart); } #? need
+  $cdsob->{offloc}= $offsetloc;
+
+  my @cdsobs=();
+  foreach my $kid (@$exonobs) {
+    my ($start,$stop,$st) = split("\t", $kid->{loc}->[0]);
+    if ($stop >= $offstart && $start <= $offstop) { 
+      push(@cdsobs, $kid);
+      }
+    }
+
+  return \@cdsobs;
+}
 
 =item  makeCompound($fob,$kidobs,$ftype)
 
@@ -937,6 +1063,7 @@ sub makeCompound
   my $cob= {};  # are these all constant per oid ?
   $cob->{chr} = $fob->{chr};
   $cob->{type}= $fob->{type};
+  $cob->{fulltype}= $fob->{fulltype};
   $cob->{name}= $fob->{name};
   $cob->{id}  = $fob->{id};
   $cob->{oid} = $fob->{oid};
@@ -993,49 +1120,6 @@ sub makeCompound
 
 ## fixed - for dang transspliced mod(mdg4) - if strands in locs differ 
 ### looks like chado pg reporting instance with CDS_exons is bad for transspliced mod(mdg4)
-
-### last release data
-# dghome2% grep Y feats0-mdg4.tsv.old
-# CDS     mod(mdg4)-PY    -       complement(complement(17182690..17182983),17191746..17192598,17193288..17193427,17193505..17193718)       mod(mdg4)-PY    CG32491 ; FlyBase:FBgn0002781     gene=mod(mdg4)
-# mRNA    mod(mdg4)-RY    -       join(17182690..17183024,complement(17191746..17192598),complement(17193288..17193427),complement(17193505..17193762),complement(17193974..17194085))mod(mdg4)-RY    CG32491 ; FlyBase:FBgn0002781   gene=mod(mdg4)
-
-## data from chado_3_2_26 postgres   
-# chipmunk% grep 3167708 chadfeat-3Rmdg4.tsv
-# 3R      17182689        17182981        1       five_prime_untranslated_region  CG32491-u5      five_prime_UTR_CG32491:34_422   3643049 parent_oid 3167708:2
-# 3R      17182689        17183024        1       exon    mod(mdg4):34    CG32491:34      3167709 parent_oid      3167708:5
-# 3R      17182689        17194085        0       mRNA    mod(mdg4)-RY    CG32491-RY      3167708 dbxref  FlyBase:FBtr0084084
-# 3R      17182689        17194085        0       mRNA    mod(mdg4)-RY    CG32491-RY      3167708 dbxref  Gadfly:CG32491-RY
-# 3R      17182689        17194085        0       mRNA    mod(mdg4)-RY    CG32491-RY      3167708 parent_oid      3167626
-# 3R      17182982        17183024        1       CDS     CG32491-cds     CDS_CG32491:34_422      3643050 parent_oid      3167708:3
-# >>        17182690..17182983 -- CG32491-cds     CDS_CG32491:34_422  has bad start/end
-# 3R      17182982        17193718        -1      protein mod(mdg4)-PY    CG32491-PY      3167710 parent_oid      3167708
-# 3R      17191745        17192598        -1      CDS     CG32491-cds     CDS_CG32491:4_422       3643015 parent_oid      3167708:2
-# 3R      17191745        17192598        -1      exon    mod(mdg4):4     CG32491:4       3167631 parent_oid      3167708:4
-# 3R      17192599        17182688        1       intron  CG32491-in      intron_CG32491:4_CG32491:34     3643051 parent_oid      3167708:3
-# 3R      17192599        17193286        -1      intron  CG32491-in      intron_CG32491:3_CG32491:4      3642803 parent_oid      3167708:2
-# 3R      17193287        17193427        -1      CDS     CG32491-cds     CDS_CG32491:3_422       3643014 parent_oid      3167708:1
-# 3R      17193287        17193427        -1      exon    mod(mdg4):3     CG32491:3       3167630 parent_oid      3167708:3
-# 3R      17193428        17193503        -1      intron  CG32491-in      intron_CG32491:2_CG32491:3      3642801 parent_oid      3167708:1
-# 3R      17193504        17193718        -1      CDS     CG32491-cds     CDS_CG32491:2_422       3643013 parent_oid      3167708:0
-# 3R      17193504        17193762        -1      exon    mod(mdg4):2     CG32491:2       3167629 parent_oid      3167708:2
-# 3R      17193719        17193762        -1      five_prime_untranslated_region  CG32491-u5      five_prime_UTR_CG32491:2_422    3643012 parent_oid 3167708:1
-# 3R      17193763        17193972        -1      intron  CG32491-in      intron_CG32491:1_CG32491:2      3642799 parent_oid      3167708:0
-# 3R      17193973        17194085        -1      exon    mod(mdg4):1     CG32491:1       3167628 parent_oid      3167708:1
-# 3R      17193973        17194085        -1      five_prime_untranslated_region  CG32491-u5      five_prime_UTR_CG32491:1_422    3643011 parent_oid 3167708:0
-
-# transplice mod(mdg4)-PY rev ex=17182983,17183024,1 ; off=17182983,17193718
-#                                ^---------------- bad exons
-# transplice mod(mdg4)-PY rev ex=17191746,17192598,-1 ; off=17182983,17193718
-# transplice mod(mdg4)-PY rev ex=17193288,17193427,-1 ; off=17182983,17193718
-# transplice mod(mdg4)-PY rev ex=17193505,17193718,-1 ; off=17182983,17193718
-
-## after patch
-# transplice mod(mdg4)-PY replaced cds_exons with mrna exons
-# transplice mod(mdg4)-PY rev ex=17182690,17183024,1 ; off=17182983,17193718
-# transplice mod(mdg4)-PY rev ex=17191746,17192598,-1 ; off=17182983,17193718
-# transplice mod(mdg4)-PY rev ex=17193288,17193427,-1 ; off=17182983,17193718
-# transplice mod(mdg4)-PY rev ex=17193505,17193762,-1 ; off=17182983,17193718
-# CDS     mod(mdg4)-PY    -       complement(complement(17182690..17182983),17191746..17192598,17193288..17193427,17193505..17193718)    CG32491-PY      FlyBase:FBpp0083483;GB_protein:AAO41582.1;Gadfly:CG32491-PY;FlyBase:FBgn0002781;
 
 =cut  
 
@@ -1191,9 +1275,16 @@ sub putFeats
   my($hasforward,$l_hasforward)=(0,0);
   
   my $n= scalar(@$fobs);
-  print STDERR "putFeats n=$n, total=".($n+$ntotalout)
-    .", oid1=".(($n>0)?$fobs->[0]->{oid}:0)."\n" if $DEBUG;
-
+  
+  if ($DEBUG>1 || $DEBUG && $flag =~ /final/) {
+    print STDERR "putFeats n=$n, total=".($n+$ntotalout)
+    .", oid1=".(($n>0)?$fobs->[0]->{oid}:0)."\n";
+    }
+  elsif ($DEBUG) {
+    print STDERR ".";
+    }
+    
+    
 =item  
 
   ?? add interface to output formats: -- looks fairly complex - simple is nice
@@ -1238,45 +1329,48 @@ sub putFeats
     foreach my $fob (@$cobs) {  
       my $fffline= $self->getFFF( $fob );
       next unless($fffline);
-      print $ffh $fffline;
+      print $ffh $fffline if $ffh;
       ##$self->writeFFF( $outh->{fff}, $fob);
       $nout++;
 
-      if ( $fah ) {
-        ## !URK! need a large set of fasta file handles, one for each featureset type
-        ## need to reverse lookup featset from this $fob->{type}
-        ## OR could split fasta files by featuretype after this 
-        my $featname= $fob->{type};
-        my $featset= $featname; ## cheater .. FIXME
-        my $chr= $fob->{chr};
-        my $fasta= $self->{sequtil}->fastaFromFFF( $fffline, $chr, $featset);
-        print $fah $fasta if $fasta;
-        }
+#         #?? separate this from makeFeatures > makeFasta ?
+#       if ( $fah ) {
+#         ## !URK! need a large set of fasta file handles, one for each featureset type
+#         ## need to reverse lookup featset from this $fob->{type}
+#         ## OR could split fasta files by featuretype after this 
+#         my $featname= $fob->{type};
+#         my $featset= $featname; ## cheater .. FIXME
+#         my $chr= $fob->{chr};
+#         my $fasta= $self->handler()->fastaFromFFF( $fffline, $chr, $featset);
+#         print $fah $fasta if $fasta;
+#         }
       }
       
     $ntotalout += $nout;
-    if ($outh->{fff}) {
-      my $fh= $outh->{fff};
-      print $fh "#\n" if ($nout>3);  # is this a section break?
-      }
+#     if ($outh->{fff}) {
+#       my $fh= $outh->{fff};
+#       print $fh "#\n" if ($nout>3);  # is this a section break?
+#       }
   }
   
   if ($outh->{gff}) {
     my $gffh= $outh->{gff};
     # print $gffh "# fwd oid=".$self->getForwards()."\n"; # is this a section break?
+    my $gffend= 0;
     $l_hasforward= $self->checkForward('writegff');
     foreach my $fob (@$fobs) { 
       $hasforward= $self->checkForward('writegff',$fob,$oidobs);
-      if ($hasforward && !$l_hasforward) { $self->writeGFFendfeat($gffh); }
+      if ($hasforward && !$l_hasforward && !$gffend) { $self->writeGFFendfeat($gffh); $gffend++; }
       $l_hasforward= $hasforward; #?
       if ($hasforward) {
         $fob->{'writegff'}=1; # flag we have it for checkForward
         push(@gffForwards, $fob);
         }
       else {
-        while (@gffForwards) { $self->writeGFF( $gffh,shift @gffForwards,$oidobs) ; }
+        while (@gffForwards) { $self->writeGFF( $gffh,shift @gffForwards,$oidobs) ;  }
         ## if we drop use of ID=oid, need to resolve all forwards before writeGFF
         $self->writeGFF( $gffh,$fob,$oidobs) ; 
+        $gffend=0;
         }
       }
       
@@ -1348,6 +1442,8 @@ sub setDefaultValues
     # protein => "CDS", # only if mRNA is parent !!
   );
   
+  %maptype_pattern = ();
+  %mapname_pattern = ();
   ## change to hash of hash : { fulltype => { gfftype => val, gffsource => val } }
   %maptype_gff = (
     mRNA_genscan => ["mRNA","genscan"],
@@ -1484,16 +1580,17 @@ sub writeFFF1header
   print $fh "# Features for $org from $sourcetitle [$sourcefile, $date]\n";
   print $fh "# gnomap-version 1\n";
   print $fh "# source: ",join("\t", $seqid, "$start..$stop"),"\n";
-  print $fh "# ",join("\t", qw(Feature gene map range id db_xref notes)),"\n";
+  ##print $fh "# ",join("\t", qw(Feature gene map range id db_xref notes)),"\n";
+  print $fh "# ",join("\t", qw(Feature name cytomap location id db_xref notes)),"\n";
   print $fh "#\n";
    
   if ($stop > $start) {
     if ($fff_mergecols) {
       my $bstart= TOP_SORT; # if ($self->{config}->{topsort}->{$fob->{type}});
-      print $fh join("\t", $seqid, $bstart, "source", $org, $seqid, "$start..$stop")."\n";
+      print $fh join("\t", $seqid, $bstart, "source", $org, $seqid, "$start..$stop", $seqid,)."\n";
       }
     else {
-      print $fh join("\t", "source", $org, $seqid, "$start..$stop")."\n";
+      print $fh join("\t", "source", $org, $seqid, "$start..$stop", $seqid,)."\n";
       }
     }
 }
@@ -1525,8 +1622,12 @@ sub getFFF
   my @attr= @{$fob->{attr}};
   
   my $featname= $fob->{type};
+  my $fulltype= $fob->{fulltype};
   my($id,$s_id)= $self->remapId($featname,$fob->{id},'-'); 
   $id= '-' unless (defined($id) && $id);
+  
+  (my $ftop= $fulltype) =~ s/[\:\.].*$//;
+  if ($ftop && $featname =~ /^$ftop/) { $featname= $fulltype; } #?? want this 
   
   my $sym= $fob->{name} || '-';
   my $map= '-';
@@ -1630,12 +1731,17 @@ sub writeGFFendfeat
 sub splitGffType
 {
 	my $self= shift;
-  my($gffsource,$type)= @_;
+  my($gffsource,$type,$fulltype)= @_;
+  
+    #? use fulltype instead of type? as 'match:sim4:na_EST_complete_dros'
     # convert mRNA_genscan,mRNA_piecegenie to gffsource,mRNA ?
   if ($maptype_gff{$type}) {
     ($type,$gffsource)= @{$maptype_gff{$type}};
     }
-  elsif ($type =~ m/^([\w\_]+)[\.:]([\w\_]+)$/) {
+  elsif ($fulltype =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
+    ($type,$gffsource)=($1,$2);
+    }
+  elsif ($type =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
     ($type,$gffsource)=($1,$2);
     }
   return($gffsource,$type);
@@ -1662,6 +1768,7 @@ sub writeGFF
   my($fh,$fob,$oidobs)= @_;
   my $v;
   my $type= $fob->{type};
+  my $fulltype= $fob->{fulltype};
   $fob->{'writegff'}=1;
   if ($dropfeat_gff{$type}) { return; }
   my $gffsource=".";
@@ -1710,7 +1817,7 @@ sub writeGFF
   foreach my $k (sort keys %at) { push(@at, "$k=$at{$k}"); }
   $at = join(";",@at);
   
-  ($gffsource,$type)= $self->splitGffType($gffsource,$type);
+  ($gffsource,$type)= $self->splitGffType($gffsource,$type,$fulltype);
   
     ## need to make uniq ids for dupl oids - any @loc > 1 ?
     ## and need to make parent feature to join.  Use ID=OID.1... OID.n

@@ -1,0 +1,53 @@
+<opt
+  name="tognomap"
+  date="20040821"
+  >
+ 
+  <title>Genome Feature merge (genomic and cytology features)</title>
+  <about>
+    These configs help merge two or more fff feature sets
+    for use with gnomap,gbrowse(fb) and such feature file uses
+    
+    Add these to per-release-db configs.
+    Cut from mergeflyfeats4.pl and .xml config, d.gilbert, aug04
+  </about>
+  
+  <informat>fff</informat>  
+  <informat>dna</informat>  
+
+  <seqids
+    path="tmp/chado-fb.ids"
+    date="20040721" 
+    noIDmap="cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4"
+    indexidtype="^(gene|pseudogene|\w+RNA)"
+    indexidpattern="[A-Z]{2}gn\d+"
+  />
+
+  <seqfeat
+    path="fff/[\w\-\_]+.fff"
+    date="20040804"
+    seqfeat="1"
+    name="Annotation feature parts" 
+    >
+    <drop>chromosome_band</drop>
+    <drop>remark</drop>
+    <drop>source</drop>
+  </seqfeat>
+  
+  
+  <cytofeat
+    path="cytomap/(cyto-features|cytofeat)-[\w\-\_].tsv"
+    name="cyto-feature parts" 
+    cytofeat="1"
+    date="20040707" 
+  />
+  
+  
+  <sorsa
+    path="cytomap/sorsa.txt"
+    name="Table of genome:cytology mapping"
+    date="20020817" 
+  />
+  
+
+</opt>

@@ -12,8 +12,8 @@ ARGOS_SERVICE_ROOT=$ARGOS_ROOT/flybase
 
 #n Path to installation 
 #n for Argos, this is better: GMOD_ROOT=$ARGOS_ROOT/gmod
-GMOD_ROOT=/bio/argos/gmod
-#or# GMOD_ROOT=$ARGOS_ROOT/gmod
+GMOD_ROOT=/bio/argos/flybase
+#or# GMOD_ROOT=$ARGOS_ROOT/flybase
 
 #n Chado (Postgres) Database name
 CHADO_DB_NAME=chado001
@@ -42,8 +42,8 @@ XORT_TMP=$ARGOS_SERVICE_ROOT/tmp
 APOLLO_DATA=$ARGOS_SERVICE_ROOT/data2/fban/current/xml-game
 APOLLO_DATA_URL=http://flybase.net/ftpdata/genomes/Drosophila_melanogaster/current/xml-game/
 
-#n for postgresql server data location
-FLYBASE_PGDATA=$ARGOS_SERVICE_ROOT/indices/pgsql
+#n for postgresql server data location - aug04 drop this, not useful
+# FLYBASE_PGDATA=$ARGOS_SERVICE_ROOT/indices/pgsql
 
 
 #n flag this conf has been loaded in ENVIRON

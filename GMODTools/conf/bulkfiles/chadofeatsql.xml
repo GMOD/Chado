@@ -1,0 +1,312 @@
+<opt
+  name="chadofeatsql" 
+  date="20040821"
+  >
+
+  <title>FlyBase Chado DB SQL</title>
+  
+  <about>
+    This is a collection of Chado DB SQL calls to extract
+    all basic genome features, into intermediate feature_table form
+    
+  arm     fmin    fmax    strand  type    name    id      oid     attr_type       attribute
+  2L      0       305900  1       golden_path_region      AE003590        AE003590        1273141 dbxref   Gadfly:AE003590
+  2L      6364    6366    1       transcription_start_site        6365-6366-AE999999.Fake-dummy-promoter   6365-6366-AE999999.Fake-dummy-promoter  1273564         
+  2L      6773    6808    1       exon            NULL:960558     1273721 parent_oid      1273720:1
+  2L      6773    9276            mRNA    6773,9276-AE999999.Fake-dummy-piecegenie        NULL:9605
+  
+    There is a tag feature_sql, type="feature_table" for each group of
+    features needing separate SQL: chromosome/super-contigs,
+    gene_models, matches, analyses, syntenic features ..
+    
+    Logic in Bulkfiles::FeatureWriter then merges, selects/reformats
+    these feature_tables and writes bulk files per chromosome.  One can
+    also attach post-processing scripts (see matches below).
+  </about>
+  
+  
+  <feature_sql name="fbids" type="list" output="chado-fb.ids">
+  <sql>
+    -- used for flybase to exclude cytologic features with same genome feature id
+    SELECT accession FROM dbxref 
+    WHERE accession like '%FBgn%' or accession like '%FBti%';
+  </sql>
+  </feature_sql>
+
+
+  <feature_sql name="chromosomes" type="feature_table" output="chromosomes.tsv">
+  <sql>
+-- get chromosome/arm/supercontig/... lengths/names
+-- add get-residues to file 
+SELECT 
+  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  '1' as fmin, armft.seqlen as fmax, '0' as strand,
+  featcv.name as type,
+  armft.name as name,
+  armft.uniquename as id,
+  armft.feature_id as oid,
+  'species' as attr_type, 
+  org.genus || '_' || org.species AS attribute
+FROM 
+  feature armft, organism org, cvterm featcv
+WHERE 
+  featcv.name in ( 'chromosome', 'chromosome_arm')  --  need more choices 
+  and armft.organism_id = org.organism_id
+  and armft.type_id = featcv.cvterm_id
+ORDER BY arm ;
+  </sql>
+
+  </feature_sql>
+
+  
+  <feature_sql name="features" type="feature_table" output="features.tsv">
+  <sql>
+-- standard features (excluding matches, analyses)
+SELECT  distinct
+  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armloc.fmin, armloc.fmax, armloc.strand,
+  targcv.name as type,
+  targft.name as name,
+  targft.uniquename as id,
+  targft.feature_id as oid,
+  attr.type as attr_type, attr.attribute
+
+FROM
+  feature armft, 
+  feature targft left outer join gffattr_gmodel attr
+    on (targft.feature_id = attr.feature_id),
+  featureloc armloc, 
+  cvterm targcv
+
+WHERE
+  NOT (targcv.name in ('match')) --  add orthologous_region, syntenic_region
+  and targft.type_id = targcv.cvterm_id 
+  and armft.feature_id = armloc.srcfeature_id  
+  and targft.feature_id = armloc.feature_id  
+  
+ORDER BY
+   arm, armloc.fmin, targcv.name
+;
+  </sql>
+  </feature_sql>
+  
+  
+  <feature_sql name="matches" type="feature_table"  output="matches.tsv">
+  <sql>
+-- use this to get the paired genome/target match items w/ attr (or null) --
+-- jun04 - need to filter out apollo dupl. evidence for
+-- match features, type = transposable_element_insertion_site
+SELECT distinct
+  CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+  armloc.fmin, armloc.fmax, armloc.strand,
+  targcv.name as type, 
+  targft.name as name,
+  targft.uniquename as id,
+  targft.feature_id as oid,
+  attr.type as attr_type, attr.attribute
+ 
+FROM
+  feature matchft, feature armft, 
+  feature targft left outer join gffattr_match attr
+     on (targft.feature_id = attr.feature_id),
+  featureloc armloc, featureloc targloc,
+  cvterm targcv, cvterm matchcv, cvterm armcv
+   
+   -- tested speed of this w/ cv.names versus cvterm_id number inserted
+   -- pg is smart enough to optimize cv name lookup once - leave as is
+WHERE
+  matchcv.name = 'match' 
+  and matchcv.cvterm_id = matchft.type_id 
+  and armcv.name in ( 'chromosome', 'chromosome_arm')
+  and armcv.cvterm_id = armft.type_id  
+
+  and targft.type_id = targcv.cvterm_id 
+  and targft.feature_id != armft.feature_id  
+  
+  -- separate paired features here - keep chr-arm loc, target types/attr
+  and matchft.feature_id = armloc.feature_id  
+  and armft.feature_id = armloc.srcfeature_id
+    
+  and matchft.feature_id = targloc.feature_id  
+  and targft.feature_id = targloc.srcfeature_id 
+   
+ORDER BY
+   arm, armloc.fmin, targcv.name
+;
+  </sql>
+  </feature_sql>
+
+  
+  <feature_sql name="analysis" type="feature_table" output="analysis.tsv">
+  
+  <!-- ant-like ; is this usable? -->
+  <target name="main" depends="query,postprocess"/> 
+  <target name="query" action="sql" /> 
+  <target name="postprocess" action="rdump" description="fix parents w/o featureloc from kid values" /> 
+
+  <!--  this works: perl -i.old rdump $r/tmp/featdump/analysis.tsv -->
+  <script name="rdump" type="postprocess" shell="perl -i" language="perl">
+<![CDATA[
+while(<>) { 
+  my @v= split/[\t]/; $d= $v[-1]; 
+  if ($v[0] eq "arm") { print join("\t",@v); next; } 
+  rdump() if ($ld && $d ne $ld);  
+  push(@r,\@v); $ld= $d; 
+  rdump() if (eof);
+  } 
+
+sub rdump() {
+  $p=$r[0]; $k= $r[1]; ($a,$b,$e,$s)= @{$k}[0..3];
+  foreach $k (@r[2..$#r]) {
+    $kb=$$k[1]; $ke=$$k[2]; $b=$kb if ($kb<$b); $e=$ke if ($ke>$e); }
+  $$p[0]=$a; $$p[1]=$b; $$p[2]=$e; $$p[3]=$s; pop(@$p); $$p[-1]="\n"; $r[0]=$p;
+  foreach $i (1..$#r) { $r[$i]->[4] =~ s/^match_/match_part_/; }
+  foreach $r (@r) { print join("\t",@$r); } @r=(); 
+  } 
+
+]]>
+  </script>
+  
+  <!-- want sql tag at top level of feature_sql like others -->
+  <sql>
+-- select all an features of right type, with arm featureloc when avail
+-- add analysis.sourcename where needed (ignore 'dummy');
+-- change 'match_' leading type ; drop or make option
+SELECT 
+  armft.arm, armft.fmin, armft.fmax, armft.strand, 
+  -- 'match_' || an.program as type,  
+  'match_' || an.program || an.sourcename as type,  
+  targft.name as name,  
+  targft.uniquename as id, 
+  targft.feature_id as oid,
+  CASE WHEN attr.type IS NULL THEN text('object_oid')  ELSE attr.type  END 
+  as attr_type,
+  CASE WHEN attr.attribute IS NULL THEN text(targft.feature_id) ELSE attr.attribute  END 
+  as attribute
+FROM 
+  feature targft left outer join gffatts_evid attr
+    on (targft.feature_id = attr.feature_id),
+  analysisfeature anf left outer join gffatts_anfloc armft
+    on (anf.feature_id = armft.feature_id),
+  analysis an
+WHERE
+  an.program in ('HDP','RNAiHDP','fgenesh') -- FIXME add params here
+  and an.analysis_id = anf.analysis_id
+  and anf.feature_id = targft.feature_id
+;
+  </sql>
+  </feature_sql>
+
+
+
+  <feature_sql name="views" type="view">
+  <sql>
+-- from sequence-gff-views.sql 
+-- dont need all of these attribs;
+--   dbxref: yes, cvterm: no, synonym: no?, pub: no, 
+--   featureprop - want some: cyto_range, gbunit?(no)
+-- add dbxref_2nd, aug04 for dbxref need to know primary/secondary > feature_dbxref.is_current !
+
+-- attr view for regular features which may have parent features (exons)
+CREATE OR REPLACE VIEW gffattr_gmodel (
+    feature_id, type, attribute
+) AS
+  SELECT feature_id,  
+    CASE WHEN fs.is_current IS FALSE THEN 'dbxref_2nd' ELSE 'dbxref' END AS type, 
+    d.name || ':' || s.accession AS attribute
+  FROM dbxref s, feature_dbxref fs, db d
+  WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+
+UNION ALL
+  SELECT feature_id, cv.name AS type, fp.value AS attribute
+  FROM featureprop fp, cvterm cv
+  WHERE fp.type_id = cv.cvterm_id
+    and (cv.name = 'cyto_range' or cv.name = 'gbunit')
+    -- keep this restriction - other props not useful here: comments, sp_comment, owner ...
+
+UNION ALL
+  SELECT feature_id,
+    CASE WHEN fs.is_current IS FALSE THEN 'synonym_2nd' ELSE 'synonym' END AS type, 
+    s.synonym_sgml AS attribute
+  FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id and fs.is_internal IS FALSE
+
+UNION ALL
+  -- add parent feat ids for exons, etc.
+  SELECT pk.subject_id AS feature_id, 'parent_oid' AS type, 
+    CASE  
+      WHEN pk.rank IS NULL THEN text(pk.object_id)
+      ELSE pk.object_id || ':' || pk.rank
+    END 
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffattr_gmodel TO PUBLIC;
+
+-- attr view for match features
+CREATE OR REPLACE VIEW gffattr_match (
+    feature_id,  type,  attribute
+) AS
+  SELECT feature_id,  
+    CASE WHEN fs.is_current IS FALSE THEN 'dbxref_2nd' ELSE 'dbxref' END AS type, 
+    d.name || ':' || s.accession AS attribute
+  FROM dbxref s, feature_dbxref fs, db d
+  WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+
+UNION ALL
+  SELECT feature_id, cv.name AS type, fp.value AS attribute
+  FROM featureprop fp, cvterm cv
+  WHERE fp.type_id = cv.cvterm_id
+    and (cv.name = 'cyto_range' or cv.name = 'gbunit')
+
+UNION ALL
+  SELECT feature_id,
+    CASE WHEN fs.is_current IS FALSE THEN 'synonym_2nd' ELSE 'synonym' END AS type, 
+    s.synonym_sgml AS attribute
+  FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id and fs.is_internal IS FALSE
+;
+GRANT SELECT ON gffattr_match TO PUBLIC;
+
+-- attrib view for cross-species feats (synteny, orthology)
+CREATE OR REPLACE VIEW gffattr_synteny (
+    feature_id, type,  attribute
+) AS
+  --  parent feat ids for source supercontigs, etc.
+  SELECT pk.subject_id, 'parent_oid' as type, 
+    CASE  
+      WHEN pk.rank IS NULL THEN text(pk.object_id)
+      ELSE pk.object_id || ':' || pk.rank
+    END 
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffattr_synteny TO PUBLIC;
+
+
+-- for analysis features
+CREATE OR REPLACE VIEW gffatts_anfloc (
+    feature_id, arm, fmin, fmax, strand
+  ) AS
+  SELECT 
+    armloc.feature_id,  
+    CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm,
+    armloc.fmin, armloc.fmax, armloc.strand
+  FROM  feature armft, featureloc armloc, cvterm armcv
+  WHERE 
+    armft.type_id = armcv.cvterm_id
+    and armcv.name in ( 'chromosome', 'chromosome_arm')
+    and armft.feature_id = armloc.srcfeature_id
+;
+GRANT SELECT ON gffatts_anfloc TO PUBLIC;
+
+-- for analysis features
+CREATE OR REPLACE VIEW gffatts_evid (
+    feature_id, type, attribute
+) AS
+  SELECT pk.subject_id, text('parent_oid'), text(pk.object_id)
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffatts_evid TO PUBLIC;
+
+  </sql>
+  </feature_sql>
+</opt>

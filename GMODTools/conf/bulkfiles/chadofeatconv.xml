@@ -13,12 +13,96 @@
     This works with, but is independent of SeqUtil2 configs.
   </about>
   
-  <informat>feature/table</informat> <!-- feature_table ? -->
+  <informat>feature_table</informat>  
   
   <outformats>fff</outformats>
   <outformats>gff</outformats>
   <outformats>fasta</outformats>
- 
+
+  <!-- copied from db-release config files .. this is mostly common info,
+    but db-release config can override @featset, %featmap -->
+
+  <!-- feature sets to make fasta bulk files -->
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>gene_extended2000</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+  <featset>intergenic</featset>
+  <featset>scaffold</featset>
+
+  <!-- 
+   featmap for feature sets that need reprocessing, attributes: 
+    name = feature set name
+    types = feature types, space delimited (in fff/gff)
+    typelabel = type to use in output header, paired with types list
+    subrange = expansion/extraction range to add to feature location;
+             readseq syntax not yet supported, i.e. {start,end}+/-offset)
+    fromdb = extract from chado database feature.residues field
+             rather than chromosome dna file,
+             for curated residues - transcript, translation)
+    get_id = save id, dbxref fields for add to other (genemodel) features
+    add_id = add id of parent feature (genemodel)
+    note: translation type=protein is coded into various seq fetch programs
+  -->
+  
+  
+  <featmap name="gene" get_id="1" />
+  <featmap name="five_prime_UTR" add_id="gene" />
+  <featmap name="three_prime_UTR" add_id="gene" />
+  <featmap name="intron" add_id="gene" />
+  <featmap name="mRNA" add_id="gene" />
+  <featmap name="CDS" add_id="gene" />
+
+  <featmap
+    name="translation"
+    types="CDS"
+    typelabel="protein"
+    fromdb="1"
+    />
+  <featmap
+    name="transcript"
+    types="mRNA"
+    typelabel="transcript"
+    fromdb="1"
+    />
+  <featmap
+    name="scaffold"
+    types="golden_path_region"
+    typelabel="scaffold"
+    fromdb="1"
+    />
+  <featmap
+    name="transposon"
+    types="transposable_element"
+    typelabel="transposable_element"
+    />
+  <featmap
+    name="miscRNA"
+    types="ncRNA snRNA snoRNA rRNA" 
+    />
+  <featmap
+    name="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+  <featmap
+    name="intergenic"
+    types="gene"
+    typelabel="intergenic"
+    method="between"
+    />
+
+    
   <rename_child_type>pseudogene|\w+RNA</rename_child_type>
   <mergematch></mergematch>
 
@@ -48,6 +132,9 @@
 #? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
 -->
 
+  <!-- remapType: append this name pattern to type -->
+  <name2type_pattern>[-_](genscan|piecegenie|twinscan|genewise|pred|trnascan)</name2type_pattern>
+  
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
     chromosome_arm="1"
@@ -145,6 +232,7 @@
     />
     
   <maptype 
+    protein="CDS"
     CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="golden_path"
@@ -161,6 +249,14 @@
   <!--
   so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
   -->
+
+    <mapname_pattern name="null" from="null" to="null"/>
+    <mapname_pattern name="dum" from="\-dummy\-" to=""/>
+    <mapname_pattern name="tep" type="transposable_element_pred" 
+      from="JOSHTRANSPOSON\-" to=""/>
+    
+<!--   <maptype_pattern name="null" from="null" to="null"/> -->
+<!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
     
   <maptype_gff>
     <!-- FIXME: ordered arrays here .. $type, $gffsource -->

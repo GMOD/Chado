@@ -10,16 +10,155 @@ use strict;
 # debug
 use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
 
-our $DEBUG = 0;
 use vars qw/@ISA/;
-BEGIN {
-@ISA = qw/ Bio::GMOD::Bulkfiles::ToFormat /;
-}
+use Bio::GMOD::Bulkfiles::ToFormat;   
+our $DEBUG = 0;
+my $configfile= "tofasta"; #? BulkFiles/tofasta.xml 
+
+BEGIN { @ISA = qw/ Bio::GMOD::Bulkfiles::ToFormat /; }
 
 sub init {
 	my $self= shift;
 	$self->SUPER::init();
+
+  # $self->{failonerror}= 0 unless defined $self->{failonerror};
 }
+
+=item initData
+
+initialize data from config
+
+=cut
+
+sub initData
+{
+  my($self)= @_;
+  $self->SUPER::initData();
+  my $config = $self->{config};
+  my $sconfig= $self->{handler}->{config};
+  my $oroot= $sconfig->{rootpath};
+ 
+    ## use instead $self->{handler}->{config} values here?
+#   $self->{org}= $sconfig->{org} || $config->{org} || 'noname';
+#   $self->{rel}= $sconfig->{rel} || $config->{rel} || 'noname';  
+#   $self->{sourcetitle}= $sconfig->{title} || $config->{title} || 'untitled'; 
+#   $self->{sourcefile} = $config->{input}  || '';  
+#   $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+  
+  my $fastadir= $self->{handler}->getReleaseSubdir( $sconfig->{fastafiles}->{path} || 'fasta/');
+  $self->{fastadir} = $config->{fastadir}= $fastadir;
+  
+}
+
+
+#-------------- subs -------------
+
+
+=item  makeFiles( %args )
+
+  primary method
+  makes  blast indices.
+  input file sets are intermediate chado db dump tables.
+  
+  arguments: 
+  infiles => \@fileset,   # required
+
+=cut
+
+sub makeFiles
+{
+	my $self= shift;
+  my %args= @_;  
+
+  print STDERR "makeFiles\n" if $DEBUG; # debug
+  my $fileset = $args{infiles};
+  unless(ref $fileset) { 
+    
+    # $fileset= $self->{sequtil}->getFastaFiles();
+    
+    warn "makeFiles: no infiles => \@filesets given"; return; 
+    }
+ 
+  my @ffffiles= $self->openInput( $fileset );
+  my $res= $self->processFasta( \@ffffiles);
+  
+  print STDERR "FastaWriter::makeFiles: done\n" if $DEBUG; 
+
+  return 1; #what?
+}
+
+=item openInput( $fileset )
+
+  handle input files
+  
+=cut
+
+sub openInput
+{
+	my $self= shift;
+  my( $fileset )= @_; # do per-csome/name
+  my @files= ();
+  my $inh= undef;
+  return undef unless(ref $fileset);
+
+  my $intype = $self->{config}->{informat} || 'fff'; #? maybe array
+  my $featset= $self->{config}->{featset} || [];
+  if (@$featset) { 
+  
+    }
+    
+  print STDERR "openInput: type=$intype \n" if $DEBUG; 
+  
+  foreach my $fs (@$fileset) {
+    my $fp= $fs->{path};
+    my $name= $fs->{name};
+    my $type= $fs->{type}; # want also/instead featset type here ? gene,mrna,cds,...
+    next unless( $fs->{type} =~ /$intype/); # could it be 'dna/fasta', 'amino/fasta' ?
+    unless(-e $fp) { warn "missing intype file $fp"; next; }
+
+    push(@files, $fp);
+    }
+    
+  return @files;  
+}
+
+
+
+=item processFasta
+
+
+=cut
+
+sub processFasta
+{
+	my $self= shift;
+  my( $rseqfiles )=  @_;
+  
+#   my $blastdir= $self->{blastdir};
+#   my ($doformat, $doconfig)= (1,1);
+#   my $ndone= 0;
+#   
+#   # format only if changed...
+#   $self->updateformat(  $blastdir, $rseqfiles) if ($doformat);
+#   
+#   my @blastfiles=();
+#   opendir(D, $blastdir);
+#   @blastfiles= grep(/^\w/,readdir(D));
+#   closedir(D);
+#   
+#   if ($doconfig) {
+#     $self->update_blastrc( $blastdir, \@blastfiles);
+#     $self->update_dbselect( $blastdir, \@blastfiles);
+#     $self->update_dbhtml( $blastdir, \@blastfiles);
+#     }
+# 
+#   $ndone= scalar( @blastfiles);
+#   print STDERR "processBlastInput ndone = $ndone\n" if $DEBUG;
+#   return $ndone;
+
+}
+
+
 
 
 sub writeheader 
@@ -196,7 +335,7 @@ sub raw2Fasta
 }
 
 
-=item $fa= $sequtil->fastaFromFFF( $fffeature,$chr,$featset)
+=item $fa= $handler->fastaFromFFF( $fffeature,$chr,$featset)
 
 return fasta for one flat-file-feature input line
 
