@@ -10,10 +10,13 @@
   <xsl:key name="k-feature" match="//feature" use="feature_id"/>
 
   <xsl:template match="/chado">
-    <chado>
+    <chaos>
       <xsl:for-each select="//feature">
         <!-- nest all features directly under chado element -->
         <feature>
+          <feature_id>
+            <xsl:apply-templates mode="make-link" select="."/>
+          </feature_id>
           <xsl:apply-templates select="*"/>
         </feature>
       </xsl:for-each>
@@ -30,11 +33,16 @@
           <xsl:apply-templates select="rank"/>
         </feature_relationship>
       </xsl:for-each>
-    </chado>
+    </chaos>
   </xsl:template>
 
+  <!-- TODO: allow macro vs no-macro -->
   <xsl:template mode="make-link" match="feature">
     <xsl:value-of select="concat(organism_id/organism/genus,'_',organism_id/organism/species,':',type_id/cvterm/name,':',uniquename)"/>
+  </xsl:template>
+
+  <xsl:template mode="make-link" match="organism">
+    <xsl:value-of select="concat(genus,'_',species)"/>
   </xsl:template>
 
   <!-- block; we have already placed these at top-level -->
@@ -45,6 +53,11 @@
 
   <xsl:template match="/ | * | node()">
     <xsl:choose>
+      <xsl:when test="name(.)='is_current'"/>
+      <xsl:when test="name(.)='is_fmin_partial'"/>
+      <xsl:when test="name(.)='is_fmax_partial'"/>
+      <xsl:when test="name(.)='timeaccessioned'"/>
+      <xsl:when test="name(.)='timelastmodified'"/>
       <xsl:when test="name(.)='srcfeature_id'">
         <srcfeature_id>
           <xsl:apply-templates mode="make-link" select="."/>
@@ -66,9 +79,9 @@
         </cvterm>
       </xsl:when>
       <xsl:when test="name(.)='dbxref_id'">
-        <dbxref>
+        <dbxrefstr>
           <xsl:value-of select="concat(dbxref/db_id/db/name,':',dbxref/accession)"/>
-        </dbxref>
+        </dbxrefstr>
       </xsl:when>
       <xsl:when test="name(.)='type_id'">
         <type>
@@ -76,10 +89,33 @@
         </type>
       </xsl:when>
       <xsl:when test="name(.)='organism_id'">
-        <organism>
+        <organismstr>
           <xsl:value-of select="concat(organism/genus,' ',organism/species)"/>
-        </organism>
+        </organismstr>
       </xsl:when>
+      <xsl:when test="name(.)='fmin'">
+      </xsl:when>
+      <xsl:when test="name(.)='fmax'">
+        <xsl:choose>
+          <xsl:when test="strand = -1">
+            <nbeg>
+              <xsl:value-of select="../fmax"/>
+            </nbeg>
+            <nend>
+              <xsl:value-of select="../fmin"/>
+            </nend>
+          </xsl:when>
+          <xsl:otherwise>
+            <nbeg>
+              <xsl:value-of select="../fmin"/>
+            </nbeg>
+            <nend>
+              <xsl:value-of select="../fmax"/>
+            </nend>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
       <xsl:otherwise>
         <!-- recursively apply this same template again -->
         <xsl:copy>

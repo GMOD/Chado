@@ -3,7 +3,7 @@
   <xsl:param name="source" select="'chado'"/>
   <xsl:output indent="yes" method="text" />
 
-  <xsl:strip-space elements="*"/>
+  <xsl:strip-space elements="text()|@*"/>
   <xsl:key name="k-feature" match="//feature" use="feature_id"/>
   <xsl:key 
     name="k-feature_relationship" 
@@ -30,9 +30,7 @@
 
   <xsl:template match="feature">
     <xsl:if test="featureloc">
-      <xsl:text></xsl:text>
-      <xsl:value-of select="key('k-feature', featureloc/srcfeature_id)/uniquename"/>
-      <xsl:text></xsl:text>
+      <xsl:value-of select="normalize-space(featureloc/srcfeature_id)"/>
       <xsl:text>&#9;</xsl:text>
       <xsl:value-of select="$source"/>
       <xsl:text>&#9;</xsl:text>
