@@ -8,7 +8,7 @@ use Chado::LoadDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 
-use constant DEBUG=>1;
+use constant DEBUG=>0;
 
 #######################################
 # COPYRIGHT
