@@ -261,6 +261,13 @@ $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Featur
 $sth->execute;
 my($sofa_id) =  $sth->fetchrow_array();
 
+#backup plan for old chado instances
+if(!defined($sofa_id)){
+  $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology'");
+  $sth->execute;
+  ($sofa_id) =  $sth->fetchrow_array();
+}
+
 $sth->finish;
 ########################
 
@@ -286,34 +293,36 @@ while(my $feature = $gffio->next_feature()){
 
   my $type = $type{$featuretype};
   if(!$type){
+warn $featuretype;
+warn $sofa_id;
     ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
     $type{$featuretype} = $type->id;
   }
   die "no cvterm for ".$featuretype unless $type;
 
-  my $src = $src{$feature->seqid->value};
+  my $src = $src{$feature->seq_id->value};
   if(!$src){
-    if($feature->seqid->value eq '.'){
+    if($feature->seq_id->value eq '.'){
       $src = '\N';
     } else {
-      ($src) = Chado::Feature->search( uniquename => $feature->seqid->value )
-            || Chado::Feature->search( name => $feature->seqid->value );
-      die "Unable to find srcfeature ",$feature->seqid->value," in the database\n" 
+      ($src) = Chado::Feature->search( uniquename => $feature->seq_id->value )
+            || Chado::Feature->search( name => $feature->seq_id->value );
+      die "Unable to find srcfeature ",$feature->seq_id->value," in the database\n" 
             unless $src;
       if ($src->isa('Class::DBI::Iterator')) {
         my @sources;
         while (my $tmp = $src->next) {
           push @sources, $tmp;
         }
-        die "more that one source for ".$feature->seqid->value if (@sources>1);
-        $src{$feature->seqid->value} = $sources[0]->id;
+        die "more that one source for ".$feature->seq_id->value if (@sources>1);
+        $src{$feature->seq_id->value} = $sources[0]->id;
       } else {
-        $src{$feature->seqid->value} = $src->id;
+        $src{$feature->seq_id->value} = $src->id;
       }
-      $src = $src{$feature->seqid->value};
+      $src = $src{$feature->seq_id->value};
     }
   }
-  die "no feature for ".$feature->seqid->value unless $src;
+  die "no feature for ".$feature->seq_id->value unless $src;
 
   if($feature->annotation->get_Annotations('Parent')){
     my $pname = undef;
