@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.71 2004-08-13 15:00:22 scottcain Exp $
+# $Id: Makefile.PL,v 1.72 2004-08-13 15:29:33 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -662,7 +662,7 @@ metadata: $working_dir/bin/ddltrans
 	$working_dir/bin/ddltrans -f xml $working_dir/dat/chado.ddl > $working_dir/dat/chado.xml
 
 load_schema ::
-	\$(SHELL) $working_dir/bin/test_load.sh $DBHOST $DBPORT $DBNAME
+	\$(SHELL) $working_dir/bin/test_load.sh $DBHOST $DBPORT $DBUSER $DBNAME
 
 prepdb ::
 	./Build prepdb
