@@ -24,7 +24,8 @@ CREATE OR REPLACE VIEW featurepropd AS
 -- Adds dbname to dbxref
 CREATE OR REPLACE VIEW dbxrefd AS
  SELECT dbxref.*,
-        db.name AS dbname
+        db.name AS dbname,
+        db.name || ':' || dbxref.accession AS dbxrefstr
  FROM
   dbxref INNER JOIN db USING (db_id);
 
@@ -65,6 +66,19 @@ CREATE OR REPLACE VIEW xfeature AS
   feature INNER JOIN dbxrefd USING (dbxref_id);
 
 -- ================================================
+-- featurex = feature * feature_dbxref * dbxref
+-- ================================================
+-- Adds dbxref to feature
+CREATE OR REPLACE VIEW featurex AS
+ SELECT feature.*,
+        dbxrefd.dbname,
+        dbxrefd.accession,
+        dbxrefd.version
+ FROM
+  feature INNER JOIN feature_dbxref USING (feature_id);
+  feature_dbxref INNER JOIN dbxrefd USING (dbxref_id);
+
+-- ================================================
 -- txfeature = xfeature * cvterm
 -- ================================================
 -- cross product of tfeature and xfeature
@@ -86,10 +100,10 @@ CREATE OR REPLACE VIEW featurelocf AS
   featureloc INNER JOIN feature ON (featureloc.srcfeature_id=feature.feature_id);
 
 -- ================================================
--- ffeature = feature * featureloc (rank=0) (locgroup 0)
+-- featurefl = feature * featureloc (rank=0) (locgroup 0)
 -- ================================================
 -- adds main location to feature
-CREATE OR REPLACE VIEW ffeature AS
+CREATE OR REPLACE VIEW featurefl AS
  SELECT feature.*,
         featureloc.*
  FROM
