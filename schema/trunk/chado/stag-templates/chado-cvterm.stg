@@ -6,12 +6,12 @@
   LEFT OUTER JOIN dbxrefd           USING (dbxref_id)
   LEFT OUTER JOIN cvtermsynonym     USING (cvterm_id)
 :WHERE
-    [cvterm.accession => &cvterm_accession&]
-    [cvterm.name => &cvterm_name&]
-    [cvterm.cvname => &cvterm_cvname&]
-    [cvterm.definition => &cvterm_definition&]
-:ORDER BY cvterm.name
-:USE NESTING (set(cvterm(cvterm_dbxref(dbxref))(cvterm_synonym)))
+    [xcvterm.accession => &cvterm_accession&]
+    [xcvterm.name => &cvterm_name&]
+    [xcvterm.cvname => &cvterm_cvname&]
+    [xcvterm.definition => &cvterm_definition&]
+:ORDER BY xcvterm.name
+:USE NESTING (set(xcvterm(cvterm_dbxref(dbxref))(cvterm_synonym)))
 
 //
 schema: chado
@@ -22,7 +22,7 @@ desc:
 
   Does not fetch graph/relationship data
 
-  requires bdgp-views
+  REQUIRES: modules/sequence/bdgp/bdgp-views.sql
 
 example_input: cvterm_accession => SELECT DISTINCT cvterm.accession FROM cvterm WHERE cvterm_id IN (SELECT object_id FROM cvterm_relationship)
 example_input: cvterm_name => SELECT DISTINCT cvterm.name FROM cvterm WHERE cvterm_id IN (SELECT object_id FROM cvterm_relationship)
