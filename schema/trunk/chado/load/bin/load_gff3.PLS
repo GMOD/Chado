@@ -171,6 +171,7 @@ my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
   ( undef, undef, undef, undef );
 my $feature_count = 0;        #for cache/flush
 my $cv;
+my $null_db_id;
 my %srcfeature        = ();
 my %feature           = ();
 my %featureloc_locgroup   = ();
@@ -490,12 +491,13 @@ sub load_Ontology_term {
         my ($cvterm) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
                                                                                 
         next unless $cvterm;
-                                                                                
+                              
         my ($feature_cvterm) = Chado::Feature_Cvterm->find_or_create(
             {
                 feature_id => $chado_feature->id,
                 cvterm_id  => $cvterm->id,
                 pub_id     => $nullpub->id,
+                dbxref_id  => $dbxref->id,
             }
         );
         push @transaction, $feature_cvterm;
@@ -946,6 +948,8 @@ sub load_sequences {
             $progress->message("multiple features for sequence $name\n")
               if scalar(@chado_feature) > 1;
 
+            my $dna       = $seq->seq;
+            undef $seq;                     #get this thing out of here ASAP, it's using memory
             foreach my $f (@chado_feature) {
 
                 $f->residues('');
@@ -953,8 +957,6 @@ sub load_sequences {
                 $f->dbi_commit;
 
                 $progress->message("copying Bio::Seq sequence to simple scalar variable") if DEBUG;
-                my $dna       = $seq->seq;
-                undef $seq;                     #get this thing out of here ASAP, it's using memory
                 $progress->message("copied.  Bio::Seq object purged to conserve memory") if DEBUG;
 
                 my $shredsize = 100_000_000;    #don't increase this...
@@ -1230,11 +1232,29 @@ sub cache_cvterm {
       and $cvterm{$name}->isa('Class::DBI::Iterator');
 
     if ( !$cvterm{$name} && !$soid  ) {
+
+        unless ($null_db_id) {
+            my ($null_db)  = Chado::Db->search(
+                {
+                    name   => 'null'
+                }
+            );
+            $null_db_id = $null_db->id;
+        }
+
+        my ($dbxref)       = Chado::Dbxref->find_or_create(
+            {
+                db_id      => $null_db_id,
+                accession  => $cv->name.":".$name,
+            }
+        );
+
         ( $cvterm{$name} ) = Chado::Cvterm->find_or_create(
             {
                 name       => $name,
                 cv_id      => $cv->id,
                 definition => 'autocreated by gmod_load_gff3.pl',
+                dbxref_id  => $dbxref->id,
             }
         );
     }
