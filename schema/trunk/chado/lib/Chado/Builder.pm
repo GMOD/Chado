@@ -309,15 +309,31 @@ sub ACTION_tokenize {
     }
   ) || ( $m->log->fatal("Template error: $Template::ERROR") and die );
 
-  foreach my $tt2file ( keys %{ $m->conf->{tt2} } ) {
-    my $tokenized;
-    $template->process( 
-      $tt2file, 
-      $conf->{tt2}->{$tt2file}->{token},
-      \$tokenized 
-    ) || ( $m->log->fatal( "Template error: " . $template->error() ) and die );
+  foreach my $templatefile ( keys %{ $conf->{template}{file} } ) {
 
-    open( OUT, '>' . $conf->{tt2}->{$tt2file}->{output} );
+    #there is an order of preference in which keys are added.
+    #this affects which config sections clobber which others, beware.
+    my $tokens = {%{$conf->{database}}, %{$conf->{build}}};
+
+    if(ref($conf->{template}{file}{$templatefile}) eq 'HASH'){
+      $tokens->{ $_ } = $conf->{template}{file}{$templatefile}{$_} foreach keys %{ $conf->{template}{file}{$templatefile}};
+    }
+
+    #knock out empty hashes (like undef db_password)
+    foreach my $token (keys %{$tokens}){
+      undef($tokens->{$token}) if(ref($tokens->{$token}) eq 'HASH' and !keys %{$tokens->{$token}});
+    }
+
+    my $tokenized;
+
+    $m->log->debug(Dumper($tokens));
+
+    $template->process( 
+      $conf->{template}{file}{$templatefile}{in}, 
+      $tokens,
+      \$tokenized,
+    ) || ( $m->log->fatal( "Template error: " . $template->error() ) and die );
+    open( OUT, '>' . $conf->{template}{file}{$templatefile}{out} );
     print OUT $tokenized;
     close(OUT);
   }
@@ -461,7 +477,7 @@ sub _loaded {
   my $m    = shift;
   my $conf = $m->conf;
   my ( $file, $touch ) = @_;
-  $file .= '_' . $conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+  $file .= '_' . $conf->{'build'}{'load_touchext'};
   if ($touch) {
     open( T, '>' . $file );
     print T "\n";
