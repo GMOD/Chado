@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.8 2003-12-10 16:28:37 scottcain Exp $
+$Id: INSTALL,v 1.9 2003-12-10 19:54:34 allenday Exp $
 
 Prerequisites:
 
@@ -95,8 +95,9 @@ As indicated, the host, port, and password are optional.
         *   Available extensions to the core schema:
             [1] sequence/gff-bridge/sequence-gff-views.sql
             [2] sequence/gff-bridge/sequence-gff-funcs.pgsql
-            [3] expression/rad.sql
-            [4] expression/expression.sql
+            [3] sequence/functions/feature_subalignments.plpgsql
+            [4] expression/rad.sql
+            [5] expression/expression.sql
 
             What extensions to the core schema would you like?
             (Note that selecting any of these will force the
@@ -110,8 +111,14 @@ As indicated, the host, port, and password are optional.
         If you plan to use Chado in combination with GBrowse, make
         sure you select (1) and (2).
 
+        If you plan to store many alignments with small regions of
+        perfect match, you might want to load the alignment data
+        as an alignment string rather than creating a feature for
+        each aligned block.  Functionality exists for using this
+        method in (3), and is documented in ____.
+
         If you plan to represent gene expression data in a way that
-        is compliant with MIAME standards, make sure you select (3).
+        is compliant with MIAME standards, make sure you select (4).
         !!!!!IMPORTANT!!!!!
 
         *   Enter the full path of an external DDL file [none] 
