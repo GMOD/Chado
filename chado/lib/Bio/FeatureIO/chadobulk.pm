@@ -29,7 +29,7 @@ sub _initialize {
   #my $config = Bio::GMOD::Config->new();
   #warn Dumper($config);
 
-  $self->dbh(DBI->connect('dbi:Pg:host=oratino;dbname=chado1','aday','aday'));
+  $self->dbh(DBI->connect('dbi:Pg:host=soleus;dbname=chado_gec','allenday','allenday'));
   $self->setup();
 }
 
@@ -183,6 +183,8 @@ sub write_row_featureloc{
 # srcfeature_id   | integer  |
 
   my $srcfeature_id = $self->feature_id($feature->seq_id);
+
+  return undef unless defined($srcfeature_id);
 
 # fmin            | integer  |
 
