@@ -147,6 +147,20 @@ create index assay_idx4 on assay (dbxref_id);
 
 COMMENT ON TABLE assay IS 'an assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician info).  the assay can be thought of as a hybridization';
 
+create table assayprop (
+    assayprop_id serial not null,
+	primary key (assayprop_id),
+    assay_id int not null,
+	foreign key (assay_id) references assay (assay_id) on delete cascade,
+    type_id int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    value varchar(100) not null
+);
+create index assayprop_idx1 on assayprop (assay_id);
+create index assayprop_idx2 on assayprop (type_id);
+
+COMMENT ON TABLE assayprop IS 'extra assay properties that are not accounted for in assay';
+
 create table assay_project (
     assay_project_id serial not null,
         primary key (assay_project_id),

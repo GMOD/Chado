@@ -178,7 +178,6 @@ AS SELECT
   elementresult.float4 AS quartile3,
   elementresult.float5 AS sd,
   elementresult.int1   AS n,
-  elementresult.int2   AS version
 FROM elementresult
 WHERE SUBCLASS_VIEW = 'elementstat';
 
@@ -186,9 +185,9 @@ CREATE OR REPLACE RULE "_RuleI_elementstat" AS
   ON INSERT TO elementstat
   DO INSTEAD
     INSERT INTO elementresult
-    (subclass_view,element_id,quantification_id,float1,float2,float3,float4,float5,int1,int2)
+    (subclass_view,element_id,quantification_id,float1,float2,float3,float4,float5,int1)
     VALUES
-    ('elementstat',NEW.element_id,1,NEW.mean,NEW.median,NEW.quartile1,NEW.quartile3,NEW.sd,NEW.n,NEW.version);
+    ('elementstat',NEW.element_id,1,NEW.mean,NEW.median,NEW.quartile1,NEW.quartile3,NEW.sd,NEW.n);
 
 CREATE RULE "_RuleU_elementstat" AS
   ON UPDATE TO elementstat
@@ -203,7 +202,6 @@ CREATE RULE "_RuleU_elementstat" AS
     float4 = NEW.quartile3,
     float5 = NEW.sd,
     int1   = NEW.n,
-    int1   = NEW.version
     WHERE elementresult_id = OLD.elementresult_id;
 
 CREATE RULE "_RuleD_elementstat" AS
