@@ -18,6 +18,8 @@ my $fmt = 'png';
 my $phen;
 my $view;
 my $fontsize = 10;
+my $horizontal = 0;
+my %graphvizopts = ();
 GetOptions(
            "loc|l"=>\$loc,
            "phen|p"=>\$phen,
@@ -25,6 +27,8 @@ GetOptions(
            "style|s=s%"=>\%style,
            "conf|c=s"=>\$conf,
            "view|v"=>\$view,
+           "gv=s%"=>\%graphvizopts,
+           "horizontal"=>\$horizontal,
            "fontsize=s"=>\$fontsize,
           );
 my @font_args = ();
@@ -43,7 +47,7 @@ my $fn = shift @ARGV;
 my $T = Bio::XML::Sequence::Transform->new();
 $T->parse($fn);
 
-my $g = GraphViz->new();
+my $g = GraphViz->new(rankdir=>$horizontal, %graphvizopts);
 
 # add genes
 my @genes = map {Node(gene=>$_)} $T->get_gene;
@@ -76,7 +80,7 @@ map {
                  label=>get_flabel($_),
                  @font_args,
                  style=>'filled',
-                 fillcolor=>$cnf->sget_featurefillcolor || '#88FF88',
+                 fillcolor=>$cnf->sget_featurefillcolor || 'green',
                  cluster=>$cluster,
                 );
 } @features;
@@ -86,6 +90,7 @@ map {
                  @font_args,
                  label=>$_->sget_type);
 } @frs;
+
 # show locations
 if ($loc) {
     map {
@@ -103,6 +108,73 @@ if ($loc) {
         }
     } @features;
 }
+
+
+my $next_id = 1;
+
+# show analysisresults
+sub show_analysisresult {
+    my $ar = shift;
+    my $anname = shift;
+    my $parent = shift;
+    $ar->set_id("analysisresult_".$next_id++);
+    $g->add_node($ar->sget_id,
+		 label=>get_resultlabel($ar),
+		 @font_args,
+		 style=>'filled',
+		 fillcolor=>$cnf->sget_analysisresultfillcolor || 'cyan',
+		 cluster=>$anname,
+		);
+    if ($parent) {
+	$g->add_edge($ar->sget_id, $parent->sget_id,
+		     label=>sprintf('parent'),
+		     @font_args,
+                     style=>$cnf->sget_genefeaturestyle || 'dashed',
+                     cluster=>$anname,
+                    );
+    }
+    else {
+	$g->add_edge($ar->sget_id, $anname, 
+		     label=>sprintf('analysis'),
+		     @font_args,
+                     style=>$cnf->sget_genefeaturestyle || 'dashed',
+                     cluster=>$anname,
+                    );
+    }
+    my @locs = $ar->gettree("resultlocation");
+    foreach my $loc (@locs) {
+	$g->add_edge($ar->sget_id,
+		     $loc->sget_srcfeature,
+		     label=>'loc',
+		     @font_args,
+                     style=>$cnf->sget_genefeaturestyle || 'dashed',
+		    );
+    }
+}
+my @ans = $T->findSubTree("analysis");
+foreach my $an (@ans) {
+    my $anname = $an->sget_name;
+    $g->add_node($anname,
+                 label=>get_anlabel($an),
+                 @font_args,
+                 shape=>$cnf->sget_analysisshape || 'box',
+                 style=>'filled',
+                 fillcolor=>$cnf->sget_genefillcolor || 'red',
+                 cluster=>$anname,
+                );
+    my @aresults = $an->findSubTree("analysisresult");
+    foreach my $ar (@aresults) {
+	show_analysisresult($ar, $anname);
+	my @subresults = 
+	  grep {
+	      $_->name eq "analysisresult"
+	  } $ar->children;
+	map {
+	    show_analysisresult($_, $anname, $ar);
+	} @subresults;
+    }
+}
+
 if ($phen) {
     my @phenotypes = $T->fst("phenotype");
     my ($pcnf) = $cnf->fst("phenotype");
@@ -160,6 +232,18 @@ sub get_flabel {
     sprintf("%s",
             join("\n",
                  map {"$_:".$f->sget($_)} qw(dbxref name ftype)));
+}
+sub get_anlabel {
+    my $f = shift;
+    sprintf("%s",
+            join("\n",
+                 map {"$_:".$f->sget($_)} qw(name program sourcename)));
+}
+sub get_resultlabel {
+    my $f = shift;
+    sprintf("%s",
+            join("\n",
+                 map {"$_:".$f->sget($_)} qw(score significance)));
 }
 sub get_glabel {
     my $f = shift;
