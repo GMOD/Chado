@@ -2,9 +2,9 @@ package Chado::DBI;
 use base 'Class::DBI::mysql';
 Chado::DBI->set_db(
 				   'Main',
-				   'd:s:n;host=hostname',
-				   'username',
-				   'password'
+				   'dbi:mysql:chado_wax;host=sumo',
+				   'nobody',
+				   ''
 				  );
 
 1;
