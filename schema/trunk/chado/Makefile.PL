@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.46 2003-12-12 17:12:38 scottcain Exp $
+# $Id: Makefile.PL,v 1.47 2003-12-18 16:41:58 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -106,6 +106,7 @@ $O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
 $O{PACKAGE_HOME} = catfile $O{GMOD_HOME}, 'lib', 'schema';
 $O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
 $O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
+$O{FUNCDEF}      = catfile $working_dir, 'modules', 'function.modules';
 
 mkdir $lib_dir   unless -d $lib_dir;
 mkdir $chado_dir unless -d $chado_dir;
@@ -310,6 +311,24 @@ unless ($external eq 'none') {
   }
 }
 
+print "\nAvailable function extensions to the core schema:\n";
+open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
+my @funcfiles = ( );
+my $i = 0;
+while (<EXT>) {
+  next if /^\s*#/; # allow comment lines
+  $i++;
+  print "[$i] $_";
+  chomp;
+  my $file = "$working_dir/modules/".$_;
+  push @funcfiles, $file;
+}
+close EXT;
+                                                                                    
+print "\nWhat function extensions to the core schema would you like?\n";
+my $funcstr = prompt("(Comma-delimited)?","0");
+
+
 #
 # Show the user the options (esp. if using RECONFIGURE or DEFAULTS).
 #
@@ -391,6 +410,18 @@ if ($rebuild_complete || !-e $complete_sql) {
   ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 
   system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
+}
+
+if (@funcfiles > 0) {
+  open OUT, ">>$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
+  foreach my $file (@funcfiles) {
+    open IN, $file or die "Couldn't read file '$file': $!\n";
+    while (<IN>) {
+      print OUT;
+    }
+    close IN;
+  }
+  close OUT;
 }
 
 WriteMakefile(

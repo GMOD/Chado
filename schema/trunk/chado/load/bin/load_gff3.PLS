@@ -342,17 +342,27 @@ while(my $gff_feature = $gffio->next_feature()) {
   my $fmin = $gff_feature->start -1;    # GFF -> InterBase
   my $fmax = $gff_feature->end;
 
-  my($chado_feature) = Chado::Feature->find_or_create({
-    organism_id  => $chado_organism,
-#    name         => $gff_feature->has_tag('ID') ? $gff_feature->get_tag_values('ID')
-#                                                : ' ',
-    name         => $id,
-    uniquename   => $id .'_'. $gff_feature->primary_tag
-                        .'_'. $gff_feature->seq_id .':'
-                            . $fmin .'..'. $fmax,
-    type_id      => $chado_type->cvterm_id,
-    seqlen       => $seqlen
-                                                    });
+  my $chado_feature;
+  if ($gff_feature->has_tag('ID')) {
+    ($chado_feature) = Chado::Feature->find_or_create({
+      organism_id  => $chado_organism,
+      name         => $id,
+      uniquename   => $id .'_'. $gff_feature->primary_tag
+                          .'_'. $gff_feature->seq_id .':'
+                          . $fmin .'..'. $fmax,
+      type_id      => $chado_type->cvterm_id,
+      seqlen       => $seqlen
+                                                      });
+  } else {
+    ($chado_feature) = Chado::Feature->find_or_create({
+      organism_id  => $chado_organism,
+      uniquename   =>  '_'. $gff_feature->primary_tag
+                      .'_'. $gff_feature->seq_id .':'
+                      . $fmin .'..'. $fmax,
+      type_id      => $chado_type->cvterm_id,
+      seqlen       => $seqlen
+                                                     });
+  }
 
   push @transaction, $chado_feature;
 

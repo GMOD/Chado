@@ -120,6 +120,7 @@ while ( my $seq = $seqio->next_seq() ) {
 
         print OUT $sf->gff_string . "\n";
 
+        my $localgeneid = 1;
         foreach my $sf2 ( $sf->get_SeqFeatures ) {
             $sf2->seq_id($acc);
             $sf2->gff_format( Bio::Tools::GFF->new( -gff_version => 3 ) );
@@ -127,6 +128,7 @@ while ( my $seq = $seqio->next_seq() ) {
             if ( $sf->has_tag('ID') ) {
                 $sf2->add_tag_value( 'Parent', $sf->get_tag_values('ID') );
             }
+
             if ( $sf2->primary_tag eq 'variation' and $sf2->length == 1 ) {
                 $sf2->primary_tag('SNP');
             } elsif ($sf2->primary_tag eq 'variation') {
@@ -164,10 +166,15 @@ while ( my $seq = $seqio->next_seq() ) {
                 $sf2->source_tag( $sf->source_tag );
             }
 
-            #require either a Parent or ID
-            unless ( ($sf2->has_tag('ID') || $sf2->has_tag('Parent')) ) {
-                $sf->add_tag_value( 'ID', "GFF_internal_id_$acc-$idcount");
-                $idcount++;
+            my @subfeats = $sf2->get_SeqFeatures;
+            if (@subfeats > 0) {
+                unless ($sf2->has_tag('ID')) {
+                    my ($parentID) = $sf->get_tag_values('ID');
+                    $sf2->add_tag_value( 'ID', "$parentID\_"
+                                              .$sf2->primary_tag
+                                              ."_$localgeneid" );
+                    $localgeneid++;
+                } 
             }
 
             validate_tag($sf2);
@@ -176,13 +183,15 @@ while ( my $seq = $seqio->next_seq() ) {
 
             print OUT $sf2->gff_string . "\n";
 
-            foreach my $sf3 ( $sf2->get_SeqFeatures ) {
+            foreach my $sf3 ( @subfeats ) {
                 $sf3->seq_id($acc);
                 $sf3->gff_format( Bio::Tools::GFF->new( -gff_version => 3 ) );
 
-                if ( $sf->has_tag('ID') ) {
-                    $sf3->add_tag_value( 'Parent', $sf->get_tag_values('ID') );
+                if ( $sf2->has_tag('ID') ) {
+                    my ($parentID) = $sf2->get_tag_values('ID');
+                    $sf3->add_tag_value( 'Parent', $parentID );
                 }
+
                 unless ( $sf3->source_tag ) {
                     $sf3->source_tag( $sf2->source_tag );
                 }
