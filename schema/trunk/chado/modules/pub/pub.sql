@@ -16,13 +16,14 @@ create table pub (
        pyear  varchar(255),
        pages  varchar(255),
        miniref varchar(255) not null,
+       uniquename text not null,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
 
-       unique(miniref)
+       unique(uniquename)
 );
 -- title: title of paper, chapter of book, journal, etc
 -- volumetitle: title of part if one of a series
@@ -30,6 +31,11 @@ create table pub (
 -- pages: page number range[s], eg, 457--459, viii + 664pp, lv--lvii
 -- type_id: the type of the publication (book, journal, poem, graffiti, etc)
 -- is_obsolete: do we want this even though we have the relationship in pub_relationship?
+-- uniquename: the unique name for a publication. FlyBase policy for setting publication 
+-- 	uniquenames is the following:
+--	a. use MEDLINE id for any publication that has one
+--	b. for books/journals, use the ISSN number
+--	c. for anything else, use FBrf#
 create index pub_idx1 on pub (type_id);
 
 -- ================================================
