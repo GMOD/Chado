@@ -1,0 +1,121 @@
+VERSION 0.01
+============
+
+No change log
+
+VERSION 0.02
+============
+
+No change log
+
+VERSION 0.03
+============
+
+all modules
+	ditched timeentered and timelastmod columns in every table
+		We've decided that auditing is implementation specific.
+		We're presently working on the FB implementation, and
+		  will make that available soon
+	changed all dbxrefstr foreign keys to dbxref_id
+	added indexes for every foreign key column in every table
+
+general module:
+
+	dbxref
+		removed dbxref.dbxrefstr
+		removed unique key (dbxrefstr)
+
+cv module:
+
+	New table:
+		added table cv to hold cv names
+	cvterm
+		changed accordingly
+	cvpath
+		changed accordingly	
+
+
+organism module:
+
+	organism_dbxref
+		added unique key (organism_id,dbxref_id)
+
+pub module
+
+	pub
+		added miniref
+		added unique key (miniref)
+	pub_author
+		added unique key (author_id,pub_id)
+	author
+		added unique key (surname,givenname,suffix)
+
+	
+sequence module
+
+	Deleted table
+		feature_organism
+	feature
+		added foreign key organism_id (not null)
+		added uniquename column (not null)
+		added unique key (organism_id,uniquename)
+		made type_id not null
+	featureloc
+		added unique key (feature_id,locgroup,rank)
+	feature_dbxref
+		changed unique key to (feature_id,dbxref_id)
+			- was (feature_dbxref_id, dbxref_id)  OK???
+	feature_relationship
+		changed type_id int attribute to not null
+
+
+genetic module
+
+NOTE:  We don't have unique keys on genotype, phenotype, and interaction.
+       Since we're going to be having a schema review on this module soon,
+       I decided not to worry about these for the time being.
+
+	feature_genotype
+		added unique key (feature_id,genotype_id)
+	feature_phenotype
+		added unique key (feature_id,phenotype_id)
+	phenotype_cvterm
+		added unique key (phenotype_id,cvterm_id,prank)
+	interaction_subj
+		added unique key (feature_id,interaction_id)
+	interaction_obj
+		added unique key (feature_id,interaction_id)
+
+companalysis module
+
+	analysis
+		added unique key (program,programversion)
+	analysisfeature
+		changed unique key to (feature_id,analysis_id)
+			was (feature_id)	
+
+expression module
+
+	expression
+		doesn't have a unique key!  But what would it be?
+	feature_expression
+		added unique key (expression_id,feature_id)
+	expression_cvterm
+		added unique key (expression_id,cvterm_id)
+	expression_pub
+		added unique key (expression_id,pub_id)
+	eimage
+		doesn't have a unique key! What would it be?
+	expression_image
+		added unique key (expression_id,eimage_id)
+
+map module
+
+	I've skipped this one except for ditching the auditing attributes
+	and dbxrefstr stuff... still needs lots of work!   Maybe we could
+	do a mini-review on this module sometime soon?  I've got some
+	examples of how I use a rejigged featurepos table to manage the
+	fragmented a.gambiae genome, but I'd bet what I did can be 
+	improved upon.
+
+
