@@ -242,6 +242,7 @@ while (<IN>){
    my @temp1=split(/\s*\(/, $temp[1]);
    $tablename=$temp1[0];
    print "\ntable name:$tablename";
+   push @tables_pseudo, $tablename;
    if ($all_tables){
       $all_tables=$all_tables." ".$tablename;
    }

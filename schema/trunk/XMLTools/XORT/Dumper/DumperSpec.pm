@@ -12,6 +12,9 @@ my $pro=XORT::Util::GeneralUtil::Properties->new('ddl');
  %hash_ddl=$pro->get_properties_hash();
 my $dbh_obj;
 
+my $TABLES_PSEUDO='table_pseudo';
+my %hash_tables_pseudo;
+
 #global variable, attribute of test or dump
 my $DUMP_ALL='all';
 my $DUMP_COL='cols';
@@ -57,6 +60,14 @@ my %hash_op=(
   my    %dbh_hash=$dbh_pro->get_dbh_hash();
   $dbh_obj=XORT::Util::DbUtil::DB->_new(\%dbh_hash)  ;
   $dbh_obj->open();
+
+   # load the elements which need to be filtered out
+   my @array_pseudo=split(/\s+/, $hash_ddl{$TABLES_PSEUDO});
+   foreach my $value(@array_pseudo){
+   $hash_tables_pseudo{$value}=1;
+     print "\npseudo:$value";
+   }
+
 
   bless $self, $type;
   return $self;
@@ -2274,7 +2285,6 @@ sub _data_type_checker(){
         my @temp1=split(/:/, $temp[$i]);
 	if ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
             # in case of boolean type, need to replace 0/1 with f/t ?
-         
             if (defined($hash_ref->{$temp1[0]})){
               my $value=$hash_ref->{$temp1[0]};
               my @array_value=split(/\|/, $value);
