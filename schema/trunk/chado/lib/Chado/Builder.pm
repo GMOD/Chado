@@ -76,9 +76,10 @@ sub ACTION_radviews {
   $m->log->info("entering ACTION_radviews");
 
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $db_host   = $conf->{'database'}{'db_host'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
   my $init_sql  = catfile( $build_dir, 'modules', 'expression', 'rad.views' );
-  my $sys_call  = "psql -f $init_sql $db_name";
+  my $sys_call  = "psql -h $db_host -f $init_sql $db_name";
 
   $m->log->debug("system call: $sys_call");
 
@@ -107,9 +108,10 @@ sub ACTION_prepdb {
   $m->log->info("entering ACTION_prepdb");
 
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $db_host   = $conf->{'database'}{'db_host'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
   my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
-  my $sys_call  = "psql -f $init_sql $db_name";
+  my $sys_call  = "psql -h $db_host -f $init_sql $db_name";
 
   $m->log->debug("system call: $sys_call");
 
