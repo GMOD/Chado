@@ -91,14 +91,6 @@ Chado::Contact->has_many(
     'biomaterial_biosourceprovider_id', 'Chado::Biomaterial' => 'biosourceprovider_id'
 );
 
-sub arrays {
-    return shift->array_manufacturer_id
-}
-
-Chado::Contact->has_many(
-    'array_manufacturer_id', 'Chado::Array' => 'manufacturer_id'
-);
-
 sub assays {
     return shift->assay_operator_id
 }
@@ -113,6 +105,14 @@ sub dbs {
 
 Chado::Contact->has_many(
     'db_contact_id', 'Chado::Db' => 'contact_id'
+);
+
+sub arraydesigns {
+    return shift->arraydesign_manufacturer_id
+}
+
+Chado::Contact->has_many(
+    'arraydesign_manufacturer_id', 'Chado::Arraydesign' => 'manufacturer_id'
 );
 
 sub authors {
@@ -217,14 +217,6 @@ Chado::Dbxref->has_many(
     'feature_dbxref_dbxref_id', 'Chado::Feature_Dbxref' => 'dbxref_id'
 );
 
-sub arrays {
-    return shift->array_dbxref_id
-}
-
-Chado::Dbxref->has_many(
-    'array_dbxref_id', 'Chado::Array' => 'dbxref_id'
-);
-
 sub features {
     return shift->feature_dbxref_id
 }
@@ -239,6 +231,14 @@ sub organism_dbxrefs {
 
 Chado::Dbxref->has_many(
     'organism_dbxref_dbxref_id', 'Chado::Organism_Dbxref' => 'dbxref_id'
+);
+
+sub arraydesigns {
+    return shift->arraydesign_dbxref_id
+}
+
+Chado::Dbxref->has_many(
+    'arraydesign_dbxref_id', 'Chado::Arraydesign' => 'dbxref_id'
 );
 
 sub studys {
@@ -470,6 +470,18 @@ Chado::Cvterm->has_many(
     'feature_cvterm_cvterm_id', 'Chado::Feature_Cvterm' => 'cvterm_id'
 );
 
+sub arraydesigns {
+    return shift->arraydesign_platformtype_id
+}
+
+Chado::Cvterm->has_many(
+    'arraydesign_platformtype_id', 'Chado::Arraydesign' => 'platformtype_id'
+);
+
+Chado::Cvterm->has_many(
+    'arraydesign_substratetype_id', 'Chado::Arraydesign' => 'substratetype_id'
+);
+
 sub biomaterial_relationships {
     return shift->biomaterial_relationship_type_id
 }
@@ -633,18 +645,6 @@ Chado::Cvterm->has_many(
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->cvterm_dbxref_cvterm_id }
-
-sub arrays {
-    return shift->array_platformtype_id
-}
-
-Chado::Cvterm->has_many(
-    'array_platformtype_id', 'Chado::Array' => 'platformtype_id'
-);
-
-Chado::Cvterm->has_many(
-    'array_substratetype_id', 'Chado::Array' => 'substratetype_id'
-);
 
 sub assayprops {
     return shift->assayprop_type_id
@@ -2641,14 +2641,6 @@ sub dbxref {
     return shift->dbxref_id
 }
 
-sub arrays {
-    return shift->array_protocol_id
-}
-
-Chado::Protocol->has_many(
-    'array_protocol_id', 'Chado::Array' => 'protocol_id'
-);
-
 sub treatments {
     return shift->treatment_protocol_id
 }
@@ -2671,6 +2663,14 @@ sub acquisitions {
 
 Chado::Protocol->has_many(
     'acquisition_protocol_id', 'Chado::Acquisition' => 'protocol_id'
+);
+
+sub arraydesigns {
+    return shift->arraydesign_protocol_id
+}
+
+Chado::Protocol->has_many(
+    'arraydesign_protocol_id', 'Chado::Arraydesign' => 'protocol_id'
 );
 
 sub protocolparams {
@@ -2764,21 +2764,21 @@ Chado::Channel->has_many(
 );
 
 # -------------------------------------------------------------------
-package Chado::Array;
+package Chado::Arraydesign;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Array->set_up_table('array');
+Chado::Arraydesign->set_up_table('arraydesign');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->array_id
+    shift->arraydesign_id
 }
 
-Chado::Array->has_a(
+Chado::Arraydesign->has_a(
     manufacturer_id => 'Chado::Contact'
 );
 
@@ -2786,7 +2786,7 @@ sub manufacturer {
     return shift->manufacturer_id
 }
 
-Chado::Array->has_a(
+Chado::Arraydesign->has_a(
     platformtype_id => 'Chado::Cvterm'
 );
 
@@ -2794,7 +2794,7 @@ sub platformtype {
     return shift->platformtype_id
 }
 
-Chado::Array->has_a(
+Chado::Arraydesign->has_a(
     substratetype_id => 'Chado::Cvterm'
 );
 
@@ -2802,7 +2802,7 @@ sub substratetype {
     return shift->substratetype_id
 }
 
-Chado::Array->has_a(
+Chado::Arraydesign->has_a(
     protocol_id => 'Chado::Protocol'
 );
 
@@ -2810,7 +2810,7 @@ sub protocol {
     return shift->protocol_id
 }
 
-Chado::Array->has_a(
+Chado::Arraydesign->has_a(
     dbxref_id => 'Chado::Dbxref'
 );
 
@@ -2819,27 +2819,27 @@ sub dbxref {
 }
 
 sub arrayprops {
-    return shift->arrayprop_array_id
+    return shift->arrayprop_arraydesign_id
 }
 
-Chado::Array->has_many(
-    'arrayprop_array_id', 'Chado::Arrayprop' => 'array_id'
+Chado::Arraydesign->has_many(
+    'arrayprop_arraydesign_id', 'Chado::Arrayprop' => 'arraydesign_id'
 );
 
 sub assays {
-    return shift->assay_array_id
+    return shift->assay_arraydesign_id
 }
 
-Chado::Array->has_many(
-    'assay_array_id', 'Chado::Assay' => 'array_id'
+Chado::Arraydesign->has_many(
+    'assay_arraydesign_id', 'Chado::Assay' => 'arraydesign_id'
 );
 
 sub elements {
-    return shift->element_array_id
+    return shift->element_arraydesign_id
 }
 
-Chado::Array->has_many(
-    'element_array_id', 'Chado::Element' => 'array_id'
+Chado::Arraydesign->has_many(
+    'element_arraydesign_id', 'Chado::Element' => 'arraydesign_id'
 );
 
 # -------------------------------------------------------------------
@@ -2858,11 +2858,11 @@ sub id {
 }
 
 Chado::Arrayprop->has_a(
-    array_id => 'Chado::Array'
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub array {
-    return shift->array_id
+sub arraydesign {
+    return shift->arraydesign_id
 }
 
 Chado::Arrayprop->has_a(
@@ -2889,11 +2889,11 @@ sub id {
 }
 
 Chado::Assay->has_a(
-    array_id => 'Chado::Array'
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub array {
-    return shift->array_id
+sub arraydesign {
+    return shift->arraydesign_id
 }
 
 Chado::Assay->has_a(
@@ -3685,11 +3685,11 @@ sub feature {
 }
 
 Chado::Element->has_a(
-    array_id => 'Chado::Array'
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub array {
-    return shift->array_id
+sub arraydesign {
+    return shift->arraydesign_id
 }
 
 Chado::Element->has_a(
