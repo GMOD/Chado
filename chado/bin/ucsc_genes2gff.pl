@@ -14,11 +14,10 @@ use Data::Dumper;
 
 my $executable = basename($0);
 
-my ($SRCDB,$ORIGIN,$ANNOTATIONS,$CENTER);
+my ($SRCDB,$ORIGIN,$ANNOTATIONS);
 GetOptions('srcdb:s'       => \$SRCDB,
            'origin:i'      => \$ORIGIN,
            'annotations:s' => \$ANNOTATIONS,
-           'center:s'      => \$CENTER,
           ) and $ANNOTATIONS or die <<USAGE;
 Usage: $0 -annotations <dir> [options]
 
@@ -37,7 +36,6 @@ Options:
 USAGE
 
 $SRCDB           ||= 'UCSC';
-my $CENTER       ||= 'unigene';
 $ORIGIN          ||= 1;
 my $KGXREF         = $ANNOTATIONS.'/kgXref.txt';
 my $KNOWNGENE      = $ANNOTATIONS.'/knownGene.txt';
@@ -49,8 +47,15 @@ my $KNOWNU133      = $ANNOTATIONS.'/knownToU133.txt';
 my $KNOWNU95       = $ANNOTATIONS.'/knownToU95.txt';
 my $GENBANK        = $ANNOTATIONS.'/genbank2accessions.txt';
 my $LOCACC         = $ANNOTATIONS.'/loc2acc';
+my $LOCGO          = $ANNOTATIONS.'/loc2go';
+my $LOCUG          = $ANNOTATIONS.'/loc2UG';
+my $REFLINK        = $ANNOTATIONS.'/refLink.txt';
+my $REFSEQSUMMARY  = $ANNOTATIONS.'/refSeqSummary.txt';
+my $CHROMINFO      = $ANNOTATIONS.'/chromInfo.txt';
 
 my %xref;
+my %loc2mrna;
+my %ref2mrna;
 
 parseGenbank(\%xref,$GENBANK);
 parseKnownGenePep(\%xref,$KNOWNGENEPEP);
@@ -59,10 +64,13 @@ parseKgXref(\%xref,$KGXREF);
 parseLocAcc(\%xref,$LOCACC); # the best way I've found so far
                                                   # to link Genbank mRNA accession to
                                                   # Genbank protein accession
+parseLocGo(\%xref,$LOCGO);
+parseLocUG(\%xref,$LOCUG);
 parseKnownLocusLink(\%xref,$KNOWNLOCUSLINK);
 parseKnownAffy(\%xref,$KNOWNU133,$KNOWNU95);
 parseKnownPfam(\%xref,$KNOWNPFAM);
-# need to pull in the omim and other annotations too
+parseRefLink(\%xref,$REFLINK);
+parseRefSeqSummary(\%xref,$REFSEQSUMMARY);
 
 print "##gff-version 3\n";
 #if(1){ #for debugging
@@ -263,6 +271,8 @@ sub parseLocAcc {
 	#$line[4] =~ /(.*)\.\d/;
 	#my $protein = $1;
 
+    my $loc = $line[0];
+
     my $gene    = $line[1];
     my $protein = $line[4];
     $gene    =~ s/\.\d+$//;
@@ -270,11 +280,132 @@ sub parseLocAcc {
 
     next if $gene eq 'none';
 
+    push @{ $loc2mrna{$loc} }, $gene;
+
 	$xref->{$gene}{'db:genbank:protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-');
   }
   close ANNFILE;
 }
 
+=head2 parseLocGo
+
+ Title   : parseLocGo
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseLocGo {
+  my($xref,$filename) = @_;
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+	my @line = split /\t/;
+
+    if($loc2mrna{$line[0]}){
+      foreach my $mrna (@{$loc2mrna{$line[0]}}){
+        $xref->{$mrna}{'cvterm:go'}{$line[1]} = 1;
+      }
+    }
+  }
+  close ANNFILE;
+}
+
+=head2 parseLocUG
+
+ Title   : parseLocUG
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseLocUG {
+  my($xref,$filename) = @_;
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+	my @line = split /\t/;
+
+    if($loc2mrna{$line[0]}){
+      foreach my $mrna (@{$loc2mrna{$line[0]}}){
+        $xref->{$mrna}{'db:unigene'}{$line[1]} = 1;
+      }
+    }
+  }
+  close ANNFILE;
+}
+
+=head2 parseRefLink
+
+ Title   : parseRefLink
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseRefLink {
+  my($xref,$filename) = @_;
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+	my($symbol,$description,$refmrna,$refprotein,undef,undef,$locus,$omim) = split /\t/;
+    $description = uri_escape($description);
+
+    if($ref2mrna{$refmrna}){
+      foreach my $mrna (@{$ref2mrna{$refmrna}}){
+        $xref->{$mrna}{'db:locuslink'}{$locus} = 1;
+        $xref->{$mrna}{'db:omim'}{$omim} = 1;
+        $xref->{$mrna}{'db:refseq:mrna'}{$refmrna} = 1;
+        $xref->{$mrna}{'db:refseq:protein'}{$refprotein} = 1;
+        $xref->{$mrna}{'Alias'}{$symbol} = 1;
+        $xref->{$mrna}{'description'}{$description} = 1;
+      }
+    }
+  }
+  close ANNFILE;
+}
+
+=head2 parseRefSeqSummary
+
+ Title   : parseRefSeqSummary
+ Usage   :
+ Function:
+ Example :
+ Returns :
+ Args    :
+
+=cut
+
+sub parseRefSeqSummary {
+  my($xref,$filename) = @_;
+  open  ANNFILE, $filename or die "Can't open file $filename: $!";
+  while(<ANNFILE>) {
+    chomp;
+    next if /^#/;
+	my($refmrna,$completeness,$description) = split /\t/;
+    $description = uri_escape($description);
+
+    if($ref2mrna{$refmrna}){
+      foreach my $mrna (@{$ref2mrna{$refmrna}}){
+        $xref->{$mrna}{'completeness'}{$completeness} = 1;
+        $xref->{$mrna}{'description'}{$description} = 1;
+      }
+    }
+  }
+  close ANNFILE;
+}
 
 =head2 parseKnownLocusLink
 
@@ -456,12 +587,12 @@ sub parseKgXref {
     next if /^#/;
 	# first two are the same (genebank) followed by swissprot etc...
     my ($kgID, $mRNA, $spID, $spDisplayID, $geneSymbol, $refseq, $protAcc, $description) = split /\t/;
-    my $key = "";
-    if($CENTER =~ /unigene/i) { $key = $kgID; }
-    else { $key = $refseq; }
+    my $key = $kgID;
     # escape certain fields
     $key = uri_escape($key);
     $description = uri_escape($description);
+
+    push @{ $ref2mrna{$refseq} }, $kgID;
 
     $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID;
     $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA;
