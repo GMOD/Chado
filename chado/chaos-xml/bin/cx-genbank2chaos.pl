@@ -14,7 +14,9 @@ my $ascii;
 my $nameby = 'feature_id';
 my $error_threshold = 3;
 my $dir = '.';
-my $verbose;
+my $ds_root;
+my $ds;    # The pathname to the datastore root.
+my $verbose;  # reference to the datastore object.
 my $include_haplotypes;
 GetOptions("fmt|i=s"=>\$fmt,
            "writer|w=s"=>\$writer,
@@ -26,6 +28,7 @@ GetOptions("fmt|i=s"=>\$fmt,
 	   "nameby|n=s"=>\$nameby,
 	   "ethresh|e=s"=>\$error_threshold,
 	   "remove_type=s@"=>\@remove_types,
+           "ds_root=s"=>\$ds_root,
            "verbose|v=s"=>\$verbose,
            "include_haplotypes"=>\$include_haplotypes,
 	   "help|h"=>sub {
@@ -36,7 +39,15 @@ GetOptions("fmt|i=s"=>\$fmt,
 my $W = Data::Stag->getformathandler($writer);
 $W->fh(\*STDOUT);
 my $next_idn = 0;
-mkdir($dir) unless $dir eq '.';
+
+if ($ds_root) {
+    require "Datastore/MD5.pm";
+    $ds = new Datastore::MD5("root" => $ds_root, "depth" => 2);
+}
+else {
+    mkdir($dir) unless $dir eq '.';
+}
+
 foreach my $file (@ARGV) {
     print STDERR "CONVERTING: $file\n";
     my $chaos;
@@ -125,11 +136,22 @@ foreach my $file (@ARGV) {
                     my $W = Data::Stag->getformathandler($writer);
                     my $id = $f->get($nameby);
                     $id =~ tr/A-Za-z0-9_:;\.//cd; # make name safe
-                    my $fn = sprintf("%s/%s.%s",
-                                     $path_prefix,
-                                     $id,
-                                     $writer);
-                    my $fh = FileHandle->new(">$fn") || die "can't open $fn";
+                    my $fh;
+                    my $fn;
+                    if ($ds_root) {
+                        $ds->mkdir($id) || die "Unable to ds->mkdir() for $id";
+                        $fn = sprintf("%s/%s.%s",
+                                      $ds->id_to_dir($id),
+                                      $id,
+                                      $writer);
+                    }
+                    else {
+                        $fn = sprintf("%s/%s.%s",
+                                      $path_prefix,
+                                      $id,
+                                      $writer);
+                    }
+                    $fh = FileHandle->new(">$fn") || die "can't open $fn";
                     $W->fh($fh);
                     my $res = $seqf->sget_residues;
                     $seqf->unset_residues;
