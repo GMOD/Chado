@@ -292,6 +292,9 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         elsif ( $tag eq 'Note' ) {
             load_Note_tag( $gff_feature, $chado_feature );
         }
+        elsif ( $tag eq 'Ontology_term' || $tag =~ /^cvterm/) {
+            load_Ontology_term( $gff_feature, $chado_feature, $tag );
+        }
         elsif ( $tag =~ /^[A-Z]/ ) {
             die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the GFF3 spec?";
         }
@@ -389,29 +392,6 @@ sub load_custom_tags {
         }
 
     }
-    elsif ( $tag =~ /^cvterm:(.+)/ ) {
-        foreach my $d (@d) {
-            my ($dbxref) = Chado::Dbxref->search( accession => $d );
-            $progress->message("couldn't find cvterm: $d") and next
-              unless $dbxref;
-            my ($cvterm) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
-
-            next unless $cvterm;
-
-            my ($feature_cvterm) = Chado::Feature_Cvterm->find_or_create(
-                {
-                    feature_id => $chado_feature->id,
-                    cvterm_id  => $cvterm->id,
-                    pub_id     => $nullpub->id,
-                }
-            );
-            push @transaction, $feature_cvterm;
-        }
-    }
-    elsif ( $tag eq 'completeness' ) {
-
-        #fix fix fix
-    }
     else {
         unless ( defined $cvterm{$tag} ) {
             cache_cvterm($tag);
@@ -429,6 +409,40 @@ sub load_custom_tags {
 
             push @transaction, $featureprop;
         }
+    }
+}
+
+=pod
+
+=head1 load_Ontology_term
+
+Loads ontology terms to feature_cvterm.
+
+=cut
+
+sub load_Ontology_term {
+    my $gff_feature   = shift;
+    my $chado_feature = shift;
+    my $tag           = shift;
+                                                                                
+    my @d = $gff_feature->get_tag_values($tag);
+
+    foreach my $d (@d) {
+        my ($dbxref) = Chado::Dbxref->search( accession => $d );
+        $progress->message("couldn't find cvterm in dbxref: $d") and next
+          unless $dbxref;
+        my ($cvterm) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+                                                                                
+        next unless $cvterm;
+                                                                                
+        my ($feature_cvterm) = Chado::Feature_Cvterm->find_or_create(
+            {
+                feature_id => $chado_feature->id,
+                cvterm_id  => $cvterm->id,
+                pub_id     => $nullpub->id,
+            }
+        );
+        push @transaction, $feature_cvterm;
     }
 }
 
