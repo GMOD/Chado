@@ -1507,9 +1507,10 @@ SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS a
 FROM gcontext g, feature_gcontext fg
 WHERE g.gcontext_id = fg.gcontext_id
 UNION ALL
-SELECT feature_id, 'Alias' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.synonym_id = s.synonym_id
+SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs, feature f
+WHERE fs.synonym_id = s.synonym_id and f.feature_id = fs.feature_id and
+      f.name != s.name
 UNION ALL
 SELECT fp.feature_id,cv.name,fp.value
 FROM featureprop fp, cvterm cv
@@ -2361,7 +2362,7 @@ LANGUAGE 'sql';
 --functional index that depends on the above functions
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
 
---uses the gff3view to create a GFF3 compliant attribute string
+--uses the gff3atts to create a GFF3 compliant attribute string
 CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
 'DECLARE
   return_string      varchar;
@@ -2414,7 +2415,9 @@ CREATE OR REPLACE VIEW gff3view (
   score,
   strand,
   phase,
-  attributes
+  attributes,
+  seqlen,
+  name
 ) AS
 SELECT
   f.feature_id   ,
@@ -2426,16 +2429,16 @@ SELECT
   '.'            ,
   fl.strand      ,
   fl.phase       ,
-  gffattstring(f.feature_id)
-FROM feature f, feature sf, feature_dbxref fd,
-     dbxref dbx, db db, cvterm cv, featureloc fl
-WHERE f.feature_id     = fl.feature_id AND
-      fl.srcfeature_id = sf.feature_id AND
-      f.type_id        = cv.cvterm_id  AND
-      db.name          = 'GFF_source'  AND
-      db.db_id         = dbx.db_id     AND
-      dbx.dbxref_id    = fd.dbxref_id  AND
-      fd.feature_id    = f.feature_id ;
+  gffattstring(f.feature_id),
+  f.seqlen       ,
+  f.name
+FROM feature f
+     LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
+     LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id) 
+     LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
+     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
+     LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
+WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
 
 CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
 DECLARE
