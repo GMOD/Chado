@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.52 2004-03-15 18:58:33 scottcain Exp $
+# $Id: Makefile.PL,v 1.53 2004-03-15 19:16:08 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -265,7 +265,11 @@ my @sqlfiles;
 my $external;
 my @funcfiles;
 my $rebuild_complete = 0;
-unless ($O{'SIMPLE'} =~ /^[Yy]/) {
+if ($O{'SIMPLE'} =~ /^[Yy]/) {
+  system('cp', 
+         "$working_dir/modules/default_schema.sql", 
+         "$working_dir/modules/complete.sql");
+} else{
 
   open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
   while (<CORE>) {
