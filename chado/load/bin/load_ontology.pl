@@ -4,12 +4,11 @@ use strict;
 use lib 'lib';
 use DBI;
 use Data::Dumper;
-#use Chado::LoadDBI;
-use Chado::AutoDBI;
+use Chado::LoadDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 
-use constant DEBUG=>0;
+use constant DEBUG=>1;
 
 #######################################
 # COPYRIGHT
@@ -31,7 +30,7 @@ my ($ontology_file, $ontology_deffile) = @ARGV;
 #allow non-existant defsfile for this one
 die "USAGE: $0 <dagedit file> [<defs file>]" unless $ontology_file;
 
-#Chado::LoadDBI->init();
+Chado::LoadDBI->init();
 
 #######################################
 # SET UP GLOBAL VARS
