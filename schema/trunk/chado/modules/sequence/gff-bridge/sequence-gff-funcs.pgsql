@@ -45,24 +45,25 @@ LANGUAGE SQL;
 -- functions for creating coordinate based functions
 --
 -- create a point
-CREATE FUNCTION p (int, int) RETURNS point AS
+CREATE OR REPLACE FUNCTION p (int, int) RETURNS point AS
  'SELECT point ($1, $2)'
 LANGUAGE 'sql';
 
 -- create a range box
 -- (make this immutable so we can index it)
-CREATE FUNCTION boxrange (int, int) RETURNS box AS
- 'SELECT box (p(0, $1), p($2, 25000000))'
+CREATE OR REPLACE FUNCTION boxrange (int, int) RETURNS box AS
+ 'SELECT box (p(0, $1), p($2,500000000))'
 LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
-CREATE FUNCTION boxquery (int, int) RETURNS box AS
+CREATE OR REPLACE FUNCTION boxquery (int, int) RETURNS box AS
  'SELECT box (p($1, $2), p($1, $2))'
 LANGUAGE 'sql' IMMUTABLE;
 
-CREATE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
+CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
   'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
 LANGUAGE 'sql';
 
 --functional index that depends on the above functions
+DROP INDEX binloc_boxrange;
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
