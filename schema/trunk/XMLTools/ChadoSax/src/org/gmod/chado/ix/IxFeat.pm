@@ -532,7 +532,7 @@ sub printObj { ## was toString
   
   ## print "# Keys\n";
   foreach my $k (sort keys %$self) {
-    next if ($k =~ /^(id|tag|list|attrlist|loclist|handler)$/);
+    next if ($k =~ /^(id|tag|list|attrlist|loclist|handler|parnode)$/);
     #? uniquename is most valid name ?
     # next if ($k eq 'uniquename' && $self->{name});
     my $v= $self->{$k};

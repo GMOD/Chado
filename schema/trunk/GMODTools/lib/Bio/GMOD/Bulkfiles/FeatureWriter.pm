@@ -92,11 +92,12 @@ use vars qw/
   %simplefeat   
   %skipaskid    
   %dropfeat_fff 
-  %dropfeat_gff 
-  %dropid       
+  %dropfeat_gff  %oidisid_gff
+  %dropid  %nameisid     
   %dropname     
   %mergematch   
   %hasdups  
+  %keepstrand
   $rename_child_type
   $name2type_pattern
   $duptype_pattern
@@ -167,6 +168,8 @@ sub initData
   $name2type_pattern= $config->{name2type_pattern};
   $duptype_pattern= $config->{duptype_pattern};
   
+  #?? redo this to automake hashes from config ?
+  
   %maptype      = %{ $config->{'maptype'} } if ref $config->{'maptype'};
   %maptype_pattern= %{ $config->{'maptype_pattern'} } if ref $config->{'maptype_pattern'};
   %mapname_pattern= %{ $config->{'mapname_pattern'} } if ref $config->{'mapname_pattern'};
@@ -177,32 +180,21 @@ sub initData
   %dropfeat_fff = %{ $config->{'dropfeat_fff'} } if ref $config->{'dropfeat_fff'};
   %dropfeat_gff = %{ $config->{'dropfeat_gff'} } if ref $config->{'dropfeat_gff'};
   %dropid       = %{ $config->{'dropid'} } if ref $config->{'dropid'};
+  %nameisid       = %{ $config->{'nameisid'} } if ref $config->{'nameisid'};
   %dropname     = %{ $config->{'dropname'} } if ref $config->{'dropname'};
   %mergematch   = %{ $config->{'mergematch'} } if ref $config->{'mergematch'};
   %hasdups      = %{ $config->{'hasdups'} } if ref $config->{'hasdups'};
+  %keepstrand   = %{ $config->{'keepstrand'} } if ref $config->{'keepstrand'};
+  %oidisid_gff = %{ $config->{'oidisid_gff'} } if ref $config->{'oidisid_gff'};
 
   @GModelParts  = qw( CDS five_prime_UTR three_prime_UTR intron );
   @GModelParts  = @{ $config->{'gmodel_parts'} } if ref $config->{'gmodel_parts'};
   
   #? require segmentfeats be simplefeat ?
   map { $simplefeat{$_}=1; } keys %segmentfeats;
+  delete $simplefeat{'gene'}; # dont make this mistake
+  delete $simplefeat{'mRNA'}; # 
   
-   ## read these also ...
-#   $config->{maptype}= \%maptype;
-#   $config->{maptype_pattern}= \%maptype_pattern;
-#   $config->{mapname_pattern}= \%mapname_pattern;
-#   $config->{maptype_gff}= \%maptype_gff;
-#   $config->{segmentfeats}= \%segmentfeats;
-#   $config->{simplefeat}= \%simplefeat;
-#   $config->{skipaskid}= \%skipaskid;
-#   $config->{dropfeat_fff}= \%dropfeat_fff;
-#   $config->{dropfeat_gff}= \%dropfeat_gff;
-#   $config->{dropid}= \%dropid;
-#   $config->{dropname}= \%dropname;
-#   $config->{mergematch}= \%mergematch;
-#   $config->{hasdups}= \%hasdups;
-#   $config->{rename_child_type}= $rename_child_type;
-
   ## merge config from this INTO handler config ?
   ## that is best place to keep common <featmap> and <featset>
   ## ? move this out of here; use separate featmap/featset include file?
@@ -375,7 +367,8 @@ sub remapId
 	my $self= shift;
   my ($type,$id,$name)= @_;
   my $save= $id;
-  if ($dropid{$type} || $id =~ /^NULL:/ || $id =~ /^:\d+/) { $id= undef; }
+  if (($nameisid{$type}) && $name) { $id= $name; } ## ? not for gff 
+  elsif ($dropid{$type} || $id =~ /^NULL:/ || $id =~ /^:\d+/) { $id= undef; }
   #?? or not# elsif (!$id) { $id= $name; } 
   return ($id,$save);
 }
@@ -386,6 +379,7 @@ sub remapName
 	my $self= shift;
   my ($type,$name,$id,$fulltype)= @_;
   my $save= $name;
+  
   if ( $dropname{$type} ) { $name= ''; }
   
   ## handle stupid match name = all the match type + ...
@@ -396,23 +390,23 @@ sub remapName
     if ($name =~ m/^(twinscan|genewise|genscan|piecegenie)/i) { $name= "${id}_$1"; }
     }
   elsif (!$name) { $name= $id unless ($id =~ /^NULL:/i || $id =~ /^:\d+/); } 
-  else {
+    ## dmelr4.1 ; must apply below name patches to id (no name)
+  
     ## this one could be time sink .. use evaled sub {} ?
-    foreach my $mp (sort keys %mapname_pattern) {
-      next if ($mp eq 'null'); # dummy?
-      my $mtype= $mapname_pattern{$mp}->{type};
-      next if ($mtype && $type !~ m/$mtype/);
-      if ($mapname_pattern{$mp}->{cuttype}) {
-        my @tparts= split(/[_:.-]/, $type);
-        push(@tparts, split(/[_:.-]/, $fulltype) ); #??
-        foreach my $t (@tparts) { $name =~ s/\W?$t\W?//; }
-        next;
-        }
-      my $from= $mapname_pattern{$mp}->{from}; next unless($from);
-      my $to  = $mapname_pattern{$mp}->{to};
-      if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
-      else { $name =~ s/$from/$to/g; }
+  foreach my $mp (sort keys %mapname_pattern) {
+    next if ($mp eq 'null'); # dummy?
+    my $mtype= $mapname_pattern{$mp}->{type};
+    next if ($mtype && $type !~ m/$mtype/);
+    if ($mapname_pattern{$mp}->{cuttype}) {
+      my @tparts= split(/[_:.-]/, $type);
+      push(@tparts, split(/[_:.-]/, $fulltype) ); #??
+      foreach my $t (@tparts) { $name =~ s/\W?$t\W?//; }
+      next;
       }
+    my $from= $mapname_pattern{$mp}->{from}; next unless($from);
+    my $to  = $mapname_pattern{$mp}->{to};
+    if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
+    else { $name =~ s/$from/$to/g; }
     }
   
   return ($name,$save);
@@ -578,11 +572,204 @@ sub remapType
   
 =cut
 
+use constant LINEBUF_SIZE => 2000; # for forward refs
+
+sub getline {
+	my $self= shift;
+  my($fh)=  @_;
+  my $n= scalar( @{$self->{linebuf}} );
+  while (<$fh>) {
+    next unless(/^\w/);
+    next if(/^arm\tfmin/); # header from sql out
+    chomp;
+    push @{$self->{linebuf}}, $_;
+    $n++;
+    last if ($n >= LINEBUF_SIZE);
+    }
+  my $fin= shift @{$self->{linebuf}};
+  return $fin;
+}
+
+sub popline {
+	my $self= shift;
+  my $fin = shift @{$self->{linebuf}};
+  return $fin;
+}
+
+sub peekline {
+	my $self= shift;
+  my($n)=  @_;
+  $n= 0 unless($n);
+  my $fin= ${$self->{linebuf}}[$n];
+  return $fin;
+}
+
+sub grepline {
+	my $self= shift;
+  my($patt)=  @_;
+  my $grep= grep /$patt/, @{$self->{linebuf}};
+  return $grep;
+}
+
+
+sub hasObForwards {
+	my $self= shift;
+  my($fobs,$oidobs)=  @_;
+
+  foreach my $fob (@$fobs) {  
+    my $oid= $fob->{oid};
+    my $paroid= $fob->{paroid}; # may be one of many ! need $oidobs->{parent}
+    my $ftype= $fob->{type};
+    
+    # my $issimple= $simplefeat{$ftype};
+    next unless($paroid || $ftype =~ m/^(mRNA|gene)$/); # add CDS ? or do any types w/ paroid?
+    
+    #my $hasfor= grepline("\b$oid\b"); # mainly looking for attrib: parent_oid\t$oid
+    my $hasfor= $self->grepline("parent_oid\t".$oid);  
+    my $isfor= 0;
+
+    if ($DEBUG && $hasfor) {
+      # my @val= grep /parent_oid\t$oid/, @{$self->{linebuf}};
+      print STDERR "hasForward: $ftype, ",$fob->{name},", $oid\n>","\n"; #join("\n>",@val),"\n"; 
+      }
+
+    ## ? need reverse: if fob has parent_oid, grep for its object_oid ?
+    unless($hasfor) {
+    $isfor= ($paroid && $self->grepline("\b$paroid\b"));  
+    if ($DEBUG && $isfor) {
+      # my @val= grep /\b$paroid\b/, @{$self->{linebuf}};
+      print STDERR "isForward: $ftype, ",$fob->{name},", par=$paroid\n>", "\n"; # ,join("\n>",@val),"\n"; 
+      }
+    }
+    
+    return 1 if ($hasfor || $isfor);
+    }
+  return 0;
+}
+
+
+sub newParentOid
+{
+	my $self= shift;
+  my($fob,$attr_type,$attribute,$oidobs)=  @_;
+
+  ## my $paroid= $fob->{paroid};
+  ##BAD-exon has many parents## return if($paroid);
+  
+  # my $type= $fob->{type}; return if ($simplefeat{$type}); ## TEST before call
+
+  my $oid = $fob->{oid};
+  
+    # do part of this when fob is created:
+    # >> add paroid->child and oid->{parent} refs
+    # defer any requirement for parent/child ob till putLink()
+    
+  ##my($attr_type,$attribute)= split "\t",$addattr; 
+  if ($attribute && $attr_type eq 'parent_oid' ) {
+    my($paroid,$rank)= ($attribute, 0);
+    if ($paroid  =~ s/:(.*)$//) {  $rank=$1; } # dont need rank, but must drop from paroid
+
+    $fob->{paroid}= $paroid; ## replace OLD ok ??
+    ## push( @{$fob->{attr}}, "rank\t$attribute"); # ? need this for exon, utr - but tied to parent_oid
+    
+    ## ? got dupl parent_oid for dpse genscan/twinscan genes only ?? screen here? -- gff output only?
+    ## >> problem looks like oids are duplicated among gene/mRNA/CDS and the related genscan/genewise/twinscan/... objects
+    
+    $oidobs->{$paroid}->{child}= [] unless (ref $oidobs->{$paroid}->{child});
+    push( @{$oidobs->{$paroid}->{child}}, $fob);   ##? use $rank to position in {child} array ??
+
+    $oidobs->{$oid}->{parent}= [] unless (ref $oidobs->{$oid}->{parent});
+    push( @{$oidobs->{$oid}->{parent}}, $paroid);
+  }
+}
+
+sub updateParentKidLinks
+{
+	my $self= shift;
+  my($fobs,$oidobs)=  @_;
+  foreach my $fob (@$fobs) {  
+    $self->update1ParentKidLinks($fob,$oidobs);
+    }
+}
+
+sub update1ParentKidLinks
+{
+	my $self= shift;
+  my($fob,$oidobs)=  @_;
+  
+  ## my $paroid= $fob->{paroid}; ## FIXME: exons have many parent 
+  return unless( $fob->{paroid} );
+  
+  my $oid = $fob->{oid};
+  my $type= $fob->{type};
+  
+  foreach my $paroid ( @{$oidobs->{$oid}->{parent}} ) {
+  
+  my $parob= $oidobs->{$paroid}->{fob};
+  unless($parob) {
+    warn "> MISSING parent ob $paroid for $type:$oid\n"
+      unless ($type =~ /match_part|cytology|band|oligo|BAC/); # || $id =~ /GA\d/
+      # these match parts miss parent often: 'repeat|blast|genscan|sim4'
+    next; # return;
+    }
+      
+    ## another fixup for  CDS/protein-of-mRNA feature set
+    ## was bad  - simplefeat included gene, pseudogene 
+    ## dang; now gene children: 
+    # insertion, aberration_junction,regulatory_region,
+    # sequence_variant,rescue_fragment, enhancer, etc are missing
+    # -> only gone from fff, not gff
+    
+    ##   <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+
+  if ($rename_child_type && $fob->{type} ne 'mRNA' 
+        && $fob->{type} =~ m/^($rename_child_type)/) {
+    # this is  bad for real gene subfeatures like point_mutation
+    my $ptype= $fob->{type};
+    
+    ## feb05:
+    ## this is causing problems for featuretype purists ; should leave 'gene' and subtype \w+RNA
+    ## as is ?? but fix software to process right; use fulltype == orig; type = recoding ?
+    
+    if ($parob && ( $parob->{type} eq 'gene' || $parob->{type} eq $ptype) ) { 
+      ##$parob->{fulltype}= $parob->{type}= $ptype; 
+      ##$fob->{fulltype}= $fob->{type}= 'mRNA'; 
+      $parob->{type}= $ptype; 
+      $fob->{type}= 'mRNA'; 
+      }
+    # warn ">pse2: $arm,$fmin,".$parob->{type}."/".$fob->{type}.",$name,$oid,$l_oid\n" if $DEBUG; 
+    }
+
+  if ($fob->{type} =~ m/^(mRNA|CDS)$/) {  
+   
+    ## for genscan/twinscan etc mrna's - retype as parent gene_pred type
+    if ($parob->{type} =~ m/^gene([_:.-]\w+)/ ) { 
+      $fob->{type} .= $1; 
+      if ($parob->{fulltype} =~ m/^gene([_:.-]\w+)/ ) { $fob->{fulltype} .= $1; }
+      }
+      
+    # copy gene id dbxref attr  
+    # got gene ids to all mRNA; missing some in CDS; need to do CDS after mRNA
+    my $idpattern= $self->{idpattern};
+    foreach my $pidattr (@{$parob->{attr}}) { 
+      next if ($pidattr =~ m/2nd/); #? dbxref_2nd:
+      if (!$idpattern || $pidattr =~ m/$idpattern/) { ## (FBgn|FBti)\d+   
+        push( @{$fob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$fob->{attr}});  
+        last; # add only 1st/primary
+        }
+      }
+    }
+
+  }
+  
+}
+
+
 sub processChadoTable
 {
 	my $self= shift;
   my($fh, $outh)=  @_;
-  
+   
   $outh= $self->{outh} unless(ref $outh);
   my %origin_one= %{ $self->{config}->{origin_one} || {} };
   my $utrpatch= $self->{utrpatch} ; 
@@ -600,18 +787,45 @@ sub processChadoTable
   my ($l_arm,$l_oid,$l_fmin,$l_fmax,$l_type)= (0,0,0);
   my ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute) ;
   my($s_type, $fulltype, $s_arm, $armfile, $s_name, $s_id);
-  my $fin;
+  my ($fin,$fhpeek);
   
-  while(<$fh>){
-    next unless(/^\w/);
-    next if(/^arm\tfmin/); # header from sql out
-    $ndone++; 
-    chomp;
-    $fin=$_;
+  #? use line buffer @fhpeek to grep for missing forward refs ? eg. PA for mRNA ?
+  $self->{linebuf}= [];
+
+#   while(<$fh>) {
+#     next unless(/^\w/);
+#     next if(/^arm\tfmin/); # header from sql out
+#     chomp; 
+#     $fin=$_; }
     
+  while( $fin= $self->getline($fh) ) {
+    $_= $fin;
+    $ndone++; 
+    my @addattr=();
+
+    ##? loop here over <$fh> while $oid == $l_oid ? all lines of 1 object
+    ## only part changing is $attr_type/$attribute
+    my $sameoid= 0;
+    do { 
+
     #($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute) = (0)x20;
     ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute) 
       = split("\t",$fin);  
+    
+    ## this inner read loop may be problem: need to process parent_oid attrib only once below !
+    my $nextin= $self->peekline(0);
+    my $joid= index($nextin,"$id\t$oid");
+    $sameoid= ($joid>0);
+    if ($sameoid) {
+      my $ioid= index($fin,"$id\t$oid");
+      $sameoid= ($ioid==$joid && substr($nextin,0,$ioid) eq substr($fin,0,$ioid) );
+      if ($sameoid) {
+        $fin= $self->popline();
+        if ($attribute) { push( @addattr, "$attr_type\t$attribute");  $attribute= undef; }
+        }
+      }
+    } while ($sameoid);
+    
     #my $tss= ($DEBUG && $type eq 'transcription_start_site');
     #warn ">tss1: $arm,$fmin,$type,$name,$oid,$l_oid\n" if $tss; 
 
@@ -654,34 +868,35 @@ sub processChadoTable
     # ($id,$s_id)= $self->remapId($type,$id,$name); 
 
     ($name,$s_name)= $self->remapName($type,$name,$id,$fulltype); 
-      #warn ">tss2b: new $arm,$fmin,$oid\n" if $tss;
+    
+    ## dmelr4.1 patch; cant do this for all dropid - gff needs real ids for exons for instance
+    #if (($dropid{$type} || $nameisid{$type}) && $name) { $id= $name; } ## 
+    ## do this in remapId ..
+    ## if (($nameisid{$type}) && $name) { $id= $name; } ## ? not for gff 
 
+    my $loc="$fmin\t$fmax\t$strand";
+    
     ##  problem: processed_transcript  .. dbxref  genbank:FBg..
     if ($type eq 'processed_transcript' && $attribute) {
       $attribute= undef if ($attribute !~ /^FlyBase/);
       }
-    elsif ($type eq 'chromosome_band' && !$attribute) {
-      $attr_type = 'cyto_range';
-      $attribute = $s_name;  
-      $attribute =~ s/(cyto|band|\-)//g;
+      
+      # dmelr4.1 - need add band attrib even if attrib == parent_oid
+    elsif ($type eq 'chromosome_band') { ##  && !$attribute
+      my $battr_type = 'cyto_range';
+      my $battribute = $s_name;  
+      $battribute =~ s/(cyto|band|\-)//g;
+      push( @addattr, "$battr_type\t$battribute");  
       $name =~ s/\-cyto//;
       }
 
-    my $loc="$fmin\t$fmax\t$strand";
-
-    my @addattr=();
     if ($attribute) {  
-
-      #if ($attr_type eq 'to_name' && !$s_name) { # orthologous_region only?
-        # $name= $attribute; #?? "ortho:".$attr; add to_species ?
-        # change name in $fob if  $oid eq $l_oid 
-        #}
 
       # $attr_type='species2' if ($attr_type eq 'to_species'); #??why; add config attr remappers?
       ##if ($to_species) {  push( @addattr, "species2\t$to_species");  }
       ##if ($an_program) {  push( @addattr, "analysis\t$an_program:$an_source");  }
       # add dbxref_2nd patch? ; do we want to rename db here - looks like Gadfly from 2ndary/old ids
-      # $attribute =~ s/Gadfly:/FlyBase:/ if ($attr_type =~ m/^dbxref/);
+
       push( @addattr, "$attr_type\t$attribute");  
       }
     
@@ -746,17 +961,12 @@ sub processChadoTable
       push( @{$fob->{loc}},  $loc) unless(grep /$loc/,@{$fob->{loc}});  
       #warn ">tss2S: new $arm,$fmin,$oid,$l_oid\n" if $tss;
       
-      foreach my $at (@addattr) {
-        push( @{$fob->{attr}}, $at)
-          unless( grep {$at eq $_} @{$fob->{attr}});  
-        }
       }
       
     else {
       
       ## new feature object here ..
       
-      # if ($armfile ne $l_arm)  
       if ($arm ne $l_arm) {
         $self->putFeats($outh,\@fobs,\%oidobs,'final'); 
         undef @fobs;  @fobs=();
@@ -765,12 +975,22 @@ sub processChadoTable
         $max_max=0; $min_max= 0;
 
         $outh= $self->openCloseOutput($outh, $arm, 'open');
-        ## start new files / chr - fff, gff, fasta - need file opener/closer
         }
         
         #? do we need to set a max @fbobs ?
-      if ($fmin >= $max_max && $fmin > $min_max && scalar(@fobs)>5)  #= reset
-        { 
+        ## is this where we lose PA/CDS associated with mRNA/gene ? havent got to yet before putFeats?
+        
+      my $flushok= ($fmin >= $max_max && $fmin > $min_max && scalar(@fobs)>5);
+      if ($flushok) {
+        if ($self->hasObForwards(\@fobs, \%oidobs)) {
+          $flushok = 0;
+          $min_max= $fmin + 2000; ##smaller step so we dont miss chance to flush
+          }
+        warn "hasObForwards no=$flushok at $fmin $type:$name $oid\n" if ($DEBUG>1);
+        }
+        
+      if ($flushok) { 
+        ##warn "flushobs at $fmin $type:$name $oid\n" if $DEBUG;
         my ($nstart, $nleft, $nobs)=(0,0,0);
         if ($DEBUG>1) { $nobs= scalar(@fobs); }
         
@@ -815,83 +1035,119 @@ sub processChadoTable
       ##warn ">tss2x: new $arm,$fmin,$oid\n" if $tss;
 
       push( @{$fob->{loc}},  $loc);  
-      foreach my $at (@addattr) { push( @{$fob->{attr}}, $at); }
+      ##moved below## foreach my $at (@addattr) { push( @{$fob->{attr}}, $at); }
       }
     
     ## make oid crossref here so outputters know feature relations
-    if ($attribute && $attr_type eq 'parent_oid' 
-      && !$simplefeat{$type} ## problem for segments, etc and gffForwards 
-        ##  mature_peptide attached to protein-CDS - causes 2nd CDS feature 
-        ##  really need to turn into compound feature of its own (not CDS) 
-      ) {
-    
-      (my $paroid= $attribute) =~ s/:(.*)$//;
-      # my $rank= ($1) ? $1 : 0;
-      ####push( @{$fob->{attr}}, "rank\t$attribute");  
-        # ? need this for exon, utr - but tied to parent_oid
-      
-      $oidobs{$paroid}->{child}= [] unless (ref $oidobs{$paroid}->{child});
-      ##? use $rank to position in {child} array ??
-      push( @{$oidobs{$paroid}->{child}}, $fob); 
+    ## change this (see above $samoid read loop)
+    ## FIXME 05: this sub should be run only after forward parent_oid is found;
+    ## or change input to sort given model gene > mRNA > CDS (ignoring seq start)
+    foreach my $at (@addattr) {
+      my $paroid='';
+      if ($at =~ /parent_oid\t(.+)/) { $paroid=$1; } 
+      push( @{$fob->{attr}}, $at)
+        ; # unless( grep {$at eq $_} @{$fob->{attr}});  #? do we have any dupls?
 
-      ## need to either skip parent/child here or in gff forward for these types
-      ##    $simplefeat{$type} or $segmentfeats{$type}; # dont do parent for these ... ?
-
-      $oidobs{$oid}->{parent}= [] unless (ref $oidobs{$oid}->{parent});
-      push( @{$oidobs{$oid}->{parent}}, $paroid);
- 
-#       if ($fob->{type} ne 'mRNA' && $fob->{type} =~ m/^(pseudogene|\w+RNA)/) {
-#         warn ">pse1: $arm,$fmin,$fob->{type},$name,$oid,$l_oid\n" if $DEBUG; 
-#         }
-        
-      ## another fixup for  CDS/protein-of-mRNA feature set
-      ## was bad  - simplefeat included gene, pseudogene 
-      ## dang; now gene children: 
-      # insertion, aberration_junction,regulatory_region,
-      # sequence_variant,rescue_fragment, enhancer, etc are missing
-      # -> only gone from fff, not gff
-      
-      
-      if ($rename_child_type && $fob->{type} ne 'mRNA' && $fob->{type} =~ m/^($rename_child_type)/) {
-        # this is  bad for real gene subfeatures like point_mutation
-        my $ptype= $fob->{type};
-        my $parob= $oidobs{$paroid}->{fob};
-        if ($parob && ( $parob->{type} eq 'gene' || $parob->{type} eq $ptype) ) { 
-          $parob->{fulltype}= $parob->{type}= $ptype; 
-          $fob->{fulltype}= $fob->{type}= 'mRNA'; 
-          }
-        # warn ">pse2: $arm,$fmin,".$parob->{type}."/".$fob->{type}.",$name,$oid,$l_oid\n" if $DEBUG; 
+       ## REMEMBER SOME (exons) HAVE MULTIPLE parent_oid attributes 
+      if ($paroid && !$simplefeat{$type}) { 
+#         my $genepatt=join('|', 'gene','mRNA','exon',@GModelParts);
+#         warn "newob $fmin $type:$name $oid $paroid\n" 
+#           if($DEBUG && $type =~ m/^($genepatt)$/);
+          
+        $self->newParentOid($fob, 'parent_oid', $paroid, \%oidobs);  
         }
-
-      if ($fob->{type} =~ m/^(mRNA|CDS)$/) {
-        my $parob= $oidobs{$paroid}->{fob};
-        if ($parob) {
-          ## for genscan/twinscan etc mrna's - retype as parent gene_pred type
-          if ($parob->{type} =~ m/^gene([_:.-]\w+)/ ) { 
-            $fob->{type} .= $1; 
-            if ($parob->{fulltype} =~ m/^gene([_:.-]\w+)/ ) { $fob->{fulltype} .= $1; }
-            }
-          # copy FBgn dbxref attr - ? do also for CDS
-          my $idpattern= $self->{idpattern};
-          foreach my $pidattr (@{$parob->{attr}}) { 
-            next if ($pidattr =~ m/dbxref_2nd:/); #?
-            if (!$idpattern || $pidattr =~ m/$idpattern/) { ## (FBgn|FBti)\d+/  
-              push( @{$fob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$fob->{attr}});  
-              last; # add only 1st/primary
-              }
-            }
-          }
-        }
-        
-      # repair bad names -- do below
+      
       }
-    
+      
+    # $self->newParentKidLink($fob, \%oidobs); # uses @{$fob->{attr}} parent_oid
+
+    ## MOVED below TO putFeats: $self->update1ParentKidLinks($fob, \%oidobs);
+
+#     foreach my $addattr (@addattr) { 
+#       ($attr_type,$attribute)= split "\t",$addattr; 
+#     
+#     if ($attribute && $attr_type eq 'parent_oid' 
+#       && !$simplefeat{$type} ## problem for segments, etc and gffForwards 
+#         ##  mature_peptide attached to protein-CDS - causes 2nd CDS feature 
+#         ##  really need to turn into compound feature of its own (not CDS) 
+#       ) {
+#     
+#       (my $paroid= $attribute) =~ s/:(.*)$//;
+#       # my $rank= ($1) ? $1 : 0;
+#       ####push( @{$fob->{attr}}, "rank\t$attribute");  
+#         # ? need this for exon, utr - but tied to parent_oid
+#       
+#       $oidobs{$paroid}->{child}= [] unless (ref $oidobs{$paroid}->{child});
+#       ##? use $rank to position in {child} array ??
+#       push( @{$oidobs{$paroid}->{child}}, $fob); 
+# 
+#       ## need to either skip parent/child here or in gff forward for these types
+#       ##    $simplefeat{$type} or $segmentfeats{$type}; # dont do parent for these ... ?
+# 
+#       $oidobs{$oid}->{parent}= [] unless (ref $oidobs{$oid}->{parent});
+#       push( @{$oidobs{$oid}->{parent}}, $paroid);
+#  
+# #       if ($fob->{type} ne 'mRNA' && $fob->{type} =~ m/^(pseudogene|\w+RNA)/) {
+# #         warn ">pse1: $arm,$fmin,$fob->{type},$name,$oid,$l_oid\n" if $DEBUG; 
+# #         }
+#         
+#       ## another fixup for  CDS/protein-of-mRNA feature set
+#       ## was bad  - simplefeat included gene, pseudogene 
+#       ## dang; now gene children: 
+#       # insertion, aberration_junction,regulatory_region,
+#       # sequence_variant,rescue_fragment, enhancer, etc are missing
+#       # -> only gone from fff, not gff
+#       
+#       ##   <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+# 
+#       if ($rename_child_type && $fob->{type} ne 'mRNA' 
+#             && $fob->{type} =~ m/^($rename_child_type)/) {
+#         # this is  bad for real gene subfeatures like point_mutation
+#         my $ptype= $fob->{type};
+#         my $parob= $oidobs{$paroid}->{fob};
+#         
+#         ## feb05:
+#         ## this is causing problems for featuretype purists ; should leave 'gene' and subtype \w+RNA
+#         ## as is ?? but fix software to process right; use fulltype == orig; type = recoding ?
+#         
+#         if ($parob && ( $parob->{type} eq 'gene' || $parob->{type} eq $ptype) ) { 
+#           ##$parob->{fulltype}= $parob->{type}= $ptype; 
+#           ##$fob->{fulltype}= $fob->{type}= 'mRNA'; 
+#           $parob->{type}= $ptype; 
+#           $fob->{type}= 'mRNA'; 
+#           }
+#         # warn ">pse2: $arm,$fmin,".$parob->{type}."/".$fob->{type}.",$name,$oid,$l_oid\n" if $DEBUG; 
+#         }
+# 
+#       if ($fob->{type} =~ m/^(mRNA|CDS)$/) {
+#         my $parob= $oidobs{$paroid}->{fob};
+#         if ($parob) {
+#           ## for genscan/twinscan etc mrna's - retype as parent gene_pred type
+#           if ($parob->{type} =~ m/^gene([_:.-]\w+)/ ) { 
+#             $fob->{type} .= $1; 
+#             if ($parob->{fulltype} =~ m/^gene([_:.-]\w+)/ ) { $fob->{fulltype} .= $1; }
+#             }
+#           # copy FBgn dbxref attr - ? do also for CDS
+#           my $idpattern= $self->{idpattern};
+#           foreach my $pidattr (@{$parob->{attr}}) { 
+#             next if ($pidattr =~ m/dbxref_2nd:/); #?
+#             if (!$idpattern || $pidattr =~ m/$idpattern/) { ## (FBgn|FBti)\d+/  
+#               push( @{$fob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$fob->{attr}});  
+#               last; # add only 1st/primary
+#               }
+#             }
+#           }
+#         }
+#         
+#       # repair bad names -- do below
+#       }
+#     } # end @attrib
     
     ## forward ref checkpoint .. maybe skip more than segmentfeats here ? what is big?
     if ($fmax > $max_max && !$segmentfeats{$fob->{type}}) {
       $max_max= $fmax; 
       my $supermax= $min_max - MIN_FORWARD_RANGE + MAX_FORWARD_RANGE;   
-      $max_max= $supermax if ($max_max > $supermax);
+      $max_max= $supermax if ($max_max > $supermax); # is it < or > ? was > (set to SMALLER)
       }
     
     ## only need save these:
@@ -940,8 +1196,21 @@ but missing in fff output
    18716   protgn.list
    13458   protgnuniq.list -- diff from gene.list below
 
->> several of these missing prots are in features.tsv as CDS, not in fff output tho !?
+.. feb04, dmelr41 check .. still missing some PA entries in fff, found in gff, featdump
 
+chipmunk% comm -3 genecg41.list prot*list
+ ;; these -Px proteins are in featdump, .gff, not .fff
+CG10272 -- 3R
+CG10324 -- 3R
+CG11798 -- 2R
+CG12591 -- 3R
+CG17998 -- 3R
+CG31092 -- 3R
+CG3973 -- X
+CG4993 -- 2L
+CG5789 -- 3R
+
+>> several of these missing prots are in features.tsv as CDS, not in fff output tho !?
 dghome2% comm -3 gene.list protgnu.list
 CG11989   3L
 CG18675   3L
@@ -960,52 +1229,13 @@ CG7369
 CG8742
         Gyc76C == CG8742 
 
-2L      11282092        11284337        1       1       gene    mre11   CG16928 3144718 dbxref  FlyBase:FBgn0020270
-2L      18125258        18134139        -1      1       gene    kel     CG7210  3149621 dbxref  FlyBase:FBgn0001301
-2R      15015156        15016159        -1      1       gene    CG16926 CG16926 3182027 dbxref  FlyBase:FBgn0040732
-2R      18004079        18069646        -1      1       gene    px      CG4444  3094781 dbxref  FlyBase:FBgn0003175
-3L      4157384 4176500 1       1       gene    CG18675 CG18675 3103081 dbxref  FlyBase:FBgn0040696
-3L      5971160 6000157 1       1       gene    CG32406 CG32406 3125921 dbxref  FlyBase:FBgn0052406
-3L      7624529 7733071 1       1       gene    CG32373 CG32373 3124495 dbxref  FlyBase:FBgn0052373
-3L      9946189 9947970 1       1       gene    CG11989 CG11989 3121762 dbxref  FlyBase:FBgn0036064
-3L      22675904        22682457        1       1       gene    CG7369  CG7369  3134649 dbxref  FlyBase:FBgn0037188
-3R      11022333        11028699        1       1       gene    CG4196  CG4196  3161431 dbxref  FlyBase:FBgn0038297
-3R      13757594        13841516        1       1       gene    cpo     CG31243 3164388 dbxref  FlyBase:FBgn0000363
-3R      18725023        18787456        1       1       gene    klg     CG6669  3169260 dbxref  FlyBase:FBgn0017590
-3R      22624764        22668125        1       1       gene    Tl      CG5490  3173761 dbxref  FlyBase:FBgn0003717
-X       9931753 9983936 1       1       gene    CG12094 CG12094 3092421 dbxref  FlyBase:FBgn0030179
-X       10800804        10801941        1       1       gene    CG16922 CG16922 3104168 dbxref  FlyBase:FBgn0030254
-X       14156162        14296308        1       1       gene    CG32600 CG32600 3107250 dbxref  FlyBase:FBgn0052600
-X       20240356        20243886        1       1       gene    mal     CG1692  3127426 dbxref  FlyBase:FBgn0002641
-
 for this case CG18675; gff has right data, fff lacks CDS,three_prime_UTR
 distance is gene:4157385 to CDS:4157485 = 100 b
 
 chipmunk% gunzip $dr/gff.save/*gz
 grep CG18675 ../../gff.chipmunk% grep CG18675 ../../gff.save//*3L*ff
-3L      .       five_prime_UTR  4157385 4157484 .       +       .       ID=CG18675-RA-u5;Dbxref=FlyBase:FBgn0040696;Parent=CG18675-RA
-3L      .       exon    4157385 4157859 .       +       .       ID=CG18675:1;Parent=CG18675-RA
-3L      .       gene    4157385 4176500 .       +       .       ID=CG18675;Dbxref=FlyBase:FBan0018675,FlyBase:FBgn0040696;cyto_range=64A10-64A10;gbunit=AE003480;synonym=CG18675
-3L      .       mRNA    4157385 4176500 .       +       .       ID=CG18675-RA;Dbxref=FlyBase:FBtr0073218,FlyBase:FBgn0040696;Parent=CG18675;dbxref_2nd=Gadfly:CG18675-RA;synonym=CG18675-RA
-3L      sim4:na_transcript_dmel_r31     match   4157385 4176500 .       +       .       ID=:857891_sim4;Name=CG18675-RA.31
-3L      sim4:na_transcript_dmel_r32     match   4157385 4176500 .       +       .       ID=:279181_sim4;Name=CG18675-RA.32
-3L      .       CDS     4157485 4175834 .       +       .       ID=CG18675-PA;Dbxref=FlyBase:FBpp0073074,GB_protein:AAF47852.3,FlyBase:FBgn0040696;Parent=CG18675-RA;dbxref_2nd=Gadfly:CG18675-PA;synonym=CG18675-PA
-3L      .       intron  4157860 4157925 .       +       .       ID=intron_CG18675:1_CG18675:2;Name=CG18675-in;Parent=CG18675-RA
-3L      .       exon    4157926 4158195 .       +       .       ID=CG18675:2;Parent=CG18675-RA
-3L      .       intron  4158196 4158257 .       +       .       ID=intron_CG18675:2_CG18675:3;Name=CG18675-in;Parent=CG18675-RA
-3L      .       exon    4158258 4158374 .       +       .       ID=CG18675:3;Parent=CG18675-RA
-3L      .       intron  4158375 4175723 .       +       .       ID=intron_CG18675:3_CG18675:4;Name=CG18675-in;Parent=CG18675-RA
-3L      .       transposable_element_insertion_site     4172023 4172024 .       -       .       ID=FBti0039011;Name=P{EPgy2}CG18675[EY10307];synonym=P{EPgy2}CG18675<up>EY10307</up>
-3L      .       exon    4175724 4176500 .       +       .       ID=CG18675:4;Parent=CG18675-RA
-3L      .       three_prime_UTR 4175838 4176500 .       +       .       ID=three_prime_UTR_CG18675:4_161;Name=CG18675-u3;Parent=CG18675-RA
 
 chipmunk% grep CG18675 ../../fff.save//*3L*ff
-3L      4157385 gene    CG18675 64A10-64A10     4157385..4176500        CG18675 FlyBase:FBan0018675;FlyBase:FBgn0040696;      gbunit=AE003480;synonym=CG18675;
-3L      4157385 mRNA    CG18675-RA      -       4157385..4157859        CG18675-RA      FlyBase:FBtr0073218;FlyBase:FBgn0040696;Gadfly:CG18675-RA;    synonym=CG18675-RA;
-3L      4157385 five_prime_UTR  CG18675-RA-u5   -       4157385..4157484        CG18675-RA-u5   FlyBase:FBgn0040696;
-3L      4157385 match:sim4:na_transcript_dmel_r31       CG18675-RA.31   -       4157385..4157859     -
-3L      4157385 match:sim4:na_transcript_dmel_r32       CG18675-RA.32   -       4157385..4157859     -
-3L      4172023 transposable_element_insertion_site     P{EPgy2}CG18675[EY10307]        -       complement(4172023..4172024)  FBti0039011             synonym=P{EPgy2}CG18675<up>EY10307</up>;
 
 =cut
 
@@ -1032,7 +1262,8 @@ sub  makeFlatFeats
 ## missing exons: CG10033 (2L?)
 ## missing proteins: 3L CG11989 CG18675 CG32373 CG32406
 
-    my $GMM= ($DEBUG && $id =~ /CG11989|CG18675|CG32373|CG32406/) ? 1 : 0; # jan05 bug test, mRNA misses last 2 exons
+    ##my $GMM= ($DEBUG && $id =~ /CG11989|CG18675|CG32373|CG32406/) ? 1 : 0; # jan05 bug test, mRNA misses last 2 exons
+    my $GMM= 0; ##($DEBUG && $id =~ /CG4993|CG11798|CG10272|CG3973/) ? 1 : 0; # feb05 bug test, mRNA misses last 2 exons
     
     if (!$issimple && $oidob) {
       $iskid= (defined $oidob->{parent} && @{$oidob->{parent}} > 0);
@@ -1054,14 +1285,14 @@ sub  makeFlatFeats
       #NEED THIS# $issimple = 1 if ($ftype =~ m/^gene$/); #?? otherwise misc. gene parts GMM get flagged as written
       
       if ($issimple) { push(@cobs, $fob); } # simple feature
-      else {
+      else {              # has kids, make compound feature
         my $kidobs= $oidob->{child};
-        # has kids, make compound feature
         my $cob= $self->makeCompound( $fob, $kidobs, $ftype); 
         push(@cobs, $cob);
+        # $self->listkids($cob,$kidobs) if($DEBUG && $ftype =~ m/^(gene|mRNA)$/);  ## was loosing kids to bad $oidobs
         }
       warn ">gmm2 add $ftype $id \n" if $GMM;
-      _debugObj("gmmisc=$id object",$cobs[-1]) if $GMM;
+      ## _debugObj("gmmisc=$id object",$cobs[-1]) if $GMM;
       }
     
       # UTR here ? ?? insert CDS between UTR's ?
@@ -1147,6 +1378,7 @@ DEBUG obj: par=CG18001-RA objects={
         my $exonobs=[];
         my $mrnaexons=[];
         my $kidobs=[];
+        
         foreach my $kidob (@{$oidob->{child}}) {  
  
           if ($kidob->{type} eq 'exon') { ## $ftname eq 'CDS' && 
@@ -1172,16 +1404,6 @@ DEBUG obj: par=CG18001-RA objects={
             $utrob= $kidob unless($utrob);
             push(@$kidobs, $kidob); 
             
-            ## double dang - want to copy gene model dbxref id into  these features, as per above
-            my $idpattern= $self->{idpattern};
-            foreach my $pidattr (@{$fob->{attr}}) { 
-              next if ($pidattr =~ m/dbxref_2nd:/); #?
-              if (!$idpattern || $pidattr =~ m/$idpattern/) { ## (FBgn|FBti)\d+/  
-                push( @{$utrob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$utrob->{attr}});  
-                last; # add only 1st/primary
-                }
-              }
-            
             # repair bad names
             my $part="";
             if ($ftname eq 'three_prime_UTR') {  $part= "-u3";  }
@@ -1192,6 +1414,7 @@ DEBUG obj: par=CG18001-RA objects={
               $utrob->{id}= $fob->{id}.$part;
               }
             }
+            
           }
         
           ## ERROR -  CDS/protein w/o CDS_exon parts - not harvard chado 'reporting' db
@@ -1203,7 +1426,17 @@ DEBUG obj: par=CG18001-RA objects={
           }
          
         if ($utrob) { ## @$kidobs < do even if no kidobs ???
-  
+
+            ## copy gene model dbxref id into  these features, as per above
+          my $idpattern= $self->{idpattern};
+          foreach my $pidattr (@{$fob->{attr}}) { 
+            next if ($pidattr =~ m/2nd/);   #dbxref_2nd:
+            if (!$idpattern || $pidattr =~ m/$idpattern/) { 
+              push( @{$utrob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$utrob->{attr}});  
+              last; # add only 1st/primary
+              }
+            }
+            
           if ($ftname =~ /UTR/ && $self->{utrpatch}) {
             $self->patchUTRs( $utrob, $cdsob, $mrnaexons, $kidobs);
             }
@@ -1211,7 +1444,8 @@ DEBUG obj: par=CG18001-RA objects={
           ##print STDERR "makeCompound $ftname par=$id, kid=",$utrob->{id},  "\n" if $DEBUG;
           # below # if ($ftname eq 'CDS') { $kidobs= adjustCDSendpoints( $utrob, $kidobs); }
           my $cob= $self->makeCompound( $utrob, $kidobs, $ftname); 
-          
+          # $self->listkids($cob,$kidobs) if($DEBUG);  ## was loosing kids to bad $oidobs
+
             # patch bad data -- use getCDSexons above ??
           if ($id =~ /CG32491/ && $ftname eq 'CDS') {  
             my @exlocs=();
@@ -1304,6 +1538,26 @@ sub getCDSexons
   return \@cdsobs;
 }
 
+
+sub listkids { ## DEBUG only
+	my $self= shift;
+  my ($cob,$kidobs)= @_;
+
+  my $name=$cob->{name};
+  my $ftype=$cob->{type};
+  my @locs= @ { $cob->{loc} };
+  print STDERR "COB $ftype:$name";
+  print STDERR " locs=",join(",",@locs);
+
+  print STDERR " kids=";
+  foreach my $kid (@$kidobs) {  
+    print STDERR  $kid->{type},":",$kid->{name}," ";
+    print STDERR join(",", @{$kid->{loc}})," ";
+    }
+  print STDERR "\n";
+}
+
+
 =item  makeCompound($fob,$kidobs,$ftype)
 
   create compound feature from parent, kids (e.g., mRNA + exons)
@@ -1338,10 +1592,16 @@ sub makeCompound
   ## FIXME - for dang transspliced mod(mdg4) - if strands in locs differ -> getLocation
   
   my @locs= ();
+  #my @kidlist=(); ## debug only?
   
   ## need to skip kids for 'gene', others ?
   foreach my $kid (@$kidobs) {
+  
     ##next if ($fob->{type} eq 'mRNA' && $kid->{type} ne 'exon');
+    #if ($DEBUG && $fob->{type} =~ m/^(mRNA|gene)$/) {
+    #  push(@kidlist, $kid->{name}, $kid->{type});
+    #  }
+      
     next if ($fob->{type} =~ m/^(mRNA|gene)$/ && $kid->{type} ne 'exon');
     if ($ftype eq 'CDS' && $kid->{type} eq 'mature_peptide')
     {
@@ -1362,6 +1622,7 @@ sub makeCompound
     foreach my $loc (@{$fob->{loc}}) { push( @locs, $loc);  }
     }
   $cob->{loc}= \@locs;
+  # $cob->{kidlist}= \@kidlist if ($DEBUG); ## debug only?
     
   return $cob;
 }
@@ -1371,10 +1632,11 @@ sub makeCompound
 =item getLocation($fob,@loc)
   
   get feature genbank/embl/ddbj location string (FTstring)
-  including transplice messes
+  including transplice complexity
   
-  return ($location, $start);
+  return ($location, $start, $strand);
 
+## feb05: need to preserve strand==0/undefined for some features which have mixture
 ## fixed - for dang transspliced mod(mdg4) - if strands in locs differ 
 ### looks like chado pg reporting instance with CDS_exons is bad for transspliced mod(mdg4)
 
@@ -1451,7 +1713,7 @@ sub getLocation
   if ($l_strand < 0) { $srange= "complement($srange)"; }
   elsif($srange =~ m/,/) { $srange= "join($srange)"; }
   
-  return ($srange, $bstart);
+  return ($srange, $bstart, $l_strand);
 }
 
 
@@ -1630,7 +1892,7 @@ sub putFeats
   
   my $n= scalar(@$fobs);
   
-  if ($DEBUG>1 || $DEBUG && $flag =~ /final/) {
+  if ($DEBUG && $flag =~ /final/) { # $DEBUG>1 || 
     print STDERR "putFeats n=$n, total=".($n+$ntotalout)
     .", oid1=".(($n>0)?$fobs->[0]->{oid}:0)."\n";
     }
@@ -1638,6 +1900,7 @@ sub putFeats
     print STDERR ".";
     }
     
+  $self->updateParentKidLinks($fobs, $oidobs); #05feb: logic change ; was in processChadoTable
    
   if ($outh->{fff}) { ## || $outh->{fasta} < moved out
     my $ffh= $outh->{fff};
@@ -1658,6 +1921,7 @@ sub putFeats
       }
     
     undef $cobs;
+    $ffh->flush();
     $ntotalout += $nout;
   }
   
@@ -1686,6 +1950,7 @@ sub putFeats
     if ($flag =~ /final/) {
       while (@gffForwards) { $self->writeGFF( $gffh,shift @gffForwards,$oidobs) ; }
       }
+    $gffh->flush();
     }
 }
 
@@ -1855,7 +2120,7 @@ sub setDefaultValues
     ##processed_transcript => 1,
     ##### protein => 1, # only if not CDS!!!
     );
-    
+  %keepstrand=();  
   %hasdups = (
     exon => 1,
     three_prime_UTR => 1,
@@ -1905,6 +2170,15 @@ sub writeFFF1header
 }
 
 
+sub _fffEscape
+{
+  my $v= shift;
+  # $v =~ tr/ /+/; #? leave in spc ?
+  $v =~ s/([\t\n\=&;,])/sprintf("%%%X",ord($1))/ge;  
+  return $v;
+}
+
+
 =item getFFF v1
 
   return tab-delimied feature lines in this format 
@@ -1939,11 +2213,17 @@ sub getFFF
   if ($ftop && $featname =~ /^$ftop/) { $featname= $fulltype; } #?? want this 
   
   my $sym= $fob->{name} || '-';
+  $sym = _fffEscape($sym);
+  
   my $map= '-';
   my $dbxref=""; my $dbxref_2nd="";
   my $notes= "";
   foreach (@attr) {
     my ($k,$v)= split "\t";
+
+    ## synonym_2nd=ribosomal protein S3&agr;; << problem; escape
+    $v = _fffEscape($v);  # _gffEscape; at least any [\t\n\=&;,]
+
     if ($k eq "parent_oid" || $k eq "object_oid") {
       ##$v =~ s/:.*$//; #$v= $oidmap{$v} || $v;
       ##$at .= "Parent=$v;" 
@@ -1962,11 +2242,14 @@ sub getFFF
 
   $dbxref .= $dbxref_2nd; # aug04: making sure 2nd are last is enough to get 1st ID
   
-  my ($srange,$bstart);
+  my ($srange,$bstart,$strand);
   #my $srange = $fob->{location}; # computed already for transsplice ?
   #my $bstart = $fob->{start}; # computed already for transsplice ?
-  #unless($srange && defined $bstart) { ...
-  ($srange,$bstart) = $self->getLocation($fob,@loc);
+  #unless($srange && defined $bstart) ...
+  ($srange,$bstart,$strand) = $self->getLocation($fob,@loc);
+  
+  ## feb05: need to preserve strand==0/undefined for some features which have mixture
+  if ($strand == 0 && $keepstrand{$featname}) { $notes .= "strand=0;"; }
   
   ## add chr,start to front cols for sort-merge
   if ($fff_mergecols) {
@@ -2053,6 +2336,8 @@ sub splitGffType
   elsif ($type =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
     ($type,$gffsource)=($1,$2);
     }
+  else { $type= $fulltype; } #?? feb05; want snRNA not mRNA .. leave in fulltype ?
+  
   return($gffsource,$type);
 }
 
@@ -2060,7 +2345,7 @@ sub _gffEscape
 {
   my $v= shift;
   $v =~ tr/ /+/;
-  $v =~ s/([\t\n\=;,])/sprintf("%%%X",ord($1))/ge; # Bio::Tools::GFF _gff3_string escaper
+  $v =~ s/([\t\n\=&;,])/sprintf("%%%X",ord($1))/ge; # Bio::Tools::GFF _gff3_string escaper
   return $v;
 }
 
@@ -2075,7 +2360,6 @@ sub writeGFF
 {
 	my $self= shift;
   my($fh,$fob,$oidobs)= @_;
-  my $v;
   my $type= $fob->{type};
   my $fulltype= $fob->{fulltype};
   return if ($fob->{'writegff'});
@@ -2088,21 +2372,31 @@ sub writeGFF
   my @loc= @{$fob->{loc}};
   my @attr= @{$fob->{attr}};
   my $at="";
-  my @at=();
+  my @at= ();
+  my %at= ();
   
+=item  gff IDs
+
   ## gff3 loader is using ID for uniquename, unless give attr key for uniquename
   ## ? do we want to drop $oid and use id/dbid - is it always uniq in gff file?
-  ## below Parent from {id} is not working; need all forward refs resolved here
+
+  ## feb05; need to test parid != id; problem now w/ some features (match/match_part same id)
+  ## feb05 - EST's now have same ID for different location matches; need uniq gff id
+  ## sim4:na_dbEST.diff.dmel .. use object_oid ?
+
+=cut
   
+  if ($oidisid_gff{$type}) { $id= $oid; } 
+  
+  my $v;
   push @at, "ID="._gffEscape($id) if ($id); # use this for gff internal id instead of public id?
   push @at, "Name="._gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
   if ($gff_keepoids) {  push @at, "oid=$oid"; }
 
-  my %at= ();
   foreach (@attr) {
     my ($k,$v)= split "\t";
     if (!$v) { next; }
-    elsif ($k eq "object_oid") {}
+    elsif ($k eq "object_oid") { next; }
     elsif ($k eq "parent_oid") {
       if ($gff_keepoids) { $at{$k} .= ',' if $at{$k}; $at{$k} .= $v; }
       next if $segmentfeats{$type}; # dont do parent for these ... ?
@@ -2125,39 +2419,29 @@ sub writeGFF
 >> could be due to garbage collect. on oidobs; try MAX_FORWARD_RANGE+++
 >>  MAX_FORWARD_RANGE => 990000 seems to have fixed it
 
-openInput: name=X, type=feature_table, /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dm
-el_r4.0_20041119/tmp/featdump/chadofeat-dmelX.tsv
-# output /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dmel_r4.0_20041119/gff/dmel-X-r4
-.0.gff (append=0)
-.................................................................................................
-....GFF: missed Parent ID for i/o/t:CG32584-RB/3108194/mRNA parob= k/v=Parent/3108188 
-............................................putFeats n=608, total=608, oid1=5982090
-
-processChadoTable ndone = 637432
-
-openInput: name=3L, type=feature_table, /bio/argos/flybase/data/genomes/Drosophila_melanogaster/d
-mel_r4.0_20041119/tmp/featdump/chadofeat-dmel3L.tsv
-# output /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dmel_r4.0_20041119/gff/dmel-3L-r
-4.0.gff (append=0)
-................................................................................................G
-FF: missed Parent ID for i/o/t:Df(3L)st-k2.bk2/3204648/aberration_junction parob= k/v=Parent/3115
-834 
-....................GFF: missed Parent ID for i/o/t:CG3263-RB/4554565/mRNA parob= k/v=Parent/4554
-550 
-GFF: missed Parent ID for i/o/t:CG3263-RD/4554558/mRNA parob= k/v=Parent/4554550 
-............putFeats n=435, total=435, oid1=8313668
-
-processChadoTable ndone = 734624
-
-
 =cut
 
       my $parob= $oidobs->{$v}->{fob};
       if ($parob && $parob->{id}) {
         $v= $parob->{id};
+        if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
+        
+        if ($v eq $id) { ## FIXME .. ? try to use index in parent->{child} array ?
+          my $i= 1;
+          my $paroid= $parob->{oid};
+          my $kids = $oidobs->{$paroid}->{child};
+          if ($kids) { 
+          foreach my $kidob (@{$kids}) {
+            last if ($kidob->{oid} eq $oid);
+            $i++;
+            }
+           }
+          $id= "$id.$i";
+          $at[0]= "ID="._gffEscape($id);
+          }
         }
       else {
-        next if ($fulltype =~ /match_part/ || $id =~ /GA\d/); 
+        next if ($fulltype =~ /match_part|cytology|band|oligo|BAC/ || $id =~ /GA\d/); 
           # dpse GA genes; odd parent = csome; ignore parent here? FIXME
         print STDERR "GFF: missed Parent ID for i/o/t:",$id,"/",$oid,"/",$fulltype,
           " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
@@ -2170,7 +2454,7 @@ processChadoTable ndone = 734624
       }
       
     if ($k) {
-      $at{$k} .= ',' if $at{$k};
+      $at{$k} .= ',' if $at{$k}; # got duplicate Parent=aaa,aaa in dpse data; why?
       $at{$k} .= _gffEscape($v);  # should be urlencode($v) - at least any [=,;\s]
       }
     }

@@ -482,6 +482,11 @@ sub start_element {
       if ($atid) { 
         $attr->set( id => $atid); 
         $self->{idhash}{$atid}= $attr;  
+
+        if (/^dbxref$/ && $elpar eq 'dbxref_id') {
+          $self->{dbxref_id}= $atid;   ## feb05 fix
+          }
+
         }
       $self->{$_}= $attr; #??
       # $self->{curattr}= $attr; #??
@@ -639,7 +644,7 @@ sub end_element {
  		/^($featmainpatt)$/ &&  do {  #|analysis 
       my $ft= pop( @{$self->{featstack}});
       my $parft= @{$self->{featstack}}[-1]; 
-      $ft->{parnode}= $parft; #??
+      ### $ft->{parnode}= $parft; #?? problematic for viewer; other need
       $parft->add($ft);
 			$self->{$_}= undef;
 			$self->{curfeat}= $parft; 
@@ -719,7 +724,9 @@ sub end_element {
     
 		/^(feature_dbxref)$/ &&  do {  
 		  ##mar04: need feature_dbxref instead of dbxref_id/name to get is_current
+		  ##feb05: see above dbxref must set parent dbxref_id
       my $attr= $self->{$_};
+ 		  
       $self->setAttrs($attr, qw(dbxref_id is_current is_internal));
  		  if ( $self->{curgenfeat} ) { 
  			  $self->{curgenfeat}->addattr($attr);

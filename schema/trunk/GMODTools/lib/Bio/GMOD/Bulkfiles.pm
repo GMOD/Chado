@@ -1022,7 +1022,7 @@ sub sortNSplitByChromosome
 
   my $sorter=`which sort`; chomp($sorter); ## '/bin/sort'; '/usr/bin/sort';
   ## WATCH OUT - TAB here in '	' ; does shell understand '^I' instead ?
-  my $sortfeaturescmd= "$sorter -t'	' -k 1,1 -k 2,2n";
+  my $sortfeaturescmd= "$sorter -t'	' -k 1,1 -k 2,2n"; #? add -k 3,3rn ; nope end not there
 
   $fileset= $self->getDumpFiles() unless(ref $fileset);
   # return undef unless(ref $fileset);
@@ -1242,24 +1242,23 @@ sub makeFiles
     }
   
   if (grep /fasta/, @outformats) {
+    ## ! check/warn here if $featfiles or $dnafiles are missing
     my $writer= $self->getWriter('fasta');
-    # my $writer= $self->getFastaWriter();  
     $result .= $writer->makeFiles(%args, 
       infiles =>  $featfiles, chromosomes => $chromosomes);
     }
     
   if (grep /blast/, @outformats) {
+    ## ! check/warn here if $fafiles are missing
     my $fafiles = $self->getFiles( 'fasta', $chromosomes);
     my $writer  = $self->getWriter('blast'); # this works; eval new writer
-    # my $fafiles = $self->getFastaFiles($chromosomes);  # update after getFastaWriter
-    # my $writer= $self->getBlastWriter(); 
     $result .= $writer->makeFiles( %args, 
       infiles =>  $fafiles, chromosomes => $chromosomes );  
     }
     
   if (grep /gnomap/, @outformats) {
+    ## ! check/warn here if $featfiles or $dnafiles are missing
     my $writer= $self->getWriter('gnomap');
-    # my $writer= $self->getGnomapWriter(); 
     $result .= $writer->makeFiles(%args, 
       infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes); # needs $featfiles
     }
@@ -1806,13 +1805,17 @@ sub getSeqSql
   my ($self, $sqlconf, $sqlenv)= @_;
   $sqlconf = 'chadofeatsql' unless($sqlconf);
   $sqlenv= \%ENV unless (ref $sqlenv);
+
+  print STDERR "sqlenv: ",join("\n ", map{ $_."=".$sqlenv->{$_}} keys %$sqlenv ),"\n"
+    if ($DEBUG>1);     
+
   my $seqsql = $self->{$sqlconf} || '';
   unless($seqsql) {
     my $config2= $self->{config2}; #?? Config2 object, not hash
     $seqsql= $config2->readConfig( $sqlconf, {Variables => $sqlenv}, {} ); 
             ## readConfig( $file, \%opts, \%toconf) << add some main opts->{Variables} ?
     print STDERR $config2->showConfig($seqsql, { debug => $DEBUG })
-       if ($self->{showconfig}>1); ##if $DEBUG;      
+       if ($self->{showconfig} && $DEBUG>1);      
     $self->{$sqlconf}= $seqsql;
     }
   return $seqsql;
@@ -2166,7 +2169,9 @@ sub initData
   if($relid && ref $config->{release}->{$relid}) {
     my %relh= %{$config->{release}->{$relid}};
     foreach my $k (keys %relh) {
-      $config->{$k}= $relh{$k} unless($config->{$k});
+      ## need release date !
+      $config->{$k}= $relh{$k} ;
+        #??NO?# unless($config->{$k});
       }
     }
   if ($relid && !$config->{rel}) { 

@@ -81,6 +81,7 @@ sub initData
   
   my $config = $self->{config};
   my $sconfig= $self->handler()->{config};
+#  my $org= $self->{org} || $self->handler()->{config}->{org};
 
   ##  gnomapfiles
   my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo('gnomap');
@@ -88,10 +89,10 @@ sub initData
 
   $self->{indexonly} = $finfo->{indexonly};
 
-#   $noIDmap = $finfo->{noidmap} 
-#     || $config->{noidmap} 
+#   $noIDmap = $finfo->{noIDmap} 
+#     || $config->{noIDmap} 
 #     || 'cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4';
-  $noIDmap =  $finfo->{noidmap} || $config->{noidmap};
+  $noIDmap =  $finfo->{noIDmap} || $config->{noIDmap};
   unless($noIDmap) {
   $noIDmap= join '|',
   qw(cytowalk 
@@ -218,6 +219,10 @@ sub makeFiles
     my $intype= $self->{config}->{informat} || ['fff','dna']; #? maybe array
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
     # warn "makeFiles: no infiles => \@filesets given"; return;  
+    }
+  unless(ref $fileset) { 
+    warn "GnomapWriter: no input 'fff' feature or dna files found\n"; 
+    return;  
     }
 
   ## infiles => [ @$featfiles, @$dnafiles ]
@@ -467,7 +472,8 @@ sub printSummary
     my $fh= new FileHandle(">$sumfile");
     my $title = $self->{config}->{title};
     my $date  = $self->{config}->{date};
-    my $org   = $self->{config}->{species} || $self->{config}->{org};
+    ##my $org   = $self->{config}->{species} || $self->{config}->{org};
+    my $org= $self->{org} || $self->handler()->{config}->{org};
     print $fh "# Genome feature summary of $org from $title [$date]\n";
     my @fl= grep { 'all' ne $_ } sort keys %$csomefeats;
     foreach my $arm ('all', @fl) {
@@ -865,15 +871,19 @@ sub makeAllIdmaps
   my $indexidpattern='^[A-Za-z]{2,}';  
   my $indexdbpattern='^[A-Za-z]{2,}';  # FIXME - config
   #die "Can't read $file" unless (open(FIN,$file));
-  my $org   = ucfirst( $self->{config}->{org} || 'Any');
+  # my $org   = ucfirst( $self->{config}->{org} || 'Any');
+  my $org= $self->{org} || $self->handler()->{config}->{org};
+  $org=  'Any' unless($org);
   # fixme for ortholog to_name in $notes
   my($nte,$ste,$ite);
-  
+
+	# warn "makeAllIdmaps: noIdmap.classes='$noIDmap' \n" if $DEBUG;
+
   while(<$fin>) {
     my ($class,$sym,$map,$range,$idv,$dbx,$notes)= split(/\t/);
     $nte++ if ($class =~/transposable_element/); #DEBUG
     next unless( $range && $range ne '-' );
-    next if ($class =~ /$noIDmap/); ## ?? drop or keep
+    next if ($class =~ /$noIDmap/i); ## ?? drop or keep
     
     my @ids= (split(/[,;\s]/,$idv),split(/[,;\s]/,$dbx));  
     if ($class =~ /$nameIsId/) { # fixme for fff output - put in ID field
@@ -889,6 +899,11 @@ sub makeAllIdmaps
       my $toorg = ($notes =~ /to_species=([^;,\s]+)/) ? $1 : $org;
       unshift(@ids,ucfirst($toorg).'\\'.$tosym);
       }
+      
+      # feb05: getting lots of useless idmap-xxx.tsv for things like
+      # polyA_site with symbol name as id/name 
+      # gbb-polyA_site-1, Delta88{}su(s)[28] , 
+      
     my $needid=1;
     IDINDEX:
     while ($needid && (my $tid = shift @ids)) {

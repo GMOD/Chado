@@ -93,6 +93,7 @@ use vars qw/
   @cmt_props @skip_props
   $AnnoDbName $GeneDbName
   $RECSEP
+  $indexanyid
   /;
 
 =item 
@@ -113,6 +114,8 @@ BEGIN {
   
   $AnnoDbName= ''; ## 'GadFly:'; # or is it 'FlyBase:' now - what software needs updates
   $GeneDbName= 'FlyBase:';
+  
+  $indexanyid= 0; #only for non-dmel ??
   
 #   my $sppabbrev={
 #     Drosophila_pseudoobscura => 'dpse',
@@ -170,6 +173,7 @@ sub acode {
   my $optok= Getopt::Long::GetOptions( 
     'debug!' => \$debug,
     'index!' => \$doindex,
+    'anyidindex!' => \$indexanyid,
     'outfile=s' => \$outf,
     'tefile=s' => \$outte,
     'featfile=s' => \$ftoutf,
@@ -189,6 +193,7 @@ sub acode {
   -index = index output.acode
   -fbgn2id = table of FBgn 2ndary id -> primary id to patch in
   -skipfeat = residues  -- optionally drop xml tags during parse
+  -anyidindex -- index any/all ID|XXnnnnn numeric part (not just FBan)
   -[no]debug     
   ";
     }
@@ -266,8 +271,23 @@ sub acode {
   close($faout) if $faout;
   close($fnout) if $fnout;
 
+=item feb05: FIXME indexAcode for GAnnn ids in Dpse
+
+  use Acodes;
+  $alib="dpse.acode";
+  @ids= qw(GA14722 GA21028 GA15475);
+  $acode= new Acodes();
+  $acode->extractrecs($alib, \@ids, "test.out","GA");
+  >>> got them ok
+  RETE|ID 1 GA14722       GID 1 FBgn0074749 
+  RETE|ID 1 GA21028       GID 1 FBgn0081017 '
+  RETE|ID 1 GA15475       GID 1 FBgn0075492
+
+=cut
+
   if ($doindex && $outf) {
-    indexAcode( $outf, "FBan", "FBgn");
+    if ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
+    else { indexAcode( $outf, "FBan", "FBgn"); }
     }  
   if ($doindex && $outte) {
     indexAcode( $outte, "FBti");
@@ -280,18 +300,33 @@ sub acode {
  
  main method; create acode.idx index files for (FBan,FBgn) IDs
  where @ARGV= (input.acode)
-
+  
+ Feb05 : flybase needs FBan.list == RETE header list file (with indexes)
+   Do here or elsewhere? - see datagen.pl ...
+ 
 =cut
 
 sub acodeindex {
-  unless(@ARGV) { die "usage: acodeindex FBan.acode\n"; }
+  unless(@ARGV) { die "usage: acodeindex [-anyid -out=f.acode -te=te.acode] FBan.acode\n"; }
   #? no need for new ToAcode()
-  my $file= shift @ARGV;
-  unless(-r $file) { die "acodeindex: cannot index $file\n"; }
-  indexAcode( $file, "FBan", "FBgn");
-  
-## dang FBti problem
-  (my $outte= $file) =~ s/\./-TE\./;  # transposable_element have separate ID class - FBti
+  my ($outf,$outte);
+  my $optok= Getopt::Long::GetOptions( 
+    'debug!' => \$debug,
+    'anyidindex!' => \$indexanyid,
+    'outfile=s' => \$outf,
+    'tefile=s' => \$outte,
+    );
+
+  unless($outf) { $outf= shift @ARGV; }
+  unless(-e $outf) { warn "acodeindex: cannot index $outf\n"; }
+  else {
+    if ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
+    else { indexAcode( $outf, "FBan", "FBgn"); }
+    }
+    
+  unless ($outte) {
+    ($outte= $outf) =~ s/\./-TE\./;  # transposable_element have separate ID class - FBti
+    }
   if (-e $outte) { indexAcode( $outte, "FBti"); }
 }
 
@@ -341,18 +376,31 @@ sub cleandate {
   return $_;
 }
 
+sub getAttribName
+{
+  my $self= shift;
+  my $ob  = shift;
+  my $class= shift || 'type_id'; 
+  unless($class =~ /_id/) { $class .= '_id'; }
+  my($tag,$name)= $ob->id2name($class,$ob->{$class});
+  return $name;
+}
+
+
 sub getDbXref {  
 	my $self = shift;
 	my $ob = shift; # IxAttr tag=dbxref only
 	if ($ob->{tag} eq 'dbxref_id') {
 	  $ob= $ob->getid( $ob->{attr} ); # no id, use attr
 	  }
-# 	elsif ($ob->{tag} eq 'feature_dbxref') {
-#     $ob= $ob->getid( $ob->{dbxref_id} ); ## no good
-#     # my($dtag,$db)= $ob->id2name('db_id',$dbob->{db_id});
-#     }
+	elsif ($ob->{tag} eq 'feature_dbxref') {
+    $ob= $ob->getid( $ob->{dbxref_id} ); ## no good???
+    # my($dtag,$attr)= $ob->id2name('dbxref_id', $ob->{dbxref_id});
+    }
   my($tag,$dbid,$attr)= ('db_id', $ob->{db_id}, $ob->{attr});
   my($dtag,$db)= $ob->id2name($tag,$dbid);
+  #? my $db= $self->getAttribName($ob,'db_id');
+  
   my $dbattr= ($db ne $dbid && $attr !~ m/^$db:/) ?  "$db:$attr"  : $attr;
   return ($attr, $db, $dbattr);
 }
@@ -399,25 +447,146 @@ sub orgid2name {
   return ($k,$v);
 }
 
+sub foo { 1; }
 sub _debugObj
 {
   my ($name,$obj)= @_;
   require Data::Dumper;
   $Data::Dumper::Maxdepth = 3;
-  my $dd = Data::Dumper->new([$obj]); $dd->Terse(1);
-  $dd->Seen( [ { '*handler' => 1} ]);
-  #$dd->Maxdepth(3); 
   
+  my $handler= delete $obj->{handler}; 
+  my $parnode= delete $obj->{parnode}; 
+  my $dd = Data::Dumper->new([$obj]); $dd->Terse(1);
+  $dd->Seen( { 'handler' => \&foo, '*handler' => \&foo  } );
+  #$dd->Maxdepth(3); 
   print STDERR "DEBUG obj: $name=",  $dd->Dump(),"\n";
+  $obj->{handler}= $handler if ($handler);
+  $obj->{parnode}= $parnode if ($parnode);
 }
 
-# sub getMiscFeatureLoc {
-# 	my $self = shift;
-#  	my ($ft, $type)= @_;
-#   my $loc= $ft->getlocation();
-#   my $dt= cleandate($ft->{timelastmodified}); 
-#   return ($loc, $dt);  
-# }
+
+sub setvalue {  
+	my $self = shift;
+	my ($ftd,$key,$val,$iscur,$ob)= @_;
+  my $oldval= $ftd->{$key};
+  my $noset= (defined $oldval && ($iscur != 1 || $oldval eq $val));
+  if ($debug && !$noset && defined $oldval) {
+    warn "#>> reset-value key:$key new:$val old:$oldval\n";
+#     if ($ob) {
+#     foreach my $k (keys %{$ob}){ print STDERR "ob.$k = ",$ob->{$k},"\n"; }
+#     }
+    }
+    
+  $ftd->{$key}= $val unless($noset);
+}
+
+
+=item addEstEvidence
+
+## EST only if DB|na_EST.all_nr.dros and/or? DB|na_DGC.dros
+# dmel r4 -- need to recode blast PRG/DB types to get EST/cDNA
+# sim4_na_EST.all_nr.dros=EST -- old
+# sim4_na_dbEST.diff.dmel=EST
+# sim4_na_dbEST.same.dmel=EST
+# sim4_na_cDNA.dros=cDNA -- old
+# sim4_na_adh.cDNAs.dros=cDNA -- old
+# sim4_na_DGC.dros=DGC
+# sim4_na_DGC.in_process.dros=DGC
+
+=cut
+
+
+sub addEstEvidence
+{
+  my $self= shift;
+  my($ftd,$type,$dbname,$prg,$pdb)= @_;
+  
+  if ($prg =~ m/(sim4|groupest)/ && $type =~ m/(EST|match|alignment)/) { #? other types?
+    if ($pdb=~/(EST)/) { $type='EST'; }
+    elsif ($pdb=~/(cDNA)/) { $type='cDNA_clone'; }
+    elsif ($pdb=~/(DGC)/) { $type='cDNA_clone'; } # or separate to DGC field?
+    }
+  if ($type eq 'EST' && $pdb =~ /\.(dmel|dros)/) { 
+    my $v= $dbname; $v =~ s/[:_\.].*//;
+    $ftd->{EST} .= $v .$RECSEP unless($ftd->{EST} =~ m/$v$RECSEP/); 
+    }
+  elsif ($type =~ /cDNA/) { 
+    my $v= $dbname;  $v =~ s/[:_\.].*//;
+    $ftd->{CDNA} .= $v .$RECSEP unless($ftd->{CDNA} =~ m/$v$RECSEP/);  
+    }
+  elsif ($type =~ /DGC/) { 
+    my $v= $dbname;  $v =~ s/[:_\.].*//;
+    $ftd->{DGC} .= $v .$RECSEP unless($ftd->{DGC} =~ m/$v$RECSEP/);  
+    }
+  elsif ($type =~ /^oligo/) { # $type eq 'oligonucleotide' 
+    my $v= $dbname; $v =~ s/_at_\d+/_at/;
+    $ftd->{AFFY} .= $v .$RECSEP unless($ftd->{AFFY} =~ m/$v$RECSEP/); 
+    }
+}
+
+
+## see below alignment_evidence / separateEST/debugEST
+sub getESTfeat
+{
+  my $self= shift;
+  my($ob,$xxx)= @_;
+  my %estft=();
+  my ($ni,$nn);
+  
+  my @ft1= $ob->getfeats('feature');
+  return () unless (@ft1);
+  my $ft1= shift @ft1; # only 1? - 1 top level, many subfeature 'match'
+  my @ft2= $ft1->getfeats('feature');  
+  foreach my $ft2 (@ft2) {
+    my @ft3= $ft2->getfeats('feature');  
+    if (@ft3 != 2) { return (); }
+    
+    my $type0= $self->getAttribName($ft3[0],"type_id");
+    my $type1= $self->getAttribName($ft3[1],"type_id");
+    my ($ename, $etype, $srcid, $srcnm);
+    my @elocs;
+    
+    if ( $type0 eq 'EST') {
+      $ename= $ft3[0]->name();
+      $etype= $ft3[0]->{type_id};
+      $srcid= $ft3[1]->{id};
+      ##$srcnm= $ft3[1]->{uniquename};
+      
+      # my %sp= $ft2->getlocations();
+      # @elocs= @{$sp{$srcid}->{'locs'}};
+      }
+    elsif ( $type1 eq 'EST') {
+      $ename= $ft3[1]->name();
+      $etype= $ft3[1]->{type_id};
+      $srcid= $ft3[0]->{id};
+      ##$srcnm= $ft3[0]->{uniquename};
+      ## @elocs= @{$ft3[0]->{loclist}};
+      }
+    else {
+      return ();
+      }
+      
+    my $estft= $estft{$ename};
+    unless($estft) {
+      $estft= new org::gmod::chado::ix::IxFeat( tag => 'feature',
+        name => $ename, type_id => $etype,
+        id => $ename, handler => $ft1->{handler});  
+      $estft{$ename}= $estft;
+      }
+
+    my @list= @{$ft2->{loclist}};
+    foreach my $el (@list) { 
+      my $src= $el->get('src'); # which is it -- $srcid is it
+      if ($src eq $srcid) { $estft->addloc( $el ); $ni++; }
+      ##elsif ($src eq $srcnm) { $estft->addloc( $el ); $nn++; }
+      }
+    }
+    
+  ## print STDERR "#>>getESTfeat: ",join(", ",keys %estft), " nid=$ni, nname=$nn\n";
+  return values %estft;
+}
+
+
 
 =item handleObj($depth,$object)
 
@@ -470,7 +639,8 @@ sub handleObj_base {
 ##  warn "# handleObj $otag = $ob  \n" if ($debug && $depth<1);
 
   ## otype == gene|mRNA|protein|exon|...
-  my($k,$otype)= $ob->id2name('type_id', $ob->get('type_id'));
+  my($kkk,$otype)= $ob->id2name('type_id', $ob->get('type_id'));
+  # my $otype= $self->getAttribName($ob,'type_id');
   my ($dolist, $doatts)= (1,1);
   
     # these change for each depth==0 feature
@@ -512,15 +682,18 @@ sub handleObj_base {
       # $ftd->{ANID}= ## dbxref={ FBan0003665, db_name=FlyBase, id=dbxref_58553 } 
       # $ftd->{CGSYM}=  #    dbxref={ CG3665, db_name=Gadfly, id=dbxref_58552 } dbxref_name=CG3665  
       # $ftd->{GID}=  dbxref_name=FBgn0000635 
-
-      $ftd->{GSYM}= $obname;  
+      ## also fix these double backslashes in gene symbol: Dpse\\CG2206
+      
+      my $gsym= $obname;
+      if ($gsym =~ s/\\\\/\\/) { } # ?? $obname= $gsym;
+      $ftd->{GSYM}= $gsym;  
       $ftd->{GNLEN}= $ob->{seqlen};
      
       my $dt= cleandate($ob->{timelastmodified}); 
       $ftd->{DT}= $dt if $dt;
       
-      my($tag,$type)= ('type_id', $ob->{type_id});
-      ($tag,$type)= $ob->id2name($tag,$type);
+      my($tag,$type)= $ob->id2name('type_id', $ob->{type_id});
+      ##my $type= $self->getAttribName($ob,'type_id');
       $ftd->{TYPE}= $type;
       
       if ($type eq 'transposable_element') {
@@ -817,13 +990,19 @@ VERS|3.2.0
       last SWITCH if ($ob->get('is_internal') == 1);  
       
       my($tag,$attr)= $ob->id2name('dbxref_id', $ob->{dbxref_id});
+      # my $attr= $self->getAttribName($ob,'dbxref_id');
       # my($attr, $db, $dbattr)= $self->getDbXref($ob); # fixed for feature_dbxref
      
       my $iscur= (defined $ob->{is_current}) ? $ob->{is_current} : -1; # == 0/1/null
+
+        ## feb05 -- missing valid is_current here ?
       my $notdone= 0;
       if ($attr =~ /\S/) { 
         my $dbob= $ob->getid($ob->{dbxref_id}); 
         my($dtag,$db)= $ob->id2name('db_id',$dbob->{db_id});
+        
+        $dbob->{'is_internal'}= 1; # flag so we don't redo below... ?? is this too late? does dbxref come 1st ?
+        
         # warn "DEBUG: feature_dbxref=$db:$attr, $dbattr\n" if $debug;
         if ($depth == 1) { 
           if ($attr =~ /^(SO|GO):/) {  }
@@ -834,10 +1013,38 @@ VERS|3.2.0
             ## - need only hashtable lookup of ~ 10k ids; alternate 'sed -f list' takes a long time
             if (%fbgn2id && $attr =~ /FBgn/) { $attr= $fbgn2id{$attr} || $attr; }
 
-               if ($attr =~ /FBgn|FBti/ ) { $ftd->{GID}= $attr; } 
-            elsif ($attr =~ /FBan/ ) { $ftd->{ANID}= $attr; } 
-            elsif ($attr =~ /^C[GR]\d/ ) { $ftd->{CGSYM}= $attr; }
-            elsif ($attr =~ /^TE\d/ ) { $ftd->{CGSYM} = $attr; } 
+=item new CGSYM  IDs
+
+Dpse/other spp GA/xxx ids add to CG/CR annot ids
+ANID == obsolete ?
+
+also fix these double backslashes in gene symbol: Dpse\\CG2206
+
+    name=Dpse\\Uro
+    type_name=gene
+    uniquename=GA20153
+
+feb05 -- missing valid is_current here ?
+    >> debug show replacement if {GID} {ANID} {CGSYM} already exist
+    >> problem is dbxref nested inside feature_dbxref,
+      .. setting GID from both objects, dbxref w/o is_current flag
+      
+# ToAcode( xmlt/AE003469_r4.1.chado.xml.gz ).....
+# IxReadSax parse <xmlt/AE003469_r4.1.chado.xml.gz>
+#>> setvalue key:GID new:FBgn0035177 old:FBgn0028999
+#>> setvalue key:GID new:FBgn0010869 old:FBgn0011251
+...
+# ToAcode done ............ 
+  ./chado2acode.sh xmlta/AE003469.acode xmlt/AE003469*gz >& log.xmlt
+
+>> save FBtr, FBpp ids here (depth == 2,3 ?)
+
+=cut
+
+               if ($attr =~ /FBgn|FBti/ ) { $self->setvalue($ftd,"GID",$attr,$iscur,$ob); } ## $ftd->{GID}= $attr;
+            elsif ($attr =~ /FBan/ ) { $self->setvalue($ftd,"ANID",$attr,$iscur,$ob); } 
+            elsif ($attr =~ /^C[GR]\d/ ) { $self->setvalue($ftd,"CGSYM",$attr,$iscur,$ob); }
+            elsif ($attr =~ /^TE\d/ ) { $self->setvalue($ftd,"CGSYM",$attr,$iscur,$ob); } 
             else { $notdone=1; }
             }
           }
@@ -859,18 +1066,21 @@ VERS|3.2.0
     ($otag =~ /^dbxref$/ && $depth==1) && do {
       last SWITCH if ($ob->get('is_internal') == 1);
       my($attr, $db, $dbattr)= $self->getDbXref($ob);
+      
       my $iscur= (defined $ob->{is_current}) ? $ob->{is_current} : -1; # == 0/1/null
-
+      # my $iscur= $ob->get('is_current');
+      # $iscur= -1 unless(defined $iscur);
+      
       ## patch here? to replace FBgn 2ndary ids w/ primary 
       if (%fbgn2id && $attr =~ /FBgn/) { $attr= $fbgn2id{$attr} || $attr; }
       
       if ($attr =~ /^(X|2L|2R|3L|3R|4)$/) {  }
       elsif ($attr =~ /^(SO|GO):/) {  }
       elsif ($iscur == 0) { $ftd->{ID2} .= $dbattr .$RECSEP; }
-      elsif ($attr =~ /^C[GR]\d/ && $db =~ m/FlyBase|Gadfly/i) { $ftd->{CGSYM} = $attr; }
-      elsif ($attr =~ /^TE\d/ && $db =~ m/FlyBase|Gadfly/i) { $ftd->{CGSYM} = $attr; }#or ANID?
-      elsif ($attr =~ /^FBan/ && $db =~ m/FlyBase/i) { $ftd->{ANID} = $attr; }
-      elsif ($attr =~ /^(FBgn|FBti)/ && $db =~ m/FlyBase/i) { $ftd->{GID}  = $attr; }
+      elsif ($attr =~ /^C[GR]\d/ && $db =~ m/FlyBase|Gadfly/i) { $self->setvalue($ftd,"CGSYM",$attr,$iscur,$ob); }
+      elsif ($attr =~ /^TE\d/ && $db =~ m/FlyBase|Gadfly/i) { $self->setvalue($ftd,"CGSYM",$attr,$iscur,$ob); }#or ANID?
+      elsif ($attr =~ /^FBan/ && $db =~ m/FlyBase/i) { $self->setvalue($ftd,"ANID",$attr,$iscur,$ob); }
+      elsif ($attr =~ /^(FBgn|FBti)/ && $db =~ m/FlyBase/i) { $self->setvalue($ftd,"GID",$attr,$iscur,$ob); }
       elsif ($attr =~ /^GO/ && $db =~ m/GO/i) {  }
       elsif ($attr =~ /^FB\w\w\d+/ || $db =~ /^GB/) {
         my @sym= ( $ftd->{DBX} );
@@ -952,7 +1162,7 @@ VERS|3.2.0
         $attr= "$forg/$ftype:$nm";
         
         $ftd->{ORTHO} .= "$rtype=$attr".$RECSEP ;  ## fixme NOT right field for this
-        ##$notdone= 0; 
+        $notdone= 0; 
         }
       };  
       warn "#>> feature_relationship error: $@\n" if $@;
@@ -970,10 +1180,6 @@ VERS|3.2.0
 # MISSED feature=mRNA [lev=2] GA15475-RA 
 # MISSED feature_relationship= ,type_name,putative_ortholog_of [lev=1]
 # MISSED feature=gene [lev=2] CG2822 
-# MISSED feature_relationship= ,type_name,partof [lev=1]
-# MISSED feature=mRNA [lev=2] GA21028-RA 
-# MISSED feature_relationship= ,type_name,putative_ortholog_of [lev=1]
-# MISSED feature=gene [lev=2] CG8372 
 
 # CMT|comment=Range of putative ortholog from tblastn was extended 
 # |to cover the gene prediction
@@ -997,6 +1203,7 @@ VERS|3.2.0
       
       my($tag,$db)= $ob->id2name('type_id', $ob->{type_id});
       my $notdone= 0;
+      my $iscur= (defined $ob->{is_current}) ? $ob->{is_current} : -1; # == 0/1/null
       
       # mar04 - drop all ::DATE: text
       $attr =~ s/\s*::DATE:.*//;
@@ -1016,7 +1223,7 @@ VERS|3.2.0
       #?? use @skip_props and add anything else as CMT or PEPST  or PEPCMT?
       if ($attr !~ /\S/) {}
       elsif ($db eq 'gbunit') {
-        $ftd->{SCAF}= $attr;
+        $self->setvalue($ftd,"SCAF",$attr,$iscur,$ob);
         }
       elsif (grep(/^$db$/, @skip_props)) {
         $notdone= 0;
@@ -1144,6 +1351,13 @@ VERS|3.2.0
 			last SWITCH; 
 			};  
 
+
+
+=item alignment_evidence
+
+   alignment_evidence has feature.feature.feature.  substructure
+   
+#--- feb04, EST ** need separate processing to split out sub-features
 #--- nov04, dmel rel4 chado evidence types (prg,pdb); all type =  match
 ## Chado-FBan EVD PRG_DB list - Nov 04
 # egrep '^(PRG|DB)\b' fban-r4.acode | \
@@ -1167,11 +1381,11 @@ VERS|3.2.0
 # repeatmasker_dummy      1377
 # sim4_na_ARGs.dros       740
 # sim4_na_ARGsCDS.dros    716
-# sim4_na_DGC.in_process.dros     2351   == EST/cDNA
+# sim4_na_DGC.in_process.dros     2351   == EST/cDNA   ***
 # sim4_na_HDP_RNAi.dmel   50
 # sim4_na_HDP_mRNA.dmel   66
-# sim4_na_dbEST.diff.dmel 7139 == EST/cDNA
-# sim4_na_dbEST.same.dmel 8100 == EST/cDNA
+# sim4_na_dbEST.diff.dmel 7139 == EST/cDNA   ***
+# sim4_na_dbEST.same.dmel 8100 == EST/cDNA   ***
 # sim4_na_gadfly.dros.RELEASE2    11076
 # sim4_na_gb.dmel 8236
 # sim4_na_gb.tpa.dmel     236
@@ -1184,9 +1398,9 @@ VERS|3.2.0
 # tblastxwrap_masked_na_baylorf1_scfchunk.dpse    11480
 # tblastxwrap_masked_na_scf_chunk_agambiae.fa     8695
 
+=cut
 
     ($otag =~ /^alignment_evidence$/) && do {
-      ## has feature.feature.feature. ... substructure
       last SWITCH if ($ob->get('is_internal') == 1);
       
       my $anid= $ob->get('analysis_id');
@@ -1206,28 +1420,58 @@ VERS|3.2.0
           my($ntag,$aname)= $ob->id2name('analysis_id',$anid);
           $anh->{PROGRAM}= $aname; 
           }
-          
        # warn "# evd $otag: $anid = $anh->{PROGRAM} \n" if ($debug);
       }
       
       my($prg,$pdb)=($anh->{PROGRAM},$anh->{DATABASE});
-      
+
       $dolist= $doatts= 0; # no more recurse ??
-      last SWITCH
-        if ($prg eq 'locator' && $pdb eq 'cytology');
+      last SWITCH if ($prg eq 'locator' && $pdb eq 'cytology');
         
+=item
+      Feb05: patch here for EST/cDNA/DGC alignment_evidence with subfeatures
+      that need to be promoted to separate features.  All of them?
+=cut
+      ## my $debugEST=1; my $estloc; my $armdft;
+      my $separateEST = 1; 
+      
+      my @estft= ($separateEST ? $self->getESTfeat($ob) : ());
+      if (@estft) {
+        foreach my $estft (@estft) {
+        my ($eloc,$dbx,$type,$tag);
+        eval {
+          $dbx= $estft->name();
+          ($tag,$type)= $estft->id2name('type_id',$estft->{type_id});
+          $eloc= $estft->getlocation(); # was bad 
+          $anh->{mRNA} .= $eloc.$RECSEP;  
+          $anh->{mRNA_dbx} .= $dbx .$RECSEP; 
+          $anh->{TYPE}= $type if ($type);
+          
+          $self->addEstEvidence( $ftd, $type, $dbx, $prg, $pdb);
+          };
+        warn ">>getEST: err $@" if ($@);
+        ##warn "getEST  $type $dbx=$eloc \n" if $debug; 
+        }
+
+        $dolist= $doatts= 0; # no more recurse ??
+        last SWITCH; 
+      }
+        
+      ## alignment_evidence has feature.feature.feature.  substructure
       my @fts= $ob->getfeats('feature');
       if (@fts) {
       my $ft= shift @fts; # only 1? - 1 top level, many subfeature 'match'
       my $loc= $ft->getlocation(  $ftd->{srcid},'match');
       my $dt= cleandate($ft->{timelastmodified}); 
-      $anh->{mRNA} .= $loc.$RECSEP; ## FIXME - which ??
+      
+      $anh->{mRNA} .= $loc.$RECSEP; 
       $anh->{DT}  = "$dt" if $dt;   
       
         ## dang need feature.feature kids here . but only 1st of them?
       @fts= $ft->getfeats('feature'); # find dbx names
       @fts= $fts[0]->getfeats('feature') if (@fts); 
-      foreach my $dft (@fts) {
+      
+      foreach my $dft (@fts) { ## see next, last below in loop
         next if ($dft->{id} eq $ftd->{srcid});
 
         my($tag,$type)= $dft->id2name('type_id',$dft->{type_id});
@@ -1257,45 +1501,12 @@ VERS|3.2.0
           }
         $anh->{mRNA_dbx} .= $dbx .$RECSEP; 
         # $anh->{mRNA_dbx2} .= $dbname .';' ; 
-
-        ## EST only if DB|na_EST.all_nr.dros and/or? DB|na_DGC.dros
-        # dmel r4 -- need to recode blast PRG/DB types to get EST/cDNA
-        # sim4_na_EST.all_nr.dros=EST -- old
-        # sim4_na_dbEST.diff.dmel=EST
-        # sim4_na_dbEST.same.dmel=EST
-        # sim4_na_cDNA.dros=cDNA -- old
-        # sim4_na_adh.cDNAs.dros=cDNA -- old
-        # sim4_na_DGC.dros=DGC
-        # sim4_na_DGC.in_process.dros=DGC
         
-        if ($prg =~ m/(sim4|groupest)/ && $type =~ m/(match|alignment)/) { #? other types?
-          if ($pdb=~/(EST)/) { $type='EST'; }
-          elsif ($pdb=~/(cDNA)/) { $type='cDNA_clone'; }
-          elsif ($pdb=~/(DGC)/) { $type='cDNA_clone'; } # or separate to DGC field?
-          #? change acode type?
-          # $anh->{TYPE}= $type if ($type);
-          }
-
-        ## EST only if DB|na_EST.all_nr.dros and/or? DB|na_DGC.dros
-        if ($type eq 'EST' && $pdb =~ /\.(dmel|dros)/) { 
-          my $v= $dbname; $v =~ s/[:_\.].*//;
-          $ftd->{EST} .= $v .$RECSEP unless($ftd->{EST} =~ m/$v$RECSEP/); 
-          }
-        elsif ($type =~ /cDNA/) { 
-          my $v= $dbname;  $v =~ s/[:_\.].*//;
-          $ftd->{CDNA} .= $v .$RECSEP unless($ftd->{CDNA} =~ m/$v$RECSEP/);  
-          }
-        elsif ($type =~ /DGC/) { 
-          my $v= $dbname;  $v =~ s/[:_\.].*//;
-          $ftd->{DGC} .= $v .$RECSEP unless($ftd->{DGC} =~ m/$v$RECSEP/);  
-          }
-        elsif ($type eq 'oligonucleotide') { 
-          my $v= $dbname; $v =~ s/_at_\d+/_at/;
-          $ftd->{AFFY} .= $v .$RECSEP unless($ftd->{AFFY} =~ m/$v$RECSEP/); 
-          }
+        $self->addEstEvidence( $ftd, $type, $dbname, $prg, $pdb);
         
         last; #? only 1
         }
+        
       }
       
       $dolist= $doatts= 0; # no more recurse ??
@@ -1326,6 +1537,7 @@ VERS|3.2.0
     $parob= $lastpar;
     }
   ## recursion end ......
+  
   
   if ($depth == 0 && $ftd->{ID}) 
   {
@@ -1456,10 +1668,14 @@ sub fbanAcode1 {
   my @id2= ();
   my $type= ($h{TYPE} eq 'gene') ? '' : $h{TYPE};
   my $anid = $h{ANID}; #?? what if null?
-  my $uniqid= $h{ID}; # mar04
+  my $uniqid= $h{ID}; # mar04; feb05 - need this for non-Dmel data, no ANID/CGSYM
   
   my $gsym = $h{GSYM}  || $h{CGSYM}; 
-  my $cgsym= $h{CGSYM} || $gsym;
+  ## my $cgsym= $h{CGSYM} || $gsym;
+  my $cgsym= $h{CGSYM};
+  if (!$cgsym && $uniqid && $uniqid !~ /(FBan|TE)\d/) { $cgsym= $uniqid; }
+  if (!$cgsym && $h{GSYM}) { $cgsym= $h{GSYM}; } ## ??
+  
   my $sqlen= $h{GNLEN}; ##sqlen($h{BLOC});
   my $gid= $h{GID}; 
   my $arm= $h{ARM};
@@ -1482,6 +1698,15 @@ BLOC|17099533..17099534
   FIXME - aug04, need to get rid of TE/FBti -> FBan + FBTI_IDBASE hack
      .. create separate FBan-te.acode file? index by fbti or TE(num) 
 =cut 
+
+=item new annot IDs
+
+Dpse/other spp GA/xxx ids add to CG/CR annot ids
+for now all these have FBgn GID, but no FBan id 
+*** messes up indexing, etc. 
+need record index revisions, ? as per gnomap/idmap-XXX.tsv
+
+=cut
    
   if ($uniqid) {
     if ($uniqid !~ /FBan\d/) {
@@ -1516,7 +1741,7 @@ BLOC|17099533..17099534
     $gensr .= "ID|$gid\n}\n";
     push(@re,"ID 1 $anid");
     push(@re,"GID 1 $gid") if ($gid);
-    push(@re,"GSYM 1 $gsym"); #SYM keep same as FBgn GSYM??
+    push(@re,"GSYM 1 $gsym") if ($gsym); #SYM keep same as FBgn GSYM??
     push(@re,"CGSYM 1 $cgsym") if ($cgsym); # dup of SYM !? leave out
     }
     
@@ -1562,8 +1787,8 @@ perl -p -e'BEGIN{$an=$anold="";} if (/^RETE/ && /FBti0*(\d+)/) { $t=$1; \
        }
     push(@re,"ID 1 $anid");
     push(@re,"GID 1 $gid");
-    push(@re,"GSYM 1 $gsym");
-    push(@re,"CGSYM 1 $cgsym");
+    push(@re,"GSYM 1 $gsym") if ($gsym);
+    push(@re,"CGSYM 1 $cgsym") if ($cgsym);
     $gensr= "GENSR\n{\n";
     $gensr .= "GSYM|$gsym\n";
     $gensr .= "ID|$gid\n}\n";
@@ -1578,6 +1803,7 @@ perl -p -e'BEGIN{$an=$anold="";} if (/^RETE/ && /FBti0*(\d+)/) { $t=$1; \
     push(@re,"GSYM 1 $gsym") if ($gsym); #SYM keep same as FBgn GSYM??
     push(@re,"CGSYM 1 $cgsym") if ($cgsym);
     }
+    
   push(@re,"CLA 1 $type") if $type;
   push(@re,"ARM 1 $arm") if $arm;
   push(@re,"CLOC 1 $h{CLOCC}") if $h{CLOCC};
@@ -1773,14 +1999,18 @@ TEOF
 }
 
 
-## jan05 add
-# SYNT 
-# {
-# CLA|syntenic_region
-# NAM|syntenic_block:240
-# BLOC|dmel/2L:3458904..3859790
-# BLOC|dpse/4_group3:4830267..5271058
-# }
+=item synteny blocks
+
+jan05  - add for dpse data, also ortholog class
+SYNT 
+{
+CLA|syntenic_region
+NAM|syntenic_block:240
+BLOC|dmel/2L:3458904..3859790
+BLOC|dpse/4_group3:4830267..5271058
+}
+
+=cut
 
 sub syntAcode {
 	my $self = shift;
@@ -1980,11 +2210,12 @@ sub indexAcode {
 			$idnum= $id2num= 0;
 			$start= $at;
 			}
-		if (/^ID\|${idtag}0*(\d+)/) {
-			$idnum= $1;
-			}
 		if ($id2tag && /^ID\|${id2tag}0*(\d+)/) {
 			$id2num= $1;
+			}
+		if (/^ID\|${idtag}0*(\d+)/) {
+			unless($indexanyid && $id2tag && /^ID\|${id2tag}/)
+			{ $idnum= $1; }
 			}
 		}
 	$end= tell(AA);

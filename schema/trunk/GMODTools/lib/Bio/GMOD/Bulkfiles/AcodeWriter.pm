@@ -144,6 +144,10 @@ sub makeFiles
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
     # warn "makeFiles: no infiles => \@filesets given"; return;  
     }
+  unless(ref $fileset) { 
+    warn "AcodeWriter: no input 'fff' feature files found\n"; 
+    return;  
+    }
  
   my $featset= $self->handler->{config}->{featset} || []; #? or default set ?
   my $addids = defined $args{addids} ? $args{addids} : $self->{addids};

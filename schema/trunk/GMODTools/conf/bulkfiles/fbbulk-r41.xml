@@ -1,6 +1,7 @@
 <opt
   name="fbbulk-r41" 
   relid="41"
+  date="20050207"
   ROOT="${GMOD_ROOT}/"
   TMP="${GMOD_ROOT}/tmp"
   datadir="data/genomes/Drosophila_melanogaster"
@@ -40,7 +41,10 @@
   <doc name="README"><![CDATA[
     D. melanogaster euchromatin genome data from FlyBase
     Release  ${rel}, dated ${date}.
-    This release provides new chromosomal dna from release 3, and associated features.
+    
+    This release adds  features missing in release 4.0: oligo, BAC, 
+    as well as many transposon/insertion features, 
+    and corrects various problems with the prior release.
     
     See release notes at <a href="http://flybase.net${release_url}">
     http://flybase.net${release_url}</a>
@@ -81,14 +85,22 @@
     splitname="chadofeat"
     >
     <ENV 
-      golden_path="'chromosome_arm'"
       dummy="dummy"
+      golden_path="'chromosome_arm'"
+      est_where_clause="AND (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      analysis_where_clause="AND NOT (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
       />
+    <!-- note: ests target replaces analysis EST exclusion above -->
+    <!-- dang analysis_where_clause failed to work.. -->
+    
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
+    <target>ests</target>
     <!-- <target>matches</target> -->  
-    <target>synteny</target>
+    <!-- <target>synteny</target> -->
   </featdump>
 
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
@@ -102,6 +114,7 @@
       chromosome dna; but had out-of-date errors, safer to use
       chromosome, not fromdb for these? 
   -->
+  <!--
   <featmap
     name="scaffold"   
     alt_name0 = "golden_path_region" 
@@ -114,5 +127,6 @@
     NOT_fromdb="1"
     />
   <featmap name="dummy" note="here for xml parser" />
+  -->
 
 </opt>
