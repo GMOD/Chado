@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.23 2004-04-30 21:00:47 scottcain Exp $
+$Id: INSTALL,v 1.24 2004-05-06 16:13:37 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -84,6 +84,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * XML::Parser              (chado<->Apollo)
     * XML::Parser::PerlSAX     (chado<->Apollo)
     * LWP                      (chado)
+    * Template                 (chado)
     * Log::Log4perl            (chado)
     * Term::ProgressBar (2.06 or better)  (chado)
   
