@@ -24,6 +24,8 @@ create table feature (
        unique(dbxrefstr)
 );
 
+create index feature_name_ind1 on feature(name);
+
 -- ================================================
 -- TABLE: featureloc
 -- ================================================
@@ -251,6 +253,23 @@ create table feature_organism (
 );
 
 -- ================================================
+-- TABLE: synonym
+-- ================================================
+
+create table synonym (
+       synonym_id serial not null,
+       primary key (synonym_id),
+       synonym varchar(255) not null,
+-- types would be symbol and fullname for now
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       timeentered timestamp not null default current_timestamp,
+       timelastmod timestamp not null default current_timestamp,
+
+       unique(synonym)
+);
+
+-- ================================================
 -- TABLE: feature_synonym
 -- ================================================
 
@@ -277,23 +296,6 @@ create table feature_synonym (
        timelastmod timestamp not null default current_timestamp,
 
        unique(synonym_id, feature_id, pub_id)
-);
-
--- ================================================
--- TABLE: synonym
--- ================================================
-
-create table synonym (
-       synonym_id serial not null,
-       primary key (synonym_id),
-       synonym varchar(255) not null,
--- types would be symbol and fullname for now
-       type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
-
-       unique(synonym)
 );
 
 -- ================================================
