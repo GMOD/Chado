@@ -5,6 +5,7 @@ use strict;
 use base 'Module::Build';
 use Carp;
 use File::Spec::Functions 'catfile';
+use File::Path;
 use Data::Dumper;
 use Template;
 use XML::Simple;
@@ -120,68 +121,71 @@ sub ACTION_ncbi {
 }
 
 sub ACTION_mageml {
-  my $m = shift;
+  my $m    = shift;
   my $conf = $m->conf;
 
   $m->log->info("entering ACTION_mageml");
 
   print "Available MAGE-ML annotation files:\n";
 
-  my $i = 1;
+  my $i  = 1;
   my %ml = ();
-  foreach my $mageml (sort keys %{ $conf->{mageml} }){
-	$ml{$i} = $mageml;
-	print "[$i] $mageml\n";
-	$i++;
+  foreach my $mageml ( sort keys %{ $conf->{mageml} } ) {
+    $ml{$i} = $mageml;
+    print "[$i] $mageml\n";
+    $i++;
   }
   print "\n";
 
-  my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
-  $m->notes('affymetrix' => $chosen);
+  my $chosen =
+    $m->prompt(
+    "Which ontologies would you like to load (Comma delimited)? [0]");
+  $m->notes( 'affymetrix' => $chosen );
 
-  my %mageml = map {$ml{$_} => $conf->{mageml}{$ml{$_}}} split ',',$chosen;
+  my %mageml = map { $ml{$_} => $conf->{mageml}{ $ml{$_} } } split ',', $chosen;
 
-  foreach my $mageml (keys %mageml){
-	print "fetching files for $mageml\n";
+  foreach my $mageml ( keys %mageml ) {
+    print "fetching files for $mageml\n";
 
-	my $load = 0;
-    foreach my $file (@{ $mageml{$mageml}{file} }){
+    my $load = 0;
+    foreach my $file ( @{ $mageml{$mageml}{file} } ) {
 
-	  my $fullpath = $conf->{path}{data}.'/'.$file->{local};
-	  $fullpath =~ s!^(.+)/[^/]*!$1!;
+      my $fullpath = catfile $conf->{path}{data}, $file->{local};
+      $fullpath =~ s!^(.+)/[^/]*!$1!;
 
-      if(! -d $fullpath){
-		$m->log->debug("mkdir -p $fullpath");
-        system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
+      unless ( -d $fullpath ) {
+        $m->log->debug("mkpath $fullpath");
+        mkpath( $fullpath, 0, 0711 )
+          or print "Couldn't make path '$fullpath': $!\n";
       }
 
-      print "  +",$file->{remote},"\n";
-      $load = 1 if $m->_mirror($file->{remote},$file->{local});
-	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
+      print "  +", $file->{remote}, "\n";
+      $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+      $load = 1 unless $m->_loaded( $fullpath );
 
-	  next unless $load;
+      next unless $load;
 
       print "    loading...";
 
-	  $m->log->debug("system call: ".'./load/bin/load_affymetrix.pl'. ' '/
-					 $conf->{'path'}{'data'}.'/'.$file->{'local'}
-					);
+      my $sys_call = "./load/bin/load_affymetrix.pl $fullpath";
+      $m->log->debug( "system call: $sys_call" );
 
-      my $result = system('./load/bin/load_affymetrix.pl',
-				  $conf->{'path'}{'data'}.'/'.$file->{'local'});
-      if ($result != 0) { print "failed: $!\n"; die; }
-	  else {
-		$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
-		print "done!\n";
-	  }
-	}
+      my $result = system( $sys_call );
+      if ( $result != 0 ) { 
+        die "failed: $!\n";
+      }
+      else {
+        $m->_loaded( $fullpath, 1 );
+        print "done!\n";
+      }
+    }
   }
 
   $m->log->info("leaving ACTION_mageml");
 }
 
 sub ACTION_ontologies {
-  my $m = shift;
+  my $m    = shift;
   my $conf = $m->conf;
 
   $m->log->info("entering ACTION_ontologies");
@@ -189,63 +193,76 @@ sub ACTION_ontologies {
   print "Available ontologies:\n";
 
   my %ont = ();
-  foreach my $ontology (keys %{ $conf->{ontology} }) {
-    $ont{$conf->{ontology}->{$ontology}->{order}} = $ontology;
+  foreach my $ontology ( keys %{ $conf->{ontology} } ) {
+    $ont{ $conf->{ontology}->{$ontology}->{order} } = $ontology;
   }
-  foreach my $key (sort keys %ont) { print "[$key] ", $ont{$key}, "\n"; }
+  foreach my $key ( sort keys %ont ) { print "[$key] ", $ont{$key}, "\n"; }
   print "\n";
 
-  my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
-  $m->notes('ontologies' => $chosen);
-  my %ontologies = map {$_ => $conf->{ontology}{$ont{$_}}} split ',',$chosen;
+  my $chosen =
+    $m->prompt(
+    "Which ontologies would you like to load (Comma delimited)? [0]");
+  $m->notes( 'ontologies' => $chosen );
+  my %ontologies = map { $_ => $conf->{ontology}{ $ont{$_} } } split ',',
+    $chosen;
 
-  foreach my $ontology (sort keys %ontologies){
+  foreach my $ontology ( sort keys %ontologies ) {
     print "fetching files for ", $ont{$ontology}, "\n";
 
     my $load = 0;
-    foreach my $file (grep {$_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} }){
-      my $fullpath = $conf->{path}{data}.'/'.$file->{local};
+    foreach my $file ( 
+      grep { $_->{type} eq 'definitions' } @{ $ontologies{$ontology}{file} } 
+    ) {
+      my $fullpath = catfile $conf->{path}{data}, $file->{local};
       $fullpath =~ s!^(.+)/[^/]*!$1!;
 
-      if(! -d $fullpath){
-		$m->log->debug("mkdir -p $fullpath");
-        system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
+      unless ( -d $fullpath ) {
+        $m->log->debug("mkpath $fullpath");
+        mkpath( $fullpath, 0, 0711 )
+          or print "Couldn't make path '$fullpath': $!\n";
       }
 
-      print "  +",$file->{remote},"\n";
-      $load = 1 if $m->_mirror($file->{remote},$file->{local});
+      print "  +", $file->{remote}, "\n";
+      $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
     }
 
-    my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
-    foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
-      print "  +",$ontfile->{remote},"\n";
+    my ($deffile) =
+      grep { $_ if $_->{type} eq 'definitions' }
+      @{ $ontologies{$ontology}{file} };
 
-      $load = 1 if $m->_mirror($ontfile->{remote},$ontfile->{local});
-#	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->{'local'});
+    foreach my $ontfile ( 
+      grep { $_->{type} eq 'ontology' } @{ $ontologies{$ontology}{file} } 
+    ) {
+      print "  +", $ontfile->{remote}, "\n";
 
-	  next unless $load;
+      $load = 1 if $m->_mirror( $ontfile->{remote}, $ontfile->{local} );
+
+ #	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->{'local'});
+
+      next unless $load;
 
       print "    loading...";
 
-	  $m->log->debug("system call: ".'./load/bin/load_ontology.pl'.    ' '.
-					 $conf->{'path'}{'data'}.'/'.$ontfile->{'local'}.  ' '.
-					 $conf->{'path'}{'data'}.'/'.$deffile->{'local'}
-					);
+      my $sys_call = join( ' ', 
+        './load/bin/load_ontology.pl',
+        catfile( $conf->{'path'}{'data'}, $ontfile->{'local'} ),
+        catfile( $conf->{'path'}{'data'}, $deffile->{'local'} )
+      );
+      $m->log->debug( "system call: $sys_call" );
 
-	  my $result = system('./load/bin/load_ontology.pl',
-						  $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
-						  $conf->{'path'}{'data'}.'/'.$deffile->{'local'});
+      my $result = system( $sys_call );
 
-      if ($result != 0) {
-		print "failed: $!\n";
-		$m->log->fatal("failed: $!");
-		die;
-	  } else {
-		$m->_loaded( $conf->{'path'}{'data'}.'/'.$ontfile->{'local'} , 1 );
-		$m->_loaded( $conf->{'path'}{'data'}.'/'.$deffile->{'local'} , 1 );
-		print "done!\n";
-		$m->log->debug("done!");
-	  }
+      if ( $result != 0 ) {
+        print "System call '$sys_call' failed: $!\n";
+        $m->log->fatal("failed: $!");
+        die;
+      }
+      else {
+        $m->_loaded( catfile($conf->{'path'}{'data'}, $ontfile->{'local'}), 1 );
+        $m->_loaded( catfile($conf->{'path'}{'data'}, $deffile->{'local'}), 1 );
+        print "done!\n";
+        $m->log->debug("done!");
+      }
     }
   }
 
@@ -253,21 +270,27 @@ sub ACTION_ontologies {
 }
 
 sub ACTION_tokenize {
-  my $m = shift;
+  my $m    = shift;
   my $conf = $m->conf;
 
   $m->log->info('entering ACTION_tokenize');
 
-  my $template = Template->new({
-    INTERPOLATE  => 0,
-    RELATIVE     => 1,
-  }) || ($m->log->fatal("Template error: $Template::ERROR") and die);
+  my $template = Template->new(
+    {
+      INTERPOLATE => 0,
+      RELATIVE    => 1,
+    }
+  ) || ( $m->log->fatal("Template error: $Template::ERROR") and die );
 
-  foreach my $tt2file ( keys %{ $m->conf->{tt2} } ){
+  foreach my $tt2file ( keys %{ $m->conf->{tt2} } ) {
     my $tokenized;
-    $template->process($tt2file, $conf->{tt2}->{$tt2file}->{token}, \$tokenized) || ($m->log->fatal("Template error: ".$template->error()) and die);
+    $template->process( 
+      $tt2file, 
+      $conf->{tt2}->{$tt2file}->{token},
+      \$tokenized 
+    ) || ( $m->log->fatal( "Template error: " . $template->error() ) and die );
 
-    open(OUT,'>'.$conf->{tt2}->{$tt2file}->{output});
+    open( OUT, '>' . $conf->{tt2}->{$tt2file}->{output} );
     print OUT $tokenized;
     close(OUT);
   }
@@ -290,50 +313,51 @@ sub ACTION_tokenize {
 
 =cut
 sub fetchAndLoadFiles {
-    my ($m,$conf,$type,$command,$itm) = @_;
-    $m->log->info('entering fetchAndLoadFiles');
+  my ( $m, $conf, $type, $command, $itm ) = @_;
+  $m->log->info('entering fetchAndLoadFiles');
 
-    foreach my $key (keys %$itm){
-	print "fetching files for $key\n";
+  foreach my $key ( keys %$itm ) {
+    print "fetching files for $key\n";
 
-	my $load = 0;
-    foreach my $file (@{ $itm->{$key}{file} }){
-	  # check to see if this command can handle this type
-      if($file->{type} eq $type) {
-		my $fullpath = $conf->{path}{data}.'/'.$file->{local};
-		$fullpath =~ s!^(.+)/[^/]*!$1!;
+    my $load = 0;
+    foreach my $file ( @{ $itm->{$key}{file} } ) {
 
-		if(! -d $fullpath){
-		  $m->log->debug("mkdir -p $fullpath");
-		  system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
-		}
+      # check to see if this command can handle this type
+      if ( $file->{type} eq $type ) {
+        my $fullpath = catfile( $conf->{path}{data}, $file->{local});
+        $fullpath =~ s!^(.+)/[^/]*!$1!;
 
-		print "  +",$file->{remote},"\n";
-		$load = 1 if $m->_mirror($file->{remote},$file->{local});
-		$load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
+        unless ( -d $fullpath ) {
+          $m->log->debug("mkpath $fullpath");
+          mkpath( $fullpath, 0, 0711 )
+            or print "Couldn't make path '$fullpath': $!\n";
+        }
 
-		next unless $load;
+        print "  +", $file->{remote}, "\n";
+        $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+        $load = 1 unless $m->_loaded( $fullpath );
 
-		print "    loading...";
+        next unless $load;
 
-		$m->log->debug("system call: ". $command .' '.
-					   $conf->{'path'}{'data'}.'/'.$file->{'local'}
-					  );
+        print "    loading...";
 
-		my $result = system($command,
-							$conf->{'path'}{'data'}.'/'.$file->{'local'});
+        my $sys_call = join( ' ', $command, $fullpath );
+        $m->log->debug( "system call: $sys_call" );
 
-		if($result != 0) {
-		  print "failed: $!\n";
-		  $m->log->fatal("failed: $!");
-		  die;
-		} else{
-		  $m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
-		  print "done!\n";
-		  $m->log->debug("done!");
-		}
-	  }
-	}
+        my $result = system( $sys_call );
+
+        if ( $result != 0 ) {
+          print "failed: $!\n";
+          $m->log->fatal("failed: $!");
+          die;
+        }
+        else {
+          $m->_loaded( $fullpath, 1 );
+          print "done!\n";
+          $m->log->debug("done!");
+        }
+      }
+    }
   }
 
   $m->log->info('leaving fetchAndLoadFiles');
@@ -387,8 +411,8 @@ sub conf {
 
   my $file = $self->property('load_conf');
   $self->{conf} = XMLin($file, 
-    forcearray  => ['token','path','file'], 
-    keyattr     => [qw(tt2 input token name file)], 
+    ForceArray  => ['token','path','file'], 
+    KeyAttr     => [qw(tt2 input token name file)], 
     ContentKey  => '-value'
   );
 
@@ -407,18 +431,19 @@ sub log {
 }
 
 sub _loaded {
-  my $m = shift;
+  my $m    = shift;
   my $conf = $m->conf;
-  my ($file,$touch) = @_;
-  $file .= '_'. $conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
-  if($touch){
-	open(T,'>'.$file);
+  my ( $file, $touch ) = @_;
+  $file .= '_' . $conf->{'tt2'}{'load/tt2/Makefile.tt2'}{'token'}{'touch_ext'};
+  if ($touch) {
+    open( T, '>' . $file );
     print T "\n";
-	close(T);
-	return 1;
-  } else {
-	return 1 if -f $file;
-	return 0;
+    close(T);
+    return 1;
+  }
+  else {
+    return 1 if -f $file;
+    return 0;
   }
 }
 
