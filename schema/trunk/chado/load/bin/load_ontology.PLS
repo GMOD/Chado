@@ -175,7 +175,7 @@ sub load_ontologyterms{
   #load edge terms
   foreach my $predicate (@predicates) {
     $progress->update(++$loaded);
-	warn "this is a predicate: ", $oborelmap{ predmap($predicate->name) }, "\n" if DEBUG;
+    $progress->message("this is a predicate: ". ref($predicate) ." ". ($oborelmap{ predmap($predicate->name) } || predmap($predicate->name))) if DEBUG;
 
     #create new predicates and dbxrefs as necessary
     if(!$oborelmap{predmap($predicate->name)}){
@@ -186,6 +186,7 @@ sub load_ontologyterms{
 	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
 
 	if(!$predicate_db){
+		$progress->message("creating predicate term for: ".predmap($predicate->name));
 		my $dbxref = Chado::Dbxref->find_or_create({
 				db_id => $db->id,
 				accession => $oborelmap{ predmap($predicate->name) } || predmap($predicate->name),
