@@ -71,7 +71,7 @@ create table tableinfo (
 -- ================================================
 create table project (
        project_id serial not null,
-       primary key (projectinfo_id),
+       primary key (project_id),
        name varchar(255) not null,
       description varchar(255) not null
 );

@@ -17,4 +17,6 @@ all :: ./modules/audit/audit.mysql \
 	./bin/pg2my.pl $< > $@
 
 cdbi:
-	./bin/pg2cdbi.pl ./modules/*/*.sql > ./src/mysql/Chado/AutoDBI.pm
+	./bin/pg2cdbi.pl ./modules/*/*.sql > ./src/pgsql/Chado/AutoDBI.pm
+	./bin/pg2cdbi.pl ./modules/*/*.mysql > ./src/mysql/Chado/AutoDBI.pm
+
