@@ -5,7 +5,7 @@
 package XORT::Loader::XMLParser;
 use lib $ENV{CodeBase};
 use XML::Parser::PerlSAX;
-use XORT:Util::DbUtil::DB;
+use XORT::Util::DbUtil::DB;
 use strict;
 
 # This one is modified on 1/29/2003 for the dtd: chado_1.0.dtd
@@ -313,9 +313,7 @@ for my $i(0..$#temp){
 		 }
                }
 	  }
-          else {
-              $hash_data_ref=&_extract_hash($AoH_data[$level], $hash_level_name{$level-1});
-          }
+
           # for empty hash_ref, will do nothing(other way to test undefined hash ? )
           my @temp;
           foreach my $key (%$hash_data_ref){
@@ -324,6 +322,7 @@ for my $i(0..$#temp){
 	     }
 	  }
 	 if ($#temp >-1 ){
+          #print "\nthere is data for main module table:$hash_level_name{$level-1}";
           my  $hash_ref=&_data_check($hash_data_ref,  $hash_level_name{$level-1}, $level, \%hash_level_id, \%hash_level_name );
 
           # here for different type of op, deal with the $hash_data_ref and return the $db_id
