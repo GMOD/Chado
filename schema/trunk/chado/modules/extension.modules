@@ -1,5 +1,4 @@
 sequence/gff-bridge/sequence-gff-views.sql
 expression/rad.sql
-expression/expression.sql
 #pathway/pathway.sql
 #www/www.sql

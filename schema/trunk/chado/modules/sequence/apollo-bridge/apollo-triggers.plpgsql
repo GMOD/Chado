@@ -630,6 +630,7 @@ DECLARE
   f_type	cvterm.name%TYPE;
   f_type_gene	CONSTANT varchar :=''gene'';
   f_row         feature%ROWTYPE;
+  s_type_id     synonym.type_id%TYPE;
   name_suffix   varchar;
 BEGIN
   IF OLD.uniquename <> NEW.uniquename AND OLD.uniquename NOT LIKE ''%temp%'' THEN
@@ -642,10 +643,16 @@ BEGIN
       RETURN NEW;
   END IF;
 
+
+--fetch a few useful things
+ SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+
   SELECT INTO f_type cv.name FROM feature f, cvterm cv WHERE f.feature_id = OLD.feature_id and f.type_id = cv.cvterm_id; 
 
   IF f_type <> f_type_gene THEN
       --its not a gene, so go ahead
+      --but insert the new name into the synonym table
+      
       RETURN NEW;
   END IF;
 

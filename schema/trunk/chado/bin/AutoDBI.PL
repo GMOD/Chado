@@ -42,7 +42,6 @@ Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHO
 !GROK!THIS!
 
 print OUT <<'!NO!SUBS!';
-# -------------------------------------------------------------------
 package Chado::Tableinfo;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -228,6 +227,8 @@ Chado::Dbxref->has_many(
     'organism_dbxref_dbxref_id', 'Chado::Organism_Dbxref' => 'dbxref_id'
 );
 
+sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_dbxref_dbxref_id }
+
 sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
@@ -262,6 +263,14 @@ Chado::Dbxref->has_many(
     'cvterm_dbxref_dbxref_id', 'Chado::Cvterm_Dbxref' => 'dbxref_id'
 );
 
+sub feature_cvterm_dbxrefs {
+    return shift->feature_cvterm_dbxref_dbxref_id
+}
+
+Chado::Dbxref->has_many(
+    'feature_cvterm_dbxref_dbxref_id', 'Chado::Feature_Cvterm_Dbxref' => 'dbxref_id'
+);
+
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
@@ -274,14 +283,6 @@ sub elements {
 
 Chado::Dbxref->has_many(
     'element_dbxref_id', 'Chado::Element' => 'dbxref_id'
-);
-
-sub phenstatements {
-    return shift->phenstatement_dbxref_id
-}
-
-Chado::Dbxref->has_many(
-    'phenstatement_dbxref_id', 'Chado::Phenstatement' => 'dbxref_id'
 );
 
 sub biomaterials {
@@ -395,32 +396,12 @@ Chado::Cvterm->has_many(
     'protocol_type_id', 'Chado::Protocol' => 'type_id'
 );
 
-sub phenstatementprops {
-    return shift->phenstatementprop_type_id
-}
-
-Chado::Cvterm->has_many(
-    'phenstatementprop_type_id', 'Chado::Phenstatementprop' => 'type_id'
-);
-
 sub elementresult_relationships {
     return shift->elementresult_relationship_type_id
 }
 
 Chado::Cvterm->has_many(
     'elementresult_relationship_type_id', 'Chado::Elementresult_Relationship' => 'type_id'
-);
-
-sub phenstatement_relationships {
-    return shift->phenstatement_relationship_type_id
-}
-
-Chado::Cvterm->has_many(
-    'phenstatement_relationship_type_id', 'Chado::Phenstatement_Relationship' => 'type_id'
-);
-
-Chado::Cvterm->has_many(
-    'phenstatement_relationship_comment_id', 'Chado::Phenstatement_Relationship' => 'comment_id'
 );
 
 sub studyfactors {
@@ -477,6 +458,14 @@ Chado::Cvterm->has_many(
     'arraydesign_substratetype_id', 'Chado::Arraydesign' => 'substratetype_id'
 );
 
+sub library_cvterms {
+    return shift->library_cvterm_cvterm_id
+}
+
+Chado::Cvterm->has_many(
+    'library_cvterm_cvterm_id', 'Chado::Library_Cvterm' => 'cvterm_id'
+);
+
 sub biomaterial_relationships {
     return shift->biomaterial_relationship_type_id
 }
@@ -499,14 +488,6 @@ sub cvterm_dbxrefs {
 
 Chado::Cvterm->has_many(
     'cvterm_dbxref_cvterm_id', 'Chado::Cvterm_Dbxref' => 'cvterm_id'
-);
-
-sub gcontext_relationships {
-    return shift->gcontext_relationship_type_id
-}
-
-Chado::Cvterm->has_many(
-    'gcontext_relationship_type_id', 'Chado::Gcontext_Relationship' => 'type_id'
 );
 
 sub feature_relationshipprops {
@@ -617,6 +598,14 @@ Chado::Cvterm->has_many(
     'quantificationprop_type_id', 'Chado::Quantificationprop' => 'type_id'
 );
 
+sub libraryprops {
+    return shift->libraryprop_type_id
+}
+
+Chado::Cvterm->has_many(
+    'libraryprop_type_id', 'Chado::Libraryprop' => 'type_id'
+);
+
 sub biomaterial_treatments {
     return shift->biomaterial_treatment_unittype_id
 }
@@ -649,14 +638,6 @@ Chado::Cvterm->has_many(
     'cvterm_relationship_object_id', 'Chado::Cvterm_Relationship' => 'object_id'
 );
 
-sub phenstatement_cvterms {
-    return shift->phenstatement_cvterm_cvterm_id
-}
-
-Chado::Cvterm->has_many(
-    'phenstatement_cvterm_cvterm_id', 'Chado::Phenstatement_Cvterm' => 'cvterm_id'
-);
-
 sub acquisitionprops {
     return shift->acquisitionprop_type_id
 }
@@ -672,6 +653,14 @@ sub studydesignprops {
 Chado::Cvterm->has_many(
     'studydesignprop_type_id', 'Chado::Studydesignprop' => 'type_id'
 );
+
+sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_cvterm_id }
+
+Chado::Cvterm->has_many(
+    'library_type_id', 'Chado::Library' => 'type_id'
+);
+
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
 
 sub featureprops {
     return shift->featureprop_type_id
@@ -691,6 +680,14 @@ Chado::Cvterm->has_many(
     'assayprop_type_id', 'Chado::Assayprop' => 'type_id'
 );
 
+sub environment_cvterms {
+    return shift->environment_cvterm_cvterm_id
+}
+
+Chado::Cvterm->has_many(
+    'environment_cvterm_cvterm_id', 'Chado::Environment_Cvterm' => 'cvterm_id'
+);
+
 sub protocolparams {
     return shift->protocolparam_datatype_id
 }
@@ -703,18 +700,10 @@ Chado::Cvterm->has_many(
     'protocolparam_unittype_id', 'Chado::Protocolparam' => 'unittype_id'
 );
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_cvterm_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_cvterm_id }
 
 Chado::Cvterm->has_many(
     'pub_type_id', 'Chado::Pub' => 'type_id'
-);
-
-sub gcontextprops {
-    return shift->gcontextprop_type_id
-}
-
-Chado::Cvterm->has_many(
-    'gcontextprop_type_id', 'Chado::Gcontextprop' => 'type_id'
 );
 
 sub controls {
@@ -741,19 +730,27 @@ Chado::Cvterm->has_many(
     'dbxrefprop_type_id', 'Chado::Dbxrefprop' => 'type_id'
 );
 
-sub feature_gcontexts {
-    return shift->feature_gcontext_cvterm_id
+sub phenotype_cvterms {
+    return shift->phenotype_cvterm_cvterm_id
 }
 
 Chado::Cvterm->has_many(
-    'feature_gcontext_cvterm_id', 'Chado::Feature_Gcontext' => 'cvterm_id'
+    'phenotype_cvterm_cvterm_id', 'Chado::Phenotype_Cvterm' => 'cvterm_id'
 );
 
-sub gcontext_relationships { my $self = shift; return $self->gcontext_relationship_type_id(@_) }
+sub feature_genotypes {
+    return shift->feature_genotype_cvterm_id
+}
 
-sub phenstatement_relationship_type_ids { my $self = shift; return $self->phenstatement_relationship_type_id(@_) }
+Chado::Cvterm->has_many(
+    'feature_genotype_cvterm_id', 'Chado::Feature_Genotype' => 'cvterm_id'
+);
 
-sub phenstatement_relationship_comment_ids { my $self = shift; return $self->phenstatement_relationship_comment_id(@_) }
+sub cvterm_relationship_type_ids { my $self = shift; return $self->cvterm_relationship_type_id(@_) }
+
+sub cvterm_relationship_subject_ids { my $self = shift; return $self->cvterm_relationship_subject_id(@_) }
+
+sub cvterm_relationship_object_ids { my $self = shift; return $self->cvterm_relationship_object_id(@_) }
 
 sub feature_relationships {
     return shift->feature_relationship_type_id
@@ -771,25 +768,35 @@ Chado::Cvterm->has_many(
     'acquisition_relationship_type_id', 'Chado::Acquisition_Relationship' => 'type_id'
 );
 
-sub phenstatements { my $self = shift; return map $_->phenstatement_id, $self->phenstatement_cvterm_cvterm_id }
-
-Chado::Cvterm->has_many(
-    'phenstatement_observable_id', 'Chado::Phenstatement' => 'observable_id'
-);
-
-Chado::Cvterm->has_many(
-    'phenstatement_attr_id', 'Chado::Phenstatement' => 'attr_id'
-);
-
-Chado::Cvterm->has_many(
-    'phenstatement_cvalue_id', 'Chado::Phenstatement' => 'cvalue_id'
-);
-
-Chado::Cvterm->has_many(
-    'phenstatement_assay_id', 'Chado::Phenstatement' => 'assay_id'
-);
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
 
 sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
+
+sub phenstatements {
+    return shift->phenstatement_type_id
+}
+
+Chado::Cvterm->has_many(
+    'phenstatement_type_id', 'Chado::Phenstatement' => 'type_id'
+);
+
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
+
+Chado::Cvterm->has_many(
+    'phenotype_observable_id', 'Chado::Phenotype' => 'observable_id'
+);
+
+Chado::Cvterm->has_many(
+    'phenotype_attr_id', 'Chado::Phenotype' => 'attr_id'
+);
+
+Chado::Cvterm->has_many(
+    'phenotype_cvalue_id', 'Chado::Phenotype' => 'cvalue_id'
+);
+
+Chado::Cvterm->has_many(
+    'phenotype_assay_id', 'Chado::Phenotype' => 'assay_id'
+);
 
 sub pub_relationships {
     return shift->pub_relationship_type_id
@@ -805,6 +812,14 @@ sub feature_cvtermprops {
 
 Chado::Cvterm->has_many(
     'feature_cvtermprop_type_id', 'Chado::Feature_Cvtermprop' => 'type_id'
+);
+
+sub phenotype_comparisons {
+    return shift->phenotype_comparison_type_id
+}
+
+Chado::Cvterm->has_many(
+    'phenotype_comparison_type_id', 'Chado::Phenotype_Comparison' => 'type_id'
 );
 
 # -------------------------------------------------------------------
@@ -1056,6 +1071,14 @@ Chado::Organism->has_many(
     'organism_dbxref_organism_id', 'Chado::Organism_Dbxref' => 'organism_id'
 );
 
+sub librarys {
+    return shift->library_organism_id
+}
+
+Chado::Organism->has_many(
+    'library_organism_id', 'Chado::Library' => 'organism_id'
+);
+
 sub organismprops {
     return shift->organismprop_organism_id
 }
@@ -1151,14 +1174,6 @@ sub type {
     return shift->type_id
 }
 
-sub expression_pubs {
-    return shift->expression_pub_pub_id
-}
-
-Chado::Pub->has_many(
-    'expression_pub_pub_id', 'Chado::Expression_Pub' => 'pub_id'
-);
-
 sub protocols {
     return shift->protocol_pub_id
 }
@@ -1167,11 +1182,23 @@ Chado::Pub->has_many(
     'protocol_pub_id', 'Chado::Protocol' => 'pub_id'
 );
 
-sub featureprops { my $self = shift; return map $_->featureprop_id, $self->featureprop_pub_pub_id }
+sub expression_pubs {
+    return shift->expression_pub_pub_id
+}
 
-sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->pub_dbxref_pub_id }
+Chado::Pub->has_many(
+    'expression_pub_pub_id', 'Chado::Expression_Pub' => 'pub_id'
+);
 
 sub features { my $self = shift; return map $_->feature_id, $self->feature_cvterm_pub_id }
+
+sub library_pubs {
+    return shift->library_pub_pub_id
+}
+
+Chado::Pub->has_many(
+    'library_pub_pub_id', 'Chado::Library_Pub' => 'pub_id'
+);
 
 sub feature_cvterms {
     return shift->feature_cvterm_pub_id
@@ -1183,6 +1210,14 @@ Chado::Pub->has_many(
 
 sub expressions { my $self = shift; return map $_->expression_id, $self->expression_pub_pub_id }
 
+sub library_cvterms {
+    return shift->library_cvterm_pub_id
+}
+
+Chado::Pub->has_many(
+    'library_cvterm_pub_id', 'Chado::Library_Cvterm' => 'pub_id'
+);
+
 sub studys {
     return shift->study_pub_id
 }
@@ -1190,18 +1225,6 @@ sub studys {
 Chado::Pub->has_many(
     'study_pub_id', 'Chado::Study' => 'pub_id'
 );
-
-sub feature_synonyms {
-    return shift->feature_synonym_pub_id
-}
-
-Chado::Pub->has_many(
-    'feature_synonym_pub_id', 'Chado::Feature_Synonym' => 'pub_id'
-);
-
-sub pub_relationship_subject_ids { my $self = shift; return $self->pub_relationship_subject_id(@_) }
-
-sub pub_relationship_object_ids { my $self = shift; return $self->pub_relationship_object_id(@_) }
 
 sub feature_relationship_pubs {
     return shift->feature_relationship_pub_pub_id
@@ -1211,22 +1234,44 @@ Chado::Pub->has_many(
     'feature_relationship_pub_pub_id', 'Chado::Feature_Relationship_Pub' => 'pub_id'
 );
 
-sub pub_authors {
-    return shift->pub_author_pub_id
-}
-
-Chado::Pub->has_many(
-    'pub_author_pub_id', 'Chado::Pub_Author' => 'pub_id'
-);
-
 sub feature_relationshipprops { my $self = shift; return map $_->feature_relationshipprop_id, $self->feature_relationshipprop_pub_pub_id }
 
-sub gcontexts {
-    return shift->gcontext_pub_id
+sub featuremaps { my $self = shift; return map $_->featuremap_id, $self->featuremap_pub_pub_id }
+
+sub pubprops {
+    return shift->pubprop_pub_id
 }
 
 Chado::Pub->has_many(
-    'gcontext_pub_id', 'Chado::Gcontext' => 'pub_id'
+    'pubprop_pub_id', 'Chado::Pubprop' => 'pub_id'
+);
+
+sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_pub_id }
+
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_pub_id(@_) }
+
+sub featureprops { my $self = shift; return map $_->featureprop_id, $self->featureprop_pub_pub_id }
+
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->pub_dbxref_pub_id }
+
+sub pubauthors {
+    return shift->pubauthor_pub_id
+}
+
+Chado::Pub->has_many(
+    'pubauthor_pub_id', 'Chado::Pubauthor' => 'pub_id'
+);
+
+sub pub_relationship_subject_ids { my $self = shift; return $self->pub_relationship_subject_id(@_) }
+
+sub pub_relationship_object_ids { my $self = shift; return $self->pub_relationship_object_id(@_) }
+
+sub feature_synonyms {
+    return shift->feature_synonym_pub_id
+}
+
+Chado::Pub->has_many(
+    'feature_synonym_pub_id', 'Chado::Feature_Synonym' => 'pub_id'
 );
 
 sub feature_pubs {
@@ -1245,6 +1290,10 @@ Chado::Pub->has_many(
     'featuremap_pub_pub_id', 'Chado::Featuremap_Pub' => 'pub_id'
 );
 
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->library_cvterm_pub_id }
+
+sub feature_relationships { my $self = shift; return map $_->feature_relationship_id, $self->feature_relationship_pub_pub_id }
+
 sub feature_relationshipprop_pubs {
     return shift->feature_relationshipprop_pub_pub_id
 }
@@ -1253,11 +1302,15 @@ Chado::Pub->has_many(
     'feature_relationshipprop_pub_pub_id', 'Chado::Feature_Relationshipprop_Pub' => 'pub_id'
 );
 
-sub featuremaps { my $self = shift; return map $_->featuremap_id, $self->featuremap_pub_pub_id }
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_pub_id(@_) }
 
-sub feature_relationships { my $self = shift; return map $_->feature_relationship_id, $self->feature_relationship_pub_pub_id }
+sub phenstatements {
+    return shift->phenstatement_pub_id
+}
 
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->feature_cvterm_pub_id }
+Chado::Pub->has_many(
+    'phenstatement_pub_id', 'Chado::Phenstatement' => 'pub_id'
+);
 
 sub pub_dbxrefs {
     return shift->pub_dbxref_pub_id
@@ -1267,12 +1320,14 @@ Chado::Pub->has_many(
     'pub_dbxref_pub_id', 'Chado::Pub_Dbxref' => 'pub_id'
 );
 
-sub pubprops {
-    return shift->pubprop_pub_id
+sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_pub_id(@_) }
+
+sub phendescs {
+    return shift->phendesc_pub_id
 }
 
 Chado::Pub->has_many(
-    'pubprop_pub_id', 'Chado::Pubprop' => 'pub_id'
+    'phendesc_pub_id', 'Chado::Phendesc' => 'pub_id'
 );
 
 sub featureprop_pubs {
@@ -1281,6 +1336,14 @@ sub featureprop_pubs {
 
 Chado::Pub->has_many(
     'featureprop_pub_pub_id', 'Chado::Featureprop_Pub' => 'pub_id'
+);
+
+sub library_synonyms {
+    return shift->library_synonym_pub_id
+}
+
+Chado::Pub->has_many(
+    'library_synonym_pub_id', 'Chado::Library_Synonym' => 'pub_id'
 );
 
 sub pub_relationships {
@@ -1293,6 +1356,14 @@ Chado::Pub->has_many(
 
 Chado::Pub->has_many(
     'pub_relationship_object_id', 'Chado::Pub_Relationship' => 'object_id'
+);
+
+sub phenotype_comparisons {
+    return shift->phenotype_comparison_pub_id
+}
+
+Chado::Pub->has_many(
+    'phenotype_comparison_pub_id', 'Chado::Phenotype_Comparison' => 'pub_id'
 );
 
 # -------------------------------------------------------------------
@@ -1366,21 +1437,21 @@ sub dbxref {
 }
 
 # -------------------------------------------------------------------
-package Chado::Pub_Author;
+package Chado::Pubauthor;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Pub_Author->set_up_table('pub_author');
+Chado::Pubauthor->set_up_table('pubauthor');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->pub_author_id
+    shift->pubauthor_id
 }
 
-Chado::Pub_Author->has_a(
+Chado::Pubauthor->has_a(
     pub_id => 'Chado::Pub'
 );
 
@@ -1466,6 +1537,8 @@ Chado::Feature->has_many(
     'feature_dbxref_feature_id', 'Chado::Feature_Dbxref' => 'feature_id'
 );
 
+sub librarys { my $self = shift; return map $_->library_id, $self->library_feature_feature_id }
+
 sub featureprops {
     return shift->featureprop_feature_id
 }
@@ -1506,6 +1579,14 @@ Chado::Feature->has_many(
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_feature_id }
 
+sub library_features {
+    return shift->library_feature_feature_id
+}
+
+Chado::Feature->has_many(
+    'library_feature_feature_id', 'Chado::Library_Feature' => 'feature_id'
+);
+
 sub featureranges {
     return shift->featurerange_feature_id
 }
@@ -1530,18 +1611,6 @@ Chado::Feature->has_many(
     'featurerange_rightendf_id', 'Chado::Featurerange' => 'rightendf_id'
 );
 
-sub feature_gcontexts {
-    return shift->feature_gcontext_feature_id
-}
-
-Chado::Feature->has_many(
-    'feature_gcontext_feature_id', 'Chado::Feature_Gcontext' => 'feature_id'
-);
-
-Chado::Feature->has_many(
-    'feature_gcontext_chromosome_id', 'Chado::Feature_Gcontext' => 'chromosome_id'
-);
-
 sub featurelocs {
     return shift->featureloc_feature_id
 }
@@ -1554,6 +1623,14 @@ Chado::Feature->has_many(
     'featureloc_srcfeature_id', 'Chado::Featureloc' => 'srcfeature_id'
 );
 
+sub analysisfeatures {
+    return shift->analysisfeature_feature_id
+}
+
+Chado::Feature->has_many(
+    'analysisfeature_feature_id', 'Chado::Analysisfeature' => 'feature_id'
+);
+
 sub feature_pubs {
     return shift->feature_pub_feature_id
 }
@@ -1562,12 +1639,32 @@ Chado::Feature->has_many(
     'feature_pub_feature_id', 'Chado::Feature_Pub' => 'feature_id'
 );
 
-sub analysisfeatures {
-    return shift->analysisfeature_feature_id
+sub feature_phenotypes {
+    return shift->feature_phenotype_feature_id
 }
 
 Chado::Feature->has_many(
-    'analysisfeature_feature_id', 'Chado::Analysisfeature' => 'feature_id'
+    'feature_phenotype_feature_id', 'Chado::Feature_Phenotype' => 'feature_id'
+);
+
+sub feature_genotypes {
+    return shift->feature_genotype_feature_id
+}
+
+Chado::Feature->has_many(
+    'feature_genotype_feature_id', 'Chado::Feature_Genotype' => 'feature_id'
+);
+
+Chado::Feature->has_many(
+    'feature_genotype_chromosome_id', 'Chado::Feature_Genotype' => 'chromosome_id'
+);
+
+sub elements {
+    return shift->element_feature_id
+}
+
+Chado::Feature->has_many(
+    'element_feature_id', 'Chado::Element' => 'feature_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_feature_id }
@@ -1584,14 +1681,6 @@ Chado::Feature->has_many(
     'feature_relationship_object_id', 'Chado::Feature_Relationship' => 'object_id'
 );
 
-sub elements {
-    return shift->element_feature_id
-}
-
-Chado::Feature->has_many(
-    'element_feature_id', 'Chado::Element' => 'feature_id'
-);
-
 sub featureposs {
     return shift->featurepos_feature_id
 }
@@ -1603,6 +1692,8 @@ Chado::Feature->has_many(
 Chado::Feature->has_many(
     'featurepos_map_feature_id', 'Chado::Featurepos' => 'map_feature_id'
 );
+
+sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->feature_phenotype_feature_id }
 
 # -------------------------------------------------------------------
 package Chado::Featureloc;
@@ -1968,6 +2059,14 @@ sub pub {
     return shift->pub_id
 }
 
+sub feature_cvterm_dbxrefs {
+    return shift->feature_cvterm_dbxref_feature_cvterm_id
+}
+
+Chado::Feature_Cvterm->has_many(
+    'feature_cvterm_dbxref_feature_cvterm_id', 'Chado::Feature_Cvterm_Dbxref' => 'feature_cvterm_id'
+);
+
 sub feature_cvtermprops {
     return shift->feature_cvtermprop_feature_cvterm_id
 }
@@ -2008,6 +2107,37 @@ sub type {
 }
 
 # -------------------------------------------------------------------
+package Chado::Feature_Cvterm_Dbxref;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Cvterm_Dbxref->set_up_table('feature_cvterm_dbxref');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_cvterm_dbxref_id
+}
+
+Chado::Feature_Cvterm_Dbxref->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
+);
+
+sub feature_cvterm {
+    return shift->feature_cvterm_id
+}
+
+Chado::Feature_Cvterm_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
+);
+
+sub dbxref {
+    return shift->dbxref_id
+}
+
+# -------------------------------------------------------------------
 package Chado::Synonym;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -2029,6 +2159,14 @@ Chado::Synonym->has_a(
 sub type {
     return shift->type_id
 }
+
+sub library_synonyms {
+    return shift->library_synonym_synonym_id
+}
+
+Chado::Synonym->has_many(
+    'library_synonym_synonym_id', 'Chado::Library_Synonym' => 'synonym_id'
+);
 
 sub feature_synonyms {
     return shift->feature_synonym_synonym_id
@@ -2078,131 +2216,84 @@ sub pub {
 }
 
 # -------------------------------------------------------------------
-package Chado::Gcontext;
+package Chado::Genotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Gcontext->set_up_table('gcontext');
+Chado::Genotype->set_up_table('genotype');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->gcontext_id
-}
-
-Chado::Gcontext->has_a(
-    pub_id => 'Chado::Pub'
-);
-
-sub pub {
-    return shift->pub_id
+    shift->genotype_id
 }
 
 sub phenstatements {
-    return shift->phenstatement_gcontext_id
+    return shift->phenstatement_genotype_id
 }
 
-Chado::Gcontext->has_many(
-    'phenstatement_gcontext_id', 'Chado::Phenstatement' => 'gcontext_id'
+Chado::Genotype->has_many(
+    'phenstatement_genotype_id', 'Chado::Phenstatement' => 'genotype_id'
 );
 
-sub feature_gcontexts {
-    return shift->feature_gcontext_gcontext_id
-}
+sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenotype_comparison_genotype1_id(@_) }
 
-Chado::Gcontext->has_many(
-    'feature_gcontext_gcontext_id', 'Chado::Feature_Gcontext' => 'gcontext_id'
-);
-
-sub gcontext_relationships {
-    return shift->gcontext_relationship_subject_id
-}
-
-Chado::Gcontext->has_many(
-    'gcontext_relationship_subject_id', 'Chado::Gcontext_Relationship' => 'subject_id'
-);
-
-Chado::Gcontext->has_many(
-    'gcontext_relationship_object_id', 'Chado::Gcontext_Relationship' => 'object_id'
-);
+sub phenotype_comparison_genotype2_ids { my $self = shift; return $self->phenotype_comparison_genotype2_id(@_) }
 
 sub phendescs {
-    return shift->phendesc_gcontext_id
+    return shift->phendesc_genotype_id
 }
 
-Chado::Gcontext->has_many(
-    'phendesc_gcontext_id', 'Chado::Phendesc' => 'gcontext_id'
+Chado::Genotype->has_many(
+    'phendesc_genotype_id', 'Chado::Phendesc' => 'genotype_id'
 );
 
-sub gcontext_relationship_subject_ids { my $self = shift; return $self->gcontext_relationship_subject_id(@_) }
+sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenotype_comparison_genotype1_id(@_) }
 
-sub gcontext_relationship_object_ids { my $self = shift; return $self->gcontext_relationship_object_id(@_) }
+sub phenotype_comparison_genotype2_ids { my $self = shift; return $self->phenotype_comparison_genotype2_id(@_) }
 
-sub gcontextprops {
-    return shift->gcontextprop_gcontext_id
+sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenotype_comparison_genotype1_id(@_) }
+
+sub phenotype_comparison_genotype2_ids { my $self = shift; return $self->phenotype_comparison_genotype2_id(@_) }
+
+sub feature_genotypes {
+    return shift->feature_genotype_genotype_id
 }
 
-Chado::Gcontext->has_many(
-    'gcontextprop_gcontext_id', 'Chado::Gcontextprop' => 'gcontext_id'
+Chado::Genotype->has_many(
+    'feature_genotype_genotype_id', 'Chado::Feature_Genotype' => 'genotype_id'
+);
+
+sub phenotype_comparisons {
+    return shift->phenotype_comparison_genotype1_id
+}
+
+Chado::Genotype->has_many(
+    'phenotype_comparison_genotype1_id', 'Chado::Phenotype_Comparison' => 'genotype1_id'
+);
+
+Chado::Genotype->has_many(
+    'phenotype_comparison_genotype2_id', 'Chado::Phenotype_Comparison' => 'genotype2_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::Gcontext_Relationship;
+package Chado::Feature_Genotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Gcontext_Relationship->set_up_table('gcontext_relationship');
+Chado::Feature_Genotype->set_up_table('feature_genotype');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->gcontext_relationship_id
+    shift->feature_genotype_id
 }
 
-Chado::Gcontext_Relationship->has_a(
-    subject_id => 'Chado::Gcontext'
-);
-
-sub subject {
-    return shift->subject_id
-}
-
-Chado::Gcontext_Relationship->has_a(
-    object_id => 'Chado::Gcontext'
-);
-
-sub object {
-    return shift->object_id
-}
-
-Chado::Gcontext_Relationship->has_a(
-    type_id => 'Chado::Cvterm'
-);
-
-sub type {
-    return shift->type_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Feature_Gcontext;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Feature_Gcontext->set_up_table('feature_gcontext');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->feature_gcontext_id
-}
-
-Chado::Feature_Gcontext->has_a(
+Chado::Feature_Genotype->has_a(
     feature_id => 'Chado::Feature'
 );
 
@@ -2210,15 +2301,15 @@ sub feature {
     return shift->feature_id
 }
 
-Chado::Feature_Gcontext->has_a(
-    gcontext_id => 'Chado::Gcontext'
+Chado::Feature_Genotype->has_a(
+    genotype_id => 'Chado::Genotype'
 );
 
-sub gcontext {
-    return shift->gcontext_id
+sub genotype {
+    return shift->genotype_id
 }
 
-Chado::Feature_Gcontext->has_a(
+Chado::Feature_Genotype->has_a(
     chromosome_id => 'Chado::Feature'
 );
 
@@ -2226,7 +2317,7 @@ sub chromosome {
     return shift->chromosome_id
 }
 
-Chado::Feature_Gcontext->has_a(
+Chado::Feature_Genotype->has_a(
     cvterm_id => 'Chado::Cvterm'
 );
 
@@ -2235,34 +2326,225 @@ sub cvterm {
 }
 
 # -------------------------------------------------------------------
-package Chado::Gcontextprop;
+package Chado::Environment;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Gcontextprop->set_up_table('gcontextprop');
+Chado::Environment->set_up_table('environment');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->gcontextprop_id
+    shift->environment_id
 }
 
-Chado::Gcontextprop->has_a(
-    gcontext_id => 'Chado::Gcontext'
-);
-
-sub gcontext {
-    return shift->gcontext_id
+sub phenstatements {
+    return shift->phenstatement_environment_id
 }
 
-Chado::Gcontextprop->has_a(
-    type_id => 'Chado::Cvterm'
+Chado::Environment->has_many(
+    'phenstatement_environment_id', 'Chado::Phenstatement' => 'environment_id'
 );
 
-sub type {
-    return shift->type_id
+sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phenotype_comparison_environment1_id(@_) }
+
+sub phenotype_comparison_environment2_ids { my $self = shift; return $self->phenotype_comparison_environment2_id(@_) }
+
+sub environment_cvterms {
+    return shift->environment_cvterm_environment_id
+}
+
+Chado::Environment->has_many(
+    'environment_cvterm_environment_id', 'Chado::Environment_Cvterm' => 'environment_id'
+);
+
+sub phendescs {
+    return shift->phendesc_environment_id
+}
+
+Chado::Environment->has_many(
+    'phendesc_environment_id', 'Chado::Phendesc' => 'environment_id'
+);
+
+sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phenotype_comparison_environment1_id(@_) }
+
+sub phenotype_comparison_environment2_ids { my $self = shift; return $self->phenotype_comparison_environment2_id(@_) }
+
+sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phenotype_comparison_environment1_id(@_) }
+
+sub phenotype_comparison_environment2_ids { my $self = shift; return $self->phenotype_comparison_environment2_id(@_) }
+
+sub phenotype_comparisons {
+    return shift->phenotype_comparison_environment1_id
+}
+
+Chado::Environment->has_many(
+    'phenotype_comparison_environment1_id', 'Chado::Phenotype_Comparison' => 'environment1_id'
+);
+
+Chado::Environment->has_many(
+    'phenotype_comparison_environment2_id', 'Chado::Phenotype_Comparison' => 'environment2_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Environment_Cvterm;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Environment_Cvterm->set_up_table('environment_cvterm');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->environment_cvterm_id
+}
+
+Chado::Environment_Cvterm->has_a(
+    environment_id => 'Chado::Environment'
+);
+
+sub environment {
+    return shift->environment_id
+}
+
+Chado::Environment_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
+);
+
+sub cvterm {
+    return shift->cvterm_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Phenotype;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Phenotype->set_up_table('phenotype');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->phenotype_id
+}
+
+Chado::Phenotype->has_a(
+    observable_id => 'Chado::Cvterm'
+);
+
+sub observable {
+    return shift->observable_id
+}
+
+Chado::Phenotype->has_a(
+    attr_id => 'Chado::Cvterm'
+);
+
+sub attr {
+    return shift->attr_id
+}
+
+Chado::Phenotype->has_a(
+    cvalue_id => 'Chado::Cvterm'
+);
+
+sub cvalue {
+    return shift->cvalue_id
+}
+
+Chado::Phenotype->has_a(
+    assay_id => 'Chado::Cvterm'
+);
+
+sub assay {
+    return shift->assay_id
+}
+
+sub phenstatements {
+    return shift->phenstatement_phenotype_id
+}
+
+Chado::Phenotype->has_many(
+    'phenstatement_phenotype_id', 'Chado::Phenstatement' => 'phenotype_id'
+);
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
+
+sub phenotype_cvterms {
+    return shift->phenotype_cvterm_phenotype_id
+}
+
+Chado::Phenotype->has_many(
+    'phenotype_cvterm_phenotype_id', 'Chado::Phenotype_Cvterm' => 'phenotype_id'
+);
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+sub feature_phenotypes {
+    return shift->feature_phenotype_phenotype_id
+}
+
+Chado::Phenotype->has_many(
+    'feature_phenotype_phenotype_id', 'Chado::Feature_Phenotype' => 'phenotype_id'
+);
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+sub phenotype_comparisons {
+    return shift->phenotype_comparison_phenotype1_id
+}
+
+Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype1_id', 'Chado::Phenotype_Comparison' => 'phenotype1_id'
+);
+
+Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype2_id', 'Chado::Phenotype_Comparison' => 'phenotype2_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Phenotype_Cvterm;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->phenotype_cvterm_id
+}
+
+Chado::Phenotype_Cvterm->has_a(
+    phenotype_id => 'Chado::Phenotype'
+);
+
+sub phenotype {
+    return shift->phenotype_id
+}
+
+Chado::Phenotype_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
+);
+
+sub cvterm {
+    return shift->cvterm_id
 }
 
 # -------------------------------------------------------------------
@@ -2281,86 +2563,75 @@ sub id {
 }
 
 Chado::Phenstatement->has_a(
-    gcontext_id => 'Chado::Gcontext'
+    genotype_id => 'Chado::Genotype'
 );
 
-sub gcontext {
-    return shift->gcontext_id
+sub genotype {
+    return shift->genotype_id
 }
 
 Chado::Phenstatement->has_a(
-    dbxref_id => 'Chado::Dbxref'
+    environment_id => 'Chado::Environment'
 );
 
-sub dbxref {
-    return shift->dbxref_id
+sub environment {
+    return shift->environment_id
 }
 
 Chado::Phenstatement->has_a(
-    observable_id => 'Chado::Cvterm'
+    phenotype_id => 'Chado::Phenotype'
 );
 
-sub observable {
-    return shift->observable_id
+sub phenotype {
+    return shift->phenotype_id
 }
 
 Chado::Phenstatement->has_a(
-    attr_id => 'Chado::Cvterm'
+    type_id => 'Chado::Cvterm'
 );
 
-sub attr {
-    return shift->attr_id
+sub type {
+    return shift->type_id
 }
 
 Chado::Phenstatement->has_a(
-    cvalue_id => 'Chado::Cvterm'
+    pub_id => 'Chado::Pub'
 );
 
-sub cvalue {
-    return shift->cvalue_id
+sub pub {
+    return shift->pub_id
 }
 
-Chado::Phenstatement->has_a(
-    assay_id => 'Chado::Cvterm'
-);
+# -------------------------------------------------------------------
+package Chado::Feature_Phenotype;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
 
-sub assay {
-    return shift->assay_id
+Chado::Feature_Phenotype->set_up_table('feature_phenotype');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_phenotype_id
 }
 
-sub phenstatement_relationship_subject_ids { my $self = shift; return $self->phenstatement_relationship_subject_id(@_) }
+Chado::Feature_Phenotype->has_a(
+    feature_id => 'Chado::Feature'
+);
 
-sub phenstatement_relationship_object_ids { my $self = shift; return $self->phenstatement_relationship_object_id(@_) }
-
-sub phenstatementprops {
-    return shift->phenstatementprop_phenstatement_id
+sub feature {
+    return shift->feature_id
 }
 
-Chado::Phenstatement->has_many(
-    'phenstatementprop_phenstatement_id', 'Chado::Phenstatementprop' => 'phenstatement_id'
+Chado::Feature_Phenotype->has_a(
+    phenotype_id => 'Chado::Phenotype'
 );
 
-sub phenstatement_cvterms {
-    return shift->phenstatement_cvterm_phenstatement_id
+sub phenotype {
+    return shift->phenotype_id
 }
-
-Chado::Phenstatement->has_many(
-    'phenstatement_cvterm_phenstatement_id', 'Chado::Phenstatement_Cvterm' => 'phenstatement_id'
-);
-
-sub phenstatement_relationships {
-    return shift->phenstatement_relationship_subject_id
-}
-
-Chado::Phenstatement->has_many(
-    'phenstatement_relationship_subject_id', 'Chado::Phenstatement_Relationship' => 'subject_id'
-);
-
-Chado::Phenstatement->has_many(
-    'phenstatement_relationship_object_id', 'Chado::Phenstatement_Relationship' => 'object_id'
-);
-
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->phenstatement_cvterm_phenstatement_id }
 
 # -------------------------------------------------------------------
 package Chado::Phendesc;
@@ -2378,45 +2649,93 @@ sub id {
 }
 
 Chado::Phendesc->has_a(
-    gcontext_id => 'Chado::Gcontext'
+    genotype_id => 'Chado::Genotype'
 );
 
-sub gcontext {
-    return shift->gcontext_id
+sub genotype {
+    return shift->genotype_id
+}
+
+Chado::Phendesc->has_a(
+    environment_id => 'Chado::Environment'
+);
+
+sub environment {
+    return shift->environment_id
+}
+
+Chado::Phendesc->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::Phenstatement_Relationship;
+package Chado::Phenotype_Comparison;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Phenstatement_Relationship->set_up_table('phenstatement_relationship');
+Chado::Phenotype_Comparison->set_up_table('phenotype_comparison');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->phenstatement_relationship_id
+    shift->phenotype_comparison_id
 }
 
-Chado::Phenstatement_Relationship->has_a(
-    subject_id => 'Chado::Phenstatement'
+Chado::Phenotype_Comparison->has_a(
+    genotype1_id => 'Chado::Genotype'
 );
 
-sub subject {
-    return shift->subject_id
+sub genotype1 {
+    return shift->genotype1_id
 }
 
-Chado::Phenstatement_Relationship->has_a(
-    object_id => 'Chado::Phenstatement'
+Chado::Phenotype_Comparison->has_a(
+    environment1_id => 'Chado::Environment'
 );
 
-sub object {
-    return shift->object_id
+sub environment1 {
+    return shift->environment1_id
 }
 
-Chado::Phenstatement_Relationship->has_a(
+Chado::Phenotype_Comparison->has_a(
+    genotype2_id => 'Chado::Genotype'
+);
+
+sub genotype2 {
+    return shift->genotype2_id
+}
+
+Chado::Phenotype_Comparison->has_a(
+    environment2_id => 'Chado::Environment'
+);
+
+sub environment2 {
+    return shift->environment2_id
+}
+
+Chado::Phenotype_Comparison->has_a(
+    phenotype1_id => 'Chado::Phenotype'
+);
+
+sub phenotype1 {
+    return shift->phenotype1_id
+}
+
+Chado::Phenotype_Comparison->has_a(
+    phenotype2_id => 'Chado::Phenotype'
+);
+
+sub phenotype2 {
+    return shift->phenotype2_id
+}
+
+Chado::Phenotype_Comparison->has_a(
     type_id => 'Chado::Cvterm'
 );
 
@@ -2424,74 +2743,12 @@ sub type {
     return shift->type_id
 }
 
-Chado::Phenstatement_Relationship->has_a(
-    comment_id => 'Chado::Cvterm'
+Chado::Phenotype_Comparison->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub comment {
-    return shift->comment_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Phenstatement_Cvterm;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Phenstatement_Cvterm->set_up_table('phenstatement_cvterm');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->phenstatement_cvterm_id
-}
-
-Chado::Phenstatement_Cvterm->has_a(
-    phenstatement_id => 'Chado::Phenstatement'
-);
-
-sub phenstatement {
-    return shift->phenstatement_id
-}
-
-Chado::Phenstatement_Cvterm->has_a(
-    cvterm_id => 'Chado::Cvterm'
-);
-
-sub cvterm {
-    return shift->cvterm_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Phenstatementprop;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Phenstatementprop->set_up_table('phenstatementprop');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->phenstatementprop_id
-}
-
-Chado::Phenstatementprop->has_a(
-    phenstatement_id => 'Chado::Phenstatement'
-);
-
-sub phenstatement {
-    return shift->phenstatement_id
-}
-
-Chado::Phenstatementprop->has_a(
-    type_id => 'Chado::Cvterm'
-);
-
-sub type {
-    return shift->type_id
+sub pub {
+    return shift->pub_id
 }
 
 # -------------------------------------------------------------------
@@ -2593,6 +2850,208 @@ Chado::Analysisfeature->has_a(
 
 sub analysis {
     return shift->analysis_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Expression;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Expression->set_up_table('expression');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->expression_id
+}
+
+sub expression_pubs {
+    return shift->expression_pub_expression_id
+}
+
+Chado::Expression->has_many(
+    'expression_pub_expression_id', 'Chado::Expression_Pub' => 'expression_id'
+);
+
+sub features { my $self = shift; return map $_->feature_id, $self->feature_expression_expression_id }
+
+sub eimages { my $self = shift; return map $_->eimage_id, $self->expression_image_expression_id }
+
+sub feature_expressions {
+    return shift->feature_expression_expression_id
+}
+
+Chado::Expression->has_many(
+    'feature_expression_expression_id', 'Chado::Feature_Expression' => 'expression_id'
+);
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->expression_pub_expression_id }
+
+sub expression_images {
+    return shift->expression_image_expression_id
+}
+
+Chado::Expression->has_many(
+    'expression_image_expression_id', 'Chado::Expression_Image' => 'expression_id'
+);
+
+sub expression_cvterms {
+    return shift->expression_cvterm_expression_id
+}
+
+Chado::Expression->has_many(
+    'expression_cvterm_expression_id', 'Chado::Expression_Cvterm' => 'expression_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Feature_Expression;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Expression->set_up_table('feature_expression');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_expression_id
+}
+
+Chado::Feature_Expression->has_a(
+    expression_id => 'Chado::Expression'
+);
+
+sub expression {
+    return shift->expression_id
+}
+
+Chado::Feature_Expression->has_a(
+    feature_id => 'Chado::Feature'
+);
+
+sub feature {
+    return shift->feature_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Expression_Cvterm;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Expression_Cvterm->set_up_table('expression_cvterm');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->expression_cvterm_id
+}
+
+Chado::Expression_Cvterm->has_a(
+    expression_id => 'Chado::Expression'
+);
+
+sub expression {
+    return shift->expression_id
+}
+
+Chado::Expression_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
+);
+
+sub cvterm {
+    return shift->cvterm_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Expression_Pub;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Expression_Pub->set_up_table('expression_pub');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->expression_pub_id
+}
+
+Chado::Expression_Pub->has_a(
+    expression_id => 'Chado::Expression'
+);
+
+sub expression {
+    return shift->expression_id
+}
+
+Chado::Expression_Pub->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Eimage;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Eimage->set_up_table('eimage');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->eimage_id
+}
+
+sub expressions { my $self = shift; return map $_->expression_id, $self->expression_image_eimage_id }
+
+sub expression_images {
+    return shift->expression_image_eimage_id
+}
+
+Chado::Eimage->has_many(
+    'expression_image_eimage_id', 'Chado::Expression_Image' => 'eimage_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Expression_Image;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Expression_Image->set_up_table('expression_image');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->expression_image_id
+}
+
+Chado::Expression_Image->has_a(
+    expression_id => 'Chado::Expression'
+);
+
+sub expression {
+    return shift->expression_id
+}
+
+Chado::Expression_Image->has_a(
+    eimage_id => 'Chado::Eimage'
+);
+
+sub eimage {
+    return shift->eimage_id
 }
 
 # -------------------------------------------------------------------
@@ -2775,6 +3234,254 @@ Chado::Featuremap_Pub->has_a(
 
 sub pub {
     return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Library;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Library->set_up_table('library');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->library_id
+}
+
+Chado::Library->has_a(
+    organism_id => 'Chado::Organism'
+);
+
+sub organism {
+    return shift->organism_id
+}
+
+Chado::Library->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
+}
+
+sub library_features {
+    return shift->library_feature_library_id
+}
+
+Chado::Library->has_many(
+    'library_feature_library_id', 'Chado::Library_Feature' => 'library_id'
+);
+
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->library_cvterm_library_id }
+
+sub features { my $self = shift; return map $_->feature_id, $self->library_feature_library_id }
+
+sub library_pubs {
+    return shift->library_pub_library_id
+}
+
+Chado::Library->has_many(
+    'library_pub_library_id', 'Chado::Library_Pub' => 'library_id'
+);
+
+sub libraryprops {
+    return shift->libraryprop_library_id
+}
+
+Chado::Library->has_many(
+    'libraryprop_library_id', 'Chado::Libraryprop' => 'library_id'
+);
+
+sub library_cvterms {
+    return shift->library_cvterm_library_id
+}
+
+Chado::Library->has_many(
+    'library_cvterm_library_id', 'Chado::Library_Cvterm' => 'library_id'
+);
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_library_id }
+
+sub library_synonyms {
+    return shift->library_synonym_library_id
+}
+
+Chado::Library->has_many(
+    'library_synonym_library_id', 'Chado::Library_Synonym' => 'library_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Library_Synonym;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Library_Synonym->set_up_table('library_synonym');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->library_synonym_id
+}
+
+Chado::Library_Synonym->has_a(
+    synonym_id => 'Chado::Synonym'
+);
+
+sub synonym {
+    return shift->synonym_id
+}
+
+Chado::Library_Synonym->has_a(
+    library_id => 'Chado::Library'
+);
+
+sub library {
+    return shift->library_id
+}
+
+Chado::Library_Synonym->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Library_Pub;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Library_Pub->set_up_table('library_pub');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->library_pub_id
+}
+
+Chado::Library_Pub->has_a(
+    library_id => 'Chado::Library'
+);
+
+sub library {
+    return shift->library_id
+}
+
+Chado::Library_Pub->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Libraryprop;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Libraryprop->set_up_table('libraryprop');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->libraryprop_id
+}
+
+Chado::Libraryprop->has_a(
+    library_id => 'Chado::Library'
+);
+
+sub library {
+    return shift->library_id
+}
+
+Chado::Libraryprop->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Library_Cvterm;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Library_Cvterm->set_up_table('library_cvterm');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->library_cvterm_id
+}
+
+Chado::Library_Cvterm->has_a(
+    library_id => 'Chado::Library'
+);
+
+sub library {
+    return shift->library_id
+}
+
+Chado::Library_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
+);
+
+sub cvterm {
+    return shift->cvterm_id
+}
+
+Chado::Library_Cvterm->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Library_Feature;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Library_Feature->set_up_table('library_feature');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->library_feature_id
+}
+
+Chado::Library_Feature->has_a(
+    library_id => 'Chado::Library'
+);
+
+sub library {
+    return shift->library_id
+}
+
+Chado::Library_Feature->has_a(
+    feature_id => 'Chado::Feature'
+);
+
+sub feature {
+    return shift->feature_id
 }
 
 # -------------------------------------------------------------------
@@ -4308,208 +5015,6 @@ Chado::Studyfactorvalue->has_a(
 
 sub assay {
     return shift->assay_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Expression;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Expression->set_up_table('expression');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->expression_id
-}
-
-sub expression_pubs {
-    return shift->expression_pub_expression_id
-}
-
-Chado::Expression->has_many(
-    'expression_pub_expression_id', 'Chado::Expression_Pub' => 'expression_id'
-);
-
-sub features { my $self = shift; return map $_->feature_id, $self->feature_expression_expression_id }
-
-sub eimages { my $self = shift; return map $_->eimage_id, $self->expression_image_expression_id }
-
-sub feature_expressions {
-    return shift->feature_expression_expression_id
-}
-
-Chado::Expression->has_many(
-    'feature_expression_expression_id', 'Chado::Feature_Expression' => 'expression_id'
-);
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->expression_pub_expression_id }
-
-sub expression_images {
-    return shift->expression_image_expression_id
-}
-
-Chado::Expression->has_many(
-    'expression_image_expression_id', 'Chado::Expression_Image' => 'expression_id'
-);
-
-sub expression_cvterms {
-    return shift->expression_cvterm_expression_id
-}
-
-Chado::Expression->has_many(
-    'expression_cvterm_expression_id', 'Chado::Expression_Cvterm' => 'expression_id'
-);
-
-# -------------------------------------------------------------------
-package Chado::Feature_Expression;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Feature_Expression->set_up_table('feature_expression');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->feature_expression_id
-}
-
-Chado::Feature_Expression->has_a(
-    expression_id => 'Chado::Expression'
-);
-
-sub expression {
-    return shift->expression_id
-}
-
-Chado::Feature_Expression->has_a(
-    feature_id => 'Chado::Feature'
-);
-
-sub feature {
-    return shift->feature_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Expression_Cvterm;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Expression_Cvterm->set_up_table('expression_cvterm');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->expression_cvterm_id
-}
-
-Chado::Expression_Cvterm->has_a(
-    expression_id => 'Chado::Expression'
-);
-
-sub expression {
-    return shift->expression_id
-}
-
-Chado::Expression_Cvterm->has_a(
-    cvterm_id => 'Chado::Cvterm'
-);
-
-sub cvterm {
-    return shift->cvterm_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Expression_Pub;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Expression_Pub->set_up_table('expression_pub');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->expression_pub_id
-}
-
-Chado::Expression_Pub->has_a(
-    expression_id => 'Chado::Expression'
-);
-
-sub expression {
-    return shift->expression_id
-}
-
-Chado::Expression_Pub->has_a(
-    pub_id => 'Chado::Pub'
-);
-
-sub pub {
-    return shift->pub_id
-}
-
-# -------------------------------------------------------------------
-package Chado::Eimage;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Eimage->set_up_table('eimage');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->eimage_id
-}
-
-sub expressions { my $self = shift; return map $_->expression_id, $self->expression_image_eimage_id }
-
-sub expression_images {
-    return shift->expression_image_eimage_id
-}
-
-Chado::Eimage->has_many(
-    'expression_image_eimage_id', 'Chado::Expression_Image' => 'eimage_id'
-);
-
-# -------------------------------------------------------------------
-package Chado::Expression_Image;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Expression_Image->set_up_table('expression_image');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->expression_image_id
-}
-
-Chado::Expression_Image->has_a(
-    expression_id => 'Chado::Expression'
-);
-
-sub expression {
-    return shift->expression_id
-}
-
-Chado::Expression_Image->has_a(
-    eimage_id => 'Chado::Eimage'
-);
-
-sub eimage {
-    return shift->eimage_id
 }
 
 1;
