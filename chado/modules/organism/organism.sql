@@ -36,8 +36,8 @@ create table organism_dbxref (
        primary key (organism_dbxref_id),
        organism_id int,
        foreign key (organism_id) references organism (organism_id),
-       dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       dbxref_str varchar(255) not null,
+       foreign key (dbxref_str) references dbxref (dbxref_str),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp
 );

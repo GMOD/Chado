@@ -5,6 +5,8 @@
 create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
+-- dbxref_str is concatenation of dbname:accession[.version]
+       dbxref_str varchar(255) not null,
        dbname varchar(255) not null,
        accession varchar(255) not null,
 -- accession_version is unique key
@@ -13,7 +15,8 @@ create table dbxref (
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique (dbname, accession, version)
+       unique (dbname, accession, version),
+       unique (dbxref_str)
 );
 
 -- ================================================
