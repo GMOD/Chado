@@ -29,7 +29,6 @@ create table mageml (
     mage_package varchar(100) not null,
     mage_ml varchar not null
 );
-insert into tableinfo (name,primary_key_column) values('mageml','mageml_id');
 
 create table magedocumentation (
     magedocumentation_id serial not null,
@@ -41,7 +40,6 @@ create table magedocumentation (
     row_id int not null,
     mageidentifier varchar(100) not null
 );
-insert into tableinfo (name,primary_key_column) values('magedocumentation','magedocumentation_id');
 
 create table protocol (
     protocol_id serial not null,
@@ -58,7 +56,6 @@ create table protocol (
     hardwaredescription varchar(500) null,
     softwaredescription varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('protocol','protocol_id');
 
 create table protocolparam (
     protocolparam_id serial not null,
@@ -72,7 +69,6 @@ create table protocolparam (
 	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
     value varchar(100) null
 );
-insert into tableinfo (name,primary_key_column) values('protocolparam','protocolparam_id');
 
 create table channel (
     channel_id serial not null,
@@ -80,7 +76,6 @@ create table channel (
     name varchar(100) not null,
     definition varchar(500) not null
 );
-insert into tableinfo (name,primary_key_column) values('channel','channel_id');
 
 create table array (
     array_id serial not null,
@@ -108,7 +103,6 @@ create table array (
     num_sub_columns int null,
     num_sub_rows int null
 );
-insert into tableinfo (name,primary_key_column) values('array','array_id');
 
 create table arrayprop (
     arrayprop_id int not null,
@@ -119,7 +113,6 @@ create table arrayprop (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(100) not null
 );
-insert into tableinfo (name,primary_key_column) values('arrayprop','arrayprop_id');
 
 create table assay (
     assay_id serial not null,
@@ -138,7 +131,6 @@ create table assay (
     name varchar(100) null,
     description varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('assay','assay_id');
 
 create table biomaterial (
     biomaterial_id serial not null,
@@ -148,14 +140,13 @@ create table biomaterial (
     biosourceprovider_id int null,
 	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null,
 --is this table still an imp, needs to have a view to use?
-    subclass_view varchar(27) not null,
+--    subclass_view varchar(27) not null,
     dbxref_id varchar(50) null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
 --what about these fields?
-    string1 varchar(100) null,
-    string2 varchar(500) null
+    name varchar(100) null,
+    description varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('biomaterial','biomaterial_id');
 
 create table biomaterialrelationship (
     biomaterialrelationship_id serial not null,
@@ -167,7 +158,6 @@ create table biomaterialrelationship (
     object_id int not null
         foreign key (object_id) references cvterm (cvterm_id)
 );
-insert into tableinfo (name,primary_key_column) values('biomaterialrelationship','biomaterialrelationship_id');
 
 create table biomaterialprop (
     biomaterialprop_id serial not null,
@@ -178,7 +168,6 @@ create table biomaterialprop (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(100) null
 );
-insert into tableinfo (name,primary_key_column) values('biomaterialprop','biomaterialprop_id');
 
 create table treatment (
     treatment_id serial not null,
@@ -194,7 +183,6 @@ create table treatment (
 	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     name varchar(100) null
 );
-insert into tableinfo (name,primary_key_column) values('treatment','treatment_id');
 
 create table biomaterialmeasurement (
     biomaterialmeasurement_id serial not null,
@@ -207,7 +195,6 @@ create table biomaterialmeasurement (
     unittype_id int null,
 	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null
 );
-insert into tableinfo (name,primary_key_column) values('biomaterialmeasurement','biomaterialmeasurement_id');
 
 create table assay_biomaterial (
     assay_biomaterial_id serial not null,
@@ -219,7 +206,6 @@ create table assay_biomaterial (
     channel_id int null,
 	foreign key (channel_id) references channel (channel_id) on delete set null
 );
-insert into tableinfo (name,primary_key_column) values('assay_biomaterial','assay_biomaterial_id');
 
 create table acquisition (
     acquisition_id serial not null,
@@ -234,7 +220,6 @@ create table acquisition (
     name varchar(100) null,
     uri varchar(255) null
 );
-insert into tableinfo (name,primary_key_column) values('acquisition','acquisition_id');
 
 create table acquisitionprop (
     acquisitionprop_id serial not null,
@@ -245,7 +230,6 @@ create table acquisitionprop (
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(50) not null
 );
-insert into tableinfo (name,primary_key_column) values('acquisitionprop','acquisitionprop_id');
 
 create table acquisitionrelationship (
     acquisitionrelationship_id serial not null,
@@ -257,7 +241,6 @@ create table acquisitionrelationship (
     object_id int not null,
 	foreign key (object_id) references acquisition (acquisition_id) on delete cascade
 );
-insert into tableinfo (name,primary_key_column) values('acquisitionrelationship','acquisitionrelationship_id');
 
 create table quantification (
     quantification_id serial not null,
@@ -274,7 +257,6 @@ create table quantification (
     name varchar(100) null,
     uri varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('quantification','quantification_id');
 
 create table quantificationprop (
     quantificationprop_id serial not null,
@@ -285,7 +267,6 @@ create table quantificationprop (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(50) not null
 );
-insert into tableinfo (name,primary_key_column) values('quantificationprop','quantificationprop_id');
 
 create table quantificationrelationship (
     quantificationrelationship_id serial not null,
@@ -297,7 +278,6 @@ create table quantificationrelationship (
     object_id int not null,
 	foreign key (object_id) references quantification (quantification_id) on delete cascade
 );
-insert into tableinfo (name,primary_key_column) values('quantificationrelationship','quantificationrelationship_id');
 
 create table control (
     control_id serial not null,
@@ -312,7 +292,6 @@ create table control (
     name varchar(100) null,
     value varchar(255) null
 );
-insert into tableinfo (name,primary_key_column) values('control','control_id');
 
 create table element (
     element_id serial not null,
@@ -342,7 +321,6 @@ create table element (
     string1 varchar(500) null,
     string2 varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('element','element_id');
 
 create table elementresult (
     elementresult_id serial not null,
@@ -390,7 +368,6 @@ create table elementresult (
     string1 varchar(500) null,
     string2 varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('elementresult','elementresult_id');
 
 --this is so we can knock out the compositeelementresult_id FK from elementresult
 --better to just have a part_of relationship between elements
@@ -404,7 +381,6 @@ create table elementesultrelationship (
     object_id int not null,
         foreign key (object_id) references cvterm (cvterm_id),
 );
-insert into tableinfo (name,primary_key_column) values('elementresultrelationship','elementresultrelationship_id');
 
 create table study (
     study_id serial not null,
@@ -418,7 +394,6 @@ create table study (
     name varchar(100) not null,
     description varchar(4000) null
 );
-insert into tableinfo (name,primary_key_column) values('study','study_id');
 
 create table study_assay (
     study_assay_id serial not null,
@@ -428,7 +403,6 @@ create table study_assay (
     assay_id int not null,
 	foreign key (assay_id) references assay (assay_id) on delete cascade
 );
-insert into tableinfo (name,primary_key_column) values('study_assay','study_assay_id');
 
 create table studydesign (
     studydesign_id serial not null,
@@ -437,7 +411,6 @@ create table studydesign (
 	foreign key (study_id) references study (study_id) on delete cascade,
     description varchar(4000) null
 );
-insert into tableinfo (name,primary_key_column) values('studydesign','studydesign_id');
 
 create table studydesignprop (
     studydesignprop_id serial not null,
@@ -448,7 +421,6 @@ create table studydesignprop (
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value varchar(500) not null
 );
-insert into tableinfo (name,primary_key_column) values('studydesignprop','studydesignprop_id');
 
 create table studyfactor (
     studyfactor_id serial not null,
@@ -460,7 +432,6 @@ create table studyfactor (
     name varchar(100) not null,
     description varchar(500) null
 );
-insert into tableinfo (name,primary_key_column) values('studyfactor','studyfactor_id');
 
 create table studyfactorvalue (
     studyfactorvalue_id serial not null,
@@ -472,4 +443,3 @@ create table studyfactorvalue (
     factorvalue varchar(100) not null,
     name varchar(100) null
 );
-insert into tableinfo (name,primary_key_column) values('studyfactorvalue','studyfactorvalue_id');
