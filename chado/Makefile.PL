@@ -2,6 +2,15 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
+# questions to ask:
+#  - what database server
+#  - do you want to create Class::DBI stuff (which will be done now,
+#      so that it can be put in lib/Class/DBI)
+#
+
+
+
+
 my %O;
 
 #hard code these for the moment for testing
@@ -19,6 +28,10 @@ while (<CORE>) {
   push @sqlfiles, 'modules/'.$_;
 }
 close CORE;
+
+#what server? (Assume Pg for now)
+#my $db = prompt("What database server will you be using?",'PostgreSQL');
+#die "Really only PostgreSQL is well supported right now" unless $db =~ /^[Pp]/;
 
 # get available extensions to core and ask if any are to be used.
 print "Available extensions to the core schema:\n";
@@ -53,6 +66,10 @@ foreach my $file (@sqlfiles) {
 }
 close OUT;
 
+warn "Creating Class::DBI classes in lib/ (this could take a while) ...\n";
+system("./bin/pg2cdbi.pl ./modules/complete.sql > ./lib/Chado/AutoDBI.pm")==0
+  or die "bin/pg2cdbi.pl failed";
+
 
 WriteMakefile(
     'NAME'		=> 'chado',
@@ -68,7 +85,6 @@ WriteMakefile(
 print <<HERE
 ----------------------------------------------------------
 possible targets of makefile:
-  cdbi      - build Class::DBI middleware layer
   diagram   - make diagram images of schema
   graphviz  - make graphviz images of schema
   metadata  - ???
@@ -77,9 +93,6 @@ possible targets of makefile:
 
 HINT: you probably want to run (at least) "make test_load"
 ----------------------------------------------------------
---
-NOTE FROM/TO Scott: make sure that if Class::DBI is made, 
-that it also gets moved to blib to be installed!!
 HERE
 ;
 
@@ -97,7 +110,7 @@ go ::
 	make go/function.go_loaded
 	make go/process.go_loaded
 
-websync :: \
+websync :: 
 	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/component.ontology
 	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/function.ontology
 	wget -nd -N -r -Pgo http://www.geneontology.org/ontology/process.ontology
