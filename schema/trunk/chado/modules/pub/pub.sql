@@ -61,15 +61,15 @@ create table pub_relationship (
 create table pub_dbxref (
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       dbxref_str varchar(255) not null,
-       foreign key (dbxref_str) references dbxref (dbxref_str),
+       dbxrefstr varchar(255) not null,
+       foreign key (dbxrefstr) references dbxref (dbxrefstr),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(pub_id,dbxref_str)
+       unique(pub_id,dbxrefstr)
 );
 
-create index pub_dbxref_ind1 on pub_dbxref (dbxref_str);
+create index pub_dbxref_ind1 on pub_dbxref (dbxrefstr);
 
 
 -- ================================================
