@@ -163,7 +163,7 @@ create table featureprop (
        pkey_id int not null,
        foreign key (pkey_id) references cvterm (cvterm_id),
        pval text not null default '',
-       prank integer,
+       prank int not null default 0,
 
        unique(feature_id, pkey_id, pval, prank)
 );
