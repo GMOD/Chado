@@ -44,6 +44,7 @@ my $KNOWNGENEMRNA  = $ANNOTATIONS.'/knownGeneMrna.txt';
 my $KNOWNLOCUSLINK = $ANNOTATIONS.'/knownToLocusLink.txt';
 my $KNOWNPFAM      = $ANNOTATIONS.'/knownToPfam.txt';
 my $KNOWNU133      = $ANNOTATIONS.'/knownToU133.txt';
+my $KNOWNU133PLUS  = $ANNOTATIONS.'/knownToU133Plus2.txt';
 my $KNOWNU95       = $ANNOTATIONS.'/knownToU95.txt';
 my $GENBANK        = $ANNOTATIONS.'/genbank2accessions.txt';
 my $LOCACC         = $ANNOTATIONS.'/loc2acc';
@@ -57,20 +58,44 @@ my %xref;
 my %loc2mrna;
 my %ref2mrna;
 
+print STDERR "Parsing Genbank...";
 parseGenbank(\%xref,$GENBANK);
+print STDERR "done!\n";
+print STDERR "Parsing Genbank Peptide...";
 parseKnownGenePep(\%xref,$KNOWNGENEPEP);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene...";
 parseKnownGeneMrna(\%xref,$KNOWNGENEMRNA);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene Xref...";
 parseKgXref(\%xref,$KGXREF);
+print STDERR "done!\n";
+print STDERR "Parsing LocusLink...";
 parseLocAcc(\%xref,$LOCACC); # the best way I've found so far
                                                   # to link Genbank mRNA accession to
                                                   # Genbank protein accession
+print STDERR "done!\n";
+print STDERR "Parsing LocusLink -> GO...";
 parseLocGo(\%xref,$LOCGO);
+print STDERR "done!\n";
+print STDERR "Parsing LocusLink -> UniGene...";
 parseLocUG(\%xref,$LOCUG);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene -> Locuslink...";
 parseKnownLocusLink(\%xref,$KNOWNLOCUSLINK);
-parseKnownAffy(\%xref,$KNOWNU133,$KNOWNU95);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene -> Affy...";
+parseKnownAffy(\%xref,$KNOWNU133PLUS,$KNOWNU133,$KNOWNU95);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene -> PFAM...";
 parseKnownPfam(\%xref,$KNOWNPFAM);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene -> RefSeq...";
 parseRefLink(\%xref,$REFLINK);
+print STDERR "done!\n";
+print STDERR "Parsing Known Gene -> RefSeq Summary...";
 parseRefSeqSummary(\%xref,$REFSEQSUMMARY);
+print STDERR "done!\n";
 
 print "##gff-version 3\n";
 #if(1){ #for debugging
@@ -93,21 +118,54 @@ while (<KG>) {
   # print the transcript
   print join ("\t",$chrom,$SRCDB,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id;");
   if(defined($xref{$id})) {
-    foreach my $annotation_set (map {($_ !~ /^sequence/) ? $_ : undef} keys %{$xref{$id}}) {
+    print "Dbxref=";
+    my @annotation_sets = grep { $_ =~ /^db:/ && $_ !~ /protein/ } keys %{$xref{$id}};
+    my $i = 0;
+    foreach my $annotation_set ( @annotation_sets ) {
       next unless $annotation_set;
-      print "$annotation_set=". join(",", keys %{$xref{$id}{$annotation_set}}) .';';
+      $annotation_set =~ s/^db://;
 
+      #yeah, it's a hack.  so fix it.
+      my $foo = join(",",
+                     map {uri_escape("$annotation_set:$_")}
+                     grep { $xref{$id}{'db:'.$annotation_set}{$_} != 0 && $_ != 0 }
+                     keys %{$xref{$id}{'db:'.$annotation_set}}
+                    );
+      print $foo;
+      $i++;
+      print "," if $foo && $i != scalar(@annotation_sets);
     }
+    print ";";
+
+    if(my @aliases = keys %{ $xref{$id}{Alias} }){
+      print "Alias=" . join(",", map {uri_escape($_)} @aliases) . ";";
+    }
+
+    if(my @notes = keys %{ $xref{$id}{Note} }){
+      print "Note=" . join(",", map {uri_escape($_)} @notes) . ";";
+    }
+
     print "\n";
 
-    foreach my $annotation_set (map {($_ !~ /^sequence/ and $_ =~ /genbank:protein/) ? $_ : undef} keys %{$xref{$id}}){
-      next unless $annotation_set;
-
-      #there may be multiple protein IDs associated with a given mRNA.  list them separately.
-      #there is nothing in the spec saying only one ID tag per line, but it seems sensible.
-      foreach my $i (keys %{$xref{$id}{$annotation_set}}){
-        print join ("\t",'.',$SRCDB,'protein','.','.','.','.','.',"ID=$i;Parent=$id"), "\n";
+    #and print the protein if there is one
+    if( my($prot_id) = keys %{$xref{$id}{'db:RefSeq_protein'}} ){
+      @annotation_sets = grep { $_ =~ /^db:/ && $_ =~ /protein/ } keys %{$xref{$id}};
+      print join ("\t",'.',$SRCDB,'protein','.','.','.','.','.',"ID=$prot_id;Parent=$id;");
+      my $i = 0;
+      print "Dbxref=";
+      foreach my $annotation_set ( @annotation_sets ) {
+        my @a = keys %{ $xref{$id}{$annotation_set} };
+        $annotation_set =~ s/db://;
+        my $j = 0;
+        foreach my $a (@a){
+          print uri_escape( "$annotation_set:$a" ) if $a;
+          $j++;
+          print "," if $a && $j != scalar(@a);
+        }
+        $i++;
+        print "," unless $i == scalar(@annotation_sets);
       }
+      print ";\n";
     }
   }
 
@@ -233,13 +291,13 @@ foreach my $kg (keys %xref){
   my $seq_prot = $xref{$kg}{'sequence:protein'};
 
   if($seq_mrna){
-    foreach my $k (keys %{$xref{$kg}{'db:genbank:mrna'}}){
+    foreach my $k (keys %{$xref{$kg}{'db:GenBank_mRNA'}}){
       print ">$k\n". wrap('','',$seq_mrna) ."\n";
     }
   }
 
   if($seq_prot){
-    foreach my $k (keys %{$xref{$kg}{'db:genbank:protein'}}){
+    foreach my $k (keys %{$xref{$kg}{'db:GenBank_protein'}}){
       print ">$k\n". wrap('','',$seq_prot) ."\n";
     }
   }
@@ -282,7 +340,7 @@ sub parseLocAcc {
 
     push @{ $loc2mrna{$loc} }, $gene;
 
-	$xref->{$gene}{'db:genbank:protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-' || $protein !~ /^[A-Z]{3}\d/ || $protein =~ /_/);
+	$xref->{$gene}{'db:GenBank_protein'}{$protein} = 1 unless($gene eq 'none' || $protein eq '-' || $protein !~ /^[A-Z]{3}\d/ || $protein =~ /_/);
   }
   close ANNFILE;
 }
@@ -336,7 +394,7 @@ sub parseLocUG {
 
     if($loc2mrna{$line[0]}){
       foreach my $mrna (@{$loc2mrna{$line[0]}}){
-        $xref->{$mrna}{'db:unigene'}{$line[1]} = 1;
+        $xref->{$mrna}{'db:Unigene'}{$line[1]} = 1;
       }
     }
   }
@@ -365,12 +423,12 @@ sub parseRefLink {
 
     if($ref2mrna{$refmrna}){
       foreach my $mrna (@{$ref2mrna{$refmrna}}){
-        $xref->{$mrna}{'db:locuslink'}{$locus} = 1;
-        $xref->{$mrna}{'db:omim'}{$omim} = 1;
-        $xref->{$mrna}{'db:refseq:mrna'}{$refmrna} = 1;
-        $xref->{$mrna}{'db:refseq:protein'}{$refprotein} = 1;
+        $xref->{$mrna}{'db:LocusLink'}{$locus} = 1;
+        $xref->{$mrna}{'db:OMIM'}{$omim} = 1;
+        $xref->{$mrna}{'db:RefSeq_mRNA'}{$refmrna} = 1;
+        $xref->{$mrna}{'db:RefSeq_protein'}{$refprotein} = 1;
         $xref->{$mrna}{'Alias'}{$symbol} = 1;
-        $xref->{$mrna}{'description'}{$description} = 1;
+        $xref->{$mrna}{'Note'}{$description} = 1;
       }
     }
   }
@@ -425,7 +483,7 @@ sub parseKnownLocusLink {
     chomp;
     next if /^#/;
 	my ($accession,$locuslink) = split /\t/;
-	$xref->{$accession}{'db:locuslink'}{$locuslink} = 1;
+	$xref->{$accession}{'db:LocusLink'}{$locuslink} = 1;
   }
   close ANNFILE;
 }
@@ -449,7 +507,7 @@ sub parseKnownPfam {
     chomp;
     next if /^#/;
 	my ($accession,$pfam) = split /\t/;
-	$xref->{$accession}{'db:pfam'}{$pfam} = 1;
+	$xref->{$accession}{'db:PFAM'}{$pfam} = 1;
   }
   close ANNFILE;
 }
@@ -470,13 +528,14 @@ sub parseKnownAffy {
   my $xref = shift @_;
 
   my $i = 0;
+  my @chip = qw(U133PLUS U133 U95);
   foreach my $filename (@_){
     open  ANNFILE, $filename or die "Can't open file $filename: $!";
     while(<ANNFILE>) {
       chomp;
       next if /^#/;
       my ($accession,$probeset) = split /\t/;
-      $xref->{$accession}{'db:affy:'.($i?'U95':'U133')}{$probeset} = 1;
+      $xref->{$accession}{'db:Affymetrix_'.$chip[$i]}{$probeset} = 1;
     }
     close ANNFILE;
     $i++;
@@ -557,7 +616,7 @@ sub parseGenbank {
     chomp;
     next if /^#/;
     my ($mrna, $prot) = split /\t/;
-    $xref->{$mrna}{'db:genbank:protein'}{$prot} = 1 if $prot =~ /^[A-Z]{3}\d/ and $prot !~ /_/;
+    $xref->{$mrna}{'db:GenBank_protein'}{$prot} = 1 if $prot =~ /^[A-Z]{3}\d/ and $prot !~ /_/;
 #    $annotations->{$mrna} = $prot;
   }
   close ANNFILE;
@@ -598,14 +657,14 @@ sub parseKgXref {
     #http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html#AccessionB
     #http://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html#ProteinIDB
 
-    $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID and $kgID =~ /^[A-Z]{1,2}\d/ and $kgID !~ /_/;
-    $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA and $mRNA =~ /^[A-Z]{1,2}\d/ and $mRNA !~ /_/ and $mRNA ne $kgID;
-    $xref->{$key}{'db:swissprot'}{$spID}                = 1 if $spID;
-    $xref->{$key}{'db:swissprot:display'}{$spDisplayID} = 1 if $spDisplayID and $spDisplayID ne $spID;
+    $xref->{$key}{'db:GenBank_protein'}{$kgID}          = 1 if $kgID and $kgID =~ /^[A-Z]{1,2}\d/ and $kgID !~ /_/;
+    $xref->{$key}{'db:GenBank_mRNA'}{$mRNA}             = 1 if $mRNA and $mRNA =~ /^[A-Z]{1,2}\d/ and $mRNA !~ /_/ and $mRNA ne $kgID;
+    $xref->{$key}{'db:Swiss'}{$spID}                    = 1 if $spID;
+    $xref->{$key}{'db:Swiss'}{$spDisplayID}             = 1 if $spDisplayID and $spDisplayID ne $spID;
     $xref->{$key}{'Alias'}{$geneSymbol}                 = 1 if $geneSymbol;
-    $xref->{$key}{'db:refseq:mrna'}{$refseq}            = 1 if $refseq and $refseq =~ /^(NC|NG|NM|NR|NT|NW|XM|XR|NZ)_/;
-    $xref->{$key}{'db:refseq:protein'}{$protAcc}        = 1 if $protAcc and $protAcc =~ /^(NP|XP|ZP)_/;
-    $xref->{$key}{'description'}{$description}          = 1 if $description;
+    $xref->{$key}{'db:RefSeq_mRNA'}{$refseq}            = 1 if $refseq and $refseq =~ /^(NC|NG|NM|NR|NT|NW|XM|XR|NZ)_/;
+    $xref->{$key}{'db:RefSeq_protein'}{$protAcc}        = 1 if $protAcc and $protAcc =~ /^(NP|XP|ZP)_/;
+    $xref->{$key}{'Note'}{$description}          = 1 if $description;
   }
   close(ANNFILE);
 }
@@ -640,7 +699,7 @@ site.  Give the table file as the argument to this script.  You may
 want to provide an alternative "source" field.  Otherwise this script
 defaults to "UCSC".
 
-  % pucsc_genes2gff.pl -src RefSeq refseq_data.ucsc > refseq.gff
+  % ucsc_genes2gff.pl -src RefSeq refseq_data.ucsc > refseq.gff
 
 The resulting GFF file can then be loaded into a Bio::DB::GFF database
 using the following command:
@@ -653,7 +712,7 @@ L<Bio::DB::GFF>, L<bulk_load_gff.pl>, L<load_gff.pl>
 
 =head1 AUTHOR
 
-Lincoln Stein <lstein@cshl.org>.
+Allen Day <allenday@ucla.edu>, Lincoln Stein <lstein@cshl.org>.
 
 Copyright (c) 2003 Cold Spring Harbor Laboratory
 
