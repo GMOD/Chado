@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
 use strict;
-use lib 'lib';
+use lib '/raid5a/boconnor/cvsroot/gmod-schema/chado/lib';
 use DBI;
 use Data::Dumper;
-use Chado::LoadDBI;
+#use Chado::LoadDBI;
 use Chado::AutoDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
@@ -31,7 +31,7 @@ my ($ontology_file, $ontology_deffile) = @ARGV;
 #allow non-existant defsfile for this one
 die "USAGE: $0 <dagedit file> [<defs file>]" unless $ontology_file;
 
-Chado::LoadDBI->init();
+#Chado::LoadDBI->init();
 
 #######################################
 # SET UP GLOBAL VARS
