@@ -15,7 +15,7 @@ insert into cvterm (name,cv_id) values ('survival_time',(select cv_id from cv wh
 insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
-insert into pub (miniref,type_id) values ('null',(select cvterm_id from cvterm where name = 'null'));
+insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
 insert into db (name, contact_id) values ('DB:refseq' ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank',(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucsc'   ,(select contact_id from contact where name = 'null'));

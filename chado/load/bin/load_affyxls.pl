@@ -118,6 +118,8 @@ while(my $arrayio = $affx->next_array){
 
   my($nulltype)               = Chado::Cvterm->search( name => 'null' );
   my($oligo)                  = Chado::Cvterm->search( name => 'microarray_oligo' );
+  die "couldn't find ontology term 'microarray_oligo', did you load the Sequence Ontology?" unless ref($oligo);
+
   my($human)                  = Chado::Organism->search( common_name => 'Human' );
   my $operator                = Chado::Contact->find_or_create( { name => 'UCLA Microarray Core' });
   my $operator_quantification = Chado::Contact->find_or_create( { name => $ENV{USER} });
@@ -164,7 +166,7 @@ while(my $arrayio = $affx->next_array){
   }
 
   my $assay = Chado::Assay->find_or_create({
-									array_id => $array,
+									array_id => $array->id,
 									operator_id => $operator->id,
                                     name => $chip_id,
 									protocol_id => $protocol_assay->id,
@@ -232,6 +234,7 @@ while(my $arrayio = $affx->next_array){
 
 
     if(!$feature){
+$progress->message("creating feature: ".$featuregroup->id);
       $feature = Chado::Feature->find_or_create({
                                                  organism_id => $human,
                                                  type_id => $oligo,
@@ -243,6 +246,7 @@ while(my $arrayio = $affx->next_array){
     }
 
 	if(!$element){
+$progress->message("creating element for: ".$featuregroup->id);
 	  $element = Chado::Element->find_or_create({
 												 feature_id => $feature,
 												 array_id => $array,
