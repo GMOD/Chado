@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.4 2003-12-23 22:19:06 allenday Exp $
+$Id: README.H_sapiens,v 1.5 2003-12-24 07:17:35 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -30,12 +30,12 @@ LOAD GENOMIC DATA
 1. Download chromosome data.  The following URL provides a GFF describing
 the chromosomes given in UCSC Build 16 (hg16) of the Human genome.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.chromosomes.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.chromosome.gff
 
 Load the GFF file as below.  Make sure you are in your chado distribution
 directory.
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile Hg16.chromosomes.gff
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile Hg16.chromosome.gff
 
 If you look at the data loaded into the feature table at this point,
 you will notice that the chromosomes have been loaded as objects of
