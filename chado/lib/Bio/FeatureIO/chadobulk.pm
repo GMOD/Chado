@@ -4,6 +4,7 @@ use strict;
 use base qw(Bio::FeatureIO);
 
 use Bio::SeqIO;
+use Bio::GMOD::Config;
 use DBI;
 use Data::Dumper;
 
@@ -25,7 +26,10 @@ sub _initialize {
   $self->contact($arg{-contact});
   $self->pub($arg{-pub});
 
-  $self->dbh(DBI->connect('dbi:Pg:host=soleus;dbname=chado_bulktest','allenday',''));
+  #my $config = Bio::GMOD::Config->new();
+  #warn Dumper($config);
+
+  $self->dbh(DBI->connect('dbi:Pg:host=oratino;dbname=chado1','aday','aday'));
   $self->setup();
 }
 
@@ -39,19 +43,84 @@ sub write_feature {
   my $dbxref_id   = "\\N";
 
   my $organism_id = 1; #FIXME
-#  my $organism_id = $self->organism->id;
+
+  my $feature_id = $self->write_row_feature($feature);
+  $self->write_row_featureloc($feature , $feature_id);
+  $self->write_row_feature_relationship($feature,$feature_id);
+}
+
+sub DESTROY {
+  my $self = shift;
+  $self->bulkload();
+  $self->cleanup();
+}
+
+=head2 write_row_feature
+
+ Title   : write_row_feature
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub write_row_feature{
+  my ($self,$feature) = @_;
+
+#      Column      |            Type             | Modifiers
+#------------------+-----------------------------+----------
+# feature_id       | integer                     | not null
+
+  my $feature_id = $self->seq('feature');
+
+# dbxref_id        | integer                     |
+
+  my $dbxref_id = '\\N';
+
+# organism_id      | integer                     | not null
+
+  my $organism_id = 1; #FIXME
+  #my $organism_id = $self->organism->id;
+
+# name             | character varying(255)      |
 
   my @names = map {$_->value} $feature->annotation->get_Annotations('Name');
-  my $name = $names[0] || '\\N';
+  my $name = $names[0];
   if(scalar(@names) > 1){
-    $self->throw('feature can only have one name, but had: '.join(' ',@names));
+    $self->throw('feature can only have one Name, (this is a limitation in the loader and/or gff spec, not the file) but had: '.join(' ',@names));
   }
 
+# uniquename       | text                        | not null
+
   my @unames = map {$_->value} $feature->annotation->get_Annotations('ID');
-  my $uname = $unames[0] || $feature->seq_id.':'.$feature->start.','.$feature->end;
-  if(scalar(@unames) > 1){
-    $self->throw('feature can only have one ID, but had: '.join(' ',@unames));
+  my $uname = $unames[0];
+  if($uname){
+    $self->feature_id($uname,$feature_id);
+  } else {
+    $uname = $feature->seq_id.':'.$feature->start.','.$feature->end;
   }
+  if(scalar(@unames) > 1){
+    $self->throw('feature can only have one ID (this is a limitation in the loader and/or gff spec, not the file), but had: '.join(' ',@unames));
+  }
+
+  $name ||= $uname;
+
+# residues         | text                        |
+
+  my $residues = '\\N';
+
+# seqlen           | integer                     |
+
+  my $seqlen = '\\N';
+
+# md5checksum      | character(32)               |
+
+  my $md5 = '\\N';
+
+# type_id          | integer                     | not null
 
   my @types = map { $self->cvterm($_->name) } $feature->annotation->get_Annotations('feature_type');
   my $type = $types[0];
@@ -60,19 +129,131 @@ sub write_feature {
   }
   $self->throw("$feature has undefined feature_type, bailing out") unless $type;
 
-  my $feature_fh = $self->file('feature');
-  my $feature_id = $self->seq('feature');
+# is_analysis      | boolean                     | not null
 
   my $is_analysis = 'F';
 
-  print $feature_fh join("\t",$feature_id,$dbxref_id,$organism_id,$name,$uname,'\\N','\\N','\\N',$type,$is_analysis,$self->now,$self->now),"\n";
+# timeaccessioned  | timestamp without time zone | not null
+
+  my $timeaccessioned = $self->now();
+
+# timelastmodified | timestamp without time zone | not null
+
+  my $timelastmodified = $self->now();
+
+  my $feature_fh = $self->file('feature');
+  print $feature_fh join("\t",
+                         $feature_id,$dbxref_id,$organism_id,$name,$uname,
+                         $residues,$seqlen,$md5,$type,$is_analysis,
+                         $timeaccessioned,$timelastmodified),"\n";
+
+  return $feature_id;
 }
 
-sub DESTROY {
-  my $self = shift;
-  $self->bulkload();
-  $self->cleanup();
+=head2 write_row_featureloc
+
+ Title   : write_row_featureloc
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub write_row_featureloc{
+  my ($self,$feature,$feature_id) = @_;
+
+#     Column      |   Type   |                               Modifiers
+#-----------------+----------+-----------------------------------------------------------------------
+# featureloc_id   | integer  | not null
+
+  my $featureloc_id = $self->seq('featureloc');
+
+# feature_id      | integer  | not null
+
+  #passed as arg
+
+# srcfeature_id   | integer  |
+
+  my $srcfeature_id = $self->feature_id($feature->seq_id);
+
+# fmin            | integer  |
+
+  my $fmin = $feature->start();
+
+# is_fmin_partial | boolean  | not null
+
+  my $is_fmin_partial = 'F';
+
+# fmax            | integer  |
+
+  my $fmax = $feature->end() + 1;
+
+# is_fmax_partial | boolean  | not null
+
+  my $is_fmax_partial = 'F';
+
+# strand          | smallint |
+
+  my $strand = $feature->strand();
+
+# phase           | integer  |
+
+  my $phase = $feature->frame();
+  $phase = '\\N' if $phase eq '.';
+
+# residue_info    | text     |
+
+  my $residue_info = '\\N';
+
+# locgroup        | integer  | not null
+
+  my $locgroup = 0;
+
+# rank            | integer  | not null
+
+  my $rank = 0;
+
+  my $featureloc_fh = $self->file('featureloc');
+  print $featureloc_fh join("\t",
+                            $featureloc_id,$feature_id,$srcfeature_id,$fmin,$is_fmin_partial,
+                            $fmax,$is_fmax_partial,$strand,$phase,$residue_info,$locgroup,$rank),"\n";
+
+  return $featureloc_id;
+
 }
+
+=head2 write_row_feature_relationship
+
+ Title   : write_row_feature_relationship
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub write_row_feature_relationship{
+   my ($self,$feature,$feature_id) = @_;
+
+   my $parent = ($feature->annotation->get_Annotations('Parent'))[0];
+warn $parent;
+   return undef unless $parent;
+   my $parent_id = $self->feature_id($parent->value());
+   my $part_of = $self->cvterm('part_of');
+
+   my $feature_relationship_id = $self->seq('feature_relationship');
+
+   my $fh = $self->file('feature_relationship');
+   print $fh join("\t",
+                  $feature_relationship_id,$feature_id,$parent_id,$part_of,'\\N',0
+                 ),"\n";
+}
+
 
 =head2 setup
 
@@ -281,6 +462,42 @@ sub seq{
   }
 }
 
+=head2 feature_id
+
+ Title   : feature_id
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub feature_id{
+   my ($self,$id,$feature_id) = @_;
+
+   if(defined($feature_id)){
+     $self->{'feature_id'}{$id} = $feature_id;
+   } elsif(!defined($self->{'feature_id'}{$id})){
+     #do dbi lookup and cache here
+     if(!$self->{'feature_id_sth'}){
+       my $dbh = $self->dbh();
+       $self->{'feature_id_sth'} = $dbh->prepare('select feature_id from feature where name = ?');
+     }
+
+     $self->{'feature_id_sth'}->execute($id);
+
+     $self->throw("too many records for $id") if $self->{'feature_id_sth'}->rows() > 1;
+
+     my($x) = $self->{'feature_id_sth'}->fetchrow_array();
+     $self->{'feature_id'}{$id} = $x;
+   }
+
+   return $self->{'feature_id'}{$id};
+}
+
+
 =head2 file
 
  Title   : file
@@ -333,12 +550,13 @@ sub cvterm {
 
   if(!$self->{'cvterm_sth'}){
     my $dbh = $self->dbh;
-    my $sth = $dbh->prepare("select cvterm_id from cvterm c,dbxref d where c.dbxref_id = d.dbxref_id and (c.name = ? or d.accession = ?);");
+    #FIXME this does not handle SO:xxxxxxx identifiers from dbxref, which requires an OUTER JOIN query
+    my $sth = $dbh->prepare("select cvterm_id from cvterm c,dbxref d where c.name = ?;");
     $self->{'cvterm_sth'} = $sth;
   }
 
   if(!$self->{'cvterm'}{$name}){
-    $self->{'cvterm_sth'}->execute($name,$name);
+    $self->{'cvterm_sth'}->execute($name);
     my $id = $self->{'cvterm_sth'}->fetchrow_array();
     $self->throw("couldn't find cvterm for $name") unless defined($id);
     $self->{'cvterm'}{$name} = $id;
