@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.19 2003-02-25 03:22:58 allenday Exp $
+## $Id: companalysis.sql,v 1.20 2003-02-28 17:45:21 emmert Exp $
 
 -- ================================================
 -- TABLE: analysis
@@ -77,6 +77,8 @@ create index analysis_idx1 on analysis (queryfeature_id);
 -- used in running a blast
 
 create table analysisprop (
+    analysisprop_id serial not null,
+    primary key (analysisprop_id),
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
     pkey_id int not null,
@@ -147,12 +149,12 @@ create index analysisprop_idx2 on analysisprop (pkey_id);
 --  the scoredsetprop table.
 
 create table analysisfeature (
+    analysisfeature_id serial not null,
+    primary key (analysisfeature_id),
     feature_id int not null,
     foreign key (feature_id) references feature (feature_id),
-
     analysis_id int,
     foreign key (analysis_id) references analysis (analysis_id),
-
     rawscore double,
     normscore double,
     significance double,
