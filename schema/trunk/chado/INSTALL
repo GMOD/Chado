@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.7 2003-12-10 16:11:13 scottcain Exp $
+$Id: INSTALL,v 1.8 2003-12-10 16:28:37 scottcain Exp $
 
 Prerequisites:
 
@@ -10,6 +10,7 @@ Prerequisites:
   Apache (1.3.*)
 
   BioPerl (-live or 1.4 when available)
+          (-microarray 0.1 --required for microarray data)
 
   Standard Perl modules:
     * CGI                      (GBrowse)
