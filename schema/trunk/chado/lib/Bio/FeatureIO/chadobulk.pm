@@ -221,7 +221,7 @@ sub write_row_featureloc{
 
 # rank            | integer  | not null
 
-  my $rank = 0;
+  my $rank = $self->featureloc_rank($feature_id);
 
   my $featureloc_fh = $self->file('featureloc');
   print $featureloc_fh join("\t",
@@ -468,6 +468,31 @@ sub seq{
     return $return;
   }
 }
+
+=head2 featureloc_rank
+
+ Title   : featureloc_rank
+ Usage   :
+ Function:
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub featureloc_rank{
+   my ($self,$feature_id) = @_;
+
+   if(!$self->{'featureloc_rank'}{$feature_id}){
+     $self->{'featureloc_rank'}{$feature_id} = 0;
+   }
+
+   my $r = $self->{'featureloc_rank'}{$feature_id};
+   $self->{'featureloc_rank'}{$feature_id}++;
+   return $r;
+}
+
 
 =head2 feature_id
 
