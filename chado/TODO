@@ -3,10 +3,28 @@ Tue Jan  6 01:34:51 PST 2004 - allenday
 Add documentation to README and/or INSTALL regarding Postgres VACUUM and ANALYZE
 functions.  We might want to give users an example of how to set up a cron job
 to do this nightly.  I had a 3 order of magnitude speed increase today from a 
-10 second ANALYZE command.
+10 second ANALYZE command.  See 
+
+   http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
+
+which has useful information for tuning postgresql.conf as well as a suggestion
+for setting up the auto vacuum daemon.
 
 We might also want to build an analyze() method into the loaders, or possibly
 the middleware layer itself.  This will dramatically speed up large loads, but
 requires changing the cache/flush strategy to the more complex
 begin-transaction/cache/flush/end-transaction/analyze strategy.
 --
+
+
+where to start?
+
+For the next release:
+- integrate Apollo
+- integrate a web front end (probably turnkey)
+
+For following releases:
+- incorporate Pub*
+- write a bulk load utility that will quickly load GFF3 data to chado
+- write a utility that will delete data from the database with a GFF
+file as a template
