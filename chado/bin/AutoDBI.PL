@@ -120,14 +120,6 @@ Chado::Contact->has_many(
     'arraydesign_manufacturer_id', 'Chado::Arraydesign' => 'manufacturer_id'
 );
 
-sub authors {
-    return shift->author_contact_id
-}
-
-Chado::Contact->has_many(
-    'author_contact_id', 'Chado::Author' => 'contact_id'
-);
-
 sub studys {
     return shift->study_contact_id
 }
@@ -222,9 +214,7 @@ Chado::Dbxref->has_many(
     'feature_dbxref_dbxref_id', 'Chado::Feature_Dbxref' => 'dbxref_id'
 );
 
-sub features {
-    return shift->feature_dbxref_id
-}
+sub features { my $self = shift; return map $_->feature_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
     'feature_dbxref_id', 'Chado::Feature' => 'dbxref_id'
@@ -238,9 +228,7 @@ Chado::Dbxref->has_many(
     'organism_dbxref_dbxref_id', 'Chado::Organism_Dbxref' => 'dbxref_id'
 );
 
-sub arraydesigns {
-    return shift->arraydesign_dbxref_id
-}
+sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
     'arraydesign_dbxref_id', 'Chado::Arraydesign' => 'dbxref_id'
@@ -274,9 +262,7 @@ Chado::Dbxref->has_many(
     'cvterm_dbxref_dbxref_id', 'Chado::Cvterm_Dbxref' => 'dbxref_id'
 );
 
-sub cvterms {
-    return shift->cvterm_dbxref_id
-}
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
     'cvterm_dbxref_id', 'Chado::Cvterm' => 'dbxref_id'
@@ -459,7 +445,7 @@ Chado::Cvterm->has_many(
 
 sub quantification_relationships { my $self = shift; return $self->quantification_relationship_type_id(@_) }
 
-sub features { my $self = shift; return map $_->feature_id, $self->feature_cvterm_cvterm_id }
+sub features { my $self = shift; return map $_->feature_id, $self->element_type_id }
 
 Chado::Cvterm->has_many(
     'feature_type_id', 'Chado::Feature' => 'type_id'
@@ -481,9 +467,7 @@ Chado::Cvterm->has_many(
     'feature_cvterm_cvterm_id', 'Chado::Feature_Cvterm' => 'cvterm_id'
 );
 
-sub arraydesigns {
-    return shift->arraydesign_platformtype_id
-}
+sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_type_id }
 
 Chado::Cvterm->has_many(
     'arraydesign_platformtype_id', 'Chado::Arraydesign' => 'platformtype_id'
@@ -697,12 +681,26 @@ Chado::Cvterm->has_many(
     'featureprop_type_id', 'Chado::Featureprop' => 'type_id'
 );
 
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_type_id }
+
 sub assayprops {
     return shift->assayprop_type_id
 }
 
 Chado::Cvterm->has_many(
     'assayprop_type_id', 'Chado::Assayprop' => 'type_id'
+);
+
+sub protocolparams {
+    return shift->protocolparam_datatype_id
+}
+
+Chado::Cvterm->has_many(
+    'protocolparam_datatype_id', 'Chado::Protocolparam' => 'datatype_id'
+);
+
+Chado::Cvterm->has_many(
+    'protocolparam_unittype_id', 'Chado::Protocolparam' => 'unittype_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_cvterm_id }
@@ -717,18 +715,6 @@ sub gcontextprops {
 
 Chado::Cvterm->has_many(
     'gcontextprop_type_id', 'Chado::Gcontextprop' => 'type_id'
-);
-
-sub protocolparams {
-    return shift->protocolparam_datatype_id
-}
-
-Chado::Cvterm->has_many(
-    'protocolparam_datatype_id', 'Chado::Protocolparam' => 'datatype_id'
-);
-
-Chado::Cvterm->has_many(
-    'protocolparam_unittype_id', 'Chado::Protocolparam' => 'unittype_id'
 );
 
 sub controls {
@@ -785,8 +771,6 @@ Chado::Cvterm->has_many(
     'acquisition_relationship_type_id', 'Chado::Acquisition_Relationship' => 'type_id'
 );
 
-sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
-
 sub phenstatements { my $self = shift; return map $_->phenstatement_id, $self->phenstatement_cvterm_cvterm_id }
 
 Chado::Cvterm->has_many(
@@ -804,6 +788,8 @@ Chado::Cvterm->has_many(
 Chado::Cvterm->has_many(
     'phenstatement_assay_id', 'Chado::Phenstatement' => 'assay_id'
 );
+
+sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
 
 sub pub_relationships {
     return shift->pub_relationship_type_id
@@ -1380,37 +1366,6 @@ sub dbxref {
 }
 
 # -------------------------------------------------------------------
-package Chado::Author;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Author->set_up_table('author');
-
-
-#
-# Primary key accessor
-#
-sub id {
-    shift->author_id
-}
-
-Chado::Author->has_a(
-    contact_id => 'Chado::Contact'
-);
-
-sub contact {
-    return shift->contact_id
-}
-
-sub pub_authors {
-    return shift->pub_author_author_id
-}
-
-Chado::Author->has_many(
-    'pub_author_author_id', 'Chado::Pub_Author' => 'author_id'
-);
-
-# -------------------------------------------------------------------
 package Chado::Pub_Author;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -1423,14 +1378,6 @@ Chado::Pub_Author->set_up_table('pub_author');
 #
 sub id {
     shift->pub_author_id
-}
-
-Chado::Pub_Author->has_a(
-    author_id => 'Chado::Author'
-);
-
-sub author {
-    return shift->author_id
 }
 
 Chado::Pub_Author->has_a(
@@ -1527,6 +1474,8 @@ Chado::Feature->has_many(
     'featureprop_feature_id', 'Chado::Featureprop' => 'feature_id'
 );
 
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_feature_id }
+
 sub feature_expressions {
     return shift->feature_expression_feature_id
 }
@@ -1544,6 +1493,8 @@ Chado::Feature->has_many(
 );
 
 sub expressions { my $self = shift; return map $_->expression_id, $self->feature_expression_feature_id }
+
+sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_feature_id }
 
 sub feature_synonyms {
     return shift->feature_synonym_feature_id
@@ -1619,7 +1570,7 @@ Chado::Feature->has_many(
     'analysisfeature_feature_id', 'Chado::Analysisfeature' => 'feature_id'
 );
 
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->feature_cvterm_feature_id }
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_feature_id }
 
 sub feature_relationships {
     return shift->feature_relationship_subject_id
@@ -3096,6 +3047,8 @@ sub dbxref {
     return shift->dbxref_id
 }
 
+sub features { my $self = shift; return map $_->feature_id, $self->element_arraydesign_id }
+
 sub arraydesignprops {
     return shift->arraydesignprop_arraydesign_id
 }
@@ -3119,6 +3072,10 @@ sub elements {
 Chado::Arraydesign->has_many(
     'element_arraydesign_id', 'Chado::Element' => 'arraydesign_id'
 );
+
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_arraydesign_id }
+
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_arraydesign_id }
 
 # -------------------------------------------------------------------
 package Chado::Arraydesignprop;
@@ -3825,6 +3782,8 @@ Chado::Quantification->has_many(
 sub quantification_relationship_subject_ids { my $self = shift; return $self->quantification_relationship_subject_id(@_) }
 
 sub quantification_relationship_object_ids { my $self = shift; return $self->quantification_relationship_object_id(@_) }
+
+sub elements { my $self = shift; return map $_->element_id, $self->elementresult_quantification_id }
 
 # -------------------------------------------------------------------
 package Chado::Quantificationprop;
