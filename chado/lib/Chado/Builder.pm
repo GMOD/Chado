@@ -240,8 +240,8 @@ sub ACTION_ontologies {
       my $result = system( $sys_call );
 
       if ( $result != 0 ) {
-        print "System call '$sys_call' failed: $!\n";
-        $m->log->fatal("failed: $!");
+        print "System call '$sys_call' failed: $?\n";
+        $m->log->fatal("failed: $?");
         die;
       }
       else {
