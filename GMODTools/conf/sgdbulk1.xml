@@ -1,0 +1,244 @@
+<opt
+  name="sgdbulk1"
+  rel="sgdr1"
+  relfull="sgdlite_20040519"
+  relid="1"
+  date="20040519"
+  ROOT="${ARGOS_ROOT}/flybase/"
+  TMP="${ARGOS_ROOT}/flybase/tmp"
+  SERVICE="flybase"
+  datadir="data2/fban"
+  >
+  
+  <title>SGD Chado DB Lite r1</title>
+  
+  <about><![CDATA[
+
+  Chado genome databases available (aug 2004) are
+  ftp://flybase.net/genomes/Drosophila_melanogaster/current/pgsql/chado_r3_2_26_s.gz
+  http://sgdlite.princeton.edu/download/sgdlite/2004_05_19_sgdlite.sql.gz
+
+  Given a postgres db installation, load dump file with
+     createdb sgdlite_20040519
+     (zcat 2004_05_19_sgdlite.sql.gz | psql -d sgdlite_20040519 -f - ) >& log.load &
+
+  Non-flybase test for GMOD::Bulkfile processor
+  aug 04, d.gilbert 
+  
+  dghome2% ls $sgr
+  /bio/biodb/flybase/data2/fban/sgdlite_20040519:
+  chadofeat-summary.txt  fasta/                 gff/                   tmp/
+  dna/                   fff/                   gnomap/                
+  
+  dghome2% du $sgr
+  24052   /bio/biodb/flybase/data2/fban/sgdlite_20040519/dna
+  9928    /bio/biodb/flybase/data2/fban/sgdlite_20040519/fasta
+  944     /bio/biodb/flybase/data2/fban/sgdlite_20040519/fff
+  924     /bio/biodb/flybase/data2/fban/sgdlite_20040519/gff
+  0       /bio/biodb/flybase/data2/fban/sgdlite_20040519/gnomap
+  3980    /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/featdump
+  3980    /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp
+  39836   /bio/biodb/flybase/data2/fban/sgdlite_20040519
+
+  # Summary of features for Saccharomyces cerevisiae from SGD Chado DB Lite r1  [20040519]
+  
+  # ALL chromosomes
+  ARS     59     
+  CDS     7050
+  centromere      16
+  chromosome      17
+  gene    13645
+  long_terminal_repeat    382
+  ncRNA   14
+  non_transcribed_region  3
+  noncoding_exon  466
+  rRNA    56
+  region  78
+  repeat_family   110
+  retrotransposon 50
+  snRNA   14
+  snoRNA  135
+  tRNA    347
+  telomere        32
+  transcribed_spacer_region       16
+  transposable_element_gene       100
+
+  == process log ==
+  DBI->connect( dbi:Pg:dbname=sgdlite_20040519;host=localhost;port=7302 )
+  do sql  views view
+  sql dump chromosomes feature_table /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/featdump/
+  chromosomes.tsv
+  sql dump chromosomes n rows=17
+  sql dump features feature_table /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/featdump/fea
+  tures.tsv
+  sql dump features n rows=22573
+  sortNSplitByChromosome:
+
+  dumpChromosomeBases /bio/biodb/flybase/data2/fban/sgdlite_20040519/dna/scer_chrI_dna_sgdr1.raw
+  ...
+
+  makeFiles: outformats= fff gff fasta
+  openInput: type=feature/table part=0 
+  openInput: name=chrI, type=feature/table, /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/fe
+  atdump/chadofeat-chrI.tsv
+  # output /bio/biodb/flybase/data2/fban/sgdlite_20040519/fff/scer_chrI_sgdr1.fff (append=0)
+  # output /bio/biodb/flybase/data2/fban/sgdlite_20040519/gff/scer_chrI_sgdr1.gff (append=0)
+  # output /bio/biodb/flybase/data2/fban/sgdlite_20040519/fasta/scer_chrI_sgdr1.fasta (append=0)
+  putFeats n=11, total=11, oid1=126750
+  open dnafile /bio/biodb/flybase/data2/fban/sgdlite_20040519/dna/scer_chrI_dna_sgdr1.raw, length
+  =230210
+  putFeats n=17, total=25, oid1=126761
+
+  processChadoTable ndone = 1737
+  openInput: type=feature/table part=18 
+  openInput: nothing matches part=18
+  makeFiles: done
+  ]]></about>
+
+  <release id="1" value="sgdr1"  db="sgdlite_20040519" date="20040519"/>
+  <release id="0" value="sgdr0"  db="sgdlite" date="20040000"/>
+  <!-- need two+ release entries for config reader .. -->
+
+  <db
+    driver="Pg"
+    name="sgdlite_20040519"
+    host="localhost"
+    port="7302"
+    user="gilbertd"
+    password=""
+    />
+
+  <org>scer</org>
+  <species>Saccharomyces cerevisiae</species>
+  
+  <dnadump
+    path="dna/dna-\w+.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    />
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+<!--  //none in sgdlite1//  <target>matches</target> -->
+<!--  //none in sgdlite1//  <target>analysis</target> -->
+    
+    <!-- ? use this for sql arguments ? -->
+    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
+  </featdump>
+  
+  <!-- release output folders .. make all these ? -->
+  <datafolder>blast</datafolder>
+  <datafolder>dna</datafolder>
+  <datafolder>fasta</datafolder>
+  <datafolder>gff</datafolder>
+  <datafolder>indices</datafolder> <!-- srs/ lucene/seqs lucene/gnomap .. -->
+  <datafolder>gnomap</datafolder>
+  <datafolder>pgsql</datafolder>
+
+  <dnafiles
+    path="dna/dna-(\w+).raw"
+    date="20040821"
+    name="Chromosome dna" 
+    dofasta="1"
+    doraw="1"
+  />
+
+  <featfiles
+    path="gnomap/features-(\w+).tsv"
+    date="20040821"
+    name="Genome features" 
+    config="chadofeatconv"
+    dogff="1"
+    dofff="1"
+  />
+
+
+  <idpattern></idpattern>
+
+  <fastafiles
+    path="fasta/\w+.fasta"
+    date="20040821"
+    name="Genome feature sequence fasta" 
+    dropnotes="synonym_2nd,synonym"
+  />
+
+  <!-- feature sets to make fasta bulk files -->
+  <!-- ?? do we want mRNA = computed AND transcript = curated dna ? -->  
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>gene_extended2000</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+
+  <!-- 
+   featmap for feature sets that need reprocessing, attributes: 
+    name = feature set name
+    types = feature types, space delimited (in fff/gff)
+    typelabel = type to use in output header
+    subrange = expansion/extraction range to add to feature location;
+             readseq syntax not yet supported, i.e. {start,end}+/-offset)
+    fromdb = extract from chado database feature.residues field
+             rather than chromosome dna file,
+             for curated residues - transcript, translation)
+    get_id = save id, dbxref fields for add to other (genemodel) features
+    add_id = add id of parent feature (genemodel)
+    note: translation type=protein is coded into various seq fetch programs
+  -->
+  
+  
+  <featmap name="gene" get_id="1" />
+  <featmap name="five_prime_UTR" add_id="gene" />
+  <featmap name="three_prime_UTR" add_id="gene" />
+  <featmap name="intron" add_id="gene" />
+  <featmap name="mRNA" add_id="gene" />
+  <featmap name="CDS" add_id="gene" />
+
+  <featmap
+    name="translation"
+    types="CDS"
+    typelabel="protein"
+    fromdb="1"
+    />
+  <featmap
+    name="transcript"
+    types="mRNA"
+    typelabel="transcript"
+    fromdb="1"
+    />
+<!--   <featmap -->
+<!--     name="transposon" -->
+<!--     types="transposable_element" -->
+<!--     typelabel="transposable_element" -->
+<!--     /> -->
+<!-- sgd variant for this feature -->
+  <featmap
+    name="transposon"
+    types="transposable_element_gene"
+    typelabel="transposable_element"
+    />
+  <featmap
+    name="miscRNA"
+    types="ncRNA snRNA snoRNA rRNA" 
+    />
+  <featmap
+    name="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+
+</opt>

@@ -1,23 +1,124 @@
 
 =head1 SYNOPSIS
 
-  GMODTools is a collection of perl scripts for use
-  with GMOD Chado databases, primarily at this point
-  for loading and extracting miscellaneous sequences.
+  GMODTools is a collection of perl scripts for use with GMOD Chado
+  databases, primarily at this point for loading and extracting
+  miscellaneous sequences.
+
+  August 2004: Added Bio::GMOD::Bulkfiles package from FlyBase file
+  dumper
   
-  Many of the sequence functions are in library module
-    GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
+  Other sequence functions are in library module
+  GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
   with main programs in bin/ folder as summarized below.
   
-  It is based on GMOD release 0.001 (January 2004) and can
+  ======================================================================  
+  
+=head1 NAME
+
+  Bio::GMOD::Bulkfiles -- produce bulk sequence and feature files
+    from Chado genome database for public distribution.
+
+=head1 ABOUT Bulkfiles
+
+  This generates Fasta, GFF, DNA and other bulk genome annotation files at
+    ftp://flybase.net/genomes/Drosophila_melanogaster/current/ ..
+    (and other species soon)
+  It is tested with flybase chado dbs, and with SGDLite chado db
+
+  Bulkfiles is mostly self-contained, but uses a few
+  BioPerl parts plus XML::Simple for configuration files.  All of
+  the organism/database-specific logic should be in these configuration
+  files (see GMODTools/conf/)
+    fbbulk-r4.xml, sgdbulk1.xml .. -- organism/database/release specific options
+    chadofeatsql.xml  --  chado db sql calls to dump features
+    chadofeatconv.xml --  feature conversion options
+
+=head1 OUTPUTS
+  
+  DNA files (full chromosomes) in raw and fasta formats
+  GFF (v3) feature files
+  FFF (v1) feature files (used in FlyBase, each complex feature one line
+     using GenBank/EMBL locations)
+  Fasta sequence for each selected feature set,
+     with headers from feature files
+  
+=head1 USAGE
+  
+  use Bio::GMOD::Bulkfiles;    
+  
+  my $sequtil= Bio::GMOD::Bulkfiles->new( 
+    configfile => 'sgdbulk1',   # data-release config file
+    debug => 1, showconfig => 0, );
+  
+  my $feattables = $sequtil->dumpFeatures(); 
+  my $chrfeats   = $sequtil->sortNSplitByChromosome( $feattables) ; 
+  my $seqfiles   = $sequtil->dumpChromosomeBases();  
+  
+  my $featwriter= $sequtil->getFeatureWriter();
+  my $result= $featwriter->makeFiles( 
+    infiles => [ @$seqfiles, @$chrfeats ], # required
+    formats => [qw(fff gff fasta)] , # optional
+    );
+  
+    
+=head1 WHY Bulkfiles? 
+
+  (rather than using other middleware layers to chado db - chadoxml,
+   chadodbi, bioperl, ...)
+   
+  The general logic is
+  
+    1. dump all chado db features using simple (and quick) sql,
+       to common intermediate table files, and chromosome dna to raw files.
+       The feature info is simple: type, location, name/id, and a few
+       attributes (db_xrefs,..)
+       
+    2. postprocess these table files to create the various public use
+       formats (the time-consuming and configurable part), organized
+       into per-chromosome files.
+    
+  Here are some reasons we take this approach:
+  
+    a. using simple sql to dump all db features to intermediate table
+       allows easy checks that all features get to bulk files
+       
+    b. simple sql dump is fast (30 - 60 min for full fly genome), 
+       reliable in getting all mapped features by keeping logic simple
+       
+    c. process table output in stages - better debugging of steps in
+        process, and can split processing among computers
+       c1. the stages are loosely coupled - one can go back, tweek
+        configurations and get a new output w/o redoing the complete
+        extraction process.
+        
+    d. convert one common feature table + dna to several output formats
+       in one step, or repeatedly as needed.
+    
+    e. combine features from several chado dbs (flybase now has 3 chado dbs
+       for d.mel genome features), and add other sources like
+       flybase cytology features.
+       
+    f. need fairly complex and data specific configurations - moving
+      that to config files keeps code reusable.
+      
+
+ ==========================================================================  
+
+
+=head1 ABOUT Chado::SeqUtils
+
+  Chado::SeqUtils is based on GMOD release 0.001 (January 2004) and can
   be expected to change or go obsolete.  Besides contents of
   this package, requirements to run include the perl modules
   installed with GMOD release, esp. Chado::LoadDBI/AutoDBI and
   its ancestor classes from CPAN - Class::DBI, Ima::DBI, etc.
   
-  This was written for use with the nascent Daphnia genome database,
+  Chado::SeqUtils was written for use with the nascent Daphnia genome database,
   wFleaBase, at http://eugenes.org/daphnia/ See also further information
   at http://eugenes.org/daphnia/database
+    
+  ======================================================================  
 
   
 =head1 NAME
@@ -34,6 +135,7 @@ gmod_init_db.pl
 
   Assumes that Chado::LoadDBI is available for ontologies
 
+  ======================================================================  
 
 =head1 NAME
 
@@ -50,6 +152,7 @@ Good for small seqs: cDNA, EST, microsats, ; left out genome-sized
 methods. Need for nascent daphnia wFleaBase to get sequence public IDs
 Cut from gmod_load_gff3.pl
 
+  ======================================================================  
 
 
 =head1 NAME
@@ -64,6 +167,7 @@ Need for nascent daphnia wFleaBase to use sequence public IDs
 
 Good for small seqs: cDNA, EST, microsats. Left out genome-sized methods. 
 Only does fasta format now
+  ======================================================================  
 
 
 =head1 NAME

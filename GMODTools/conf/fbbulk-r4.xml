@@ -1,0 +1,204 @@
+<!-- seqdump-r4.xml -->
+<opt
+  name="fbbulk-r4" 
+  rel="r4.0t"
+  relfull="r4.0test"
+  relid="4"
+  date="20040821"
+  ROOT="${ARGOS_ROOT}/flybase/"
+  TMP="${ARGOS_ROOT}/flybase/tmp"
+  SERVICE="flybase"
+  datadir="data2/fban"
+>
+<!-- see below sections
+  featconfig="chadofeatconv"
+  sqlconfig="chadofeatsql"
+-->
+
+  <title>FlyBase Chado DB r4.0 test</title>
+  <about>
+   Configurations to extract feature and sequence data for
+   bulk files from FlyBase chado databases, including various
+   release information.
+  </about>
+  
+  <release id="4" value="r4.0t"  db="chado_r3_2" date="20040821"/>
+  <release id="3" value="r3.2.1" db="chado_r3_2_27" date="20040804"/>
+  <release id="2" value="r3.2.0" db="chado_r3.2_18" date="20040321"/>
+  <release id="1" value="r3.1.0" db="chado_r3_1_0" date="20031210"/>
+
+  <release id="h" value="r3.2.0h"  db="chadohet_081604" date="20040821"/>
+  <release id="p1" value="dpse_r1.0"  db="dmelr3_2_dpser1_0" date="20040821"/>
+
+  <!-- db.name  is release-dependent ; use above -->
+  <db
+    driver="Pg"
+    default_name="dmel_chado"
+    host="bugbane.bio.indiana.edu"
+    port="7302"
+    user="flybase"
+    password=""
+    />
+
+<!--
+bugbane% psql -l
+            List of databases
+       Name        |  Owner   | Encoding  
+ chado_r3.2        | gilbertd | SQL_ASCII  
+ chado_r3.2_18     | argosadm | SQL_ASCII
+ chado_r3.2_26     | gilbertd | SQL_ASCII
+ chado_r3_2_27     | gilbertd | SQL_ASCII  << alias dmel_chado
+ chadohet_081604   | gilbertd | SQL_ASCII  << alias dmelhet_chado
+ dmelr3_2_dpser1_0 | gilbertd | SQL_ASCII  << alias dpse_chado
+-->
+
+
+  <org>dmel</org>
+  <species>Drosophila melanogaster</species>
+  
+  <!-- get from featdump chromosomes -->
+  <chromosomes>X</chromosomes>
+  <chromosomes>2L</chromosomes>
+  <chromosomes>2R</chromosomes>
+  <chromosomes>3L</chromosomes>
+  <chromosomes>3R</chromosomes>
+  <chromosomes>4</chromosomes>
+  <!-- get chromosome name="2L" length="22217931" from featdump chromosomes -->
+
+  <dnadump
+    path="dna/dna-\w+.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    />
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+<!--     <target>fbids</target> // accessory table ; fixme -->
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>matches</target>
+    <target>analysis</target>
+    
+    <!-- ? use this for sql arguments ? -->
+    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
+  </featdump>
+  
+  <!-- release output folders .. make all these ? -->
+  <datafolder>blast</datafolder>
+  <datafolder>dna</datafolder>
+  <datafolder>dna-fasta</datafolder>
+  <datafolder>fasta</datafolder>
+  <datafolder>gff</datafolder>
+  <datafolder>indices</datafolder> <!-- srs/ lucene/seqs lucene/gnomap .. -->
+  <datafolder>gnomap</datafolder>
+  <datafolder>pgsql</datafolder>
+  <datafolder>xml-chado</datafolder>
+  <datafolder>xml-game</datafolder>
+
+  <dnafiles
+    path="dna/dna-(X|2L|2R|3L|3R|4).raw"
+    date="20040821"
+    name="Chromosome dna" 
+    dofasta="1"
+    doraw="1"
+  />
+
+  <featfiles
+    path="gnomap/features-(X|2L|2R|3L|3R|4).tsv"
+    date="20040821"
+    name="Genome features" 
+    config="chadofeatconv"
+    dogff="1"
+    dofff="1"
+  />
+
+
+  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+
+  <fastafiles
+    path="fasta/\w+.fasta"
+    date="20040821"
+    name="Genome feature sequence fasta" 
+    dropnotes="synonym_2nd,synonym"
+  />
+<!--  allowanyfeat="1" -->
+
+  <!-- FIXME allowanyfeat; 
+    new parse steps put all individual feats to fasta ; 
+    change back to use featset info
+  -->
+
+  <!-- feature sets to make fasta bulk files -->
+  <!-- ?? do we want mRNA = computed AND transcript = curated dna ? -->  
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>gene_extended2000</featset>
+  <featset>five_prime_UTR</featset>
+  <featset>three_prime_UTR</featset>
+  <featset>intron</featset>
+
+  <!-- 
+   featmap for feature sets that need reprocessing, attributes: 
+    name = feature set name
+    types = feature types, space delimited (in fff/gff)
+    typelabel = type to use in output header
+    subrange = expansion/extraction range to add to feature location;
+             readseq syntax not yet supported, i.e. {start,end}+/-offset)
+    fromdb = extract from chado database feature.residues field
+             rather than chromosome dna file,
+             for curated residues - transcript, translation)
+    get_id = save id, dbxref fields for add to other (genemodel) features
+    add_id = add id of parent feature (genemodel)
+    note: translation type=protein is coded into various seq fetch programs
+  -->
+  
+  
+  <featmap name="gene" get_id="1" />
+  <featmap name="five_prime_UTR" add_id="gene" />
+  <featmap name="three_prime_UTR" add_id="gene" />
+  <featmap name="intron" add_id="gene" />
+  <featmap name="mRNA" add_id="gene" />
+  <featmap name="CDS" add_id="gene" />
+
+  <featmap
+    name="translation"
+    types="CDS"
+    typelabel="protein"
+    fromdb="1"
+    />
+  <featmap
+    name="transcript"
+    types="mRNA"
+    typelabel="transcript"
+    fromdb="1"
+    />
+  <featmap
+    name="transposon"
+    types="transposable_element"
+    typelabel="transposable_element"
+    />
+  <featmap
+    name="miscRNA"
+    types="ncRNA snRNA snoRNA rRNA" 
+    typelabel="miscRNA"
+    />
+  <featmap
+    name="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+
+</opt>
