@@ -18,6 +18,11 @@ my %hash_ddl;
 my %hash_id;
 # this hash using for checking the avail of refer objectect, any object first time define, it will has all the field, after that, only unique
 my %hash_object_id;
+#here for pseudo table, e.g view, function and _appdata, _sql
+my $TABLES_PSEUDO='table_pseudo';
+my %hash_tables_pseudo;
+
+
 my $LOCAL_ID="local_id";
 my $NO_LOCAL_ID='xml';
 my $MODULE="module";
@@ -95,6 +100,10 @@ sub Generate_XML {
    my $root;
 
 
+
+
+
+
    #load the propertity information and open the connection with database
    my  $property_file=$self->{'dbname'};
    my $dbh_pro=XORT::Util::GeneralUtil::Properties->new($property_file);
@@ -103,6 +112,14 @@ sub Generate_XML {
    $dbh->open();
    my $ddl_pro=XORT::Util::GeneralUtil::Properties->new('ddl');
    %hash_ddl=$ddl_pro->get_properties_hash();
+
+
+   # load the elements which need to be filtered out
+   my @array_pseudo=split(/\s+/, $hash_ddl{$TABLES_PSEUDO});
+   foreach my $value(@array_pseudo){
+   $hash_tables_pseudo{$value}=1;
+     print "\npseudo:$value";
+   }
 
    # if there is dumpspec to guide the dumper, then use it
    if (defined $dumpspec_obj){
@@ -117,7 +134,7 @@ sub Generate_XML {
          my $node_type=$node->getNodeType();
          my $node_name=$node->getNodeName();
          print "\nnode_type:$node_type:node_name:$node_name";
-         if ($node_type eq ELEMENT_NODE && defined $hash_ddl{$node_name}){
+         if ($node_type eq ELEMENT_NODE && defined $hash_ddl{$node_name} && !(defined $hash_tables_pseudo{$node_name})){
                print "\nnode name ", $node->getNodeName();
                #the result from get_id($node) is id string separated by '|'
                my $query=$dumpspec_obj->format_sql_id($node);
@@ -238,6 +255,7 @@ sub _table2xml(){
               $data =~ s/\"/\&quot;/g;
               $data =~ s/\'/\&apos;/g;
               $data =~ s/\\/\\\\/g;
+              $data =~ s/ /&amp;nbsp;/g if ($data !~/\W|\w|\S/);
          $hash_ref->{$key}=$data;
     }
   # print "\ncol:$key\tvalue:$hash_ref->{$key}";

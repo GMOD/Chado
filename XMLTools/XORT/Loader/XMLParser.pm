@@ -82,7 +82,7 @@ my $ATTRIBUTE_REF='ref';
 # for some elements, it will be ignored, i.e view, and _app_data,
 # algorithms to filter out ignore elements: initiately P_pseudo set to -1, for tables_pseudo, increase by 1 at beginning of start_element,  decrease by 1 at end of end_element
 # if P_pseudo >-1, then do nothing for start_element, end_element, character
-my $TABLES_PSEUDO='tables_pseudo';
+my $TABLES_PSEUDO='table_pseudo';
 my %hash_tables_pseudo;
 my $P_pseudo=-1;
 
@@ -448,11 +448,22 @@ sub characters {
 
  if ($P_pseudo==-1 && $element_name ne $APP_DATA_NODE) {
      my $data = $properties->{'Data'};
-     $data =~ s/\&/\&amp;/g;
-     $data =~ s/</\&lt;/g;
-     $data =~ s/>/\&gt;/g;
-     $data =~ s/\"/\&quot;/g;
-     $data =~ s/\'/\&apos;/g;   
+     #$data =~ s/\&/\&amp;/g;
+     #$data =~ s/</\&lt;/g;
+     #$data =~ s/>/\&gt;/g;
+     #$data =~ s/\"/\&quot;/g;
+     #$data =~ s/\'/\&apos;/g;
+     #$data =~ s/\\/\\\\/g;
+
+
+     $data =~ s/\&amp;/\&/g;
+     $data =~ s/\&lt;/</g;
+     $data =~ s/\&gt;/>/g;
+     $data =~ s/\&quot;/\"/g;
+     $data =~ s/\&apos;/\'/g;
+     $data =~ s/\\\\/\\/g;
+     #$data =~ s/\&amp;nbsp;/\s/g;
+
     chomp($data);
     my $data_length=length $data;
 
@@ -473,20 +484,23 @@ sub characters {
     # ----------------------------------------------------------------------------------
     if (defined $hash_ddl{$parent_element}){
         my $hash_ref_cols=&_get_table_columns($parent_element);
-        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w/ || $data eq '-') && $data ne "\t"){
+        if  (defined $hash_ref_cols->{$element_name} && ($data =~/\w|\W/ || $data eq '-') && $data ne "\t"){
            my  $key=$hash_level_name{$level-1}.".".$element_name;
                 # treat differently for update and other operation
                 if ($AoH_op[$level-1]{$parent_element} eq 'update'){
 		  if ($AoH_op[$level]{$element_name} eq 'update'){
                       $AoH_data_new[$level]{$key}= $AoH_data_new[$level]{$key}.$data;
+                      # $AoH_data_new[$level]{$key}=~ s/&nbsp;/\s/g;
 		  }
                   else {
                       $AoH_data[$level]{$key}= $AoH_data[$level]{$key}.$data;
+                      # $AoH_data[$level]{$key}=~ s/&nbsp;/\s/g;
                   }
 		}
                 else {
 		  if ($AoH_op[$level]{$element_name} ne 'update'){
                       $AoH_data[$level]{$key}= $AoH_data[$level]{$key}.$data;
+                      # $AoH_data[$level]{$key}=~ s/&nbsp;/\s/g;
 		    }
                    else {
                       print "\nTry to update a column which the op for table is not update.....";
@@ -494,7 +508,7 @@ sub characters {
                       exit(1);
                   }
 	        }
-         #print "\n\nkey:$key\tvalue:$AoH_data[$level]{$key}\tlevel:$level";
+         print "\n\nkey:$key\tvalue:$AoH_data[$level]{$key}:\tlevel:$level";
 
 
           #here to save all the currrent transaction information in case of abnormal transaction happen, and undef at end of each trans
@@ -530,6 +544,8 @@ sub end_element {
    if (defined $hash_ddl{$element_name} && $hash_level_name{$level-1} eq $root_element){
       undef %hash_trans;
    }
+
+ 
 
    # ------------------------------------------------------------
    # here come to the end of table
@@ -804,8 +820,11 @@ sub end_element {
 
 sub end_document {
     #clean the load.log 
-    system("delete load.log") if -e 'load.log';
+
+    system(sprintf("delete $log_file")) if (-e $log_file && ($recovery_status eq '0' || $recovery_status ==0));
     $dbh_obj->close();
+    print "\n\nbingo ....you success !....";
+    exit(1);
 }
 
 
@@ -827,7 +846,9 @@ sub _extract_hash(){
 	if (index($value, $content) ==0 ){
             my $start=length $content;
             my $key=substr($value, $start);
-          #  print "\ncontent:$content:value:$value:\tkey:$key:";
+
+            #here we modify to get space as value since standard xml will be empty element, so &amp;nbsp; will represent ' '
+            $hash_ref->{$value}=~ s/&nbsp;/ /g;
             $result->{$key}=$hash_ref->{$value};
             delete $hash_ref->{$value};
 	}

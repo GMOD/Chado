@@ -57,7 +57,7 @@ sub usage()
     "\n -g dumpspec     :dumpspec xml file which guide the dumper behavior",
     "\n -s struct_type  :module/single",
     "\n -l loadable     :1 for loadable, 0 for non_loadable",
-    "\n -l app_data     :app data for dumpspec if using variable in dumpspec, separate by space for multvalue",
+    "\n -a app_data     :app data for dumpspec if using variable in dumpspec, separate by space for multvalue",
     "\n if you provide dumpspec, struct_type, loadable and tables will be ignored",
     "\nexample1: $0  -d chado_gadfly5 -g \"/users/zhou/work/API/XORT/Config/dumpspec_gene.xml\" -p \"/export/zhou/dump_gene_no_local_id.xml\" -f no_local_id  ",
     "\nexample2: $0  -d chado_gadfly5 -g \"/users/zhou/work/API/XORT/Config/dumpspec_scaffold.xml\" -p \"/export/zhou/dump_scaffold_local_id.xml\" -f local_id -a \"1 14473012 14476172 AE002603\" ",

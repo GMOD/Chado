@@ -149,11 +149,11 @@ create table organism (
 	primary key (organism_id),
 	abbrev varchar(255) null,
 	genus varchar(255) not null,
-	taxgroup varchar(255) not null,
+
 	species varchar(255) not null,
 	common_name varchar(255) null,
 	comment text null,
-	unique(taxgroup, genus, species)
+	unique(genus, species)
 );
 GRANT ALL on organism_organism_id_seq to PUBLIC;
 GRANT ALL on organism to PUBLIC;
