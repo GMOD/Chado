@@ -242,7 +242,6 @@ sub ACTION_ontologies {
     print "fetching files for ", $ont{$ontology}, "\n";
 
     my $file = $ontologies{$ontology}{file};
-    warn $file;
 
     my $load = 0;
     foreach my $file ( 
