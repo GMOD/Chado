@@ -133,7 +133,7 @@ while(my $arrayio = $affx->next_array){
   push @txn, $protocol_acquisition;
   push @txn, $protocol_quantification;
 
-  my $biomaterial = Chado::Biomaterial->create({ name => $sample_id , description => $arrayio->id , taxon_id => $human});
+  my $biomaterial = Chado::Biomaterial->find_or_create({ name => $sample_id , description => $arrayio->id , taxon_id => $human});
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
@@ -157,7 +157,7 @@ while(my $arrayio = $affx->next_array){
     push @txn, $biomaterialprop;
   }
 
-  my $assay = Chado::Assay->create({
+  my($assay) = Chado::Assay->find_or_create({
 									array_id => $array,
 									operator_id => $operator->id,
                                     name => $chip_id,
