@@ -296,6 +296,21 @@ create table synonym (
        unique(synonym)
 );
 
+-- ================================================
+-- TABLE: synonym_pub
+-- ================================================
+
+create table synonym_pub (
+       synonym_id int not null,
+       foreign key (synonym_id) references synonym (synonym_id),
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id),
+       timeentered timestamp not null default current_timestamp,
+       timelastmod timestamp not null default current_timestamp,
+
+       unique(synonym_id, pub_id)
+);
+
 -- [this needs moved to a different file]
 -- typed feature
 create view tfeature as
