@@ -300,7 +300,7 @@ private int m_ExonCount = 0;
 		for(int i=0;i<topNode.getGenFeatCount();i++){
 			GenFeat gf = topNode.getGenFeat(i);
 			if(gf.getType()!=null){
-			System.out.println("\tCHECKING GENE TYPE<"
+				System.out.println("\tCHECKING GENE TYPE<"
 					+gf.getType()+"> WITH ID<"
 					+gf.getId()+">");
 			if((gf.getType().equals("gene"))
@@ -630,16 +630,12 @@ private int m_ExonCount = 0;
 		modfeatNode.setAttribute("op","delete");
 
 		//ID
-		//if(the_gf.getId()!=null){
-		//	modfeatNode.setAttribute("ref","GB:"+the_gf.getId());
-		//}
+		if(the_gf.getId()!=null){
+			//modfeatNode.setAttribute("ref","GB:"+the_gf.getId());
+			modfeatNode.setAttribute("ref","Gadfly:"+the_gf.getId());
+		}
 
-		//NAME
-		//if(the_gf.getName()!=null){
-		//	modfeatNode.appendChild(makeGenericNode(
-		//			the_DOC,"name",the_gf.getName()));
-		//}
-
+		/********************
 		//UNIQUENAME
 		String uniquename = the_gf.getName();
 		if(uniquename==null){
@@ -664,6 +660,7 @@ private int m_ExonCount = 0;
 			modfeatNode.appendChild(makeGenericNode(
 					the_DOC,"type_id",typStr));
 		}
+		********************/
 		return modfeatNode;
 	}
 
