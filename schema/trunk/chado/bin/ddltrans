@@ -288,6 +288,7 @@ Relational Schema to DTD Conversion rules:
       next if $tablename =~ /_audit$/;
       push(@{$tablenames},$tablename); }
     print "<!ELEMENT $schemaname ( ", join(" | ", @{$tablenames}), ")*>\n";
+    print "<!ATTLIST $schemaname\n\tdumpspec CDATA #IMPLIED\n\tdata CDATA #IMPLIED>\n\n";
     foreach $tablename (@{$tablenames})
     {  $table=$schema->{$tablename};
        $colnames=$table->{column}->{_order};
