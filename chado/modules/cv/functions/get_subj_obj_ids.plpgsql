@@ -1,12 +1,12 @@
 ---arg: parent term id
 ---result: fetch all children term id and their parent term id with relationship type id
 
-CREATE OR REPLACE FUNCTION get_all_subject_ids(INTEGER) RETURNS SETOF cvterm_relationship AS
+CREATE OR REPLACE FUNCTION get_all_subject_ids(INTEGER) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     parentid alias for $1;
     pcount integer := 1;
-    cterm cvterm_relationship%ROWTYPE;
+    cterm cvtermpath%ROWTYPE;
 BEGIN
     CREATE TEMP TABLE tmpparent (cvterm_id INTEGER, status INTEGER DEFAULT 0);
     EXECUTE ''INSERT INTO tmpparent VALUES('' || parentid || '', 0);'';
@@ -33,12 +33,12 @@ LANGUAGE 'plpgsql';
 ---arg: child term id
 ---result: fetch all parent term id and their childrent term id with relationship type id
 
-CREATE OR REPLACE FUNCTION get_all_object_ids(INTEGER) RETURNS SETOF cvterm_relationship AS
+CREATE OR REPLACE FUNCTION get_all_object_ids(INTEGER) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     childid alias for $1;
     pcount integer := 1;
-    cterm cvterm_relationship%ROWTYPE;
+    cterm cvtermpath%ROWTYPE;
 BEGIN
     CREATE TEMP TABLE tmpchild (cvterm_id INTEGER, status INTEGER DEFAULT 0);
     EXECUTE ''INSERT INTO tmpchild VALUES('' || childid || '', 0);'';
