@@ -1,6 +1,10 @@
 package Chado::Builder;
+# vim: set ft=perl ts=2 expandtab:
+
 use strict;
 use base 'Module::Build';
+use Carp;
+use File::Spec::Functions 'catfile';
 use Data::Dumper;
 use Template;
 use XML::Simple;
@@ -74,11 +78,14 @@ sub ACTION_prepdb {
 
   $m->log->info("entering ACTION_prepdb");
 
-  $m->log->debug("system call: ". "psql ".$conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{db_name}." < ".
-				 $conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{chado_path}."/load/etc/initialize.sql"
-				);
+  my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $build_dir = $conf->{'build'}{'working_dir'} || '';
+  my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
+  my $sys_call  = "psql -f $init_sql $db_name";
 
-  system("psql ".$conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{db_name}." < ".$conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{chado_path}."/load/etc/initialize.sql");
+  $m->log->debug("system call: $sys_call");
+
+  system( $sys_call ) == 0 or croak "Error executing '$sys_call': $?";
 
   $m->log->info("leaving ACTION_prepdb");
 }
@@ -379,8 +386,12 @@ sub conf {
   return $self->{conf} if defined $self->{conf};
 
   my $file = $self->property('load_conf');
-  $self->{conf} = XMLin($file, forcearray => ['token','path','file'], keyattr => [qw(tt2 input token name file)], ContentKey => '-value');
-#warn Dumper($self->{conf});
+  $self->{conf} = XMLin($file, 
+    forcearray  => ['token','path','file'], 
+    keyattr     => [qw(tt2 input token name file)], 
+    ContentKey  => '-value'
+  );
+
   return $self->{conf};
 }
 
