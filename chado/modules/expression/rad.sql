@@ -432,6 +432,7 @@ create table element (
     subclass_view varchar(27) not null,
     tinyint1 int null,
     smallint1 int null,
+    smallint2 int null,
     char1 varchar(5) null,
     char2 varchar(5) null,
     char3 varchar(5) null,
@@ -508,6 +509,26 @@ create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (subclass_view);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
+
+create table element_relationship (
+    element_relationship_id serial not null,
+    primary key (element_relationship_id),
+    subject_id int not null,
+    foreign key (subject_id) references element (element_id) INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
+    object_id int not null,
+    foreign key (object_id) references element (element_id) INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint element_relationship_c1 unique (subject_id,object_id,type_id,rank)
+);
+create index element_relationship_idx1 on element_relationship (subject_id);
+create index element_relationship_idx2 on element_relationship (type_id);
+create index element_relationship_idx3 on element_relationship (object_id);
+create index element_relationship_idx4 on element_relationship (value);
+
+COMMENT ON TABLE element_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
 
 create table elementresult_relationship (
     elementresult_relationship_id serial not null,

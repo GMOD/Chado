@@ -21,6 +21,90 @@ LEFT JOIN (
 )
 ON (b.biomaterial_id = bp3.biomaterial_id);
 
+CREATE OR REPLACE VIEW affymetrixprobe
+AS SELECT
+  element.element_id     AS element_id,
+  element.feature_id     AS feature_id,
+  element.arraydesign_id AS arraydesign_id,
+  element.type_id        AS type_id,
+  element.dbxref_id      AS dbxref_id,
+  element.subclass_view  AS subclass_view,
+  element.smallstring1   AS probe,
+  element.smallint1      AS row,
+  element.smallint2      AS col
+FROM element
+WHERE subclass_view = 'affymetrixprobe';
+
+CREATE OR REPLACE RULE "_RuleI_affymetrixprobe" AS
+  ON INSERT TO affymetrixprobe
+  DO INSTEAD
+    INSERT INTO element
+    (subclass_view,feature_id,arraydesign_id,type_id,dbxref_id,smallstring1,smallint1,smallint2)
+    VALUES
+    ('affymetrixprobe',NEW.feature_id,NEW.arraydesign_id,NEW.type_id,NEW.dbxref_id,NEW.probe,NEW.row,NEW.col);
+
+CREATE OR REPLACE RULE "_RuleU_affymetrixprobe" AS
+  ON UPDATE TO affymetrixprobe
+  DO INSTEAD
+    UPDATE element
+    SET
+    element_id     = NEW.element_id,
+    feature_id     = NEW.feature_id,
+    arraydesign_id = NEW.arraydesign_id,
+    type_id        = NEW.type_id,
+    dbxref_id      = NEW.dbxref_id,
+    subclass_view  = NEW.subclass_view,
+    smallstring1   = NEW.probe,
+    smallint1      = NEW.row,
+    smallint2      = NEW.col
+    WHERE element_id = OLD.element_id;
+
+CREATE OR REPLACE RULE "_RuleD_affymetrixprobe" AS
+  ON DELETE TO affymetrixprobe
+  DO INSTEAD
+    DELETE FROM element
+    WHERE element_id = OLD.element_id
+    AND subclass_view = 'affymetrixprobe';
+
+CREATE OR REPLACE VIEW affymetrixprobeset
+AS SELECT
+  element.element_id AS element_id,
+  element.feature_id AS feature_id,
+  element.arraydesign_id AS arraydesign_id,
+  element.type_id AS type_id,
+  element.dbxref_id AS dbxref_id,
+  element.subclass_view AS subclass_view
+FROM element
+WHERE subclass_view = 'affymetrixprobeset';
+
+CREATE OR REPLACE RULE "_RuleI_affymetrixprobeset" AS
+  ON INSERT TO affymetrixprobeset
+  DO INSTEAD
+    INSERT INTO element
+    (subclass_view,feature_id,arraydesign_id,type_id,dbxref_id)
+    VALUES
+    ('affymetrixprobeset',NEW.feature_id,NEW.arraydesign_id,NEW.type_id,NEW.dbxref_id);
+
+CREATE OR REPLACE RULE "_RuleU_affymetrixprobeset" AS
+  ON UPDATE TO affymetrixprobeset
+  DO INSTEAD
+    UPDATE element
+    SET
+    element_id     = NEW.element_id,
+    feature_id     = NEW.feature_id,
+    arraydesign_id = NEW.arraydesign_id,
+    type_id        = NEW.type_id,
+    dbxref_id      = NEW.dbxref_id,
+    subclass_view  = NEW.subclass_view
+    WHERE element_id = OLD.element_id;
+
+CREATE OR REPLACE RULE "_RuleD_affymetrixprobeset" AS
+  ON DELETE TO affymetrixprobeset
+  DO INSTEAD
+    DELETE FROM element
+    WHERE element_id = OLD.element_id
+    AND subclass_view = 'affymetrixprobeset';
+
 CREATE OR REPLACE VIEW affymetrixcel
 AS SELECT
   elementresult.elementresult_id AS elementresult_id,
