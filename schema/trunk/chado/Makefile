@@ -10,7 +10,11 @@ all :: ./modules/audit/audit.mysql \
        ./modules/organism/organism.mysql \
        ./modules/pub/pub.mysql \
        ./modules/sequence/sequence.mysql \
-       ./modules/www/www.mysql
+       ./modules/www/www.mysql \
+       cdbi
 
 %.mysql: %.sql
 	./bin/pg2my.pl $< > $@
+
+cdbi:
+	./bin/pg2cdbi.pl ./modules/*/*.sql > ./src/mysql/Chado/AutoDBI.pm
