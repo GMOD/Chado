@@ -141,7 +141,7 @@ my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
 my ($synonym_type) = Chado::Cvterm->search(name => 'synonym');
 unless ($synonym_type) {
   my ($cv_entry) = Chado::Cv->find_or_create({
-                    name       => 'synonym type',
+                    name       => 'autocreated',
                     definition => 'auto created by load_gff3.pl'
                                              }); 
   ($synonym_type) = Chado::Cvterm->find_or_create({
@@ -150,16 +150,31 @@ unless ($synonym_type) {
                     definition => 'auto created by load_gff3.pl'
                                                   });
 }
-
 die "Unable to create a synonym type in cvterm table."
     unless $synonym_type;
+
+my ($note_type) = Chado::Cvterm->search(name => 'note');
+my ($note_type  = Chado::Cvterm->search(name => 'Note') unless $note_type;
+unless ($note_type) {
+  my ($cv_entry) = Chado::Cv->find_or_create({
+                    name       => 'autocreated',
+                    definition => 'auto created by load_gff3.pl'
+                                             });
+  ($note_type) = Chado::Cvterm->find_or_create({
+                    name       => 'note',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+}
+die "Unable to create note type in cvterm table."
+    unless $note_type;
 
 while(my $gff_feature = $gffio->next_feature()) {
 
   #skip mitochondrial genes?
 
-  my($id) = $gff_feature->has_tag('ID') ? $gff_feature->get_tag_values('ID')
-                                        : $gff_feature->get_tag_values('Parent');
+  my($id) = $gff_feature->has_tag('ID')? $gff_feature->get_tag_values('ID')
+                                       : $gff_feature->get_tag_values('Parent');
 
   if ($gff_feature->has_tag('ID') && !($id eq $gff_feature->seq_id) ){
     ($srcfeature{$id}) = Chado::Feature->search(name => $gff_feature->seq_id);
@@ -174,6 +189,8 @@ while(my $gff_feature = $gffio->next_feature()) {
       die;
     }
 
+
+#is this general, or what should really be done here?
     if(!$dbxref{$id}){
       my($chado_dbxref) = Chado::Dbxref->find_or_create({
         db_id => $chado_db->id,
@@ -256,7 +273,7 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
                       pub_id     => 1 ##what should go here?
-                                            })
+                                            });
   }
 
   if($gff_feature->has_tag('Parent')){
@@ -269,6 +286,43 @@ while(my $gff_feature = $gffio->next_feature()) {
                                               });
 
   }
+
+  if($gff_feature->has_tag('Alias')) {
+    my ($synonym) = Chado::Synonym->find_or_create({
+                      name    => $gff_feature->get_tag_values('Alias'),
+                      type_id => $synonym_type->cvterm_id
+                                                   });
+                                                                                
+                                                                                
+    Chado::Feature_synonym->find_or_create ({
+                      synonym_id => $synonym->synonym_id,
+                      feature_id => $chado_feature->feature_id,
+                      pub_id     => 1 ##what should go here?
+                                            });
+ 
+  }
+
+  if($gff_feature->has_tag('Name')) {
+    my ($synonym) = Chado::Synonym->find_or_create({
+                      name    => $gff_feature->get_tag_values('Name'),
+                      type_id => $synonym_type->cvterm_id
+                                                   });
+                                                                                
+                                                                                
+    Chado::Feature_synonym->find_or_create ({
+                      synonym_id => $synonym->synonym_id,
+                      feature_id => $chado_feature->feature_id,
+                      pub_id     => 1 ##what should go here?
+                                            });
+  }
+
+  if($gff_feature->has_tag('note')) {
+    Chado::Featureprop->find_or_create({
+                      feature_id => $chado_feature->feature_id,
+                      type_id    => $note_type->cvterm_id,
+                      value      => $gff_feature->get_tag_values('note');
+                                       });
+  } 
 
 }
 $gffio->close();
