@@ -1,0 +1,43 @@
+:SELECT 
+  gene.*,
+  mrna.*,
+  exon.*,
+  protein.*,
+  geneprop.*,
+  gptype.name AS geneprop__type
+:FROM
+  feature AS gene 
+    INNER JOIN 
+  feature_relationship AS gene2mrna ON (gene.feature_id = gene2mrna.object_id)
+    INNER JOIN 
+  feature AS mrna ON (mrna.feature_id = gene2mrna.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2exon ON (mrna.feature_id = mrna2exon.object_id)
+    INNER JOIN
+  feature AS exon ON (exon.feature_id = mrna2exon.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2protein ON (mrna.feature_id = mrna2protein.object_id)
+    INNER JOIN
+  feature AS protein ON (protein.feature_id = mrna2protein.subject_id)
+    INNER JOIN
+  cvterm AS proteintype ON (protein.type_id = proteintype.cvterm_id)
+    INNER JOIN
+  cvterm AS exontype ON (exon.type_id = exontype.cvterm_id)
+    LEFT OUTER JOIN
+  featureprop AS geneprop ON (gene.feature_id = geneprop.feature_id)
+    LEFT OUTER JOIN
+  cvterm AS gptype ON (geneprop.type_id = gptype.cvterm_id)
+:WHERE 
+  [exontype.name = 'exon']
+  [proteintype.name = 'protein']
+  [gene.name => &gene_name&]
+  [mrna.name => &mrna_name&]
+  [protein.name => &protein_name&]
+
+:USE NESTING (set(gene(geneprop)(mrna(protein)(exon))))
+
+//
+schema: chado
+desc: protein coding gene model; bare bones (no featureprops etc)
+
+example_input: name => SELECT name FROM gene

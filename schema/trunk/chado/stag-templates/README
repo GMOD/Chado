@@ -7,6 +7,23 @@ This directory contains SQL Templates for querying chado in stag
 format. The templates can either be browsed as a resource in their own
 right, or they can be used in conjunction with the DBStag library.
 
+These templates let you query chado via
+
+  WWW
+  Command Line
+  API
+
+And retrieve XML or auto-objects representing nested relations from a
+set of templated queries.
+
+For example
+
+  chado-pcgenemodel -d chado gene_name=CG1234
+  chado-genemodel -d chado gene_name=CR15821
+  chado-protein -d chado CG1234-PA
+  chado-mrna -d chado CG1234-RA
+  chado-feature-by-direct-cvterm -d chado cvterm_name='chaperone activity'
+
 PREREQUISITES
 =============
 

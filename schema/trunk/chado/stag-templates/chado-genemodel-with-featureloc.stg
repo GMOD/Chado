@@ -2,6 +2,7 @@
   gene.*,
   transcript.*,
   leaf.*,
+  leafloc.*,
   leaftype.name AS leaf__type,
   geneprop.*,
   gptype.name AS geneprop__type
@@ -16,6 +17,8 @@
     INNER JOIN
   feature AS leaf ON (leaf.feature_id = transcript2leaf.subject_id)
     INNER JOIN
+  featureloc AS leafloc ON (leafloc.feature_id = leaf.feature_id)
+    INNER JOIN
   cvterm AS leaftype ON (leaf.type_id = leaftype.cvterm_id)
     LEFT OUTER JOIN
   featureprop AS geneprop ON (gene.feature_id = geneprop.feature_id)
@@ -26,7 +29,7 @@
   [mrna.name => &mrna_name&]
   [protein.name => &protein_name&]
 
-:USE NESTING (set(gene(geneprop)(transcript(leaf))))
+:USE NESTING (set(gene(geneprop)(transcript(leaf(leafloc)))))
 
 //
 schema: chado
