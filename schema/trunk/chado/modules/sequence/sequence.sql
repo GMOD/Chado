@@ -232,18 +232,18 @@ create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
 create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
-       subjfeature_id int not null,
-       foreign key (subjfeature_id) references feature (feature_id) on delete cascade,
-       objfeature_id int not null,
-       foreign key (objfeature_id) references feature (feature_id) on delete cascade,
+       subject_id int not null,
+       foreign key (subject_id) references feature (feature_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references feature (feature_id) on delete cascade,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-       relrank int,
+       rank int,
 
-       unique(subjfeature_id, objfeature_id, type_id)
+       unique(subject_id, object_id, type_id)
 );
-create index feature_relationship_idx1 on feature_relationship (subjfeature_id);
-create index feature_relationship_idx2 on feature_relationship (objfeature_id);
+create index feature_relationship_idx1 on feature_relationship (subject_id);
+create index feature_relationship_idx2 on feature_relationship (object_id);
 create index feature_relationship_idx3 on feature_relationship (type_id);
 
 
