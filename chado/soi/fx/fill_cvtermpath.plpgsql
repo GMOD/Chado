@@ -1,0 +1,100 @@
+--- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology whose name is same
+--- as in cvterm, and the cvterm term is the root of the ontology.
+
+--- meant to be called by fill_cvtermpath function
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    pcount integer := 1;
+    depth integer := 1;
+    query text := '''';
+    total integer := 0;
+BEGIN
+    CREATE TEMP TABLE tmpparent (cvterm_id INTEGER, status INTEGER DEFAULT 0);
+    EXECUTE ''INSERT INTO tmpparent VALUES('' || rootid || '', 0);'';
+    WHILE (pcount > 0) LOOP
+        -- get all children
+        query := ''INSERT INTO cvtermpath (subject_id, object_id, cv_id, pathdistance)
+            SELECT DISTINCT c.subject_id, '' || rootid || '', '' || cvid || '', '' || depth ||
+            '' FROM cvterm_relationship c, tmpparent p WHERE p.cvterm_id = c.object_id
+            AND p.status = 0;'';
+        RAISE NOTICE ''%'', query;
+        EXECUTE query;
+
+        EXECUTE ''UPDATE tmpparent SET status = 1 WHERE status = 0;'';
+        -- get children of parent (those above whose path to children added) and make children become parent
+        EXECUTE ''INSERT INTO tmpparent SELECT DISTINCT c.subject_id, 0 
+            FROM cvterm_relationship c, tmpparent p 
+            WHERE c.object_id = p.cvterm_id AND p.status = 1;'';
+        -- set status to indicate parents are done
+        EXECUTE ''UPDATE tmpparent SET status = 2 WHERE status = 1;'';
+        EXECUTE ''SELECT * FROM tmpparent WHERE status = 0;'';
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+        depth := depth + 1;
+    END LOOP;
+
+--    SELECT COUNT(*) INTO total FROM tmpparent;
+    EXECUTE ''DROP TABLE tmpparent;'';
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+
+DROP TYPE cvtp_type CASCADE;
+CREATE TYPE cvtp_type AS (
+   cv_id INTEGER,
+   cvterm_id INTEGER
+);
+DROP TYPE cvtp_type2 CASCADE;
+CREATE TYPE cvtp_type2 AS (
+    cv_id INTEGER,
+    cvterm_id INTEGER,
+    status INTEGER
+);
+
+CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvtp_type%ROWTYPE;
+    parent cvtp_type2%ROWTYPE;
+    pcount INTEGER;
+    count INTEGER := 0;
+    cquery TEXT := '''';
+    query TEXT := '''';
+BEGIN
+    EXECUTE ''DELETE FROM cvtermpath WHERE cv_id = '' || cvid || '';'';
+
+    CREATE TEMP TABLE tmproot (cv_id INTEGER, cvterm_id INTEGER, status INTEGER DEFAULT 0);
+    query := ''SELECT cv.cv_id, cvterm.cvterm_id FROM cv, cvterm WHERE cv.name = cvterm.name 
+                AND cv.cv_id = '' || cvid || '';'';
+    FOR root IN EXECUTE query LOOP
+        EXECUTE ''INSERT INTO tmproot VALUES('' || root.cv_id || '', '' || root.cvterm_id || '', 0);'';
+        cquery := ''SELECT * FROM tmproot WHERE status = 0;'';
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+        WHILE (pcount > 0) LOOP
+            FOR parent IN EXECUTE ''SELECT * FROM tmproot WHERE status = 0;'' LOOP
+                PERFORM _fill_cvtermpath4root(parent.cvterm_id, parent.cv_id);
+            END LOOP;
+            EXECUTE ''UPDATE tmproot SET status = 1 WHERE status = 0;'';
+            EXECUTE ''INSERT INTO tmproot SELECT DISTINCT '' || root.cv_id || '', c.subject_id, 0 
+                    FROM cvterm_relationship c, tmproot p 
+                    WHERE c.object_id = p.cvterm_id AND p.status = 1;'';
+            EXECUTE ''UPDATE tmproot SET status = 2 WHERE status = 1;'';
+            EXECUTE cquery;
+            GET DIAGNOSTICS pcount = ROW_COUNT;
+        END LOOP;
+    END LOOP; 
+
+    EXECUTE ''DROP TABLE tmproot;'';
+
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+

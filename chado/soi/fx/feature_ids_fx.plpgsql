@@ -1,0 +1,396 @@
+--- get all feature ids (including children) for feature_id in tmproot (starting parents)
+--- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
+--- also watch out for same variable name table column name!!
+--- rely on caller to create tmproot table!! never envision to join 2 results from these functions!
+--- maybe it is a bad assumption (wishful thinking)?
+
+DROP TYPE feature_by_cvt_type CASCADE;
+CREATE TYPE feature_by_cvt_type AS (
+    feature_id INTEGER,
+    depth INT
+);
+
+CREATE OR REPLACE FUNCTION _feature_ids_children() RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    myrc feature_by_cvt_type%ROWTYPE;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+BEGIN
+
+    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
+    EXECUTE cquery;
+    GET DIAGNOSTICS pcount = ROW_COUNT;
+    WHILE (pcount > 0) LOOP
+        ---RAISE NOTICE ''%'',pcount;
+        depth := depth + 1;
+        FOR myrc in EXECUTE ''SELECT DISTINCT feature_id FROM tmproot WHERE status = 0;'' LOOP
+            RETURN NEXT myrc;
+        END LOOP;
+        EXECUTE ''UPDATE tmproot SET status = 1 WHERE status = 0;'';
+        EXECUTE ''INSERT INTO tmproot (feature_id, status)
+            SELECT DISTINCT c.feature_id, 0 FROM feature c, feature_relationship fr,
+            tmproot p WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
+            AND p.status = 1;'';
+        EXECUTE ''UPDATE tmproot SET status = 2 WHERE status = 1;'';
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+    END LOOP;
+
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+--- parent does not include seeded feature, and call this after getting children
+CREATE OR REPLACE FUNCTION _feature_ids_parents() RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    myrc feature_by_cvt_type%ROWTYPE;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+BEGIN
+
+    EXECUTE ''DELETE FROM tmproot WHERE seed = 0;'';
+    EXECUTE ''UPDATE tmproot SET status = 1;'';
+    EXECUTE ''INSERT INTO tmproot (feature_id, status)
+        SELECT DISTINCT p.feature_id, 0 FROM feature p, feature_relationship fr,
+        tmproot c WHERE p.feature_id = fr.object_id AND fr.subject_id = c.feature_id
+        AND c.status = 1;'';
+    EXECUTE ''UPDATE tmproot SET status = 2 WHERE status = 1;'';
+    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
+    EXECUTE cquery;
+    GET DIAGNOSTICS pcount = ROW_COUNT;
+    WHILE (pcount > 0) LOOP
+        ---RAISE NOTICE ''%'',pcount;
+        depth := depth + 1;
+        FOR myrc in EXECUTE ''SELECT DISTINCT feature_id FROM tmproot WHERE status = 0;'' LOOP
+            RETURN NEXT myrc;
+        END LOOP;
+        EXECUTE ''UPDATE tmproot SET status = 1 WHERE status = 0;'';
+        EXECUTE ''INSERT INTO tmproot (feature_id, status)
+            SELECT DISTINCT p.feature_id, 0 FROM feature p, feature_relationship fr,
+            tmproot c WHERE fr.object_id = p.feature_id AND c.feature_id = fr.subject_id
+            AND c.status = 1;'';
+        EXECUTE ''UPDATE tmproot SET status = 2 WHERE status = 1;'';
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+    END LOOP;
+
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+--- children feature ids only (not include itself), specifically for range (using src_seq name for speed)
+CREATE OR REPLACE FUNCTION feature_child_ids(cvterm.name%TYPE,feature.uniquename%TYPE,char(1)) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    gtype alias for $1;
+    src alias for $2;
+    is_an alias for $3;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot1 (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot1 (feature_id, status, seed) SELECT DISTINCT f.feature_id, 1, 1
+        FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
+        ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
+        WHERE t.name = '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
+        || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+ 
+    IF (STRPOS(gtype, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot1 (feature_id, status, seed) SELECT DISTINCT f.feature_id, 1, 1
+            FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
+            ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
+            WHERE t.name like '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
+            || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+    END IF;
+    EXECUTE query;
+
+    EXECUTE ''INSERT INTO tmproot1 (feature_id, status)
+        SELECT DISTINCT c.feature_id, 0 FROM feature c, feature_relationship fr,
+        tmproot1 p WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
+        AND p.status = 1;'';
+    EXECUTE ''UPDATE tmproot1 SET status = 2 WHERE status = 1;'';
+    cquery := ''SELECT * FROM tmproot1 tmp WHERE tmp.status = 0;'';
+    EXECUTE cquery;
+    GET DIAGNOSTICS pcount = ROW_COUNT;
+    depth := 1;
+    WHILE (pcount > 0) LOOP
+        ---RAISE NOTICE ''%'',pcount;
+        depth := depth + 1;
+        FOR myrc in EXECUTE ''SELECT DISTINCT feature_id,'' || depth || '' FROM tmproot1 WHERE status = 0;'' LOOP
+            RETURN NEXT myrc;
+        END LOOP;
+        EXECUTE ''UPDATE tmproot1 SET status = 1 WHERE status = 0;'';
+        EXECUTE ''INSERT INTO tmproot1 (feature_id, status)
+            SELECT DISTINCT c.feature_id, 0 FROM feature c, feature_relationship fr,
+            tmproot1 p WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
+            AND p.status = 1;'';
+        EXECUTE ''UPDATE tmproot1 SET status = 2 WHERE status = 1;'';
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+    END LOOP;
+
+    EXECUTE ''DROP TABLE tmproot1;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+--- by SO type, usefull for tRNA, ncRNA, etc, look both ways (up and down)
+
+CREATE OR REPLACE FUNCTION feature_ids_by_type(cvterm.name%TYPE, char(1)) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    gtype alias for $1;
+    is_an alias for $2;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+        FROM feature f, cvterm t WHERE t.cvterm_id = f.type_id AND t.name = '' || quote_literal(gtype) ||
+        '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+    IF (STRPOS(gtype, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+            FROM feature f, cvterm t WHERE t.cvterm_id = f.type_id AND t.name like ''
+            || quote_literal(gtype) || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+    END IF;
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    FOR myrc IN SELECT * FROM _feature_ids_parents() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION feature_ids_by_type2(cvterm.name%TYPE, feature.uniquename%TYPE, char(1)) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    gtype alias for $1;
+    src alias for $2;
+    is_an alias for $3;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+        FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
+        ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
+        WHERE t.name = '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
+        || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+ 
+    IF (STRPOS(gtype, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+            FROM feature f INNER join cvterm t ON (f.type_id = t.cvterm_id) INNER join featureloc fl
+            ON (f.feature_id = fl.feature_id) INNER join feature src ON (src.feature_id = fl.srcfeature_id)
+            WHERE t.name like '' || quote_literal(gtype) || '' AND src.uniquename = '' || quote_literal(src)
+            || '' AND f.is_analysis = '' || quote_literal(is_an) || '';'';
+    END IF;
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    FOR myrc IN SELECT * FROM _feature_ids_parents() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+--- get all feature ids (including children) for feature that has an ontology term (say GO function)
+--- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
+--- this function returns a set of feature_id for feature with the aspect and cvterm
+
+
+CREATE OR REPLACE FUNCTION feature_ids_by_ont(cv.name%TYPE,cvterm.name%TYPE) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    aspect alias for $1;
+    term alias for $2;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fcvt.feature_id, 0, 1
+        FROM feature_cvterm fcvt, cv, cvterm t WHERE cv.cv_id = t.cv_id AND
+        t.cvterm_id = fcvt.cvterm_id AND cv.name = '' || quote_literal(aspect) ||
+        '' AND t.name = '' || quote_literal(term) || '';'';
+    IF (STRPOS(term, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fcvt.feature_id, 0, 1
+            FROM feature_cvterm fcvt, cv, cvterm t WHERE cv.cv_id = t.cv_id AND
+            t.cvterm_id = fcvt.cvterm_id AND cv.name = '' || quote_literal(aspect) ||
+            '' AND t.name like '' || quote_literal(term) || '';'';
+    END IF;
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+--- get all feature ids (including children) for feature with the property (type, val)
+--- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
+--- this function returns a set of feature_id for feature with the typed val
+
+CREATE OR REPLACE FUNCTION feature_ids_by_property(cvterm.name%TYPE,varchar) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    p_type alias for $1;
+    p_val alias for $2;
+    myrc feature_by_cvt_type%ROWTYPE;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fprop.feature_id, 0, 1
+        FROM featureprop fprop, cvterm t WHERE t.cvterm_id = fprop.type_id AND t.name = '' ||
+        quote_literal(p_type) || '' AND fprop.value = '' || quote_literal(p_val) || '';'';
+    IF (STRPOS(p_val, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fprop.feature_id, 0, 1
+            FROM featureprop fprop, cvterm t WHERE t.cvterm_id = fprop.type_id AND t.name = '' ||
+            quote_literal(p_type) || '' AND fprop.value like '' || quote_literal(p_val) || '';'';
+    END IF;
+    EXECUTE query;
+
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+
+    RETURN null;
+END;
+'
+LANGUAGE 'plpgsql';
+
+--- get all feature ids (including children) for feature with the property val
+--- this function can be executed >1 time in one session/connection, has to use EXECUTE (readablility suffers)
+--- this function returns a set of feature_id for feature with the property value
+
+
+CREATE OR REPLACE FUNCTION feature_ids_by_propval(varchar) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    p_val alias for $1;
+    myrc feature_by_cvt_type%ROWTYPE;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fprop.feature_id, 0, 1
+        FROM featureprop fprop WHERE fprop.value = '' || quote_literal(p_val) || '';'';
+    IF (STRPOS(p_val, ''%'') > 0) THEN
+        query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT fprop.feature_id, 0, 1
+            FROM featureprop fprop WHERE fprop.value like '' || quote_literal(p_val) || '';'';
+    END IF;
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+
+    RETURN null;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+---4 args: ptype, ctype, count, operator (valid SQL number comparison operator), and is_analysis 
+---get feature ids for any node with type = ptype whose child node type = ctype
+---and child node feature count comparing (using operator) to ccount
+CREATE OR REPLACE FUNCTION feature_ids_by_child_count(cvterm.name%TYPE, cvterm.name%TYPE, INTEGER, varchar, char(1)) RETURNS SETOF feature_by_cvt_type AS
+'
+DECLARE
+    ptype alias for $1;
+    ctype alias for $2;
+    ccount alias for $3;
+    operator alias for $4;
+    is_an alias for $5;
+    pcount INTEGER;
+    depth INT := 0;
+    cquery TEXT;
+    query TEXT;
+    myrc feature_by_cvt_type%ROWTYPE;
+
+BEGIN
+
+    CREATE TEMP TABLE tmproot (feature_id INT not null, status INT DEFAULT 0, seed INT DEFAULT 0);
+
+    query := ''INSERT INTO tmproot (feature_id, status, seed) SELECT DISTINCT f.feature_id, 0, 1
+        FROM feature f INNER join (select count(*) as c, p.feature_id FROM feature p
+            INNER join cvterm pt ON (p.type_id = pt.cvterm_id) INNER join feature_relationship fr
+            ON (p.feature_id = fr.object_id) INNER join feature c ON (c.feature_id = fr.subject_id)
+            INNER join cvterm ct ON (c.type_id = ct.cvterm_id)
+            WHERE pt.name = '' || quote_literal(ptype) || '' AND ct.name = '' || quote_literal(ctype)
+            || '' AND p.is_analysis = '' || quote_literal(is_an) || '' group by p.feature_id) as cq
+        ON (cq.feature_id = f.feature_id) WHERE cq.c '' || operator || ccount || '';'';
+    ---RAISE NOTICE ''%'', query; 
+    EXECUTE query;
+
+    FOR myrc IN SELECT * FROM _feature_ids_children() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    FOR myrc IN SELECT * FROM _feature_ids_parents() LOOP
+        RETURN NEXT myrc;
+    END LOOP;
+    EXECUTE ''DROP TABLE tmproot;'';
+    RETURN NULL;
+END;
+'
+LANGUAGE 'plpgsql';
