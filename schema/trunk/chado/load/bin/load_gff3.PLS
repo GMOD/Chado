@@ -167,6 +167,7 @@ my %feature           = ();
 my %featureloc_locgroup   = ();
 my %dbxref            = ();
 my %cvterm            = ();
+my $so;
 
 initialize();
 
@@ -254,7 +255,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         }
     }
 
-    cache_cvterm( $gff_feature->primary_tag, 1 );
+    cache_cvterm( $gff_feature->primary_tag, $so->id );
     my ($chado_type) = $cvterm{ $gff_feature->primary_tag };
 
     die $gff_feature->primary_tag
@@ -708,6 +709,8 @@ sub initialize {
             definition => 'auto created by load_gff3.pl'
         }
     );
+    ($so) = Chado::Cv->search( { name => 'Sequence Ontology' } );
+    die "Unable to find Sequence Ontology in cv table; that is a pretty big problem" unless $so;
 
     # find needed cvterm and other pieces of information
     my @needed_cvterms =
@@ -1084,17 +1087,23 @@ sub load_feature_locations {
 
 sub cache_cvterm {
     my $name = shift;
-    my $dontcreate = shift;
+    my $soid = shift;
 
     #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
     #one from SO.
 
-    ( $cvterm{$name} ) = Chado::Cvterm->search( name => $name )
-      || Chado::Cvterm->search( name => ucfirst($name) );
+    ( $cvterm{$name} ) = Chado::Cvterm->search( {
+                                                  name => $name,
+                                                  cv_id=> $soid } ) 
+                      || Chado::Cvterm->search( {
+                                                  name => ucfirst($name),
+                                                  cv_id=> $soid } );
+
     $cvterm{$name} = $cvterm{$name}->next()
       if defined( $cvterm{$name} )
       and $cvterm{$name}->isa('Class::DBI::Iterator');
-    if ( !$cvterm{$name} && !$dontcreate  ) {
+
+    if ( !$cvterm{$name} && !$soid  ) {
         ( $cvterm{$name} ) = Chado::Cvterm->find_or_create(
             {
                 name       => $name,
@@ -1104,7 +1113,7 @@ sub cache_cvterm {
         );
     }
     die "unable to create a '$name' entry in the cvterm table"
-      if (!$cvterm{$name} && !$dontcreate );
+      if (!$cvterm{$name} && !$soid );
 }
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
