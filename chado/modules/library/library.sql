@@ -37,17 +37,14 @@ create table library_synonym (
     library_synonym_id serial not null,
     primary key (library_synonym_id),
     synonym_id int not null,
-    foreign key (synonym_id) references synonym (synonym_id) on delete cascade I
-NITIALLY DEFERRED,
+    foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
     library_id int not null,
-    foreign key (library_id) references library (library_id) on delete cascade I
-NITIALLY DEFERRED,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEF
-ERRED,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     is_current boolean not null default 'true',
     is_internal boolean not null default 'false',
-    constraint library_synonym_c1 unique (synonym_id,feature_id,pub_id)
+    constraint library_synonym_c1 unique (synonym_id,library_id,pub_id)
 );
 -- pub_id: the pub_id link is for relating the usage of a given synonym to the
 -- publication in which it was used
