@@ -5,6 +5,10 @@
 create table feature (
        feature_id serial not null,
        primary key (feature_id),
+
+       dbxref_id int,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
+       
        name varchar(255) not null,
        fnbeg int,
        fnend int,
@@ -21,8 +25,6 @@ create table feature (
 
        unique(name, end5, end3, strand, seqlen, md5checksum, type_id)
 );
-## dbxref should be unique; does that work w/ null values?
-## every feature has to have an accession (dbxref_id)
 ## IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
 ## this is vital as it allows us to represent zero-length
 ## features eg splice sites, insertion points without
