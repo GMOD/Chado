@@ -1007,6 +1007,29 @@ sub load_feature_locations {
     $chado_feature->update;                     # flush updates to this feature object
 
 
+    # find pre-existing feature locations that were loaded prior
+    # to this GFF3 file.
+    if(!$featureloc_locgroup{ $chado_feature->id }){
+      my $max_locgroup = undef;
+      foreach my $previous_featureloc (Chado::Featureloc->search(
+        feature_id => $chado_feature->id,
+      )){
+
+        if($fmin == $previous_featureloc->fmin and
+           $fmax == $previous_featureloc->fmax and
+           $previous_featureloc->srcfeature_id == $srcfeature{$gff_feature->seq_id}->id
+          ){
+          next;
+        }
+
+        $max_locgroup = $max_locgroup > $previous_featureloc->locgroup ? $max_locgroup : $previous_featureloc->locgroup;
+      }
+
+      if(defined($max_locgroup)){
+        $featureloc_locgroup{ $chado_feature->id } = $max_locgroup;
+      }
+    }
+
     # add feature location
     $featureloc_locgroup{ $chado_feature->id }++;
 
