@@ -8,18 +8,18 @@ unless ( scalar @ARGV > 3 ) {
   die "USAGE: $0 <dbname> <username> <password> <sql file> [<sql files>]\n";
 }
 
-my $dbname      = shift @ARGV;
-my $username    = shift @ARGV;
-my $password    = shift @ARGV;
-my @files       = @ARGV;
+my $db_name     = shift @ARGV;
+my $db_username = shift @ARGV;
+my $db_password = shift @ARGV;
+my $dsn         = "dbi:Pg:dbname=$db_name";
 my $translator  = SQL::Translator->new(
-  from          => 'PostgreSQL', 
+  from          => 'PostgreSQL',
   to            => 'ClassDBI',
-  filename      => \@files,
+  filename      => \@ARGV,
   producer_args => {
-    db_user     => $username,
-    db_pass     => $password,
-    dsn         => "dbi:Pg:dbname=$dbname",
+    db_user     => $db_username,
+    db_pass     => $db_password,
+    dsn         => $dsn,
   },
 );
 
