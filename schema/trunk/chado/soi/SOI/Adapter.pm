@@ -119,7 +119,7 @@ sub get_features {
         $typelist = [$typelist];
     }
     my $tlist = join(",",map{sql_q($_)}@$typelist);
-    my $where = $self->_get_where($constr);
+    my $where = $self->_get_where($constr, $opts);
     my $first_add_w = $where;
 
     my $fl_cols = join(", ",map{"fl.$_"}($self->_loc_attr));
@@ -139,7 +139,10 @@ sub get_features {
            map{"null as $_"}
            grep{$_ ne 'srcfeature_id' && $_ ne 'fmin' && $_ ne 'fmax' && $_ ne 'strand'}
            ($self->_loc_attr));
-        $first_add_w = $self->_get_where($constr, {src_col=>'f.uniquename',chromosome_arm=>1});
+        my $opts2 = $opts;
+        $opts2->{src_col} = 'f.uniquename';
+        $opts2->{chromosome_arm} = 1;
+        $first_add_w = $self->_get_where($constr, $opts2);
         $sp_from = "";
     }
     $first_add_w = " AND $first_add_w" if ($first_add_w);
@@ -203,7 +206,9 @@ sub get_features {
     return unless (scalar(keys %node_h));
 
     #auxillaries can be optional
-    %node_h = $self->_get_auxillaries($constr, $typelist, \%node_h) unless ($opts->{noauxillaries});
+    my $opts2 = $opts;
+    $opts2->{types} = $typelist;
+    %node_h = $self->_get_auxillaries($constr, $opts2, \%node_h) unless ($opts->{noauxillaries});
 
     #collect top level
     foreach my $id (keys %node_h) {
@@ -593,7 +598,7 @@ sub get_features_by_typed_value {
         $range->{fmax} += $extend;
     }
     my $constr = {range=>$range};
-    return ($range, $self->$method($constr, $tlist));
+    return ($range, $self->$method($constr, $opts));
 }
 
 =head2 get_features_by_gene
@@ -828,6 +833,7 @@ sub _get_where {
         my ($src, $fmin, $fmax) = ($range->{src}, $range->{fmin}, $range->{fmax});
         confess("Invalid range args $src, $fmin, $fmax") if (!$src || ($fmax-$fmin) <=0);
         $where = "$src_col = '$src' and $fl_tbl.fmin <= $fmax and $fl_tbl.fmax >= $fmin";
+        $where = "$src_col = '$src' and $fl_tbl.fmin >= $fmin and $fl_tbl.fmax <= $fmax" if ($opts->{within});
         $where = "$src_col = '$src'" if ($chr_arm);
     }
     elsif ($constr->{src} || $constr->{src_seq}) {
@@ -903,7 +909,8 @@ sub _get_organism {
 sub _get_auxillaries {
     my $self = shift;
     my $constr = shift;
-    my $tlist = shift;
+    my $opts = shift || {};
+    my $tlist = $opts->{type} || $opts->{types} || $opts->{feature_types};
     my $href = shift;
     my %node_h = %{$href};
 
@@ -942,7 +949,7 @@ sub _get_auxillaries {
           $soi
          ) as q ON (f.type_id = q.cvterm_id)
          );
-    $where = $self->_get_where($constr);
+    $where = $self->_get_where($constr, $opts);
     $sql = sprintf("$sql WHERE %s", $where);
     $self->_get_dbxrefs($sql, \%node_h);
 
