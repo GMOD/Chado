@@ -164,13 +164,22 @@ while(my $arrayio = $affx->next_array){
       }
     }
 
-	my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
-                                                          biomaterial_id => $biomaterial->id,
-                                                          type_id => $chado_cvterm,
-                                                          value => $cvterm{$cvterm},
-                                                         });
-    $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: ". $cvterm{$cvterm});
-    push @txn, $biomaterialprop;
+    if(length($cvterm{$cvterm})){
+      my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
+                                                                    biomaterial_id => $biomaterial->id,
+                                                                    type_id => $chado_cvterm,
+                                                                    value => $cvterm{$cvterm},
+                                                                   });
+      $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: ". $cvterm{$cvterm});
+      push @txn, $biomaterialprop;
+    } else {
+      my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
+                                                                    biomaterial_id => $biomaterial->id,
+                                                                    type_id => $chado_cvterm,
+                                                                   });
+      $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: none");
+      push @txn, $biomaterialprop;
+    }
   }
 
   my $assay = Chado::Assay->find_or_create({
