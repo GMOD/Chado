@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.13 2004-02-11 16:50:12 scottcain Exp $
+$Id: INSTALL,v 1.14 2004-02-13 21:07:26 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -20,7 +20,17 @@ cain@cshl.org
 Prerequisites:
 
   PostgreSQL (currently, developers are using 7.3.2, but should transition to
-  7.4 soon).
+  7.4 soon). Items to do with postgres to make it ready to go:
+
+    * make it accept tcp/ip connections by adding this line to postgresql.conf:
+        tcpip_socket = true
+
+    * create a database user with permission to drop and add databases:
+        psql> CREATE USER <username> WITH CREATDB;
+
+    * tell postgres that it can use the plpgsql language (either as user
+      postgres or as the user created above):
+        # /usr/bin/createlang plpgsql template1
 
   Apache (1.3.*)
 
