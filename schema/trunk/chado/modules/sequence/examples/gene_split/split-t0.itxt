@@ -1,0 +1,273 @@
+#BEGIN
+data:  
+  gene:                                # a gene element/table is the collection
+    dbxref: FBgn0000001                # of all alleles (gene model instances)
+    name: motorhead
+    gene_genesynonym:
+      genesynonym:
+        gsynonym: lemmy
+      pub:
+        dbxref: FBrf00000001           # pub in which synonym is used
+    gene_genesynonym:
+      genesynonym:
+        gsynonym: CG11111
+      pub:
+        dbxref: FBrf00050001           # pub in which synonym is used
+                                       # (could be annotation paper)
+  
+  fset:
+  
+    # first we'll define the chromosome arm feature, on
+    # which all our examples are located
+  
+    feature:
+      name: 2L
+      ftype: chromosome_arm
+      dbxref: FBsf12
+      residues: ATTT.......<20megabases>......GTTGGTT
+      featureprop:
+        pkey: is_allele_wildtype        # wildtype sequence
+        pval: 1
+  
+    # then lets define the wildtype/canonical gene model -
+  
+    feature:
+      ftype: gene                      # gene model/instance aka allele
+      dbxref: FBal99                   # FBals for features where type=gene?
+      name: motorhead[+]               # auto assigned from gene + suffix
+      suffix: +                        # we don't have this field in db currently
+      source_feature: FBsf12           # seqfeatures have FBsfs?
+      gene_to_feature:
+        gene: FBgn0000001              # link to gene entity (symbol etc)
+      featureprop:
+        pkey: is_allele_wildtype
+        pval: 1
+      feature_cvterm:                  # GO terms *should* be linked to protein
+        cvterm:                        # but we still use gns for convenience.
+          termname: motor              # (could do both - eg in warehouse/mart?)
+          dbxref: GO:0004773
+  
+    # a gene model also includes exon structure etc; lets define these.
+    # the composition graph (feature_relationship entries) appears
+    # further on down
+  
+    feature:
+      ftype: transcript
+      dbxref: FBtr15
+      name: motorhead-RA[+]            # auto assigned from gene + allele + suffix
+                                       # [how do we name dicistronic trs?]
+      suffix: A                        # we don't have this field in db currently
+      source_feature: FBsf12
+      residues: GGTCCATGCTTAAGTCA............ATTTGAACC     # *spliced* residues
+  
+    feature:
+      ftype: exon
+      dbxref: FBsf201
+      name: motorhead-Ex1[+]           # auto assigned from gene + allele + suffix
+                                       # [how do we name dicistronic exons?]
+      suffix: 1                        # we don't have this field in db currently
+      source_feature: FBsf12
+      fmin: 1000
+      fmax: 3000
+      fstrand: 1
+  
+    feature:
+      ftype: exon
+      dbxref: FBsf202
+      name: motorhead-Ex2[+]           # auto assigned from gene + allele + suffix
+                                       # [how do we name dicistronic exons?]
+      suffix: 2                        # we don't have this field in db currently
+      source_feature: FBsf12
+      fmin: 4000
+      fmax: 9000
+      fstrand: 1
+  
+    feature:
+      ftype: CDS
+      dbxref: FBsf203
+      source_feature: FBsf12
+      residues: ATG.................TCG
+  
+    feature:
+      ftype: CDS_exon
+      dbxref: FBsf204
+      source_feature: FBsf12
+      fmin: 1200
+      fmax: 3000
+      fstrand: 1
+  
+    feature:
+      ftype: CDS_exon
+      dbxref: FBsf205
+      source_feature: FBsf12
+      fmin: 4000
+      fmax: 8800
+      fstrand: 1
+  
+    feature:
+      ftype: translation
+      dbxref: FBpp5
+      name: motorhead-P1[+]            # auto assigned from gene + allele + suffix
+                                       # [how do we name dicistronic exons?]
+      suffix: 1                        # we don't have this field in db currently
+      residues: MVQQQVQVQV.....PQSC*
+      # we could have all kinds of stuff attached here:
+      # eg, GO function, mol weight, proteomic modules
+  
+    feature:
+      ftype: protein_motif
+      dbxref: FBsf30008
+      name: motorhead-P1[+] kinesin motor domain
+      feature_cvterm:
+        cvterm:
+          termname: kinesis motor domain
+          dbxref: IPR001752
+      source_feature: FBpp5               # domain located relative to pp
+      fmin: 21
+      fmax: 183
+      fstrand: 1
+  
+    # ^^^^
+    # ok, above is the canonical gene model on wildtype sequence
+    # 
+    # now, we shall define any mutant alleles
+  
+    feature:
+      ftype: gene                      # gene model/instance aka allele
+      dbxref: FBal345                  # allele identifier                   
+      gene_to_feature:
+        gene: FBgn0000001              # alleles collected by gene entity
+      name: motorhead[12]              # auto assigned from gene + suffix
+      suffix: 12
+      featureprop:
+        pkey: is_allele_wildtype
+        pval: 0                        # mutant allele
+      feature_cvterm:
+        cvterm:
+          termname: X-ray              # mutation method [see NOTE*]
+  
+      # note: we *could* instantiate mutant transcript, translation etc
+      # but we won't bother here
+  
+    feature:
+      ftype: gene                      # gene model/instance aka allele
+      dbxref: FBal346                  # allele identifier                   
+      name: motorhead[ab]              # auto assigned from gene + suffix
+      suffix: ab
+      gene_to_feature:
+        gene: FBgn0000001              # alleles collected by gene entity
+      featureprop:
+        pkey: is_allele_wildtype
+        pval: 0                        # mutant allele
+  
+  
+    # any other features here - lets have one molecularly characterised
+    # mutation, which shall be the 'causative agent' of the
+    # allele immediately above. lets leave the other allele as being purely
+    # genetically/phenotypically characterised (ie no mutation feature)
+  
+    feature:
+      name: motorhead{BG000001}         # rules/triggers for this?
+      suffix: BG000001
+      ftype: insertion                  # subtype of general variation type
+      dbxref: FBti78
+      source_feature: FBsf12
+      fmin: 1582                        # inserts into CDS exon
+      fmax: 1582
+      fstrand: 1
+      featureprop:
+        pkey: variation_type
+        pval: CDS
+  
+    # lets have some more features in the region; one could be
+    # an oligonucleotide sequence localised to the genome; this
+    # oligo could have been used in a microarray experiment, for
+    # example. raw data could be attached to the oligo via
+    # a microarray module. conclusions could be transfered to
+    # the gene or transcript object via genome coordinate
+    # intersections with oligo
+  
+    feature:
+      ftype: oligo
+      dbxref: FBol666                   # PRIMARY identifier
+      source_feature: FBsf12
+      fmin: 8940                        # made from 3' UTR
+      fmax: 8964
+      fstrand: 1
+      residues: ATATTAT.........GGGG
+      feature_dbxref:                   # EXTERNAL identifiers
+        dbxref:
+          dbname: Affy
+          accession: 000000123
+  
+  # now we'll do the graph relating features to eachother
+  
+  feature_relationship_set:
+    feature_relationship:
+      subjfeature: FBtr15               #  transcript
+      objfeature:  FBal99               #  gene model / allele
+      type:        Part-Of              #  compositional relationship
+  
+    feature_relationship:
+      subjfeature: FBsf201              #  exon
+      objfeature:  FBtr15               #  transcript
+      type:        Part-Of
+  
+    feature_relationship:
+      subjfeature: FBsf202              #  exon 
+      objfeature:  FBtr15               #  transcript
+      type:        Part-Of
+  
+    feature_relationship:
+      subjfeature: FBsf203              #  CDS
+      objfeature:  FBtr15               #  transcript
+      type:        Coded-By             #  ? use partof ?
+  
+    feature_relationship:
+      subjfeature: FBpp5                #  translation
+      objfeature:  FBsf203              #  CDS
+      type:        Translated-From      
+  
+    feature_relationship:
+      subjfeature: FBsf204              #  CDS-exon
+      objfeature:  FBsf203              #  CDS
+      type:        Part-Of
+  
+    feature_relationship:
+      subjfeature: FBsf205              #  CDS-exon
+      objfeature:  FBsf203              #  CDS
+      type:        Part-Of
+  
+    feature_relationship:
+      subjfeature: FBti78               #  insertion
+      objfeature:  FBal346              #  mutant allele
+      type:        Causes
+  
+  # some basic phenotypic data for our 2 alleles
+  
+  pset:
+  
+    phenotype:
+      dbxref: FBph001
+      phenotype_cvterm:
+        cvterm:
+          termname: curly
+      phenotype_cvterm:
+        cvterm:
+          termname: wings
+      feature_phenotype:
+        feature: FBal345
+  
+    phenotype:
+      dbxref: FBph002
+      phenotype_cvterm:
+        cvterm:
+          termname: lethal               # note: dist between class and effect
+      phenotype_cvterm:                  # is implicit
+        cvterm:
+          termname: dominant
+      feature_phenotype:
+        feature: FBal346
+  
+#END
+  

@@ -1,0 +1,4 @@
+cnf:
+  phenotype:
+    fillcolor: \#440044
+    featurelinkstyle: dotted

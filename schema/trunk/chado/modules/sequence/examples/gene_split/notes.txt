@@ -1,0 +1,820 @@
+genes splits/merges/splerges are distributed long transactions
+
+use case:
+
+gene is split by genome curators, literature data resolved at later
+date by literature curators:
+
+T-0
+
+#BEGIN
+
+gene:                                # a gene element/table is the collection
+  dbxref: FBgn0000001                # of all alleles (gene model instances)
+  name: motorhead
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001           # pub in which synonym is used
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001           # pub in which synonym is used
+                                     # (could be annotation paper)
+
+fset:
+
+  # first we'll define the chromosome arm feature, on
+  # which all our examples are located
+
+  feature:
+    name: 2L
+    ftype: chromosome_arm
+    dbxref: FBsf12
+    residues: ATTT.......<20megabases>......GTTGGTT
+    featureprop:
+      pkey: is_allele_wildtype        # wildtype sequence
+      pval: 1
+
+  # then lets define the wildtype/canonical gene model -
+
+  feature:
+    ftype: gene                      # gene model/instance aka allele
+    dbxref: FBal99                   # FBals for features where type=gene?
+    name: motorhead[+]               # auto assigned from gene + suffix
+    suffix: +                        # we don't have this field in db currently
+    source_feature: FBsf12           # seqfeatures have FBsfs?
+    gene_to_feature:
+      gene: FBgn0000001              # link to gene entity (symbol etc)
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+    feature_cvterm:                  # GO terms *should* be linked to protein
+      cvterm:                        # but we still use gns for convenience.
+        termname: motor              # (could do both - eg in warehouse/mart?)
+        dbxref: GO:0004773
+
+  # a gene model also includes exon structure etc; lets define these.
+  # the composition graph (feature_relationship entries) appears
+  # further on down
+
+  feature:
+    ftype: transcript
+    dbxref: FBtr15
+    name: motorhead-RA[+]            # auto assigned from gene + allele + suffix
+                                     # [how do we name dicistronic trs?]
+    suffix: A                        # we don't have this field in db currently
+    source_feature: FBsf12
+    residues: GGTCCATGCTTAAGTCA............ATTTGAACC     # *spliced* residues
+
+  feature:
+    ftype: exon
+    dbxref: FBsf201
+    name: motorhead-Ex1[+]           # auto assigned from gene + allele + suffix
+                                     # [how do we name dicistronic exons?]
+    suffix: 1                        # we don't have this field in db currently
+    source_feature: FBsf12
+    fmin: 1000
+    fmax: 3000
+    fstrand: 1
+
+  feature:
+    ftype: exon
+    dbxref: FBsf202
+    name: motorhead-Ex2[+]           # auto assigned from gene + allele + suffix
+                                     # [how do we name dicistronic exons?]
+    suffix: 2                        # we don't have this field in db currently
+    source_feature: FBsf12
+    fmin: 4000
+    fmax: 9000
+    fstrand: 1
+
+  feature:
+    ftype: CDS
+    dbxref: FBsf203
+    source_feature: FBsf12
+    residues: ATG.................TCG
+
+  feature:
+    ftype: CDS_exon
+    dbxref: FBsf204
+    source_feature: FBsf12
+    fmin: 1200
+    fmax: 3000
+    fstrand: 1
+
+  feature:
+    ftype: CDS_exon
+    dbxref: FBsf205
+    source_feature: FBsf12
+    fmin: 4000
+    fmax: 8800
+    fstrand: 1
+
+  feature:
+    ftype: translation
+    dbxref: FBpp5
+    name: motorhead-P1[+]            # auto assigned from gene + allele + suffix
+                                     # [how do we name dicistronic exons?]
+    suffix: 1                        # we don't have this field in db currently
+    residues: MVQQQVQVQV.....PQSC*
+    # we could have all kinds of stuff attached here:
+    # eg, GO function, mol weight, proteomic modules
+
+  feature:
+    ftype: protein_motif
+    dbxref: FBsf30008
+    name: motorhead-P1[+] kinesin motor domain
+    feature_cvterm:
+      cvterm:
+        termname: kinesis motor domain
+        dbxref: IPR001752
+    source_feature: FBpp5               # domain located relative to pp
+    fmin: 21
+    fmax: 183
+    fstrand: 1
+
+  # ^^^^
+  # ok, above is the canonical gene model on wildtype sequence
+  # 
+  # now, we shall define any mutant alleles
+
+  feature:
+    ftype: gene                      # gene model/instance aka allele
+    dbxref: FBal345                  # allele identifier                   
+    gene_to_feature:
+      gene: FBgn0000001              # alleles collected by gene entity
+    name: motorhead[12]              # auto assigned from gene + suffix
+    suffix: 12
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0                        # mutant allele
+    feature_cvterm:
+      cvterm:
+        termname: X-ray              # mutation method [see NOTE*]
+
+    # note: we *could* instantiate mutant transcript, translation etc
+    # but we won't bother here
+
+  feature:
+    ftype: gene                      # gene model/instance aka allele
+    dbxref: FBal346                  # allele identifier                   
+    name: motorhead[ab]              # auto assigned from gene + suffix
+    suffix: ab
+    gene_to_feature:
+      gene: FBgn0000001              # alleles collected by gene entity
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0                        # mutant allele
+
+
+  # any other features here - lets have one molecularly characterised
+  # mutation, which shall be the 'causative agent' of the
+  # allele immediately above. lets leave the other allele as being purely
+  # genetically/phenotypically characterised (ie no mutation feature)
+
+  feature:
+    name: motorhead{BG000001}         # rules/triggers for this?
+    suffix: BG000001
+    ftype: insertion                  # subtype of general variation type
+    dbxref: FBti78
+    source_feature: FBsf12
+    fmin: 1582                        # inserts into CDS exon
+    fmax: 1582
+    fstrand: 1
+    featureprop:
+      pkey: variation_type
+      pval: CDS
+
+  # lets have some more features in the region; one could be
+  # an oligonucleotide sequence localised to the genome; this
+  # oligo could have been used in a microarray experiment, for
+  # example. raw data could be attached to the oligo via
+  # a microarray module. conclusions could be transfered to
+  # the gene or transcript object via genome coordinate
+  # intersections with oligo
+
+  feature:
+    ftype: oligo
+    dbxref: FBol666                   # PRIMARY identifier
+    source_feature: FBsf12
+    fmin: 8940                        # made from 3' UTR
+    fmax: 8964
+    fstrand: 1
+    residues: ATATTAT.........GGGG
+    feature_dbxref:                   # EXTERNAL identifiers
+      dbxref:
+        dbname: Affy
+        accession: 000000123
+
+# now we'll do the graph relating features to eachother
+
+feature_relationship_set:
+  feature_relationship:
+    subjfeature: FBtr15               #  transcript
+    objfeature:  FBal99               #  gene model / allele
+    type:        Part-Of              #  compositional relationship
+
+  feature_relationship:
+    subjfeature: FBsf201              #  exon
+    objfeature:  FBtr15               #  transcript
+    type:        Part-Of
+
+  feature_relationship:
+    subjfeature: FBsf202              #  exon 
+    objfeature:  FBtr15               #  transcript
+    type:        Part-Of
+
+  feature_relationship:
+    subjfeature: FBsf203              #  CDS
+    objfeature:  FBtr15               #  transcript
+    type:        Coded-By             #  ? use partof ?
+
+  feature_relationship:
+    subjfeature: FBpp5                #  translation
+    objfeature:  FBsf203              #  CDS
+    type:        Translated-From      
+
+  feature_relationship:
+    subjfeature: FBsf204              #  CDS-exon
+    objfeature:  FBsf203              #  CDS
+    type:        Part-Of
+
+  feature_relationship:
+    subjfeature: FBsf205              #  CDS-exon
+    objfeature:  FBsf203              #  CDS
+    type:        Part-Of
+
+  feature_relationship:
+    subjfeature: FBti78               #  insertion
+    objfeature:  FBal346              #  mutant allele
+    type:        Causes
+
+  feature_relationship:
+    subjfeature: FB                   #
+    objfeature:  FB                   #
+    type:        
+
+# some basic phenotypic data for our 2 alleles
+
+pset:
+
+  phenotype:
+    dbxref: FBph001
+    phenotype_cvterm:
+      cvterm:
+        termname: curly
+    phenotype_cvterm:
+      cvterm:
+        termname: wings
+    feature_phenotype:
+      feature: FBal345
+
+  phenotype:
+    dbxref: FBph002
+    phenotype_cvterm:
+      cvterm:
+        termname: lethal               # note: dist between class and effect
+    phenotype_cvterm:                  # is implicit
+      cvterm:
+        termname: dominant
+    feature_phenotype:
+      feature: FBal346
+
+#END
+
+Ok, basic two exon gene model, two mutant alleles, one caused by P
+insertion, 
+
+NOTE*
+
+if we want key/val pairs both derived from cv we need a new table;
+eg
+
+key = mutation method
+val = spontaneous
+
+Or just have a specific table for these?
+
+eg
+
+Aaaaanyway, lets say apollo curator splits the gene. the exon
+coordinates remain the same, its just the relationships between the
+exons, transcripts and genes that change.
+
+what happens?
+
+the end result will look like one deletion and two inserts of new
+genes. however, stuff must remain attached to the old gene until
+literature curators decide which allele/ref goes with which gene.
+
+T-1:
+
+#BEGIN
+
+# OLD unsplit gene
+gene:
+  dbxref: FBgn0000001
+  name: motorhead
+  gene_status:
+    status_flag: PARTIALLY-DELETED
+    status_time: T-1
+    gene_history:
+      new_gene: FBgn0000002
+    gene_history:
+      new_gene: FBgn0000003
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+# child1
+gene:
+  dbxref: FBgn0000011
+  name: tempname-xyz111               # this could be a CG instead?
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+# child2
+gene:
+  dbxref: FBgn0000012
+  name: tempname-qyt956               # this could be a CG instead?
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: motorhead             # original name
+    pub:
+      dbxref: FBrf00000002
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+# note - only displaying history for the dead gene, could equally
+# show it for both
+
+fset:
+
+  # REMAINS THE SAME
+  feature:
+    name: 2L
+    ftype: chromosome_arm
+    dbxref: FBsf12
+    residues: ATTT.......<20megabases>......GTTGGTT
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+
+
+  # OLD MODEL - DEAD
+  # note: we need to generate new FBal, Fal99 is disused
+  # [what happens to wildtype FBals right now I wonder?]
+  feature:
+    feature_status:
+      status_flag: PARTIALLY-DELETED
+      status_time: T-1       
+    feature_history:
+      new_feature: FBal20001
+    feature_history:
+      new_feature: FBal20002
+    ftype: gene
+    dbxref: FBal99
+    name: motorhead[+]               # auto assigned from gene + suffix
+    suffix: +                        # we don't have this field in db currently
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000001
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+
+    # we keep GO annotation around until literature can be checked,
+    # authors contacted, analyses run and inspected, etc
+    feature_cvterm:
+      cvterm:
+        termname: motor
+        dbxref: GO:0004773
+
+  # NEW CHILD 1
+  feature:
+    ftype: gene
+    dbxref: FBal20001
+    name: tempname-xyz111[+]
+    suffix: + 
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000011               # gene entity 1
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+    # note: GO annot is gone until checked (see dead entry for GO)
+
+  # NEW CHILD 2
+  feature:
+    ftype: gene
+    dbxref: FBal20002
+    name: tempname-qyt956[+]
+    suffix: + 
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000012               # gene entity 2
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+    # note: GO annot is gone until checked (see dead entry for GO)
+
+  # PARTIALLY-DELETED TRANSCRIPT
+  # note: we may or may not decide to keep dead transcripts around
+  feature:
+    feature_status:
+      status_flag: PARTIALLY-DELETED
+      status_time: T-1       
+    feature_history:
+      new_feature: FBtr21
+    feature_history:
+      new_feature: FBtr22
+    ftype: transcript
+    dbxref: FBtr15
+    name: motorhead-RA[+]            
+    suffix: A                        
+    source_feature: FBsf12
+    residues: GGTCCATGCTTAAGTCA............ATTTGAACC
+
+  # first new transcript from split
+  feature:
+    ftype: transcript
+    dbxref: FBtr21
+    name: tempname-xyz111-RA[+]
+    suffix: A
+    source_feature: FBsf12
+    residues: GGTCCATGCTTAAGTCA............
+
+  # second new transcript from split
+  feature:
+    ftype: transcript
+    dbxref: FBtr22
+    name: tempname-qyt956-RA[+]
+    suffix: A 
+    source_feature: FBsf12
+    residues: ............ATTTGAACC
+
+  # EXONS UNCHANGED (except auto-names? change suffixes?)
+  # exon suffixes should be unique per gene model/cassette
+  feature:
+    ftype: exon
+    dbxref: FBsf201
+    name: tempname-xyz111-Ex1[+]     # auto assigned from gene + allele + suffix
+    suffix: 1                        
+    source_feature: FBsf12
+    fmin: 1000
+    fmax: 3000
+    fstrand: 1
+
+  feature:
+    ftype: exon
+    dbxref: FBsf202
+    name: tempname-qyt956-Ex1[+]     # auto assigned from gene + allele + suffix
+    suffix: 1                        # note - suffix has changed
+    source_feature: FBsf12
+    fmin: 4000
+    fmax: 9000
+    fstrand: 1
+
+  # too lazy to show CDS feature changes
+
+  # PARTIALLY-DELETED TRANSLATION
+  # note: we may decide not to do tracking of split merges at the
+  # non-gene level - in which case this entry would just disappear
+  feature:
+    feature_status:
+      status_flag: PARTIALLY-DELETED
+      status_time: T-1       
+    feature_history:
+      new_feature: FBpp6
+    feature_history:
+      new_feature: FBpp7
+    ftype: translation
+    dbxref: FBpp5
+    name: motorhead-P1[+]            # auto assigned from gene + allele + suffix
+    suffix: 1                        # we don't have this field in db currently
+    residues: MVQQQVQVQV.....PQSC*
+
+  # two new translations
+  # (again, not showing history here)
+  feature:
+    ftype: translation
+    dbxref: FBpp6
+    name: tempname-xyz111-P1[+]      
+    suffix: 1                        
+    residues: MVQQQVQVQV.....*
+
+  feature:
+    ftype: translation
+    dbxref: FBpp7
+    name: tempname-qyt956-P1[+]      
+    suffix: 1                        
+    residues: MILLSCV.....*
+
+  # this is modified: domain is now relative to 1st new protein
+  # (this may not appear until after a re-analysis eg with interpro)
+  feature:
+    ftype: protein_motif
+    dbxref: FBsf30008
+    feature_cvterm:
+      cvterm:
+        termname: kinesis motor domain
+        dbxref: IPR001752
+    source_feature: FBpp6
+    fmin: 21
+    fmax: 183
+    fstrand: 1
+
+  # wildtype alleles - these are not partially-deleted/split;
+  # however, they will remain pointing at the old/partially-deleted
+  # gene (FBgn0000001) until a literature curator decides if
+  # they should be linked to FBgn0000002 or FBgn0000003
+  # (ie which of the two new models by transitivity)
+
+  # this first allele could actually be automatically
+  # transfered because the causative agent is a P insertion
+  # the location of which is known; let us wait until T2
+  # before we change the FBgn however
+  feature:
+    ftype: gene
+    dbxref: FBal345
+    name: motorhead[12]              # auto assigned from gene + suffix
+    suffix: 12
+    gene_to_feature:
+      gene: FBgn0000001
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0
+    feature_cvterm:
+      cvterm:
+        termname: X-ray
+
+  feature:
+    ftype: gene
+    dbxref: FBal346
+    name: motorhead[ab]              # auto assigned from gene + suffix
+    suffix: ab
+    gene_to_feature:
+      gene: FBgn0000001
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0
+
+
+  # the insertion remains the same; at T2 the name will change
+  feature:
+    name: motorhead{BG000001}         # rules/triggers for this?
+    suffix: BG000001
+    ftype: insertion
+    dbxref: FBti78
+    source_feature: FBsf12
+    fmin: 1582
+    fmax: 1582
+    fstrand: 1
+    featureprop:
+      pkey: variation_type
+      pval: CDS
+
+  # no change to oligo
+  feature:
+    ftype: oligo
+    dbxref: FBol666
+    source_feature: FBsf12
+    fmin: 8940
+    fmax: 8964
+    fstrand: 1
+    residues: ATATTAT.........GGGG
+    feature_dbxref:
+      dbxref:
+        dbname: Affy
+        accession: 000000123
+
+# leave out feature_relationship for brevity;
+# question: do we mark relationships between
+# a partially-deleted feature and another
+# feature in some way?
+
+# also leave out phenotypes for brevity
+
+
+#END
+
+Ok, now at time T-2, a literature curator comes along and decides what
+the new functional annotation (GO) is, and which alleles go with which
+genes. after this, some automatic naming can be done.
+
+Here I'm only going to include CHANGED elements:
+
+T-2
+
+#BEGIN
+
+gene:
+  dbxref: FBgn0000001
+  name: motorhead-OBSOLETE
+  gene_status:
+    status_flag: DELETED                # note - now fully deleted
+    status_time: T-2
+    gene_history:
+      new_gene: FBgn0000002
+    gene_history:
+      new_gene: FBgn0000003
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+# child1
+gene:
+  dbxref: FBgn0000011
+  name: motorhead                    # the first child of the split
+                                     # is the real motorhead
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+# child2
+gene:
+  dbxref: FBgn0000012
+  name: yakuza                        # this guy is not motorhead - new symbol
+                                      # assigned by curator
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: motorhead             # original name
+    pub:
+      dbxref: FBrf00000002
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: lemmy
+    pub:
+      dbxref: FBrf00000001
+  gene_genesynonym:
+    genesynonym:
+      gsynonym: CG11111
+    pub:
+      dbxref: FBrf00050001
+
+fset:
+  feature:
+    feature_status:
+      status_flag: DELETED                # note - now fully deleted
+      status_time: T-2       
+    feature_history:
+      new_feature: FBal20001
+    feature_history:
+      new_feature: FBal20002
+    ftype: gene
+    dbxref: FBal99
+    name: motorhead[+]-OBSOLETE               
+    suffix: +                        
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000001
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+
+    # note: GO annotation now gone
+
+  # NEW CHILD 1 (gets the motorhead symbol back)
+  feature:
+    ftype: gene
+    dbxref: FBal20001
+    name: motorhead[+]
+    suffix: +
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000011               # gene entity 1
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+    # GO annot moved to this wt allele/gene
+    feature_cvterm:
+      cvterm:
+        termname: motor
+        dbxref: GO:0004773
+
+  # NEW CHILD 2 (unchanged except for name)
+  feature:
+    ftype: gene
+    dbxref: FBal20002
+    name: yakuze[+]
+    suffix: +
+    source_feature: FBsf12
+    gene_to_feature:
+      gene: FBgn0000012               # gene entity 2
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 1
+
+  # DELETED TRANSCRIPT
+  # note: we may or may not decide to keep dead transcripts around
+  feature:
+    feature_status:
+      status_flag: DELETED            # now fully deleted
+      status_time: T-2       
+    feature_history:
+      new_feature: FBtr21
+    feature_history:
+      new_feature: FBtr22
+    ftype: transcript
+    dbxref: FBtr15
+    name: motorhead-RA[+]-DELETED
+    suffix: A
+    source_feature: FBsf12
+    residues: GGTCCATGCTTAAGTCA............ATTTGAACC
+
+  # havent bothered to show split transcripts - they are the same as
+  # at T-1, except for their names (now motorhead-RA and yakuza-RA)
+  # similarly for exons
+
+  # now our alleles - reassigned to correct genes
+  feature:
+    ftype: gene
+    dbxref: FBal345
+    name: motorhead[12]              # auto assigned from gene + suffix
+    suffix: 12
+    gene_to_feature:
+      gene: FBgn0000002
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0
+    feature_cvterm:
+      cvterm:
+        termname: X-ray
+
+  feature:
+    ftype: gene
+    dbxref: FBal346
+    name: motorhead[ab]              # auto assigned from gene + suffix
+    suffix: ab
+    gene_to_feature:
+      gene: FBgn0000002
+    featureprop:
+      pkey: is_allele_wildtype
+      pval: 0
+
+
+  # name actually remains the same since the (new) gene model it disrupts
+  # gets to keep the name motorhead
+  feature:
+    name: motorhead{BG000001}
+    ftype: insertion
+    dbxref: FBti78
+    source_feature: FBsf12
+    fmin: 1582
+    fmax: 1582
+    fstrand: 1
+    featureprop:
+      pkey: variation_type
+      pval: CDS
+
+#END
+
+
+comments:
+
+need to check naming rules in split - does old symbol get preserved
+and if so how is it decided which of the new genes to assign it to -
+it seems sometimes the gene is named by allele (via phenotype, eg
+wingless) so in these cases it is easy once you find which alleles go
+with which genes eg via compl test. similarly genes named by homology?
+
