@@ -113,3 +113,37 @@ END;
 '
 LANGUAGE plpgsql;
 
+--creates a view that is suitable for creating a GFF3 string
+CREATE OR REPLACE VIEW gff3view (
+  feature_id,
+  ref,
+  source,
+  type,
+  fstart,
+  fend,
+  score,
+  strand,
+  phase,
+  attributes
+) AS
+SELECT
+  f.feature_id   ,
+  sf.name        ,
+  dbx.accession  ,
+  cv.name        ,
+  fl.fmin+1      ,
+  fl.fmax        ,
+  '.'            ,
+  fl.strand      ,
+  fl.phase       ,
+  gffattstring(f.feature_id)
+FROM feature f, feature sf, feature_dbxref fd,
+     dbxref dbx, db db, cvterm cv, featureloc fl
+WHERE f.feature_id     = fl.feature_id AND
+      fl.srcfeature_id = sf.feature_id AND
+      f.type_id        = cv.cvterm_id  AND
+      db.name          = 'GFF_source'  AND
+      db.db_id         = dbx.db_id     AND
+      dbx.dbxref_id    = fd.dbxref_id  AND
+      fd.feature_id    = f.feature_id ;
+
