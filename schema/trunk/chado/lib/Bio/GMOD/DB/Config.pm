@@ -173,7 +173,7 @@ sub name {
                                                                                 
 =cut
 
-sub name {
+sub sqlfile {
     shift->get_tag_value('SQLFILE');
 }
 
