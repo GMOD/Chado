@@ -1014,7 +1014,6 @@ sub load_feature_locations {
       foreach my $previous_featureloc (Chado::Featureloc->search(
         feature_id => $chado_feature->id,
       )){
-
         if($fmin == $previous_featureloc->fmin and
            $fmax == $previous_featureloc->fmax and
            $previous_featureloc->srcfeature_id == $srcfeature{$gff_feature->seq_id}->id
