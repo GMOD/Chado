@@ -455,6 +455,7 @@ create table elementresult (
     int6 int null,
     tinyint1 int null,
     tinyint2 int null,
+    tinyint3 int null,
     smallint1 int null,
     smallint2 int null,
     char1 varchar(5) null,
