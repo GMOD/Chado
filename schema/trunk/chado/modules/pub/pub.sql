@@ -15,14 +15,15 @@ create table pub (
        issue  varchar(255),
        pyear  varchar(255),
        pages  varchar(255),
-       miniref varchar(255) not null,
+       miniref varchar(255),
+       uniquename text not null,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
 
-       unique(miniref)
+       unique(uniquename, type_id)
 );
 -- title: title of paper, chapter of book, journal, etc
 -- volumetitle: title of part if one of a series
