@@ -257,7 +257,8 @@ create table gene (
 
        unique(name),
        unique(dbxref_str)
-;
+);
+
 -- the set of tables handling genes, which here are exclusively grouping
 -- objects.  All FlyBase data currently stored under "Gene" and associated
 -- tables will need to be moved under the wildtype allele
