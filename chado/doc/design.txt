@@ -1,3 +1,6 @@
+[these are notes from the original chado design retreat - things have
+changed a LOT since then!!! cjm@fruitfly.org]
+
 IDB DESIGN
 ----------
 
