@@ -349,6 +349,7 @@ sub load_custom_tags {
     }
     elsif ( $tag eq 'description' ) {
         foreach my $d (@d) {
+            next if $d eq '';
             my ($featureprop) = Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
@@ -378,6 +379,7 @@ sub load_custom_tags {
         push @transaction, $db if $add_db;
 
         foreach my $d (@d) {
+            next if $d eq '';
             my ($dbxref) = Chado::Dbxref->find_or_create(
                 {
                     db_id     => $db->id,
@@ -396,7 +398,7 @@ sub load_custom_tags {
     }
     elsif ( $tag eq 'dbxref') {
         foreach my $d (@d) { 
-
+            next if $d eq '';
             if ($d =~ /(.+):(.+)/) {
                 $tag = "DB:$1";
                 $d   = $2;
@@ -441,6 +443,7 @@ sub load_custom_tags {
 
         my $rank = 0;
         foreach my $d (@d) {
+            next if $d eq '';
             my ($featureprop) = Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
@@ -471,6 +474,7 @@ sub load_Ontology_term {
     my @d = $gff_feature->get_tag_values($tag);
 
     foreach my $d (@d) {
+        next if $d eq '';
         my ($dbxref) = Chado::Dbxref->search( accession => $d );
         $progress->message("couldn't find cvterm in dbxref: $d") and next
           unless $dbxref;
@@ -506,6 +510,7 @@ sub load_Note_tag {
     my @d = $gff_feature->get_tag_values('Note');
     my $rank = 0;
     foreach my $d (@d) {
+        next if $d eq '';
         my ($featureprop) = Chado::Featureprop->find_or_create(
             {
                 feature_id => $chado_feature->id,
@@ -600,6 +605,7 @@ sub load_Parent_tag {
     if ( $gff_feature->has_tag('Parent') ) {
         my @parents = $gff_feature->get_tag_values('Parent');
         foreach my $parent (@parents) {
+            next if $parent = '';
 
             my $reltype =
                 ( $gff_feature->primary_tag eq 'protein' ||
@@ -642,7 +648,7 @@ sub load_Alias_tag {
             push @aliases, $gff_feature->get_tag_values('Alias');
         }
         foreach my $alias (@aliases) {
-
+            next if $alias = '';
             #create the synonym
             my ($chado_synonym1) = Chado::Synonym->find_or_create(
                 {
@@ -688,6 +694,7 @@ sub load_Name_tag {
     }
 
     foreach my $name (@names) {
+        next if $name = '';
         my ($chado_synonym1) = Chado::Synonym->find_or_create(
             {
                 name         => $name,
