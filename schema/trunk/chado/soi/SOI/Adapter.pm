@@ -331,7 +331,8 @@ sub _get_progs_dbs {
   valid options key: type, values is a single SO type or an array ref of SO types
                      default to [qw(match mRNA transposable_element)]
 
-                     noresidues, not to get subject seq residues, default 0
+                     noresidues, not to get subject seq residues, default 0 (get them)
+                     BEWARE: without residues, you will not have subj seq len as $sec_loc->{seq}->{seqlen}
 
   Description - get is_analysis true features and their children as a Feature tree
 
@@ -373,13 +374,14 @@ sub get_results {
     #soi children only
     my $soi_sql = $self->_soi_children_select($tlist);
     my $sub_select = 
-      qq(select DISTINCT feature_id, name, depth, object_id, rank FROM
+      qq(select DISTINCT feature_id, name, depth, object_id, rank, relationship_type FROM
          ((select
            f.feature_id,
            q.name,
            1 as depth,
            null as object_id,
-           null as rank
+           null as rank,
+           null as relationship_type
            FROM
            analysis an
            INNER join
@@ -402,7 +404,8 @@ sub get_results {
            q.name,
            q.depth,
            fr.object_id,
-           fr.rank as rank
+           fr.rank as rank,
+           frt.name as relationship_type
            FROM
            analysis an
            INNER join
@@ -411,6 +414,8 @@ sub get_results {
            feature f ON (f.feature_id = a2f.feature_id)
            INNER join
            feature_relationship fr ON (f.feature_id = fr.subject_id)
+           INNER join
+           cvterm frt ON (fr.type_id = frt.cvterm_id)
            INNER join
            featureloc fl ON (f.feature_id = fl.feature_id)
            INNER join
@@ -428,7 +433,8 @@ sub get_results {
          q.name as type,
          q.depth,
          q.object_id as parent_id,
-         q.rank as orderrank
+         q.rank as orderrank,
+         q.relationship_type
          FROM
          feature f
          INNER join
@@ -598,6 +604,10 @@ sub get_features_by_typed_value {
         $range->{fmax} += $extend;
     }
     my $constr = {range=>$range};
+	if ($opts->{constraint}) {
+		my $cnstr = $opts->{constraint};
+		map{$constr->{$_}=$cnstr->{$_}}keys %$cnstr;
+	}
     return ($range, $self->$method($constr, $opts));
 }
 
@@ -1154,12 +1164,12 @@ sub get_handle {
         $database_name = $loc;
     }
 
-    my $dbms = "Pg"; 
+    my $dbms = "Pg";
 
     if ($database_name =~ /:/) {
         ($dbms, $database_name) = split(/:/, $database_name);
-        $ENV{DBMS} = $dbms;
     }
+    $ENV{DBMS} = $dbms;
 
     my $dsn = "dbi:$dbms:$database_name";
 
@@ -1200,7 +1210,7 @@ sub get_handle {
     $dbh->{private_database_name} = $database_name;
     $dbh->{private_dbms} = $dbms;
     $dbh->{private_dbhost} = $host;
-    eval {$dbh->{AutoCommit} = 0};
+    eval {$dbh->{AutoCommit} = 1};
     $dbh->{private_dsn_str} = $dsn;
     # default behaviour should be to chop trailing blanks;
     # this behaviour is preferable as it makes the semantics free
@@ -1220,15 +1230,6 @@ sub get_handle {
     }
 
     print STDERR "get_handle: $database_name\n";
-
-    # set lock mode to wait
-    if (!$ENV{DBMS} || $ENV{DBMS} ne "mysql" && lc($ENV{DBMS}) ne 'pg') {
-        my $sth =
-          $dbh->prepare("set lock mode to wait 120") ||
-            confess $dbh->errstr;
-        $sth->execute() ||
-          confess $dbh->errstr;
-    }
 
     return $dbh;
 }
@@ -1399,7 +1400,7 @@ sub _select_objhash {
             #rank indicates secondary loc, another rank(renamed orderrank) for feature order
             if ($h->{rank}) {
                 my %sec_loc_h;
-                map {$sec_loc_h{$_} = $h->{$_}}('src_seq',@sec_loc_attr);
+                map {$sec_loc_h{$_} = $h->{$_}}('src_seq', @sec_loc_attr);
                 $node->add_secondary_location({%sec_loc_h});
             }
             my $parent = $node_h{$h->{parent_id}};
