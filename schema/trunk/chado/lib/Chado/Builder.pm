@@ -164,9 +164,9 @@ sub ACTION_mageml {
   }
   print "\n";
 
-  my $chosen =
-    $m->prompt(
-    "Which ontologies would you like to load (Comma delimited)? [0]");
+  my $chosen = $m->prompt(
+                          "Which ontologies would you like to load (Comma delimited)? [0]"
+                         );
   $m->notes( 'affymetrix' => $chosen );
 
   my %mageml = map { $ml{$_} => $conf->{mageml}{ $ml{$_} } } split ',', $chosen;
@@ -226,10 +226,9 @@ sub ACTION_ontologies {
   foreach my $key ( sort keys %ont ) { print "[$key] ", $ont{$key}, "\n"; }
   print "\n";
 
-  my $chosen =
-    $m->prompt(
-    "Which ontologies would you like to load (Comma delimited)? [0]");
+  my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
   $m->notes( 'ontologies' => $chosen );
+
   my %ontologies = map { $_ => $conf->{ontology}{ $ont{$_} } } split ',',
     $chosen;
 
@@ -238,17 +237,15 @@ sub ACTION_ontologies {
 
     my $load = 0;
     foreach my $file ( 
-      grep { $_->{type} eq 'definitions' } @{ $ontologies{$ontology}{file} } 
+      grep { $_->{type} eq 'definitions' } @{ $ontologies{$ontology}{file} }
     ) {
       my $fullpath = catfile $conf->{path}{data}, $file->{local};
       $fullpath =~ s!^(.+)/[^/]*!$1!;
-
       unless ( -d $fullpath ) {
         $m->log->debug("mkpath $fullpath");
         mkpath( $fullpath, 0, 0711 )
           or print "Couldn't make path '$fullpath': $!\n";
       }
-
       print "  +", $file->{remote}, "\n";
       $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
     }
@@ -257,14 +254,22 @@ sub ACTION_ontologies {
       grep { $_ if $_->{type} eq 'definitions' }
       @{ $ontologies{$ontology}{file} };
 
-    foreach my $ontfile ( 
-      grep { $_->{type} eq 'ontology' } @{ $ontologies{$ontology}{file} } 
+    foreach my $file (
+      grep { $_->{type} eq 'ontology' } @{ $ontologies{$ontology}{file} }
     ) {
-      print "  +", $ontfile->{remote}, "\n";
+      my $fullpath = catfile $conf->{path}{data}, $file->{local};
+      $fullpath =~ s!^(.+)/[^/]*!$1!;
+      unless ( -d $fullpath ) {
+        $m->log->debug("mkpath $fullpath");
+        mkpath( $fullpath, 0, 0711 )
+          or print "Couldn't make path '$fullpath': $!\n";
+      }
 
-      $load = 1 if $m->_mirror( $ontfile->{remote}, $ontfile->{local} );
+      print "  +", $file->{remote}, "\n";
 
- #	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$ontfile->{'local'});
+      $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+
+ #	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
 
       next unless $load;
 
@@ -272,7 +277,7 @@ sub ACTION_ontologies {
 
       my $sys_call = join( ' ', 
         './load/bin/gmod_load_ontology.pl',
-        catfile( $conf->{'path'}{'data'}, $ontfile->{'local'} ),
+        catfile( $conf->{'path'}{'data'}, $file->{'local'} ),
         catfile( $conf->{'path'}{'data'}, $deffile->{'local'} )
       );
       $m->log->debug( "system call: $sys_call" );
@@ -285,7 +290,7 @@ sub ACTION_ontologies {
         die;
       }
       else {
-        $m->_loaded( catfile($conf->{'path'}{'data'}, $ontfile->{'local'}), 1 );
+        $m->_loaded( catfile($conf->{'path'}{'data'}, $file->{'local'}), 1 );
         $m->_loaded( catfile($conf->{'path'}{'data'}, $deffile->{'local'}), 1 );
         print "done!\n";
         $m->log->debug("done!");

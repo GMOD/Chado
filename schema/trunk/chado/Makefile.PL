@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.59 2004-03-26 19:19:42 scottcain Exp $
+# $Id: Makefile.PL,v 1.60 2004-04-10 00:06:01 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -634,7 +634,7 @@ radviews ::
 	./Build radviews
 
 rm_locks ::
-	`find $LOCAL_TMP -name "*.$DBNAME" -exec rm -f '{}' ';'`
+	`find $LOCAL_TMP -name "*$DBNAME" -exec rm -f '{}' ';'`
 
   };  
 }

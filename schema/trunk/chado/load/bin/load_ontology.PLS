@@ -1,21 +1,22 @@
 #!perl -w
-                 
+
 use Config;
 use File::Basename qw(&basename &dirname);
 use Cwd;
-       
-                                    
+
+
 $origdir = cwd;
 chdir dirname($0);
 $file = basename($0, '.PL','.PLS');
 $file = "gmod_$file.pl";
-           
+
 open OUT,">$file" or die "Can't create $file: $!";
 print OUT "$Config{startperl}\n";
 
 print OUT <<'!NO!SUBS!';
 use strict;
 use lib 'lib';
+use File::Basename;
 use DBI;
 use Data::Dumper;
 use Chado::LoadDBI;
@@ -58,10 +59,11 @@ my $ontname = $ontology_file2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Onto
               $ontology_file2 =~ /^MA/              ? "Mouse Adult Anatomy Ontology" :
               $ontology_file2 =~ /^mouse_pathology/ ? "Mouse Pathology Ontology (Pathbase)" :
               $ontology_file2 =~ /^rel/             ? "Relationship Ontology" :
-              $ontology_file2 =~ /^component/       ? "Gene Ontology" :
-              $ontology_file2 =~ /^function/        ? "Gene Ontology" :
-              $ontology_file2 =~ /^process/         ? "Gene Ontology" :
-              $ontology_file2 =~ /^cell_type/       ? "eVOC Cell Type Ontology" :
+              $ontology_file2 =~ /^component/       ? "Cellular Component (Gene Ontology)" : #cjm request
+              $ontology_file2 =~ /^function/        ? "Molecular Function (Gene Ontology)" : #cjm request
+              $ontology_file2 =~ /^process/         ? "Biological Process (Gene Ontology)" : #cjm request
+#no longer used
+#              $ontology_file2 =~ /^cell_type/       ? "eVOC Cell Type Ontology" :
               $ontology_file2 =~ /^cell/            ? "Cell Ontology" :
               $ontology_file2 =~ /^pathology/       ? "eVOC Pathology Ontology" :
               $ontology_file2 =~ /^SO[FD]A|so\./    ? "Sequence Ontology" :
@@ -110,7 +112,8 @@ my $termfact = Bio::Ontology::TermFactory->new();
 my $relfact = Bio::Ontology::RelationshipFactory->new();
 
 #decide what format we need.  simple indented file or DAG-Edit ?
-my $format = $ontname =~ 'eVOC' ? 'simplehierarchy' : 'so';
+#my $format = $ontname =~ 'eVOC' ? 'simplehierarchy' : 'so';
+my $format = 'so';
 
 warn "starting parser...\n" if DEBUG;
 my $parser = Bio::OntologyIO->new(
@@ -308,6 +311,12 @@ sub load_dblinks {
 
   my @term_links = $term->get_dblinks();
   foreach my $term_link (@term_links) {
+
+    if(length($term_link) > 255){
+      warn("definition for term '".$term->name()."' too long, truncating to length 255");
+      $term_link = substr($term_link, 0, 255);
+    }
+
 	my $dbxref_db = Chado::Dbxref->find_or_create ({
 				accession => $term_link,
 				db_id => $db->id,
