@@ -166,6 +166,9 @@ create table cvtermprop (
 
     unique(cvterm_id, type_id, value, rank) 
 );
+create index cvtermprop_idx1 on cvtermprop (cvterm_id);
+create index cvtermprop_idx2 on cvtermprop (type_id);
+
 
 -- ================================================
 -- TABLE: dbxrefprop
