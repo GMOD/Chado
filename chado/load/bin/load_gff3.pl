@@ -302,7 +302,9 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   my($chado_feature) = Chado::Feature->find_or_create({
     organism_id  => $chado_organism,
-    name         => $id,
+    name         => $gff_feature->has_tag('ID') ? $gff_feature->get_tag_values('ID')
+                                                : ' ',
+#    name         => $id,
     uniquename   => $id .'_'. $gff_feature->primary_tag
                         .'_'. $gff_feature->seq_id .':'
                             . $fmin .'..'. $fmax,
