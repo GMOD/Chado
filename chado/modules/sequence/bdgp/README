@@ -15,4 +15,7 @@ The BDGP extensions currently comprise of
 
 * Sequence Ontology Layer
 
-  See...
+  so-views.sql                  -- portable SO view layer
+
+  [DOCUMENTATION FORTHCOMING]
+

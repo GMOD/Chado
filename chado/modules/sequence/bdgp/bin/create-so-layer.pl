@@ -116,7 +116,7 @@ my $featurereltriples =
 			     FROM feature_relationship AS fr1 
                              INNER JOIN feature AS f1 ON (f1.feature_id = fr1.subject_id)
 			     INNER JOIN feature AS f2 ON (f2.feature_id = fr1.object_id)
-			     INNER JOIN feature_relationship AS fr2 INNER JOIN ON (f2.feature_id = fr2.subject_id)
+			     INNER JOIN feature_relationship AS fr2 ON (f2.feature_id = fr2.subject_id)
 			     INNER JOIN feature AS f3 ON (f3.feature_id = fr2.object_id)
 			    ]);
 
@@ -352,10 +352,12 @@ foreach my $type (@$ftypes) {
         }
     }
 }
+msg("generating feature rels");
 
 # FEATURE RELATIONSHIPS
 foreach my $fr (@$featurerels) {
     my ($stid, $otid) = @$fr;
+    msg("SubObj type_ids: $stid $otid");
     my $st1 = $typemap{$stid} || die "no type for $stid";
     my $ot1 = $typemap{$otid} || die "no type for $otid";
     my $st = $namemap{lc($st1)} || die "no namemap for $st1";
