@@ -233,26 +233,26 @@ while(my $gff_feature = $gffio->next_feature()) {
       load_custom_tags($gff_feature,$chado_feature,$tag);
     }
 
-    unless (defined $cvterm{$tag}) {
-      $cvterm{$tag} = Chado::Cvterm->find_or_create ({
-                                                      name       => $tag,
-                                                      cv_id      => $cv->id,
-                                                      definition => 'auto created by load_gff3.pl'
-                                                     });
-
-      push @transaction, $cvterm{$tag};
-    }
-
-    my @values = $gff_feature->get_tag_values($tag);
-    foreach my $value (@values) {
-      my($chado_featureprop) = Chado::Featureprop->find_or_create({
-                                                                   feature_id => $chado_feature->id,
-                                                                   type_id    => $cvterm{$tag}->id,
-                                                                   value      => $value
-                                                                  });
-
-      push @transaction, $chado_featureprop;
-    }
+    #unless (defined $cvterm{$tag}) {
+    #  $cvterm{$tag} = Chado::Cvterm->find_or_create ({
+    #                                                  name       => $tag,
+    #                                                  cv_id      => $cv->id,
+    #                                                  definition => 'auto created by load_gff3.pl'
+    #                                                 });
+    #
+    #  push @transaction, $cvterm{$tag};
+    #}
+    #
+    #my @values = $gff_feature->get_tag_values($tag);
+    #foreach my $value (@values) {
+    #  my($chado_featureprop) = Chado::Featureprop->find_or_create({
+    #                                                               feature_id => $chado_feature->id,
+    #                                                               type_id    => $cvterm{$tag}->id,
+    #                                                               value      => $value
+    #                                                              });
+    #
+    #  push @transaction, $chado_featureprop;
+    #}
   }
 
   if ($feature_count % $CACHE_SIZE == 0) {
@@ -586,7 +586,7 @@ sub load_sequences {
 
 
     #count the file lines.  we need this to track load progress
-    open(WC,"grep -c -v '^>' $TMPFASTA |");
+    open(WC,"grep -c '^>' $TMPFASTA |");
     $linecount = <WC>; chomp $linecount;
     close(WC);
     ($linecount) = $linecount =~ /^\s*?(\d+)/;
