@@ -1,6 +1,22 @@
 /* For load_gff3.pl */
 insert into organism (abbreviation, genus, species, common_name)
-       values ('H.sapiens', 'Homo','sapiens','Human');
+       values ('H.sapiens', 'Homo','sapiens','human');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('D.melanogaster', 'Drosophila','melanogaster','fruitfly');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('M.musculus', 'Mus','musculus','mouse');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('A.gambiae', 'Anopheles','gambiae','mosquito');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('R.norvegicus', 'Rattus','norvegicus','rat');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('A.thaliana', 'Arabidopsis','thaliana','mustard weed');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('C.elegans', 'Caenorhabditis','elegans','worm');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('D.rerio', 'Danio','rerio','zebrafish');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('S.cerevisiae', 'Saccharomyces','cerevisiae','yeast');
 insert into contact (name) values ('Affymetrix');
 insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
