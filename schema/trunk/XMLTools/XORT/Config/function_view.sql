@@ -228,6 +228,10 @@ update featureloc set max=nbeg where (strand=0 or strand is null) and
 nbeg>nend;
 create index featureloc_src_min_max on featureloc
 (srcfeature_id,min,max);
+
+
+
+
 select count(*) from featureloc where min is null and nbeg is not null;
 
 
