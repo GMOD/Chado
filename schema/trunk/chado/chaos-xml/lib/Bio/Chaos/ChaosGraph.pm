@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.1 2004-06-16 02:46:50 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.2 2004-08-18 23:39:04 cmungall Exp $
 #
 #
 
@@ -185,23 +185,32 @@ sub fire_feature_event {
     return if $done_idx->{$fid};
 
     my $g = $self->graph;
-    my @es = $g->in_edges($fid);
+    my @es = $g->in_edges($fid); # object FRs
     my @frs = ();
     while (my @e = splice(@es, 0, 2)) {
 	$self->freak("bad edge [@e] for $fid") unless $e[0] && $e[1];
 	my $type = $g->get_attribute('type', @e);
 
-	# objects must be written before subjects
-	$self->fire_feature_event($W,
-				  $self->feature_idx->{$e[0]},
-				  $done_idx);
-
+        my $object_id = $e[0];
+        my $subject_id = $e[1];
+        if (!$self->feature_idx->{$object_id}) {
+            #$self->freak("cannot find object_id:$object_id in feature_idx for $fid / $subject_id");
+            $f->add_featureprop([[type=>'comment'],[value=>"this feature has a parent in another subgraph; there will be a trailing object_id=$object_id"]]);
+            # this is the case for AceView worm models and
+            # dicistronic genes where exons are shared across genes
+        }
+        else {
+            # objects must be written before subjects
+            $self->fire_feature_event($W,
+                                      $self->feature_idx->{$object_id},
+                                      $done_idx);
+        }
 	# no point carrying on, redundant tree traversal
 	return if $done_idx->{$fid};
 	push(@frs,
 	     [feature_relationship=>[
-				     [subject_id=>$e[1]],
-				     [object_id=>$e[0]],
+				     [subject_id=>$subject_id],
+				     [object_id=>$object_id],
 				     [type=>$type],
 				    ]]);
     }
@@ -627,10 +636,16 @@ sub make_island {
     $self->loctransform($f,
 			$island);
     my $children = $self->get_all_contained_features($f);
+    # replicate feature and add to subhraph
+    # (we wish to replicate because a feature can be
+    #  shared between graphs and we want to do loctransforms
+    #  on the features on a per-subgraph basis)
+    $children = [map {$_->duplicate} @$children];
+
     foreach my $child (@$children) {
 	$self->loctransform($child, $island);
     }
-    my $C = $self->new;
+    my $C = $self->new; # create a new subgraph
     my @feats = ($srcf, $island, $f, @$children);
     foreach my $subf (@feats) {
 	$C->add_feature($subf);
@@ -761,7 +776,7 @@ sub loctransform {
     # ASSERTION (see above) - at least 1 pair
     if (!($sfloc || $tfloc)) {
         $self->freak("NO LOC PAIR FOUND",
-                     @sflocs, @tflocs);
+                     @sflocs, @tflocs,$sfeature,$tfeature);
     }
 
 

@@ -13,6 +13,8 @@ my $ascii;
 my $nameby = 'feature_id';
 my $error_threshold = 3;
 my $dir = '.';
+my $verbose;
+my $include_haplotypes;
 GetOptions("fmt|i=s"=>\$fmt,
            "writer|w=s"=>\$writer,
            "outfmt|o=s"=>\$outfmt,
@@ -23,6 +25,8 @@ GetOptions("fmt|i=s"=>\$fmt,
 	   "nameby|n=s"=>\$nameby,
 	   "ethresh|e=s"=>\$error_threshold,
 	   "remove_type=s@"=>\@remove_types,
+           "verbose|v=s"=>\$verbose,
+           "include_haplotypes"=>\$include_haplotypes,
 	   "help|h"=>sub {
 	       system("perldoc $0"); exit 0;
 	   }
@@ -39,6 +43,13 @@ foreach my $file (@ARGV) {
       Bio::SeqIO->new(-file=> $file,
                       -format => $fmt);
     while (my $seq = $seqio->next_seq()) {
+        if ($seq->desc =~ /haplotype/i) {
+            # this is NASTY, but unfortunately GB has no
+            # consistent way of defining haps;
+            # in general we wish to remove alternative haps 
+            # an only show the reference sequence
+            next unless $include_haplotypes;
+        }
         printf STDERR "  Got bioperl Seq: %s [$file]\n", $seq->accession;
         my $C =
           Bio::Chaos::ChaosGraph->new;
@@ -46,6 +57,7 @@ foreach my $file (@ARGV) {
         my $unflattener = $C->unflattener;
         my $type_mapper = $C->type_mapper;
         $unflattener->error_threshold($error_threshold);
+        $unflattener->verbose($verbose) if $verbose;
         $unflattener->remove_types(-seq=>$seq,
                                    -types=>\@remove_types)
           if @remove_types;
@@ -62,6 +74,8 @@ foreach my $file (@ARGV) {
             printf STDERR "  Problems unflattening: %s BYE BYE [$file]\n", $seq->accession;
             exit 1;
         }
+        printf STDERR "  Unflattened Seq: %s [$file]\n", $seq->accession;
+
         my $outio = Bio::SeqIO->new( -format => 'chaos');
         $outio->write_seq($seq); # "writes" to a stag object
         $outio->end_of_data;
@@ -92,6 +106,7 @@ foreach my $file (@ARGV) {
                 $C->freak("no type", $f) unless $type;
                 next unless $f->get_type eq 'gene';
                 eval {
+                    printf STDERR "Making island around: %s\n", $f->get_feature_id;
                     my $islandC = $C->make_island($f, 500);
                     #		print $islandC->asciitree;
                     my $W = Data::Stag->getformathandler($writer);
@@ -112,8 +127,9 @@ foreach my $file (@ARGV) {
                 };
                 if ($@) {
                     print STDERR $@;
-                    print STDERR "Problem with feature\n";
-                    print STDERR $f->sxpr;
+                    print STDERR "Problem resides with source feature\n";
+                    print STDERR $f->xml;
+                    exit 1;
                 }
             }
         } else {
@@ -206,6 +222,40 @@ uses L<Bio::Chaos::ChaosGraph>
 uses L<Bio::Chaos::ChaosGraph>
 
 =back
+
+=head1 ARGUMENTS
+
+=head2 -islands
+
+exports one file per gene
+
+=head2 -ethresh ERRORTHRESH
+
+Sets the error threshold. See L<Bio::SeqFeature::Tools::Unflattener>
+
+you will want to keep this at its default setting of 3 (insensitive)
+
+=head2 -remove_type GENBANKFEATURETYPE
+
+This will remove all features of a certain type prior to unflattening
+
+This is useful if you wish to exclude a certain kind of feature (eg
+variation) from your analysis
+
+It is also required for the genbank release of S_Pombe, which has a
+few scattered types purportedly of mRNA which confuse the unflattening
+process
+
+=head2 -include_haplotypes
+
+by default, only reference sequences are exported. if the genbank
+definition like contains the string "haplotype", then this is probably
+an alternative haplotype that will skew analyses. this is removed by
+default, unless this switch is set
+
+For an example, see contigs NG_002432 and NT_007592 (the former is an
+alt hap of the latter)
+
 
 =head1 REQUIREMENTS
 
