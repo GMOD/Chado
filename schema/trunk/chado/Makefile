@@ -53,3 +53,13 @@ diagram :: \
 cdbi:
 	./bin/pg2cdbi.pl ./modules/*/*.sql > ./src/pgsql/Chado/AutoDBI.pm
 	./bin/my2cdbi.pl ./modules/*/*.mysql > ./src/mysql/Chado/AutoDBI.pm
+
+metadata: ./bin/ddltrans
+	cat `find . -name \*.sql -print` > ./dat/chado.ddl
+	./bin/ddltrans -f dtd ./dat/chado.ddl > ./dat/chado.dtd
+	./bin/ddltrans -f html ./dat/chado.ddl > ./dat/chado.html
+	./bin/ddltrans -f perl ./dat/chado.ddl > ./dat/chado.pl
+	./bin/ddltrans -f xml ./dat/chado.ddl > ./dat/chado.xml
+
+
+
