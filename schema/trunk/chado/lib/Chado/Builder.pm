@@ -107,7 +107,7 @@ sub ACTION_ncbi {
   # now that I know what you want mirror files and load
   # fetchAndLoadFiles is called for each possible type
   # but only actively loaded for those the user selects
-  fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile", \%ncbis);
+  fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile", \%ncbis);
   fetchAndLoadFiles($m, $conf, "locuslink", "./load/bin/load_locuslink.pl", \%ncbis);
   $m->log->info("leaving ACTION_ncbi");
 }
