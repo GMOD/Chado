@@ -22,18 +22,32 @@ insert into organism (abbreviation, genus, species, common_name)
 insert into contact (name) values ('Affymetrix');
 insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
-insert into cv (name,definition) values ('Ad Hoc Ontology','Locally created terms');
+insert into cv (name,definition) values ('local','Locally created terms');
 insert into cv (name,definition) values ('Statistical Terms','Locally created terms for statistics');
-insert into cvterm (name,cv_id) values ('null',       (select cv_id from cv where name = 'null'));
-insert into cvterm (name,cv_id) values ('Note', (select cv_id from cv where name = 'null'));
-insert into cvterm (name,cv_id) values ('computer file', (select cv_id from cv where name = 'null'));
-insert into cvterm (name,cv_id) values ('synonym', (select cv_id from cv where name = 'null'));
-insert into cvterm (name,cv_id) values ('score', (select cv_id from cv where name = 'null'));
-insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
+insert into db (name, contact_id,description) values ('null',(select contact_id from contact where name = 'null'),'a fake database for local items');
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:null');
+insert into cvterm (name,cv_id,dbxref_id) values ('null',(select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:null'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:Note');
+insert into cvterm (name,cv_id,dbxref_id) values ('Note', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:Note'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:computer file');
+insert into cvterm (name,cv_id,dbxref_id) values ('computer file', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:computer file'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:synonym');
+insert into cvterm (name,cv_id,dbxref_id) values ('synonym', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:synonym'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:score');
+insert into cvterm (name,cv_id,dbxref_id) values ('score', (select cv_id from cv where name = 'null'), (select dbxref_id from dbxref where accession='local:score'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:glass');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('glass','glass array',(select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='local:glass'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:photochemical_oligo');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='local:photochemical_oligo'));
 
 insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
-insert into db (name, contact_id,description) values ('null',(select contact_id from contact where name = 'null'),'a fake db to make the flybase triggers happy');
 insert into db (name, contact_id,description) values ('GFF_source', (select contact_id from contact where name = 'null'), 'A collection of sources (ie, column 2) from GFF files');
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
@@ -91,31 +105,77 @@ insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) 
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('430 2.0'          , (select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('ATH1'             , (select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
 
-insert into cvterm (name,cv_id) values ('fetus',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,cv_id) values ('neonate',    (select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,cv_id) values ('child',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,cv_id) values ('adult_young',(select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,cv_id) values ('adult',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
-insert into cvterm (name,cv_id) values ('adult_old',  (select cv_id from cv where name = 'Ad Hoc Ontology'));
+insert into cv (name) values ('developmental statges');
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:fetus');
+insert into cvterm (name,cv_id,dbxref_id) values ('fetus',      (select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='developmental statges:fetus'));
 
-insert into cvterm (name,cv_id) values ('survival_time',(select cv_id from cv where name = 'Ad Hoc Ontology'));
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:neonate');
+insert into cvterm (name,cv_id,dbxref_id) values ('neonate',    (select cv_id from cv where name = 'developmental statges'), (select dbxref_id from dbxref where accession='developmental statges:neonate'));
 
-insert into cvterm (name,definition,cv_id) values ('n','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('minimum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('maximum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('modality','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('modality p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('median','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('mode','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('quartile 1','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('quartile 3','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('skewness','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('kurtosis','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('chi square p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('standard deviation','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:child');
+insert into cvterm (name,cv_id,dbxref_id) values ('child',      (select cv_id from cv where name = 'developmental statges'), (select dbxref_id from dbxref where accession='developmental statges:child'));
 
-insert into cvterm (name,definition,cv_id) values ('expectation maximization gaussian mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('expectation maximization p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
-insert into cvterm (name,definition,cv_id) values ('histogram','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'));
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:adult_young');
+insert into cvterm (name,cv_id,dbxref_id) values ('adult_young',(select cv_id from cv where name = 'developmental statges'),(select dbxref_id from dbxref where accession='developmental statges:adult_young'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:adult');
+insert into cvterm (name,cv_id,dbxref_id) values ('adult',      (select cv_id from cv where name = 'developmental statges'),(select dbxref_id from dbxref where accession='developmental statges:adult'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental statges:adult_old');
+insert into cvterm (name,cv_id,dbxref_id) values ('adult_old',  (select cv_id from cv where name = 'developmental statges'), (select dbxref_id from dbxref where accession='developmental statges:adult_old'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:survival_time');
+insert into cvterm (name,cv_id,dbxref_id) values ('survival_time',(select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='local:survival_time'));
+
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:n');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('n','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:n'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:minimum');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('minimum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:minimum'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:maximum');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('maximum','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:maximum'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:modality');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('modality','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:modality'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:modality p');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('modality p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:modality p'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:mean');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:mean'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:median');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('median','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:median'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:mode');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('mode','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:mode'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:quartile 1');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('quartile 1','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:quartile 1'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:quartile 3');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('quartile 3','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:quartile 3'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:skewness');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('skewness','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:skewness'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:kurtosis');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('kurtosis','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:kurtosis'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:chi square p');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('chi square p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:chi square p'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:standard deviation');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('standard deviation','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:standard deviation'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:expectation maximization gaussian mean');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('expectation maximization gaussian mean','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:expectation maximization gaussian mean'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:expectation maximization p');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('expectation maximization p','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:expectation maximization p'));
+
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'Statistical Terms:histogram');
+insert into cvterm (name,definition,cv_id,dbxref_id) values ('histogram','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:histogram'));
 
