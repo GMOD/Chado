@@ -5,9 +5,8 @@ use lib 'lib';
 use Bio::Tools::GFF;
 use Chado::AutoDBI;
 use Chado::LoadDBI;
-use Term::ProgressBar;
 use Getopt::Long;
-use constant CACHE_SIZE => 1000;
+use constant CACHE_SIZE => 10;
 
 $| = 1;
 
@@ -120,18 +119,6 @@ $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
 $GFFFILE  ||='test.gff';
 
-#count the file lines.  we need this to track load progress
-open(WC,"/usr/bin/wc -l $GFFFILE |");
-my $linecount = <WC>; chomp $linecount;
-close(WC);
-($linecount) = $linecount =~ /^\s+(\d+)\s+.+$/;
-
-my $progress = Term::ProgressBar->new({name => 'Features', count => $linecount,
-                                       ETA => 'linear', });
-$progress->max_update_rate(1);
-my $next_update = 0;
-
-
 Chado::LoadDBI->init();
 
 my %typemap;
@@ -222,7 +209,7 @@ die "unable to find or create a pub entry in the pub table"
     unless $pub;
 
 while(my $gff_segment = $gffio->next_segment()) {
-  my $segment = Chado::Feature->search({name => $gff_segment->display_id});
+  my ($segment) = Chado::Feature->search({name => $gff_segment->display_id});
   if(!$segment){
 
     if(!$typemap{'region'}){
@@ -234,8 +221,8 @@ while(my $gff_segment = $gffio->next_segment()) {
 	      organism_id => $chado_organism,
 	      name        => $gff_segment->display_id,
 	      uniquename  => $gff_segment->display_id .'_region',
-	      type_id => $typemap{'region'},
-	      seqlen => abs($gff_segment->end - $gff_segment->start), #who knows? spec doesn't specify start < end
+	      type_id     => $typemap{'region'},
+	      seqlen      => $gff_segment->end
 			          });
 
     $feature_count++;
@@ -284,7 +271,8 @@ while(my $gff_feature = $gffio->next_feature()) {
   if ($typemap{$gff_feature->primary_tag}) {
     ($chado_type) = $typemap{$gff_feature->primary_tag};
   } else {
-    ($typemap{$gff_feature->primary_tag}) = Chado::Cvterm->search( name => $gff_feature->primary_tag );
+    ($typemap{$gff_feature->primary_tag})
+           = Chado::Cvterm->search( name => $gff_feature->primary_tag );
     ($chado_type) = $typemap{$gff_feature->primary_tag}; 
   }
 
@@ -417,20 +405,57 @@ while(my $gff_feature = $gffio->next_feature()) {
     }
   }
 
-#  if($gff_feature->has_tag('note') or $gff_feature->has_tag('Note')) {
-#    my @notes;
-#    push @notes, $gff_feature->get_tag_values('note')
-#         if $gff_feature->has_tag('note');
-#    push @notes, $gff_feature->get_tag_values('Note')
-#         if $gff_feature->has_tag('Note');
-#    foreach my $note (@notes) {
-#      Chado::Featureprop->find_or_create({
-#                      feature_id => $chado_feature->feature_id,
-#                      type_id    => $note_type->cvterm_id,
-#                      value      => $note
-#                                         });
-#    }
-#  } 
+  if($gff_feature->has_tag('Target')) {
+    my @targets = $gff_feature->get_tag_values('Target');
+    foreach my $target (@targets) {
+      my ($tstart,$tend);
+      if ($target =~ /^(\S+?)\+(\d+)\+(\d+)$/) {
+        ($target,$tstart,$tend) = ($1,$2,$3); 
+      } else {
+        die "your Target attribute seems to be improperly formated";
+      }
+
+      my($chado_synonym1) = Chado::Synonym->find_or_create({
+                      name         => $target,
+                      synonym_sgml => $target,
+                      type_id      => $synonym_type->cvterm_id
+                                                     });
+                                                                                       
+      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+                      synonym_id => $chado_synonym1->synonym_id,
+                      feature_id => $chado_feature->feature_id,
+                      pub_id     => $pub->pub_id,
+                                              });
+
+      my($chado_featureloc) = Chado::Featureloc->find_or_create({
+                      feature_id    => $chado_feature->feature_id,
+                      srcfeature_id => $chado_feature->feature_id,
+                      fmin          => $tstart,
+                      fmax          => $tend,
+                      rank          => 1 
+                                              });
+
+      unless (defined $tagtype{'score'}) {
+        $tagtype{'score'} = Chado::Cvterm->find_or_create ({
+                    name       => 'score',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                      });
+        push @transaction, $tagtype{'score'};
+      }
+
+      my($chado_featureprop) = Chado::Featureprop->find_or_create({
+                      feature_id => $chado_feature->feature_id,
+                      type_id    => $tagtype{'score'}->cvterm_id,
+                      value      => $gff_feature->score
+                                              });
+
+      push @transaction, $chado_synonym1;
+      push @transaction, $chado_synonym2;
+      push @transaction, $chado_featureloc;
+      push @transaction, $chado_featureprop;
+    }
+  }   
 
   my @tags = $gff_feature->all_tags;
   foreach my $tag (@tags) {
@@ -438,6 +463,7 @@ while(my $gff_feature = $gffio->next_feature()) {
     next if $tag eq 'Parent';
     next if $tag eq 'Alias';
     next if $tag eq 'Name';
+    next if $tag eq 'Target';
 
     unless (defined $tagtype{$tag}) {
       $tagtype{$tag} = Chado::Cvterm->find_or_create ({
@@ -462,21 +488,16 @@ while(my $gff_feature = $gffio->next_feature()) {
   }
 
   if ($feature_count % CACHE_SIZE == 0) {
-    $progress->message(sprintf "committed %8d features", $feature_count);
     $_->dbi_commit foreach @transaction;
-  }
     @transaction = ();
+  }
 
-    $next_update = $progress->update($feature_count) if($feature_count > $next_update);
-#warn $next_update;
-#    $progress->update($linecount) if($linecount >= $next_update);
-    $progress->update($linecount) if($next_update >= $linecount);
-
-    #old-style progress tracker
-    #print STDERR "features loaded $feature_count";
-    #print STDERR -t STDOUT && !$ENV{EMACS} ? "\r" : "\n";
-#  }
+  if ($feature_count % 1000 == 0) {
+    print STDERR "features loaded $feature_count";
+    print STDERR -t STDOUT && !$ENV{EMACS} ? "\r" : "\n";
+  }
 }
+$_->dbi_commit foreach @transaction;
 $gffio->close();
 
 print "$feature_count features added\n";
