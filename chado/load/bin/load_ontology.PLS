@@ -1,5 +1,19 @@
-#!/usr/bin/perl
+#!perl -w
+                 
+use Config;
+use File::Basename qw(&basename &dirname);
+use Cwd;
+       
+                                    
+$origdir = cwd;
+chdir dirname($0);
+$file = basename($0, '.PL','.PLS');
+$file = "gmod_$file.pl";
+           
+open OUT,">$file" or die "Can't create $file: $!";
+print OUT "$Config{startperl}\n";
 
+print OUT <<'!NO!SUBS!';
 use strict;
 use lib 'lib';
 use DBI;
@@ -346,13 +360,11 @@ load_ontology.pl - load DAG-Edit or simple indented hierarchy ontology files int
 
 this script relies on three external modules:
 
+=over
+
 =item Bio::OntologyIO (available from Bioperl)
 
-=back
-
 =item Chado::AutoDBI  (generated from chado/complete.sql using chado/bin/pg2cdbi.pl)
-
-=back
 
 =item SQL::Translator required to generate Chado::AutoDBI
 
@@ -368,3 +380,8 @@ in Chado from a DAG-Edit file.
 Allen Day E<lt>allenday@ucla.eduE<gt>
 
 Copyright 2002-2003
+!NO!SUBS!
+close OUT or die "Can't close $file: $!";
+chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
+chdir $origdir;
+

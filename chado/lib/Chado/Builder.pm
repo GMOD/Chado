@@ -44,7 +44,7 @@ fixfixfix
 
 =item ontologies()
 
-loads ontologies by running load_ontology.pl on all files in
+loads ontologies by running gmod_load_ontology.pl on all files in
 $(DATA)/ontology
 
 =item tokenize()
@@ -271,7 +271,7 @@ sub ACTION_ontologies {
       print "    loading...";
 
       my $sys_call = join( ' ', 
-        './load/bin/load_ontology.pl',
+        './load/bin/gmod_load_ontology.pl',
         catfile( $conf->{'path'}{'data'}, $ontfile->{'local'} ),
         catfile( $conf->{'path'}{'data'}, $deffile->{'local'} )
       );

@@ -106,8 +106,9 @@ can be abbreviated to one letter.
   --srcdb    <dbname>        The name of the source database
                                 (default: 'DB:refseq')
   --gfffile  <filename>      The name of the GFF3 file
-  --cache    <# of features> The number of features to cache before committing
-                                to the database (default: 1000)
+  --cache    <# of features> The number of features to cache before
+                                committing to the database
+                                (default: 1000)
 
 =head1 AUTHORS
 
@@ -130,8 +131,9 @@ GetOptions('organism:s'       => \$ORGANISM,
 
 $ORGANISM   ||='Human';
 $SRC_DB     ||= 'DB:refseq';
-$GFFFILE    ||='test.gff';
 $CACHE_SIZE ||= 1000;
+
+die unless $GFFFILE "\nYou must specify a GFF file\n";
 
 #deal with GFF3 files that contain sequence
 # this is ugly, ugly, ugly, but in addtion to dealing with
