@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.74 2004-09-14 15:45:31 scottcain Exp $
+# $Id: Makefile.PL,v 1.75 2004-10-23 20:27:55 cmungall Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -24,6 +24,7 @@ Optional Targets:
 
   make radviews     (creates views for gene expression data.  this is
                      necessary if you chose expression/rad.sql above)
+  make html         (auto-generates html documentation for each module)
   make images       (generates images of the schema in several formats)
   make rm_locks     (removes ontology lock files, allowing installation
                      of ontologies on successive builds of the database
@@ -659,6 +660,25 @@ diagram :: \
 	make $working_dir/modules/pathway/pathway.diagram.png \
 	make $working_dir/modules/www/www.diagram.png \
 	make $working_dir/modules/complete.diagram.png
+
+
+html :: \
+	make $working_dir/modules/companalysis/companalysis.html \
+	make $working_dir/modules/cv/cv.html \
+	make $working_dir/modules/expression/expression.html \
+	make $working_dir/modules/expression/rad.html \
+	make $working_dir/modules/general/general.html \
+	make $working_dir/modules/genetic/genetic.html \
+	make $working_dir/modules/map/map.html \
+	make $working_dir/modules/organism/organism.html \
+	make $working_dir/modules/pub/pub.html \
+	make $working_dir/modules/sequence/sequence.html \
+	make $working_dir/modules/pathway/pathway.html \
+	make $working_dir/modules/www/www.html \
+	make $working_dir/modules/complete.html
+
+%.html: %.sql
+	$working_dir/bin/pg2html.pl \$< > \$@
 
 %.graphviz.png: %.sql
 	$working_dir/bin/pg2graphviz.pl \$< > \$@
