@@ -48,7 +48,7 @@ sub ACTION_ncbi
   my $conf = $m->conf;
 
   # print out the available refseq datasets
-  my %ncbis = printAndReadOptions($m,$conf,"NCBI");
+  my %ncbis = printAndReadOptions($m,$conf,"ncbi");
   #print Dumper(%ncbis);
 
 }
