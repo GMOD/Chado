@@ -1,0 +1,63 @@
+---arg: parent term id
+---result: fetch all children term id and their parent term id with relationship type id
+
+CREATE OR REPLACE FUNCTION get_all_subject_ids(INTEGER) RETURNS SETOF cvterm_relationship AS
+'
+DECLARE
+    parentid alias for $1;
+    pcount integer := 1;
+    cterm cvterm_relationship%ROWTYPE;
+BEGIN
+    CREATE TEMP TABLE tmpparent (cvterm_id INTEGER, status INTEGER DEFAULT 0);
+    EXECUTE ''INSERT INTO tmpparent VALUES('' || parentid || '', 0);'';
+    WHILE (pcount > 0) LOOP
+        -- get all children
+        FOR cterm IN EXECUTE ''SELECT r.* FROM cvterm_relationship r, tmpparent p WHERE p.cvterm_id = r.object_id AND status = 0;'' LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+
+        EXECUTE ''UPDATE tmpparent SET status = 1 WHERE status = 0;'';
+        EXECUTE ''INSERT INTO tmpparent SELECT DISTINCT r.subject_id, 0 FROM cvterm_relationship r, tmpparent p WHERE r.object_id = p.cvterm_id AND p.status = 1;'';
+        -- set status to indicate parents are done
+        EXECUTE ''UPDATE tmpparent SET status = 2 WHERE status = 1;'';
+        EXECUTE ''SELECT * FROM tmpparent WHERE status = 0;'';
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+    END LOOP;
+
+    DROP TABLE tmpparent;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+---arg: child term id
+---result: fetch all parent term id and their childrent term id with relationship type id
+
+CREATE OR REPLACE FUNCTION get_all_object_ids(INTEGER) RETURNS SETOF cvterm_relationship AS
+'
+DECLARE
+    childid alias for $1;
+    pcount integer := 1;
+    cterm cvterm_relationship%ROWTYPE;
+BEGIN
+    CREATE TEMP TABLE tmpchild (cvterm_id INTEGER, status INTEGER DEFAULT 0);
+    EXECUTE ''INSERT INTO tmpchild VALUES('' || childid || '', 0);'';
+    WHILE (pcount > 0) LOOP
+        -- get all children
+        FOR cterm IN EXECUTE ''SELECT r.* FROM cvterm_relationship r, tmpchild c WHERE c.cvterm_id = r.subject_id AND status = 0;'' LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+
+        EXECUTE ''UPDATE tmpchild SET status = 1 WHERE status = 0;'';
+        EXECUTE ''INSERT INTO tmpchild SELECT DISTINCT r.object_id, 0 FROM cvterm_relationship r, tmpchild c WHERE r.subject_id = c.cvterm_id AND c.status = 1;'';
+        -- set status to indicate children are done
+        EXECUTE ''UPDATE tmpchild SET status = 2 WHERE status = 1;'';
+        EXECUTE ''SELECT * FROM tmpchild WHERE status = 0;'';
+        GET DIAGNOSTICS pcount = ROW_COUNT;
+    END LOOP;
+
+    DROP TABLE tmpchild;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
