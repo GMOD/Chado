@@ -91,7 +91,7 @@ use Exporter;
 
 use strict;
 use Carp;
-use SOI::Outputter qw(chaos_xml soi_xml game_xml);
+use SOI::Outputter qw(chaos_xml soi_xml game_xml gff3);
 use base qw(Exporter);
 use vars qw($AUTOLOAD);
 
@@ -241,6 +241,21 @@ sub add_node {
 
     if (@_) {
         push @{$self->{nodes}}, shift;
+    }
+}
+sub synonyms {
+    my $self = shift;
+    if (@_) {
+        my $syn = shift;
+        $syn = [$syn] unless (ref($syn) eq 'ARRAY');
+        $self->{synonyms} = $syn;
+    }
+    return $self->{synonyms};
+}
+sub add_synonym {
+    my $self = shift;
+    if (@_) {
+        push @{$self->{synonyms}}, shift;
     }
 }
 sub dbxrefs {
@@ -430,7 +445,7 @@ sub _transform {
 =head2 stitch_child_segments
 
   Usage   - my $contig = $arm->stich_child_segments($fmin, $fmax, $options)
-  Returns - SOI::Feature object list
+  Returns - SOI::Feature object, and original segments (array ref)
   Args    - arm (SOI::Feature) with overlapping segments (golden_path_region) that cover $fmin and $fmax
             fmin, fmax: the range of new contig
             optional options: {name=>'temp:blabla'}, {source_origin_feature_type=>'blabla'}
@@ -476,7 +491,7 @@ sub stitch_child_segments {
     my $offset = ($nbeg-$seg_b);
     $residues = substr($residues,$offset,($nend - $nbeg));
     my $tmp = $opts->{name} || sprintf("%s:%d-%d",$nodes[0]->src_seq,$nbeg,$nend);
-    my $new = shift @nodes;
+    my $new = SOI::Feature->new;
     my $nh =
       {feature_id=>$tmp,
        name=>$tmp,
@@ -486,15 +501,15 @@ sub stitch_child_segments {
        seqlen=>CORE::length($residues),
        strand=>1,
        is_analysis=>0,
-       src_seq=>$new->src_seq,
-       srcfeature_id=>$new->hash->{srcfeature_id},
+       src_seq=>$nodes[0]->src_seq,
+       srcfeature_id=>$nodes[0]->hash->{srcfeature_id},
        residues=>$residues,
        type=>'contig'
       };
     $new->hash($nh);
     $self->nodes([$new]);
-    $new->dbxrefs([]);$new->properties([]);
-    return $new;
+#    $new->dbxrefs([]);$new->properties([]);
+    return ($new, [@nodes]);
 }
 sub _rsetup_coord {
     my $self = shift;
@@ -552,6 +567,16 @@ sub to_game_xml {
     confess(sprintf("cycle detected; parent=%s", $self->hash->{name})) if (grep {$self->id eq $_}@c_ids);
     return game_xml($self, @_);
 }
+sub to_gff {
+    my $self = shift;
+
+    #detect cycle;
+    my @c_ids = grep{$_->id}@{$self->nodes || []};
+    confess(sprintf("cycle detected; parent=%s", $self->hash->{name})) if (grep {$self->id eq $_}@c_ids);
+    return gff3($self, @_);
+}
+*to_gff3 =\&to_gff;
+*to_GFF3 =\&to_gff;
 
 sub _min_attr {
     my $self = shift;
@@ -598,7 +623,7 @@ sub AUTOLOAD {
 #        $self->hash->{$name} = shift if (@_);
 #        return $self->hash->{$name};
 #    } else {
-#        warn("Does not support $name") if ($ENV{DEBUB} || $self->hash->{DEBUGMODE});
+#        warn("Does not support $name") if ($ENV{DEBUG} || $self->hash->{DEBUGMODE});
 #   }
 #}
 
