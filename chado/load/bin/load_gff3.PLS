@@ -88,9 +88,9 @@ or with a standard GFF line:
 
   chr1	NCBI	chromosome	1	246127941	.	.	.	ID=chr1
 
-Note that if the '##sequence-region' notation is used, this script will
-not be able to determine the type of sequence and therefore will 
-assign it the 'region' type which is very general. If that is not what
+Do not use both.  Note that if the '##sequence-region' notation is used,
+this script will not be able to determine the type of sequence and therefore
+will assign it the 'region' type which is very general. If that is not what
 you want, use the standard GFF line to specify the reference
 sequence.
 
@@ -136,7 +136,7 @@ $ORGANISM   ||='Human';
 $SRC_DB     ||= 'DB:refseq';
 $CACHE_SIZE ||= 1000;
 
-die unless $GFFFILE "\nYou must specify a GFF file\n";
+die "\nYou must specify a GFF file\n" unless $GFFFILE;
 
 #deal with GFF3 files that contain sequence
 # this is ugly, ugly, ugly, but in addtion to dealing with
