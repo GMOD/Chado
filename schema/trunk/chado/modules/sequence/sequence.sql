@@ -128,6 +128,8 @@ create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
 -- ================================================
 
 create table feature_pub (
+       feature_pub_id serial not null,
+       primary key (feature_pub_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        pub_id int not null,
@@ -164,6 +166,8 @@ create index featureprop_idx2 on featureprop (pkey_id);
 -- ================================================
 
 create table featureprop_pub (
+       featureprop_pub_id serial not null,
+       primary key (featureprop_pub_id),
        featureprop_id int not null,
        foreign key (featureprop_id) references featureprop (featureprop_id),
        pub_id int not null,
@@ -185,7 +189,7 @@ create table feature_dbxref (
        primary key (feature_dbxref_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
-       dbxref_id varchar(255),
+       dbxref_id int not null,
        foreign key (dbxref_id) references dbxref (dbxref_id),
        is_current boolean not null default 'true',
 
@@ -263,7 +267,7 @@ create table synonym (
        synonym_sgml varchar(255) not null,
        foreign key (type_id) references cvterm (cvterm_id),
 
-       unique(synonym)
+       unique(synonym,type_id)
 );
 create index synonym_idx1 on synonym (type_id);
 
@@ -273,6 +277,8 @@ create index synonym_idx1 on synonym (type_id);
 -- ================================================
 
 create table feature_synonym (
+       feature_synonym_id serial not null,
+       primary key (feature_synonym_id),
        synonym_id int not null,
        foreign key (synonym_id) references synonym (synonym_id),
        feature_id int not null,
@@ -306,6 +312,8 @@ create index feature_synonym_idx3 on feature_synonym (pub_id);
 -- ================================================
 
 create table synonym_pub (
+       synonym_pub_id serial not null,
+       primary key (synonym_pub_id),
        synonym_id int not null,
        foreign key (synonym_id) references synonym (synonym_id),
        pub_id int not null,
