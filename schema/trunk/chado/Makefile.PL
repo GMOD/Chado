@@ -258,18 +258,7 @@ my $extstr = prompt("(e.g. 1-3,5)?","0");
 
 if ($extstr) {
   $rebuild_complete++; 
-  my %numbers =
-    # make a unique lookup 
-    map  { $_, 1 }
-    # take only numbers
-    grep { /\d+/ }
-    # look for ranges
-    map  { $_ =~ m/(\d+)-(\d+)/ ? ( $1..$2 ) : $_ }
-    # split on space or comma
-    split /[,\s]+/, $extstr
-  ;
-
-  my @extindex = keys %numbers;
+  my @extindex = split /,/, $extstr;
   foreach my $index (@extindex) {
     next unless defined $extfiles[$index];
     push @sqlfiles, $extfiles[$index];
