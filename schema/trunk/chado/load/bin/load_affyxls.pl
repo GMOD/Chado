@@ -123,7 +123,7 @@ while(my $arrayio = $affx->next_array){
   }
   $LOG->debug("cached features: ".scalar(keys %feature));
 
-  my($array)     = Chado::Arraydesign->search(name => $arraytype);
+  my($array)     = Chado::Arraydesign->search(name => $arraydesigntype);
   ($array)     ||= Chado::Arraydesign->search(name => 'unknown');
   $LOG->debug("loaded record for array type: ".$array->name);
 
