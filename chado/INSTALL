@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.12 2004-01-07 21:09:17 scottcain Exp $
+$Id: INSTALL,v 1.13 2004-02-11 16:50:12 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -196,10 +196,17 @@ As indicated, the host, port, and password are optional.
     command line.)
     Loads GFF file.  Note that this command will fail unless you add 
     fruitfly to the organism table.  See `gmod_load_gff3.pl --help` for 
-    details.  The loading script requires GFF3 as it has tighter
-    control of the syntax and requires the use of a controlled vocabulary
-    (SOFA), allowing mapping to the relational schema.  GFF3 files can 
-    be generated either from the included gmod_genbank2gff3.pl script:
+    details.  In summary, execute this command in the psql shell for the
+    database:
+
+      chado=# insert into organism (abbreviation, genus, species, common_name)
+      chado-# values ('D.melanogaster','Drosophila','melanogaster','fruitfly');
+
+    to add fruitfly to the organism table.  The loading script requires
+    GFF3 as it has tighter control of the syntax and requires the use of a
+    controlled vocabulary (SOFA), allowing mapping to the relational schema. 
+    GFF3 files can be generated either from the included gmod_genbank2gff3.pl
+    script:
 
         $ gmod_genbank2gff3.pl <genbank file> > <gff file>
 
