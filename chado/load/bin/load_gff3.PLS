@@ -751,12 +751,37 @@ sub initialize {
     ($nullpub)        = Chado::Pub->search( miniref          => 'null' );
     ($nullcontact)    = Chado::Contact->search( name         => 'null' );
 
-    die
-      "The organism '$ORGANISM' could not be found. Did you spell it correctly?"
-      unless $chado_organism;
+    unless ($chado_organism) {
+      warn "\n\nCouldn't find or create organism $ORGANISM.\n";
+      warn "The current contents of the organism table is:\n\n";
 
-    die "The database '$SRC_DB' could not be found. Did you spell it correctly?"
-      unless $chado_db;
+      my @all_columns = Chado::Organism->columns;
+      printf "%15s %8s %11s %11s %12s %15s\n\n", sort @all_columns;
+
+      my $organism_iterator = Chado::Organism->retrieve_all();
+      while(my $organism = $organism_iterator->next){ 
+        my @cols = map { $organism->$_ } sort $organism->columns;
+        printf "%15s %8s %11s %11s %12s %15s\n", @cols;
+      }
+      print "\nPlease see \`perldoc gmod_load_gff3.pl\` for more information\n";
+      exit 1;
+    }
+
+    unless ($chado_db) {
+      warn "\n\nCouldn't find or create database $SRC_DB.\n";
+      warn "The current contents of the database table is:\n\n";
+                                                                                
+      my @all_columns = Chado::Db->columns;
+      printf "%10s %6s %13s %25s %5s %10s\n\n", sort @all_columns;
+                                                                                
+      my $db_iterator = Chado::Db->retrieve_all();
+      while(my $db = $db_iterator->next){
+        my @cols = map { $db->$_ } sort $db->columns;
+        printf "%10s %6s %13s %25s %5s %10s\n", @cols;
+      }
+      print "\nPlease see \`perldoc gmod_load_gff3.pl\` for more information\n";
+      exit 1;
+    }
 }
 
 sub load_segments {
