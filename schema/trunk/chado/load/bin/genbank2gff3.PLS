@@ -65,8 +65,9 @@ while ( my $seq = $seqio->next_seq() ) {
     my $sname = $seq->accession || $seq->display_name;
     my $end   = length $seq->seq;
     print OUT "##gff-version 3\n",
-              "##date $date\n",
-              "##sequence-region ",join(' ', $sname, 1, $end),"\n";
+              "##date $date\n";
+
+#              "##sequence-region ",join(' ', $sname, 1, $end),"\n";
 
     foreach my $sf (@sfs) {
 
@@ -191,6 +192,7 @@ while ( my $seq = $seqio->next_seq() ) {
 
             validate_ID($sf2,$acc);
 
+
             print OUT $sf2->gff_string . "\n";
 
             foreach my $sf3 ( @subfeats ) {
@@ -211,6 +213,7 @@ while ( my $seq = $seqio->next_seq() ) {
                 validate_ID($sf3,$acc);
 
                 print OUT $sf3->gff_string . "\n";
+
             }
         }
     }
