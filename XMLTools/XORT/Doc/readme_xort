@@ -6,9 +6,10 @@ setenv CodeBase /users/zhou/work/API
 2. create the ddl.properties file by running CodeBase/XORT/bin/ddl_properties_creater.pl, it will create the ddl.properties in CodeBase/XORT/Config
 
 
-3. create database properties for each database you intend to use, and put those file in CodeBase/XORT/Config, name format: databasename.properties, i.e, for chado_gadfly5, the file name will be chado_gadfly5.properties
+3. create database properties for each database you intend to use, and put those file in CodeBase/XORT/Config, name format: databasename.properties, i.e, for chado_gadfly5, the file name will be CodeBase/XORT/Config/chado_gadfly5.properties
 
 4. log into the target database and execute CodeBase/XORT/Config/function_view.sql to synchronize the database
+   here will create the necessary view, also because the current dump from Berkeley didn't have featureloc.min and featureloc.max, so need o add those two cols, if in the future you get the dump which already implement those change, then you can comment those sql statement which modify featureloc table. 
 
 5. run CodeBase/XORT/bin/dump.pl  loader.pl validator.pl with -h for how to use it. 
 
