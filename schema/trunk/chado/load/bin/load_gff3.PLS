@@ -982,7 +982,12 @@ sub load_feature_locations {
     }
 
     ($chado_feature) = Chado::Feature->find_or_create(\%feature_attributes);
-    $chado_feature->seqlen($seqlen);
+
+    if(!defined($chado_feature->seqlen)){
+        $chado_feature->seqlen($seqlen);
+        $chado_feature->update;
+        $chado_feature->dbi_commit;
+    }
 
     push @transaction, $chado_feature;
 
