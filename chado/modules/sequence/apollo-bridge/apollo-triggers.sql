@@ -122,11 +122,11 @@ DECLARE
   pos        int;
   id         varchar(255);
   max_id     int;
-  prefix     constants.value%TYPE;
-  suffix     constants.value%TYPE;
+  is_anal    feature.is_analysis%TYPE;
+  prefix     cvtermprop.value%TYPE;
+  suffix     cvtermprop.value%TYPE;
   f_row_g    feature%ROWTYPE;
   f_row_e    feature%ROWTYPE;
-  fl_row_e   featureloc%ROWTYPE;
   f_row_t    feature%ROWTYPE;
   f_row_p    feature%ROWTYPE;
   f_type     cvterm.name%TYPE;
@@ -169,6 +169,14 @@ DECLARE
   p_miniref         CONSTANT varchar:=''null'';
   p_id  pub.pub_id%TYPE;
 BEGIN
+  SELECT INTO is_anal is_analysis FROM feature WHERE uniquename = NEW.uniquename and 
+                                                     type_id = NEW.type_id and 
+                                                     organism_id = NEW.organism_id;
+  IF (is_anal) THEN
+      RETURN NEW;
+  END IF;
+
+
   SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv  
                              WHERE cvterm.name = ''prefix'' and
                                    cp.cvterm_id = cvterm.cvterm_id and
@@ -220,18 +228,40 @@ BEGIN
       END IF; --ends if gene
   END IF;     --ends if uniquename like temp
 
-  --deal with non-gene entries, note the the %:temp% is to deal with situations like promoter:temp1
+  --deal with non-gene entries
   IF (NEW.uniquename not like prefix||'':temp%''||suffix and 
       (NEW.uniquename like ''%-R%'' or NEW.uniquename like ''%-P%'' or NEW.uniquename like ''%:temp%'' ))  THEN
-      IF f_type is NOT NULL THEN
-          RAISE NOTICE ''in f_i, type of this feature is:%'', f_type;
-      END IF;
       IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA ) THEN
           SELECT INTO f_row_t * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
-          SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
+
+          --assume the temp name is like gene_uniquename-RtempXXX
+          --transcripts of various types are named after the genename like gene_name-typeXXX
+
+          pos:=position(''-'' in NEW.uniquename)-1;
+          f_uniquename:=substring(NEW.uniquename from 1 for pos);
+          RAISE NOTICE ''gene uniquename for this transcript:% should be:%'', NEW.uniquename, f_uniquename;
+
+          SELECT INTO max_id to_number(max(substring(uniquename from (pos+1+length(f_type)))), ''99999'') FROM feature where uniquename like f_uniquename||''-''||f_type||''%'';
+          IF max_id IS NULL THEN
+              max_id = 1;
+          ELSE
+              max_id = max_id + 1;
+          END IF;
+
+          f_uniquename_tr:=CAST(f_uniquename||''-''||f_type||max_id AS TEXT);
+
+          RAISE NOTICE ''New uniquename for % feature is %'',f_type,f_uniquename_tr;
+
+          IF NEW.name IS NULL OR NEW.name like ''%temp%'' THEN
+              UPDATE feature SET uniquename=f_uniquename_tr, name=f_uniquename_tr WHERE feature_id=f_row_t.feature_id;
+          ELSE
+              UPDATE feature SET uniquename=f_uniquename_tr WHERE feature_id=f_row_t.feature_id;
+          END IF;
+
+          SELECT INTO s_id synonym_id from synonym where name=f_uniquename_tr and type_id=s_type_id;
           IF s_id IS NULL THEN
-              INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.uniquename, NEW.uniquename, s_type_id);
-              SELECT INTO s_id synonym_id from synonym where name=NEW.uniquename and type_id=s_type_id;
+              INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_tr, f_uniquename_tr, s_type_id);
+              SELECT INTO s_id synonym_id from synonym where name=f_uniquename_tr and type_id=s_type_id;
           END IF;
           SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_t.feature_id and synonym_id=s_id and pub_id=p_id;
           IF f_s_id IS NULL THEN
@@ -277,26 +307,23 @@ BEGIN
       END IF; --ends if type = protein
       IF f_type=f_type_exon THEN
           SELECT INTO f_row_e * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
-          SELECT INTO fl_row_e * from featureloc where feature_id = f_row_e.feature_id and rank=0;
-          pos:=position('':'' in NEW.uniquename)-1;
-          f_uniquename:=substring(NEW.uniquename from 1 for pos);
-          RAISE NOTICE ''gene uniquename for this exon:% should be:%'', NEW.uniquename, f_uniquename;
-          f_uniquename_exon:=CAST(f_uniquename||'':''||fl_row_e.fmin||''-''||fl_row_e.fmax AS TEXT);
-          RAISE NOTICE ''new uniquename:% for old uniquename:%'', f_uniquename_exon, NEW.uniquename;
-          IF NEW.name like ''%temp%'' THEN
-              UPDATE feature set uniquename=f_uniquename_exon, name=f_uniquename_exon where feature_id=f_row_e.feature_id;
+          IF f_row_e.uniquename like ''%temp%'' THEN
+              RAISE NOTICE ''This exons uniquename is %, but a new uniquename cannot be assigned,'',f_row_e.uniquename;
+              RAISE NOTICE ''since the uniquename should contain featureloc fmin and fmax, but they dont exist yet'';
+              RETURN OLD;
           ELSE
-              UPDATE feature set uniquename=f_uniquename_exon where feature_id=f_row_e.feature_id;
-          END IF;
-          RAISE NOTICE ''new uniquename of this feature is:%'', f_uniquename_exon;
-          SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
-          IF s_id IS NULL THEN
-              INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_exon, f_uniquename_exon, s_type_id);
-              SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
-          END IF;
-          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_e.feature_id and synonym_id=s_id and pub_id=p_id;
-          IF f_s_id IS NULL THEN
-              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
+              IF NEW.name like ''%temp%'' THEN
+                  UPDATE feature set name=f_row_e.uniquename where feature_id=f_row_e.feature_id;
+              END IF;
+              SELECT INTO s_id synonym_id from synonym where name=f_row_euniquename and type_id=s_type_id;
+              IF s_id IS NULL THEN
+                  INSERT INTO synonym(name, synonym_sgml, type_id) values(f_row_e.uniquename, f_row_e.uniquename, s_type_id);
+                  SELECT INTO s_id synonym_id from synonym where name=f_row_e.uniquename and type_id=s_type_id;
+              END IF;
+              SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_e.feature_id and synonym_id=s_id and pub_id=p_id;
+              IF f_s_id IS NULL THEN
+                  INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
+              END IF;
           END IF;
       END IF; --ends if type=exon
   END IF;     --ends if misc cases
@@ -308,7 +335,16 @@ BEGIN
       f_name      :=CAST(f_type||'':''||id as TEXT);
       RAISE NOTICE ''new unquename:%, old uniquename is:%, new name is:%'', f_uniquename, NEW.uniquename, f_name;
       UPDATE feature set uniquename=f_uniquename, name=f_name where feature_id=NEW.feature_id;
-      --need to add to synonym table
+
+      SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
+      IF s_id IS NULL THEN
+          INSERT INTO synonym (name, synonym_sgml, type_id) values (f_uniquename, f_uniquename, s_type_id);
+          SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
+      END IF;
+      SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_e.feature_id and synonym_id=s_id and pub_id=p_id;
+      IF f_s_id IS NULL THEN
+          INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
+      END IF;
   END IF; --end dealing with one level types
   RAISE NOTICE ''leave f_i .......'';
   return NEW;    
