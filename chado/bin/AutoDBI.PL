@@ -519,6 +519,14 @@ Chado::Cvterm->has_many(
     'gcontext_relationship_type_id', 'Chado::Gcontext_Relationship' => 'type_id'
 );
 
+sub feature_relationshipprops {
+    return shift->feature_relationshipprop_type_id
+}
+
+Chado::Cvterm->has_many(
+    'feature_relationshipprop_type_id', 'Chado::Feature_Relationshipprop' => 'type_id'
+);
+
 sub quantification_relationships {
     return shift->quantification_relationship_type_id
 }
@@ -779,6 +787,14 @@ sub pub_relationships {
 
 Chado::Cvterm->has_many(
     'pub_relationship_type_id', 'Chado::Pub_Relationship' => 'type_id'
+);
+
+sub feature_cvtermprops {
+    return shift->feature_cvtermprop_type_id
+}
+
+Chado::Cvterm->has_many(
+    'feature_cvtermprop_type_id', 'Chado::Feature_Cvtermprop' => 'type_id'
 );
 
 # -------------------------------------------------------------------
@@ -1154,6 +1170,8 @@ Chado::Pub->has_many(
     'pub_author_pub_id', 'Chado::Pub_Author' => 'pub_id'
 );
 
+sub feature_relationshipprops { my $self = shift; return map $_->feature_relationshipprop_id, $self->feature_relationshipprop_pub_pub_id }
+
 sub gcontexts {
     return shift->gcontext_pub_id
 }
@@ -1176,6 +1194,14 @@ sub featuremap_pubs {
 
 Chado::Pub->has_many(
     'featuremap_pub_pub_id', 'Chado::Featuremap_Pub' => 'pub_id'
+);
+
+sub feature_relationshipprop_pubs {
+    return shift->feature_relationshipprop_pub_pub_id
+}
+
+Chado::Pub->has_many(
+    'feature_relationshipprop_pub_pub_id', 'Chado::Feature_Relationshipprop_Pub' => 'pub_id'
 );
 
 sub featuremaps { my $self = shift; return map $_->featuremap_id, $self->featuremap_pub_pub_id }
@@ -1768,6 +1794,14 @@ sub type {
     return shift->type_id
 }
 
+sub feature_relationshipprops {
+    return shift->feature_relationshipprop_feature_relationship_id
+}
+
+Chado::Feature_Relationship->has_many(
+    'feature_relationshipprop_feature_relationship_id', 'Chado::Feature_Relationshipprop' => 'feature_relationship_id'
+);
+
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_relationship_pub_feature_relationship_id }
 
 sub feature_relationship_pubs {
@@ -1802,6 +1836,78 @@ sub feature_relationship {
 }
 
 Chado::Feature_Relationship_Pub->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Feature_Relationshipprop;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Relationshipprop->set_up_table('feature_relationshipprop');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_relationshipprop_id
+}
+
+Chado::Feature_Relationshipprop->has_a(
+    feature_relationship_id => 'Chado::Feature_Relationship'
+);
+
+sub feature_relationship {
+    return shift->feature_relationship_id
+}
+
+Chado::Feature_Relationshipprop->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
+}
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_relationshipprop_pub_feature_relationshipprop_id }
+
+sub feature_relationshipprop_pubs {
+    return shift->feature_relationshipprop_pub_feature_relationshipprop_id
+}
+
+Chado::Feature_Relationshipprop->has_many(
+    'feature_relationshipprop_pub_feature_relationshipprop_id', 'Chado::Feature_Relationshipprop_Pub' => 'feature_relationshipprop_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Feature_Relationshipprop_Pub;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Relationshipprop_Pub->set_up_table('feature_relationshipprop_pub');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_relationshipprop_pub_id
+}
+
+Chado::Feature_Relationshipprop_Pub->has_a(
+    feature_relationshipprop_id => 'Chado::Feature_Relationshipprop'
+);
+
+sub feature_relationshipprop {
+    return shift->feature_relationshipprop_id
+}
+
+Chado::Feature_Relationshipprop_Pub->has_a(
     pub_id => 'Chado::Pub'
 );
 
@@ -1846,6 +1952,45 @@ Chado::Feature_Cvterm->has_a(
 
 sub pub {
     return shift->pub_id
+}
+
+sub feature_cvtermprops {
+    return shift->feature_cvtermprop_feature_cvterm_id
+}
+
+Chado::Feature_Cvterm->has_many(
+    'feature_cvtermprop_feature_cvterm_id', 'Chado::Feature_Cvtermprop' => 'feature_cvterm_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::Feature_Cvtermprop;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Cvtermprop->set_up_table('feature_cvtermprop');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_cvtermprop_id
+}
+
+Chado::Feature_Cvtermprop->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
+);
+
+sub feature_cvterm {
+    return shift->feature_cvterm_id
+}
+
+Chado::Feature_Cvtermprop->has_a(
+    type_id => 'Chado::Cvterm'
+);
+
+sub type {
+    return shift->type_id
 }
 
 # -------------------------------------------------------------------
@@ -4295,7 +4440,6 @@ sub eimage {
 }
 
 1;
-
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
