@@ -40,6 +40,28 @@ sub ACTION_foo {
   print "I'm fooing to death!\n";
 }
 
+=head2 ACTION_prepdb
+
+ Title   : ACTION_prepdb
+ Usage   :
+ Function: Current hack to setup any rows in the DB before the load. Should be
+           replaced in the future by encapsulating in the load scripts. Right
+           now executes any SQL statements in the load/etc/initialize.sql file.
+ Example :
+ Returns : 
+ Args    :
+
+=cut
+sub ACTION_prepdb
+{
+  # the build object $m
+  my $m = shift;
+  # the XML config object
+  my $conf = $m->conf;
+
+  system("psql ".$conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{db_name}." < ".$conf->{tt2}->{'load/tt2/LoadDBI.tt2'}->{token}->{chado_path}."/load/etc/initialize.sql");
+}
+
 sub ACTION_ncbi
 {
   # the build object $m
@@ -49,7 +71,9 @@ sub ACTION_ncbi
 
   # print out the available refseq datasets
   my %ncbis = printAndReadOptions($m,$conf,"ncbi");
-  #print Dumper(%ncbis);
+
+  # now that I know what you want mirror files
+  fetchAndLoadFiles($m,$conf,%ncbis,"load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile");
 
 }
 
@@ -94,11 +118,10 @@ sub ACTION_mageml {
 
       print "    loading...";
 
-      if(! system('./load/bin/load_affymetrix.pl',
-				  $conf->{'path'}{'data'}.'/'.$file->{'local'},
-				 ) && (print "failed: $!\n" and die)
-		){
-
+      my $result = system('./load/bin/load_affymetrix.pl',
+				  $conf->{'path'}{'data'}.'/'.$file->{'local'});
+      if ($result != 0) { print "failed: $!\n"; die; }
+	  else {
 		$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
 		print "done!\n";
 	  }
@@ -111,22 +134,19 @@ sub ACTION_ontologies {
 
   print "Available ontologies:\n";
 
-  my $i = 1;
   my %ont = ();
-  foreach my $ontology (sort keys %{ $conf->{ontology} }) {
-    $ont{$i} = $ontology;
-    print "[$i] $ontology\n";
-    $i++;
+  foreach my $ontology (keys %{ $conf->{ontology} }) {
+    $ont{$conf->{ontology}->{$ontology}->{order}} = $ontology;
   }
+  foreach my $key (sort keys %ont) { print "[$key] ", $ont{$key}, "\n"; }
   print "\n";
 
   my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
   $m->notes('ontologies' => $chosen);
-  
-  my %ontologies = map {$ont{$_} => $conf->{ontology}{$ont{$_}}} split ',',$chosen;
+  my %ontologies = map {$_ => $conf->{ontology}{$ont{$_}}} split ',',$chosen;
 
-  foreach my $ontology (keys %ontologies){
-    print "fetching files for $ontology\n";
+  foreach my $ontology (sort keys %ontologies){
+    print "fetching files for ", $ont{$ontology}, "\n";
 
     my $load = 0;
     foreach my $file (grep {$_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} }){
@@ -141,16 +161,7 @@ sub ACTION_ontologies {
       $load = 1 if $m->_mirror($file->{remote},$file->{local});
     }
 
-    my($deffile) = grep {$_ if $_->{type} eq '  print "Available ontologies:\n";
-
-  my $i = 1;
-  my %ont = ();
-  foreach my $ontology (sort keys %{ $conf->{ontology} }) {
-    $ont{$i} = $ontology;
-    print "[$i] $ontology\n";
-    $i++;
-  }
-  print "\n";definitions'} @{ $ontologies{$ontology}{file} };
+    my($deffile) = grep {$_ if $_->{type} eq 'definitions'} @{ $ontologies{$ontology}{file} };
     foreach my $ontfile (grep {$_->{type} eq 'ontology'} @{ $ontologies{$ontology}{file} }){
       print "  +",$ontfile->{remote},"\n";
 
@@ -161,12 +172,12 @@ sub ACTION_ontologies {
 
       print "    loading...";
 
-      if(! system('./load/bin/load_ontology.pl',
+      my $result = system('./load/bin/load_ontology.pl',
 				  $conf->{'path'}{'data'}.'/'.$ontfile->{'local'},
-				  $conf->{'path'}{'data'}.'/'.$deffile->{'local'},
-				 ) && (print "failed: $!\n" and die)
-		){
-		_loaded( $conf->{'path'}{'data'}.'/'.$ontfile->{'local'} , 1 );
+				  $conf->{'path'}{'data'}.'/'.$deffile->{'local'});
+      if ($result != 0) { print "failed: $!\n"; die; }
+	  else {
+		$m->_loaded( $conf->{'path'}{'data'}.'/'.$ontfile->{'local'} , 1 );
 		print "done!\n";
 	  }
     }
@@ -195,6 +206,54 @@ sub ACTION_tokenize {
 =head1 NON-ACTIONS
 
 =cut
+
+=head2 fetchAndLoadFiles
+
+ Title   : fetchAndLoadFiles
+ Usage   : fetchAndLoadFiles(<build_obj>, <xml_conf_obj>, <file_type>)
+ Function: Calls internal methods to mirror files specified for this file_type in the xml_conf_obj
+ Example :
+ Returns : 
+ Args    :
+
+
+=cut
+
+sub fetchAndLoadFiles
+{
+    my ($m,$conf,%itm,$command,@args) = @_;
+    foreach my $key (keys %itm){
+	print "fetching files for $key\n";
+
+	my $load = 0;
+    foreach my $file (@{ $itm{$key}{file} }){
+
+	  my $fullpath = $conf->{path}{data}.'/'.$file->{local};
+	  $fullpath =~ s!^(.+)/[^/]*!$1!;
+
+      if(! -d $fullpath){
+        system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
+      }
+
+      print "  +",$file->{remote},"\n";
+      $load = 1 if $m->_mirror($file->{remote},$file->{local});
+	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
+
+	  next unless $load;
+
+      print "    loading...";
+
+      my $result = system($command,
+				  $conf->{'path'}{'data'}.'/'.$file->{'local'}, @args);
+      if($result != 0) { print "failed: $!\n"; die; }
+	  else{
+		$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
+		print "done!\n";
+	  }
+	}
+  }
+}
+
 
 =head2 printAndReadOptions
 
