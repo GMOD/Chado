@@ -89,7 +89,7 @@ can be abbreviated to one letter.
 
 =head1 AUTHOR
 
-Allen Day
+Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>cain@cshl.orgE<gt>
 
 Copyright (c) 2003
 
@@ -118,13 +118,13 @@ my %feature = ();
 my %srcfeature = ();
 my %dbxref = ();
 
-my $line_count = 0;
+my $feature_count = 0;
 
 my($chado_organism) = Chado::Organism->search(common_name => $ORGANISM );
 my($chado_db)       = Chado::Db->search(name => $SRC_DB);
 my($part_of)        = Chado::Cvterm->search(name => 'part_of');
 
-die "The organism '$ORGANISM' could not be found. Did you spell it right?"
+die "The organism '$ORGANISM' could not be found. Did you spell it correctly?"
      unless $chado_organism;
 
 die "The database '$SRC_DB' could not be found. Did you spell it correctly?"
@@ -162,8 +162,6 @@ while(my $gff_feature = $gffio->next_feature()) {
                                         : $gff_feature->get_tag_values('Parent');
 
   if ($gff_feature->has_tag('ID') && !($id eq $gff_feature->seq_id) ){
-#print $id,"\n";
-#print STDERR $id,"\n";
     ($srcfeature{$id}) = Chado::Feature->search(name => $gff_feature->seq_id);
 
     unless ($srcfeature{$id}) {
@@ -197,14 +195,10 @@ while(my $gff_feature = $gffio->next_feature()) {
   die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
 
 
-#warn $id .'_'. $gff_feature->primary_tag .'_'. $gff_feature->seq_id .':'. $gff_feature->start .'..'. $gff_feature->end;
-#warn "*".$gff_feature->has_tag('ID')." ". $dbxref{$id}->id;
-#warn "organism:$chado_organism";
-
   ## GFF features are base-oriented, so we must add 1 to the diff
   ## between the end base and the start base, to get the number of
   ## intervening bases between the start and end intervals
-  my $seqlen = ($gff_feature->end - $gff_feature->start) +1;
+  my $seqlen = ($gff_feature->end - $gff_feature->start) + 1;
 
   ## we must convert between base-oriented coordinates (GFF3) and
   ## interbase coordinates (chado)
@@ -227,19 +221,17 @@ while(my $gff_feature = $gffio->next_feature()) {
     name         => $id,
     uniquename   => $id .'_'. $gff_feature->primary_tag
                         .'_'. $gff_feature->seq_id .':'
-                            . $fmix .'..'. $fmax,
+                            . $fmin .'..'. $fmax,
     type_id      => $chado_type->cvterm_id,
     seqlen       => $seqlen
                                                     });
 
-  $line_count++;
+  $feature_count++ if $gff_feature->has_tag('ID');
 
   next if $id eq $gff_feature->seq_id; #ie, this is a srcfeature (ie, fref) so only create the feature
 
   $chado_feature->dbxref_id($dbxref{$id}) if $gff_feature->has_tag('ID'); # is this the right thing to do here?
   $chado_feature->update;
-
-#warn $chado_feature->name;
 
   my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
 
@@ -270,7 +262,6 @@ while(my $gff_feature = $gffio->next_feature()) {
   if($gff_feature->has_tag('Parent')){
     my($parent) = $gff_feature->get_tag_values('Parent');
 
-#warn $chado_feature->uniquename ." part of ". $gff_feature{$parent}->uniquename; 
     Chado::Feature_Relationship->find_or_create({
       subject_id => $chado_feature->id,
       object_id => $feature{$parent}->id,
@@ -282,4 +273,4 @@ while(my $gff_feature = $gffio->next_feature()) {
 }
 $gffio->close();
 
-print "$line_count features added\n";
+print "$feature_count features added\n";
