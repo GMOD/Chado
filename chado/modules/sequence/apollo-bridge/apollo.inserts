@@ -132,21 +132,11 @@ insert into dbxref (db_id, accession,description) values ((select db_id from db 
 
 create sequence uniquename_id_generator;
 
-create table constants (
-   constants_id serial not null,
-   primary key (constants_id),
-   application_id int not null,
-   foreign key (application_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-   type_id int,
-   foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-   name varchar(100),
-   value text not null
-);
+insert into cv (name, definition) values ('apollo', 'A cv for constants that are needed for interacting with apollo');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name ='apollo'), 'suffix');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name ='apollo'), 'prefix');
 
-insert into cv (name, definition) values ('application', 'A cv for holding names of applications that interact with chado');
-insert into cvterm (cv_id,name) values ((select cv_id from cv where name ='application'), 'apollo');
-
-insert into constants (application_id,name,value) values ((select cvterm_id from cvterm where name='apollo' and cv_id in (select cv_id from cv where name='application')),'prefix','ABC');
-insert into constants (application_id,name,value) values ((select cvterm_id from cvterm where name='apollo' and cv_id in (select cv_id from cv where name='application')),'suffix','XYZ');
+insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='prefix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'ABC');
+insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='suffix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'XYZ');
 
 

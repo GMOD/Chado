@@ -169,18 +169,16 @@ DECLARE
   p_miniref         CONSTANT varchar:=''null'';
   p_id  pub.pub_id%TYPE;
 BEGIN
-  SELECT INTO prefix c.value FROM constants c, cvterm, cv  
-                             WHERE c.name = ''prefix'' and
-                                   c.application_id = cvterm.cvterm_id and
-                                   cvterm.name = ''apollo'' and 
+  SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv  
+                             WHERE cvterm.name = ''prefix'' and
+                                   cp.cvterm_id = cvterm.cvterm_id and
                                    cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''application'';
-  SELECT INTO suffix c.value FROM constants c, cvterm, cv
-                             WHERE c.name = ''suffix'' and
-                                   c.application_id = cvterm.cvterm_id and
-                                   cvterm.name = ''apollo'' and
+                                   cv.name = ''apollo'';
+  SELECT INTO suffix cp.value FROM cvtermprop cp, cvterm, cv
+                             WHERE cvterm.name = ''suffix'' and
+                                   cp.cvterm_id = cvterm.cvterm_id and
                                    cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''application'';
+                                   cv.name = ''apollo'';
   SELECT INTO f_type c.name
          from feature f, cvterm c
          where f.type_id=c.cvterm_id and
