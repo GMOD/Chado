@@ -67,7 +67,8 @@ while(my $arrayio = $affx->next_array){
   my @txn = ();
   last unless $arrayio->id;
 
-  print STDERR "loading array ".$arrayio->id."\n";
+  print STDERR "loading array ".$arrayio->id." (filename: $arrayfile)\n";
+  $LOG->info("filename: ".$arrayfile);
   $LOG->info("loading array: ".$arrayio->id);
 
   my $cvterms;
@@ -75,30 +76,16 @@ while(my $arrayio = $affx->next_array){
   my $chip_id;
   my $newchip = 0;
 
-  #we can do this on filename or arrayname.
-  #if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
-  if($arrayfile =~ m!/!){
-    #has leading directory and cvterms
-    if($arrayfile =~ /^.*\/(\d+)\-(\d+)\-(\S+)/){
-      $chip_id   = $1;
-      $sample_id = $2;
-      $cvterms   = $3;
-    #has leading directory
-    } elsif($arrayfile =~ /^.*\/(\d+)\-(\d+)/){
-      $chip_id   = $1;
-      $sample_id = $2;
-    }
-  } else {
-    #has cvterms
-    if($arrayfile =~ /^(\d+)\-(\d+)\-(\S+)/){
-      $chip_id   = $1;
-      $sample_id = $2;
-      $cvterms   = $3;
+  $arrayfile =~ s!.+/!!;
+  #has cvterms
+  if($arrayfile =~ /^(\d+)\-(\d+)\-(\S+)/){
+    $chip_id   = $1;
+    $sample_id = $2;
+    $cvterms   = $3;
     #has nothing
-    } elsif($arrayfile =~ /^(\d+)\-(\d+)/){
-      $chip_id   = $1;
-      $sample_id = $2;
-    }
+  } elsif($arrayfile =~ /^(\d+)\-(\d+)/){
+    $chip_id   = $1;
+    $sample_id = $2;
   }
 
   $chip_id   ||= $arrayio->id;
