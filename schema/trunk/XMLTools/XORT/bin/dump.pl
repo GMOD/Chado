@@ -7,7 +7,6 @@
 use lib $ENV{CodeBase};
 
 use XORT::Util::GeneralUtil::Properties;
-
 use XORT::Dumper::DumperXML;
 use XORT::Util::DbUtil::DB;
 use Getopt::Std;
