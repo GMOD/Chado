@@ -12,7 +12,8 @@
  use XML::DOM;
  use strict;
 
-my $unit_indent="       ";
+#my $unit_indent="       ";
+my $unit_indent="\t";
 my %hash_ddl;
 # this hash contact all pairs of local_id/local_id
 my %hash_id;
@@ -22,7 +23,7 @@ my %hash_object_id;
 my $TABLES_PSEUDO='table_pseudo';
 my %hash_tables_pseudo;
 
-
+my $DEBUG=0;
 my $LOCAL_ID="local_id";
 my $NO_LOCAL_ID='xml';
 my $MODULE="module";
@@ -59,7 +60,9 @@ my $REF_OBJ_ALL='1';
   my $type=shift;
   my $self={};
   $self->{'dbname'}=shift;
-
+  $DEBUG=shift;
+  undef %hash_id;
+  undef %hash_object_id;
   bless $self, $type;
   return $self;
  }
@@ -80,8 +83,8 @@ sub Generate_XML {
    #if file exist, delete first, then open filehandle for writting
    system("/bin/rm $file") if -e $file;
    $file=">>".$file;
-   open (LOG, $file) or die "could not write to log file";
-   print LOG "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- created by Pinglei Zhou, Flybase Harvard University -->";
+   open (LOG, $file) or die "could not write to log file:$file";
+   print LOG "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- created by Pinglei Zhou, Flybase Harvard University -->\n<!--created from Database:$self->{'dbname'} using dump_spec:$dump_spec -->";
    my $app_data=sprintf("\n<$ROOT_NODE>");
    my $temp_dumpspec;
 
@@ -133,9 +136,9 @@ sub Generate_XML {
          my $node=$nodes->item($i-1);
          my $node_type=$node->getNodeType();
          my $node_name=$node->getNodeName();
-         print "\nnode_type:$node_type:node_name:$node_name";
+         print "\nnode_type:$node_type:node_name:$node_name" if ($DEBUG==1);
          if ($node_type eq ELEMENT_NODE && defined $hash_ddl{$node_name} && !(defined $hash_tables_pseudo{$node_name})){
-               print "\nnode name ", $node->getNodeName();
+               print "\nnode name ", $node->getNodeName() if ($DEBUG==1);
                #the result from get_id($node) is id string separated by '|'
                my $query=$dumpspec_obj->format_sql_id($node);
                my $query_all=$dumpspec_obj->format_sql($node);
@@ -143,17 +146,18 @@ sub Generate_XML {
                    my $primary_key_string=$node_name."_primary_key";
                    my $table_id=$hash_ddl{$primary_key_string};
 
-                   print "\nstm_dumpspec:$query";
+                   print "\nstm_dumpspec:$query\n";
                    my $hash_ref= $dbh->get_all_hashref($query);
 
                     foreach my $key(keys %$hash_ref){
                         my $hash_ref_sub=$hash_ref->{$key};
                         my $query_join=&_join_sql($query_all, $node_name, $$hash_ref_sub{$table_id});
-                        print "\nquery_join:$query_join";
+                        print "\nquery_join:$query_join\n" if ($DEBUG==1);
                         my $hash_ref_all= $dbh->get_all_hashref($query_join);
 			foreach my $key1(keys %$hash_ref_all){
                             my $hash_ref_sub=$hash_ref_all->{$key1};
-                            my $xml=&_table2xml($hash_ref_sub, '     ', $node_name, $op_type, $format_type, $MODULE,  $dbh, $ref_obj, $node);
+                            #my $xml=&_table2xml($hash_ref_sub, '     ', $node_name, $op_type, $format_type, $MODULE,  $dbh, $ref_obj, $node);
+                             my $xml=&_table2xml($hash_ref_sub, "\t", $node_name, $op_type, $format_type, $MODULE,  $dbh, $ref_obj, $node);
                             print LOG $xml;
 			}
                     }
@@ -177,7 +181,7 @@ sub Generate_XML {
        # my $hash_ref=$dbh->get_row_hashref($stm);
        foreach my $key(keys %$hash_ref){
          my $hash_ref_sub=$hash_ref->{$key};
-         my $xml=&_table2xml($hash_ref_sub, '   ', $array_tables[$i], $op_type, $format_type, $struct_type,  $dbh);
+         my $xml=&_table2xml($hash_ref_sub, "\t", $array_tables[$i], $op_type, $format_type, $struct_type,  $dbh);
          print LOG $xml;
        }
     }
@@ -215,7 +219,7 @@ sub _table2xml(){
  my $xml_sub;
  if (defined $node){
    $attribute= $dumpspec_obj->get_attribute_value($node);
-     print "\nentrance of _table2xml, node name:", $node->getNodeName();
+     print "\nentrance of _table2xml, node name:", $node->getNodeName() if ($DEBUG==1);
    $node_name=$node->getNodeName();
  }
 
@@ -226,7 +230,7 @@ sub _table2xml(){
  my $id=$table."_".$hash_ref->{$table_id};
  # here if this object has been dumped, then do nothing.
  if (defined $hash_id{$id}){
-   return ;
+   #return ;
  }
 
  # we always save all the defined objects, whether using local_id or not
@@ -241,7 +245,7 @@ sub _table2xml(){
  my $foreign_id=$hash_ref->{$table_id};
 
  # clean the orinal data, eg. remove the serial id column
- print "\n\ndata in main table....:$table";
+ print "\n\ndata in main table....:$table" if ($DEBUG==1);
  foreach my $key (keys %$hash_ref){
     #print "\nkey:$key\tvalue:$hash_ref->{$key}";
     if (!(defined $hash_ref->{$key}) || $hash_ref->{$key} eq '' || $key eq $table_id){
@@ -275,8 +279,17 @@ sub _table2xml(){
    if (defined $hash_ddl{$foreign_table_ref} && $key ne $table_id){
      my $key_local_id=$hash_ddl{$foreign_table_ref}."_".$hash_ref->{$key};
      # here to substitute with local_id, if ALLOWED
-     if (defined $hash_id{$key_local_id}){
-         $hash_ref->{$key}=$hash_id{$key_local_id};
+        # here overwrite the default, if there is dumpspec to guide the dump
+      my $nest_node1;
+      if (defined $node){
+           my $path=$table.":".$key.":".$hash_ddl{$foreign_table_ref};
+            if (defined $node){
+               $nest_node1=$dumpspec_obj->get_nested_node($node, $path, $TYPE_DUMP);
+            }
+	 }
+
+     if (defined $hash_id{$key_local_id} && !(defined $nest_node1)){
+          $hash_ref->{$key}=$hash_id{$key_local_id};
      }
      # here to output foreign id by defining a object
      else {
@@ -293,12 +306,12 @@ sub _table2xml(){
           my $attribute_dump;
           my @array_table_obj_cols;
           my $nest_node;
-         #there is $node, then dump this table according to the dumpspec of this node
+          #there is $node, then dump this table according to the dumpspec of this node
 	 if (defined $node){
             my $path=$table.":".$key.":".$hash_ddl{$foreign_table_ref};
 
             if (defined $node){
-               print "\nstart to retrieve the nest node of node:$node_name:.....path:$path";
+               print "\nstart to retrieve the nest node of node:$node_name:.....path:$path" if ($DEBUG==1);
                $nest_node=$dumpspec_obj->get_nested_node($node, $path, $TYPE_DUMP);
             }
             if (defined $nest_node){
@@ -318,38 +331,43 @@ sub _table2xml(){
                }
                elsif ($attribute_dump eq $DUMP_SELECT){
                  my $nodes=$nest_node->getChildNodes();
-                 my @temp_cols=split(/\s+/, $hash_ddl{$node_name});
+                 my @temp_cols=split(/\s+/, $hash_ddl{$nest_node_name});
                  my %hash_cols;
-                 foreach (@temp_cols){
-                      $hash_cols{$_}=1;
+                 foreach my $col (@temp_cols){
+                      $hash_cols{$col}=1;
+                      #print "\nin col dump table:$node_name:col:$col";
                  }
                  for my $i (1..$nodes->getLength()){
                    my $child_node=$nodes->item($i-1);
                    my $child_node_name=$child_node->getNodeName();
+                        #print "\ndump select for table: $node_name:$child_node_name:$child_node->getNodeType()";
                    if ($child_node->getNodeType() eq ELEMENT_NODE && defined $hash_cols{$child_node_name}){
                       my $attribute_dump=$dumpspec_obj->get_attribute_value($child_node);
-                      if ($attribute_dump eq $DUMP_YES){
+                        #print "\ndump select for table: $nest_node_name:$child_node_name:$attribute_dump";
+                      if ($attribute_dump eq $DUMP_SELECT){
                         push @array_table_obj_cols, $child_node_name;
+                        #print "\ndump select for table: $nest_node_name:$child_node_name";
 		      }
          	   }
                  }
                }
 	    } # end of defined nest_node
             else {
-             print "\nno nest node for node:$node_name";
+             print "\nno nest node for node:$node_name" if ($DEBUG==1);
             }
 	  } # end of defined node
 
           # if no dump guide this ref_obj, then either dump unique_keys or cols
-          print "\nlocal_id_foreign_object:$local_id_foreign_object\nref_obj:$ref_obj";
+          #print "\nlocal_id_foreign_object:$local_id_foreign_object\nref_obj:$ref_obj";
 	  if (@array_table_obj_cols==0){
+            # if this object NOT dumped before, and want to dump it so that it can be re-load without losing any data
             if (!(defined $hash_object_id{$local_id_foreign_object}) && $ref_obj eq $REF_OBJ_ALL){
                @array_table_obj_cols=split(/\s+/, $hash_ddl{$hash_ddl{$foreign_table_ref}});
-               print "\nforeign_table_ref:$foreign_table_ref:@array_table_obj_cols";
+               #print "\nforeign_table_ref:$foreign_table_ref:@array_table_obj_cols";
             }
             else {
               my $unique_key=$hash_ddl{$foreign_table_ref}."_unique";
-              print "\nunique_key:$unique_key";
+              #print "\nunique_key:$unique_key";
               # my $unique_key=$hash_ddl{$foreign_table_ref}."_non_null_cols";
               @array_table_obj_cols=split(/\s+/, $hash_ddl{$unique_key});
             }
@@ -369,20 +387,20 @@ sub _table2xml(){
          #  print "\n\nunique_key:$unique_key\tdata_list:$data_list";
          my $stm=sprintf("select $data_list from $hash_ddl{$foreign_table_ref} where $foreign_table_id=$hash_ref->{$key}");
 
-         print "\nstm:$stm";
+         #print "\nstm:$stm";
          my $hash_ref_sub=$dbh->get_row_hashref($stm);
 
          my $object_ref_module;
-         if (defined $nest_node && $attribute_dump eq $DUMP_ALL){
+         if (defined $nest_node && ($attribute_dump eq $DUMP_ALL ||  $attribute_dump eq $DUMP_SELECT || $attribute_dump eq $DUMP_COL) ){
            $object_ref_module=$MODULE;
 	 }
          else {
            $object_ref_module=$SINGLE;
          }
-         print "\nmodel:$object_ref_module";
+         #print "\nmodel:$object_ref_module";
          my $data_sub=&_table2xml($hash_ref_sub, $new_indent, $hash_ddl{$foreign_table_ref}, $op_type, $format_type, $object_ref_module,  $dbh, $ref_obj, $nest_node);
          $hash_ref->{$key}=$data_sub;
-     }
+     } # end of here to output foreign id by defining a object, which is no local_id
 
    }
    # ignore the null value
@@ -414,6 +432,7 @@ sub _table2xml(){
               if ($link_node->getNodeType()==ELEMENT_NODE && defined $hash_tables_link_copy{$link_node_name}){
                  my $attribute_type=$dumpspec_obj->get_node_type($link_node);
                  my $attribute_link=$dumpspec_obj->get_attribute_value($link_node);
+                 print "\nattribute_link:$attribute_link for link_node:$link_node_name\n" if ($DEBUG==1);
                  if ($attribute_type eq $TYPE_DUMP && $attribute_link ne $DUMP_NO ){
                      delete $hash_tables_link{$link_node_name};
                      my $stm_link_table=$dumpspec_obj->format_sql($link_node);
@@ -430,7 +449,7 @@ sub _table2xml(){
                          else {
                               $stm_link_table=$stm_link_table. " where $alias_table_link.$join_key=$foreign_id";
                          }
-                         print "\nstm_link_table:$stm_link_table";
+                         print "\nstm_link_table:$stm_link_table" if ($DEBUG==1);
                          my $hash_ref_subtable=$dbh->get_all_hashref($stm_link_table);
                          # here remove the join_foreign_key which will be implicit retrieved by context
                          if (defined $hash_ref_subtable){
@@ -440,7 +459,7 @@ sub _table2xml(){
                                my $indent_sub=$indent.$unit_indent;
                               #why ???
                               # if ($key ne $foreign_key){
-                                   $xml_sub=$xml_sub."\n.$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $link_node_name, $op_type, $format_type,$SINGLE, $dbh, $ref_obj, $link_node);
+                                   $xml_sub=$xml_sub."$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $link_node_name, $op_type, $format_type,$SINGLE, $dbh, $ref_obj, $link_node);
                               #  }
 	                    }
 	                 } # end of 
@@ -467,7 +486,7 @@ sub _table2xml(){
          	       }
                         foreach my $join_key (keys %hash_join){
                              my $stm_sub=sprintf("select * from $table_sub where $join_key=$foreign_id");
-                              print "\nstm_sub:$stm_sub";
+                              print "\nstm_sub not in dumpspec:$stm_sub" if ($DEBUG==1);
                              my $hash_ref_subtable=$dbh->get_all_hashref($stm_sub);
                              # here remove the join_foreign_key which will be implicit retrieved by context
                              if (defined $hash_ref_subtable){
@@ -477,7 +496,7 @@ sub _table2xml(){
                                    my $indent_sub=$indent.$unit_indent;
                                   # why ?????
                                   # if ($key ne $foreign_key){
-                                       $xml_sub=$xml_sub."\n.$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $table_sub, $op_type, $format_type,$SINGLE, $dbh,$ref_obj);
+                                       $xml_sub=$xml_sub."$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $table_sub, $op_type, $format_type,$SINGLE, $dbh,$ref_obj);
                                   #  }
          	               }
          	            }
@@ -507,7 +526,7 @@ sub _table2xml(){
 	       }
                foreach my $join_key (keys %hash_join){
                     my $stm_sub=sprintf("select * from $table_sub where $join_key=$foreign_id");
-                     print "\nstm_sub:$stm_sub";
+                     print "\nstm_sub:$stm_sub" if ($DEBUG==1);
                     my $hash_ref_subtable=$dbh->get_all_hashref($stm_sub);
                     # here remove the join_foreign_key which will be implicit retrieved by context
                     if (defined $hash_ref_subtable){
@@ -516,7 +535,7 @@ sub _table2xml(){
                           delete $hash_ref_temp->{$join_key};
                           my $indent_sub=$indent.$unit_indent;
                         #  if ($key ne $foreign_key){
-                              $xml_sub=$xml_sub."\n.$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $table_sub, $op_type, $format_type,$SINGLE, $dbh, $ref_obj);
+                              $xml_sub=$xml_sub."$indent_sub".&_table2xml($hash_ref_temp, $indent_sub, $table_sub, $op_type, $format_type,$SINGLE, $dbh, $ref_obj);
                         #   }
 	               }
 	            }
@@ -613,7 +632,7 @@ sub _replace_dumpspec (){
 
  # method using to join a query with primary_key value, i.e. "select * from feature" into "select * from feature where feature_id=13"
  # because of difference source, it need to figure out the alias if there is any
- # here we assume that the query already been validated in dumpspec
+ # here we assume that the query already been validated in dumpspec, how about _sql  ?????
 sub _join_sql(){
   my $sql=shift;
   my $table=shift;
@@ -636,6 +655,16 @@ sub _join_sql(){
      }
      $join_string=$alias.".".$table_id."=".$table_id_value;
   }
+  #since here no need to group for only ONE record, will drop the group function
+  if ($sql =~/group/ ) {
+    my ($sql_temp, $junk)=split(/group/, $sql);
+    $sql=$sql_temp;
+  }
+  elsif ($sql =~/GROUP/) {
+    my ($sql_temp, $junk)=split(/GROUP/, $sql);
+    $sql=$sql_temp;
+  }
+
   if ($sql =~/where/){
     $result=$sql." and ".$join_string;
   }

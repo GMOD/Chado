@@ -67,6 +67,8 @@ my $ATTRIBUTE_ID='id';
 my $ATTRIBUTE_OP='op';
 my $ATTRIBUTE_REF='ref';
 
+my $DEBUG=0;
+
 # for some elements, it will be ignored, i.e view, and _app_data,
 # algorithms to filter out ignore elements: initiately P_pseudo set to -1, for tables_pseudo, increase by 1 at beginning of start_element,  decrease by 1 at end of end_element
 # if P_pseudo >-1, then do nothing for start_element, end_element, character
@@ -101,8 +103,26 @@ sub new (){
  my $type=shift;
  my $self={};
  $self->{'file'}=shift;
+ $DEBUG=shift;
     my $pro=XORT::Util::GeneralUtil::Properties->new('ddl');
     %hash_ddl=$pro->get_properties_hash();
+
+# under all thos hash and arrary, otherwise, it will intervense for batch executing
+undef $level;
+undef %hash_table_col;
+undef %hash_id;
+undef @AoH_data;
+undef @AoH_data_new;
+undef @AoH_db_id;
+undef @AoH_local_id;
+undef @AoH_op;
+undef @AoH_ref;
+undef %hash_level_id;
+undef %hash_level_name;
+undef %hash_level_op;
+undef %hash_level_ref;
+undef %hash_level_sub_detect;
+
  print "\n start to validate xml file without DB connection.....";
  bless $self, $type;
  return $self;

@@ -136,8 +136,9 @@ sub get_one_value(){
      $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
      $row_array = $query->fetchrow_arrayref;
 
-
-    return $row_array->[0];
+    my $value=$row_array->[0];
+    $query->finish();
+    return $value;
 }
 
 
@@ -149,6 +150,7 @@ sub execute_sql(){
   my $stm=shift;
   my $query=$dbh->prepare($stm);
      $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
+     $query->finish();
 
 }
 
@@ -169,11 +171,13 @@ sub execute_sql(){
 sub get_all_arrayref(){
     my $self=shift;
     my $stm=shift;
-
+    my $ref_array;
     my $dbh=$self->{'dbh'};
     my $query=$dbh->prepare($stm);
     $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
-    return $query->fetchall_arrayref;    
+    $ref_array=$query->fetchall_arrayref;
+    $query->finish();
+    return $ref_array;
 }
 
 #  Fetches the next row of data and returns it as a reference to a hash containing field name and field value pairs.
@@ -308,6 +312,7 @@ sub db_select(){
           $db_id= $row_array->[0];
           if ($db_id){
              print "\ndb_id is:$db_id";
+             $query->finish();
              return $db_id;
           }
           else {
@@ -410,7 +415,7 @@ sub db_lookup(){
     }
 
 
-   #print "\n\nlookup stm:$stm_select\nlookup stm_insert:$stm_insert";
+   print "\n\nlookup stm:$stm_select\n";
 
    if ($stm_select && $stm_insert){
           # here start the database work, first check, if not in db, then insert
@@ -425,6 +430,7 @@ sub db_lookup(){
           $row_array = $query->fetchrow_arrayref;
           $db_id= $row_array->[0];
           if ($db_id){
+             $query->finish();
              return $db_id;
           }
 
@@ -590,6 +596,7 @@ sub db_update(){
                   &create_log($hash_trans, $hash_local_id, $log_file);
                   die "could not execute: $stm_update\n";
                 }
+                $query->finish();
                 return $db_id;
 	  }
           else {
@@ -693,6 +700,7 @@ sub db_delete(){
                &create_log($hash_trans, $hash_local_id, $log_file);
                die "unable to execute:$stm_delete\n";
              }
+            $query->finish();
             return $db_id;
 	  }
           else {
@@ -800,6 +808,7 @@ sub db_insert(){
           $db_id= $row_array->[0];
           if ($db_id){
             print "\nWarning: you try to insert a duplicate record:$stm_insert";
+            $query->finish();
             return $db_id;
 	  }
           else {
@@ -814,6 +823,7 @@ sub db_insert(){
             $row_array = $query->fetchrow_arrayref;
             $db_id= $row_array->[0];
             if ($db_id){
+               $query->finish();
                return $db_id;
             }
           }
@@ -972,6 +982,7 @@ sub db_force(){
                   die "could not execute $stm_update\n";
                 }
 	    }
+            $query->finish();
             return $db_id;
 	  }
           else {
@@ -992,6 +1003,7 @@ sub db_force(){
             $row_array = $query->fetchrow_arrayref;
             $db_id= $row_array->[0];
             if ($db_id){
+               $query->finish();
                return $db_id;
             }
           }

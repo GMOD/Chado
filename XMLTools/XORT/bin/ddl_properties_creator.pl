@@ -186,7 +186,6 @@ while (<IN>){
      my  @temp=split(/\s*\(\s*/, $input);
      my @temp1=split(/\s*\)\s*/, $temp[1]);
      $primary_key=$temp1[0];
-
    }
 
    # here to get the primary/foreign pair
@@ -241,7 +240,7 @@ while (<IN>){
    #get the table name
    my @temp1=split(/\s*\(/, $temp[1]);
    $tablename=$temp1[0];
-   print "\ntable name:$tablename";
+   #print "\ntable name:$tablename";
    push @tables_pseudo, $tablename;
    if ($all_tables){
       $all_tables=$all_tables." ".$tablename;
@@ -299,6 +298,8 @@ while (<IN>){
      }
    }
   undef  %hash_non_null_default;
+
+   print "\nwarning:no primary key for table:$tablename" if !(defined $primary_key);
 
    print OUT "\n\n$tablename", "=$table_col";
    print OUT "\n$tablename","_primary_key=$primary_key";

@@ -15,7 +15,7 @@ use XML::DOM;
 my $doc = $parser->parsefile ("/users/zhou/work/API/XORT/Config/dumpspec_test.xml");
 
 
- my $dumpspec_obj=XORT::Dumper::DumperSpec->new(-dbname=>'chado_gadfly4');
+ my $dumpspec_obj=XORT::Dumper::DumperSpec->new(-dbname=>'chado_gadfly7');
 
 my $in_query=sprintf("select feature_relationship_0.subjfeature_id from feature_relationship feature_relationship_0 where feature_relationship_0.objfeature_id=47 and feature_relationship_0.subjfeature_id in \(select feature_1.feature_id from feature feature_1, cvterm cvterm_0 where feature_1.type_id=cvterm_0.cvterm_id and cvterm_0.termname='gene'\)");
 

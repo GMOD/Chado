@@ -7,6 +7,7 @@ use lib $ENV{CodeBase};
 use XML::Parser::PerlSAX;
 use XORT::Util::DbUtil::DB;
 use strict;
+use XORT::Loader::XMLAccession;
 
 # This one is modified on 1/29/2003 for the dtd: chado_1.0.dtd
 # Different from XML_parser1_copy.pm
@@ -38,6 +39,7 @@ my $level=1;
 
 my $element_name;
 my $table_name;
+my $db;
 my $dbh_obj;
 my %hash_table_col;
 # this hash will have the pair of local_id/db_id, eg. cvterm_99 from xml file, id from cvterm_id 88, the key format: table_name:local_id, value: db_id
@@ -79,6 +81,8 @@ my $ATTRIBUTE_ID='id';
 my $ATTRIBUTE_OP='op';
 my $ATTRIBUTE_REF='ref';
 
+my $DEBUG=0;
+
 # for some elements, it will be ignored, i.e view, and _app_data,
 # algorithms to filter out ignore elements: initiately P_pseudo set to -1, for tables_pseudo, increase by 1 at beginning of start_element,  decrease by 1 at end of end_element
 # if P_pseudo >-1, then do nothing for start_element, end_element, character
@@ -103,6 +107,8 @@ sub new (){
  my $self={};
  $self->{'db'}=shift;
  $self->{'file'}=shift;
+ $db=$self->{db};
+ $DEBUG=shift;
  #load the properties file
  my $pro=XORT::Util::GeneralUtil::Properties->new('ddl');
  %hash_ddl=$pro->get_properties_hash();
@@ -111,9 +117,25 @@ sub new (){
  my @array_pseudo=split(/\s+/, $hash_ddl{$TABLES_PSEUDO});
  foreach my $value(@array_pseudo){
    $hash_tables_pseudo{$value}=1;
-   print "\npseudo:$value";
+   print "\npseudo:$value" if ($DEBUG==1);
  }
 
+
+# under all thos hash and arrary, otherwise, it will intervense for batch executing
+undef $level;
+undef %hash_table_col;
+undef %hash_id;
+undef @AoH_data;
+undef @AoH_data_new;
+undef @AoH_db_id;
+undef @AoH_local_id;
+undef @AoH_op;
+undef @AoH_ref;
+undef %hash_level_id;
+undef %hash_level_name;
+undef %hash_level_op;
+undef %hash_level_ref;
+undef %hash_level_sub_detect;
 
 
  print "\n start to parse xml file .....";
@@ -132,11 +154,11 @@ sub load (){
      $recovery_status=$is_recovery;
    }
    my $file=$self->{file};
-   my $db=$self->{db};
+   $db=$self->{db};
    my $dbh_pro=XORT::Util::GeneralUtil::Properties->new($db);
     my %dbh_hash=$dbh_pro->get_dbh_hash();
     $dbh_obj=XORT::Util::DbUtil::DB->_new(\%dbh_hash)  ;
-   $dbh_obj->open();
+    $dbh_obj->open();
  #  $dbh_obj->set_autocommit();
 
     my  $API_location=$ENV{CodeBase};
@@ -187,11 +209,11 @@ for my $i(0..$#temp){
       close(LOG);
     }
    elsif (!(-e $log_file) && ($recovery_status eq '1' || $recovery_status ==1)) {
-      print "\n are you sure you have run this before ?\nif first time parsing, please set the is_recovery=>0\n";
+      print "\n are you sure you have run this before ?\nif first time parsing, please set the is_recovery=>0\n" if ($DEBUG==1);
       exit(1);
    }
    else {
-        print "\nIf you parse this xml file from the beginning, you can safely delete this file:\n";
+        print "\nIf you parse this xml file from the beginning, you can safely delete this file:\n" if ($DEBUG==1);
         system("delete $log_file");
 
    }
@@ -206,7 +228,7 @@ for my $i(0..$#temp){
      $level++;
      $hash_level_sub_detect{$level}=1;
      $element_name=$element->{'Name'};
-     print "\nstart_element:$element_name";
+     print "\nstart_element:$element_name" if ($DEBUG==1);
 
      # here to check whether it is ELEMENT_pseudo
      if (defined $hash_tables_pseudo{$element_name}){
@@ -233,10 +255,14 @@ for my $i(0..$#temp){
        $local_id =~ s/\'/\&apos;/g;
        $hash_level_id{$level}=$local_id;
        $AoH_local_id[$level]{$element_name}=$local_id;
+       if ($local_id eq 'dbxref_49378'){
+               # &create_log(\%hash_trans, \%hash_id, $log_file);
+               # exit(1);
+       }
     }
     else {
-      delete $hash_level_id{$level};
-      delete $AoH_local_id[$level]{$element_name};
+       delete $hash_level_id{$level};
+       delete $AoH_local_id[$level]{$element_name};
     }
     if ($op && $op ne ''){
        $op =~ s/\&/\&amp;/g;
@@ -260,7 +286,7 @@ for my $i(0..$#temp){
        $ref =~ s/\'/\&apos;/g;
        $hash_level_ref{$level}=$ref;
        $AoH_ref[$level]{$element_name}=$ref;
-       print "\nref for this element:$element_name is :$ref";
+       print "\nref for this element:$element_name is :$ref" if ($DEBUG==1);
     }
     else {
        delete $hash_level_ref{$level};
@@ -290,7 +316,7 @@ for my $i(0..$#temp){
        # when come to subordinary table(e.g cvrelationship), and previous sibling element is not table column(if is, it alread out) out it  output primary table(e.g cvterm)
        $table_name=$element_name;
        if (  defined $hash_ddl{$hash_level_name{$level-1}}){
-	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name";
+	  print "\nstart to output the module table:$hash_level_name{$level-1}, level:$level before parse sub table:$table_name" if ($DEBUG==1);
           my  $hash_data_ref;
 
           $hash_data_ref=&_extract_hash($AoH_data[$level], $hash_level_name{$level-1});
@@ -308,6 +334,9 @@ for my $i(0..$#temp){
                  if (defined $temp_db_id){
                       $hash_data_ref=&_get_ref_data($element_name, $temp_db_id );
 		 }
+                 else {
+                   print "\nunable to retrieve record for this ref:$AoH_ref[$level-1]{$hash_level_name{$level-1}}";
+                 }
                }
 	  }
 
@@ -319,7 +348,7 @@ for my $i(0..$#temp){
 	     }
 	  }
 	 if ($#temp >-1 ){
-          #print "\nthere is data for main module table:$hash_level_name{$level-1}";
+          #print "\nthere is data for main module table:$hash_level_name{$level-1}"  if ($DEBUG==1);
           my  $hash_ref=&_data_check($hash_data_ref,  $hash_level_name{$level-1}, $level, \%hash_level_id, \%hash_level_name );
 
           # here for different type of op, deal with the $hash_data_ref and return the $db_id
@@ -335,7 +364,7 @@ for my $i(0..$#temp){
                $AoH_db_id[$level-1]{$hash_level_name{$level-1}}=$db_id;
 	     }
              else {
-               print "\nyou try to update a record which not exist in db yet";
+               print "\nyou try to update a record which not exist in db yet" ;
                &create_log(\%hash_trans, \%hash_id, $log_file);
                exit(1);
              }
@@ -356,7 +385,7 @@ for my $i(0..$#temp){
           }
           elsif ($hash_level_op{$level-1} eq 'insert'){
              $db_id=$dbh_obj->db_insert(-data_hash=>$hash_ref, -table=>$hash_level_name{$level-1},-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
-             print "\ndb_id:$db_id:";
+             print "\ndb_id:$db_id:"  if ($DEBUG==1);
              #save the pair of local_id/db_id
 	     if (defined $db_id && defined $AoH_local_id[$level-1]{$hash_level_name{$level-1}}){
                my $hash_id_key=$hash_level_name{$level-1}.":".$AoH_local_id[$level-1]{$hash_level_name{$level-1}};
@@ -398,7 +427,7 @@ for my $i(0..$#temp){
         undef %hash_table_col;
         foreach my $i(0..$#array_col){
 	   $hash_table_col{$array_col[$i]}=1;
-         #  print "\ncol:$array_col[$i]";
+         #  print "\ncol:$array_col[$i]"  if ($DEBUG==1);
         }
 
         #after deal with the primary table, here set the operation of link table, default willl be:force
@@ -412,11 +441,11 @@ for my $i(0..$#temp){
    # otherwise, check if it is column, if not, exit and show error.
    elsif ( $element_name ne  $root_element ) {
 
-     print "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
+     print "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name"  if ($DEBUG==1);
      my $col_ref=&_get_table_columns($hash_level_name{$level-1});
      #not column element name
      if (!(exists $col_ref->{$element_name})){
-        print "\n invalid element...... element:$element_name";
+        print "\n invalid element...... element:$element_name" ;
         print "\ntable:$hash_level_name{$level-1}:\tcolumn:$element_name";
         &create_log(\%hash_trans, \%hash_id, $log_file);
         exit(1);
@@ -498,12 +527,12 @@ sub characters {
                       $AoH_data[$level]{$key}= $AoH_data[$level]{$key}.$data;
 		    }
                    else {
-                      print "\nTry to update a column which the op for table is not update.....";
+                      print "\nTry to update a column which the op for table is not update....." ;
                       &create_log(\%hash_trans, \%hash_id , $log_file );
                       exit(1);
                   }
 	        }
-         #print "\n\nin characters key:$key\tvalue:$AoH_data[$level]{$key}:\tlevel:$level";
+         #print "\n\nin characters key:$key\tvalue:$AoH_data[$level]{$key}:\tlevel:$level"  if ($DEBUG==1);
 
 
           #here to save all the currrent transaction information in case of abnormal transaction happen, and undef at end of each trans
@@ -526,11 +555,12 @@ sub end_element {
   #my $table_name_id=$table_name."_id";
   my $hash_ref;
 
-  print "\nend_element_name:$element_name";
+  print "\nend_element_name:$element_name" if ($DEBUG==1);
    # come to end of document
   if ($element_name eq $root_element){
-    print "\n\nbingo ....you success !....";
-    exit(1);
+    print "\n\nbingo ....you success !...." ;
+    #$dbh_obj->close();
+    return;
   }
 
  #do something only when NOT within ELEMENT_PSEUDO
@@ -598,14 +628,14 @@ sub end_element {
             if ($db_id && $hash_level_op{$level} ne 'delete'){
                $AoH_db_id[$level]{$element_name}=$db_id;
 	    }
-               print "\nend_element:$element_name is table element, and sub element is col of this table";
-               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+               print "\nend_element:$element_name is table element, and sub element is col of this table" if ($DEBUG==1);
+               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:" if ($DEBUG==1);
          }
        }    # end of if defined hash_data_ref, 
        #for case using ref attribuate to ref object
        elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && !(defined $hash_data_ref)){
           my  $hash_id_key=$element_name.":".$AoH_ref[$level]{$hash_level_name{$level}};
-
+          print "\nin case using ref attribuate to ref object, ref:$AoH_ref[$level]{$hash_level_name{$level}}" if ($DEBUG==1);
           if (defined $hash_id{$hash_id_key}){
               $hash_data_ref=&_get_ref_data($element_name, $hash_id{$hash_id_key});
   	  }
@@ -614,6 +644,11 @@ sub end_element {
               if (defined $temp_db_id){
                  $hash_data_ref=&_get_ref_data($element_name, $temp_db_id );
 	      }
+              else {
+                 print "\nunable to retrieve the record based on the ref:$AoH_ref[$level]{$hash_level_name{$level}}";
+                 &create_log(\%hash_trans, \%hash_id, $log_file);
+                 exit(1);
+              }
           }
 
           # for empty hash_ref, do nothing
@@ -662,8 +697,8 @@ sub end_element {
             if ($db_id  && $AoH_op[$level]{$element_name} ne 'delete'){
                $AoH_db_id[$level]{$element_name}=$db_id;
 	    }
-               print "\nend_element is $element_name table element, and sub element is col of this table";
-               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
+               print "\nend_element is $element_name table element, and sub element is col of this table" if ($DEBUG==1);
+               print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:" if ($DEBUG==1);
          } # end of if (%hash_data_temp)
 	} # end of using ref attribute to refer object
         elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && defined $hash_data_ref) {
@@ -690,7 +725,7 @@ sub end_element {
            else {
                $AoH_data[$level-1]{$key}=$AoH_db_id[$level]{$element_name};
            }
-          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:";
+          print "\nsubstitute it with db_id:$AoH_db_id[$level]{$element_name}:level:$level-1:key:$key:" if ($DEBUG==1);
 	}
    }
    # self: column element
@@ -698,7 +733,7 @@ sub end_element {
       my $temp_foreign=$hash_level_name{$level-1}.":".$element_name."_ref_table";
       my $key=$hash_level_name{$level-1}.".".$element_name;
       my $primary_table=$hash_ddl{$temp_foreign};
-      print "\n$element_name is column_element";
+      print "\n$element_name is column_element" if ($DEBUG==1);
        #if is foreign key, and next level element is the primary table, it has done in last step, ie. <type_id><cvterm>...</cvterm></type_id>
       if ($hash_ddl{$temp_foreign} eq $hash_level_name{$level+1} && defined $hash_ddl{$temp_foreign} ne '' && (defined $hash_level_sub_detect{$level+1})){
         # my $key=$hash_level_name{$level-1}.".".$element_name;
@@ -728,24 +763,25 @@ sub end_element {
               $AoH_data[$level]{$key}=$hash_id{$hash_id_key};
 	    }
           elsif(defined $hash_accession_entry{$primary_table}) {
+             print "\nhas value:$AoH_data[$level]{$key},not in hash_id" if ($DEBUG==1);
              my $id=&_get_accession($AoH_data[$level]{$key}, $primary_table, $level);
-             if ($id){
+             if (defined $id){
                 $AoH_data[$level]{$key}=$id;
                 $hash_id{$hash_id_key}=$id;
 	     }
              else {
-                print "\n$element_name: can't retrieve the id based on the accession:$AoH_data[$level]{$key}";
-                print "\nor correct format for accesion, but op for table:$hash_level_name{$level-1} is 'delete', and record for this accesion is not in db yet";
+                print "\n$element_name: can't retrieve the id based on the accession:$AoH_data[$level]{$key}" if ($DEBUG==1);
+                print "\nor correct format for accesion, but op for table:$hash_level_name{$level-1} is 'delete', and record for this accesion is not in db yet" if ($DEBUG==1);
                  &create_log(\%hash_trans, \%hash_id, $log_file);
                 exit(1);
              }
            }
           else {
-                print "\n$element_name:$AoH_data[$level]{$key}: is not accession, or local_id:$AoH_data[$level]{$key} is not defined yet";
+                print "\n$element_name:$AoH_data[$level]{$key}: is not accession, or local_id:$AoH_data[$level]{$key} is not defined yet" ;
                 &create_log(\%hash_trans, \%hash_id , $log_file );
                 exit(1);
           }
-           print "\nend_element:$element_name is col, table_op:not update";
+           print "\nend_element:$element_name is col, table_op:not update" if ($DEBUG==1);
        	}
         #table:update, col:update
         elsif ($hash_level_op{$level-1} eq 'update' && $hash_level_op{$level} eq 'update' ){
@@ -771,7 +807,7 @@ sub end_element {
                 &create_log(\%hash_trans, \%hash_id, $log_file);
                 exit(1);
           }
-          print "\nend_element: self:col, table_op:update, col_op:update";
+          print "\nend_element: self:col, table_op:update, col_op:update" if ($DEBUG==1);
         }
         #table: update, col: not upate
         else {
@@ -796,10 +832,10 @@ sub end_element {
                 &create_log(\%hash_trans, \%hash_id, $log_file);
                 exit(1);
           }
-         print "\nend_element: self:col, table_op:update, col_op:not update";
+         print "\nend_element: self:col, table_op:update, col_op:not update" if ($DEBUG==1);
         }
-       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}";
-       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}";
+       print "\nprimary table:$hash_ddl{$temp_foreign}:sub element:$hash_level_name{$level+1}" if ($DEBUG==1);
+       print "\n\n$element_name is foreign key, no sub element, has data, db_id:$AoH_data[$level]{$key}" if ($DEBUG==1);
       }
       # foreign key, no sub element, but NO data, error .......
       elsif ($hash_ddl{$temp_foreign} ne $hash_level_name{$level+1} && $hash_ddl{$temp_foreign} ne '' && !$AoH_db_id[$level+1]{$primary_table} && ($AoH_data[$level]{$key} eq '')) {
@@ -829,7 +865,8 @@ sub end_document {
     system(sprintf("delete $log_file")) if (-e $log_file && ($recovery_status eq '0' || $recovery_status ==0));
     $dbh_obj->close();
     print "\n\nbingo ....you success !....";
-    exit(1);
+   # exit(1);
+   return;
 }
 
 
@@ -847,11 +884,11 @@ sub _extract_hash(){
 
     my $content=$element.".";
     foreach my $value (keys %$hash_ref){
-            print "\nextract_hash before:key:$value:value:$hash_ref->{$value}:";
+            #print "\nextract_hash before:key:$value:value:$hash_ref->{$value}:"  if ($DEBUG==1);
 	if (index($value, $content) ==0 ){
             my $start=length $content;
             my $key=substr($value, $start);
-            print "\nextract_hash:content:$content:value:$value:key:$key:$hash_ref->{$value}:";
+            #print "\nextract_hash:content:$content:value:$value:key:$key:$hash_ref->{$value}:"  if ($DEBUG==1);
            # if ($hash_ref->{$value} =~/\w/){
              $result{$key}=$hash_ref->{$value};
 
@@ -862,9 +899,9 @@ sub _extract_hash(){
 
 
 
-    #foreach my $key (keys %$hash_ref){
-      # print "\nleft key:$key:\tvalue:$hash_ref{$key}:";
-    #}
+   # foreach my $key (keys %$hash_ref){
+   #    print "\nleft key:$key:\tvalue:$hash_ref{$key}:"  if ($DEBUG==1);
+   # }
     if (%result){
          return \%result;
     }
@@ -906,7 +943,7 @@ sub _data_check(){
     }
 
     foreach my $key (keys %$hash_ref){
-      print "\nin data_check col:$key\tvalue:$hash_ref->{$key}:";
+      print "\nin data_check col:$key\tvalue:$hash_ref->{$key}:" if ($DEBUG==1);
     }
 
     my $table_non_null=$table."_non_null_cols";
@@ -919,7 +956,7 @@ sub _data_check(){
       #not serial id, is not null column, and is foreign key, then retrieved from the nearest outer of hash_level_db_id
       if ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && (defined $hash_foreign_key{$temp[$i]} )){
          my $temp_key=$table.":".$temp[$i]."_ref_table";
-         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}";
+         print "\ndata_check temp_key:$temp_key:value:$hash_ddl{$temp_key}" if ($DEBUG==1);
          my $retrieved_value=&_context_retrieve($level,  $hash_ddl{$temp_key}, $hash_level_name_ref);
          if ($retrieved_value){
             $hash_ref->{$temp[$i]}=$retrieved_value;
@@ -930,7 +967,7 @@ sub _data_check(){
              &create_log(\%hash_trans, \%hash_id, $log_file);
              exit(1);
 	   }
-           #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force is already exist in DB, NOT ok for insert
+           #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force if already exist in DB, NOT ok for insert
            else {
                my $op=$hash_level_op{$level-1};
                if ($op eq $OP_INSERT){
@@ -1003,16 +1040,16 @@ sub _context_retrieve(){
     my $primary_table=shift;
     my $hash_level_name_ref=shift;
     my $result;
-  #  print "\ncontext_retrieve:level:$level:primary_table:$primary_table";
+    print "\ncontext_retrieve:level:$level:primary_table:$primary_table"  if ($DEBUG==1);
     for ( my $i=$level-1; $i>=0; $i--){
-  #    print "\ncontext check hash_level_name:$hash_level_name_ref->{$i}";
+      print "\ncontext check hash_level_name:$hash_level_name_ref->{$i}"  if ($DEBUG==1);
       if ($primary_table eq $hash_level_name_ref->{$i}){
-        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}"; 
+        print "\ncontext_retrieve:level:$level:primary_table:$primary_table:value:$AoH_db_id[$i]{$primary_table}" if ($DEBUG==1);
         $result= $AoH_db_id[$i]{$primary_table};
         last;
       }
     }
-    print "\nresult is:$result";
+    print "\nresult is:$result" if ($DEBUG==1);
     return $result;
 }
 
@@ -1027,9 +1064,9 @@ sub _get_table_columns(){
   my $hash_table_column_ref;
         foreach my $i(0..$#array_col){
           if ($array_col[$i] ne ''){
-	   $hash_table_column_ref->{$array_col[$i]}=1;
-	 }
-         #  print "\ncol:$array_col[$i]";
+	    $hash_table_column_ref->{$array_col[$i]}=1;
+	  }
+          # print "\ncol:$array_col[$i]"  if ($DEBUG==1);
         }
   return $hash_table_column_ref;
 }
@@ -1046,88 +1083,23 @@ sub _get_accession(){
 
   my $op=$hash_level_op{$level};
   my ($dbname, $acc, $version, $db_id, $stm_select, $stm_insert);
+  print "\nstart the _get_accession in XMLParse.pm....";
 
-  print "\nget information for table:$table based on accession:$accession";
-
-  if ($accession =~ /([a-zA-Z]+)\:([a-zA-Z0-9]+)(\.\d)*/){
-      my @temp=split(/\:/, $accession);
-      $dbname=$temp[0];
-      if ($temp[1] =~/\./){
-      my @temp1=split(/\./, $temp[1]);
-      $acc=$temp1[0];
-      $version=$temp1[1];
-    }
-    else {
-      $acc=$temp[1];
-      $version='';
-    }
-
-    my $organism_id;
-    #create a pseudo organism record GAME xml loading
-    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
-    if (! $organism_id) {
-      $dbh_obj->execute_sql("insert into organism (genus, species) values('Drosophila', 'melanogaster')");
-      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
-    }
-
-   my $type_id;
-   # create pseudo cvterm record for GAME xml loading
-    $type_id=$dbh_obj->get_one_value("select cvterm_id from cvterm, cv where name='curator note' and cvname='pub type' and cv.cv_id=cvterm.cv_id");
-    if (! $type_id) {
-      my $cv_id;
-      $cv_id=$dbh_obj->get_one_value("select cv_id from cv where cvname='pub type'");
-      if (!$cv_id) {
-          $dbh_obj->execute_sql("insert into cv(cvname) values('pub type')");
-          $cv_id=$dbh_obj->get_one_value("select cv_id from cv where cvname='pub type'");
-      }
-      $dbh_obj->execute_sql(sprintf("insert into cvterm(name, cv_id) values('curator note', $cv_id) "));
-      $type_id=$dbh_obj->get_one_value("select cvterm_id from cvterm, cv where name='curator note' and cvname='pub type' and cv.cv_id=cvterm.cv_id");
-    }
-
-
-    # here to figure out eg. feature_id, table will be feature
-    if ($table =~/\_id/){
-       my @temp2=split(/\_id/, $table);
-       $table=$temp2[0];
-    }
-
-    #my $table_id=$table."_id";
-    my $table_id_string=$table."_primary_key";
-    my $table_id=$hash_ddl{$table_id_string};
-    my $dbxref_id;
-    my $stm_select_dbxref=sprintf("select dbxref_id from dbxref where dbname='%s' and accession='%s' and version='%s'", $dbname, $acc, $version);
-    my $stm_insert_dbxref=sprintf("insert into dbxref (dbname, accession, version) values('%s', '%s', '%s')", $dbname, $acc, $version);
-    $dbxref_id=$dbh_obj->get_one_value($stm_select_dbxref);
-    if (!$dbxref_id && $op ne $OP_DELETE){
-       $dbh_obj->execute_sql($stm_insert_dbxref);
-       $dbxref_id=$dbh_obj->get_one_value($stm_select_dbxref);
-    }
-    else {
-       print "\nop is :$OP_DELETE, so no need to insert";
-    }
-
-    if ($table eq 'dbxref'){
-       $db_id=$dbxref_id;
-    }
-    elsif ($table eq 'feature' ){ 
-     my  $stm_select_feature=sprintf("select $table_id from $table where uniquename='%s' and organism_id=%s", $accession, $organism_id);
-     my  $stm_insert_feature=sprintf("insert into feature (organism_id, uniquename, type_id) values(%s, '%s', $type_id)", $organism_id, $accession);
-       $db_id=$dbh_obj->get_one_value($stm_select_feature);
-       if (!$db_id && $op ne $OP_DELETE){
-          $dbh_obj->execute_sql($stm_insert_feature);
-          $db_id=$dbh_obj->get_one_value($stm_select_feature);
-       }
-       else {
-          print "\nop is :$OP_DELETE, so no need to insert";
-       }
-    }
+  my $config_acc_file=$ENV{CodeBase}."/XORT/Config/config_accession.xml";
+  if (-e $config_acc_file) {
+     $dbh_obj->close();
+     my $acc_parser=XORT::Loader::XMLAccession->new($db, $config_acc_file, $DEBUG);
+     my $acc_id=$acc_parser->parse_accession($table, $accession, $op);
+     print "\nget global_id:$acc_id: for this accession:$accession";
+      $dbh_obj->open();
+     print "\nend the _get_accession....";
+     return $acc_id;
   }
   else {
-        print "\nsorry, the accession:$accession is not correct format as: db:acc[.version]";
-          &create_log(\%hash_trans, \%hash_id, $log_file);
-          exit(1);
+    print "\nunable to find configureation file:$config_acc_file";
+    return;
   }
-  return $db_id;
+
 }
 
 
@@ -1138,21 +1110,19 @@ sub _get_organism_id(){
     my $level=shift;
 
     my $result;
-  #  print "\ncontext_retrieve:level:$level:primary_table:$primary_table";
     for ( my $i=$level; $i>=0; $i--){
-  #    print "\ncontext check hash_level_name:$hash_level_name_ref->{$i}";
-     # print "\nhash_level_name:$hash_level_name{$i-1}";
+      print "\nhash_level_name:$hash_level_name{$i-1}"  if ($DEBUG==1);
       if ( $hash_level_name{$i} eq 'feature' ){
         my $hash_ref=$AoH_local_id[$i+1];
         foreach my $key (keys %$hash_ref){
-           print "\nkey:$key\tvalue:$hash_ref->{$key}";
+           print "\nkey:$key\tvalue:$hash_ref->{$key}"  if ($DEBUG==1);
 	}
         $result= $AoH_local_id[$i+1]{'organism_id'};
-        print "\n\norganism_id is:$result ........";
+        print "\n\norganism_id is:$result ........" if ($DEBUG==1);
         last;
       }
     }
-    print "\n\norganism_id is:$result ........";
+    print "\n\norganism_id is:$result ........" if ($DEBUG==1);
     return $result;
 
 }
@@ -1181,12 +1151,12 @@ sub _get_ref_data(){
  }
 
  my $stm_select=sprintf("select $data_list from $table where $table_id=$id");
- print "\nget_ref_data stm:$stm_select";
+ print "\nget_ref_data stm:$stm_select" if ($DEBUG==1);
  my $array_ref=$dbh_obj->get_all_arrayref($stm_select);
  if (defined $array_ref){
    for my $i (0..$#{$array_ref->[0]}){
         $hash_ref->{$array_table_cols[$i]}=$array_ref->[0][$i];
-        print "\nfrom ref:$table:$array_table_cols[$i]:$array_ref->[0][$i]";
+        print "\nfrom ref:$table:$array_table_cols[$i]:$array_ref->[0][$i]" if ($DEBUG==1);
    }
   return $hash_ref;
  }

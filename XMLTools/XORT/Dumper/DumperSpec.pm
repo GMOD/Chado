@@ -39,7 +39,7 @@ my $ROOT_NODE='chado';
 my $APP_DATA_NODE='_appdata';
 my $SQL_NODE='_sql';
 
-
+my $DEBUG=0;
 my $FN_ARG='fn_arg';
 my %hash_op=(
     'gt'=>'>',
@@ -111,7 +111,7 @@ my %hash_op=(
     #first one always start with "table_0"
     my $alias=$node_name."_0";
    my $attribute_fn_arg=$node->getAttribute($FN_ARG);
-   print "\nattribute_fn_arg for node:$node_name:$attribute_fn_arg\n";
+   print "\nattribute_fn_arg for node:$node_name:$attribute_fn_arg\n" if ($DEBUG==1);
    if (defined $attribute_fn_arg){
        $alias_table=$node_name.$attribute_fn_arg. " ".$alias;
    }
@@ -181,7 +181,7 @@ my %hash_op=(
 
     if (defined $tables && defined $where_list && defined $hash_ddl{$node_name}){
       $query=sprintf("select $what_list from $tables where  $where_list");
-      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query";
+      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query if ($DEBUG==1)";
         return $query;
     }
     # no constraint for this table
@@ -218,7 +218,7 @@ my %hash_op=(
     my $alias=$node_name."_0";
 
    my $attribute_fn_arg=$node->getAttribute($FN_ARG);
-   print "\nattribute_fn_arg for node:$node_name:$attribute_fn_arg\n";
+   print "\nattribute_fn_arg for node:$node_name:$attribute_fn_arg\n" if ($DEBUG==1);
    my $alias_table;
    if (defined $attribute_fn_arg){
        $alias_table=$node_name.$attribute_fn_arg. " ".$alias;
@@ -282,8 +282,8 @@ my %hash_op=(
          my $child_node_name=$child_node->getNodeName();
          if ($child_node->getNodeType() eq ELEMENT_NODE && defined $hash_cols{$child_node_name}){
              my $attribute_dump=_get_attribute_value($child_node);
-             print "\nattribute_dump for select:$attribute_dump:";
-             if ($attribute_dump eq $DUMP_YES){
+             #print "\nattribute_dump for ELEMENT:$child_node_name:$attribute_dump:";
+             if ($attribute_dump eq $DUMP_SELECT){
                push @array_table_cols, $child_node_name;
 	     }
 	 }
@@ -304,13 +304,13 @@ my %hash_op=(
      # there is constraint for this table
     if (defined $tables && defined $where_list && defined $hash_ddl{$node_name}){
       $query=sprintf("select $what_list from $tables where  $where_list");
-      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query";
+      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query" if ($DEBUG==1);
         return $query;
     }
     # no constraint for this table
     elsif( defined $hash_ddl{$node_name}) {
       $query=sprintf("select $what_list from $alias_table");
-      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query";
+      #print "\n\n\nformat_sql:query:node_name:$node_name\n$query" if ($DEBUG==1);
         return $query;
     }
 
@@ -330,7 +330,7 @@ my %hash_op=(
 
    my %hash_data_yes;
    my %hash_data_no;
-   print "\n\nnode:", $node->getNodeName(), "\n\n";
+   print "\n\nnode:", $node->getNodeName(), "\n\n" if ($DEBUG==1);
    #&_traverse($node);
    #figure out attribute_test
    my $type=&_get_node_type($node);
@@ -339,7 +339,7 @@ my %hash_op=(
           $attribute_test=&_get_attribute_value($node);
      }
    }
-   print "\nattribute_test value in _format_sql:$attribute_test\ttype:$type";
+   print "\nattribute_test value in _format_sql:$attribute_test\ttype:$type" if ($DEBUG==1);
 
    #has_test to control whether there is any column constrait data 1:yes, 0:no, this could help to set join: if has column_constraint, then set join, i.e. feature_relationship.subjfeature_id=feature.feature_id
    my $has_test=0;
@@ -363,7 +363,7 @@ my %hash_op=(
 
    #node suppose to be table_node
    if (!(defined $hash_ddl{$node_name})) {
-      print "\n$node_name is not table node";
+      print "\n$node_name is not table node" if ($DEBUG==1);
       return;
    }
    else {
@@ -397,9 +397,9 @@ my %hash_op=(
       my $attribute;
        #only need the column_element
       if ($child_node->getNodeType()==ELEMENT_NODE && !(defined $hash_ddl{$child_node_name}) && defined $hash_cols{$child_node_name}){
-         # print "\ntable:$node_name\texist col:$child_node_name";
+         # print "\ntable:$node_name\texist col:$child_node_name" if ($DEBUG==1);
          $attribute=$child_node->getAttribute($TYPE_TEST);
-          #print "\n2.entrance node of _format_sql:", $node_name, "\tattribute_test:$attribute_test\tattribute:$attribute:\n";
+          #print "\n2.entrance node of _format_sql:", $node_name, "\tattribute_test:$attribute_test\tattribute:$attribute:\n" if ($DEBUG==1);
          if (!(defined $attribute) || $attribute eq '' ){
              $attribute=$attribute_test;
 	 }
@@ -409,7 +409,7 @@ my %hash_op=(
 	  # if (!(defined $attribute)){
           #    $attribute=$attribute_test;
 	  # }
-          #        print "\n2. entrance node of _format_sql:", $node_name, "\tattribute:$attribute\n";
+          #        print "\n2. entrance node of _format_sql:", $node_name, "\tattribute:$attribute\n" if ($DEBUG==1);
             # here get all child_node of column_element node, could be:TEXT, FOREIGN_KEY, OR node
             my $nodes_1=$child_node->getChildNodes();
             for my $i (1..$nodes_1->getLength()){
@@ -486,7 +486,7 @@ my %hash_op=(
                   for my $j (1..$or_nodes->getLength()){
                         $or_value=$or_nodes->item($j-1)->getFirstChild()->getData();
                         $or_value=&_format_data($node_name, $child_node_name, $or_value);
-                        #print "\nor value:$or_value";
+                        #print "\nor value:$or_value" if ($DEBUG==1);
                         $hash_or{$or_value}=1;
 		  }
                   my $stm;
@@ -529,7 +529,7 @@ my %hash_op=(
       }
       #link table, then first output the 
       elsif (defined $hash_ddl{$child_node_name} && !(defined $hash_cols{$child_node_name})){
-         print "\nstart to deal with link table ....:$child_node_name";
+         print "\nstart to deal with link table ....:$child_node_name" if ($DEBUG==1);
          my $attribute_test_link=$child_node->getAttribute('test');
          my $attribute_fn_arg_link=$child_node->getAttribute($FN_ARG);
          #only those with 'test' will be considered
@@ -537,13 +537,13 @@ my %hash_op=(
 	     if (!(defined $attribute_test_link) || $attribute_test_link eq ''){
                $attribute_test_link=$attribute_test;
 	     }
-             print "\nattribute_test_link:$attribute_test_link";
+             print "\nattribute_test_link:$attribute_test_link" if ($DEBUG==1);
              my %hash_tables_link;
              my %hash_where_link;
              my $node_name=$node->getNodeName();
 
              my $join_key=&_get_join_foreign_key($child_node);
-             print "\njoin_key:$join_key";
+             print "\njoin_key:$join_key" if ($DEBUG==1);
              my $join_string;
              my $alias_no_link;
 
@@ -568,7 +568,7 @@ my %hash_op=(
                $join_string=$alias.".".$table_id."=".$link_alias.".".$join_key;
                $hash_where_link{$join_string}=1;
                $hash_tables_link{$link_alias_table}=1;
-              print "\njoin_string in link:$join_string\nlink_alias_table:$link_alias_table";
+              print "\njoin_string in link:$join_string\nlink_alias_table:$link_alias_table" if ($DEBUG==1);
               &_format_sql($child_node, \%hash_tables_link, \%hash_where_link,$hash_alias_no_ref, $attribute_test_link);
 
 
@@ -584,7 +584,7 @@ my %hash_op=(
                 $tables_list_link=$key;
               }
             }
-            print "\ntables_link:$tables_list_link";
+            print "\ntables_link:$tables_list_link" if ($DEBUG==1);
 
             foreach my $key (keys %hash_where_link){
              if (defined $where_list_link){
@@ -596,7 +596,7 @@ my %hash_op=(
            }
            if (defined $tables_list_link && defined $where_list_link){
              $query_link=sprintf("select * from $tables_list_link where  $where_list_link");
-             print "\nquery_link:$query_link";
+             print "\nquery_link:$query_link" if ($DEBUG==1);
              if ($attribute_test_link eq 'yes'){
                $query_link="exists (".$query_link.")";
 	     }
@@ -724,7 +724,7 @@ my %hash_op=(
    my $stm_select;
    my $where_list;
    foreach my $key(keys %$hash_ref){
-     print "\nvalue:$hash_ref->{$key}";
+     print "\nvalue:$hash_ref->{$key}" if ($DEBUG==1);
      my @array_value=split(/\|/, $hash_ref->{$key});
      my $value;
      for my $i(0..$#array_value){
@@ -745,7 +745,7 @@ my %hash_op=(
      }
    }
   $stm_select="select $table_id from $node_name where $where_list";
-  print "\nformat_query stm_select:$stm_select";
+  print "\nformat_query stm_select:$stm_select" if ($DEBUG==1);
 
   return $stm_select;
 
@@ -835,7 +835,7 @@ my %hash_op=(
    my $stm_select;
    my $where_list;
    foreach my $key(keys %$hash_ref){
-     print "\nvalue:$hash_ref->{$key}";
+     print "\nvalue:$hash_ref->{$key}" if ($DEBUG==1);
      my @array_value=split(/\|/, $hash_ref->{$key});
      my $value;
      for my $i(0..$#array_value){
@@ -856,7 +856,7 @@ my %hash_op=(
      }
    }
   $stm_select="select $table_id from $node_name where $where_list";
-  print "\nget_id stm_select:$stm_select";
+  print "\nget_id stm_select:$stm_select" if ($DEBUG==1);
 
  # return $dbh_obj->get_one_value($stm_select);
     my $ref = $dbh_obj->get_all_arrayref($stm_select); 
@@ -922,7 +922,7 @@ my %hash_op=(
           }
        }
        else {
-               print "\nnot link table ";
+               print "\nnot link table " ;
                return ;
        }
        $first_child_node=$node->getFirstChild();
@@ -953,7 +953,7 @@ my %hash_op=(
                       $result=$key;
                    }
 	        }
-                print "\njoin foreign key:$result for table:", $node->getNodeName();
+                print "\njoin foreign key:$result for table:", $node->getNodeName() if ($DEBUG==1);
                 return $result;
 	    }
 	}
@@ -967,19 +967,19 @@ my %hash_op=(
              else {
                 $result=$key;
              }
-             print "\nin get join key:$key";
+             print "\nin get join key:$key" if ($DEBUG==1);
 	  }
           return $result;
         }
       }
      }
      else {
-        print "\nparent node is not defined";
+        print "\nparent node is not defined" if ($DEBUG==1);
         return;
      }
    }
    else {
-     print "\nnode not defined or is not ELEMENT_NODE";
+     print "\nnode not defined or is not ELEMENT_NODE" if ($DEBUG==1);
      return ;
    }
  }
@@ -998,7 +998,7 @@ my %hash_op=(
    my $is_link_table=0;
 
    if (!(defined $node)){
-     print "\nnode not defined";
+     print "\nnode not defined" if ($DEBUG==1);
      return;
    }
    my $result;
@@ -1024,7 +1024,7 @@ my %hash_op=(
           }
        }
        else {
-               print "\nnot link table ";
+               print "\nnot link table " if ($DEBUG==1);
                return ;
        }
        $first_child_node=$node->getFirstChild();
@@ -1069,19 +1069,19 @@ my %hash_op=(
              else {
                 $result=$key;
              }
-             print "\nin get join key:$key";
+             print "\nin get join key:$key" if ($DEBUG==1);
 	  }
           return $result;
         }
       }
      }
      else {
-        print "\nparent node is not defined";
+        print "\nparent node is not defined" if ($DEBUG==1);
         return;
      }
    }
    else {
-     print "\nnode not defined or is not ELEMENT_NODE";
+     print "\nnode not defined or is not ELEMENT_NODE" if ($DEBUG==1);
      return ;
    }
  }
@@ -1134,7 +1134,7 @@ my %hash_op=(
                        my $child_node_name=$child_node->getNodeName();
                        my $child_node_type=&_get_node_type($child_node);
                        #return the first child node that is foreign key
-                       print "\nlink_table_node_type:$link_table_node_type:child_node_type:$child_node_type:child_node:", $child_node->getNodeName();
+                       print "\nlink_table_node_type:$link_table_node_type:child_node_type:$child_node_type:child_node:", $child_node->getNodeName() if ($DEBUG==1);
                        if (defined $hash_foreign_key{$child_node_name} && $link_table_node_type eq $child_node_type){
                            print "\nget_foreign_key node name:", $child_node->getNodeName();
                            return $child_node;
@@ -1146,7 +1146,7 @@ my %hash_op=(
                 return;
 	    }
             else {
-               print "\nnot link table ";
+               print "\nnot link table " if ($DEBUG==1);
                return ;
             }
 	}
@@ -1157,7 +1157,7 @@ my %hash_op=(
       }
      }
      else {
-        print "\nparent node is not defined";
+        print "\nparent node is not defined" ;
         return;
      }
    }
@@ -1186,7 +1186,7 @@ my %hash_op=(
      print "\nnode not defined";
      return;
    }
-   print "\nentrance node for _get_foreign_key_node:", $node->getNodeName();
+   print "\nentrance node for _get_foreign_key_node:", $node->getNodeName() if ($DEBUG==1);
   
 
    # first test if it is link_table, then get the foreign key
@@ -1225,7 +1225,7 @@ my %hash_op=(
 		    }
 		}
                 #search all child, and can't find the foreign key, so return null;
-                print "\nunable to find foreign node for node:", $node->getNodeName();
+                print "\nunable to find foreign node for node:", $node->getNodeName() if ($DEBUG==1);
                 return;
 	    }
             else {
@@ -1464,11 +1464,11 @@ sub get_nested_node(){
      }
    }
    else {
-     print "\nattribute in get_nested_node:$attribute:type:$type:\n";
+     print "\nattribute in get_nested_node:$attribute:type:$type:\n" if ($DEBUG==1);
      return ;
    }
  }
-   &_traverse($node);
+   #&_traverse($node);
    return $node;
  }
 
@@ -1923,7 +1923,7 @@ sub _validate_sql_element(){
 sub transform_in_query (){
   my $self=shift;
   my $in_query=shift;
-  print "\nin_query in transorm_in_query:\n", $in_query;
+  print "\nin_query in transorm_in_query:\n", $in_query if ($DEBUG==1);
 
   my $out_query;
   my @array_where;
@@ -1967,7 +1967,7 @@ sub transform_in_query (){
   my @temp_sub5=split(/\s*,\s*/, $temp_sub4[1]);
   for my $i(0..$#temp_sub5){
     $hash_tables{$temp_sub5[$i]}=1;
-    print "\nsub table:$temp_sub5[$i]";
+    print "\nsub table:$temp_sub5[$i]" if ($DEBUG==1);
   }
   my @temp_sub6=split (/\s*select\s+/, $temp_sub4[0]);
   $join_key_right=$temp_sub6[1];
@@ -1987,14 +1987,14 @@ sub transform_in_query (){
         else {
           $hash_table_alias_no{$temp_sub7[0]}=0;
         }
-       print "\ntable:$temp_sub7[0]: \talias no:$hash_table_alias_no{$temp_sub7[0]}";
+       print "\ntable:$temp_sub7[0]: \talias no:$hash_table_alias_no{$temp_sub7[0]}" if ($DEBUG==1);
       }
       #no alias, set default alias no as 0
       else {
          $hash_table_alias_no{$temp_sub7[0]}=0;
       }
     }
- print "\nlast alias no for table:feature:$hash_table_alias_no{'feature'}";
+ print "\nlast alias no for table:feature:$hash_table_alias_no{'feature'}" if ($DEBUG==1);
 #key: table, value: alias for post parsing
 my %hash_main_table_alias;
 #store the information before parsing, key: old_alias, value: new alias
@@ -2012,24 +2012,24 @@ my %hash_main_old_alias;
     my $alias_no=0;
     my $alias_string;
     my $table_alias;
-    print "\ntable of main:$array_tables_main[$i]:\n";
+    print "\ntable of main:$array_tables_main[$i]:\n" if ($DEBUG==1);
     #no alias in main query
     if ($array_tables_main[$i] !~/\s+/){
         print "\nno alias in main table:$array_tables_main[$i]:\n";
         my $temp_table=$array_tables_main[$i];
-        print "\nprevious alias no for table:$temp_table:$hash_table_alias_no{$temp_table}";
+        print "\nprevious alias no for table:$temp_table:$hash_table_alias_no{$temp_table}" if ($DEBUG==1);
         if (defined $hash_table_alias_no{$temp_table} && $hash_table_alias_no{$temp_table} =~/\d/){
            $alias_no=$hash_table_alias_no{$temp_table}+1;
 	}
         $table_alias=$temp_table."_".$alias_no;
         $alias_string=$temp_table." ".$table_alias;
-        print "\ntable_alias:$table_alias:\talias_string:$alias_string";
+        print "\ntable_alias:$table_alias:\talias_string:$alias_string" if ($DEBUG==1);
         $hash_tables{$alias_string}=1;
         $hash_main_table_alias{$temp_table}=$table_alias;
     }
     #there is alias
     else { #0: table, 1: alias
-      print "\nthere is alias in main table:$array_tables_main[$i]:";
+      print "\nthere is alias in main table:$array_tables_main[$i]:" if ($DEBUG==1);
       my @temp_alias=split(/\s+/,$array_tables_main[$i]);
       #there is same table in subquery
       if ( defined $hash_table_alias_no{$temp_alias[0]}){
@@ -2037,8 +2037,8 @@ my %hash_main_old_alias;
         if ($temp_alias[1] =~/\_/){
             my @temp_1=split(/\_/, $temp_alias[1]);
             $alias_no=$temp_1[1]+$hash_table_alias_no{$temp_alias[0]}+1;
-            print "\noriginal alias_no:$hash_table_alias_no{$temp_alias[0]}";
-            print "\nin format of _:$alias_no:table:$temp_alias[0]:";
+            print "\noriginal alias_no:$hash_table_alias_no{$temp_alias[0]}" if ($DEBUG==1);
+            print "\nin format of _:$alias_no:table:$temp_alias[0]:" if ($DEBUG==1);
 	}
         else {
             $alias_no=$hash_table_alias_no{$temp_alias[0]}+1;
@@ -2077,11 +2077,11 @@ my %hash_main_old_alias;
   }
 
   #parse the where main query
-  print "\nwhere of main:$temp_where[1]";
+  print "\nwhere of main:$temp_where[1]" if ($DEBUG==1);
   my @temp_2=split(/\s+and\s+/, $temp_where[1]);
   #where case: =, like, <>, what else ?, last one will be something "in"
   for my $i(0..$#temp_2-1){
-    print "\nwhere of main:$temp_2[$i]";
+    print "\nwhere of main:$temp_2[$i]" if ($DEBUG==1);
     my $op;
     my @temp_3;
     if ($temp_2[$i] =~/like/){
@@ -2117,7 +2117,7 @@ my %hash_main_old_alias;
     $hash_where{$where_stm}=1;
   }
    #store the join stm
-  print "\njoin_left from main:$temp_2[$#temp_2]:\n";
+  print "\njoin_left from main:$temp_2[$#temp_2]:\n" if ($DEBUG==1);
   if ($temp_2[$#temp_2] !~/\./){
     $join_key_left=$hash_main_table_alias{$hash_cols{$temp_2[$#temp_2]}}.".".$temp_2[$#temp_2];
   }
@@ -2161,7 +2161,7 @@ my %hash_main_old_alias;
             $temp_what=$hash_main_old_alias{$temp_select_2[0]}.".".$temp_select_2[1];
 	 }
       }
-      print "\ntemp_what:$temp_what";
+      print "\ntemp_what:$temp_what" if ($DEBUG==1);
       $hash_what{$temp_what}=1;
      }
    }
@@ -2200,7 +2200,11 @@ my %hash_main_old_alias;
 
 }
 
-
+# close the DB connection
+sub close (){
+  my $self=shift;
+  $dbh_obj->close();
+}
 
 # This util will return a hash ref which contains all the columns of this table
 sub _get_table_columns(){

@@ -17,5 +17,7 @@ setenv CodeBase /users/zhou/work/API
 
 6. CodeBase/XORT/Config/dumpspec_gene.xml for sample dumpspec file, and dump output from this dumpspec(dump_gene_local_id.xml)
 
-7. If you try to use 'local_id' mechanism to represent an object, the dumper will use this format to represent it: 'table_name'.'_'.'primary_key', it will garantee the uniqueness. However, it is not necessary at all to use this format for loader, as long as its uniqueness, loader can handle it. 
+7. if you use global_id mechanism to refer any object, then you need create config file to guide the behavior of GLOBAL_ID loading/refering/autocreating. put this file in CodeBase/XORT/Config/config_accession.xml
+ 
+8. If you try to use 'local_id' mechanism to represent an object, the dumper will use this format to represent it: 'table_name'.'_'.'primary_key', it will garantee the uniqueness. However, it is not necessary at all to use this format for loader, as long as its uniqueness, loader can handle it. 
 
