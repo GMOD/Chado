@@ -588,7 +588,6 @@ private String m_ExonGeneName = null;
 							tranSpan = tranSpan.union(
 								exonSpan);
 						}
-						//System.out.println("TRAN IS NOW<"+tranSpan.toString()+"> OF LEN<"+tranSpan.getLength()+">");
 						//System.out.println("AS ADVANCED EXON SPAN<"+exonSpan.toString()+">");
 					}else{
 						System.out.println("\tUNK FEATURE_SPAN TYPE<"+exon.getType()+">");
@@ -1219,28 +1218,27 @@ private String m_ExonGeneName = null;
 				}else if(gf.getType().equals("aa")){
 					if(startCodonSpan!=null){
 						gf.setSpan(startCodonSpan);
-						//System.out.println(
-						//	"STARTCODONSPAN<"
-						//	+startCodonSpan.toString()+">");
+						System.out.println(
+							"STARTCODONSPAN<"
+							+startCodonSpan.toString()+">");
 					}
 					if(gf.getSpan()!=null){
 					if(transSpan!=null){
 						String tttRes = cleanString(
 							gf.getResidues());
-						Span newSpan = calcNewProtSpan(
+		//System.out.println("RECEIVING START_CODON SPAN<"+gf.getSpan().toString()+"> LEN<"+tttRes.length()+"> EXON LIST SIZE<"+ExonList.size()+">");
+		//for(int x=0;x<ExonList.size();x++){
+		//	Span xsp = (Span)ExonList.get(x);
+		//	System.out.println("\tEX<"+xsp.toString()+">");
+		//}
+						Span newSpan = ProtCalc.calcNewProtSpan(
 								gf.getSpan(),
 								tttRes.length(),
 								ExonList);
-						//System.out.println("NEWSPAN<"
-						//	+newSpan.toString()+">");
-						//System.out.println("TRANSSPAN<"
-						//	+transSpan.toString()+">");
+		//System.out.println("RETURNS PROT_SPAN<"+newSpan.toString()+">");
 						newSpan.setSrc(m_NewREFSTRING);
 						Span wrtTransSpan = newSpan.retreat(transSpan.getStart());
 						wrtTransSpan.setSrc(transSpan.getSrc());
-						//System.out.println("WRTTRANSSPAN<"
-						//	+wrtTransSpan.toString()+">");
-						//System.out.println("SEQNODE<"+the_gf.getName()+"> AAA<"+gf.getName()+"> FIRST ARMSPAN<"+newSpan.toString()+"> SECOND<");//+wrtTransSpan.toString()+">");
 						FeatNode.appendChild(
 							makeFeatRel(the_DOC,"producedby",0,
 								makeSeqNode(the_DOC,gf,the_gf.getName(),newSpan,wrtTransSpan)));
@@ -1273,11 +1271,13 @@ private String m_ExonGeneName = null;
 			return protLen;
 		}
 	}
+
+/*****************
 	public Span calcNewProtSpan(Span the_startSpan,int the_seqLen,
 			Vector the_ExonList){
-		//System.out.println("FSS_STARTCODON<"+the_startSpan+">");
-		//System.out.println("FSS_PROTLEN<"+the_seqLen+">");
-		//System.out.println("FSS_EXONLISTSIZE<"+the_ExonList.size()+">");
+		System.out.println("CALC_NEW_PROTSPAN STARTCODON<"+the_startSpan+">");
+		System.out.println("CALC_NEW_PROTSPAN PROTLEN<"+the_seqLen+">");
+		System.out.println("CALC_NEW_PROTSPAN EXONLISTSIZE<"+the_ExonList.size()+">");
 		int start = the_startSpan.getStart();
 		int end = start;
 		int dnaLen = the_seqLen+the_seqLen+the_seqLen;
@@ -1296,7 +1296,7 @@ private String m_ExonGeneName = null;
 					//System.out.println("\tWITH REMAINDER<"
 					//		+rem+">");
 					if(dnaLen<=rem){
-						end = start+dnaLen;
+						end = start+dnaLen-1;
 						return (new Span(start,end));
 					}else{
 						end = s.getEnd();
@@ -1328,27 +1328,26 @@ private String m_ExonGeneName = null;
 		j++;
 		while((dnaLen>0)&&(j<the_ExonList.size())){
 			Span s = (Span)the_ExonList.get(j);
-			//System.out.println("FSS_TRANSSPAN ["+j+"] MIDDLE<"
-			//		+s.toString()+"> OF LEN<"
-			//		+s.getLength()+">");
 			if(dnaLen>s.getLength()){
 				dnaLen-=s.getLength();
 				end = s.getEnd();
 				//System.out.println("\tNEW DNALEN<"+dnaLen+">");
 			}else{
 				if(s.isForward()){
-					end = s.getStart()+dnaLen;
+					end = s.getStart()+dnaLen-1;
 				}else{
-					end = s.getStart()-dnaLen-1;
+					end = s.getStart()-dnaLen+1;
 				}
 				//System.out.println("\tDONE END<"+end+">");
 				return (new Span(start,end));
 			}
 			j++;
 		}
-		//System.out.println("\tNOT DONE REMAINING<"+dnaLen+">");
+		System.out.println("\tCALC_NEW_PROTSPAN REMAINDER<"+dnaLen+">");
+		System.out.println("\tCALC_NEW_PROTSPAN RETURN<"+start+".."+end+">");
 		return (new Span(start,end));
 	}
+*****************/
 
 	public Element makeFeatHeader(Document the_DOC,
 			GenFeat the_gf,Element the_FeatNode,
@@ -1480,9 +1479,12 @@ private String m_ExonGeneName = null;
 		//NAME
 		if((the_gf.getName()!=null)&&(!(the_gf.getName().equals("")))){
 			String tmpName = the_gf.getName();
-			if(tmpName.endsWith(".3")){
-				tmpName = tmpName.substring(
-						0,tmpName.length()-2);
+			if(!(the_gf instanceof Annot)){
+				//TRUNCATE '.3' FOR ALL FEATURES BUT ANNOT
+				if(tmpName.endsWith(".3")){
+					tmpName = tmpName.substring(
+							0,tmpName.length()-2);
+				}
 			}
 			the_FeatNode.appendChild(makeGenericNode(
 					the_DOC,"name",tmpName));
@@ -1494,9 +1496,12 @@ private String m_ExonGeneName = null;
 		}
 
 		if(uniquename!=null){
-			if(uniquename.endsWith(".3")){
-				uniquename = uniquename.substring(
-						0,uniquename.length()-2);
+			if(!(the_gf instanceof Annot)){
+				//TRUNCATE '.3' FOR ALL FEATURES BUT ANNOT
+				if(uniquename.endsWith(".3")){
+					uniquename = uniquename.substring(
+							0,uniquename.length()-2);
+				}
 			}
 			the_FeatNode.appendChild(makeGenericNode(
 					the_DOC,"uniquename",uniquename));
@@ -1529,26 +1534,15 @@ private String m_ExonGeneName = null;
 					the_DOC,"type_id",tmpTypeId));
 		}
 
-		/**************
-		//TIMESTAMP
-		if(the_gf.gettimestamp()!=null){
-			the_FeatNode.appendChild(makeChadoTimestampNode(
-					the_DOC,the_gf.gettimestamp()));
-		}
 		//DATE
-		if(the_gf.gettimestamp()!=null){
-			Element time = (Element)the_DOC.createElement("timeaccessioned");
-			time.appendChild(the_DOC.createTextNode(the_gf.gettimestamp()));
-			the_FeatNode.appendChild(time);
+		if(the_gf.getdate()!=null){
+			the_FeatNode.appendChild(makeChadoDateNode(
+					the_DOC,"timeaccessioned",
+					the_gf.getdate().toString()));
 		}
-		**************/
-
 
 		//RESIDUES
 		if(the_gf instanceof Annot){
-			//System.out.println("ANNOT<"+the_gf.getSpan()
-			//		+"> OF LEN<"
-			//		+the_gf.getSpan().getLength()+">");
 			//SEQLEN
 			if(the_gf.getSpan()!=null){
 				the_FeatNode.appendChild(makeGenericNode(
@@ -1577,9 +1571,6 @@ private String m_ExonGeneName = null;
 				}
 			}
 		}else if(the_gf instanceof FeatureSpan){
-			//System.out.println("FEATURE_SPAN <"+the_gf.getSpan()
-			//		+"> OF LEN<"
-			//		+the_gf.getSpan().getLength()+">");
 			//SEQLEN
 			if(the_gf.getSpan()!=null){
 				the_FeatNode.appendChild(makeGenericNode(
@@ -1618,7 +1609,6 @@ private String m_ExonGeneName = null;
 		//AUTHOR
 		if(the_gf.getAuthor()!=null){
 			the_FeatNode.appendChild(makeFeaturePropNode(
-					//the_DOC,"author",the_gf.getAuthor()));
 					the_DOC,"owner",the_gf.getAuthor()));
 		}
 
@@ -1707,6 +1697,15 @@ private String m_ExonGeneName = null;
 		return the_FeatNode;
 	}
 
+	public Element makeChadoDateNode(Document the_DOC,
+			String the_timeelement,String the_timestring){
+		Element time = (Element)the_DOC.createElement(the_timeelement);
+		String chadoDate = DateConv.GameDateToChadoDate(the_timestring);
+		time.appendChild(the_DOC.createTextNode(chadoDate));
+		return time;
+	}
+
+
 	public String getTranSuffix(String the_name){
 		String suffix = "";
 		if(the_name==null){
@@ -1754,15 +1753,6 @@ private String m_ExonGeneName = null;
 		return genNode;
 	}
 
-	public Element makeChadoTimestampNode(Document the_DOC,
-			String the_timestamp){
-			//PUT IN ITS OWN FUNCTION AS
-			//PREPROCESSING MAY BE NEEDED LATER
-		Element tsNode = (Element)the_DOC.createElement("timeaccessioned");
-		tsNode.appendChild(the_DOC.createTextNode(the_timestamp));
-		return tsNode;
-	}
-
 	public Element makeFeaturePropNode(Document the_DOC,
 			String the_pkey_id,String the_pval){
 		Element fpNode = (Element)the_DOC.createElement("featureprop");
@@ -1784,16 +1774,15 @@ private String m_ExonGeneName = null;
 		if(the_attr.gettype()!=null){
 			atNode.appendChild(makeGenericNode(
 					the_DOC,"type_id",the_attr.gettype()));
-			//if(the_attr.gettype().equals("protein_id")){
-			//	prefix = "SP:";
-			//}
 		}
 		if(the_attr.getvalue()!=null){
 			//Element pval = (Element)the_DOC.createElement("pval");
 			Element pval = (Element)the_DOC.createElement("value");
 			String tmp = the_attr.getvalue();
 			if(the_attr.getdate()!=null){
-				tmp += "::DATE:"+the_attr.getdate();
+				String chadoDate = DateConv.GameDateToChadoDate(
+						the_attr.getdate().toString());
+				tmp += "::DATE:"+chadoDate;
 			}
 			if(the_attr.gettimestamp()!=null){
 				tmp += "::TS:"+the_attr.gettimestamp();
@@ -1840,7 +1829,9 @@ private String m_ExonGeneName = null;
 			Element pval = (Element)the_DOC.createElement("value");
 			String tmp = the_attr.gettext();
 			if(the_attr.getdate()!=null){
-				tmp += "::DATE:"+the_attr.getdate();
+				String chadoDate = DateConv.GameDateToChadoDate(
+						the_attr.getdate().toString());
+				tmp += "::DATE:"+chadoDate;
 			}
 			if(the_attr.gettimestamp()!=null){
 				tmp += "::TS:"+the_attr.gettimestamp();
@@ -2530,6 +2521,16 @@ private String m_ExonGeneName = null;
 		}
 		return analysis;
 	}
+
+	public Element makeChadoTimestampNode(Document the_DOC,
+			String the_timestamp){
+			//PUT IN ITS OWN FUNCTION AS
+			//PREPROCESSING MAY BE NEEDED LATER
+		Element tsNode = (Element)the_DOC.createElement("timeaccessioned");
+		tsNode.appendChild(the_DOC.createTextNode(the_timestamp));
+		return tsNode;
+	}
+
 ***********************************/
 
 //FSS
@@ -2681,7 +2682,13 @@ private String m_ExonGeneName = null;
 
 	public Element makeCASrcFeatResult(Document the_DOC,GenFeat the_gf){
 		Element srcFeat = (Element)the_DOC.createElement("feature");
-		//TIMEACCESSIONED
+		//DATE
+		if(the_gf.getdate()!=null){
+			srcFeat.appendChild(makeChadoDateNode(
+					the_DOC,"timeaccessioned",
+					the_gf.getdate().toString()));
+		}
+
 		//NAME
 		//RESIDUES
 		//TIMELASTMODIFIED
