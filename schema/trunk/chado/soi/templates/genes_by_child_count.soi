@@ -24,7 +24,7 @@ cvterm q ON (f.type_id = q.cvterm_id)
 INNER join
 cv ON (q.cv_id = cv.cv_id)
 INNER join
-(select * from feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as parent ON (f.feature_id = parent.feature_id)
+(select * from get_feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as parent ON (f.feature_id = parent.feature_id)
 WHERE f.is_analysis = 'f' AND q.name = 'gene' and cv.name = 'so' [and src.name IN (&&src&&)]
 )
 UNION
@@ -48,7 +48,7 @@ feature_relationship fr ON (f.feature_id = fr.subject_id)
 INNER join
 cvterm frt ON (fr.type_id = frt.cvterm_id)
 INNER join 
-(select * from feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from get_feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 (select c.name, c.cvterm_id, max(pathdistance+1) as depth
  FROM cvterm c, cvtermpath path, cvterm p, cv
@@ -66,7 +66,7 @@ fp.rank
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from get_feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 featureprop fp ON (fp.feature_id = f.feature_id)
 INNER join
@@ -87,7 +87,7 @@ cv.name as cv
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from get_feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 feature_cvterm fcvt ON (f.feature_id = fcvt.feature_id)
 INNER join
@@ -112,7 +112,7 @@ db.name as dbname
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from get_feature_ids_by_child_count(&&ptype&&, &&ctype&&, &&count&&, &&operator&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 feature_dbxref fxref ON (f.feature_id = fxref.feature_id)
 INNER join

@@ -47,6 +47,6 @@ cvterm frt ON (fr.type_id = frt.cvterm_id)
 INNER join
 cvterm t ON (f.type_id = t.cvterm_id)
 INNER join
-(select feature_id, depth FROM feature_child_ids(&&type&&, &&src&&, 'f')) as q ON (f.feature_id = q.feature_id)
+(select feature_id, depth FROM get_sub_feature_ids_by_type_src(&&type&&, &&src&&, 'f')) as q ON (f.feature_id = q.feature_id)
 WHERE f.is_analysis = 'f' and src.uniquename = &&src&& and fl.fmin <= &&fmax&& and fl.fmax >= &&fmin&&
 )) as uf order by depth, parent_id, orderrank, rank;
