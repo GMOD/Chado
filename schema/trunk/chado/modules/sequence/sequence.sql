@@ -289,7 +289,7 @@ create table synonym (
        synonym varchar(255) not null,
 -- types would be symbol and fullname for now
        type_id int not null,
-       foreign key (synonym_type) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
