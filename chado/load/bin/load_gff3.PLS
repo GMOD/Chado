@@ -605,7 +605,7 @@ sub load_Parent_tag {
     if ( $gff_feature->has_tag('Parent') ) {
         my @parents = $gff_feature->get_tag_values('Parent');
         foreach my $parent (@parents) {
-            next if $parent = '';
+            next if $parent eq '';
 
             my $reltype =
                 ( $gff_feature->primary_tag eq 'protein' ||
@@ -648,7 +648,7 @@ sub load_Alias_tag {
             push @aliases, $gff_feature->get_tag_values('Alias');
         }
         foreach my $alias (@aliases) {
-            next if $alias = '';
+            next if $alias eq '';
             #create the synonym
             my ($chado_synonym1) = Chado::Synonym->find_or_create(
                 {
@@ -694,7 +694,7 @@ sub load_Name_tag {
     }
 
     foreach my $name (@names) {
-        next if $name = '';
+        next if $name eq '';
         my ($chado_synonym1) = Chado::Synonym->find_or_create(
             {
                 name         => $name,
