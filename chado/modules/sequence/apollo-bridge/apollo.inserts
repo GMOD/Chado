@@ -126,4 +126,4 @@ insert into cvterm (name, cv_id) values('internalnotes', (select cv_id from cv w
 insert into cvterm (name, cv_id) values('languages', (select cv_id from cv where name='pubprop type'));
 insert into cvterm (name, cv_id) values('series_abbrev', (select cv_id from cv where name='pubprop type'));
 
-
+insert into dbxref (db_id, accession,description) values ((select db_id from db where name='DB:GR'), 'CG30000','fake dbxref to make renaming trigger happy');
