@@ -7,6 +7,7 @@ mysql :: \
 		./modules/companalysis/companalysis.mysql \
 		./modules/cv/cv.mysql \
 		./modules/expression/expression.mysql \
+		./modules/expression/rad.mysql \
 		./modules/general/general.mysql \
 		./modules/genetic/genetic.mysql \
 		./modules/map/map.mysql \
@@ -20,6 +21,7 @@ graphviz :: \
 		./modules/companalysis/companalysis.graphviz.png \
 		./modules/cv/cv.graphviz.png \
 		./modules/expression/expression.graphviz.png \
+		./modules/expression/rad.graphviz.png \
 		./modules/general/general.graphviz.png \
 		./modules/genetic/genetic.graphviz.png \
 		./modules/map/map.graphviz.png \
@@ -33,6 +35,7 @@ diagram :: \
 		./modules/companalysis/companalysis.diagram.png \
 		./modules/cv/cv.diagram.png \
 		./modules/expression/expression.diagram.png \
+		./modules/expression/rad.diagram.png \
 		./modules/general/general.diagram.png \
 		./modules/genetic/genetic.diagram.png \
 		./modules/map/map.diagram.png \
