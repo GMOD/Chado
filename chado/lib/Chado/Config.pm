@@ -24,6 +24,8 @@ use FindBin '$Bin';
 use File::Spec::Functions;
 use XML::Simple;
 
+use constant DEFAULT_FILENAME => catfile( $Bin, 'load', 'etc', 'load.conf' );
+
 # ---------------------------------------------------------
 =pod
 
@@ -69,8 +71,7 @@ sub filename {
     my ( $self, $arg ) = @_;
 
     if ( ! defined $self->{'filename'} && ! $arg ) {
-        my $file = catfile( $Bin, 'load', 'etc', 'load.conf' );
-        $arg = $file if -e $file;
+        $arg = DEFAULT_FILENAME if -e DEFAULT_FILENAME;
     } 
 
     if ( $arg ) {
