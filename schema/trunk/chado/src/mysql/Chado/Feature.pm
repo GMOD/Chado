@@ -1,5 +1,6 @@
 package Chado::Feature;
 use base 'Chado::DBI';
+use Class::DBI::Pager;
 
 Chado::Feature->set_up_table('feature');
 

@@ -1,5 +1,6 @@
 package Chado::Eplatform;
 use base 'Chado::DBI';
+use Class::DBI::Pager;
 
 Chado::Eplatform->set_up_table('eplatform');
 

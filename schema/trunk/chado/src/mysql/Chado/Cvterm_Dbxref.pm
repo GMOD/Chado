@@ -1,6 +1,7 @@
 package Chado::Cvterm_Dbxref;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Cvterm_Dbxref->set_up_table('cvterm_dbxref');
 Chado::Cvterm_Dbxref->hasa(Chado::Cvterm => 'cvterm_id');

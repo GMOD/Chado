@@ -2,6 +2,7 @@ package Chado::Cvterm;
 use base 'Chado::DBI';
 
 use Chado::Cvrelationship;
+use Class::DBI::Pager;
 
 Chado::Cvterm->set_up_table('cvterm');
 

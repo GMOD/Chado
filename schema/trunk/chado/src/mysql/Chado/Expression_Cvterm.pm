@@ -1,6 +1,7 @@
 package Chado::Expression_Cvterm;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Expression_Cvterm->set_up_table('expression_cvterm');
 Chado::Expression_Cvterm->hasa(Chado::Expression => 'expression_id');

@@ -1,6 +1,7 @@
 package Chado::Feature_Expression_Dchipxls;
 use base 'Chado::DBI';
 use mixin 'Class::DBI::Join';
+use Class::DBI::Pager;
 
 Chado::Feature_Expression_Dchipxls->set_up_table('feature_expression_dchipxls');
 Chado::Feature_Expression_Dchipxls->hasa(Chado::Feature => 'feature_id');
