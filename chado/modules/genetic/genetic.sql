@@ -1,4 +1,6 @@
 -- This module depends on the sequence, pub, and cv modules 
+-- 18-JAN-03 (DE): This module is unfinished and due for schema review (Bill 
+-- Gelbart will be leading the charge)   
 
 -- ================================================
 -- TABLE: genotype
@@ -7,9 +9,7 @@
 create table genotype (
        genotype_id serial not null,
        primary key (genotype_id),
-       description varchar(255),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+       description varchar(255)
 );
 
 
@@ -22,9 +22,12 @@ create table feature_genotype (
        foreign key (feature_id) references feature (feature_id),
        genotype_id int,
        foreign key (genotype_id) references genotype (genotype_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(feature_id,genotype_id)
 );
+create index feature_genotype_idx1 on feature_genotype (feature_id);
+create index feature_genotype_idx2 on feature_genotype (genotype_id);
+
 
 -- ================================================
 -- TABLE: phenotype
@@ -43,10 +46,13 @@ create table phenotype (
        foreign key (pub_id) references pub (pub_id),
 -- Do we want to call this simply genotype_id to allow natural joins?
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+       foreign key (background_genotype_id) references genotype (genotype_id)
 );
+create index phenotype_idx1 on phenotype (statement_type);
+create index phenotype_idx2 on phenotype (pub_id);
+create index phenotype_idx3 on phenotype (background_genotype_id);
+
+
 -- ================================================
 -- TABLE: feature_phenotype
 -- ================================================
@@ -56,9 +62,12 @@ create table feature_phenotype (
        foreign key (feature_id) references feature (feature_id),
        phenotype_id int not null,
        foreign key (phenotype_id) references phenotype (phenotype_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(feature_id,phenotype_id)       
 );
+create index feature_phenotype_idx1 on feature_phenotype (feature_id);
+create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
+
 
 -- ================================================
 -- TABLE: phenoype_cvterm
@@ -70,9 +79,11 @@ create table phenotype_cvterm (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
        prank int not null,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(phenotype_id,cvterm_id,prank)
 );
+create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
+create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
 
 
 -- ================================================
@@ -89,10 +100,11 @@ create table interaction (
        background_genotype_id int,
        foreign key (background_genotype_id) references genotype (genotype_id),
        phenotype_id int,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+       foreign key (phenotype_id) references phenotype (phenotype_id)
 );
+create index interaction_idx1 on interaction (pub_id);
+create index interaction_idx2 on interaction (background_genotype_id);
+create index interaction_idx3 on interaction (phenotype_id);
 
 
 -- ================================================
@@ -104,9 +116,11 @@ create table interaction_subj (
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,
        foreign key (interaction_id) references interaction (interaction_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(feature_id,interaction_id)
 );
+create index interaction_subj_idx1 on interaction_subj (feature_id);
+create index interaction_subj_idx2 on interaction_subj (interaction_id);
 
 
 -- ================================================
@@ -118,7 +132,8 @@ create table interaction_obj (
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,
        foreign key (interaction_id) references interaction (interaction_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
-);
 
+       unique(feature_id,interaction_id)
+);
+create index interaction_obj_idx1 on interaction_obj (feature_id);
+create index interaction_obj_idx2 on interaction_obj (interaction_id);

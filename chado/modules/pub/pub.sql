@@ -19,6 +19,7 @@ create table pub (
        pyear  varchar(255),
 -- page number range[s], eg, 457--459, viii + 664pp, lv--lvii
        pages  varchar(255),
+       miniref varchar(255) not null,
 -- the type of the publication (book, journal, poem, graffiti, etc)
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
@@ -26,9 +27,10 @@ create table pub (
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(miniref)
 );
+create index pub_idx1 on pub (type_id);
 
 -- ================================================
 -- TABLE: pub_relationship
@@ -46,11 +48,13 @@ create table pub_relationship (
        foreign key (obj_pub_id) references pub (pub_id),
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(subj_pub_id, obj_pub_id, type_id)
 );
+create index pub_relationship_idx1 on pub_relationship (subj_pub_id);
+create index pub_relationship_idx2 on pub_relationship (obj_pub_id);
+create index pub_relationship_idx3 on pub_relationship (type_id);
+
 
 -- ================================================
 -- TABLE: pub_dbxref
@@ -61,15 +65,13 @@ create table pub_relationship (
 create table pub_dbxref (
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       dbxrefstr varchar(255) not null,
-       foreign key (dbxrefstr) references dbxref (dbxrefstr),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
 
-       unique(pub_id,dbxrefstr)
+       unique(pub_id,dbxref_id)
 );
-
-create index pub_dbxref_ind1 on pub_dbxref (dbxrefstr);
+create index pub_dbxref_idx1 on pub_dbxref (pub_id);
+create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 
 
 -- ================================================
@@ -86,9 +88,10 @@ create table author (
        givennames varchar(255),
 -- Jr., Sr., etc       
        suffix varchar(255),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(surname,givennames,suffix)
 );
+
 
 -- ================================================
 -- TABLE: pub_author
@@ -103,9 +106,12 @@ create table pub_author (
        arank int not null,
 -- indicates whether the author is an editor for linked publication
        editor boolean default 'false',
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+
+       unique(author_id,pub_id)
 );
+create index pub_author_idx1 on pub_author (author_id);
+create index pub_author_idx2 on pub_author (pub_id);
+
 
 -- ================================================
 -- TABLE: pubprop
@@ -118,9 +124,9 @@ create table pubprop (
        foreign key (pkey_id) references cvterm (cvterm_id),
        pval text not null,
        prank integer,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(pub_id,pkey_id,pval)
 );
+create index pubprop_idx1 on pubprop (pub_id);
+create index pubprop_idx2 on pubprop (pkey_id);
 

@@ -5,26 +5,29 @@
 create table feature (
        feature_id serial not null,
        primary key (feature_id),
-
--- dbxrefstr uniquely identifies editable features
-       dbxrefstr varchar(255),
--- dbxref_id is replaced by dbxrefstr
---       dbxref_id int,
---       foreign key (dbxref_id) references dbxref (dbxref_id),
-       
+-- dbxref_id here is intended for the primary dbxref for this feature.   
+-- Additional dbxref links are made via feature_dbxref
+       dbxref_id int,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id),
+-- the human-readable common name for a feature, for display
        name varchar(255),
+-- the unique name for a feature; may not be particularly human-readable
+       uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
-       type_id int,
+       type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
-       unique(dbxrefstr)
+       unique(organism_id,uniquename)
 );
-
 create index feature_name_ind1 on feature(name);
+create index feature_idx1 on feature (dbxref_id);
+create index feature_idx2 on feature (organism_id);
+create index feature_idx3 on feature (type_id);
+
 
 -- ================================================
 -- TABLE: featureloc
@@ -108,13 +111,11 @@ create table featureloc (
        locgroup int not null default 0,
        rank     int not null default 0,
 
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
-
---       unique (feature_id, srcfeature_id),
---       unique (feature_id, locgroup, rank)
+       unique (feature_id, locgroup, rank)
 );
-
+create index featureloc_idx1 on featureloc (feature_id);
+create index featureloc_idx2 on featureloc (srcfeature_id);
+create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
 
 -- ================================================
 -- TABLE: feature_pub
@@ -125,11 +126,11 @@ create table feature_pub (
        foreign key (feature_id) references feature (feature_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(feature_id, pub_id)
 );
+create index feature_pub_idx1 on feature_pub (feature_id);
+create index feature_pub_idx2 on feature_pub (pub_id);
 
 
 -- ================================================
@@ -145,14 +146,11 @@ create table featureprop (
        foreign key (pkey_id) references cvterm (cvterm_id),
        pval text not null default '',
        prank integer,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(feature_id, pkey_id, pval, prank)
 );
--- feature_prop_id allows us to link a featureprop record to a publication
--- ARE WE BEING CONSISTENT IN HOW WE LINK PROPERTIES TO PUBLICATIONS?  LOOK
--- AT ALL OTHER PROPERTY TABLES!!!
+create index featureprop_idx1 on featureprop (feature_id);
+create index featureprop_idx2 on featureprop (pkey_id);
 
 
 -- ================================================
@@ -164,50 +162,36 @@ create table featureprop_pub (
        foreign key (featureprop_id) references featureprop (featureprop_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(featureprop_id, pub_id)
 );
+create index featureprop_pub_idx1 on featureprop_pub (featureprop_id);
+create index featureprop_pub_idx2 on featureprop_pub (pub_id);
+
 
 -- ================================================
 -- TABLE: feature_dbxref
 -- ================================================
-
+-- links a feature to dbxrefs.  Note that there is also feature.dbxref_id
+-- link for the primary dbxref link.
 create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
-       dbxrefstr varchar(255),
-       foreign key (dbxrefstr) references dbxref (dbxrefstr),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
+       dbxref_id varchar(255),
+       foreign key (dbxref_id) references dbxref (dbxref_id),
+       is_current boolean not null default 'true',
 
-       unique(feature_dbxref_id, dbxrefstr)
+       unique(feature_id, dbxref_id)
 );
--- each feature can be linked to multiple external dbs
+create index feature_dbxref_idx1 on feature_dbxref (feature_id);
+create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
 
 
 -- ================================================
 -- TABLE: feature_relationship
 -- ================================================
-
-create table feature_relationship (
-       feature_relationship_id serial not null,
-       primary key (feature_relationship_id),
-       subjfeature_id int not null,
-       foreign key (subjfeature_id) references feature (feature_id),
-       objfeature_id int not null,
-       foreign key (objfeature_id) references feature (feature_id),
-       type_id int,
-       foreign key (type_id) references cvterm (cvterm_id),
-       relrank int,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
-
-       unique(subjfeature_id, objfeature_id, type_id)
-);
 
 -- features can be arranged in graphs, eg exon partof transcript 
 -- partof gene; translation madeby transcript
@@ -219,6 +203,24 @@ create table feature_relationship (
 -- most of the time we can order things implicitly by sequence
 -- coordinates, we can't always do this - eg transpliced genes.
 -- it's also useful for quickly getting implicit introns
+
+create table feature_relationship (
+       feature_relationship_id serial not null,
+       primary key (feature_relationship_id),
+       subjfeature_id int not null,
+       foreign key (subjfeature_id) references feature (feature_id),
+       objfeature_id int not null,
+       foreign key (objfeature_id) references feature (feature_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       relrank int,
+
+       unique(subjfeature_id, objfeature_id, type_id)
+);
+create index feature_relationship_idx1 on feature_relationship (subjfeature_id);
+create index feature_relationship_idx2 on feature_relationship (objfeature_id);
+create index feature_relationship_idx3 on feature_relationship (type_id);
+
 
 -- ================================================
 -- TABLE: feature_cvterm
@@ -233,24 +235,13 @@ create table feature_cvterm (
        foreign key (cvterm_id) references cvterm (cvterm_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(feature_id, cvterm_id, pub_id)
 );
+create index feature_cvterm_idx1 on feature_cvterm (feature_id);
+create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
+create index feature_cvterm_idx3 on feature_cvterm (pub_id);
 
--- ================================================
--- TABLE: feature_organism
--- ================================================
-
-create table feature_organism (
-       feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
-       organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
-);
 
 -- ================================================
 -- TABLE: synonym
@@ -262,12 +253,14 @@ create table synonym (
        synonym varchar(255) not null,
 -- types would be symbol and fullname for now
        type_id int not null,
+-- sgml-ized version of symbols
+       synonym_sgml varchar(255) not null,
        foreign key (type_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(synonym)
 );
+create index synonym_idx1 on synonym (type_id);
+
 
 -- ================================================
 -- TABLE: feature_synonym
@@ -278,6 +271,8 @@ create table feature_synonym (
        foreign key (synonym_id) references synonym (synonym_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
+-- the pub_id link is for relating the usage of a given synonym to the
+-- publication in which it was used
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
 -- the is_current bit indicates whether the linked synonym is the 
@@ -292,11 +287,13 @@ create table feature_synonym (
 -- synonym is "internal" and should be queryable but should not be listed 
 -- in reports as a valid synonym.
        is_internal boolean not null default 'false',
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(synonym_id, feature_id, pub_id)
 );
+create index feature_synonym_idx1 on feature_synonym (synonym_id);
+create index feature_synonym_idx2 on feature_synonym (feature_id);
+create index feature_synonym_idx3 on feature_synonym (pub_id);
+
 
 -- ================================================
 -- TABLE: synonym_pub
@@ -307,9 +304,8 @@ create table synonym_pub (
        foreign key (synonym_id) references synonym (synonym_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(synonym_id, pub_id)
 );
-
+create index synonym_pub_idx1 on synonym_pub (synonym_id);
+create index synonym_pub_idx2 on synonym_pub (pub_id);

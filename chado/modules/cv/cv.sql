@@ -1,4 +1,17 @@
 -- The cvterm module design is based on the ontology 
+
+-- ================================================
+-- TABLE: cv
+-- ================================================
+
+create table cv (
+       cv_id serial not null,
+       cvname varchar not null,
+       cvdefinition text,
+
+       unique(cvname)
+);
+
 -- ================================================
 -- TABLE: cvterm
 -- ================================================
@@ -6,18 +19,20 @@
 create table cvterm (
        cvterm_id serial not null,
        primary key (cvterm_id),
+       cv_id int not null,
+       foreign key (cv_id) references cv (cv_id),
        termname varchar(255) not null,
        termdefinition text,
-       termtype_id int,
-       foreign key (termtype_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
+-- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
+       dbxref_id int,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
 
-       unique(termname, termtype_id)
--- Its important to use termtype_id properly.  It is *NOT* used for 
--- handling, eg, parent - child relationships.  The unique key on
--- termname, termtype_id ensures that all terms are unique in a given cv
+       unique(termname, cv_id)
+-- The unique key on termname, termtype_id ensures that all terms are 
+-- unique within a given cv
 );
+create index cvterm_idx1 on cvterm (cv_id);
+
 
 -- ================================================
 -- TABLE: cvrelationship
@@ -32,11 +47,14 @@ create table cvrelationship (
        foreign key (subjterm_id) references cvterm (cvterm_id),
        objterm_id int not null,
        foreign key (objterm_id) references cvterm (cvterm_id),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(reltype_id, subjterm_id, objterm_id)
 );
+create index cvrelationship_idx1 on cvrelationship (reltype_id);
+create index cvrelationship_idx2 on cvrelationship (subjterm_id);
+create index cvrelationship_idx3 on cvrelationship (objterm_id);
+
+
 -- ================================================
 -- TABLE: cvpath
 -- ================================================
@@ -50,14 +68,16 @@ create table cvpath (
        foreign key (subjterm_id) references cvterm (cvterm_id),
        objterm_id int not null,
        foreign key (objterm_id) references cvterm (cvterm_id),
-       termtype_id int not null,
-       foreign key (termtype_id) references cvterm (cvterm_id),
+       cv_id int not null,
+       foreign key (cv_id) references cv (cv_id),
        pathdistance int,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique (subjterm_id, objterm_id)
 );
+create index cvpath_idx1 on cvpath (reltype_id);
+create index cvpath_idx2 on cvpath (subjterm_id);
+create index cvpath_idx3 on cvpath (objterm_id);
+create index cvpath_idx4 on cvpath (cv_id);
 
 
 -- ================================================
@@ -68,11 +88,10 @@ create table cvterm_synonym (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
        termsynonym varchar(255) not null,
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
 
        unique(cvterm_id, termsynonym)
 );
+create index cvterm_synonym_idx1 on cvterm_synonym (cvterm_id);
 
 
 -- ================================================
@@ -82,17 +101,11 @@ create table cvterm_synonym (
 create table cvterm_dbxref (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
-       dbxrefstr varchar(255) not null,
-       foreign key (dbxrefstr) references dbxref (dbxrefstr),
-       timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
+       dbxref_id varchar(255) not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id),
 
-       unique(cvterm_id, dbxrefstr)
+       unique(cvterm_id, dbxref_id)
 );
-
--- references from other modules:
---	      sequence: feature_cvterm
-
-
-
+create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
+create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
 
