@@ -14,8 +14,12 @@ use strict;
 use re 'taint';
 use Config;
 use Cwd;
-use XML::Simple;
+use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
+use XML::Simple;
+
+use lib 'lib';
+use Chado::Config;
 
 my %args    =  (
   DBDRIVER  => {
@@ -113,42 +117,21 @@ mkdir $lib_dir   unless -d $lib_dir;
 mkdir $chado_dir unless -d $chado_dir;
 
 #
-# Look for load config file from a previous run ...
+# If no config file, copy the template (if available).
 #
-my $load_conf;
-if ( -e $config_file ) {
-  open CONF, "<$config_file" or die "Can't read file '$config_file': $!\n";
-  local $/;
-  $load_conf = <CONF>;
-  close CONF or die "Can't close file '$config_file': $!\n";
-}
-#
-# Or the template to create a new one.
-#
-else {
+unless ( -e $config_file ) {
   my $config_template = catfile( $working_dir, 'load', 'tt2', 'load.conf.tt2' );
-  if ( open CONF, "<$config_template" ) {
-    local $/;
-    $load_conf = <CONF>;
-    close CONF or die "Can't close '$config_template': $!\n";
-  }
-  else {
-    warn "Can't read config template '$config_template': $!\n";
-  }
+  copy( $config_template, $config_file ) if -e $config_template;
 }
 
 #
-# If there is a configuration, read it in.
+# If the config file is there, parse it when Chado::Config.
 #
-my $conf = $load_conf 
-  ? XMLin( 
-    $load_conf, 
-    ForceArray => [ qw( token path file ) ],
-    KeyAttr    => [ qw( tt2 input token name file ) ],
-    ContentKey => '-value',
-  )
-  : {}
-;
+my $conf = {};
+if ( -e $config_file ) {
+    my $cc = Chado::Config->new( filename => $config_file );
+    $conf  = $cc->config;
+}
 
 #
 # Now figure out where the values are coming from -- load.conf, 
@@ -157,7 +140,7 @@ my $conf = $load_conf
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
   $SQLFILES, $EXTERNAL_DDL );
 
-unless ( @argv ) {
+if ( ! @argv && $conf->{'database'} ) {
   my $answer = prompt(
     "Previous configuration detected.\nUse values in '$config_file'?", 'Y'
   );
