@@ -9,7 +9,8 @@ all :: audit/audit.mysql \
        map/map.mysql \
        organism/organism.mysql \
        pub/pub.mysql \
-       sequence/sequence.mysql
+       sequence/sequence.mysql \
+       www/www.mysql
 
 %.mysql: %.sql
 	./bin/pg2my.pl $< > $@
