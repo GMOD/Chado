@@ -4,6 +4,7 @@ use strict;
 use lib 'lib';
 use DBI;
 use Data::Dumper;
+use Chado::LoadDBI;
 use Chado::AutoDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
@@ -24,18 +25,13 @@ use constant DEBUG=>0;
 # INITIALIZATION
 #######################################
 
-#perl pgload_so2.pl user dbname SODA.ontology SODA.defs
-my ($user, $dbname, $ontology_file, $ontology_deffile) = @ARGV;
+#perl load_ontology.pl SODA.ontology SODA.defs
+my ($ontology_file, $ontology_deffile) = @ARGV;
 
 #allow non-existant defsfile for this one
-die "USAGE: $0 <username> <dbname> <dagedit file> (defs file)" unless $user and $dbname and $ontology_file;
+die "USAGE: $0 <dagedit file> [<defs file>]" unless $ontology_file;
 
-Chado::DBI->set_db('Main',
-		   "dbi:Pg:dbname=$dbname",
-		   "$user",
-		   "",
-		   {AutoCommit => 1}
-		  ) or die "set_db failed";
+Chado::LoadDBI->init();
 
 #######################################
 # SET UP GLOBAL VARS
@@ -331,10 +327,10 @@ load_ontology.pl - load DAG-Edit or simple indented hierarchy ontology files int
 =head1 SYNOPSIS
 
 #with a definitions file...
-/usr/bin/perl load_ontology.pl $USER database_name SODA.ontology SODA.defs
+/usr/bin/perl load_ontology.pl SODA.ontology SODA.defs
 
 #...and without
-/usr/bin/perl load_ontology.pl $USER database_name cell.ontology
+/usr/bin/perl load_ontology.pl cell.ontology
 
 =head1 DESCRIPTION
 
