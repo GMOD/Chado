@@ -122,7 +122,7 @@ create index array_idx4 on array (protocol_id);
 create index array_idx5 on array (dbxref_id);
 
 create table arrayprop (
-    arrayprop_id int not null,
+    arrayprop_id serial not null,
 	primary key (arrayprop_id),
     array_id int not null,
 	foreign key (array_id) references array (array_id) on delete cascade,
