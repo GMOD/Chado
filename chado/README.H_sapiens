@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.6 2003-12-24 07:29:08 allenday Exp $
+$Id: README.H_sapiens,v 1.7 2004-01-03 04:59:32 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -66,7 +66,7 @@ to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
 
 Now load the GFF file as:
 
-  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile Hg16.knownGene.gff
+  ./load/bin/gmod_load_gff3.pl --organism Human --srcdb 'DB:ucsc' --cache 10000 --gfffile Hg16.knownGene.gff
 
 This will take several hours to complete.
 
