@@ -1,0 +1,1900 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- created by Pinglei Zhou, Flybase Harvard University -->
+
+<chado >
+     <feature id="feature_2779466">
+.            
+            <feature_relationship id="feature_relationship_1490121">
+                   <subjfeature_id>
+                          <feature id="feature_2779467">
+                                 <timeaccessioned>2002-03-04 11:45:41</timeaccessioned>
+                                 <name>CG13339-RA</name>
+                                 <residues>ATTGTTTTTATATTCAAAACGCAAAAACATGGCAGAAACCACTGGTGTGCAAATAAAACTGGAACAGCAAAACATCAAGGAGCGCCTGAATCTGCACGTCAAGCGGCGCCTGCAGCAGGATGCGGATAATCCCGCCGAGAGTCCCGAATTGCTGCCCACCGATGCGAATGCCAAGCGCAGCAAGACGAAAGATGTCTCAAAACCAAGAAAACCCTACCAAAAACGGACAGAAAAACCGAAAACAGAGGCGACCAAGTGCAAGAAAGTTGGACAATTGGGCAGTCCGGCGGGTGAAGTGGATCCAATGGATGACCAGGAGACGGAAGGCTTTTCCCCGGAGGCGCCGGATGGCAAATCCGCCAGACGGGATTGCTGCAAAAATGCCGACATCCTCAACATAGTTTTGAACGCTAAGAAACGTAGTTTAATGCAGGATCCTGAAGTTCAGGCCTTCTGGACCGAAATAACCAATTGCATAAAGGGCTGAAAGCTTAACTGATCATAAGGGTCATTAGATCATAAGGAAATATTGTTGATGTTCGGGATATTTGTTATATGAACAACATTAAATATCTAATATTAGGGCTGTTGTACAAATATGTAAATAAAATAAAATAAGTGTTAATCCAAAAA</residues>
+                                 <timelastmodified>2003-04-13 08:35:13.12345</timelastmodified>
+                                 <dbxref_id>
+                                        <dbxref id="dbxref_249821">
+                                               <accession>CG13339-RA</accession>
+                                               <dbname>Gadfly</dbname>
+                                        </dbxref>
+                                 </dbxref_id>
+                                 <uniquename>CG13339-RA</uniquename>
+                                 <seqlen>686</seqlen>
+                                 <md5checksum>90ccd596644163d1f0ca3613562f38d8</md5checksum>
+                                 <organism_id>
+                                        <organism id="organism_1">
+                                               <genus>Drosophila</genus>
+                                               <taxgroup>drosophilid</taxgroup>
+                                               <species>melanogaster</species>
+                                        </organism>
+                                 </organism_id>
+                                 <type_id>
+                                        <cvterm id="cvterm_4">
+                                               <name>mRNA</name>
+                                               <cv_id>
+                                                      <cv id="cv_1">
+                                                             <cvname>SO</cvname>
+                                                      </cv>
+                                               </cv_id>
+                                        </cvterm>
+                                 </type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490122">
+                                        <subjfeature_id>
+                                               <feature id="feature_2779468">
+                                                      <timeaccessioned>2003-04-13 08:35:13</timeaccessioned>
+                                                      <name>CG13339:1</name>
+                                                      <timelastmodified>2003-04-13 08:35:13.177332</timelastmodified>
+                                                      <dbxref_id>
+                                                             <dbxref id="dbxref_249822">
+                                                                    <accession>CG13339:1</accession>
+                                                                    <dbname>Gadfly</dbname>
+                                                             </dbxref>
+                                                      </dbxref_id>
+                                                      <uniquename>CG13339:1</uniquename>
+                                                      <seqlen>266</seqlen>
+                                                      <md5checksum>                                </md5checksum>
+                                                      <organism_id>organism_1</organism_id>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_15">
+                                                                    <name>exon</name>
+                                                                    <cv_id>cv_1</cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <feature_dbxref id="feature_dbxref_254141">
+                                                             <is_current>1</is_current>
+                                                             <dbxref_id>dbxref_249822</dbxref_id>
+                                                      </feature_dbxref>
+.                                                      
+                                                      <featureloc id="featureloc_2802657">
+                                                             <srcfeature_id>
+                                                                    <feature id="feature_2">
+                                                                           <uniquename>2R</uniquename>
+                                                                           <organism_id>organism_1</organism_id>
+                                                                    </feature>
+                                                             </srcfeature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>8889605</nbeg>
+                                                             <rank>0</rank>
+                                                             <min>8889605</min>
+                                                             <nend>8889871</nend>
+                                                             <max>8889871</max>
+                                                      </featureloc>
+.                                                      
+                                               </feature>
+                                        </subjfeature_id>
+                                        <type_id>
+                                               <cvterm id="cvterm_56">
+                                                      <name>producedby</name>
+                                                      <cv_id>
+                                                             <cv id="cv_5">
+                                                                    <cvname>relationship type</cvname>
+                                                             </cv>
+                                                      </cv_id>
+                                               </cvterm>
+                                        </type_id>
+                                 </feature_relationship>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490123">
+                                        <subjfeature_id>
+                                               <feature id="feature_2779469">
+                                                      <timeaccessioned>2003-04-13 08:35:13</timeaccessioned>
+                                                      <name>CG13339:2</name>
+                                                      <timelastmodified>2003-04-13 08:35:13.204929</timelastmodified>
+                                                      <dbxref_id>
+                                                             <dbxref id="dbxref_249823">
+                                                                    <accession>CG13339:2</accession>
+                                                                    <dbname>Gadfly</dbname>
+                                                             </dbxref>
+                                                      </dbxref_id>
+                                                      <uniquename>CG13339:2</uniquename>
+                                                      <seqlen>367</seqlen>
+                                                      <md5checksum>                                </md5checksum>
+                                                      <organism_id>organism_1</organism_id>
+                                                      <type_id>cvterm_15</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <feature_dbxref id="feature_dbxref_254142">
+                                                             <is_current>1</is_current>
+                                                             <dbxref_id>dbxref_249823</dbxref_id>
+                                                      </feature_dbxref>
+.                                                      
+                                                      <featureloc id="featureloc_2802658">
+                                                             <srcfeature_id>feature_2</srcfeature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>8889924</nbeg>
+                                                             <rank>0</rank>
+                                                             <min>8889924</min>
+                                                             <nend>8890291</nend>
+                                                             <max>8890291</max>
+                                                      </featureloc>
+.                                                      
+                                               </feature>
+                                        </subjfeature_id>
+                                        <type_id>cvterm_56</type_id>
+                                 </feature_relationship>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490124">
+                                        <subjfeature_id>
+                                               <feature id="feature_2779470">
+                                                      <timeaccessioned>2003-04-13 08:35:13</timeaccessioned>
+                                                      <name>CG13339-PA</name>
+                                                      <residues>MAETTGVQIKLEQQNIKERLNLHVKRRLQQDADNPAESPELLPTDANAKRSKTKDVSKPRKPYQKRTEKPKTEATKCKKVGQLGSPAGEVDPMDDQETEGFSPEAPDGKSARRDCCKNADILNIVLNAKKRSLMQDPEVQAFWTEITNCIKG</residues>
+                                                      <timelastmodified>2003-04-13 08:35:13.237961</timelastmodified>
+                                                      <dbxref_id>
+                                                             <dbxref id="dbxref_249824">
+                                                                    <accession>CG13339-PA</accession>
+                                                                    <dbname>Gadfly</dbname>
+                                                             </dbxref>
+                                                      </dbxref_id>
+                                                      <uniquename>CG13339-PA</uniquename>
+                                                      <seqlen>152</seqlen>
+                                                      <md5checksum>567b563c858a6cc98bf828111b18837f</md5checksum>
+                                                      <organism_id>organism_1</organism_id>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_18">
+                                                                    <name>protein</name>
+                                                                    <cv_id>cv_1</cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <feature_dbxref id="feature_dbxref_254143">
+                                                             <is_current>1</is_current>
+                                                             <dbxref_id>dbxref_249824</dbxref_id>
+                                                      </feature_dbxref>
+.                                                      
+                                                      <featureloc id="featureloc_2802659">
+                                                             <srcfeature_id>feature_2</srcfeature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>8889633</nbeg>
+                                                             <rank>0</rank>
+                                                             <min>8889633</min>
+                                                             <nend>8890143</nend>
+                                                             <max>8890143</max>
+                                                      </featureloc>
+.                                                      
+                                               </feature>
+                                        </subjfeature_id>
+                                        <type_id>cvterm_56</type_id>
+                                 </feature_relationship>
+.                                 
+                                 <feature_dbxref id="feature_dbxref_254140">
+                                        <is_current>1</is_current>
+                                        <dbxref_id>dbxref_249821</dbxref_id>
+                                 </feature_dbxref>
+.                                 
+                                 <feature_synonym id="feature_synonym_39331">
+                                        <is_internal>0</is_internal>
+                                        <synonym_id>
+                                               <synonym id="synonym_39331">
+                                                      <name>CG13339-RA</name>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_59">
+                                                                    <name>synonym</name>
+                                                                    <cv_id>
+                                                                           <cv id="cv_6">
+                                                                                  <cvname>synonym type</cvname>
+                                                                           </cv>
+                                                                    </cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                               </synonym>
+                                        </synonym_id>
+                                        <pub_id>
+                                               <pub id="pub_1">
+                                                      <miniref>gadfly3</miniref>
+                                               </pub>
+                                        </pub_id>
+                                        <is_current>0</is_current>
+                                 </feature_synonym>
+.                                 
+                                 <featureloc id="featureloc_2802656">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <locgroup>0</locgroup>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <strand>1</strand>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <nbeg>8889605</nbeg>
+                                        <rank>0</rank>
+                                        <min>8889605</min>
+                                        <nend>8890291</nend>
+                                        <max>8890291</max>
+                                 </featureloc>
+.                                 
+                                 <featureprop id="featureprop_606179">
+                                        <pval>AAF58333</pval>
+                                        <prank>0</prank>
+                                        <pkey_id>
+                                               <cvterm id="cvterm_44">
+                                                      <name>protein_id</name>
+                                                      <cv_id>
+                                                             <cv id="cv_3">
+                                                                    <cvname>property type</cvname>
+                                                             </cv>
+                                                      </cv_id>
+                                               </cvterm>
+                                        </pkey_id>
+                                 </featureprop>
+.                                 
+                                 <featureprop id="featureprop_606181">
+                                        <pval>all done</pval>
+                                        <prank>0</prank>
+                                        <pkey_id>
+                                               <cvterm id="cvterm_48">
+                                                      <name>status</name>
+                                                      <cv_id>cv_3</cv_id>
+                                               </cvterm>
+                                        </pkey_id>
+                                 </featureprop>
+.                                 
+                                 <featureprop id="featureprop_606180">
+                                        <pval>Perfect match to HYPO SP record with corresponding FBgn</pval>
+                                        <prank>0</prank>
+                                        <pkey_id>
+                                               <cvterm id="cvterm_46">
+                                                      <name>sp_comment</name>
+                                                      <cv_id>cv_3</cv_id>
+                                               </cvterm>
+                                        </pkey_id>
+                                 </featureprop>
+.                                 
+                                 <featureprop id="featureprop_606182">
+                                        <pval>mhuang</pval>
+                                        <prank>0</prank>
+                                        <pkey_id>
+                                               <cvterm id="cvterm_42">
+                                                      <name>owner</name>
+                                                      <cv_id>cv_3</cv_id>
+                                               </cvterm>
+                                        </pkey_id>
+                                 </featureprop>
+                          </feature>
+                   </subjfeature_id>
+                   <type_id>
+                          <cvterm id="cvterm_58">
+                                 <name>partof</name>
+                                 <cv_id>cv_5</cv_id>
+                          </cvterm>
+                   </type_id>
+            </feature_relationship>
+.            
+            <feature_evidence id="feature_evidence_2779466:2780661">
+                   <evidence_id>
+                          <feature id="feature_2780661">
+                                 <timeaccessioned>2003-04-13 08:35:51</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:51.835622</timelastmodified>
+                                 <uniquename>NULL:2170880</uniquename>
+                                 <seqlen>237</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>
+                                        <organism id="organism_2">
+                                               <genus>Computational</genus>
+                                               <taxgroup>bogus</taxgroup>
+                                               <species>result</species>
+                                        </organism>
+                                 </organism_id>
+                                 <type_id>
+                                        <cvterm id="cvterm_14">
+                                               <name>alignment_hsp</name>
+                                               <cv_id>cv_1</cv_id>
+                                        </cvterm>
+                                 </type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2803923">
+                                        <srcfeature_id>
+                                               <feature id="feature_2780660">
+                                                      <timeaccessioned>2003-04-13 08:35:51</timeaccessioned>
+                                                      <name>CT32659</name>
+                                                      <residues>ATGGCAGAAACCACTGGTGTGCAAATAAAACTGGAACAGCAAAACATCAAGGAGCGCCTGAATCTGCACGTCAAGCGGCGCCTGCAGCAGGATGCGGATAATCCCGCCGAGAGTCCCGAATTGCTGCCCACCGATGCGAATGCCAAGCGCAGCAAGACGAAAGATGTCTCAAAACCAAGAAAACCCTACCAAAAACGGACAGAAAAACCGAAAACAGAGGCGACCAAGTGCAAGAAAGTTGGACAATTGGGCAGTCCGGCGGGTGAAGTGGATCCAATGGATGACCAGGAGACGGAAGGCTTTTCCCCGGAGGCGCCGGATGGCAAATCCGCCAGACGGGATTGCTGCAAAAATGCCGACATCCTCAACATAGTTTTGAACGCTAAGAAACGTAGTTTAATGCAGGATCCTGAAGTTCAGGCCTTCTGGACCGAAATAACCAATTGCATAAAGGGCTGA</residues>
+                                                      <timelastmodified>2003-04-13 08:35:51.7941</timelastmodified>
+                                                      <uniquename>CT32659</uniquename>
+                                                      <seqlen>459</seqlen>
+                                                      <md5checksum>98e688f9e462a075ff575a49e8dee2a2</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_17">
+                                                                    <name>processed_transcript</name>
+                                                                    <cv_id>cv_1</cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <feature_dbxref id="feature_dbxref_254314">
+                                                             <is_current>1</is_current>
+                                                             <dbxref_id>
+                                                                    <dbxref id="dbxref_249965">
+                                                                           <accession>FBgn0033871</accession>
+                                                                           <dbname>FB</dbname>
+                                                                    </dbxref>
+                                                             </dbxref_id>
+                                                      </feature_dbxref>
+.                                                      
+.                                                      
+                                                      <featureloc id="featureloc_2803925">
+                                                             <feature_id>
+                                                                    <feature id="feature_2780662">
+                                                                           <uniquename>NULL:2170881</uniquename>
+                                                                           <organism_id>organism_2</organism_id>
+                                                                    </feature>
+                                                             </feature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>238</nbeg>
+                                                             <rank>1</rank>
+                                                             <min>238</min>
+                                                             <nend>459</nend>
+                                                             <max>459</max>
+                                                      </featureloc>
+.                                                      
+                                                      <featureprop id="featureprop_606468">
+                                                             <pval>CG13339|FBgn0033871|CT32659|FBan0013339 GO:[]  located on: 2R 50C12-50C12; |cDNA sequence</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>
+                                                                    <cvterm id="cvterm_38">
+                                                                           <name>description</name>
+                                                                           <cv_id>cv_3</cv_id>
+                                                                    </cvterm>
+                                                             </pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>238</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2803922">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889871</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889633</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170880">
+                                        <analysis_id>
+                                               <analysis id="analysis_16">
+                                                      <program>sim4</program>
+                                                      <sourcename>na_gadfly.dros.RELEASE2</sourcename>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490853">
+                                        <objfeature_id>
+                                               <feature id="feature_2780659">
+                                                      <uniquename>NULL:2170879</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781529">
+                   <evidence_id>
+                          <feature id="feature_2781529">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.899793</timelastmodified>
+                                 <uniquename>NULL:2171579</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804707">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781528">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_292</name>
+                                                      <residues>GATGACCAGGAGACGGAAGGCTTTT</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.8867</timelastmodified>
+                                                      <uniquename>147170_at_292</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>b15ceb64e0a76fd9c5394dd87ab3dd6e</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_27">
+                                                                    <name>oligonucleotide</name>
+                                                                    <cv_id>cv_1</cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606637">
+                                                             <pval>147170_at_292 X=12 Y=405</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804706">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889990</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889965</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171579">
+                                        <analysis_id>
+                                               <analysis id="analysis_18">
+                                                      <program>sim4</program>
+                                                      <sourcename>na_affy_oligo.dros</sourcename>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491245">
+                                        <objfeature_id>
+                                               <feature id="feature_2781527">
+                                                      <uniquename>NULL:2171578</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781511">
+                   <evidence_id>
+                          <feature id="feature_2781511">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.550794</timelastmodified>
+                                 <uniquename>NULL:2171567</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804695">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781510">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_51</name>
+                                                      <residues>GCAAAACATCAAGGAGCGCCTGAAT</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.537623</timelastmodified>
+                                                      <uniquename>147170_at_51</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>de4164a901f9d4b93bc5cdfdd661f312</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606631">
+                                                             <pval>147170_at_51 X=213 Y=367</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804694">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889696</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889671</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171567">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491239">
+                                        <objfeature_id>
+                                               <feature id="feature_2781509">
+                                                      <uniquename>NULL:2171566</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781532">
+                   <evidence_id>
+                          <feature id="feature_2781532">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.950852</timelastmodified>
+                                 <uniquename>NULL:2171581</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804709">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781531">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_325</name>
+                                                      <residues>GCGCCGGATGGCAAATCCGCCAGAC</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.937742</timelastmodified>
+                                                      <uniquename>147170_at_325</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>6006b38d41543990d533abbb3a186df5</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606638">
+                                                             <pval>147170_at_325 X=384 Y=339</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804708">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890023</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889998</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171581">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491246">
+                                        <objfeature_id>
+                                               <feature id="feature_2781530">
+                                                      <uniquename>NULL:2171580</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781514">
+                   <evidence_id>
+                          <feature id="feature_2781514">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.612844</timelastmodified>
+                                 <uniquename>NULL:2171569</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804697">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781513">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_83</name>
+                                                      <residues>TCAAGCGGCGCCTGCAGCAGGATGC</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.599275</timelastmodified>
+                                                      <uniquename>147170_at_83</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>7f5c52e0e9ecca63df5d3006d6f608ca</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606632">
+                                                             <pval>147170_at_83 X=358 Y=561</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804696">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889728</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889703</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171569">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491240">
+                                        <objfeature_id>
+                                               <feature id="feature_2781512">
+                                                      <uniquename>NULL:2171568</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781535">
+                   <evidence_id>
+                          <feature id="feature_2781535">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.002541</timelastmodified>
+                                 <uniquename>NULL:2171583</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804711">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781534">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_328</name>
+                                                      <residues>CCGGATGGCAAATCCGCCAGACGGG</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.989153</timelastmodified>
+                                                      <uniquename>147170_at_328</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>d5d9ac845c571d5b6c11cdc7447b5f12</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606639">
+                                                             <pval>147170_at_328 X=479 Y=299</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804710">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890026</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890001</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171583">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491247">
+                                        <objfeature_id>
+                                               <feature id="feature_2781533">
+                                                      <uniquename>NULL:2171582</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781517">
+                   <evidence_id>
+                          <feature id="feature_2781517">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.663922</timelastmodified>
+                                 <uniquename>NULL:2171571</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804699">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781516">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_102</name>
+                                                      <residues>GGATGCGGATAATCCCGCCGAGAGT</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.650222</timelastmodified>
+                                                      <uniquename>147170_at_102</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>66ae96ee6bc307fd260be5411b78c8dd</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606633">
+                                                             <pval>147170_at_102 X=455 Y=457</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804698">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889747</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889722</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171571">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491241">
+                                        <objfeature_id>
+                                               <feature id="feature_2781515">
+                                                      <uniquename>NULL:2171570</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781538">
+                   <evidence_id>
+                          <feature id="feature_2781538">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.05478</timelastmodified>
+                                 <uniquename>NULL:2171585</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804713">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781537">
+                                                      <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                                      <name>147170_at_341</name>
+                                                      <residues>CCGCCAGACGGGATTGCTGCAAAAA</residues>
+                                                      <timelastmodified>2003-04-13 08:36:19.041701</timelastmodified>
+                                                      <uniquename>147170_at_341</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>d372b66c05c6422def0314e048f565d0</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606640">
+                                                             <pval>147170_at_341 X=408 Y=295</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804712">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890039</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890014</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171585">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491248">
+                                        <objfeature_id>
+                                               <feature id="feature_2781536">
+                                                      <uniquename>NULL:2171584</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781520">
+                   <evidence_id>
+                          <feature id="feature_2781520">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.714208</timelastmodified>
+                                 <uniquename>NULL:2171573</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804701">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781519">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_141</name>
+                                                      <residues>CACCGATGCGAATGCCAAGCGCAGC</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.701441</timelastmodified>
+                                                      <uniquename>147170_at_141</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>376e6d2da76b68fd96fd8baa95acfde5</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606634">
+                                                             <pval>147170_at_141 X=187 Y=193</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804700">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889786</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889761</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171573">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491242">
+                                        <objfeature_id>
+                                               <feature id="feature_2781518">
+                                                      <uniquename>NULL:2171572</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781541">
+                   <evidence_id>
+                          <feature id="feature_2781541">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.105242</timelastmodified>
+                                 <uniquename>NULL:2171587</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804715">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781540">
+                                                      <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                                      <name>147170_at_354</name>
+                                                      <residues>TTGCTGCAAAAATGCCGACATCCTC</residues>
+                                                      <timelastmodified>2003-04-13 08:36:19.092494</timelastmodified>
+                                                      <uniquename>147170_at_354</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>5c1740e55b3422cffb8326312a055756</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606641">
+                                                             <pval>147170_at_354 X=42 Y=611</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804714">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890052</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890027</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171587">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491249">
+                                        <objfeature_id>
+                                               <feature id="feature_2781539">
+                                                      <uniquename>NULL:2171586</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781523">
+                   <evidence_id>
+                          <feature id="feature_2781523">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.794964</timelastmodified>
+                                 <uniquename>NULL:2171575</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804703">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781522">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_157</name>
+                                                      <residues>AAGCGCAGCAAGACGAAAGATGTCT</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.758455</timelastmodified>
+                                                      <uniquename>147170_at_157</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>ef0b25de677ca723495526c51ffbff5c</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606635">
+                                                             <pval>147170_at_157 X=505 Y=149</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804702">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889802</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889777</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171575">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491243">
+                                        <objfeature_id>
+                                               <feature id="feature_2781521">
+                                                      <uniquename>NULL:2171574</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781544">
+                   <evidence_id>
+                          <feature id="feature_2781544">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.157851</timelastmodified>
+                                 <uniquename>NULL:2171589</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804717">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781543">
+                                                      <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                                      <name>147170_at_366</name>
+                                                      <residues>TGCCGACATCCTCAACATAGTTTTG</residues>
+                                                      <timelastmodified>2003-04-13 08:36:19.144935</timelastmodified>
+                                                      <uniquename>147170_at_366</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>bec5861bdb069c2ac3acdb872ff26b4e</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606642">
+                                                             <pval>147170_at_366 X=39 Y=523</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804716">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890064</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890039</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171589">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491250">
+                                        <objfeature_id>
+                                               <feature id="feature_2781542">
+                                                      <uniquename>NULL:2171588</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2780662">
+                   <evidence_id>feature_2780662</evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781547">
+                   <evidence_id>
+                          <feature id="feature_2781547">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.208346</timelastmodified>
+                                 <uniquename>NULL:2171591</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804719">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781546">
+                                                      <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                                      <name>147170_at_380</name>
+                                                      <residues>ACATAGTTTTGAACGCTAAGAAACG</residues>
+                                                      <timelastmodified>2003-04-13 08:36:19.195639</timelastmodified>
+                                                      <uniquename>147170_at_380</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>715a17b9afe43265fdd935e95c5111b4</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606643">
+                                                             <pval>147170_at_380 X=271 Y=115</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804718">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890078</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890053</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171591">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491251">
+                                        <objfeature_id>
+                                               <feature id="feature_2781545">
+                                                      <uniquename>NULL:2171590</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2780227">
+                   <evidence_id>
+                          <feature id="feature_2780227">
+                                 <timeaccessioned>2003-04-13 08:35:38</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:38.0983</timelastmodified>
+                                 <uniquename>NULL:2170512</uniquename>
+                                 <seqlen>312</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2803351">
+                                        <srcfeature_id>
+                                               <feature id="feature_2780225">
+                                                      <timeaccessioned>2003-04-13 08:35:38</timeaccessioned>
+                                                      <name>RE71823.5prime</name>
+                                                      <residues>ATTGTTTTTATATTCAAAACGCAAAAACATGGCAGAAACCACTGGTGTGCAAATAAAACTGGAACAGCAAAACATCAAGGAGCGCCTGAATCTGCACGTCAAGCGGCGCCTGCAGCAGGATGCGGATAATCCCGCCGAGAGTCCCGAATTGCTGCCCACCGATGCGAATGCCAAGCGCAGCAAGACGAAAGATGTCTCAAAACCAAGAAAACCCTACCAAAAACGGACAGAAAAACCGAAAACAGAGGCGACCAAGTGCAAGAAAATTGGACAATTGGGCAGTCCGGCGGGTGAAGTGGATCCAATGGATGACCAGGAGACGGAAGGCTTTTCCCCGGAGGCGCCGGATGGCAAATCCGCCAGACGGGATTGCTGCAAAAATGCCGACATCCTCAACATAGTTTTGAACGCTAAGAAACGTAGTTTAATGCAGGATCCTGAAGTTCAGGCCTTCTGGACCGAAATAACCAATTGCATAAAGGGCTGAAAGCTTAACTGATCATAAGGGTCATTAGATCATAAGGAAATATTGTTGATGTTCGGGATATTTGTTATATGAACAACATTAAATATCTAATA</residues>
+                                                      <timelastmodified>2003-04-13 08:35:38.058028</timelastmodified>
+                                                      <uniquename>RE71823.5prime</uniquename>
+                                                      <seqlen>579</seqlen>
+                                                      <md5checksum>888c3e1da38616ded9c850597d7c7628</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>
+                                                             <cvterm id="cvterm_22">
+                                                                    <name>EST</name>
+                                                                    <cv_id>cv_1</cv_id>
+                                                             </cvterm>
+                                                      </type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <featureloc id="featureloc_2803349">
+                                                             <feature_id>
+                                                                    <feature id="feature_2780226">
+                                                                           <uniquename>NULL:2170511</uniquename>
+                                                                           <organism_id>organism_2</organism_id>
+                                                                    </feature>
+                                                             </feature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>0</nbeg>
+                                                             <rank>1</rank>
+                                                             <min>0</min>
+                                                             <nend>266</nend>
+                                                             <max>266</max>
+                                                      </featureloc>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606402">
+                                                             <pval>RE71823.5prime BI578027 [similar by BLASTN (1.2e-98) to CG13339 &quot;FBan0013339 GO:[]  located on: 2R 50C12-50C12;&quot; 05/18/2001]</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>579</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>266</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2803350">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890237</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889924</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170512">
+                                        <analysis_id>
+                                               <analysis id="analysis_12">
+                                                      <program>sim4</program>
+                                                      <sourcename>na_EST.all_nr.dros</sourcename>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490567">
+                                        <objfeature_id>
+                                               <feature id="feature_2780224">
+                                                      <uniquename>NULL:2170510</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781550">
+                   <evidence_id>
+                          <feature id="feature_2781550">
+                                 <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:19.263923</timelastmodified>
+                                 <uniquename>NULL:2171593</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804721">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781549">
+                                                      <timeaccessioned>2003-04-13 08:36:19</timeaccessioned>
+                                                      <name>147170_at_406</name>
+                                                      <residues>AGTTTAATGCAGGATCCTGAAGTTC</residues>
+                                                      <timelastmodified>2003-04-13 08:36:19.251094</timelastmodified>
+                                                      <uniquename>147170_at_406</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>7f19cd38a854ebb2a9e18c45dc1cc3f2</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606644">
+                                                             <pval>147170_at_406 X=425 Y=61</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804720">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890104</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8890079</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171593">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491252">
+                                        <objfeature_id>
+                                               <feature id="feature_2781548">
+                                                      <uniquename>NULL:2171592</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2780463">
+                   <evidence_id>
+                          <feature id="feature_2780463">
+                                 <timeaccessioned>2003-04-13 08:35:45</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:45.353745</timelastmodified>
+                                 <uniquename>NULL:2170707</uniquename>
+                                 <seqlen>346</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2803639">
+                                        <srcfeature_id>
+                                               <feature id="feature_2780461">
+                                                      <timeaccessioned>2003-04-13 08:35:45</timeaccessioned>
+                                                      <name>RE69336.5prime</name>
+                                                      <residues>ATTGTTTTTATATTCAAAACGCAAAAACATGGCAGAAACCACTGGTGTGCAAATAAAACTGGAACAGCAAAACATCAAGGAGCGCCTGAATCTGCACGTCAAGCGGCGCCTGCAGCAGGATGCGGATAATCCCGCCGAGAGTCCCGAATTGCTGCCCACCGATGCGAATGCCAAGCGCAGCAAGACGAAAGATGTCTCAAAACCAAGAAAACCCTACCAAAAACGGACAGAAAAACCGAAAACAGAGGCGACCAAGTGCAAGAAAATTGGACAATTGGGCAGTCCGGCGGGTGAAGTGGATCCAATGGATGACCAGGAGACGGAAGGCTTTTCCCCGGAGGCGCCGGATGGCAAATCCGCCAGACGGGATTGCTGCAAAAATGCCGACATCCTCAACATAGTTTTGAACGCTAAGAAACGTAGTTTAATGCAGGATCCTGAAGTTCAGGCCTTCTGGACCGAAATAACCAATTGCATAAAGGGCTGAAAGCTTAACTGATCATAAGGGTCATTAGATCATAAGGAAATATTGTTGATGTTCGGGATATTTGTTATATGAACAACATTAAATATCTAATATTAGGGCTGTTGTACAAATATGTAAATAAAATAA</residues>
+                                                      <timelastmodified>2003-04-13 08:35:45.302564</timelastmodified>
+                                                      <uniquename>RE69336.5prime</uniquename>
+                                                      <seqlen>613</seqlen>
+                                                      <md5checksum>aab26597947d747a8971fed380b99e10</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_22</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+                                                      <featureloc id="featureloc_2803637">
+                                                             <feature_id>
+                                                                    <feature id="feature_2780462">
+                                                                           <uniquename>NULL:2170706</uniquename>
+                                                                           <organism_id>organism_2</organism_id>
+                                                                    </feature>
+                                                             </feature_id>
+                                                             <locgroup>0</locgroup>
+                                                             <is_nbeg_partial>0</is_nbeg_partial>
+                                                             <strand>1</strand>
+                                                             <is_nend_partial>0</is_nend_partial>
+                                                             <nbeg>0</nbeg>
+                                                             <rank>1</rank>
+                                                             <min>0</min>
+                                                             <nend>266</nend>
+                                                             <max>266</max>
+                                                      </featureloc>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606443">
+                                                             <pval>RE69336.5prime [similar by BLASTN (1.2e-98) to CG13339 &quot;FBan0013339 GO:[]  located on: 2R 50C12-50C12;&quot; 05/16/2001]</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>613</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>266</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2803638">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8890271</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889924</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170707">
+                                        <analysis_id>
+                                               <analysis id="analysis_13">
+                                                      <program>sim4</program>
+                                                      <sourcename>na_DGC.dros</sourcename>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490711">
+                                        <objfeature_id>
+                                               <feature id="feature_2780460">
+                                                      <uniquename>NULL:2170705</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2781526">
+                   <evidence_id>
+                          <feature id="feature_2781526">
+                                 <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:36:18.846736</timelastmodified>
+                                 <uniquename>NULL:2171577</uniquename>
+                                 <seqlen>24</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_14</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2804705">
+                                        <srcfeature_id>
+                                               <feature id="feature_2781525">
+                                                      <timeaccessioned>2003-04-13 08:36:18</timeaccessioned>
+                                                      <name>147170_at_276</name>
+                                                      <residues>TGAAGTGGATCCAATGGATGACCAG</residues>
+                                                      <timelastmodified>2003-04-13 08:36:18.833923</timelastmodified>
+                                                      <uniquename>147170_at_276</uniquename>
+                                                      <seqlen>25</seqlen>
+                                                      <md5checksum>4656e11a070a88b7d20bdf26e395d12e</md5checksum>
+                                                      <organism_id>organism_2</organism_id>
+                                                      <type_id>cvterm_27</type_id>
+                                                      <is_analysis>0</is_analysis>
+.                                                      
+.                                                      
+                                                      <featureprop id="featureprop_606636">
+                                                             <pval>147170_at_276 X=354 Y=509</pval>
+                                                             <prank>0</prank>
+                                                             <pkey_id>cvterm_38</pkey_id>
+                                                      </featureprop>
+                                               </feature>
+                                        </srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>25</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>1</rank>
+                                        <nbeg>0</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <featureloc id="featureloc_2804704">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <nend>8889974</nend>
+                                        <locgroup>0</locgroup>
+                                        <rank>0</rank>
+                                        <nbeg>8889949</nbeg>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <strand>1</strand>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2171577">
+                                        <analysis_id>analysis_18</analysis_id>
+                                        <rawscore>100</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1491244">
+                                        <objfeature_id>
+                                               <feature id="feature_2781524">
+                                                      <uniquename>NULL:2171576</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2779686">
+                   <evidence_id>
+                          <feature id="feature_2779686">
+                                 <timeaccessioned>2003-04-13 08:35:22</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:22.462765</timelastmodified>
+                                 <uniquename>NULL:2170082</uniquename>
+                                 <seqlen>237</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_15</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2802873">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <locgroup>0</locgroup>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <strand>1</strand>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <nbeg>8889633</nbeg>
+                                        <rank>0</rank>
+                                        <min>8889633</min>
+                                        <nend>8889871</nend>
+                                        <max>8889871</max>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170082">
+                                        <analysis_id>
+                                               <analysis id="analysis_2">
+                                                      <program>genscan</program>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>29.57</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490290">
+                                        <objfeature_id>
+                                               <feature id="feature_2779685">
+                                                      <uniquename>NULL:2170081</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2779773">
+                   <evidence_id>
+                          <feature id="feature_2779773">
+                                 <timeaccessioned>2003-04-13 08:35:24</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:24.941946</timelastmodified>
+                                 <uniquename>NULL:2170169</uniquename>
+                                 <seqlen>237</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_15</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2802941">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <locgroup>0</locgroup>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <strand>1</strand>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <nbeg>8889633</nbeg>
+                                        <rank>0</rank>
+                                        <min>8889633</min>
+                                        <nend>8889871</nend>
+                                        <max>8889871</max>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170169">
+                                        <analysis_id>
+                                               <analysis id="analysis_4">
+                                                      <program>piecegenie</program>
+                                                      <programversion>1.0</programversion>
+                                               </analysis>
+                                        </analysis_id>
+                                        <rawscore>296.78</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490357">
+                                        <objfeature_id>
+                                               <feature id="feature_2779772">
+                                                      <uniquename>NULL:2170168</uniquename>
+                                                      <organism_id>organism_2</organism_id>
+                                               </feature>
+                                        </objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2779774">
+                   <evidence_id>
+                          <feature id="feature_2779774">
+                                 <timeaccessioned>2003-04-13 08:35:24</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:24.964068</timelastmodified>
+                                 <uniquename>NULL:2170170</uniquename>
+                                 <seqlen>220</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_15</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2802942">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <locgroup>0</locgroup>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <strand>1</strand>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <nbeg>8889924</nbeg>
+                                        <rank>0</rank>
+                                        <min>8889924</min>
+                                        <nend>8890145</nend>
+                                        <max>8890145</max>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170170">
+                                        <analysis_id>analysis_4</analysis_id>
+                                        <rawscore>291.24</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490358">
+                                        <objfeature_id>feature_2779772</objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_evidence id="feature_evidence_2779466:2779687">
+                   <evidence_id>
+                          <feature id="feature_2779687">
+                                 <timeaccessioned>2003-04-13 08:35:22</timeaccessioned>
+                                 <timelastmodified>2003-04-13 08:35:22.498451</timelastmodified>
+                                 <uniquename>NULL:2170083</uniquename>
+                                 <seqlen>152</seqlen>
+                                 <md5checksum>                                </md5checksum>
+                                 <organism_id>organism_2</organism_id>
+                                 <type_id>cvterm_15</type_id>
+                                 <is_analysis>0</is_analysis>
+.                                 
+                                 <featureloc id="featureloc_2802874">
+                                        <srcfeature_id>feature_2</srcfeature_id>
+                                        <locgroup>0</locgroup>
+                                        <is_nbeg_partial>0</is_nbeg_partial>
+                                        <strand>1</strand>
+                                        <is_nend_partial>0</is_nend_partial>
+                                        <nbeg>8889924</nbeg>
+                                        <rank>0</rank>
+                                        <min>8889924</min>
+                                        <nend>8890077</nend>
+                                        <max>8890077</max>
+                                 </featureloc>
+.                                 
+                                 <analysisfeature id="analysisfeature_2170083">
+                                        <analysis_id>analysis_2</analysis_id>
+                                        <rawscore>3.54</rawscore>
+                                 </analysisfeature>
+.                                 
+                                 <feature_relationship id="feature_relationship_1490291">
+                                        <objfeature_id>feature_2779685</objfeature_id>
+                                        <type_id>cvterm_58</type_id>
+                                 </feature_relationship>
+                          </feature>
+                   </evidence_id>
+            </feature_evidence>
+.            
+            <feature_dbxref id="feature_dbxref_254138">
+                   <is_current>1</is_current>
+                   <dbxref_id>
+                          <dbxref id="dbxref_249819">
+                                 <accession>FBgn0033871</accession>
+                                 <dbname>FlyBase</dbname>
+                          </dbxref>
+                   </dbxref_id>
+            </feature_dbxref>
+.            
+            <feature_dbxref id="feature_dbxref_254139">
+                   <is_current>1</is_current>
+                   <dbxref_id>
+                          <dbxref id="dbxref_249820">
+                                 <accession>FBan0013339</accession>
+                                 <dbname>flybase</dbname>
+                          </dbxref>
+                   </dbxref_id>
+            </feature_dbxref>
+.            
+            <feature_dbxref id="feature_dbxref_254137">
+                   <is_current>1</is_current>
+                   <dbxref_id>
+                          <dbxref id="dbxref_249818">
+                                 <accession>CG13339</accession>
+                                 <dbname>Gadfly</dbname>
+                          </dbxref>
+                   </dbxref_id>
+            </feature_dbxref>
+.            
+            <feature_synonym id="feature_synonym_39330">
+                   <is_internal>0</is_internal>
+                   <synonym_id>
+                          <synonym id="synonym_39330">
+                                 <name>CG13339</name>
+                                 <type_id>cvterm_59</type_id>
+                          </synonym>
+                   </synonym_id>
+                   <pub_id>pub_1</pub_id>
+                   <is_current>0</is_current>
+            </feature_synonym>
+.            
+            <featureloc id="featureloc_2802655">
+                   <srcfeature_id>feature_2</srcfeature_id>
+                   <locgroup>0</locgroup>
+                   <is_nbeg_partial>0</is_nbeg_partial>
+                   <strand>1</strand>
+                   <is_nend_partial>0</is_nend_partial>
+                   <nbeg>8889605</nbeg>
+                   <rank>0</rank>
+                   <min>8889605</min>
+                   <nend>8890291</nend>
+                   <max>8890291</max>
+            </featureloc>
+.            
+            <featureprop id="featureprop_606178">
+                   <pval>AE003817</pval>
+                   <prank>0</prank>
+                   <pkey_id>
+                          <cvterm id="cvterm_51">
+                                 <name>gbunit</name>
+                                 <cv_id>cv_3</cv_id>
+                          </cvterm>
+                   </pkey_id>
+            </featureprop>
+.            
+            <featureprop id="featureprop_606177">
+                   <pval>50C6-50C6</pval>
+                   <prank>0</prank>
+                   <pkey_id>
+                          <cvterm id="cvterm_52">
+                                 <name>cyto_range</name>
+                                 <cv_id>cv_3</cv_id>
+                          </cvterm>
+                   </pkey_id>
+            </featureprop>
+.            
+            <featureprop id="featureprop_606176">
+                   <pval>Not in SwissProt real (computational)</pval>
+                   <prank>0</prank>
+                   <pkey_id>
+                          <cvterm id="cvterm_47">
+                                 <name>sp_status</name>
+                                 <cv_id>cv_3</cv_id>
+                          </cvterm>
+                   </pkey_id>
+            </featureprop>
+     </feature>
+</chado>
