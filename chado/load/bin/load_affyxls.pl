@@ -65,7 +65,7 @@ $LOG->debug("created new Bio::Expression::MicroarrayIO $affx");
 
 while(my $arrayio = $affx->next_array){
   my @txn = ();
-  #last unless $arrayio->id;
+  last unless $arrayio->id;
 
   print STDERR "loading array ".$arrayio->id."\n";
   $LOG->info("loading array: ".$arrayio->id);
@@ -166,7 +166,7 @@ while(my $arrayio = $affx->next_array){
     my($chado_cvterm) = Chado::Cvterm->search(name => $cvterm);
     if(!$chado_cvterm){
       my($chado_dbxref) = Chado::Dbxref->search(accession => $cvterm);
-      my $fatal = undef;;
+      my $fatal = undef;
       ($chado_cvterm) = Chado::Cvterm->search(dbxref_id => $chado_dbxref)
         or $fatal = "couldn't find cvterm for $cvterm, you need to create it";
       if($fatal){
@@ -326,6 +326,7 @@ sub make_cvterms {
     $cvterm =~ /^(\D*?)(\d*?)$/g;
     next unless $1;
     $cvterm = $2 ? "$1:$2" : $1;
+    $cvterm =~ s/:+/:/g while $cvterm =~ /::/;
     $cvterm{$cvterm} = $val;
   }
   return %cvterm;

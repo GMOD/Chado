@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.48 2003-12-18 17:07:31 scottcain Exp $
+# $Id: Makefile.PL,v 1.49 2003-12-26 19:47:12 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -71,7 +71,7 @@ DBPORT   The port on which the database is listening ($args{'DBPORT'}{'default'}
 
 e.g., perl Makefile.PL DBDRIVER=PostgreSQL DBNAME=chado [...]
 
-Optionally, if the file "load.conf" can be found from a previous run
+Optionally, if the file "build.conf" can be found from a previous run
 of the Makefile.PL, you will be prompted to confirm the values saved 
 in this file.  
 
