@@ -3,6 +3,7 @@
 use strict;
 use lib 'lib';
 use Bio::Tools::GFF;
+use Bio::SeqIO;
 use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
@@ -119,6 +120,22 @@ GetOptions('organism:s'       => \$ORGANISM,
 $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
 $GFFFILE  ||='test.gff';
+
+#deal with GFF3 files that contain sequence
+# this is ugly, ugly, ugly, but in addtion to dealing with
+# sequence, it also fixes Allen's method of tracking progress
+die "$GFFFILE does not exist" unless (-e $GFFFILE);
+my $TMPFASTA = 'tmp.fasta';
+my $TMPGFF   = 'tmp.gff';
+my $linenumber = `grep -n ">" $GFFFILE`;
+if ($linenumber =~ /^(\d+)/) {
+  $linenumber = $1;
+  system("tail +$linenumber $GFFFILE > $TMPFASTA");
+  $linenumber -= 1;
+  system("head -$linenumber $GFFFILE > $TMPGFF");
+  system('mv',$TMPGFF,$GFFFILE); 
+}
+
 
 Chado::LoadDBI->init();
 
@@ -514,3 +531,21 @@ $_->dbi_commit foreach @transaction;
 $gffio->close();
 
 print "$feature_count features added\n";
+
+if (-e $TMPFASTA) {
+  my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
+ 
+  while (my $seq = $in->next_seq() ) {
+    my $name = $seq->id;
+    my @chado_feature = Chado::Feature->search({'name' => $name});
+    die "couldn't uniquely identify the sequence identified by $name"
+      unless (scalar @chado_feature == 1);
+
+    $chado_feature[0]->residues($seq->seq);
+    $chado_feature[0]->update;
+    $chado_feature[0]->commit;
+  }
+
+#  unlink $TMPFASTA;
+}
+
