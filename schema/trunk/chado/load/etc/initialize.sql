@@ -29,9 +29,19 @@ insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvter
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:swissprot',(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
-
+insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot',(select contact_id from contact where name = 'null'),'SwissProt','http://us.expasy.org/cgi-bin/niceprot.pl?');
+insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:mrna',(select contact_id from contact where name = 'null'),'RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:protein',(select contact_id from contact where name = 'null'),'RefSeq Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:unigene',(select contact_id from contact where name = 'null'),'Unigene','http://http://www.ncbi.nih.gov/entrez/query.fcgi?db=unigene&cmd=search&term=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:omim',(select contact_id from contact where name = 'null'),'OMIM','http://http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:locuslink',(select contact_id from contact where name = 'null'),'LocusLink','http://http://www.ncbi.nlm.nih.gov/LocusLink/LocRpt.cgi?l=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:genbank:mrna',(select contact_id from contact where name = 'null'),'GenBank mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:genbank:protein',(select contact_id from contact where name = 'null'),'GenBank Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot:display',(select contact_id from contact where name = 'null'),'SwissProt','http://http://us.expasy.org/cgi-bin/niceprot.pl?');
+insert into db (name, contact_id, description, urlprefix) values ('DB:pfam',(select contact_id from contact where name = 'null'),'Pfam','http://http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
+insert into db (name, contact_id, description, urlprefix) values ('DB:affy:U133',(select contact_id from contact where name = 'null'),'Affymetrix U133','http://https://www.affymetrix.com/analysis/netaffx/fullrecord.affx?pk=HG-U133_PLUS_2:');
+insert into db (name, contact_id, description, urlprefix) values ('DB:affy:U95',(select contact_id from contact where name = 'null'),'Affymetrix U95','http://https://www.affymetrix.com/analysis/netaffx/fullrecord.affx?pk=HG-U95AV2:');
 
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('virtual array' ,(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
