@@ -107,10 +107,10 @@ create table featureloc (
        rank     int not null default 0,
 
        timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp,
+       timelastmod timestamp not null default current_timestamp
 
-       unique (feature_id, srcfeature_id),
-       unique (feature_id, locgroup, rank)
+--       unique (feature_id, srcfeature_id),
+--       unique (feature_id, locgroup, rank)
 );
 
 
