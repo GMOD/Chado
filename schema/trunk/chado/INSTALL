@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.10 2004-01-06 21:13:43 scottcain Exp $
+$Id: INSTALL,v 1.11 2004-01-06 22:01:12 scottcain Exp $
 
 This document installs the installation procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -169,7 +169,19 @@ As indicated, the host, port, and password are optional.
 
 *   make ontologies
     Gets and installs various ontologies.  Requires a network 
-    connection.
+    connection.  Note retrieved ontology files are stored
+    in /tmp/chado_load/.  In order to do a repeat installation,
+    lock files need to be removed to allow reinstallation of
+    ontologies.  Those lock files are located in subdirectories
+    of /tmp/chado_load and are suffixed with '_chado'.  For
+    example, the Sequence Ontology lock files are located in
+    /tmp/chado_load/song and are called so.definition_chado
+    and so.ontology_chado.  Alternatively, deleting everything
+    in /tmp/chado_load will force the re-downloading of the
+    ontology data from their respective sources.  Also note that
+    loading a large ontology like the Gene Ontology will take
+    several minutes (perhaps as long as an hour).
+    
 
 *   make install
     Probably needs to be run as root.  Installs data loading scripts in
@@ -202,3 +214,6 @@ As indicated, the host, port, and password are optional.
     development is ongoing to provide better translation.
 
 *   install Generic-Genome-Browser.
+    $ tar -zxvf Generic-Genome-Browser-1.58.tar.gz
+    $ cd Generic-Genome-Browser-1.58.tar.gz
+    and follow the instruction in the INSTALL documentation.
