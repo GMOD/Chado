@@ -7,6 +7,8 @@ use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
 
+$| = 1;
+
 =head1 NAME
 
 load_gff3.pl - Load gff3 files into a chado database.
@@ -64,18 +66,24 @@ command may be appropriate in your case, but this should work in a pinch.
 The GFF in the datafile must be version 3 due to its tighter control of
 the specification and use of controlled vocabulary.  Accordingly, the names
 of feature types must be exactly those in the Sequence Ontology, not the
-synonyms and not the accession numbers.  Also, in order for the load
+synonyms and not the accession numbers (SO accession numbers may be
+supported in future versions of this script).  Also, in order for the load
 to be successful, the reference sequences (eg, chromosomes or contigs)
 must be defined in the GFF file before any features on them are listed.
 This can be done either by the reference-sequence meta data specification,
 which would be lines that look like this:
 
-  ##sequence-region chr1 1 246127941  ----except that this isn't supported
-  yet--can I get Bio::Tools::GFF to give me this info?
+  ##sequence-region chr1 1 246127941
 
 or with a standard GFF line:
 
   chr1	NCBI	chromosome	1	246127941	.	.	.	ID=chr1
+
+Note that if the '##sequence-region' notation is used, this script will
+not be able to determine the type of sequence and therefore will 
+assign it the 'region' type which is very general. If that is not what
+you want, use the standard GFF line to specify the reference
+sequence.
 
 =back
 
@@ -88,7 +96,7 @@ can be abbreviated to one letter.
   --srcdb    <dbname>        The name of the source database
   --gfffile  <filename>      The name of the GFF3 file
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>cain@cshl.orgE<gt>
 
@@ -245,7 +253,7 @@ while(my $gff_feature = $gffio->next_feature()) {
       warn "That is, ".$gff_feature->seq_id." should either have a entry in the \n";
       warn "feature table or earlier in this GFF file and it doesn't.\n\n";
       warn "*" x 72 ."\n";
-      die;
+      exit 1;
     }
 
 
@@ -268,7 +276,7 @@ while(my $gff_feature = $gffio->next_feature()) {
     ($chado_type) = $typemap{$gff_feature->primary_tag}; 
   }
 
- die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
+  die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
 
 
   ## GFF features are base-oriented, so we must add 1 to the diff
@@ -302,7 +310,7 @@ while(my $gff_feature = $gffio->next_feature()) {
     seqlen       => $seqlen
                                                     });
 
-  $feature_count++ if $gff_feature->has_tag('ID');
+  $feature_count++;
 
   next if $id eq $gff_feature->seq_id; #ie, this is a srcfeature (ie, fref) so only create the feature
 
@@ -392,6 +400,11 @@ while(my $gff_feature = $gffio->next_feature()) {
                                          });
     }
   } 
+
+  if ($feature_count % 1000 == 0) {
+    print STDERR "features loaded $feature_count";
+    print STDERR -t STDOUT && !$ENV{EMACS} ? "\r" : "\n";
+  }
 }
 $gffio->close();
 
