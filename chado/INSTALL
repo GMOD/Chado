@@ -1,14 +1,15 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.27 2004-05-13 02:50:40 scottcain Exp $
+$Id: INSTALL,v 1.28 2004-07-16 16:21:01 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
 considered alpha software, so expect there to be bumps in the road.  When
 you experience problems, please email them to the gmod-devel mailing list
-at gmod-devel@lists.sourceforge.net.  Also packaged with this release is
-version 1.61 of the Generic Genome Browser (gbrowse) which has adaptors
-to work with chado.  The installation instructions for gbrowse are included
+at gmod-devel@lists.sourceforge.net.  This release is will work with the
+most recent release of the Generic Genome Browser (gbrowse) version 1.62,
+which has had several improvements to its chado adaptor since the last 
+release.  The installation instructions for gbrowse are included
 in that package.  There are plans to make the installation of gbrowse and
 other components more automatic, but for the time being, please unpack it 
 and install separately.
@@ -60,7 +61,11 @@ host    all         all         127.0.0.1         255.255.255.255   trust
       the two most critical parameters to tune are shared_buffers and
       effective_cache size.  Adjusting these parameters may require
       modification of memory settings in /etc/sysctl.conf, see the sysctl
-      manpage for details.
+      manpage for details.  Also critical for continued performance of
+      postgres is the regular execution of the VACUUM FULL ANALYZE command.
+      This command clears out old, deleted data and analyzes the structure
+      of the database so that the execution planner can predict the
+      fastest way to execute a given query.
 
   Apache (1.3.*)
 
@@ -68,6 +73,10 @@ host    all         all         127.0.0.1         255.255.255.255   trust
           (-microarray 0.1 --required for microarray data)
 
   Standard Perl modules:
+      The perl modules can be installed via the cpan shell and by issuing 
+      the command 'install Bundle::GMOD' which will install all of the 
+      modules below except for SQL::Translator, which is optional.
+
     * CGI                      (GBrowse)
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
@@ -139,7 +148,7 @@ As indicated, the host, port, and password are optional.
         is recomended, and that is all that is necessary in order to use
         the full schema and run GBrowse on top of it.
 
-        *   Use values in '/home/scott/schema/chado/build.conf'? [Y]
+        *   Use values in '/home/scott/gmod/build.conf'? [Y]
 
         If `perl Makefile.PL` has been run before, answering yes to this
         will cause Makefile.PL to use the configuration options from the
@@ -263,27 +272,33 @@ As indicated, the host, port, and password are optional.
 
 With that, the installation of the schema is complete.  The easiest way
 to load data into the database is to use a GFF3 file and the script
-gmod_load_gff3.pl.  Located in the dat directory is a compressed
-GFF3 file for S. cerevisiae called yeast.gff3.bz2.  First, uncompress
-the file with bzip2:
+gmod_load_gff3.pl.  A nice set of sample data is the GFF3 file prepared
+by the nice folks at the Saccraromyces Genome Database, at
 
-    bzip2 -d dat/yeast.gff3.bz2
+    ftp://ftp.yeastgenome.org//pub/yeast/data_download/chromosomal_feature/saccharomyces_cerevisiae.gff
+
+This file contains gene ontology (GO) anotations, so if you didn't load
+go when you executed `make ontologies`, you will get many warning messages
+about being unable to find entries in the dbxref table.  If you want to 
+load GO now, you can execute `make ontologies` and select 'Gene Ontology'
+for installation.
 
 Then execute gmod_load_gff3.pl: 
 
     gmod_load_gff3.pl --organism yeast \
                       --srcdb DB:SGD  \
-                      --gfffile dat/yeast.gff3
+                      --gfffile saccharomyces_cerevisiae.gff
 
     (note that the '\' is included to allow cutting and pasting to a unix
     command line.)
+
     This loads the GFF3 file.  The loading script requires GFF3 as it has
     tighter control of the syntax and requires the use of a controlled
-    vocabulary (SOFA), allowing mapping to the relational schema.  In
-    addition to supplying the location of the file with the --gfffile flag,
-    the --orgainism tag uses the common name from the organism table and
-    --srcdb uses the database name from the db table.  See
-    `perldoc gmod_load_gff.pl` for more information on adding other
+    vocabulary (from the Sequence Ontology (SO)), allowing mapping to the
+    relational schema.  In addition to supplying the location of the file
+    with the --gfffile flag, the --orgainism tag uses the common name from
+    the organism table and --srcdb uses the database name from the db table.
+    See `perldoc gmod_load_gff.pl` for more information on adding other
     organisms and databases, as well as other available commandline flags.
 
     GFF3 files can also be generated either from the included (and not
@@ -307,7 +322,7 @@ GBrowse.  To do this execute the following commands (substituting the
 version number for the 'x's):
 
     $ tar -zxvf Generic-Genome-Browser-x.xx.tar.gz
-    $ cd Generic-Genome-Browser-x.xx.tar.gz
+    $ cd Generic-Genome-Browser-x.xx
     and follow the instruction in the INSTALL documentation.
 
 After installing GBrowse, go to 
