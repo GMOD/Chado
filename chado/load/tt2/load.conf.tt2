@@ -58,7 +58,7 @@
     <file type="ontology"    local="go/component.ontology" remote="http://www.geneontology.org/ontology/component.ontology" method="/usr/bin/lwp-mirror"/>
     <file type="ontology"    local="go/function.ontology"  remote="http://www.geneontology.org/ontology/function.ontology"  method="/usr/bin/lwp-mirror"/>
     <file type="ontology"    local="go/process.ontology"   remote="http://www.geneontology.org/ontology/process.ontology"   method="/usr/bin/lwp-mirror"/>
-    <file type="definitions" local="go/GO.defs"            remote="http://www.geneontology.org/doc/GO.defs"                 method="/usr/bin/lwp-mirror"/>
+    <file type="definitions" local="go/GO.defs"            remote="http://www.geneontology.org/ontology/GO.defs"                 method="/usr/bin/lwp-mirror"/>
   </ontology>
 
   <ontology name="Embryonic Mouse Anatomy Ontology" order="4">
