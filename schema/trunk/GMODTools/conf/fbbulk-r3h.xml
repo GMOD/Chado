@@ -6,7 +6,6 @@
   date="20040816"
   ROOT="${ARGOS_ROOT}/flybase/"
   TMP="${ARGOS_ROOT}/flybase/tmp"
-  SERVICE="flybase"
   datadir="data2/fban"
   >
   <title>FlyBase Chado DB r3 heterochromatin</title>
@@ -26,7 +25,7 @@
     default_name="dmelhet_chado"
     host="bugbane.bio.indiana.edu"
     port="7302"
-    user="gilbertd"
+    user=""
     password=""
     />
 
@@ -40,7 +39,6 @@
 <!--   <chromosomes>3L</chromosomes> -->
 <!--   <chromosomes>3R</chromosomes> -->
 <!--   <chromosomes>4</chromosomes> -->
-  <!-- get chromosome name="2L" length="22217931" from featdump chromosomes -->
 
   <dnadump
     path="dna/dna-\w+.raw"
@@ -103,12 +101,7 @@
     name="Genome feature sequence fasta" 
     dropnotes="synonym_2nd,synonym"
   />
-<!--  allowanyfeat="1" -->
 
-  <!-- FIXME allowanyfeat; 
-    new parse steps put all individual feats to fasta ; 
-    change back to use featset info
-  -->
 
   <!-- feature sets to make fasta bulk files -->
   <!-- ?? do we want mRNA = computed AND transcript = curated dna ? -->  
