@@ -90,7 +90,8 @@ sub new {
 
     return bless {db       => \@db,
                   conf     => \%conf,
-                  confdir  => $confdir}, $self;
+                  confdir  => $confdir,
+                  gmod_root=> $root}, $self;
 }
 
 =head2 available_dbs
@@ -203,7 +204,7 @@ sub confdir {
 =head2 tmp
 
  Title   : tmp
- Usage   : $tmpdir = $config->tmp();
+ Usage   : $tmpdir = $config->tmpdir();
  Function: returns the path to the GMOD tmp directory
  Returns : see above
  Args    : none
@@ -216,6 +217,23 @@ Returns the path to the GMOD tmp directory.
 
 sub tmpdir {
     shift->get_tag_value('TMP');
+}
+
+=head2 gmod_root 
+                                                                                
+ Title   : gmod_root
+ Usage   : $gmod_root = $config->gmod_root();
+ Function: returns the path to the GMOD root directory
+ Returns : see above
+ Args    : none
+ Status  : public
+                                                                                
+Returns the path to the GMOD root directory.
+
+=cut
+
+sub gmod_root {
+    shift->{'gmod_root'};
 }
 
 1;
