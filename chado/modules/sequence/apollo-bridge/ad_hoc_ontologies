@@ -26,6 +26,9 @@ mol_type
 dev_stage
 chromosome
 map
+finished
+missing_start_codon
+missing_stop_codon
 
 [pub type]
 computer file
@@ -100,4 +103,3 @@ series_abbrev
 [apollo]
 suffix
 prefix
-producedby [REL]

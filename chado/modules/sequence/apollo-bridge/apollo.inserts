@@ -30,6 +30,8 @@ insert into pub (uniquename, title, type_id) values ('none', 'none', (select cvt
 
 create sequence uniquename_id_generator;
 
-insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='prefix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'ABC');
-insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='suffix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'XYZ');
+insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='prefix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'RICE');
+insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from cvterm where name='suffix' and cv_id in (select cv_id from cv where name='apollo')),(select cvterm_id from cvterm where name='is_a' and cv_id in (select cv_id from cv where name='Relationship Ontology')),'');
 
+insert into dbxref (db_id, accession) values ((select db_id from db where name='null'),'Relationship Ontology:producedby');
+insert into cvterm (name, cv_id, dbxref_id, is_relationshiptype) values ('producedby',(select cv_id from cv where name='Relationship Ontology'),(select dbxref_id from dbxref where accession = 'Relationship Ontology:producedby'),1);

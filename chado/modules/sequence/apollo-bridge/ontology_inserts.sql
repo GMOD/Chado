@@ -53,6 +53,12 @@ INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='n
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'chromosome',(select dbxref_id from dbxref where accession='property type:chromosome'));
 INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:map');
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'map',(select dbxref_id from dbxref where accession='property type:map'));
+INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:finished');
+INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'finished',(select dbxref_id from dbxref where accession='property type:finished'));
+INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:missing_start_codon');
+INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'missing_start_codon',(select dbxref_id from dbxref where accession='property type:missing_start_codon'));
+INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:missing_stop_codon');
+INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'missing_stop_codon',(select dbxref_id from dbxref where accession='property type:missing_stop_codon'));
 INSERT INTO cv (name) VALUES ('pub type');
 INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'pub type:computer file');
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='pub type'),'computer file',(select dbxref_id from dbxref where accession='pub type:computer file'));
@@ -189,5 +195,3 @@ INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='n
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='apollo'),'suffix',(select dbxref_id from dbxref where accession='apollo:suffix'));
 INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'apollo:prefix');
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='apollo'),'prefix',(select dbxref_id from dbxref where accession='apollo:prefix'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'apollo:producedby');
-INSERT INTO cvterm (cv_id,name,dbxref_id,is_relationshiptype) VALUES ((select cv_id from cv where name='apollo'),'producedby',(select dbxref_id from dbxref where accession='apollo:producedby'),1);
