@@ -17,7 +17,7 @@ create table pub (
        pages  varchar(255),
        miniref varchar(255) not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -45,11 +45,11 @@ create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
        subj_pub_id int not null,
-       foreign key (subj_pub_id) references pub (pub_id),
+       foreign key (subj_pub_id) references pub (pub_id) on delete cascade,
        obj_pub_id int not null,
-       foreign key (obj_pub_id) references pub (pub_id),
+       foreign key (obj_pub_id) references pub (pub_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
        unique(subj_pub_id, obj_pub_id, type_id)
 );
@@ -68,9 +68,9 @@ create table pub_dbxref (
        pub_dbxref_id serial not null,
        primary key (pub_dbxref_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(pub_id,dbxref_id)
 );
@@ -88,7 +88,7 @@ create table author (
        author_id serial not null,
        primary key (author_id),
        contact_id int not null,
-       foreign key (contact_id) references contact (contact_id),
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
 -- these fields may be moving to the contact table...
        surname varchar(100) not null,
        givennames varchar(100),
@@ -108,9 +108,9 @@ create table pub_author (
        pub_author_id serial not null,
        primary key (pub_author_id),
        author_id int not null,
-       foreign key (author_id) references author (author_id),
+       foreign key (author_id) references author (author_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        arank int not null,
        editor boolean default 'false',
 
@@ -130,9 +130,9 @@ create table pubprop (
        pubprop_id serial not null,
        primary key (pubprop_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        value text not null,
        rank integer,
 

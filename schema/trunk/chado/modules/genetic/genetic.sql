@@ -21,9 +21,9 @@ create table feature_genotype (
        feature_genotype_id serial not null,
        primary key (feature_genotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        genotype_id int not null,
-       foreign key (genotype_id) references genotype (genotype_id),
+       foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
 
        unique(feature_id,genotype_id)
 );
@@ -40,11 +40,11 @@ create table phenotype (
        primary key (phenotype_id),
        description text,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        backgroundgenotype_id int,
-       foreign key (backgroundgenotype_id) references genotype (genotype_id)
+       foreign key (backgroundgenotype_id) references genotype (genotype_id) on delete set null
 );
 -- type of phenotypic statement  [Chris, we need this or something like it
 -- for FB where we have three types of statement in *k: "Phenotypic class:",
@@ -63,9 +63,9 @@ create table feature_phenotype (
        feature_phenotype_id serial not null,
        primary key (feature_phenotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
 
        unique(feature_id,phenotype_id)       
 );
@@ -81,9 +81,9 @@ create table phenotype_cvterm (
        phenotype_cvterm_id serial not null,
        primary key (phenotype_cvterm_id),
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        rank int not null,
 
        unique(phenotype_id,cvterm_id,rank)
@@ -101,12 +101,12 @@ create table interaction (
        primary key (interaction_id),
        description text,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 -- Do we want to call this simply genotype_id to allow natural joins?
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id),
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null,
        phenotype_id int,
-       foreign key (phenotype_id) references phenotype (phenotype_id)
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete set null
 );
 create index interaction_idx1 on interaction (pub_id);
 create index interaction_idx2 on interaction (background_genotype_id);
@@ -121,9 +121,9 @@ create table interactionsubject (
        interactionsubject_id serial not null,
        primary key (interactionsubject_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
 
        unique(feature_id,interaction_id)
 );
@@ -139,9 +139,9 @@ create table interactionobject (
        interactionobject_id serial not null,
        primary key (interactionobject_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
 
        unique(feature_id,interaction_id)
 );

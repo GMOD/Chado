@@ -90,15 +90,15 @@ create table analysisinvocation (
     analysisinvocation_id serial not null,
     primary key (analysisinvocation_id),
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     description text,
 
     inputtableinfo_id int not null,
-    foreign key (inputtableinfo_id) references tableinfo (tableinfo_id),
+    foreign key (inputtableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     inputrow_id int not null,
 
     outputtableinfo_id int not null,
-    foreign key (outputtableinfo_id) references tableinfo (tableinfo_id),
+    foreign key (outputtableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     outputrow_id int not null
 );
 
@@ -114,9 +114,9 @@ create table analysisinvocationprop (
     analysisinvocationprop_id serial not null,
     primary key (analysisinvocationprop_id),
     analysisinvocation_id int not null,
-    foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
+    foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id) on delete cascade,
     type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id),
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value text,
 
     unique(analysisinvocation_id, type_id, value)
@@ -187,9 +187,9 @@ create table analysisfeature (
     analysisfeature_id serial not null,
     primary key (analysisfeature_id),
     feature_id int not null,
-    foreign key (feature_id) references feature (feature_id),
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     rawscore double precision,
     normscore double precision,
     significance double precision,

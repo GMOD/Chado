@@ -1,4 +1,4 @@
-# Schema metadata produced by ddltrans on Fri May 30 09:35:47 EDT 2003
+# Schema metadata produced by ddltrans on Tue Jun 10 11:25:00 EDT 2003
 $schema = {
             'labelmethod' => {
                                'name' => 'labelmethod',
@@ -134,7 +134,7 @@ $schema = {
                                           '_entity' => 'set'
                                         },
                            'name' => 'wwwuser',
-                           'comment' => '------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  keep track of www users.  this may also be useful  in an audit module at some point (?).',
+                           'comment' => 'pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they\'re looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to \'true\' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym. ------------------------------ -- dfeatureloc --------------- ------------------------------  dfeatureloc is meant as an alternate representation of  the data in featureloc (see the descrption of featureloc  in sequence.sql).  In dfeatureloc, fmin and fmax are  replaced with nbeg and nend.  Whereas fmin and fmax  are absolute coordinates relative to the parent feature, nbeg  and nend are the beginning and ending coordinates  relative to the feature itself.  For example, nbeg would  mark the 5\' end of a gene and nend would mark the 3\' end. ------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------  Note from Scott:  I changed this view to depend on dfeatureloc,  since I don\'t know what it is used for.  The change should  be transparent.  I also changed dbxrefstr to dbxref_id since  dbxrefstr is no longer in feature ------------------------------ -- fp_key ------------------- ------------------------------  no C++ style comments please. what is this file for, anyway?  /* feature before (?)deletion trigger implements the following rules:       -if feature to be deleted is a  	transcript: 	-delete any exons having this as their only related transcript 	-delete any proteins having this as their only related transcript 	-prevent deletion if there are any alleles of the transcript?  	gene: 	-prevent deletion if there are any alleles of the gene? or other info? 	-delete all transcripts that are related only to this gene  	what needs to be preserved about dbxrefs, etc.? */  CREATE OR REPLACE FUNCTION feature_del_tr () RETURNS TRIGGER AS \' body goes here     \' LANGUAGE SQL (?); or language plpgsql;  CREATE TRIGGER name { BEFORE | AFTER } { event [OR ...] }           ON table FOR EACH { ROW | STATEMENT }           EXECUTE PROCEDURE func ( arguments )  CREATE TRIGGER feature_del_tr BEFORE DELETE ON feature FOR EACH { ROW | STATEMENT } 	EXECUTE PROCEDURE feature_del_tr ;  keep track of www users.  this may also be useful  in an audit module at some point (?).',
                            '_entity' => 'table',
                            'primarykey' => 'wwwuser_id',
                            'column' => {
@@ -288,7 +288,7 @@ $schema = {
                                                               '_entity' => 'index'
                                                             },
                                           'pubprop_idx2' => {
-                                                              'columns' => 'pkey_id',
+                                                              'columns' => 'type_id',
                                                               'name' => 'pubprop_idx2',
                                                               '_entity' => 'index'
                                                             }
@@ -298,13 +298,6 @@ $schema = {
                            '_entity' => 'table',
                            'primarykey' => 'pubprop_id',
                            'column' => {
-                                         'pval' => {
-                                                     'name' => 'pval',
-                                                     'allownull' => 'no',
-                                                     'type' => 'text',
-                                                     '_entity' => 'column',
-                                                     'unique' => 3
-                                                   },
                                          'pub_id' => {
                                                        'fk_table' => 'pub',
                                                        'name' => 'pub_id',
@@ -317,16 +310,16 @@ $schema = {
                                          '_order' => [
                                                        'pubprop_id',
                                                        'pub_id',
-                                                       'pkey_id',
-                                                       'pval',
-                                                       'prank'
+                                                       'type_id',
+                                                       'value',
+                                                       'rank'
                                                      ],
-                                         'prank' => {
-                                                      'name' => 'prank',
-                                                      'allownull' => 'yes',
-                                                      'type' => 'integer',
-                                                      '_entity' => 'column'
-                                                    },
+                                         'rank' => {
+                                                     'name' => 'rank',
+                                                     'allownull' => 'yes',
+                                                     'type' => 'integer',
+                                                     '_entity' => 'column'
+                                                   },
                                          'pubprop_id' => {
                                                            'name' => 'pubprop_id',
                                                            'allownull' => 'no',
@@ -335,9 +328,16 @@ $schema = {
                                                            'primarykey' => 'yes'
                                                          },
                                          '_entity' => 'list',
-                                         'pkey_id' => {
+                                         'value' => {
+                                                      'name' => 'value',
+                                                      'allownull' => 'no',
+                                                      'type' => 'text',
+                                                      '_entity' => 'column',
+                                                      'unique' => 3
+                                                    },
+                                         'type_id' => {
                                                         'fk_table' => 'cvterm',
-                                                        'name' => 'pkey_id',
+                                                        'name' => 'type_id',
                                                         'allownull' => 'no',
                                                         'type' => 'int',
                                                         '_entity' => 'column',
@@ -347,8 +347,8 @@ $schema = {
                                        },
                            'unique' => [
                                          'pub_id',
-                                         'pkey_id',
-                                         'pval'
+                                         'type_id',
+                                         'value'
                                        ]
                          },
             'eimage' => {
@@ -558,14 +558,14 @@ $schema = {
                                                            '_entity' => 'column',
                                                            'primarykey' => 'yes'
                                                          },
-                                         'element_type_id' => {
-                                                                'fk_table' => 'cvterm',
-                                                                'name' => 'element_type_id',
-                                                                'allownull' => 'yes',
-                                                                'type' => 'int',
-                                                                '_entity' => 'column',
-                                                                'fk_column' => 'cvterm_id'
-                                                              },
+                                         'elementtype_id' => {
+                                                               'fk_table' => 'cvterm',
+                                                               'name' => 'elementtype_id',
+                                                               'allownull' => 'yes',
+                                                               'type' => 'int',
+                                                               '_entity' => 'column',
+                                                               'fk_column' => 'cvterm_id'
+                                                             },
                                          'feature_id' => {
                                                            'fk_table' => 'feature',
                                                            'name' => 'feature_id',
@@ -584,7 +584,7 @@ $schema = {
                                                        'element_id',
                                                        'feature_id',
                                                        'array_id',
-                                                       'element_type_id',
+                                                       'elementtype_id',
                                                        'dbxref_id',
                                                        'subclass_view',
                                                        'tinyint1',
@@ -750,6 +750,10 @@ $schema = {
                                                                                      {
                                                                                        'table' => 'feature_cvterm',
                                                                                        'column' => 'feature_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'analysis',
+                                                                                       'column' => 'queryfeature_id'
                                                                                      },
                                                                                      {
                                                                                        'table' => 'featureloc',
@@ -930,16 +934,16 @@ $schema = {
                                                '_order' => [
                                                              'cvtermsynonym_id',
                                                              'cvterm_id',
-                                                             'termsynonym'
+                                                             'synonym'
                                                            ],
                                                '_entity' => 'list',
-                                               'termsynonym' => {
-                                                                  'name' => 'termsynonym',
-                                                                  'allownull' => 'no',
-                                                                  'type' => 'varchar(255)',
-                                                                  '_entity' => 'column',
-                                                                  'unique' => 2
-                                                                },
+                                               'synonym' => {
+                                                              'name' => 'synonym',
+                                                              'allownull' => 'no',
+                                                              'type' => 'varchar(255)',
+                                                              '_entity' => 'column',
+                                                              'unique' => 2
+                                                            },
                                                'cvterm_id' => {
                                                                 'fk_table' => 'cvterm',
                                                                 'name' => 'cvterm_id',
@@ -952,7 +956,7 @@ $schema = {
                                              },
                                  'unique' => [
                                                'cvterm_id',
-                                               'termsynonym'
+                                               'synonym'
                                              ]
                                },
             'wwwuser_feature' => {
@@ -1081,6 +1085,14 @@ $schema = {
                                                      'type' => 'varchar(100)',
                                                      '_entity' => 'column'
                                                    },
+                                          'protocoltype_id' => {
+                                                                 'fk_table' => 'cvterm',
+                                                                 'name' => 'protocoltype_id',
+                                                                 'allownull' => 'no',
+                                                                 'type' => 'int',
+                                                                 '_entity' => 'column',
+                                                                 'fk_column' => 'cvterm_id'
+                                                               },
                                           'name' => {
                                                       'name' => 'name',
                                                       'allownull' => 'no',
@@ -1117,7 +1129,7 @@ $schema = {
                                                          },
                                           '_order' => [
                                                         'protocol_id',
-                                                        'protocol_type_id',
+                                                        'protocoltype_id',
                                                         'pub_id',
                                                         'dbxref_id',
                                                         'name',
@@ -1169,15 +1181,7 @@ $schema = {
                                                                      'allownull' => 'yes',
                                                                      'type' => 'varchar(500)',
                                                                      '_entity' => 'column'
-                                                                   },
-                                          'protocol_type_id' => {
-                                                                  'fk_table' => 'cvterm',
-                                                                  'name' => 'protocol_type_id',
-                                                                  'allownull' => 'no',
-                                                                  'type' => 'int',
-                                                                  '_entity' => 'column',
-                                                                  'fk_column' => 'cvterm_id'
-                                                                }
+                                                                   }
                                         }
                           },
             'expression_image' => {
@@ -1297,15 +1301,25 @@ $schema = {
                           '_entity' => 'table',
                           'primarykey' => 'author_id',
                           'column' => {
+                                        'contact_id' => {
+                                                          'fk_table' => 'contact',
+                                                          'name' => 'contact_id',
+                                                          'allownull' => 'no',
+                                                          'type' => 'int',
+                                                          '_entity' => 'column',
+                                                          'fk_column' => 'contact_id'
+                                                        },
                                         'surname' => {
                                                        'name' => 'surname',
                                                        'allownull' => 'no',
                                                        'type' => 'varchar(100)',
+                                                       'comment' => 'these fields may be moving to the contact table...',
                                                        '_entity' => 'column',
                                                        'unique' => 3
                                                      },
                                         '_order' => [
                                                       'author_id',
+                                                      'contact_id',
                                                       'surname',
                                                       'givennames',
                                                       'suffix'
@@ -1927,13 +1941,28 @@ $schema = {
                                                          '_entity' => 'column',
                                                          'unique' => 3
                                                        },
+                                        'db_id' => {
+                                                     'fk_table' => 'db',
+                                                     'name' => 'db_id',
+                                                     'allownull' => 'no',
+                                                     'type' => 'int',
+                                                     '_entity' => 'column',
+                                                     'fk_column' => 'db_id',
+                                                     'unique' => 3
+                                                   },
                                         '_order' => [
                                                       'dbxref_id',
-                                                      'dbname',
+                                                      'db_id',
                                                       'accession',
                                                       'version',
-                                                      'dbxrefdescription'
+                                                      'description'
                                                     ],
+                                        'description' => {
+                                                           'name' => 'description',
+                                                           'allownull' => 'yes',
+                                                           'type' => 'text',
+                                                           '_entity' => 'column'
+                                                         },
                                         '_entity' => 'list',
                                         'version' => {
                                                        'name' => 'version',
@@ -1943,21 +1972,6 @@ $schema = {
                                                        'default' => '\'\'',
                                                        'unique' => 3
                                                      },
-                                        'dbxrefdescription' => {
-                                                                 'name' => 'dbxrefdescription',
-                                                                 'allownull' => 'yes',
-                                                                 'type' => 'text',
-                                                                 '_entity' => 'column'
-                                                               },
-                                        'dbname' => {
-                                                      'fk_table' => 'db',
-                                                      'name' => 'dbname',
-                                                      'allownull' => 'no',
-                                                      'type' => 'varchar(255)',
-                                                      '_entity' => 'column',
-                                                      'fk_column' => 'db_id',
-                                                      'unique' => 3
-                                                    },
                                         'dbxref_id' => {
                                                          'name' => 'dbxref_id',
                                                          'allownull' => 'no',
@@ -1981,10 +1995,6 @@ $schema = {
                                                                                    },
                                                                                    {
                                                                                      'table' => 'assay',
-                                                                                     'column' => 'dbxref_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'dbxrefprop',
                                                                                      'column' => 'dbxref_id'
                                                                                    },
                                                                                    {
@@ -2021,7 +2031,7 @@ $schema = {
                                                        }
                                       },
                           'unique' => [
-                                        'dbname',
+                                        'db_id',
                                         'accession',
                                         'version'
                                       ]
@@ -2470,65 +2480,17 @@ $schema = {
                                                   'organism_id'
                                                 ]
                                   },
-            'synonym_pub' => {
-                               'indexes' => {
-                                              'synonym_pub_idx1' => {
-                                                                      'columns' => 'synonym_id',
-                                                                      'name' => 'synonym_pub_idx1',
-                                                                      '_entity' => 'index'
-                                                                    },
-                                              'synonym_pub_idx2' => {
-                                                                      'columns' => 'pub_id',
-                                                                      'name' => 'synonym_pub_idx2',
-                                                                      '_entity' => 'index'
-                                                                    },
-                                              '_entity' => 'set'
-                                            },
-                               'name' => 'synonym_pub',
-                               'comment' => 'pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they\'re looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to \'true\' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym.',
-                               '_entity' => 'table',
-                               'primarykey' => 'synonym_pub_id',
-                               'column' => {
-                                             'synonym_id' => {
-                                                               'fk_table' => 'synonym',
-                                                               'name' => 'synonym_id',
-                                                               'allownull' => 'no',
-                                                               'type' => 'int',
-                                                               '_entity' => 'column',
-                                                               'fk_column' => 'synonym_id',
-                                                               'unique' => 2
-                                                             },
-                                             'pub_id' => {
-                                                           'fk_table' => 'pub',
-                                                           'name' => 'pub_id',
-                                                           'allownull' => 'no',
-                                                           'type' => 'int',
-                                                           '_entity' => 'column',
-                                                           'fk_column' => 'pub_id',
-                                                           'unique' => 2
-                                                         },
-                                             '_order' => [
-                                                           'synonym_pub_id',
-                                                           'synonym_id',
-                                                           'pub_id'
-                                                         ],
-                                             '_entity' => 'list',
-                                             'synonym_pub_id' => {
-                                                                   'name' => 'synonym_pub_id',
-                                                                   'allownull' => 'no',
-                                                                   'type' => 'serial',
-                                                                   '_entity' => 'column',
-                                                                   'primarykey' => 'yes'
-                                                                 }
-                                           },
-                               'unique' => [
-                                             'synonym_id',
-                                             'pub_id'
-                                           ]
-                             },
             'analysis' => {
+                            'indexes' => {
+                                           'analysis_idx1' => {
+                                                                'columns' => 'queryfeature_id',
+                                                                'name' => 'analysis_idx1',
+                                                                '_entity' => 'index'
+                                                              },
+                                           '_entity' => 'set'
+                                         },
                             'name' => 'analysis',
-                            'comment' => 'ok drop table if exists analysis;',
+                            'comment' => 'an analysis is a particular execution of a computational analysis;  it may be a blast of one sequence against another, or an all by all  blast, or a different kind of analysis altogether.  it is a single unit of computation - if different blast runs  were instantiated over differnet query sequences, there would  be multiple entries here.   name:    a way of grouping analyses. this should be a handy    short identifier that can help people find an analysis they    want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"    it should not be assumed to be unique. for instance, there may    be lots of seperate analyses done against a cDNA database.   program:    e.g. blastx, blastp, sim4, genscan   programversion:    e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]   algorithm:    e.g. blast   sourcename:    e.g. cDNA, SwissProt   queryfeature_id:    the sequence that was used as the query sequence can be    optionally included via queryfeature_id - even though this    is redundant with the tables below. this can still    be useful - for instance, we may have an analysis that blasts    contigs against a database. we may then transform those hits    into global coordinates; it may be useful to keep a record    of which contig was blasted as the query.    MAPPING (bioperl): maps to Bio::Search::Result::ResultI   sourceuri:    This is an optional permanent URL/URI for the source of the    analysis. The idea is that someone could recreate the analysis    directly by going to this URI and fetching the source data    (eg the blast database, or the training model).',
                             '_entity' => 'table',
                             'primarykey' => 'analysis_id',
                             'column' => {
@@ -2553,116 +2515,93 @@ $schema = {
                                                              '_entity' => 'column',
                                                              'primarykey' => 'yes'
                                                            },
+                                          'sourceuri' => {
+                                                           'name' => 'sourceuri',
+                                                           'allownull' => 'yes',
+                                                           'type' => 'text',
+                                                           '_entity' => 'column'
+                                                         },
                                           'name' => {
                                                       'name' => 'name',
-                                                      'allownull' => 'no',
-                                                      'type' => 'varchar(100)',
+                                                      'allownull' => 'yes',
+                                                      'type' => 'varchar(255)',
                                                       '_entity' => 'column'
                                                     },
-                                          '_order' => [
-                                                        'analysis_id',
-                                                        'name',
-                                                        'description'
-                                                      ],
+                                          'sourcename' => {
+                                                            'name' => 'sourcename',
+                                                            'allownull' => 'yes',
+                                                            'type' => 'varchar(255)',
+                                                            '_entity' => 'column',
+                                                            'unique' => 3
+                                                          },
                                           'description' => {
                                                              'name' => 'description',
                                                              'allownull' => 'yes',
-                                                             'type' => 'varchar(500)',
+                                                             'type' => 'text',
                                                              '_entity' => 'column'
                                                            },
-                                          '_entity' => 'list'
-                                        }
-                          },
-            'cvpath' => {
-                          'indexes' => {
-                                         'cvpath_idx1' => {
-                                                            'columns' => 'reltype_id',
-                                                            'name' => 'cvpath_idx1',
-                                                            '_entity' => 'index'
-                                                          },
-                                         'cvpath_idx2' => {
-                                                            'columns' => 'subjterm_id',
-                                                            'name' => 'cvpath_idx2',
-                                                            '_entity' => 'index'
-                                                          },
-                                         '_entity' => 'set',
-                                         'cvpath_idx3' => {
-                                                            'columns' => 'objterm_id',
-                                                            'name' => 'cvpath_idx3',
-                                                            '_entity' => 'index'
-                                                          },
-                                         'cvpath_idx4' => {
-                                                            'columns' => 'cv_id',
-                                                            'name' => 'cvpath_idx4',
-                                                            '_entity' => 'index'
-                                                          }
-                                       },
-                          'name' => 'cvpath',
-                          '_entity' => 'table',
-                          'primarykey' => 'cvpath_id',
-                          'column' => {
-                                        'pathdistance' => {
-                                                            'name' => 'pathdistance',
-                                                            'allownull' => 'yes',
-                                                            'type' => 'int',
-                                                            '_entity' => 'column'
-                                                          },
-                                        'subjterm_id' => {
-                                                           'fk_table' => 'cvterm',
-                                                           'name' => 'subjterm_id',
-                                                           'allownull' => 'no',
-                                                           'type' => 'int',
-                                                           '_entity' => 'column',
-                                                           'fk_column' => 'cvterm_id',
-                                                           'unique' => 2
+                                          'timeexecuted' => {
+                                                              'name' => 'timeexecuted',
+                                                              'allownull' => 'no',
+                                                              'type' => 'timestamp',
+                                                              '_entity' => 'column',
+                                                              'default' => 'current_timestamp'
+                                                            },
+                                          'sourceversion' => {
+                                                               'name' => 'sourceversion',
+                                                               'allownull' => 'yes',
+                                                               'type' => 'varchar(255)',
+                                                               '_entity' => 'column'
+                                                             },
+                                          'algorithm' => {
+                                                           'name' => 'algorithm',
+                                                           'allownull' => 'yes',
+                                                           'type' => 'varchar(255)',
+                                                           '_entity' => 'column'
                                                          },
-                                        'reltype_id' => {
-                                                          'fk_table' => 'cvterm',
-                                                          'name' => 'reltype_id',
-                                                          'allownull' => 'yes',
-                                                          'type' => 'int',
-                                                          '_entity' => 'column',
-                                                          'fk_column' => 'cvterm_id'
-                                                        },
-                                        'cvpath_id' => {
-                                                         'name' => 'cvpath_id',
+                                          'program' => {
+                                                         'name' => 'program',
                                                          'allownull' => 'no',
-                                                         'type' => 'serial',
+                                                         'type' => 'varchar(255)',
                                                          '_entity' => 'column',
-                                                         'primarykey' => 'yes'
+                                                         'unique' => 3
                                                        },
-                                        '_order' => [
-                                                      'cvpath_id',
-                                                      'reltype_id',
-                                                      'subjterm_id',
-                                                      'objterm_id',
-                                                      'cv_id',
-                                                      'pathdistance'
-                                                    ],
-                                        '_entity' => 'list',
-                                        'cv_id' => {
-                                                     'fk_table' => 'cv',
-                                                     'name' => 'cv_id',
-                                                     'allownull' => 'no',
-                                                     'type' => 'int',
-                                                     '_entity' => 'column',
-                                                     'fk_column' => 'cv_id'
-                                                   },
-                                        'objterm_id' => {
-                                                          'fk_table' => 'cvterm',
-                                                          'name' => 'objterm_id',
-                                                          'allownull' => 'no',
-                                                          'type' => 'int',
-                                                          '_entity' => 'column',
-                                                          'fk_column' => 'cvterm_id',
-                                                          'unique' => 2
-                                                        }
-                                      },
-                          'unique' => [
-                                        'subjterm_id',
-                                        'objterm_id'
-                                      ]
-                        },
+                                          '_order' => [
+                                                        'analysis_id',
+                                                        'name',
+                                                        'description',
+                                                        'program',
+                                                        'programversion',
+                                                        'algorithm',
+                                                        'sourcename',
+                                                        'sourceversion',
+                                                        'sourceuri',
+                                                        'queryfeature_id',
+                                                        'timeexecuted'
+                                                      ],
+                                          '_entity' => 'list',
+                                          'queryfeature_id' => {
+                                                                 'fk_table' => 'feature',
+                                                                 'name' => 'queryfeature_id',
+                                                                 'allownull' => 'yes',
+                                                                 'type' => 'int',
+                                                                 '_entity' => 'column',
+                                                                 'fk_column' => 'feature_id'
+                                                               },
+                                          'programversion' => {
+                                                                'name' => 'programversion',
+                                                                'allownull' => 'no',
+                                                                'type' => 'varchar(255)',
+                                                                '_entity' => 'column',
+                                                                'unique' => 3
+                                                              }
+                                        },
+                            'unique' => [
+                                          'program',
+                                          'programversion',
+                                          'sourcename'
+                                        ]
+                          },
             'featureloc' => {
                               'indexes' => {
                                              'featureloc_idx2' => {
@@ -2671,7 +2610,7 @@ $schema = {
                                                                     '_entity' => 'index'
                                                                   },
                                              'featureloc_idx3' => {
-                                                                    'columns' => 'srcfeature_id,nbeg,nend',
+                                                                    'columns' => 'srcfeature_id,fmin,fmax',
                                                                     'name' => 'featureloc_idx3',
                                                                     '_entity' => 'index'
                                                                   },
@@ -2683,7 +2622,7 @@ $schema = {
                                                                   }
                                            },
                               'name' => 'featureloc',
-                              'comment' => 'dbxref_id here is intended for the primary dbxref for this feature.  Additional dbxref links are made via feature_dbxref  name: the human-readable common name for a feature, for display  uniquename: the unique name for a feature; may not be particularly human-readable  timeaccessioned and timelastmodified are for handling object accession/  modification timestamps (as opposed to db auditing info, handled elsewhere).  The expectation is that these fields would be available to software  interacting with chado.  each feature can have 0 or more locations.  multiple locations do NOT indicate non-contiguous locations.  instead they designate alternate locations or grouped locations;  for instance, a feature designating a blast hit or hsp will have two  locations, one on the query feature, one on the subject feature.  features representing sequence variation could have alternate locations  instantiated on a feature on the mutant strain.  the field "rank" is used to differentiate these different locations.  the default rank \'0\' is used for the main/primary location (eg in  similarity features, 0 is query, 1 is subject), although sometimes  this will be symmeytical and there is no primary location.   redundant locations can also be stored - for instance, the position  of an exon on a BAC and in global coordinates. the field "locgroup"  is used to differentiate these groupings of locations. the default  locgroup \'0\' is used for the main/primary location, from which the  others can be derived via coordinate transformations. another  example of redundant locations is storing ORF coordinates relative  to both transcript and genome. redundant locations open the possibility  of the database getting into inconsistent states; this schema gives  us the flexibility of both \'warehouse\' instantiations with redundant  locations (easier for querying) and \'management\' instantiations with  no redundant locations.  most features (exons, transcripts, etc) will have 1 location, with  locgroup and rank equal to 0   an example of using both locgroup and rank:  imagine a feature indicating a conserved region between the chromosomes  of two different species. we may want to keep redundant locations on  both contigs and chromosomes. we would thus have 4 locations for the  single conserved region feature - two distinct locgroups (contig level  and chromosome level) and two distinct ranks (for the two species).  altresidues is used to store alternate residues of a feature, when these  differ from feature.residues. for instance, a SNP feature located on  a wild and mutant protein would have different alresidues.  for alignment/similarity features, the altresidues is used to represent  the alignment string.  note on variation features; even if we don\'t want to instantiate a mutant  chromosome/contig feature, we can still represent a SNP etc with 2 locations,  one (rank 0) on the genome, the other (rank 1) would have most fields null,  except for altresidues  IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates  this is vital as it allows us to represent zero-length  features eg splice sites, insertion points without  an awkward fuzzy system  nbeg, nend are for feature natural begin/end  by natural begin, end we mean these are the actual  beginning (5\' position) and actual end (3\' position)  rather than the low position and high position, as  these terms are sometimes erroneously used',
+                              'comment' => 'dbxref_id here is intended for the primary dbxref for this feature.  Additional dbxref links are made via feature_dbxref  name: the human-readable common name for a feature, for display  uniquename: the unique name for a feature; may not be particularly human-readable  timeaccessioned and timelastmodified are for handling object accession/  modification timestamps (as opposed to db auditing info, handled elsewhere).  The expectation is that these fields would be available to software  interacting with chado.  each feature can have 0 or more locations.  multiple locations do NOT indicate non-contiguous locations.  instead they designate alternate locations or grouped locations;  for instance, a feature designating a blast hit or hsp will have two  locations, one on the query feature, one on the subject feature.  features representing sequence variation could have alternate locations  instantiated on a feature on the mutant strain.  the field "rank" is used to differentiate these different locations.  the default rank \'0\' is used for the main/primary location (eg in  similarity features, 0 is query, 1 is subject), although sometimes  this will be symmeytical and there is no primary location.   redundant locations can also be stored - for instance, the position  of an exon on a BAC and in global coordinates. the field "locgroup"  is used to differentiate these groupings of locations. the default  locgroup \'0\' is used for the main/primary location, from which the  others can be derived via coordinate transformations. another  example of redundant locations is storing ORF coordinates relative  to both transcript and genome. redundant locations open the possibility  of the database getting into inconsistent states; this schema gives  us the flexibility of both \'warehouse\' instantiations with redundant  locations (easier for querying) and \'management\' instantiations with  no redundant locations.  most features (exons, transcripts, etc) will have 1 location, with  locgroup and rank equal to 0   an example of using both locgroup and rank:  imagine a feature indicating a conserved region between the chromosomes  of two different species. we may want to keep redundant locations on  both contigs and chromosomes. we would thus have 4 locations for the  single conserved region feature - two distinct locgroups (contig level  and chromosome level) and two distinct ranks (for the two species).  altresidues is used to store alternate residues of a feature, when these  differ from feature.residues. for instance, a SNP feature located on  a wild and mutant protein would have different alresidues.  for alignment/similarity features, the altresidues is used to represent  the alignment string.  note on variation features; even if we don\'t want to instantiate a mutant  chromosome/contig feature, we can still represent a SNP etc with 2 locations,  one (rank 0) on the genome, the other (rank 1) would have most fields null,  except for altresidues  IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates  this is vital as it allows us to represent zero-length  features eg splice sites, insertion points without  an awkward fuzzy system  Note that nbeg and nend have been replaced with fmin and fmax,  which are the minimum and maximum coordinates of the feature  relative to the parent feature.  By contrast,  nbeg, nend are for feature natural begin/end  by natural begin, end we mean these are the actual  beginning (5\' position) and actual end (3\' position)  rather than the low position and high position, as  these terms are sometimes erroneously used.  To compensate  for the removal of nbeg and nend from featureloc, a view  based on featureloc, dfeatureloc, is provided in sequence_views.sql.',
                               '_entity' => 'table',
                               'primarykey' => 'featureloc_id',
                               'column' => {
@@ -2695,32 +2634,6 @@ $schema = {
                                                                  '_entity' => 'column',
                                                                  'fk_column' => 'feature_id'
                                                                },
-                                            'phase' => {
-                                                         'name' => 'phase',
-                                                         'allownull' => 'yes',
-                                                         'type' => 'int',
-                                                         '_entity' => 'column'
-                                                       },
-                                            'is_nbeg_partial' => {
-                                                                   'name' => 'is_nbeg_partial',
-                                                                   'allownull' => 'no',
-                                                                   'type' => 'boolean',
-                                                                   '_entity' => 'column',
-                                                                   'default' => '\'false\''
-                                                                 },
-                                            'nend' => {
-                                                        'name' => 'nend',
-                                                        'allownull' => 'yes',
-                                                        'type' => 'int',
-                                                        '_entity' => 'column'
-                                                      },
-                                            'featureloc_id' => {
-                                                                 'name' => 'featureloc_id',
-                                                                 'allownull' => 'no',
-                                                                 'type' => 'serial',
-                                                                 '_entity' => 'column',
-                                                                 'primarykey' => 'yes'
-                                                               },
                                             'feature_id' => {
                                                               'fk_table' => 'feature',
                                                               'name' => 'feature_id',
@@ -2730,6 +2643,25 @@ $schema = {
                                                               'fk_column' => 'feature_id',
                                                               'unique' => 3
                                                             },
+                                            'phase' => {
+                                                         'name' => 'phase',
+                                                         'allownull' => 'yes',
+                                                         'type' => 'int',
+                                                         '_entity' => 'column'
+                                                       },
+                                            'is_fmin_partial' => {
+                                                                   'name' => 'is_fmin_partial',
+                                                                   'allownull' => 'no',
+                                                                   'type' => 'boolean',
+                                                                   '_entity' => 'column',
+                                                                   'default' => '\'false\''
+                                                                 },
+                                            'fmin' => {
+                                                        'name' => 'fmin',
+                                                        'allownull' => 'yes',
+                                                        'type' => 'int',
+                                                        '_entity' => 'column'
+                                                      },
                                             'locgroup' => {
                                                             'name' => 'locgroup',
                                                             'allownull' => 'no',
@@ -2738,14 +2670,21 @@ $schema = {
                                                             'default' => '0',
                                                             'unique' => 3
                                                           },
+                                            'is_fmax_partial' => {
+                                                                   'name' => 'is_fmax_partial',
+                                                                   'allownull' => 'no',
+                                                                   'type' => 'boolean',
+                                                                   '_entity' => 'column',
+                                                                   'default' => '\'false\''
+                                                                 },
                                             '_order' => [
                                                           'featureloc_id',
                                                           'feature_id',
                                                           'srcfeature_id',
-                                                          'nbeg',
-                                                          'is_nbeg_partial',
-                                                          'nend',
-                                                          'is_nend_partial',
+                                                          'fmin',
+                                                          'is_fmin_partial',
+                                                          'fmax',
+                                                          'is_fmax_partial',
                                                           'strand',
                                                           'phase',
                                                           'residue_info',
@@ -2772,20 +2711,20 @@ $schema = {
                                                           'type' => 'smallint',
                                                           '_entity' => 'column'
                                                         },
-                                            'is_nend_partial' => {
-                                                                   'name' => 'is_nend_partial',
-                                                                   'allownull' => 'no',
-                                                                   'type' => 'boolean',
-                                                                   '_entity' => 'column',
-                                                                   'default' => '\'false\''
-                                                                 },
-                                            '_entity' => 'list',
-                                            'nbeg' => {
-                                                        'name' => 'nbeg',
+                                            'fmax' => {
+                                                        'name' => 'fmax',
                                                         'allownull' => 'yes',
                                                         'type' => 'int',
                                                         '_entity' => 'column'
-                                                      }
+                                                      },
+                                            '_entity' => 'list',
+                                            'featureloc_id' => {
+                                                                 'name' => 'featureloc_id',
+                                                                 'allownull' => 'no',
+                                                                 'type' => 'serial',
+                                                                 '_entity' => 'column',
+                                                                 'primarykey' => 'yes'
+                                                               }
                                           },
                               'unique' => [
                                             'feature_id',
@@ -2851,78 +2790,6 @@ $schema = {
                                             'mapname'
                                           ]
                             },
-            'cvrelationship' => {
-                                  'indexes' => {
-                                                 'cvrelationship_idx1' => {
-                                                                            'columns' => 'reltype_id',
-                                                                            'name' => 'cvrelationship_idx1',
-                                                                            '_entity' => 'index'
-                                                                          },
-                                                 'cvrelationship_idx2' => {
-                                                                            'columns' => 'subjterm_id',
-                                                                            'name' => 'cvrelationship_idx2',
-                                                                            '_entity' => 'index'
-                                                                          },
-                                                 'cvrelationship_idx3' => {
-                                                                            'columns' => 'objterm_id',
-                                                                            'name' => 'cvrelationship_idx3',
-                                                                            '_entity' => 'index'
-                                                                          },
-                                                 '_entity' => 'set'
-                                               },
-                                  'name' => 'cvrelationship',
-                                  'comment' => 'the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The unique key on termname, cv_id ensures that all terms are  unique within a given cv',
-                                  '_entity' => 'table',
-                                  'primarykey' => 'cvrelationship_id',
-                                  'column' => {
-                                                'subjterm_id' => {
-                                                                   'fk_table' => 'cvterm',
-                                                                   'name' => 'subjterm_id',
-                                                                   'allownull' => 'no',
-                                                                   'type' => 'int',
-                                                                   '_entity' => 'column',
-                                                                   'fk_column' => 'cvterm_id',
-                                                                   'unique' => 3
-                                                                 },
-                                                'reltype_id' => {
-                                                                  'fk_table' => 'cvterm',
-                                                                  'name' => 'reltype_id',
-                                                                  'allownull' => 'no',
-                                                                  'type' => 'int',
-                                                                  '_entity' => 'column',
-                                                                  'fk_column' => 'cvterm_id',
-                                                                  'unique' => 3
-                                                                },
-                                                '_order' => [
-                                                              'cvrelationship_id',
-                                                              'reltype_id',
-                                                              'subjterm_id',
-                                                              'objterm_id'
-                                                            ],
-                                                '_entity' => 'list',
-                                                'objterm_id' => {
-                                                                  'fk_table' => 'cvterm',
-                                                                  'name' => 'objterm_id',
-                                                                  'allownull' => 'no',
-                                                                  'type' => 'int',
-                                                                  '_entity' => 'column',
-                                                                  'fk_column' => 'cvterm_id',
-                                                                  'unique' => 3
-                                                                },
-                                                'cvrelationship_id' => {
-                                                                         'name' => 'cvrelationship_id',
-                                                                         'allownull' => 'no',
-                                                                         'type' => 'serial',
-                                                                         '_entity' => 'column',
-                                                                         'primarykey' => 'yes'
-                                                                       }
-                                              },
-                                  'unique' => [
-                                                'reltype_id',
-                                                'subjterm_id',
-                                                'objterm_id'
-                                              ]
-                                },
             'phenotype_cvterm' => {
                                     'indexes' => {
                                                    'phenotype_cvterm_idx1' => {
@@ -2987,6 +2854,43 @@ $schema = {
                                                   'prank'
                                                 ]
                                   },
+            'contact' => {
+                           'name' => 'contact',
+                           'comment' => 'should this be in pub? ',
+                           '_entity' => 'table',
+                           'primarykey' => 'contact_id',
+                           'column' => {
+                                         'contact_id' => {
+                                                           'name' => 'contact_id',
+                                                           'allownull' => 'no',
+                                                           'type' => 'serial',
+                                                           'foreign_references' => [
+                                                                                     {
+                                                                                       'table' => 'author',
+                                                                                       'column' => 'contact_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'db',
+                                                                                       'column' => 'contact_id'
+                                                                                     }
+                                                                                   ],
+                                                           '_entity' => 'column',
+                                                           'primarykey' => 'yes'
+                                                         },
+                                         '_order' => [
+                                                       'contact_id',
+                                                       'description'
+                                                     ],
+                                         'description' => {
+                                                            'name' => 'description',
+                                                            'allownull' => 'yes',
+                                                            'type' => 'varchar(255)',
+                                                            'comment' => 'fields to be added after discussion',
+                                                            '_entity' => 'column'
+                                                          },
+                                         '_entity' => 'list'
+                                       }
+                         },
             'featureprop' => {
                                'indexes' => {
                                               'featureprop_idx1' => {
@@ -2995,7 +2899,7 @@ $schema = {
                                                                       '_entity' => 'index'
                                                                     },
                                               'featureprop_idx2' => {
-                                                                      'columns' => 'pkey_id',
+                                                                      'columns' => 'type_id',
                                                                       'name' => 'featureprop_idx2',
                                                                       '_entity' => 'index'
                                                                     },
@@ -3027,33 +2931,33 @@ $schema = {
                                                                    '_entity' => 'column',
                                                                    'primarykey' => 'yes'
                                                                  },
-                                             'pval' => {
-                                                         'name' => 'pval',
-                                                         'allownull' => 'no',
-                                                         'type' => 'text',
-                                                         '_entity' => 'column',
-                                                         'default' => '\'\'',
-                                                         'unique' => 4
-                                                       },
                                              '_order' => [
                                                            'featureprop_id',
                                                            'feature_id',
-                                                           'pkey_id',
-                                                           'pval',
-                                                           'prank'
+                                                           'type_id',
+                                                           'value',
+                                                           'rank'
                                                          ],
-                                             'prank' => {
-                                                          'name' => 'prank',
+                                             'rank' => {
+                                                         'name' => 'rank',
+                                                         'allownull' => 'no',
+                                                         'type' => 'int',
+                                                         '_entity' => 'column',
+                                                         'default' => '0',
+                                                         'unique' => 4
+                                                       },
+                                             '_entity' => 'list',
+                                             'value' => {
+                                                          'name' => 'value',
                                                           'allownull' => 'no',
-                                                          'type' => 'int',
+                                                          'type' => 'text',
                                                           '_entity' => 'column',
-                                                          'default' => '0',
+                                                          'default' => '\'\'',
                                                           'unique' => 4
                                                         },
-                                             '_entity' => 'list',
-                                             'pkey_id' => {
+                                             'type_id' => {
                                                             'fk_table' => 'cvterm',
-                                                            'name' => 'pkey_id',
+                                                            'name' => 'type_id',
                                                             'allownull' => 'no',
                                                             'type' => 'int',
                                                             '_entity' => 'column',
@@ -3063,9 +2967,9 @@ $schema = {
                                            },
                                'unique' => [
                                              'feature_id',
-                                             'pkey_id',
-                                             'pval',
-                                             'prank'
+                                             'type_id',
+                                             'value',
+                                             'rank'
                                            ]
                              },
             'wwwuser_genotype' => {
@@ -3218,6 +3122,7 @@ $schema = {
                                  },
             'tableinfo' => {
                              'name' => 'tableinfo',
+                             'comment' => 'this table pending review   create table dbxrefprop (        dbxrefprop_id serial not null,        primary key (dbxrefprop_id),        dbxref_id int not null,        foreign key (dbxref_id) references dbxref (dbxref_id),        pkey_id int not null,        foreign key (pkey_id) references cvterm (cvterm_id),        pval text not null default \'\',        prank int not null default 0,         unique(dbxref_id, pkey_id, pval, prank) ); create index dbxrefprop_idx1 on dbxrefprop (dbxref_id); create index dbxrefprop_idx2 on dbxrefprop (pkey_id);   this table pending review   create table dbxrefrelationship (        dbxrefrelationship_id serial not null,        primary key (dbxrefrelationship_id),        reltype_id int not null,        foreign key (reltype_id) references cvterm (cvterm_id),        subjterm_id int not null,        foreign key (subjterm_id) references dbxref (dbxref_id),        objterm_id int not null,        foreign key (objterm_id) references dbxref (dbxref_id),         unique(reltype_id, subjterm_id, objterm_id) ); create index dbxrefrelationship_idx1 on dbxrefrelationship (reltype_id); create index dbxrefrelationship_idx2 on dbxrefrelationship (subjterm_id); create index dbxrefrelationship_idx3 on dbxrefrelationship (objterm_id);',
                              '_entity' => 'table',
                              'primarykey' => 'tableinfo_id',
                              'column' => {
@@ -3732,27 +3637,27 @@ $schema = {
                             },
             'cv' => {
                       'name' => 'cv',
-                      'comment' => '- term - term_definition - term2term - graph_path - term_synonym - term_dbxref -- dbxref - tricky, namespace clash...  The cvterm module design is based on the ontology',
+                      'comment' => 'The cvterm module design is based on the ontology',
                       '_entity' => 'table',
                       'primarykey' => 'cv_id',
                       'column' => {
-                                    'cvdefinition' => {
-                                                        'name' => 'cvdefinition',
-                                                        'allownull' => 'yes',
-                                                        'type' => 'text',
-                                                        '_entity' => 'column'
-                                                      },
-                                    'cvname' => {
-                                                  'name' => 'cvname',
-                                                  'allownull' => 'no',
-                                                  'type' => 'varchar(255)',
-                                                  '_entity' => 'column',
-                                                  'unique' => 1
-                                                },
+                                    'definition' => {
+                                                      'name' => 'definition',
+                                                      'allownull' => 'yes',
+                                                      'type' => 'text',
+                                                      '_entity' => 'column'
+                                                    },
+                                    'name' => {
+                                                'name' => 'name',
+                                                'allownull' => 'no',
+                                                'type' => 'varchar(255)',
+                                                '_entity' => 'column',
+                                                'unique' => 1
+                                              },
                                     '_order' => [
                                                   'cv_id',
-                                                  'cvname',
-                                                  'cvdefinition'
+                                                  'name',
+                                                  'definition'
                                                 ],
                                     '_entity' => 'list',
                                     'cv_id' => {
@@ -3761,7 +3666,7 @@ $schema = {
                                                  'type' => 'serial',
                                                  'foreign_references' => [
                                                                            {
-                                                                             'table' => 'cvpath',
+                                                                             'table' => 'cvtermpath',
                                                                              'column' => 'cv_id'
                                                                            },
                                                                            {
@@ -3774,7 +3679,7 @@ $schema = {
                                                }
                                   },
                       'unique' => [
-                                    'cvname'
+                                    'name'
                                   ]
                     },
             'arrayannotation' => {
@@ -3819,81 +3724,6 @@ $schema = {
                                                                          }
                                                }
                                  },
-            'dbxrefprop' => {
-                              'indexes' => {
-                                             'dbxrefprop_idx1' => {
-                                                                    'columns' => 'dbxref_id',
-                                                                    'name' => 'dbxrefprop_idx1',
-                                                                    '_entity' => 'index'
-                                                                  },
-                                             'dbxrefprop_idx2' => {
-                                                                    'columns' => 'pkey_id',
-                                                                    'name' => 'dbxrefprop_idx2',
-                                                                    '_entity' => 'index'
-                                                                  },
-                                             '_entity' => 'set'
-                                           },
-                              'name' => 'dbxrefprop',
-                              '_entity' => 'table',
-                              'primarykey' => 'dbxrefprop_id',
-                              'column' => {
-                                            'dbxrefprop_id' => {
-                                                                 'name' => 'dbxrefprop_id',
-                                                                 'allownull' => 'no',
-                                                                 'type' => 'serial',
-                                                                 '_entity' => 'column',
-                                                                 'primarykey' => 'yes'
-                                                               },
-                                            'pval' => {
-                                                        'name' => 'pval',
-                                                        'allownull' => 'no',
-                                                        'type' => 'text',
-                                                        '_entity' => 'column',
-                                                        'default' => '\'\'',
-                                                        'unique' => 4
-                                                      },
-                                            '_order' => [
-                                                          'dbxrefprop_id',
-                                                          'dbxref_id',
-                                                          'pkey_id',
-                                                          'pval',
-                                                          'prank'
-                                                        ],
-                                            'prank' => {
-                                                         'name' => 'prank',
-                                                         'allownull' => 'no',
-                                                         'type' => 'int',
-                                                         '_entity' => 'column',
-                                                         'default' => '0',
-                                                         'unique' => 4
-                                                       },
-                                            '_entity' => 'list',
-                                            'pkey_id' => {
-                                                           'fk_table' => 'cvterm',
-                                                           'name' => 'pkey_id',
-                                                           'allownull' => 'no',
-                                                           'type' => 'int',
-                                                           '_entity' => 'column',
-                                                           'fk_column' => 'cvterm_id',
-                                                           'unique' => 4
-                                                         },
-                                            'dbxref_id' => {
-                                                             'fk_table' => 'dbxref',
-                                                             'name' => 'dbxref_id',
-                                                             'allownull' => 'no',
-                                                             'type' => 'int',
-                                                             '_entity' => 'column',
-                                                             'fk_column' => 'dbxref_id',
-                                                             'unique' => 4
-                                                           }
-                                          },
-                              'unique' => [
-                                            'dbxref_id',
-                                            'pkey_id',
-                                            'pval',
-                                            'prank'
-                                          ]
-                            },
             'compositeelementresult' => {
                                           'name' => 'compositeelementresult',
                                           'comment' => 'dropped compositeelementannotation.  use featureprop instead. dropped compositeelementgus.         use feature instead. dropped compositeelement.            use feature instead. ok drop table if exists compositeelementresult;',
@@ -4082,10 +3912,6 @@ $schema = {
                                                            'type' => 'serial',
                                                            'foreign_references' => [
                                                                                      {
-                                                                                       'table' => 'synonym_pub',
-                                                                                       'column' => 'synonym_id'
-                                                                                     },
-                                                                                     {
                                                                                        'table' => 'feature_synonym',
                                                                                        'column' => 'synonym_id'
                                                                                      }
@@ -4196,48 +4022,40 @@ $schema = {
                             '_entity' => 'table',
                             'primarykey' => 'organism_id',
                             'column' => {
-                                          'genus' => {
-                                                       'name' => 'genus',
-                                                       'allownull' => 'no',
-                                                       'type' => 'varchar(255)',
-                                                       '_entity' => 'column',
-                                                       'unique' => 3
-                                                     },
-                                          'abbrev' => {
-                                                        'name' => 'abbrev',
-                                                        'allownull' => 'yes',
-                                                        'type' => 'varchar(255)',
-                                                        '_entity' => 'column'
-                                                      },
-                                          'comment' => {
-                                                         'name' => 'comment',
-                                                         'allownull' => 'yes',
-                                                         'type' => 'text',
-                                                         '_entity' => 'column'
-                                                       },
                                           'common_name' => {
                                                              'name' => 'common_name',
                                                              'allownull' => 'yes',
                                                              'type' => 'varchar(255)',
                                                              '_entity' => 'column'
                                                            },
-                                          'taxgroup' => {
-                                                          'name' => 'taxgroup',
-                                                          'allownull' => 'no',
-                                                          'type' => 'varchar(255)',
-                                                          '_entity' => 'column',
-                                                          'unique' => 3
-                                                        },
+                                          'genus' => {
+                                                       'name' => 'genus',
+                                                       'allownull' => 'no',
+                                                       'type' => 'varchar(255)',
+                                                       '_entity' => 'column',
+                                                       'unique' => 2
+                                                     },
+                                          'comment' => {
+                                                         'name' => 'comment',
+                                                         'allownull' => 'yes',
+                                                         'type' => 'text',
+                                                         '_entity' => 'column'
+                                                       },
                                           '_order' => [
                                                         'organism_id',
-                                                        'abbrev',
+                                                        'abbreviation',
                                                         'genus',
-                                                        'taxgroup',
                                                         'species',
                                                         'common_name',
                                                         'comment'
                                                       ],
-                                          '_entity' => 'list',
+                                          'species' => {
+                                                         'name' => 'species',
+                                                         'allownull' => 'no',
+                                                         'type' => 'varchar(255)',
+                                                         '_entity' => 'column',
+                                                         'unique' => 2
+                                                       },
                                           'organism_id' => {
                                                              'name' => 'organism_id',
                                                              'allownull' => 'no',
@@ -4252,6 +4070,10 @@ $schema = {
                                                                                          'column' => 'organism_id'
                                                                                        },
                                                                                        {
+                                                                                         'table' => 'organismprop',
+                                                                                         'column' => 'organism_id'
+                                                                                       },
+                                                                                       {
                                                                                          'table' => 'biomaterial',
                                                                                          'column' => 'taxon_id'
                                                                                        },
@@ -4263,16 +4085,15 @@ $schema = {
                                                              '_entity' => 'column',
                                                              'primarykey' => 'yes'
                                                            },
-                                          'species' => {
-                                                         'name' => 'species',
-                                                         'allownull' => 'no',
-                                                         'type' => 'varchar(255)',
-                                                         '_entity' => 'column',
-                                                         'unique' => 3
-                                                       }
+                                          '_entity' => 'list',
+                                          'abbreviation' => {
+                                                              'name' => 'abbreviation',
+                                                              'allownull' => 'yes',
+                                                              'type' => 'varchar(255)',
+                                                              '_entity' => 'column'
+                                                            }
                                         },
                             'unique' => [
-                                          'taxgroup',
                                           'genus',
                                           'species'
                                         ]
@@ -4490,7 +4311,7 @@ $schema = {
                                                                         '_entity' => 'index'
                                                                       },
                                                'analysisprop_idx2' => {
-                                                                        'columns' => 'pkey_id',
+                                                                        'columns' => 'type_id',
                                                                         'name' => 'analysisprop_idx2',
                                                                         '_entity' => 'index'
                                                                       },
@@ -4517,23 +4338,23 @@ $schema = {
                                                                      '_entity' => 'column',
                                                                      'primarykey' => 'yes'
                                                                    },
-                                              'pval' => {
-                                                          'name' => 'pval',
-                                                          'allownull' => 'yes',
-                                                          'type' => 'text',
-                                                          '_entity' => 'column',
-                                                          'unique' => 3
-                                                        },
                                               '_order' => [
                                                             'analysisprop_id',
                                                             'analysis_id',
-                                                            'pkey_id',
-                                                            'pval'
+                                                            'type_id',
+                                                            'value'
                                                           ],
                                               '_entity' => 'list',
-                                              'pkey_id' => {
+                                              'value' => {
+                                                           'name' => 'value',
+                                                           'allownull' => 'yes',
+                                                           'type' => 'text',
+                                                           '_entity' => 'column',
+                                                           'unique' => 3
+                                                         },
+                                              'type_id' => {
                                                              'fk_table' => 'cvterm',
-                                                             'name' => 'pkey_id',
+                                                             'name' => 'type_id',
                                                              'allownull' => 'no',
                                                              'type' => 'int',
                                                              '_entity' => 'column',
@@ -4543,8 +4364,8 @@ $schema = {
                                             },
                                 'unique' => [
                                               'analysis_id',
-                                              'pkey_id',
-                                              'pval'
+                                              'type_id',
+                                              'value'
                                             ]
                               },
             'projectlink' => {
@@ -4667,6 +4488,20 @@ $schema = {
                       '_entity' => 'table',
                       'primarykey' => 'db_id',
                       'column' => {
+                                    'contact_id' => {
+                                                      'fk_table' => 'contact',
+                                                      'name' => 'contact_id',
+                                                      'allownull' => 'no',
+                                                      'type' => 'int',
+                                                      '_entity' => 'column',
+                                                      'fk_column' => 'contact_id'
+                                                    },
+                                    'urlprefix' => {
+                                                     'name' => 'urlprefix',
+                                                     'allownull' => 'yes',
+                                                     'type' => 'varchar(255)',
+                                                     '_entity' => 'column'
+                                                   },
                                     'name' => {
                                                 'name' => 'name',
                                                 'allownull' => 'no',
@@ -4677,11 +4512,11 @@ $schema = {
                                     'db_id' => {
                                                  'name' => 'db_id',
                                                  'allownull' => 'no',
-                                                 'type' => 'varchar(255)',
+                                                 'type' => 'serial',
                                                  'foreign_references' => [
                                                                            {
                                                                              'table' => 'dbxref',
-                                                                             'column' => 'dbname'
+                                                                             'column' => 'db_id'
                                                                            }
                                                                          ],
                                                  '_entity' => 'column',
@@ -4696,7 +4531,9 @@ $schema = {
                                     '_order' => [
                                                   'db_id',
                                                   'name',
+                                                  'contact_id',
                                                   'description',
+                                                  'urlprefix',
                                                   'url'
                                                 ],
                                     'description' => {
@@ -5355,7 +5192,7 @@ $schema = {
                                     },
             'genotype' => {
                             'name' => 'genotype',
-                            'comment' => 'This module depends on the sequence, pub, and cv modules  18-JAN-03 (DE): This module is unfinished and due for schema review (Bill  Gelbart will be leading the charge)',
+                            'comment' => 'pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they\'re looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to \'true\' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym.  This module depends on the sequence, pub, and cv modules  18-JAN-03 (DE): This module is unfinished and due for schema review (Bill  Gelbart will be leading the charge)',
                             '_entity' => 'table',
                             'primarykey' => 'genotype_id',
                             'column' => {
@@ -5984,6 +5821,96 @@ $schema = {
                                                       'type_id'
                                                     ]
                                       },
+            'cvtermpath' => {
+                              'indexes' => {
+                                             'cvtermpath_idx1' => {
+                                                                    'columns' => 'type_id',
+                                                                    'name' => 'cvtermpath_idx1',
+                                                                    '_entity' => 'index'
+                                                                  },
+                                             'cvtermpath_idx2' => {
+                                                                    'columns' => 'subject_id',
+                                                                    'name' => 'cvtermpath_idx2',
+                                                                    '_entity' => 'index'
+                                                                  },
+                                             '_entity' => 'set',
+                                             'cvtermpath_idx3' => {
+                                                                    'columns' => 'object_id',
+                                                                    'name' => 'cvtermpath_idx3',
+                                                                    '_entity' => 'index'
+                                                                  },
+                                             'cvtermpath_idx4' => {
+                                                                    'columns' => 'cv_id',
+                                                                    'name' => 'cvtermpath_idx4',
+                                                                    '_entity' => 'index'
+                                                                  }
+                                           },
+                              'name' => 'cvtermpath',
+                              '_entity' => 'table',
+                              'primarykey' => 'cvtermpath_id',
+                              'column' => {
+                                            'object_id' => {
+                                                             'fk_table' => 'cvterm',
+                                                             'name' => 'object_id',
+                                                             'allownull' => 'no',
+                                                             'type' => 'int',
+                                                             '_entity' => 'column',
+                                                             'fk_column' => 'cvterm_id',
+                                                             'unique' => 2
+                                                           },
+                                            'cv_id' => {
+                                                         'fk_table' => 'cv',
+                                                         'name' => 'cv_id',
+                                                         'allownull' => 'no',
+                                                         'type' => 'int',
+                                                         '_entity' => 'column',
+                                                         'fk_column' => 'cv_id'
+                                                       },
+                                            'pathdistance' => {
+                                                                'name' => 'pathdistance',
+                                                                'allownull' => 'yes',
+                                                                'type' => 'int',
+                                                                '_entity' => 'column'
+                                                              },
+                                            'cvtermpath_id' => {
+                                                                 'name' => 'cvtermpath_id',
+                                                                 'allownull' => 'no',
+                                                                 'type' => 'serial',
+                                                                 '_entity' => 'column',
+                                                                 'primarykey' => 'yes'
+                                                               },
+                                            '_order' => [
+                                                          'cvtermpath_id',
+                                                          'type_id',
+                                                          'subject_id',
+                                                          'object_id',
+                                                          'cv_id',
+                                                          'pathdistance'
+                                                        ],
+                                            '_entity' => 'list',
+                                            'subject_id' => {
+                                                              'fk_table' => 'cvterm',
+                                                              'name' => 'subject_id',
+                                                              'allownull' => 'no',
+                                                              'type' => 'int',
+                                                              '_entity' => 'column',
+                                                              'fk_column' => 'cvterm_id',
+                                                              'unique' => 2
+                                                            },
+                                            'type_id' => {
+                                                           'fk_table' => 'cvterm',
+                                                           'name' => 'type_id',
+                                                           'allownull' => 'yes',
+                                                           'type' => 'int',
+                                                           '_entity' => 'column',
+                                                           'fk_column' => 'cvterm_id'
+                                                         }
+                                          },
+                              'unique' => [
+                                            'subject_id',
+                                            'object_id'
+                                          ]
+                            },
             'wwwuser_phenotype' => {
                                      'indexes' => {
                                                     '_entity' => 'set',
@@ -6165,15 +6092,22 @@ $schema = {
                                                                                 }
                                                   },
                                      'name' => 'expression_cvterm',
-                                     'comment' => 'What are the possibities of combination when more than one cvterm is used  in a field?   For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal  If the two terms used in a particular field are co-equal (both from the  same CV, is the relation always "&"?   May we find "or"?   Obviously another case is when a bodypart term and a bodypart qualifier  term are used in a specific field, eg:    <t> L | third instar <a> larval antennal segment sensilla | subset <p   WRT the three-part <t><a><p> statements, are the values in the different  parts *always* from different vocabularies in proforma.CV?   If not,  we\'ll need to have some kind of type qualifier telling us whether the  cvterm used is <t>, <a>, or <p>',
+                                     'comment' => 'What are the possibities of combination when more than one cvterm is used  in a field?   For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal  If the two terms used in a particular field are co-equal (both from the  same CV, is the relation always "&"?   May we find "or"?   Obviously another case is when a bodypart term and a bodypart qualifier  term are used in a specific field, eg:    <t> L | third instar <a> larval antennal segment sensilla | subset <p   WRT the three-part <t><a><p> statements, are the values in the different  parts *always* from different vocabularies in proforma.CV?   If not,  we\'ll need to have some kind of type qualifier telling us whether the  cvterm used is <t>, <a>, or <p>  yes we should have a type qualifier as a cv term can be from diff vocab  e.g. blastoderm can be body part and stage terms in dros anatomy  but cvterm_type needs to be a cv instead of a free text type here?',
                                      '_entity' => 'table',
                                      'primarykey' => 'expression_cvterm_id',
                                      'column' => {
+                                                   'cvterm_type' => {
+                                                                      'name' => 'cvterm_type',
+                                                                      'allownull' => 'yes',
+                                                                      'type' => 'varchar(255)',
+                                                                      '_entity' => 'column'
+                                                                    },
                                                    '_order' => [
                                                                  'expression_cvterm_id',
                                                                  'expression_id',
                                                                  'cvterm_id',
-                                                                 'rank'
+                                                                 'rank',
+                                                                 'cvterm_type'
                                                                ],
                                                    'rank' => {
                                                                'name' => 'rank',
@@ -6213,6 +6147,153 @@ $schema = {
                                                    'cvterm_id'
                                                  ]
                                    },
+            'organismprop' => {
+                                'indexes' => {
+                                               '_entity' => 'set',
+                                               'organismprop_idx1' => {
+                                                                        'columns' => 'organism_id',
+                                                                        'name' => 'organismprop_idx1',
+                                                                        '_entity' => 'index'
+                                                                      },
+                                               'organismprop_idx2' => {
+                                                                        'columns' => 'type_id',
+                                                                        'name' => 'organismprop_idx2',
+                                                                        '_entity' => 'index'
+                                                                      }
+                                             },
+                                'name' => 'organismprop',
+                                '_entity' => 'table',
+                                'primarykey' => 'organismprop_id',
+                                'column' => {
+                                              '_order' => [
+                                                            'organismprop_id',
+                                                            'organism_id',
+                                                            'type_id',
+                                                            'value',
+                                                            'rank'
+                                                          ],
+                                              'rank' => {
+                                                          'name' => 'rank',
+                                                          'allownull' => 'no',
+                                                          'type' => 'int',
+                                                          '_entity' => 'column',
+                                                          'default' => '0',
+                                                          'unique' => 4
+                                                        },
+                                              'organism_id' => {
+                                                                 'fk_table' => 'organism',
+                                                                 'name' => 'organism_id',
+                                                                 'allownull' => 'no',
+                                                                 'type' => 'int',
+                                                                 '_entity' => 'column',
+                                                                 'fk_column' => 'organism_id',
+                                                                 'unique' => 4
+                                                               },
+                                              '_entity' => 'list',
+                                              'value' => {
+                                                           'name' => 'value',
+                                                           'allownull' => 'no',
+                                                           'type' => 'text',
+                                                           '_entity' => 'column',
+                                                           'default' => '\'\'',
+                                                           'unique' => 4
+                                                         },
+                                              'organismprop_id' => {
+                                                                     'name' => 'organismprop_id',
+                                                                     'allownull' => 'no',
+                                                                     'type' => 'serial',
+                                                                     '_entity' => 'column',
+                                                                     'primarykey' => 'yes'
+                                                                   },
+                                              'type_id' => {
+                                                             'fk_table' => 'cvterm',
+                                                             'name' => 'type_id',
+                                                             'allownull' => 'no',
+                                                             'type' => 'int',
+                                                             '_entity' => 'column',
+                                                             'fk_column' => 'cvterm_id',
+                                                             'unique' => 4
+                                                           }
+                                            },
+                                'unique' => [
+                                              'organism_id',
+                                              'type_id',
+                                              'value',
+                                              'rank'
+                                            ]
+                              },
+            'cvtermrelationship' => {
+                                      'indexes' => {
+                                                     'cvtermrelationship_idx1' => {
+                                                                                    'columns' => 'type_id',
+                                                                                    'name' => 'cvtermrelationship_idx1',
+                                                                                    '_entity' => 'index'
+                                                                                  },
+                                                     'cvtermrelationship_idx2' => {
+                                                                                    'columns' => 'subject_id',
+                                                                                    'name' => 'cvtermrelationship_idx2',
+                                                                                    '_entity' => 'index'
+                                                                                  },
+                                                     'cvtermrelationship_idx3' => {
+                                                                                    'columns' => 'object_id',
+                                                                                    'name' => 'cvtermrelationship_idx3',
+                                                                                    '_entity' => 'index'
+                                                                                  },
+                                                     '_entity' => 'set'
+                                                   },
+                                      'name' => 'cvtermrelationship',
+                                      'comment' => 'the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The unique key on termname, cv_id ensures that all terms are  unique within a given cv',
+                                      '_entity' => 'table',
+                                      'primarykey' => 'cvtermrelationship_id',
+                                      'column' => {
+                                                    'object_id' => {
+                                                                     'fk_table' => 'cvterm',
+                                                                     'name' => 'object_id',
+                                                                     'allownull' => 'no',
+                                                                     'type' => 'int',
+                                                                     '_entity' => 'column',
+                                                                     'fk_column' => 'cvterm_id',
+                                                                     'unique' => 3
+                                                                   },
+                                                    '_order' => [
+                                                                  'cvtermrelationship_id',
+                                                                  'type_id',
+                                                                  'subject_id',
+                                                                  'object_id'
+                                                                ],
+                                                    'subject_id' => {
+                                                                      'fk_table' => 'cvterm',
+                                                                      'name' => 'subject_id',
+                                                                      'allownull' => 'no',
+                                                                      'type' => 'int',
+                                                                      '_entity' => 'column',
+                                                                      'fk_column' => 'cvterm_id',
+                                                                      'unique' => 3
+                                                                    },
+                                                    '_entity' => 'list',
+                                                    'type_id' => {
+                                                                   'fk_table' => 'cvterm',
+                                                                   'name' => 'type_id',
+                                                                   'allownull' => 'no',
+                                                                   'type' => 'int',
+                                                                   '_entity' => 'column',
+                                                                   'fk_column' => 'cvterm_id',
+                                                                   'unique' => 3
+                                                                 },
+                                                    'cvtermrelationship_id' => {
+                                                                                 'name' => 'cvtermrelationship_id',
+                                                                                 'allownull' => 'no',
+                                                                                 'type' => 'serial',
+                                                                                 '_entity' => 'column',
+                                                                                 'primarykey' => 'yes'
+                                                                               }
+                                                  },
+                                      'unique' => [
+                                                    'type_id',
+                                                    'subject_id',
+                                                    'object_id'
+                                                  ]
+                                    },
             'protocolparam' => {
                                  'name' => 'protocolparam',
                                  'comment' => 'ok drop table if exists protocolparam;',
@@ -6385,10 +6466,6 @@ $schema = {
                                                                              },
                                                                              {
                                                                                'table' => 'phenotype',
-                                                                               'column' => 'pub_id'
-                                                                             },
-                                                                             {
-                                                                               'table' => 'synonym_pub',
                                                                                'column' => 'pub_id'
                                                                              },
                                                                              {
@@ -6822,12 +6899,12 @@ $schema = {
                           '_entity' => 'table',
                           'primarykey' => 'cvterm_id',
                           'column' => {
-                                        'termdefinition' => {
-                                                              'name' => 'termdefinition',
-                                                              'allownull' => 'yes',
-                                                              'type' => 'text',
-                                                              '_entity' => 'column'
-                                                            },
+                                        'definition' => {
+                                                          'name' => 'definition',
+                                                          'allownull' => 'yes',
+                                                          'type' => 'text',
+                                                          '_entity' => 'column'
+                                                        },
                                         'name' => {
                                                     'name' => 'name',
                                                     'allownull' => 'no',
@@ -6839,7 +6916,7 @@ $schema = {
                                                       'cvterm_id',
                                                       'cv_id',
                                                       'name',
-                                                      'termdefinition',
+                                                      'definition',
                                                       'dbxref_id'
                                                     ],
                                         '_entity' => 'list',
@@ -6863,11 +6940,11 @@ $schema = {
                                                                                    },
                                                                                    {
                                                                                      'table' => 'pubprop',
-                                                                                     'column' => 'pkey_id'
+                                                                                     'column' => 'type_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'element',
-                                                                                     'column' => 'element_type_id'
+                                                                                     'column' => 'elementtype_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'cvterm_dbxref',
@@ -6883,7 +6960,7 @@ $schema = {
                                                                                    },
                                                                                    {
                                                                                      'table' => 'protocol',
-                                                                                     'column' => 'protocol_type_id'
+                                                                                     'column' => 'protocoltype_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'wwwuser_cvterm',
@@ -6902,44 +6979,16 @@ $schema = {
                                                                                      'column' => 'statement_type'
                                                                                    },
                                                                                    {
-                                                                                     'table' => 'cvpath',
-                                                                                     'column' => 'subjterm_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'cvpath',
-                                                                                     'column' => 'reltype_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'cvpath',
-                                                                                     'column' => 'objterm_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'cvrelationship',
-                                                                                     'column' => 'subjterm_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'cvrelationship',
-                                                                                     'column' => 'reltype_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'cvrelationship',
-                                                                                     'column' => 'objterm_id'
-                                                                                   },
-                                                                                   {
                                                                                      'table' => 'phenotype_cvterm',
                                                                                      'column' => 'cvterm_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'featureprop',
-                                                                                     'column' => 'pkey_id'
+                                                                                     'column' => 'type_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'studydesigndescription',
                                                                                      'column' => 'descriptiontype_id'
-                                                                                   },
-                                                                                   {
-                                                                                     'table' => 'dbxrefprop',
-                                                                                     'column' => 'pkey_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'synonym',
@@ -6947,7 +6996,7 @@ $schema = {
                                                                                    },
                                                                                    {
                                                                                      'table' => 'analysisprop',
-                                                                                     'column' => 'pkey_id'
+                                                                                     'column' => 'type_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'biomaterialmeasurement',
@@ -6966,8 +7015,36 @@ $schema = {
                                                                                      'column' => 'type_id'
                                                                                    },
                                                                                    {
+                                                                                     'table' => 'cvtermpath',
+                                                                                     'column' => 'object_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'cvtermpath',
+                                                                                     'column' => 'subject_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'cvtermpath',
+                                                                                     'column' => 'type_id'
+                                                                                   },
+                                                                                   {
                                                                                      'table' => 'expression_cvterm',
                                                                                      'column' => 'cvterm_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'organismprop',
+                                                                                     'column' => 'type_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'cvtermrelationship',
+                                                                                     'column' => 'object_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'cvtermrelationship',
+                                                                                     'column' => 'subject_id'
+                                                                                   },
+                                                                                   {
+                                                                                     'table' => 'cvtermrelationship',
+                                                                                     'column' => 'type_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'protocolparam',
@@ -6999,7 +7076,7 @@ $schema = {
                                                                                    },
                                                                                    {
                                                                                      'table' => 'array',
-                                                                                     'column' => 'substrate_type_id'
+                                                                                     'column' => 'substratetype_id'
                                                                                    },
                                                                                    {
                                                                                      'table' => 'array',
@@ -7546,7 +7623,7 @@ $schema = {
                                                                             }
                                                 },
                                    'name' => 'organism_dbxref',
-                                   'comment' => 'Compared to mol5..Species, organism table lacks "approved char(1) null".  We need to work w/ Aubrey & Michael to ensure that we don\'t need this in  future [dave]   in response: this is very specific to a limited use case I think;  if it\'s really necessary we can have an organismprop table  for adding internal project specific data  [cjm]',
+                                   'comment' => 'Compared to mol5..Species, organism table lacks "approved char(1) null".  We need to work w/ Aubrey & Michael to ensure that we don\'t need this in  future [dave]   in response: this is very specific to a limited use case I think;  if it\'s really necessary we can have an organismprop table  for adding internal project specific data  [cjm]  done (below) 19-MAY-03 [dave]',
                                    '_entity' => 'table',
                                    'primarykey' => 'organism_dbxref_id',
                                    'column' => {
@@ -7838,14 +7915,6 @@ $schema = {
                                                         '_entity' => 'column',
                                                         'fk_column' => 'dbxref_id'
                                                       },
-                                       'substrate_type_id' => {
-                                                                'fk_table' => 'cvterm',
-                                                                'name' => 'substrate_type_id',
-                                                                'allownull' => 'yes',
-                                                                'type' => 'int',
-                                                                '_entity' => 'column',
-                                                                'fk_column' => 'cvterm_id'
-                                                              },
                                        'array_id' => {
                                                        'name' => 'array_id',
                                                        'allownull' => 'no',
@@ -7867,6 +7936,14 @@ $schema = {
                                                        '_entity' => 'column',
                                                        'primarykey' => 'yes'
                                                      },
+                                       'substratetype_id' => {
+                                                               'fk_table' => 'cvterm',
+                                                               'name' => 'substratetype_id',
+                                                               'allownull' => 'yes',
+                                                               'type' => 'int',
+                                                               '_entity' => 'column',
+                                                               'fk_column' => 'cvterm_id'
+                                                             },
                                        'num_array_columns' => {
                                                                 'name' => 'num_array_columns',
                                                                 'allownull' => 'yes',
@@ -7923,7 +8000,7 @@ $schema = {
                                                      'array_id',
                                                      'manufacturer_id',
                                                      'platformtype_id',
-                                                     'substrate_type_id',
+                                                     'substratetype_id',
                                                      'protocol_id',
                                                      'dbxref_id',
                                                      'name',
