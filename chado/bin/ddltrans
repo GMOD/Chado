@@ -1,0 +1,362 @@
+#!/usr/local/bin/perl
+
+# DDLTRANS: Transform sql schema definitions into various useful formats.
+# (DDL=data definition language, the schema defining subset of SQL -- create table, etc.)
+
+# Syntax: ddltrans [-f format] ddlfiles
+# Writes to stdout.
+
+# Converts ddl files to dtd, xml, perl or html according to format arg. Default is html.
+
+# -dtd: generates a DTD according to translation rules of XORT (XML Object To Relational 
+# Translator) system, which specify a fixed mapping from a relational schema to an (optionally 
+# hierarchical, i.e. object-like) XML format.
+# There is a loader and dumper that will load/dump XORT XML into corresponding PostGreSQL databases.
+
+# -perl: generates a hierarchical Perl data structure (hashes and arrays) containing all the
+# metadata extracted from DDL, for use by schema-driven perl applications. Suitable for loading
+# with "do".
+
+# -html: generates very simple html presentation of schema, suitable (possibly) for developers.
+
+# -xml: generates straighforward XML representation of schema suitable for schema-driven applications
+# in languages other than Perl; e.g. Java.
+
+# WARNING: The SQL parser is not robust; stylistic variations of legal SQL may break it.
+
+use Getopt::Std;
+use Data::Dumper; 
+
+my %opts;
+getopts('f:', \%opts);
+
+
+# open(STDIN,"/users/stan/sql/sequence.sql") || die "Can't read .sql"; $opts{f}=dtd;
+
+$date=`date`; chop($date);
+
+$schema = {_entity=>set}; # set of tables
+$currobj=0;
+$output_format = "html"; # default
+$known_format{xml}=1;
+$known_format{perl}=1;
+$known_format{html}=1;
+$known_format{dtd}=1;
+if(defined($opts{f}))
+{ if($known_format{$opts{f}})
+  { $output_format = $opts{f}; }
+  else { die "Unknown format $opts{f} -- supported formats are perl, xml and html.\n"; }}
+
+while(<>){
+    chop;
+    next if $_ !~ /\S/;  # skip blank lines
+    next if /^##/;  # skip blank lines
+    if( /^\s*(\S.*\S)\s*$/ ){ $_ = $1; } # eliminate leading/trailing blanks
+    if(/^([^-]*)\-\-(.*)$/) # handle comments
+    { $_=$1; $newcomment=$2;
+      if($newcomment !~ /=====*/ & $newcomment !~ /TABLE/ ) # ignore header comments
+      { $comment="$comment $newcomment"; # concat comments 
+	if($comment=~/^\s+(\S.*\S)\s*$/){ $comment=$1; }} # remove blanks
+  }
+    next if $_ !~ /\S/;
+    if( /^(.*\S)\s+$/ ){ $_ = $1; }
+    if(/create table\s+(\S+)\s\((.*)$/) {
+	die Dumper($currobj) if $currobj;
+	$currobj = { _entity=>table, 
+		     name=>$1, column=>{_entity=>list, _order=>[]}};
+	if( $output_format eq "xml"){ $currobj->{_order} = [name, comment, column, unique, "index"]; }
+	if($comment){ $currobj->{comment}=$comment; $comment=""; }
+	$rest=$2;
+	if( $rest =~ /\S/ ){ die "Unexpected stuff after ( in create table line"; }
+	next;
+    } elsif( $currobj->{_entity} eq "table" ){
+	if(/^\s*(\S.*),\s*$/){ $_=$1;}      # lose any final comma
+	if( /^(.*)\)\s*;\s*/ ){ $_=$1; $eoc=1; } # lose any final );
+	if(/foreign\s+key\s+\(\s*(\S+)\s*\)\s+references\s+\s*(\S+)\s*\s+\(\s*(\S+)\s*\)/)
+	{ $fkcol=$1;
+	  $keytable=$2;
+	  $keycol=$3; 
+	  $currobj->{column}->{$fkcol}->{fk_table}=$keytable;
+	  $currobj->{column}->{$fkcol}->{fk_column}=$keycol;
+      }
+	elsif(/primary\s+key\s+\(\s*(\S+)\s*\)/)
+	{ $currobj->{primarykey}=$1; 
+	  die "Can't find primary key $1 of $currobj->{name}" if ! defined($currobj->{column}->{$1});
+	  $currobj->{column}->{$1}->{primarykey}="yes";
+      }
+	elsif(/^unique\s*\(\s*(\S.*)\s*\)$/) # Assumes only one to a table -- not correct?
+	{ @ucols=split(/\s*,\s*/,$1);
+	  foreach $col (@ucols)
+	  { die "Can't find $currobj->{name}.$col in uniqueness constraint" if ! defined($currobj->{column}->{$col});
+	    push(@{$currobj->{unique}}, $col);
+	    $currobj->{column}->{$col}->{unique}=@ucols+0; # store of # columns in unique key under each col: eg 1 of 3, 1 or 2, etc.
+	}
+      }
+	elsif(/^(\S+)\s+(\S.*)$/)
+	{ $colname=$1;
+	  $type=$2;
+	  if($type=~/^(\S+)\s(\S.*)$/){ $type = $1; $rest=$2; }
+	  else { $rest=""; }
+	  $col={_entity=>"column", 
+		name=>$colname, type=>$type };
+	  if( $output_format eq "xml")
+	  { $col->{_order} = [name, type, allownull, comment, fk_table, fk_column, foreign_references]; }
+	  $col->{allownull}="yes";
+	  if( $rest )
+	  { if($rest =~ /\s*not\s+null/i ){  
+	      $col->{allownull}="no"; }
+	    if($rest =~ /default\s+(\S.*)$/ )
+	    { $col->{default}=$1; }}
+	  if( $comment ){ $col->{comment}=$comment; $comment=""; }
+	  $currobj->{column}->{$colname}=$col;
+	  push(@{$currobj->{column}->{_order}},$colname);
+      }}
+    elsif( /^\s*\)\s*;\s*$/ ){
+	$eoc=1;
+    }
+    elsif(/create index\s+(\S+)\s+on\s+(\S+)\s*\(\s*(\S+)\s*\)\s*;$/i) {
+	$index=$1; $table=$2; $cols=$3;
+	$schema->{$table}->{indexes}->{$index} = { _entity=>"index", name=>$index, columns=>$cols };
+	$schema->{$table}->{indexes}->{_entity} = set;
+    }
+    elsif(/^grant/i)
+    { # ignore permissions for now; should annotate tables
+    }
+    elsif(/^drop/i)
+    { # ignore 
+    }
+    elsif(/^create /i)
+    { # ignore 
+	if($_ !~ /;$/){ while(<>){ last if /;$/; }}
+    }
+    else { warn "Unrecognized sql: $_\n"; if($_ !~ /;$/){ while(<>){ last if /;$/; }}}
+    if($eoc)
+    { die "No name in ", Dumper($currobj) if ! defined($currobj->{name});
+      $schema->{$currobj->{name}} = $currobj;
+#      print Dumper($currobj), "\n"; 
+      $currobj=0;
+      $eoc=0;
+    }
+}
+
+
+# Create inverse foreign key reference info
+foreach $table (keys(%{$schema}))
+{ foreach $col (keys(%{$schema->{$table}->{column}}))
+  { next if $col =~ /^\_/;
+    if(defined($schema->{$table}->{column}->{$col}->{fk_table}))
+    { $fk_table=$schema->{$table}->{column}->{$col}->{fk_table};
+      $fk_col=$schema->{$table}->{column}->{$col}->{fk_column};
+      if(defined($schema->{$fk_table}))
+      { if(defined($schema->{$fk_table}->{column}->{$fk_col}))
+	{ push(@{$schema->{$fk_table}->{column}->{$fk_col}->{foreign_references}},
+	       {table=>$table, column=>$col}); }
+	else { warn "Foreign key reference from $table.$col to unknown column $fk_col of $fk_table.\n"; }}
+      else  { warn "Foreign key reference from $table.$col to unknown table $fk_table.$fk_col.\n"; }}}}
+
+if( $output_format eq "perl"){ 
+  print "# Schema metadata produced by ddltrans on $date\n"; 
+  print Data::Dumper->Dump([$schema], [schema]), "\n"; }
+
+elsif( $output_format eq "xml"){ 
+  print "<!-- Schema metadata produced by ddltrans on $date>\n\n"; 
+  print_xml( {schema=>{schema=>$schema}} ); }
+
+elsif( $output_format eq "html"){
+  print "<em>Schema metadata produced by ddltrans on $date</em>\n\n"; 
+  print print_html($schema); }
+elsif( $output_format eq "dtd"){ print_dtd($schema); }
+else { die "Unrecognized output format $output_format"; }
+
+sub print_xml {
+    my($x, $indent)=@_;
+
+    if( ! defined($indent)){ $indent = 0; }
+#    print ref($x), "\n"; # Dumper($x); 
+    if(ref($x) eq "HASH")
+    { my($k);
+      my(@keys)=keys(%{$x});
+      if(defined($x->{_order}))
+      { @keys=(); foreach $k (@{$x->{_order}}){ if(defined($x->{$k})){ push(@keys, $k); }}}
+      if($x->{_entity} eq "set" | $x->{_entity} eq "list") 
+      { foreach $k (@keys)
+	{ if($k !~ /^_/){ print_xml( $x->{$k}, $indent); }}}
+      else { 
+	  if(defined($x->{_entity})){ print "\n", " " x $indent, "<$x->{_entity}>"; $indent += 3; }
+	  foreach $k (@keys)
+	  { next if $k =~ /^\_/;
+	    my $show_ent=1;
+	    if( ref($x->{$k}) eq "HASH")
+	    { $show_ent=0 if $x->{$k}->{_entity} eq "set" || $x->{$k}->{_entity} eq "list"; }
+	    if($show_ent)
+	    { print "\n", " " x $indent, "<$k>";
+	      print_xml( $x->{$k}, $indent + 3);
+	      if( $show_ent & ref($x->{$k}) eq "HASH" | ref($x->{$k}) eq "ARRAY")
+	      { print "\n", " " x $indent; } 
+	      print "</$k>"; }
+	    else { print_xml( $x->{$k}, $indent); }
+	}
+	  if(defined($x->{_entity})){ $indent -= 3; print "\n", " " x $indent, "<\\$x->{_entity}>";  }}
+  }
+    elsif(ref($x) eq "ARRAY" )
+    { my($i);
+      for($i=0;$i<(@{$x});$i++)
+      { print "\n", " " x $indent, "<li>";
+	print_xml( $x->[$i], $indent + 4 );
+	print "<\\li>"; }}
+    else { print $x; }
+}
+
+
+sub print_html {
+    my($schema, $indent)=@_;
+    
+    print "<html>\n";
+    foreach $table (sort(keys(%{$schema})))
+    { next if $table =~ /^_/;
+      print "<h2>$table</h2>\n$schema->{$table}->{comment}\n<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>\n";
+      foreach $colname (keys(%{$schema->{$table}->{column}}))
+      { next if $colname =~ /^_/;
+	$col = $schema->{$table}->{column}->{$colname};
+	print "<tr><td>$col->{name}</td><td>$col->{type}</td><td>$col->{allownull}</td><td>$col->{comment}</td><td>";
+	if(defined($col->{fk_table}))
+	{ print "$col->{fk_table}.$col->{fk_column}"; }
+	elsif(defined($col->{foreign_references}))
+	{ foreach $fk (@{$col->{foreign_references}})
+	  { print "<li>$fk->{table}.$fk->{column}"; }}
+	print "</td></tr>\n"; }
+      print "</table>\n\n"; 
+  }
+}
+
+sub print_dtd {
+    my($schema, $tables)=@_;
+     
+    print '<?xml version="1.0" encoding="UTF-8"?>', "\n\n";
+    print "<!-- **********************  XORT XML DTD **************************
+  autogenerated on $date by ddltrans
+  for use with XORT dumper and loader.
+
+Relational Schema to DTD Conversion rules:
+-Outermost element is <xort> -- permits any table elements in any order as children
+-Every table has a corresponding element. Table elements have a child element for every
+ column except the primary key, in order, followed optionally by all tables
+ containing foreign keys to this table, in any order.
+-Tables may be nested inside other tables iff the inner table
+ has a foreign key column to the primary key of the outer table.
+ If the foreign key field is required, it can be omitted, as it
+ will be inferred from the nesting context.
+-Table elements take an optional id attribute which can be used to define
+ a local id for the table row within the file. This id can be any string,
+ and it can be used in foreign key fields to refer to the table row.
+-Table elements take on optional op attribute which can be insert, update,
+ delete, force, or lookup. insert is default. Lookup is used to retrieve
+ primary keys of objects in DB.
+-The number of instances of a column element within a table element is
+ context dependent. In an insert operation, non-null data columns must
+ appear once. Required foreign key columns may be omitted if they can
+ be inferred from nesting context -- the first outer element of the
+ appropriate type will be plugged in. In an update op, unique key columns
+ may appear twice if the key is being modified: once to specify the
+ object to be updated in terms of its unique key values, and once to
+ specify the new values (with op=update).
+-Column elements have op=update attribute if the column is being
+ updated.
+-Foreign key columns may contain any of the following:
+    -an instance of the table element for the referenced table --
+      typically this will have op=lookup and supply the values of those
+      columns that make up a unique key for this table
+    -a local id defined previously in the file (def before ref!)
+    -a global accession number. This applies only to objects that have
+     a primary dbxref in their maintable (e.g. feature, cvterm)
+     and the value must match an entry in the dbxref table.
+-When op is update or delete, the affected object can be specified by a 
+ ref=value attribute, where value is a local id or global accession number.
+
+-->\n\n";
+    $tablenames=[];
+    foreach $tablename (sort(keys(%{$schema})))
+    { next if $tablename =~ /^_/;
+      next if $tablename =~ /_audit$/;
+      push(@{$tablenames},$tablename); }
+    print "<!ELEMENT xort ( ", join(" | ", @{$tablenames}), ")*>\n";
+    foreach $tablename (@{$tablenames})
+    {  $table=$schema->{$tablename};
+       $colnames=$table->{column}->{_order};
+
+       # print documentation comment
+       print "\n<!-- ********************* TABLE $tablename *****************************\n";
+       for $colname (@{$colnames})
+       { $col=$table->{column}->{$colname};
+	 print "*\t$col->{name}\t$col->{type}";
+	 if($col->{allownull} eq "no"){ print "\tnot null"; }
+	 if($col->{default}){ print "\tdefault $col->{default}"; }
+	 if($col->{primarykey}){ print "\tprimary key"; }
+	 if($col->{fk_table}){ print "\tforeign key to $col->{fk_table}.$col->{fk_column}"; }
+	 if($col->{unique}){ print "\tunique($col->{unique})"; }
+	 if($col->{comment}){print " - $col->{comment}"; }
+	 print "\n"; }
+       print "     ************************************************************************* -->\n";
+       # print table element
+       print "<!ELEMENT $tablename (";
+
+       # column subelements
+       $dlm="";
+       for $colname (@{$colnames})
+       { next if $colname eq $table->{primarykey};
+	 # Cardinality of table fields:
+	 # if part of a unique key, may appear twice in an update context: once to refer, once to modify
+	 # if a foreign key, may be ommitted due to hierarchy rule
+	 # if a non-null field, may still be ommitted in an update or delete context.
+	 $card="?";
+	 if( defined($table->{column}->{$colname}->{unique}) ) { $card="*"; }
+	 print "$dlm$colname"; $dlm = " | "; }
+       print ")* ";
+
+       # linking table subelements
+       my($joins)=$table->{column}->{$table->{primarykey}}->{foreign_references};
+       if(@{$joins}+0)
+       { print "\n\t( ", $dlm = "";
+	 $printed={};
+	 foreach $join (@{$joins})
+	 { next if $printed->{$join->{table}};
+	   $printed->{$join->{table}}=1;
+	   print $dlm, $join->{table}; $dlm=" | "; }
+	 print ")*\n "; }
+
+       print ")>\n";  # end table element
+       
+       # Table element ttribute list
+       print "\n<!ATTLIST $tablename\n\tid CDATA #IMPLIED\n\tref CDATA #IMPLIED\n\top (lookup | insert | update | force | delete) #IMPLIED>\n";
+	   
+       # column elements
+       for $colname (@{$colnames})
+       { next if $colname eq $table->{primarykey};
+	 $col=$table->{column}->{$colname};
+	 if(defined($col->{fk_table})){ $def=$col->{fk_table}; }
+	 else { $def=$col->{type}; }
+	 if($defined{$colname})
+	 { if($def ne $defined{$colname}->{to})
+	   { next if canonical_type( $def ) eq canonical_type( $defined{$colname}->{to});
+	     warn "Warning: Incompatible definitions of column `$colname':\n\tin table $defined{$colname}->{from} as $defined{$colname}->{to}\n\tin table $tablename as $def\n";
+	     next; }}
+	 $defined{$colname}={from=>$tablename, to=>$def};
+	 print "<!ELEMENT $colname ";
+	 if($col->{fk_table}){ print "( #PCDATA | $col->{fk_table} )"; }
+	 else { print "#PCDATA"; }
+	 print " >"; 
+	 print "\t<!ATTLIST $colname op (update) #IMPLIED>";
+	 print "\n";
+     }
+   }
+}
+
+sub canonical_type {
+# canonicalize datatypes for purposes of checking compatibility of XML entity defs
+# eg varchar and text are equivalent, int and integer, etc.
+    my($type)=@_;
+    if( $type =~ /^int/ ){ return "int"; }
+    elsif( $type =~ /^varchar/ ){ return "char"; }
+    elsif( $type eq "text" ){ return "char"; }
+    else { return $type; }
+}
