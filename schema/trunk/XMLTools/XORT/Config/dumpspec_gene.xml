@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE chado SYSTEM "/users/zhou/work/flybase/xml/chado_stan.dtd">
+<!-- 1. dump all information for gene CG9570 and all information for transcript, all for translation, for feature_evidence, dump all cols of foreign object:featureloc -->
+<chado>
+  <feature dump="all">
+     <type_id test="yes">
+           <cvterm>
+                  <name>gene</name>
+           </cvterm>
+     </type_id>
+     <!-- get all mRNA of those gene -->
+     <feature_relationship dump="all">
+       <subjfeature_id test="yes">
+          <feature>
+              <type_id>
+                 <cvterm>
+                     <name>mRNA</name>
+                 </cvterm>
+              </type_id>
+          </feature>
+       </subjfeature_id>
+       <subjfeature_id>
+          <feature dump="all">  
+              <!-- get all exon of those mRNA --> 
+              <feature_relationship dump="all">
+                 <subjfeature_id test="yes">
+                     <feature>
+                        <type_id>
+                           <cvterm>
+                               <name>exon</name>
+                           </cvterm>                     
+                        </type_id>
+                     </feature>
+                 </subjfeature_id>
+                 <subjfeature_id>
+                     <feature dump="all">
+                       <!-- feature_evidence for exon, type of evidence is either alignment_hit or alignment_hsp -->
+                       <feature_evidence dump="no_dump">
+
+                       </feature_evidence>
+                       <!-- feature_evidence for exon, type of evidence is neithor alignment_hit nor alignment_hsp -->
+                       <feature_evidence dump="no_dump">
+                       </feature_evidence>
+                       <scaffold_feature dump="no_dump" />
+                    </feature>
+                 </subjfeature_id>
+             </feature_relationship>
+             <!-- get all protein of those mRNA --> 
+              <feature_relationship dump="all">
+                 <subjfeature_id test="yes">
+                     <feature>
+                        <type_id>
+                           <cvterm>
+                               <name>protein</name>
+                           </cvterm>                     
+                        </type_id>
+                     </feature>
+                 </subjfeature_id>
+                 <subjfeature_id>
+                     <feature dump="all">
+
+                        <!-- feature_evidence for protein, type of evidence is either alignment_hit or alignment_hsp -->
+                        <feature_evidence dump="no_dump"> 
+
+                        </feature_evidence>
+                        <!-- feature_evidence for protein, type of evidence is neithor alignment_hit nor alignment_hsp -->
+                        <feature_evidence dump="no_dump">
+
+                        </feature_evidence>
+                        <scaffold_feature dump="no_dump" />    
+                     </feature>
+                 </subjfeature_id>
+             </feature_relationship>
+
+              <feature_relationship dump="all">
+                 <subjfeature_id test="yes">
+                     <feature>
+                        <type_id>
+                           <cvterm>
+                               <name test="no"><or>protein</or><or>exon</or></name>
+                           </cvterm>                     
+                        </type_id>
+                     </feature>
+                 </subjfeature_id>
+                 <subjfeature_id>
+                     <feature dump="all">
+                      <!-- feature_evidence for  feature neither protein nor exon, type of evidence is either alignment_hit or alignment_hsp -->
+                      <feature_evidence dump="no_dump">
+
+                      </feature_evidence>
+                     <!-- feature_evidence for  feature neither protein nor exon, type of evidence is neithor alignment_hit nor alignment_hsp -->
+                      <feature_evidence dump="no_dump">
+
+                       </feature_evidence>
+                       <scaffold_feature dump="no_dump" />    
+                     </feature>
+                 </subjfeature_id>
+             </feature_relationship>
+              <!-- feature_evidence for mRNA, type of evidence is either alignment_hit or alignment_hsp -->
+             <feature_evidence dump="no_dump">
+
+             </feature_evidence>
+            <!-- feature_evidence for mRNA, type of evidence is neithor alignment_hit nor alignment_hsp -->
+             <feature_evidence dump="no_dump">
+
+              </feature_evidence>
+             <scaffold_feature dump="no_dump" />
+          </feature>
+       </subjfeature_id>                  
+     </feature_relationship>
+    <!-- get all NO mRNA of those gene -->
+     <feature_relationship dump="all">
+       <subjfeature_id test="yes">
+          <feature>
+              <type_id>
+                 <cvterm>
+                     <name test="no">mRNA</name>
+                 </cvterm>
+              </type_id>
+          </feature>
+       </subjfeature_id>
+       <subjfeature_id>
+          <feature dump="all">   
+            <scaffold_feature dump="no_dump" />
+            <!-- feature_evidence for gene, type of evidence is either alignment_hit or alignment_hsp -->
+            <feature_evidence dump="no_dump">
+ 
+            </feature_evidence>
+           <!-- feature_evidence for gene, type of evidence is neithor alignment_hit nor alignment_hsp -->
+            <feature_evidence dump="no_dump">
+
+             </feature_evidence>
+          </feature>
+       </subjfeature_id>
+     </feature_relationship>
+
+
+     <!-- feature_evidence for gene, type of evidence is either alignment_hit or alignment_hsp -->
+     <feature_evidence dump="cols">
+         <evidence_id test="yes">
+             <feature>
+                 <type_id>
+                    <cvterm>
+                        <name><or>alignment_hit</or><or>alignment_hsp</or></name>
+                    </cvterm>
+                 </type_id>
+             </feature>
+         </evidence_id>
+         <evidence_id>
+             <feature dump="all">
+                 <featureloc dump="cols">
+                    <rank test="yes">1</rank>
+                    <srcfeature_id>
+                          <feature dump="all"> 
+                              <scaffold_feature dump="no_dump"/> 
+                          </feature> 
+                    </srcfeature_id>
+                 </featureloc>
+                 <featureloc dump="cols">
+                    <rank test="no">1</rank>
+                    <srcfeature_id>
+                          <feature dump="ref"/>   
+                    </srcfeature_id>
+                 </featureloc>
+                 <scaffold_feature dump="no_dump"/>
+                 <feature_evidence dump="no_dump"/> 
+             </feature>
+         </evidence_id>
+     </feature_evidence>
+
+    <!-- feature_evidence for gene, type of evidence is neithor alignment_hit nor alignment_hsp -->
+     <feature_evidence dump="cols">
+         <evidence_id test="yes">
+             <feature>
+                 <type_id>
+                    <cvterm>
+                        <name test="no"><or>alignment_hit</or><or>alignment_hsp</or></name>
+                    </cvterm>
+                 </type_id>
+             </feature>
+         </evidence_id>
+         <evidence_id>
+             <feature dump="all">
+                   <scaffold_feature dump="no_dump"/> 
+                   <feature_evidence dump="no_dump"/> 
+             </feature>
+         </evidence_id>
+      </feature_evidence>
+
+     <scaffold_feature dump="no_dump"/>
+  </feature>
+</chado>

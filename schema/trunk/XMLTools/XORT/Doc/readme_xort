@@ -1,0 +1,18 @@
+
+
+How to use XORT and related API
+1. add the env variable CodeBase to  where you gunzip the package to env, i.e in my case, all the code in dir /users/zhou/work/API, so I will add the following line to .cshrc file:
+setenv CodeBase /users/zhou/work/API
+
+
+2. create the ddl.properties file by running CodeBase/XORT/bin/ddl_properties_creater.pl, it will create the ddl.properties in CodeBase/Config
+
+
+3. create database properties for each database you intend to use, and put those file in CodeBase/XORT/Config, name format: databasename.properties, i.e, for chado_gadfly5, the file name will be chado_gadfly5.properties
+
+4. see how sample code(CodeBase/XORT/bin/): dump.pl  loader.pl validator.pl to call Loader, Dumper and Validator test_dumpspec.pl
+
+5. CodeBase/XORT/Config/dumpspec.xml for sample dumpspec file, and dump output from this dumpspec
+
+6. If you try to use 'local_id' mechanism to represent an object, the dumper will use this format to represent it: 'table_name'.'_'.'primary_key', it will garantee the uniqueness. However, it is not necessary at all to use this format for loader, as long as its uniqueness, loader can handle it. 
+
