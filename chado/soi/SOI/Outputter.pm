@@ -39,7 +39,7 @@ sub _chaos_hidden_params {
     return qw(analysis_id parent_id featureloc_id analysisfeature_id organism_id dbxref_id type_id nbeg nend start end fmin fmax depth timelastmodified timeaccessioned relationship_type locgroup);
 }
 sub _soi_hidden_params {
-    return (grep{$_ ne 'fmin' && $_ ne 'fmax'}(_chaos_hidden_params),
+    return (grep{$_ ne 'fmin' && $_ ne 'fmax' && $_ ne 'relationship_type'}(_chaos_hidden_params),
             qw(feature_id srcfeature_id type md5checksum));
 }
 
@@ -63,7 +63,7 @@ sub chaos_xml {
             $w->startTag($pt);
             my $h = $_;
             map{
-                $w->dataElement($_, $h->{$_}) if ($h->{$_});
+                $w->dataElement($_, $h->{$_}) if (defined($h->{$_}));
             }@fp_params;
             $w->endTag($pt);
         }@{$node->properties || []};
@@ -120,7 +120,7 @@ sub _chaos_xml {
     $w->dataElement('nend',$node->nend);
     $w->dataElement('rank',$node->hash->{rank});
     $w->dataElement('locgroup',$node->hash->{locgroup});
-    $w->dataElement('phase',$node->hash->{phase}) if ($node->hash->{phase});
+    $w->dataElement('phase',$node->hash->{phase}) if (defined($node->hash->{phase}));
     $w->endTag($flt);
     foreach my $h (@{$node->secondary_locations || []}) {
         $w->startTag($flt);
@@ -132,7 +132,7 @@ sub _chaos_xml {
         $w->dataElement('strand',$h->{strand});
         $w->dataElement('rank',$h->{rank});
         $w->dataElement('locgroup',$h->{locgroup});
-        $w->dataElement('phase',$h->{phase}) if ($h->{phase});
+        $w->dataElement('phase',$h->{phase}) if (defined($h->{phase}));
         $w->endTag($flt);
     }
 
@@ -192,19 +192,28 @@ sub soi_xml {
             $w->dataElement($t, $v);
             $w->endTag('seq');
         } else {
-            $w->dataElement($t, $v) if ($v);
+            $w->dataElement($t, $v) if (defined($v));
         }
     }
     foreach my $h (@{$node->secondary_locations || []}) {
-        $w->startTag("secondary_loc");
+        $w->startTag("secondary_location");
         $w->dataElement("src_seq",$h->{src_seq});
         $w->dataElement('fmin',$h->{fmin});
         $w->dataElement('fmax',$h->{fmax});
         $w->dataElement('strand',$h->{strand});
         $w->dataElement('rank',$h->{rank});
         $w->dataElement('locgroup',$h->{locgroup});
-        $w->dataElement('phase',$h->{phase}) if ($h->{phase});
-        $w->endTag("secondary_loc");
+        $w->dataElement('phase',$h->{phase}) if (defined($h->{phase}));
+#subject seq data is hidden in soi and chaos?!!
+#        my $subj_seq = $h->{seq};
+#        if ($subj_seq) {
+#            foreach my $k (qw(seqlen)) {
+#                my $t = "src_seq_$k";
+#                my $v = $subj_seq->{$k};
+#                $w->dataElement($t, $v) if (defined($v));
+#            }
+#        }
+        $w->endTag("secondary_location");
     }
 
     my ($dbxt, $pt, $cvt) = qw(dbxref property cvterm);
@@ -230,7 +239,6 @@ sub soi_xml {
     $w->endTag($node->type);
 }
 
-#test game
 sub game_xml {
     my $node = shift;
     my $output = shift;
@@ -283,7 +291,7 @@ sub _genomic_seq_game_xml {
     $node->_setup_coord;
     $w->startTag('seq', id=>$node->uniquename, length=>$node->seqlen, focus=>'true');
     $w->dataElement('name', $node->name);
-    my $residues = $node->hash->{residues};
+    my $residues = $node->hash->{residues} || "";
     $residues =~ s/(.{50})/$1\n/g;
     chomp $residues;
     $residues = "\n$residues\n";
@@ -493,7 +501,7 @@ sub _an_game_xml {
     if ($game_t =~ /_analysis/) {
         $w->startTag($game_t);
         $w->dataElement('program', $h->{program});
-        $w->dataElement('database', $h->{sourcename});
+        $w->dataElement('database', $h->{sourcename}) if ($h->{sourcename});
     }
     elsif ($game_t =~ /_set/) {
         $w->startTag($game_t, id=>$node->uniquename);
@@ -517,12 +525,12 @@ sub _an_game_xml {
     #primary loc
     if ($game_t =~ /_span/) {
         foreach my $k (sort{$a cmp $b}keys %{$h || {}}) {
-            next if (grep{$k eq $_}(_soi_hidden_params, qw(rank orderrank is_analysis strand fmin fmax src_seq seqlen start end residue_info)));
+            next if (grep{$k eq $_}(_soi_hidden_params, qw(rank orderrank is_analysis strand fmin fmax is_fmin_partial is_fmax_partial src_seq seqlen start end residue_info relationship_type)));
             my ($t,$v) = ($k,$h->{$k});
             $t = 'rank' if ($t eq 'orderrank');
             $t = 'score' if ($t eq 'rawscore');
             $t = 'name' if ($t eq 'uniquename' && !$h->{name});
-            $w->dataElement($t, $v) if ($v);
+            $w->dataElement($t, $v) if (defined($v));
         }
         $w->startTag('seq_relationship', type=>'query',seq=>$node->src_seq);
         $w->startTag('span');
@@ -542,10 +550,11 @@ sub _an_game_xml {
     }
 
     my ($dbxt, $pt, $cvt) = qw(dbxref property cvterm);
+    $pt = 'output' if ($game_t =~ /_span/);
     map{
         $w->startTag($pt);
         $w->dataElement('type',$_->{type});
-        $w->dataElement('valule', $_->{value});
+        $w->dataElement('value', $_->{value});
         $w->endTag($pt);
     }@{$node->properties || []};
     map{_an_game_xml($_, $w)}@{$node->nodes || []};

@@ -13,13 +13,11 @@ my $feature = SOI::Feature->new($hashref)
 
 =cut
 
-
 =head1 FEEDBACK
 
 Email sshu@fruitfly.org
 
 =cut
-
 
 =head1 GENERAL DESCRIPTION
 
@@ -27,13 +25,11 @@ For building feature tree, each SOI::Feature object has 0..m child SOI::Feature 
 
 =cut
 
-
 =head2 chado feature table column method
 
-all chado feature table column names can be called, e.g. $feature->uniqename
+all chado feature table column names can be called, e.g. $feature->uniquename
 
 =cut
-
 
 =head2 non-chado feature table column method
 
@@ -41,13 +37,11 @@ id, src/src_seq(=srcfeature.uniquename), nbeg, nend, start, end, symbol(=name), 
 
 =cut
 
-
 =head2 coordinate system
 
 remapped to interbase 0 system (nbeg, nend) and base 1 system(start, end) from fmin, fmax and strand
 
 =cut
-
 
 =head2 multivalued attr/method
 
@@ -55,6 +49,13 @@ properties, dbxrefs, and ontologies, all are a list of hash refs, nodes for chil
 
 =cut
 
+=head2 subject seq
+
+  adapter by default get subject seq residues and all subject seq data are in $sec_loc->{seq},
+  which will have subject seq length as $sec_loc->{seq}->{seqlen}, if database has it.
+  secondary_location will have rank, right now FlyBase use loc rank 1 to indicate span is subject
+
+=cut
 
 =head2 computating method
 
@@ -62,8 +63,7 @@ transform, stitch_child_segments, see doc below for each method
 
 =cut
 
-
-=head2 output GAME xml for apollo
+=head2 GAME xml for apollo
 
 the following structure is expected
 
@@ -79,11 +79,10 @@ the following structure is expected
 
 =cut
 
-
-=head2 output XML formats
+=head2 XML formats
 
 chaos, soi, GAME. soi is nested structure, start/end tag are SO type,
-it is between chaos and GAME, it is provided for human readability of xml
+it is between chaos and GAME
 
 =cut
 
@@ -126,14 +125,23 @@ sub id {
     shift->hash->{feature_id};
 }
 sub type {
-    return shift->hash->{type};
+    my $self = shift;
+    $self->hash->{type} = shift if (@_);
+    return $self->hash->{type};
 }
 sub name {
-    shift->hash->{name};
+    my $self = shift;
+    $self->hash->{name} = shift if (@_);
+    return $self->hash->{name};
 }
-sub symbol {
-    shift->hash->{name};
+*symbol =\&name;
+
+sub uniquename {
+	my $self = shift;
+	$self->hash->{uniquename} = shift if (@_);
+	return $self->hash->{uniquename} || $self->name;
 }
+
 sub src_seq {
     my $self = shift;
     if (@_) {
@@ -150,7 +158,7 @@ sub nbeg {
         my $nbeg;
         if (ref($h)) {
             my $strand = $h->{strand};
-	    $nbeg = ($strand > 0) ? $h->{fmin} : $h->{fmax};
+            $nbeg = ($strand > 0) ? $h->{fmin} : $h->{fmax};
         } else {
             $nbeg = $h;
         }
@@ -165,7 +173,7 @@ sub nend {
         my $nend;
         if (ref($h)) {
             my $strand = $h->{strand};
-	    $nend = ($strand > 0) ? $h->{fmax} : $h->{fmin}
+            $nend = ($strand > 0) ? $h->{fmax} : $h->{fmin}
         } else {
             $nend = $h;
         }
@@ -173,7 +181,30 @@ sub nend {
     }
     return $self->hash->{nend};
 }
-sub strand {shift->hash->{strand}}
+#it is genomic length
+sub length {
+    my $self = shift;
+    $self->{length} = shift if (@_);
+    unless ($self->{length}) {
+        if (defined($self->fmin) && defined($self->fmax)) {
+            $self->{length} = $self->fmax - $self->fmin;
+        }
+        elsif (defined($self->nbeg) && defined($self->nend)) {
+            my ($s, $e) = ($self->nbeg, $self->nend);
+            if ($self->strand < 0) {
+                ($s,$e) = ($e, $s);
+            }
+            $self->{length} = $e - $s;
+        }
+    }
+    return $self->{length};
+}
+
+sub strand {
+    my $self = shift;
+    $self->hash->{strand} = shift if (@_);
+    return $self->hash->{strand};
+}
 sub start {
     my $self = shift;
     unless (defined($self->hash->{start})) {
@@ -225,6 +256,17 @@ sub add_dbxref {
         push @{$self->{dbxrefs}}, shift;
     }
 }
+sub get_property {
+    my $self = shift;
+    my $k = shift;
+    my @val;
+    map{
+        if ($k eq $_->{type}) {
+            push @val, $_->{value};
+        }
+    }@{$self->properties || []};
+    return @val;
+}
 sub properties {
     my $self = shift;
     if (@_) {
@@ -237,7 +279,12 @@ sub properties {
 sub add_property {
     my $self = shift;
     if (@_) {
-        push @{$self->{properties}}, shift;
+        my $h = shift;
+        unless (ref($h) eq 'HASH') {
+            my $k = $h;
+            $h = {type=>$k, value=>shift};
+        }
+        push @{$self->{properties}}, $h;
     }
 }
 sub ontologies {
@@ -261,15 +308,55 @@ sub secondary_locations {
     if (@_) {
         my $loc = shift;
         $loc = [$loc] unless (ref($loc) eq 'ARRAY');
-        $self->{secondary_locations} = $loc;
+        $self->{secondary_nodes} = [map{ref($self)->new($_)}@$loc];
     }
-    return $self->{secondary_locations};
+    return [map{$_->hash}@{$self->secondary_nodes || []}];
 }
 sub add_secondary_location {
     my $self = shift;
     if (@_) {
-        push @{$self->{secondary_locations}}, shift;
+        push @{$self->{secondary_nodes}}, ref($self)->new(shift);
     }
+}
+#same as secondary_location but obj, as matter of fact, location stores internally as typeless SOI::Feature without property/dbxref/ontology
+sub secondary_nodes {
+    my $self = shift;
+    if (@_) {
+        my $nodes = shift;
+        $nodes = [$nodes] unless (ref($nodes) eq 'ARRAY');
+        $self->{secondary_nodes} = $nodes;
+    }
+    return $self->{secondary_nodes};
+}
+sub add_secondary_node {
+    my $self = shift;
+    if (@_) {
+        my $node = shift;
+        push @{$self->{secondary_nodes}}, $node;
+    }
+}
+sub secondary_node {
+    my $nodes = shift->secondary_nodes;
+    return $nodes->[0] if (@{$nodes || []});
+}
+*secondary_loc =\&secondary_node;
+
+=head2 set_depth
+
+  Usage  - $feature->set_depth(0)
+  Return - none
+  Args   - depth val
+
+  Description  - set depth and its children depth, change depth will change tree structure.
+  mainly for finding intersection (see SOI::IntersectGraph)
+
+=cut
+
+sub set_depth {
+    my $self = shift;
+    my $d = shift;
+    $self->depth($d);
+    map{$_->set_depth($self->depth+1)}@{$self->nodes || []};
 }
 
 =head2 transform
@@ -394,6 +481,11 @@ sub stitch_child_segments {
 }
 sub _setup_coord {
     my $self = shift;
+    unless (defined $self->nbeg && defined $self->nend) {
+        my $h = $self->hash;
+        $self->nbeg($h);
+        $self->nend($h);
+    }
     if (defined $self->nbeg && defined $self->nend) {
         $self->start;
         $self->end;
@@ -442,19 +534,51 @@ sub to_game_xml {
     return game_xml($self, @_);
 }
 
-sub AUTOLOAD {
+sub _min_attr {
     my $self = shift;
-
-    my $name = $AUTOLOAD;
-    $name =~ s/.*://;   # strip fully-qualified portion
-    if ($name eq "DESTROY") {
-        return;
+    unless ($self->{_min_attr}) {
+        my %att_h;
+        map{$att_h{$_}=1}keys %{$self->hash};
+        #some of them alread have method that is ok since it is for autoload method (see below)
+        map{$att_h{$_}=1}qw(type relationship_type depth name uniquename feature_id genus species residues seqlen md5checksum srcfeature_id src_seq fmin fmax strand residue_info phase is_fmin_partial is_fmax_partial rank locgroup);
+        $self->{_min_attr} = [keys %att_h];
     }
-    if (grep {$name eq $_} keys %{$self->hash}) {
-        return $self->hash->{$name};
+    return $self->{_min_attr};
+}
+
+sub DESTROY {}
+sub AUTOLOAD {
+    no strict "refs";
+    my ($self, $newval) = @_;
+
+    my $field = $AUTOLOAD;
+    $field =~ s/.*://;   # strip fully-qualified portion
+    if (grep {$field eq $_}@{$self->_min_attr || []}) {
+        #use autoload to install a method(with closure)
+        #so next time it is called, the method is called instead of autoload for speed
+        *{$field} = sub {
+            my $self = shift;
+            @_ ? $self->hash->{$field} = shift : $self->hash->{$field};
+        };
+        &$field(@_);
     } else {
-        warn("Does not support $name") if ($ENV{DEBUB} || $self->hash->{DEBUGMODE});
+        confess("Does not support $field");
    }
 }
+#sub AUTOLOAD {
+#    my $self = shift;
+
+#    my $name = $AUTOLOAD;
+#    $name =~ s/.*://;   # strip fully-qualified portion
+#    if ($name eq "DESTROY") {
+#        return;
+#    }
+#    if (grep {$name eq $_}@{$self->_min_attr || []}) {
+#        $self->hash->{$name} = shift if (@_);
+#        return $self->hash->{$name};
+#    } else {
+#        warn("Does not support $name") if ($ENV{DEBUB} || $self->hash->{DEBUGMODE});
+#   }
+#}
 
 1;
