@@ -36,7 +36,7 @@ BEGIN
   id:=lpad(maxid, 6, ''000000'');
   f_uniquename:=CAST(prefix||id||suffix as VARCHAR);
   RETURN f_uniquename;
-END
+END;
 'LANGUAGE plpgsql;
 
 DROP TRIGGER tr_feature_del  ON feature;
@@ -405,7 +405,6 @@ DECLARE
   f_row_e       feature%ROWTYPE;
   f_row_t       feature%ROWTYPE;
   f_row_p       feature%ROWTYPE;
-  fl_row_e      featureloc%ROWTYPE;
   f_type        cvterm.name%TYPE;
   f_type_temp   cvterm.name%TYPE;
   letter_e      varchar(100);
@@ -500,6 +499,7 @@ DECLARE
   f_row_e      feature%ROWTYPE;
   f_row_t      feature%ROWTYPE;
   f_row_p      feature%ROWTYPE;
+  fl_row_e     featureloc%ROWTYPE;
   f_type       cvterm.name%TYPE;
   f_type_temp  cvterm.name%TYPE;
   letter_t     varchar(100);
@@ -564,9 +564,27 @@ BEGIN
 
  RAISE NOTICE ''enter fr_i, fr.object_id:%, fr.subject_id:%'', NEW.object_id, NEW.subject_id;
  SELECT INTO f_type c.name from feature f, cvterm c  where f.type_id=c.cvterm_id and f.feature_id=NEW.object_id;
+
+
+ -- OK, the thing having a child added is a gene
  IF f_type=f_type_gene THEN 
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_snoRNA or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snRNA or f_type_temp=f_type_tRNA or f_type_temp=f_type_rRNA or f_type_temp=f_type_miRNA or f_type_temp=f_type_pseudo or f_type_temp=f_type_transposable_element or f_type_temp=f_type_promoter or f_type_temp=f_type_repeat_region) THEN
+
+         --generate a new uniquename based on the gene name
+         --this mimics functionallity in the assignnames trigger, and should be abstracted out
+         SELECT INTO f_uniquename_gene  uniquename from feature where feature_id=NEW.object_id;
+
+         SELECT INTO maxid to_number(max(substring(uniquename from (length(f_uniquename_gene)+1+length(f_type)))), ''99999'') FROM feature where uniquename like f_uniquename_gene||''-''||f_type||''%'';
+         IF maxid IS NULL THEN
+             maxid = 1;
+         ELSE
+             maxid = maxid + 1;
+         END IF;
+
+         f_uniquename_transcript:=CAST(f_uniquename_gene||''-''||f_type_temp||maxid AS TEXT);
+
+
          SELECT INTO f_row_t * from feature where feature_id=NEW.subject_id;
          RAISE NOTICE ''start to update feature, old:%, new:%'', f_row_t.uniquename, f_uniquename_transcript;
          IF f_row_t.name like ''%temp%'' THEN
@@ -575,7 +593,6 @@ BEGIN
          ELSE                
              UPDATE feature set  uniquename=f_uniquename_transcript where feature_id=NEW.subject_id;
          END IF;   
-         RAISE NOTICE ''assign new number for transcript:%'', NEW.subject_id;
          RAISE NOTICE ''s_type_id:%'', s_type_id;
          SELECT INTO s_id synonym_id from synonym where name=f_uniquename_transcript and type_id=s_type_id;
          IF s_id IS NULL THEN 
@@ -589,65 +606,81 @@ BEGIN
          END IF;     
      END IF;
 
+-- here the thing having a child added is a second level thing (eg, a transcript is getting an exon)
  ELSIF (f_type=f_type_transcript or f_type=f_type_ncRNA  or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_miRNA or f_type=f_type_pseudo or f_type=f_type_transposable_element or f_type=f_type_promoter or f_type=f_type_repeat_region)   THEN
      SELECT INTO f_uniquename_gene f.uniquename from feature f, feature_relationship fr, cvterm c where f.feature_id=fr.object_id and fr.subject_id=NEW.object_id and f.type_id=c.cvterm_id and c.name=f_type_gene;
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
-     IF f_type_temp=f_type_protein and f_uniquename_gene IS NOT NULL THEN
-         SELECT INTO f_row_p * from feature where feature_id=NEW.subject_id;  
-         RAISE NOTICE ''update uniquename of protein:% to new uniquename:%'',f_row_p.uniquename, f_uniquename_protein;
-         IF f_row_p.name like ''%temp%'' THEN
-             UPDATE feature set name=f_uniquename_protein, uniquename=f_uniquename_protein where feature_id=NEW.subject_id;
-         ELSE
-             UPDATE feature set  uniquename=f_uniquename_protein where feature_id=NEW.subject_id;
-         END IF;   
-         RAISE NOTICE ''assign new number:% for protein:%'', f_uniquename_protein,  NEW.subject_id;
-         SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
-         SELECT INTO s_id synonym_id from synonym where name=f_uniquename_protein and type_id=s_type_id;
-         IF s_id IS NULL THEN
-             INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_protein, f_uniquename_protein, s_type_id);
+
+     --adding a protein to a transcript
+     IF f_type_temp=f_type_protein THEN
+         IF f_uniquename_gene IS NOT NULL THEN
+             SELECT INTO f_row_p * from feature where feature_id=NEW.subject_id;  
+
+             --create a new uniquename for this protein (again repeating code in assign_names)
+             SELECT INTO maxid to_number(max(substring(uniquename from (length(f_uniquename_gene)+1+8))), ''99999'') FROM feature where uniquename like f_uniquename_gene||''-protein%'';
+             IF maxid IS NULL THEN
+                 maxid = 1;
+             ELSE
+                 maxid = maxid + 1;
+             END IF;
+
+             f_uniquename_protein:=CAST(f_uniquename_gene||''-protein''||maxid AS TEXT);
+
+             RAISE NOTICE ''update uniquename of protein:% to new uniquename:%'',f_row_p.uniquename, f_uniquename_protein;
+             IF f_row_p.name like ''%temp%'' THEN
+                 UPDATE feature set name=f_uniquename_protein, uniquename=f_uniquename_protein where feature_id=NEW.subject_id;
+             ELSE
+                 UPDATE feature set  uniquename=f_uniquename_protein where feature_id=NEW.subject_id;
+             END IF;   
+             SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
              SELECT INTO s_id synonym_id from synonym where name=f_uniquename_protein and type_id=s_type_id;
+             IF s_id IS NULL THEN
+                 INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_protein, f_uniquename_protein, s_type_id);
+                 SELECT INTO s_id synonym_id from synonym where name=f_uniquename_protein and type_id=s_type_id;
+             END IF;
+
+             SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_p.feature_id and synonym_id=p_id;
+             IF f_s_id is NULL THEN
+                 INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_p.feature_id, s_id, p_id, ''true'');
+             END IF;
+         ELSIF (f_row_p.uniquename like prefix||''%''||suffix||''-P_'') and  f_row_p.uniquename not like ''%:%'' THEN
+             RAISE NOTICE ''add protein to existing transcript'';
+         ELSE
+             RAISE NOTICE ''warning:unexpected format of protein uniquename:%'', f_row_p.uniquename;
          END IF;
 
-         SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_p.feature_id and synonym_id=p_id;
-         IF f_s_id is NULL THEN
-             INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_p.feature_id, s_id, p_id, ''true'');
-         END IF;
-                
-     ELSIF (f_row_p.uniquename like prefix||''%''||suffix||''-P_'') and  f_row_p.uniquename not like ''%:%'' THEN
-         RAISE NOTICE ''add protein to existing transcript'';
-     ELSE
-         RAISE NOTICE ''warning:unexpected format of protein uniquename:%'', f_row_p.uniquename;
-     END IF;
- ELSIF f_type_temp=f_type_exon and f_uniquename_gene IS NOT NULL THEN
-     SELECT INTO f_row_e * from feature where feature_id=NEW.subject_id;
-     IF f_row_e.uniquename like prefix||'':temp%''||suffix   THEN            
-         f_accession_temp:=f_row_e.uniquename;
-         IF f_accession_temp like prefix||'':temp%''||suffix  THEN
-              SELECT INTO fl_row_e * from featureloc where feature_id = NEW.subject_id and rank=0;
-              IF fl_row_e.fmin IS NULL OR fl_row_e.fmax IS NULL THEN
-                  RAISE NOTICE ''cant create exon uniquename since there is no featureloc entry'';
-                  RETURN OLD;
-              ELSE
-                  f_uniquename_exon:=CAST(f_uniquename_gene||'':''||fl_row_e.fmin||''-''||fl_row_e.fmax  AS TEXT);
-              END IF;
-         ELSE 
-              f_uniquename_exon:=f_accession_temp;
-         END IF;
-         RAISE NOTICE ''exon new uniquenam:%'', f_uniquename_exon;
-         IF f_row_e.uniquename like ''%temp%'' THEN
-             UPDATE feature set name=f_uniquename_exon, uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
+     --adding an exon to a transcript
+     ELSIF f_type_temp=f_type_exon and f_uniquename_gene IS NOT NULL THEN
+         SELECT INTO f_row_e * from feature where feature_id=NEW.subject_id;
+         IF f_row_e.uniquename like prefix||'':temp%''||suffix   THEN            
+             f_accession_temp:=f_row_e.uniquename;
+             IF f_accession_temp like prefix||'':temp%''||suffix  THEN
+                 SELECT INTO fl_row_e * from featureloc where feature_id = NEW.subject_id and rank=0;
+                 IF fl_row_e.fmin IS NULL OR fl_row_e.fmax IS NULL THEN
+                     RAISE NOTICE ''cant create exon uniquename since there is no featureloc entry'';
+                     RETURN OLD;
+                 ELSE
+                     f_uniquename_exon:=CAST(f_uniquename_gene||'':''||fl_row_e.fmin||''-''||fl_row_e.fmax  AS TEXT);
+                 END IF;
+             ELSE 
+                 f_uniquename_exon:=f_accession_temp;
+             END IF;
+             RAISE NOTICE ''exon new uniquenam:%'', f_uniquename_exon;
+             IF f_row_e.uniquename like ''%temp%'' THEN
+                 UPDATE feature set name=f_uniquename_exon, uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
+             ELSE
+                 UPDATE feature set  uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
+             END IF;   
+             SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+             SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id; 
+             IF s_id IS NULL THEN
+                 INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_exon, f_uniquename_exon, s_type_id);
+                 SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
+             END IF;
+             INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');                
          ELSE
-             UPDATE feature set  uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
-         END IF;   
-         SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
-         SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id; 
-         IF s_id IS NULL THEN
-             INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_exon, f_uniquename_exon, s_type_id);
-             SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id;
+             RAISE NOTICE ''unexpected format of exon uniquename:%'', f_row_e.uniquename;            
          END IF;
-         INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');                
-     ELSE
-         RAISE NOTICE ''unexpected format of exon uniquename:%'', f_row_e.uniquename;            
      END IF;
  ELSE
      RAISE NOTICE ''no link to gene for this transcript or wrong feature_relationship: transcript->protein/exon:object_id:%, subject_id:%'', NEW.object_id, NEW.subject_id;
