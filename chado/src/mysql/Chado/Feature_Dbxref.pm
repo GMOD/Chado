@@ -6,7 +6,7 @@ Chado::Feature_Dbxref->set_up_table('feature_dbxref');
 Chado::Feature_Dbxref->hasa(Chado::Feature => 'feature_id');
 Chado::Feature_Dbxref->hasa(Chado::Dbxref  => 'dbxref_id');
 
-sub id { return shift->feature_dbxref }
+sub id { return shift->feature_dbxref_id }
 
 sub feature { return shift->feature_id }
 sub dbxref  { return shift->dbxref_id  }
