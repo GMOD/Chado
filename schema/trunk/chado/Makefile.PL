@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.37 2003-12-04 22:05:15 kycl4rk Exp $
+# $Id: Makefile.PL,v 1.38 2003-12-04 22:24:13 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -430,37 +430,14 @@ sub MY::install {
 }
 
 sub MY::c_o {
-  return ".SUFFIXES : .gz .loaded .ontology .go_loaded .so_loaded .unpacked";
+  return ".SUFFIXES : .gz ";
 }
 
 sub MY::postamble {
   qq{
-.gz.unpacked:
-	cp \$< \$<.tmp
-	gunzip -f \$<
-	mv \$<.tmp \$<
-	touch \$@
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh
-
-song ::
-	make $working_dir/song/SODA.defs.unpacked
-	make $working_dir/song/SODA.ontology.unpacked
-	make $working_dir/song/SODA.so_loaded
-
-go ::
-	make $working_dir/go/component.go_loaded
-	make $working_dir/go/function.go_loaded
-	make $working_dir/go/process.go_loaded
-
-websync :: 
-	wget -nd -N -r -P$working_dir/go http://www.geneontology.org/ontology/component.ontology
-	wget -nd -N -r -P$working_dir/go http://www.geneontology.org/ontology/function.ontology
-	wget -nd -N -r -P$working_dir/go http://www.geneontology.org/ontology/process.ontology
-	wget -nd -N -r -P$working_dir/go http://www.geneontology.org/doc/GO.defs
-	wget -nd -N -r -P$working_dir/song http://heanet.dl.sourceforge.net/sourceforge/song/SODA.defs.gz
-	wget -nd -N -r -P$working_dir/song http://cesnet.dl.sourceforge.net/sourceforge/song/SODA.ontology.gz
 
 images :: graphviz graphviz_svg diagram
 
@@ -537,12 +514,5 @@ prepdb ::
 ontologies ::
 	./Build ontologies
 
-%.go_loaded: %.ontology
-	$working_dir/bin/load_ontology.pl $DBUSER $DBNAME \$< $working_dir/go/GO.defs
-	touch \$@
-
-%.so_loaded: %.ontology
-	$working_dir/bin/load_ontology.pl $DBUSER $DBNAME \$< $working_dir/song/SODA.defs
-	touch \$@
   };  
 }
