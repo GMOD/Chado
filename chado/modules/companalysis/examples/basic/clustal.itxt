@@ -44,7 +44,7 @@ data:
           nbeg: 0
           nend: 5
           strand: 1
-          rank: 1
+          rank: 2
           srcfeature: SwissProt:P00002.1      # non-fly protein 2
           alignment: MSGGA
       # ---- Seconds Block ----
@@ -67,7 +67,7 @@ data:
           nbeg: 10
           nend: 15
           strand: 1
-          rank: 1
+          rank: 2
           srcfeature: SwissProt:P00002.1      # non-fly protein 2
           alignment: GLQ-VM
 
