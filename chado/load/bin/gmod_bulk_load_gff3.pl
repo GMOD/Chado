@@ -16,7 +16,7 @@ gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
 
 =head1 SYNOPSIS
 
-  % gmod_bulk_load.pl 
+  % cat <gff-file> | gmod_bulk_load.pl [options]
 
 =head1 COMMAND-LINE OPTIONS
 
