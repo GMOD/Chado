@@ -168,7 +168,7 @@ my $DEBUG=1;
     open (IN, $config_acc) or die "unable to open $config_acc";
     print "\nconfig_acc_temp:$config_acc_temp";
     my $config_acc_temp1=">".$config_acc_temp;
-    open (OUT,$config_acc_temp1) or "unable to open file";
+    open (OUT,$config_acc_temp1) or die "unable to open file";
       my $parser = new XML::DOM::Parser;
       my  $doc = $parser->parsefile ($config_acc);
       my  $root=$doc->getDocumentElement();

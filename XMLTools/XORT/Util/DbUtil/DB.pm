@@ -14,6 +14,7 @@ package XORT::Util::DbUtil::DB;
  use Carp;
  use DBI;
 
+my $DEBUG=0;
 
 my %hash_ddl;
 
@@ -311,7 +312,7 @@ sub db_select(){
           $row_array = $query->fetchrow_arrayref;
           $db_id= $row_array->[0];
           if ($db_id){
-             print "\ndb_id is:$db_id";
+             print "\ndb_id is:$db_id" if ($DEBUG>0);
              $query->finish();
              return $db_id;
           }
@@ -395,14 +396,14 @@ sub db_lookup(){
     #in case it is not in the database, we may first insert, then return the 
      my ($data_list, $col_list);
      foreach my $key(keys %$data_hash_ref){
-       if ($data_list){
+       if (defined $data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if ($col_list){
+      if (defined $col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -415,7 +416,7 @@ sub db_lookup(){
     }
 
 
-   print "\n\nlookup stm:$stm_select\n";
+   print "\n\nlookup stm:$stm_select\n" if ($DEBUG>0);
 
    if ($stm_select && $stm_insert){
           # here start the database work, first check, if not in db, then insert
@@ -473,7 +474,7 @@ sub db_update(){
   my ($data_list, $where_list, $stm_select, $stm_update);
      # here to get the data_list from $new_hash_ref
      foreach my $key(keys %$new_hash_ref){
-       if ($data_list){
+       if (defined $data_list){
                    if ($new_hash_ref->{$key}){
 		        $data_list=$data_list." , ".$key."=".$new_hash_ref->{$key};
 	           }
@@ -727,14 +728,14 @@ sub db_insert(){
 
      my ($data_list, $col_list, $stm_insert, $stm_select, $db_id);
      foreach my $key(keys %$data_hash_ref){
-       if ($data_list){
+       if (defined $data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if ($col_list){
+      if (defined $col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -766,7 +767,7 @@ sub db_insert(){
      my ($where_list);
      foreach my $key(keys %hash_unique){
         if (defined $data_hash_ref->{$key}){
-           print "\ninsert unique of $table:$key";
+           print "\ninsert unique of $table:$key" if ($DEBUG>0);
            if ($where_list){
                $where_list=$where_list." and ".$key."=".$data_hash_ref->{$key};
            }
@@ -851,14 +852,14 @@ sub db_force(){
 
      #format the insert statement
      foreach my $key(keys %$data_hash_ref){
-       if ($data_list){
+       if (defined $data_list){
 	      $data_list=$data_list." , ".$data_hash_ref->{$key};
 
        }
        else {
 	      $data_list=$data_hash_ref->{$key};
        }
-      if ($col_list){
+      if (defined $col_list){
 	      $col_list=$col_list." , ".$key;
 
        }
@@ -959,9 +960,10 @@ sub db_force(){
   }
 
 
-   print "\ndb_force: stm_select:$stm_select\nstm_insert:$stm_insert\nstm_update:$stm_update";
+   print "\ndb_force: stm_select:$stm_select\nstm_insert:$stm_insert\nstm_update:$stm_update" if ($DEBUG>0);
     my $rs;
     if ($stm_insert && $stm_select && $stm_update){
+          $db_id= '';
           my $dbh=$self->{'dbh'}; 
           $query=$dbh->prepare($stm_select);
           # $query->execute or die "Unable to execute query: $dbh->errstr:$stm\n";
@@ -971,7 +973,7 @@ sub db_force(){
               die "could not execute $stm_select\n";
           } 
           $row_array = $query->fetchrow_arrayref;
-          $db_id= $row_array->[0];
+          $db_id= $row_array->[0] if ($row_array);
           if ($db_id){
             if ($update_need eq 'true'){
                $query=$dbh->prepare($stm_update);
@@ -1192,10 +1194,10 @@ sub insertTableHashSerial {
 sub _data_type_checker(){
     my $hash_ref=shift;
     my $table=shift;
-    my %hash_boolean={
-          0=>TRUE,
-          1=>FALSE,
-    };
+    my %hash_boolean= (
+          0=>'true',
+          1=>'false',
+    );
 
     foreach my $key (keys %$hash_ref){
      #	print "\nbefore type check key:$key:\tvalue:$hash_ref->{$key}";
@@ -1223,19 +1225,26 @@ sub _data_type_checker(){
     my @temp=split(/;/, $data_type);
     for my $i(0..$#temp){
         my @temp1=split(/:/, $temp[$i]);
-	if ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
+        
+  # dgg
+  if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){ 
+    $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
+    }
+  elsif # dgg
+  ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
            
-            if ($temp1[1] =~  /boolean/ && defined $hash_boolean{$hash_ref->{$temp1[0]}} && defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
-                  $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
-            }
-	    elsif ( defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
+#             if ($temp1[1] =~  /boolean/ && defined $hash_boolean{$hash_ref->{$temp1[0]}} && defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
+#                   $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
+#             }
+# 	    elsif
+	    if ( defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
               $hash_ref->{$temp1[0]}="\'".$hash_ref->{$temp1[0]}."\'";
             }
        	}
              # in case of boolean type, need to replace 0/1 with f/t ?
-            if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){
-               $hash_ref->{$temp1[0]}=$hash_boolean{$hash_ref->{$temp1[0]}};
-	    }
+#             if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){
+#                $hash_ref->{$temp1[0]}=$hash_boolean{$hash_ref->{$temp1[0]}};
+# 	    }
     }
 
    return $hash_ref;
