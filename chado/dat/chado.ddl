@@ -59,7 +59,7 @@ create table analysis (
     sourceversion varchar(255),
     sourceuri text,
     queryfeature_id int,
-    foreign key (queryfeature_id) references feature (feature_id),
+    foreign key (queryfeature_id) references feature (feature_id) on delete set null,
     timeexecuted timestamp not null default current_timestamp,
 
     unique(program, programversion, sourcename)
@@ -78,15 +78,15 @@ create table analysisprop (
     analysisprop_id serial not null,
     primary key (analysisprop_id),
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
-    pkey_id int not null,
-    foreign key (pkey_id) references cvterm (cvterm_id),
-    pval text,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    value text,
 
-    unique(analysis_id, pkey_id, pval)
+    unique(analysis_id, type_id, value)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
-create index analysisprop_idx2 on analysisprop (pkey_id);
+create index analysisprop_idx2 on analysisprop (type_id);
 
 
 -- ================================================
@@ -150,9 +150,9 @@ create table analysisfeature (
     analysisfeature_id serial not null,
     primary key (analysisfeature_id),
     feature_id int not null,
-    foreign key (feature_id) references feature (feature_id),
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
     analysis_id int not null,
-    foreign key (analysis_id) references analysis (analysis_id),
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     rawscore double precision,
     normscore double precision,
     significance double precision,
@@ -235,9 +235,9 @@ CREATE RULE "_RuleD_term_definition" AS
 CREATE VIEW term2term AS
 SELECT
  cvrelationship_id AS id,
- reltype_id        AS relationship_type_id,
- objterm_id        AS term1_id,
- subjterm_id       AS term2_id
+ type_id        AS relationship_type_id,
+ object_id        AS term1_id,
+ subject_id       AS term2_id
 FROM cvrelationship;
 
 CREATE RULE "_RuleI_term2term" AS
@@ -245,9 +245,9 @@ CREATE RULE "_RuleI_term2term" AS
  DO INSTEAD
   INSERT INTO cvrelationship
   (
-   reltype_id,
-   objterm_id,
-   subjterm_id)
+   type_id,
+   object_id,
+   subject_id)
   VALUES
   (
    NEW.relationship_type_id, 
@@ -260,9 +260,9 @@ CREATE RULE "_RuleU_term2term" AS
  DO INSTEAD
   UPDATE cvrelationship
   SET
- reltype_id        = NEW.relationship_type_id,
- objterm_id        = NEW.term1_id,
- subjterm_id       = NEW.term2_id
+ type_id        = NEW.relationship_type_id,
+ object_id        = NEW.term1_id,
+ subject_id       = NEW.term2_id
   WHERE cvrelationship_id = OLD.id;
 
 CREATE RULE "_RuleD_term2term" AS
@@ -277,8 +277,8 @@ CREATE VIEW graph_path AS
 SELECT
  cvpath_id AS id,
  NULL              AS relationship_type_id,
- objterm_id        AS term1_id,
- subjterm_id       AS term2_id,
+ object_id        AS term1_id,
+ subject_id       AS term2_id,
  pathdistance      AS distance
 FROM cvpath;
 
@@ -287,9 +287,9 @@ CREATE RULE "_RuleI_graph_path" AS
  DO INSTEAD
   INSERT INTO cvpath
   (
-   reltype_id,
-   objterm_id,
-   subjterm_id,
+   type_id,
+   object_id,
+   subject_id,
    pathdistance)
   VALUES
   (
@@ -304,9 +304,9 @@ CREATE RULE "_RuleU_graph_path" AS
  DO INSTEAD
   UPDATE cvpath
   SET
- reltype_id        = NULL,
- objterm_id        = NEW.term1_id,
- subjterm_id       = NEW.term2_id,
+ type_id        = NULL,
+ object_id        = NEW.term1_id,
+ subject_id       = NEW.term2_id,
  pathdistance      = NEW.distance
   WHERE cvpath_id = OLD.id;
 
@@ -389,10 +389,10 @@ CREATE RULE "_RuleD_term_dbxref" AS
 create table cv (
        cv_id serial not null,
        primary key (cv_id),
-       cvname varchar(255) not null,
-       cvdefinition text,
+       name varchar(255) not null,
+       definition text,
 
-       unique(cvname)
+       unique(name)
 );
 
 -- ================================================
@@ -403,11 +403,11 @@ create table cvterm (
        cvterm_id serial not null,
        primary key (cvterm_id),
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        name varchar(255) not null,
-       termdefinition text,
+       definition text,
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
 
        unique(name, cv_id)
 );
@@ -418,49 +418,49 @@ create index cvterm_idx1 on cvterm (cv_id);
 
 
 -- ================================================
--- TABLE: cvrelationship
+-- TABLE: cvtermrelationship
 -- ================================================
 
-create table cvrelationship (
-       cvrelationship_id serial not null,
-       primary key (cvrelationship_id),
-       reltype_id int not null,
-       foreign key (reltype_id) references cvterm (cvterm_id),
-       subjterm_id int not null,
-       foreign key (subjterm_id) references cvterm (cvterm_id),
-       objterm_id int not null,
-       foreign key (objterm_id) references cvterm (cvterm_id),
+create table cvtermrelationship (
+       cvtermrelationship_id serial not null,
+       primary key (cvtermrelationship_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
 
-       unique(reltype_id, subjterm_id, objterm_id)
+       unique(type_id, subject_id, object_id)
 );
-create index cvrelationship_idx1 on cvrelationship (reltype_id);
-create index cvrelationship_idx2 on cvrelationship (subjterm_id);
-create index cvrelationship_idx3 on cvrelationship (objterm_id);
+create index cvtermrelationship_idx1 on cvtermrelationship (type_id);
+create index cvtermrelationship_idx2 on cvtermrelationship (subject_id);
+create index cvtermrelationship_idx3 on cvtermrelationship (object_id);
 
 
 -- ================================================
--- TABLE: cvpath
+-- TABLE: cvtermpath
 -- ================================================
 
-create table cvpath (
-       cvpath_id serial not null,
-       primary key (cvpath_id),
-       reltype_id int,
-       foreign key (reltype_id) references cvterm (cvterm_id),
-       subjterm_id int not null,
-       foreign key (subjterm_id) references cvterm (cvterm_id),
-       objterm_id int not null,
-       foreign key (objterm_id) references cvterm (cvterm_id),
+create table cvtermpath (
+       cvtermpath_id serial not null,
+       primary key (cvtermpath_id),
+       type_id int,
+       foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        pathdistance int,
 
-       unique (subjterm_id, objterm_id)
+       unique (subject_id, object_id)
 );
-create index cvpath_idx1 on cvpath (reltype_id);
-create index cvpath_idx2 on cvpath (subjterm_id);
-create index cvpath_idx3 on cvpath (objterm_id);
-create index cvpath_idx4 on cvpath (cv_id);
+create index cvtermpath_idx1 on cvtermpath (type_id);
+create index cvtermpath_idx2 on cvtermpath (subject_id);
+create index cvtermpath_idx3 on cvtermpath (object_id);
+create index cvtermpath_idx4 on cvtermpath (cv_id);
 
 
 -- ================================================
@@ -471,10 +471,10 @@ create table cvtermsynonym (
        cvtermsynonym_id int not null,
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
-       termsynonym varchar(255) not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       synonym varchar(255) not null,
 
-       unique(cvterm_id, termsynonym)
+       unique(cvterm_id, synonym)
 );
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
 
@@ -487,9 +487,9 @@ create table cvterm_dbxref (
        cvterm_dbxref_id serial not null,
        primary key (cvterm_dbxref_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(cvterm_id, dbxref_id)
 );
@@ -524,9 +524,9 @@ create table feature_expression (
        feature_expression_id serial not null,
        primary key (feature_expression_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
 
        unique(expression_id,feature_id)       
 );
@@ -553,15 +553,19 @@ create index feature_expression_idx2 on feature_expression (feature_id);
 -- parts *always* from different vocabularies in proforma.CV?   If not,
 -- we'll need to have some kind of type qualifier telling us whether the
 -- cvterm used is <t>, <a>, or <p>
+-- yes we should have a type qualifier as a cv term can be from diff vocab
+-- e.g. blastoderm can be body part and stage terms in dros anatomy
+-- but cvterm_type needs to be a cv instead of a free text type here?
 
 create table expression_cvterm (
        expression_cvterm_id serial not null,
        primary key (expression_cvterm_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        rank int not null,
+	   cvterm_type varchar(255),
 
        unique(expression_id,cvterm_id)
 );
@@ -577,9 +581,9 @@ create table expression_pub (
        expression_pub_id serial not null,
        primary key (expression_pub_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(expression_id,pub_id)       
 );
@@ -610,9 +614,9 @@ create table expression_image (
        expression_image_id serial not null,
        primary key (expression_image_id),
        expression_id int not null,
-       foreign key (expression_id) references expression (expression_id),
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
        eimage_id int not null,
-       foreign key (eimage_id) references eimage (eimage_id),
+       foreign key (eimage_id) references eimage (eimage_id) on delete cascade,
 
        unique(expression_id,eimage_id)
 );
@@ -633,11 +637,11 @@ create table acquisition (
     acquisition_id           																				serial not null,
 	primary key (acquisition_id),
     assay_id                 																				int not null,
-	foreign key (assay_id) references  assay (assay_id),
+	foreign key (assay_id) references  assay (assay_id) on delete cascade,
     protocol_id              																				int null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     channel_id               																				int null,
-	foreign key (channel_id) references channel (channel_id),
+	foreign key (channel_id) references channel (channel_id) on delete set null,
     acquisitiondate          																				date null,
     name                     																				varchar(100) null,
     uri                      																				varchar(255) null
@@ -649,7 +653,7 @@ create table acquisitionparam (
     acquisitionparam_id      																				serial not null,
 	primary key (acquisitionparam_id),
     acquisition_id           																				int not null,
-	foreign key (acquisition_id) references acquisition (acquisition_id),
+	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
     name                     																				varchar(100) not null,
     value                    																				varchar(50) not null
 );
@@ -669,7 +673,7 @@ create table analysisimplementation (
     analysisimplementation_id          																		serial not null,
 	primary key (analysisimplementation_id),
     analysis_id                        																		int not null,
-	foreign key (analysis_id) references analysis (analysis_id),
+	foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
     name                               																		varchar(100) not null,
     description  																		         			varchar(500) null
 );
@@ -680,7 +684,7 @@ create table analysisimplementationparam (
     analysisimplementationparam_id     																		serial not null,
 	primary key (analysisimplementationparam_id),
     analysisimplementation_id          																		int not null,
-	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id),
+	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id) on delete cascade,
     name                               																		varchar(100) not null,
     value                              																		varchar(100) not null
 );
@@ -691,9 +695,9 @@ create table analysisinput (
     analysisinput_id         																				serial not null,
 	primary key (analysisinput_id),
     analysisinvocation_id    																				int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
+	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id) on delete cascade,
     tableinfo_id                 																			int null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete set null,
     inputrow_id             																				int null,
     inputvalue              																				varchar(50) null
 );
@@ -704,7 +708,7 @@ create table analysisinvocation (
     analysisinvocation_id              																		serial not null,
 	primary key (analysisinvocation_id),
     analysisimplementation_id          																		int not null,
-	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id),
+	foreign key (analysisimplementation_id) references analysisimplementation (analysisimplementation_id) on delete cascade,
     name                               																		varchar(100) not null,
     description                        																		varchar(500) null
 );
@@ -715,7 +719,7 @@ create table analysisinvocationparam (
     analysisinvocationparam_id         																		serial not null,
 	primary key (analysisinvocationparam_id),
     analysisinvocation_id              																		int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
+	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id) on delete cascade,
     name                               																		varchar(100) not null,
     value                            																		varchar(100) not null
 );
@@ -726,7 +730,7 @@ create table analysisoutput (
     analysisoutput_id       																				serial not null,
 	primary key (analysisoutput_id),
     analysisinvocation_id   																				int not null,
-	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id),
+	foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id) on delete cascade,
     name                    																				varchar(100) not null,
     type                    																				varchar(50) not null,
     value                   																				int not null
@@ -738,15 +742,15 @@ create table array (
     array_id                           																		serial not null,
 	primary key (array_id),
     manufacturer_id                    																		int not null,
-	foreign key (manufacturer_id) references author (author_id),
+	foreign key (manufacturer_id) references author (author_id) on delete cascade,
     platformtype_id                   																		int not null,
-	foreign key (platformtype_id) references cvterm (cvterm_id),
-    substrate_type_id                  																		int null,
-	foreign key (substrate_type_id) references cvterm (cvterm_id),
+	foreign key (platformtype_id) references cvterm (cvterm_id) on delete cascade,
+    substratetype_id                  																		int null,
+	foreign key (substratetype_id) references cvterm (cvterm_id) on delete set null,
     protocol_id                        																		int null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     dbxref_id                          																		int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     name                               																		varchar(100) not null,
     version                            																		varchar(50)  null,
     description                        																		varchar(500) null,
@@ -767,7 +771,7 @@ create table arrayannotation (
     arrayannotation_id      																				int not null,
 	primary key (arrayannotation_id),
     array_id                																				int not null,
-	foreign key (array_id) references array (array_id),
+	foreign key (array_id) references array (array_id) on delete cascade,
     name                    																				varchar(500) not null,
     value                   																				varchar(100) not null
 );
@@ -778,16 +782,16 @@ create table assay (
     assay_id                           																		serial not null,
 	primary key (assay_id),
     array_id                         																		int not null,
-	foreign key (array_id) references array (array_id),
+	foreign key (array_id) references array (array_id) on delete cascade,
     protocol_id                        																		int null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     assaydate                         																		date null,
     arrayidentifier                   																		varchar(100) null,
     arraybatchidentifier             																		varchar(100) null,
     operator_id                        																		int not null,
-	foreign key (operator_id) references author (author_id),
+	foreign key (operator_id) references author (author_id) on delete cascade,
     dbxref_id                          																		int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     name                               																		varchar(100) null,
     description                        																		varchar(500) null
 );
@@ -798,9 +802,9 @@ create table assay_biomaterial (
     assay_biomaterial_id    																				serial not null,
 	primary key (assay_biomaterial_id),
     assay_id                 																				int not null,
-	foreign key (assay_id) references assay (assay_id),
+	foreign key (assay_id) references assay (assay_id) on delete cascade,
     biomaterial_id          																				int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id)
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade
 );
 
 --ok
@@ -809,11 +813,11 @@ create table assay_labeledextract (
     assay_labeledextract_id 																				serial not null,
 	primary key (assay_labeledextract_id),
     assay_id                																				int not null,
-	foreign key (assay_id) references assay (assay_id),
+	foreign key (assay_id) references assay (assay_id) on delete cascade,
     labeledextract_id       																				int not null,
-	foreign key (labeledextract_id) references biomaterial (biomaterial_id),
+	foreign key (labeledextract_id) references biomaterial (biomaterial_id) on delete cascade,
     channel_id              																				int not null,
-	foreign key (channel_id) references channel (channel_id)
+	foreign key (channel_id) references channel (channel_id) on delete cascade
 );
 
 --ok
@@ -823,9 +827,9 @@ create table biomaterial_cvterm (
     biomaterial_cvterm_id     																				serial not null,
 	primary key (biomaterial_cvterm_id),
     biomaterial_id            																				int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id),
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     cvterm_id                 																				int not null,
-	foreign key (cvterm_id) references cvterm (cvterm_id),
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
     value                     																				varchar(100) null
 );
 
@@ -836,14 +840,14 @@ create table biomaterial (
     biomaterial_id                   																		serial not null,
 	primary key (biomaterial_id),
     labelmethod_id                  																		int null,
-	foreign key (labelmethod_id) references labelmethod (labelmethod_id),
+	foreign key (labelmethod_id) references labelmethod (labelmethod_id) on delete set null,
     taxon_id                         																		int null,
-	foreign key (taxon_id) references organism (organism_id),
+	foreign key (taxon_id) references organism (organism_id) on delete set null,
     biosourceprovider_id             																		int null,
-	foreign key (biosourceprovider_id) references author (author_id),
+	foreign key (biosourceprovider_id) references author (author_id) on delete set null,
     subclass_view                    																		varchar(27) not null,
     dbxref_id                        																		varchar(50) null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     string1                          																		varchar(100) null,
     string2                          																		varchar(500) null
 );
@@ -854,12 +858,12 @@ create table biomaterialmeasurement (
     biomaterialmeasurement_id        																		serial not null,
 	primary key (biomaterialmeasurement_id),
     treatment_id                     																		int not null,
-	foreign key (treatment_id) references treatment (treatment_id),
+	foreign key (treatment_id) references treatment (treatment_id) on delete cascade,
     biomaterial_id                   																		int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id),
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     value                            																		float(15) null,
     unittype_id                     																		int null,
-	foreign key (unittype_id) references cvterm (cvterm_id)
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null
 );
 
 --ok
@@ -881,9 +885,9 @@ create table compositeelementresult (
     compositeelementresult_id          																		serial not null,
 	primary key (compositeelementresult_id),
     compositeelement_id                																		int not null,
-	foreign key (compositeelement_id) references feature (feature_id),
+	foreign key (compositeelement_id) references feature (feature_id) on delete cascade,
     quantification_id                  																		int not null,
-	foreign key (quantification_id) references quantification (quantification_id),
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
     subclass_view                      																		varchar(27) not null,
     float1                             																		float(15) null,
     float2                             																		float(15) null,
@@ -909,11 +913,11 @@ create table control (
     control_id               																				serial not null,
 	primary key (control_id),
     controltype_id          																				int not null,
-	foreign key (controltype_id) references cvterm (cvterm_id),
+	foreign key (controltype_id) references cvterm (cvterm_id) on delete cascade,
     assay_id                 																				int not null,
-	foreign key (assay_id) references assay (assay_id),
+	foreign key (assay_id) references assay (assay_id) on delete cascade,
     tableinfo_id                 																			int not null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     row_id                   																				int not null,
     name                     																				varchar(100) null,
     value                    																				varchar(255) null
@@ -927,13 +931,13 @@ create table element (
     element_id                         																		serial not null,
 	primary key (element_id),
     feature_id           		     																		int null,
-	foreign key (feature_id) references feature (feature_id),
+	foreign key (feature_id) references feature (feature_id) on delete set null,
     array_id                           																		int not null,
-	foreign key (array_id) references array (array_id),
-    element_type_id                    																		int null,
-	foreign key (element_type_id) references cvterm (cvterm_id),
+	foreign key (array_id) references array (array_id) on delete cascade,
+    elementtype_id                    																		int null,
+	foreign key (elementtype_id) references cvterm (cvterm_id) on delete set null,
     dbxref_id                          																		int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     subclass_view                      																		varchar(27) not null,
     tinyint1                           																		int null,
     smallint1                          																		int null,
@@ -958,11 +962,11 @@ create table elementresult (
     elementresult_id                   																		serial not null,
 	primary key (elementresult_id),
     element_id                         																		int not null,
-	foreign key (element_id) references element (element_id),
+	foreign key (element_id) references element (element_id) on delete cascade,
     compositeelementresult_id          																		int null,
-	foreign key (compositeelementresult_id) references compositeelementresult (compositeelementresult_id),
+	foreign key (compositeelementresult_id) references compositeelementresult (compositeelementresult_id) on delete set null,
     quantification_id                  																		int not null,
-	foreign key (quantification_id) references quantification (quantification_id),
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
     subclass_view                      																		varchar(27) not null,
     foreground                         																		float(15) null,
     background                         																		float(15) null,
@@ -1022,9 +1026,9 @@ create table labelmethod (
     labelmethod_id           																				serial not null,
 	primary key (labelmethod_id),
     protocol_id              																				int not null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete cascade,
     channel_id               																				int not null,
-	foreign key (channel_id) references channel (channel_id),
+	foreign key (channel_id) references channel (channel_id) on delete cascade,
     labelused               																				varchar(50) null,
     labelmethod             																				varchar(1000) null
 );
@@ -1035,9 +1039,9 @@ create table magedocumentation (
     magedocumentation_id     																				serial not null,
 	primary key (magedocumentation_id),
     mageml_id                																				int not null,
-	foreign key (mageml_id) references mageml (mageml_id),
+	foreign key (mageml_id) references mageml (mageml_id) on delete cascade,
     tableinfo_id                 																			int not null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     row_id                   																				int not null,
     mageidentifier          																				varchar(100) not null
 );
@@ -1058,7 +1062,7 @@ create table processimplementation (
     processimplementation_id           																		serial not null,
 	primary key (processimplementation_id),
     processtype_id                    																		int not null,
-	foreign key (processtype_id) references cvterm (cvterm_id),
+	foreign key (processtype_id) references cvterm (cvterm_id) on delete cascade,
     name                               																		varchar(100) null
 );
 
@@ -1068,7 +1072,7 @@ create table processimplementationparam (
     processimplementationparam_id       																		serial not null,
 	primary key (processimplementationparam_id),
     processimplementation_id           																		int not null,
-	foreign key (processimplementation_id) references processimplementation (processimplementation_id),
+	foreign key (processimplementation_id) references processimplementation (processimplementation_id) on delete cascade,
     name                               																		varchar(100) not null,
     value                              																		varchar(100) not null
 );
@@ -1079,7 +1083,7 @@ create table processinvocation (
     processinvocation_id              																		serial not null,
 	primary key (processinvocation_id),
     processimplementation_id          																		int not null,
-	foreign key (processimplementation_id) references processimplementation (processimplementation_id),
+	foreign key (processimplementation_id) references processimplementation (processimplementation_id) on delete cascade,
     processinvocationdate             																		date not null,
     description                        																		varchar(500) null
 );
@@ -1090,7 +1094,7 @@ create table processinvocationparam (
     processinvocationparam_id          																		serial not null,
 	primary key (processinvocationparam_id),
     processinvocation_id               																		int not null,
-	foreign key (processinvocation_id) references processinvocation (processinvocation_id),
+	foreign key (processinvocation_id) references processinvocation (processinvocation_id) on delete cascade,
     name                               																		varchar(100) not null,
     value                              																		varchar(100) not null
 );
@@ -1102,9 +1106,9 @@ create table processinvocation_quantification (
     processinvocation_quantification_id      																serial not null,
 	primary key (processinvocation_quantification_id),
     processinvocation_id                     																int not null,
-	foreign key (processinvocation_id) references processinvocation (processinvocation_id),
+	foreign key (processinvocation_id) references processinvocation (processinvocation_id) on delete cascade,
     quantification_id                        																int not null,
-	foreign key (quantification_id) references quantification (quantification_id)
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade
 );
 
 --ok
@@ -1113,13 +1117,13 @@ create table processio (
     processio_id             																				serial not null,
 	primary key (processio_id),
     processinvocation_id     																				int not null,
-	foreign key (processinvocation_id) references processinvocation (processinvocation_id),
+	foreign key (processinvocation_id) references processinvocation (processinvocation_id) on delete cascade,
     inputtable_id                 																			int not null,
-	foreign key (inputtable_id) references tableinfo (tableinfo_id),
+	foreign key (inputtable_id) references tableinfo (tableinfo_id) on delete cascade,
     inputrow_id          																					int not null,
     input_role               																				varchar(50) null,
     outputrow_id         																					int not null,
-	foreign key (outputrow_id) references processresult (processresult_id)
+	foreign key (outputrow_id) references processresult (processresult_id) on delete cascade
 );
 
 --ok
@@ -1129,7 +1133,7 @@ create table processresult (
 	primary key (processresult_id),
     value                   																				float(15) not null,
     unittype_id             																				int null,
-	foreign key (unittype_id) references cvterm (cvterm_id)
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null
 );
 
 --ok
@@ -1138,9 +1142,9 @@ create table projectlink (
     projectlink_id           																				serial not null,
 	primary key (projectlink_id),
     project_id               																			int not null,
-	foreign key (project_id) references project (project_id),
+	foreign key (project_id) references project (project_id) on delete cascade,
     tableinfo_id                 																			int not null,
-	foreign key (tableinfo_id) references tableinfo (tableinfo_id),
+	foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
     id                       																				int not null,
     currentversion          																				varchar(4) null
 );
@@ -1150,12 +1154,12 @@ create table projectlink (
 create table protocol (
     protocol_id                        																		serial not null,
 	primary key (protocol_id),
-    protocol_type_id                   																		int not null,
-	foreign key (protocol_type_id) references cvterm (cvterm_id),
+    protocoltype_id                   																		int not null,
+	foreign key (protocoltype_id) references cvterm (cvterm_id) on delete cascade,
     pub_id         																							int null,
-	foreign key (pub_id) references pub (pub_id),
+	foreign key (pub_id) references pub (pub_id) on delete set null,
     dbxref_id                          																		int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     name                               																		varchar(100) not null,
     uri                                																		varchar(100) null,
     protocoldescription               																		varchar(4000) null,
@@ -1169,12 +1173,12 @@ create table protocolparam (
     protocolparam_id         																				serial not null,
 	primary key (protocolparam_id),
     protocol_id              																				int not null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete cascade,
     name                     																				varchar(100) not null,
     datatype_id             																				int null,
-	foreign key (datatype_id) references cvterm (cvterm_id),
+	foreign key (datatype_id) references cvterm (cvterm_id) on delete set null,
     unittype_id             																				int null,
-	foreign key (unittype_id) references cvterm (cvterm_id),
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
     value                    																				varchar(100) null
 );
 
@@ -1184,13 +1188,13 @@ create table quantification (
     quantification_id        																				serial not null,
 	primary key (quantification_id),
     acquisition_id           																				int not null,
-	foreign key (acquisition_id) references acquisition (acquisition_id),
+	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
     operator_id              																				int null,
-	foreign key (operator_id) references author (author_id),
+	foreign key (operator_id) references author (author_id) on delete set null,
     protocol_id              																				int null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     resulttable_id          																				int null,
-	foreign key (resulttable_id) references tableinfo (tableinfo_id),
+	foreign key (resulttable_id) references tableinfo (tableinfo_id) on delete set null,
     quantificationdate       																				date null,
     name                     																				varchar(100) null,
     uri                      																				varchar(500) null
@@ -1202,7 +1206,7 @@ create table quantificationparam (
     quantificationparam_id   																				serial not null,
 	primary key (quantificationparam_id),
     quantification_id        																				int not null,
-	foreign key (quantification_id) references quantification (quantification_id),
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
     name                     																				varchar(100) not null,
     value                    																				varchar(50) not null
 );
@@ -1213,9 +1217,9 @@ create table relatedacquisition (
     relatedacquisition_id              																		serial not null,
 	primary key (relatedacquisition_id),
     acquisition_id                     																		int not null,
-	foreign key (acquisition_id) references acquisition (acquisition_id),
+	foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade,
     associatedacquisition_id          																		int not null,
-	foreign key (associatedacquisition_id) references acquisition (acquisition_id),
+	foreign key (associatedacquisition_id) references acquisition (acquisition_id) on delete cascade,
     name                               																		varchar(100) null,
     designation                        																		varchar(50) null,
     associateddesignation             																		varchar(50) null
@@ -1227,9 +1231,9 @@ create table relatedquantification (
     relatedquantification_id           																		serial not null,
 	primary key (relatedquantification_id),
     quantification_id                  																		int not null,
-	foreign key (quantification_id) references quantification (quantification_id),
+	foreign key (quantification_id) references quantification (quantification_id) on delete cascade,
     associatedquantification_id       																		int not null,
-	foreign key (associatedquantification_id) references quantification (quantification_id),
+	foreign key (associatedquantification_id) references quantification (quantification_id) on delete cascade,
     name                               																		varchar(100) null,
     designation                        																		varchar(50) null,
     associateddesignation             																		varchar(50) null
@@ -1241,11 +1245,11 @@ create table study (
     study_id                           																		serial not null,
 	primary key (study_id),
     contact_id                         																		int not null,
-	foreign key (contact_id) references author (author_id),
+	foreign key (contact_id) references author (author_id) on delete cascade,
    	pub_id         																							int null,
-	foreign key (pub_id) references pub (pub_id),
+	foreign key (pub_id) references pub (pub_id) on delete set null,
     dbxref_id                          																		int null,
-	foreign key (dbxref_id) references dbxref (dbxref_id),
+	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
     name                               																		varchar(100) not null,
     description                        																		varchar(4000) null
 );
@@ -1257,9 +1261,9 @@ create table study_assay (
     study_assay_id           																				serial not null,
 	primary key (study_assay_id),
     study_id                 																				int not null,
-	foreign key (study_id) references study (study_id),
+	foreign key (study_id) references study (study_id) on delete cascade,
     assay_id                 																				int not null,
-	foreign key (assay_id) references assay (assay_id)
+	foreign key (assay_id) references assay (assay_id) on delete cascade
 );
 
 --ok
@@ -1268,9 +1272,9 @@ create table studydesign (
     studydesign_id           																				serial not null,
 	primary key (studydesign_id),
     study_id                 																				int not null,
-	foreign key (study_id) references study (study_id),
+	foreign key (study_id) references study (study_id) on delete cascade,
     studydesigntype_id     																					int  null,
-	foreign key (studydesigntype_id) references cvterm (cvterm_id),
+	foreign key (studydesigntype_id) references cvterm (cvterm_id) on delete set null,
     description              																				varchar(4000) null
 );
 
@@ -1281,9 +1285,9 @@ create table studydesign_assay (
     studydesign_assay_id    																				serial not null,
 	primary key (studydesign_assay_id),
     studydesign_id          																				int not null,
-	foreign key (studydesign_id) references studydesign (studydesign_id),
+	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
     assay_id                																				int not null,
-	foreign key (assay_id) references assay (assay_id)
+	foreign key (assay_id) references assay (assay_id) on delete cascade
 );
 
 --ok
@@ -1292,9 +1296,9 @@ create table studydesigndescription (
     studydesigndescription_id         																		serial not null,
 	primary key (studydesigndescription_id),
     studydesign_id                     																		int not null,
-	foreign key (studydesign_id) references studydesign (studydesign_id),
+	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
     descriptiontype_id                 																		int not null,
-	foreign key (descriptiontype_id) references cvterm (cvterm_id),
+	foreign key (descriptiontype_id) references cvterm (cvterm_id) on delete cascade,
     description                        																		varchar(4000) not null
 );
 
@@ -1304,9 +1308,9 @@ create table studyfactor (
     studyfactor_id          																				serial not null,
 	primary key (studyfactor_id),
     studydesign_id          																				int not null,
-	foreign key (studydesign_id) references studydesign (studydesign_id),
+	foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade,
     studyfactortype_id     																					int null,
-	foreign key (studyfactortype_id) references cvterm (cvterm_id),
+	foreign key (studyfactortype_id) references cvterm (cvterm_id) on delete set null,
     name                     																				varchar(100) not null,
     description              																				varchar(500) null
 );
@@ -1317,9 +1321,9 @@ create table studyfactorvalue (
     studyfactorvalue_id      																				serial not null,
 	primary key (studyfactorvalue_id),
     studyfactor_id           																				int not null,
-	foreign key (studyfactor_id) references studyfactor (studyfactor_id),
+	foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade,
     assay_id                 																				int not null,
-	foreign key (assay_id) references assay (assay_id),
+	foreign key (assay_id) references assay (assay_id) on delete cascade,
     factorvalue             																				varchar(100) not null,
     name                     																				varchar(100) null
 );
@@ -1331,22 +1335,38 @@ create table treatment (
 	primary key (treatment_id),
     ordernum                																				int not null,
     biomaterial_id           																				int not null,
-	foreign key (biomaterial_id) references biomaterial (biomaterial_id),
+	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     treatmenttype_id        																				int not null,
-	foreign key (treatmenttype_id) references cvterm (cvterm_id),
+	foreign key (treatmenttype_id) references cvterm (cvterm_id) on delete cascade,
     protocol_id              																				int null,
-	foreign key (protocol_id) references protocol (protocol_id),
+	foreign key (protocol_id) references protocol (protocol_id) on delete set null,
     name                     																				varchar(100) null
 );
+--
+-- should this be in pub?
+--
+-- ================================================
+-- TABLE: contact
+-- ================================================
+create table contact (
+       contact_id serial not null,
+       primary key (contact_id),
+-- fields to be added after discussion
+       description varchar(255) null
+);
+
 -- ================================================
 -- TABLE: db
 -- ================================================
 
 create table db (
-       db_id varchar(255) not null,
+       db_id serial not null,
        primary key (db_id),
        name varchar(255) not null,
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
        description varchar(255) null,
+       urlprefix varchar(255) null,
        url varchar(255) null,
        unique (name)
 );
@@ -1359,33 +1379,59 @@ create table db (
 create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
-       dbname varchar(255) not null,
-       foreign key (dbname) references db (db_id),
+       db_id int not null,
+       foreign key (db_id) references db (db_id) on delete cascade,
        accession varchar(255) not null,
        version varchar(255) not null default '',
-       dbxrefdescription text,
+       description text,
 
-       unique (dbname, accession, version)
+       unique (db_id, accession, version)
 );
 
+--
+-- this table pending review
+--
 -- ================================================
 -- TABLE: dbxrefprop
 -- ================================================
+--
+--create table dbxrefprop (
+--       dbxrefprop_id serial not null,
+--       primary key (dbxrefprop_id),
+--       dbxref_id int not null,
+--       foreign key (dbxref_id) references dbxref (dbxref_id),
+--       pkey_id int not null,
+--       foreign key (pkey_id) references cvterm (cvterm_id),
+--       pval text not null default '',
+--       prank int not null default 0,
+--
+--       unique(dbxref_id, pkey_id, pval, prank)
+--);
+--create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
+--create index dbxrefprop_idx2 on dbxrefprop (pkey_id);
 
-create table dbxrefprop (
-       dbxrefprop_id serial not null,
-       primary key (dbxrefprop_id),
-       dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null default '',
-       prank int not null default 0,
-
-       unique(dbxref_id, pkey_id, pval, prank)
-);
-create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
-create index dbxrefprop_idx2 on dbxrefprop (pkey_id);
+--
+-- this table pending review
+--
+-- ================================================
+-- TABLE: dbxrefrelationship
+-- ================================================
+--
+--create table dbxrefrelationship (
+--       dbxrefrelationship_id serial not null,
+--       primary key (dbxrefrelationship_id),
+--       reltype_id int not null,
+--       foreign key (reltype_id) references cvterm (cvterm_id),
+--       subjterm_id int not null,
+--       foreign key (subjterm_id) references dbxref (dbxref_id),
+--       objterm_id int not null,
+--       foreign key (objterm_id) references dbxref (dbxref_id),
+--       
+--       unique(reltype_id, subjterm_id, objterm_id)
+--);
+--create index dbxrefrelationship_idx1 on dbxrefrelationship (reltype_id);
+--create index dbxrefrelationship_idx2 on dbxrefrelationship (subjterm_id);
+--create index dbxrefrelationship_idx3 on dbxrefrelationship (objterm_id);
 
 -- ================================================
 -- TABLE: tableinfo
@@ -1413,7 +1459,7 @@ create table project (
        project_id serial not null,
        primary key (project_id),
        name varchar(255) not null,
-      description varchar(255) not null
+       description varchar(255) not null
 );
 -- This module depends on the sequence, pub, and cv modules 
 -- 18-JAN-03 (DE): This module is unfinished and due for schema review (Bill 
@@ -1438,9 +1484,9 @@ create table feature_genotype (
        feature_genotype_id serial not null,
        primary key (feature_genotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        genotype_id int not null,
-       foreign key (genotype_id) references genotype (genotype_id),
+       foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
 
        unique(feature_id,genotype_id)
 );
@@ -1457,11 +1503,11 @@ create table phenotype (
        primary key (phenotype_id),
        description text,
        statement_type int not null,
-       foreign key (statement_type) references cvterm (cvterm_id),
+       foreign key (statement_type) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id)
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null
 );
 -- type of phenotypic statement  [Chris, we need this or something like it
 -- for FB where we have three types of statement in *k: "Phenotypic class:",
@@ -1480,9 +1526,9 @@ create table feature_phenotype (
        feature_phenotype_id serial not null,
        primary key (feature_phenotype_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
 
        unique(feature_id,phenotype_id)       
 );
@@ -1498,9 +1544,9 @@ create table phenotype_cvterm (
        phenotype_cvterm_id serial not null,
        primary key (phenotype_cvterm_id),
        phenotype_id int not null,
-       foreign key (phenotype_id) references phenotype (phenotype_id),
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        prank int not null,
 
        unique(phenotype_id,cvterm_id,prank)
@@ -1518,12 +1564,12 @@ create table interaction (
        primary key (interaction_id),
        description text,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 -- Do we want to call this simply genotype_id to allow natural joins?
        background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id),
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null,
        phenotype_id int,
-       foreign key (phenotype_id) references phenotype (phenotype_id)
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete set null
 );
 create index interaction_idx1 on interaction (pub_id);
 create index interaction_idx2 on interaction (background_genotype_id);
@@ -1538,9 +1584,9 @@ create table interaction_subj (
        interaction_subj_id serial not null,
        primary key (interaction_subj_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
 
        unique(feature_id,interaction_id)
 );
@@ -1556,9 +1602,9 @@ create table interaction_obj (
        interaction_obj_id serial not null,
        primary key (interaction_obj_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        interaction_id int not null,
-       foreign key (interaction_id) references interaction (interaction_id),
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
 
        unique(feature_id,interaction_id)
 );
@@ -1612,17 +1658,17 @@ create table featurerange (
        featurerange_id serial not null,
        primary key (featurerange_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        leftstartf_id int not null,
-       foreign key (leftstartf_id) references feature (feature_id),       
+       foreign key (leftstartf_id) references feature (feature_id) on delete cascade,
        leftendf_id int,
-       foreign key (leftendf_id) references feature (feature_id),       
+       foreign key (leftendf_id) references feature (feature_id) on delete set null,
        rightstartf_id int,
-       foreign key (rightstartf_id) references feature (feature_id),       
+       foreign key (rightstartf_id) references feature (feature_id) on delete set null,
        rightendf_id int not null,
-       foreign key (rightendf_id) references feature (feature_id),
+       foreign key (rightendf_id) references feature (feature_id) on delete cascade,
        rangestr varchar(255)
 );
 create index featurerange_idx1 on featurerange (featuremap_id);
@@ -1641,11 +1687,11 @@ create table featurepos (
        featurepos_id serial not null,
        primary key (featurepos_id),
        featuremap_id serial not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        map_feature_id int not null,
-       foreign key (map_feature_id) references feature (feature_id),
+       foreign key (map_feature_id) references feature (feature_id) on delete cascade,
        mappos float not null
 );
 -- map_feature_id links to the feature (map) upon which the feature is
@@ -1663,9 +1709,9 @@ create table featuremap_pub (
        featuremap_pub_id serial not null,
        primary key (featuremap_pub_id),
        featuremap_id int not null,
-       foreign key (featuremap_id) references featuremap (featuremap_id),
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id)
+       foreign key (pub_id) references pub (pub_id) on delete cascade
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
@@ -1681,14 +1727,13 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 create table organism (
 	organism_id serial not null,
 	primary key (organism_id),
-	abbrev varchar(255) null,
+	abbreviation varchar(255) null,
 	genus varchar(255) not null,
-	taxgroup varchar(255) not null,
 	species varchar(255) not null,
 	common_name varchar(255) null,
 	comment text null,
 
-	unique(taxgroup, genus, species)
+	unique(genus, species)
 );
 -- Compared to mol5..Species, organism table lacks "approved char(1) null".  
 -- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
@@ -1698,6 +1743,7 @@ create table organism (
 -- if it's really necessary we can have an organismprop table
 -- for adding internal project specific data
 -- [cjm]
+-- done (below) 19-MAY-03 [dave]
 
 
 -- ================================================
@@ -1708,14 +1754,33 @@ create table organism_dbxref (
        organism_dbxref_id serial not null,
        primary key (organism_dbxref_id),
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(organism_id,dbxref_id)
 );
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
+
+-- ================================================
+-- TABLE: organismprop
+-- ================================================
+
+create table organismprop (
+       organismprop_id serial not null,
+       primary key (organismprop_id),
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
+
+       unique(organism_id, type_id, value, rank)
+);
+create index organismprop_idx1 on organismprop (organism_id);
+create index organismprop_idx2 on organismprop (type_id);
 
 -- We should take a look in OMG for a standard representation we might use 
 -- instead of this.
@@ -1736,7 +1801,7 @@ create table pub (
        pages  varchar(255),
        miniref varchar(255) not null,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        is_obsolete boolean default 'false',
        publisher varchar(255),
        pubplace varchar(255),
@@ -1764,11 +1829,11 @@ create table pub_relationship (
        pub_relationship_id serial not null,
        primary key (pub_relationship_id),
        subj_pub_id int not null,
-       foreign key (subj_pub_id) references pub (pub_id),
+       foreign key (subj_pub_id) references pub (pub_id) on delete cascade,
        obj_pub_id int not null,
-       foreign key (obj_pub_id) references pub (pub_id),
+       foreign key (obj_pub_id) references pub (pub_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
        unique(subj_pub_id, obj_pub_id, type_id)
 );
@@ -1787,9 +1852,9 @@ create table pub_dbxref (
        pub_dbxref_id serial not null,
        primary key (pub_dbxref_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(pub_id,dbxref_id)
 );
@@ -1806,6 +1871,9 @@ create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 create table author (
        author_id serial not null,
        primary key (author_id),
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
+-- these fields may be moving to the contact table...
        surname varchar(100) not null,
        givennames varchar(100),
        suffix varchar(100),
@@ -1824,9 +1892,9 @@ create table pub_author (
        pub_author_id serial not null,
        primary key (pub_author_id),
        author_id int not null,
-       foreign key (author_id) references author (author_id),
+       foreign key (author_id) references author (author_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        arank int not null,
        editor boolean default 'false',
 
@@ -1846,16 +1914,16 @@ create table pubprop (
        pubprop_id serial not null,
        primary key (pubprop_id),
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null,
-       prank integer,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null,
+       rank integer,
 
-       unique(pub_id,pkey_id,pval)
+       unique(pub_id,type_id,value)
 );
 create index pubprop_idx1 on pubprop (pub_id);
-create index pubprop_idx2 on pubprop (pkey_id);
+create index pubprop_idx2 on pubprop (type_id);
 
 -- ================================================
 -- TABLE: feature
@@ -1865,16 +1933,16 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
        name varchar(255),
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 	is_analysis boolean not null default 'false',
 -- timeaccessioned and timelastmodified are for handling object accession/
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
@@ -1958,25 +2026,30 @@ create index feature_lc_name on feature (lower(name));
 -- features eg splice sites, insertion points without
 -- an awkward fuzzy system
 
+-- Note that nbeg and nend have been replaced with fmin and fmax,
+-- which are the minimum and maximum coordinates of the feature
+-- relative to the parent feature.  By contrast,
 -- nbeg, nend are for feature natural begin/end
 -- by natural begin, end we mean these are the actual
 -- beginning (5' position) and actual end (3' position)
 -- rather than the low position and high position, as
--- these terms are sometimes erroneously used
+-- these terms are sometimes erroneously used.  To compensate
+-- for the removal of nbeg and nend from featureloc, a view
+-- based on featureloc, dfeatureloc, is provided in sequence_views.sql.
 
 create table featureloc (
        featureloc_id serial not null,
        primary key (featureloc_id),
 
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        srcfeature_id int,
-       foreign key (srcfeature_id) references feature (feature_id),
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
 
-       nbeg int,
-       is_nbeg_partial boolean not null default 'false',
-       nend int,
-       is_nend_partial boolean not null default 'false',
+       fmin int,
+       is_fmin_partial boolean not null default 'false',
+       fmax int,
+       is_fmax_partial boolean not null default 'false',
        strand smallint,
        phase int,
 
@@ -1990,7 +2063,7 @@ create table featureloc (
 -- phase: phase of translation wrt srcfeature_id.  Values are 0,1,2
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
-create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
+create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
 
 -- ================================================
 -- TABLE: feature_pub
@@ -2000,9 +2073,9 @@ create table feature_pub (
        feature_pub_id serial not null,
        primary key (feature_pub_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(feature_id, pub_id)
 );
@@ -2018,16 +2091,16 @@ create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null default '',
-       prank int not null default 0,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
 
-       unique(feature_id, pkey_id, pval, prank)
+       unique(feature_id, type_id, value, rank)
 );
 create index featureprop_idx1 on featureprop (feature_id);
-create index featureprop_idx2 on featureprop (pkey_id);
+create index featureprop_idx2 on featureprop (type_id);
 
 
 -- ================================================
@@ -2038,9 +2111,9 @@ create table featureprop_pub (
        featureprop_pub_id serial not null,
        primary key (featureprop_pub_id),
        featureprop_id int not null,
-       foreign key (featureprop_id) references featureprop (featureprop_id),
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(featureprop_id, pub_id)
 );
@@ -2057,9 +2130,9 @@ create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        is_current boolean not null default 'true',
 
        unique(feature_id, dbxref_id)
@@ -2087,11 +2160,11 @@ create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
        subjfeature_id int not null,
-       foreign key (subjfeature_id) references feature (feature_id),
+       foreign key (subjfeature_id) references feature (feature_id) on delete cascade,
        objfeature_id int not null,
-       foreign key (objfeature_id) references feature (feature_id),
+       foreign key (objfeature_id) references feature (feature_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        relrank int,
 
        unique(subjfeature_id, objfeature_id, type_id)
@@ -2109,13 +2182,14 @@ create table feature_cvterm (
        feature_cvterm_id serial not null,
        primary key (feature_cvterm_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
-       unique(feature_id, cvterm_id, pub_id)
+       unique (feature_id, cvterm_id, pub_id)
+
 );
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
 create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
@@ -2132,7 +2206,7 @@ create table synonym (
        name varchar(255) not null,
        type_id int not null,
        synonym_sgml varchar(255) not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id), -- no delete action
 
        unique(name,type_id)
 );
@@ -2149,11 +2223,11 @@ create table feature_synonym (
        feature_synonym_id serial not null,
        primary key (feature_synonym_id),
        synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        is_current boolean not null,
        is_internal boolean not null default 'false',
 
@@ -2174,24 +2248,42 @@ create table feature_synonym (
 create index feature_synonym_idx1 on feature_synonym (synonym_id);
 create index feature_synonym_idx2 on feature_synonym (feature_id);
 create index feature_synonym_idx3 on feature_synonym (pub_id);
+--------------------------------
+---- dfeatureloc ---------------
+--------------------------------
+-- dfeatureloc is meant as an alternate representation of
+-- the data in featureloc (see the descrption of featureloc
+-- in sequence.sql).  In dfeatureloc, fmin and fmax are 
+-- replaced with nbeg and nend.  Whereas fmin and fmax
+-- are absolute coordinates relative to the parent feature, nbeg 
+-- and nend are the beginning and ending coordinates
+-- relative to the feature itself.  For example, nbeg would
+-- mark the 5' end of a gene and nend would mark the 3' end.
 
+CREATE OR REPLACE VIEW dfeatureloc (
+ featureloc_id,
+ feature_id,
+ srcfeature_id,
+ nbeg,
+ is_nbeg_partial,
+ nend,
+ is_nend_partial,
+ strand,
+ phase,
+ residue_info,
+ locgroup,
+ rank
+) AS
+SELECT featureloc_id, feature_id, srcfeature_id, fmin, is_fmin_partial,
+       fmax, is_fmax_partial, strand, phase, residue_info, locgroup, rank
+FROM featureloc
+WHERE (strand < 0 or phase < 0)
+UNION
+SELECT featureloc_id, feature_id, srcfeature_id, fmax, is_fmax_partial,
+       fmin, is_fmin_partial, strand, phase, residue_info, locgroup, rank
+FROM featureloc
+WHERE (strand is NULL or strand >= 0 or phase >= 0) ;
 
--- ================================================
--- TABLE: synonym_pub
--- ================================================
-
-create table synonym_pub (
-       synonym_pub_id serial not null,
-       primary key (synonym_pub_id),
-       synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
-       pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-
-       unique(synonym_id, pub_id)
-);
-create index synonym_pub_idx1 on synonym_pub (synonym_id);
-create index synonym_pub_idx2 on synonym_pub (pub_id);
 --------------------------------
 ---- f_type --------------------
 --------------------------------
@@ -2235,16 +2327,21 @@ AS
 --------------------------------
 ---- f_loc ---------------------
 --------------------------------
+-- Note from Scott:  I changed this view to depend on dfeatureloc,
+-- since I don't know what it is used for.  The change should
+-- be transparent.  I also changed dbxrefstr to dbxref_id since
+-- dbxrefstr is no longer in feature
+
 DROP VIEW f_loc;
 CREATE VIEW f_loc
 AS
   SELECT  f.feature_id,
           f.name,
-          f.dbxrefstr,
+          f.dbxref_id,
           fl.nbeg,
           fl.nend,
           fl.strand
-    FROM  featureloc fl, f_type f
+    FROM  dfeatureloc fl, f_type f
    WHERE  f.feature_id = fl.feature_id;
 
 --------------------------------
@@ -2259,38 +2356,39 @@ AS
     FROM  featureprop fp, cvterm c
    WHERE  fp.pkey_id = c.cvterm_id;
 
-
-/* feature before (?)deletion trigger implements the following rules:
-
-     -if feature to be deleted is a 
-	
-	transcript:
-	-delete any exons having this as their only related transcript
-	-delete any proteins having this as their only related transcript
-	-prevent deletion if there are any alleles of the transcript?
-     
-	gene:
-	-prevent deletion if there are any alleles of the gene? or other info?
-	-delete all transcripts that are related only to this gene
-
-	what needs to be preserved about dbxrefs, etc.? 	
-*/
-
-CREATE OR REPLACE FUNCTION feature_del_tr () RETURNS TRIGGER AS '
-body goes here
-
-
-
-
-' LANGUAGE SQL (?);
-or language plpgsql;
-
-CREATE TRIGGER name { BEFORE | AFTER } { event [OR ...] }
-          ON table FOR EACH { ROW | STATEMENT }
-          EXECUTE PROCEDURE func ( arguments )
- 
-CREATE TRIGGER feature_del_tr BEFORE DELETE ON feature FOR EACH { ROW | STATEMENT }
-	EXECUTE PROCEDURE feature_del_tr ; 
+-- no C++ style comments please. what is this file for, anyway?
+--
+--/* feature before (?)deletion trigger implements the following rules:
+--
+--     -if feature to be deleted is a 
+--	
+--	transcript:
+--	-delete any exons having this as their only related transcript
+--	-delete any proteins having this as their only related transcript
+--	-prevent deletion if there are any alleles of the transcript?
+--    
+--	gene:
+--	-prevent deletion if there are any alleles of the gene? or other info?
+--	-delete all transcripts that are related only to this gene
+--
+--	what needs to be preserved about dbxrefs, etc.? 	
+--*/
+--
+--CREATE OR REPLACE FUNCTION feature_del_tr () RETURNS TRIGGER AS '
+--body goes here
+--
+--
+--
+--
+--' LANGUAGE SQL (?);
+--or language plpgsql;
+--
+--CREATE TRIGGER name { BEFORE | AFTER } { event [OR ...] }
+--          ON table FOR EACH { ROW | STATEMENT }
+--          EXECUTE PROCEDURE func ( arguments )
+-- 
+--CREATE TRIGGER feature_del_tr BEFORE DELETE ON feature FOR EACH { ROW | STATEMENT }
+--	EXECUTE PROCEDURE feature_del_tr ; 
 -- ================================================
 -- TABLE: wwwuser
 -- ================================================
@@ -2317,9 +2415,9 @@ create table wwwuser_project (
 	wwwuser_project_id serial not null,
 	primary key (wwwuser_project_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	project_id int not null,
-	foreign key (project_id) references project (project_id),
+	foreign key (project_id) references project (project_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,project_id)
 );
@@ -2335,9 +2433,9 @@ create table wwwuser_author (
 	wwwuser_author_id serial not null,
 	primary key (wwwuser_author_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	author_id int not null,
-	foreign key (author_id) references author (author_id),
+	foreign key (author_id) references author (author_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,author_id)
 );
@@ -2353,9 +2451,9 @@ create table wwwuser_cvterm (
 	wwwuser_cvterm_id serial not null,
 	primary key (wwwuser_cvterm_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	cvterm_id int not null,
-	foreign key (cvterm_id) references cvterm (cvterm_id),
+	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,cvterm_id)
 );
@@ -2371,9 +2469,9 @@ create table wwwuser_expression (
 	wwwuser_expression_id serial not null,
 	primary key (wwwuser_expression_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	expression_id int not null,
-	foreign key (expression_id) references expression (expression_id),
+	foreign key (expression_id) references expression (expression_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,expression_id)
 );
@@ -2389,9 +2487,9 @@ create table wwwuser_feature (
 	wwwuser_feature_id serial not null,
 	primary key (wwwuser_feature_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	feature_id int not null,
-	foreign key (feature_id) references feature (feature_id),
+	foreign key (feature_id) references feature (feature_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,feature_id)
 );
@@ -2407,9 +2505,9 @@ create table wwwuser_genotype (
 	wwwuser_genotype_id serial not null,
 	primary key (wwwuser_genotype_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	genotype_id int not null,
-	foreign key (genotype_id) references genotype (genotype_id),
+	foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,genotype_id)
 );
@@ -2425,9 +2523,9 @@ create table wwwuser_interaction (
 	wwwuser_interaction_id serial not null,
 	primary key (wwwuser_interaction_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	interaction_id int not null,
-	foreign key (interaction_id) references interaction (interaction_id),
+	foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,interaction_id)
 );
@@ -2443,9 +2541,9 @@ create table wwwuser_organism (
 	wwwuser_organism_id serial not null,
 	primary key (wwwuser_organism_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	organism_id int not null,
-	foreign key (organism_id) references organism (organism_id),
+	foreign key (organism_id) references organism (organism_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,organism_id)
 );
@@ -2461,9 +2559,9 @@ create table wwwuser_phenotype (
 	wwwuser_phenotype_id serial not null,
 	primary key (wwwuser_phenotype_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	phenotype_id int not null,
-	foreign key (phenotype_id) references phenotype (phenotype_id),
+	foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,phenotype_id)
 );
@@ -2479,9 +2577,9 @@ create table wwwuser_pub (
 	wwwuser_pub_id serial not null,
 	primary key (wwwuser_pub_id),
 	wwwuser_id int not null,
-	foreign key (wwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	pub_id int not null,
-	foreign key (pub_id) references pub (pub_id),
+	foreign key (pub_id) references pub (pub_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,pub_id)
 );
@@ -2497,12 +2595,1323 @@ create table wwwuserrelationship (
 	wwwuserrelationship_id serial not null,
 	primary key (wwwuserrelationship_id),
 	objwwwuser_id int not null,
-	foreign key (objwwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (objwwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	subjwwwuser_id int not null,
-	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id),
+	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id) on delete cascade,
 	world_read smallint not null default 1,
 	unique(objwwwuser_id,subjwwwuser_id)
 );
 create index wwwuserrelationship_idx1 on wwwuserrelationship(subjwwwuser_id);
 create index wwwuserrelationship_idx2 on wwwuserrelationship(objwwwuser_id);
+--
+-- should this be in pub?
+--
+-- ================================================
+-- TABLE: contact
+-- ================================================
+create table contact (
+       contact_id serial not null,
+       primary key (contact_id),
+-- fields to be added after discussion
+       description varchar(255) null
+);
+
+-- ================================================
+-- TABLE: db
+-- ================================================
+
+create table db (
+       db_id serial not null,
+       primary key (db_id),
+       name varchar(255) not null,
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
+       description varchar(255) null,
+       urlprefix varchar(255) null,
+       url varchar(255) null,
+       unique (name)
+);
+
+
+-- ================================================
+-- TABLE: dbxref
+-- ================================================
+
+create table dbxref (
+       dbxref_id serial not null,
+       primary key (dbxref_id),
+       db_id int not null,
+       foreign key (db_id) references db (db_id) on delete cascade,
+       accession varchar(255) not null,
+       version varchar(255) not null default '',
+       description text,
+
+       unique (db_id, accession, version)
+);
+
+--
+-- this table pending review
+--
+-- ================================================
+-- TABLE: dbxrefprop
+-- ================================================
+--
+--create table dbxrefprop (
+--       dbxrefprop_id serial not null,
+--       primary key (dbxrefprop_id),
+--       dbxref_id int not null,
+--       foreign key (dbxref_id) references dbxref (dbxref_id),
+--       pkey_id int not null,
+--       foreign key (pkey_id) references cvterm (cvterm_id),
+--       pval text not null default '',
+--       prank int not null default 0,
+--
+--       unique(dbxref_id, pkey_id, pval, prank)
+--);
+--create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
+--create index dbxrefprop_idx2 on dbxrefprop (pkey_id);
+
+--
+-- this table pending review
+--
+-- ================================================
+-- TABLE: dbxrefrelationship
+-- ================================================
+--
+--create table dbxrefrelationship (
+--       dbxrefrelationship_id serial not null,
+--       primary key (dbxrefrelationship_id),
+--       reltype_id int not null,
+--       foreign key (reltype_id) references cvterm (cvterm_id),
+--       subjterm_id int not null,
+--       foreign key (subjterm_id) references dbxref (dbxref_id),
+--       objterm_id int not null,
+--       foreign key (objterm_id) references dbxref (dbxref_id),
+--       
+--       unique(reltype_id, subjterm_id, objterm_id)
+--);
+--create index dbxrefrelationship_idx1 on dbxrefrelationship (reltype_id);
+--create index dbxrefrelationship_idx2 on dbxrefrelationship (subjterm_id);
+--create index dbxrefrelationship_idx3 on dbxrefrelationship (objterm_id);
+
+-- ================================================
+-- TABLE: tableinfo
+-- ================================================
+
+create table tableinfo (
+       tableinfo_id serial not null,
+       primary key (tableinfo_id),
+       name varchar(30) not null,
+       table_type varchar(40) not null,
+       primary_key_column varchar(30) null,
+       database_id int not null,
+       is_versioned int not null,
+       is_view int not null,
+       view_on_table_id int null,
+       superclass_table_id int null,
+       is_updateable int not null,
+       modification_date date not null
+);
+
+-- ================================================
+-- TABLE: project
+-- ================================================
+create table project (
+       project_id serial not null,
+       primary key (project_id),
+       name varchar(255) not null,
+       description varchar(255) not null
+);
+-- The cvterm module design is based on the ontology 
+
+-- ================================================
+-- TABLE: cv
+-- ================================================
+
+create table cv (
+       cv_id serial not null,
+       primary key (cv_id),
+       name varchar(255) not null,
+       definition text,
+
+       unique(name)
+);
+
+-- ================================================
+-- TABLE: cvterm
+-- ================================================
+
+create table cvterm (
+       cvterm_id serial not null,
+       primary key (cvterm_id),
+       cv_id int not null,
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
+       name varchar(255) not null,
+       definition text,
+       dbxref_id int,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+
+       unique(name, cv_id)
+);
+create index cvterm_idx1 on cvterm (cv_id);
+-- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
+-- The unique key on termname, cv_id ensures that all terms are 
+-- unique within a given cv
+
+
+-- ================================================
+-- TABLE: cvtermrelationship
+-- ================================================
+
+create table cvtermrelationship (
+       cvtermrelationship_id serial not null,
+       primary key (cvtermrelationship_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
+
+       unique(type_id, subject_id, object_id)
+);
+create index cvtermrelationship_idx1 on cvtermrelationship (type_id);
+create index cvtermrelationship_idx2 on cvtermrelationship (subject_id);
+create index cvtermrelationship_idx3 on cvtermrelationship (object_id);
+
+
+-- ================================================
+-- TABLE: cvtermpath
+-- ================================================
+
+create table cvtermpath (
+       cvtermpath_id serial not null,
+       primary key (cvtermpath_id),
+       type_id int,
+       foreign key (type_id) references cvterm (cvterm_id) on delete set null,
+       subject_id int not null,
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
+       object_id int not null,
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
+       cv_id int not null,
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
+       pathdistance int,
+
+       unique (subject_id, object_id)
+);
+create index cvtermpath_idx1 on cvtermpath (type_id);
+create index cvtermpath_idx2 on cvtermpath (subject_id);
+create index cvtermpath_idx3 on cvtermpath (object_id);
+create index cvtermpath_idx4 on cvtermpath (cv_id);
+
+
+-- ================================================
+-- TABLE: cvtermsynonym
+-- ================================================
+
+create table cvtermsynonym (
+       cvtermsynonym_id int not null,
+       primary key (cvtermsynonym_id),
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       synonym varchar(255) not null,
+
+       unique(cvterm_id, synonym)
+);
+create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
+
+
+-- ================================================
+-- TABLE: cvterm_dbxref
+-- ================================================
+
+create table cvterm_dbxref (
+       cvterm_dbxref_id serial not null,
+       primary key (cvterm_dbxref_id),
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+
+       unique(cvterm_id, dbxref_id)
+);
+create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
+create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
+
+-- ================================================
+-- TABLE: organism
+-- ================================================
+
+create table organism (
+	organism_id serial not null,
+	primary key (organism_id),
+	abbreviation varchar(255) null,
+	genus varchar(255) not null,
+	species varchar(255) not null,
+	common_name varchar(255) null,
+	comment text null,
+
+	unique(genus, species)
+);
+-- Compared to mol5..Species, organism table lacks "approved char(1) null".  
+-- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
+-- future [dave]
+--
+-- in response: this is very specific to a limited use case I think;
+-- if it's really necessary we can have an organismprop table
+-- for adding internal project specific data
+-- [cjm]
+-- done (below) 19-MAY-03 [dave]
+
+
+-- ================================================
+-- TABLE: organism_dbxref
+-- ================================================
+
+create table organism_dbxref (
+       organism_dbxref_id serial not null,
+       primary key (organism_dbxref_id),
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+
+       unique(organism_id,dbxref_id)
+);
+create index organism_dbxref_idx1 on organism_dbxref (organism_id);
+create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
+
+-- ================================================
+-- TABLE: organismprop
+-- ================================================
+
+create table organismprop (
+       organismprop_id serial not null,
+       primary key (organismprop_id),
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
+
+       unique(organism_id, type_id, value, rank)
+);
+create index organismprop_idx1 on organismprop (organism_id);
+create index organismprop_idx2 on organismprop (type_id);
+
+-- We should take a look in OMG for a standard representation we might use 
+-- instead of this.
+
+-- ================================================
+-- TABLE: pub
+-- ================================================
+
+create table pub (
+       pub_id serial not null,
+       primary key (pub_id),
+       title text,
+       volumetitle text,
+       volume  varchar(255),
+       series_name varchar(255),
+       issue  varchar(255),
+       pyear  varchar(255),
+       pages  varchar(255),
+       miniref varchar(255) not null,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       is_obsolete boolean default 'false',
+       publisher varchar(255),
+       pubplace varchar(255),
+
+       unique(miniref)
+);
+-- title: title of paper, chapter of book, journal, etc
+-- volumetitle: title of part if one of a series
+-- series_name: full name of (journal) series
+-- pages: page number range[s], eg, 457--459, viii + 664pp, lv--lvii
+-- type_id: the type of the publication (book, journal, poem, graffiti, etc)
+-- is_obsolete: do we want this even though we have the relationship in pub_relationship?
+create index pub_idx1 on pub (type_id);
+
+-- ================================================
+-- TABLE: pub_relationship
+-- ================================================
+
+-- Handle relationships between publications, eg, when one publication
+-- makes others obsolete, when one publication contains errata with
+-- respect to other publication(s), or when one publication also 
+-- appears in another pub (I think these three are it - at least for fb)
+
+create table pub_relationship (
+       pub_relationship_id serial not null,
+       primary key (pub_relationship_id),
+       subj_pub_id int not null,
+       foreign key (subj_pub_id) references pub (pub_id) on delete cascade,
+       obj_pub_id int not null,
+       foreign key (obj_pub_id) references pub (pub_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+
+       unique(subj_pub_id, obj_pub_id, type_id)
+);
+create index pub_relationship_idx1 on pub_relationship (subj_pub_id);
+create index pub_relationship_idx2 on pub_relationship (obj_pub_id);
+create index pub_relationship_idx3 on pub_relationship (type_id);
+
+
+-- ================================================
+-- TABLE: pub_dbxref
+-- ================================================
+
+-- Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
+
+create table pub_dbxref (
+       pub_dbxref_id serial not null,
+       primary key (pub_dbxref_id),
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+
+       unique(pub_id,dbxref_id)
+);
+create index pub_dbxref_idx1 on pub_dbxref (pub_id);
+create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
+
+
+-- ================================================
+-- TABLE: author
+-- ================================================
+
+-- using the FB author table columns
+
+create table author (
+       author_id serial not null,
+       primary key (author_id),
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id) on delete cascade,
+-- these fields may be moving to the contact table...
+       surname varchar(100) not null,
+       givennames varchar(100),
+       suffix varchar(100),
+
+       unique(surname,givennames,suffix)
+);
+-- givennames: first name, initials
+-- suffix: Jr., Sr., etc       
+
+
+-- ================================================
+-- TABLE: pub_author
+-- ================================================
+
+create table pub_author (
+       pub_author_id serial not null,
+       primary key (pub_author_id),
+       author_id int not null,
+       foreign key (author_id) references author (author_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       arank int not null,
+       editor boolean default 'false',
+
+       unique(author_id,pub_id)
+);
+-- arank: order of author in author list for this pub
+-- editor: indicates whether the author is an editor for linked publication
+create index pub_author_idx1 on pub_author (author_id);
+create index pub_author_idx2 on pub_author (pub_id);
+
+
+-- ================================================
+-- TABLE: pubprop
+-- ================================================
+
+create table pubprop (
+       pubprop_id serial not null,
+       primary key (pubprop_id),
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null,
+       rank integer,
+
+       unique(pub_id,type_id,value)
+);
+create index pubprop_idx1 on pubprop (pub_id);
+create index pubprop_idx2 on pubprop (type_id);
+
+-- ================================================
+-- TABLE: feature
+-- ================================================
+
+create table feature (
+       feature_id serial not null,
+       primary key (feature_id),
+       dbxref_id int,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
+       organism_id int not null,
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
+       name varchar(255),
+       uniquename text not null,
+       residues text,
+       seqlen int,
+       md5checksum char(32),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	is_analysis boolean not null default 'false',
+-- timeaccessioned and timelastmodified are for handling object accession/
+-- modification timestamps (as opposed to db auditing info, handled elsewhere).
+-- The expectation is that these fields would be available to software 
+-- interacting with chado.
+       timeaccessioned timestamp not null default current_timestamp,
+       timelastmodified timestamp not null default current_timestamp,
+
+       unique(organism_id,uniquename)
+);
+-- dbxref_id here is intended for the primary dbxref for this feature.   
+-- Additional dbxref links are made via feature_dbxref
+-- name: the human-readable common name for a feature, for display
+-- uniquename: the unique name for a feature; may not be particularly human-readable
+
+-- timeaccessioned and timelastmodified are for handling object accession/
+-- modification timestamps (as opposed to db auditing info, handled elsewhere).
+-- The expectation is that these fields would be available to software 
+-- interacting with chado.
+create sequence feature_uniquename_seq;
+create index feature_name_ind1 on feature(name);
+create index feature_idx1 on feature (dbxref_id);
+create index feature_idx2 on feature (organism_id);
+create index feature_idx3 on feature (type_id);
+create index feature_idx4 on feature (uniquename);
+create index feature_lc_name on feature (lower(name));
+
+
+
+-- ================================================
+-- TABLE: featureloc
+-- ================================================
+
+-- each feature can have 0 or more locations.
+-- multiple locations do NOT indicate non-contiguous locations.
+-- instead they designate alternate locations or grouped locations;
+-- for instance, a feature designating a blast hit or hsp will have two
+-- locations, one on the query feature, one on the subject feature.
+-- features representing sequence variation could have alternate locations
+-- instantiated on a feature on the mutant strain.
+-- the field "rank" is used to differentiate these different locations.
+-- the default rank '0' is used for the main/primary location (eg in
+-- similarity features, 0 is query, 1 is subject), although sometimes
+-- this will be symmeytical and there is no primary location.
+--
+-- redundant locations can also be stored - for instance, the position
+-- of an exon on a BAC and in global coordinates. the field "locgroup"
+-- is used to differentiate these groupings of locations. the default
+-- locgroup '0' is used for the main/primary location, from which the
+-- others can be derived via coordinate transformations. another
+-- example of redundant locations is storing ORF coordinates relative
+-- to both transcript and genome. redundant locations open the possibility
+-- of the database getting into inconsistent states; this schema gives
+-- us the flexibility of both 'warehouse' instantiations with redundant
+-- locations (easier for querying) and 'management' instantiations with
+-- no redundant locations.
+
+-- most features (exons, transcripts, etc) will have 1 location, with
+-- locgroup and rank equal to 0
+--
+-- an example of using both locgroup and rank:
+-- imagine a feature indicating a conserved region between the chromosomes
+-- of two different species. we may want to keep redundant locations on
+-- both contigs and chromosomes. we would thus have 4 locations for the
+-- single conserved region feature - two distinct locgroups (contig level
+-- and chromosome level) and two distinct ranks (for the two species).
+
+-- altresidues is used to store alternate residues of a feature, when these
+-- differ from feature.residues. for instance, a SNP feature located on
+-- a wild and mutant protein would have different alresidues.
+-- for alignment/similarity features, the altresidues is used to represent
+-- the alignment string.
+
+-- note on variation features; even if we don't want to instantiate a mutant
+-- chromosome/contig feature, we can still represent a SNP etc with 2 locations,
+-- one (rank 0) on the genome, the other (rank 1) would have most fields null,
+-- except for altresidues
+
+-- IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
+-- this is vital as it allows us to represent zero-length
+-- features eg splice sites, insertion points without
+-- an awkward fuzzy system
+
+-- Note that nbeg and nend have been replaced with fmin and fmax,
+-- which are the minimum and maximum coordinates of the feature
+-- relative to the parent feature.  By contrast,
+-- nbeg, nend are for feature natural begin/end
+-- by natural begin, end we mean these are the actual
+-- beginning (5' position) and actual end (3' position)
+-- rather than the low position and high position, as
+-- these terms are sometimes erroneously used.  To compensate
+-- for the removal of nbeg and nend from featureloc, a view
+-- based on featureloc, dfeatureloc, is provided in sequence_views.sql.
+
+create table featureloc (
+       featureloc_id serial not null,
+       primary key (featureloc_id),
+
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       srcfeature_id int,
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
+
+       fmin int,
+       is_fmin_partial boolean not null default 'false',
+       fmax int,
+       is_fmax_partial boolean not null default 'false',
+       strand smallint,
+       phase int,
+
+       residue_info text,
+
+       locgroup int not null default 0,
+       rank     int not null default 0,
+
+       unique (feature_id, locgroup, rank)
+);
+-- phase: phase of translation wrt srcfeature_id.  Values are 0,1,2
+create index featureloc_idx1 on featureloc (feature_id);
+create index featureloc_idx2 on featureloc (srcfeature_id);
+create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
+
+-- ================================================
+-- TABLE: feature_pub
+-- ================================================
+
+create table feature_pub (
+       feature_pub_id serial not null,
+       primary key (feature_pub_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+
+       unique(feature_id, pub_id)
+);
+create index feature_pub_idx1 on feature_pub (feature_id);
+create index feature_pub_idx2 on feature_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: featureprop
+-- ================================================
+
+create table featureprop (
+       featureprop_id serial not null,
+       primary key (featureprop_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       value text not null default '',
+       rank int not null default 0,
+
+       unique(feature_id, type_id, value, rank)
+);
+create index featureprop_idx1 on featureprop (feature_id);
+create index featureprop_idx2 on featureprop (type_id);
+
+
+-- ================================================
+-- TABLE: featureprop_pub
+-- ================================================
+
+create table featureprop_pub (
+       featureprop_pub_id serial not null,
+       primary key (featureprop_pub_id),
+       featureprop_id int not null,
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+
+       unique(featureprop_id, pub_id)
+);
+create index featureprop_pub_idx1 on featureprop_pub (featureprop_id);
+create index featureprop_pub_idx2 on featureprop_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: feature_dbxref
+-- ================================================
+-- links a feature to dbxrefs.  Note that there is also feature.dbxref_id
+-- link for the primary dbxref link.
+create table feature_dbxref (
+       feature_dbxref_id serial not null,
+       primary key (feature_dbxref_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       dbxref_id int not null,
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
+       is_current boolean not null default 'true',
+
+       unique(feature_id, dbxref_id)
+);
+create index feature_dbxref_idx1 on feature_dbxref (feature_id);
+create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
+
+
+-- ================================================
+-- TABLE: feature_relationship
+-- ================================================
+
+-- features can be arranged in graphs, eg exon partof transcript 
+-- partof gene; translation madeby transcript
+-- if type is thought of as a verb, each arc makes a statement
+-- [SUBJECT VERB OBJECT]
+-- object can also be thought of as parent, and subject as child
+--
+-- we include the relationship rank/order, because even though
+-- most of the time we can order things implicitly by sequence
+-- coordinates, we can't always do this - eg transpliced genes.
+-- it's also useful for quickly getting implicit introns
+
+create table feature_relationship (
+       feature_relationship_id serial not null,
+       primary key (feature_relationship_id),
+       subjfeature_id int not null,
+       foreign key (subjfeature_id) references feature (feature_id) on delete cascade,
+       objfeature_id int not null,
+       foreign key (objfeature_id) references feature (feature_id) on delete cascade,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+       relrank int,
+
+       unique(subjfeature_id, objfeature_id, type_id)
+);
+create index feature_relationship_idx1 on feature_relationship (subjfeature_id);
+create index feature_relationship_idx2 on feature_relationship (objfeature_id);
+create index feature_relationship_idx3 on feature_relationship (type_id);
+
+
+-- ================================================
+-- TABLE: feature_cvterm
+-- ================================================
+
+create table feature_cvterm (
+       feature_cvterm_id serial not null,
+       primary key (feature_cvterm_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+
+       unique (feature_id, cvterm_id, pub_id)
+
+);
+create index feature_cvterm_idx1 on feature_cvterm (feature_id);
+create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
+create index feature_cvterm_idx3 on feature_cvterm (pub_id);
+
+
+-- ================================================
+-- TABLE: synonym
+-- ================================================
+
+create table synonym (
+       synonym_id serial not null,
+       primary key (synonym_id),
+       name varchar(255) not null,
+       type_id int not null,
+       synonym_sgml varchar(255) not null,
+       foreign key (type_id) references cvterm (cvterm_id), -- no delete action
+
+       unique(name,type_id)
+);
+-- type_id: types would be symbol and fullname for now
+-- synonym_sgml: sgml-ized version of symbols
+create index synonym_idx1 on synonym (type_id);
+
+
+-- ================================================
+-- TABLE: feature_synonym
+-- ================================================
+
+create table feature_synonym (
+       feature_synonym_id serial not null,
+       primary key (feature_synonym_id),
+       synonym_id int not null,
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       is_current boolean not null,
+       is_internal boolean not null default 'false',
+
+       unique(synonym_id, feature_id, pub_id)
+);
+-- pub_id: the pub_id link is for relating the usage of a given synonym to the
+-- publication in which it was used
+-- is_current: the is_current bit indicates whether the linked synonym is the 
+-- current -official- symbol for the linked feature
+-- is_internal: typically a synonym exists so that somebody querying the db with an
+-- obsolete name can find the object they're looking for (under its current
+-- name.  If the synonym has been used publicly & deliberately (eg in a 
+-- paper), it my also be listed in reports as a synonym.   If the synonym 
+-- was not used deliberately (eg, there was a typo which went public), then 
+-- the is_internal bit may be set to 'true' so that it is known that the 
+-- synonym is "internal" and should be queryable but should not be listed 
+-- in reports as a valid synonym.
+create index feature_synonym_idx1 on feature_synonym (synonym_id);
+create index feature_synonym_idx2 on feature_synonym (feature_id);
+create index feature_synonym_idx3 on feature_synonym (pub_id);
+-- This module depends on the sequence, pub, and cv modules 
+-- 18-JAN-03 (DE): This module is unfinished and due for schema review (Bill 
+-- Gelbart will be leading the charge)   
+
+-- ================================================
+-- TABLE: genotype
+-- ================================================
+
+create table genotype (
+       genotype_id serial not null,
+       primary key (genotype_id),
+       description varchar(255)
+);
+
+
+-- ================================================
+-- TABLE: feature_genotype
+-- ================================================
+
+create table feature_genotype (
+       feature_genotype_id serial not null,
+       primary key (feature_genotype_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       genotype_id int not null,
+       foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
+
+       unique(feature_id,genotype_id)
+);
+create index feature_genotype_idx1 on feature_genotype (feature_id);
+create index feature_genotype_idx2 on feature_genotype (genotype_id);
+
+
+-- ================================================
+-- TABLE: phenotype
+-- ================================================
+
+create table phenotype (
+       phenotype_id serial not null,
+       primary key (phenotype_id),
+       description text,
+       statement_type int not null,
+       foreign key (statement_type) references cvterm (cvterm_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+       background_genotype_id int,
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null
+);
+-- type of phenotypic statement  [Chris, we need this or something like it
+-- for FB where we have three types of statement in *k: "Phenotypic class:",
+-- "Phenotype manifest in:", and free-text]
+-- Do we want to call this simply genotype_id to allow natural joins?
+create index phenotype_idx1 on phenotype (statement_type);
+create index phenotype_idx2 on phenotype (pub_id);
+create index phenotype_idx3 on phenotype (background_genotype_id);
+
+
+-- ================================================
+-- TABLE: feature_phenotype
+-- ================================================
+
+create table feature_phenotype (
+       feature_phenotype_id serial not null,
+       primary key (feature_phenotype_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       phenotype_id int not null,
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+
+       unique(feature_id,phenotype_id)       
+);
+create index feature_phenotype_idx1 on feature_phenotype (feature_id);
+create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
+
+
+-- ================================================
+-- TABLE: phenoype_cvterm
+-- ================================================
+
+create table phenotype_cvterm (
+       phenotype_cvterm_id serial not null,
+       primary key (phenotype_cvterm_id),
+       phenotype_id int not null,
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       prank int not null,
+
+       unique(phenotype_id,cvterm_id,prank)
+);
+create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
+create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
+
+
+-- ================================================
+-- TABLE: interaction
+-- ================================================
+
+create table interaction (
+       interaction_id serial not null,
+       primary key (interaction_id),
+       description text,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+-- Do we want to call this simply genotype_id to allow natural joins?
+       background_genotype_id int,
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null,
+       phenotype_id int,
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete set null
+);
+create index interaction_idx1 on interaction (pub_id);
+create index interaction_idx2 on interaction (background_genotype_id);
+create index interaction_idx3 on interaction (phenotype_id);
+
+
+-- ================================================
+-- TABLE: interaction_subj
+-- ================================================
+
+create table interaction_subj (
+       interaction_subj_id serial not null,
+       primary key (interaction_subj_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       interaction_id int not null,
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
+
+       unique(feature_id,interaction_id)
+);
+create index interaction_subj_idx1 on interaction_subj (feature_id);
+create index interaction_subj_idx2 on interaction_subj (interaction_id);
+
+
+-- ================================================
+-- TABLE: interaction_obj
+-- ================================================
+
+create table interaction_obj (
+       interaction_obj_id serial not null,
+       primary key (interaction_obj_id),
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       interaction_id int not null,
+       foreign key (interaction_id) references interaction (interaction_id) on delete cascade,
+
+       unique(feature_id,interaction_id)
+);
+create index interaction_obj_idx1 on interaction_obj (feature_id);
+create index interaction_obj_idx2 on interaction_obj (interaction_id);
+-- ================================================
+-- TABLE: analysis
+-- ================================================
+
+-- an analysis is a particular execution of a computational analysis;
+-- it may be a blast of one sequence against another, or an all by all
+-- blast, or a different kind of analysis altogether.
+-- it is a single unit of computation - if different blast runs
+-- were instantiated over differnet query sequences, there would
+-- be multiple entries here.
+--
+-- name: 
+--   a way of grouping analyses. this should be a handy
+--   short identifier that can help people find an analysis they
+--   want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
+--   it should not be assumed to be unique. for instance, there may
+--   be lots of seperate analyses done against a cDNA database.
+--
+-- program: 
+--   e.g. blastx, blastp, sim4, genscan
+--
+-- programversion:
+--   e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]
+--
+-- algorithm:
+--   e.g. blast
+--
+-- sourcename: 
+--   e.g. cDNA, SwissProt
+--
+-- queryfeature_id:
+--   the sequence that was used as the query sequence can be
+--   optionally included via queryfeature_id - even though this
+--   is redundant with the tables below. this can still
+--   be useful - for instance, we may have an analysis that blasts
+--   contigs against a database. we may then transform those hits
+--   into global coordinates; it may be useful to keep a record
+--   of which contig was blasted as the query.
+--
+--
+-- MAPPING (bioperl): maps to Bio::Search::Result::ResultI
+
+--
+-- sourceuri: 
+--   This is an optional permanent URL/URI for the source of the
+--   analysis. The idea is that someone could recreate the analysis
+--   directly by going to this URI and fetching the source data
+--   (eg the blast database, or the training model).
+
+create table analysis (
+    analysis_id serial not null,
+    primary key (analysis_id),
+    name varchar(255),
+    description text,
+    program varchar(255) not null,
+    programversion varchar(255) not null,
+    algorithm varchar(255),
+    sourcename varchar(255),
+    sourceversion varchar(255),
+    sourceuri text,
+    queryfeature_id int,
+    foreign key (queryfeature_id) references feature (feature_id) on delete set null,
+    timeexecuted timestamp not null default current_timestamp,
+
+    unique(program, programversion, sourcename)
+);
+create index analysis_idx1 on analysis (queryfeature_id);
+
+
+-- ================================================
+-- TABLE: analysisprop
+-- ================================================
+
+-- analyses can have various properties attached - eg the parameters
+-- used in running a blast
+
+create table analysisprop (
+    analysisprop_id serial not null,
+    primary key (analysisprop_id),
+    analysis_id int not null,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    value text,
+
+    unique(analysis_id, type_id, value)
+);
+create index analysisprop_idx1 on analysisprop (analysis_id);
+create index analysisprop_idx2 on analysisprop (type_id);
+
+
+-- ================================================
+-- TABLE: analysisfeature
+-- ================================================
+
+-- computational analyses generate features (eg genscan generates
+-- transcripts and exons; sim4 alignments generate similarity/match
+-- features)
+
+-- analysisfeatures are stored using the feature table from
+-- the sequence module. the analysisfeature table is used to
+-- decorate these features, with analysis specific attributes.
+--
+-- a feature is an analysisfeature if and only if there is
+-- a corresponding entry in the analysisfeature table
+--
+-- analysisfeatures will have two or more featureloc entries,
+-- with rank indicating query/subject
+
+--  analysis_id:
+--    scoredsets are grouped into analyses
+--
+--  rawscore:
+--    this is the native score generated by the program; for example,
+--    the bitscore generated by blast, sim4 or genscan scores.
+--    one should not assume that high is necessarily better than low.
+--
+--  normscore:
+--    this is the rawscore but semi-normalized. complete normalization
+--    to allow comparison of features generated by different programs
+--    would be nice but too difficult. instead the normalization should
+--    strive to enforce the following semantics:
+--
+--    * normscores are floating point numbers >= 0
+--    * high normscores are better than low one.
+--
+--    for most programs, it would be sufficient to make the normscore
+--    the same as this rawscore, providing these semantics are
+--    satisfied.
+--
+--  significance:
+--    this is some kind of expectation or probability metric,
+--    representing the probability that the scoredset would appear
+--    randomly given the model.
+--    as such, any program or person querying this table can assume
+--    the following semantics:
+--     * 0 <= significance <= n, where n is a positive number, theoretically
+--       unbounded but unlikely to be more than 10
+--     * low numbers are better than high numbers.
+--
+--  identity:
+--    percent identity between the locations compared
+--
+--  note that these 4 metrics do not cover the full range of scores
+--  possible; it would be undesirable to list every score possible, as
+--  this should be kept extensible. instead, for non-standard scores, use
+--  the scoredsetprop table.
+
+create table analysisfeature (
+    analysisfeature_id serial not null,
+    primary key (analysisfeature_id),
+    feature_id int not null,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    analysis_id int not null,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
+    rawscore double precision,
+    normscore double precision,
+    significance double precision,
+    identity double precision,
+
+    unique (feature_id,analysis_id)
+);
+create index analysisfeature_idx1 on analysisfeature (feature_id);
+create index analysisfeature_idx2 on analysisfeature (analysis_id);
+-- This module is totally dependant on the sequence module.  Objects in the
+-- genetic module cannot connect to expression data except by going via the
+-- sequence module
+
+-- We assume that we'll *always* have a controlled vocabulary for expression 
+-- data.   If an experiment used a set of cv terms different from the ones
+-- FlyBase uses (bodypart cv, bodypart qualifier cv, and the temporal cv
+-- (which is stored in the curaton.doc under GAT6 btw)), they'd have to give
+-- us the cv terms, which we could load into the cv module
+
+-- ================================================
+-- TABLE: expression
+-- ================================================
+
+create table expression (
+       expression_id serial not null,
+       primary key (expression_id),
+       description text
+);
+
+-- ================================================
+-- TABLE: feature_expression
+-- ================================================
+
+create table feature_expression (
+       feature_expression_id serial not null,
+       primary key (feature_expression_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+
+       unique(expression_id,feature_id)       
+);
+create index feature_expression_idx1 on feature_expression (expression_id);
+create index feature_expression_idx2 on feature_expression (feature_id);
+
+
+-- ================================================
+-- TABLE: expression_cvterm
+-- ================================================
+
+-- What are the possibities of combination when more than one cvterm is used
+-- in a field?   
+--
+-- For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal
+-- If the two terms used in a particular field are co-equal (both from the
+-- same CV, is the relation always "&"?   May we find "or"?
+--
+-- Obviously another case is when a bodypart term and a bodypart qualifier
+-- term are used in a specific field, eg:
+--   <t> L | third instar <a> larval antennal segment sensilla | subset <p  
+--
+-- WRT the three-part <t><a><p> statements, are the values in the different 
+-- parts *always* from different vocabularies in proforma.CV?   If not,
+-- we'll need to have some kind of type qualifier telling us whether the
+-- cvterm used is <t>, <a>, or <p>
+-- yes we should have a type qualifier as a cv term can be from diff vocab
+-- e.g. blastoderm can be body part and stage terms in dros anatomy
+-- but cvterm_type needs to be a cv instead of a free text type here?
+
+create table expression_cvterm (
+       expression_cvterm_id serial not null,
+       primary key (expression_cvterm_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       cvterm_id int not null,
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+       rank int not null,
+	   cvterm_type varchar(255),
+
+       unique(expression_id,cvterm_id)
+);
+create index expression_cvterm_idx1 on expression_cvterm (expression_id);
+create index expression_cvterm_idx2 on expression_cvterm (cvterm_id);
+
+
+-- ================================================
+-- TABLE: expression_pub
+-- ================================================
+
+create table expression_pub (
+       expression_pub_id serial not null,
+       primary key (expression_pub_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
+
+       unique(expression_id,pub_id)       
+);
+create index expression_pub_idx1 on expression_pub (expression_id);
+create index expression_pub_idx2 on expression_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: eimage
+-- ================================================
+
+create table eimage (
+       eimage_id serial not null,
+       primary key (eimage_id),
+       eimage_data text,
+       eimage_type varchar(255) not null,
+       image_uri varchar(255)
+);
+-- we expect images in eimage_data (eg jpegs) to be uuencoded
+-- describes the type of data in eimage_data
+
+
+-- ================================================
+-- TABLE: expression_image
+-- ================================================
+
+create table expression_image (
+       expression_image_id serial not null,
+       primary key (expression_image_id),
+       expression_id int not null,
+       foreign key (expression_id) references expression (expression_id) on delete cascade,
+       eimage_id int not null,
+       foreign key (eimage_id) references eimage (eimage_id) on delete cascade,
+
+       unique(expression_id,eimage_id)
+);
+create index expression_image_idx1 on expression_image (expression_id);
+create index expression_image_idx2 on expression_image (eimage_id);
+-- NOTE: this module is all due for revision...
+
+-- A possibly problematic case is where we want to localize an object
+-- to the left or right of a feature (but not within it):
+--
+--                     |---------|  feature-to-map
+--        ------------------------------------------------- map
+--                |------|         |----------|   features to map wrt
+--
+-- How do we map the 3' end of the feature-to-map?
+
+-- TODO:  Get a comprehensive set of mapping use-cases 
+
+-- one set of use-cases is aberrations (which will all be involved with this 
+-- module).   Simple aberrations should be do-able, but what about cases where
+-- a breakpoint interrupts a gene?  This would be an example of the problematic
+-- case above...  (or?)
+
+-- ================================================
+-- TABLE: featuremap
+-- ================================================
+
+create table featuremap (
+       featuremap_id serial not null,
+       primary key (featuremap_id),
+       mapname varchar(255),
+       mapdesc varchar(255),
+       mapunit varchar(255),
+
+       unique(mapname)
+);
+
+
+-- ================================================
+-- TABLE: featurerange
+-- ================================================
+
+-- In cases where the start and end of a mapped feature is a range, leftendf
+-- and rightstartf are populated.  
+-- featuremap_id is the id of the feature being mapped
+-- leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of
+-- features with respect to with the feature is being mapped.  These may
+-- be cytological bands.
+
+create table featurerange (
+       featurerange_id serial not null,
+       primary key (featurerange_id),
+       featuremap_id int not null,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       leftstartf_id int not null,
+       foreign key (leftstartf_id) references feature (feature_id) on delete cascade,
+       leftendf_id int,
+       foreign key (leftendf_id) references feature (feature_id) on delete set null,
+       rightstartf_id int,
+       foreign key (rightstartf_id) references feature (feature_id) on delete set null,
+       rightendf_id int not null,
+       foreign key (rightendf_id) references feature (feature_id) on delete cascade,
+       rangestr varchar(255)
+);
+create index featurerange_idx1 on featurerange (featuremap_id);
+create index featurerange_idx2 on featurerange (feature_id);
+create index featurerange_idx3 on featurerange (leftstartf_id);
+create index featurerange_idx4 on featurerange (leftendf_id);
+create index featurerange_idx5 on featurerange (rightstartf_id);
+create index featurerange_idx6 on featurerange (rightendf_id);
+
+
+-- ================================================
+-- TABLE: featurepos
+-- ================================================
+
+create table featurepos (
+       featurepos_id serial not null,
+       primary key (featurepos_id),
+       featuremap_id serial not null,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       feature_id int not null,
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
+       map_feature_id int not null,
+       foreign key (map_feature_id) references feature (feature_id) on delete cascade,
+       mappos float not null
+);
+-- map_feature_id links to the feature (map) upon which the feature is
+-- being localized
+create index featurepos_idx1 on featurepos (featuremap_id);
+create index featurepos_idx2 on featurepos (feature_id);
+create index featurepos_idx3 on featurepos (map_feature_id);
+
+
+-- ================================================
+-- TABLE: featuremap_pub
+-- ================================================
+
+create table featuremap_pub (
+       featuremap_pub_id serial not null,
+       primary key (featuremap_pub_id),
+       featuremap_id int not null,
+       foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade
+);
+create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
+create index featuremap_pub_idx2 on featuremap_pub (pub_id);
+
+
+
+
 

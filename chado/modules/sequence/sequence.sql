@@ -6,16 +6,16 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
        organism_id int not null,
-       foreign key (organism_id) references organism (organism_id),
+       foreign key (organism_id) references organism (organism_id) on delete cascade,
        name varchar(255),
        uniquename text not null,
        residues text,
        seqlen int,
        md5checksum char(32),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 	is_analysis boolean not null default 'false',
 -- timeaccessioned and timelastmodified are for handling object accession/
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
@@ -24,7 +24,7 @@ create table feature (
        timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
 
-       unique(organism_id,uniquename)
+       unique(organism_id,uniquename, type_id)
 );
 -- dbxref_id here is intended for the primary dbxref for this feature.   
 -- Additional dbxref links are made via feature_dbxref
@@ -115,9 +115,9 @@ create table featureloc (
        primary key (featureloc_id),
 
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        srcfeature_id int,
-       foreign key (srcfeature_id) references feature (feature_id),
+       foreign key (srcfeature_id) references feature (feature_id) on delete set null,
 
        fmin int,
        is_fmin_partial boolean not null default 'false',
@@ -146,9 +146,9 @@ create table feature_pub (
        feature_pub_id serial not null,
        primary key (feature_pub_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(feature_id, pub_id)
 );
@@ -164,9 +164,9 @@ create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        value text not null default '',
        rank int not null default 0,
 
@@ -184,9 +184,9 @@ create table featureprop_pub (
        featureprop_pub_id serial not null,
        primary key (featureprop_pub_id),
        featureprop_id int not null,
-       foreign key (featureprop_id) references featureprop (featureprop_id),
+       foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(featureprop_id, pub_id)
 );
@@ -203,9 +203,9 @@ create table feature_dbxref (
        feature_dbxref_id serial not null,
        primary key (feature_dbxref_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
        is_current boolean not null default 'true',
 
        unique(feature_id, dbxref_id)
@@ -233,11 +233,11 @@ create table feature_relationship (
        feature_relationship_id serial not null,
        primary key (feature_relationship_id),
        subjfeature_id int not null,
-       foreign key (subjfeature_id) references feature (feature_id),
+       foreign key (subjfeature_id) references feature (feature_id) on delete cascade,
        objfeature_id int not null,
-       foreign key (objfeature_id) references feature (feature_id),
+       foreign key (objfeature_id) references feature (feature_id) on delete cascade,
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        relrank int,
 
        unique(subjfeature_id, objfeature_id, type_id)
@@ -255,11 +255,11 @@ create table feature_cvterm (
        feature_cvterm_id serial not null,
        primary key (feature_cvterm_id),
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique (feature_id, cvterm_id, pub_id)
 
@@ -278,9 +278,8 @@ create table synonym (
        primary key (synonym_id),
        name varchar(255) not null,
        type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        synonym_sgml varchar(255) not null,
-       foreign key (type_id) references cvterm (cvterm_id),
-
        unique(name,type_id)
 );
 -- type_id: types would be symbol and fullname for now
@@ -296,11 +295,11 @@ create table feature_synonym (
        feature_synonym_id serial not null,
        primary key (feature_synonym_id),
        synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
+       foreign key (synonym_id) references synonym (synonym_id) on delete cascade,
        feature_id int not null,
-       foreign key (feature_id) references feature (feature_id),
+       foreign key (feature_id) references feature (feature_id) on delete cascade,
        pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
+       foreign key (pub_id) references pub (pub_id) on delete cascade,
        is_current boolean not null,
        is_internal boolean not null default 'false',
 

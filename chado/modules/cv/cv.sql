@@ -21,11 +21,11 @@ create table cvterm (
        cvterm_id serial not null,
        primary key (cvterm_id),
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        name varchar(255) not null,
        definition text,
        dbxref_id int,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
 
        unique(name, cv_id)
 );
@@ -43,11 +43,11 @@ create table cvtermrelationship (
        cvtermrelationship_id serial not null,
        primary key (cvtermrelationship_id),
        type_id int not null,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        subject_id int not null,
-       foreign key (subject_id) references cvterm (cvterm_id),
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
        object_id int not null,
-       foreign key (object_id) references cvterm (cvterm_id),
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
 
        unique(type_id, subject_id, object_id)
 );
@@ -64,13 +64,13 @@ create table cvtermpath (
        cvtermpath_id serial not null,
        primary key (cvtermpath_id),
        type_id int,
-       foreign key (type_id) references cvterm (cvterm_id),
+       foreign key (type_id) references cvterm (cvterm_id) on delete set null,
        subject_id int not null,
-       foreign key (subject_id) references cvterm (cvterm_id),
+       foreign key (subject_id) references cvterm (cvterm_id) on delete cascade,
        object_id int not null,
-       foreign key (object_id) references cvterm (cvterm_id),
+       foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
        cv_id int not null,
-       foreign key (cv_id) references cv (cv_id),
+       foreign key (cv_id) references cv (cv_id) on delete cascade,
        pathdistance int,
 
        unique (subject_id, object_id)
@@ -89,7 +89,7 @@ create table cvtermsynonym (
        cvtermsynonym_id int not null,
        primary key (cvtermsynonym_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        synonym varchar(255) not null,
 
        unique(cvterm_id, synonym)
@@ -105,9 +105,9 @@ create table cvterm_dbxref (
        cvterm_dbxref_id serial not null,
        primary key (cvterm_dbxref_id),
        cvterm_id int not null,
-       foreign key (cvterm_id) references cvterm (cvterm_id),
+       foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
        dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(cvterm_id, dbxref_id)
 );

@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl -i.old
+
+# USAGE: addcascades <filename>
+#    Adds delete propagation commands to schema files.
+#    -Adds "on delete cascade" if column is not nullable.
+#    -Adds "on delete set null" if column is nullable.
+
+# WARNING: modifies files in place. Saves old versions as *.old.
+
+# WARNING: relies on syntactic convention that original file foreign key refs
+# are on same line or next line as column info. If elsewhere in or
+# outside of table def it will not work, and a warning will be issued,
+# and a comment "-- no delete action" will be appended to the line
+# so it can be easily found.
+
+# WARNING: Foreign keys with existing cascade info are not touched.
+# Therefore you can use this repeatedly to add cascades to new tables,
+# but if nullness of a column changes you must update by hand.
+
+# open(STDIN, "../dat/chado.ddl") || die "Can't open";
+
+
+while(<>){
+$i++;
+  if(/^(.*)\sforeign\s+key\s+\(([^\)]*)\)\s*references\s+(\S+)\s+\(([^\)]+)\)\s*(,?)/i){
+    # should check for old cascade info -- update in case nullness changes? no, do by hand
+    $pre=$1; $fkcol=$2; $fktable=$3; $joincol=$4; $comma=$5;
+    if(/^\s*--/){ print; next; } # skip comment lines
+    if( $prevcol ne $fkcol){
+      chop;
+      warn "$i Warning 1: Ignoring $prev$_\n";
+      print "$_ -- no delete action\n"; }
+    else {
+      if(/^(.*\S)\s*$/)
+	{ $line=$1; 
+	  if( $line =~ /^(.*),$/){ $line = $1; }
+	} else { die; }
+      # print "$prev$_=>"; # \t$fktable\t$joincol\n\n";
+      print $line, " on delete ";
+      if( $null ){ print "set null"; } else { print "cascade"; }
+      print "$comma\n";
+    }
+  }
+  elsif(/foreign/) { 
+    chop;
+    warn "Warning 2: Ignoring $_\n";
+    print "$_ -- no delete action\n"; }
+  else { 
+    print $_; 
+    if(/^\s*(\S+)\s(.*)$/){
+      $prevcol = $1;
+      if( $2 =~ /not null/i){ $null=0; } else { $null=1; } }}
+  $prev=$_;
+}

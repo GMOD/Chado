@@ -1,4 +1,4 @@
-<em>Schema metadata produced by ddltrans on Fri May 30 09:35:47 EDT 2003</em>
+<em>Schema metadata produced by ddltrans on Tue Jun 10 11:24:59 EDT 2003</em>
 
 <html>
 <h2>acquisition</h2>
@@ -23,11 +23,19 @@ ok drop table if exists acquisitionparam;
 </table>
 
 <h2>analysis</h2>
-ok drop table if exists analysis;
+an analysis is a particular execution of a computational analysis;  it may be a blast of one sequence against another, or an all by all  blast, or a different kind of analysis altogether.  it is a single unit of computation - if different blast runs  were instantiated over differnet query sequences, there would  be multiple entries here.   name:    a way of grouping analyses. this should be a handy    short identifier that can help people find an analysis they    want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"    it should not be assumed to be unique. for instance, there may    be lots of seperate analyses done against a cDNA database.   program:    e.g. blastx, blastp, sim4, genscan   programversion:    e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]   algorithm:    e.g. blast   sourcename:    e.g. cDNA, SwissProt   queryfeature_id:    the sequence that was used as the query sequence can be    optionally included via queryfeature_id - even though this    is redundant with the tables below. this can still    be useful - for instance, we may have an analysis that blasts    contigs against a database. we may then transform those hits    into global coordinates; it may be useful to keep a record    of which contig was blasted as the query.    MAPPING (bioperl): maps to Bio::Search::Result::ResultI   sourceuri:    This is an optional permanent URL/URI for the source of the    analysis. The idea is that someone could recreate the analysis    directly by going to this URI and fetching the source data    (eg the blast database, or the training model).
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>analysis_id</td><td>serial</td><td>no</td><td></td><td><li>analysisfeature.analysis_id<li>analysisprop.analysis_id<li>analysisimplementation.analysis_id</td></tr>
-<tr><td>name</td><td>varchar(100)</td><td>no</td><td></td><td></td></tr>
-<tr><td>description</td><td>varchar(500)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>sourceuri</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>name</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>sourcename</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>description</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>timeexecuted</td><td>timestamp</td><td>no</td><td></td><td></td></tr>
+<tr><td>sourceversion</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>algorithm</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>program</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>queryfeature_id</td><td>int</td><td>yes</td><td></td><td>feature.feature_id</td></tr>
+<tr><td>programversion</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
 </table>
 
 <h2>analysisfeature</h2>
@@ -103,8 +111,8 @@ analyses can have various properties attached - eg the parameters  used in runni
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>analysis_id</td><td>int</td><td>no</td><td></td><td>analysis.analysis_id</td></tr>
 <tr><td>analysisprop_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
-<tr><td>pval</td><td>text</td><td>yes</td><td></td><td></td></tr>
-<tr><td>pkey_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>value</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>array</h2>
@@ -116,8 +124,8 @@ ok drop table if exists array;
 <tr><td>description</td><td>varchar(500)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>version</td><td>varchar(50)  null</td><td>yes</td><td></td><td></td></tr>
 <tr><td>dbxref_id</td><td>int</td><td>yes</td><td></td><td>dbxref.dbxref_id</td></tr>
-<tr><td>substrate_type_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>array_id</td><td>serial</td><td>no</td><td></td><td><li>element.array_id<li>assay.array_id<li>arrayannotation.array_id</td></tr>
+<tr><td>substratetype_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>num_array_columns</td><td>int</td><td>yes</td><td></td><td></td></tr>
 <tr><td>platformtype_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>num_grid_columns</td><td>int</td><td>yes</td><td></td><td></td></tr>
@@ -174,7 +182,8 @@ ok drop table if exists assay_labeledextract;
 <h2>author</h2>
 using the FB author table columns
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>surname</td><td>varchar(100)</td><td>no</td><td></td><td></td></tr>
+<tr><td>contact_id</td><td>int</td><td>no</td><td></td><td>contact.contact_id</td></tr>
+<tr><td>surname</td><td>varchar(100)</td><td>no</td><td>these fields may be moving to the contact table...</td><td></td></tr>
 <tr><td>suffix</td><td>varchar(100)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>givennames</td><td>varchar(100)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>author_id</td><td>serial</td><td>no</td><td></td><td><li>assay.operator_id<li>wwwuser_author.author_id<li>pub_author.author_id<li>quantification.operator_id<li>biomaterial.biosourceprovider_id<li>study.contact_id<li>array.manufacturer_id</td></tr>
@@ -245,6 +254,13 @@ dropped compositeelementannotation.  use featureprop instead. dropped compositee
 <tr><td>int1</td><td>int</td><td>yes</td><td></td><td></td></tr>
 </table>
 
+<h2>contact</h2>
+should this be in pub? 
+<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>contact_id</td><td>serial</td><td>no</td><td></td><td><li>author.contact_id<li>db.contact_id</td></tr>
+<tr><td>description</td><td>varchar(255)</td><td>yes</td><td>fields to be added after discussion</td><td></td></tr>
+</table>
+
 <h2>control</h2>
 ok drop table if exists control;
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
@@ -258,40 +274,20 @@ ok drop table if exists control;
 </table>
 
 <h2>cv</h2>
-- term - term_definition - term2term - graph_path - term_synonym - term_dbxref -- dbxref - tricky, namespace clash...  The cvterm module design is based on the ontology
+The cvterm module design is based on the ontology
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>cvdefinition</td><td>text</td><td>yes</td><td></td><td></td></tr>
-<tr><td>cvname</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>cv_id</td><td>serial</td><td>no</td><td></td><td><li>cvpath.cv_id<li>cvterm.cv_id</td></tr>
-</table>
-
-<h2>cvpath</h2>
-
-<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>pathdistance</td><td>int</td><td>yes</td><td></td><td></td></tr>
-<tr><td>subjterm_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>reltype_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>cvpath_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
-<tr><td>cv_id</td><td>int</td><td>no</td><td></td><td>cv.cv_id</td></tr>
-<tr><td>objterm_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-</table>
-
-<h2>cvrelationship</h2>
-the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The unique key on termname, cv_id ensures that all terms are  unique within a given cv
-<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>subjterm_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>reltype_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>objterm_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>cvrelationship_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
+<tr><td>definition</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>name</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>cv_id</td><td>serial</td><td>no</td><td></td><td><li>cvtermpath.cv_id<li>cvterm.cv_id</td></tr>
 </table>
 
 <h2>cvterm</h2>
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>termdefinition</td><td>text</td><td>yes</td><td></td><td></td></tr>
+<tr><td>definition</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>name</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
 <tr><td>cv_id</td><td>int</td><td>no</td><td></td><td>cv.cv_id</td></tr>
-<tr><td>cvterm_id</td><td>serial</td><td>no</td><td></td><td><li>control.controltype_id<li>pubprop.pkey_id<li>element.element_type_id<li>cvterm_dbxref.cvterm_id<li>feature.type_id<li>cvtermsynonym.cvterm_id<li>protocol.protocol_type_id<li>wwwuser_cvterm.cvterm_id<li>pub_relationship.type_id<li>feature_cvterm.cvterm_id<li>phenotype.statement_type<li>cvpath.subjterm_id<li>cvpath.reltype_id<li>cvpath.objterm_id<li>cvrelationship.subjterm_id<li>cvrelationship.reltype_id<li>cvrelationship.objterm_id<li>phenotype_cvterm.cvterm_id<li>featureprop.pkey_id<li>studydesigndescription.descriptiontype_id<li>dbxrefprop.pkey_id<li>synonym.type_id<li>analysisprop.pkey_id<li>biomaterialmeasurement.unittype_id<li>treatment.treatmenttype_id<li>biomaterial_cvterm.cvterm_id<li>feature_relationship.type_id<li>expression_cvterm.cvterm_id<li>protocolparam.datatype_id<li>protocolparam.unittype_id<li>processimplementation.processtype_id<li>pub.type_id<li>studydesign.studydesigntype_id<li>studyfactor.studyfactortype_id<li>processresult.unittype_id<li>array.substrate_type_id<li>array.platformtype_id</td></tr>
+<tr><td>cvterm_id</td><td>serial</td><td>no</td><td></td><td><li>control.controltype_id<li>pubprop.type_id<li>element.elementtype_id<li>cvterm_dbxref.cvterm_id<li>feature.type_id<li>cvtermsynonym.cvterm_id<li>protocol.protocoltype_id<li>wwwuser_cvterm.cvterm_id<li>pub_relationship.type_id<li>feature_cvterm.cvterm_id<li>phenotype.statement_type<li>phenotype_cvterm.cvterm_id<li>featureprop.type_id<li>studydesigndescription.descriptiontype_id<li>synonym.type_id<li>analysisprop.type_id<li>biomaterialmeasurement.unittype_id<li>treatment.treatmenttype_id<li>biomaterial_cvterm.cvterm_id<li>feature_relationship.type_id<li>cvtermpath.object_id<li>cvtermpath.subject_id<li>cvtermpath.type_id<li>expression_cvterm.cvterm_id<li>organismprop.type_id<li>cvtermrelationship.object_id<li>cvtermrelationship.subject_id<li>cvtermrelationship.type_id<li>protocolparam.datatype_id<li>protocolparam.unittype_id<li>processimplementation.processtype_id<li>pub.type_id<li>studydesign.studydesigntype_id<li>studyfactor.studyfactortype_id<li>processresult.unittype_id<li>array.substratetype_id<li>array.platformtype_id</td></tr>
 <tr><td>dbxref_id</td><td>int</td><td>yes</td><td></td><td>dbxref.dbxref_id</td></tr>
 </table>
 
@@ -303,19 +299,41 @@ the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The uniqu
 <tr><td>cvterm_dbxref_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
 </table>
 
+<h2>cvtermpath</h2>
+
+<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>object_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>cv_id</td><td>int</td><td>no</td><td></td><td>cv.cv_id</td></tr>
+<tr><td>pathdistance</td><td>int</td><td>yes</td><td></td><td></td></tr>
+<tr><td>cvtermpath_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
+<tr><td>subject_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>type_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
+</table>
+
+<h2>cvtermrelationship</h2>
+the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The unique key on termname, cv_id ensures that all terms are  unique within a given cv
+<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>object_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>subject_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>cvtermrelationship_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
+</table>
+
 <h2>cvtermsynonym</h2>
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>cvtermsynonym_id</td><td>int</td><td>no</td><td></td><td></td></tr>
-<tr><td>termsynonym</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>synonym</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
 <tr><td>cvterm_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>db</h2>
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>contact_id</td><td>int</td><td>no</td><td></td><td>contact.contact_id</td></tr>
+<tr><td>urlprefix</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>name</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>db_id</td><td>varchar(255)</td><td>no</td><td></td><td><li>dbxref.dbname</td></tr>
+<tr><td>db_id</td><td>serial</td><td>no</td><td></td><td><li>dbxref.db_id</td></tr>
 <tr><td>url</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>description</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 </table>
@@ -324,20 +342,10 @@ the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref  The uniqu
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>accession</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>db_id</td><td>int</td><td>no</td><td></td><td>db.db_id</td></tr>
+<tr><td>description</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>version</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>dbxrefdescription</td><td>text</td><td>yes</td><td></td><td></td></tr>
-<tr><td>dbname</td><td>varchar(255)</td><td>no</td><td></td><td>db.db_id</td></tr>
-<tr><td>dbxref_id</td><td>serial</td><td>no</td><td></td><td><li>element.dbxref_id<li>cvterm_dbxref.dbxref_id<li>feature.dbxref_id<li>protocol.dbxref_id<li>assay.dbxref_id<li>dbxrefprop.dbxref_id<li>pub_dbxref.dbxref_id<li>feature_dbxref.dbxref_id<li>biomaterial.dbxref_id<li>cvterm.dbxref_id<li>study.dbxref_id<li>organism_dbxref.dbxref_id<li>array.dbxref_id</td></tr>
-</table>
-
-<h2>dbxrefprop</h2>
-
-<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>dbxrefprop_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
-<tr><td>pval</td><td>text</td><td>no</td><td></td><td></td></tr>
-<tr><td>prank</td><td>int</td><td>no</td><td></td><td></td></tr>
-<tr><td>pkey_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
-<tr><td>dbxref_id</td><td>int</td><td>no</td><td></td><td>dbxref.dbxref_id</td></tr>
+<tr><td>dbxref_id</td><td>serial</td><td>no</td><td></td><td><li>element.dbxref_id<li>cvterm_dbxref.dbxref_id<li>feature.dbxref_id<li>protocol.dbxref_id<li>assay.dbxref_id<li>pub_dbxref.dbxref_id<li>feature_dbxref.dbxref_id<li>biomaterial.dbxref_id<li>cvterm.dbxref_id<li>study.dbxref_id<li>organism_dbxref.dbxref_id<li>array.dbxref_id</td></tr>
 </table>
 
 <h2>eimage</h2>
@@ -370,7 +378,7 @@ dropped elementannotation.  use featureprop instead. ok drop table if exists ele
 <tr><td>char7</td><td>varchar(5)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>smallint1</td><td>int</td><td>yes</td><td></td><td></td></tr>
 <tr><td>element_id</td><td>serial</td><td>no</td><td></td><td><li>elementresult.element_id</td></tr>
-<tr><td>element_type_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>elementtype_id</td><td>int</td><td>yes</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>feature_id</td><td>int</td><td>yes</td><td></td><td>feature.feature_id</td></tr>
 <tr><td>subclass_view</td><td>varchar(27)</td><td>no</td><td></td><td></td></tr>
 </table>
@@ -443,8 +451,9 @@ This module is totally dependant on the sequence module.  Objects in the  geneti
 </table>
 
 <h2>expression_cvterm</h2>
-What are the possibities of combination when more than one cvterm is used  in a field?   For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal  If the two terms used in a particular field are co-equal (both from the  same CV, is the relation always "&"?   May we find "or"?   Obviously another case is when a bodypart term and a bodypart qualifier  term are used in a specific field, eg:    <t> L | third instar <a> larval antennal segment sensilla | subset <p   WRT the three-part <t><a><p> statements, are the values in the different  parts *always* from different vocabularies in proforma.CV?   If not,  we'll need to have some kind of type qualifier telling us whether the  cvterm used is <t>, <a>, or <p>
+What are the possibities of combination when more than one cvterm is used  in a field?   For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal  If the two terms used in a particular field are co-equal (both from the  same CV, is the relation always "&"?   May we find "or"?   Obviously another case is when a bodypart term and a bodypart qualifier  term are used in a specific field, eg:    <t> L | third instar <a> larval antennal segment sensilla | subset <p   WRT the three-part <t><a><p> statements, are the values in the different  parts *always* from different vocabularies in proforma.CV?   If not,  we'll need to have some kind of type qualifier telling us whether the  cvterm used is <t>, <a>, or <p>  yes we should have a type qualifier as a cv term can be from diff vocab  e.g. blastoderm can be body part and stage terms in dros anatomy  but cvterm_type needs to be a cv instead of a free text type here?
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>cvterm_type</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>rank</td><td>int</td><td>no</td><td></td><td></td></tr>
 <tr><td>expression_id</td><td>int</td><td>no</td><td></td><td>expression.expression_id</td></tr>
 <tr><td>expression_cvterm_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
@@ -475,7 +484,7 @@ we expect images in eimage_data (eg jpegs) to be uuencoded  describes the type o
 <tr><td>timelastmodified</td><td>timestamp</td><td>no</td><td></td><td></td></tr>
 <tr><td>residues</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>dbxref_id</td><td>int</td><td>yes</td><td></td><td>dbxref.dbxref_id</td></tr>
-<tr><td>feature_id</td><td>serial</td><td>no</td><td></td><td><li>element.feature_id<li>wwwuser_feature.feature_id<li>feature_cvterm.feature_id<li>featureloc.srcfeature_id<li>featureloc.feature_id<li>featureprop.feature_id<li>analysisfeature.feature_id<li>feature_genotype.feature_id<li>compositeelementresult.compositeelement_id<li>featurepos.feature_id<li>featurepos.map_feature_id<li>feature_dbxref.feature_id<li>feature_synonym.feature_id<li>featurerange.leftendf_id<li>featurerange.rightendf_id<li>featurerange.feature_id<li>featurerange.leftstartf_id<li>featurerange.rightstartf_id<li>feature_relationship.objfeature_id<li>feature_relationship.subjfeature_id<li>feature_phenotype.feature_id<li>feature_pub.feature_id<li>interaction_subj.feature_id<li>interaction_obj.feature_id<li>feature_expression.feature_id</td></tr>
+<tr><td>feature_id</td><td>serial</td><td>no</td><td></td><td><li>element.feature_id<li>wwwuser_feature.feature_id<li>feature_cvterm.feature_id<li>analysis.queryfeature_id<li>featureloc.srcfeature_id<li>featureloc.feature_id<li>featureprop.feature_id<li>analysisfeature.feature_id<li>feature_genotype.feature_id<li>compositeelementresult.compositeelement_id<li>featurepos.feature_id<li>featurepos.map_feature_id<li>feature_dbxref.feature_id<li>feature_synonym.feature_id<li>featurerange.leftendf_id<li>featurerange.rightendf_id<li>featurerange.feature_id<li>featurerange.leftstartf_id<li>featurerange.rightstartf_id<li>feature_relationship.objfeature_id<li>feature_relationship.subjfeature_id<li>feature_phenotype.feature_id<li>feature_pub.feature_id<li>interaction_subj.feature_id<li>interaction_obj.feature_id<li>feature_expression.feature_id</td></tr>
 <tr><td>uniquename</td><td>text</td><td>no</td><td></td><td></td></tr>
 <tr><td>seqlen</td><td>int</td><td>yes</td><td></td><td></td></tr>
 <tr><td>md5checksum</td><td>char(32)</td><td>yes</td><td></td><td></td></tr>
@@ -556,20 +565,20 @@ type_id: types would be symbol and fullname for now  synonym_sgml: sgml-ized ver
 </table>
 
 <h2>featureloc</h2>
-dbxref_id here is intended for the primary dbxref for this feature.  Additional dbxref links are made via feature_dbxref  name: the human-readable common name for a feature, for display  uniquename: the unique name for a feature; may not be particularly human-readable  timeaccessioned and timelastmodified are for handling object accession/  modification timestamps (as opposed to db auditing info, handled elsewhere).  The expectation is that these fields would be available to software  interacting with chado.  each feature can have 0 or more locations.  multiple locations do NOT indicate non-contiguous locations.  instead they designate alternate locations or grouped locations;  for instance, a feature designating a blast hit or hsp will have two  locations, one on the query feature, one on the subject feature.  features representing sequence variation could have alternate locations  instantiated on a feature on the mutant strain.  the field "rank" is used to differentiate these different locations.  the default rank '0' is used for the main/primary location (eg in  similarity features, 0 is query, 1 is subject), although sometimes  this will be symmeytical and there is no primary location.   redundant locations can also be stored - for instance, the position  of an exon on a BAC and in global coordinates. the field "locgroup"  is used to differentiate these groupings of locations. the default  locgroup '0' is used for the main/primary location, from which the  others can be derived via coordinate transformations. another  example of redundant locations is storing ORF coordinates relative  to both transcript and genome. redundant locations open the possibility  of the database getting into inconsistent states; this schema gives  us the flexibility of both 'warehouse' instantiations with redundant  locations (easier for querying) and 'management' instantiations with  no redundant locations.  most features (exons, transcripts, etc) will have 1 location, with  locgroup and rank equal to 0   an example of using both locgroup and rank:  imagine a feature indicating a conserved region between the chromosomes  of two different species. we may want to keep redundant locations on  both contigs and chromosomes. we would thus have 4 locations for the  single conserved region feature - two distinct locgroups (contig level  and chromosome level) and two distinct ranks (for the two species).  altresidues is used to store alternate residues of a feature, when these  differ from feature.residues. for instance, a SNP feature located on  a wild and mutant protein would have different alresidues.  for alignment/similarity features, the altresidues is used to represent  the alignment string.  note on variation features; even if we don't want to instantiate a mutant  chromosome/contig feature, we can still represent a SNP etc with 2 locations,  one (rank 0) on the genome, the other (rank 1) would have most fields null,  except for altresidues  IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates  this is vital as it allows us to represent zero-length  features eg splice sites, insertion points without  an awkward fuzzy system  nbeg, nend are for feature natural begin/end  by natural begin, end we mean these are the actual  beginning (5' position) and actual end (3' position)  rather than the low position and high position, as  these terms are sometimes erroneously used
+dbxref_id here is intended for the primary dbxref for this feature.  Additional dbxref links are made via feature_dbxref  name: the human-readable common name for a feature, for display  uniquename: the unique name for a feature; may not be particularly human-readable  timeaccessioned and timelastmodified are for handling object accession/  modification timestamps (as opposed to db auditing info, handled elsewhere).  The expectation is that these fields would be available to software  interacting with chado.  each feature can have 0 or more locations.  multiple locations do NOT indicate non-contiguous locations.  instead they designate alternate locations or grouped locations;  for instance, a feature designating a blast hit or hsp will have two  locations, one on the query feature, one on the subject feature.  features representing sequence variation could have alternate locations  instantiated on a feature on the mutant strain.  the field "rank" is used to differentiate these different locations.  the default rank '0' is used for the main/primary location (eg in  similarity features, 0 is query, 1 is subject), although sometimes  this will be symmeytical and there is no primary location.   redundant locations can also be stored - for instance, the position  of an exon on a BAC and in global coordinates. the field "locgroup"  is used to differentiate these groupings of locations. the default  locgroup '0' is used for the main/primary location, from which the  others can be derived via coordinate transformations. another  example of redundant locations is storing ORF coordinates relative  to both transcript and genome. redundant locations open the possibility  of the database getting into inconsistent states; this schema gives  us the flexibility of both 'warehouse' instantiations with redundant  locations (easier for querying) and 'management' instantiations with  no redundant locations.  most features (exons, transcripts, etc) will have 1 location, with  locgroup and rank equal to 0   an example of using both locgroup and rank:  imagine a feature indicating a conserved region between the chromosomes  of two different species. we may want to keep redundant locations on  both contigs and chromosomes. we would thus have 4 locations for the  single conserved region feature - two distinct locgroups (contig level  and chromosome level) and two distinct ranks (for the two species).  altresidues is used to store alternate residues of a feature, when these  differ from feature.residues. for instance, a SNP feature located on  a wild and mutant protein would have different alresidues.  for alignment/similarity features, the altresidues is used to represent  the alignment string.  note on variation features; even if we don't want to instantiate a mutant  chromosome/contig feature, we can still represent a SNP etc with 2 locations,  one (rank 0) on the genome, the other (rank 1) would have most fields null,  except for altresidues  IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates  this is vital as it allows us to represent zero-length  features eg splice sites, insertion points without  an awkward fuzzy system  Note that nbeg and nend have been replaced with fmin and fmax,  which are the minimum and maximum coordinates of the feature  relative to the parent feature.  By contrast,  nbeg, nend are for feature natural begin/end  by natural begin, end we mean these are the actual  beginning (5' position) and actual end (3' position)  rather than the low position and high position, as  these terms are sometimes erroneously used.  To compensate  for the removal of nbeg and nend from featureloc, a view  based on featureloc, dfeatureloc, is provided in sequence_views.sql.
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>srcfeature_id</td><td>int</td><td>yes</td><td></td><td>feature.feature_id</td></tr>
-<tr><td>phase</td><td>int</td><td>yes</td><td></td><td></td></tr>
-<tr><td>is_nbeg_partial</td><td>boolean</td><td>no</td><td></td><td></td></tr>
-<tr><td>nend</td><td>int</td><td>yes</td><td></td><td></td></tr>
-<tr><td>featureloc_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
 <tr><td>feature_id</td><td>int</td><td>no</td><td></td><td>feature.feature_id</td></tr>
+<tr><td>phase</td><td>int</td><td>yes</td><td></td><td></td></tr>
+<tr><td>is_fmin_partial</td><td>boolean</td><td>no</td><td></td><td></td></tr>
+<tr><td>fmin</td><td>int</td><td>yes</td><td></td><td></td></tr>
 <tr><td>locgroup</td><td>int</td><td>no</td><td></td><td></td></tr>
+<tr><td>is_fmax_partial</td><td>boolean</td><td>no</td><td></td><td></td></tr>
 <tr><td>rank</td><td>int</td><td>no</td><td></td><td></td></tr>
 <tr><td>residue_info</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>strand</td><td>smallint</td><td>yes</td><td></td><td></td></tr>
-<tr><td>is_nend_partial</td><td>boolean</td><td>no</td><td></td><td></td></tr>
-<tr><td>nbeg</td><td>int</td><td>yes</td><td></td><td></td></tr>
+<tr><td>fmax</td><td>int</td><td>yes</td><td></td><td></td></tr>
+<tr><td>featureloc_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
 </table>
 
 <h2>featuremap</h2>
@@ -604,9 +613,9 @@ map_feature_id links to the feature (map) upon which the feature is  being local
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>feature_id</td><td>int</td><td>no</td><td></td><td>feature.feature_id</td></tr>
 <tr><td>featureprop_id</td><td>serial</td><td>no</td><td></td><td><li>featureprop_pub.featureprop_id</td></tr>
-<tr><td>pval</td><td>text</td><td>no</td><td></td><td></td></tr>
-<tr><td>prank</td><td>int</td><td>no</td><td></td><td></td></tr>
-<tr><td>pkey_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>rank</td><td>int</td><td>no</td><td></td><td></td></tr>
+<tr><td>value</td><td>text</td><td>no</td><td></td><td></td></tr>
+<tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>featureprop_pub</h2>
@@ -631,7 +640,7 @@ In cases where the start and end of a mapped feature is a range, leftendf  and r
 </table>
 
 <h2>genotype</h2>
-This module depends on the sequence, pub, and cv modules  18-JAN-03 (DE): This module is unfinished and due for schema review (Bill  Gelbart will be leading the charge)
+pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they're looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to 'true' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym.  This module depends on the sequence, pub, and cv modules  18-JAN-03 (DE): This module is unfinished and due for schema review (Bill  Gelbart will be leading the charge)
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>description</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>genotype_id</td><td>serial</td><td>no</td><td></td><td><li>phenotype.background_genotype_id<li>wwwuser_genotype.genotype_id<li>feature_genotype.genotype_id<li>interaction.background_genotype_id</td></tr>
@@ -694,21 +703,30 @@ ok  warning - mage_ml does not appear in core.tableinfo drop table if exists mag
 <h2>organism</h2>
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>genus</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>abbrev</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
-<tr><td>comment</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>common_name</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
-<tr><td>taxgroup</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>organism_id</td><td>serial</td><td>no</td><td></td><td><li>feature.organism_id<li>wwwuser_organism.organism_id<li>biomaterial.taxon_id<li>organism_dbxref.organism_id</td></tr>
+<tr><td>genus</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>comment</td><td>text</td><td>yes</td><td></td><td></td></tr>
 <tr><td>species</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
+<tr><td>organism_id</td><td>serial</td><td>no</td><td></td><td><li>feature.organism_id<li>wwwuser_organism.organism_id<li>organismprop.organism_id<li>biomaterial.taxon_id<li>organism_dbxref.organism_id</td></tr>
+<tr><td>abbreviation</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 </table>
 
 <h2>organism_dbxref</h2>
-Compared to mol5..Species, organism table lacks "approved char(1) null".  We need to work w/ Aubrey & Michael to ensure that we don't need this in  future [dave]   in response: this is very specific to a limited use case I think;  if it's really necessary we can have an organismprop table  for adding internal project specific data  [cjm]
+Compared to mol5..Species, organism table lacks "approved char(1) null".  We need to work w/ Aubrey & Michael to ensure that we don't need this in  future [dave]   in response: this is very specific to a limited use case I think;  if it's really necessary we can have an organismprop table  for adding internal project specific data  [cjm]  done (below) 19-MAY-03 [dave]
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>organism_id</td><td>int</td><td>no</td><td></td><td>organism.organism_id</td></tr>
 <tr><td>organism_dbxref_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
 <tr><td>dbxref_id</td><td>int</td><td>no</td><td></td><td>dbxref.dbxref_id</td></tr>
+</table>
+
+<h2>organismprop</h2>
+
+<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
+<tr><td>rank</td><td>int</td><td>no</td><td></td><td></td></tr>
+<tr><td>organism_id</td><td>int</td><td>no</td><td></td><td>organism.organism_id</td></tr>
+<tr><td>value</td><td>text</td><td>no</td><td></td><td></td></tr>
+<tr><td>organismprop_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
+<tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>phenotype</h2>
@@ -814,6 +832,7 @@ ok drop table if exists projectlink;
 ok drop table if exists protocol;
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>uri</td><td>varchar(100)</td><td>yes</td><td></td><td></td></tr>
+<tr><td>protocoltype_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>name</td><td>varchar(100)</td><td>no</td><td></td><td></td></tr>
 <tr><td>hardwaredescription</td><td>varchar(500)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>pub_id</td><td>int</td><td>yes</td><td></td><td>pub.pub_id</td></tr>
@@ -821,7 +840,6 @@ ok drop table if exists protocol;
 <tr><td>dbxref_id</td><td>int</td><td>yes</td><td></td><td>dbxref.dbxref_id</td></tr>
 <tr><td>protocol_id</td><td>serial</td><td>no</td><td></td><td><li>labelmethod.protocol_id<li>assay.protocol_id<li>treatment.protocol_id<li>quantification.protocol_id<li>protocolparam.protocol_id<li>acquisition.protocol_id<li>array.protocol_id</td></tr>
 <tr><td>softwaredescription</td><td>varchar(500)</td><td>yes</td><td></td><td></td></tr>
-<tr><td>protocol_type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>protocolparam</h2>
@@ -841,7 +859,7 @@ We should take a look in OMG for a standard representation we might use  instead
 <tr><td>pages</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>pyear</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>title</td><td>text</td><td>yes</td><td></td><td></td></tr>
-<tr><td>pub_id</td><td>serial</td><td>no</td><td></td><td><li>pubprop.pub_id<li>featuremap_pub.pub_id<li>protocol.pub_id<li>featureprop_pub.pub_id<li>pub_relationship.obj_pub_id<li>pub_relationship.subj_pub_id<li>feature_cvterm.pub_id<li>phenotype.pub_id<li>synonym_pub.pub_id<li>expression_pub.pub_id<li>pub_author.pub_id<li>interaction.pub_id<li>pub_dbxref.pub_id<li>feature_synonym.pub_id<li>wwwuser_pub.pub_id<li>feature_pub.pub_id<li>study.pub_id</td></tr>
+<tr><td>pub_id</td><td>serial</td><td>no</td><td></td><td><li>pubprop.pub_id<li>featuremap_pub.pub_id<li>protocol.pub_id<li>featureprop_pub.pub_id<li>pub_relationship.obj_pub_id<li>pub_relationship.subj_pub_id<li>feature_cvterm.pub_id<li>phenotype.pub_id<li>expression_pub.pub_id<li>pub_author.pub_id<li>interaction.pub_id<li>pub_dbxref.pub_id<li>feature_synonym.pub_id<li>wwwuser_pub.pub_id<li>feature_pub.pub_id<li>study.pub_id</td></tr>
 <tr><td>is_obsolete</td><td>boolean</td><td>yes</td><td></td><td></td></tr>
 <tr><td>volume</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
 <tr><td>issue</td><td>varchar(255)</td><td>yes</td><td></td><td></td></tr>
@@ -883,11 +901,11 @@ title: title of paper, chapter of book, journal, etc  volumetitle: title of part
 <h2>pubprop</h2>
 arank: order of author in author list for this pub  editor: indicates whether the author is an editor for linked publication
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>pval</td><td>text</td><td>no</td><td></td><td></td></tr>
 <tr><td>pub_id</td><td>int</td><td>no</td><td></td><td>pub.pub_id</td></tr>
-<tr><td>prank</td><td>integer</td><td>yes</td><td></td><td></td></tr>
+<tr><td>rank</td><td>integer</td><td>yes</td><td></td><td></td></tr>
 <tr><td>pubprop_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
-<tr><td>pkey_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
+<tr><td>value</td><td>text</td><td>no</td><td></td><td></td></tr>
+<tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 </table>
 
 <h2>quantification</h2>
@@ -1003,21 +1021,13 @@ ok drop table if exists studyfactorvalue;
 
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>name</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
-<tr><td>synonym_id</td><td>serial</td><td>no</td><td></td><td><li>synonym_pub.synonym_id<li>feature_synonym.synonym_id</td></tr>
+<tr><td>synonym_id</td><td>serial</td><td>no</td><td></td><td><li>feature_synonym.synonym_id</td></tr>
 <tr><td>type_id</td><td>int</td><td>no</td><td></td><td>cvterm.cvterm_id</td></tr>
 <tr><td>synonym_sgml</td><td>varchar(255)</td><td>no</td><td></td><td></td></tr>
 </table>
 
-<h2>synonym_pub</h2>
-pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they're looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to 'true' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym.
-<table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
-<tr><td>synonym_id</td><td>int</td><td>no</td><td></td><td>synonym.synonym_id</td></tr>
-<tr><td>pub_id</td><td>int</td><td>no</td><td></td><td>pub.pub_id</td></tr>
-<tr><td>synonym_pub_id</td><td>serial</td><td>no</td><td></td><td></td></tr>
-</table>
-
 <h2>tableinfo</h2>
-
+this table pending review   create table dbxrefprop (        dbxrefprop_id serial not null,        primary key (dbxrefprop_id),        dbxref_id int not null,        foreign key (dbxref_id) references dbxref (dbxref_id),        pkey_id int not null,        foreign key (pkey_id) references cvterm (cvterm_id),        pval text not null default '',        prank int not null default 0,         unique(dbxref_id, pkey_id, pval, prank) ); create index dbxrefprop_idx1 on dbxrefprop (dbxref_id); create index dbxrefprop_idx2 on dbxrefprop (pkey_id);   this table pending review   create table dbxrefrelationship (        dbxrefrelationship_id serial not null,        primary key (dbxrefrelationship_id),        reltype_id int not null,        foreign key (reltype_id) references cvterm (cvterm_id),        subjterm_id int not null,        foreign key (subjterm_id) references dbxref (dbxref_id),        objterm_id int not null,        foreign key (objterm_id) references dbxref (dbxref_id),         unique(reltype_id, subjterm_id, objterm_id) ); create index dbxrefrelationship_idx1 on dbxrefrelationship (reltype_id); create index dbxrefrelationship_idx2 on dbxrefrelationship (subjterm_id); create index dbxrefrelationship_idx3 on dbxrefrelationship (objterm_id);
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>tableinfo_id</td><td>serial</td><td>no</td><td></td><td><li>control.tableinfo_id<li>analysisinput.tableinfo_id<li>processio.inputtable_id<li>projectlink.tableinfo_id<li>magedocumentation.tableinfo_id<li>quantification.resulttable_id</td></tr>
 <tr><td>database_id</td><td>int</td><td>no</td><td></td><td></td></tr>
@@ -1044,7 +1054,7 @@ ok drop table if exists treatment;
 </table>
 
 <h2>wwwuser</h2>
------------------------------- -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  keep track of www users.  this may also be useful  in an audit module at some point (?).
+pub_id: the pub_id link is for relating the usage of a given synonym to the  publication in which it was used  is_current: the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature  is_internal: typically a synonym exists so that somebody querying the db with an  obsolete name can find the object they're looking for (under its current  name.  If the synonym has been used publicly & deliberately (eg in a  paper), it my also be listed in reports as a synonym.   If the synonym  was not used deliberately (eg, there was a typo which went public), then  the is_internal bit may be set to 'true' so that it is known that the  synonym is "internal" and should be queryable but should not be listed  in reports as a valid synonym. ------------------------------ -- dfeatureloc --------------- ------------------------------  dfeatureloc is meant as an alternate representation of  the data in featureloc (see the descrption of featureloc  in sequence.sql).  In dfeatureloc, fmin and fmax are  replaced with nbeg and nend.  Whereas fmin and fmax  are absolute coordinates relative to the parent feature, nbeg  and nend are the beginning and ending coordinates  relative to the feature itself.  For example, nbeg would  mark the 5' end of a gene and nend would mark the 3' end. ------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------  Note from Scott:  I changed this view to depend on dfeatureloc,  since I don't know what it is used for.  The change should  be transparent.  I also changed dbxrefstr to dbxref_id since  dbxrefstr is no longer in feature ------------------------------ -- fp_key ------------------- ------------------------------  no C++ style comments please. what is this file for, anyway?  /* feature before (?)deletion trigger implements the following rules:       -if feature to be deleted is a  	transcript: 	-delete any exons having this as their only related transcript 	-delete any proteins having this as their only related transcript 	-prevent deletion if there are any alleles of the transcript?  	gene: 	-prevent deletion if there are any alleles of the gene? or other info? 	-delete all transcripts that are related only to this gene  	what needs to be preserved about dbxrefs, etc.? */  CREATE OR REPLACE FUNCTION feature_del_tr () RETURNS TRIGGER AS ' body goes here     ' LANGUAGE SQL (?); or language plpgsql;  CREATE TRIGGER name { BEFORE | AFTER } { event [OR ...] }           ON table FOR EACH { ROW | STATEMENT }           EXECUTE PROCEDURE func ( arguments )  CREATE TRIGGER feature_del_tr BEFORE DELETE ON feature FOR EACH { ROW | STATEMENT } 	EXECUTE PROCEDURE feature_del_tr ;  keep track of www users.  this may also be useful  in an audit module at some point (?).
 <table border=1><tr><th>Name</th><th>Type</th><th>NULL?</th><th>Comment</th><th>References</th></tr>
 <tr><td>email</td><td>varchar(128)</td><td>no</td><td></td><td></td></tr>
 <tr><td>username</td><td>varchar(32)</td><td>no</td><td></td><td></td></tr>
