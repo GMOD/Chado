@@ -539,6 +539,8 @@ BEGIN
                                   cvterm.name = ''apollo'' and
                                   cvterm.cv_id = cv.cv_id and
                                   cv.name = ''applications'';
+ SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
+ SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
 
  RAISE NOTICE ''propagating names, prefix:%, suffix:%'',prefix,suffix;
  
@@ -549,45 +551,20 @@ BEGIN
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
      IF (f_type_temp=f_type_transcript or f_type_temp=f_type_snoRNA or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snRNA or f_type_temp=f_type_tRNA or f_type_temp=f_type_rRNA or f_type_temp=f_type_miRNA or f_type_temp=f_type_pseudo or f_type_temp=f_type_transposable_element or f_type_temp=f_type_promoter or f_type_temp=f_type_repeat_region) THEN
          SELECT INTO f_row_t * from feature where feature_id=NEW.subject_id;
-         IF f_row_t.uniquename like prefix||'':temp%'' THEN
-             SELECT INTO f_uniquename_gene uniquename from feature where feature_id=NEW.object_id;
-             f_accession_temp:=f_row_t.uniquename;
-             IF f_accession_temp like prefix||'':temp%'' THEN
-                 len:=length(f_accession_temp);
-                 letter_t:=substring(f_accession_temp from len for 1);             
-                 f_uniquename_transcript:=CAST(f_uniquename_gene||''-R''||letter_t  AS TEXT);
-             ELSE 
-                f_uniquename_transcript:=f_accession_temp;
-             END IF;
-         RAISE NOTICE ''insert new accession for transcript, dbname:%, accession:%'', f_dbname_gadfly, f_uniquename_transcript;
-         SELECT INTO d_id db_id from db where name=f_dbname_gadfly;
-         SELECT INTO dx_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=f_uniquename_transcript;
-         IF (dx_id IS NOT NULL ) THEN 
-             RAISE NOTICE ''warning: you insert dumplicate transcript:% into db....'', f_uniquename_transcript;
-         ELSE 
-             INSERT into dbxref (db_id, accession) values(d_id, f_uniquename_transcript);
-             SELECT INTO dx_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=f_uniquename_transcript;
-         END IF;
-         SELECT INTO f_d_id feature_dbxref_id from feature_dbxref where feature_id=NEW.subject_id and dbxref_id=dx_id;
-         IF f_d_id IS NULL THEN
-             INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(NEW.subject_id, dx_id, ''false'');
-         END IF;
          RAISE NOTICE ''start to update feature, old:%, new:%'', f_row_t.uniquename, f_uniquename_transcript;
          IF f_row_t.name like ''%temp%'' THEN
              RAISE NOTICE ''also update feature.name'';
-             UPDATE feature set name=f_uniquename_transcript, uniquename=f_uniquename_transcript, dbxref_id=dx_id where feature_id=NEW.subject_id;
+             UPDATE feature set name=f_uniquename_transcript, uniquename=f_uniquename_transcript where feature_id=NEW.subject_id;
          ELSE                
-             UPDATE feature set  uniquename=f_uniquename_transcript, dbxref_id=dx_id where feature_id=NEW.subject_id;
+             UPDATE feature set  uniquename=f_uniquename_transcript where feature_id=NEW.subject_id;
          END IF;   
          RAISE NOTICE ''assign new number for transcript:%'', NEW.subject_id;
-         SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
          RAISE NOTICE ''s_type_id:%'', s_type_id;
          SELECT INTO s_id synonym_id from synonym where name=f_uniquename_transcript and type_id=s_type_id;
          IF s_id IS NULL THEN 
              INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename_transcript, f_uniquename_transcript, s_type_id);
              SELECT INTO s_id synonym_id from synonym where name=f_uniquename_transcript and type_id=s_type_id;
          END IF;
-         SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
          IF p_id IS NULL THEN
              SELECT INTO p_type_id cvterm_id from cvterm where name=p_cvterm_name;
              IF p_type_id IS NULL THEN
@@ -602,7 +579,7 @@ BEGIN
              INSERT INTO pub(uniquename, miniref, type_id) values(p_miniref, p_miniref, p_type_id);
              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
          END IF;
-         RAISE NOTICe ''start to insert feature_synonym:synonym_id:%,feature_id:%, pub_id:%'', s_id, f_row_t.feature_id, p_id;
+         RAISE NOTICE ''start to insert feature_synonym:synonym_id:%,feature_id:%, pub_id:%'', s_id, f_row_t.feature_id, p_id;
          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_t.feature_id and synonym_id=s_id and pub_id=p_id;
          IF f_s_id IS NULL THEN 
              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_t.feature_id, s_id, p_id, ''true'');           
@@ -614,15 +591,6 @@ BEGIN
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
      IF f_type_temp=f_type_protein and f_uniquename_gene IS NOT NULL THEN
          SELECT INTO f_row_p * from feature where feature_id=NEW.subject_id;  
-         IF f_row_p.uniquename like prefix||'':temp%''   THEN     
-             f_accession_temp:=f_row_p.uniquename;
-             IF f_accession_temp like prefix'':temp%'' THEN
-                 len:=length(f_accession_temp);
-                 letter_p:=substring(f_accession_temp from len for 1);             
-                 f_uniquename_protein:=CAST(f_uniquename_gene||''-P''||letter_p  AS TEXT);
-             ELSE 
-                 f_uniquename_protein:=f_accession_temp;
-             END IF;
          RAISE NOTICE ''update uniquename of protein:% to new uniquename:%'',f_row_p.uniquename, f_uniquename_protein;
          SELECT INTO d_id db_id from db where name=f_dbname_gadfly;
          SELECT INTO dx_id dbxref_id from dbxref dx, db d  where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=f_uniquename_protein;
@@ -665,20 +633,6 @@ BEGIN
          SELECT INTo f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_p.feature_id and synonym_id=p_id;
          INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_p.feature_id, s_id, p_id, ''true'');
                 
-         SELECT INTO maxid_fb to_number(substring(max(accession) from 5 for 11),''9999999'') from dbxref dx, db d  where dx.db_id=d.db_id and d.name = f_dbname_FB and accession like ''FBpp_______'';  
-         IF maxid_fb IS NULL OR maxid_fb< 70000  THEN
-             maxid_fb:=70000;
-         ELSE 
-             maxid_fb:=maxid_fb+1;
-         END IF;
-         id_fb:=lpad(maxid_fb, 7, ''0000000'');
-         fb_accession:=CAST(''FBpp''||id_fb AS TEXT);
-         RAISE NOTICE ''fb_accession is:%'', fb_accession;
-         SELECT INTO d_id db_id from db where name=f_dbname_FB;
-         INSERT INTO dbxref(db_id, accession) values(d_id, fb_accession);
-         SELECT INTO dx_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_FB and accession=fb_accession;
-         INSERT INTO feature_dbxref(feature_id, dbxref_id) values(NEW.subject_id, dx_id);
-         RAISE NOTICE ''insert FBpp:% into feature_dbxref, and set is_current as true'', fb_accession;
      ELSIF (f_row_p.uniquename like prefix||''%''||suffix||''-P_'') and  f_row_p.uniquename not like ''%:%'' THEN
          RAISE NOTICE ''add protein to exist transcript'';
      ELSE
@@ -686,13 +640,13 @@ BEGIN
      END IF;
  ELSIF f_type_temp=f_type_exon and f_uniquename_gene IS NOT NULL THEN
      SELECT INTO f_row_e * from feature where feature_id=NEW.subject_id;
-     IF f_row_e.uniquename like prefix||'':temp%''   THEN            
+     IF f_row_e.uniquename like prefix||'':temp%''||suffix   THEN            
          f_accession_temp:=f_row_e.uniquename;
-         IF f_accession_temp like prefix||'':temp_:%''  THEN
+         IF f_accession_temp like prefix||'':temp_:%''||suffix  THEN
               len:=length(f_accession_temp);
               letter_e:=substring(f_accession_temp from ''\:([^:]+)$'');             
               f_uniquename_exon:=CAST(f_uniquename_gene||'':''||letter_e  AS TEXT);
-         ELSIF f_accession_temp like prefix||'':temp__:%'' THEN
+         ELSIF f_accession_temp like prefix||'':temp__:%''||suffix THEN
               len:=length(f_accession_temp);
               letter_e:=substring(f_accession_temp from 11);             
               f_uniquename_exon:=CAST(f_uniquename_gene||'':''||letter_e  AS TEXT);
@@ -700,16 +654,11 @@ BEGIN
               f_uniquename_exon:=f_accession_temp;
          END IF;
          RAISE NOTICE ''letter_e:%, uniquename:%'', letter_e, f_uniquename_exon;
-         SELECT INTO d_id db_id from db where name=f_dbname_gadfly;
-         INSERT into dbxref (db_id, accession) values(d_id, f_uniquename_exon);
-         SELECT INTO dx_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=f_uniquename_exon;
-         INSERT INTO feature_dbxref(feature_id, dbxref_id, is_current) values(NEW.subject_id, dx_id, ''false'');
          IF f_row_e.uniquename like ''%temp%'' THEN
-             UPDATE feature set name=f_uniquename_exon, uniquename=f_uniquename_exon, dbxref_id=d_id where feature_id=NEW.subject_id;
+             UPDATE feature set name=f_uniquename_exon, uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
          ELSE
-             UPDATE feature set  uniquename=f_uniquename_exon, dbxref_id=d_id where feature_id=NEW.subject_id;
+             UPDATE feature set  uniquename=f_uniquename_exon where feature_id=NEW.subject_id;
          END IF;   
-         RAISE NOTICE ''assign new number:% for exon:%'', f_uniquename_exon,  NEW.subject_id;
          SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
          SELECT INTO s_id synonym_id from synonym where name=f_uniquename_exon and type_id=s_type_id; 
          IF s_id IS NULL THEN
@@ -732,21 +681,7 @@ BEGIN
              SELECT INTO p_id pub_id from pub p, cvterm c where uniquename=p_miniref and c.name=p_cvterm_name and c.cvterm_id=p.type_id;
          END IF;
          INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');                
-         SELECT INTO maxid_fb to_number(substring(max(accession) from 5 for 11),''9999999'') from dbxref dx, db d  where dx.db_id=d.db_id and d.name = f_dbname_FB and accession like ''FBex%'';  
-         IF maxid_fb IS NULL OR maxid_fb< 70000  THEN
-             maxid_fb:=70000;
-         ELSE 
-             maxid_fb:=maxid_fb+1;
-         END IF;
-         id_fb:=lpad(maxid_fb, 7, ''0000000'');
-         fb_accession:=CAST(''FBex''||id_fb AS TEXT);
-         RAISE NOTICE ''fb_accession is:%'', fb_accession;
-         SELECT INTO d_id db_id from db where name=f_dbname_FB;
-         INSERT INTO dbxref(db_id, accession) values(d_id, fb_accession);
-         SELECT INTO dx_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_FB and accession=fb_accession;
-         INSERT INTO feature_dbxref(feature_id, dbxref_id) values(NEW.subject_id, dx_id);
-         RAISE NOTICE ''insert FBpp:% into feature_dbxref, and set is_current as true'', fb_accession;
-     ELSIF f_row_e.uniquename like prefix||''%:%'' THEN 
+     ELSIF f_row_e.uniquename like prefix||''%:%''||suffix THEN 
          RAISE NOTICE ''add exon to exist transcript'';  
      ELSE
          RAISE NOTICE ''unexpected format of exon uniquename:%'', f_row_e.uniquename;            
