@@ -1,0 +1,12 @@
+Tue Jan  6 01:34:51 PST 2004 - allenday
+
+Add documentation to README and/or INSTALL regarding Postgres VACUUM and ANALYZE
+functions.  We might want to give users an example of how to set up a cron job
+to do this nightly.  I had a 3 order of magnitude speed increase today from a 
+10 second ANALYZE command.
+
+We might also want to build an analyze() method into the loaders, or possibly
+the middleware layer itself.  This will dramatically speed up large loads, but
+requires changing the cache/flush strategy to the more complex
+begin-transaction/cache/flush/end-transaction/analyze strategy.
+--
