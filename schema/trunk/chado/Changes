@@ -204,3 +204,57 @@ VERSION 0.04
 		tables removed in favor of using the general-purpose "contact"
 		table in general module, and using a new tag-value based approach
 		to storing user bookmarks/lists/preferences/etc
+
+VERSION 0.04
+============
+
+	MODULE CHANGES
+	--------------
+
+	audit module
+		no changes
+
+	bin
+		no changes
+
+	companalysis
+		table analysisinvocation removed as redundant with current
+		usage of analysis.
+
+		table analysisinvocationprop changed back to analysisprop.
+
+	cv
+		renamed table cvtermrelationship to cvterm_relationship
+
+	expression
+		no changes
+
+	general
+		tables tableinfo and project moved to metadata.sql.
+
+		tables dbxrefprop and dbxrefrelationship removed for now
+		since they caused problems with the build.
+
+	genetic
+		interaction.backgroundgenotype_id changed to 
+		interaction.background_genotype_id.
+
+	map
+		no changes
+
+	organism
+		no changes
+
+	pub
+		deleted the fk from author table to contact table in the
+		general module, as this relation is effectively 
+		unimplementable for the vast majority of author records.
+
+	sequence
+		feature_relationship keys subjfeature_id, objfeature_id,
+		and relrank changed to subject_id, object_id, and rank,
+		respectively, for consistency with the rest of the schema.
+
+	www
+		no change
+
