@@ -63,11 +63,7 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-  qq{
-test_load ::
-	\$(SHELL) install/test_load.sh
-  };  
-  q{
+  my $uninterp =  q{
 mysql :: \
                 ./modules/companalysis/companalysis.mysql \
                 ./modules/cv/cv.mysql \
@@ -127,4 +123,11 @@ metadata: ./bin/ddltrans
 	./bin/ddltrans -f perl ./dat/chado.ddl > ./dat/chado.pl
 	./bin/ddltrans -f xml ./dat/chado.ddl > ./dat/chado.xml
   };
+
+  qq{
+test_load ::
+	\$(SHELL) install/test_load.sh
+
+$uninterp
+  };  
 }
