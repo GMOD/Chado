@@ -1,14 +1,32 @@
---
--- should this be in pub?
---
+-- ================================================
+-- TABLE: tableinfo
+-- ================================================
+
+create table tableinfo (
+       tableinfo_id serial not null,
+       primary key (tableinfo_id),
+       name varchar(30) not null,
+       primary_key_column varchar(30) null,
+       is_view int not null default 0,
+       view_on_table_id int null,
+       superclass_table_id int null,
+       is_updateable int not null default 1,
+       modification_date date not null default now(),
+
+       unique (name)
+);
+
+
 -- ================================================
 -- TABLE: contact
 -- ================================================
 create table contact (
        contact_id serial not null,
        primary key (contact_id),
--- fields to be added after discussion
-       description varchar(255) null
+       name varchar(30) not null,
+       description varchar(255) null,
+
+       unique (name)
 );
 
 -- ================================================
@@ -44,4 +62,14 @@ create table dbxref (
        unique (db_id, accession, version)
 );
 
+-- ================================================
+-- TABLE: project
+-- ================================================
+create table project (
+       project_id serial not null,  
+       primary key (project_id),
+       name varchar(255) not null,
+       description varchar(255) not null,
 
+       unique(name)
+);
