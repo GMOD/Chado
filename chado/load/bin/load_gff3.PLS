@@ -253,17 +253,17 @@ while ( my $gff_feature = $gffio->next_feature() ) {
             warn "*" x 72 . "\n";
             exit 1;
         }
+    }
 
-        #is this general, or what should really be done here?
-        if ( $id && !$dbxref{$id} ) {
-            my ($chado_dbxref) = Chado::Dbxref->find_or_create(
-                {
-                    db_id     => $chado_db->id,
-                    accession => $id,
-                }
-            );
-            $dbxref{$id} = $chado_dbxref;
-        }
+    #is this general, or what should really be done here?
+    if ( $id && !$dbxref{$id} ) {
+        my ($chado_dbxref) = Chado::Dbxref->find_or_create(
+            {
+                db_id     => $chado_db->id,
+                accession => $id,
+            }
+        );
+        $dbxref{$id} = $chado_dbxref;
     }
 
     cache_cvterm( $gff_feature->primary_tag, $so->id );
@@ -1134,17 +1134,16 @@ sub load_feature_locations {
         push @transaction, $feature_dbxref;
     }
 
+    $chado_feature->dbxref_id( $dbxref{$id} )
+        if $gff_feature->has_tag('ID');         # is this the right thing to do here?
+    $chado_feature->update;                     # flush updates to this feature object
+
     if ( $id eq $gff_feature->seq_id
         or $gff_feature->seq_id eq '.' ) {
       #ie, this is a srcfeature (ie, fref) so only create the feature
         $srcfeature{$gff_feature->seq_id} = $chado_feature;
         return ($chado_feature);
     }
-
-    $chado_feature->dbxref_id( $dbxref{$id} )
-        if $gff_feature->has_tag('ID');         # is this the right thing to do here?
-    $chado_feature->update;                     # flush updates to this feature object
-
 
     # find pre-existing feature locations that were loaded prior
     # to this GFF3 file.
