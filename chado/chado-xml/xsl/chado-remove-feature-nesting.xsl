@@ -22,9 +22,10 @@
             <xsl:apply-templates mode="make-link" select=".."/>
           </subject_id>
           <object_id>
-            <xsl:apply-templates mode="make-link" select="object_id/feature"/>
+            <xsl:apply-templates mode="make-link" select="subject_id/feature"/>
           </object_id>
           <xsl:copy-of select="type_id"/>
+          <xsl:copy-of select="rank"/>
         </feature_relationship>
       </xsl:for-each>
     </chado>

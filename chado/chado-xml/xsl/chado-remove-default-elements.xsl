@@ -11,7 +11,7 @@
   <!-- match everything -->
   <xsl:template match="/ | @* | node()">
     <xsl:choose>
-      <xsl:when test="(name(.)='rank' or name(.)='locgroup' or name(.)='is_fmin_partial' or name(.)='is_fmax_partial' or name(.)='is_internal') and .=0"/>
+      <xsl:when test="(name(.)='rank' or name(.)='locgroup' or name(.)='is_fmin_partial' or name(.)='is_fmax_partial' or name(.)='is_internal' or name(.)='is_analysis') and (.=0 or .='')"/>
       <xsl:when test="(name(.)='is_current') and .=1"/>
       <xsl:otherwise>
         <!-- recursively apply this same template again -->
