@@ -48,13 +48,18 @@ others. (there is also some overlaps with levels 1/2).
 I have listed how FB implements each policy choice - other chado
 instances feel free to add....
 
+TIGR: Currently at level 0 conformance, though most (if not all) of the 
+terms being used have an obvious counterpart in SO.  Therefore these
+"TIGR Ontology" terms are used in the answers to the SO-related questions
+that appear below.  We plan on updating our terms with SO terms very soon.
+
 POLICY CHOICES
 --------------
 
 * SO terms used for standard central-dogma gene model
 
 FB: gene mRNA exon protein [other types are derivable]
-TIGR: ?
+TIGR: gene transcript CDS exon protein [though the strict answer is for any of these SO questions is "none" since we do not yet meet level 1 conformance]
 
   NOTE: we should be using 'polypeptide' instead of 'protein'. For
   now, software should be tolerant of both these uses.
@@ -62,21 +67,31 @@ TIGR: ?
 * SO terms used for storing alignments
 
 FB: match
-TIGR: ?
+TIGR: match
 
   NOTE: we want to use the new more specific SO types for match_set,
   match_part, for hits and hsps respectively. For now, software should
   be tolerant of either usage.
 
+  TIGR: We've also extended the model for storing pairwise alignments
+  to store multiple alignments.  Each member of the alignment is
+  featureloced to the 'match' feature.  We've used this representation
+  to store paralogous/orthologous gene families.
+
 * feature_relationship.types
 
 FB: partof (for mRNA to gene and exon to mRNA)
     producedby (for protein to mRNA)
-TIGR: ?
+TIGR: part_of (gene-assembly, exon-transcript, assembly-supercontig)
+      produced_by (protein-CDS, CDS-transcript, transcript-gene)
 
   NOTE: this should be "part_of" and "derived_from" to conform to
   SO. Most read-only software should be able to safely ignore
-  feature_relationship.type anyway.
+  feature_relationship.type anyway. Protein should be polypeptide -
+  see note above
+
+  NOTE: the main difference between FB and TIGR here is that TIGR
+  introduce an intermediate CDS feature between mRNA and protein
 
 * featureloc policy
 
@@ -84,10 +99,8 @@ FB: all constituent parts of a central dogma gene model are located
 relative to the same srcfeature (the chromosome arm). No redundant
 locations (ie featureloc.group > 0) are used
 
-TIGR: I believe TIGR were interested in redundant locations - for
-example, locating gene model parts on both clones/contigs and
-chromosomes. The derivable redundant localisations would be indicated
-with featureloc.group set to > 0
+TIGR: Redundant locations are used and indicated with featureloc.group > 0.
+
 
   NOTE: we want to allow some flexibility with this policy. I believe
   that the constituent parts linked located relative to the feature
@@ -96,6 +109,12 @@ with featureloc.group set to > 0
     IF   X is linked to Y via feature_relationship
     AND  X is located relative to Z via featureloc.srcfeature_id
     THEN Y must also be located relative to Z via featureloc.srcfeature_id 
+
+TIGR: We've followed this policy in adding a featureloc between the
+protein and genomic contig in our databases (such a featureloc does
+not appear in the Chado usage documents).  This additional featureloc
+simplifies many queries, especially when looking at the genomic
+context of 'match' features associated with proteins.
 
   We should also expect that the fmin/fmax boundaries of a feature be
   defined the the outermost boundaries of the outermost constituent
@@ -113,12 +132,14 @@ with featureloc.group set to > 0
 
 FB: we store a lot of non-central dogma gene models; noncoding gene
 models and pseudogenes [need to fill in more details here]
-TIGR: ?
+TIGR: not many of these stored yet, save for a few pseudogenes
+and the occasional non-coding ORF
 
 * other features
 
 FB: the FlyBase implementation includes many other feature types,
 including polyA_site and sequence_variant [need to fill in details]
+TIGR: using 'SNP' in some databases
 
 * derivable features types
 
@@ -128,6 +149,8 @@ non-derivale level. For example, we never use types "5_prime_exon",
 "dicistronic_gene", "coding_exon" as these are always inferrable. We
 always use type "gene" - the specific type of gene is inferred from
 the child type (mRNA, tRNA, snRNA, etc).
+TIGR: derivable features are not included.  currently not storing any
+tRNAs or snRNAs.
 
   NOTE: whilst it is perfectly permissable to include redundant
   derivable features (useful for warehouse-style querying), you should
@@ -137,6 +160,13 @@ the child type (mRNA, tRNA, snRNA, etc).
 * sequence_variants
 
 FB: these are included in chado, but they are lacking full detail
+TIGR: only SNPs so far.  the SNPs currently being stored are computed from
+pairwise alignments of sequences already loaded into Chado, so each SNP 
+feature is featureloc'ed to the appropriate place on each of the two 
+sequences (rather than having one of the featurelocs "dangling", as 
+indicated in some of the Chado usage documents.)  featureloc.residue_info
+is used to redundantly store the base referenced in each of the two 
+sequences.
 
   NOTE: variation features should specify the edit that makes one
   feature (such as the reference/wild-type) from another (the
