@@ -1,5 +1,6 @@
 #!/usr/local/bin/perl
 use lib $ENV{CodeBase};
+use strict;
 
 print "Enter the ddl file:\n: ";
 my $ddl_file= <STDIN>;
@@ -7,7 +8,7 @@ my $ddl_file= <STDIN>;
 
 open (IN, $ddl_file) or die "could not open ddl file";
 
-my $ddl_properties_file=">".$ENV{CodeBase}."/Config/ddl.properties";
+my $ddl_properties_file=">".$ENV{CodeBase}."/XORT/Config/ddl.properties";
 
 
 open (OUT, $ddl_properties_file) or die "could not open file";
@@ -17,6 +18,8 @@ my $primary_key;
 
 #key: table_name value: all cols, separated by space
 my %hash_table;
+
+
 
 my $all_tables;
 #key: primary_table_name:primary_table_primary_key value: all the foreign_table_name:foreign_key_col_name
@@ -36,7 +39,9 @@ my %hash_foreign_key;
 
 
 my $table_name;
-
+my $start;
+my $table_data_type;
+my @foreign_keys;
 
 # here loading ddl.properties
 while (<IN>){
@@ -112,7 +117,7 @@ while (<IN>){
    print OUT "\n$tablename", "_unique=","$table_unique";
    print OUT "\n$tablename", "_non_null_cols=", $non_null_cols;
    print OUT "\n$tablename", "_non_null_default=", $non_null_default;
-   foreach my $key (%hash_default_value){
+   foreach my $key (keys %hash_default_value){
      print OUT "\n$key", "_default=", $hash_default_value{$key};
    }
    undef %hash_table;
@@ -163,7 +168,7 @@ while (<IN>){
    elsif ($input =~/primary/){ #get the primary key
      my  @temp=split(/\s*\(\s*/, $input);
      my @temp1=split(/\s*\)\s*/, $temp[1]);
-     $primary_key=@temp1[0];
+     $primary_key=$temp1[0];
 
    }
 
@@ -194,9 +199,9 @@ while (<IN>){
 }
 close(IN);
 
-print "Enter the view_ddl file:\n: ";
-my $ddl_file= <STDIN>;
-
+print "\n\nEnter the view_ddl file:\n:";
+my $view_file= <STDIN>;
+open (IN, $view_file) or die "could not open view file";
 
 # here loading ddl_view.properties
 while (<IN>){
@@ -387,4 +392,4 @@ foreach my $key (sort keys %hash_foreign_key){
 
 #print out the table_pseudo
 my $tables_pseudo_string=join " ", @tables_pseudo;
-print OUT "\ntable_pseudo=", $tables_pseudo_string;
+print OUT "\n\ntable_pseudo=", $tables_pseudo_string;

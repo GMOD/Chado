@@ -8,6 +8,7 @@
                   <name>gene</name>
            </cvterm>
      </type_id>
+     <uniquename test="yes">CG13339</uniquename>
      <!-- get all mRNA of those gene -->
      <feature_relationship dump="all">
        <subjfeature_id test="yes">
