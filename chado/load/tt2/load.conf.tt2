@@ -1,4 +1,20 @@
 <load>
+  <database>
+    <db_driver>[% db_driver %]</db_driver>
+    <db_name>[% db_name %]</db_name>
+    <db_username>[% db_username %]</db_username>
+    <db_password>[% db_password %]</db_password>
+    <db_host>[% db_host %]</db_host>
+    <db_port>[% db_port %]</db_port>
+  </database>
+
+  <build>
+    <working_dir>[% working_dir %]</working_dir>
+    <external_ddl>[% external_ddl %]</external_ddl>
+    [% FOREACH f=sql_files %]<sql_files>[% f %]</sql_files>
+    [% END %]
+  </build>
+
   <path name="data" value="/tmp/chado_load"/>
 
   <!--                 -->
