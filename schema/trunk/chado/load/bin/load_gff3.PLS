@@ -854,14 +854,14 @@ sub load_sequences {
                 while ( $offset < $dnalen ) {
                     $progress->message("loading shred.  offset: $offset bp") if DEBUG;
                     my $shred = substr( $dna, $offset, $shredsize );
-                    $progress->message("${offset}bp loaded") if $offset > 0;
+                    $progress->message("${offset}bp loaded") if $offset > 0 and DEBUG;
                     $sth->execute( $shred, $f->id );
                     $progress->message("loaded shred") if DEBUG;
 
                     $offset += $shredsize;
                 }
 
-                $progress->message("${dnalen}bp loaded");
+                $progress->message("${dnalen}bp loaded") if DEBUG;
                 $f->update;
 
                 $progress->message("pre dbi_commit") if DEBUG;
