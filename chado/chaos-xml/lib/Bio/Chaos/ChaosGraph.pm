@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.5 2005-01-14 01:20:42 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.6 2005-02-18 20:26:39 cmungall Exp $
 #
 #
 
@@ -49,12 +49,16 @@ creates a new Chaos::ChaosGraph object
 sub new {
     my $proto = shift; my $class = ref($proto) || $proto;;
     my $self = bless {}, $class;
-    my ($stag) =
-      $self->_rearrange([qw(stag)], @_);
+    my ($stag,$file,$fmt) =
+      $self->_rearrange([qw(stag file fmt)], @_);
+    if ($stag && $file) {
+        $self->freak("use -stag OR -file as arguments");
+    }
     $self->graph(Graph->new);
     $self->locgraph(Graph->new);
     $self->feature_idx({});
     $self->init_from_stag($stag) if $stag;
+    $self->init_from_file($file,$fmt) if $file;
     return $self;
 }
 
@@ -87,8 +91,21 @@ sub init_from_stag {
 sub init_from_file {
     my $self = shift;
     my $file = shift;
-    my $fmt = shift || 'genbank';
-    $self->chaos_flavour("genbank_unflattened");
+    my $fmt = shift;
+    if (!$fmt) {
+        if ($file =~ /chaos/) {
+            $fmt = 'chaos';
+        }
+        else {
+            $fmt = 'genbank';
+        }
+    }
+    if ($fmt eq 'chaos') {
+        my $stag = Data::Stag->parse($file);
+	$self->init_from_stag($stag);
+        return;
+    }
+    $self->chaos_flavour("$fmt-unflattened");
     $self->load_module("Bio::SeqIO");
     my $unflattener = $self->unflattener;
     my $type_mapper = $self->type_mapper;
