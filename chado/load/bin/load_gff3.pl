@@ -120,19 +120,19 @@ $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
 $GFFFILE  ||='test.gff';
 
+Chado::LoadDBI->init();
+
 #count the file lines.  we need this to track load progress
 open(WC,"/usr/bin/wc -l $GFFFILE |");
 my $linecount = <WC>; chomp $linecount;
 close(WC);
 ($linecount) = $linecount =~ /^\s*?(\d+)/;
 
-my $progress = Term::ProgressBar->new({name => "Features ($linecount):", count => $linecount,
+my $progress = Term::ProgressBar->new({name => "Features ($linecount)", count => $linecount,
                                        ETA => 'linear', });
 $progress->max_update_rate(1);
 my $next_update = 0;
 
-
-Chado::LoadDBI->init();
 
 my %typemap;
 
