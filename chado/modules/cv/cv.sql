@@ -128,7 +128,7 @@ create table dbxrefprop (
        value text not null default '',
        rank int not null default 0,
 
-       unique(dbxref_id, type_id, rank)
+       unique(dbxref_id, type_id, value, rank)
 );
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
