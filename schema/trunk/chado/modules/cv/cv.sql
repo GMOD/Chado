@@ -24,15 +24,15 @@ create table cvterm (
        foreign key (cv_id) references cv (cv_id),
        name varchar(255) not null,
        termdefinition text,
--- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
        dbxref_id int,
        foreign key (dbxref_id) references dbxref (dbxref_id),
 
        unique(termname, cv_id)
--- The unique key on termname, termtype_id ensures that all terms are 
--- unique within a given cv
 );
 create index cvterm_idx1 on cvterm (cv_id);
+-- the primary dbxref for this term.  Other dbxrefs may be cvterm_dbxref
+-- The unique key on termname, cv_id ensures that all terms are 
+-- unique within a given cv
 
 
 -- ================================================
