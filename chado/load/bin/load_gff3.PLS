@@ -392,6 +392,43 @@ sub load_custom_tags {
         }
 
     }
+    elsif ( $tag eq 'dbxref') {
+        foreach my $d (@d) { 
+
+            if ($d =~ /(.+):(.+)/) {
+                $tag = "DB:$1";
+                $d   = $2;
+            } else {
+                die "unable to determine database for dbxref: $d\n";
+            }
+
+            my ($db) = Chado::Db->search( name => $tag );
+            if ( !$db ) {
+                $db = Chado::Db->find_or_create(
+                    {
+                        name       => $tag,
+                        contact_id => $nullcontact,
+                    }
+                );
+            }
+            die "couldn't create db $db" unless $db;
+            push @transaction, $db;
+                                                                                
+            my ($dbxref) = Chado::Dbxref->find_or_create(
+                {
+                    db_id     => $db->id,
+                    accession => $d
+                }
+            );
+            my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create(
+                {
+                    feature_id => $chado_feature->id,
+                    dbxref_id  => $dbxref->id,
+                }
+            );
+            push @transaction, ( $dbxref, $feature_dbxref );
+        } 
+    }
     else {
         unless ( defined $cvterm{$tag} ) {
             cache_cvterm($tag);
