@@ -7,7 +7,9 @@ create table featuremap (
        mapdesc varchar(255),
        mapunit varchar(255),
        timeentered timestamp not null default current_timestamp,
-       timelastmod timestamp not null default current_timestamp
+       timelastmod timestamp not null default current_timestamp,
+
+       unique(mapname)
 );
 
 create table featurerange (
@@ -75,4 +77,7 @@ create table featuremap_pub (
 -- module).   Simple aberrations should be do-able, but what about cases where
 -- a breakpoint interrupts a gene?  This would be an example of the problematic
 -- case above...  (or?)
+
+
+
 

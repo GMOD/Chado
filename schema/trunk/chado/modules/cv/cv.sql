@@ -82,12 +82,12 @@ create table cvterm_synonym (
 create table cvterm_dbxref (
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
-       dbxref_id int not null,
-       foreign key (dbxref_id) references dbxref (dbxref_id),
+       dbxref_str varchar(255) not null,
+       foreign key (dbxref_str) references dbxref (dbxref_str),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(cvterm_id, dbxref_id)
+       unique(cvterm_id, dbxref_str)
 );
 
 -- references from other modules:
