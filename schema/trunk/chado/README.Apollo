@@ -1,0 +1,15 @@
+This needs to be better documented, but here is a start:
+
+In order to use Apollo read/write with chado, here are things that need to
+be done:
+
+  - grant privileges to users to several tables (list here) --in the  
+    meantime, you can grant all using sqlt and the template, 
+    bin/privileges.tmpl 
+  - add the functions and triggers in 
+    modules/sequence/apollo-bridge/apollo-triggers.sql.  Do this with the
+    command
+
+      % cat modules/sequence/apollo-bridge/apollo-triggers.sql | psql <DBNAME>
+
+
