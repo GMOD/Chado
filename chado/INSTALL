@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.31 2004-07-26 17:08:49 scottcain Exp $
+$Id: INSTALL,v 1.32 2004-08-05 14:19:27 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -66,6 +66,26 @@ host    all         all         127.0.0.1         255.255.255.255   trust
       This command clears out old, deleted data and analyzes the structure
       of the database so that the execution planner can predict the
       fastest way to execute a given query.
+
+      While the above link describes tuning in general, the examples given
+      for tuning kernel parameters are Linux specific.  For setting 
+      shmmax on Mac OS X boxes, edit 
+
+          /System/Library/StartupItems/SystemTuning/SystemTuning (for OS X 10.2)
+        
+      or
+ 
+          /etc/rc (for OS X 10.3)
+
+      to increase the values of shmmax and shmall, like this:
+
+          sysctl -w kern.sysv.shmmax=52428800 # bytes: 50 megs
+          sysctl -w kern.sysv.shmmin=1
+          sysctl -w kern.sysv.shmmni=32
+          sysctl -w kern.sysv.shmseg=8
+          sysctl -w kern.sysv.shmall=25600 # 4k pages: 100 megs
+
+      (these are the values I use for my Mac that has 1.2 G RAM) and reboot.
 
   Apache (1.3.*)
 
