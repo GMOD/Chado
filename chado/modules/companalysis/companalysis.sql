@@ -64,68 +64,23 @@ create table analysis (
 );
 
 -- ================================================
--- TABLE: analysisinvocation
+-- TABLE: analysisprop
 -- ================================================
 
--- an analysisinvocation is an instance (ie a run) or an analysis.
--- parameters for the analysis are stored as key/value pairs in
--- analysisprop.  if different blast runs were instantiated over
--- different query sequences, there would be multiple entries here.
---
--- an analysis has inputs and outputs.  data from elsewhere in the
--- database is fed into an analysis (referenced by the composite FK
--- inputtableinfo_id/inputrow_id), and is the output is stored
--- elsewhere in the database (referenced by the composite FK
--- ouputtableinfo_id/outputrow_id).
--- 
--- composite FKs are necessary because analyses can be done on
--- multiple types of data coming from fundamentally different tables
--- (array normalization and feature alignment, for example)
-
--- input* fields store data about what data from elsewhere in the
--- database (data referenced by *tableinfo_id/*inputrow_id composite FK) was used in a particular
--- analysis invocation.
-
-create table analysisinvocation (
-    analysisinvocation_id serial not null,
-    primary key (analysisinvocation_id),
+create table analysisprop (
+    analysisprop_id serial not null,
+    primary key (analysisprop_id),
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
-    description text,
-
-    inputtableinfo_id int not null,
-    foreign key (inputtableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
-    inputrow_id int not null,
-
-    outputtableinfo_id int not null,
-    foreign key (outputtableinfo_id) references tableinfo (tableinfo_id) on delete cascade,
-    outputrow_id int not null
-);
-
-
--- ================================================
--- TABLE: analysisinvocationprop
--- ================================================
-
--- analysis invocations can have various properties attached - eg the
--- parameters used in running a blast
-
-create table analysisinvocationprop (
-    analysisinvocationprop_id serial not null,
-    primary key (analysisinvocationprop_id),
-    analysisinvocation_id int not null,
-    foreign key (analysisinvocation_id) references analysisinvocation (analysisinvocation_id) on delete cascade,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     value text,
 
-    unique(analysisinvocation_id, type_id, value)
+    unique(analysis_id, type_id, value)
 );
-create index analysisinvocationprop_idx1 on analysisinvocationprop (analysisinvocation_id);
-create index analysisinvocationprop_idx2 on analysisinvocationprop (type_id);
+create index analysisprop_idx1 on analysisprop (analysis_id);
+create index analysisprop_idx2 on analysisprop (type_id);
 
--- ** not sure this table is still necessary with the introduction
--- ** of analysis input/output fields
 -- ================================================
 -- TABLE: analysisfeature
 -- ================================================

@@ -36,12 +36,12 @@ create index cvterm_idx1 on cvterm (cv_id);
 
 
 -- ================================================
--- TABLE: cvtermrelationship
+-- TABLE: cvterm_relationship
 -- ================================================
 
-create table cvtermrelationship (
-       cvtermrelationship_id serial not null,
-       primary key (cvtermrelationship_id),
+create table cvterm_relationship (
+       cvterm_relationship_id serial not null,
+       primary key (cvterm_relationship_id),
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        subject_id int not null,
@@ -51,9 +51,9 @@ create table cvtermrelationship (
 
        unique(type_id, subject_id, object_id)
 );
-create index cvtermrelationship_idx1 on cvtermrelationship (type_id);
-create index cvtermrelationship_idx2 on cvtermrelationship (subject_id);
-create index cvtermrelationship_idx3 on cvtermrelationship (object_id);
+create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
+create index cvterm_relationship_idx2 on cvterm_relationship (subject_id);
+create index cvterm_relationship_idx3 on cvterm_relationship (object_id);
 
 
 -- ================================================

@@ -43,8 +43,8 @@ create table phenotype (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade,
-       backgroundgenotype_id int,
-       foreign key (backgroundgenotype_id) references genotype (genotype_id) on delete set null
+       background_genotype_id int,
+       foreign key (background_genotype_id) references genotype (genotype_id) on delete set null
 );
 -- type of phenotypic statement  [Chris, we need this or something like it
 -- for FB where we have three types of statement in *k: "Phenotypic class:",
@@ -52,7 +52,7 @@ create table phenotype (
 -- Do we want to call this simply genotype_id to allow natural joins?
 create index phenotype_idx1 on phenotype (type_id);
 create index phenotype_idx2 on phenotype (pub_id);
-create index phenotype_idx3 on phenotype (backgroundgenotype_id);
+create index phenotype_idx3 on phenotype (background_genotype_id);
 
 
 -- ================================================
