@@ -10,9 +10,9 @@ setenv CodeBase /users/zhou/work/API
 
 4. log into the target database and execute CodeBase/XORT/Config/function_view.sql to synchronize the database
 
-5. see how sample code: dump.pl  loader.pl validator.pl to call Loader, Dumper and Validator test_dumpspec.pl
+5. run CodeBase/XORT/bin/dump.pl  loader.pl validator.pl with -h for how to use it. 
 
-6. CodeBase/XORT/Config/dumpspec.xml for sample dumpspec file, and dump output from this dumpspec
+6. CodeBase/XORT/Config/dumpspec_gene.xml for sample dumpspec file, and dump output from this dumpspec(dump_gene_local_id.xml)
 
 7. If you try to use 'local_id' mechanism to represent an object, the dumper will use this format to represent it: 'table_name'.'_'.'primary_key', it will garantee the uniqueness. However, it is not necessary at all to use this format for loader, as long as its uniqueness, loader can handle it. 
 
