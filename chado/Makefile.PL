@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.77 2005-02-23 15:17:52 scottcain Exp $
+# $Id: Makefile.PL,v 1.78 2005-03-05 10:26:40 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -395,20 +395,26 @@ if ($O{'SIMPLE'} =~ /^[Yy]/) {
   }
 
   print "\nAvailable function extensions to the core schema:\n";
-  open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
-  @funcfiles = ( );
+#  open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
+  @funcfiles = `find modules/ -name *.plpgsql`;
   my $i = 0;
-  while (<EXT>) {
-    next if /^\s*#/; # allow comment lines
+  foreach my $file (@funcfiles) {
     $i++;
-    print "[$i] $_";
-    chomp;
-    my $file = "$working_dir/modules/".$_;
-    push @funcfiles, $file;
+    print "[$i] $file";
+    chomp $file;
   }
-  close EXT;
+#  while (<EXT>) {
+#    next if /^\s*#/; # allow comment lines
+#    $i++;
+#    print "[$i] $_";
+#    chomp;
+#    my $file = "$working_dir/modules/".$_;
+#    push @funcfiles, $file;
+#  }
+#  close EXT;
                                                                                     
   print "\nWhat function extensions to the core schema would you like?\n";
+  print "Only load triggers if you know what you are doing!\n";
   my $funcstr = prompt("(Comma-delimited)?","0");
 
   my @indexes = split /,\s*/, $funcstr;
@@ -522,6 +528,7 @@ else {
     ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
 
     system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
+    copy("$working_dir/modules/complete.sql","$working_dir/modules/nofuncs.sql"); 
   }
 
   if (@funcfiles > 0) {
@@ -573,6 +580,7 @@ WriteMakefile(
            'load/bin/gmod_load_ontology.pl',
            'load/bin/gmod_bulk_load_gff3.pl',
            'bin/gmod_dump_gff3.pl',
+           'bin/gmod_apollo_triggers.pl',
     ],
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
