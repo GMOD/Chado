@@ -22,11 +22,10 @@ doc/design.txt
 doc/implementation.txt
 doc/snps.txt
 INSTALL
-install_util/conf_install.pl
 install_util/conf_install.PLS
 install_util/install.pm
-install_util/src_install.pl
 install_util/src_install.PLS
+install_util/log4perl.conf.PLS
 lib/Bio/GMOD/Config.pm
 lib/Bio/GMOD/DB/Config.pm
 lib/Bio/GMOD/Load.pm

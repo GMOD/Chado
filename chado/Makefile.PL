@@ -1,23 +1,24 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.67 2004-07-16 17:31:23 scottcain Exp $
+# $Id: Makefile.PL,v 1.68 2004-07-16 18:24:48 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 Makefile written.  Now you should do the following, in order:
 
-  1. make             (creates necessary build files)
+  1. make              (creates necessary build files)
+  2. sudo make install (creates \$GMOD_ROOT and subdirectories)
 
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-         STEP 2 WILL DELETE ANY DATA IN A DATABASE WITH THE 
+         STEP 3 WILL DELETE ANY DATA IN A DATABASE WITH THE 
             DATABASE NAME YOU PROVIDED!
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-  2. make load_schema (loads SQL schema into database)
-  3. make prepdb      (loads basic data)
-  4. make ontologies  (loads data for various ontologies)
+  3. make load_schema (loads SQL schema into database)
+  4. make prepdb      (loads basic data)
+  5. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
 
@@ -522,8 +523,9 @@ WriteMakefile(
 #          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
           'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
           'load/bin/load_ontology.PLS'   => 'load/bin/gmod_load_ontology.pl',
-          'install_util/conf_install.PLS'     => 'install_util/conf_install.pl',
-          'install_util/src_install.PLS'      => 'install_util/src_install.pl',
+          'install_util/conf_install.PLS'    => 'install_util/conf_install.pl',
+          'install_util/src_install.PLS'     => 'install_util/src_install.pl',
+          'install_util/log4perl.conf.PLS'   => 'install_util/log4perl.conf.pl',
     },
     EXE_FILES             => [
            'load/bin/gmod_genbank2gff3.pl',
@@ -555,7 +557,7 @@ sub MY::clean {
 sub MY::install {
   package MY;
   my $inherited = shift->SUPER::install(@_);
-  $inherited =~ s/doc_install/doc_install conf_install src_install/;
+  $inherited =~ s/doc_install/doc_install conf_install src_install log4perl.conf/;
   $inherited;
 }
 
@@ -579,6 +581,9 @@ conf_install ::
 
 src_install ::
 	\$(PERL) \"$working_dir/install_util/src_install.pl\"
+
+log4perl.conf ::
+	\$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" $root
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh
