@@ -144,6 +144,12 @@ Here is a suggested term:
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <!-- oct04 : intron here only temp. till fix chadodb intron calculator; offbyone now 
     is 5/3prime like calc-feature offbyone?
+    feb05: possibly the 0-base insertion sites are origin_one; min==max
+2L      67576   67576           1       transposable_element_insertion_site     P{EPgy2}CG11371[EY
+04764]  FBti0039195     4547923 synonym P{EPgy2}CG11371<up>EY04764</up>
+2L      80708   80708           1       transposable_element_insertion_site     P{EPgy2}EY09207 FB
+ti0039584       4548312 synonym P{EPgy2}EY09207
+
     -->
   <origin_one
     chromosome_arm="1"
@@ -151,6 +157,7 @@ Here is a suggested term:
     chromosome="1"
     golden_path="1"
     NOTNOWintron="1"
+    transposable_element_insertion_site="1"
     />
 
   <topsort

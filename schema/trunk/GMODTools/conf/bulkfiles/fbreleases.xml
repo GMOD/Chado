@@ -1,6 +1,6 @@
 <opt
   name="fbreleases"
-  date="20041119"
+  date="20050120"
   >
  
   <title>FlyBase data release definitions</title>
@@ -18,6 +18,13 @@
 
   </about>
   
+  <release id="41" 
+    rel="r4.1"  
+    dbname="chado_dmel_r4_1_8"  
+    relfull="dmel_r4.1_20050207"
+    date="20050207" 
+    release_url="/annot/dmel_release4.1.txt"
+    />
   <release id="4" 
     rel="r4.0"  
     dbname="chado_dmel_r4_0_3"  
@@ -65,6 +72,29 @@
     />
     
     
+    <!-- 
+    From: cdsmith <cdsmith@fruitfly.org>
+    Date: Mon, 10 Jan 2005 12:30:09 -0800
+    I have updated XML for you for Release 3.2b ..
+    Release3.2b_01102005 
+    heterchrom/chado_dmel_h_r3_2b.gz for pg dump
+    -->
+  <release id="h3b2"
+    rel="hetr32b2"
+    dbname="dmelhet_r32b2_chado"
+    relfull="dmel_hetr32b2_20050110"
+    date="20050110"
+    release_url="/annot/dmelhet-release3.2b2.html"
+    />
+
+  <release id="h3b"
+    rel="hetr32b"
+    dbname="dmelhet_r32b_chado"
+    relfull="dmel_hetr32b_20041025"
+    date="20041025"
+    release_url="/annot/dmelhet-release3.2b.html"
+    />
+
   <release id="h3" 
     rel="r3_2h"  
     dbname="chadohet_081604" 
@@ -73,7 +103,24 @@
     release_url="/annot/dmel_het_release3.2.txt"
     />
     
-    
+<!--
+Date: Wed, 8 Dec 2004 10:36:08 -0500 (EST)
+From: Peili Zhang <peili@morgan.harvard.edu>
+Subject: pg dump for updated dpse r1.0 data
+To: don@morgan.harvard.edu
+.. updated 16 dec 04 
+i just put the postgres dump for the updated dpse r1.0 data on our ftpsite 
+(ftpsite@flybase.harvard.edu), the file is by the name 
+chado_dmelr3_2_dpse_30_reporting.gz in directory 'dpse_r1.0_120804'. 
+-->
+  <release id="p4" 
+    rel="r1.04"  
+    relfull="dpse_r10_20041216"
+    dbname="dmelr3_2_dpse_30"
+    date="20041216" 
+    release_url="/annot/dpse_release1.04.txt"
+    />
+
   <release id="p3" 
     rel="r1.03"  
     relfull="dpse_r10_20041108"
