@@ -20,19 +20,22 @@ create table feature (
        md5checksum char(32),
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id),
--- timeentered and timelastmodified are for handling object entry/
+-- timeaccessioned and timelastmodified are for handling object accession/
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
 -- The expectation is that these fields would be available to software 
 -- interacting with chado.
-       timeentered timestamp not null default current_timestamp,
+       timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
 
        unique(organism_id,uniquename)
 );
+create seuqence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
 create index feature_idx1 on feature (dbxref_id);
 create index feature_idx2 on feature (organism_id);
 create index feature_idx3 on feature (type_id);
+
+
 
 
 -- ================================================
