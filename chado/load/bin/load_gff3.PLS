@@ -26,15 +26,33 @@ $| = 1;
 
 =head1 NAME
 
-load_gff3.pl - Load gff3 files into a chado database.
+gmod_load_gff3.pl - Load gff3 files into a chado database.
 
 =head1 SYNOPSIS
 
-  % load_gff3.pl --organism Human --srcdb 'DB:refseq' --gfffile refseq.gff
+  % gmod_load_gff3.pl --organism Human --srcdb 'DB:refseq' --gfffile refseq.gff
 
 =head1 DESCRIPTION
 
-See the notes; there is plenty there.
+The gmod_load_gff3.pl script takes genomic annotations in the GFF3 format
+and loads them into several tables in chado.  (see
+L<http://song.sourceforge.net/gff3.shtml> for a description of the format).  
+There are two types of data tags in GFF3: those that are part of the
+specification, and those that aren't.  There is a short list of those that
+are part of the spec (ie, reserved)  They include ID, Parent, Name, Alias,
+Target, and Gap.  Tags that are part of the spec are first letter capitalized
+and all other tags are all lower case.  All tags that are part of the spec
+are handled as special cases during the insert, as well as some non-spec
+tags.  These include 'description', tags beginning with 'db:' or 'DB:',
+and tags beginning with 'cvterm:'.  All other tags are inserted into the
+same table (featureprop).  If that is not the desired behavior for a given
+tag, you may look at modifying the load_custom_tags subroutine.  If you
+have a modification that you feel might be particularly useful, please 
+email your suggestion to the authors.
+
+(Note that this behavior might better be module-ized, so that we could 
+provide an empty 'custom tag processing' module, that if installed, would
+provide addtional processing of custom tags.  Add it to the todo list.)
 
 =head2 NOTES
 
@@ -254,9 +272,18 @@ print "\n$feature_count features added\n";
 my $seqs_loaded = load_sequences();
 print "\n$seqs_loaded sequences added\n";
 print "Done\n";
+exit 0;
 
+=pod
 
+=head1 load_custom_tags
 
+Handles inserting non-reserved tags into chado.  Determines if the tag
+falls into a short list of tags for custom handling and deals with them
+appropriately.  If the tag is not on the list, the information is placed 
+in the featureprop table.
+
+=cut
 
 sub load_custom_tags {
    my $gff_feature = shift;
@@ -349,6 +376,14 @@ sub load_custom_tags {
    }
 }
 
+=pod
+
+=head1 load_ID_tag
+
+Loads ID tag values
+
+=cut
+
 sub load_ID_tag {
   my $gff_feature = shift;
   my $chado_feature = shift;
@@ -380,6 +415,14 @@ sub load_ID_tag {
   #}
 }
 
+=pod
+
+=head1 load_Note_tag
+
+Loads Note tag values to the featureprop table.
+
+=cut
+
 sub load_Note_tag {
     my $gff_feature   = shift;
     my $chado_feature = shift;
@@ -398,6 +441,16 @@ sub load_Note_tag {
         );
     }
 }
+
+
+=pod
+                                                                                
+=head1 load_Target_tag
+                                                                                
+Loads Target values.  These are used for alignment information.
+                                                                                
+=cut
+
 
 sub load_Target_tag {
   my $gff_feature = shift;
@@ -447,6 +500,16 @@ sub load_Target_tag {
   }
 }
 
+=pod
+                                                                                
+=head1 load_Parent_tag
+                                                                                
+Loads Parent tag values.  These are used to denote a parent feature
+of the given feature.
+                                                                                
+=cut
+
+
 sub load_Parent_tag {
   my $gff_feature = shift;
   my $chado_feature = shift;
@@ -469,6 +532,15 @@ sub load_Parent_tag {
     }
   }
 }
+
+=pod
+                                                                                
+=head1 load_Alias_tag
+                                                                                
+Loads Alias tag values.  These are used for synonyms.
+                                                                                
+=cut
+
 
 sub load_Alias_tag {
   my $gff_feature = shift;
@@ -496,6 +568,15 @@ sub load_Alias_tag {
     }
   }
 }
+
+=pod
+                                                                                
+=head1 load_Name_tag
+                                                                                
+Loads Name tag values.
+                                                                                
+=cut
+
 
 sub load_Name_tag {
   my $gff_feature = shift;
