@@ -136,7 +136,7 @@ create table pubprop (
        value text not null,
        rank integer,
 
-       unique(pub_id,pkey_id,value)
+       unique(pub_id,type_id,value)
 );
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);

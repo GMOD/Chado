@@ -36,12 +36,12 @@ create table dbxref (
        dbxref_id serial not null,
        primary key (dbxref_id),
        db_id int not null,
-       foreign key (dbname) references db (db_id),
+       foreign key (db_id) references db (db_id),
        accession varchar(255) not null,
        version varchar(255) not null default '',
        description text,
 
-       unique (dbname, accession, version)
+       unique (db_id, accession, version)
 );
 
 --
