@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.22 2004-04-07 20:11:09 scottcain Exp $
+$Id: INSTALL,v 1.23 2004-04-30 21:00:47 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -22,15 +22,25 @@ Prerequisites:
   PostgreSQL (currently, developers are using 7.3.2, but should transition to
   7.4 soon). Items to do with postgres to make it ready to go:
 
-    * make it accept tcp/ip connections by adding this line to postgresql.conf:
+    * make it accept tcp/ip connections by adding this line to postgresql.conf
+      (must be done either as user root or postgres; database must be restarted
+      in order for this change to take affect):
+
         tcpip_socket = true
 
-    * create a database user with permission to drop and add databases:
-        psql> CREATE USER <username> WITH CREATDB;
+    * create a database user with permission to drop and add databases;
+      the database user name should be the same as your unix user name to
+      allow the software build to progress smoothly (must be done as user
+      postgres; createuser is a commandline program that comes with the
+      PostgreSQL package):
+        
+        # createuser --createdb <your username> 
 
     * tell postgres that it can use the plpgsql language (either as user
-      postgres or as the user created above):
-        # /usr/bin/createlang plpgsql template1
+      postgres or as the user created above; createlang is a commandline
+      program that comes with the PostgreSQL package):
+
+        # createlang plpgsql template1
 
     * edit the pg_hba.conf (either as the user 'root' or 'postgres') to give
       the user created above permission to access the database.  Read
@@ -48,7 +58,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
          http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
 
       the two most critical parameters to tune are shared_buffers and
-      effective_cache size.  adjusting these parameters may require
+      effective_cache size.  Adjusting these parameters may require
       modification of memory settings in /etc/sysctl.conf, see the sysctl
       manpage for details.
 
@@ -80,7 +90,15 @@ host    all         all         127.0.0.1         255.255.255.255   trust
 
 This document describes how to install the Chado schema:
 
-1.  First, you must should set the following variables in your environment:
+1.  First, you must should set the following variables in your environment.
+    If you are using bash or a bash-like shell, this is done via a command
+    like this:
+
+       $ export VARNAME=value
+
+    If you are using a csh-like shell, it is done like this:
+
+       $ setenv VARNAME value
 
    * GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
 
@@ -290,3 +308,8 @@ version number for the 'x's):
     $ cd Generic-Genome-Browser-x.xx.tar.gz
     and follow the instruction in the INSTALL documentation.
 
+After installing GBrowse, go to 
+
+  http://localhost/gbrowse/docs/pod/README-chado.html
+
+for more information on configuring GBrowse to work with chado.

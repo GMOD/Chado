@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.60 2004-04-10 00:06:01 allenday Exp $
+# $Id: Makefile.PL,v 1.61 2004-04-30 21:00:48 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -514,9 +514,13 @@ print <<HERE
 Makefile written.  Now you should do the following, in order:
 
   1. make             (creates necessary build files)
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+         STEP 2 WILL DELETE ANY DATA IN A DATABASE WITH THE 
+            DATABASE NAME YOU PROVIDED!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
   2. make load_schema (loads SQL schema into database)
-                       NOTE: this will destroy any existing database
-                         with the same name as the one you are creating
   3. make prepdb      (loads basic data)
   4. make ontologies  (loads data for various ontologies)
 
