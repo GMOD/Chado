@@ -30,6 +30,7 @@ gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
  --dbhost      Database host
  --dbport      Database port
  --analysis    The GFF data is from computational analysis
+ --noload      Create bulk load files, but don't actually load them.
 
 Note that all of the arguments that begin 'db' can be provided by default
 by Bio::GMOD::Config, which was installed when 'make install' was run.
@@ -109,7 +110,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $NOLOAD);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -137,6 +138,7 @@ GetOptions(
     'dbhost:s'   => \$DBHOST,
     'dbport:s'   => \$DBPORT,
     'analysis'   => \$ANALYSIS,
+    'noload'     => \$NOLOAD,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -170,20 +172,20 @@ my @tables = (
    "feature_cvterm",#
    "synonym",#?
    "feature_synonym",#
-   "feature_dbxref",#
    "dbxref",#
+   "feature_dbxref",#
    "analysisfeature",
 );
 my %files = (
    feature              => "feature.tmp",
    featureloc           => "featureloc.tmp",
-   feature_relationship => "featurerel.tmp",
+   feature_relationship => "feature_relationship.tmp",
    featureprop          => "featureprop.tmp",
-   feature_cvterm       => "featurecvterm.tmp",
+   feature_cvterm       => "feature_cvterm.tmp",
    synonym              => "synonym.tmp",
-   feature_synonym      => "featuresynonym.tmp",
-   feature_dbxref       => "featuredbxref.tmp",
+   feature_synonym      => "feature_synonym.tmp",
    dbxref               => "dbxref.tmp",
+   feature_dbxref       => "feature_dbxref.tmp",
    analysisfeature      => "analysisfeature.tmp",
 );
 my %sequences = (
@@ -194,8 +196,8 @@ my %sequences = (
    feature_cvterm       => "feature_cvterm_feature_cvterm_id_seq",
    synonym              => "synonym_synonym_id_seq",
    feature_synonym      => "feature_synonym_feature_synonym_id_seq",
-   feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
    dbxref               => "dbxref_dbxref_id_seq",
+   feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
    analysisfeature      => "analysisfeature_analysisfeature_id_seq"
 );
 my %copystring = (
@@ -206,8 +208,8 @@ my %copystring = (
    feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
    synonym              => "(synonym_id,name,type_id,synonym_sgml)",
    feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
-   feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
    dbxref               => "(dbxref_id,db_id,accession,version,description)",
+   feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
    analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance)",
 );
 
@@ -479,7 +481,7 @@ while(my $feature = $gffio->next_feature()){
       my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
 
       #enforcing the unique index on dbxref table
-      if {$cache{dbxref}{"$database|$accession|$version"}){
+      if($cache{dbxref}{"$database|$accession|$version"}){
           print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
           $nextfeaturedbxref++;
       } else {
@@ -658,33 +660,36 @@ close FDBX;
 close DBX;
 close AF;
 
-foreach my $table (@tables) {
+if(!$NOLOAD){
+  foreach my $table (@tables) {
     copy_from_stdin($db,$table,
                     $copystring{$table},
                     $files{$table},
                     $sequences{$table},
                     $nextvalue{$table});
-}
+  }
 
-$db->commit;
-$db->{AutoCommit}=1;
+  $db->commit;
+  $db->{AutoCommit}=1;
 
-warn "Optimizing database (this may take a while) ...\n";
-print STDERR "  (";
-foreach (@tables) {
-  print STDERR "$_ "; 
-  $db->do("VACUUM ANALYZE $_");
-}
-print STDERR ") Done.\n";
-$db->disconnect;
+  warn "Optimizing database (this may take a while) ...\n";
+  print STDERR "  (";
+  foreach (@tables) {
+    print STDERR "$_ "; 
+    $db->do("VACUUM ANALYZE $_");
+  }
+  print STDERR ") Done.\n";
+  $db->disconnect;
 
-warn "Deleting temporary files\n";
-foreach (@tables) {
-  unlink $files{$_};
-}
+  warn "Deleting temporary files\n";
+  foreach (@tables) {
+    unlink $files{$_};
+  }
 
-warn "\nWhile this script has made an effort to optimize the database, you\n"
+  warn "\nWhile this script has made an effort to optimize the database, you\n"
     ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
+
+}
 
 exit(0);
 
