@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chado>
+  <organism id="Drosophila__melanogaster">
+    <genus>Drosophila</genus>
+    <species>melanogaster</species>
+  </organism>
+  <db id="db__Gadfly">
+    <name>Gadfly</name>
+  </db>
+  <db id="db__SO">
+    <name>SO</name>
+  </db>
+  <db id="db__GB_protein">
+    <name>GB_protein</name>
+  </db>
+  <db id="db__FlyBase">
+    <name>FlyBase</name>
+  </db>
+  <cv id="cv__SO">
+    <name>SO</name>
+  </cv>
+  <cv id="cv__relationship type">
+    <name>relationship type</name>
+  </cv>
+  <cv id="cv__pub type">
+    <name>pub type</name>
+  </cv>
+  <cv id="cv__synonym type">
+    <name>synonym type</name>
+  </cv>
+  <cv id="cv__property type">
+    <name>property type</name>
+  </cv>
+  <cvterm id="SO__gene">
+    <cv_id>cv__SO</cv_id>
+    <name>gene</name>
+  </cvterm>
+  <cvterm id="SO__mRNA">
+    <cv_id>cv__SO</cv_id>
+    <name>mRNA</name>
+  </cvterm>
+  <cvterm id="SO__exon">
+    <cv_id>cv__SO</cv_id>
+    <name>exon</name>
+  </cvterm>
+  <cvterm id="SO__chromosome_arm">
+    <cv_id>cv__SO</cv_id>
+    <dbxref_id>
+      <dbxref>
+        <accession>SO:0000105</accession>
+        <db_id>db__SO</db_id>
+      </dbxref>
+    </dbxref_id>
+    <name>chromosome_arm</name>
+  </cvterm>
+  <cvterm id="relationship type__partof">
+    <cv_id>cv__relationship type</cv_id>
+    <name>partof</name>
+  </cvterm>
+  <cvterm id="SO__protein">
+    <cv_id>cv__SO</cv_id>
+    <name>protein</name>
+  </cvterm>
+  <cvterm id="pub type__computer file">
+    <cv_id>cv__pub type</cv_id>
+    <name>computer file</name>
+  </cvterm>
+  <cvterm id="synonym type__synonym">
+    <cv_id>cv__synonym type</cv_id>
+    <name>synonym</name>
+  </cvterm>
+  <cvterm id="relationship type__producedby">
+    <cv_id>cv__relationship type</cv_id>
+    <name>producedby</name>
+  </cvterm>
+  <cvterm id="property type__owner">
+    <cv_id>cv__property type</cv_id>
+    <name>owner</name>
+  </cvterm>
+  <cvterm id="property type__sp_comment">
+    <cv_id>cv__property type</cv_id>
+    <name>sp_comment</name>
+  </cvterm>
+  <cvterm id="property type__protein_id">
+    <cv_id>cv__property type</cv_id>
+    <name>protein_id</name>
+  </cvterm>
+  <cvterm id="property type__sp_status">
+    <cv_id>cv__property type</cv_id>
+    <name>sp_status</name>
+  </cvterm>
+  <cvterm id="property type__cyto_range">
+    <cv_id>cv__property type</cv_id>
+    <name>cyto_range</name>
+  </cvterm>
+  <cvterm id="property type__gbunit">
+    <cv_id>cv__property type</cv_id>
+    <name>gbunit</name>
+  </cvterm>
+  <_appdata name="title">CG10833</_appdata>
+  <_appdata name="arm">2L</_appdata>
+  <_appdata name="fmin">5205478</_appdata>
+  <_appdata name="fmax">5217450</_appdata>
+  <_appdata name="residues">AAGCTAAATTTCAAGTAAGAAAAATTTAAACAAAAAAATGTTGAATATCGAAATGGAAGAGTTGTACATTTGTGTAGTTTATCACATTTTGTAATTGTATGTAATTTTATAGTCATTCGATAGCTAGAGGCATTAATAAAACAACCAATTTGTATATAACCTACTGAACCGAACAGACTCGACAAGCCGAACATGAAACACGTAAAAGAATTAAACAAAAAAATAAAAAGAAACAGAATGAACTAACTATTCAAACTAACGACAAGTAACCGAAACCCTTTTGTAAAACGATATATACATTATACATATATATTTGCACAGCAAACAATTTATATATTCATATATACCCACGTATATGATCCCAAAAAAACTATAGAGAACCCAAACATTTTGTATATAAAAATATCTAAGCTAAAACGAAATCAAAATACGCACACGAACATTTTACTCATCAACGCACGTTTTCGCATTTAGAGAGATCCTGGGCAGCAGAAAATTGCGATTAGCATCCTGCCAATTTCGTGGAACATTTTCGCAGGATATGATCTCAAGTTCCTGCTGCCAGCGATGGGCTAGAAAGGCAAACGAAATCCCAAGACAAAATCATGACCCACATAGACCAATCGCCTGGAGATCCTCATGGCAACCAATGTTCCTAGTTTCCAGCGCGTCCTTCTCCCAAACTCAGGGCTATGCTGTCAACAGTGGGCATTGACCTCCATTTGGACTCCGGCTTCTAAAGAGACCCCGTGTCAAGAAGGATCACTCTACCCAAGGCCAAGATCTCTCCCACGGCCAAGGGTTAGATGGGATAGCAGCCAGTGCGCCAGCCACAGGTCACTGGGCTCGAAATCAATCCTTAAACTCCATCCCGACACTGGGGCCTAGACATTTCAAGCATTCCTGATACTCATTTCCAAATTACCAATAGACATTGACCATCGAAGCCAGCTCTCAAAGAAAAGAAAATGGAAAACGTGCGTGCCACGAGCATTGAACAAAACGAAGCAAGTGTCCTATGCCGGTGCTAAACCAACCTACAAATTTTCTGTATAAAGAAAAAATGTAAAATGCGTATACAAAAAACAAAAATATTATGAATTCATAAAAGAAGAGATTAATTCTTTGAAAAAAAAAAATCGTAAAAATGCAATATGCATATTGACAAGTGACGTAAGTCCATCCAGTAAAAGATACCTATTTTGTTGTTAATATTTTTTGATAATCCTAATTATATTTGCCTTATACTTATCCAACTTGTTTATTACAACTATTTTCTATTATTTAATGCTTGGCCAATTATTATTGAGAAAATACATACATTTATTTATTAGGCCTATGAACGATTTACTATGTATAAAATTAAGTTTGATTTAAATGTTAAATTTGTGTACTTTGCTGCTTCTATCTGGTTATGAAATAATTAGCCGTTATCGAGTTAATATAATTTATGTAGCATTTTAAGATTTCCTTTCTTGTGAACAACTGTACCTTTATATGCATTATGATTATTAAAAAAAAAAAAAACAAATAAAAAATAAAACACATTGTTTTTTTTATACCTTTGAATTTATGTCTGCAGCTCTATTGACATAACTATATACGTTTTGGTTTTACAGGTTTCATGCTTATCGATATTTTATTACCTATCTTGTTTAATTGACTTTTGATCGAGCGCTACGAGATTAATGCAATCAGACTAAAAAAAAACAAACAAATTTTAAAAGAGGAAATTTATTAAAATACGATTAGATTGCTTCCAGCGCGTGTCTATTTTTTTGGCATAAATATAGGCCCCTGCGTTAATCTGTAGCCCATAAGCTTCCAACATGTGCCCAGTAACTACATTTCTTGTCCTCGTGCTGACCCTGTTGGTTCTGGTCTACGTGTTTCTGACATGGAACTTCAACTATTGGAGAAAACGTGGCATCAAGACGGCTCCCACATGGCCATTTGTTGGAAGTTTTCCCAGCATTTTCACAAGAAAGCGAAATATTGCCTACGATATTGATGATATCTATGAGTATGTATACAATATGAGTGAGAAGGGCAAGCTATAGTTATGTTGTATAATAGTGGAGTCAAAGCGCAGTTTATACTTAATGGGTGTAAAAATCAGAACAGTCTTCTCTAGAGCTAATATAAGTTACTTTTTGATGTGAACTTTTTGTTTTTGCAGAAAGTATAAAGACACGGACAATATGGTGGGCGTTTTTACCACCCGAGTGCCCCAATTGCTGGTCATGTGTCCGGAATATATACACAAGATCTATGCAACCGATTTCCGTAGCTTTCATAACAATGAATGGCGTAATTTTGTAAGTACTCGTAAGTTTAGTAAATAATGGATAATCCATTACTGAATTACAATGTTCATAGGTGAACAAAAAGACGGACATGATATTGGGCAACAATCCGTTCGTGTTAACTGGCGACGAGTGGAAGGAAAGAAGGTCGGAGATCATGCCAGCACTGTCCCCCAATCGAGTAAGGAACCACATTAACCATCTATCCAATCAAAATTCTATCTTTGAATTCCGTAAGGTCAAGGCCGTTTATCCAGTATCGCAGAGCGTATGCAAAAAGTTCGTGGAATATATCAGGCGACAGCAGCAGATGGCCACCTCCGAGGGATTGGACGCCATGGATCTGTCTCTTTGCTACACCACCGAAGTAGTTTCCGACTGCGGACTGGGAGTATCGGCCCAGAGTTTCACGGACACTCCCACGCCGCTGTTGAAAATGATAAAGCGTGTGTTCAATACCTCCTTTGAGTTCATCTTCTACAGCGTTGTTACCAACCTGTGGCAAAAGGTGCGCAAGTTCTACAGCGTACCGTTCTTCAACAAGGAAACGGAAGTGTTCTTCCTGGACATCATCCGGCGATGCATTACTTTGAGACTGGAAAAACCAGAGCAACAGCGCGACGATTTCCTCAACTATATGCTGCAGTTGCAGGAGAAGAAGGGCCTGCACACGGATAACATCCTGATAAATACGATGACCTTCATTCTAGACGGATTCGAGACTACGGCTCTAGTTCTAGCGCATATTATGCTGATGCTGGGACGTAATCCGGAGGAGCAAGATAAGGTCCGCAAGGAAATTGGCAGTGCGGATCTGACCTTTGATCAAATGTCCGAGCTTCCGCATCTGGACGCCTGCATATATGGTGGGAAATTCTATCTTGATCTCTTGATATTCAGTTTCTTTAACTACATTATAAAATTTTATAATTTTAGAAACTTTGCGTTTGTTTTCACCGCAAGTTGCAGCACGTAAGCTGGTCACCGAACCCTTTGAGTTTGCGAACAAGAACGGACGCACTGTGCACTTGAAACCCGGAGATGTGGTTACTATACCGGTAAAAGCTCTGCACCACGATCCGCAGTATTATGAGGATCCTTTGACATTCAAGCCGGAACGTTTCCTTGAGAGCAATGGAGGTGGTATGAAAAGTTACAGAGACAGGGGTGTTTACCTAGCTTTTGGCGATGGACCTCGTCACTGTCCAGGTTGGTGTTATAAAAATTTATCTGAAAATCACATACTACAATAAGTCGATCTCTACATTTAGGAATGCGATTTGCGCTGACTCAACTTAAAGCAGCTCTGGTGGAAATCTTGAGGAACTTTGAAATCAAGGTTAATCCTAAAACCCGCTCGGACAATCAGATAGATGATACTTTCTTCATGGCCACCTTGAAGGGTGGTATTTACCTGGACTTTAAGGACCTTTAAATAATAGCAATAATCATAGTAAGCTTTAAGCTTAAAAAACTGGATAAAGAGAAGTTGTTTGCTCGAAATAACAAAAATTAAAATTAACCTTGATTAATGCATGATAATAAAAAAAAAATAAAATGCAGTAGAGATTTATTACTCAAGAAAGGCAAATGTTGCGGATGATCCACAACAAGGCTCGATCGAACATGGTTCGACAGTGATGTTGCATGCGCAACAAGTTCGATTGCTAGTGCGCAACATGTCGGTTGTAGGTTGGCCATCCGATTTTAAATACTTGCAAGATATAAGATTTAATTGAGATTTTATAATAAAAAGTAATAAGAATTATAGAATTATAGATCAAGGGGTGTATAAAGAATATAAAGAAATCGATTCACCATCATAGGCATCTCAAGGCTCAAGCTCAAGGGCAGTTTTGGTGGAGATCGTAAGAAATTTCGAAATCAATGTAAACGTCAAGACGCGATCGGATAATCGACTGAATGACATCTGCTTGACGTATTTTGAAGAGCGATAGTAAAATGGCTGAAGTGTTGTTGTAAGTGTTGATAAGATAATGCGCCAATTAAAAATGAAATCAGAAATTTGATTAACTACTTAGGTGCTACACACATTGTTTGTCCAGAGTATCTATACCCATTACTCGTTAAATGAAAATGGGTATGTTGTATTCCTAGAAAAGTATGCAACTGATAGATGGACCTTCTGAATACGACACATTGTTTTTTGTTTTCATCAAGCATCGCACTTTGCAATCCTACTTATTTATTTAAAAGTCGATACATTGCTATTTTTCCTTTAATTGTTTATGGTTTATGTATATGTCGTTTAATTTCACAACCGTTTATTCCATTTCTCTATGCTACTAAAACCGTTCCCTTAAAACACATCTTTATCTGCGTGCTTTAGATACATATGCCATGTACAATAATTGTAAGTTTGAGCACTTAGTGAAATGACAAGCTGAAAAGTTCTGTTTCATCGTCATATCATAAAATGGCTTTTCTTAACAGTTTTTGTACTACTACTTTGTGGCGCATGACCTAGGACTAGGTATATTGTAGCCCCTTGATCTTGATAACGAAATCAGGCATTATCTTCAAATGGTGCAATTTTATATACGACAAATATTAACAGCGGTGGTGAATGCAATTTGATCAATTTGTTTACTGGGTGAATCCATCCACTTGACTGGCGCGCAAGTTCAATTTAAATGACTGCGGCAGCTCAATTGAGTTCCAGTTGGTTTTCATCCGCGTTGGCGAGAGGTTGTGCCATGTGTCCGATTTCCACGGCTCTTTTTGTAATTGCGGCCATCCTGGCCTTGATCTATGTCTTTCTAACATGGAACTTTAGCTACTGGAAGAAGAGGGGCATTCCAACGGCCAAGTCATGGCCCTTTGTGGGCAGTTTTCCCAGCGTTTTCACCCAGAAACGGAACGTAGTCTACGACATCGATGAGATCTATGAGTAAGTGTATAGAGTTAGCTACGTTATCTGGTTACTGATTGCATCATCTCATTAGGCAGTACAAGAACACCGACAGCATTGTGGGAGTGTTTCAAACCAGAATTCCACAACTAATGGTCACAACTCCGGAATATGCGCACAAGATATATGTTAGTGACTTCCGCAGCTTCCACGACAATGAGATGGCTAAGTTTGTGAGTAGATTGCAAATACATACTGGTCTTAGGAGCCCATTTCATAAGTTAATTCACACAATAGACCGACAGCAAAACGGATCCCATTTTGGCGAATAATCCGTTCGTATTGACTGGTGAGGCCTGGAAAGAAAGACGCGCCGAAGTTACACCCGGACTTTCGGCAAATCGGGTAAGCTTAGGTTGCCCTCGAATTGTTTATTCAAAACTTATCTCGTGCTAATGTTTATTTTCACTGGGGGCCCTGATACCCTTATCAATTGAAGTGCTCCAATCAATTAACGCTCTGCCTCCCCAAAAGGTCAAAGCTGCCTATCCCGTCTCGCTGCGCGTTTGTAAAAAGTTTGTGGAATATATAAGGCGACAGAGCCTGATGGCCCCCGCCCAAGGACTAAATGCGAAGGATCTCTGCTTGTGCTACACCACCGAAGTGATTTCCGATTGTGTCCTGGGCATTTCCGCCCAGAGTTTCACGGATAATCCCACACCCATGGTGGGAATGACCAAGCGCGTCTTCGAACAGTCTTTTGGCTTCATTTTCTACACGGTGGTCGCCAATCTATGGCCACCAATCACGAAATTCTACTCCGTTTCGCTGTTCGCCAAGGACGTGGCTGCGTTCTTCTATGACCTCATGCAGAAGTGCATCCAAGTTCGGCGGGAAAGTCCGGCGGCACAGCAGCGAGATGACTTCCTCAACTACATGTTGCAGTTGCAGGAGAAAAAGGGACTGAATGCGGCGGAGCTGACCTCGCACACAATGACATTTTTAACGGACGGATTCGAGACCACCGCACAAGTGCTTACCCACACACTCCTTTTCCTGGCACGCAATCCCAAGGAGCAGATGAAGTTGAGGGAGGAGATCGGTACCGCCGAGCTGACCTTTGAACAGATAAGTGAGCTGCCCTTCACCGAAGCCTGCATCCATGGTGAGTTTTTTGGCGAAATCTGAAGTTATTTAGTATGCGTATAATATCTATATCTGCAGAAACTTTGAGAATTTTCTCACCTGTTCTGGCTGCCCGCAAGGTGGTAACTGAGCCCTGTGAACTGACGAACAAAAACGGAGTGAGCGTGAAACTGAGACCCGGGGATGTAGTCATCATTCCTGTGAACGCCTTGCACCACGATCCCCAATACTATGAGGAACCTCAATCGTTCAAGCCCGAGCGATTCCTGAACATCAATGGCGGAGCCAAAAAGTACAGAGATCAGGGTCTATTCTTTGGGTTTGGCGATGGACCACGTATTTGCCCCGGTGGGTAACATCATTTTTGAAACAATTAAAGTTACTAAAAAAAATCTATGCATAATTTGTAGGTATGCGGTTTTCACTTACCCAAATCAAAGCTGCCCTGGTGGAAATCGTGCGAAACTTCGACATCAAGGTTAATCCCAAAACTCGCAAGGATAATGAAATTGATGATACCTACTTTATGCCAGCCTTAAAAGGCGGCGTTTGGCTGGATTTTGTTGAACGCAATTAGTTATTCAATAATGTTACGACTTTATATTAAATATAGTTTATCCAGTTGCATACATGTTATATTTCCAAACACTCTTAATACTTTAATTTTGTAACTTAAAACCACACTTTTAGTCTCGACTTAGGGCTAGTTGCACTAGGGGCAGCACCTTGATAGAGGACAAGTCTGCCAGAATCGCTTCGATGCTATCCAACGAGGCCACCTGCATGATGCTCTCCTTTCGAAAGCTAAGAATGATGATGGCGAATAGAGGAAGGATCTCCAAGCTATCAAAGCCAAGGATCTGAAAAGGAAGGGATAAGTACTGCCAATAAGAACGGAGGTGTATTTCGTACCAGATCCCAGAGGACCAGCAATTGATCGGGAGGCAAATGTCCGGAAAACGCTCGCATAAGCCATTTGAAGACCACCCGCAGGCTAAGGAAAGATATGTCGTGAAATGGGTGAAATAGCTGTCTAACGAAAAACCCAATCCCAACTCACGGCTGTATCTGAAGCTCTCGGAAATGGGACCATAACTGCGGTTCGTATGTCTGCAGCAGCTTCTCGAAGAGCAGGCACAGACTGACAATCCCTTGAGGATGCGTGTTTATGGTGGTCAAGCGATGGCAGTACCGGATATAGAAGGCCCGGAATGTATAGTATAGACTCACCGGCGAGTCATACAGATAACAAAAGGGGGCGGCAAACATGCAGATGCCGTGGAAGGGCACCACACCCGATGGAGGACCTTCGTAGGTCTTGCCCTTCACCGGAAACGTCTCGTATTCCACACATCCACCGATATCGGTGTCCCGAGAAAAGCAGAGCAGCACCTGGTAGAGCACGTCCTCGAACACAAAGTACTGGTCGTCGTTGGAGGCCGTCAACTGAATGTCCTTGAAGACCAGTTTGTCAACGATGTGATCCGTAGTCCAAACGGCATTGCGCAGCTTTTGCCAGTACTCAATATCCTTCGGGGGTATAGAGATGTATAATGAGGTTATTGATCCCAAAATCAGTAGTTACGTAGTCATGTAGCTTGCTGTCCAGCACCGAAGCCCAGAGAGCTCCCCTATAAGGTGCGGGTGTGCAGCCCTTCTTCAGAAACTGCTGGCACATGGGCGCATGCCTGGCCTCCAGAATCCTCTGGCACTGAACCGTAAGATCCGGCACTCCCAAATAGCTATCACTTCGCAGCAGATCCGCGTAGTGGGCACGCAGCTCGAAAAGATTTTTCACAGGTAGTGCAATGTGGGAGAACTCCCATTGGGGGATTTGACTAATGAGCAAAATGATTATTTACCTGACTGATTTAAACCAAAACTTACTCTGTATTTTCAGTGGTTTTGGCGGGTCCTTTTAGCGAGAGTAGCACCTCCAGTAAATCCTTTGGAGCGTAAACAGGCCTATAGTTGGCCAGATCTAGAAGTTTAACCATGGTTAATTGTTAGCTTCAATATTTACGAAATGCCTACCCATATTGTAGTTGCTCAGTTCGTTCCACTTGGCCATAAAGTCCTCGCGATCAGCACTGATCCTTGGTTGTCCATGCAATGGAACCTTCAGCTCTGTACACATGGCATTCAAACTCTTCCTAACCCTTCGATCCCAAAGCACACCAGCTCTTTTTAAATATCCAAGTGGATCACTAACGGTGGGTTTCTATTGGAAAATATAGACATAAGTAAAGAACTATTTAATTCATTTTCCCTAGCACTACATACTACTAATACCCCTAAGGCTAACTCTATAGTTGTGGCACTTCGAGATCTTCCGGTATTATGTATCATTATAATTTGTTTTATAAACGTTAAGGTATAAAATAAAATTTTGCCAATAAAGTCAAAAAGTAGAAAATGATAGGAGCAGCATGGAATACTTTTAAATACCACTCCAATTATTCTAAATTCAATTACAAGAAATTTGATAAATTGTATCTTAAAAGTTGTACCCACCGCTCCCTGTTTGTTGGCCAGGTTTTTGTCATCTGTTTTCGACAGCCGCGTGCGGACCAGGTTGTAGACAATATTCCGGATCTCCGTCTCCAGTCCGGCGCTCTTGATGGCATCCTCGAGGGTGTTGCGCATATCGTGAGTATCTACGCTGGGATTGCAGACCAGCTTCTGCAGCTCCTTGTAGATGGGCTCGTAGCTCTTAGTGTTCTTGATGGCCGCGATTACCTTTGCGGTCATATGGTGGATGCTGGCATCCTGCAGCTCCTCCATGCCGATAGCTCCTTGACCCGACCGTTCTTTCTACGTATTACTCTGCCACTGACTACCAACTAACTATTTACACCGTTTTGATACCGATTAGCCCCAAAACTTTGGGCGCTCCTAACTCCGTCGTTTGACTTTTATCGATCAAACTCCGTCGCCTGCTTTGATTTGGAGTCGATTCGATTCCGAGTCACATCCTCGGTTGTCGTCGCTTCTTGGCGACGGAATGCAAACACTTGTTTGGCTGCTAGTTTCGCGTTAGTTGTGATTTGATTCGTTCGTTTTGCCGCCCCTCGCAACCAAGAAATTCCATTATGTTTCGTTTCGAATGAAAAGCCAGAGGCGCGTGAAATTGCTTTCCATATACATTTATTTTCACGCACACCGAAACACGCTGAAACTGAAACTGAGTGGCGGCAACTTTTCCTTTTTCTTGGCATCTGTCACCTGGCCCAACGAGTTGTTGACGTGGTCGTCGGGTTGGCTCCTCCTGTTGATTGCGAAGGTGGGCCAAACTCACCTGAACATGTCAGAGTGTCGAAAGTATTTCACCTGAATATTTAGACCAGGCCGAAATATGATTTTGAAATGGCAAAAATTTTTACACGAAAATAGAGATATATAATCCTCTATGTGGTACATTATTCAATGTTTATTTATGAATTAAAAATATTCGTTTTAAGATTTGGATAGCATCCCTTACTACGTTCCAATCAATTTATCTATAATATCATCGTTCACGAAAGTTCGACCTTTTAGTTGGCGGCTTATTGAGGTAAAGTTCTCTCCCTTGGCATAAGGAGGACCATTATTGGTATCCAGAAAATACCTGCCTCTGGCTCTGCAATTAAATAGATAAAAAGAGATCTGGAAAAATAGGTGCTGGCACTTACTTCGGATCCACGTGAAAACCCATCAGCTCTATATTTTTATCAGGAATGCAAATTCCCTTTGCGAAGCTTTTAAAATTGGGACAGTAGAAGCCATAGAATCCAGAAGGTGACGAAATAGACTCGGCATAATAGTCTGCTGCTCGGTTATGGTAGCAGAAATGAGTCTCCACTAAAGTCAGAACAACGAAAATGAAAAATATAGGTAAAGCAGATGGCCTTAATATTACTAACTCTTATTAATGGGTCCGCAGTTGGGCTGTGATACACCCATGTTCAAGTAGAAGTCCACGTGACCCACTGCATCCAGTAAGCCAAGCATCGTGACATCCGTGTGCACGACGTCCACGAACTTGGCATCAGTGGGATCGAGCTTTAGAGCCGGATCCTTGACCATGTAAAATGGTTTTGCCGGATCGAGGGCTGTAATATGCTCCAGCTTGTGTTCCGGAAGAAACTGCCCAATGAAGCCTGCGACATGGGCACCTAAGCCCAAGCCAATTAGGTGCAGATCCTCAATTTTGACCAATCCGCTCTCGAGGAGTACTCGTAGCAACTGAGCAGTACAGCGAGCTACGTATTTGGCATTGTGCACCGCTTCCGTATAGCAGGGTTCATAGGCTAGTTTTGGATAATCCAAGGATATCAAATTGTAATCCTGTGTCAGGAACAGCGGACGTAGCTGGGTATTGGGACTGAAATCGCGGTGCCCGTTGAATCCATGGATCAGAACCTTGAGCGGTTTGTGGTGATAAAATTCAAAACGATTAAGTTCAAAAACTGAAAGCTTAGTTCCCTCCTGATTTTCTTTTCTGCAGATACGGATAGATAATGAAAATCATAGTATAAAACCATTAATCTTACGTGTATAGCCAAAAGGAAATGTTGGCATTGGGACAAATTTCGTTTTGCAGGGAAAAACAGTTCATATCATCTAAGCCAGCAACGAGCATAACACTCGAGAAGCCTAAAACACGATTACTTTATGACTTTATTATTAACTCAGCCTGAATTACCTATTAAGACCAAGATGTTATTCATCATTCTCTTCGATTCCGTTGAGGCCTTTACTGATTTTTTTATTTTCCGACTTTATATGCTCTAGGTTCCATAAAATCTTTTTAATTAAGTTTGTCTCGTTCAACCGAATAAGTAACCGGAAAGCTTTTCTAATTGCAAAATATGTGCATCTGTAGCGCCCAGGGAGGAGCAGTAAAATATTATAGCAGTGGAATTCTGCATAAAAGTTAAATATGATTAAATTATAAAAAGAACAGAAATAGAATTTTAAAAATCAATTTAAAAATAAATAGGAAGTCAGTAATTAATTAATTCGCGGTTGACTTCGCTCCTGGGCAGAACAATTTGCAGTGGTAATTACATCGTAAATCTAGCCTTAAATTTCATGCCACCAAAATGTCAGCGTTCGAATTAGAACTTATGCCACAAGTGTGGCCAACACTCAACTCAAGCTATTTATACAGATACACATTTTGGGCATTGAAAATTATGCAAAAACAATCGAAGTGCCACTGTGTGAGTGCACTGTGGTCGCCAGAGCAACCCAACCCAACCCAACCCAACCCCTCTTCCCATTGTGCCATTCCGTCACCTCACTGGGACATTCCAAATGTGTTTCACGTTTTGTCATAAATAATAAAACTCAAATGACCATCAAAGCCACTACTGTGCGCCTTTGCCAAAAAAAAAAATGCCGCTGCCGGAAGGTTACCCACTCATACAGAACTATCCAAATTCGAATTCGCATCCAAATCCGAACCCATGCCCAAAGAACCATAGCATCCCCCACAATTGGCCTGTCCATCTAGCGTGATGTCCATTTGCCAGCCTGAATGCCTGTTTGTTTGTTTTAAAGCAAAAATCTAAAACCAAATCAACATTTTTCGAGACCAAAGTGGAGAGGATGGAGGTTGAGGATCGGATGGGTGTGTGGTTAACCGCAGCACTAGTGGCTATGGG</_appdata>
+  <feature>
+    <dbxref_id>
+      <dbxref>
+        <accession>CG10833</accession>
+        <db_id>db__Gadfly</db_id>
+      </dbxref>
+    </dbxref_id>
+    <is_analysis>0</is_analysis>
+    <name>Cyp28d1</name>
+    <organism_id>Drosophila__melanogaster</organism_id>
+    <seqlen>1972</seqlen>
+    <timeaccessioned>2004-08-09 15:56:24.057523</timeaccessioned>
+    <timelastmodified>2004-08-09 15:56:24.057523</timelastmodified>
+    <type_id>SO__gene</type_id>
+    <uniquename>CG10833</uniquename>
+    <feature_relationship>
+      <subject_id>
+        <feature>
+          <dbxref_id>
+            <dbxref>
+              <accession>CG10833-RA</accession>
+              <db_id>db__Gadfly</db_id>
+            </dbxref>
+          </dbxref_id>
+          <is_analysis>0</is_analysis>
+          <md5checksum>275f2c58611a9f912c514d896a652470</md5checksum>
+          <name>Cyp28d1-RA</name>
+          <organism_id>Drosophila__melanogaster</organism_id>
+          <residues>CCGCGTTGGCGAGAGGTTGTGCCATGTGTCCGATTTCCACGGCTCTTTTTGTAATTGCGGCCATCCTGGCCTTGATCTATGTCTTTCTAACATGGAACTTTAGCTACTGGAAGAAGAGGGGCATTCCAACGGCCAAGTCATGGCCCTTTGTGGGCAGTTTTCCCAGCGTTTTCACCCAGAAACGGAACGTAGTCTACGACATCGATGAGATCTATGAGCAGTACAAGAACACCGACAGCATTGTGGGAGTGTTTCAAACCAGAATTCCACAACTAATGGTCACAACTCCGGAATATGCGCACAAGATATATGTTAGTGACTTCCGCAGCTTCCACGACAATGAGATGGCTAAGTTTACCGACAGCAAAACGGATCCCATTTTGGCGAATAATCCGTTCGTATTGACTGGTGAGGCCTGGAAAGAAAGACGCGCCGAAGTTACACCCGGACTTTCGGCAAATCGGGTCAAAGCTGCCTATCCCGTCTCGCTGCGCGTTTGTAAAAAGTTTGTGGAATATATAAGGCGACAGAGCCTGATGGCCCCCGCCCAAGGACTAAATGCGAAGGATCTCTGCTTGTGCTACACCACCGAAGTGATTTCCGATTGTGTCCTGGGCATTTCCGCCCAGAGTTTCACGGATAATCCCACACCCATGGTGGGAATGACCAAGCGCGTCTTCGAACAGTCTTTTGGCTTCATTTTCTACACGGTGGTCGCCAATCTATGGCCACCAATCACGAAATTCTACTCCGTTTCGCTGTTCGCCAAGGACGTGGCTGCGTTCTTCTATGACCTCATGCAGAAGTGCATCCAAGTTCGGCGGGAAAGTCCGGCGGCACAGCAGCGAGATGACTTCCTCAACTACATGTTGCAGTTGCAGGAGAAAAAGGGACTGAATGCGGCGGAGCTGACCTCGCACACAATGACATTTTTAACGGACGGATTCGAGACCACCGCACAAGTGCTTACCCACACACTCCTTTTCCTGGCACGCAATCCCAAGGAGCAGATGAAGTTGAGGGAGGAGATCGGTACCGCCGAGCTGACCTTTGAACAGATAAGTGAGCTGCCCTTCACCGAAGCCTGCATCCATGAAACTTTGAGAATTTTCTCACCTGTTCTGGCTGCCCGCAAGGTGGTAACTGAGCCCTGTGAACTGACGAACAAAAACGGAGTGAGCGTGAAACTGAGACCCGGGGATGTAGTCATCATTCCTGTGAACGCCTTGCACCACGATCCCCAATACTATGAGGAACCTCAATCGTTCAAGCCCGAGCGATTCCTGAACATCAATGGCGGAGCCAAAAAGTACAGAGATCAGGGTCTATTCTTTGGGTTTGGCGATGGACCACGTATTTGCCCCGGTATGCGGTTTTCACTTACCCAAATCAAAGCTGCCCTGGTGGAAATCGTGCGAAACTTCGACATCAAGGTTAATCCCAAAACTCGCAAGGATAATGAAATTGATGATACCTACTTTATGCCAGCCTTAAAAGGCGGCGTTTGGCTGGATTTTGTTGAACGCAATTAGTTATTCAATAATGTTACGACTTTATATTAAATATAGTTTATCCAGTTGCATACATGTTATATTTCCAAACA</residues>
+          <seqlen>1603</seqlen>
+          <timeaccessioned>2004-08-09 15:56:24.230779</timeaccessioned>
+          <timelastmodified>2002-04-30 16:10:52</timelastmodified>
+          <type_id>SO__mRNA</type_id>
+          <uniquename>CG10833-RA</uniquename>
+          <feature_relationship>
+            <rank>6</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:6</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>238</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.665877</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.665877</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:6</uniquename>
+                <featureloc>
+                  <fmax>5212450</fmax>
+                  <fmin>5212212</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <rank>4</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:4</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>631</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.587619</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.587619</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:4</uniquename>
+                <featureloc>
+                  <fmax>5211821</fmax>
+                  <fmin>5211190</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <rank>1</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:1</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>217</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.453082</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.453082</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:1</uniquename>
+                <featureloc>
+                  <fmax>5210695</fmax>
+                  <fmin>5210478</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <rank>5</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:5</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>270</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.626408</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.626408</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:5</uniquename>
+                <featureloc>
+                  <fmax>5212150</fmax>
+                  <fmin>5211880</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <rank>2</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:2</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>139</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.502579</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.502579</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:2</uniquename>
+                <featureloc>
+                  <fmax>5210889</fmax>
+                  <fmin>5210750</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <rank>3</rank>
+            <subject_id>
+              <feature>
+                <is_analysis>0</is_analysis>
+                <name>Cyp28d1:3</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <seqlen>108</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.546345</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.546345</timelastmodified>
+                <type_id>SO__exon</type_id>
+                <uniquename>CG10833:3</uniquename>
+                <featureloc>
+                  <fmax>5211061</fmax>
+                  <fmin>5210953</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__partof</type_id>
+          </feature_relationship>
+          <feature_relationship>
+            <subject_id>
+              <feature>
+                <dbxref_id>
+                  <dbxref>
+                    <accession>CG10833-PA</accession>
+                    <db_id>db__Gadfly</db_id>
+                  </dbxref>
+                </dbxref_id>
+                <is_analysis>0</is_analysis>
+                <md5checksum>35dca04d49d72956485a3ecefc21ada4</md5checksum>
+                <name>Cyp28d1-PA</name>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <residues>MCPISTALFVIAAILALIYVFLTWNFSYWKKRGIPTAKSWPFVGSFPSVFTQKRNVVYDIDEIYEQYKNTDSIVGVFQTRIPQLMVTTPEYAHKIYVSDFRSFHDNEMAKFTDSKTDPILANNPFVLTGEAWKERRAEVTPGLSANRVKAAYPVSLRVCKKFVEYIRRQSLMAPAQGLNAKDLCLCYTTEVISDCVLGISAQSFTDNPTPMVGMTKRVFEQSFGFIFYTVVANLWPPITKFYSVSLFAKDVAAFFYDLMQKCIQVRRESPAAQQRDDFLNYMLQLQEKKGLNAAELTSHTMTFLTDGFETTAQVLTHTLLFLARNPKEQMKLREEIGTAELTFEQISELPFTEACIHETLRIFSPVLAARKVVTEPCELTNKNGVSVKLRPGDVVIIPVNALHHDPQYYEEPQSFKPERFLNINGGAKKYRDQGLFFGFGDGPRICPGMRFSLTQIKAALVEIVRNFDIKVNPKTRKDNEIDDTYFMPALKGGVWLDFVERN</residues>
+                <seqlen>502</seqlen>
+                <timeaccessioned>2004-08-09 15:56:24.711814</timeaccessioned>
+                <timelastmodified>2004-08-09 15:56:24.711814</timelastmodified>
+                <type_id>SO__protein</type_id>
+                <uniquename>CG10833-PA</uniquename>
+                <featureloc>
+                  <fmax>5212376</fmax>
+                  <fmin>5210501</fmin>
+                  <is_fmax_partial>0</is_fmax_partial>
+                  <is_fmin_partial>0</is_fmin_partial>
+                  <locgroup>0</locgroup>
+                  <rank>0</rank>
+                  <srcfeature_id>
+                    <feature>
+                      <organism_id>Drosophila__melanogaster</organism_id>
+                      <type_id>SO__chromosome_arm</type_id>
+                      <uniquename>2L</uniquename>
+                    </feature>
+                  </srcfeature_id>
+                  <strand>1</strand>
+                </featureloc>
+                <feature_dbxref>
+                  <dbxref_id>
+                    <dbxref>
+                      <accession>AAF52226.1</accession>
+                      <db_id>db__GB_protein</db_id>
+                    </dbxref>
+                  </dbxref_id>
+                  <is_current>1</is_current>
+                </feature_dbxref>
+                <feature_dbxref>
+                  <dbxref_id>
+                    <dbxref>
+                      <accession>FBpp0078698</accession>
+                      <db_id>db__FlyBase</db_id>
+                    </dbxref>
+                  </dbxref_id>
+                  <is_current>1</is_current>
+                </feature_dbxref>
+                <feature_dbxref>
+                  <dbxref_id>
+                    <dbxref>
+                      <accession>CG10833-PA</accession>
+                      <db_id>db__Gadfly</db_id>
+                    </dbxref>
+                  </dbxref_id>
+                  <is_current>0</is_current>
+                </feature_dbxref>
+                <feature_synonym>
+                  <is_current>1</is_current>
+                  <is_internal>0</is_internal>
+                  <pub_id>
+                    <pub>
+                      <type_id>pub type__computer file</type_id>
+                      <uniquename>gadfly3</uniquename>
+                    </pub>
+                  </pub_id>
+                  <synonym_id>
+                    <synonym>
+                      <name>CG10833-PA</name>
+                      <type_id>synonym type__synonym</type_id>
+                    </synonym>
+                  </synonym_id>
+                </feature_synonym>
+              </feature>
+            </subject_id>
+            <type_id>relationship type__producedby</type_id>
+          </feature_relationship>
+          <featureloc>
+            <fmax>5212450</fmax>
+            <fmin>5210478</fmin>
+            <is_fmax_partial>0</is_fmax_partial>
+            <is_fmin_partial>0</is_fmin_partial>
+            <locgroup>0</locgroup>
+            <rank>0</rank>
+            <srcfeature_id>
+              <feature>
+                <organism_id>Drosophila__melanogaster</organism_id>
+                <type_id>SO__chromosome_arm</type_id>
+                <uniquename>2L</uniquename>
+              </feature>
+            </srcfeature_id>
+            <strand>1</strand>
+          </featureloc>
+          <feature_dbxref>
+            <dbxref_id>
+              <dbxref>
+                <accession>FBtr0079062</accession>
+                <db_id>db__FlyBase</db_id>
+              </dbxref>
+            </dbxref_id>
+            <is_current>1</is_current>
+          </feature_dbxref>
+          <feature_dbxref>
+            <dbxref_id>
+              <dbxref>
+                <accession>CG10833-RA</accession>
+                <db_id>db__Gadfly</db_id>
+              </dbxref>
+            </dbxref_id>
+            <is_current>0</is_current>
+          </feature_dbxref>
+          <feature_synonym>
+            <is_current>1</is_current>
+            <is_internal>0</is_internal>
+            <pub_id>
+              <pub>
+                <type_id>pub type__computer file</type_id>
+                <uniquename>joshk</uniquename>
+              </pub>
+            </pub_id>
+            <synonym_id>
+              <synonym>
+                <name>CG10833-RA</name>
+                <type_id>synonym type__synonym</type_id>
+              </synonym>
+            </synonym_id>
+          </feature_synonym>
+          <feature_synonym>
+            <is_current>1</is_current>
+            <is_internal>0</is_internal>
+            <pub_id>
+              <pub>
+                <type_id>pub type__computer file</type_id>
+                <uniquename>gadfly3</uniquename>
+              </pub>
+            </pub_id>
+            <synonym_id>
+              <synonym>
+                <name>CG10833-RA</name>
+                <type_id>synonym type__synonym</type_id>
+              </synonym>
+            </synonym_id>
+          </feature_synonym>
+          <featureprop>
+            <rank>0</rank>
+            <type_id>property type__owner</type_id>
+            <value>joshk</value>
+          </featureprop>
+          <featureprop>
+            <rank>0</rank>
+            <type_id>property type__sp_comment</type_id>
+            <value>Perfect match to REAL SP with corresponding FBgn</value>
+          </featureprop>
+          <featureprop>
+            <rank>0</rank>
+            <type_id>property type__protein_id</type_id>
+            <value>AAF52226</value>
+          </featureprop>
+        </feature>
+      </subject_id>
+      <type_id>relationship type__partof</type_id>
+    </feature_relationship>
+    <featureprop>
+      <rank>0</rank>
+      <type_id>property type__sp_status</type_id>
+      <value>Perfect match to SwissProt real (computational)</value>
+    </featureprop>
+    <featureprop>
+      <rank>0</rank>
+      <type_id>property type__cyto_range</type_id>
+      <value>25C10-25C10</value>
+    </featureprop>
+    <featureprop>
+      <rank>0</rank>
+      <type_id>property type__gbunit</type_id>
+      <value>AE003609</value>
+    </featureprop>
+    <feature_dbxref>
+      <dbxref_id>
+        <dbxref>
+          <accession>FBgn0031689</accession>
+          <db_id>db__FlyBase</db_id>
+        </dbxref>
+      </dbxref_id>
+      <is_current>1</is_current>
+    </feature_dbxref>
+    <feature_dbxref>
+      <dbxref_id>
+        <dbxref>
+          <accession>CG10833</accession>
+          <db_id>db__Gadfly</db_id>
+        </dbxref>
+      </dbxref_id>
+      <is_current>1</is_current>
+    </feature_dbxref>
+    <feature_dbxref>
+      <dbxref_id>
+        <dbxref>
+          <accession>FBan0010833</accession>
+          <db_id>db__FlyBase</db_id>
+        </dbxref>
+      </dbxref_id>
+      <is_current>1</is_current>
+    </feature_dbxref>
+    <feature_synonym>
+      <is_current>0</is_current>
+      <is_internal>0</is_internal>
+      <pub_id>
+        <pub>
+          <type_id>pub type__computer file</type_id>
+          <uniquename>gadfly3</uniquename>
+        </pub>
+      </pub_id>
+      <synonym_id>
+        <synonym>
+          <name>28d1</name>
+          <type_id>synonym type__synonym</type_id>
+        </synonym>
+      </synonym_id>
+    </feature_synonym>
+    <featureloc>
+      <fmax>5212450</fmax>
+      <fmin>5210478</fmin>
+      <is_fmax_partial>0</is_fmax_partial>
+      <is_fmin_partial>0</is_fmin_partial>
+      <locgroup>0</locgroup>
+      <rank>0</rank>
+      <srcfeature_id>
+        <feature>
+          <organism_id>Drosophila__melanogaster</organism_id>
+          <type_id>SO__chromosome_arm</type_id>
+          <uniquename>2L</uniquename>
+        </feature>
+      </srcfeature_id>
+      <strand>1</strand>
+    </featureloc>
+  </feature>
+</chado>
