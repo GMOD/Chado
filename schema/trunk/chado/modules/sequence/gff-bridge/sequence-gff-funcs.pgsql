@@ -70,3 +70,46 @@ LANGUAGE 'sql';
 
 --functional index that depends on the above functions
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
+
+--uses the gff3view to create a GFF3 compliant attribute string
+CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
+'DECLARE
+  return_string      varchar;
+  f_id               ALIAS FOR $1;
+  atts_view          gffatts%ROWTYPE;
+  feature_row        feature%ROWTYPE;
+  name               varchar;
+  uniquename         varchar;
+  parent             varchar;
+                                                                                
+BEGIN
+  --Get name from feature.name
+  --Get ID from feature.uniquename
+                                                                                
+  SELECT INTO feature_row * FROM feature WHERE feature_id = f_id;
+  name  = feature_row.name;
+  return_string = ''ID='' || feature_row.uniquename;
+  IF name IS NOT NULL AND name != ''''
+  THEN
+    return_string = return_string ||'';'' || ''Name='' || name;
+  END IF;
+                                                                                
+  --Get Parent from feature_relationship
+  SELECT INTO feature_row * FROM feature f, feature_relationship fr
+    WHERE fr.subject_id = f_id AND fr.object_id = f.feature_id;
+  IF FOUND
+  THEN
+    return_string = return_string||'';''||''Parent=''||feature_row.uniquename;
+  END IF;
+                                                                                
+  FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
+    return_string = return_string || '';''
+                     || atts_view.type || ''=''
+                     || atts_view.attribute;
+  END LOOP;
+                                                                                
+  RETURN return_string;
+END;
+'
+LANGUAGE plpgsql;
+

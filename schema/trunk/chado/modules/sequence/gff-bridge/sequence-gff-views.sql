@@ -41,3 +41,69 @@ SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
 FROM pub s, feature_pub fs
 WHERE fs.pub_id = s.pub_id;
 
+--creates a view that is suitable for creating a GFF3 string
+CREATE OR REPLACE VIEW gff3view (
+  feature_id,
+  ref,
+  source,
+  type,
+  fstart,
+  fend,
+  score,
+  strand,
+  phase,
+  attributes
+) AS
+SELECT
+  f.feature_id   ,
+  sf.name        ,
+  dbx.accession  ,
+  cv.name        ,
+  fl.fmin+1      ,
+  fl.fmax        ,
+  '.'            ,
+  fl.strand      ,
+  fl.phase       ,
+  gffattstring(f.feature_id)
+FROM feature f, feature sf, feature_dbxref fd,
+     dbxref dbx, db db, cvterm cv, featureloc fl
+WHERE f.feature_id     = fl.feature_id AND
+      fl.srcfeature_id = sf.feature_id AND
+      f.type_id        = cv.cvterm_id  AND
+      db.name          = 'GFF_source'  AND
+      db.db_id         = dbx.db_id     AND
+      dbx.dbxref_id    = fd.dbxref_id  AND
+      fd.feature_id    = f.feature_id ;
+
+--creates a view that can be used to assemble a GFF3 compliant attribute string
+CREATE OR REPLACE VIEW gff3atts (
+    feature_id,
+    type,
+    attribute
+) AS
+SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
+FROM cvterm s, dbxref dbx, feature_cvterm fs
+WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
+UNION ALL
+SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
+      d.name != 'GFF_source'
+UNION ALL
+SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+FROM gcontext g, feature_gcontext fg
+WHERE g.gcontext_id = fg.gcontext_id
+UNION ALL
+SELECT feature_id, 'Alias' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs
+WHERE fs.synonym_id = s.synonym_id
+UNION ALL
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.type_id = cv.cvterm_id
+UNION ALL
+SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
+FROM pub s, feature_pub fs
+WHERE fs.pub_id = s.pub_id;
+
+
