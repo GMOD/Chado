@@ -1,6 +1,5 @@
 --audit tables generated from 
--- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql > \
---        audits.sql
+-- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>audits.sql
 
 [% FOREACH table IN schema.get_tables %]
    DROP TABLE audit_[% table.name %];
