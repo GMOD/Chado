@@ -3,7 +3,7 @@ insert into organism (abbreviation, genus, species, common_name)
        values ('H.sapiens', 'Homo','sapiens','Human');
 insert into contact (name) values ('DBUSER');
 insert into contact (name) values ('Affymetrix');
-insert into contact (name) values ('null');
+insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
 insert into cv (name,definition) values ('Ad Hoc Ontology','Locally created terms');
 insert into cvterm (name,cv_id) values ('null',       (select cv_id from cv where name = 'null'));
