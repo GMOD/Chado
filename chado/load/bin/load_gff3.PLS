@@ -778,8 +778,8 @@ sub initialize {
             definition => 'auto created by load_gff3.pl'
         }
     );
-    ($so) = Chado::Cv->search( { name => 'Sequence Ontology' } );
-    die "Unable to find Sequence Ontology in cv table; that is a pretty big problem" unless $so;
+    ($so) = Chado::Cv->search( { name => 'Sequence Ontology Feature Annotation' } );
+    die "Unable to find SOFA in cv table; that is a pretty big problem" unless $so;
 
     # find needed cvterm and other pieces of information
     my @needed_cvterms =
