@@ -16,10 +16,6 @@ use Config;
 use Cwd;
 use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
-use XML::Simple;
-
-use lib 'lib';
-use Chado::Config;
 
 my %args    =  (
   DBDRIVER  => {
@@ -57,6 +53,7 @@ DBUSER   The username to use when connecting to the database ($args{'DBUSER'}{'d
 DBPASS   The password for connecting ($args{'DBPASS'}{'default'})
 DBHOST   The machine name where the database is running ($args{'DBHOST'}{'default'})
 DBPORT   The port on which the database is listening ($args{'DBPORT'}{'default'})
+CONF_DIR The directory to place the GMOD/Chado config file ($args{'CONF_DIR'}{'default'})
 
 e.g., perl Makefile.PL DBDRIVER=PostgreSQL DBNAME=chado [...]
 
@@ -78,7 +75,7 @@ END
 #
 # Parse arguments.
 #
-my $all_args = join( '|', qw[RECONFIGURE DEFAULTS], keys %args );
+my $all_args = join( '|', qw[ RECONFIGURE DEFAULTS ], keys %args );
 my %opts;
 my @argv = @ARGV;
 @ARGV    = (); # empty out @ARGV so MakeMaker doesn't get confused
@@ -105,7 +102,7 @@ $PERL            =~ s/^\s*#!\s*//;
 my $working_dir  = cwd;
 my $lib_dir      = catdir $working_dir, 'lib';
 my $chado_dir    = catdir $lib_dir, 'Chado';
-my $config_file  = catfile $working_dir, 'load', 'etc', 'load.conf';
+my $config_file  = catfile $working_dir, 'build.conf';
 
 my %O;
 $O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
@@ -117,30 +114,29 @@ mkdir $lib_dir   unless -d $lib_dir;
 mkdir $chado_dir unless -d $chado_dir;
 
 #
-# If no config file, copy the template (if available).
+# If the config file is there, parse it.
 #
-unless ( -e $config_file ) {
-  my $config_template = catfile( $working_dir, 'load', 'tt2', 'load.conf.tt2' );
-  copy( $config_template, $config_file ) if -e $config_template;
+my %conf = ();
+if ( -e $config_file && -r _ ) {
+  open CONF, "<$config_file" or die "Can't read file '$config_file': $!\n";
+  while ( <CONF> ) {
+    chomp;
+    next if /^\#/;
+    if ( /^($all_args)=(.+)$/o ) {
+      $conf{ $1 } = $2;
+    }
+  }
+  close CONF;
 }
 
 #
-# If the config file is there, parse it when Chado::Config.
-#
-my $conf = {};
-if ( -e $config_file ) {
-    my $cc = Chado::Config->new( filename => $config_file );
-    $conf  = $cc->config;
-}
-
-#
-# Now figure out where the values are coming from -- load.conf, 
+# Now figure out where the values are coming from -- build.conf, 
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
   $SQLFILES, $EXTERNAL_DDL );
 
-if ( ! @argv && $conf->{'database'} ) {
+if ( ! @argv && %conf ) {
   my $answer = prompt(
     "Previous configuration detected.\nUse values in '$config_file'?", 'Y'
   );
@@ -148,13 +144,13 @@ if ( ! @argv && $conf->{'database'} ) {
   $opts{'RECONFIGURE'} = $answer =~ /^[Yy]/ ? 1 : 0;
 }
 
-if ( $opts{'RECONFIGURE'} && $conf->{'database'} ) {
-  $DBDRIVER = $conf->{'database'}{'db_driver'} || '';
-  $DBNAME   = $conf->{'database'}{'db_name'}   || '';
-  $DBUSER   = $conf->{'database'}{'db_user'}   || '';
-  $DBPASS   = $conf->{'database'}{'db_pass'}   || '';
-  $DBHOST   = $conf->{'database'}{'db_host'}   || '';
-  $DBPORT   = $conf->{'database'}{'db_port'}   || '';
+if ( $opts{'RECONFIGURE'} && %conf ) {
+  $DBDRIVER = $conf{'DBDRIVER'} || '';
+  $DBNAME   = $conf{'DBNAME'}   || '';
+  $DBUSER   = $conf{'DBUSER'}   || '';
+  $DBPASS   = $conf{'DBPASS'}   || '';
+  $DBHOST   = $conf{'DBHOST'}   || '';
+  $DBPORT   = $conf{'DBPORT'}   || '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -179,8 +175,8 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   #
   $DBDRIVER ||= prompt(
     'What database server will you be using?', 
-    $VALID_DBS{ $conf->{'database'}{'db_driver'} }
-    ? $VALID_DBS{ $conf->{'database'}{'db_driver'} }
+    $VALID_DBS{ $conf{'DBDRIVER'} }
+    ? $VALID_DBS{ $conf{'DBDRIVER'} }
     : $args{'DBDRIVER'}{'default'}
   );
   
@@ -194,23 +190,23 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   }
   
   $DBNAME ||= prompt( 'What is the Chado database name?', 
-    $conf->{'database'}{'db_name'} || $args{'DBNAME'}{'default'}
+    $conf{'DBNAME'} || $args{'DBNAME'}{'default'}
   );
   
   $DBUSER ||= prompt( 'What is the database username?', 
-    $conf->{'database'}{'db_username'} || $args{'DBUSER'}{'default'}
+    $conf{'DBUSER'} || $args{'DBUSER'}{'default'}
   );
   
   $DBPASS ||= prompt( "What is the password for '$DBUSER'?", 
-    $conf->{'database'}{'db_password'} || $args{'DBPASS'}{'default'}
+    $conf{'DBPASS'} || $args{'DBPASS'}{'default'}
   );
   
   $DBHOST ||= prompt( 'What is the database host?', 
-    $conf->{'database'}{'db_host'} || $args{'DBHOST'}{'default'}
+    $conf{'DBHOST'} || $args{'DBHOST'}{'default'}
   );
   
   $DBPORT ||= prompt( 'What is your database port?', 
-    $conf->{'database'}{'db_port'} || $args{'DBPORT'}{'default'}
+    $conf{'DBPORT'} || $args{'DBPORT'}{'default'}
   );
 }
 
@@ -297,17 +293,14 @@ print join("\n",
 # Save build options.
 #
 if ( open CONF, ">$config_file" ) {
-  $conf->{'database'}{'db_driver'}   = $db_lookup{ $DBDRIVER };
-  $conf->{'database'}{'db_name'}     = $DBNAME;
-  $conf->{'database'}{'db_username'} = $DBUSER;
-  $conf->{'database'}{'db_password'} = $DBPASS;
-  $conf->{'database'}{'db_host'}     = $DBHOST;
-  $conf->{'database'}{'db_port'}     = $DBPORT;
-  $conf->{'build'}{'working_dir'}    = $working_dir;
-  $conf->{'build'}{'external_ddl'}   = $external;
-  $conf->{'build'}{'sqlfiles'}       = \@sqlfiles;
+  $conf{'DBDRIVER'} = $db_lookup{ $DBDRIVER };
+  $conf{'DBNAME'}   = $DBNAME;
+  $conf{'DBUSER'}   = $DBUSER;
+  $conf{'DBPASS'}   = $DBPASS;
+  $conf{'DBHOST'}   = $DBHOST;
+  $conf{'DBPORT'}   = $DBPORT;
 
-  print CONF XMLout( $conf, RootName => 'load' );
+  print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$config_file': $!\n";
 }
 
