@@ -5,4 +5,5 @@ pub/pub.sql
 sequence/sequence.sql
 genetic/genetic.sql
 companalysis/companalysis.sql
+expression/expression.sql
 map/map.sql
