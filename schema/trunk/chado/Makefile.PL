@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.34 2003-12-03 23:53:53 kycl4rk Exp $
+# $Id: Makefile.PL,v 1.35 2003-12-04 02:02:32 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -28,16 +28,16 @@ my %args    =  (
     default => $ENV{'CHADO_DB_NAME'}
   },
   DBUSER    => {
-    default => $ENV{'CHADO_DB_USERNAME'}
+    default => $ENV{'CHADO_DB_USERNAME'} || $ENV{'USER'}
   },
   DBPASS    => {
     default => $ENV{'CHADO_DB_PASSWORD'}
   },
   DBHOST    => {
-    default => $ENV{'CHADO_DB_HOST'}
+    default => $ENV{'CHADO_DB_HOST'} || $ENV{'HOST'}
   },
   DBPORT    => {
-    default => $ENV{'CHADO_DB_PORT'}
+    default => $ENV{'CHADO_DB_PORT'} || 5432
   }
 );
 
