@@ -98,21 +98,6 @@ while(my $arrayio = $affx->next_array){
   $LOG->info("cvterms: ".join(', ', keys %cvterm));
   #might want to break here if %cvterm is undef (likely due to missing/malformed cvterm line in array file)
 
-  ##############################
-  # load feature and element ids
-  ##############################
-  my($sth,%feature);
-  my $sth;
-  $LOG->debug("caching features...");
-  $sth = Chado::Feature->sql_affy_probesets;
-  $sth->execute;
-  while(my $row = $sth->fetchrow_hashref){
-    #warn $row->{name};
-	$feature{$row->{name}}{feature_id} = $row->{feature_id};
-	$feature{$row->{name}}{element_id} = $row->{element_id};
-  }
-  $LOG->debug("cached features: ".scalar(keys %feature));
-
   my($array)     = Chado::Arraydesign->search(name => $arraydesigntype);
   ($array)     ||= Chado::Arraydesign->search(name => 'unknown');
   $LOG->debug("loaded record for array type: ".$array->name);
@@ -239,6 +224,21 @@ while(my $arrayio = $affx->next_array){
 
   $progress->message("already loaded") unless $newchip;
   $progress->update($total) and next unless $newchip;
+
+  ##############################
+  # load feature and element ids
+  ##############################
+  my($sth,%feature);
+  my $sth;
+  $LOG->debug("caching features...");
+  $sth = Chado::Feature->sql_affy_probesets;
+  $sth->execute;
+  while(my $row = $sth->fetchrow_hashref){
+    #warn $row->{name};
+	$feature{$row->{name}}{feature_id} = $row->{feature_id};
+	$feature{$row->{name}}{element_id} = $row->{element_id};
+  }
+  $LOG->debug("cached features: ".scalar(keys %feature));
 
   my $c = 0;
   $LOG->info("featuregroups loading...");
