@@ -57,7 +57,9 @@ private FeatSub m_GF;
 		}
 
 		if(gf!=null){
-			if(m_type.equals("type")){
+			if(m_type.equals("cvterm")){
+				retStr = ((CVTerm)gf).getname();
+			}else if(m_type.equals("type")){
 				retStr = ((CVTerm)gf).getname();
 			}else if(m_type.equals("pkey")){
 				retStr = ((CVTerm)gf).getname();
@@ -65,6 +67,12 @@ private FeatSub m_GF;
 				//retStr = ((Dbxref)gf).getgenus();
 			}else if(m_type.equals("pub")){
 				retStr = ((Pub)gf).getminiref();
+				if(retStr==null){
+					retStr = ((Pub)gf).getuniquename();
+					//System.out.println("NEW STYLE PUB ENTRY<"+retStr+">");
+				}else{
+					//System.out.println("OLD STYLE PUB ENTRY<"+retStr+">");
+				}
 			}else if(m_type.equals("cv")){
 				retStr = ((CV)gf).getcvname();
 			}else if(m_type.equals("db")){

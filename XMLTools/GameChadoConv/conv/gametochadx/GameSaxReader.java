@@ -6,16 +6,12 @@ import org.xml.sax.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-//import com.sun.xml.tree.*;
-//import com.sun.xml.parser.Parser.*;
-
 import javax.xml.parsers.*;
 import java.util.*;
 import java.io.*;
 
 
 public class GameSaxReader extends DefaultHandler {
-//public class GameSaxReader {
 
 public static int PARSEGENES = 0;
 public static int PARSEALL = 1;
@@ -23,7 +19,7 @@ public static int PARSECOMP = 2;
 private int m_ParseFlag = 0;
 
 SAXParser parser;
-private String m_CurrTxt = null;
+//private String m_CurrTxt = null;
 
 private GenFeat m_CurrFeat;
 private Attrib m_CurrAttr;
@@ -35,6 +31,7 @@ private GenFeat m_CurrGame,m_CurrSeq,m_CurrAnnot,m_CurrFeatSet,m_CurrFeatSpan;
 private GenFeat m_CurrResultSet,m_CurrResultSpan;
 private GenFeat m_CurrCompAnal;
 private GDate m_CurrDate;
+
 
 private Aspect m_CurrAspect;
 private SeqRel m_CurrSeqRel;
@@ -62,8 +59,16 @@ private int m_AnnotCount = 0;
 private String m_Residues;
 private int m_ResiduesLength;
 private String m_Alignment;
-
+private int m_align = 0;
 private StringBuffer m_SB;
+
+//NEW
+private NewModFeat m_nmf;
+private boolean m_transBefore = false;
+private boolean m_transAfter = false;
+
+//FFFFF
+private boolean m_inOutput = false;
 
 	public GameSaxReader(){
 		super();
@@ -106,6 +111,8 @@ private StringBuffer m_SB;
 		//GLOBAL
 		if(qualifiedName.equals("game")){
 			m_CurrFeat = m_CurrGame = new Game("currentgame");
+/****/
+//OLD STYLE TRANSACTIONS
 		}else if(qualifiedName.equals("deleted_gene")){
 			String idTxt = attributes.getValue("id");
 			//m_CurrGame.addGenFeat(new ModFeat(idTxt));
@@ -127,6 +134,16 @@ private StringBuffer m_SB;
 			mf.setType("deleted_transcript");
 			m_CurrGame.addGenFeat(mf);
 			//System.out.println("READ DELETED_TRANSCRIPT<"+idTxt+">");
+/****/
+//NEW STYLE TRANSACTIONS
+		}else if(qualifiedName.equals("transaction")){
+			//System.out.println("START TRANSACTION");
+			m_nmf = new NewModFeat("trans");
+		}else if(qualifiedName.equals("before")){
+			m_transBefore = true;
+		}else if(qualifiedName.equals("after")){
+			m_transAfter = true;
+/****/
 		}else if(qualifiedName.equals("date")){
 			String timestampTxt = attributes.getValue("timestamp");
 			m_CurrDate = new GDate(timestampTxt);
@@ -154,10 +171,10 @@ private StringBuffer m_SB;
 			if(prodSeqTxt!=null){
 				m_CurrFeatSpan.setProducesSeq(prodSeqTxt);
 			}
+//FSS START
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("seq"))){
-			//System.out.println("STARTING SEQ NODE");
 			String idTxt = attributes.getValue("id");
-			//m_CurrFeat = m_CurrSeq = new Seq(idTxt);
+			//System.out.println("STARTING SEQ NODE<"+idTxt+">");
 			m_CurrSeq = new Seq(idTxt);
 			String typeTxt = attributes.getValue("type");
 			if(typeTxt!=null){
@@ -176,11 +193,6 @@ private StringBuffer m_SB;
 				m_CurrSeq.setMd5(md5Txt);
 			}
 
-			//if(m_CurrFeatSet!=null){
-			//	m_CurrFeatSet.addSeq(m_CurrSeq);
-			//	m_CurrSeq = null;
-			//}
-
 		}else if(qualifiedName.equals("seq_relationship")){
 			String typeTxt = attributes.getValue("type");
 			m_CurrSeqRel = new SeqRel("seqrel");
@@ -191,18 +203,20 @@ private StringBuffer m_SB;
 			if(seqTxt!=null){
 				m_CurrSeqRel.setSeqLabel(seqTxt);
 			}
+			//System.out.println("\t\t\tSTART SEQ_REL TYPE<"+typeTxt
+			//		+"> SEQ<"+seqTxt+">");
 
 		}else if(qualifiedName.equals("computational_analysis")){
 			String idTxt = attributes.getValue("id");
-			//System.out.println("START COMPUTATIONAL_ANALYSIS<"+idTxt+">");
+			//System.out.println("START COMPUTATIONAL_ANALYSIS ID<"+idTxt+">");
 			m_CurrFeat = m_CurrCompAnal = new ComputationalAnalysis(idTxt);
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_set"))){
 			String idTxt = attributes.getValue("id");
-			System.out.println("\tSTART RESULT_SET <"+idTxt+">");
+			//System.out.println("\tSTART RESULT_SET ID<"+idTxt+">");
 			m_CurrFeat = m_CurrResultSet = new ResultSet(idTxt);
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_span"))){
 			String idTxt = attributes.getValue("id");
-			System.out.println("\t\tSTART RESULT_SPAN <"+idTxt+">");
+			//System.out.println("\t\tSTART RESULT_SPAN ID<"+idTxt+">");
 			m_CurrFeat = m_CurrResultSpan = new ResultSpan(idTxt);
 
 		//ATTRIBUTES
@@ -218,6 +232,8 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("comment")){
 			m_CurrAttr = m_CurrCommentAttr = new Attrib("comment");
 			//System.out.println("MADE COMMENT");
+		}else if(qualifiedName.equals("output")){ //WRAPS 'score'
+			m_inOutput = true;
 		}
 	}
 
@@ -226,21 +242,27 @@ private StringBuffer m_SB;
 		//System.out.println("LocalName<"+localName+">");
 		//System.out.println("LEAVING QualifiedName<"+qualifiedName+">");
 		//AFTER ELEMENT CLOSES, GRAB IT'S INNER TEXT
-		if(qualifiedName.equals("start")){
+/****/
+//NEW STYLE TRANSACTIONS
+		if(qualifiedName.equals("transaction")){
+			//System.out.println("END TRANSACTION");
+			if(m_nmf!=null){
+				//System.out.println("ADDING TRANSACTION TO CURRGAME");
+				m_CurrGame.addGenFeat(m_nmf);
+				m_nmf = null;
+			}
+		}else if(qualifiedName.equals("before")){
+			m_transBefore = false;
+		}else if(qualifiedName.equals("after")){
+			m_transAfter = false;
+/****/
+		}else if(qualifiedName.equals("start")){
 			m_SpanStartTxt = m_SB.toString();
 		}else if(qualifiedName.equals("end")){
 			m_SpanEndTxt = m_SB.toString();
-		}else if(qualifiedName.equals("span")){
-			if(m_CurrSeqRel!=null){
-				//System.out.println("HAS SRC<"
-				//		+m_CurrSeqRel.getSeqLabel()+">");
-				m_Span = new Span(m_SpanStartTxt,m_SpanEndTxt,
-						m_CurrSeqRel.getSeqLabel());
-			}else{
-				m_Span = new Span(m_SpanStartTxt,m_SpanEndTxt);
-			}
-			//PROBABLY BETTER TO HAVE SPAN PUT INTO PLACE
-			//A END OF OUTER FEATURE
+		}else if(qualifiedName.equals("seq_relationship")){
+			m_Span.setAlignment(m_CurrSeqRel.getAlignment());
+
 			if(m_CurrFeat!=null){
 				if(m_CurrFeat.getSpan()==null){
 					m_CurrFeat.setSpan(m_Span);
@@ -249,6 +271,17 @@ private StringBuffer m_SB;
 				}
 			}else{
 				System.out.println("********No CurrFeat FOR SPAN!");
+			}
+			m_CurrSeqRel = null;
+
+		}else if(qualifiedName.equals("span")){
+			if(m_CurrSeqRel!=null){
+				//System.out.println("HAS SRC<"
+				//		+m_CurrSeqRel.getSeqLabel()+">");
+				m_Span = new Span(m_SpanStartTxt,m_SpanEndTxt,
+						m_CurrSeqRel.getSeqLabel());
+			}else{
+				m_Span = new Span(m_SpanStartTxt,m_SpanEndTxt);
 			}
 		}else if(qualifiedName.equals("map_position")){
 			//System.out.println("********END MAP_POSITION!");
@@ -260,6 +293,8 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("score")){
 			if(m_CurrFeat!=null){
 				m_CurrFeat.setScore(m_SB.toString());
+				//System.out.println("SCORE <"+m_CurrFeat.getScore()
+				//		+"> PUT IN Feature<"+m_CurrFeat.getId()+">");
 			}else{
 				System.out.println("********No CurrFeat FOR SCORE!");
 			}
@@ -276,18 +311,34 @@ private StringBuffer m_SB;
 				System.out.println("********No CurrFeat FOR DATABASE!");
 			}
 		}else if(qualifiedName.equals("residues")){
+			//System.out.println("\tDONE READING RESIDUES");
 			if(m_SB!=null){
 				m_Residues = m_SB.toString().trim();
 			}
 		}else if(qualifiedName.equals("alignment")){
 			m_Alignment = m_SB.toString().trim();
-			//System.out.println("\t\tSAVING ALIGNMENT OF LEN<"
+			//System.out.print("\t\tALIGNMENT["+m_align+"] SAVING LEN<"
 			//		+m_Alignment.length()+">");
+			m_align++;
+			/**/
+			String tmp = m_Alignment;
+			if((tmp!=null)&&(tmp.length()>10)){
+				tmp = tmp.substring(0,9);
+			}
+			//System.out.println("ALIGN<"+tmp+">");
+			/**/
+
 			if(m_CurrSeqRel!=null){
-				//System.out.println("\t\t\tIN SEQREL<"
-				//		+m_CurrSeqRel.getId()+">");
+				//System.out.println("\t\t\tIN SEQREL<"+m_CurrSeqRel.getId()+">");
 				m_CurrSeqRel.setAlignment(m_Alignment);
 			}
+			if(m_CurrFeatSpan!=null){
+				//System.out.println("\t\t\tIN CURRFEAT_SPAN<"+m_CurrFeatSpan.getId()+">");
+			}else{
+				//System.out.println("\t\t\tIN CURRFEAT_SPAN IS NULL");
+			}
+			m_Alignment = null;
+
 		}else if(qualifiedName.equals("type")){
 			m_typeTxt = m_SB.toString();
 			if((m_CurrAttr!=null)&&(m_CurrAttr.getAttribType().equals("property"))){
@@ -295,35 +346,112 @@ private StringBuffer m_SB;
 				//m_typeTxt = m_SB.toString();
 			}else{
 				//System.out.println("LOOKING FOR PLACE TO PUT<"+m_typeTxt+"> IN CurrFeat<"+m_CurrFeat.getId()+"> WHICH ALREADY HAS<"+m_CurrFeat.getType()+">");
-				if(m_CurrFeat.getType()==null){
+				if(m_inOutput){
+					m_typeTxt = null;
+				}else if(m_CurrFeat.getType()==null){
 					m_CurrFeat.setType(m_typeTxt);
 					//SO IT TAKES ONLY THE FIRST ONE
 					//OTHERWISE CONFLICT BETWEEN
 					//<result_span><type> AND
 					//<result_span><output><type>
+//FFFFF
+					m_typeTxt = null;
 				}
 			}
+/*****/
 		}else if(qualifiedName.equals("author")){
 			if(m_SB.toString()!=null){
-				if(m_CurrFeat!=null){
-					//ONLY EXPECTED IN FEATURE_SET
+				if(m_nmf!=null){
+	//NEW
+					m_nmf.setAuthor(m_SB.toString().trim());
+				}else if(m_CurrFeat!=null){
 					m_CurrFeat.setAuthor(m_SB.toString().trim());
 				}
 			}
-			
+		}else if(qualifiedName.equals("object_class")){
+	//NEW
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					m_nmf.setObjClass(m_SB.toString().trim());
+				}
+			}
+		}else if(qualifiedName.equals("operation")){
+	//NEW
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					m_nmf.setOperation(m_SB.toString().trim());
+				}
+			}
+		}else if(qualifiedName.equals("annotation_id")){
+	//NEW
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					if(m_transBefore){
+						m_nmf.setBeforeAnnotationId(m_SB.toString().trim());
+					}else if(m_transAfter){
+						m_nmf.setAfterAnnotationId(m_SB.toString().trim());
+					}
+				}
+			}
+		}else if(qualifiedName.equals("transcript_name")){
+	//NEW
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					if(m_transBefore){
+						m_nmf.setBeforeTranscriptName(m_SB.toString().trim());
+					}else if(m_transAfter){
+						m_nmf.setAfterTranscriptName(m_SB.toString().trim());
+					}
+				}
+			}
+		}else if(qualifiedName.equals("id")){
+	//NEW
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					if(m_transBefore){
+						if(m_nmf.getBeforeId1()==null){
+							m_nmf.setBeforeId1(m_SB.toString().trim());
+						}else{
+							m_nmf.setBeforeId2(m_SB.toString().trim());
+						}
+					}else if(m_transAfter){
+						if(m_nmf.getAfterId1()==null){
+							m_nmf.setAfterId1(m_SB.toString().trim());
+						}else{
+							m_nmf.setAfterId2(m_SB.toString().trim());
+						}
+					}
+				}
+			}
+/*****
+	//NEW
+		}else if(qualifiedName.equals("name")){
+			if(m_SB.toString()!=null){
+				if(m_nmf!=null){
+					if(m_transBefore){
+						m_nmf.setBeforeName(m_SB.toString().trim());
+					}else if(m_transAfter){
+						m_nmf.setAfterName(m_SB.toString().trim());
+					}
+				}
+			}
+****/
 		}else if(qualifiedName.equals("date")){
 			if(m_SB.toString()!=null){
 				m_CurrDate.setdate(m_SB.toString().trim());
-				System.out.println("FOUND DATE STR <"
-						+m_CurrDate.getdate()+">");
+				//System.out.println("FOUND DATE STR <"
+				//		+m_CurrDate.getdate()+">");
 			}
 			if(m_CurrDate.getdate()==null){
+			}else if(m_nmf!=null){
+	//NEW
+				m_nmf.setdate(m_CurrDate.getdate());
 			}else if(m_CurrAttr!=null){
-				System.out.println(" IN ATTR <"+m_CurrAttr.gettype()+">");
+				//System.out.println(" IN ATTR <"+m_CurrAttr.gettype()+">");
 				m_CurrAttr.setdate(m_CurrDate.getdate());
 				m_CurrAttr.settimestamp(m_CurrDate.gettimestamp());
 			}else if(m_CurrFeat!=null){
-				System.out.println(" IN FEAT <"+m_CurrFeat.getId()+">");
+				//System.out.println(" IN FEAT <"+m_CurrFeat.getId()+">");
 				m_CurrFeat.setdate(m_CurrDate.getdate());
 				m_CurrFeat.settimestamp(m_CurrDate.gettimestamp());
 				//if((m_CurrAnnot!=null)&&(m_CurrDate.getdate()!=null)){
@@ -334,12 +462,13 @@ private StringBuffer m_SB;
 				//			m_CurrDate.gettimestamp());
 				//}
 			}else if(m_CurrAnnot!=null){
-				System.out.println(" IN ANNOT <"+m_CurrAnnot.getId()+">");
+				//System.out.println(" IN ANNOT <"+m_CurrAnnot.getId()+">");
 				//PUSH UP TO ANNOTATION ALSO
 				m_CurrAnnot.setdate(m_CurrDate.getdate());
 				m_CurrAnnot.settimestamp(m_CurrDate.gettimestamp());
 			}
 			m_CurrDate = null;
+			System.gc();
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("annotation"))){
 			//System.out.println("DONE WITH ANNOTATION\n");
 			//System.out.println("ADDING Annot TO GAME\n");
@@ -376,7 +505,7 @@ private StringBuffer m_SB;
 				System.out.println("********No CurrAnnot FOR ASPECT!");
 			}
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("feature_set"))){
-			//System.out.println("\tADDING FEAT_SET TO ANNOT");
+			//System.out.println("\tADDING FEAT_SET<"+m_CurrFeatSet.getId()+"> TO ANNOT");
 			if(m_CurrAnnot!=null){
 				m_CurrAnnot.addGenFeat(m_CurrFeatSet);
 				m_CurrFeatSet = null;
@@ -391,30 +520,27 @@ private StringBuffer m_SB;
 			}else{
 				System.out.println("********No CurrFeatSet FOR FEATURE_SPAN!");
 			}
+//FSS END
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("seq"))){
-			//System.out.println("ENDING SEQ NODE<"+m_CurrSeq.getId()+">");
-			//cdna GETS PUT IN SEPARATE FEATURE
-			if(m_Residues!=null){
-				m_CurrSeq.setResidues(m_Residues);
-			}else{
-				//NO RESIDUE - MUST RELY ON ATTRIB FOR LENGTH
-			}
-
-			if((m_CurrSeq!=null)&&(m_descriptionTxt!=null)){
-				m_CurrSeq.setDescription(m_descriptionTxt);
-				m_descriptionTxt=null;
+			//System.out.println("ENDING SEQ NODE<"
+			//		+m_CurrSeq.getId()+">");
+			if(m_CurrSeq!=null){
+				if(m_Residues!=null){
+					m_CurrSeq.setResidues(m_Residues);
+				}
+				if(m_descriptionTxt!=null){
+					m_CurrSeq.setDescription(
+							m_descriptionTxt);
+					m_descriptionTxt=null;
+				}
 			}
 			if(m_CurrFeatSet!=null){ //FEATURE_SET LEVEL
 				if(m_CurrSeq!=null){
-				if((m_CurrSeq.getResidueType()!=null)&&(m_CurrSeq.getResidueType().equals("cdna"))){
+				if((m_CurrSeq.getResidueType()!=null)
+						&&(m_CurrSeq.getResidueType().equals("cdna"))){
 					m_CurrSeq.setType("cdna");
-				}else if((m_CurrSeq.getResidueType()!=null)&&(m_CurrSeq.getResidueType().equals("aa"))){
-					//Span sp = calcCDSSpan(
-					//	m_CurrSeq.getResidueLength(),
-					//	m_CurrFeatSet);
-					//if(sp!=null){
-					//	m_CurrSeq.setSpan(sp);
-					//}
+				}else if((m_CurrSeq.getResidueType()!=null)
+						&&(m_CurrSeq.getResidueType().equals("aa"))){
 					m_CurrSeq.setType("aa");
 				}
 				m_CurrFeatSet.addGenFeat(m_CurrSeq);
@@ -427,7 +553,7 @@ private StringBuffer m_SB;
 
 		//COMPUTATIONAL_ANALYSIS
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("computational_analysis"))){
-			System.out.println("FINISH COMPUTATIONAL_ANALYSIS");
+			System.out.println(" FINISH COMPUTATIONAL_ANALYSIS");
 			if(m_CurrGame!=null){
 				m_CurrGame.addGenFeat(m_CurrCompAnal);
 				m_CurrCompAnal = null;
@@ -435,26 +561,19 @@ private StringBuffer m_SB;
 				System.out.println("********No CurrGame FOR COMP_ANAL!");
 			}
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_set"))){
-			System.out.println("\tFINISH RESULT_SET");
+			//System.out.print("\t FINISH RESULT_SET WITH NAME<");
 			if(m_CurrCompAnal!=null){
+				//System.out.println(m_CurrResultSet.getName()+">");
 				m_CurrCompAnal.addGenFeat(m_CurrResultSet);
-				System.out.println("\t\tWITH NAME<"
-					+m_CurrResultSet.getName()+">");
 				m_CurrResultSet = null;
 			}else{
 				System.out.println("********No CurrCompAnal FOR RESULT_SET!");
 			}
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_span"))){
-			System.out.println("\t\tFINISH RESULT_SPAN");
+			//System.out.print("\t\t FINISH RESULT_SPAN WITH ID<");
 			if(m_CurrResultSpan!=null){
-				if(m_CurrSeqRel!=null){
-					m_CurrResultSpan.setResidues(
-							m_CurrSeqRel.getAlignment());
-					m_CurrSeqRel = null;
-				}
+				//System.out.println(m_CurrResultSpan.getId()+">");
 				m_CurrResultSet.addGenFeat(m_CurrResultSpan);
-				System.out.println("\t\tWITH NAME<"
-					+m_CurrResultSpan.getName()+">");
 				m_CurrResultSpan = null;
 			}else{
 				System.out.println("********No CurrResultSet FOR RESULT_SPAN!");
@@ -469,12 +588,16 @@ private StringBuffer m_SB;
 		//ATTRIBUTES
 		}else if(qualifiedName.equals("property")){
 			m_CurrAttr.settype(m_typeTxt);
+//FFFFF
+			m_typeTxt = null;
 			m_CurrAttr.setvalue(m_valueTxt);
 			//System.out.println("READ GAME PROPERTY OF TYPE<"
 			//		+m_typeTxt
 			//		+"> VALUE<"+m_valueTxt+">");
 			if((m_typeTxt!=null)&&(m_typeTxt.startsWith("internal"))){
 				m_CurrAttr.setisinternal("1");
+			}else{
+				m_CurrAttr.setisinternal("0");
 			}
 			if(m_CurrCompAnal!=null){
 				m_CurrCompAnal.addAttrib(m_CurrAttr);
@@ -500,6 +623,8 @@ private StringBuffer m_SB;
 			m_CurrAttr = null;
 		}else if(qualifiedName.equals("dbxref")){
 			if(m_CurrDbxrefAttr!=null){
+				//System.out.println("READ GAME DBXREF DB<"
+				//	+m_xref_dbTxt+"> ID<"+m_db_xref_idTxt+">");
 				if(m_xref_dbTxt!=null){
 					m_CurrDbxrefAttr.setxref_db(m_xref_dbTxt);
 				}
@@ -507,9 +632,13 @@ private StringBuffer m_SB;
 					m_CurrDbxrefAttr.setdb_xref_id(m_db_xref_idTxt);
 				}
 				if(m_CurrSeq!=null){
+					//System.out.println("\tPUT IN SEQ");
 					m_CurrSeq.addAttrib(m_CurrDbxrefAttr);
+					m_CurrDbxrefAttr = null;
 				}else if(m_CurrFeat!=null){
+					//System.out.println("\tPUT IN FEAT");
 					m_CurrFeat.addAttrib(m_CurrDbxrefAttr);
+					m_CurrDbxrefAttr = null;
 				}else{
 					System.out.println("****No CurrFeat FOR ATTR dbxref!");
 				}
@@ -518,7 +647,10 @@ private StringBuffer m_SB;
 			}
 		}else if(qualifiedName.equals("comment")){
 			m_CurrAttr.settext(m_textTxt);
-			m_CurrAttr.setperson(m_personTxt);
+			if(m_personTxt!=null){
+				m_CurrAttr.setperson(m_personTxt);
+				m_personTxt = null;
+			}
 			if(m_CurrDate!=null){
 				m_CurrAttr.setdate(m_CurrDate.getdate());
 				m_CurrAttr.settimestamp(m_CurrDate.gettimestamp());
@@ -567,6 +699,16 @@ private StringBuffer m_SB;
 				m_CurrResultSpan.setName(m_nameTxt);
 			}else if(m_CurrSeq!=null){
 				m_CurrSeq.setName(m_nameTxt);
+			}else if(m_nmf!=null){
+/****/
+//NEW
+				//System.out.println("NMF NAME");
+				if(m_transBefore){
+					m_nmf.setBeforeName(m_SB.toString().trim());
+				}else if(m_transAfter){
+					m_nmf.setAfterName(m_SB.toString().trim());
+				}
+/****/
 			}else{
 				//System.out.println("NAME<"+m_nameTxt
 				//		+">TYPE<"+m_CurrFeat.getType()
@@ -636,8 +778,11 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("result_set")){
 		}else if(qualifiedName.equals("result_span")){
 		}else if(qualifiedName.equals("game")){
-		}else if(qualifiedName.equals("seq_relationship")){
 		}else if(qualifiedName.equals("output")){ //WRAPS 'score'
+			m_inOutput = false;
+//FFFFF
+			m_typeTxt = null;
+			//SINCE 'output' ISNT USED, NEITHER SHOULD ITS TYPE
 		}else if(qualifiedName.equals("deleted_gene")){
 		}else if(qualifiedName.equals("deleted_transcript")){
 		}else if(qualifiedName.equals("changed_gene")){
@@ -651,10 +796,10 @@ private StringBuffer m_SB;
 
 	public void characters(char[] ch,int start,int length){
 		m_SB.append(new String(ch,start,length));
+		//System.out.println("\t\tCHARACTERS LEN<"+ch.length+">");
 	}
 
 
-//FSSPEILI
 	public Span calcCDSSpan(String the_DeclResidueLength,
 			GenFeat the_CurrFeatSet){
 		System.out.println("CALC CDS SPAN");
@@ -692,7 +837,6 @@ private StringBuffer m_SB;
 		}
 	}
 
-//FSSPEILI
 	private int getEndpoint(Vector the_SpanList,int the_start,int the_len){
 		int endPos = 0;
 		int i=0;

@@ -8,6 +8,7 @@ public class Feature extends GenFeat {
 
 private String m_timeaccessioned;
 private String m_timelastmodified;
+private String m_timeexecuted;
 private String m_seqlen;
 //private String m_isanalysis;
 private String m_Residues;
@@ -21,6 +22,7 @@ private SMTPTR m_PubId = new SMTPTR("pubINIT");
 
 private Vector m_FeatDbxrefList = new Vector();
 private Vector m_FeatSynList = new Vector();
+private Vector m_FeatCVTermList = new Vector();
 
 private Vector m_AttribList = null; //FOR <property>,<gene>,<dbxref>,<comment>
 private Vector m_FeatSubList = null; //FOR <property>,<gene>,<dbxref>,<comment>
@@ -53,6 +55,14 @@ private String m_programversion = null;
 
 	public String gettimelastmodified(){
 		return m_timelastmodified;
+	}
+
+	public void settimeexecuted(String the_timeexecuted){
+		m_timeexecuted = the_timeexecuted;
+	}
+
+	public String gettimeexecuted(){
+		return m_timeexecuted;
 	}
 
 	public void setseqlen(String the_seqlen){
@@ -176,7 +186,7 @@ private String m_programversion = null;
 
 	public void addFeatDbxref(FeatDbxref the_gf){
 //DISABLE
-//		m_FeatDbxrefList.add(the_gf);
+		m_FeatDbxrefList.add(the_gf);
 	}
 
 	public FeatDbxref getFeatDbxref(int the_indx){
@@ -200,6 +210,23 @@ private String m_programversion = null;
 		//System.out.println("FEATURE:getFeatSyn("+the_indx+")");
 		if((the_indx>=0)&&(the_indx<m_FeatSynList.size())){
 			return (FeatSyn)m_FeatSynList.get(the_indx);
+		}
+		return null;
+	}
+
+//FEAT_CVTERM
+	public int getFeatCVTermCount(){
+		return m_FeatCVTermList.size();
+	}
+
+	public void addFeatCVTerm(FeatSub the_gf){
+		m_FeatCVTermList.add(the_gf);
+	}
+
+	public FeatCVTerm getFeatCVTerm(int the_indx){
+		//System.out.println("FEATURE:getFeatCVTerm("+the_indx+")");
+		if((the_indx>=0)&&(the_indx<m_FeatCVTermList.size())){
+			return (FeatCVTerm)m_FeatCVTermList.get(the_indx);
 		}
 		return null;
 	}

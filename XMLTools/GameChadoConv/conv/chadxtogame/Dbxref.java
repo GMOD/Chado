@@ -54,6 +54,10 @@ private String m_accession;
 		System.out.println(offsetTxt+"  dbname    <"+getDBId()+">");
 		System.out.println(offsetTxt+"  accession <"+m_accession+">");
 	}
+
+	public String toString(){
+		return ("ID<"+m_Id+"> NAME<"+getDBId()+"> ACC<"+m_accession+">");
+	}
 }
 
 

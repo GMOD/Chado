@@ -17,6 +17,7 @@ private String m_nendpart = null;
 private String m_rank = null;
 private String m_min = null;
 private String m_max = null;
+private String m_residue_info = null;
 private String m_Align = null;
 
 	public FeatLoc(String the_Id){
@@ -47,7 +48,9 @@ private String m_Align = null;
 	}
 
 	public int getstrand(){
-		if(m_strand.equals("-1")){
+		if(m_strand==null){
+			return 0;
+		}else if(m_strand.equals("-1")){
 			return -1;
 		}else{
 			return 1;
@@ -100,6 +103,14 @@ private String m_Align = null;
 
 	public String getmax(){
 		return m_max;
+	}
+
+	public void setresidue_info(String the_residue_info){
+		m_residue_info = the_residue_info;
+	}
+
+	public String getresidue_info(){
+		return m_residue_info;
 	}
 
 	public void setAlign(String the_Align){

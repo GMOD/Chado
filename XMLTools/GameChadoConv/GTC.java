@@ -14,22 +14,34 @@ public class GTC {
 		int modeflags = ChadoWriter.WRITEALL;
 		int seqflags = ChadoWriter.SEQOMIT;
 		int tpflags = ChadoWriter.TPOMIT;
+		int ulflags = 0;
 		for(int i=0;i<argv.length;i++){
 			if(argv[i]!=null){
 				if(argv[i].startsWith("-")){
 					//FLAG
 					if(argv[i].equals("-a")){//ALL
 						parseflags = GameSaxReader.PARSEALL;
-					}else if(argv[i].equals("-c")){//COMPUTATIONAL_ANALYSIS
+					}else if(argv[i].equals("-c")){
+						//COMPUTATIONAL_ANALYSIS
 						parseflags = GameSaxReader.PARSECOMP;
-					}else if(argv[i].equals("-g")){//GENES
+					}else if(argv[i].equals("-g")){
+						//GENES
 						parseflags = GameSaxReader.PARSEGENES;
-					}else if(argv[i].equals("-t")){//TRANSACTIONAL CHANGES
+					}else if(argv[i].equals("-t")){
+						//TRANSACTIONAL CHANGES
 						modeflags = ChadoWriter.WRITECHANGED;
-					}else if(argv[i].equals("-s")){//INCL SEQ
+					}else if(argv[i].equals("-s")){
+						//INCL SEQ
 						seqflags = ChadoWriter.SEQINCL;
-					}else if(argv[i].equals("-p")){//INCL Transposable Elements
+					}else if(argv[i].equals("-p")){
+						//INCL Transposable Elements
 						tpflags = ChadoWriter.TPINCL;
+					}else if(argv[i].equals("-R")){
+						//EXCEPTION FOR REL4 CODE
+						ulflags = ChadoWriter.REL4;
+					}else if(argv[i].equals("-H")){
+						//EXCEPTION FOR HETEROCHROMATIN CODE
+						ulflags = ChadoWriter.HET;
 					}
 				}else{
 					if(infile==null){//FIRST IS INFILE
@@ -41,7 +53,8 @@ public class GTC {
 			}
 		}
 
-		ChadoWriter rd = new ChadoWriter(infile,outfile,parseflags,modeflags,seqflags,tpflags);
+		ChadoWriter rd = new ChadoWriter(infile,outfile,
+				parseflags,modeflags,seqflags,tpflags,ulflags);
 		rd.GameToChado();
 	}
 }
