@@ -15,5 +15,5 @@ rm -rf /tmp/chado_load/*
 ./Build ontologies
      #gets and installs various ontologies
      #edit lib/Chado/LoadDBI.pm to remove Autocommit
-load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile refseq.gff
+load/bin/load_gff3.pl --organism Ecoli --srcdb DB:genbank --gfffile dat/NC_000913.gff
      #loads gff file
