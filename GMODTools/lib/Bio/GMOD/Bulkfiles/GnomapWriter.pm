@@ -98,7 +98,6 @@ sub initData
     _fragment 
     _junction 
     _mutation 
-    _site  
     _UTR 
     _variant 
     misc
@@ -115,8 +114,10 @@ sub initData
     transposable_element_pred 
     );
   }
-  $noIDmap =~ s/\s+/|/g;
+  $noIDmap =~ s/\s+/|/g; 
   $noIDmap .= '|\bregion';
+  $noIDmap =~ s/\|\|/|/g;
+  
   $nameIsId= $finfo->{nameisid} || $config->{nameisid} || '^(BAC)';
   $nameIsSpeciesId= $finfo->{nameisorgid} || $config->{nameisorgid} || '^(gene)$';  # others? rnas?
   $cutdbpattern=  $finfo->{idcutdb} || $config->{idcutdb} || '^(FlyBase|GadFly|GB_protein|GO):';
@@ -367,7 +368,7 @@ sub merge2gnomap
   my $ffformat = 0; #? test always; probably is 2
   while(<$inh>){
     if (/^\w/ && /\t/) {  
-      my @v= split "\t", $_;
+      my @v= split(/\t/); #split "\t", $_;
       if ( $ffformat == 2 || @v > 7 || ($v[0] =~ /^\w/ && $v[1] =~ /^[\d-]+$/)) { 
         $ffformat= 2;
         splice(@v,0,2); 
@@ -439,7 +440,7 @@ sub copyFFF2Gnomap
     open(OUT,">$featname");
     while(<FF>){
       if (/^\w/ && /\t/) {  
-        my @v= split "\t", $_;
+        my @v= split(/\t/); # split /\t/, $_;
         if ( $ffformat == 2 || @v > 7 || ($v[0] =~ /^\w/ && $v[1] =~ /^[\d-]+$/)) { 
           $ffformat= 2;
           splice(@v,0,2); 
@@ -866,9 +867,11 @@ sub makeAllIdmaps
   #die "Can't read $file" unless (open(FIN,$file));
   my $org   = ucfirst( $self->{config}->{org} || 'Any');
   # fixme for ortholog to_name in $notes
+  my($nte,$ste,$ite);
   
   while(<$fin>) {
-    my ($class,$sym,$map,$range,$idv,$dbx,$notes)= split "\t";
+    my ($class,$sym,$map,$range,$idv,$dbx,$notes)= split(/\t/);
+    $nte++ if ($class =~/transposable_element/); #DEBUG
     next unless( $range && $range ne '-' );
     next if ($class =~ /$noIDmap/); ## ?? drop or keep
     
@@ -891,14 +894,16 @@ sub makeAllIdmaps
     while ($needid && (my $tid = shift @ids)) {
       next if ($tid eq '-');
       
+      $ite++ if ($tid =~/FBti/); #DEBUG
       my $db='';
       if ($tid =~ s/$cutdbpattern//i) { $db= $1; } 
       next unless ($db =~ /$indexdbpattern/ || $tid =~ /$indexidpattern/);
       
-      my($start, $stop)= $self->maxrange($range); #$self->
+      my($start, $stop)= $self->maxrange($range);  
       my $idkey="$tid.$csome.$start";
       next if ($didid{$idkey});
-      
+
+      $ste++ if ($tid =~/FBti/); #DEBUG
       my $idf= 'idmap-all.tsv';
       if ( $tid =~ m/^([A-Za-z]+)/ ) { $idf= "idmap-$1.tsv"; }
       my $fh= $idfh->{$idf};
@@ -912,6 +917,7 @@ sub makeAllIdmaps
         }  
       }
   }
+	warn "TE count: nte=$nte idte=$ite saved=$ste\n" if $DEBUG;
   #close(FIN);
   return "makeAllIdmaps n=$nd\n";
 }

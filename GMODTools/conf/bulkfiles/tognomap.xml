@@ -12,13 +12,18 @@
     Cut from mergeflyfeats4.pl and .xml config, d.gilbert, aug04
   </about>
 
-  <noIDmap>_fragment|_junction|_mutation|_peptide|_site|_UTR|_variant
+  <noIDmap>_fragment|_junction|_mutation|_peptide|_UTR|_variant
     chromosome|golden_path\b|source
     enhancer|EST|cDNA|intron
     misc|match|motif|sim4
-    mRNA|CDS|oligo|processed|protein|
-    repeat|regulatory_region|repeat_region
-    transposable_element_pred</noIDmap>
+    mRNA|CDS|oligo|processed|protein
+    transcription_start_site|protein_binding_site|polyA_site|\binsertion_site
+    repeat|regulatory_region|repeat_region</noIDmap>
+  <!-- keep:
+  transposable_element_insertion_site
+  drop:  insertion_site polyA_site protein_binding_site transcription_start_site
+  -->
+  
   <indexidtype>^(gene|pseudogene|\w+RNA)</indexidtype>
   <indexidpattern>[A-Z]{2}gn\d+</indexidpattern>
   <nameisid>BAC</nameisid>

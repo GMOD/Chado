@@ -48,7 +48,7 @@ our $DEBUG = 0;
 my $VERSION = "1.0";
 my $configfile= "toacode"; #? BulkFiles/AcodeWriter.xml 
 
-use vars qw/  $noIDmap $nameIsId $nameIsSpeciesId $cutdbpattern $indexidtype $indexidpattern /;
+use vars qw/  $noIDmap $nameIsId $nameIsSpeciesId $cutdbpattern $indexidtype $gnidpattern $anidpattern /;
 
 sub init 
 {
@@ -110,14 +110,10 @@ sub initData
   $nameIsSpeciesId= $finfo->{nameisorgid} || $config->{nameisorgid} || '^(gene)$';  # others? rnas?
   $cutdbpattern=  $finfo->{idcutdb} || $config->{idcutdb} || '^(FlyBase|GadFly|GB_protein|GO):';
 
-  $indexidtype= $finfo->{indexidtype} 
-    || $config->{indexidtype} 
-    || '^(gene|pseudogene|\w+RNA)';
-  $indexidpattern= $finfo->{indexidpattern} 
-    || $config->{indexidpattern} 
-    || '[A-Z]{2}gn\d+';
+  $indexidtype= $finfo->{indexidtype}|| $config->{indexidtype} || '^(gene|pseudogene|\w+RNA)';
+  $gnidpattern= $finfo->{gnidpattern}|| $config->{gnidpattern} || '[A-Z]{2}gn\d+';
+  $anidpattern= $finfo->{anidpattern}|| $config->{anidpattern} || '[A-Z]{2}an\d+';
     
-
 }
 
 
@@ -319,6 +315,7 @@ sub acodeHeader
 {
   my($self,%vals)= @_;
   
+  
   my $type= delete $vals{type};
   my $arm = delete $vals{chr} || delete $vals{chromosome};
   my $loc = delete $vals{loc} || delete $vals{location};
@@ -332,13 +329,15 @@ sub acodeHeader
 
   my @ids= map { s/$cutdbpattern//i; $_; } split(/,/, $ID.",".$db_xref);
     
-  my ($anid)= grep /FBan/, @ids;
-  my ($gid) = grep /FBgn/, @ids;
+  
+  my ($anid)= grep /$anidpattern/, @ids;
+  my ($gid) = grep /$gnidpattern/, @ids;
   my $gsym= $name;
   my $cgsym= $ID;
   my $cloc= delete $vals{cytomap};
   my $scaf= delete $vals{gbunit};
   my $syn = delete $vals{synonym_2nd};
+  my $isTE=($type =~ /transposable_element/ || $gid =~ /FBti/); # an = TE\d+ ; gn = FBti\d+
 
   my @re=();
   push(@re,"ID 1 $anid");
@@ -368,10 +367,17 @@ sub acodeHeader
   $gadr .= "RETE|$re\n";
   $gadr .= "ID|$anid\n";
   $gadr .= "SYM|$cgsym\n";
-  $gadr .= "GENSR\n{\n";
+  
+  if ($isTE) {
+  $gadr .= "INSR\n{\n";  ## need INSR variant, FBti/TE 
+  $gadr .= "SYM|$gsym\n";
+  $gadr .= "ID|$gid\n}\n";
+  } else {
+  $gadr .= "GENSR\n{\n";  ## need INSR variant, FBti/TE 
   $gadr .= "GSYM|$gsym\n";
   $gadr .= "ID|$gid\n}\n";
-
+  }
+  
   $gadr.= "CLA|$type\n" if $type;
   $gadr.= "ARM|$arm\n" if $arm;
   $gadr.= "SCAF|$scaf\n" if $scaf;
@@ -554,6 +560,7 @@ sub fromFFFloop
     # my ($gid) = grep /FBgn/, @ids;
     my ($gid) = ($dbxref =~ m/(FBgn\d+)/);
     my ($cid) = ($id =~ m/(C[GR]\d+)/);
+    # add FBti/TE support
     
     if ($type =~ /^(mRNA|CDS)/) {  # intron|UTR ???
       ## subfeature for acode  

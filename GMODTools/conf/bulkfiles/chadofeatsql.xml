@@ -251,10 +251,22 @@ ORDER BY arm, armloc.fmin --, matchcv.name
 
 
   <feature_sql id="matches" type="feature_table"  output="matches.tsv">
+
+  <script name="matchfilt" type="postprocess" shell="perl -ni.old" language="perl">
+<![CDATA[
+  #filter matches that exist in analysis set; keep EST/cDNAs matches; RE60666.5prime, LD02891.5prime and like
+  print if (/([.:])(5prime|3prime|contig)/ && !/sim4:wrap/);
+]]>
+  </script>
+
   <sql>
 -- use this to get the paired genome/target match items w/ attr (or null) --
 -- jun04 - need to filter out apollo dupl. evidence for
 -- match features, type = transposable_element_insertion_site
+-- jan05 ; there are dmel chado features here not in analysis; but need to filter
+-- those found in analysis set from here. Problem is finding shared OID !
+-- change 'targft left outer join gffattr_match ' to 'matchft ..' ?
+
 SELECT distinct
   -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   armft.uniquename as arm,

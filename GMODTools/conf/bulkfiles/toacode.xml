@@ -16,12 +16,19 @@
  
   <indexidtype>^(gene|pseudogene|\w+RNA)</indexidtype>
   <indexsubtype>^(mRNA|CDS)</indexsubtype>
-  <indexidpattern>[A-Z]{2}gn\d+</indexidpattern>
+  <gnidpattern>[A-Z]{2}gn\d+</gnidpattern>
+  <anidpattern>[A-Z]{2}an\d+</anidpattern>
 
+<!--   <indexidtype>^(transposable_element|transposable_element_insertion_site)</indexidtype> -->
+<!--   <indexsubtype>^(NONE)</indexsubtype>  -->
+<!--   <gnidpattern>[A-Z]{2}ti\d+</gnidpattern> -->
+<!--   <anidpattern>[A-Z]{2}ti\d+</anidpattern> -->
+  
   <idcutdb>^(FlyBase|Gadfly|GB_protein|GO):</idcutdb>
   
   <informat>fff</informat>  
 
+<!--
   <featset>gene</featset>
   <featset>mRNA</featset>
   <featset>CDS</featset>
@@ -35,16 +42,7 @@
   <featset>three_prime_UTR</featset>
   <featset>intron</featset>
   <featset>syntenic_region</featset> 
+-->
 
-  <!--
-  <fileset
-    name="cytofeat"
-    path="tmp/cytomap/dmel\-[\w\-\_]+\-cytofeat.*.fff"
-    oldpath="tmp/cytomap/cyto-features-[\w\-\_]+.tsv"
-    title="cyto-feature parts" 
-    cytofeat="1"
-    date="20041021" 
-  />
-  --> 
 
 </opt>

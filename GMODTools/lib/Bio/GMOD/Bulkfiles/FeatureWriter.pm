@@ -79,7 +79,7 @@ my %gffForwards=();
 my @gffForwards=();
 
 use constant TOP_SORT => -9999999;
-use constant MAX_FORWARD_RANGE => 500000; # maximum base length allowed for collecting forward refs
+use constant MAX_FORWARD_RANGE => 990000; # at 500000 lost a handful of oidobs refs; maximum base length allowed for collecting forward refs
 use constant MIN_FORWARD_RANGE =>  20000; # minimum base length for collecting forward refs
 
 ## our == global scope; use vars == package scope
@@ -616,15 +616,18 @@ sub processChadoTable
     #warn ">tss1: $arm,$fmin,$type,$name,$oid,$l_oid\n" if $tss; 
 
     ## data fixes
-    if( !defined $fmax ) { $fmax=0; }
-    if( !defined $fmin ) { $fmin=0; }
+    unless( defined $fmax ) { $fmax=0; }
+    unless( defined $fmin ) { $fmin=0; }
     elsif ($intronpatch && $type eq 'intron') { $fmax += 1; }
     elsif ($utrpatch && $type =~ /_prime_untranslated_region|_prime_UTR/) { 
       $fmin= $fmax if ($fmax == $fmin-1); 
       }
-    elsif( ! $origin_one{$type} ) { $fmin += 1; } # dang -1 chado start
-    if( !defined $strand )  { $strand=0; }
+    elsif( !($origin_one{$type} || $fmin == $fmax) ) { $fmin += 1; } # dang -1 chado start
+    unless( defined $strand )  { $strand=0; }
     
+    # feb05: the zero-base insertion sites ( fmin==fmax ) should not have fmin+1 adjustment
+    # 2L      131986  131986  1       1       transposable_element_insertion_site
+
     ## this check only for intron,UTR chado-computed locs ??
     ## also looks like computed UTR's can be off by 1 out of gene bounds, if UTR == 0
     ## CG2657 = 2L:21918..23888 ;  exon1 = 22983..23888 ; exon2 = 21918..22687
@@ -884,7 +887,7 @@ sub processChadoTable
       }
     
     
-    ## forward ref checkpoint
+    ## forward ref checkpoint .. maybe skip more than segmentfeats here ? what is big?
     if ($fmax > $max_max && !$segmentfeats{$fob->{type}}) {
       $max_max= $fmax; 
       my $supermax= $min_max - MIN_FORWARD_RANGE + MAX_FORWARD_RANGE;   
@@ -928,6 +931,84 @@ sub _debugObj
   
 =cut
 
+=item missing prots check
+
+This is list of prot genes lacking proteins - many/most cases where
+there are protein and CDS feats in features.tsv and intermediat files,
+but missing in fff output
+   13472   gene.list
+   18716   protgn.list
+   13458   protgnuniq.list -- diff from gene.list below
+
+>> several of these missing prots are in features.tsv as CDS, not in fff output tho !?
+
+dghome2% comm -3 gene.list protgnu.list
+CG11989   3L
+CG18675   3L
+CG32373   3L
+CG32406   3L
+CG12094   X
+CG1692    X
+CG31243   3R
+CG32600
+CG4196
+CG4444
+CG5490
+CG6669
+CG7210
+CG7369
+CG8742
+        Gyc76C == CG8742 
+
+2L      11282092        11284337        1       1       gene    mre11   CG16928 3144718 dbxref  FlyBase:FBgn0020270
+2L      18125258        18134139        -1      1       gene    kel     CG7210  3149621 dbxref  FlyBase:FBgn0001301
+2R      15015156        15016159        -1      1       gene    CG16926 CG16926 3182027 dbxref  FlyBase:FBgn0040732
+2R      18004079        18069646        -1      1       gene    px      CG4444  3094781 dbxref  FlyBase:FBgn0003175
+3L      4157384 4176500 1       1       gene    CG18675 CG18675 3103081 dbxref  FlyBase:FBgn0040696
+3L      5971160 6000157 1       1       gene    CG32406 CG32406 3125921 dbxref  FlyBase:FBgn0052406
+3L      7624529 7733071 1       1       gene    CG32373 CG32373 3124495 dbxref  FlyBase:FBgn0052373
+3L      9946189 9947970 1       1       gene    CG11989 CG11989 3121762 dbxref  FlyBase:FBgn0036064
+3L      22675904        22682457        1       1       gene    CG7369  CG7369  3134649 dbxref  FlyBase:FBgn0037188
+3R      11022333        11028699        1       1       gene    CG4196  CG4196  3161431 dbxref  FlyBase:FBgn0038297
+3R      13757594        13841516        1       1       gene    cpo     CG31243 3164388 dbxref  FlyBase:FBgn0000363
+3R      18725023        18787456        1       1       gene    klg     CG6669  3169260 dbxref  FlyBase:FBgn0017590
+3R      22624764        22668125        1       1       gene    Tl      CG5490  3173761 dbxref  FlyBase:FBgn0003717
+X       9931753 9983936 1       1       gene    CG12094 CG12094 3092421 dbxref  FlyBase:FBgn0030179
+X       10800804        10801941        1       1       gene    CG16922 CG16922 3104168 dbxref  FlyBase:FBgn0030254
+X       14156162        14296308        1       1       gene    CG32600 CG32600 3107250 dbxref  FlyBase:FBgn0052600
+X       20240356        20243886        1       1       gene    mal     CG1692  3127426 dbxref  FlyBase:FBgn0002641
+
+for this case CG18675; gff has right data, fff lacks CDS,three_prime_UTR
+distance is gene:4157385 to CDS:4157485 = 100 b
+
+chipmunk% gunzip $dr/gff.save/*gz
+grep CG18675 ../../gff.chipmunk% grep CG18675 ../../gff.save//*3L*ff
+3L      .       five_prime_UTR  4157385 4157484 .       +       .       ID=CG18675-RA-u5;Dbxref=FlyBase:FBgn0040696;Parent=CG18675-RA
+3L      .       exon    4157385 4157859 .       +       .       ID=CG18675:1;Parent=CG18675-RA
+3L      .       gene    4157385 4176500 .       +       .       ID=CG18675;Dbxref=FlyBase:FBan0018675,FlyBase:FBgn0040696;cyto_range=64A10-64A10;gbunit=AE003480;synonym=CG18675
+3L      .       mRNA    4157385 4176500 .       +       .       ID=CG18675-RA;Dbxref=FlyBase:FBtr0073218,FlyBase:FBgn0040696;Parent=CG18675;dbxref_2nd=Gadfly:CG18675-RA;synonym=CG18675-RA
+3L      sim4:na_transcript_dmel_r31     match   4157385 4176500 .       +       .       ID=:857891_sim4;Name=CG18675-RA.31
+3L      sim4:na_transcript_dmel_r32     match   4157385 4176500 .       +       .       ID=:279181_sim4;Name=CG18675-RA.32
+3L      .       CDS     4157485 4175834 .       +       .       ID=CG18675-PA;Dbxref=FlyBase:FBpp0073074,GB_protein:AAF47852.3,FlyBase:FBgn0040696;Parent=CG18675-RA;dbxref_2nd=Gadfly:CG18675-PA;synonym=CG18675-PA
+3L      .       intron  4157860 4157925 .       +       .       ID=intron_CG18675:1_CG18675:2;Name=CG18675-in;Parent=CG18675-RA
+3L      .       exon    4157926 4158195 .       +       .       ID=CG18675:2;Parent=CG18675-RA
+3L      .       intron  4158196 4158257 .       +       .       ID=intron_CG18675:2_CG18675:3;Name=CG18675-in;Parent=CG18675-RA
+3L      .       exon    4158258 4158374 .       +       .       ID=CG18675:3;Parent=CG18675-RA
+3L      .       intron  4158375 4175723 .       +       .       ID=intron_CG18675:3_CG18675:4;Name=CG18675-in;Parent=CG18675-RA
+3L      .       transposable_element_insertion_site     4172023 4172024 .       -       .       ID=FBti0039011;Name=P{EPgy2}CG18675[EY10307];synonym=P{EPgy2}CG18675<up>EY10307</up>
+3L      .       exon    4175724 4176500 .       +       .       ID=CG18675:4;Parent=CG18675-RA
+3L      .       three_prime_UTR 4175838 4176500 .       +       .       ID=three_prime_UTR_CG18675:4_161;Name=CG18675-u3;Parent=CG18675-RA
+
+chipmunk% grep CG18675 ../../fff.save//*3L*ff
+3L      4157385 gene    CG18675 64A10-64A10     4157385..4176500        CG18675 FlyBase:FBan0018675;FlyBase:FBgn0040696;      gbunit=AE003480;synonym=CG18675;
+3L      4157385 mRNA    CG18675-RA      -       4157385..4157859        CG18675-RA      FlyBase:FBtr0073218;FlyBase:FBgn0040696;Gadfly:CG18675-RA;    synonym=CG18675-RA;
+3L      4157385 five_prime_UTR  CG18675-RA-u5   -       4157385..4157484        CG18675-RA-u5   FlyBase:FBgn0040696;
+3L      4157385 match:sim4:na_transcript_dmel_r31       CG18675-RA.31   -       4157385..4157859     -
+3L      4157385 match:sim4:na_transcript_dmel_r32       CG18675-RA.32   -       4157385..4157859     -
+3L      4172023 transposable_element_insertion_site     P{EPgy2}CG18675[EY10307]        -       complement(4172023..4172024)  FBti0039011             synonym=P{EPgy2}CG18675<up>EY10307</up>;
+
+=cut
+
 sub  makeFlatFeats 
 {
 	my $self= shift;
@@ -948,7 +1029,10 @@ sub  makeFlatFeats
     my $issimple= $simplefeat{$ftype};
      
 #     my $GMM= $GMM{$ftype} && $DEBUG;
-#     warn ">gmm1 $ftype $id \n" if $GMM;
+## missing exons: CG10033 (2L?)
+## missing proteins: 3L CG11989 CG18675 CG32373 CG32406
+
+    my $GMM= ($DEBUG && $id =~ /CG11989|CG18675|CG32373|CG32406/) ? 1 : 0; # jan05 bug test, mRNA misses last 2 exons
     
     if (!$issimple && $oidob) {
       $iskid= (defined $oidob->{parent} && @{$oidob->{parent}} > 0);
@@ -962,6 +1046,7 @@ sub  makeFlatFeats
         $iskid= $ok;
         }
       }
+    warn ">gmm1 $ftype $id ispar=$ispar iskid=$iskid\n" if $GMM;
       
     my $keepfeat= ($ispar || $self->keepfeat_fff($ftype));
     if ($keepfeat) {
@@ -975,8 +1060,8 @@ sub  makeFlatFeats
         my $cob= $self->makeCompound( $fob, $kidobs, $ftype); 
         push(@cobs, $cob);
         }
-#       warn ">gmm2 add $ftype $id \n" if $GMM;
-#       _debugObj("gmmisc=$id object",$cobs[-1]) if $GMM;
+      warn ">gmm2 add $ftype $id \n" if $GMM;
+      _debugObj("gmmisc=$id object",$cobs[-1]) if $GMM;
       }
     
       # UTR here ? ?? insert CDS between UTR's ?
@@ -2027,16 +2112,67 @@ sub writeGFF
       
       ## now need to convert oid to parent id, given above change to id
       ## BUT this is bad when Parent hasn't been seen yet !
+      
+=item  BUG
+
+      ## Dec04 -- sometimes miss parent id here; get OID instead in output
+      ##  grep CG32584 dmel-X-r4.0.gff 
+      ##  mRNA ID=CG32584-RB;Parent=3108188;      
+      ##  mRNA ID=CG32584-RA;Parent=CG32584
+      ## lots for match_part .. ignore those?
+
+>> not many; 1/2 per csome; 
+>> could be due to garbage collect. on oidobs; try MAX_FORWARD_RANGE+++
+>>  MAX_FORWARD_RANGE => 990000 seems to have fixed it
+
+openInput: name=X, type=feature_table, /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dm
+el_r4.0_20041119/tmp/featdump/chadofeat-dmelX.tsv
+# output /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dmel_r4.0_20041119/gff/dmel-X-r4
+.0.gff (append=0)
+.................................................................................................
+....GFF: missed Parent ID for i/o/t:CG32584-RB/3108194/mRNA parob= k/v=Parent/3108188 
+............................................putFeats n=608, total=608, oid1=5982090
+
+processChadoTable ndone = 637432
+
+openInput: name=3L, type=feature_table, /bio/argos/flybase/data/genomes/Drosophila_melanogaster/d
+mel_r4.0_20041119/tmp/featdump/chadofeat-dmel3L.tsv
+# output /bio/argos/flybase/data/genomes/Drosophila_melanogaster/dmel_r4.0_20041119/gff/dmel-3L-r
+4.0.gff (append=0)
+................................................................................................G
+FF: missed Parent ID for i/o/t:Df(3L)st-k2.bk2/3204648/aberration_junction parob= k/v=Parent/3115
+834 
+....................GFF: missed Parent ID for i/o/t:CG3263-RB/4554565/mRNA parob= k/v=Parent/4554
+550 
+GFF: missed Parent ID for i/o/t:CG3263-RD/4554558/mRNA parob= k/v=Parent/4554550 
+............putFeats n=435, total=435, oid1=8313668
+
+processChadoTable ndone = 734624
+
+
+=cut
+
       my $parob= $oidobs->{$v}->{fob};
-      $v= $parob->{id} if ($parob && $parob->{id});
+      if ($parob && $parob->{id}) {
+        $v= $parob->{id};
+        }
+      else {
+        next if ($fulltype =~ /match_part/ || $id =~ /GA\d/); 
+          # dpse GA genes; odd parent = csome; ignore parent here? FIXME
+        print STDERR "GFF: missed Parent ID for i/o/t:",$id,"/",$oid,"/",$fulltype,
+          " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
+        next; # always skip writing bogus Parent= to gff
+        }
       }
     elsif ($k eq "dbxref") { # dbxref_2nd - leave as separate 
       $k= 'Dbxref'; 
       ##$v= "\"$v\"";  # NO quotes - spec says to but BioPerl::GFFv3 reader doesn't strip quotes
       }
       
-    $at{$k} .= ',' if $at{$k};
-    $at{$k} .= _gffEscape($v);  # should be urlencode($v) - at least any [=,;\s]
+    if ($k) {
+      $at{$k} .= ',' if $at{$k};
+      $at{$k} .= _gffEscape($v);  # should be urlencode($v) - at least any [=,;\s]
+      }
     }
     
   foreach my $k (sort keys %at) { push(@at, "$k=$at{$k}"); }

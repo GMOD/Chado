@@ -1,0 +1,229 @@
+<opt
+  name="fbbulk-hetr3"
+  relid="h3b2"
+  ROOT="${GMOD_ROOT}/"
+  TMP="${GMOD_ROOT}/tmp"
+  datadir="genomes/Drosophila_melanogaster"
+  >
+
+  <title>DHGP/FlyBase Heterochromatin rel 3.2</title>
+  
+<doc name="README">
+  D. melanogaster heterochomatin genome data from 
+  Drosophila Heterochromatin Genome Project, www.dhgp.org
+  Release  ${rel}, dated ${date}.
+  
+  See release notes at <a href="http://flybase.net${release_url}">
+  http://flybase.net${release_url}</a>
+</doc>
+  
+  <!-- release could/should be from include fbreleases.xml -->
+  
+  <!-- 
+  From: cdsmith <cdsmith@fruitfly.org>
+  Date: Mon, 10 Jan 2005 12:30:09 -0800
+  I have updated XML for you for Release 3.2b ..
+  Release3.2b_01102005 
+  heterchrom/chado_dmel_h_r3_2b.gz for pg dump
+  -->
+  <release id="h3b2"
+    rel="hetr32b2"
+    dbname="chado_dmel_h_r32b2"
+    relfull="dmel_hetr32b2_20050110"
+    date="20050110"
+    release_url="/annot/dmelhet-release3.2b2.html"
+    />
+
+  <release id="h3b"
+    rel="hetr32b"
+    dbname="dmelhet_r32b_chado"
+    relfull="dmel_hetr32b_20041025"
+    date="20041025"
+    release_url="/annot/dmelhet-release3.2b.html"
+    />
+    
+  <release id="h3" 
+    rel="r3_2h"  
+    dbname="chadohet_081604" 
+    relfull="dmel_hetr3_2_08162004"
+    date="20040821" 
+    release_url="/annot/het-release3.2.html"
+    />
+
+
+  <db
+    driver="Pg"
+    name="dmelhet_chado"
+    host="localhost"
+    alt_host="bugbane.bio.indiana.edu"
+    port="7302"
+    user=""
+    password=""
+    />
+
+  <org>dmel</org>
+  <species>Drosophila melanogaster</species>
+  <include>organisms</include>
+
+  <include>filesets</include>
+  
+  <dnadump
+    path="dna/[\w\-\_]+.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    type="dna_dump"
+    />
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <!-- need to put in ENV for subsequent chadofeatsql.xml config -->
+    <ENV 
+      golden_path="'chromosome_arm','ultra_scaffold'"
+      species="Drosophila_melanogaster"
+      unknown_chr="U"
+      />
+    
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+
+    <!--  <target>matches</target>  -->
+    <!-- drop matches for analysis which has same/better info 
+      hetr32 matches has only generic 'alignment' and 'sim4:wrap...'
+    -->
+
+  </featdump>
+
+  
+  <fileset
+    name="feature_table"
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+  </fileset>
+
+  <!-- 
+    fileset are output formats w/ config, perl handler, location, etc.
+  -->
+
+  <fileset
+    name="dna"
+    path="dna/[\w\-\_]+.raw"
+    input="dna_dump"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    title="Chromosome dna"
+    />
+
+  <fileset
+    name="fff"
+    path="fff/[\w\-\_]+.fff"
+    input="feature_table"
+    title="FFF Genome features"
+    config="dmelhetfeatconv"
+    handler="FeatureWriter"
+    dogzip="0"
+    />
+
+  <fileset
+    name="gff"
+    path="gff/[\w\-\_]+.gff"
+    title="GFF Genome features"
+    dogzip="1"
+    />
+
+  <fileset
+    name="gnomap"
+    path="gnomap/[\w\-\_]+.tsv"
+    input="fff"
+    config="tognomap"
+    handler="GnomapWriter"
+    title="GnoMap features"
+    indexonly="0"
+    />
+  <fileset
+    name="gbrowse"
+    path="gnomap/gbrowse.conf"
+    config="gbrowseconf" 
+    handler="GnomapWriter"
+    withvars="1"
+    />
+
+  <fileset
+    name="fasta"
+    path="fasta/[\w\-\_]+.fasta"
+    input="fff"
+    config="tofasta"
+    handler="FastaWriter"
+    dropnotes="synonym_2nd,synonym"
+    makeall="1"
+    perchr="1"
+    dogzip="0"
+    title="Genome feature sequence fasta" 
+    />
+  <fileset
+    name="blast"
+    path="blast/[\w\-\_]+.*"
+    input="fasta"
+    config="blastfiles"
+    handler="BlastWriter"
+    title="Blast indices" 
+    />
+
+<!--   <fileset -->
+<!--     name="luseq" -->
+<!--     input="fasta" -->
+<!--     path="indices/lucene/seqs/.*" -->
+<!--     title="lucene sequence indices" -->
+<!--     config="lucegene" -->
+<!--     handler="LucegeneWriter" -->
+<!--     /> -->
+<!--   <fileset -->
+<!--     name="lufeat" -->
+<!--     input="fff" -->
+<!--     path="indices/lucene/gnomap/.*" -->
+<!--     config="lucegene" -->
+<!--     handler="LucegeneWriter" -->
+<!--     title="lucene map indices" -->
+<!--     /> -->
+ 
+  <!-- use to add parent ids to features .. change tag parentidpattern ? -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+
+  <!-- feature sets to make fasta bulk files 
+      .. change tag to fastaset ?
+      .. add intergene set ?
+  -->
+
+  <featset>chromosome</featset>
+  <featset>scaffold</featset> <!-- ? no het scaffolds? -->
+
+  <featset>gene</featset>
+  <featset>mRNA</featset>
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>pseudogene</featset>
+  <featset>gene_extended2000</featset>
+  
+  <featset>intergenic</featset>
+  
+  <!--  no het gmodel parts ? -->
+   <featset>five_prime_UTR</featset> 
+   <featset>three_prime_UTR</featset>
+   <featset>intron</featset>
+
+  <!-- see featmap in chadofeatconf -->
+ 
+</opt>
