@@ -1,6 +1,10 @@
 --create sql to grant permissions on tables in the database
--- sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>privileges.sql
-
+-- sqlt -f PostgreSQL -t TTSchema --template bin/privileges.tmpl modules/nofuncs.sql>privileges.sql
+--
+--after it is created, the permissions can be updated by excuting this command:
+--
+--  $ cat privileges.sql | psql <databasename>
+--
 --since this opens up the database to all users, it should be used with
 --caution.  Another option would be to change "PUBLIC" below to a 
 --specific user or group to whom you want to grant privileges, or
