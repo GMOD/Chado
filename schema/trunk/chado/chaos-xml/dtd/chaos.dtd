@@ -19,54 +19,59 @@
 -->
 
 <!-- chaos: this is the top-level node -->
-<!ELEMENT chaos chaos_metadata (feature+|feature_relationship+)>
+<!ELEMENT chaos (chaos_metadata,(feature|feature_relationship)+)>
 
 <!-- ======== -->
 <!-- METADATA -->
 <!-- ======== -->
 
 <!-- chaos_metadata: information about the document file itself (node) -->
-<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?)>
+<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?)+>
 
 <!-- chaos_version: (s) -->
-<!ELEMENT chaos_version PCDATA>
+<!ELEMENT chaos_version (#PCDATA)>
 
 <!-- chaos_flavour: there may be subtle differences in the chaos xml
      depending on the generation method. Typical values may be
      "bioperl", "ensembl", "chado" -->
-<!ELEMENT chaos_flavour PCDATA>
+<!ELEMENT chaos_flavour (#PCDATA)>
+
+<!-- focus_feature_id: if the chaos-xml document is gene-centric,
+     this will be the feature_id of the central gene in the document
+     -->
+<!ELEMENT focus_feature_id (#PCDATA)>
 
 <!-- feature_unique_key: this is the element that provides the unique
      identifier for features. If set, this should always be equal to
      the string "feature_id"  -->
-<!ELEMENT feature_unique_key PCDATA>
+<!ELEMENT feature_unique_key (#PCDATA)>
 
 <!-- equiv_chado_release: this is the tag for the equivalent chado
      version release that corresponds to the chaos xml. If set, this
      should be equal to "chado_1_01"    -->
-<!ELEMENT equiv_chado_release PCDATA>
+<!ELEMENT equiv_chado_release (#PCDATA)>
 
 <!-- export_unixtime: unixtime (seconds since 1970) at which the
      document was exported       -->
-<!ELEMENT export_unixtime PCDATA>
+<!ELEMENT export_unixtime (#PCDATA)>
 
 <!-- export_localtime: human readable string of the time at which
      the document was exported -->
-<!ELEMENT export_localtime PCDATA>
+<!ELEMENT export_localtime (#PCDATA)>
 
 <!-- export_host: name of the machine from which the document was
      exported  -->
-<!ELEMENT export_host PCDATA>
+<!ELEMENT export_host (#PCDATA)>
 
 <!-- export_user: fullname or username of person who exported the
      document  -->
-<!ELEMENT export_user PCDATA>
+<!ELEMENT export_user (#PCDATA)>
 
 <!-- export_perl5lib: value for env var PERL5LIB at export time -->
-<!ELEMENT export_perl5lib PCDATA>
+<!ELEMENT export_perl5lib (#PCDATA)>
 
 <!-- export_program: name of executable that generated the document -->
-<!ELEMENT export_program PCDATA>
+<!ELEMENT export_program (#PCDATA)>
 
 <!-- ======== -->
 <!-- FEATURES -->
@@ -83,7 +88,7 @@
      It is equivalent to the chado table "feature"
 
       -->
-<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5?|featureprop*|organismstr|featureloc*|feature_dbxref*|seqlen?)>
+<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5?|featureprop*|organismstr?|featureloc*|feature_dbxref*|seqlen?)+>
 
 <!-- feature_id:
 
@@ -103,7 +108,7 @@
      feature.feature_id values may be used in the document.
 
  -->
-<!ELEMENT feature_id PCDATA>
+<!ELEMENT feature_id (#PCDATA)>
 
 <!-- dbxrefstr:
 
@@ -139,7 +144,7 @@
   DBNAME is mapped to the chado column db.name
 
  -->
-<!ELEMENT dbxrefstr PCDATA>
+<!ELEMENT dbxrefstr (#PCDATA)>
 
 <!-- name:
 
@@ -162,7 +167,7 @@
   HSPs)
 
  -->
-<!ELEMENT name PCDATA>
+<!ELEMENT name (#PCDATA)>
 
 <!-- uniquename:
 
@@ -196,7 +201,7 @@
   structure of the uniquename, other than it is globally unique
 
 -->
-<!ELEMENT uniquename PCDATA>
+<!ELEMENT uniquename (#PCDATA)>
 
 <!-- residues:
 
@@ -210,7 +215,16 @@
   features that have other features located relative to them
 
  -->
-<!ELEMENT residues PCDATA>
+<!ELEMENT residues (#PCDATA)>
+
+<!-- md5:
+
+  The MD5 checksum of the residues
+
+  The md5 may be present even if the residues are not
+
+ -->
+<!ELEMENT md5 (#PCDATA)>
 
 <!-- seqlen:
 
@@ -224,7 +238,7 @@
   element is not present
 
  -->
-<!ELEMENT seqlen PCDATA>
+<!ELEMENT seqlen (#PCDATA)>
 
 <!-- type:
 
@@ -242,7 +256,7 @@
     - this is the type of relationship occuring between two features
 
  -->
-<!ELEMENT type PCDATA>
+<!ELEMENT type (#PCDATA)>
 
 <!-- featureprop:
 
@@ -252,14 +266,16 @@
   indicated with featureprop/rank
 
 -->
-<!ELEMENT featureprop  type value rank?>
+
+<!ELEMENT featureprop (type|value|rank?)+>
 
 <!-- value: (s) 
 
   The value of a property
 
 -->
-<!ELEMENT value PCDATA>
+
+<!ELEMENT value (#PCDATA)>
 
 <!-- rank:
 
@@ -286,7 +302,8 @@
      variation features (eg SNPs) relative to different haplotype
      srcfeatures
  -->
-<!ELEMENT rank PCDATA>
+
+<!ELEMENT rank (#PCDATA)>
 
 <!-- organismstr: (s) 
 
@@ -312,7 +329,8 @@
   For other cases (eg hybrids, engineered genes) [TODO syntax policy]
 
 -->
-<!ELEMENT organismstr PCDATA>
+
+<!ELEMENT organismstr (#PCDATA)>
 
 <!-- feature_dbxref:
 
@@ -322,7 +340,7 @@
  Each identifier must have a seperate feature_dbxref element
 
  -->
-<!ELEMENT feature_dbxref dbxrefstr>
+<!ELEMENT feature_dbxref (dbxrefstr)>
 
 <!-- =========== -->
 <!-- FEATURELOCS -->
@@ -337,18 +355,28 @@
   **** ALL LOCATIONS ARE INTERBASE ****
   !!!!!!!! VERY IMPORTANT !!!!!!!!
 
+  interbase starts with origin 0, and counts the spaces between bases
+
+  for example:
+
+  sequence:    a t g c c g a a a
+  position:   0 1 2 3 4 5 6 7 8 9  
+
+  the first three bases "atg" are indicated by the interbase range
+  [0,2]
+
   All featurelocs are relative to the feature indicated by srcfeature_id
 
  -->
-<!ELEMENT featureloc (nbeg|nend|strand|srcfeature_id|locgroup?|rank?)>
+<!ELEMENT featureloc (nbeg|nend|strand|srcfeature_id|locgroup?|rank?)+>
 
 <!-- nbeg: INTEGER
 
-  Position of the natural beginning (ie 5' end) of a feature
+  Position of the natural begin (ie 5' end) of a feature
   (relative to the feature indicated by srcfeature_id)
 
  -->
-<!ELEMENT nbeg PCDATA>
+<!ELEMENT nbeg (#PCDATA)>
 
 <!-- nend: INTEGER
 
@@ -356,7 +384,7 @@
   (relative to the feature indicated by srcfeature_id)
 
  -->
-<!ELEMENT nend PCDATA>
+<!ELEMENT nend (#PCDATA)>
 
 <!-- strand: INTEGER
 
@@ -366,7 +394,7 @@
   EXCEPT in the case of zero-length features (ie insertions)
 
 -->
-<!ELEMENT strand PCDATA>
+<!ELEMENT strand (#PCDATA)>
 
 <!-- srcfeature_id:
 
@@ -374,7 +402,7 @@
   relative to
 
  -->
-<!ELEMENT srcfeature_id PCDATA>
+<!ELEMENT srcfeature_id (#PCDATA)>
 
 <!-- locgroup: INT 
 
@@ -385,7 +413,7 @@
    featurelocs are indicated with a locgroup>0
 
 -->
-<!ELEMENT locgroup PCDATA>
+<!ELEMENT locgroup (#PCDATA)>
 
 <!-- ===================== -->
 <!-- FEATURE_RELATIONSHIPS -->
@@ -407,23 +435,23 @@
   
 
  -->
-<!ELEMENT feature_relationship subject_id object_id type>
+<!ELEMENT feature_relationship (subject_id|object_id|type)+>
 
 <!-- subject_id:
 
   feature_id of subject (child) feature
 
  -->
-<!ELEMENT subject_id PCDATA>
+<!ELEMENT subject_id (#PCDATA)>
 
 <!-- object_id:
 
    feature_id of object (parent) feature
 
  -->
-<!ELEMENT object_id PCDATA>
+<!ELEMENT object_id (#PCDATA)>
 
 <!--  END OF CHAOS XML DTD -->
 <!--  $Author: cmungall $ -->
-<!--  $Id: chaos.dtd,v 1.1 2004-06-16 02:46:50 cmungall Exp $ -->
+<!--  $Id: chaos.dtd,v 1.2 2004-09-01 00:08:11 cmungall Exp $ -->
 
