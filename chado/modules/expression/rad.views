@@ -184,7 +184,7 @@ CREATE OR REPLACE RULE "_RuleU_affymetrixdchip" AS
     quantification_id = NEW.quantification_id,
     float1 = NEW.signal,
     float2 = NEW.se,
-    float2 = NEW.z,
+    float3 = NEW.z,
     char1 = NEW.apcall
     WHERE elementresult_id = OLD.elementresult_id;
 
