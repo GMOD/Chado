@@ -50,6 +50,7 @@ insert into db (name, contact_id) values ('DB:PRODOM',(select contact_id from co
 insert into db (name, contact_id) values ('DB:PRINTS',(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:SMART',(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:TIGRFAMs',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:PIR',(select contact_id from contact where name = 'null'));
 
 insert into db (name, contact_id,description) values ('DB:GR',(select contact_id from contact where name = 'null'),'Gramene');
 insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot',(select contact_id from contact where name = 'null'),'SwissProt','http://us.expasy.org/cgi-bin/niceprot.pl?');
