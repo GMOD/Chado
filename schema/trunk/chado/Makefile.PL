@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.36 2003-12-04 02:24:27 allenday Exp $
+# $Id: Makefile.PL,v 1.37 2003-12-04 22:05:15 kycl4rk Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -34,7 +34,8 @@ my %args    =  (
     default => $ENV{'CHADO_DB_PASSWORD'}
   },
   DBHOST    => {
-    default => $ENV{'CHADO_DB_HOST'} || $ENV{'HOST'}
+    default => $ENV{'CHADO_DB_HOST'} || $ENV{'HOST'} ||
+               scalar gethostent || 'localhost'
   },
   DBPORT    => {
     default => $ENV{'CHADO_DB_PORT'} || 5432
@@ -44,7 +45,7 @@ my %args    =  (
 my $usage = <<"END";
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-                         CHADO INSTALLATION
+                      CHADO INSTALLATION HELP
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 The arguments to this script should be set in your environment per
@@ -97,10 +98,15 @@ foreach ( @argv ) {
 # Check to see if the enviroment is there, mostly to make sure
 # other apps can get what they need.
 #
-unless ( $ENV{'GMOD_ROOT'} ) {
+my @env_missing = ();
+for my $key (qw[GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME CHADO_DB_PASSWORD]) {
+  push @env_missing, $key unless $ENV{ $key };
+}
+if ( @env_missing ) {
   die join("\n",
     '*' x 72,
-    "\$ENV{'GMOD_ROOT'} not detected.",
+    'The following enviroment variables not detected:',
+    ( map { "  $_"} @env_missing ),
     'Please read the INSTALL document and set required environment variables.',
     '*' x 72,
     ''
@@ -369,11 +375,14 @@ if ($rebuild_complete || !-e $complete_sql) {
     "$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
     "$working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm"
   ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
+
+  system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
 }
 
 WriteMakefile(
-    'NAME'		  => 'chado',
-    'PREREQ_PM'		  => { 
+    'NAME'		            => 'chado',
+    'VERSION'             => 0.01,
+    'PREREQ_PM'		        => { 
       'SQL::Translator'   => 0.04,
       'Class::DBI'        => 0.94,
       'Class::DBI::Pager' => 0,
@@ -391,6 +400,11 @@ WriteMakefile(
       ( # retrieve abstract from module
        AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()
     ),
+    clean                 => {
+      FILES               => 
+        '$(DISTVNAME).tar$(SUFFIX) load/etc/load.conf build.conf ' .
+        '_build Build lib/Chado/AutoDBI.pm lib/Chado/LoadDBI.pm'  
+    },
 );
 
 print <<HERE
@@ -398,11 +412,11 @@ print <<HERE
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 Makefile written.  Possible targets of Makefile:
 
-  images    - Generate images of the schema in several formats
-  metadata  - ???
-  test_load - Test database CREATE TABLE statements
+  images      - Generate images of the schema in several formats
+  load_schema - Load SQL schema into database
+  prepdb      - Load basic data
+  ontologies  - Load data for various ontologies
 
-HINT: You probably want to run (at least) "make test_load"
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 HERE
@@ -514,11 +528,14 @@ metadata: $working_dir/bin/ddltrans
 	$working_dir/bin/ddltrans -f perl $working_dir/dat/chado.ddl > $working_dir/dat/chado.pl
 	$working_dir/bin/ddltrans -f xml $working_dir/dat/chado.ddl > $working_dir/dat/chado.xml
 
-test_load ::
-	\$(SHELL) $working_dir/bin/test_load.sh $DBNAME
-
-test_load_pl ::
+load_schema ::
 	$PERL $working_dir/bin/test_load.pl $DBNAME
+
+prepdb ::
+	./Build prepdb
+
+ontologies ::
+	./Build ontologies
 
 %.go_loaded: %.ontology
 	$working_dir/bin/load_ontology.pl $DBUSER $DBNAME \$< $working_dir/go/GO.defs
