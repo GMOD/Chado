@@ -114,10 +114,10 @@ create table featureloc (
        srcfeature_id int,
        foreign key (srcfeature_id) references feature (feature_id),
 
-       nbeg int,
-       is_nbeg_partial boolean not null default 'false',
-       nend int,
-       is_nend_partial boolean not null default 'false',
+       fmin int,
+       is_fmin_partial boolean not null default 'false',
+       fmax int,
+       is_fmax_partial boolean not null default 'false',
        strand smallint,
        phase int,
 
@@ -131,7 +131,7 @@ create table featureloc (
 -- phase: phase of translation wrt srcfeature_id.  Values are 0,1,2
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
-create index featureloc_idx3 on featureloc (srcfeature_id,nbeg,nend);
+create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
 
 -- ================================================
 -- TABLE: feature_pub
