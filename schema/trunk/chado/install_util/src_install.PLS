@@ -20,7 +20,7 @@ use Cwd;
 use FindBin '$Bin';
 use lib './lib';
 use Bio::GMOD::Config;
-use lib './install';
+use lib './install_util';
 use install;
 
 my $origdir = cwd;
