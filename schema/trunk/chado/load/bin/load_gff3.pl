@@ -126,7 +126,7 @@ $CACHE_SIZE ||= 1000;
 die "$GFFFILE does not exist" unless (-e $GFFFILE);
 my $TMPFASTA = 'tmp.fasta';
 my $TMPGFF   = 'tmp.gff';
-my $linenumber = `grep -n ">" $GFFFILE`;
+my $linenumber = `grep -n "^>" $GFFFILE`;
 if ($linenumber =~ /^(\d+)/) {
   $linenumber = $1;
   system("tail +$linenumber $GFFFILE > $TMPFASTA");
