@@ -15,9 +15,15 @@ no warnings;
 
 this is an example target
 
+= item prepdb()
+
+Simply calls the psql command and pipes in the contents of the 
+load/etc/initialize.sql file.  Put any insert statements that
+your data load needs here.
+
 =item ncbi()
 
-fixfixfix
+Load action for all NCBI data.
 
 =item mageml()
 
@@ -54,9 +60,7 @@ sub ACTION_foo {
 
  Title   : ACTION_prepdb
  Usage   :
- Function: Current hack to setup any rows in the DB before the load. Should be
-           replaced in the future by encapsulating in the load scripts. Right
-           now executes any SQL statements in the load/etc/initialize.sql file.
+ Function: Executes any SQL statements in the load/etc/initialize.sql file.
  Example :
  Returns : 
  Args    :
@@ -79,6 +83,16 @@ sub ACTION_prepdb {
   $m->log->info("leaving ACTION_prepdb");
 }
 
+=head2 ACTION_ncbi
+
+ Title   : ACTION_ncbi
+ Usage   :
+ Function: Load action for all NCBI data.
+ Example :
+ Returns :
+ Args    :
+
+=cut
 sub ACTION_ncbi {
   # the build object $m
   my $m = shift;
@@ -93,9 +107,8 @@ sub ACTION_ncbi {
   # now that I know what you want mirror files and load
   # fetchAndLoadFiles is called for each possible type
   # but only actively loaded for those the user selects
-  fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile", %ncbis);
-  fetchAndLoadFiles($m, $conf, "locuslink", "./load/bin/load_locuslink.pl", %ncbis);
-
+  fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile", \%ncbis);
+  fetchAndLoadFiles($m, $conf, "locuslink", "./load/bin/load_locuslink.pl", \%ncbis);
   $m->log->info("leaving ACTION_ncbi");
 }
 
@@ -268,19 +281,16 @@ sub ACTION_tokenize {
  Returns : 
  Args    :
 
-
 =cut
-
 sub fetchAndLoadFiles {
-  my ($m,$conf,$type,$command,%itm) = @_;
+    my ($m,$conf,$type,$command,$itm) = @_;
+    $m->log->info('entering fetchAndLoadFiles');
 
-  $m->log->info('entering fetchAndLoadFiles');
-
-  foreach my $key (keys %itm){
+    foreach my $key (keys %$itm){
 	print "fetching files for $key\n";
 
 	my $load = 0;
-    foreach my $file (@{ $itm{$key}{file} }) {
+    foreach my $file (@{ $itm->{$key}{file} }){
 	  # check to see if this command can handle this type
       if($file->{type} eq $type) {
 		my $fullpath = $conf->{path}{data}.'/'.$file->{local};
