@@ -17,7 +17,8 @@ my @common_SOFA_types = (
   'STS',
   'rRNA',
   'tRNA',
-  'RNA'
+  'RNA',
+  'SNP'
 );
 
 my $unflattener = Bio::SeqFeature::Tools::Unflattener->new;
@@ -91,7 +92,9 @@ while ( my $seq = $seqio->next_seq() ) {
             $sf->add_tag_value( 'ID', $gene_name[0] ) ;
         }
 
-        if ( $sf->primary_tag eq 'variation' ) {
+        if ( $sf->primary_tag eq 'variation' and $sf->length == 1 ) {
+            $sf->primary_tag('SNP');
+        } elsif ($sf->primary_tag eq 'variation') {
             $sf->primary_tag('chromosome_variation');
         }
 
@@ -108,9 +111,12 @@ while ( my $seq = $seqio->next_seq() ) {
             if ( $sf->has_tag('ID') ) {
                 $sf2->add_tag_value( 'Parent', $sf->get_tag_values('ID') );
             }
-            if ( $sf2->primary_tag() eq 'variation' ) {
+            if ( $sf2->primary_tag eq 'variation' and $sf2->length == 1 ) {
+                $sf2->primary_tag('SNP');
+            } elsif ($sf2->primary_tag eq 'variation') {
                 $sf2->primary_tag('chromosome_variation');
             }
+
             if ( $sf2->primary_tag() =~ /misc.*rna/i ) {
                 $sf2->primary_tag('RNA');
             }
