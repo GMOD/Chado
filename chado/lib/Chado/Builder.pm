@@ -48,19 +48,6 @@ platform-specific variable values
 
 =cut
 
-# create an ACTION_whatever method to implement a particular build target
-sub ACTION_foo {
-  #this is the Module::Build instance
-  my $m = shift;
-
-  #make sure you log your actions for debugging later!
-  $m->log->info("entering ACTION_foo");
-
-  print "I'm fooing to death!\n";
-
-  $m->log->info("leaving ACTION_foo");
-}
-
 =head2 ACTION_prepdb
 
  Title   : ACTION_prepdb
@@ -205,6 +192,10 @@ sub ACTION_ontologies {
   $m->notes( 'ontologies' => $chosen );
   my %ontologies = map { $_ => $conf->{ontology}{ $ont{$_} } } split ',',
     $chosen;
+
+  if ( -e $conf->{'path'}{'data'} ) {
+    rmtree $conf->{'path'}{'data'}; 
+  }
 
   foreach my $ontology ( sort keys %ontologies ) {
     print "fetching files for ", $ont{$ontology}, "\n";
