@@ -24,6 +24,8 @@ For the next release:
 - integrate a web front end (probably turnkey)
 - provide a custom tag processing module for load_gff3.pl
 - create a method for updating ontologies
+- create a method for populating cvtermpath (make_cvtermpath.pl is a starting
+point).
 
 For following releases:
 - incorporate Pub*
