@@ -32,7 +32,7 @@ Chado::DBI->set_db('Main',
 		   "dbi:Pg:dbname=$dbname",
 		   "$user",
 		   "",
-#		   {AutoCommit => 1}
+		   {AutoCommit => 1}
 		  ) or die "set_db failed";
 
 warn "ontology_file:$ontology_file\n";
