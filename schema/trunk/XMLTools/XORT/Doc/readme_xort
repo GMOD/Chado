@@ -1,23 +1,97 @@
 How to use XORT and related API
-1. add the env variable CodeBase to  where you gunzip the package to env, i.e in my case, all the code in dir /users/zhou/work/API, so I will add the following line to .cshrc file:
-setenv CodeBase /users/zhou/work/API
+
+1. add the env variable CodeBase to  where you gunzip the package to env,
+i.e in my case, all the code in dir /users/zhou/work/API, so I will add the
+following line to .cshrc file:
+
+  setenv CodeBase /users/zhou/work/API
+
+or for bash-likes:
+
+  export CodeBase=/users/zhou/work/API
+
+[Where in the schema/XMLTools directory structure does this correspond to, ie,
+if I have /home/scott/schema/XMLTools/XORT, what should CodeBase be? Also, is
+CodeBase used for anything other that executing the commands in this set of
+directions, ie, do I really need to set it, or can I give full path names for 
+the below commands and it still work?]
+
+2. create the ddl.properties file by running
+
+  $ CodeBase/XORT/bin/ddl_properties_creator.pl
+
+[just executing this command gives a usage message, so there needs to be
+something else on that line.  I am guessing it should be something like
+`-d <ddl file> [-v <view file>]` but I don't really know.]
+
+[This seems to presuppose the existance of a ddl file.  From where would that
+come?  There are no ddl files in the chado directories.  If you expect users
+to create ddl files via something like `pg_dump -s` you should say so 
+explicitly.]
+
+It will create the ddl.properties in CodeBase/XORT/Config.
+
+Before going further, view CodeBase.XORT/Config/ddl.properties to see whether
+it makes sense, if not, normally means that your ddl file DOES NOT have same
+format as samle ddl:CodeBase/XORT/Config/idb-full.ddl.
+
+[asking the user for a sanity check at this point seems a little
+pointless--how is the user to know what a valid ddl.properties file looks like?]
+
+[the following paragraph is extremely unclear--what is it I need to do?]
+
+For all view/function, you need to MAKE one create TABLE statement
+for each view/function in another file(refer to
+CodeBase/XORT/Config/function_view.sql & function_view.ddl), this will be
+argument -v to ddl_properties_creator.pl
 
 
-2. create the ddl.properties file by running CodeBase/XORT/bin/ddl_properties_creator.pl, it will create the ddl.properties in CodeBase/XORT/Config
-   before go further step, view CodeBase.XORT/Config/ddl.properties to see whether it make sense, if not, normally means that your ddl file DOES NOT have same format as samle ddl:CodeBase/XORT/Config/idb-full.ddl
-   for all view/function, you need to MAKE one create TABLE statement for each view/function in another file(refer to CodeBase/XORT/Config/function_view.sql & function_view.ddl), this will be argument -v to ddl_properties_creator.pl
+3. Create database properties for each database you intend to use, and put
+those file in CodeBase/XORT/Config, name format: databasename.properties,
+i.e, for chado_gadfly5, the file name will be
+CodeBase/XORT/Config/chado_gadfly5.properties
 
+[How?  You say to create the properties, but don't show how.]
 
-3. create database properties for each database you intend to use, and put those file in CodeBase/XORT/Config, name format: databasename.properties, i.e, for chado_gadfly5, the file name will be CodeBase/XORT/Config/chado_gadfly5.properties
+4. Log into the target database and execute
 
-4. log into the target database and execute CodeBase/XORT/Config/function_view.sql to synchronize the database
-   here will create the necessary view, also because the current dump from Berkeley didn't have featureloc.min and featureloc.max, so need o add those two cols, if in the future you get the dump which already implement those change, then you can comment those sql statement which modify featureloc table. Refering CodeBase/XORT/Config/function_view.sql and function_view.ddl for how convert function and view into ddl format.
+  $ CodeBase/XORT/Config/function_view.sql
+[is this the same as $ psql <database> < CodeBase/XORT/Config/function_view.sql?]
 
-5. run CodeBase/XORT/bin/dump.pl  loader.pl validator.pl with -h for how to use it. 
+to synchronize the database.
 
-6. CodeBase/XORT/Config/dumpspec_gene.xml for sample dumpspec file, and dump output from this dumpspec(dump_gene_local_id.xml)
+Here you will create the necessary view, also because the current dump from
+Berkeley didn't have featureloc.min and featureloc.max, so need to add those
+two cols, if in the future you get the dump which already implement those
+change, then you can comment those sql statement which modify featureloc
+table. Refering CodeBase/XORT/Config/function_view.sql and function_view.ddl
+for how convert function and view into ddl format.
 
-7. if you use global_id mechanism to refer any object, then you need create config file to guide the behavior of GLOBAL_ID loading/refering/autocreating. put this file in CodeBase/XORT/Config/config_accession.xml
+[what, if any of that, is general and not specific to flybase?]
+
+5. Run
+
+  $ CodeBase/XORT/bin/dump.pl -h
+  $ CodeBase/XORT/bin/loader.pl -h
+  $ CodeBase/XORT/bin/validator.pl -h
+
+for how to use it. [Does this mean that these should be executed in this order
+at this point? If not, there should be a section of "Notes" that are separate
+from the numbered steps to set up the use of XORT]
+
+6. Use
+
+  $ CodeBase/XORT/Config/dumpspec_gene.xml
+
+for sample dumpspec file, and dump output from this
+dumpspec(dump_gene_local_id.xml)
+
+7. If you use global_id mechanism to refer any object, then you need create
+config file to guide the behavior of GLOBAL_ID loading/refering/autocreating.
+Put this file in CodeBase/XORT/Config/config_accession.xml
  
-8. If you try to use 'local_id' mechanism to represent an object, the dumper will use this format to represent it: 'table_name'.'_'.'primary_key', it will garantee the uniqueness. However, it is not necessary at all to use this format for loader, as long as its uniqueness, loader can handle it. 
+8. If you try to use 'local_id' mechanism to represent an object, the dumper
+will use this format to represent it: 'table_name'.'_'.'primary_key', it will
+garantee the uniqueness. However, it is not necessary at all to use this
+format for loader, as long as its uniqueness, loader can handle it. 
 
