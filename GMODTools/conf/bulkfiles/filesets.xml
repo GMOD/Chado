@@ -1,0 +1,135 @@
+<opt
+  name="filesets"
+  date="20040821"
+  >
+ 
+  <title>Bulkfiles fileset definitions</title>
+ 
+  <about>
+    
+  These are configurations producing bulk file sets.
+  Use as include="filesets" to data release config file,
+  or copy into primary config file and edit to taste.
+
+  Common fileset tags:
+    name="fasta"   -- name tag
+    path="fasta/.+\.fasta"   -- path regex for output files
+    input="fff"    -- input data (but see informat in other configs)
+    config="tofasta"  -- config file (depends on handler needs)
+    handler="FastaWriter"  -- perl module that processes fileset
+    dropnotes="synonym_2nd,synonym"  -- handler-specific tag
+    makeall="1"  -- handler-specific ( _all_ fasta files from chr parts)
+    perchr="1"   -- per chr files
+    dogzip="0"   -- gzip output files
+    title="Genome feature sequence fasta" 
+
+  </about>
+
+
+  <!-- change these dump tags to fileset tags ?? 
+    Bulkfiles is current handler for dnadump, featdump ; change? -->
+  <dnadump
+    path="dna/.+\.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    />
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+<!--     <target>fbids</target> // accessory table ; fixme -->
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+<!--     <target>matches</target> -->
+    
+    <!-- ? use this for sql arguments ? -->
+    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
+  </featdump>
+  
+  <!-- rewrite of featdump -->
+  <fileset
+    name="feature_table"
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+<!--     <target>matches</target> -->
+  </fileset>
+
+
+  <fileset
+    name="dna"
+    path="dna/.+\.raw"
+    input="dna_dump"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    title="Chromosome dna in raw format (file of bases only)"
+    />
+
+  <fileset
+    name="fff"
+    path="fff/.+\.fff"
+    input="feature_table"
+    title="FFF Genome features"
+    config="chadofeatconv"
+    handler="FeatureWriter"
+    dogzip="0"
+    />
+    
+  <fileset
+    name="gff"
+    path="gff/.+\.gff"
+    input="feature_table"
+    title="GFF Genome features"
+    dogzip="1"
+    noforwards="1"
+    />
+
+  <fileset
+    name="gnomap"
+    path="gnomap/.+\.tsv"
+    input="fff"
+    config="tognomap"
+    handler="GnomapWriter"
+    title="GnoMap features"
+    indexonly="0"
+    />
+    
+  <fileset
+    name="gbrowse"
+    path="gnomap/gbrowse.conf"
+    config="gbrowseconf" 
+    handler="GnomapWriter"
+    withvars="1"
+    />
+
+  <fileset
+    name="fasta"
+    path="fasta/.+\.fasta"
+    input="fff"
+    config="tofasta"
+    handler="FastaWriter"
+    dropnotes="synonym_2nd,synonym"
+    makeall="1"
+    perchr="1"
+    dogzip="0"
+    title="Genome feature sequence fasta" 
+    />
+    
+  <fileset
+    name="blast"
+    path="blast/.+\.*"
+    input="fasta"
+    config="blastfiles"
+    handler="BlastWriter"
+    title="Blast indices" 
+    />
+
+</opt>

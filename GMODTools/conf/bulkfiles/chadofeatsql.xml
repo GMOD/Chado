@@ -48,9 +48,10 @@ SELECT
   'species' as attr_type, 
   org.genus || '_' || org.species AS attribute
 FROM 
-  feature armft, organism org, cvterm featcv
+  feature armft, organism org, cvterm featcv, cv socv
 WHERE 
   featcv.name in ( 'chromosome', 'chromosome_arm')  --  need more choices 
+  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
 ORDER BY arm ;
@@ -110,7 +111,7 @@ FROM
   feature targft left outer join gffattr_match attr
      on (targft.feature_id = attr.feature_id),
   featureloc armloc, featureloc targloc,
-  cvterm targcv, cvterm matchcv, cvterm armcv
+  cvterm targcv, cvterm matchcv, cvterm armcv, cv socv
    
    -- tested speed of this w/ cv.names versus cvterm_id number inserted
    -- pg is smart enough to optimize cv name lookup once - leave as is
@@ -118,6 +119,7 @@ WHERE
   matchcv.name = 'match' 
   and matchcv.cvterm_id = matchft.type_id 
   and armcv.name in ( 'chromosome', 'chromosome_arm')
+  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
   and armcv.cvterm_id = armft.type_id  
 
   and targft.type_id = targcv.cvterm_id 
@@ -145,25 +147,43 @@ ORDER BY
   <target name="postprocess" action="rdump" description="fix parents w/o featureloc from kid values" /> 
 
   <!--  this works: perl -i.old rdump $r/tmp/featdump/analysis.tsv -->
-  <script name="rdump" type="postprocess" shell="perl -i" language="perl">
+  <script name="rdump" type="postprocess" shell="perl -i.old" language="perl">
 <![CDATA[
+my ($loid); my @r=();
 while(<>) { 
-  my @v= split/[\t]/; $d= $v[-1]; 
-  if ($v[0] eq "arm") { print join("\t",@v); next; } 
-  rdump() if ($ld && $d ne $ld);  
-  push(@r,\@v); $ld= $d; 
-  rdump() if (eof);
+  if (/^arm\t/) { print $_; next; } #header
+  my @v= split "\t";
+  my $oid= $v[-1]; 
+  rdump() if ($loid && $oid ne $loid);  
+  push(@r,\@v); $loid= $oid; 
   } 
+rdump();
 
 sub rdump() {
-  $p=$r[0]; $k= $r[1]; ($a,$b,$e,$s)= @{$k}[0..3];
-  foreach $k (@r[2..$#r]) {
-    $kb=$$k[1]; $ke=$$k[2]; $b=$kb if ($kb<$b); $e=$ke if ($ke>$e); }
-  $$p[0]=$a; $$p[1]=$b; $$p[2]=$e; $$p[3]=$s; pop(@$p); $$p[-1]="\n"; $r[0]=$p;
-  foreach $i (1..$#r) { $r[$i]->[4] =~ s/^match_/match_part_/; }
-  foreach $r (@r) { print join("\t",@$r); } @r=(); 
-  } 
+  if (@r > 1) {
+    my $par= $r[0]; 
+    unless ($$par[0] && $$par[1] && $$par[2]) {
+      # add kid range to parent if missing (likely)
+      my $kid= $r[1]; #? check that $par oid == kids parent_oid ?
+      my($a,$b,$e,$s)= @{$kid}[0..3];
+      foreach $kid (@r[2..$#r]) {
+        my ($kb,$ke)= @{$kid}[1..2]; 
+        $b=$kb if ($kb<$b); 
+        $e=$ke if ($ke>$e); 
+        }
+      @{$par}[0..3] = ($a,$b,$e,$s);
+      if ($$par[-2] eq 'object_oid') { pop(@$par);  $$par[-1]="\n"; }  
+      $r[0]= $par;
+      }
+    
+    foreach my $i (1..$#r) { $r[$i]->[4] =~ s/^match:/match_part:/; }
+    }
+  foreach my $r (@r) { print join("\t",@$r); } 
+  @r=(); 
+} 
 
+##was##  foreach $i (1..$#r) { $r[$i]->[4] =~ s/^match_/match_part_/; }
+##sep04 -- was BAD .. dropping armloc for promoter, other.
 ]]>
   </script>
   
@@ -171,18 +191,21 @@ sub rdump() {
   <sql>
 -- select all an features of right type, with arm featureloc when avail
 -- add analysis.sourcename where needed (ignore 'dummy');
--- change 'match_' leading type ; drop or make option
+-- change 'match_' leading type ; drop or make option?
 SELECT 
   armft.arm, armft.fmin, armft.fmax, armft.strand, 
-  -- 'match_' || an.program as type,  
-  'match_' || an.program || an.sourcename as type,  
-  targft.name as name,  
-  targft.uniquename as id, 
-  targft.feature_id as oid,
+  CASE  
+    WHEN an.sourcename = 'dummy' THEN 'match:' || an.program
+    ELSE 'match:' || an.program || ':' || an.sourcename
+  END 
+  AS type, 
+  targft.name AS name,  
+  targft.uniquename AS id, 
+  targft.feature_id AS oid,
   CASE WHEN attr.type IS NULL THEN text('object_oid')  ELSE attr.type  END 
-  as attr_type,
+  AS attr_type,
   CASE WHEN attr.attribute IS NULL THEN text(targft.feature_id) ELSE attr.attribute  END 
-  as attribute
+  AS attribute
 FROM 
   feature targft left outer join gffatts_evid attr
     on (targft.feature_id = attr.feature_id),
@@ -190,9 +213,9 @@ FROM
     on (anf.feature_id = armft.feature_id),
   analysis an
 WHERE
-  an.program in ('HDP','RNAiHDP','fgenesh') -- FIXME add params here
-  and an.analysis_id = anf.analysis_id
+  an.analysis_id = anf.analysis_id
   and anf.feature_id = targft.feature_id
+  -- and an.program in ('HDP','RNAiHDP','fgenesh') --  drop this; want all an feats
 ;
   </sql>
   </feature_sql>
@@ -283,6 +306,8 @@ GRANT SELECT ON gffattr_synteny TO PUBLIC;
 
 
 -- for analysis features
+-- problem where w/ some analysis features - promotor, transposon
+-- ? need to restrict armcv to cv_id = SO id - e.g. find chromosome in 4 cv's
 CREATE OR REPLACE VIEW gffatts_anfloc (
     feature_id, arm, fmin, fmax, strand
   ) AS
@@ -290,10 +315,11 @@ CREATE OR REPLACE VIEW gffatts_anfloc (
     armloc.feature_id,  
     CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm,
     armloc.fmin, armloc.fmax, armloc.strand
-  FROM  feature armft, featureloc armloc, cvterm armcv
+  FROM  feature armft, featureloc armloc, cvterm armcv, cv socv
   WHERE 
     armft.type_id = armcv.cvterm_id
     and armcv.name in ( 'chromosome', 'chromosome_arm')
+    and armcv.cv_id = socv.cv_id and socv.name = 'SO'
     and armft.feature_id = armloc.srcfeature_id
 ;
 GRANT SELECT ON gffatts_anfloc TO PUBLIC;

@@ -124,45 +124,15 @@ sub new {
   $confdir= catdir($root, $confdir) unless($confdir =~ m,^/,); #unixism
     
   my $confpatt= $args{confpatt} || '(gmod|[\w_\-]+db)\.conf$'; # FIXME - need caller opts
+  my $read_includes= $args{read_includes} || 0;
+  my $showtags= $args{showtags} || [];
   
-  
-#   die "Please set the GMOD_ROOT environment variable\n"
-#      ."It is required from proper functioning of gmod" unless ($root);
-# 
-#   my $confdir = catdir($root, 'conf'); #not clear to me what should be in
-#                                     #gmod.conf since db stuff should go in
-#                                     #db.conf (per programmers guide)
-# 
-#   my @db;
-#   opendir CONFDIR, $confdir
-#      or die "couldn't open $confdir directory for reading:$!\n";
-#   my $dbname;
-#   while (my $dbfile = readdir(CONFDIR) ) {
-#       ## dgg - too liberal - we store apache.conf, cmap.conf, other.conf in conf/ dir
-#       if ($dbfile =~ /^(\w+)\.conf/) {
-#           push @db, $1;
-#       } else {
-#           next;
-#       }
-#   }
-#   closedir CONFDIR;
-# 
-#   my %conf;
-#   my $conffile = catfile($confdir, 'gmod.conf');
-#   open CONF, $conffile or die "Unable to open $conffile: $!\n";
-#   while (<CONF>) {
-#       next if /^\#/;
-#       if (/(\w+)\s*=\s*(\S.*)$/) {
-#           $conf{$1}=$2;
-#       }
-#   }
-#   close CONF;
-
   if (%args) {
-    #?? these should go into $confhash ?
-    delete $args{conf};
+    delete $args{conf};  # can we delete @args{qw( conf confdir ..)} 
     delete $args{confdir};
     delete $args{confpatt};
+    delete $args{read_includes};
+    delete $args{showtags};
     delete $args{gmod_root};
     delete $args{searchpath};
     
@@ -174,6 +144,8 @@ sub new {
                 conf     => $confhash,
                 confdir  => $confdir,
                 confpatt => $confpatt,
+                showtags => $showtags,
+                read_includes => $read_includes,
                 searchpath => $searchpath,
                 gmod_root=> $root }, $self;
 }
@@ -285,6 +257,27 @@ sub _find_file2  {
   return undef;
 }
 
+=head2 appendHash($tohash, $addhash, $replace)
+
+add keys to hash without  replacing existing .. prefered behavior ?
+unless $replace is flagged
+
+=cut
+
+sub appendHash 
+{
+  my $self = shift;
+  my ($tohash, $addhash, $replace)= @_;
+  # -- need to be careful here, DONT replace existing key ?
+  my @keys= keys %$addhash;
+  if ($replace) { 
+    @{$tohash}{@keys}= @{%$addhash}{@keys}; 
+    }
+  else {
+    foreach my $k (@keys) { $$tohash{$k}= $$addhash{$k} unless defined $$tohash{$k}; } 
+    }
+}
+
 =head2 readKeyValue($confval, $confhash)
 
 Read $confval string for key=value lines
@@ -295,60 +288,40 @@ Return hash-ref options
 sub readKeyValue
 {
   my $self = shift;
-  my ($confval, $confhash)= @_;
+  my ($confval, $confhash, $replace)= @_;
   $confhash = $self->{'conf'} unless(ref $confhash);
   $confhash = {} unless(ref $confhash);
-  my ($k,$v);
+  my ($k,$v,$noappend);
   foreach (split(/\n/,$confval)) {
     next if(/^\s*[\#\!]/ || /^\s*$/); # skip comments, etc.
     if (/^([^\s=:]+)\s*[=:]\s*(.*)$/) { # must have value=(*.) to allow blanks
       ($k,$v)=($1,$2);
-      $confhash->{$k}= _cleanval($v);
+      $noappend= (defined $confhash->{$k} && !$replace);
+      $confhash->{$k}= _cleanval($v) unless($noappend);
       }
     elsif ($k && s/^\s+//) {
-      $confhash->{$k} .= _cleanval($_);
+      $confhash->{$k} .= _cleanval($_) unless($noappend);
       }
     }
   return $confhash;
 }
 
 
-=head2 readConfig($file, $opts)
-
-Read configurations in these formats
-  XML::Simple OR Perl-struct OR key=value config file
-Parameters
-  $file = input file; 
-  $opts = XML::Simple options hash-ref
-Return hash-ref options
-
-=cut
 
 our $readConfigOk;
 
-sub readConfig
+=head2 readConfigFile($file, $opts)
+
+read one file; see readConfig 
+
+=cut
+
+sub readConfigFile
 {
   my $self = shift;
-  my($file, $opts, $confhash)= @_;
-  $readConfigOk= 0;
-  
-  if(ref $opts) {
-    $opts= { %$opts };
-    $opts->{Variables}= $Variables unless($opts->{Variables});
-  } else {
-    $opts= { debug => $DEBUG, Variables => $Variables };
-  }
-  $confhash = $self->{'conf'} unless(ref $confhash); # always exists ?
-  $confhash = {} unless(ref $confhash);
+  my($file, $opts, $included)= @_;
+  my $confhash = {};
 
-  my $debug= delete $opts->{debug};
-  $debug= $DEBUG unless defined $debug;
-  ##print STDERR "Config2::readConfig in=$file\n" if $debug;
-  
-  unless ($opts->{searchpath}) {
-    $opts->{searchpath}= [ @{$self->{'searchpath'}} ];
-    }
-  
   unless ($file && -e $file) {
     my($filename, $filedir);
     
@@ -378,40 +351,89 @@ sub readConfig
     if ($cnf) { $file= $cnf;  }
     }
   
-  ##print STDERR "Config2::readConfig look at $file\n" if $debug;
-  $self->{filename}= $file;
+  ##print STDERR "Config2::readConfig look at $file\n" if $DEBUG;
+  $self->{filename}= $file unless($included);
   
   if (!$file || ($file =~ /\.xml/ && -e $file)) {
     require XML::Simple; ## will attemp to read $0.xml file if no file given
     my $xs = new XML::Simple(%$opts); # (NoAttr => 1, KeepRoot => 1);#options
-    my $conf1 = $xs->XMLin( $file); 
-    if ($conf1) { 
-      my @keys= keys %$conf1;
-      @{%$confhash}{@keys}= @{%$conf1}{@keys};
-      $readConfigOk= 1;
-      }  
+    $confhash = $xs->XMLin( $file); 
     }
   
   elsif (-e $file) {
     ## handle key-value file OR perl-struct
     open(F,$file); my $confval= join("",<F>); close(F);
     if ($confval =~ m/=>/s && $confval =~ m/[\{\}\(\)]/s) {
-      my $conf1= eval $confval; 
+      $confhash= eval $confval; 
       if ($@) { warn " error $@"; }
-      else { 
-        my @keys= keys %$conf1;
-        @{%$confhash}{@keys}= @{%$conf1}{@keys};
-        $readConfigOk= 1;
-        }  
       }
     else {
       #? check for \w+ [:=] lines first ?
       $confhash= $self->readKeyValue($confval, $confhash);
-      $readConfigOk= 1;
       }
     }
+  if (scalar($confhash)) { $readConfigOk= 1; }
+
+  print STDERR "Config2: read: $file ok=$readConfigOk\n" if $DEBUG;
+  if (ref $self->{showtags}) {
+    foreach my $tag (@{$self->{showtags}}) { 
+      print "$tag = ",$$confhash{$tag},"\n" if $$confhash{$tag}; 
+      }
+    }
+    
+  return $confhash;
+}
+
+
+=head2 readConfig($file, $opts)
+
+Read configurations in these formats
+  XML::Simple OR Perl-struct OR key=value config file
+Parameters
+  $file = input file; 
+  $opts = XML::Simple options hash-ref
+Return hash-ref options
+
+=cut
+
+sub readConfig
+{
+  my $self = shift;
+  my($file, $opts, $confhash)= @_;
+  $readConfigOk= 0;
   
-  print STDERR "Config2: read: $file ok=$readConfigOk\n" if $debug;
+  if(ref $opts) {
+    $opts= { %$opts };
+    $opts->{Variables}= $Variables unless($opts->{Variables});
+  } else {
+    $opts= { Variables => $Variables };
+  }
+  $confhash = $self->{'conf'} unless(ref $confhash); # always exists ?
+  $confhash = {} unless(ref $confhash);
+
+  $DEBUG= delete $opts->{debug} if (defined $opts->{debug});
+  
+  ##print STDERR "Config2::readConfig in=$file\n" if $DEBUG;
+  
+  unless ($opts->{searchpath}) {
+    $opts->{searchpath}= [ @{$self->{'searchpath'}} ];
+    }  
+
+  my $conf1 = $self->readConfigFile($file, $opts, 0);
+  $self->appendHash($confhash, $conf1, 0) if ($conf1);
+     
+  ## $self->{filename}= $file;
+  
+  if ($self->{read_includes} && $$confhash{include}) {
+    ## $self->{read_includes}= 0; ## MUST NOT RECURSE HERE...
+    my $inc= $$confhash{include};
+    my @inc= (ref($inc) =~ /ARRAY/) ? @$inc : ($inc);
+    foreach $inc (@inc) {
+      $conf1= $self->readConfigFile($inc, $opts, 1);
+      $self->appendHash($confhash, $conf1, 0) if ($conf1);
+      }
+    }
+    
   return $confhash;
 }
 
@@ -513,9 +535,10 @@ sub init_conf
     warn " no $confpatt file at $myroot/conf; setenv $ROOT to locate."
     }
   else { # if ($SetEnv) 
+    $self->appendHash( \%ENV, $confhash, 0);
     # -- need to be careful here, DONT replace existing key ?
-    my @keys= keys %$confhash;
-    foreach my $k (@keys) { $ENV{$k}= $$confhash{$k} unless defined $ENV{$k}; } 
+    # my @keys= keys %$confhash;
+    # foreach my $k (@keys) { $ENV{$k}= $$confhash{$k} unless defined $ENV{$k}; } 
     # @ENV{@keys}= @{%$confhash}{@keys};
     }
 

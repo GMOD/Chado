@@ -79,6 +79,8 @@ my %gffForwards=();
 my @gffForwards=();
 
 use constant TOP_SORT => -9999999;
+use constant MAX_FORWARD_RANGE => 500000; # maximum base length allowed for collecting forward refs
+use constant MIN_FORWARD_RANGE =>  20000; # minimum base length for collecting forward refs
 
 ## our == global scope; use vars == package scope
 use vars qw/ 
@@ -136,7 +138,13 @@ sub initData
 #   $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
 
  
-  $self->{idpattern} = $sconfig->{idpattern} || $config->{idpattern} || '';
+  $self->{idpattern}  = $sconfig->{idpattern} || $config->{idpattern} || '';
+  
+  ## should get this from  $sconfig->{fileset}->{gff}->{noforwards}
+  my $gffinfo= $self->handler()->getFilesetInfo('gff');
+  $self->{noforwards} = ($gffinfo && defined $gffinfo->{noforwards}) 
+    ? $gffinfo->{noforwards}
+    : $config->{noforwards_gff};
 
   @outformats=  @{ $config->{outformats} || \@defaultformats } ; 
 
@@ -172,24 +180,29 @@ sub initData
   @GModelParts  = qw( CDS five_prime_UTR three_prime_UTR intron );
   @GModelParts  = @{ $config->{'gmodel_parts'} } if ref $config->{'gmodel_parts'};
   
+  #? require segmentfeats be simplefeat ?
+  map { $simplefeat{$_}=1; } keys %segmentfeats;
+  
    ## read these also ...
-  $config->{maptype}= \%maptype;
-  $config->{maptype_pattern}= \%maptype_pattern;
-  $config->{mapname_pattern}= \%mapname_pattern;
-  $config->{maptype_gff}= \%maptype_gff;
-  $config->{segmentfeats}= \%segmentfeats;
-  $config->{simplefeat}= \%simplefeat;
-  $config->{skipaskid}= \%skipaskid;
-  $config->{dropfeat_fff}= \%dropfeat_fff;
-  $config->{dropfeat_gff}= \%dropfeat_gff;
-  $config->{dropid}= \%dropid;
-  $config->{dropname}= \%dropname;
-  $config->{mergematch}= \%mergematch;
-  $config->{hasdups}= \%hasdups;
-  $config->{rename_child_type}= $rename_child_type;
+#   $config->{maptype}= \%maptype;
+#   $config->{maptype_pattern}= \%maptype_pattern;
+#   $config->{mapname_pattern}= \%mapname_pattern;
+#   $config->{maptype_gff}= \%maptype_gff;
+#   $config->{segmentfeats}= \%segmentfeats;
+#   $config->{simplefeat}= \%simplefeat;
+#   $config->{skipaskid}= \%skipaskid;
+#   $config->{dropfeat_fff}= \%dropfeat_fff;
+#   $config->{dropfeat_gff}= \%dropfeat_gff;
+#   $config->{dropid}= \%dropid;
+#   $config->{dropname}= \%dropname;
+#   $config->{mergematch}= \%mergematch;
+#   $config->{hasdups}= \%hasdups;
+#   $config->{rename_child_type}= $rename_child_type;
 
   ## merge config from this INTO handler config ?
   ## that is best place to keep common <featmap> and <featset>
+  ## ? move this out of here; use separate featmap/featset include file?
+  
   my $fset= $config->{featset};
   if (ref $fset && !$sconfig->{featset}) {
     $sconfig->{featset}= $fset;
@@ -367,7 +380,7 @@ sub remapId
 sub remapName
 {
 	my $self= shift;
-  my ($type,$name,$id)= @_;
+  my ($type,$name,$id,$fulltype)= @_;
   my $save= $name;
   if ( $dropname{$type} ) { $name= ''; }
   #elsif ($type eq 'transposable_element_pred') { $name =~ s/JOSHTRANSPOSON-//; }
@@ -384,14 +397,15 @@ sub remapName
       my $mtype= $mapname_pattern{$mp}->{type};
       next if ($mtype && $type !~ m/$mtype/);
       if ($mapname_pattern{$mp}->{cuttype}) {
-        my @tparts= split(/[_]/, $type);
+        my @tparts= split(/[_:.-]/, $type);
+        push(@tparts, split(/[_:.-]/, $fulltype) ); #??
         foreach my $t (@tparts) { $name =~ s/\W?$t\W?//; }
         next;
         }
       my $from= $mapname_pattern{$mp}->{from}; next unless($from);
       my $to  = $mapname_pattern{$mp}->{to};
       if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
-      else { $name =~ s/$from/$to/; }
+      else { $name =~ s/$from/$to/g; }
       }
     }
   
@@ -547,6 +561,14 @@ sub remapType
 
  Outputs: FFF (also used for fasta, gnomap), GFF
  
+ FIXME: something here gets very memory piggy, slow, with input feature tables
+  full of match: analysis types (messy names, types, etc.)
+  -- no feats written to fff in many hours !? - due to holding BAC and cytoband features
+  -- try dropping gffForwards; maybe better (gff written) but still memuse balloons
+  -- added clearFinishedObs() - no apparent help; dont see what else is holding objects here
+   -- ok now, added min base loc to keep in oidobs, delete all before
+       runs fast - chr 3L in 10 min. instead of >2hr.
+  
 =cut
 
 sub processChadoTable
@@ -560,54 +582,58 @@ sub processChadoTable
   my $tab= "\t"; # '[\|]'; ##"\t"; < '|' is bad sep cause some names have it !
 
   my @fobs=();
-  my %oidobs=();
-  my $fob=undef;
-  my @chead=();
-  my @l_fobs=();
+  my %oidobs=(); # this hash will grow big; can we delete before next chr ?
+  my $fob= undef;
   my $max_max=0; my $min_max= 0;
   my $armlen=0;
   my $ndone= 0;
-  my ($l_arm,$l_fmin,$l_fmax,$l_strand,$l_type,$l_name,$l_id,$l_oid,$l_attr_type,$l_attribute);
-  
-  ($l_arm,$l_oid,$l_fmin,$max_max)= (0,0,0,1);
+  ##my ($l_arm,$l_fmin,$l_fmax,$l_strand,$l_type,$l_name,$l_id,$l_oid,$l_attr_type,$l_attribute);
+  my ($l_arm,$l_oid,$l_fmin,$max_max)= (0,0,0,1);
   
   while(<$fh>){
     next unless(/^\w/);
     next if(/^arm\tfmin/); # header from sql out
     $ndone++; 
-    last if ($maxout>0 && $ndone > $maxout);
+    # last if ($maxout>0 && $ndone > $maxout); # debug code
     chomp;
-    my @c= split("\t"); # $tab
- 
-    my ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute)= @c;
+    
+    ##my @c= split("\t"); # $tab
+    my ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute) 
+      = split("\t"); ##= @c;
 
     ## data fixes
-    unless(defined $fmax) { $fmax=0; }
-    unless(defined $fmin) { $fmin=0; }
-    else { $fmin += 1 unless ($origin_one{$type}); } # dang -1 chado start 
-    $strand=0 unless($strand);
+    if( !defined $fmax ) { $fmax=0; }
+    if( !defined $fmin ) { $fmin=0; }
+    elsif( ! $origin_one{$type} ) { $fmin += 1; } # dang -1 chado start
+    if( !defined $strand )  { $strand=0; }
     ## this check only for intron,UTR chado-computed locs ??
-    if ($fmax < $fmin) { ($fmin,$fmax)= ($fmax,$fmin); $strand= ($strand==0) ? -1 : -$strand; }
+    if ($fmax < $fmin) { 
+      ($fmin,$fmax)= ($fmax,$fmin); $strand= ($strand==0) ? -1 : -$strand; 
+      }
     
     my($s_type, $fulltype, $s_arm, $armfile, $s_name, $s_id);
     
 #     ($arm,$fmin,$fmax,$strand,$armfile,$s_arm)  
 #       = $self->remapArm($arm,$fmin,$fmax,$strand); # for dpse joined contigs 
 
-    ($type,$fulltype,$s_type)= $self->remapType($type,$name); #my $transtype= 
-    next if ($type eq 'skip'); # or what? undef?
+    ($type,$fulltype,$s_type)= $self->remapType($type,$name); 
+    
+    ##if (!$type && $DEBUG) { print STDERR "missing type: $_\n";  } << repeatmasker kid objs
+    next if ($type eq 'skip' || !$type); # or what? undef? got some bad feats w/ no type??
     
     # ($id,$s_id)= $self->remapId($type,$id,$name); 
 
-    ($name,$s_name)= $self->remapName($type,$name,$id); 
+    ($name,$s_name)= $self->remapName($type,$name,$id,$fulltype); 
 
     ##  problem: processed_transcript  .. dbxref  genbank:FBgn0020497|CT32733|FBan0013387 GO:[protein-nucleus export (GO:0
     if ($type eq 'processed_transcript' && $attribute) {
       $attribute= undef if ($attribute !~ /^FlyBase/);
       }
     elsif ($type eq 'chromosome_band' && !$attribute) {
-      $attr_type='cyto_range';
-      $attribute=$s_name;  $attribute =~ s/band-//;
+      $attr_type = 'cyto_range';
+      $attribute = $s_name;  
+      $attribute =~ s/(cyto|band|\-)//g;
+      $name =~ s/\-cyto//;
       }
 
     my $loc="$fmin\t$fmax\t$strand";
@@ -615,7 +641,7 @@ sub processChadoTable
     my @addattr=();
     if ($attribute) {  
       # add dbxref_2nd patch? ; do we want to rename db here - looks like Gadfly from 2ndary/old ids
-      $attribute =~ s/Gadfly:/FlyBase:/ if ($attr_type =~ m/^dbxref/);
+      # $attribute =~ s/Gadfly:/FlyBase:/ if ($attr_type =~ m/^dbxref/);
       push( @addattr, "$attr_type\t$attribute");  
       }
     ##if ($to_species) {  push( @addattr, "species2\t$to_species");  }
@@ -674,31 +700,52 @@ sub processChadoTable
       
     else {
       
+      ## new feature object here ..
+      
       # if ($armfile ne $l_arm)  
       if ($arm ne $l_arm) {
         $self->putFeats($outh,\@fobs,\%oidobs,'final'); 
-        @l_fobs=(); @fobs=();  %oidobs=(); %gffForwards=();
-        $outh= $self->openCloseOutput($outh, $arm, 'open');
+        undef @fobs;  @fobs=();
+        undef %oidobs; %oidobs=();
+        undef %gffForwards; %gffForwards=();
         $max_max=0; $min_max= 0;
+
+        $outh= $self->openCloseOutput($outh, $arm, 'open');
         ## start new files / chr - fff, gff, fasta - need file opener/closer
         }
         
-      #if ($type eq 'gene') 
-      if ($fmin >= $max_max && $fmin > $min_max && scalar(@fobs)>10)  #= reset
+        #? do we need to set a max @fbobs ?
+      if ($fmin >= $max_max && $fmin > $min_max && scalar(@fobs)>5)  #= reset
         { 
-        $self->putFeats($outh,\@fobs,\%oidobs,''); 
-        @fobs=(); #@l_fobs= @fobs; 
+        my ($nstart, $nleft, $nobs)=(0,0,0);
+        if ($DEBUG>1) { $nobs= scalar(@fobs); }
         
-        $min_max= $fmin + 20000; #?? will this help join parts
-        ## can we clear out other obs yet: %oidobs=(); %gffForwards=(); ?
-        ## if no forwards ?
+        $self->putFeats( $outh, \@fobs, \%oidobs, ''); 
+        undef @fobs; @fobs=();  
+        $min_max= $fmin + MIN_FORWARD_RANGE; #?? will this help join parts
+        
+        ## %oidobs will grow big; 
+        ## can we clear out other obs yet: %oidobs=(); %gffForwards=();  if no forwards ?
+        if ($DEBUG>1) { while( each %oidobs ){ $nstart++; }}
+        my $clearflag= ($outh->{fff} || !$outh->{gff}) ? 'writefff' : 'writegff';
+        my $nclear= $self->clearFinishedObs( $clearflag, \%oidobs, $fmin - MAX_FORWARD_RANGE);
+        
+        if ($DEBUG>1) {
+          while( each %oidobs ){ $nleft++; } 
+          print STDERR " printed n=$nobs; oidobs: pre-clear=$nstart, cleared=$nclear, left=$nleft\n";
+          print STDERR " fmin=$fmin, fmax=$fmax, l_fmin=$l_fmin, min_max=$min_max, max_max=$max_max\n";
+          }
         }
 
 
       my $newob= {};  
       push(@fobs,$newob);
-      $oidobs{$oid}->{fob}= $newob;
       $fob= $newob;
+      
+        #?? dont add here if it is simple feature; wait till know if it is parent or kid?
+      unless( $simplefeat{$type} ) { 
+        $oidobs{$oid}->{fob}= $newob; 
+        }
       
       $fob->{chr} = $arm;
       $fob->{type}= $type;  
@@ -706,44 +753,40 @@ sub processChadoTable
       $fob->{name}= $name;
       $fob->{id}  = $id;
       $fob->{oid} = $oid;
+      $fob->{fmin}= $fmin;
+      $fob->{fmax}= $fmax;
       $fob->{loc} = [];
       $fob->{attr}= [];
 
       push( @{$fob->{loc}},  $loc);  
-      
-      foreach my $at (@addattr) {
-        push( @{$fob->{attr}}, $at);  
-        }
+      foreach my $at (@addattr) { push( @{$fob->{attr}}, $at); }
       }
     
     ## make oid crossref here so outputters know feature relations
     if ($attribute && $attr_type eq 'parent_oid' 
-      && !$segmentfeats{$type} ## problem for segments, etc and gffForwards 
-      && !$skipaskid{$type}  
+      && !$simplefeat{$type} ##!$segmentfeats{$type} ## problem for segments, etc and gffForwards 
+      ## && !$skipaskid{$type}  << subset of simplefeat
         ##  mature_peptide attached to protein-CDS - causes 2nd CDS feature 
         ##  really need to turn into compound feature of its own (not CDS) 
       ) {
     
       (my $paroid= $attribute) =~ s/:(.*)$//;
-      my $rank= ($1) ? $1 : 0;
+      # my $rank= ($1) ? $1 : 0;
       ####push( @{$fob->{attr}}, "rank\t$attribute");  
         # ? need this for exon, utr - but tied to parent_oid
       
       $oidobs{$paroid}->{child}= [] unless (ref $oidobs{$paroid}->{child});
       ##? use $rank to position in {child} array ??
-      push( @{$oidobs{$paroid}->{child}}, $fob);
+      push( @{$oidobs{$paroid}->{child}}, $fob); 
 
       ## need to either skip parent/child here or in gff forward for these types
-      ##    $simplefeats{$type} or $segmentfeats{$type}; # dont do parent for these ... ?
+      ##    $simplefeat{$type} or $segmentfeats{$type}; # dont do parent for these ... ?
 
       $oidobs{$oid}->{parent}= [] unless (ref $oidobs{$oid}->{parent});
       push( @{$oidobs{$oid}->{parent}}, $paroid);
  
       ## another fixup for  CDS/protein-of-mRNA feature set
 
-          ## THIS SHOULD MOVE TO config maptype
-     ## if ($fob->{type} eq 'protein') { $fob->{type}= 'CDS'; } 
-      
       if ($fob->{type} ne 'mRNA' && $fob->{type} =~ m/^($rename_child_type)/) {
         # this is  bad for real gene subfeatures like point_mutation
         my $ptype= $fob->{type};
@@ -778,15 +821,20 @@ sub processChadoTable
     
     
     ## forward ref checkpoint
-    $max_max= $fmax if (!$segmentfeats{$fob->{type}} && $fmax > $max_max);  
+    if ($fmax > $max_max && !$segmentfeats{$fob->{type}}) {
+      $max_max= $fmax; 
+      my $supermax= $min_max - MIN_FORWARD_RANGE + MAX_FORWARD_RANGE;   
+      $max_max= $supermax if ($max_max > $supermax);
+      }
     
-    ($l_arm,$l_fmin,$l_fmax,$l_strand,$l_type,$l_name,$l_id,$l_oid,$l_attr_type,$l_attribute)= @c;   
+    ##($l_arm,$l_fmin,$l_fmax,$l_strand,$l_type,$l_name,$l_id,$l_oid,$l_attr_type,$l_attribute)
+    ##  = @c;   
     ## only need save these:
-    ## ($l_arm,$l_oid,$l_fmin)=($armfile,$oid,$fmin);
+    ($l_arm,$l_oid,$l_fmin)= ($arm,$oid,$fmin);
     }
   
-  # putFeat($outh,$fob); #push(@fobs,$fob) if ($fob);
-  $self->putFeats($outh,\@fobs,\%oidobs, 'final'); @l_fobs= (); @fobs=(); %oidobs=();
+  $self->putFeats($outh,\@fobs,\%oidobs, 'final'); 
+  @fobs=(); %oidobs=();
   
   $outh= $self->openCloseOutput($outh,'','close');
   print STDERR "\nprocessChadoTable ndone = $ndone\n" if $DEBUG;
@@ -822,13 +870,12 @@ sub  makeFlatFeats
 {
 	my $self= shift;
   my ($fobs,$oidobs)= @_;
-  my %obs= %$oidobs;
   
   my @cobs=();
   foreach my $fob (@$fobs) {  
     my $oid= $fob->{oid};
     my ($iskid,$ispar)= (0,0);
-    my $oidob= $obs{$oid};
+    my $oidob= $oidobs->{$oid};
     my $ftype= $fob->{type};
     my $fulltype= $fob->{fulltype};
     my $id= $fob->{id};
@@ -841,7 +888,7 @@ sub  makeFlatFeats
       if ($iskid) { # check we have backref to parend obj ??
         my $ok= 0;
         foreach my $poid (@{$oidob->{parent}}) {
-          if ($obs{$poid}) { $ok=1; last; }
+          if ($oidobs->{$poid}) { $ok=1; last; }
           }
         $iskid= $ok;
         }
@@ -1198,9 +1245,104 @@ sub getLocation
 }
 
 
+=item clearFinishedObs($flag,$oidobs)
+  
+  undef/release objects from %oidobs - 
+  otherwise fills up for full chromosome and overruns memory available
+
+  -- ok now, added min base loc to keep in oidobs, delete all before
+  runs fast - chr 3L in 10 min. instead of >2hr.
+  before this, oidobs was retaining *all* objects per input chr file; 
+  and mem swapping to death before end.  Now looks stable around 50 MB mem use.
+  AND speeds up greatly; fly chr 3L in 10 min. instead of >2hr.
+  
+=cut
+
+sub clearFinishedObs
+{
+	my $self= shift;
+  my ( $flag, $oidobs, $beforebase )= @_;
+  ##my $flag= 'writefff';
+  my $nclear= 0;
+  
+  if ($self->{noforwards}) {
+    my @oid; my @parids; my @kids;
+    foreach my $oid (keys %{$oidobs}) {
+      my $isfree= 1;
+      my $parids= $oidobs->{$oid}->{parent}; 
+      foreach my $parid (@{$parids}) {
+        my $pob = $oidobs->{$parid};
+        my $done= ($pob && $pob->{$flag}); #? this is bad?
+        unless($done) {
+          my $ptype= $pob->{fob}->{type};
+          if ($pob && $pob->{fob} && $simplefeat{$ptype}) { $done=1; }
+          }
+        unless($done) { $isfree=0; last; }
+        }
+        
+      my $kids= $oidobs->{$oid}->{child};
+      foreach my $kidob (@{$kids}) {
+        my $done= ($kidob->{$flag});
+        unless($done) { $isfree=0; last; }
+        }
+      
+      ## dont free here -- finish iterate then do 
+      if ($isfree) {
+        push(@oid, @{$parids}) if $parids;
+        push(@kids, $kids) if $kids;
+        push(@oid, $oid) if $oid;
+        }
+      }
+      
+    foreach my $kids (@kids) { undef @{$kids}; $nclear++; }
+    foreach my $oid (@oid) { 
+      my $ob= delete $oidobs->{$oid};  $nclear++;
+      if ($ob) {
+        undef @{$ob->{parent}}; 
+        undef @{$ob->{child}}; 
+        undef %{$ob->{fob}}; 
+        undef $ob;
+        }
+      }
+      
+      ## this fix looks like it is controlling memory overload
+      ## before this, oidobs was retaining *all* objects per input chr file; 
+      ## and mem swapping to death before end.  Now looks stable around 50 MB mem use.
+      ## AND speeds up greatly over last data dump; < 1hr/chr versus 3hr+
+    if ($beforebase>0) {
+      while( my($oid,$ob)= each(%{$oidobs}) ) {
+        if ($ob->{fob} && $ob->{fob}->{fmax} < $beforebase) {
+          undef @{$ob->{parent}}; 
+          undef @{$ob->{child}}; 
+          undef %{$ob->{fob}}; 
+          undef $ob;
+          delete $oidobs->{$oid}; $nclear++;
+          }
+        }
+      }
+      
+    }
+    
+    # need to use gffForwards check
+    # NOTE: not tested; need likely above $beforebase fix to keep from retaining all oidobs
+  else {
+    foreach my $foid (keys %gffForwards) {
+      if ($gffForwards{$foid} == -1) {
+        delete $gffForwards{$foid};
+        delete $oidobs->{$foid}; #? need to undef/delete $oidobs{n}->parts ?
+        $nclear++;
+        }
+      }
+    }
+  return $nclear;
+}
+
+
 =item checkForward($flag,$fob,$oidobs)
   
   check for any remaining forwarded (unseen) objects (for gff)
+  >> forward checks are problematic w/ new feats; 
+  causing gff to sit in mem for full chromosome
   
 =cut
 
@@ -1209,9 +1351,11 @@ sub checkForward
 	my $self= shift;
   my ($flag,$fob,$oidobs)= @_;
   my $thisforward=0;
+  my $anyforward=0;
   my $oid= undef;
+  return $anyforward if ($self->{noforwards}); 
   
-  my $issimple= ($fob && $segmentfeats{$fob->{type}});
+  my $issimple= ($fob && $simplefeat{$fob->{type}} );
 ## this is wrong - need to check kid ids written (also!?)
 ## ?? also need to check fob->{loc}/{fmax} to see if we have past that point ??
 
@@ -1226,7 +1370,8 @@ sub checkForward
       if (defined $gffForwards{$parid} &&  $gffForwards{$parid}<0) { next; }
       my $pob= $oidobs->{$parid};
       my $done= ($pob && $pob->{$flag}); #? this is bad?
-      if ($pob && $pob->{fob} && $segmentfeats{$pob->{fob}->{type}}) { $done=1; }
+      my $ptype= $pob->{fob}->{type};
+      if ($pob && $pob->{fob} && ($simplefeat{$ptype})) { $done=1; }
       if (!$done) { $gffForwards{$parid}=1; $thisforward=1; }
       else { $gffForwards{$parid}=-1; }
       }
@@ -1245,7 +1390,6 @@ sub checkForward
   }
   
   ## need $flag check here?
-  my $anyforward=0;
   foreach my $need (values %gffForwards) { if ($need>0) { $anyforward=1; last; } }
   $gffForwards{$oid}=-1 if ($oid); # about to write this $fob
   
@@ -1284,82 +1428,37 @@ sub putFeats
     print STDERR ".";
     }
     
-    
-=item  
-
-  ?? add interface to output formats: -- looks fairly complex - simple is nice
-
-  my $cobs= undef;
-  foreach $fmt (@formats) {  
-    $fmtproc= $self->{$fmt};
-    ## need to do fff before fasta, then save fffline for fasta header
-    next if ($fmtproc->didwrite());
-    
-    if ($fmtproc->needsCompoundFeatures()) {
-      $cobs= $self->makeFlatFeats($fobs,$oidobs) unless $cobs;
-      foreach my $fob (@$cobs) {
-        my $outline= $fmtproc->write( $self,  $fob, $oidobs, $flag);
-        foreach my $fmtproc2 ($fmtproc->chainto()) {
-          $fmtproc2->chainwrite( $self, $outline, $fob, $oidobs, $flag);
-          }
-        }
-      }
-    else {
-      ## handle gff forward here or in fmtproc ??
-      foreach my $fob (@$fobs) {
-        my $outline= $fmtproc->write( $self,  $fob, $oidobs, $flag);
-        foreach my $fmtproc2 ($fmtproc->chainto()) {
-          $fmtproc2->chainwrite( $self,  $outline, $fob, $oidobs, $flag);
-          }
-        }
-      }
-      
-    foreach my $fmtproc2 ($fmtproc->chainto()) { $fmtproc2->didwrite(1); }
-  }
-  
-  
-=cut
-
-  if ($outh->{fff} || $outh->{fasta}) {
+   
+  if ($outh->{fff}) { ## || $outh->{fasta} < moved out
     my $ffh= $outh->{fff};
-    my $fah= $outh->{fasta};
+    # my $fah= $outh->{fasta};
   
     my $cobs= $self->makeFlatFeats($fobs,$oidobs);
+    # need to undef @$cobs when done !
+    
     my $nout= 0;
     foreach my $fob (@$cobs) {  
-      my $fffline= $self->getFFF( $fob );
-      next unless($fffline);
-      print $ffh $fffline if $ffh;
       ##$self->writeFFF( $outh->{fff}, $fob);
-      $nout++;
-
-#         #?? separate this from makeFeatures > makeFasta ?
-#       if ( $fah ) {
-#         ## !URK! need a large set of fasta file handles, one for each featureset type
-#         ## need to reverse lookup featset from this $fob->{type}
-#         ## OR could split fasta files by featuretype after this 
-#         my $featname= $fob->{type};
-#         my $featset= $featname; ## cheater .. FIXME
-#         my $chr= $fob->{chr};
-#         my $fasta= $self->handler()->fastaFromFFF( $fffline, $chr, $featset);
-#         print $fah $fasta if $fasta;
-#         }
+      my $fffline= $self->getFFF( $fob );
+      if($fffline) {
+        print $ffh $fffline;
+        $nout++;
+        }
+      undef $fob;
       }
-      
+    
+    undef $cobs;
     $ntotalout += $nout;
-#     if ($outh->{fff}) {
-#       my $fh= $outh->{fff};
-#       print $fh "#\n" if ($nout>3);  # is this a section break?
-#       }
   }
   
   if ($outh->{gff}) {
     my $gffh= $outh->{gff};
+    my $noforw= $self->{noforwards};
     # print $gffh "# fwd oid=".$self->getForwards()."\n"; # is this a section break?
     my $gffend= 0;
-    $l_hasforward= $self->checkForward('writegff');
+    $l_hasforward= ($noforw) ? 0 : $self->checkForward('writegff');
     foreach my $fob (@$fobs) { 
-      $hasforward= $self->checkForward('writegff',$fob,$oidobs);
+      $hasforward= ($noforw) ? 0 : $self->checkForward('writegff',$fob,$oidobs);
       if ($hasforward && !$l_hasforward && !$gffend) { $self->writeGFFendfeat($gffh); $gffend++; }
       $l_hasforward= $hasforward; #?
       if ($hasforward) {
@@ -1367,7 +1466,7 @@ sub putFeats
         push(@gffForwards, $fob);
         }
       else {
-        while (@gffForwards) { $self->writeGFF( $gffh,shift @gffForwards,$oidobs) ;  }
+        while (@gffForwards) { $self->writeGFF( $gffh, shift @gffForwards,$oidobs) ;  }
         ## if we drop use of ID=oid, need to resolve all forwards before writeGFF
         $self->writeGFF( $gffh,$fob,$oidobs) ; 
         $gffend=0;
@@ -1480,21 +1579,22 @@ sub setDefaultValues
     transcription_start_site => 1,
     repeat_region => 1,
     region => 1, # attached to gene parents .. RpL40-misc_feature-1
-    mature_peptide => 1, #! attached to protein/CDS 
+    # mature_peptide => 1, #! attached to protein/CDS 
     ##so => 1,
     ##processed_transcript => 1, < are compound
     ##EST => 1, < some are compound !
   );
   map { $simplefeat{$_}=1; } keys %segmentfeats;
-  
-  # use to fix messup with mature_peptide attached to protein/cds - causes generation of 2nd CDS?
-  %skipaskid = (
-    point_mutation => 1,
-    transcription_start_site => 1,
-    repeat_region => 1,
-    region => 1, # attached to gene parents .. RpL40-misc_feature-1
-  ##  mature_peptide => 1, #! attached to protein/CDS -- fixed as own compound type
-  );
+ 
+ ## skipaskid == subset of simplefeat
+#  # use to fix messup with mature_peptide attached to protein/cds - causes generation of 2nd CDS?
+#   %skipaskid = (
+#     point_mutation => 1,
+#     transcription_start_site => 1,
+#     repeat_region => 1,
+#     region => 1, # attached to gene parents .. RpL40-misc_feature-1
+#   ##  mature_peptide => 1, #! attached to protein/CDS -- fixed as own compound type
+#   );
   
   ## drop 'remark' feat from all ?
   %dropfeat_fff = ( ## for the parent/kid test for compound feats

@@ -1,0 +1,67 @@
+<opt
+  name="fbreleases"
+  date="20040821"
+  >
+ 
+  <title>FlyBase data release definitions</title>
+ 
+  <about>
+  Use as include="fbreleases" to data release config file. 
+
+  Common release tags are:
+    id="4"   -- reference from release config file with relid="4"
+    rel="r4.0t"  -- release abbreviation (goes into filenames)
+    dbname="dmel_chado"  -- chado database name
+    relfull="dmel_r4_0t_20040821"  -- output folder name
+    date="20040821"   -- release date
+    release_url="/annot/release4.html"  -- release info url
+
+  </about>
+  
+  <release id="4" 
+    rel="r4.0t"  
+    dbname="dmel_chado"  
+    relfull="dmel_r4_0t_20040821"
+    date="20040821" 
+    release_url="/annot/release4.html"
+    />
+    
+  <release id="3" 
+    rel="r3.2.1" 
+    relfull="dmel_r3.2.1_07212004"
+    dbname="chado_r3_2_27" 
+    date="20040804" 
+    release_url="/annot/release3.2.1.html"
+    />
+  <release id="2" 
+    rel="r3.2.0" 
+    relfull="dmel_r3.2.0_03162004"
+    dbname="chado_r3.2_18" 
+    date="20040321" 
+    release_url="/annot/release3.2.html"
+    />
+  <release id="1" 
+    rel="r3.1.0" 
+    relfull="dmel_r3.1.0_12182003"
+    dbname="chado_r3.1" 
+    date="20031218" 
+    release_url="/annot/release3.1.html"
+    />
+    
+  <release id="h3" 
+    rel="r3_2h"  
+    dbname="chadohet_081604" 
+    relfull="dmel_hetr3_2_08162004"
+    date="20040821" 
+    release_url="/annot/het-release3.2.html"
+    />
+    
+  <release id="p1" 
+    rel="dpse_r1.0"  
+    relfull="dpse_r1_0_20040821"
+    dbname="dmelr3_2_dpser1_0" 
+    date="20040821" 
+    release_url="/annot/dpse-release1.html"
+    />
+
+</opt>
