@@ -62,9 +62,20 @@ WriteMakefile(
        AUTHOR     => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>') : ()),
 );
 
-print "-----------------------------------------------------\n";
-print "type 'make test_load' to test database table creation\n";
-print "-----------------------------------------------------\n";
+print <<HERE
+----------------------------------------------------------
+possible targets of makefile:
+  cdbi      - build Class::DBI middleware layer
+  diagram   - make diagram images of schema
+  graphviz  - make graphviz images of schema
+  metadata  - ???
+  mysql     - convert postgres sql files to mysql sql
+  test_load - test database CREATE TABLE statements
+
+HINT: you probably want to run (at least) "make test_load"
+----------------------------------------------------------
+HERE
+;
 
 sub MY::postamble {
   my $uninterp =  q{
