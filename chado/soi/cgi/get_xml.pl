@@ -20,7 +20,7 @@ use CGI;
 my ($cgi) = new CGI;
 my ($ad);
 
-my $dbname = $cgi->param('database') || $ENV{dbname} || "chado";
+my $dbname = $cgi->param('database') || $ENV{DBNAME} || "chado";
 
 print $cgi->header(-type=>'text/plain');
 
