@@ -15,6 +15,7 @@ create table tableinfo (
 
        unique (name)
 );
+create index tableinfo_idx1 on tableinfo (name);
 
 COMMENT ON TABLE tableinfo IS NULL;
 
@@ -29,6 +30,7 @@ create table contact (
 
        unique (name)
 );
+create index contact_idx1 on contact (name);
 
 COMMENT ON TABLE contact IS NULL;
 
@@ -47,6 +49,7 @@ create table db (
        url varchar(255) null,
        unique (name)
 );
+create index db_idx1 on db (name);
 
 COMMENT ON TABLE db IS NULL;
 
@@ -65,6 +68,9 @@ create table dbxref (
 
        unique (db_id, accession, version)
 );
+create index dbxref_idx1 on dbxref (db_id);
+create index dbxref_idx2 on dbxref (accession);
+create index dbxref_idx3 on dbxref (version);
 
 COMMENT ON TABLE dbxref IS NULL;
 
@@ -79,6 +85,7 @@ create table project (
 
        unique(name)
 );
+create index project_idx1 on project (name);
 
 COMMENT ON TABLE project IS NULL;
 
