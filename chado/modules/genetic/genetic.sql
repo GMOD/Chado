@@ -39,20 +39,20 @@ create table phenotype (
        phenotype_id serial not null,
        primary key (phenotype_id),
        description text,
-       statement_type int not null,
-       foreign key (statement_type) references cvterm (cvterm_id),
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       background_genotype_id int,
-       foreign key (background_genotype_id) references genotype (genotype_id)
+       backgroundgenotype_id int,
+       foreign key (backgroundgenotype_id) references genotype (genotype_id)
 );
 -- type of phenotypic statement  [Chris, we need this or something like it
 -- for FB where we have three types of statement in *k: "Phenotypic class:",
 -- "Phenotype manifest in:", and free-text]
 -- Do we want to call this simply genotype_id to allow natural joins?
-create index phenotype_idx1 on phenotype (statement_type);
+create index phenotype_idx1 on phenotype (type_id);
 create index phenotype_idx2 on phenotype (pub_id);
-create index phenotype_idx3 on phenotype (background_genotype_id);
+create index phenotype_idx3 on phenotype (backgroundgenotype_id);
 
 
 -- ================================================
@@ -84,9 +84,9 @@ create table phenotype_cvterm (
        foreign key (phenotype_id) references phenotype (phenotype_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
-       prank int not null,
+       rank int not null,
 
-       unique(phenotype_id,cvterm_id,prank)
+       unique(phenotype_id,cvterm_id,rank)
 );
 create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
 create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
@@ -114,12 +114,12 @@ create index interaction_idx3 on interaction (phenotype_id);
 
 
 -- ================================================
--- TABLE: interaction_subj
+-- TABLE: interactionsubject
 -- ================================================
 
-create table interaction_subj (
-       interaction_subj_id serial not null,
-       primary key (interaction_subj_id),
+create table interactionsubject (
+       interactionsubject_id serial not null,
+       primary key (interactionsubject_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,
@@ -127,17 +127,17 @@ create table interaction_subj (
 
        unique(feature_id,interaction_id)
 );
-create index interaction_subj_idx1 on interaction_subj (feature_id);
-create index interaction_subj_idx2 on interaction_subj (interaction_id);
+create index interactionsubject_idx1 on interactionsubject (feature_id);
+create index interactionsubject_idx2 on interactionsubject (interaction_id);
 
 
 -- ================================================
--- TABLE: interaction_obj
+-- TABLE: interactionobject
 -- ================================================
 
-create table interaction_obj (
-       interaction_obj_id serial not null,
-       primary key (interaction_obj_id),
+create table interactionobject (
+       interactionobject_id serial not null,
+       primary key (interactionobject_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        interaction_id int not null,
@@ -145,5 +145,5 @@ create table interaction_obj (
 
        unique(feature_id,interaction_id)
 );
-create index interaction_obj_idx1 on interaction_obj (feature_id);
-create index interaction_obj_idx2 on interaction_obj (interaction_id);
+create index interactionobject_idx1 on interactionobject (feature_id);
+create index interactionobject_idx2 on interactionobject (interaction_id);
