@@ -168,8 +168,8 @@ $progress->max_update_rate(1);
 my $next_update = 0;
 
 
+# find needed cvterm and other pieces of information
 my %typemap;
-
 my %feature = ();
 my %featureloc_rank = ();
 my %srcfeature = ();
@@ -224,6 +224,18 @@ unless ($note_type) {
 die "Unable to create note type in cvterm table."
     unless $note_type;
 
+my ($develops_from) = Chado::Cvterm->search(name => 'develops_from');
+($develops_from) = Chado::Cvterm->search(name => 'Develops_From') unless $develops_from;
+unless ($develops_from) {
+  ($develops_from) = Chado::Cvterm->find_or_create({
+                    name       => 'develops_from',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+}
+die "Unable to create note type in cvterm table."
+    unless $develops_from;
+
 my ($pub_type) = Chado::Cvterm->search(name => 'gff_file');
 unless ($pub_type) {
   ($pub_type) = Chado::Cvterm->find_or_create({
@@ -255,6 +267,8 @@ if ($pub and !$FORCE_LOAD) {
 die "unable to find or create a pub entry in the pub table"
     unless $pub;
 
+
+# creates the features for each gff segment
 while(my $gff_segment = $gffio->next_segment()) {
   my ($segment) = Chado::Feature->search({name => $gff_segment->display_id});
   if(!$segment){
@@ -282,6 +296,8 @@ while(my $gff_segment = $gffio->next_segment()) {
 #mini-transactions
 my @transaction;
 
+
+# iterate over each feature in the gff
 while(my $gff_feature = $gffio->next_feature()) {
 
   #skip mitochondrial genes?
@@ -289,6 +305,7 @@ while(my $gff_feature = $gffio->next_feature()) {
   my($id) = $gff_feature->has_tag('ID')? $gff_feature->get_tag_values('ID')
                                        : $gff_feature->get_tag_values('Parent');
 
+  # look up the feature
   if ($gff_feature->has_tag('ID') && !($id eq $gff_feature->seq_id) ){
     ($srcfeature{$id}) = Chado::Feature->search(name => $gff_feature->seq_id);
 
@@ -376,10 +393,11 @@ while(my $gff_feature = $gffio->next_feature()) {
   next if $id eq $gff_feature->seq_id; #ie, this is a srcfeature (ie, fref) so only create the feature
 
   $chado_feature->dbxref_id($dbxref{$id}) if $gff_feature->has_tag('ID'); # is this the right thing to do here?
-  $chado_feature->update;
+  $chado_feature->update; # flush updates to this feature object
 
   my $frame = $gff_feature->frame eq '.' ? 0 : $gff_feature->frame;
 
+  # add feature location
   my $chado_featureloc = Chado::Featureloc->find_or_create({
       feature_id    => $chado_feature->id,
       fmin          => $fmin,
@@ -425,8 +443,139 @@ while(my $gff_feature = $gffio->next_feature()) {
     }
   }
 
-  if($gff_feature->has_tag('Alias')) {
-    my @aliases = $gff_feature->get_tag_values('Alias');
+
+# add in all the various dbxrefs
+# still need to add protein as subfeature
+  if($gff_feature->has_tag('spID') or $gff_feature->has_tag('kgID') or $gff_feature->has_tag('refseq') or $gff_feature->has_tag('protAcc')){  #add as dbxref
+
+#####  Don't each of these dbxrefs need to be added to the features????
+
+	my @dbxrefs;
+    my $chado_db;
+	if $gff_feature->has_tag('spID') {
+	  $chado_db = Chado::Db->search(name => 'DB:swissprot') else die "Must have db table entry for DB:swissprot\n";
+	  @dbxrefs = $gff_feature->get_tag_values('spID');
+	  foreach my $dbxref (@dbxrefs) {
+        my($chado_dbxref) = Chado::Dbxref->find_or_create({
+        db_id => $chado_db->id,
+        accession => $dbxref,
+        });
+        my($parentFeature) = $feature{$id};
+        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
+                      feature_id => $parentFeature->id,
+                      dbxref_id     => $chado_dbxref->id,
+                                              });
+		push @transaction, $chado_dbxref, $feature_dbxref;
+	  }
+	}
+	if $gff_feature->has_tag('kgID') {
+	  $chado_db = Chado::Db->search(name => 'DB:genbank') else die "Must have db table entry for DB:genbank\n";
+	  @dbxrefs = $gff_feature->get_tag_values('kgID');
+	  foreach my $dbxref (@dbxrefs) {
+        my($chado_dbxref) = Chado::Dbxref->find_or_create({
+        db_id => $chado_db->id,
+        accession => $dbxref,
+        });
+        my($parentFeature) = $feature{$id};
+        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
+                      feature_id => $parentFeature->id,
+                      dbxref_id     => $chado_dbxref->id,
+                                              });
+		push @transaction, $chado_dbxref, $feature_dbxref;
+	  }
+	}
+	if $gff_feature->has_tag('refseq') {
+	  $chado_db = Chado::Db->search(name => 'DB:refseq') else die "Must have db table entry for DB:refseq\n";
+	  @dbxrefs = $gff_feature->get_tag_values('refseq');
+	  foreach my $dbxref (@dbxrefs) {
+        my($chado_dbxref) = Chado::Dbxref->find_or_create({
+        db_id => $chado_db->id,
+        accession => $dbxref,
+        });
+        my($parentFeature) = $feature{$id};
+        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
+                      feature_id => $parentFeature->id,
+                      dbxref_id     => $chado_dbxref->id,
+                                              });
+		push @transaction, $chado_dbxref, $feature_dbxref;
+	  }
+	}
+	if $gff_feature->has_tag('protAcc') {
+	  $chado_db = Chado::Db->search(name => 'DB:refseq') else die "Must have db table entry for DB:refseq\n";
+	  @dbxrefs = $gff_feature->get_tag_values('protAcc');
+	  foreach my $dbxref (@dbxrefs) {
+        my($chado_dbxref) = Chado::Dbxref->find_or_create({
+        db_id => $chado_db->id,
+        accession => $dbxref,
+        });
+        my($parentFeature) = $feature{$id};
+        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
+                      feature_id => $parentFeature->id,
+                      dbxref_id     => $chado_dbxref->id,
+                                              });
+		push @transaction, $chado_dbxref, $feature_dbxref;
+	  }
+	}
+  }
+
+
+# is there something better to use than a 'description' cvterm?
+  my ($description_type) = Chado::Cvterm->search(name => 'description');
+  unless ($description_type) {
+    ($description_type) = Chado::Cvterm->find_or_create({
+                    name       => 'description',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+	push @transaction, $description_type;
+  }
+
+  if($gff_feature->has_tag('description')){ #add as featureprop
+      my($chado_featureprop) = Chado::Featureprop->find_or_create({
+                      feature_id => $chado_feature->feature_id,
+                      type_id    => $description_type->cvterm_id,
+                      value      => $gff_feature->get_tag_value('description'),
+                                              });
+	  push @transaction, $chado_featureprop;
+  }
+
+ # is this the correct ontology term to use?
+ my ($protein_type) = Chado::Cvterm->search(name => 'protein');
+  unless ($protein_type) {
+    ($protein_type) = Chado::Cvterm->find_or_create({
+                    name       => 'protein',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+	push @transaction, $protein_type;
+
+# changed from protAcc to protein
+
+  if($gff_feature->has_tag("protein")) {
+	  my($chado_feature) = Chado::Feature->find_or_create({
+    organism_id  => $chado_organism,
+    name         => $gff_feature->get_tag_values('protein'),
+    uniquename   => $gff_feature->get_tag_values('protein').'_'. $gff_feature->primary_tag
+                        .'_'. $gff_feature->seq_id .':'
+                            . $fmin .'..'. $fmax,
+    type_id      => $protein_type->cvterm_id,
+                                                    });
+
+## !!!!!!!!! Need to add in subfeature here!!!
+  my $parentFeature = $feature{$id};  # is this pulling the parent feature back here?
+  my($chado_feature_rel) = Chado::Feature_Relationship->find_or_create({
+    subject_id => $chado_feature->id,
+    object_id => $parentFeature->id,
+    type_id => $develops_from->id,
+  });
+
+  push @transaction, $chado_feature, $chado_feature_rel;
+  }
+
+  if($gff_feature->has_tag('Alias') or $gff_feature->has_tag('geneSymbol')) {
+    my @aliases;
+	if($gff_feature->has_tag('Alias')) { push @aliases, $gff_feature->get_tag_values('Alias'); }
+	if($gff_feature->has_tag('geneSymbol')) { push @aliases, $gff_feature->get_tag_values('geneSymbol'); }
     foreach my $alias (@aliases) {
       my($chado_synonym1) = Chado::Synonym->find_or_create({
                       name         => $alias,
