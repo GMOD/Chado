@@ -1,4 +1,4 @@
-# $Id: FeatureUtil.pm,v 1.1 2004-06-16 02:46:50 cmungall Exp $
+# $Id: FeatureUtil.pm,v 1.2 2004-07-23 22:15:43 cmungall Exp $
 #
 #
 
@@ -188,6 +188,8 @@ so called natural begin and end - this is the native chaos coordinate system
 sub bcmm2ibv {
     my ($bmin, $bmax, $strand) = @_;
     $strand ||= 0;
+    $strand = 1 if ($strand eq '+');
+    $strand = -1 if ($strand eq '-');
     $bmin--;
     ($bmin, $bmax) = ($bmax, $bmin) if $strand < 0;
     return ($bmin, $bmax, $strand); 

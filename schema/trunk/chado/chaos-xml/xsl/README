@@ -1,0 +1,20 @@
+chaos-xml/xsl
+
+CHAOS XSL TRANSFORMS
+====================
+
+Chris Mungall and Brad Marshall
+BDGP 
+2004
+
+This directory contains XSL stylesheets for querying, transforming and
+exporting data from Chaos XML files. For example chaos-xml files, see
+the ../example-xml/ directory
+
+There are a number of tools available for running XSL stylesheets. We
+use xsltproc [see http://xmlsoft.org/XSLT/xsltproc2.html]
+
+For example
+
+  xsltproc xsl/chaos-to-dbxref-tbl.xsl example-xml/AE003734.chaos.xml
+
