@@ -4,6 +4,10 @@
 echo "Relationship Ontology"
 ./bin/make_cvtermpath.pl $USER $DBNAME 'Relationship Ontology'         | psql -q $DBNAME
 
+echo "Sequence Ontology Feature Annotation"
+./bin/make_cvtermpath.pl $USER $DBNAME 'Sequence Ontology Feature Annotation'| psql -q $DBNAME
+
+
 echo "Sequence Ontology"
 ./bin/make_cvtermpath.pl $USER $DBNAME 'Sequence Ontology'             | psql -q $DBNAME
 
