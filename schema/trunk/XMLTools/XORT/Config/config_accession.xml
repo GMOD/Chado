@@ -4,9 +4,9 @@
 <chado>
   <global_id>
      <table>dbxref</table>
-     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <pattern>^([^:]*):([^\.]*)</pattern>
      <path>
-        <dbxref op="force" dump="all">
+        <dbxref op="lookup" dump="all">
            <db_id test="yes">
               <db>
                 <name>$1</name>
@@ -18,6 +18,56 @@
       </path>
       <rank>1</rank>
       <!--  select dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name='$'1 and db.accession='$'2 and db.version='$3' -->
+  </global_id>
+  <global_id>
+     <table>dbxref</table>
+     <pattern>^([^:]*):([^\.]*)</pattern>
+     <path>
+        <dbxref op="insert" dump="all">
+           <db_id test="yes">
+              <db>
+                <name>$1</name>
+               </db>
+           </db_id>
+           <accession test="yes">$2</accession>
+           <version test="yes">$3</version>
+        </dbxref>
+      </path>
+      <rank>1</rank>
+      <!--  select dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name='$'1 and db.accession='$'2 and db.version='$3' -->
+  </global_id>
+  <global_id>
+     <table>pub</table>
+     <pattern>^([^:]*):([^\:]*):([^\:]*)</pattern>
+     <path>
+        <pub op="lookup" dump="all">
+           <type_id test="yes">
+              <cvterm>
+                 <name>$2</name>
+                 <cv_id>
+                   <cv>
+                     <name>pub type</name>
+                   </cv>
+                 </cv_id>
+              </cvterm>
+           </type_id>
+           <pubprop test="yes">
+              <value>$1</value>
+               <type_id>
+                  <cvterm>
+                     <name>$3</name>
+                     <cv_id>
+                        <cv>
+                          <name>pub type</name>
+                        </cv>
+                     </cv_id>
+                  </cvterm>
+               </type_id>
+           </pubprop>
+        </pub>
+      </path>
+      <rank>1</rank>
+      <!--  select p.pub_id from pub p, pubprop pp, cvterm c1, cvterm c2, cv cv1, cv cv2 where p.pud_id=pp.pub_id and c1.cvterm_id=p.type_id and c1.name='journal' and c1.cv_id=cv1.cv_id and cv1.name='pub type' and pp.type_id=c2.cvterm_id and c2.name='abbrev' and c2.cv_id=cv2.cv_id and cv2.name='pub type' and pp.value='$1' -->
   </global_id>
   <global_id>
      <table>cvterm</table>
@@ -35,28 +85,13 @@
       <rank>0</rank>
       <!--  select cvterm_id from cvterm ct, cv c where c.name='$1' and cv.name='$2' -->
   </global_id>
-  <global_id>
-     <table>dbxref</table>
-     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
-     <path>
-        <dbxref op="lookup" dump="all">
-           <db_id test="yes">
-              <db>
-                <name>$1</name>
-               </db>
-           </db_id>
-           <accession test="yes">$2</accession>
-           <version test="yes">$3</version>
-        </dbxref>
-      </path>
-      <rank>0</rank>
-      <!--  select dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name='$'1 and db.accession='$'2 and db.version='$3' -->
-  </global_id>
+
   <global_id>
      <table>feature</table>
      <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
      <path>
         <feature op="lookup" dump="select">
+          <uniquename test="yes">$2</uniquename>
           <dbxref_id test="yes">
             <dbxref>
               <db_id>
@@ -77,9 +112,9 @@
      <table>feature</table>
      <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
      <path>
-       <feature op="lookup" dump="select">
-         <feature_dbxref test="yes"> 
-          <dbxref_id>
+        <feature op="lookup" dump="select">
+          <uniquename test="yes">$2</uniquename>
+          <dbxref_id test="yes">
             <dbxref>
               <db_id>
                 <db>
@@ -90,13 +125,34 @@
               <version>$3</version>
             </dbxref>
           </dbxref_id>
-          <is_current>1</is_current>
-         </feature_dbxref>
-       </feature>
+        </feature>
      </path>
-     <rank>1</rank>
-     <!-- select f.feature_id from feature f where exist (select * from feature_dbxref fd, dbxref dx, db d  where fd.feature_id=f.feature_id and fd.dbxref_id=dx.dbxref_id and dx.accession='$2' and dx.version='$3' and dx.dbxref_id=d.db_id and d.name='$1'  -->
+     <rank>0</rank>
    </global_id>
+<!-- select f.feature_id from feature f, dbxref dx, db d where f.dbxref_id=dx.dbxref_id and dx.db_id=d.db_id and d.name='$1' and dx.accession='$2' and dx.version='$3'  -->
+  <global_id>
+     <table>feature</table>
+     <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
+     <path>
+        <feature op="delete" dump="select">
+          <uniquename test="yes">$2</uniquename>
+          <dbxref_id test="yes">
+            <dbxref>
+              <db_id>
+                <db>
+                  <name>$1</name>
+                </db>
+              </db_id>
+              <accession>$2</accession>
+              <version>$3</version>
+            </dbxref>
+          </dbxref_id>
+        </feature>
+     </path>
+     <rank>2</rank>
+   </global_id>
+<!-- select f.feature_id from feature f, dbxref dx, db d where f.dbxref_id=dx.dbxref_id and dx.db_id=d.db_id and d.name='$1' and dx.accession='$2' and dx.version='$3'  -->
+
    <global_id>
      <table>feature</table>
      <pattern>^([^:]*):([^\.]*)(\.(.*))?$</pattern>
@@ -136,4 +192,4 @@
      <!-- select feature_0.feature_id from organism organism_0 , feature feature_0 where  organism_0.genus='UNKNOWN' and feature_0.organism_id=organism_0.organism_id and organism_0.species='UNKNOWN' and feature_0.uniquename='$2' -->
    </global_id>
 </chado>
-   
+  
