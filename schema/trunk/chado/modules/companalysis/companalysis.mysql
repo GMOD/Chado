@@ -1,52 +1,28 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Feb 24 19:09:27 2003
+-- Created on Mon Mar  3 13:09:16 2003
 --
 
 --
 -- Table: analysisfeature
 --
-CREATE TABLE analysisfeature (
-  feature_id int NOT NULL,
-  analysis_id int,
-  rawscore double,
-  normscore double,
-  significance double,
-  identity double,
-  UNIQUE KEY  (feature_id, analysis_id),
-  UNIQUE KEY analysisfeature_idx1 (feature_id),
-  UNIQUE KEY analysisfeature_idx2 (analysis_id)
+CREATE TABLE analysisfeature (,
+  KEY analysisfeature_idx1 (feature_id),
+  KEY analysisfeature_idx2 (analysis_id)
 );
 
 --
 -- Table: analysisprop
 --
-CREATE TABLE analysisprop (
-  analysis_id int NOT NULL,
-  pkey_id int NOT NULL,
-  pval text,
-  UNIQUE KEY  (analysis_id, pkey_id, pval(255)),
-  UNIQUE KEY analysisprop_idx1 (analysis_id),
-  UNIQUE KEY analysisprop_idx2 (pkey_id)
+CREATE TABLE analysisprop (,
+  KEY analysisprop_idx1 (analysis_id),
+  KEY analysisprop_idx2 (pkey_id)
 );
 
 --
 -- Table: analysis
 --
-CREATE TABLE analysis (
-  analysis_id int NOT NULL,
-  name varchar(255),
-  description text,
-  program varchar(255) NOT NULL,
-  programversion varchar(255) NOT NULL,
-  algorithm varchar(255),
-  sourcename varchar(255),
-  sourceversion varchar(255),
-  sourceuri text,
-  queryfeature_id int,
-  timeexecuted timestamp NOT NULL DEFAULT 'current_timestamp',
-  PRIMARY KEY  (analysis_id),
-  UNIQUE KEY  (program(85), programversion(85), sourcename(85)),
-  UNIQUE KEY analysis_idx1 (queryfeature_id)
+CREATE TABLE analysis (,
+  KEY analysis_idx1 (queryfeature_id)
 );
 

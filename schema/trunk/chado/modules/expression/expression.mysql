@@ -1,78 +1,76 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Feb 24 19:10:34 2003
+-- Created on Mon Mar  3 13:09:22 2003
 --
 
 --
 -- Table: eimage
 --
 CREATE TABLE eimage (
-  eimage_id int NOT NULL,
+  eimage_id serial(4) NOT NULL,
   eimage_data text,
   eimage_type varchar(255) NOT NULL,
-  image_uri varchar(255),
-  PRIMARY KEY  (eimage_id)
+  image_uri varchar(255)
 );
 
 --
 -- Table: expression_pub
 --
 CREATE TABLE expression_pub (
-  expression_pub_id int NOT NULL,
-  expression_id int NOT NULL,
-  pub_id int NOT NULL,
-  PRIMARY KEY  (expression_pub_id),
-  UNIQUE KEY  (expression_id, pub_id),
-  UNIQUE KEY expression_pub_idx1 (expression_id),
-  UNIQUE KEY expression_pub_idx2 (pub_id)
+  expression_pub_id serial(4) NOT NULL,
+  expression_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY expression_pub_idx1 (expression_id),
+  KEY expression_pub_idx2 (pub_id),
+  FOREIGN KEY (expression_id) REFERENCES expression (expression_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
 );
 
 --
 -- Table: feature_expression
 --
 CREATE TABLE feature_expression (
-  feature_expression_id int NOT NULL,
-  expression_id int NOT NULL,
-  feature_id int NOT NULL,
-  PRIMARY KEY  (feature_expression_id),
-  UNIQUE KEY  (expression_id, feature_id),
-  UNIQUE KEY feature_expression_idx1 (expression_id),
-  UNIQUE KEY feature_expression_idx2 (feature_id)
+  feature_expression_id serial(4) NOT NULL,
+  expression_id integer(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  KEY feature_expression_idx1 (expression_id),
+  KEY feature_expression_idx2 (feature_id),
+  FOREIGN KEY (expression_id) REFERENCES expression (expression_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id)
 );
 
 --
 -- Table: expression
 --
 CREATE TABLE expression (
-  expression_id int NOT NULL,
-  description text,
-  PRIMARY KEY  (expression_id)
+  expression_id serial(4) NOT NULL,
+  description text
 );
 
 --
 -- Table: expression_image
 --
 CREATE TABLE expression_image (
-  expression_image_id int NOT NULL,
-  expression_id int NOT NULL,
-  eimage_id int NOT NULL,
-  PRIMARY KEY  (expression_image_id),
-  UNIQUE KEY  (expression_id, eimage_id),
-  UNIQUE KEY expression_image_idx1 (expression_id),
-  UNIQUE KEY expression_image_idx2 (eimage_id)
+  expression_image_id serial(4) NOT NULL,
+  expression_id integer(4) NOT NULL,
+  eimage_id integer(4) NOT NULL,
+  KEY expression_image_idx1 (expression_id),
+  KEY expression_image_idx2 (eimage_id),
+  FOREIGN KEY (expression_id) REFERENCES expression (expression_id),
+  FOREIGN KEY (eimage_id) REFERENCES eimage (eimage_id)
 );
 
 --
 -- Table: expression_cvterm
 --
 CREATE TABLE expression_cvterm (
-  expression_cvterm_id int NOT NULL,
-  expression_id int NOT NULL,
-  cvterm_id int NOT NULL,
-  rank int NOT NULL,
-  PRIMARY KEY  (expression_cvterm_id),
-  UNIQUE KEY  (expression_id, cvterm_id),
-  UNIQUE KEY expression_cvterm_idx1 (expression_id),
-  UNIQUE KEY expression_cvterm_idx2 (cvterm_id)
+  expression_cvterm_id serial(4) NOT NULL,
+  expression_id integer(4) NOT NULL,
+  cvterm_id integer(4) NOT NULL,
+  rank integer(4) NOT NULL,
+  KEY expression_cvterm_idx1 (expression_id),
+  KEY expression_cvterm_idx2 (cvterm_id),
+  FOREIGN KEY (expression_id) REFERENCES expression (expression_id),
+  FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id)
 );
 

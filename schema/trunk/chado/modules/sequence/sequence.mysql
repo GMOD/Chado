@@ -1,0 +1,185 @@
+--
+-- Created by SQL::Translator::Producer::MySQL
+-- Created on Mon Mar  3 13:09:41 2003
+--
+
+--
+-- Table: feature_dbxref
+--
+CREATE TABLE feature_dbxref (
+  feature_dbxref_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  dbxref_id integer(4) NOT NULL,
+  is_current boolean NOT NULL DEFAULT 'true',
+  KEY feature_dbxref_idx1 (feature_id),
+  KEY feature_dbxref_idx2 (dbxref_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (dbxref_id) REFERENCES dbxref (dbxref_id)
+);
+
+--
+-- Table: featureloc
+--
+CREATE TABLE featureloc (
+  featureloc_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  srcfeature_id integer(4),
+  nbeg integer(4),
+  is_nbeg_partial boolean NOT NULL DEFAULT 'false',
+  nend integer(4),
+  is_nend_partial boolean NOT NULL DEFAULT 'false',
+  strand integer(2),
+  phase integer(4),
+  residue_info text,
+  locgroup integer(4) NOT NULL DEFAULT '',
+  rank integer(4) NOT NULL DEFAULT '',
+  KEY featureloc_idx1 (feature_id),
+  KEY featureloc_idx2 (srcfeature_id),
+  KEY featureloc_idx3 (srcfeature_id, nbeg, nend),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (srcfeature_id) REFERENCES feature (feature_id)
+);
+
+--
+-- Table: synonym_pub
+--
+CREATE TABLE synonym_pub (
+  synonym_pub_id serial(4) NOT NULL,
+  synonym_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY synonym_pub_idx1 (synonym_id),
+  KEY synonym_pub_idx2 (pub_id),
+  FOREIGN KEY (synonym_id) REFERENCES synonym (synonym_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+
+--
+-- Table: feature_pub
+--
+CREATE TABLE feature_pub (
+  feature_pub_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY feature_pub_idx1 (feature_id),
+  KEY feature_pub_idx2 (pub_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+
+--
+-- Table: featureprop
+--
+CREATE TABLE featureprop (
+  featureprop_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  pkey_id integer(4) NOT NULL,
+  pval text NOT NULL DEFAULT '',
+  prank integer(4),
+  KEY featureprop_idx1 (feature_id),
+  KEY featureprop_idx2 (pkey_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (pkey_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: feature_relationship
+--
+CREATE TABLE feature_relationship (
+  feature_relationship_id serial(4) NOT NULL,
+  subjfeature_id integer(4) NOT NULL,
+  objfeature_id integer(4) NOT NULL,
+  type_id integer(4) NOT NULL,
+  relrank integer(4),
+  KEY feature_relationship_idx1 (subjfeature_id),
+  KEY feature_relationship_idx2 (objfeature_id),
+  KEY feature_relationship_idx3 (type_id),
+  FOREIGN KEY (subjfeature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (objfeature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: feature
+--
+CREATE TABLE feature (
+  feature_id serial(4) NOT NULL,
+  dbxref_id integer(4),
+  organism_id integer(4) NOT NULL,
+  name varchar(255),
+  uniquename text NOT NULL,
+  residues text,
+  seqlen integer(4),
+  md5checksum char(32),
+  type_id integer(4) NOT NULL,
+  is_analysis boolean NOT NULL DEFAULT 'false',
+  timeaccessioned timestamp NOT NULL DEFAULT 'current_timestamp',
+  timelastmodified timestamp NOT NULL DEFAULT 'current_timestamp',
+  KEY feature_name_ind1 (name),
+  KEY feature_idx1 (dbxref_id),
+  KEY feature_idx2 (organism_id),
+  KEY feature_idx3 (type_id),
+  KEY feature_idx4 (uniquename),
+  FOREIGN KEY (dbxref_id) REFERENCES dbxref (dbxref_id),
+  FOREIGN KEY (organism_id) REFERENCES organism (organism_id),
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: synonym
+--
+CREATE TABLE synonym (
+  synonym_id serial(4) NOT NULL,
+  name varchar(255) NOT NULL,
+  type_id integer(4) NOT NULL,
+  synonym_sgml varchar(255) NOT NULL,
+  KEY synonym_idx1 (type_id),
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id)
+);
+
+--
+-- Table: feature_cvterm
+--
+CREATE TABLE feature_cvterm (
+  feature_cvterm_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  cvterm_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY feature_cvterm_idx1 (feature_id),
+  KEY feature_cvterm_idx2 (cvterm_id),
+  KEY feature_cvterm_idx3 (pub_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+
+--
+-- Table: featureprop_pub
+--
+CREATE TABLE featureprop_pub (
+  featureprop_pub_id serial(4) NOT NULL,
+  featureprop_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY featureprop_pub_idx1 (featureprop_id),
+  KEY featureprop_pub_idx2 (pub_id),
+  FOREIGN KEY (featureprop_id) REFERENCES featureprop (featureprop_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+
+--
+-- Table: feature_synonym
+--
+CREATE TABLE feature_synonym (
+  feature_synonym_id serial(4) NOT NULL,
+  synonym_id integer(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  is_current boolean NOT NULL,
+  is_internal boolean NOT NULL DEFAULT 'false',
+  KEY feature_synonym_idx1 (synonym_id),
+  KEY feature_synonym_idx2 (feature_id),
+  KEY feature_synonym_idx3 (pub_id),
+  FOREIGN KEY (synonym_id) REFERENCES synonym (synonym_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
+);
+

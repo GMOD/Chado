@@ -1,65 +1,71 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Feb 24 19:14:36 2003
+-- Created on Mon Mar  3 13:09:31 2003
 --
 
 --
 -- Table: featurerange
 --
 CREATE TABLE featurerange (
-  featurerange_id int NOT NULL,
-  featuremap_id int NOT NULL,
-  feature_id int NOT NULL,
-  leftstartf_id int NOT NULL,
-  leftendf_id int,
-  rightstartf_id int,
-  rightendf_id int NOT NULL,
+  featurerange_id serial(4) NOT NULL,
+  featuremap_id integer(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  leftstartf_id integer(4) NOT NULL,
+  leftendf_id integer(4),
+  rightstartf_id integer(4),
+  rightendf_id integer(4) NOT NULL,
   rangestr varchar(255),
-  PRIMARY KEY  (featurerange_id),
-  UNIQUE KEY featurerange_idx1 (featuremap_id),
-  UNIQUE KEY featurerange_idx2 (feature_id),
-  UNIQUE KEY featurerange_idx3 (leftstartf_id),
-  UNIQUE KEY featurerange_idx4 (leftendf_id),
-  UNIQUE KEY featurerange_idx5 (rightstartf_id),
-  UNIQUE KEY featurerange_idx6 (rightendf_id)
+  KEY featurerange_idx1 (featuremap_id),
+  KEY featurerange_idx2 (feature_id),
+  KEY featurerange_idx3 (leftstartf_id),
+  KEY featurerange_idx4 (leftendf_id),
+  KEY featurerange_idx5 (rightstartf_id),
+  KEY featurerange_idx6 (rightendf_id),
+  FOREIGN KEY (featuremap_id) REFERENCES featuremap (featuremap_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (leftstartf_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (leftendf_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (rightstartf_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (rightendf_id) REFERENCES feature (feature_id)
 );
 
 --
 -- Table: featurepos
 --
 CREATE TABLE featurepos (
-  featurepos_id int NOT NULL,
-  featuremap_id int NOT NULL,
-  feature_id int NOT NULL,
-  map_feature_id int NOT NULL,
-  mappos float NOT NULL,
-  PRIMARY KEY  (featurepos_id),
-  UNIQUE KEY featurepos_idx1 (featuremap_id),
-  UNIQUE KEY featurepos_idx2 (feature_id),
-  UNIQUE KEY featurepos_idx3 (map_feature_id)
+  featurepos_id serial(4) NOT NULL,
+  featuremap_id serial(4) NOT NULL,
+  feature_id integer(4) NOT NULL,
+  map_feature_id integer(4) NOT NULL,
+  mappos float(8) NOT NULL,
+  KEY featurepos_idx1 (featuremap_id),
+  KEY featurepos_idx2 (feature_id),
+  KEY featurepos_idx3 (map_feature_id),
+  FOREIGN KEY (featuremap_id) REFERENCES featuremap (featuremap_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id),
+  FOREIGN KEY (map_feature_id) REFERENCES feature (feature_id)
 );
 
 --
 -- Table: featuremap_pub
 --
 CREATE TABLE featuremap_pub (
-  featuremap_pub_id int NOT NULL,
-  featuremap_id int NOT NULL,
-  pub_id int NOT NULL,
-  PRIMARY KEY  (featuremap_pub_id),
-  UNIQUE KEY featuremap_pub_idx1 (featuremap_id),
-  UNIQUE KEY featuremap_pub_idx2 (pub_id)
+  featuremap_pub_id serial(4) NOT NULL,
+  featuremap_id integer(4) NOT NULL,
+  pub_id integer(4) NOT NULL,
+  KEY featuremap_pub_idx1 (featuremap_id),
+  KEY featuremap_pub_idx2 (pub_id),
+  FOREIGN KEY (featuremap_id) REFERENCES featuremap (featuremap_id),
+  FOREIGN KEY (pub_id) REFERENCES pub (pub_id)
 );
 
 --
 -- Table: featuremap
 --
 CREATE TABLE featuremap (
-  featuremap_id int NOT NULL,
+  featuremap_id serial(4) NOT NULL,
   mapname varchar(255),
   mapdesc varchar(255),
-  mapunit varchar(255),
-  PRIMARY KEY  (featuremap_id),
-  UNIQUE KEY  (mapname)
+  mapunit varchar(255)
 );
 

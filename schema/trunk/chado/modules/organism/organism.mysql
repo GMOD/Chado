@@ -1,5 +1,31 @@
 --
 -- Created by SQL::Translator::Producer::MySQL
--- Created on Mon Feb 24 19:15:17 2003
+-- Created on Mon Mar  3 13:09:34 2003
 --
+
+--
+-- Table: organism_dbxref
+--
+CREATE TABLE organism_dbxref (
+  organism_dbxref_id serial(4) NOT NULL,
+  organism_id integer(4) NOT NULL,
+  dbxref_id integer(4) NOT NULL,
+  KEY organism_dbxref_idx1 (organism_id),
+  KEY organism_dbxref_idx2 (dbxref_id),
+  FOREIGN KEY (organism_id) REFERENCES organism (organism_id),
+  FOREIGN KEY (dbxref_id) REFERENCES dbxref (dbxref_id)
+);
+
+--
+-- Table: organism
+--
+CREATE TABLE organism (
+  organism_id serial(4) NOT NULL,
+  abbrev varchar(255),
+  genus varchar(255) NOT NULL,
+  taxgroup varchar(255) NOT NULL,
+  species varchar(255) NOT NULL,
+  common_name varchar(255),
+  comment text
+);
 
