@@ -363,8 +363,10 @@ sub load_custom_tags {
     elsif ( $tag =~ /^db:/ ) {
         $tag =~ s/^db:/DB:/;
 
+        my $add_db = 0;
         my ($db) = Chado::Db->search( name => $tag );
         if ( !$db ) {
+            $add_db = 1;
             $db = Chado::Db->find_or_create(
                 {
                     name       => $tag,
@@ -373,7 +375,7 @@ sub load_custom_tags {
             );
         }
         die "couldn't create db $db" unless $db;
-        push @transaction, $db;
+        push @transaction, $db if $add_db;
 
         foreach my $d (@d) {
             my ($dbxref) = Chado::Dbxref->find_or_create(
@@ -402,9 +404,11 @@ sub load_custom_tags {
                 die "unable to determine database for dbxref: $d\n";
             }
 
+            my $add_db = 0;
             my ($db) = Chado::Db->search( name => $tag );
             if ( !$db ) {
                 $db = Chado::Db->find_or_create(
+                    $add_db = 1;
                     {
                         name       => $tag,
                         contact_id => $nullcontact,
@@ -412,7 +416,7 @@ sub load_custom_tags {
                 );
             }
             die "couldn't create db $db" unless $db;
-            push @transaction, $db;
+            push @transaction, $db if $add_db;
                                                                                 
             my ($dbxref) = Chado::Dbxref->find_or_create(
                 {
