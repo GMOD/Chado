@@ -21,6 +21,7 @@ cgi: script for web server, currently we have only get_xml.pl that serves
     out GAME xml for apollo
 
 fx: plpgsql functions on which some templates depend
+[deprecated, mv to cv or sequence module function dir]
 
 templates: soi templates SOI::Adapter can take and construct feature tree
 
