@@ -126,7 +126,7 @@ my $linecount = <WC>; chomp $linecount;
 close(WC);
 ($linecount) = $linecount =~ /^\s+(\d+)\s+.+$/;
 
-my $progress = Term::ProgressBar->new({name => 'Powers', count => $linecount,
+my $progress = Term::ProgressBar->new({name => 'Features', count => $linecount,
                                        ETA => 'linear', });
 $progress->max_update_rate(1);
 my $next_update = 0;
@@ -463,15 +463,18 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   if ($feature_count % CACHE_SIZE == 0) {
     $_->dbi_commit foreach @transaction;
+  }
     @transaction = ();
 
     $next_update = $progress->update($feature_count) if($feature_count > $next_update);
-    $progress->update($linecount) if($linecount >= $next_update);
+#warn $next_update;
+#    $progress->update($linecount) if($linecount >= $next_update);
+    $progress->update($linecount) if($next_update >= $linecount);
 
     #old-style progress tracker
     #print STDERR "features loaded $feature_count";
     #print STDERR -t STDOUT && !$ENV{EMACS} ? "\r" : "\n";
-  }
+#  }
 }
 $gffio->close();
 
