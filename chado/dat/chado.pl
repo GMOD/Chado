@@ -1,4 +1,4 @@
-# Schema metadata produced by ddltrans on Thu May 29 15:08:26 EDT 2003
+# Schema metadata produced by ddltrans on Fri May 30 09:35:47 EDT 2003
 $schema = {
             'labelmethod' => {
                                'name' => 'labelmethod',
