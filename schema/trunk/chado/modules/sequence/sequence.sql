@@ -165,15 +165,15 @@ create table featureprop (
        primary key (featureprop_id),
        feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null default '',
-       prank int not null default 0,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       value text not null default '',
+       rank int not null default 0,
 
-       unique(feature_id, pkey_id, pval, prank)
+       unique(feature_id, type_id, value, rank)
 );
 create index featureprop_idx1 on featureprop (feature_id);
-create index featureprop_idx2 on featureprop (pkey_id);
+create index featureprop_idx2 on featureprop (type_id);
 
 
 -- ================================================

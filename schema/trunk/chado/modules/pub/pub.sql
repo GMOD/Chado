@@ -87,6 +87,9 @@ create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 create table author (
        author_id serial not null,
        primary key (author_id),
+       contact_id int not null,
+       foreign key (contact_id) references contact (contact_id),
+-- these fields may be moving to the contact table...
        surname varchar(100) not null,
        givennames varchar(100),
        suffix varchar(100),
@@ -128,13 +131,13 @@ create table pubprop (
        primary key (pubprop_id),
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
-       pkey_id int not null,
-       foreign key (pkey_id) references cvterm (cvterm_id),
-       pval text not null,
-       prank integer,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id),
+       value text not null,
+       rank integer,
 
-       unique(pub_id,pkey_id,pval)
+       unique(pub_id,pkey_id,value)
 );
 create index pubprop_idx1 on pubprop (pub_id);
-create index pubprop_idx2 on pubprop (pkey_id);
+create index pubprop_idx2 on pubprop (type_id);
 
