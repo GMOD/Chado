@@ -35,13 +35,13 @@ create table feature (
 -- modification timestamps (as opposed to db auditing info, handled elsewhere).
 -- The expectation is that these fields would be available to software 
 -- interacting with chado.
-create seuqence feature_uniquename_seq;
+create sequence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
 create index feature_idx1 on feature (dbxref_id);
 create index feature_idx2 on feature (organism_id);
 create index feature_idx3 on feature (type_id);
 create index feature_idx4 on feature (uniquename);
-
+create index feature_lc_name on feature (lower(name));
 
 
 
