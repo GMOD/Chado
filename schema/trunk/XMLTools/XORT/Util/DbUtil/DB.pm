@@ -375,7 +375,7 @@ sub db_lookup(){
 	  }
            #if this is unique, not null, and no default value, it will be error ....
           elsif(defined $hash_no_null{$key}) {
-             print "\nin db_force, you missed this not null column:$key of table: $table  which has NO default value";
+             print "\nin db_lookup, you missed this not null column:$key of table: $table  which has NO default value";
              exit(1);
           }
         }
@@ -427,22 +427,26 @@ sub db_lookup(){
           if ($db_id){
              return $db_id;
           }
-          else {
 
-            $query=$dbh->prepare($stm_insert);
-            $rs= $query->execute;
-            if (! $rs ) {
-               &create_log($hash_trans, $hash_local_id, $log_file);
-               die "could not execute: $stm_insert\n";
-            }
-            $query=$dbh->prepare($stm_select);
-            $query->execute or die "Unable to execute query: $dbh->errstr:$stm_select\n";
-            $row_array = $query->fetchrow_arrayref;
-            $db_id= $row_array->[0];
-            if ($db_id){
-               return $db_id;
-            }
-           }
+          else {
+             &create_log($hash_trans, $hash_local_id, $log_file);
+              die "The record you try to lookup is not in database yet: $stm_select\n";
+
+           # $query=$dbh->prepare($stm_insert);
+           # $rs= $query->execute;
+           # if (! $rs ) {
+           #    &create_log($hash_trans, $hash_local_id, $log_file);
+           #    die "could not execute: $stm_insert\n";
+           # }
+           # $query=$dbh->prepare($stm_select);
+           # $query->execute or die "Unable to execute query: $dbh->errstr:$stm_select\n";
+           # $row_array = $query->fetchrow_arrayref;
+           # $db_id= $row_array->[0];
+           # if ($db_id){
+           #    return $db_id;
+           # }
+
+         }
 	}
 
 return ;
@@ -549,7 +553,7 @@ sub db_update(){
 	  }
            #if this is unique, not null, and no default value, it will be error ....
           elsif(defined $hash_no_null{$key}) {
-             print "\nin db_force, you missed this not null column:$key of table: $table  which has NO default value";
+             print "\nin db_update, you missed this not null column:$key of table: $table  which has NO default value";
              exit(1);
           }
         }
@@ -657,7 +661,7 @@ sub db_delete(){
 	  }
            #if this is unique, not null, and no default value, it will be error ....
           elsif(defined $hash_no_null{$key}) {
-             print "\nin db_force, you missed this not null column:$key of table: $table  which has NO default value";
+             print "\nin db_delete, you missed this not null column:$key of table: $table  which has NO default value";
              exit(1);
           }
         }
@@ -775,7 +779,7 @@ sub db_insert(){
 	  }
            #if this is unique, not null, and no default value, it will be error ....
           elsif(defined $hash_no_null{$key}) {
-             print "\nin db_force, you missed this not null column:$key of table: $table  which has NO default value";
+             print "\nin db_insert, you missed this not null column:$key of table: $table  which has NO default value";
              exit(1);
           }
         }
@@ -1177,8 +1181,8 @@ sub _data_type_checker(){
     my $hash_ref=shift;
     my $table=shift;
     my %hash_boolean={
-          '0'=>'f',
-          '1'=>'t',
+          0=>TRUE,
+          1=>FALSE,
     };
 
     foreach my $key (keys %$hash_ref){
@@ -1208,7 +1212,7 @@ sub _data_type_checker(){
     for my $i(0..$#temp){
         my @temp1=split(/:/, $temp[$i]);
 	if ($temp1[1] !~ /int|serial|float|smallint|integer|bigint|decimal|numeric|real|bigserial/ ){
-            # in case of boolean type, need to replace 0/1 with f/t ?
+           
             if ($temp1[1] =~  /boolean/ && defined $hash_boolean{$hash_ref->{$temp1[0]}} && defined($hash_ref->{$temp1[0]}) && ($hash_ref->{$temp1[0]} !~ /^'$'/)){
                   $hash_ref->{$temp1[0]}="\'".$hash_boolean{$hash_ref->{$temp1[0]}}."\'";
             }
@@ -1216,6 +1220,10 @@ sub _data_type_checker(){
               $hash_ref->{$temp1[0]}="\'".$hash_ref->{$temp1[0]}."\'";
             }
        	}
+             # in case of boolean type, need to replace 0/1 with f/t ?
+            if ($temp1[1] =~/boolean/ && exists $hash_boolean{$hash_ref->{$temp1[0]}} ){
+               $hash_ref->{$temp1[0]}=$hash_boolean{$hash_ref->{$temp1[0]}};
+	    }
     }
 
    return $hash_ref;

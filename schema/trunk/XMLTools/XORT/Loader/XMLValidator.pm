@@ -1430,10 +1430,10 @@ sub _get_accession(){
 
     my $organism_id;
     #create a pseudo organism record GAME xml loading
-    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster' and  taxgroup='0'");
+    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
     if (! $organism_id) {
-      $dbh_obj->execute_sql("insert into organism (genus, species, taxgroup) values('Drosophila', 'melanogaster' , '0')");
-      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster' and  taxgroup='0'");
+      $dbh_obj->execute_sql("insert into organism (genus, species) values('Drosophila', 'melanogaster')");
+      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
     }
 
    my $type_id;
