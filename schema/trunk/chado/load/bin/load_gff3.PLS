@@ -21,6 +21,7 @@ use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
 use Term::ProgressBar;
+use File::Temp qw(tempfile);
 
 $| = 1;
 
@@ -123,129 +124,24 @@ it under the same terms as Perl itself.
 
 =cut
 
+#my $TMPFASTA = 'tmp.fasta';
+#my $TMPGFF   = 'tmp.gff';
+my(undef,$TMPFASTA) = tempfile("XXXXXX",".fa", SUFFIX => '.fa');
+my(undef,$TMPGFF) = tempfile("XXXXXX",".gff", SUFFIX => '.gff');
+#warn $TMPFASTA;
+#warn $TMPGFF;
+
 my ($ORGANISM, $SRC_DB, $GFFFILE, $CACHE_SIZE, $FORCE_LOAD);
-
-GetOptions('organism:s'       => \$ORGANISM,
-           'srcdb:s'          => \$SRC_DB,
-           'gfffile:s'        => \$GFFFILE,
-           'cache:s'          => \$CACHE_SIZE,
-           'force'            => \$FORCE_LOAD,
-          ) or (system('pod2text',$0), exit -1); 
-
-$ORGANISM   ||='Human';
-$SRC_DB     ||= 'DB:refseq';
-$CACHE_SIZE ||= 1000;
-
-die "\nYou must specify a GFF file\n" unless $GFFFILE;
-
-#deal with GFF3 files that contain sequence
-# this is ugly, ugly, ugly, but in addtion to dealing with
-# sequence, it also fixes Allen's method of tracking progress
-die "$GFFFILE does not exist" unless (-e $GFFFILE);
-my $TMPFASTA = 'tmp.fasta';
-my $TMPGFF   = 'tmp.gff';
-my $linenumber = `grep -n "^>" $GFFFILE`;
-if ($linenumber =~ /^(\d+)/) {
-  $linenumber = $1;
-  system("tail +$linenumber $GFFFILE > $TMPFASTA");
-  $linenumber -= 1;
-  system("head -$linenumber $GFFFILE > $TMPGFF");
-  $GFFFILE = $TMPGFF;
-}
-
-
-Chado::LoadDBI->init();
-
-#count the file lines.  we need this to track load progress
-open(WC,"grep -c -v '^#' $GFFFILE |");
-my $linecount = <WC>; chomp $linecount;
-close(WC);
-($linecount) = $linecount =~ /^\s*?(\d+)/;
-
-my $progress = Term::ProgressBar->new({name => "Approx $linecount features", count => $linecount,
-                                       ETA => 'linear', });
-$progress->max_update_rate(1);
-my $next_update = 0;
-
-
-# find needed cvterm and other pieces of information
-my %typemap;
+my($progress,$next_update,$linecount) = (undef,undef,undef); #progressbar;
+my($chado_db,$chado_organism,$nullpub,$nullcontact) = (undef,undef,undef,undef);
+my $feature_count = 0; #for cache/flush
+my $cv;
 my %feature = ();
 my %featureloc_rank = ();
-my %srcfeature = ();
 my %dbxref = ();
-my %tagtype = ();
+my %cvterm = ();
 
-my $feature_count = 0;
-
-my($chado_organism) = Chado::Organism->search(common_name => $ORGANISM );
-my($chado_db)       = Chado::Db->search(name => $SRC_DB);
-my($part_of)        = Chado::Cvterm->search(name => 'part_of');
-my($nullpub)        = Chado::Pub->search(miniref => 'null');
-
-die "The organism '$ORGANISM' could not be found. Did you spell it correctly?"
-     unless $chado_organism;
-
-die "The database '$SRC_DB' could not be found. Did you spell it correctly?"
-     unless $chado_db;
-
-die "The cvterm_id for 'part_of' could not be found
-That is a pretty serious problem with you database!\n" unless $part_of;
-
-my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
-
-#check for a synonym type in cvterm--if it's not there create it
-#and a corresponding entry in cv
-
-my ($cv_entry) = Chado::Cv->find_or_create({
-                    name       => 'autocreated',
-                    definition => 'auto created by load_gff3.pl'
-                                             });
-my ($synonym_type) = Chado::Cvterm->search(name => 'synonym');
-unless ($synonym_type) {
-  ($synonym_type) = Chado::Cvterm->find_or_create({
-                    name       => 'synonym',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-}
-die "Unable to create a synonym type in cvterm table."
-    unless $synonym_type;
-
-my ($note_type) = Chado::Cvterm->search(name => 'note');
-($note_type) = Chado::Cvterm->search(name => 'Note') unless $note_type;
-unless ($note_type) {
-  ($note_type) = Chado::Cvterm->find_or_create({
-                    name       => 'note',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-}
-die "Unable to create note type in cvterm table."
-    unless $note_type;
-
-my ($develops_from) = Chado::Cvterm->search(name => 'develops_from');
-($develops_from) = Chado::Cvterm->search(name => 'Develops_From') unless $develops_from;
-unless ($develops_from) {
-  ($develops_from) = Chado::Cvterm->find_or_create({
-                    name       => 'develops_from',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-}
-die "Unable to create note type in cvterm table."
-    unless $develops_from;
-
-my ($pub_type) = Chado::Cvterm->search(name => 'gff_file');
-unless ($pub_type) {
-  ($pub_type) = Chado::Cvterm->find_or_create({
-                    name       => 'gff_file',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-}
-die "Unable to find or create pub type in cvterm table"
-    unless $pub_type;
+initialize();
 
 my $mtime = (stat($GFFFILE))[9];
 my ($pub) = Chado::Pub->search(title => $GFFFILE." ".$mtime);
@@ -259,57 +155,35 @@ if ($pub and !$FORCE_LOAD) {
   }
 } else {
   $pub = Chado::Pub->find_or_create({
-                    title      => $GFFFILE." ".$mtime,
-                    miniref    => $GFFFILE." ".$mtime,
-                    type_id    => $pub_type->cvterm_id
-                                   });
+                                     title      => $GFFFILE." ".$mtime,
+                                     miniref    => $GFFFILE." ".$mtime,
+                                     uniquename => $GFFFILE." ".$mtime,
+                                     type_id    => $cvterm{gff_file}->id
+                                    });
 }
 die "unable to find or create a pub entry in the pub table"
-    unless $pub;
+  unless $pub;
 
 
-# creates the features for each gff segment
-while(my $gff_segment = $gffio->next_segment()) {
-  my ($segment) = Chado::Feature->search({name => $gff_segment->display_id});
-  if(!$segment){
-
-    if(!$typemap{'region'}){
-      ($typemap{'region'}) = Chado::Cvterm->search( name => 'region' );
-    }
-    die "Sequence Ontology term \"region\" could not be found in your cvterm table.\nAre you sure the Sequence Ontology was correctly loaded?\n" unless $typemap{'region'};
-
-    my $f = Chado::Feature->create({
-	      organism_id => $chado_organism,
-	      name        => $gff_segment->display_id,
-	      uniquename  => $gff_segment->display_id .'_region',
-	      type_id     => $typemap{'region'},
-	      seqlen      => $gff_segment->end
-			          });
-
-    $feature_count++;
-    $f->dbi_commit;
-  }
-}
-
-#cache objects up to CACHE_SIZE, then flush.  this is a way to
-#break our large load transaction into multiple cache/flush
-#mini-transactions
+#iterate over each feature in the gff, caching objects up to
+#CACHE_SIZE, then flushing.  this is a way to break our large
+#load transaction into multiple cache/flush mini-transactions
 my @transaction;
 
+my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
 
-# iterate over each feature in the gff
+$feature_count += load_segments($gffio);
+
 while(my $gff_feature = $gffio->next_feature()) {
-
-  #skip mitochondrial genes?
 
   my($id) = $gff_feature->has_tag('ID')? $gff_feature->get_tag_values('ID')
                                        : $gff_feature->get_tag_values('Parent');
 
   # look up the feature
-  if ($gff_feature->has_tag('ID') && !($id eq $gff_feature->seq_id) ){
-    ($srcfeature{$id}) = Chado::Feature->search(name => $gff_feature->seq_id);
+  if ($gff_feature->has_tag('ID') && !($id eq $gff_feature->seq_id) && !($gff_feature->seq_id eq '.')){
+    ($feature{$id}) = Chado::Feature->search(name => $gff_feature->seq_id);
 
-    unless ($srcfeature{$id}) {
+    unless ($feature{$id}) {
       warn "\n" . "*" x 72 ."\n";
       warn "Unable to find a source feature id for the reference sequence in this line:\n";
       warn $gff_feature->gff_string . "\n\n";
@@ -319,29 +193,453 @@ while(my $gff_feature = $gffio->next_feature()) {
       exit 1;
     }
 
-
-#is this general, or what should really be done here?
+    #is this general, or what should really be done here?
     if(!$dbxref{$id}){
       my($chado_dbxref) = Chado::Dbxref->find_or_create({
-        db_id => $chado_db->id,
-        accession => $id,
-                                                       });
+                                                         db_id => $chado_db->id,
+                                                         accession => $id,
+                                                        });
       $dbxref{$id} = $chado_dbxref;
     }
   }
 
+  cache_cvterm($gff_feature->primary_tag);
+  my($chado_type) = $cvterm{$gff_feature->primary_tag};
 
-  my ($chado_type);
-  if ($typemap{$gff_feature->primary_tag}) {
-    ($chado_type) = $typemap{$gff_feature->primary_tag};
-  } else {
-    ($typemap{$gff_feature->primary_tag})
-           = Chado::Cvterm->search( name => $gff_feature->primary_tag );
-    ($chado_type) = $typemap{$gff_feature->primary_tag}; 
+  die $gff_feature->primary_tag . " could not be found in your cvterm table.\n".
+    "Either the Sequence Ontology was incorrectly loaded,\n".
+    "or this file doesn't contain GFF3" unless $chado_type;
+
+  my $chado_feature = load_feature_locations($gff_feature,$chado_type,$id);
+  $feature_count++;
+
+  $feature{$id} = $chado_feature if $gff_feature->has_tag('ID');
+
+  my @tags = $gff_feature->all_tags;
+  foreach my $tag (@tags) {
+    if($tag eq 'ID'){
+      load_ID_tag($gff_feature,$chado_feature,$id);
+    } elsif($tag eq 'Parent'){
+      load_Parent_tag($gff_feature,$chado_feature);
+    } elsif($tag eq 'Alias'){
+      load_Alias_tag($gff_feature,$chado_feature);
+    } elsif($tag eq 'Name'){
+      load_Name_tag($gff_feature,$chado_feature);
+    } elsif($tag eq 'Target'){
+      load_Target_tag($gff_feature,$chado_feature);
+    } elsif($tag =~ /^[A-Z]/){
+      die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the spec?";
+    } elsif($tag =~ /^[a-z]/){
+      load_custom_tags($gff_feature,$chado_feature,$tag);
+    }
+
+    unless (defined $cvterm{$tag}) {
+      $cvterm{$tag} = Chado::Cvterm->find_or_create ({
+                                                      name       => $tag,
+                                                      cv_id      => $cv->id,
+                                                      definition => 'auto created by load_gff3.pl'
+                                                     });
+
+      push @transaction, $cvterm{$tag};
+    }
+
+    my @values = $gff_feature->get_tag_values($tag);
+    foreach my $value (@values) {
+      my($chado_featureprop) = Chado::Featureprop->find_or_create({
+                                                                   feature_id => $chado_feature->id,
+                                                                   type_id    => $cvterm{$tag}->id,
+                                                                   value      => $value
+                                                                  });
+
+      push @transaction, $chado_featureprop;
+    }
   }
 
-  die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
+  if ($feature_count % $CACHE_SIZE == 0) {
+    $_->dbi_commit foreach @transaction;
+    @transaction = ();
+  }
 
+  $next_update = $progress->update($feature_count) if($feature_count > $next_update);
+  $progress->update($feature_count) if($feature_count >= $next_update);
+  $progress->update($linecount) if($next_update >= $linecount);
+}
+
+$_->dbi_commit foreach @transaction;
+$gffio->close();
+
+print "$feature_count features added\n";
+
+my $seqs_loaded = load_sequences();
+print "$seqs_loaded sequences added\n";
+print "Done\n";
+
+
+
+
+sub load_custom_tags {
+   my $gff_feature = shift;
+   my $chado_feature = shift;
+   my $tag = shift;
+
+   my @d = $gff_feature->get_tag_values($tag);
+
+   if(0){
+   } elsif($tag eq 'description'){
+     foreach my $d (@d){
+       my($featureprop) = Chado::Featureprop->find_or_create({
+                                                              feature_id => $chado_feature->id,
+                                                              type_id    => $cvterm{description}->id,
+                                                              value      => $d,
+                                                             });
+       my($synonym) = Chado::Synonym->find_or_create({
+                                                      name         => $d,
+                                                      synonym_sgml => $d,
+                                                      type_id      => $cvterm{description}->id
+                                                     });
+
+       my($feature_synonym) = Chado::Feature_Synonym->find_or_create ({
+                                                                       synonym_id => $synonym->id,
+                                                                       feature_id => $chado_feature->id,
+                                                                       pub_id     => $pub->id
+                                                                      });
+
+       push @transaction, ($featureprop,$synonym,$feature_synonym);
+     }
+   } elsif($tag =~ /^db:/){
+     $tag =~ s/^db:/DB:/;
+
+     my($db) = Chado::Db->search(name => $tag);
+     if(!$db){
+       $db = Chado::Db->find_or_create({name       => $tag,
+                                        contact_id => $nullcontact,
+                                       });
+     }
+     die "couldn't create db $db" unless $db;
+     push @transaction, $db;
+
+     foreach my $d (@d){
+       my($dbxref) = Chado::Dbxref->find_or_create({db_id => $db->id,
+                                                   accession => $d
+                                                  });
+       my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create({
+                                                                    feature_id => $chado_feature->id,
+                                                                    dbxref_id => $dbxref->id,
+                                                                  });
+       push @transaction, ($dbxref, $feature_dbxref);
+     }
+
+   } else {
+     $progress->message("don't know how to handle custom tag: $tag");
+   }
+}
+
+sub load_ID_tag {
+  my $gff_feature = shift;
+  my $chado_feature = shift;
+  my $id = shift;
+
+  if($gff_feature->has_tag('ID')){
+    my($chado_synonym1) = Chado::Synonym->find_or_create({
+                                                          name         => $id,
+                                                          synonym_sgml => $id,
+                                                          type_id      => $cvterm{synonym}->id
+                                                         });
+
+    my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+                                                                   synonym_id => $chado_synonym1->id,
+                                                                   feature_id => $chado_feature->id,
+                                                                   pub_id     => $pub->id
+                                                                  });
+
+    push @transaction, $chado_synonym1;
+    push @transaction, $chado_synonym2;
+  }
+}
+
+sub load_Target_tag {
+  my $gff_feature = shift;
+  my $chado_feature = shift;
+
+  if($gff_feature->has_tag('Target')) {
+    my @targets = $gff_feature->get_tag_values('Target');
+    foreach my $target (@targets) {
+      my ($tstart,$tend);
+      if ($target =~ /^(\S+?)\+(\d+)\+(\d+)$/) {
+        ($target,$tstart,$tend) = ($1,$2,$3); 
+      } else {
+        die "your Target attribute seems to be improperly formated";
+      }
+
+      my($chado_synonym1) = Chado::Synonym->find_or_create({
+                                                            name         => $target,
+                                                            synonym_sgml => $target,
+                                                            type_id      => $cvterm{synonym}->id
+                                                           });
+
+      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+                                                                     synonym_id => $chado_synonym1->id,
+                                                                     feature_id => $chado_feature->id,
+                                                                     pub_id     => $pub->id,
+                                                                    });
+
+      my($chado_featureloc) = Chado::Featureloc->find_or_create({
+                                                                 feature_id    => $chado_feature->id,
+                                                                 srcfeature_id => $chado_feature->id,
+                                                                 fmin          => $tstart,
+                                                                 fmax          => $tend,
+                                                                 rank          => 1 
+                                                                });
+
+      my($chado_featureprop) = Chado::Featureprop->find_or_create({
+                                                                   feature_id => $chado_feature->id,
+                                                                   type_id    => $cvterm{score}->id,
+                                                                   value      => $gff_feature->score
+                                                                  });
+
+      push @transaction, $chado_synonym1;
+      push @transaction, $chado_synonym2;
+      push @transaction, $chado_featureloc;
+      push @transaction, $chado_featureprop;
+    }
+  }
+}
+
+sub load_Parent_tag {
+  my $gff_feature = shift;
+  my $chado_feature = shift;
+
+  if($gff_feature->has_tag('Parent')){
+    my @parents = $gff_feature->get_tag_values('Parent');
+    foreach my $parent (@parents) {
+
+      my $reltype = $gff_feature->primary_tag eq 'protein' ? $cvterm{develops_from} : $cvterm{part_of};
+
+      #unhandled exception: what if $feature{$parent} hasn't been seen yet?
+      my $chado_feature_relationship = Chado::Feature_Relationship->find_or_create({
+                                                                                    subject_id => $chado_feature->id,
+                                                                                    object_id => $feature{$parent}->id,
+                                                                                    type_id => $reltype,
+                                                                                   });
+      push @transaction, $chado_feature_relationship;
+    }
+  }
+}
+
+sub load_Alias_tag {
+  my $gff_feature = shift;
+  my $chado_feature = shift;
+
+  if($gff_feature->has_tag('Alias')) {
+    my @aliases;
+    if($gff_feature->has_tag('Alias')) { push @aliases, $gff_feature->get_tag_values('Alias'); }
+    foreach my $alias (@aliases) {
+      #create the synonym
+      my($chado_synonym1) = Chado::Synonym->find_or_create({
+                                                            name         => $alias,
+                                                            synonym_sgml => $alias,
+                                                            type_id      => $cvterm{synonym}->id
+                                                           });
+
+      #and link it to the feature via feature_synonym
+      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+                                                                     synonym_id => $chado_synonym1->id,
+                                                                     feature_id => $chado_feature->id,
+                                                                     pub_id     => $pub->id,
+                                                                    });
+      push @transaction, $chado_synonym1;
+      push @transaction, $chado_synonym2;
+    }
+  }
+}
+
+sub load_Name_tag {
+  my $gff_feature = shift;
+  my $chado_feature = shift;
+
+  if($gff_feature->has_tag('Name')) {
+    my @names = $gff_feature->get_tag_values('Name');
+    foreach my $name (@names) {
+      my($chado_synonym1) = Chado::Synonym->find_or_create({
+                                                            name         => $name,
+                                                            synonym_sgml => $name,
+                                                            type_id      => $cvterm{synonym}->id
+                                                           });
+
+      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+                                                                     synonym_id => $chado_synonym1->id,
+                                                                     feature_id => $chado_feature->id,
+                                                                     pub_id     => $pub->id,
+                                                                    });
+      push @transaction, $chado_synonym1;
+      push @transaction, $chado_synonym2;
+    }
+  }
+}
+
+
+sub initialize {
+
+  GetOptions('organism:s'       => \$ORGANISM,
+             'srcdb:s'          => \$SRC_DB,
+             'gfffile:s'        => \$GFFFILE,
+             'cache:s'          => \$CACHE_SIZE,
+             'force'            => \$FORCE_LOAD,
+            ) or (system('pod2text',$0), exit -1); 
+
+  $ORGANISM   ||='Human';
+  $SRC_DB     ||= 'DB:refseq';
+  $CACHE_SIZE ||= 1000;
+
+  die "\nYou must specify a GFF file\n" unless $GFFFILE;
+
+  #deal with GFF3 files that contain sequence
+  # this is ugly, ugly, ugly, but in addtion to dealing with
+  # sequence, it also fixes Allen's method of tracking progress
+  die "$GFFFILE does not exist" unless (-e $GFFFILE);
+
+  my $linenumber = `grep -n "^>" $GFFFILE`;
+  if ($linenumber =~ /^(\d+)/) {
+    $linenumber = $1;
+    system("tail +$linenumber $GFFFILE > $TMPFASTA");
+    $linenumber -= 1;
+    system("head -$linenumber $GFFFILE > $TMPGFF");
+    $GFFFILE = $TMPGFF;
+  }
+
+  #count the file lines.  we need this to track load progress
+  open(WC,"grep -c -v '^#' $GFFFILE |");
+  $linecount = <WC>; chomp $linecount;
+  close(WC);
+  ($linecount) = $linecount =~ /^\s*?(\d+)/;
+
+  $progress = Term::ProgressBar->new({name => "Approx $linecount features", count => $linecount,
+                                      ETA => 'linear', });
+  $progress->max_update_rate(1);
+  $next_update = 0;
+
+  Chado::LoadDBI->init();
+  ($cv) = Chado::Cv->find_or_create({
+                                     name       => 'autocreated',
+                                     definition => 'auto created by load_gff3.pl'
+                                    });
+
+  # find needed cvterm and other pieces of information
+  my @needed_cvterms = qw(description synonym region note develops_from part_of gff_file score protein);
+  foreach my $n (@needed_cvterms){
+    cache_cvterm($n);
+  }
+
+  ($chado_organism) = Chado::Organism->search(common_name => $ORGANISM );
+  ($chado_db)       = Chado::Db->search(name => $SRC_DB);
+  ($nullpub)        = Chado::Pub->search(miniref => 'null');
+  ($nullcontact)    = Chado::Contact->search(name => 'null');
+
+  die "The organism '$ORGANISM' could not be found. Did you spell it correctly?"
+    unless $chado_organism;
+
+  die "The database '$SRC_DB' could not be found. Did you spell it correctly?"
+    unless $chado_db;
+}
+
+sub load_segments {
+  my $gffio = shift;
+  my $i = 0;
+  # creates the features for each gff segment
+  while(my $gff_segment = $gffio->next_segment()) {
+    my ($segment) = Chado::Feature->search({name => $gff_segment->display_id});
+    if(!$segment){
+      my $f = Chado::Feature->create({
+                                      organism_id => $chado_organism,
+                                      name        => $gff_segment->display_id,
+                                      uniquename  => $gff_segment->display_id .'_region',
+                                      type_id     => $cvterm{'region'},
+                                      seqlen      => $gff_segment->end
+                                     });
+
+      $i++;
+      $f->dbi_commit;
+      $feature{$f->name} = $f;
+    } else {
+      $feature{$segment->name} = $segment;
+    }
+  }
+  return $i;
+}
+
+sub load_sequences {
+  my $seqs_loaded = 0;
+
+  if (-e $TMPFASTA) {
+    Chado::Feature->set_sql(update_residues => qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?});
+    my $sth = Chado::Feature->sql_update_residues;
+
+    print STDERR "loading sequence data...\n";
+
+
+    #count the file lines.  we need this to track load progress
+    open(WC,"grep -c -v '^>' $TMPFASTA |");
+    $linecount = <WC>; chomp $linecount;
+    close(WC);
+    ($linecount) = $linecount =~ /^\s*?(\d+)/;
+
+    $progress = Term::ProgressBar->new({name => "Approx $linecount sequences", count => $linecount,
+                                        ETA => 'linear', });
+    $progress->max_update_rate(1);
+    $next_update = 0;
+
+    my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
+    while (my $seq = $in->next_seq() ) {
+      my $name = $seq->id;
+      my @chado_feature = Chado::Feature->search({'name' => $name});
+
+      #no, let's just load the sequence into all of them
+      #die "couldn't uniquely identify the sequence identified by $name"
+      #  unless (scalar @chado_feature == 1);
+      print STDERR "no feature for sequence $name\n" unless scalar(@chado_feature);
+      print STDERR "multiple features for sequence $name\n" if scalar(@chado_feature) > 1;
+
+      foreach my $f (@chado_feature){
+
+        $f->residues('');
+        $f->update;
+        $f->dbi_commit;
+
+        my $dna = $seq->seq;
+        my $shredsize = 100_000_000; #don't increase this...
+        my $offset = 0;
+        my $dnalen = length($dna);
+
+        while($offset < $dnalen){
+          my $shred = substr($dna,$offset,$shredsize);
+          $sth->execute($shred,$f->id);
+
+          $offset += $shredsize;
+        }
+
+        $f->update;
+        $f->dbi_commit;
+
+      }
+      $seqs_loaded++;
+
+      $next_update = $progress->update($seqs_loaded) if($seqs_loaded > $next_update);
+      $progress->update($seqs_loaded) if($seqs_loaded >= $next_update);
+      $progress->update($linecount) if($next_update >= $linecount);
+
+    }
+
+    unlink $TMPFASTA;
+    unlink $TMPGFF;
+  }
+
+  return $seqs_loaded;
+}
+
+sub load_feature_locations {
+  my $gff_feature = shift;
+  my $chado_type = shift;
+  my $id = shift;
 
   ## GFF features are base-oriented, so we must add 1 to the diff
   ## between the end base and the start base, to get the number of
@@ -364,33 +662,33 @@ while(my $gff_feature = $gffio->next_feature()) {
   my $fmin = $gff_feature->start -1;    # GFF -> InterBase
   my $fmax = $gff_feature->end;
 
+  my $uniquename = undef;
+  if($gff_feature->primary_tag && $gff_feature->seq_id && $fmax ne '.'){
+    $uniquename = '_'. $gff_feature->primary_tag .'_'. $gff_feature->seq_id .":$fmin..$fmax";
+  } elsif($gff_feature->primary_tag && $gff_feature->seq_id){
+    $uniquename = '_'. $gff_feature->primary_tag .'_'. $gff_feature->seq_id;
+  }
+
   my $chado_feature;
   if ($gff_feature->has_tag('ID')) {
     ($chado_feature) = Chado::Feature->find_or_create({
       organism_id  => $chado_organism,
       name         => $id,
-      uniquename   => $id .'_'. $gff_feature->primary_tag
-                          .'_'. $gff_feature->seq_id .':'
-                          . $fmin .'..'. $fmax,
-      type_id      => $chado_type->cvterm_id,
+      uniquename   => $id . $uniquename,
+      type_id      => $chado_type->id,
       seqlen       => $seqlen
                                                       });
   } else {
     ($chado_feature) = Chado::Feature->find_or_create({
       organism_id  => $chado_organism,
-      uniquename   =>  '_'. $gff_feature->primary_tag
-                      .'_'. $gff_feature->seq_id .':'
-                      . $fmin .'..'. $fmax,
-      type_id      => $chado_type->cvterm_id,
+      uniquename   => $uniquename,
+      type_id      => $chado_type->id,
       seqlen       => $seqlen
-                                                     });
+                                                      });
   }
 
   push @transaction, $chado_feature;
-
-  $feature_count++;
-
-  next if $id eq $gff_feature->seq_id; #ie, this is a srcfeature (ie, fref) so only create the feature
+  return($chado_feature) if $id eq $gff_feature->seq_id or $gff_feature->seq_id eq '.'; #ie, this is a srcfeature (ie, fref) so only create the feature
 
   $chado_feature->dbxref_id($dbxref{$id}) if $gff_feature->has_tag('ID'); # is this the right thing to do here?
   $chado_feature->update; # flush updates to this feature object
@@ -405,353 +703,29 @@ while(my $gff_feature = $gffio->next_feature()) {
       strand        => $gff_feature->strand,
       phase         => $frame,
       rank          => $featureloc_rank{$chado_feature->id} || 0,
-      srcfeature_id => $srcfeature{$id}->id,
+      srcfeature_id => $feature{$id}->id,
                                       });
 
   push @transaction, $chado_featureloc;
 
   $featureloc_rank{$chado_feature->id}++;
-  $feature{$id} = $chado_feature if $gff_feature->has_tag('ID');
+  return($chado_feature);
+}
 
-  if($gff_feature->has_tag('ID')){
-    my($chado_synonym1) = Chado::Synonym->find_or_create({
-                      name         => $id,
-                      synonym_sgml => $id,
-                      type_id      => $synonym_type->cvterm_id
-                                                   });
-    my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-                      synonym_id => $chado_synonym1->synonym_id,
-                      feature_id => $chado_feature->feature_id,
-                      pub_id     => $pub->pub_id
-                                            });
+sub cache_cvterm {
+  my $name = shift;
 
-    push @transaction, $chado_synonym1;
-    push @transaction, $chado_synonym2;
-
-  }
-
-  if($gff_feature->has_tag('Parent')){
-    my @parents = $gff_feature->get_tag_values('Parent');
-    foreach my $parent (@parents) {
-      my $chado_feature_relationship = Chado::Feature_Relationship->find_or_create({
-        subject_id => $chado_feature->id,
-        object_id => $feature{$parent}->id,
-        type_id => $part_of
-                                                  });
-
-      push @transaction, $chado_feature_relationship;
-    }
-  }
-
-
-# add in all the various dbxrefs
-# still need to add protein as subfeature
-  if($gff_feature->has_tag('spID') or $gff_feature->has_tag('kgID') or $gff_feature->has_tag('refseq') or $gff_feature->has_tag('protAcc')){  #add as dbxref
-
-#####  Don't each of these dbxrefs need to be added to the features????
-
-	my @dbxrefs;
-    my $chado_db;
-	if $gff_feature->has_tag('spID') {
-	  $chado_db = Chado::Db->search(name => 'DB:swissprot') else die "Must have db table entry for DB:swissprot\n";
-	  @dbxrefs = $gff_feature->get_tag_values('spID');
-	  foreach my $dbxref (@dbxrefs) {
-        my($chado_dbxref) = Chado::Dbxref->find_or_create({
-        db_id => $chado_db->id,
-        accession => $dbxref,
-        });
-        my($parentFeature) = $feature{$id};
-        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
-                      feature_id => $parentFeature->id,
-                      dbxref_id     => $chado_dbxref->id,
-                                              });
-		push @transaction, $chado_dbxref, $feature_dbxref;
-	  }
-	}
-	if $gff_feature->has_tag('kgID') {
-	  $chado_db = Chado::Db->search(name => 'DB:genbank') else die "Must have db table entry for DB:genbank\n";
-	  @dbxrefs = $gff_feature->get_tag_values('kgID');
-	  foreach my $dbxref (@dbxrefs) {
-        my($chado_dbxref) = Chado::Dbxref->find_or_create({
-        db_id => $chado_db->id,
-        accession => $dbxref,
-        });
-        my($parentFeature) = $feature{$id};
-        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
-                      feature_id => $parentFeature->id,
-                      dbxref_id     => $chado_dbxref->id,
-                                              });
-		push @transaction, $chado_dbxref, $feature_dbxref;
-	  }
-	}
-	if $gff_feature->has_tag('refseq') {
-	  $chado_db = Chado::Db->search(name => 'DB:refseq') else die "Must have db table entry for DB:refseq\n";
-	  @dbxrefs = $gff_feature->get_tag_values('refseq');
-	  foreach my $dbxref (@dbxrefs) {
-        my($chado_dbxref) = Chado::Dbxref->find_or_create({
-        db_id => $chado_db->id,
-        accession => $dbxref,
-        });
-        my($parentFeature) = $feature{$id};
-        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
-                      feature_id => $parentFeature->id,
-                      dbxref_id     => $chado_dbxref->id,
-                                              });
-		push @transaction, $chado_dbxref, $feature_dbxref;
-	  }
-	}
-	if $gff_feature->has_tag('protAcc') {
-	  $chado_db = Chado::Db->search(name => 'DB:refseq') else die "Must have db table entry for DB:refseq\n";
-	  @dbxrefs = $gff_feature->get_tag_values('protAcc');
-	  foreach my $dbxref (@dbxrefs) {
-        my($chado_dbxref) = Chado::Dbxref->find_or_create({
-        db_id => $chado_db->id,
-        accession => $dbxref,
-        });
-        my($parentFeature) = $feature{$id};
-        my($feature_dbxref) = Chado::Feature_Dbxref->find_or_create ({
-                      feature_id => $parentFeature->id,
-                      dbxref_id     => $chado_dbxref->id,
-                                              });
-		push @transaction, $chado_dbxref, $feature_dbxref;
-	  }
-	}
-  }
-
-
-# is there something better to use than a 'description' cvterm?
-  my ($description_type) = Chado::Cvterm->search(name => 'description');
-  unless ($description_type) {
-    ($description_type) = Chado::Cvterm->find_or_create({
-                    name       => 'description',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-	push @transaction, $description_type;
-  }
-
-  if($gff_feature->has_tag('description')){ #add as featureprop
-      my($chado_featureprop) = Chado::Featureprop->find_or_create({
-                      feature_id => $chado_feature->feature_id,
-                      type_id    => $description_type->cvterm_id,
-                      value      => $gff_feature->get_tag_value('description'),
-                                              });
-	  push @transaction, $chado_featureprop;
-  }
-
- # is this the correct ontology term to use?
- my ($protein_type) = Chado::Cvterm->search(name => 'protein');
-  unless ($protein_type) {
-    ($protein_type) = Chado::Cvterm->find_or_create({
-                    name       => 'protein',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                  });
-	push @transaction, $protein_type;
-
-# changed from protAcc to protein
-
-  if($gff_feature->has_tag("protein")) {
-	  my($chado_feature) = Chado::Feature->find_or_create({
-    organism_id  => $chado_organism,
-    name         => $gff_feature->get_tag_values('protein'),
-    uniquename   => $gff_feature->get_tag_values('protein').'_'. $gff_feature->primary_tag
-                        .'_'. $gff_feature->seq_id .':'
-                            . $fmin .'..'. $fmax,
-    type_id      => $protein_type->cvterm_id,
+  ($cvterm{$name}) = Chado::Cvterm->search(name => $name) || Chado::Cvterm->search(name => ucfirst($name));
+    $cvterm{$name} = $cvterm{$name}->next() if defined($cvterm{$name}) and $cvterm{$name}->isa('Class::DBI::Iterator');
+    unless($cvterm{$name}){
+      ($cvterm{$name}) = Chado::Cvterm->find_or_create({
+                                                     name       => $name,
+                                                     cv_id      => $cv->id,
+                                                     definition => 'autocreated by gmod_load_gff3.pl',
                                                     });
-
-## !!!!!!!!! Need to add in subfeature here!!!
-  my $parentFeature = $feature{$id};  # is this pulling the parent feature back here?
-  my($chado_feature_rel) = Chado::Feature_Relationship->find_or_create({
-    subject_id => $chado_feature->id,
-    object_id => $parentFeature->id,
-    type_id => $develops_from->id,
-  });
-
-  push @transaction, $chado_feature, $chado_feature_rel;
-  }
-
-  if($gff_feature->has_tag('Alias') or $gff_feature->has_tag('geneSymbol')) {
-    my @aliases;
-	if($gff_feature->has_tag('Alias')) { push @aliases, $gff_feature->get_tag_values('Alias'); }
-	if($gff_feature->has_tag('geneSymbol')) { push @aliases, $gff_feature->get_tag_values('geneSymbol'); }
-    foreach my $alias (@aliases) {
-      my($chado_synonym1) = Chado::Synonym->find_or_create({
-                      name         => $alias,
-                      synonym_sgml => $alias,
-                      type_id      => $synonym_type->cvterm_id
-                                                     });
-	  
-      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-                      synonym_id => $chado_synonym1->synonym_id,
-                      feature_id => $chado_feature->feature_id,
-                      pub_id     => $pub->pub_id,
-                                              });
-      push @transaction, $chado_synonym1;
-      push @transaction, $chado_synonym2;
     }
-  }
-
-  if($gff_feature->has_tag('Name')) {
-    my @names = $gff_feature->get_tag_values('Name');
-    foreach my $name (@names) {
-      my($chado_synonym1) = Chado::Synonym->find_or_create({
-                      name         => $name,
-                      synonym_sgml => $name,
-                      type_id      => $synonym_type->cvterm_id
-                                                   });
-      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-                      synonym_id => $chado_synonym1->synonym_id,
-                      feature_id => $chado_feature->feature_id,
-                      pub_id     => $pub->pub_id,
-                                            });
-      push @transaction, $chado_synonym1;
-      push @transaction, $chado_synonym2;
-    }
-  }
-
-  if($gff_feature->has_tag('Target')) {
-    my @targets = $gff_feature->get_tag_values('Target');
-    foreach my $target (@targets) {
-      my ($tstart,$tend);
-      if ($target =~ /^(\S+?)\+(\d+)\+(\d+)$/) {
-        ($target,$tstart,$tend) = ($1,$2,$3); 
-      } else {
-        die "your Target attribute seems to be improperly formated";
-      }
-
-      my($chado_synonym1) = Chado::Synonym->find_or_create({
-                      name         => $target,
-                      synonym_sgml => $target,
-                      type_id      => $synonym_type->cvterm_id
-                                                     });
-
-      my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-                      synonym_id => $chado_synonym1->synonym_id,
-                      feature_id => $chado_feature->feature_id,
-                      pub_id     => $pub->pub_id,
-                                              });
-
-      my($chado_featureloc) = Chado::Featureloc->find_or_create({
-                      feature_id    => $chado_feature->feature_id,
-                      srcfeature_id => $chado_feature->feature_id,
-                      fmin          => $tstart,
-                      fmax          => $tend,
-                      rank          => 1 
-                                              });
-
-      unless (defined $tagtype{'score'}) {
-        $tagtype{'score'} = Chado::Cvterm->find_or_create ({
-                    name       => 'score',
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                      });
-        push @transaction, $tagtype{'score'};
-      }
-
-      my($chado_featureprop) = Chado::Featureprop->find_or_create({
-                      feature_id => $chado_feature->feature_id,
-                      type_id    => $tagtype{'score'}->cvterm_id,
-                      value      => $gff_feature->score
-                                              });
-
-      push @transaction, $chado_synonym1;
-      push @transaction, $chado_synonym2;
-      push @transaction, $chado_featureloc;
-      push @transaction, $chado_featureprop;
-    }
-  }   
-
-  my @tags = $gff_feature->all_tags;
-  foreach my $tag (@tags) {
-    next if $tag eq 'ID';
-    next if $tag eq 'Parent';
-    next if $tag eq 'Alias';
-    next if $tag eq 'Name';
-    next if $tag eq 'Target';
-
-    unless (defined $tagtype{$tag}) {
-      $tagtype{$tag} = Chado::Cvterm->find_or_create ({
-                    name       => $tag,
-                    cv_id      => $cv_entry->cv_id,
-                    definition => 'auto created by load_gff3.pl'
-                                                      });
-
-      push @transaction, $tagtype{$tag};
-    }
-
-    my @values = $gff_feature->get_tag_values($tag);
-    foreach my $value (@values) {
-      my($chado_featureprop) = Chado::Featureprop->find_or_create({
-                      feature_id => $chado_feature->feature_id,
-                      type_id    => $tagtype{$tag}->cvterm_id,
-                      value      => $value
-                                         });
-
-      push @transaction, $chado_featureprop;
-    }
-  }
-
-  if ($feature_count % $CACHE_SIZE == 0) {
-    $_->dbi_commit foreach @transaction;
-    @transaction = ();
-  }
-
-  $next_update = $progress->update($feature_count) if($feature_count > $next_update);
-  $progress->update($feature_count) if($feature_count >= $next_update);
-  $progress->update($linecount) if($next_update >= $linecount);
+    die "unable to create a '$name' entry in the cvterm table" unless $cvterm{$name};
 }
-
-$_->dbi_commit foreach @transaction;
-$gffio->close();
-
-print "$feature_count features added\n";
-
-if (-e $TMPFASTA) {
-  Chado::Feature->set_sql(update_residues => qq{
-    UPDATE feature SET residues = residues || ? WHERE feature_id = ?
-  });
-  my $sth = Chado::Feature->sql_update_residues;
-
-  print STDERR "loading sequence data...\n";
-  my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
-  my $seqs_loaded = 0; 
-  while (my $seq = $in->next_seq() ) {
-    my $name = $seq->id;
-    my @chado_feature = Chado::Feature->search({'name' => $name});
-    die "couldn't uniquely identify the sequence identified by $name"
-      unless (scalar @chado_feature == 1);
-
-    $chado_feature[0]->residues('') unless $chado_feature[0]->residues();
-    $chado_feature[0]->update;
-    $chado_feature[0]->dbi_commit;
-
-    my $dna = $seq->seq;
-    my $shredsize = 100_000_000; #don't increase this...
-    my $offset = 0;
-    my $dnalen = length($dna);
-
-    while($offset < $dnalen){
-      my $shred = substr($dna,$offset,$shredsize);
-      $sth->execute($shred,$chado_feature[0]->id);
-
-      $offset += $shredsize;
-    }
-
-    $chado_feature[0]->update;
-    $chado_feature[0]->dbi_commit;
-
-    $seqs_loaded++;
-  }
-
-  unlink $TMPFASTA;
-  unlink $TMPGFF;
-
-  print "$seqs_loaded sequences added\n";
-}
-
-warn "Done\n";
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
