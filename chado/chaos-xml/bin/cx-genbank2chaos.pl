@@ -63,7 +63,7 @@ foreach my $file (@ARGV) {
             exit 1;
         }
         my $outio = Bio::SeqIO->new( -format => 'chaos');
-        $outio->write_seq($seq);
+        $outio->write_seq($seq); # "writes" to a stag object
         $outio->end_of_data;
 
         # free memory
@@ -96,7 +96,7 @@ foreach my $file (@ARGV) {
                     #		print $islandC->asciitree;
                     my $W = Data::Stag->getformathandler($writer);
                     my $id = $f->get($nameby);
-                    $id =~ tr/A-Za-z0-9_:;\.//cd;
+                    $id =~ tr/A-Za-z0-9_:;\.//cd; # make name safe
                     my $fn = sprintf("%s/%s.%s",
                                      $path_prefix,
                                      $id,
@@ -130,6 +130,9 @@ foreach my $file (@ARGV) {
     }
 }
 print STDERR "ALL DONE!\n";
+exit 0;
+
+__END__
 
 =head1 NAME 
 
