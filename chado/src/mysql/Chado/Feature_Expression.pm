@@ -7,6 +7,7 @@ Chado::Feature_Expression->set_up_table('feature_expression');
 Chado::Feature_Expression->hasa(Chado::Feature => 'feature_id');
 Chado::Feature_Expression->hasa(Chado::Expression => 'expression_id');
 
+sub id         { return shift->feature_expression_id }
 sub feature    { return shift->feature_id }
 sub expression { return shift->expression_id }
 
