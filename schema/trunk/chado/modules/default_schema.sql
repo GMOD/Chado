@@ -1488,6 +1488,38 @@ SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
 FROM pub s, feature_pub fs
 WHERE fs.pub_id = s.pub_id;
 
+--creates a view that can be used to assemble a GFF3 compliant attribute string
+CREATE OR REPLACE VIEW gff3atts (
+    feature_id,
+    type,
+    attribute
+) AS
+SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
+FROM cvterm s, dbxref dbx, feature_cvterm fs
+WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
+UNION ALL
+SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
+      d.name != 'GFF_source'
+UNION ALL
+SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+FROM gcontext g, feature_gcontext fg
+WHERE g.gcontext_id = fg.gcontext_id
+UNION ALL
+SELECT feature_id, 'Alias' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs
+WHERE fs.synonym_id = s.synonym_id
+UNION ALL
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.type_id = cv.cvterm_id
+UNION ALL
+SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
+FROM pub s, feature_pub fs
+WHERE fs.pub_id = s.pub_id;
+
+
 create table mageml (
     mageml_id serial not null,
     primary key (mageml_id),
@@ -1922,6 +1954,7 @@ create table element (
     subclass_view varchar(27) not null,
     tinyint1 int null,
     smallint1 int null,
+    smallint2 int null,
     char1 varchar(5) null,
     char2 varchar(5) null,
     char3 varchar(5) null,
@@ -1998,6 +2031,26 @@ create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (subclass_view);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
+
+create table element_relationship (
+    element_relationship_id serial not null,
+    primary key (element_relationship_id),
+    subject_id int not null,
+    foreign key (subject_id) references element (element_id) INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
+    object_id int not null,
+    foreign key (object_id) references element (element_id) INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint element_relationship_c1 unique (subject_id,object_id,type_id,rank)
+);
+create index element_relationship_idx1 on element_relationship (subject_id);
+create index element_relationship_idx2 on element_relationship (type_id);
+create index element_relationship_idx3 on element_relationship (object_id);
+create index element_relationship_idx4 on element_relationship (value);
+
+COMMENT ON TABLE element_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
 
 create table elementresult_relationship (
     elementresult_relationship_id serial not null,
@@ -2307,6 +2360,83 @@ LANGUAGE 'sql';
 
 --functional index that depends on the above functions
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
+
+--uses the gff3view to create a GFF3 compliant attribute string
+CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
+'DECLARE
+  return_string      varchar;
+  f_id               ALIAS FOR $1;
+  atts_view          gffatts%ROWTYPE;
+  feature_row        feature%ROWTYPE;
+  name               varchar;
+  uniquename         varchar;
+  parent             varchar;
+                                                                                
+BEGIN
+  --Get name from feature.name
+  --Get ID from feature.uniquename
+                                                                                
+  SELECT INTO feature_row * FROM feature WHERE feature_id = f_id;
+  name  = feature_row.name;
+  return_string = ''ID='' || feature_row.uniquename;
+  IF name IS NOT NULL AND name != ''''
+  THEN
+    return_string = return_string ||'';'' || ''Name='' || name;
+  END IF;
+                                                                                
+  --Get Parent from feature_relationship
+  SELECT INTO feature_row * FROM feature f, feature_relationship fr
+    WHERE fr.subject_id = f_id AND fr.object_id = f.feature_id;
+  IF FOUND
+  THEN
+    return_string = return_string||'';''||''Parent=''||feature_row.uniquename;
+  END IF;
+                                                                                
+  FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
+    return_string = return_string || '';''
+                     || atts_view.type || ''=''
+                     || atts_view.attribute;
+  END LOOP;
+                                                                                
+  RETURN return_string;
+END;
+'
+LANGUAGE plpgsql;
+
+--creates a view that is suitable for creating a GFF3 string
+CREATE OR REPLACE VIEW gff3view (
+  feature_id,
+  ref,
+  source,
+  type,
+  fstart,
+  fend,
+  score,
+  strand,
+  phase,
+  attributes
+) AS
+SELECT
+  f.feature_id   ,
+  sf.name        ,
+  dbx.accession  ,
+  cv.name        ,
+  fl.fmin+1      ,
+  fl.fmax        ,
+  '.'            ,
+  fl.strand      ,
+  fl.phase       ,
+  gffattstring(f.feature_id)
+FROM feature f, feature sf, feature_dbxref fd,
+     dbxref dbx, db db, cvterm cv, featureloc fl
+WHERE f.feature_id     = fl.feature_id AND
+      fl.srcfeature_id = sf.feature_id AND
+      f.type_id        = cv.cvterm_id  AND
+      db.name          = 'GFF_source'  AND
+      db.db_id         = dbx.db_id     AND
+      dbx.dbxref_id    = fd.dbxref_id  AND
+      fd.feature_id    = f.feature_id ;
+
 CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
 DECLARE
   return_data featureloc%ROWTYPE;

@@ -103,7 +103,7 @@ $sth->finish;
 ########################
 
 #my($organism) = Chado::Organism->search( common_name => 'human' ); #FIXME
-my($organism) = Chado::Organism->search( common_name => 'rice' ); #FIXME--I will
+my($organism) = Chado::Organism->search( common_name => 'yeast' ); #FIXME--I will
 
 open F   ,  ">$files{feature}";
 open FLOC,  ">$files{featureloc}";
@@ -212,24 +212,26 @@ while(my $feature = $gffio->next_feature()){
     }
   }
 
-  my @cvterms = $feature->has_tag('Ontology_term') 
-                ? $feature->get_tag_values('Ontology_term')
-                : ();
-  foreach my $term (@cvterms) {
-    unless ($type{$term}) {
-      my ($dbxref) = Chado::Dbxref->search( accession => $term );
-      warn "couldn't find $term in dbxref\n" and next unless $dbxref;
-      ($type{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
-      warn "couldn't find $term's cvterm_id in cvterm table\n" 
-        and next unless $type{$term}; 
-    }
-    unless ($pub) {
-      ($pub) = Chado::Pub->search( miniref => 'null' );
-      $pub = $pub->id; #no need to keep whole object when all we want is the id
-    }
+  if ($feature->has_tag('Ontology_term')) {
+    my @cvterms = $feature->get_tag_values('Ontology_term');
+    my %count;
+    my @ucvterms = grep {++$count{$_} < 2} @cvterms;
+    foreach my $term (@ucvterms) {
+      unless ($type{$term}) {
+        my ($dbxref) = Chado::Dbxref->search( accession => $term );
+        warn "couldn't find $term in dbxref\n" and next unless $dbxref;
+        ($type{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+        warn "couldn't find $term's cvterm_id in cvterm table\n" 
+          and next unless $type{$term}; 
+      }
+      unless ($pub) {
+        ($pub) = Chado::Pub->search( miniref => 'null' );
+        $pub = $pub->id; #no need to keep whole object when all we want is the id
+      }
 
-    print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";;
-    $nextfeaturecvterm++;
+      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";;
+      $nextfeaturecvterm++;
+    }
   }
 
   my @aliases;
