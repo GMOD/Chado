@@ -506,7 +506,7 @@ while(my $gff_feature = $gffio->next_feature()) {
   }
 
   $next_update = $progress->update($feature_count) if($feature_count > $next_update);
-  $progress->update($linecount) if($linecount >= $next_update);
+  $progress->update($feature_count) if($feature_count >= $next_update);
   $progress->update($linecount) if($next_update >= $linecount);
 }
 
