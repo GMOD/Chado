@@ -147,28 +147,31 @@ $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
 $ANALYSIS ||=0;
 
-my %feature_cache; 
-my %db_id;   #for caching db_ids
-my %dbxref_cache;
+my %cache = (
+             analysis => {},
+             db       => {}, #db.db_id cache
+             dbxref   => {},
+             feature  => {},
+             parent   => {}, #featureloc.srcfeature_id ; parent feature
+             source   => {}, #dbxref.dbxref_id ; gff_source
+             synonym  => {},
+             type     => {}, #cvterm.cvterm_id cache
+            );
+
 my %t_unique_count;
-my %src = ();
-my %type = ();
 my $pub; # for holding null pub object
-my %synonym;
-my %analysis;
 my $gff_source_db;
-my %gff_source;
 my $source_success = 1; #indicates that GFF_source is in db table
 my @tables = (
-   "feature",
-   "featureloc",
-   "feature_relationship",
-   "featureprop",
-   "feature_cvterm",
-   "synonym",
-   "feature_synonym",
-   "feature_dbxref",
-   "dbxref",
+   "feature",#
+   "featureloc",#
+   "feature_relationship",#
+   "featureprop",#
+   "feature_cvterm",#
+   "synonym",#?
+   "feature_synonym",#
+   "feature_dbxref",#
+   "dbxref",#
    "analysisfeature",
 );
 my %files = (
@@ -268,6 +271,37 @@ if(!defined($sofa_id)){
   ($sofa_id) =  $sth->fetchrow_array();
 }
 
+#######################################################
+# Load cache with existing synonym, dbxref, and
+# analysis records.  prevents failure of load if they
+# already existed.
+#
+
+my %label = (
+             #add more tables here.  key is tablename,
+             #value is label to lookup by.
+             analysis => 'name',
+             synonym  => 'name',
+             dbxref   => 'accession',
+            );
+
+my $iterator;
+
+foreach my $table (keys %label){
+  my $class = 'Chado::'.ucfirst($table);
+  $iterator = $class->retrieve_all();
+  my $label = $label{$table};
+  while(my $obj = $iterator->next()){
+    $cache{$table}{$obj->$label} = $obj;
+  }
+}
+
+#
+# End load cache.
+#######################################################
+
+
+
 $sth->finish;
 ########################
 
@@ -291,14 +325,14 @@ my $gffio = Bio::FeatureIO->new(-fh => \*STDIN , -format => 'gff');
 while(my $feature = $gffio->next_feature()){
   my $featuretype = $feature->type->name;
 
-  my $type = $type{$featuretype};
+  my $type = $cache{type}{$featuretype};
   if(!$type){
     ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
-    $type{$featuretype} = $type->id;
+    $cache{type}{$featuretype} = $type->id;
   }
   die "no cvterm for ".$featuretype unless $type;
 
-  my $src = $src{$feature->seq_id->value};
+  my $src = $cache{parent}{$feature->seq_id->value};
   if(!$src){
     if($feature->seq_id->value eq '.'){
       $src = '\N';
@@ -313,11 +347,11 @@ while(my $feature = $gffio->next_feature()){
           push @sources, $tmp;
         }
         die "more that one source for ".$feature->seq_id->value if (@sources>1);
-        $src{$feature->seq_id->value} = $sources[0]->id;
+        $cache{parent}{$feature->seq_id->value} = $sources[0]->id;
       } else {
-        $src{$feature->seq_id->value} = $src->id;
+        $cache{parent}{$feature->seq_id->value} = $src->id;
       }
-      $src = $src{$feature->seq_id->value};
+      $src = $cache{parent}{$feature->seq_id->value};
     }
   }
   die "no feature for ".$feature->seq_id->value unless $src;
@@ -325,11 +359,11 @@ while(my $feature = $gffio->next_feature()){
   if($feature->annotation->get_Annotations('Parent')){
     my $pname = undef;
     my($pname) = ($feature->annotation->get_Annotations('Parent'))[0]->value;
-    my $parent = $src{$pname};
+    my $parent = $cache{parent}{$pname};
     if(!$parent){
       ($parent) = Chado::Feature->search( uniquename => $pname )
         || Chado::Feature->search( name => $pname );
-      $src{$pname} = $parent->id;
+      $cache{parent}{$pname} = $parent->id;
     }
     die "no parent ".$pname unless $parent;
 
@@ -347,13 +381,13 @@ while(my $feature = $gffio->next_feature()){
   $name = $name->value if ref($name);
 
   #my $uniquename = $nextfeature;
-  $src{$uniquename} = $nextfeature;
+  $cache{parent}{$uniquename} = $nextfeature;
   print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type, $ANALYSIS)),"\n";
 
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !$feature->annotation->get_Annotations('Target')) {
-    $feature_cache{($feature->annotation->get_Annotations('ID'))[0]->value} = $nextfeature;
+    $cache{feature}{($feature->annotation->get_Annotations('ID'))[0]->value} = $nextfeature;
   }
 
 
@@ -369,10 +403,10 @@ while(my $feature = $gffio->next_feature()){
     my $rank = 0;
     foreach my $note (@notes) {
 
-      ($type{'Note'}) = Chado::Cvterm->search( name => 'Note')
-          unless $type{'Note'};
+      ($cache{type}{'Note'}) = Chado::Cvterm->search( name => 'Note')
+          unless $cache{type}{'Note'};
 
-      print FPROP join("\t",($nextfeatureprop,$nextfeature,$type{'Note'}->id,$note,$rank)),"\n";
+      print FPROP join("\t",($nextfeatureprop,$nextfeature,$cache{type}{'Note'}->id,$note,$rank)),"\n";
 
       $rank++;
       $nextfeatureprop++;
@@ -385,19 +419,19 @@ while(my $feature = $gffio->next_feature()){
     }
 
     if ($gff_source_db) {
-      unless ($gff_source{$source}) {
-#        $gff_source{$source} = Chado::Dbxref->find_or_create( {
+      unless ($cache{dbxref}{$source}) {
+#        $cache{dbxref}{$source} = Chado::Dbxref->find_or_create( {
 #            db_id     => $gff_source_db->id,
 #            accession => $source,
 #        } );
 
-        $gff_source{$source} = $nextdbxref;
+        $cache{dbxref}{$source} = $nextdbxref;
         print DBX join("\t",($nextdbxref,$gff_source_db->id,$source,1,'\N')),"\n";
         $nextdbxref++; 
 
-#        $gff_source{$source}->dbi_commit;
+#        $cache{dbxref}{$source}->dbi_commit;
       }
-      my $dbxref_id = $gff_source{$source};
+      my $dbxref_id = $cache{dbxref}{$source};
       print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$dbxref_id)),"\n";
       $nextfeaturedbxref++;
     } else {
@@ -411,19 +445,19 @@ while(my $feature = $gffio->next_feature()){
     my @ucvterms = grep {++$count{$_} < 2} @cvterms;
     foreach my $term (@ucvterms) {
       next unless $term;
-      unless ($type{$term}) {
+      unless ($cache{type}{$term}) {
         my ($dbxref) = Chado::Dbxref->search( accession => $term );
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
-        ($type{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+        ($cache{type}{$term}) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
         warn "couldn't find $term's cvterm_id in cvterm table\n" 
-          and next unless $type{$term}; 
+          and next unless $cache{type}{$term}; 
       }
       unless ($pub) {
         ($pub) = Chado::Pub->search( miniref => 'null' );
         $pub = $pub->id; #no need to keep whole object when all we want is the id
       }
 
-      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";
+      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$cache{type}{$term}->id,$pub)),"\n";
       $nextfeaturecvterm++;
     }
   }
@@ -442,17 +476,17 @@ while(my $feature = $gffio->next_feature()){
       my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
 
       #enforcing the unique index on dbxref table
-      next if $dbxref_cache{"$database|$accession|$version"};
-      $dbxref_cache{"$database|$accession|$version"} = 1;
+      next if $cache{dbxref}{"$database|$accession|$version"};
+      $cache{dbxref}{"$database|$accession|$version"} = 1;
 
-      unless ($db_id{$database}) {
+      unless ($cache{db}{$database}) {
         my($db_id) = Chado::Db->search( name => "DB:$database" );
         warn "couldn't find database 'DB:$database' in db table"
           and next unless $db_id;
-        $db_id{$database} = $db_id;
+        $cache{db}{$database} = $db_id;
       }
 
-      print DBX join("\t",($nextdbxref,$db_id{$database},$accession,$version,$desc)),"\n";
+      print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
       $nextdbxref++;
     }
   }
@@ -479,19 +513,19 @@ while(my $feature = $gffio->next_feature()){
     $score    = '.' eq $score   ? '\N'            : $score;
 
     my $featuretype = $feature->type->name;
-                                                                                
+
     my $ankey = $is_FgenesH ?
                 'FgenesH_Monocot' :
                 $source .'_'. $featuretype;
-                                                                                
-    unless ($analysis{$ankey}) {
+
+    unless ($cache{analysis}{$ankey}) {
       my ($ana) = Chado::Analysis->search( name => $ankey );
       die "couldn't find $ankey in analysis table\n" unless $ana;
-      $analysis{$ankey} = $ana->id;
-      die unless $analysis{$ankey};
+      $cache{analysis}{$ankey} = $ana->id;
+      die unless $cache{analysis}{$ankey};
     }
-                                                                                
-    print AF join("\t", ($nextanalysisfeature,$nextfeature,$analysis{$ankey},$score)), "\n";
+
+    print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n";
     $nextanalysisfeature++;
   }
 
@@ -519,11 +553,11 @@ while(my $feature = $gffio->next_feature()){
       #warn join("\t", (($feature->annotation->get_Annotations('Parent'))[0]->value,$target_id,$tstart,$tend )) if $feature->annotation->get_Annotations('Parent');
 
       if ($feature->annotation->get_Annotations('Parent') 
-         && $feature_cache{($feature->annotation->get_Annotations('Parent'))[0]->value}) { 
+         && $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value}) { 
         print FLOC join("\t", (
              $nextfeatureloc, 
              $nextfeature,
-             $feature_cache{($feature->annotation->get_Annotations('Parent'))[0]->value},
+             $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value},
              $tstart, $tend, $tstrand, '\N',$rank)),"\n";
       } else { #this Target needs a feature too
         $nextfeature++;
@@ -541,16 +575,16 @@ while(my $feature = $gffio->next_feature()){
 
       my $featuretype = $feature->type->name;
 
-      my $type = $type{$featuretype};
+      my $type = $cache{type}{$featuretype};
  #     if(!$type){
  #       ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
- #       $type{$featuretype} = $type->id;
+ #       $cache{type}{$featuretype} = $type->id;
  #     }
  #     die "no cvterm for ".$featuretype unless $type;
 
       my $ankey = $tsource .'_'. $featuretype;
 
-      unless($analysis{$ankey}) {
+      unless($cache{analysis}{$ankey}) {
         my ($ana) = Chado::Analysis->search( name => $ankey );
         if(!$ana){
           ($ana) = Chado::Analysis->create({
@@ -561,11 +595,11 @@ while(my $feature = $gffio->next_feature()){
           $ana->dbi_commit();
           warn "created analysis for '$ankey'";
         }
-        $analysis{$ankey} = $ana->id;
+        $cache{analysis}{$ankey} = $ana->id;
       }
-      die unless $analysis{$ankey};
+      die unless $cache{analysis}{$ankey};
 
-      print AF join("\t", ($nextanalysisfeature,$nextfeature,$analysis{$ankey},$score)), "\n"; 
+      print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n"; 
       $nextanalysisfeature++;
 
  #     my $target_unique = "target_$target_id";
@@ -672,14 +706,14 @@ sub copy_from_stdin {
 
 sub synonyms  {
     my $alias = shift;
-    unless ($synonym{$alias}) {
-      unless ($type{'synonym'}) {
-        ($type{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
+    unless ($cache{synonym}{$alias}) {
+      unless ($cache{type}{'synonym'}) {
+        ($cache{type}{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
         warn "unable to find synonym type in cvterm table"
-            and next unless $type{'synonym'};
+            and next unless $cache{type}{'synonym'};
       }
 
-      print SYN join("\t", ($nextsynonym,$alias,$type{'synonym'}->id,$alias)),"\n";
+      print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'}->id,$alias)),"\n";
 
       unless ($pub) {
         ($pub) = Chado::Pub->search( miniref => 'null' );
@@ -691,11 +725,11 @@ sub synonyms  {
 #        warn "alias:$alias,name:$name\n";
 
       $nextfeaturesynonym++;
-      $synonym{$alias} = $nextsynonym;
+      $cache{synonym}{$alias} = $nextsynonym;
       $nextsynonym++;
 
     } else {
-      print FS join("\t", ($nextfeaturesynonym,$synonym{$alias},$nextfeature,$pub)),"\n";
+      print FS join("\t", ($nextfeaturesynonym,$cache{synonym}{$alias},$nextfeature,$pub)),"\n";
 
 #        warn "in seenit, alias:$alias, name:$name\n";
 
