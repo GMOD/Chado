@@ -1018,7 +1018,7 @@ sub load_feature_locations {
            $fmax == $previous_featureloc->fmax and
            $previous_featureloc->srcfeature_id == $srcfeature{$gff_feature->seq_id}->id
           ){
-          next;
+          return $chado_feature;
         }
 
         $max_locgroup = $max_locgroup > $previous_featureloc->locgroup ? $max_locgroup : $previous_featureloc->locgroup;
