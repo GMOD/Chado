@@ -8,7 +8,6 @@ use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
 use Term::ProgressBar;
-use constant CACHE_SIZE => 1000;
 
 $| = 1;
 
@@ -27,12 +26,6 @@ See the notes; there is plenty there.
 =head2 NOTES
 
 =over
-
-=item What this script doesn't do yet
-
-It does very limited parsing of the group column (column 9).  Notes are not parsed.
-Nor are similarity/match/target data parsed.  Sequence is not handled yet either,
-though it shouldn't be to hard to add.
 
 =item The ORGANISM table
 
@@ -96,8 +89,12 @@ The following command line options are required.  Note that they
 can be abbreviated to one letter.
 
   --organism <org name>      Common name of the organism
+                                (default: 'Human')
   --srcdb    <dbname>        The name of the source database
+                                (default: 'DB:refseq')
   --gfffile  <filename>      The name of the GFF3 file
+  --cache    <# of features> The number of features to cache before committing
+                                to the database (default: 1000)
 
 =head1 AUTHORS
 
@@ -114,12 +111,14 @@ my ($ORGANISM, $SRC_DB, $GFFFILE);
 
 GetOptions('organism:s'       => \$ORGANISM,
            'srcdb:s'          => \$SRC_DB,
-           'gfffile:s'        => \$GFFFILE
+           'gfffile:s'        => \$GFFFILE,
+           'cache:s'          => \$CACHE_SIZE,
           ) or (system('pod2text',$0), exit -1); 
 
-$ORGANISM ||='Human';
-$SRC_DB   ||= 'DB:refseq';
-$GFFFILE  ||='test.gff';
+$ORGANISM   ||='Human';
+$SRC_DB     ||= 'DB:refseq';
+$GFFFILE    ||='test.gff';
+$CACHE_SIZE ||= 1000;
 
 #deal with GFF3 files that contain sequence
 # this is ugly, ugly, ugly, but in addtion to dealing with
@@ -517,7 +516,7 @@ while(my $gff_feature = $gffio->next_feature()) {
     }
   }
 
-  if ($feature_count % CACHE_SIZE == 0) {
+  if ($feature_count % $CACHE_SIZE == 0) {
     $_->dbi_commit foreach @transaction;
     @transaction = ();
   }
