@@ -265,8 +265,9 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   if($gff_feature->has_tag('ID')){
     my ($synonym) = Chado::Synonym->find_or_create({
-                      name    => $id,
-                      type_id => $synonym_type->cvterm_id
+                      name         => $id,
+                      synonym_sgml => $id,
+                      type_id      => $synonym_type->cvterm_id
                                                    });
                                                                                                                                   
     Chado::Feature_synonym->find_or_create ({
@@ -291,8 +292,9 @@ while(my $gff_feature = $gffio->next_feature()) {
     my @aliases = $gff_feature->get_tag_values('Alias');
     foreach my $alias (@aliases) {
       my ($synonym) = Chado::Synonym->find_or_create({
-                      name    => $alias,
-                      type_id => $synonym_type->cvterm_id
+                      name         => $alias,
+                      synonym_sgml => $alias,
+                      type_id      => $synonym_type->cvterm_id
                                                      });
                                                                                 
                                                                                 
@@ -308,8 +310,9 @@ while(my $gff_feature = $gffio->next_feature()) {
     my @names = $gff_feature->get_tag_values('Name');
     foreach my $name (@names) {
       my ($synonym) = Chado::Synonym->find_or_create({
-                      name    => $name,
-                      type_id => $synonym_type->cvterm_id
+                      name         => $name,
+                      synonym_sgml => $name,
+                      type_id      => $synonym_type->cvterm_id
                                                    });
                                                                                 
                                                                                 

@@ -76,6 +76,16 @@ if ($extstr) {
   }
 }
 
+my $external = prompt("Enter the full path of an external DDL file",'none');
+unless ($external eq 'none') {
+  if (-e $external) {
+    push @seqfiles, $external; 
+  } else {
+    die "The file $external couldn't be found.  Quitting...\n";
+  }
+}
+
+
 if ($rebuild_complete) {
   my $sqlout = "$working_dir/modules/complete.sql";
   open OUT, ">$sqlout" or die "couldn't open $sqlout: $!\n";
