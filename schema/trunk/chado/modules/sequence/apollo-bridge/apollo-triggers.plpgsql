@@ -653,9 +653,14 @@ BEGIN
 
   FOR f_row IN SELECT f.* FROM feature f, get_sub_feature_ids(OLD.feature_id) ch WHERE f.feature_id = ch.feature_id LOOP
       IF f_row.name LIKE OLD.name||''-%'' THEN
-          SELECT INTO name_suffix  substring(name from OLD.name||''(-.+)'');
+          SELECT INTO name_suffix  substring(name from OLD.name||''(-.+)'') FROM feature where feature_id = f_row.feature_id;
           UPDATE feature SET name = NEW.name||name_suffix WHERE feature_id = f_row.feature_id;
+      ELSIF  f_row.name LIKE OLD.name||'':%'' THEN
+          SELECT INTO name_suffix  substring(name from OLD.name||''(:.+)'') FROM feature where feature_id = f_row.feature_id;
+          UPDATE feature SET name = NEW.name||name_suffix WHERE feature_id = f_row.feature_id;
+
       END IF; 
+
   END LOOP;  
   
   RETURN NEW; 
