@@ -29,12 +29,12 @@ my $start=time();
 #dumpspec which for dumping chadoXML which can convert into Game XML readable for Apollox
 my $dump_spec;
 my %opt;
-getopts('h:d:f:s:i:e:b:', \%opt) or usage() and exit;
+getopts('h:d:f:s:e:b:', \%opt) or usage() and exit;
 
 #default for b:0
-$opt{b}=0 if !($opt{b});
+$opt{b}=0 if !(defined ($opt{b}));
 #default for b:0
-$opt{e}=1 if !($opt{e});
+$opt{e}=1 if !(defined ($opt{e}));
 
 usage() and exit if $opt{h};
 usage() and exit if (!$opt{d} || !$opt{f});
@@ -95,7 +95,7 @@ sub usage()
     "\n -h                : this (help) message",
     "\n -d                : database",
     "\n -f xml file       : GAME file name",
-    "\n -s scaffold name  : 0 for no recovery 1 for recovery",
+    "\n -s scaffold name  : scaffold name",
     "\n -e evidence       : 0 for NO evidence, 1 for evidence(default)",
     "\n -b debug          : 0 for no debug message(default),  1 for debug message",
     "\nexample: $0  -d chado_gadfly9_fogel -f /users/zhou/work/API/XORT/Log/AE003828_game.xml -s AE003828\n\n";

@@ -1,43 +1,54 @@
 1. chado to apollo 
-  first set $CodeBase, where $CodeBase is directory which XORT and GameChadoConv live in. you can either add  following line to .cshrc file:
- setenv CodeBase /home/pinglei/schema/XMLTools
+  first set $CodeBase, where $CodeBase is directory which XORT and 
+  GameChadoConv live in. you can either add  following line to .cshrc file:
+  setenv CodeBase /home/pinglei/schema/XMLTools
 
-or for bash-likes: 
- export CodeBase=/home/pinglei/schema/XMLTools
+  or for bash-likes: 
+  export CodeBase=/home/pinglei/schema/XMLTools
 
-then run 
- $CodeBase/XORT/bin/Chado2GAME.pl
+  then run 
+  $CodeBase/XORT/bin/Chado2GAME.pl
 
 2. game to chado
  first, do samething to set $CodeBase
 
-then run:
-$CodeBase/XORT/bin/GAME2Chado.pl
+ then run:
+ $CodeBase/XORT/bin/GAME2Chado.pl
 
 
 
 
 
-Notice:
-3. first following the direction of $CodeBase/XORT/Doc/readme_xort to make sure you setup XORT correctly. 
+  Notice:
+3. first following the direction of $CodeBase/XORT/Doc/readme_xort to 
+   make sure you setup XORT correctly. 
 
-4. current version not evidence data will not be included when convert from chadoXML to game, we are working on those now.
+4. current version not evidence data will not be included when convert 
+   from chadoXML to game, we are working on those now.
 
-5. here we couple the chado dumper with GameChadoConv into Chado2GAME.pl, but you have the choice to de-couple those two.
-  $CodeBase/XORT/bin/dump.pl   to dump chado into chadoxml(See $CodeBase/XORT/Doc/readme_xort #9 for special requirement)
+5. here we couple the chado dumper with GameChadoConv into Chado2GAME.pl, 
+   but you have the choice to de-couple those two.
+  $CodeBase/XORT/bin/dump.pl   to dump chado into chadoxml(See 
+   $CodeBase/XORT/Doc/readme_xort #9 for special requirement)
   
   to convert chado xml into game xml:
   java classpath $CodeBase/GameChadoConv/classes CTG -D....
 
 
-6. also we couple the GameChadoConv with loader to loader GAME xml into chado, you can divide it into two steps:
+6. also we couple the GameChadoConv with loader to loader GAME xml into chado, 
+   you can divide it into two steps:
    first convert GAME xml into chado xml
-   java classpath $CodeBase/GameChadoConv/classes apollo_file_name chado_file_name [-g]  
+   java classpath $CodeBase/GameChadoConv/classes apollo_file_name 
+       chado_file_name [-g]  
   
    then call loader to load chado xml into chado:
    $CodeBase/XORT/bin/loader.pl
 
 
-7. The currently apollo-chado round trip stick to chado schema version 1.0.1. Once there are new schema version, we will update code or setup to synchronize it with database schema.
+7. The currently apollo-chado round trip stick to chado schema version 1.0.1. 
+    Once there are new schema version, we will update code or setup to 
+     synchronize it with database schema.
 
-8. It will dump data from Chado db into a intermediate chadoXML file in  $CodeBase/XORT/Log/, so from time to time, you may want to clean this directory.
+8. It will dump data from Chado db into a intermediate chadoXML file in
+   $CodeBase/XORT/Log/, so from time to time, you may want to clean this 
+   directory.

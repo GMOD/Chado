@@ -61,7 +61,7 @@ sub usage()
     "\n -t tables       :which table(s) to be dumped",
     "\n -o op_type      :'' /force/delete/update/insert/lookup",
     "\n -g dumpspec     :dumpspec xml file which guide the dumper behavior",
-    "\n -s struct_type  :module/single",
+    "\n -s struct_type  :module/single(default)",
     "\n -b debug        : 0:no debug message(default), 1:debug message",
     "\n -l loadable     :1 for loadable, 0 for non_loadable",
     "\n -a app_data     :app data for dumpspec if using variable in dumpspec, separate by space for multvalue",
