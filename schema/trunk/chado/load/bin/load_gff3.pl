@@ -6,7 +6,8 @@ use Bio::Tools::GFF;
 use Chado::AutoDBI;
 use Chado::LoadDBI;
 use Getopt::Long;
-use constant CACHE_SIZE => 10;
+use Term::ProgressBar;
+use constant CACHE_SIZE => 1000;
 
 $| = 1;
 
@@ -118,6 +119,18 @@ GetOptions('organism:s'       => \$ORGANISM,
 $ORGANISM ||='Human';
 $SRC_DB   ||= 'DB:refseq';
 $GFFFILE  ||='test.gff';
+
+#count the file lines.  we need this to track load progress
+open(WC,"/usr/bin/wc -l $GFFFILE |");
+my $linecount = <WC>; chomp $linecount;
+close(WC);
+($linecount) = $linecount =~ /^\s*?(\d+)/;
+
+my $progress = Term::ProgressBar->new({name => "Features ($linecount):", count => $linecount,
+                                       ETA => 'linear', });
+$progress->max_update_rate(1);
+my $next_update = 0;
+
 
 Chado::LoadDBI->init();
 
@@ -492,11 +505,11 @@ while(my $gff_feature = $gffio->next_feature()) {
     @transaction = ();
   }
 
-  if ($feature_count % 1000 == 0) {
-    print STDERR "features loaded $feature_count";
-    print STDERR -t STDOUT && !$ENV{EMACS} ? "\r" : "\n";
-  }
+  $next_update = $progress->update($feature_count) if($feature_count > $next_update);
+  $progress->update($linecount) if($linecount >= $next_update);
+  $progress->update($linecount) if($next_update >= $linecount);
 }
+
 $_->dbi_commit foreach @transaction;
 $gffio->close();
 
