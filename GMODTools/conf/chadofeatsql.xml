@@ -17,7 +17,6 @@
   <sql>
 -- get chromosome/arm/supercontig/... lengths/names
 -- add get-residues to file 
--- psql -h bugbane -p 7302 -d chado_r3_2_27 -f chromosomes.sql -A -F '	' -q -o chromosomes.tsv
 SELECT 
   CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   '1' as fmin, armft.seqlen as fmax, '0' as strand,
@@ -44,7 +43,6 @@ ORDER BY arm ;
   <sql>
 -- standard features (excluding matches, analyses)
 -- bindkey  '\t' self-insert-command
--- psql -h bugbane -p 7302 -d chado_r3_2_27 -f gmodel4.sql -A -F '	' -q -o gmodel4.tsv
 SELECT  distinct
   CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   armloc.fmin, armloc.fmax, armloc.strand,

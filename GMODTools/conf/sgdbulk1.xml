@@ -6,7 +6,6 @@
   date="20040519"
   ROOT="${ARGOS_ROOT}/flybase/"
   TMP="${ARGOS_ROOT}/flybase/tmp"
-  SERVICE="flybase"
   datadir="data2/fban"
   >
   
@@ -104,7 +103,7 @@
     name="sgdlite_20040519"
     host="localhost"
     port="7302"
-    user="gilbertd"
+    user=""
     password=""
     />
 

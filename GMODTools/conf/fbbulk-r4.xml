@@ -1,4 +1,3 @@
-<!-- seqdump-r4.xml -->
 <opt
   name="fbbulk-r4" 
   rel="r4.0t"
@@ -7,13 +6,8 @@
   date="20040821"
   ROOT="${ARGOS_ROOT}/flybase/"
   TMP="${ARGOS_ROOT}/flybase/tmp"
-  SERVICE="flybase"
   datadir="data2/fban"
 >
-<!-- see below sections
-  featconfig="chadofeatconv"
-  sqlconfig="chadofeatsql"
--->
 
   <title>FlyBase Chado DB r4.0 test</title>
   <about>
@@ -39,18 +33,6 @@
     user="flybase"
     password=""
     />
-
-<!--
-bugbane% psql -l
-            List of databases
-       Name        |  Owner   | Encoding  
- chado_r3.2        | gilbertd | SQL_ASCII  
- chado_r3.2_18     | argosadm | SQL_ASCII
- chado_r3.2_26     | gilbertd | SQL_ASCII
- chado_r3_2_27     | gilbertd | SQL_ASCII  << alias dmel_chado
- chadohet_081604   | gilbertd | SQL_ASCII  << alias dmelhet_chado
- dmelr3_2_dpser1_0 | gilbertd | SQL_ASCII  << alias dpse_chado
--->
 
 
   <org>dmel</org>
@@ -126,9 +108,8 @@ bugbane% psql -l
     name="Genome feature sequence fasta" 
     dropnotes="synonym_2nd,synonym"
   />
-<!--  allowanyfeat="1" -->
 
-  <!-- FIXME allowanyfeat; 
+  <!-- FIXME  
     new parse steps put all individual feats to fasta ; 
     change back to use featset info
   -->
