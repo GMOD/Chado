@@ -1,17 +1,20 @@
 :SELECT 
   *
 :FROM
-  xcvterm 
-  LEFT OUTER JOIN cvterm_dbxref     USING (cvterm_id)
-  LEFT OUTER JOIN dbxrefd           USING (dbxref_id)
+  cvterm 
+  INNER JOIN dbxref                 USING (dbxref_id)
+  INNER JOIN db                     USING (db_id)
+  INNER JOIN cv                     USING (cv_id)
   LEFT OUTER JOIN cvtermsynonym     USING (cvterm_id)
+  LEFT OUTER JOIN cvtermprop        USING (cvterm_id)
 :WHERE
-    [xcvterm.accession => &cvterm_accession&]
-    [xcvterm.name => &cvterm_name&]
-    [xcvterm.cvname => &cvterm_cvname&]
-    [xcvterm.definition => &cvterm_definition&]
-:ORDER BY xcvterm.name
-:USE NESTING (set(xcvterm(cvterm_dbxref(dbxref))(cvterm_synonym)))
+    [dbxref.accession =>  &accession&]
+    [db.name          =>  &dbname&]
+    [cvterm.name =>       &name&]
+    [cv.cvname =>         &cvname&]
+    [cvterm.definition => &definition&]
+:ORDER BY cvterm.name
+:USE NESTING (set(cvterm(dbxref(db))(cvterm_synonym)(cvterm_prop)))
 
 //
 schema: chado
@@ -24,6 +27,5 @@ desc:
 
   REQUIRES: modules/sequence/bdgp/bdgp-views.sql
 
-example_input: cvterm_accession => SELECT DISTINCT cvterm.accession FROM cvterm WHERE cvterm_id IN (SELECT object_id FROM cvterm_relationship)
 example_input: cvterm_name => SELECT DISTINCT cvterm.name FROM cvterm WHERE cvterm_id IN (SELECT object_id FROM cvterm_relationship)
 
