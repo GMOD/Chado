@@ -24,8 +24,10 @@ as additional application-specific gff tags.
 
 Options:
 
-    -src    <string>   Choose a source for the gene, default "UCSC"
-    -origin <integer>  Choose a relative position to number from, default is "1"
+    -src         <string>   Choose a source for the gene, default "UCSC"
+    -origin      <integer>  Choose a relative position to number from, default is "1"
+    -annotations <file>     Annotations file
+    -center      <string>   ???
 
 USAGE
 
