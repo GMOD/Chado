@@ -56,7 +56,15 @@ while (<>) {
   $cdsEnd   -= $ORIGIN;
 
   # print the transcript
-  print join ("\t",$chrom,$SRC,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id"),"\n";
+  print join ("\t",$chrom,$SRC,'mRNA',$txStart,$txEnd,'.',$strand,'.',"ID=$id");
+  if(defined($annotation->{$id})){
+      foreach my $annotation_set (@{$annotation->{$id}}){
+	  foreach my $annotation_key (keys %{$annotation_set}){
+	      print ",$annotation_key=".$annotation_set->{$annotation_key};
+	  }
+      }
+  }
+  print "\n";
   #print join ("\t","dbxref=".$annotations->{$id}),"\n";
   #print Dumper($annotations->{$id});
   # now handle the CDS entries -- the tricky part is the need to keep
@@ -197,9 +205,24 @@ sub parseAnnotations {
     my $key = "";
     if($CENTER =~ /unigene/i) { $key = $kgID; }
     else { $key = $refseq; }
-	push @{$annotations{$key}}, { kgID => $kgID, mRNA => $mRNA, spID => $spID, spDisplayID => $spDisplayID, geneSymbol => $geneSymbol, refseq => $refseq, protAcc => $protAcc, description => $description };
+   
+    my %a = (kgID => $kgID,
+	     mRNA => $mRNA,
+	     spID => $spID,
+	     spDisplayID => $spDisplayID,
+	     geneSymbol => $geneSymbol,
+	     refseq => $refseq,
+	     protAcc => $protAcc,
+	     description => $description
+	     );
 
+    foreach my $k (keys %a){
+	#deletes if "defined but not true".  the cornercase here is refseq
+	#which sometimes contains a 0-length value (weird).
+	delete($a{$k}) unless $a{$k};
+    }
 
+    push @{$annotations{$key}}, \%a;
   }
   close ANNFILE;
   return(\%annotations);
@@ -214,7 +237,7 @@ ucsc_genes2gff.pl - Convert UCSC Genome Browser-format gene files into GFF files
 
 =head1 SYNOPSIS
 
-  % uscsc_genes2gff.pl [options] ucsc_file1 ucsc_file2...
+  % ucsc_genes2gff.pl [options] ucsc_file1 ucsc_file2...
 
 Options:
 
