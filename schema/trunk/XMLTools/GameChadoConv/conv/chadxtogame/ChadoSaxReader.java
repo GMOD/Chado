@@ -331,7 +331,7 @@ private boolean m_isUseful = true;
 				}
 				//System.out.println(" SAVING");
 			}else{
-				System.out.println(" NOT SAVING");
+				//System.out.println(" NOT SAVING");
 			}
 			//String m_OFFSET = "";
 			//for(int i=0;i<m_Stack.size();i++){
@@ -817,7 +817,7 @@ private boolean m_isUseful = true;
 				//		+"> AT DEPTH<"+m_Stack.size()+">");
 				if(m_Stack.size()==2){
 					if((m_readMode==GameWriter.CONVERT_GENE)&&(m_CurrFeature.getisanalysis().equals("1"))){
-						System.out.println("++++SUPPRESS THIS!");
+						//System.out.println("++++SUPPRESS THIS!");
 						m_isUseful = false;
 					}else{
 						m_isUseful = true;

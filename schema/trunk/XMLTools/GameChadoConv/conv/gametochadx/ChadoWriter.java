@@ -298,11 +298,11 @@ private Vector m_ProtUNList = null;
 
 		if(m_OldREFSTRING!=null){
 			root.appendChild(makeAppdata(
-					the_DOC,"arm",m_NewREFSTRING));
+					the_DOC,"title",m_OldREFSTRING));
 		}
 		if(m_OldREFSTRING!=null){
 			root.appendChild(makeAppdata(
-					the_DOC,"title",m_OldREFSTRING));
+					the_DOC,"arm",m_NewREFSTRING));
 		}
 		if(m_REFSPAN!=null){
 			root.appendChild(makeAppdata(
@@ -1062,13 +1062,7 @@ private Vector m_ProtUNList = null;
 		FeatNode = makeFeatHeader(the_DOC,the_gf,FeatNode,
 				the_parentName,the_parentType,the_parentId);
 		Span startCodonSpan = null;
-		//Span transSpan = null;
-		//if(the_gf instanceof FeatureSet){
-		//	transSpan = the_gf.getSpan();
-			//if((transSpan!=null)&&(the_gf.getId()!=null)){
-			//	transSpan.setSrc(the_gf.getId());
-			//}
-		//}
+		String FSType = "";
 		if((the_gf.getType()!=null)&&(the_gf.getType().equals("remark"))){
 			//IGNORE EXONS AND PROTEINS OF THIS TRANSCRIPT
 			System.out.println("REMARKS SHOW ONLY HEADER INFO, REST IGNORED");
@@ -1087,6 +1081,7 @@ private Vector m_ProtUNList = null;
 						the_gf.getName(),
 						the_gf.getType(),
 						the_gf.getId())));
+			//FSType = the_gf.getType();
 			System.out.println("\n");
 			}else if(gf instanceof FeatureSpan){
 				if(gf.getType()==null){
@@ -1174,6 +1169,14 @@ private Vector m_ProtUNList = null;
 					//CALCULATE PROTEIN
 					if((cdnaStr!=null)
 						&&(the_gf.getId()!=null)
+						&&(the_gf.getType()!=null)
+						&&(!(the_gf.getType().equals("snoRNA")))
+						&&(!(the_gf.getType().equals("ncRNA")))
+						&&(!(the_gf.getType().equals("snRNA")))
+						&&(!(the_gf.getType().equals("tRNA")))
+						&&(!(the_gf.getType().equals("rRNA")))
+						&&(!(the_gf.getType().equals("pseudogene")))
+						&&(!(the_gf.getType().equals("nuclear_micro_RNA_coding_gene")))
 						&&(!(the_gf.getId().startsWith("CR")))
 						&&(gf.getId()!=null)
 						&&(!(gf.getId().startsWith("CR")))){
@@ -1190,6 +1193,9 @@ private Vector m_ProtUNList = null;
 							System.out.println("WARNING:TRANSCRIPT <"+the_gf.getId()+"> NO START CODON SO CALC AS <"+startCodonSpan+"> AND START CALC <"+st+">");
 								
 						}
+						System.out.println("MYST<"+st
+							+"> CDNA LEN<"
+							+cdnaStr.length()+">");
 						if(st<0){
 							System.out.println("PROBLEM FOR <"+the_gf.getId()+"> CDNA<"+cdnaStr+">");
 						}else{
@@ -1241,21 +1247,23 @@ private Vector m_ProtUNList = null;
 							gf.getResidues());
 					if(calcaaStr!=null){
 					int cmp = calcaaStr.compareTo(givenaaStr);
+					System.out.println("PROTCOMPARE<"+cmp+">");
 					if(cmp!=0){
-						System.out.println("CALCULATED PROTEIN DIFFERS FROM GIVEN PROTEIN IN feature_set<"+the_gf.getId()+">");
-						System.out.println("GIVEN PROTEIN<"
-								+givenaaStr+">");
+						System.out.println("\nPROTEIN DIFFERS FROM GIVEN PROTEIN IN feature_set<"+the_gf.getId()+">");
+						System.out.print("GIVEN PROTEIN ");
 						if(givenaaStr!=null){
-							System.out.println("LEN<"+givenaaStr.length()+">\n");
+							System.out.println("LEN<"
+								+givenaaStr.length()
+								+"><"+givenaaStr+">");
 						}
-						System.out.println("CALC PROTEIN<"
-								+calcaaStr+">");
+						System.out.print("CALC PROTEIN ");
 						if(calcaaStr!=null){
-							System.out.println("LEN<"+calcaaStr.length()+">\n");
+							System.out.println("LEN<"
+								+calcaaStr.length()
+								+"><"+calcaaStr+">");
 						}
 					}
 					}
-					//System.out.println("PROTCOMPARE<"+cmp+">");
 				}else{
 					System.out.println("SHOULDNOTSEE UNK TYPE<"+gf.getType()+">");
 				}
@@ -1336,12 +1344,7 @@ private Vector m_ProtUNList = null;
 	}
 
 	private int calcRelSCPos(Span the_sc,Vector the_spanList){
-		//System.out.print("CalcRelSCPos ");
-		//if(the_spanList!=null){
-		//	System.out.println("<"+the_spanList.size()+">");
-		//}else{
-		//	System.out.println("<0>\n");
-		//}
+		System.out.print("CalcRelSCPos LOOKING FOR<"+the_sc.toString()+">");
 		boolean isForward = true;
 		//JUST FOR TEST OF LOCATION WITHIN AN EXON, THE SC IS MADE SMALLER
 		Span scSpan = new Span(the_sc.getStart(),the_sc.getStart());
@@ -1351,32 +1354,32 @@ private Vector m_ProtUNList = null;
 		}
 		int deductionLen = 0;
 		if(isForward){
-			//System.out.println("\tIS FORWARD");
+			System.out.println("\tIS FORWARD");
 			for(int i=0;i<the_spanList.size();i++){
 				Span ex = (Span)the_spanList.get(i);
-				//System.out.print("\tEXON SP<"+ex.toString()+">");
+				System.out.print("\tEXON SP<"+ex.toString()+">");
 				if(ex.contains(scSpan)){
-					//System.out.println(" CONTAINS <"
-					//		+scSpan.toString()+">");
+					System.out.println(" CONTAINS <"
+							+scSpan.toString()+">");
 					deductionLen += (scSpan.getStart()-ex.getStart());
 					return deductionLen;
 				}else{
-					//System.out.println(" HAS NO START CODON");
+					System.out.println(" HAS NO START CODON");
 					deductionLen += ex.getLength();
 				}
 			}
 		}else{
-			//System.out.println("\tIS REVERSE");
+			System.out.println("\tIS REVERSE");
 			for(int i=0;i<the_spanList.size();i++){
 				Span ex = (Span)the_spanList.get(i);
-				//System.out.print("\tEXON SP<"+ex.toString()+">");
+				System.out.print("\tEXON SP<"+ex.toString()+">");
 				if(ex.contains(scSpan)){
-					//System.out.println("CONTAINS <"
-					//		+scSpan.toString()+">");
+					System.out.println("CONTAINS <"
+							+scSpan.toString()+">");
 					deductionLen += (-scSpan.getStart()+ex.getStart());
 					return deductionLen;
 				}else{
-					//System.out.println("HAS NO START CODON");
+					System.out.println("NO START CODON IN<"+ex.toString()+">");
 					deductionLen += ex.getLength();
 				}
 			}
@@ -1624,6 +1627,9 @@ private Vector m_ProtUNList = null;
 			the_FeatNode.appendChild(makeChadoDateNode(
 					the_DOC,"timeaccessioned",
 					the_gf.getdate().toString()));
+			the_FeatNode.appendChild(makeChadoDateNode(
+					the_DOC,"timelastmodified",
+					the_gf.getdate().toString()));
 		}
 
 		//RESIDUES
@@ -1709,6 +1715,7 @@ private Vector m_ProtUNList = null;
 					//TYPE="protein_id"THEN IT BECOMES A
 					//	<feature_dbxref><dbxref_id>
 					//	"SP:"+getvalue()<><>
+//FSS
 					if(attr.gettype().equals("protein_id")){
 						//MAY NEED TO BE DEFERRED
 						//UNTIL AFTER THE
@@ -1745,6 +1752,7 @@ private Vector m_ProtUNList = null;
 			}
 		}
 
+		boolean synAlreadyHere = false;
 		//System.out.println("INTERNAL_SYNONYM");
 		//INTERNAL SYNONYM FROM GAME internal_synonym PROPERTY
 		for(int i=0;i<the_gf.getAttribCount();i++){
@@ -1755,13 +1763,19 @@ private Vector m_ProtUNList = null;
 					if(attr.gettype().equals("internal_synonym")){
 						//System.out.println("\tMADE <"+attr.getisinternal()+">");
 						the_FeatNode.appendChild(makeFeatureSynonym(the_DOC,attr.getvalue(),attr.getisinternal(),the_gf.getAuthor()));
+						if((attr.getvalue()!=null)
+							&&(the_gf.getName()!=null)
+							&&(attr.getvalue().equals(the_gf.getName()))
+							&&(attr.getisinternal().equals("0"))){
+								synAlreadyHere = true;
+						}
 					}
 				}
 			}
 		}
 
 		//EXPLICIT SYNONYM 
-		if((idTxt!=null)&&(the_gf.getName()!=null)
+		if((synAlreadyHere==false)&&(idTxt!=null)&&(the_gf.getName()!=null)
 				&&(the_gf.getName().length()>0)
 				&&(!(idTxt.equals(the_gf.getName())))){
 			the_FeatNode.appendChild(makeFeatureSynonym(
@@ -1890,9 +1904,12 @@ private Vector m_ProtUNList = null;
 			//Element pval = (Element)the_DOC.createElement("pval");
 			Element pval = (Element)the_DOC.createElement("value");
 			String tmp = the_attr.getvalue();
-			if(the_attr.getdate()!=null){
-				String chadoDate = DateConv.GameDateToChadoDate(
-						the_attr.getdate().toString());
+			if(the_attr.gettimestamp()!=null){
+				String chadoDate = DateConv.GameTimestampToChadoDate(
+						the_attr.gettimestamp());
+			//if(the_attr.getdate()!=null){
+			//	String chadoDate = DateConv.GameDateToChadoDate(
+			//			the_attr.getdate().toString());
 				tmp += "::DATE:"+chadoDate;
 			}
 			if(the_attr.gettimestamp()!=null){
@@ -1939,9 +1956,12 @@ private Vector m_ProtUNList = null;
 		if(the_attr.gettext()!=null){
 			Element pval = (Element)the_DOC.createElement("value");
 			String tmp = the_attr.gettext();
-			if(the_attr.getdate()!=null){
-				String chadoDate = DateConv.GameDateToChadoDate(
-						the_attr.getdate().toString());
+			//if(the_attr.getdate()!=null){
+			//	String chadoDate = DateConv.GameDateToChadoDate(
+			//			the_attr.getdate().toString());
+			if(the_attr.gettimestamp()!=null){
+				String chadoDate = DateConv.GameTimestampToChadoDate(
+						the_attr.gettimestamp());
 				tmp += "::DATE:"+chadoDate;
 			}
 			if(the_attr.gettimestamp()!=null){
@@ -2474,8 +2494,6 @@ private Vector m_ProtUNList = null;
 			featNode.appendChild(makeChadoDateNode(
 					the_DOC,"timelastmodified",
 					the_gf.getdate().toString()));
-			//NOT REALLY TIMELASTMOD, BUT TIMEACC
-			//SINCE GAME HAS ONLY ONE PLACE FOR DATE
 		}
 
 		//SEQLEN
@@ -2682,7 +2700,8 @@ private Vector m_ProtUNList = null;
 			GenFeat the_gf,String the_src,
 			String the_residues){
 		Element srcFeat = (Element)the_DOC.createElement("feature");
-		//TIMEACCESSIONED
+
+		//DATE
 		if(the_gf.getdate()!=null){
 			srcFeat.appendChild(makeChadoDateNode(
 					the_DOC,"timeaccessioned",
@@ -2702,7 +2721,13 @@ private Vector m_ProtUNList = null;
 					"residues",tmpRes));
 		}
 
-		//TIMELASTMODIFIED
+		//DATE
+		if(the_gf.getdate()!=null){
+			srcFeat.appendChild(makeChadoDateNode(
+					the_DOC,"timelastmodified",
+					the_gf.getdate().toString()));
+		}
+
 		//UNIQUENAME
 		if(the_src!=null){
 			srcFeat.appendChild(makeGenericNode(
