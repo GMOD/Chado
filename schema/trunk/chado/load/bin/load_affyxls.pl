@@ -76,10 +76,18 @@ while(my $arrayio = $affx->next_array){
 
   #we can do this on filename or arrayname.
   #if($arrayio->id =~ /^(\d+)\-(\d+)\-(\S+)/){
-  if($arrayfile =~ /^.*\/?(\d+)\-(\d+)\-(\S+)/){
-	$chip_id   = $1;
-	$sample_id = $2;
-	$cvterms   = $3;
+  if($arrayfile =~ m!/!){
+    if($arrayfile =~ /^.*\/(\d+)\-(\d+)\-(\S+)/){
+      $chip_id   = $1;
+      $sample_id = $2;
+      $cvterms   = $3;
+    }
+  } else {
+    if($arrayfile =~ /^(\d+)\-(\d+)\-(\S+)/){
+      $chip_id   = $1;
+      $sample_id = $2;
+      $cvterms   = $3;
+    }
   }
 
   $LOG->info("chip_id: $chip_id");
