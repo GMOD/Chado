@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.44 2003-12-09 22:28:16 allenday Exp $
+# $Id: Makefile.PL,v 1.45 2003-12-11 04:00:37 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -410,6 +410,20 @@ WriteMakefile(
       'XML::Simple'       => 2.09,
       'Log::Log4perl'     => 0.39,
     }, 
+    'PL_FILES'            => {
+          'load/bin/genbank2gff3.PLS'    => 'load/bin/gmod_genbank2gff3.pl',
+#          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
+#          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
+          'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
+#          'load/bin/load_ontology.PLS'   => 'load/bin/gmod_load_ontology.pl',
+    },
+    EXE_FILES             => [
+           'load/bin/gmod_genbank2gff3.pl',
+           #'load/bin/gmod_load_affymetrix.pl',
+           #'load/bin/gmod_load_affyxls.pl',
+           'load/bin/gmod_load_gff3.pl',
+           #'load/bin/gmod_load_ontology.pl'
+    ],
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
        AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()
@@ -442,12 +456,12 @@ Optional Targets:
 HERE
 ;
 
-sub MY::install {
-  package MY;
-  my $inherited = shift->SUPER::install(@_);
-  $inherited =~ s/doc_install/doc_install song go cvtermpath/;
-  $inherited;
-}
+#sub MY::install {
+#  package MY;
+#  my $inherited = shift->SUPER::install(@_);
+#  $inherited =~ s/doc_install/doc_install song go cvtermpath/;
+#  $inherited;
+#}
 
 sub MY::c_o {
   return ".SUFFIXES : .gz ";
