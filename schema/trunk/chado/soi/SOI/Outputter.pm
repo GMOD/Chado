@@ -284,7 +284,8 @@ sub game_xml {
         foreach my $rset (@{$an->nodes || []}) {
             foreach my $span (@{$rset->nodes || []}) {
                 foreach my $loc (@{$span->secondary_nodes || []}) {
-                    my $seq_h = $loc->seq ? $loc->seq->hash : "";
+                    my $seq = $loc->seq;
+                    my $seq_h = ref($seq) ? $seq->hash : "";
                     $sec_seq_h{$seq_h->{feature_id} || $seq_h->{name}} = $seq_h if ($seq_h);
                 }
             }
