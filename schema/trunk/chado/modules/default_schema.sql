@@ -1269,11 +1269,11 @@ create table phenotype_comparison (
     primary key (phenotype_comparison_id),
     genotype1_id int not null,
         foreign key (genotype1_id) references genotype (genotype_id) on delete cascade,
-    environment1_id int,
+    environment1_id int not null,
         foreign key (environment1_id) references environment (environment_id) on delete cascade,
     genotype2_id int not null,
         foreign key (genotype2_id) references genotype (genotype_id) on delete cascade,
-    environment2_id int,
+    environment2_id int not null,
         foreign key (environment2_id) references environment (environment_id) on delete cascade,
     phenotype1_id int not null,
         foreign key (phenotype1_id) references phenotype (phenotype_id) on delete cascade,
@@ -1283,7 +1283,7 @@ create table phenotype_comparison (
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade,
-    constraint phenotype_comparison_c1 unique (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,phenotype2_id,type_id,pub_id)
+    constraint phenotype_comparison_c1 unique (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
 );
 
 COMMENT ON TABLE phenotype_comparison IS NULL;
