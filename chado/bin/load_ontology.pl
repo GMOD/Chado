@@ -84,8 +84,8 @@ my $parser = Bio::OntologyIO->new(
 								  -format => $format,
 								  -indent_string => ',',
 								  -ontology_name => $ontname,
-								  -defs_file => $sodeffile,
-								  -files => $sofile
+								  -defs_file => $ontology_deffile,
+								  -files => $ontology_file
 								 );
 
 my %allterms;
@@ -256,3 +256,44 @@ sub load_synonyms {
 										  });
   }
 }
+
+__END__
+
+=head1 NAME
+
+load_ontology.pl - load DAG-Edit or simple indented hierarchy ontology files into a Chado database.
+
+=head1 SYNOPSIS
+
+#with a definitions file...
+/usr/bin/perl load_ontology.pl $USER database_name SODA.ontology SODA.defs
+
+#...and without
+/usr/bin/perl load_ontology.pl $USER database_name cell.ontology
+
+=head1 DESCRIPTION
+
+this script relies on three external modules:
+
+=item Bio::OntologyIO (available from Bioperl)
+
+=back
+
+=item Chado::AutoDBI  (generated from chado/complete.sql using chado/bin/pg2cdbi.pl)
+
+=back
+
+=item SQL::Translator required to generate Chado::AutoDBI
+
+=back
+
+=head1 KNOWN BUGS
+
+may not load data into the fields you'd like.  we need to establish a SOP as to what data goes where
+in Chado from a DAG-Edit file.
+
+=head1 AUTHOR
+
+Allen Day E<lt>allenday@ucla.eduE<gt>
+
+Copyright 2002-2003
