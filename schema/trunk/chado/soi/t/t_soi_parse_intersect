@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl -w
+
+use lib "../";
+BEGIN {
+    # to handle systems with no installed Test module
+    # we include the t dir (where a copy of Test.pm is located)
+    # as a fallback
+    eval { require Test; };
+    use Test;
+    plan tests => 11;
+}
+
+use strict;
+use XML::Parser::PerlSAX;
+use SOI::SOIHandler;
+use IO;
+use SOI::IntersectGraph;
+use SOI::Visitor;
+
+#note: data/AE003790.cDNA.game.xml can be loaded into Apollo to do visual validation this test result
+my $handler = SOI::SOIHandler->new([qw(chromosome_arm contig transposable_element gene mRNA tRNA exon protein companalysis match match_part)]);
+my $parser = XML::Parser::PerlSAX->new(Handler=>$handler);
+$parser->parse(Source => { SystemId =>"data/AE003790.soi.xml"});
+my $feature = $handler->feature;
+
+my $ig = SOI::IntersectGraph->new;
+
+my (@genes, @trs, @te, @trna, @cdnas);
+map{
+    my $f = $_;
+    if ($f->type eq 'gene') {
+        push @genes, $f;
+        map{
+            if ($_->type eq 'mRNA') {
+                push @trs, $_;
+            }
+            elsif ($_->type eq 'tRNA') {
+                push @trna, $_;
+            }
+        }@{$f->nodes || []};
+    }
+    elsif ($f->type eq 'transposable_element') {
+        push @te, $f;
+    }
+    elsif ($f->type eq 'companalysis' && $f->sourcename && $f->sourcename eq 'na_cDNA.dros') {
+        push @cdnas, @{$f->nodes || []};
+    }
+    else {
+        ;
+    }
+}@{$feature->nodes || []};
+
+map{$_->set_depth(0)}(@trs, @cdnas);
+map{SOI::Visitor->set_loc($_)}@cdnas;
+$ig->find_intersects(\@trs,\@cdnas,{query_type=>'exon',subject_type=>'match_part',same_strand=>1,depth=>1,threshold=>0.95});
+my %tr_w_cdna;
+my %cdna_w_tr;
+my %gene_w_cdna;
+foreach my $tr (@trs) {
+    my $cdnas = $ig->get_ilist($tr);
+    next unless (@{$cdnas || []});
+    map{$cdna_w_tr{$_->secondary_node->src_seq}++}@{$cdnas || []};
+    $tr_w_cdna{$tr->uniquename}++;
+}
+foreach my $g (@genes) {
+    if (grep{exists $tr_w_cdna{$_->uniquename}}@{$g->nodes || []}) {
+        $gene_w_cdna{$g->uniquename}++;
+    }
+}
+ok(scalar(@te), 3);
+ok(scalar(@trna), 4);
+ok(grep{$_ ne 'LD21171' && $_ ne 'GH14660' && $_ ne 'RE35072'}keys %cdna_w_tr, 1);
+ok(scalar(keys %cdna_w_tr), 37);
+ok(scalar(@{$ig->query_overlaps || {}}), 43);
+
+$ig->find_intersects(\@trs,\@cdnas,{query_type=>'exon',subject_type=>'match_part',same_strand=>1,depth=>1,threshold=>0.90});
+%tr_w_cdna = ();
+%cdna_w_tr = ();
+%gene_w_cdna = ();
+foreach my $tr (@trs) {
+    my $cdnas = $ig->get_ilist($tr);
+    next unless (@{$cdnas || []});
+    map{$cdna_w_tr{$_->secondary_node->src_seq}++}@{$cdnas || []};
+    $tr_w_cdna{$tr->uniquename}++;
+}
+foreach my $g (@genes) {
+    if (grep{exists $tr_w_cdna{$_->uniquename}}@{$g->nodes || []}) {
+        $gene_w_cdna{$g->uniquename}++;
+    }
+}
+ok(grep{$_ ne 'LD21171' && $_ ne 'GH14660' && $_ ne 'RE35072'}keys %cdna_w_tr, 0); #RE35072 now ov
+ok(scalar(keys %cdna_w_tr), 38);
+ok(scalar(@{$ig->query_overlaps || []}), 50);
+
+#printf "number of cDNA intersect w tr: %d\n", scalar(keys %cdna_w_tr);
+#printf "number of genes whose tr intersect w cDNA: %d\n",scalar(keys %gene_w_cdna);
+#printf "number of tr intersect w cDNA: %d\n", scalar(keys %tr_w_cdna);
+#printf "number of genes: %d\n",scalar(@genes);
+#printf "number of TE: %d\n", scalar(@te);
+#printf "number of tRNA: %d\n", scalar(@trna);
+#map{
+#    printf "%s: %s\n",$_->secondary_nodes->[0]->src_seq,join(",",map{$_->name}@{$ig->get_ilist($_) || []});
+#}@cdnas;
+
+$ig->find_intersects(\@cdnas,\@trs,{query_type=>'match_part',subject_type=>'exon',same_strand=>1,depth=>1,threshold=>0.98});
+ok(scalar(@{$ig->subject_overlaps || []}), 38);
+ok((grep{$_->name eq 'BcDNA:LD08743-RA' || $_->name eq 'BcDNA:LD08743-RD'}@{$ig->subject_overlaps || []}), 0);
+ok((grep{$_->name eq 'BcDNA:LD08743-RB'}@{$ig->subject_overlaps || []}),1);
+
+#printf "%s\n",join("\n",map{$_->name}@{$ig->subject_overlaps});
