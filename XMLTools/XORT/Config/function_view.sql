@@ -97,3 +97,10 @@ END;
 'LANGUAGE 'plpgsql';
 
 CREATE TRIGGER tr_feature_del BEFORE DELETE ON feature for EACH ROW EXECUTE PROCEDURE fn_feature_del();
+
+
+
+
+
+
+

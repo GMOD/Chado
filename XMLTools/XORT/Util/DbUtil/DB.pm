@@ -7,7 +7,6 @@
 #  This script have basic methods for connect with any DB, some methods still need to work out
 #  ------------------------------------------------------------------------------------------------
 
-
 package XORT::Util::DbUtil::DB;
  use lib $ENV{CodeBase};
 # use XORT::Util::GeneralUtil::Structure qw(rearrange);
@@ -234,7 +233,10 @@ sub db_select(){
      my ($ref, $table, $hash_local_id, $hash_trans, $log_file) =
      XORT::Util::GeneralUtil::Structure::rearrange(['data_hash',  'table', 'hash_local_id', 'hash_trans', 'log_file'], @_);
 
-     my $id=$table."_id";
+     #my $id=$table."_id";
+     my $table_id_string=$table."_primary_key";
+     my $id=$hash_ddl{$table_id_string};
+
      my $data_hash_ref=&_data_type_checker($ref, $table);
 
      #get the unique column of this table,
@@ -326,7 +328,10 @@ sub db_lookup(){
      my ($ref, $table, $hash_local_id, $hash_trans, $log_file) =
      XORT::Util::GeneralUtil::Structure::rearrange(['data_hash',  'table', 'hash_local_id', 'hash_trans', 'log_file'], @_);
 
-     my $id=$table."_id";
+    # my $id=$table."_id";
+     my $table_id_string=$table."_primary_key";
+     my $id=$hash_ddl{$table_id_string};
+
      my $data_hash_ref=&_data_type_checker($ref, $table);
 
      #get the unique column of this table,
@@ -549,7 +554,10 @@ sub db_update(){
           }
         }
      }
-    my $id=$table."_id";
+    #my $id=$table."_id";
+    my $table_id_string=$table."_primary_key";
+    my $id=$hash_ddl{$table_id_string};
+
     if ($where_list){
        $stm_select="select $id from $table where $where_list";
     }
@@ -601,7 +609,9 @@ sub db_delete(){
      XORT::Util::GeneralUtil::Structure::rearrange(['data_hash', 'table', 'hash_local_id', 'hash_trans', 'log_file'], @_);
 
      my $data_hash_ref=&_data_type_checker($ref, $table);
-     my $id=$table."_id";
+     #my $id=$table."_id";
+     my $table_id_string=$table."_primary_key";
+     my $id=$hash_ddl{$table_id_string};
      my ($where_list, $stm_delete, $stm_select, $db_id);
 
 
@@ -698,7 +708,9 @@ sub db_insert(){
      my ($ref, $table, $hash_local_id, $hash_trans, $log_file) =
      XORT::Util::GeneralUtil::Structure::rearrange(['data_hash', 'table', 'hash_local_id', 'hash_trans', 'log_file'], @_);
 
-     my $id=$table."_id";
+     #my $id=$table."_id";
+     my $table_id_string=$table."_primary_key";
+     my $id=$hash_ddl{$table_id_string};
      my $data_hash_ref=&_data_type_checker($ref, $table);
 
      my ($data_list, $col_list, $stm_insert, $stm_select, $db_id);
@@ -815,7 +827,9 @@ sub db_force(){
      my ($ref, $table, $hash_local_id, $hash_trans, $log_file) =
      XORT::Util::GeneralUtil::Structure::rearrange(['data_hash', 'table', 'hash_local_id', 'hash_trans', 'log_file'], @_);
 
-     my $id=$table."_id";
+     #my $id=$table."_id";
+     my $table_id_string=$table."_primary_key";
+     my $id=$hash_ddl{$table_id_string};
      my $data_hash_ref=&_data_type_checker($ref, $table);
 
      my ($data_list, $col_list, $stm_insert, $stm_select, $db_id, $stm_update);
@@ -1181,6 +1195,11 @@ sub _data_type_checker(){
 	#    }
 	#}
 
+
+   #here to deal with special case: O'Reiley, 
+    foreach my $key (keys %$hash_ref){
+        $hash_ref->{$key} =~ s/\'/\'\'/g;
+    }
 
     my $data_type_name=$table."_data_type";
     my $data_type=$hash_ddl{$data_type_name};

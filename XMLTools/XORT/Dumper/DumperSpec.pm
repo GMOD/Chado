@@ -716,7 +716,10 @@ my %hash_op=(
      }
    }
 
-   my $table_id=$node_name."_id";
+   my $table_id_string=$node_name."_primary_key";
+   my $table_id=$hash_ddl{$table_id_string};
+   #my $table_id=$node_name."_id";
+
    my $hash_ref=&_data_type_checker(\%hash_data_yes, $node_name);
    my $stm_select;
    my $where_list;
@@ -824,7 +827,10 @@ my %hash_op=(
      }
    }
 
-   my $table_id=$node_name."_id";
+   #my $table_id=$node_name."_id";
+   my $table_id_string=$node_name."_primary_key";
+   my $table_id=$hash_ddl{$table_id_string};
+
    my $hash_ref=&_data_type_checker(\%hash_data_yes, $node_name);
    my $stm_select;
    my $where_list;
