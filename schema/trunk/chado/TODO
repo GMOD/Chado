@@ -32,6 +32,7 @@ point).
 
 For following releases:
 - incorporate Pub*
+- incorporate cmap
 - write a bulk load utility that will quickly load GFF3 data to chado
 - write a utility that will delete data from the database with a GFF
 file as a template
