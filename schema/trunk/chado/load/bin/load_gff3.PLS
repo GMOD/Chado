@@ -3,7 +3,7 @@
 use Config;
 use File::Basename qw(&basename &dirname);
 use Cwd;
-                                                                                                                                    
+
 $origdir = cwd;
 chdir dirname($0);
 $file = basename($0, '.PL','.PLS');
@@ -11,7 +11,6 @@ $file = "gmod_$file.pl";
 
 open OUT,">$file" or die "Can't create $file: $!";
 print OUT "$Config{startperl}\n";
-
 
 print OUT <<'!NO!SUBS!';
 use strict;
@@ -170,7 +169,8 @@ die "unable to find or create a pub entry in the pub table"
 #load transaction into multiple cache/flush mini-transactions
 my @transaction;
 
-my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
+my $gffio = Bio::Tools::GFF->new(-file => $TMPGFF, -gff_version => 3);
+#my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
 
 $feature_count += load_segments($gffio);
 
@@ -232,27 +232,6 @@ while(my $gff_feature = $gffio->next_feature()) {
     } elsif($tag =~ /^[a-z]/){
       load_custom_tags($gff_feature,$chado_feature,$tag);
     }
-
-    #unless (defined $cvterm{$tag}) {
-    #  $cvterm{$tag} = Chado::Cvterm->find_or_create ({
-    #                                                  name       => $tag,
-    #                                                  cv_id      => $cv->id,
-    #                                                  definition => 'auto created by load_gff3.pl'
-    #                                                 });
-    #
-    #  push @transaction, $cvterm{$tag};
-    #}
-    #
-    #my @values = $gff_feature->get_tag_values($tag);
-    #foreach my $value (@values) {
-    #  my($chado_featureprop) = Chado::Featureprop->find_or_create({
-    #                                                               feature_id => $chado_feature->id,
-    #                                                               type_id    => $cvterm{$tag}->id,
-    #                                                               value      => $value
-    #                                                              });
-    #
-    #  push @transaction, $chado_featureprop;
-    #}
   }
 
   if ($feature_count % $CACHE_SIZE == 0) {
@@ -292,19 +271,21 @@ sub load_custom_tags {
                                                               type_id    => $cvterm{description}->id,
                                                               value      => $d,
                                                              });
-       my($synonym) = Chado::Synonym->find_or_create({
-                                                      name         => $d,
-                                                      synonym_sgml => $d,
-                                                      type_id      => $cvterm{description}->id
-                                                     });
+#        if(length($d) < 256){
+#          my($synonym) = Chado::Synonym->find_or_create({
+#                                                         name         => $d,
+#                                                         synonym_sgml => $d,
+#                                                         type_id      => $cvterm{description}->id
+#                                                        });
 
-       my($feature_synonym) = Chado::Feature_Synonym->find_or_create ({
-                                                                       synonym_id => $synonym->id,
-                                                                       feature_id => $chado_feature->id,
-                                                                       pub_id     => $pub->id
-                                                                      });
-
-       push @transaction, ($featureprop,$synonym,$feature_synonym);
+#          my($feature_synonym) = Chado::Feature_Synonym->find_or_create ({
+#                                                                          synonym_id => $synonym->id,
+#                                                                          feature_id => $chado_feature->id,
+#                                                                          pub_id     => $pub->id
+#                                                                         });
+#          push @transaction, ($synonym,$feature_synonym);
+#        }
+       push @transaction, ($featureprop);
      }
    } elsif($tag =~ /^db:/){
      $tag =~ s/^db:/DB:/;
@@ -329,6 +310,23 @@ sub load_custom_tags {
        push @transaction, ($dbxref, $feature_dbxref);
      }
 
+   } elsif($tag =~ /^cvterm:(.+)/){
+     foreach my $d (@d){
+       my($dbxref) = Chado::Dbxref->search(accession => $d);
+       $progress->message("couldn't find cvterm: $d") and next unless $dbxref;
+       my($cvterm) = Chado::Cvterm->search(dbxref_id => $dbxref->id);
+
+       next unless $cvterm;
+
+       my($feature_cvterm) = Chado::Feature_Cvterm->find_or_create({
+                                                                    feature_id => $chado_feature->id,
+                                                                    cvterm_id => $cvterm->id,
+                                                                    pub_id => $nullpub->id,
+                                                                   });
+       push @transaction, $feature_cvterm;
+     }
+   } elsif($tag eq 'completeness'){
+     #fix fix fix
    } else {
      $progress->message("don't know how to handle custom tag: $tag");
    }
@@ -512,11 +510,16 @@ sub initialize {
     system("tail +$linenumber $GFFFILE > $TMPFASTA");
     $linenumber -= 1;
     system("head -$linenumber $GFFFILE > $TMPGFF");
-    $GFFFILE = $TMPGFF;
+
+    #we don't want to do this, as the filename is used in a pub record
+    #$GFFFILE = $TMPGFF;
+  } else {
+    $TMPGFF = $GFFFILE;
   }
 
   #count the file lines.  we need this to track load progress
-  open(WC,"grep -c -v '^#' $GFFFILE |");
+  open(WC,"grep -c -v '^#' $TMPGFF |");
+#  open(WC,"grep -c -v '^#' $GFFFILE |");
   $linecount = <WC>; chomp $linecount;
   close(WC);
   ($linecount) = $linecount =~ /^\s*?(\d+)/;
@@ -584,7 +587,6 @@ sub load_sequences {
 
     print STDERR "loading sequence data...\n";
 
-
     #count the file lines.  we need this to track load progress
     open(WC,"grep -c '^>' $TMPFASTA |");
     $linecount = <WC>; chomp $linecount;
@@ -614,7 +616,7 @@ sub load_sequences {
         $f->dbi_commit;
 
         my $dna = $seq->seq;
-        my $shredsize = 20_000_000; #don't increase this above 100MB...
+        my $shredsize = 100_000_000; #don't increase this...
         my $offset = 0;
         my $dnalen = length($dna);
 
@@ -624,8 +626,6 @@ sub load_sequences {
 
           $offset += $shredsize;
         }
-
-	undef $dna;
 
         $f->update;
         $f->dbi_commit;
@@ -639,8 +639,8 @@ sub load_sequences {
 
     }
 
-    unlink $TMPFASTA;
-    unlink $TMPGFF;
+    unlink $TMPFASTA unless $TMPFASTA eq $GFFFILE;
+    unlink $TMPGFF   unless $TMPGFF   eq $GFFFILE;
   }
 
   return $seqs_loaded;
@@ -725,6 +725,9 @@ sub load_feature_locations {
 sub cache_cvterm {
   my $name = shift;
 
+  #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
+  #one from SO.
+
   ($cvterm{$name}) = Chado::Cvterm->search(name => $name) || Chado::Cvterm->search(name => ucfirst($name));
     $cvterm{$name} = $cvterm{$name}->next() if defined($cvterm{$name}) and $cvterm{$name}->isa('Class::DBI::Iterator');
     unless($cvterm{$name}){
@@ -740,3 +743,4 @@ sub cache_cvterm {
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 chdir $origdir;
+
