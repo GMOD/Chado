@@ -339,22 +339,30 @@ sub load_ID_tag {
   my $chado_feature = shift;
   my $id = shift;
 
-  if($gff_feature->has_tag('ID')){
-    my($chado_synonym1) = Chado::Synonym->find_or_create({
-                                                          name         => $id,
-                                                          synonym_sgml => $id,
-                                                          type_id      => $cvterm{synonym}->id
-                                                         });
-
-    my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
-                                                                   synonym_id => $chado_synonym1->id,
-                                                                   feature_id => $chado_feature->id,
-                                                                   pub_id     => $pub->id
-                                                                  });
-
-    push @transaction, $chado_synonym1;
-    push @transaction, $chado_synonym2;
-  }
+  #i don't think this cost of clogging up
+  #the synonym table is worth making searches
+  #easier.
+  #
+  #if you want a synonym, use an Alias tag.
+  #searches need to look in two places
+  #(feature and synonym) for primary and
+  #secondary IDs
+  #if($gff_feature->has_tag('ID')){
+  #  my($chado_synonym1) = Chado::Synonym->find_or_create({
+  #                                                        name         => $id,
+  #                                                        synonym_sgml => $id,
+  #                                                        type_id      => $cvterm{synonym}->id
+  #                                                       });
+  #
+  #  my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
+  #                                                                 synonym_id => $chado_synonym1->id,
+  #                                                                 feature_id => $chado_feature->id,
+  #                                                                 pub_id     => $pub->id
+  #                                                                });
+  #
+  #  push @transaction, $chado_synonym1;
+  #  push @transaction, $chado_synonym2;
+  #}
 }
 
 sub load_Target_tag {
