@@ -10,5 +10,5 @@ perl load/Build.PL load_conf=load/etc/load.conf
      #inserts a few useful items into fundamental chado tables
 ./Build ontologies
      #gets and installs various ontologies
-load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile reseq.gff
+load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile refseq.gff
      #loads gff file
