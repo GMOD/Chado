@@ -85,7 +85,7 @@ More on specific modules:
    it will load chado xml into database. 
    Norally, before loading, you may want to check whether this xml will cause any 
    problem for loading or whether this is valid ChadoXML file. run  CodeBase/XORT/validator.pl
-   will help you debug corrut data. It will catch 99% errors. The result will be written to
+   will help you debug corrupt data. It will catch 99% errors. The result will be written to
    log file CodeBase/XORT/Log/validator_input_loadfile_name.log
   execute $CodeBase/XORT/bin/loader.pl  to try this module
 
@@ -115,7 +115,7 @@ More on specific modules:
   for your project purpose.
    execute $CodeBase/XORT/bin/XORTDiff.pl  to try this module
 
-
+4. whenever you change the DB schema(DDL file change), you need to run 
 
 
 
