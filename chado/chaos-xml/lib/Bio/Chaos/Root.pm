@@ -1,4 +1,4 @@
-# $Id: Root.pm,v 1.2 2004-07-08 23:12:44 cmungall Exp $
+# $Id: Root.pm,v 1.3 2004-10-18 20:49:35 cmungall Exp $
 #
 #
 
@@ -68,6 +68,13 @@ sub load_module {
         }
     }
 }
+
+sub verbose {
+    my $self = shift;
+    $self->{_verbose} = shift if @_;
+    return $self->{_verbose};
+}
+
 
 sub freak {
     my $self = shift;

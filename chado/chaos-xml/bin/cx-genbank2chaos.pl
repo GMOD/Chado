@@ -4,6 +4,7 @@ use strict;
 use Bio::Chaos::ChaosGraph;
 use Bio::SeqIO;
 use Getopt::Long;
+use FileHandle;
 
 my ($fmt, $outfmt, $type, $writer) =
   qw(genbank chaos seq xml);
@@ -39,8 +40,19 @@ mkdir($dir) unless $dir eq '.';
 foreach my $file (@ARGV) {
     print STDERR "CONVERTING: $file\n";
     my $chaos;
+    my $infh;
+    if ($file =~ /\.gz$/) {
+        $infh = FileHandle->new("gzip -dc $file |");
+    }
+    else {
+        $infh = FileHandle->new($file);
+    }
+    if (!$infh) {
+        print STDERR "Cannot open: $file for reading\n";
+        exit 1;
+    }
     my $seqio =
-      Bio::SeqIO->new(-file=> $file,
+      Bio::SeqIO->new(-fh=> $infh,
                       -format => $fmt);
     while (my $seq = $seqio->next_seq()) {
         if ($seq->desc =~ /haplotype/i) {
@@ -50,9 +62,10 @@ foreach my $file (@ARGV) {
             # an only show the reference sequence
             next unless $include_haplotypes;
         }
-        printf STDERR "  Got bioperl Seq: %s [$file]\n", $seq->accession;
+        printf STDERR "  Got bioperl Seq: %s %d bp [$file]\n", $seq->accession, $seq->length;
         my $C =
           Bio::Chaos::ChaosGraph->new;
+        $C->verbose($verbose);
         $C->next_idn($next_idn);
         my $unflattener = $C->unflattener;
         my $type_mapper = $C->type_mapper;
@@ -144,6 +157,7 @@ foreach my $file (@ARGV) {
 
         $next_idn = $C->next_idn;
     }
+    $infh->close;
 }
 print STDERR "ALL DONE!\n";
 exit 0;

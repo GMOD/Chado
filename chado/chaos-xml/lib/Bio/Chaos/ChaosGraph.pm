@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.2 2004-08-18 23:39:04 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.3 2004-10-18 20:49:35 cmungall Exp $
 #
 #
 
@@ -596,6 +596,7 @@ sub make_gene_islands {
 sub make_island {
     my $self = shift;
     my $f = shift;
+
     my ($left, $right) = @_;
     if (!$left) {
 	$left = 0;
@@ -618,6 +619,10 @@ sub make_island {
 #    print "from: $src_fid\n";
     my $island_name = 'contig-'.$f->get_name.'-'.$left.'-'.$right;
     my $island_uniquename = 'contig-'.$f->get_uniquename.'-'.$left.'-'.$right;
+    if ($self->verbose) {
+        logtime();
+        printf STDERR "Making island $island_name\n";
+    }
     my $island =
       $self->new_feature(
 			 feature_id=>$island_id,
@@ -1002,6 +1007,13 @@ sub debug {
     print STDERR "\n";
 }
 
+sub logtime {
+    my $t = time;
+    my $lt = localtime $t;
+    printf "$t $lt : ";
+}
+
+
 1;
 
 package Iterator;
@@ -1066,6 +1078,7 @@ sub new {
 
 sub next_vertex { &{shift @_}('next_vertex')}
 sub depth { &{shift @_}('depth')}
+
 
 1;
 
