@@ -37,6 +37,7 @@ use Chado::LoadDBI;
 use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
+use URI::Escape;
 
 # parents come before features
 # no residues allowed
@@ -44,11 +45,12 @@ use Data::Dumper;
 
 =head1 NAME
 
-gmod_bulk_load.pl - Bulk loads gff3 files into a chado database.
+$0 - Bulk loads gff3 files into a chado database.
 
 =head1 SYNOPSIS
 
-  % gmod_bulk_load.pl [options]
+  % $0 [options]
+  % cat <gff-file> | $0 [options]
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -167,8 +169,8 @@ if (eval {require Bio::GMOD::Config;
           require Bio::GMOD::DB::Config;
           Bio::GMOD::DB::Config->import();
           1;  } ) {
-    my $gmod_conf = $ENV{'GMOD_ROOT'} ?
-                    Bio::GMOD::Config->new($ENV{'GMOD_ROOT'}) :
+    my $gmod_conf = $ENV{'GMOD_ROOT'} || "/var/lib/gmod" ?
+                    Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} || "/var/lib/gmod") :
                     Bio::GMOD::Config->new();
     my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,'default');
     $DBNAME = $db_conf->name();
@@ -224,6 +226,16 @@ my %cache = (
              type     => {}, #cvterm.cvterm_id cache
             );
 
+#let's track unique constraints
+my %constraint = ();
+#feature_dbxref_c1 => {}, #{feature_id}{dbxref_id}
+#featureprop_c1     => {}, #{feature_id}{type_id}{rank}
+#feature_synonym_c1 => {}, #{feature_id}{synonym_id}
+
+#allow a feature_id to be referenced by multiple featureloc.feature_id's
+my %locgroup = ();
+
+
 my %t_unique_count;
 my $pub; # for holding null pub object
 my $gff_source_db;
@@ -267,7 +279,7 @@ my %sequences = (
 );
 my %copystring = (
    feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis)",
-   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank)",
+   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
    feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
    featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
    feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
@@ -409,6 +421,8 @@ if ($GFFFILE eq 'stdin') {
 }
 
 while(my $feature = $gffio->next_feature()){
+  my $nextfeature_increment = 1;
+
   my $featuretype = $feature->type->name;
 
   my $type = $cache{type}{$featuretype};
@@ -467,8 +481,18 @@ while(my $feature = $gffio->next_feature()){
 
   #my $uniquename = $nextfeature;
   $cache{parent}{$uniquename} = $nextfeature;
-  print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type, $ANALYSIS)),"\n";
+  if($cache{feature}{$uniquename}){
+    #seen this feature before
+    $locgroup{$uniquename}++;
+  }
+  else {
+    print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type, $ANALYSIS)),"\n";
+    $cache{feature}{$uniquename} = $nextfeature;
+    $cache{parent}{$uniquename} = $nextfeature;
+    $locgroup{$uniquename} = 0;
+  }
 
+  #FIXME potential $nextfeature bug
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !$feature->annotation->get_Annotations('Target')) {
@@ -478,10 +502,10 @@ while(my $feature = $gffio->next_feature()){
 
 #need to convert from base to interbase coords
   my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
-  my $end   = $feature->end   eq '.' ? '\N' : $feature->end;
+  my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
   my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
 
-  print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $phase,'0')),"\n";
+  print FLOC join("\t", ($nextfeatureloc, $cache{feature}{$uniquename}, $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename})),"\n";
 
   if ($feature->annotation->get_Annotations('Note')) {
     my @notes = map {$_->value} $feature->annotation->get_Annotations('Note');
@@ -491,10 +515,12 @@ while(my $feature = $gffio->next_feature()){
       ($cache{type}{'Note'}) = Chado::Cvterm->search( name => 'Note')
           unless $cache{type}{'Note'};
 
-      print FPROP join("\t",($nextfeatureprop,$nextfeature,$cache{type}{'Note'}->id,$note,$rank)),"\n";
-
-      $rank++;
-      $nextfeatureprop++;
+      if ( !$constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}->id }{ $rank } ) {
+        $constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}->id }{ $rank }++;
+        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Note'}->id,uri_unescape($note),$rank)),"\n";
+        $rank++;
+        $nextfeatureprop++;
+      }
     }
   }
 
@@ -548,7 +574,7 @@ END
       my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
       my $rank=0;
       foreach my $value (@values) {
-        print FPROP join("\t",($nextfeatureprop,$nextfeature,$cache{type}{$tag}->id,$value,$rank)),"\n";
+        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{$tag}->id,$value,$rank)),"\n";
         $rank++;
         $nextfeatureprop++;
       }
@@ -577,8 +603,11 @@ END
         }
       }
       my $dbxref_id = $cache{dbxref}{$source};
-      print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$dbxref_id)),"\n";
-      $nextfeaturedbxref++;
+      if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$dbxref_id}){
+        $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$dbxref_id}++;
+        print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$dbxref_id)),"\n";
+        $nextfeaturedbxref++;
+      }
     } else {
       $source_success = 0; #geting GFF_source failed, so don't try anymore
     }
@@ -602,7 +631,7 @@ END
         $pub = $pub->id; #no need to keep whole object when all we want is the id
       }
 
-      print FCV join("\t",($nextfeaturecvterm,$nextfeature,$cache{type}{$term}->id,$pub)),"\n";
+      print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term}->id,$pub)),"\n";
       $nextfeaturecvterm++;
     }
   }
@@ -622,8 +651,11 @@ END
 
       #enforcing the unique index on dbxref table
       if(my $temp_id = $cache{dbxref}{"$database|$accession|$version"}){
-          print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$temp_id)),"\n";
+        if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$temp_id}){
+          $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$temp_id}++;
+          print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$temp_id)),"\n";
           $nextfeaturedbxref++;
+        }
       } else {
           unless ($cache{db}{$database}) {
               my($db_id) = Chado::Db->search( name => "DB:$database" );
@@ -639,15 +671,21 @@ END
                                    version   => $version);
 
           if ($existing_dbxref) {
-              print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$existing_dbxref->id)),"\n";
+            if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}){
+              $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}++;
+              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$existing_dbxref->id)),"\n";
               $nextfeaturedbxref++;
-              $cache{dbxref}{"$database|$accession|$version"} = $existing_dbxref->id; 
+            }
+            $cache{dbxref}{"$database|$accession|$version"} = $existing_dbxref->id; 
           } else {
-              print FDBX join("\t",($nextfeaturedbxref,$nextfeature,$nextdbxref)),"\n";
+            if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}){
+              $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}++;
+              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$nextdbxref)),"\n";
               $nextfeaturedbxref++;
-              print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
-              $cache{dbxref}{"$database|$accession|$version"} = $nextdbxref;
-              $nextdbxref++;
+            }
+            print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
+            $cache{dbxref}{"$database|$accession|$version"} = $nextdbxref;
+            $nextdbxref++;
           }
       }
     }
@@ -666,7 +704,7 @@ END
   my @ualiases = grep {++$count{$_} < 2} @aliases;
 
   foreach my $alias (@ualiases) {
-    synonyms($alias);
+    synonyms($alias,$cache{feature}{$uniquename});
   }
 
   if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
@@ -687,7 +725,7 @@ END
     }
     dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
-    print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n";
+    print AF join("\t", ($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score)), "\n";
     $nextanalysisfeature++;
   }
 
@@ -698,6 +736,12 @@ END
     die "Features in this GFF file have Target tags, but you did not indicate\n"
     ."--analysis on the command line";
   }
+
+  ###FIXME BUG ALERT
+  ###
+  ###This block dealing with "Target" features is probably broken due to changes allowing
+  ###a feature to have multiple locations.  The "$nextfeature-1" below is at the heart of
+  ###the problem.
   elsif ($feature->annotation->get_Annotations('Target')) {
     my @targets = $feature->annotation->get_Annotations('Target');
     my $rank = 1;
@@ -708,7 +752,7 @@ END
       my $tstrand   = $target->strand ? $target->value->strand : '\N';
       my $tsource   = $feature->source->value;
 
-      synonyms($target_id);
+      synonyms($target_id,$cache{feature}{$uniquename});
 
       #warn join("\t", (($feature->annotation->get_Annotations('Parent'))[0]->value,$target_id,$tstart,$tend )) if $feature->annotation->get_Annotations('Parent');
 
@@ -716,18 +760,24 @@ END
          && $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value}) { 
         print FLOC join("\t", (
              $nextfeatureloc, 
-             $nextfeature,
+             $nextfeature, #this is bugridden.  need to use $cache{feature}{$uniquename}, but can't due to -1 logic (see below)
              $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value},
-             $tstart, $tend, $tstrand, '\N',$rank)),"\n";
+             $tstart, $tend, $tstrand, '\N',$rank,'0')),"\n"; #this is broken for the same reason as $nextfeature
       } else { #this Target needs a feature too
         $nextfeature++;
         $name ||= "$featuretype-$uniquename";
         print F join("\t", ($nextfeature, $organism->id, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS)),"\n";
         print FLOC join("\t", (
               $nextfeatureloc,
-              $nextfeature-1,
-              $nextfeature,
-              $tstart, $tend, $tstrand, '\N',$rank)),"\n";
+              $nextfeature-1, #broken, needs to use previous $cache{feature}{$uniquename}.  may want to use a $last_uniquename var to track this.
+              $nextfeature, #broken
+              $tstart,
+              $tend,
+              $tstrand,
+              '\N',
+              $rank,
+              '0' #broken
+              )),"\n";
       }
 
       my $score = $feature->score->value ? $feature->score->value : '\N';
@@ -765,7 +815,7 @@ END
       $rank++;
     }
   }
-  $nextfeature++;
+  $nextfeature++ if $nextfeature_increment;
 }
 
 my %nextvalue = (
@@ -812,7 +862,7 @@ if(!$NOLOAD){
                     $nextvalue{$table});
   }
 
-  $db->commit;
+  $db->commit || die "commit failed: ".$db->errstr();
   $db->{AutoCommit}=1;
 
   warn "Optimizing database (this may take a while) ...\n";
@@ -846,6 +896,7 @@ sub copy_from_stdin {
 
   warn "Loading data into $table table ...\n";
   my $query = "COPY $table $fields FROM STDIN;";
+  #warn "\t".$query;
   my $sth = $dbh->prepare($query);
   $sth->execute();
 
@@ -863,6 +914,7 @@ sub copy_from_stdin {
 
 sub synonyms  {
     my $alias = shift;
+    my $feature_id = shift;
     unless ($cache{synonym}{$alias}) {
       unless ($cache{type}{'synonym'}) {
         ($cache{type}{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
@@ -881,9 +933,13 @@ sub synonyms  {
           $pub = $pub->id; #no need to keep whole object when all we want is the id
         }
 
-        print FS join("\t", ($nextfeaturesynonym,$synonym->id,$nextfeature,$pub)),"\n";
-        $nextfeaturesynonym++;
-        $cache{synonym}{$alias} = $synonym->id;
+        if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id } ) {
+          $constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id }++;
+          print FS join("\t", ($nextfeaturesynonym,$synonym->id,$feature_id,$pub)),"\n";
+
+          $nextfeaturesynonym++;
+          $cache{synonym}{$alias} = $synonym->id;
+        }
 
       } else {
         print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'}->id,$alias)),"\n";
@@ -893,15 +949,23 @@ sub synonyms  {
           $pub = $pub->id; #no need to keep whole object when all we want is the id
         }
 
-        print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$nextfeature,$pub)),"\n";
-        $nextfeaturesynonym++;
-        $cache{synonym}{$alias} = $nextsynonym;
-        $nextsynonym++;
+        if( !$constraint{feature_synonym_c1}{ $feature_id }{ $nextsynonym } ) { 
+          $constraint{feature_synonym_c1}{ $feature_id }{ $nextsynonym }++;
+
+          print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$feature_id,$pub)),"\n";
+          $nextfeaturesynonym++;
+          $cache{synonym}{$alias} = $nextsynonym;
+          $nextsynonym++;
+        }
       }
 
     } else {
-      print FS join("\t", ($nextfeaturesynonym,$cache{synonym}{$alias},$nextfeature,$pub)),"\n";
-      $nextfeaturesynonym++;
+      if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $cache{synonym}{$alias} } ) {
+        $constraint{feature_synonym_c1}{ $feature_id }{ $cache{synonym}{$alias} }++;
+
+        print FS join("\t", ($nextfeaturesynonym,$cache{synonym}{$alias},$feature_id,$pub)),"\n";
+        $nextfeaturesynonym++;
+      }
     }
 }
 
