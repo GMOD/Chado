@@ -288,12 +288,14 @@ my %label = (
 my $iterator;
 
 foreach my $table (keys %label){
+  print STDERR "caching $table... ";
   my $class = 'Chado::'.ucfirst($table);
   $iterator = $class->retrieve_all();
   my $label = $label{$table};
   while(my $obj = $iterator->next()){
     $cache{$table}{$obj->$label} = $obj;
   }
+  print STDERR "done!\n";
 }
 
 #
@@ -333,6 +335,7 @@ while(my $feature = $gffio->next_feature()){
   die "no cvterm for ".$featuretype unless $type;
 
   my $src = $cache{parent}{$feature->seq_id->value};
+
   if(!$src){
     if($feature->seq_id->value eq '.'){
       $src = '\N';
