@@ -16,6 +16,11 @@ See also org.gmod.chado.ix.IxFeat.java
 
 inherits from org::gmod::chado::ix::IxBase
 
+update dec2003; mar2004 
+ - fixed finally transsplice problem 
+ (exons and prot start/stop w/ diff orientations); 
+ - added intron, 5/3 utr parts
+
 note: want to use method names consistent w/ Java standard?
   getBob instead of getbob 
 
@@ -165,37 +170,38 @@ sub addloc {
   push(@{$self->{loclist}}, $val); ## loclist
 }
 
-=head2 getlocs()
-
-  return hash by source id of ordered Spans
-  drop for getlocations() ?
-  
-=cut
-  
-sub getlocs {
-	my $self= shift;
-	
-  my %sp=();
-  my @list= @{$self->{loclist}};
-  return undef unless(  @list);
-  
-  foreach (@list) { 
-    my $src= $_->get('src');
-    push( @{$sp{$src}}, $_->toString());
-    }
-  foreach my $src (keys %sp) {
-    my @sp= sort { $a <=> $b } @{$sp{$src}}; #? ok
-    my @ps= ();
-    my $lp;
-    foreach (@sp) {
-      if ($_ ne $lp) { push(@ps,$_); $lp=$_; }
-      }
-    @{$sp{$src}}= @ps;
-    }
-  # $self->{locs}= \%sp;
-  return %sp;
-}
-
+# =head2 getlocs()
+# 
+#   return hash by source id of ordered Spans
+#   drop for getlocations() ?
+#   
+# =cut
+#   
+# sub getlocs {
+# 	my $self= shift;
+# 	
+#   my %sp=();
+#   my @list= @{$self->{loclist}};
+#   return undef unless(  @list);
+#   
+#   foreach (@list) { 
+#     my $src= $_->get('src');
+#     push( @{$sp{$src}}, $_->toString());
+#     }
+#   foreach my $src (keys %sp) {
+#       # this sort is actually bad for transspliced, other non-linear orderings
+#     my @sp= sort { $a <=> $b } @{$sp{$src}}; #? ok
+#     my @ps= ();
+#     my $lp;
+#     foreach (@sp) {
+#       if ($_ ne $lp) { push(@ps,$_); $lp=$_; }
+#       }
+#     @{$sp{$src}}= @ps;
+#     }
+#   # $self->{locs}= \%sp;
+#   return %sp;
+# }
+# 
 
 #?? here? need  to deal with mRNA/CDS subfeature - exon joining...
 ## if which == sublocs:type_name=>exon get compound location from exon feature sublocs
@@ -224,8 +230,7 @@ sub getlocations {
 	my $sublocs= shift || undef;
   
   #return undef unless(  @{$self->{loclist}});
-  my @list= ();
-  @list= @{$self->{loclist}};
+  my @list= @{$self->{loclist}};
 	
 	if ($sublocs =~ /\S/) {
 	  @list= ();
@@ -238,35 +243,54 @@ sub getlocations {
 	
   return undef unless(@list);
   my %sp=();
-  my $dorev= 0;
   my @srcs= ();
-  
+  my %revs= ();
+   ## if we kept the Span objects in {locs} wouldn't need messy revs computes
+   ## but this is all for 1 dang fly transspliced gene
+     
   foreach (@list) { 
     my $src= $_->get('src');
-    push( @srcs, $src);# for sort order
-    $sp{$src}->{rev} = $_->reversed();
+    push( @srcs, $src) unless(exists $sp{$src}); # for sort order
+    my $rev= $_->reversed();
+    $sp{$src}->{rev} = $rev; # this is where trans splice needs patch
+    push( @{$revs{$src}}, $rev);
     push( @{$sp{$src}->{locs}}, $_->toString());
     }
     
   for my $i (0..$#srcs) {
     my $src= $srcs[$i];
-    my @sp= sort { $a <=> $b } @{$sp{$src}->{locs}}; #{$sp{$src}}; #? ok
-    my @ps= ();
-    my $lp;
-    foreach (@sp) {
-      if ($_ ne $lp) { push(@ps,$_); $lp=$_; }
+    my @revs= @{$revs{$src}};
+    my @locs= @{$sp{$src}->{locs}};
+    
+    my $istrans= 0;
+    if (@revs > 1) {
+      my $lastr= $revs[0];
+      foreach my $rev (@revs[1..$#revs]) {
+        if ($rev != $lastr) { $istrans=1; last; }
+        $lastr= $rev;
+        }
       }
-    # @{$sp{$src}->{locs}}= @ps;
-    $sp{$src}->{locs} = \@ps;
+
+    my @ps= (); my @rs=();
+    my @js= sort { $locs[$a] <=> $locs[$b] } (0..$#locs);  
+    my $lp='';
+    foreach my $j (@js) {
+      next if ($locs[$j] eq $lp); #? dont need this
+      push(@ps, $locs[$j]);  $lp= $locs[$j];
+      push(@rs, $revs[$j]) if ($istrans);
+      }
+    @locs= @ps; 
+    @revs= @rs if ($istrans);
+      
+    $sp{$src}->{locs} = \@locs;
     $sp{$src}->{i}= $i;
-#       # move this to getlocation() !?
-#     my $loc= join(",",@ps);
-#     if ($sp{$src}->{rev}) { $loc= 'complement('.$loc.')'; }
-#     elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
-#     $sp{$src}->{loc}= $loc;
+    $sp{$src}->{transspliced}= $istrans;
+    if ($istrans) { $sp{$src}->{revs}= \@revs; $sp{$src}->{rev}= 0; }
     }
   return %sp;
 }
+
+
 
 ## FIXME ##
 =head2 getlocation( [$which] [$sublocs] )
@@ -300,7 +324,6 @@ sub getlocationSrc {
   my @srcs= keys %sp;  
   if ($which =~ /\D/) { #name
     ($src)= grep(/^$which$/, @srcs);   
-    # ($src)= grep(/$which/, @srcs) unless($src);   
     $spi= $sp{$src} if ($src); # $loc= $sp{$src}->{loc} || undef;
     }
   else {
@@ -317,42 +340,162 @@ sub getlocationSrc {
   
 sub getlocationString {
 	my $self = shift;
-	my $spi  = shift;
-	return undef unless(defined $spi && defined $spi->{locs});
-  my @ps= @{$spi->{locs}};
-  my $loc= join(",",@ps);
-  if ($spi->{rev}) { $loc= 'complement('.$loc.')'; }
-  elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
+	my ($spi, $lockey)= @_;
+  $lockey ||= 'locs';
+	return undef unless(defined $spi && defined $spi->{$lockey});
+  my $loc='';
+  my @ps= @{$spi->{$lockey}};
+  if ($spi->{transspliced}) {
+    my @r= @{$spi->{revs}};
+    foreach my $i (0..$#ps) {
+      $loc .= ',' if ($loc);
+      if ($r[$i]) { $loc.= 'complement('.$ps[$i].')'; }
+      else { $loc.= $ps[$i]; }
+      }
+    # $loc= 'join('.$loc.')';
+    if ($spi->{rev} && $loc) { $loc= 'complement('.$loc.')'; }
+    elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
+    }
+  else {
+    $loc= join(",",@ps);
+    if ($spi->{rev} && $loc) { $loc= 'complement('.$loc.')'; }
+    elsif ($loc =~ /,/) { $loc= 'join('.$loc.')'; }
+    }
   return $loc;
 }
 
+
+=head2 trans spliced locs -- FIXME
+
 ## FIXME = messy; move to IxLoc
+
+FIXME: for trans splicing
+ for fly mod(mdg4) - trans-spliced; 
+ need to handle odd mix of transcript parts to CDS
+ 
+mRNA join(complement(17193974..17194085),
+   complement(17193505..17193762),
+   complement(17193288..17193427),
+   complement(17191746..17192598),17182690..17183024)
+   /gene="mod(mdg4)"
+   /locus_tag="CG32491"
+   /product="CG32491-RY"
+   /note="trans splicing"
+   /transcript_id=" NM_176523.1 "
+   /db_xref="FLYBASE: FBgn0002781 "
+   
+CDS join(complement(17193505..17193718),
+   complement(17193288..17193427),
+   complement(17191746..17192598),17182690..17182985)
+   /gene="mod(mdg4)"
+   /locus_tag="CG32491"
+   /codon_start=1
+   /exception="trans splicing"
+   /protein_id=" NP_788700.1 "
+   /db_xref="FLYBASE: FBgn0002781 "
+
+-- mar 2004 output from chado.xml r3.2.0 --
+3R      17182690        mRNA    mod(mdg4)-RY    -      
+join(17182690..17183024,complement(17191746..17192598),complement(
+17193288..17193427),complement(17193505..17193762),complement(17193974..
+17194085))  mod(mdg4)-RY    CG32491 ; FlyBase:FBgn0002781  
+gene=mod(mdg4)
+
+3R      17182690        CDS     mod(mdg4)-PY    -      
+complement(complement(17182690..17182983),17191746..17192598,17193288..
+17193427,17193505..17193718)        mod(mdg4)-PY    CG32491 ;
+FlyBase:FBgn0002781      gene=mod(mdg4)
+
+
+=cut
+
 sub insertlocations {
-	my $self = shift;
+	my $self  = shift;
 	my $loca  = shift; # amino start .. end
 	my $locb  = shift; # mrna  a..b,c..d,e..f
 	return undef unless(ref $loca);
   my @a= @{$loca->{locs}}; # should be 1 only; if more ??
   my @r= @{$locb->{locs}};
-  my @al= ();  
+  
+  # patch here..
+  my @revs=(); my $isrev= 0;
+  my $istrans= $locb->{transspliced};
+  if ($istrans) { 
+    $loca->{transspliced}= $istrans;
+    @revs= @{$locb->{revs}}; 
+    $isrev= ($loca->{rev} != $locb->{rev});
+    if ($isrev) { foreach (@revs) { $_ = ! $_; } }
+    # $loca->{revs}= \@revs; # URK, need to screen/split prot & utr revs..
+    }
+ 
+  ##  if ($istrans) -- need to flip exons here and apply $loca->b,e right way
+  ## but what is right way ? $rb..$b instead of $b..$re ? / $e..$re not $rb..$e
+   
+  my @al= ();  my @arev=();
+  my @head=(); my @tail= (); ## 5/3 prime ends
   my $a= shift @a;
   my ($b,$e)= split(/\.\./,$a);
-  foreach my $r (@r) {
+  ## need patch here for non-linear ordered parts
+  # foreach my $r (@r)  
+  foreach my $i (0..$#r) {
+    my $r= $r[$i];
+    my $rev= ($istrans) ? $revs[$i] : 0;
+    
     my ($rb,$re)= split(/\.\./,$r);
-    if ($re < $b) { next; }
-    elsif ($rb > $e) { last; }
+    if ($re < $b) { push(@head, $r); next; }
+    elsif ($rb > $e) { push(@tail, $r); next; }  
     elsif ($rb<=$b && $re>=$b) {
-      push(@al,"$b..$re");
+      if ($re>=$e) { push(@al,"$b..$e"); push(@arev,$rev); } # last
+      elsif ($istrans && $isrev && $rev) { 
+        ## is this right? only need transspliced patch for compl( compl(protexon1:b..e<),...)
+        ## here protexon1:e becomes start of prot, not protexon1:b
+        push(@al,"$rb..$b");  push(@arev,$rev);
+        push(@head, ($b+1)."..$re")  if ($b<$re);  
+        } 
+      else { 
+        push(@al,"$b..$re");  push(@arev,$rev);
+        push(@head, "$rb..".($b-1)) if ($rb<$b);  
+        }
       }
     elsif ($rb<=$e && $re>=$e) {
-      push(@al,"$rb..$e"); last;
+      push(@al,"$rb..$e"); push(@arev,$rev);
+      push(@tail, ($e+1)."..$re") if ($re>$e);
+      #was# last;
       }
-    else { push(@al,$r); }
+    else { push(@al,$r); push(@arev,$rev); }
     }
   unless(@al) { push(@al,"$b..$e"); }
   $loca->{locs}= \@al; 
+  $loca->{revs}= \@arev if ($istrans);
+  $loca->{five_prime_UTR}= \@head; 
+  $loca->{three_prime_UTR}= \@tail; 
   return $loca;
 }
+
+=item addIntrons
+
+  turn location subrange inside out = introns from exons
+  
+=cut
+
+sub addIntrons { 
+	my $self = shift;
+	my $loca  = shift; # mrna  a..b,c..d,e..f
+ 	return undef unless(ref $loca);
+  my @r= @{$loca->{locs}};
+  my @al= ();  
+  my $a= shift @r;
+  my ($bb,$be)= split(/\.\./,$a);
+  foreach my $r (@r) {
+    my ($rb,$re)= split(/\.\./,$r);
+    $be++; $rb--; # move out of seq bases
+    push(@al,"$be..$rb");
+    $be= $re;
+    }
+  $loca->{intron}= \@al; 
+  return $loca;
+}
+
 
 sub getlocsources {
 	my $self= shift;
@@ -390,7 +533,8 @@ sub printObj { ## was toString
   ## print "# Keys\n";
   foreach my $k (sort keys %$self) {
     next if ($k =~ /^(id|tag|list|attrlist|loclist|handler)$/);
-    next if ($k eq 'uniquename' && $self->{name});
+    #? uniquename is most valid name ?
+    # next if ($k eq 'uniquename' && $self->{name});
     my $v= $self->{$k};
     # check type_id|.. here and change $k if need be ?
     ($k,$v)= $self->id2name($k,$v);

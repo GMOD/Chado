@@ -71,28 +71,31 @@ use org::gmod::chado::ix::IxFeat;
 use org::gmod::chado::ix::IxAttr;
 use org::gmod::chado::ix::IxSpan;
 
-# use vars qw/ $VERSION %skipKeys /;
+use Getopt::Long;    
 use XML::Parser::PerlSAX;
 use Exporter;
 use vars qw/$VERSION $ROOT_NODE $debug @skipKeys @ISA @EXPORT /;
 @ISA = qw(Exporter);
 @EXPORT = qw(&view);
 
-$VERSION = "0.3";
+$VERSION = "0.5";
 $ROOT_NODE='chado';
 $debug= 0;
 
 BEGIN {
   # some of these are useful - later // timelastmodified 
- @skipKeys= qw/
+  # dec03 - drop residues  from skipset - let user decide w/ -skip opt
+  ## need is_current for valid/old ids/dbxref/other
+  ## need is_internal for data screening
+  ## need is_analysis for "" ?
+  @skipKeys= qw/
     locgroup 
     timeaccessioned 
-    residues md5checksum 
+    md5checksum 
     rank prank strand
     min max
     is_nend_partial is_nbeg_partial
     is_fmin_partial is_fmax_partial
-    is_current is_analysis is_internal
     evidence_id
     organism_id 
     _appdata
@@ -113,14 +116,27 @@ BEGIN {
   curl  'http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/XMLTools/XORT/Config/dump_gene_local_id.xml?rev=1.1&content-type=text/plain' \
     > dump_gene_local_id.xml
 
-  perl -M'org::gmod::chado::ix::IxReadSax' -e 'view;' -- dump_gene_local_id.xml
+
+  perl -I./ChadoSax/src -M'org::gmod::chado::ix::IxReadSax' -e'view;' -- \
+    -skip=residues r3.2_16_xml/AE003583*.xml
+
+
 
 =cut
 
 sub view {
+
+  my @skipf=();
+  my $optok= Getopt::Long::GetOptions( 
+    'debug!' => \$debug,
+    #'outfile=s' => \$outf,
+    'skipfeat=s' => \@skipf,
+    );
   
   my $handler= new org::gmod::chado::ix::IxReadSax( 
     METHOD => 'view', # cant do like handleObj; need to wait till doc is finished
+    debug => $debug,
+    skip => \@skipf,
     );  
 
   $handler->parse(@main::ARGV);
@@ -143,6 +159,9 @@ sub parse {
   if (my($arg)= grep(/debug/,@_)) { $debug= ($arg=~/nodebug/) ? 0 : 1; }
   ## need flag for NO_CLEAR - keep all parsed docs ?
   ## probably too much for large docs
+  my $zcat=`which zcat`;
+  if ($? != 0) {$zcat=`which gzcat`;}
+  chomp($zcat);
   
   foreach my $infile ( @_ ) {
     next if ($infile =~ m/^\-/); # option?
@@ -153,7 +172,7 @@ sub parse {
     my $parser = XML::Parser::PerlSAX->new( Handler => $self );
     $self->{infile}= $infile;
       
-    if ($infile =~ /\.(gz|Z)$/ && open(XFILE,"gzcat $infile|")) {
+    if ($infile =~ /\.(gz|Z)$/ && open(XFILE,"$zcat $infile|")) {
       eval { $parser->parse( Source => { ByteStream => *XFILE} ); }; 
       $err= $@;
       close(XFILE);
@@ -198,8 +217,8 @@ sub init {
 	$debug= $self->{debug} if $self->{debug};
 	$self->{idhash}= ();
 	
-	my @skips= @skipKeys;
-	if (ref($self->{skip}) =~ /ARRAY/) { @skips= @{$self->{skip}}; }
+	my @skips= @skipKeys; #? keep these always? and append user {skip} ?
+	if (ref($self->{skip}) =~ /ARRAY/) { push(@skips, @{$self->{skip}}); }
   my %sh= map { $_,1; } @skips;
   $self->{skipkeys} = \%sh;
 	
@@ -351,7 +370,7 @@ sub clear {
    feature feature_evidence prediction_evidence alignment_evidence
    analysis feature_cvterm cvterm cv db pub 
    synonym organism
-   dbxref featureprop feature_synonym
+   dbxref featureprop feature_synonym feature_dbxref
    );
    
   foreach (@k) { delete $self->{$_}; }
@@ -430,7 +449,7 @@ sub start_element {
 			last SWITCH; 
 			};  
 			
- 		/^(dbname|accession|pkey_id|pval|pub_id)$/ &&  do { 
+ 		/^(dbname|accession|pkey_id|is_current|is_internal|is_analysis|pval|pub_id)$/ &&  do { 
 			## summer03 -- xml dropped pkey_id, pval, dbname -- cvterm_id/cvterm instead
 		  $self->{$_}= undef;
 			last SWITCH; 
@@ -440,7 +459,7 @@ sub start_element {
 		  ## feature_cvterm is handled ok by nested cvterm/dbxref == GO terms + ids
 		  ## or handle like featureprop ?
 		  
-		/^(dbxref|featureprop|feature_synonym)$/ &&  do { #feature_dbxref|dbxref_id|
+		/^(dbxref|featureprop|feature_synonym|feature_dbxref)$/ &&  do { 
       my $atid= $element->{Attributes}->{id}; 
       my $attr= new org::gmod::chado::ix::IxAttr( tag => $_ , handler => $self);
       if ($atid) { 
@@ -458,6 +477,16 @@ sub start_element {
   
 }
 
+sub setAttrs {
+	my ( $self, $attr, @keys)= @_;
+	foreach my $key (@keys) {
+	  if (defined $self->{$key}) {
+      my $val= $self->{$key};
+      $attr->set( $key => $val);  
+      $self->{$key} = undef; # not delete?
+      }
+    }
+}
 
 sub end_element {
 	my ( $self, $element)= @_;
@@ -474,7 +503,7 @@ sub end_element {
   my $nada= 0;
   SWITCH: {
 		
- 		/^(uniquename|organism_id|rawscore)$/  &&  do { ##|program|programversion
+ 		/^(organism_id|rawscore)$/  &&  do { ##|program|programversion
 		  $self->{curfeat}->set( $_ => $val ) if ($hasval && !$self->{skipkeys}->{$_});
  		  last SWITCH; };  
  		    
@@ -484,7 +513,7 @@ sub end_element {
 		    if ($elpar eq 'feature_relationship') {
 		      ## skip
 		      }
-		    elsif ($elpar =~ /^(dbxref|featureprop|feature_synonym)$/) {
+		    elsif ($elpar =~ /^(dbxref|featureprop|feature_synonym|feature_dbxref)$/) {
 		      ## attributes now use type_id
  		      $self->{$elpar}->set( $_ => $val ) ;
 		      }
@@ -502,11 +531,11 @@ sub end_element {
  		/^(residues)$/ &&  do {  
 		  if ( $hasval && ! $self->{skipkeys}->{$_}) {
 		    $self->{curfeat}->set( $_ => $val );
-		    $self->{curfeat}->set( 'residuetype' => 'cdna' );
+		    $self->{curfeat}->set( 'residuetype' => 'cdna' ); #? is this correct
  		    }
  		  last SWITCH; };  
  		    
- 		/^(name|miniref|program|sourcename|programversion|seqlen|cvterm_id|analysis_id|timelastmodified)$/ &&  do {  
+ 		/^(name|uniquename|miniref|program|sourcename|programversion|seqlen|cvterm_id|analysis_id|timelastmodified)$/ &&  do {  
  		    ## general feature values - should be only 1/feature
 		  if ($hasval) {
 		    if ($self->{curgenfeat}) {
@@ -665,34 +694,54 @@ sub end_element {
  		  my $dbid= ($db) ? "$db:$acc" : $acc;
  		  $attr->setattr( $dbid); #  name =>
 
+      $self->setAttrs($attr, qw(is_current is_internal is_analysis));
+#  		  my $is_current= $self->{is_current};
+#  		  $attr->set( is_current => $is_current) if defined $is_current;  
+#       $self->{is_current}= undef;
+
 #  		  my $dbxattr= $self->{dbxref_id};
 #   		if ($dbxattr) { $dbxattr->setattr( $attr ); }
 #  		  elsif
  		  if ( $self->{curgenfeat} ) {
-#				//ADD TO FEATURE - was curfeat 
  			  $self->{curgenfeat}->addattr($attr);
  		    }
 	    $self->{$_}= undef;
  		  last SWITCH; };  
       
-
+    
+		/^(feature_dbxref)$/ &&  do {  
+		  ##mar04: need feature_dbxref instead of dbxref_id/name to get is_current
+      my $attr= $self->{$_};
+      $self->setAttrs($attr, qw(dbxref_id is_current is_internal));
+ 		  if ( $self->{curgenfeat} ) { 
+ 			  $self->{curgenfeat}->addattr($attr);
+ 		    }
+	    $self->{$_}= undef;
+      last SWITCH; };  
+	  
 		/^(feature_synonym)$/ &&  do {  ## or synonym -- done by synonym == par->add(ft)
       # now also in attrstack
  		  my $attr= $self->{$_};
+
+      $self->setAttrs($attr, qw(synonym_id pub_id is_current is_internal is_analysis));
  		  
  		  ## synonym_id always seems to enclose only synonym struct 
- 		  my $synonym_id= $self->{synonym_id};
- 		  $attr->set( synonym_id => $synonym_id) if $synonym_id;  
-      $self->{synonym_id}= undef;
-      ##?? change id=feature_synonym_1894 to id=synonym_1894 
+# # 		  my $synonym_id= $self->{synonym_id};
+#  		  $attr->set( synonym_id => $synonym_id) if $synonym_id;  
+#       $self->{synonym_id}= undef;
+#       ##?? change id=feature_synonym_1894 to id=synonym_1894 
+#       
+#       ## synonym struct is: id,name,type_id
+# #  	    my $synonym= $self->{synonym};
+# #  		  $attr->set( synonym => $synonym) if $synonym;  
+# 
+#  		  my $pub_id= $self->{pub_id};
+#  		  $attr->set( pub_id => $pub_id) if $pub_id;  
+# 
+#  		  my $is_current= $self->{is_current};
+#  		  $attr->set( is_current => $is_current) if defined $is_current;  
+#       $self->{is_current}= undef;
       
-      ## synonym struct is: id,name,type_id
-#  	    my $synonym= $self->{synonym};
-#  		  $attr->set( synonym => $synonym) if $synonym;  
-
- 		  my $pub_id= $self->{pub_id};
- 		  $attr->set( pub_id => $pub_id) if $pub_id;  
-
  		  if ( $self->{curgenfeat} ) { # was curfeat
  			  $self->{curgenfeat}->addattr($attr);
  		    }
@@ -711,8 +760,14 @@ sub end_element {
  		  unless($pval) { $pval= $self->{pval}; } # now is 'value'
  		  $attr->setattr( $pval) if $pval;  # pval => $pval
  		  
- 		  my $pub_id= $self->{pub_id};
- 		  $attr->set( pub_id => $pub_id) if $pub_id;  
+      $self->setAttrs($attr, qw(pub_id is_current is_internal is_analysis));
+
+# 		  my $pub_id= $self->{pub_id};
+#  		  $attr->set( pub_id => $pub_id) if $pub_id;  
+# 
+#  		  my $is_current= $self->{is_current};
+#  		  $attr->set( is_current => $is_current) if defined $is_current;  
+#       $self->{is_current}= undef;
 
  		  if ( $self->{curgenfeat} ) {
 #				//ADD TO FEATURE -- was curfeat - use curgenfeat instead?
@@ -722,7 +777,7 @@ sub end_element {
  		  last SWITCH; };  
 
 
- 		/^(dbname|accession|value|pkey_id|pval|pub_id|synonym_id)$/ &&  do { 
+ 		/^(dbname|accession|value|is_current|is_internal|is_analysis|pkey_id|pval|pub_id|dbxref_id|synonym_id)$/ &&  do { 
 ##		//ATTRIB FIELDS -- dbname, pkey, pval have gone
  		  $self->{$_}= $val if ($hasval); ## ($hasval) ? $val : ''; 
  		  # urk, some have cvterm inside - need to keep

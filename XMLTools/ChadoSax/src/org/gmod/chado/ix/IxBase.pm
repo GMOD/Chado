@@ -64,6 +64,7 @@ sub topnode {
 
 sub name {
 	my $self= shift;
+	#? mar04: was 'name uniquename ..'; is uniquename or name best 1st choice?
 	foreach (qw/name uniquename cvname program accession dbname/) {
 	  return $self->{$_} if ($self->{$_});
 	  }
