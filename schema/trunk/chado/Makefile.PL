@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.54 2004-03-26 03:53:17 scottcain Exp $
+# $Id: Makefile.PL,v 1.55 2004-03-26 04:01:38 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -103,8 +103,8 @@ my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #C
 my $all_envs = join( '|', keys %env_required );
 
 my %O;
-$O{GMOD_HOME}    = $ENV{GMOD_HOME} || catdir qw[usr local gmod];
-$O{PACKAGE_HOME} = catfile $O{GMOD_HOME}, 'lib', 'schema';
+$O{GMOD_ROOT}    = $ENV{GMOD_ROOT} || catdir qw[usr local gmod];
+$O{PACKAGE_HOME} = catfile $O{GMOD_ROOT}, 'lib', 'schema';
 $O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
 $O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
 $O{FUNCDEF}      = catfile $working_dir, 'modules', 'function.modules';
