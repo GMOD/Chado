@@ -13,6 +13,7 @@ TODO for the next alpha release (SOON!)
             gmod_*.pl (including what is in load/bin)
   in docs, suggest that distribution directory be moved to /usr/local/gmod/src.
 
+  Add docs for how to load genbank, blast and pfam results
 
 Tue Jan  6 01:34:51 PST 2004 - allenday
 
