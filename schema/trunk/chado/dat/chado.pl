@@ -1,4 +1,4 @@
-# Schema metadata produced by ddltrans on Thu May 29 10:39:52 EDT 2003
+# Schema metadata produced by ddltrans on Thu May 29 15:08:26 EDT 2003
 $schema = {
             'labelmethod' => {
                                'name' => 'labelmethod',
@@ -133,7 +133,105 @@ $schema = {
                                                             },
                                           '_entity' => 'set'
                                         },
-                           'column' => {}
+                           'name' => 'wwwuser',
+                           'comment' => '------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  keep track of www users.  this may also be useful  in an audit module at some point (?).',
+                           '_entity' => 'table',
+                           'primarykey' => 'wwwuser_id',
+                           'column' => {
+                                         'email' => {
+                                                      'name' => 'email',
+                                                      'allownull' => 'no',
+                                                      'type' => 'varchar(128)',
+                                                      '_entity' => 'column'
+                                                    },
+                                         'username' => {
+                                                         'name' => 'username',
+                                                         'allownull' => 'no',
+                                                         'type' => 'varchar(32)',
+                                                         '_entity' => 'column',
+                                                         'unique' => 1
+                                                       },
+                                         'wwwuser_id' => {
+                                                           'name' => 'wwwuser_id',
+                                                           'allownull' => 'no',
+                                                           'type' => 'serial',
+                                                           'foreign_references' => [
+                                                                                     {
+                                                                                       'table' => 'wwwuser_feature',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_cvterm',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_project',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_organism',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_genotype',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_author',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_interaction',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_phenotype',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_pub',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuser_expression',
+                                                                                       'column' => 'wwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuserrelationship',
+                                                                                       'column' => 'objwwwuser_id'
+                                                                                     },
+                                                                                     {
+                                                                                       'table' => 'wwwuserrelationship',
+                                                                                       'column' => 'subjwwwuser_id'
+                                                                                     }
+                                                                                   ],
+                                                           '_entity' => 'column',
+                                                           'primarykey' => 'yes'
+                                                         },
+                                         'profile' => {
+                                                        'name' => 'profile',
+                                                        'allownull' => 'yes',
+                                                        'type' => 'text',
+                                                        '_entity' => 'column'
+                                                      },
+                                         'password' => {
+                                                         'name' => 'password',
+                                                         'allownull' => 'no',
+                                                         'type' => 'varchar(32)',
+                                                         '_entity' => 'column'
+                                                       },
+                                         '_order' => [
+                                                       'wwwuser_id',
+                                                       'username',
+                                                       'password',
+                                                       'email',
+                                                       'profile'
+                                                     ],
+                                         '_entity' => 'list'
+                                       },
+                           'unique' => [
+                                         'username'
+                                       ]
                          },
             'assay_labeledextract' => {
                                         'name' => 'assay_labeledextract',
@@ -1726,7 +1824,7 @@ $schema = {
                                                                             }
                                                 },
                                    'name' => 'wwwuser_project',
-                                   'comment' => '------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  link wwwuser accounts to projects',
+                                   'comment' => 'link wwwuser accounts to projects',
                                    '_entity' => 'table',
                                    'primarykey' => 'wwwuser_project_id',
                                    'column' => {

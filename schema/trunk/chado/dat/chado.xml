@@ -1,4 +1,4 @@
-<!-- Schema metadata produced by ddltrans on Thu May 29 10:39:58 EDT 2003>
+<!-- Schema metadata produced by ddltrans on Thu May 29 15:08:27 EDT 2003>
 
 
 <schema>
@@ -85,12 +85,76 @@
          <allownull>yes</allownull>
       <\column>
    <\table>
-   <index>
-      <columns>username</columns>
-      <name>wwwuser_idx1</name>
-   <\index>
-   <column>
-   </column>
+   <table>
+      <name>wwwuser</name>
+      <comment>------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  keep track of www users.  this may also be useful  in an audit module at some point (?).</comment>
+      <column>
+         <name>wwwuser_id</name>
+         <type>serial</type>
+         <allownull>no</allownull>
+         <foreign_references>
+            <li>
+                <table>wwwuser_feature</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_cvterm</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_project</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_organism</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_genotype</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_author</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_interaction</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_phenotype</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_pub</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuser_expression</table>
+                <column>wwwuser_id</column><\li>
+            <li>
+                <table>wwwuserrelationship</table>
+                <column>objwwwuser_id</column><\li>
+            <li>
+                <table>wwwuserrelationship</table>
+                <column>subjwwwuser_id</column><\li>
+         </foreign_references>
+      <\column>
+      <column>
+         <name>username</name>
+         <type>varchar(32)</type>
+         <allownull>no</allownull>
+      <\column>
+      <column>
+         <name>password</name>
+         <type>varchar(32)</type>
+         <allownull>no</allownull>
+      <\column>
+      <column>
+         <name>email</name>
+         <type>varchar(128)</type>
+         <allownull>no</allownull>
+      <\column>
+      <column>
+         <name>profile</name>
+         <type>text</type>
+         <allownull>yes</allownull>
+      <\column>
+      <unique>
+         <li>username<\li>
+      </unique>
+   <\table>
    <table>
       <name>assay_labeledextract</name>
       <comment>ok drop table if exists assay_labeledextract;</comment>
@@ -1032,7 +1096,7 @@
    <\table>
    <table>
       <name>wwwuser_project</name>
-      <comment>------------------------------ -- f_type -------------------- ------------------------------ ------------------------------ -- fnr_type ------------------ ------------------------------ ------------------------------ -- f_loc --------------------- ------------------------------ ------------------------------ -- fp_key ------------------- ------------------------------  link wwwuser accounts to projects</comment>
+      <comment>link wwwuser accounts to projects</comment>
       <column>
          <name>wwwuser_project_id</name>
          <type>serial</type>
