@@ -93,16 +93,18 @@ if ($rebuild_complete) {
 
 WriteMakefile(
     'NAME'		=> 'chado',
-    'PREREQ_PM'		=> { SQL::Translator   => 0.02,
-                             Class::DBI        => 0,
+    'PREREQ_PM'		=> { SQL::Translator   => 0.03,
+                             Class::DBI        => 0.94,
                              Class::DBI::Pager => 0,
-                             Class::DBI::Pg    => 0
-                             #DBI             => 0,
-                             #DBD::Pg         => 0
+                             Class::DBI::Pg    => 0.02,
+                             Module::Build     => 0.20,
+                             Template          => 2.10,
+                             DBI               => 0,
+                             DBD::Pg           => 0
                             }, 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
-       AUTHOR     => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>') : ()),
+       AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()),
 );
 
 print <<HERE
