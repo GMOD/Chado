@@ -1,4 +1,4 @@
-$Id: README,v 1.2 2003-03-06 20:43:33 allenday Exp $
+$Id: README,v 1.3 2003-05-08 18:36:54 allenday Exp $
 
 [this is temporary placeholder documentation until someone writes
 something better - cjm@fruitfly.org]
@@ -63,17 +63,40 @@ some (but not all) of the use cases we have discussed are:
 
 * transgene constructs, complex genetic experiments and their results
 
-The core schema is DBMS independent. The main chado developers are
-currently using postgresql. There may be additional optional layers
-that use views, triggers, procedures, constraints etc which may be
-postgresql specific.
+The core schema is DBMS independent. The SQL table create files can
+be found in the chado/modules directory.  The main chado developers
+are currently using postgresql.
 
-The SQL table create files can be found in the chado/modules directory.  
-While these files are for creating a PostgreSQL database, there is also a
-Makefile in chado.  Running 'make all' will autogenerate MySQL
-counterparts to these files.  Note that the transform depends on a Perl
-script, and Ken Clark's SQL::Translator module, available on CPAN.
+A NOTE FOR NON-PostgreSQL USERS
+===============================
 
+While the core developers may be using postgres, we realize that this
+database platform is not an option for all users.  We don't support use
+of a non-pg platform, but we do provide a tool that is able to convert
+the schema to be compatible with other DBMS vendors.  Currently we
+generate a MySQL equivalent of the schema.
+
+There may be additional optional layers that use views, triggers,
+procedures, constraints etc which may be postgresql specific.
+
+AUTOGENERATION OF SCHEMA FILES, CODE, ETC
+=========================================
+
+The Chado Makefile currently supports:
+
+trigger			purpose
+---------------------------------------------------------------------------
+all				makes cdbi, see below
+cdbi			make Class::DBI interface classes (Chado::*) from pgsql and
+				mysql files
+diagram			make ER diagrams, one per module
+graphviz		make graphviz diagrams, one per module
+mysql			create mysql schema (sql) files from postgres sql files
+
+
+These transforms depend on a set of Perl scripts in chado/bin , and
+Ken Clark's SQL::Translator module (with all of its dependencies),
+available on CPAN.
 
 CHADO WEBSITE
 =============
