@@ -13,6 +13,14 @@ no warnings;
 
 this is an example target
 
+=item ncbi()
+
+fixfixfix
+
+=item mageml()
+
+fixfixfix
+
 =item ontologies()
 
 loads ontologies by running load_ontology.pl on all files in
@@ -45,7 +53,7 @@ sub ACTION_ncbi
 
 }
 
-sub ACTION_affymetrix {
+sub ACTION_mageml {
   my $m = shift;
   my $conf = $m->conf;
 
