@@ -11,7 +11,7 @@ sub init
     "[% db_username %]",
     "[% db_password %]",
     {
-      AutoCommit => 1
+      AutoCommit => 0
     }
   );
 }
