@@ -6,9 +6,9 @@ create table feature (
        feature_id serial not null,
        primary key (feature_id),
 
--- dbxref_string uniquely identifies editable features
-       dbxref_str varchar(255),
--- dbxref_id is replaced by dbxref_str
+-- dbxrefstr uniquely identifies editable features
+       dbxrefstr varchar(255),
+-- dbxref_id is replaced by dbxrefstr
 --       dbxref_id int,
 --       foreign key (dbxref_id) references dbxref (dbxref_id),
        
@@ -21,7 +21,7 @@ create table feature (
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(dbxref_str)
+       unique(dbxrefstr)
 );
 
 -- ================================================
@@ -175,12 +175,12 @@ create table feature_dbxref (
        primary key (feature_dbxref_id),
        feature_id int,
        foreign key (feature_id) references feature (feature_id),
-       dbxref_str varchar(255),
-       foreign key (dbxref_str) references dbxref (dbxref_str),
+       dbxrefstr varchar(255),
+       foreign key (dbxrefstr) references dbxref (dbxrefstr),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(feature_dbxref_id, dbxref_str)
+       unique(feature_dbxref_id, dbxrefstr)
 );
 -- each feature can be linked to multiple external dbs
 
@@ -250,13 +250,13 @@ create table gene (
        type_id int,
        foreign key (type_id) references cvterm (cvterm_id),
 -- accession holds the FBgn in FlyBase
-       dbxref_str int,
-       foreign key (dbxref_str) references dbxref(dbxref_str),
+       dbxrefstr int,
+       foreign key (dbxrefstr) references dbxref(dbxrefstr),
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
        unique(name),
-       unique(dbxref_str)
+       unique(dbxrefstr)
 );
 
 -- the set of tables handling genes, which here are exclusively grouping
