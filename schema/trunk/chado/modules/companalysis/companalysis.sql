@@ -1,4 +1,4 @@
---# $Id: companalysis.sql,v 1.5 2002-11-05 23:10:42 cwiel Exp $
+--# $Id: companalysis.sql,v 1.6 2002-11-08 00:06:03 cwiel Exp $
 
 -- an analysis is a particular execution of a computational analysis;
 -- it may be a blast of one sequence against another, or an all by all
@@ -49,10 +49,10 @@ create table analysis (
 create table analysisprop (
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
-    apkey_id int not null,
-    foreign key (apkey_id) references cvterm (cvterm_id),
-    apval text,
-    unique (apkey_id, apval),
+    pkey_id int not null,
+    foreign key (pkey_id) references cvterm (cvterm_id),
+    pval text,
+    unique (analysis_id, pkey_id, pval),
 
     timeentered timestamp not null default current_timestamp,
     timelastmod timestamp not null default current_timestamp
