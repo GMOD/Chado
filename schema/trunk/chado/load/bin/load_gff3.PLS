@@ -516,7 +516,6 @@ sub load_Ontology_term {
                 feature_id => $chado_feature->id,
                 cvterm_id  => $cvterm->id,
                 pub_id     => $nullpub->id,
-                dbxref_id  => $dbxref->id,
             }
         );
         push @transaction, $feature_cvterm;
