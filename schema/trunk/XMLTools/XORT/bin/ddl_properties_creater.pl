@@ -1,9 +1,15 @@
 #!/usr/local/bin/perl
 use lib $ENV{CodeBase};
+use Getopt::Std;
 use strict;
 
-print "Enter the ddl file:\n: ";
-my $ddl_file= <STDIN>;
+my %opt;
+
+getopts('h:d:v:', \%opt) or usage() and exit;
+usage() and exit if $opt{h};
+usage() and exit if (!$opt{d});
+
+my $ddl_file= $opt{'d'};
 
 
 open (IN, $ddl_file) or die "could not open ddl file";
@@ -199,8 +205,11 @@ while (<IN>){
 }
 close(IN);
 
-print "\n\nEnter the view_ddl file:\n:";
-my $view_file= <STDIN>;
+if ($opt{'v'}){
+
+
+my $view_file= $opt{'v'};
+print "\nview file:$view_file\n";
 open (IN, $view_file) or die "could not open view file";
 
 # here loading ddl_view.properties
@@ -360,7 +369,7 @@ while (<IN>){
  }
 }
 
-
+} #end of if (defined $opt{'v'}
 
 
 
@@ -393,3 +402,17 @@ foreach my $key (sort keys %hash_foreign_key){
 #print out the table_pseudo
 my $tables_pseudo_string=join " ", @tables_pseudo;
 print OUT "\n\ntable_pseudo=", $tables_pseudo_string;
+
+
+
+sub usage()
+ {
+  print "\nusage:$0 [-d ddl file] [-v view and function file]",
+
+    "\n -h              : this (help) message",
+    "\n -d ddl          : ddl file",
+    "\n -v file         : optional, file which contain information for views and function, etc",
+
+    "\n\nexample1: $0  -d  \"/users/zhou/work/API/XORT/Config/idb-full.ddl\" -v \"/users/zhou/work/API/XORT/Config/function_view.ddl\"\n",
+
+}
