@@ -10,7 +10,6 @@ bin/pg2graphviz_svg.pl
 bin/test_load.pl
 bin/test_load.sh
 bin/ucsc_genes2gff.pl
-blibdirs
 Changes
 dat/AE003644.gbk.gff.bp
 dat/chado.ddl
@@ -36,7 +35,6 @@ load/Build.PL
 load/etc/initialize.sql
 load/etc/log.conf
 load/logs/load.log
-load/Makefile
 load/tt2/load.conf.tt2
 load/tt2/LoadDBI.tt2
 Makefile.PL
