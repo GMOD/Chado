@@ -23,7 +23,8 @@ create table feature (
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(name, end5, end3, strand, seqlen, md5checksum, type_id)
+       unique(dbxref_id),
+       unique(name, fnbeg, fnend, strand, source_feature_id, type_id)
 );
 ## IMPORTANT: fnbeg and fnend are space-based (INTERBASE) coordinates
 ## this is vital as it allows us to represent zero-length
