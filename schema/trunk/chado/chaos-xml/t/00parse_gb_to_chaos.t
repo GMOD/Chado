@@ -1,5 +1,5 @@
 # -*-Perl-*- mode (to keep my emacs happy)
-# $Id: 00parse_gb_to_chaos.t,v 1.2 2004-07-26 17:37:01 cmungall Exp $
+# $Id: 00parse_gb_to_chaos.t,v 1.3 2004-12-23 16:43:55 cmungall Exp $
 
 use strict;
 use vars qw($DEBUG);
@@ -133,5 +133,5 @@ sub process_seq {
     ok(!$failed);
     ok($test1);
     printf "n_proteins: %d\n", $n_prots;
-    ok($n_prots==54);
+    ok($n_prots,54);
 }

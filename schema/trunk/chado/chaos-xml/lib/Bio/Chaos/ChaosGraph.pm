@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.3 2004-10-18 20:49:35 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.4 2004-12-23 16:43:55 cmungall Exp $
 #
 #
 
@@ -64,10 +64,18 @@ sub init_from_stag {
     if (!$stag) {
 	$self->freak;
     }
+    if ($self->verbose) {
+        logtime();
+        printf "Adding features\n";
+    }
     foreach my $feature ($stag->get_feature) {
 #	print "====\nADDING FEATURE:\n";
 #	print $feature->sxpr;
 	$self->add_feature($feature);
+    }
+    if ($self->verbose) {
+        logtime();
+        printf "Adding feature_relationships\n";
     }
     foreach my $fr ($stag->get_feature_relationship) {
 #	print "====\nADDING REL:\n";
@@ -315,33 +323,30 @@ sub add_feature {
     my $feature = shift;
     my $fid = $feature->get_feature_id;
 
+    if ($self->verbose && $self->verbose > 5) {
+        logtime();
+        printf "Making feature $fid\n";
+    }
+
     $self->graph->add_vertex($fid);
     $self->feature_idx->{$fid} = $feature;
     my @flocs = $feature->get_featureloc;
     foreach my $floc (@flocs) {
-	$self->add_featureloc($feature, $floc);
+	$self->add_featureloc($fid, $floc);
     }
     return 1;
 }
 
 sub add_featureloc {
     my $self = shift;
-    my $feature = shift;
+    my $fid = shift;
     my $floc = shift;
     my $lg = $self->locgraph;
-    my $fid = $feature->get_feature_id;
 
     my $src_fid = $floc->get_srcfeature_id;
     my @e = ($src_fid, $fid);
     $lg->add_edge(@e);
-    foreach ($floc->kids) {
-	next unless $_->isterminal;
-	next if $_->name eq 'srcfeature_id';
-	next; #TODO
-	$lg->set_attribute($_->name,
-			   @e,
-			   $_->data);
-    }
+    return;
 }
 
 sub replace_featureloc {
@@ -385,6 +390,11 @@ sub add_feature_relationship {
 	$self->freak("bad feature_rel", $fr);
     }
     $g->add_edge(@edge);
+    if ($self->verbose && $self->verbose > 5) {
+        logtime();
+        printf "Making feature_relationship @edge\n";
+    }
+
     $g->set_attribute("type",
 		      @edge,
 		      $frh{type} || '');
@@ -618,12 +628,12 @@ sub make_island {
     my $island_id = "contig:$src_fid:$nbeg:$nend";
 #    print "from: $src_fid\n";
     my $island_name = 'contig-'.$f->get_name.'-'.$left.'-'.$right;
-    my $island_uniquename = 'contig-'.$f->get_uniquename.'-'.$left.'-'.$right;
+    my $island_uniquename = 'contig-'.$f->get_uniquename.'-'.$left.'-'.$right; 
     if ($self->verbose) {
         logtime();
-        printf STDERR "Making island $island_name\n";
+        printf "Making island $island_name\n";
     }
-    my $island =
+   my $island =
       $self->new_feature(
 			 feature_id=>$island_id,
 			 name=>$island_name,
