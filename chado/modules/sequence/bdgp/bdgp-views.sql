@@ -75,8 +75,8 @@ CREATE OR REPLACE VIEW featurex AS
         dbxrefd.accession,
         dbxrefd.version
  FROM
-  feature INNER JOIN feature_dbxref USING (feature_id);
-  feature_dbxref INNER JOIN dbxrefd USING (dbxref_id);
+  feature INNER JOIN feature_dbxref USING (feature_id)
+  INNER JOIN dbxrefd USING (dbxref_id);
 
 -- ================================================
 -- txfeature = xfeature * cvterm
@@ -105,9 +105,45 @@ CREATE OR REPLACE VIEW featurelocf AS
 -- adds main location to feature
 CREATE OR REPLACE VIEW featurefl AS
  SELECT feature.*,
-        featureloc.*
+        featureloc.featureloc_id,
+        featureloc.srcfeature_id,
+        featureloc.fmin,
+        featureloc.fmax,
+        featureloc.strand,
+        featureloc.is_fmin_partial,
+        featureloc.is_fmax_partial,
+        featureloc.strand,
+        featureloc.phase,
+        featureloc.residue_info,
+        featureloc.locgroup,
+        featureloc.rank
  FROM
   feature INNER JOIN featureloc USING (feature_id)
+ WHERE rank=0 AND locgroup=0;
+
+-- ================================================
+-- featureflf = feature * featureloc * srcfeature (rank=0) (locgroup 0)
+-- ================================================
+-- as featurefl, but also adds the uniquename of the srcfeature
+CREATE OR REPLACE VIEW featureflf AS
+ SELECT feature.*,
+        featureloc.featureloc_id,
+        featureloc.srcfeature_id,
+        featureloc.fmin,
+        featureloc.fmax,
+        featureloc.strand,
+        featureloc.is_fmin_partial,
+        featureloc.is_fmax_partial,
+        featureloc.strand,
+        featureloc.phase,
+        featureloc.residue_info,
+        featureloc.locgroup,
+        featureloc.rank,
+        srcfeature.name AS srcname,
+        srcfeature.uniquename AS srcuniquename
+ FROM
+  feature INNER JOIN featureloc ON (feature.feature_id = featureloc.feature_id)
+  INNER JOIN feature AS srcfeature ON (featureloc.srcfeature_id = srcfeature.feature_id)
  WHERE rank=0 AND locgroup=0;
 
 -- ================================================
