@@ -921,10 +921,8 @@ sub load_sequences {
                     $sth->execute($name) or die $sth->errstr;
                 } 
 
-                my @feature_ids = @{ $sth->fetchall_arrayref };
-
-                foreach my $id (@feature_ids) {
-                    my @temp_feat = Chado::Feature->search( {'feature_id' => $$id[0]} );
+                while (my $hashref =  $sth->fetchrow_hashref) {
+                    my @temp_feat = Chado::Feature->search( {'feature_id' => $$hashref{'feature_id'} } );
                     push @chado_feature, @temp_feat;
                 }
             }
