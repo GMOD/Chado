@@ -142,6 +142,25 @@ That is a pretty serious problem with you database!\n" unless $part_of;
 
 my $gffio = Bio::Tools::GFF->new(-file => $GFFFILE, -gff_version => 3);
 
+#check for a synonym type in cvterm--if it's not there create it
+#and a corresponding entry in cv
+
+my ($synonym_type) = Chado::Cvterm->search(name => 'synonym');
+unless ($synonym_type) {
+  my ($cv_entry) = Chado::Cv->find_or_create({
+                    name       => 'synonym type',
+                    definition => 'auto created by load_gff3.pl'
+                                             }); 
+  ($synonym_type) = Chado::Cvterm->find_or_create({
+                    name       => 'synonym',
+                    cv_id      => $cv_entry->cv_id,
+                    definition => 'auto created by load_gff3.pl'
+                                                  });
+}
+
+die "Unable to create a synonym type in cvterm table."
+    unless $synonym_type;
+
 while(my $gff_feature = $gffio->next_feature()) {
 
   #skip mitochondrial genes?
@@ -233,7 +252,22 @@ while(my $gff_feature = $gffio->next_feature()) {
       object_id => $feature{$parent},
       type_id => $part_of,
                                               });
+  } else { # the feature is the parent, so it's name goes into synonym
+
+    my ($synonym) = Chado::Synonym->find_or_create({
+                      name    => $id,
+                      type_id => $synonym_type->cvterm_id
+                                                   });
+
+    Chado::Feature_synonym->find_or_create ({
+                      synonym_id => $synonym->synonym_id,
+                      feature_id => $chado_feature->feature_id,
+                      pub_id     => 1 ##what should go here?
+                                            })
+
   }
+
+    
 
 }
 $gffio->close();
