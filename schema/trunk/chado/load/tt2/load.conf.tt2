@@ -1,0 +1,82 @@
+<load>
+  <path name="data" value="/tmp/chado_load"/>
+
+  <!--                 -->
+  <!-- setup templates -->
+  <!--                 -->
+  <tt2 input="load/tt2/Makefile.tt2" output="load/Makefile">
+   <token name="touch_ext" value="dev_chado_allenday_03"/>
+   <token name="dbname" value="dev_chado_allenday_03"/>
+   <token name="datapath" value="/tmp/chado_load"/>
+  </tt2>
+  <tt2 input="load/tt2/LoadDBI.tt2" output="lib/Chado/LoadDBI.pm">
+   <token name="chado_path" value="/raid5a/allenday/cvsroot/gmod-schema/chado"/>
+   <token name="db_username" value="allenday"/>
+   <token name="db_password" value=""/>
+   <token name="db_name" value="dev_chado_allenday_03"/>
+   <token name="db_host" value="localhost"/>
+   <token name="db_port" value="5432"/>
+   <token name="db_vendor" value="Pg"/>
+  </tt2>
+
+  <!--            -->
+  <!-- NCBI       -->
+  <!--            -->
+  <ncbi name="RefSeq (Human Genes)">
+    <file type="refseq" local="ncbi/refseq/chromosome.gff" remote="http://monkey.wooly.org/chromosome.gff" method="lwp-mirror"/>
+    <file type="refseq" local="ncbi/refseq/refGene.gf3" remote="http://monkey.wooly.org/refGene.gf3" method="lwp-mirror"/>
+  </ncbi>
+  <ncbi name="LocusLink">
+    <file type="locuslink" local="ncbi/refseq/refGene.gf3" remote="http://monkey.wooly.org/refGene.gf3" method="lwp-mirror"/>
+  </ncbi>
+
+  <!--            -->
+  <!-- ontologies -->
+  <!--            -->
+  <ontology name="Sequence Ontology" order="3">
+    <file type="ontology"    local="song/so.ontology"   remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.ontology?rev=HEAD"   method="lwp-mirror"/>
+    <file type="definitions" local="song/so.definition" remote="http://cvs.sourceforge.net/viewcvs.py/song/ontology/so.definition?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Gene Ontology" order="2">
+    <file type="ontology"    local="go/component.ontology" remote="http://www.geneontology.org/ontology/component.ontology" method="/usr/bin/lwp-mirror"/>
+    <file type="ontology"    local="go/function.ontology"  remote="http://www.geneontology.org/ontology/function.ontology"  method="/usr/bin/lwp-mirror"/>
+    <file type="ontology"    local="go/process.ontology"   remote="http://www.geneontology.org/ontology/process.ontology"   method="/usr/bin/lwp-mirror"/>
+    <file type="definitions" local="go/GO.defs"            remote="http://www.geneontology.org/doc/GO.defs"                 method="/usr/bin/lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Embryonic Mouse Anatomy Ontology" order="4">
+    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Mouse Anatomy Ontology" order="5">
+    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Mouse Pathology Ontology (Pathbase)" order="6">
+    <file type="ontology" local="obo/phenotype/mouse_pathology/mouse_pathology.ontology" remote="http://eulep.anat.cam.ac.uk/Pathology_Ontology/mpath_obo.php" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Cell Ontology" order="7">
+    <file type="ontology" local="obo/anatomy/cell_type/cell.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.ontology?rev=HEAD" method="lwp-mirror"/>
+    <file type="definitions" local="obo/anatomy/cell_type/cell.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.definitions?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+  <ontology name="Relationship Ontology" order="1">
+    <file type="ontology"    local="obo/OBO_REL/rel.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.ontology?rev=HEAD" method="lwp-mirror"/>
+    <file type="definitions" local="obo/OBO_REL/rel.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/rel.definitions?rev=HEAD" method="lwp-mirror"/>
+  </ontology>
+
+  <!--            -->
+  <!-- MAGE-ML    -->
+  <!--            -->
+  <mageml name="Affymetrix U95Av2">
+    <file type="mageml" local="affymetrix/HG_U95Av2.xml.gz" remote="http://www.wooly.org/~allenday/doc/affy/HG_U95Av2.xml.gz"/>
+  </mageml>
+  <mageml name="Affymetrix U133A">
+    <file type="mageml" local="affymetrix/HG_U133A.xml.gz" remote="http://www.wooly.org/~allenday/doc/affy/HG_U133A.xml.gz"/>
+  </mageml>
+  <mageml name="Affymetrix U133B">
+    <file type="mageml" local="affymetrix/HG_U133B.xml.gz" remote="http://www.wooly.org/~allenday/doc/affy/HG_U133A.xml.gz"/>
+  </mageml>
+</load>
