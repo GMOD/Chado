@@ -18,8 +18,15 @@ use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
 use Template;
 
-die "*******************************************************\n\$GMOD_ROOT not detected\nPlease read install docs and set required environment variables\n*******************************************************\n"
-    unless $ENV{'GMOD_ROOT'};
+unless ( $ENV{'GMOD_ROOT'} ) {
+  die join("\n",
+    '*' x 65,
+    "\$ENV{'GMOD_ROOT'} not detected.",
+    'Please read install docs and set required environment variables.',
+    '*' x 65,
+    ''
+  );
+} 
 
 my %args    =  (
   DBDRIVER  => {
@@ -402,7 +409,6 @@ sub MY::install {
 sub MY::c_o {
   return ".SUFFIXES : .gz .loaded .ontology .go_loaded .so_loaded .unpacked";
 }
-
 
 sub MY::postamble {
   qq{
