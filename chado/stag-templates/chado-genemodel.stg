@@ -1,0 +1,30 @@
+:SELECT 
+  gene.*,
+  mrna.*,
+  exon.*,
+  protein.*
+:FROM
+  gene 
+    INNER JOIN 
+  feature_relationship AS gene2mrna ON (gene_id = gene2mrna.object_id)
+    INNER JOIN 
+  mrna ON (mrna_id = gene2mrna.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2exon ON (mrna_id = mrna2exon.object_id)
+    INNER JOIN
+  exon ON (exon_id = mrna2exon.subject_id)
+    INNER JOIN 
+  feature_relationship AS mrna2protein ON (mrna_id = mrna2protein.object_id)
+    INNER JOIN
+  protein ON (protein_id = mrna2protein.subject_id)
+:WHERE 
+  [gene.name => &gene_name&]
+
+:USE NESTING (set(gene(mrna(protein)(exon))))
+
+//
+schema: chado
+desc: bare bones gene model, protein coding genes only.
+      requires SO-layer
+
+example_input: name => SELECT name FROM gene
