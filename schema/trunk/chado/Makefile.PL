@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.58 2004-03-26 19:08:34 allenday Exp $
+# $Id: Makefile.PL,v 1.59 2004-03-26 19:19:42 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -466,7 +466,8 @@ else {
 } # close "not simple" else to make AutoDBI.pm
 
 WriteMakefile(
-    'NAME'		            => 'chado',
+#    'NAME'		            => 'chado',
+    'NAME'                => 'gmod',
     'VERSION'             => 0.002,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,

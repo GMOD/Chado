@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.17 2004-03-26 19:08:20 scottcain Exp $
+$Id: INSTALL,v 1.18 2004-03-26 19:19:42 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GenBank data records.  This is currently
@@ -249,8 +249,8 @@ Then execute gmod_load_gff3.pl:
     `perldoc gmod_load_gff.pl` for more information on adding other
     organisms and databases, as well as other available commandline flags.
 
-    GFF3 files can also be generated either from the included
-    gmod_genbank2gff3.pl script:
+    GFF3 files can also be generated either from the included (and not
+    documented) gmod_genbank2gff3.pl script:
 
         $ gmod_genbank2gff3.pl <genbank file> > <gff file>
 
