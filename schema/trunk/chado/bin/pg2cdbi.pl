@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use lib '/home1/allenday/cvsroot/sqlfairy/lib';
 use strict;
 use SQL::Translator;
 use SQL::Translator::Producer::ClassDBI;
@@ -48,6 +49,9 @@ return $package_name;
 
 sub y {
   my $table_name = shift;
-  return $table_name;
+  my $field_name = shift;
+  $field_name =~ s/_id$//;
+  return $field_name;
+#  return $table_name;
 }
 

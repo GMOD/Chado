@@ -212,4 +212,3 @@ create table wwwuserrelationship (
 );
 create index wwwuserrelationship_idx1 on wwwuserrelationship(subjwwwuser_id);
 create index wwwuserrelationship_idx2 on wwwuserrelationship(objwwwuser_id);
-
