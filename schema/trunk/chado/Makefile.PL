@@ -1,7 +1,39 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.64 2004-05-24 18:54:29 scottcain Exp $
+# $Id: Makefile.PL,v 1.65 2004-07-02 05:15:37 allenday Exp $
+
+use constant INSTRUCTIONS => <<HERE
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Makefile written.  Now you should do the following, in order:
+
+  1. make             (creates necessary build files)
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+         STEP 2 WILL DELETE ANY DATA IN A DATABASE WITH THE 
+            DATABASE NAME YOU PROVIDED!
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+  2. make load_schema (loads SQL schema into database)
+  3. make prepdb      (loads basic data)
+  4. make ontologies  (loads data for various ontologies)
+
+Optional Targets:
+
+  make radviews     (creates views for gene expression data.  this is
+                     necessary if you chose expression/rad.sql above)
+  make images       (generates images of the schema in several formats)
+  make rm_locks     (removes ontology lock files, allowing installation
+                     of ontologies on successive builds of the database
+                     without removing the ontology files altogether)
+
+  make instructions (at any moment display these instructions)
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+HERE
+;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -511,35 +543,7 @@ WriteMakefile(
     },
 );
 
-print <<HERE
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-Makefile written.  Now you should do the following, in order:
-
-  1. make             (creates necessary build files)
-
--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-         STEP 2 WILL DELETE ANY DATA IN A DATABASE WITH THE 
-            DATABASE NAME YOU PROVIDED!
--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-  2. make load_schema (loads SQL schema into database)
-  3. make prepdb      (loads basic data)
-  4. make ontologies  (loads data for various ontologies)
-
-Optional Targets:
-
-  make radviews    (creates views for gene expression data.  this is
-                    necessary if you chose expression/rad.sql above)
-  make images      (generates images of the schema in several formats)
-  make rm_locks    (removes ontology lock files, allowing installation
-                    of ontologies on successive builds of the database
-                    without removing the ontology files altogether)
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-HERE
-;
+print INSTRUCTIONS;
 
 sub MY::clean {
   package MY;
@@ -580,6 +584,9 @@ cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh
 
 images :: graphviz graphviz_svg diagram
+
+instructions ::
+	@cat Makefile.PL | head -33 | tail -24
 
 graphviz :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.png \
