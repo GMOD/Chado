@@ -13,63 +13,70 @@ use Bio::Ontology::TermFactory;
 #######################################
 
 #perl pgload_so2.pl user dbname SODA.ontology SODA.defs
-my ($user, $dbname, $sofile, $sodeffile) = @ARGV;
+my ($user, $dbname, $ontology_file, $ontology_deffile) = @ARGV;
 #allow non-existant defsfile for this one
-die "USAGE: $0 <username> <dbname> <dagedit file> (defs file)" unless $user and $dbname and $sofile;
+die "USAGE: $0 <username> <dbname> <dagedit file> (defs file)" unless $user and $dbname and $ontology_file;
 
 Chado::DBI->set_db('Main',
-				   "dbi:Pg:dbname=$dbname",
-				   "$user",
-				   "",
-				   {
-					AutoCommit => 1}
-				  );
+		   "dbi:Pg:dbname=$dbname",
+		   "$user",
+		   "",
+		   {AutoCommit => 1}
+		  );
 
 
 
 #######################################
 # SET UP GLOBAL VARS
 #######################################
-my $sofile2 = $sofile;
-$sofile2 =~ s!.+/(.+)!$1!;
+my $ontology_file2 = $ontology_file;
+$ontology_file2 =~ s!.+/(.+)!$1!;
 
-my $ontname = $sofile2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Ontology" :
-              $sofile2 =~ /^MA/              ? "Mouse Adult Anatomy Ontology" :
-              $sofile2 =~ /^mouse_pathology/ ? "Mouse Pathology Ontology (Pathbase)" :
-              $sofile2 =~ /^rel/             ? "Relationship Ontology" :
-              $sofile2 =~ /^component/       ? "Gene Ontology" :
-              $sofile2 =~ /^function/        ? "Gene Ontology" :
-              $sofile2 =~ /^process/         ? "Gene Ontology" :
-              $sofile2 =~ /^cell_type/       ? "eVOC Cell Type Ontology" :
-              $sofile2 =~ /^cell/            ? "Cell Ontology" :
-              $sofile2 =~ /^pathology/       ? "eVOC Pathology Ontology" :
-              $sofile2 =~ /^SODA/            ? "Sequence Ontology" :
+#infer the name of the ontology based on the file name.  this may be unreliable.
+
+my $ontname = $ontology_file2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Ontology" :
+              $ontology_file2 =~ /^MA/              ? "Mouse Adult Anatomy Ontology" :
+              $ontology_file2 =~ /^mouse_pathology/ ? "Mouse Pathology Ontology (Pathbase)" :
+              $ontology_file2 =~ /^rel/             ? "Relationship Ontology" :
+              $ontology_file2 =~ /^component/       ? "Gene Ontology" :
+              $ontology_file2 =~ /^function/        ? "Gene Ontology" :
+              $ontology_file2 =~ /^process/         ? "Gene Ontology" :
+              $ontology_file2 =~ /^cell_type/       ? "eVOC Cell Type Ontology" :
+              $ontology_file2 =~ /^cell/            ? "Cell Ontology" :
+              $ontology_file2 =~ /^pathology/       ? "eVOC Pathology Ontology" :
+              $ontology_file2 =~ /^SODA/            ? "Sequence Ontology" :
               undef;
 
-die "no ontology name defined for $sofile2!" unless defined($ontname);
+die "no ontology name defined for $ontology_file2!" unless defined($ontname);
 
-my %predmap = ('isa'           => 'OBO_REL:0002',
-			   'is_a'          => 'OBO_REL:0002',
-			   'is a'          => 'OBO_REL:0002',
-			   'partof'        => 'OBO_REL:0003',
-			   'part_of'       => 'OBO_REL:0003',
-			   'part of'       => 'OBO_REL:0003',
-			   'developsfrom'  => 'OBO_REL:0004',
-			   'develops_from' => 'OBO_REL:0004',
-			   'develops from' => 'OBO_REL:0004',
-			   'REL:0005'      => 'OBO_REL:0005',
-			   'rel:0005'      => 'OBO_REL:0005',
-			   'REL:0001'      => 'OBO_REL:0001',
-			   'rel:0001'      => 'OBO_REL:0001',
-			  );
+#we see all of these, apparently it's not standardized yet.  map relationship
+#types to stable Relationship Ontology IDs
+
+my %predmap = ( 'isa'           => 'OBO_REL:0002',
+		'is_a'          => 'OBO_REL:0002',
+		'is a'          => 'OBO_REL:0002',
+		'partof'        => 'OBO_REL:0003',
+		'part_of'       => 'OBO_REL:0003',
+		'part of'       => 'OBO_REL:0003',
+		'developsfrom'  => 'OBO_REL:0004',
+		'develops_from' => 'OBO_REL:0004',
+		'develops from' => 'OBO_REL:0004',
+		'REL:0005'      => 'OBO_REL:0005',
+		'rel:0005'      => 'OBO_REL:0005',
+		'REL:0001'      => 'OBO_REL:0001',
+		'rel:0001'      => 'OBO_REL:0001',
+	      );
+
+#create some default entries to satisfy chado FK requirements of ontology on contact and db tables
 
 my $nullcontact = Chado::Contact->find_or_create({ description => 'null' });
-my($db) = Chado::Db->find_or_create({name => $ontname,contact_id => $nullcontact->id});
+my($db) = Chado::Db->find_or_create({name => $ontname, contact_id => $nullcontact->id});
 my($cv_db) = Chado::Cv->find_or_create({name => $ontname});
 
 my $termfact = Bio::Ontology::TermFactory->new();
 my $relfact = Bio::Ontology::RelationshipFactory->new();
 
+#decide what format we need.  simple indented file or DAG-Edit ?
 my $format = $ontname =~ 'eVOC' ? 'simplehierarchy' : 'so';
 
 my $parser = Bio::OntologyIO->new(
@@ -84,6 +91,7 @@ my $parser = Bio::OntologyIO->new(
 my %allterms;
 my %predicateterms;
 my %allrels;
+
 #parse the ontologies
 while (my $ont = $parser->next_ontology()) {
   $ont->relationship_factory($relfact);
@@ -98,18 +106,14 @@ while (my $ont = $parser->next_ontology()) {
 sub load_ontologyterms{
   my $ontref = shift;
 
-#print Dumper $ontref;
-
   my @predicates = $ontref->get_predicate_terms();
   my @roots = $ontref->get_root_terms();
 
+  #load edge terms
   foreach my $predicate (@predicates) {
 	print STDERR "this is a predicate: ", lc($predicate->identifier) , "\n";
 
-#	my $predicate_db = Chado::Cvterm->find_or_create({
-#												  name =>predmap($predicate->name),
-#												  cv_id => $cv_db->id,
-#												 });
+	#we can't use find_or_create here because the name may already be assigned another cv_id...
 
 	my($predicate_db) = Chado::Cvterm->search(name =>predmap($predicate->name));
 	if(!$predicate_db){
@@ -120,7 +124,6 @@ sub load_ontologyterms{
 	}
 	
 	$predicateterms{predmap($predicate->name)} = $predicate_db->id;
-
 	$predicate_db->definition($predicate->name) unless defined($predicate_db->definition);
 	$predicate_db->commit;
 
@@ -128,6 +131,7 @@ sub load_ontologyterms{
 	load_dblinks($predicate,$predicate_db);
   }
 
+  #load root terms
   foreach my $root (@roots) {
 	my $root_db = Chado::Cvterm->find_or_create ({
 													  name => predmap($root->identifier),
@@ -141,6 +145,7 @@ sub load_ontologyterms{
 	load_synonyms($root,$root_db);
 	load_dblinks($root,$root_db);
 
+	#and recurse down the dag
 	load_ontologytermsR($ontref, $root, "\t");
   }
 }
@@ -214,7 +219,6 @@ sub load_ontologyrels {
 	}								
   }
 }
-
 
 sub predmap {
   my $term = shift;
