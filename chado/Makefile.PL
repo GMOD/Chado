@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.45 2003-12-11 04:00:37 scottcain Exp $
+# $Id: Makefile.PL,v 1.46 2003-12-12 17:12:38 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -442,6 +442,8 @@ Makefile written.  Now you should do the following, in order:
 
   1. make             (creates necessary build files)
   2. make load_schema (loads SQL schema into database)
+                       NOTE: this will destroy any existing database
+                         with the same name as the one you are creating
   3. make prepdb      (loads basic data)
   4. make ontologies  (loads data for various ontologies)
 
@@ -537,7 +539,7 @@ metadata: $working_dir/bin/ddltrans
 	$working_dir/bin/ddltrans -f xml $working_dir/dat/chado.ddl > $working_dir/dat/chado.xml
 
 load_schema ::
-	$PERL $working_dir/bin/test_load.pl $DBNAME
+	\$(SHELL) $working_dir/bin/test_load.sh $DBNAME
 
 prepdb ::
 	./Build prepdb
