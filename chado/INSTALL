@@ -1,6 +1,21 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.9 2003-12-10 19:54:34 allenday Exp $
+$Id: INSTALL,v 1.10 2004-01-06 21:13:43 scottcain Exp $
+
+This document installs the installation procedure for installing the chado 
+schema and loading data from GenBank data records.  This is currently
+considered alpha software, so expect there to be bumps in the road.  When
+you experience problems, please email them to the gmod-devel mailing list
+at gmod-devel@lists.sourceforge.net.  Also packaged with this release is
+version 1.58 of the Generic Genome Browser (gbrowse) which has adaptors
+to work with chado.  The installation instructions for gbrowse are included
+in that package.  There are plans to make the installation of gbrowse and
+other components more automatic, but for the time being, please unpack it 
+and install separately.
+
+Thanks,
+Scott Cain
+cain@cshl.org
 
 Prerequisites:
 
@@ -9,7 +24,7 @@ Prerequisites:
 
   Apache (1.3.*)
 
-  BioPerl (-live or 1.4 when available)
+  BioPerl (1.4 when available)
           (-microarray 0.1 --required for microarray data)
 
   Standard Perl modules:
@@ -34,19 +49,19 @@ Prerequisites:
 
 This document describes how to install the Chado schema:
 
-1.  First, you must set the following variables in your environment:
+1.  First, you must should set the following variables in your environment:
 
-*   GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
+   * GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
 
-*   CHADO_DB_NAME: The name of your Chado database
+   * CHADO_DB_NAME: The name of your Chado database
 
-*   CHADO_DB_USERNAME: The username to connect to Chado
+   * CHADO_DB_USERNAME: The username to connect to Chado
 
-*   CHADO_DB_PASSWORD: The password for the database user [opt]
+   * CHADO_DB_PASSWORD: The password for the database user [opt]
 
-*   CHADO_DB_HOST: The host on which the database runs (e.g. "localhost") [opt]
+   * CHADO_DB_HOST: The host on which the database runs (e.g. "localhost") [opt]
 
-*   CHADO_DB_PORT: The port on which the database is listening [opt]
+   * CHADO_DB_PORT: The port on which the database is listening [opt]
 
 As indicated, the host, port, and password are optional.
 
@@ -94,31 +109,37 @@ As indicated, the host, port, and password are optional.
 
         *   Available extensions to the core schema:
             [1] sequence/gff-bridge/sequence-gff-views.sql
-            [2] sequence/gff-bridge/sequence-gff-funcs.pgsql
-            [3] sequence/functions/feature_subalignments.plpgsql
-            [4] expression/rad.sql
-            [5] expression/expression.sql
+            [2] expression/rad.sql
+            [3] expression/expression.sql
+
 
             What extensions to the core schema would you like?
             (Note that selecting any of these will force the
             rebuilding of Class::DBI classes.)
             (Comma-delimited)? [0] 
 
+            Available function extensions to the core schema:
+           [1] sequence/gff-bridge/sequence-gff-funcs.pgsql
+           [2] sequence/functions/feature_subalignments.plpgsql
+
         !!!!!IMPORTANT!!!!!
         This section is where you choose optional extensions to the
         base Chado schema.
 
         If you plan to use Chado in combination with GBrowse, make
-        sure you select (1) and (2).
+        sure you select (1) from both menus.
 
         If you plan to store many alignments with small regions of
         perfect match, you might want to load the alignment data
         as an alignment string rather than creating a feature for
         each aligned block.  Functionality exists for using this
-        method in (3), and is documented in ____.
+        method in (2) of the function extentions, and is documented
+        in README.H_sapiens.
 
         If you plan to represent gene expression data in a way that
-        is compliant with MIAME standards, make sure you select (4).
+        is compliant with MIAME standards, make sure you select (2) 
+        and (3) from the core schema exentions
+.
         !!!!!IMPORTANT!!!!!
 
         *   Enter the full path of an external DDL file [none] 
@@ -133,13 +154,51 @@ As indicated, the host, port, and password are optional.
     Creates necessary files for the rest of the build process.
 
 *   make load_schema
-    Creates database, installs schema.
+    Creates database, installs schema.  Note that it will wipe out
+    any database with the same name in the process!
 
 *   make prepdb
-    Inserts a few useful items into fundamental Chado tables.
+    Inserts a few useful items into fundamental Chado tables. It 
+    uses load/etc/initialize.sql and when organism information is
+    needed, it uses human as an example.  This file can be edited
+    to use any organism.  Also note that if you did not select
+    all of the optional exentions when you executed perl Makefile.PL
+    you may get some errors at this stage and that is normal (they
+    result from trying to insert data into tables that don't
+    exist).
 
 *   make ontologies
-    Gets and installs various ontologies
+    Gets and installs various ontologies.  Requires a network 
+    connection.
 
-*   load/bin/load_gff3.pl --organism Ecoli --srcdb DB:genbank --gfffile dat/NC_000913.gff
-    Loads GFF file
+*   make install
+    Probably needs to be run as root.  Installs data loading scripts in
+    /usr/local/bin and installs autogenerated perl database connection
+    modules to perl lib directories.
+
+*   gmod_load_gff3.pl --organism fruitfly \
+                      --srcdb DB:genbank  \
+                      --gfffile dat/AE003644.gbk.gff.bp
+
+    (note that the '\' is included to allow cutting and pasting to a unix
+    command line.)
+    Loads GFF file.  Note that this command will fail unless you add 
+    fruitfly to the organism table.  See `gmod_load_gff3.pl --help` for 
+    details.  The loading script requires GFF3 as it has tighter
+    control of the syntax and requires the use of a controlled vocabulary
+    (SOFA), allowing mapping to the relational schema.  GFF3 files can 
+    be generated either from the included gmod_genbank2gff3.pl script:
+
+        $ gmod_genbank2gff3.pl <genbank file> > <gff file>
+
+    Note that is a redirect of standard out to a GFF file to collect the 
+    results of the script.  GFF3 can also be generated via a script provided
+    with bioperl 1.4, bp_genbank2gff.pl:
+
+        $ bp_genbank2gff.pl --stdout --file <genbank file> > <gff file>
+
+    Again note the redirection of standard out.  Note that neither of
+    these methods for generating GFF3 files is completely satisfactory and
+    development is ongoing to provide better translation.
+
+*   install Generic-Genome-Browser.

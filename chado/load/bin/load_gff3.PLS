@@ -227,6 +227,8 @@ while(my $gff_feature = $gffio->next_feature()) {
       load_Name_tag($gff_feature,$chado_feature);
     } elsif($tag eq 'Target'){
       load_Target_tag($gff_feature,$chado_feature);
+    } elsif($tag eq 'Note'){
+      load_Note_tag($gff_feature,$chado_feature);
     } elsif($tag =~ /^[A-Z]/){
       die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the spec?";
     } elsif($tag =~ /^[a-z]/){
@@ -328,7 +330,22 @@ sub load_custom_tags {
    } elsif($tag eq 'completeness'){
      #fix fix fix
    } else {
-     $progress->message("don't know how to handle custom tag: $tag");
+        unless (defined $cvterm{$tag}) {
+            cache_cvterm($tag);
+            warn "Data with the $tag tag are being placed in the featureprop table\n";
+        }
+
+        foreach my $d (@d) {
+            my ($featureprop) = Chado::Featureprop->find_or_create(
+                {
+                    feature_id => $chado_feature->id,
+                    type_id    => $cvterm{$tag}->id,
+                    value      => $d,
+                }
+            );
+
+            push @transaction, $featureprop;
+        }
    }
 }
 
@@ -361,6 +378,25 @@ sub load_ID_tag {
   #  push @transaction, $chado_synonym1;
   #  push @transaction, $chado_synonym2;
   #}
+}
+
+sub load_Note_tag {
+    my $gff_feature   = shift;
+    my $chado_feature = shift;
+                                                                                
+    cache_cvterm('Note') unless (defined $cvterm{'Note'});
+                                                                                
+    my @d = $gff_feature->get_tag_values('Note');
+                                                                                
+    foreach my $d (@d) {
+        my ($featureprop) = Chado::Featureprop->find_or_create(
+            {
+                feature_id => $chado_feature->id,
+                type_id    => $cvterm{'Note'}->id,
+                value      => $d,
+            }
+        );
+    }
 }
 
 sub load_Target_tag {
