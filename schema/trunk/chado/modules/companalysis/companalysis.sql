@@ -1,49 +1,53 @@
-## $Id: companalysis.sql,v 1.14 2002-12-31 01:31:54 cwiel Exp $
+## $Id: companalysis.sql,v 1.15 2003-01-21 21:58:39 emmert Exp $
 
-# an analysis is a particular execution of a computational analysis;
-# it may be a blast of one sequence against another, or an all by all
-# blast, or a different kind of analysis altogether.
-# it is a single unit of computation - if different blast runs
-# were instantiated over differnet query sequences, there would
-# be multiple entries here.
-#
-# name: 
-#   a way of grouping analyses. this should be a handy
-#   short identifier that can help people find an analysis they
-#   want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
-#   it should not be assumed to be unique. for instance, there may
-#   be lots of seperate analyses done against a cDNA database.
-#
-# program: 
-#   e.g. blastx, blastp, sim4, genscan
-#
-# programversion:
-#   e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]
-#
-# algorithm:
-#   e.g. blast
-#
-# sourcename: 
-#   e.g. cDNA, SwissProt
-#
-# queryfeature_id:
-#   the sequence that was used as the query sequence can be
-#   optionally included via queryfeature_id - even though this
-#   is redundant with the tables below. this can still
-#   be useful - for instance, we may have an analysis that blasts
-#   contigs against a database. we may then transform those hits
-#   into global coordinates; it may be useful to keep a record
-#   of which contig was blasted as the query.
-#
-#
-# MAPPING (bioperl): maps to Bio::Search::Result::ResultI
+-- ================================================
+-- TABLE: analysis
+-- ================================================
 
-#
-# sourceuri: 
-#   This is an optional permanent URL/URI for the source of the
-#   analysis. The idea is that someone could recreate the analysis
-#   directly by going to this URI and fetching the source data
-#   (eg the blast database, or the training model).
+-- an analysis is a particular execution of a computational analysis;
+-- it may be a blast of one sequence against another, or an all by all
+-- blast, or a different kind of analysis altogether.
+-- it is a single unit of computation - if different blast runs
+-- were instantiated over differnet query sequences, there would
+-- be multiple entries here.
+--
+-- name: 
+--   a way of grouping analyses. this should be a handy
+--   short identifier that can help people find an analysis they
+--   want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
+--   it should not be assumed to be unique. for instance, there may
+--   be lots of seperate analyses done against a cDNA database.
+--
+-- program: 
+--   e.g. blastx, blastp, sim4, genscan
+--
+-- programversion:
+--   e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]
+--
+-- algorithm:
+--   e.g. blast
+--
+-- sourcename: 
+--   e.g. cDNA, SwissProt
+--
+-- queryfeature_id:
+--   the sequence that was used as the query sequence can be
+--   optionally included via queryfeature_id - even though this
+--   is redundant with the tables below. this can still
+--   be useful - for instance, we may have an analysis that blasts
+--   contigs against a database. we may then transform those hits
+--   into global coordinates; it may be useful to keep a record
+--   of which contig was blasted as the query.
+--
+--
+-- MAPPING (bioperl): maps to Bio::Search::Result::ResultI
+
+--
+-- sourceuri: 
+--   This is an optional permanent URL/URI for the source of the
+--   analysis. The idea is that someone could recreate the analysis
+--   directly by going to this URI and fetching the source data
+--   (eg the blast database, or the training model).
 
 create table analysis (
     analysis_id serial not null,
@@ -59,12 +63,18 @@ create table analysis (
     queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
 
-    timeentered timestamp not null default current_timestamp,
-    timelastmod timestamp not null default current_timestamp
+    unique(program, programversion)
 );
+create index analysis_idx1 on analysis (queryfeature_id);
 
-# analyses can have various properties attached - eg the parameters
-# used in running a blast
+
+-- ================================================
+-- TABLE: analysisprop
+-- ================================================
+
+-- analyses can have various properties attached - eg the parameters
+-- used in running a blast
+
 create table analysisprop (
     analysis_id int not null,
     foreign key (analysis_id) references analysis (analysis_id),
@@ -72,69 +82,69 @@ create table analysisprop (
     foreign key (pkey_id) references cvterm (cvterm_id),
     pval text,
 
-    timeentered timestamp not null default current_timestamp,
-    timelastmod timestamp not null default current_timestamp,
-    
     unique(analysis_id, pkey_id, pval)
 );
+create index analysisprop_idx1 on analysisprop (analysis_id);
+create index analysisprop_idx2 on analysisprop (pkey_id);
+
 
 -- ================================================
 -- TABLE: analysisfeature
 -- ================================================
 
-# computational analyses generate features (eg genscan generates
-# transcripts and exons; sim4 alignments generate similarity/match
-# features)
-#
-# analysisfeatures are stored using the feature table from
-# the sequence module. the analysisfeature table is used to
-# decorate these features, with analysis specific attributes.
-#
-# a feature is an analysisfeature if and only if there is
-# a corresponding entry in the analysisfeature table
-#
-# analysisfeatures will have two or more featureloc entries,
-# with rank indicating query/subject
+-- computational analyses generate features (eg genscan generates
+-- transcripts and exons; sim4 alignments generate similarity/match
+-- features)
 
-#  analysis_id:
-#    scoredsets are grouped into analyses
-#
-#  rawscore:
-#    this is the native score generated by the program; for example,
-#    the bitscore generated by blast, sim4 or genscan scores.
-#    one should not assume that high is necessarily better than low.
-#
-#  normscore:
-#    this is the rawscore but semi-normalized. complete normalization
-#    to allow comparison of features generated by different programs
-#    would be nice but too difficult. instead the normalization should
-#    strive to enforce the following semantics:
-#
-#    * normscores are floating point numbers >= 0
-#    * high normscores are better than low one.
-#
-#    for most programs, it would be sufficient to make the normscore
-#    the same as this rawscore, providing these semantics are
-#    satisfied.
-#
-#  significance:
-#    this is some kind of expectation or probability metric,
-#    representing the probability that the scoredset would appear
-#    randomly given the model.
-#    as such, any program or person querying this table can assume
-#    the following semantics:
-#     * 0 <= significance <= n, where n is a positive number, theoretically
-#       unbounded but unlikely to be more than 10
-#     * low numbers are better than high numbers.
-#
-#  identity:
-#    percent identity between the locations compared
-#
-#  note that these 4 metrics do not cover the full range of scores
-#  possible; it would be undesirable to list every score possible, as
-#  this should be kept extensible. instead, for non-standard scores, use
-#  the scoredsetprop table.
-#
+-- analysisfeatures are stored using the feature table from
+-- the sequence module. the analysisfeature table is used to
+-- decorate these features, with analysis specific attributes.
+--
+-- a feature is an analysisfeature if and only if there is
+-- a corresponding entry in the analysisfeature table
+--
+-- analysisfeatures will have two or more featureloc entries,
+-- with rank indicating query/subject
+
+--  analysis_id:
+--    scoredsets are grouped into analyses
+--
+--  rawscore:
+--    this is the native score generated by the program; for example,
+--    the bitscore generated by blast, sim4 or genscan scores.
+--    one should not assume that high is necessarily better than low.
+--
+--  normscore:
+--    this is the rawscore but semi-normalized. complete normalization
+--    to allow comparison of features generated by different programs
+--    would be nice but too difficult. instead the normalization should
+--    strive to enforce the following semantics:
+--
+--    * normscores are floating point numbers >= 0
+--    * high normscores are better than low one.
+--
+--    for most programs, it would be sufficient to make the normscore
+--    the same as this rawscore, providing these semantics are
+--    satisfied.
+--
+--  significance:
+--    this is some kind of expectation or probability metric,
+--    representing the probability that the scoredset would appear
+--    randomly given the model.
+--    as such, any program or person querying this table can assume
+--    the following semantics:
+--     * 0 <= significance <= n, where n is a positive number, theoretically
+--       unbounded but unlikely to be more than 10
+--     * low numbers are better than high numbers.
+--
+--  identity:
+--    percent identity between the locations compared
+--
+--  note that these 4 metrics do not cover the full range of scores
+--  possible; it would be undesirable to list every score possible, as
+--  this should be kept extensible. instead, for non-standard scores, use
+--  the scoredsetprop table.
+
 create table analysisfeature (
     feature_id int not null,
     foreign key (feature_id) references feature (feature_id),
@@ -147,7 +157,7 @@ create table analysisfeature (
     significance double precision,
     identity double precision,
 
-    unique (feature_id)
+    unique (feature_id,analysis_id)
 );
-
-create index af_feature_id_ind1 on analysisfeature(feature_id);
+create index analysisfeature_idx1 on analysisfeature (feature_id);
+create index analysisfeature_idx2 on analysisfeature (analysis_id);
