@@ -9,6 +9,16 @@ use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 
 #######################################
+# COPYRIGHT
+#######################################
+#
+# This software is free.  You can use it under the terms of the 
+# Perl Artistic License.
+#
+# Allen Day <allenday@ucla.edu>
+# October 2, 2003
+
+#######################################
 # INITIALIZATION
 #######################################
 

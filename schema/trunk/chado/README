@@ -1,4 +1,4 @@
-$Id: README,v 1.3 2003-05-08 18:36:54 allenday Exp $
+$Id: README,v 1.4 2003-10-02 19:23:53 scottcain Exp $
 
 [this is temporary placeholder documentation until someone writes
 something better - cjm@fruitfly.org]
@@ -108,3 +108,11 @@ currently minimal docs
 you can browse the schema:
 
 http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
+
+COPYRIGHT
+=========
+This software is free.  You can use it under the terms of the
+Perl Artistic License.
+
+Chris Mungall, David Emmert and the GMOD team
+October 2, 2003
