@@ -1,0 +1,191 @@
+<opt
+  name="chadofeatconv"
+  date="20040821"
+  >
+ 
+  <title>Chado DB Feature info</title>
+  <about>
+    These are configurations for converting chado feature table dumps to
+    standard feature/sequence files. Much of below specifies how to
+    process different features (tied to methods in ChadoFeatDump.pm
+    
+    These configs should be data-set independent.
+    This works with, but is independent of SeqUtil2 configs.
+  </about>
+  
+  <informat>feature/table</informat> <!-- feature_table ? -->
+  
+  <outformats>fff</outformats>
+  <outformats>gff</outformats>
+  <outformats>fasta</outformats>
+ 
+  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+  <mergematch></mergematch>
+
+<!--
+## SONG/so Revision: 1.45
+##     @is_a@oligo ; SO:0000696 ; SOFA:SOFA ; synonym:oligonucleotide
+## 'so' is no longer valid
+##   old value: @is_a@so ; SO:1000000
+##  options are limited: located_sequence_feature, SO:0000110 ??
+##  in flybase, 'so' seems used for protein blast matches?
+## segment not in this    
+## alt choices ...
+#      @is_a@assembly ; SO:0000353 ; SOFA:SOFA
+# **    @is_a@golden_path ; SO:0000688 ; SOFA:SOFA   <<
+# **    @is_a@supercontig ; SO:0000148 ; SOFA:SOFA ; synonym:scaffold    <<
+#     @is_a@tiling_path ; SO:0000472 ; SOFA:SOFA
+#     @is_a@virtual_sequence ; SO:0000499 ; SOFA:SOFA
+#     @is_a@chromosome ; SO:0000340
+#     @part_of@chromosome_arm ; SO:0000105
+
+## aug04: add new analysis features (HDP,RNAiHDP,fgenesh,)
+## these are like exons but parent feature lacks featureloc 
+## - need to join together by object_oid/parent_oid and compute parent feature (has name)
+## SO type.subtype should be match.program
+## SONG: match, match_part match_set nucleotide_match cross_genome_match cDNA_match EST_match
+
+#? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
+-->
+
+  <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
+  <origin_one
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    />
+
+  <topsort
+    chromosome_arm="1"
+    chromosome="1"
+    />
+    
+  <segmentfeats 
+    BAC="1"
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    golden_path_region="1"
+    golden_path="1"
+    segment="1"
+    source="1"
+    />
+  <!-- 
+      ## segment no longer valid SO; supercontig or golden_path are best
+  -->
+  
+  <!-- simplefeat == segmentfeats + others -->
+  <simplefeat 
+    BAC="1"
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    gene="1"
+    golden_path_region="1"
+    golden_path="1"
+    mature_peptide="1"
+    oligonucleotide="1"
+    point_mutation="1"
+    pseudogene="1"
+    region="1"
+    repeat_region="1"
+    segment="1"
+    source="1"
+    transcription_start_site="1"
+    />
+    
+  <dropname 
+    mRNA_genscan="1"
+    mRNA_piecegenie="1"
+    transcription_start_site="1"
+    tRNA_trnascan="1"
+    />
+    
+  <dropid 
+    cDNA_clone="1"
+    chromosome_band="1"
+    EST="1"
+    exon="1"
+    intron="1"
+    oligonucleotide="1"
+    processed_transcript="1"
+    repeat_region="1"
+    transcription_start_site="1"
+    transposable_element_pred="1"
+    />
+    
+  <dropfeat_fff 
+    CDS_exon="1"
+    CDS="1"
+    exon="1"
+    five_prime_UTR="1"
+    intron="1"
+    remark="1"
+    three_prime_UTR="1"
+    />
+    
+  <dropfeat_gff 
+    CDS_exon="1"
+    remark="1"
+    />
+
+  <skipaskid 
+    point_mutation="1"
+    region="1"
+    repeat_region="1"
+    transcription_start_site="1"
+    />
+
+  
+  <hasdups 
+    three_prime_UTR="1" 
+    intron="1" 
+    five_prime_UTR="1" 
+    exon="1" 
+    />
+    
+  <maptype 
+    CDS="CDS_exon"
+    five_prime_untranslated_region="five_prime_UTR"
+    golden_path_region="golden_path"
+    match_fgenesh="match_fgenesh"
+    match_HDP="match_HDP"
+    match_RNAiHDP="match_RNAiHDP"
+    mRNA_genscan="mRNA_genscan"
+    mRNA_piecegenie="mRNA_piecegenie"
+    mRNA_trnascan="tRNA_trnascan"
+    oligonucleotide="oligo"
+    three_prime_untranslated_region="three_prime_UTR"
+    transposable_element_pred="transposable_element_pred"
+    />
+  <!--
+  so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
+  -->
+    
+  <maptype_gff>
+    <!-- FIXME: ordered arrays here .. $type, $gffsource -->
+    <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
+    <match_part_fgenesh>match_part</match_part_fgenesh>
+    <match_part_fgenesh>fgenesh</match_part_fgenesh>
+    <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
+    <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
+    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
+    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
+    <match_part_HDP>match_part</match_part_HDP>
+    <match_part_HDP>HDP</match_part_HDP>
+    <match_HDP>match</match_HDP>
+    <match_HDP>HDP</match_HDP>
+    <transposable_element_pred>transposable_element</transposable_element_pred>
+    <transposable_element_pred>predicted</transposable_element_pred>
+    <tRNA_trnascan>tRNA</tRNA_trnascan>
+    <tRNA_trnascan>trnascan</tRNA_trnascan>
+    <match_fgenesh>match</match_fgenesh>
+    <match_fgenesh>fgenesh</match_fgenesh>
+    <mRNA_genscan>mRNA</mRNA_genscan>
+    <mRNA_genscan>genscan</mRNA_genscan>
+    <match_RNAiHDP>match</match_RNAiHDP>
+    <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
+  </maptype_gff>
+
+  
+</opt>
