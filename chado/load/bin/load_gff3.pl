@@ -133,7 +133,7 @@ if ($linenumber =~ /^(\d+)/) {
   system("tail +$linenumber $GFFFILE > $TMPFASTA");
   $linenumber -= 1;
   system("head -$linenumber $GFFFILE > $TMPGFF");
-  system('mv',$TMPGFF,$GFFFILE); 
+  $GFFFILE = $TMPGFF;
 }
 
 
@@ -533,6 +533,7 @@ $gffio->close();
 print "$feature_count features added\n";
 
 if (-e $TMPFASTA) {
+  warn "loading sequence data...\n";
   my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
  
   while (my $seq = $in->next_seq() ) {
@@ -543,9 +544,10 @@ if (-e $TMPFASTA) {
 
     $chado_feature[0]->residues($seq->seq);
     $chado_feature[0]->update;
-    $chado_feature[0]->commit;
+    $chado_feature[0]->dbi_commit;
   }
 
-#  unlink $TMPFASTA;
+  unlink $TMPFASTA;
+  unlink $TMPGFF;
 }
 
