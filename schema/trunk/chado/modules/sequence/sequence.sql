@@ -173,7 +173,6 @@ create table featureprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        value text not null default '',
        rank int not null default 0,
-
        unique(feature_id, type_id, value, rank)
 );
 create index featureprop_idx1 on featureprop (feature_id);
@@ -242,9 +241,9 @@ create table feature_relationship (
        foreign key (object_id) references feature (feature_id) on delete cascade,
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-       rank int,
-
-       unique(subject_id, object_id, type_id)
+       value text null,
+       rank int not null default 0,
+       unique(subject_id, object_id, type_id, rank)
 );
 create index feature_relationship_idx1 on feature_relationship (subject_id);
 create index feature_relationship_idx2 on feature_relationship (object_id);
