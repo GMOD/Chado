@@ -1,5 +1,7 @@
 <!--
 
+  $Id: chaos.dtd,v 1.3 2004-10-18 20:49:34 cmungall Exp $
+
   CHAOS XML DTD
 
   Version 1
@@ -26,7 +28,7 @@
 <!-- ======== -->
 
 <!-- chaos_metadata: information about the document file itself (node) -->
-<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?)+>
+<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?|export_module_cvs_id?)+>
 
 <!-- chaos_version: (s) -->
 <!ELEMENT chaos_version (#PCDATA)>
@@ -453,5 +455,5 @@
 
 <!--  END OF CHAOS XML DTD -->
 <!--  $Author: cmungall $ -->
-<!--  $Id: chaos.dtd,v 1.2 2004-09-01 00:08:11 cmungall Exp $ -->
+<!--  $Id: chaos.dtd,v 1.3 2004-10-18 20:49:34 cmungall Exp $ -->
 
