@@ -22,7 +22,7 @@ create index library_idx3 on library (uniquename);
 
 
 -- ================================================
--- TABLE: feature_synonym
+-- TABLE: library_synonym
 -- ================================================
 
 create table library_synonym (
