@@ -61,7 +61,7 @@ Then XORT tools will treat this view:prediction_evidence like any other tables.
 
 3. Create database properties for each database you intend to use, and put
 those file in CodeBase/XORT/Config, name format: database_alias.properties,
-i.e, for alias 'fg8' , the file name will be fg5.properties
+i.e, for alias 'fg8' , the file name will be fg8.properties
 CodeBase/XORT/Config/fg8.properties
 
 it contains all necessary information for database connection, e.g fg8.properties contains:
@@ -81,7 +81,7 @@ password=*******
 
 
 More on specific modules:
-1. Loader module
+5. Loader module
    it will load chado xml into database. 
    Norally, before loading, you may want to check whether this xml will cause any 
    problem for loading or whether this is valid ChadoXML file. run  CodeBase/XORT/validator.pl
@@ -89,23 +89,29 @@ More on specific modules:
    log file CodeBase/XORT/Log/validator_input_loadfile_name.log
   execute $CodeBase/XORT/bin/loader.pl  to try this module
 
-2. Dump module,
+6. Dump module,
       This module will dump objects from database into ChadoXML file. 
- 2.1. The behavor of dumping can be guided by a dumpspec file, eg. we may nest
+
+ 6.1. The behavor of dumping can be guided by a dumpspec file, eg. we may nest
     all exons within transcripts, and all transcripts within gene, or we also want 
     to dump some evidnece to specific gene modelz(see $CodeBase/XORT/Config/dumpspec_gene.xml
-    to see what dumpspec file look like, create one for your own purpose). 
- 2.2. sometime, we may prefer use some global ID to refer a object, ig. CG# for a object in 
+    to see what dumpspec file look like, create one for your own purpose). we already
+    created a lots of template dumpspec for different purpose, all those still to current
+    chado schema. if you use the same schema, most likely you can re-use those template.
+    Especially for apollo-chado round tripping.
+
+ 6.2. sometime, we may prefer use some global ID to refer a object, ig. CG# for a object in 
     FlyBase project, this is Project specific strategy, then you can edit this property file
-     for your own purpose:   $CodeBase/XORT/Config/config_accession.xml
- 2.3. If you try to use 'local_id' mechanism to represent an object, the dumper
+    for your own purpose:   $CodeBase/XORT/Config/config_accession.xml
+
+ 6.3. If you try to use 'local_id' mechanism to represent an object, the dumper
    will use this format to represent it: 'table_name'.'_'.'primary_key', it will
    garantee the uniqueness. However, it is not necessary at all to use this
    format for loader, as long as its uniqueness, loader can handle it. 
    execute $CodeBase/XORT/bin/dump.pl  to try this module
   
 
-3. XORTTreeDiff module: this module will compare two ChadoXML(essential can
+7. XORTTreeDiff module: this module will compare two ChadoXML(essential can
    work for any XML as long as follow similar rules as ChadoXML) files. 
   Significant different from other generic tree comparison tools is that, 
   this is SCHEMA-AWARE comparison, that means, it only compare two objects
@@ -115,13 +121,26 @@ More on specific modules:
   for your project purpose.
    execute $CodeBase/XORT/bin/XORTDiff.pl  to try this module
 
-4. whenever you change the DB schema(DDL file change), you need to run 
+8. whenever you change the DB schema(DDL file change), you need to run 
+  $CodeBase/XORT/bin/ddl_properties_creator.pl `-d <ddl file> [-v <view file> -h]`
+  to synchronize the ddl property file with database schema. 
 
+9. Specially for the apollo-chado round-trip 
+   there are a few function and views, which are NOT part to generic chado schema,
+     but it is NECESSARY for for apollo-chado round-trip if you want those evidence
+    data to support gene model data. 
+   9.1 add those views function into property file:
+   $CodeBase/XORT/bin/ddl_properties_creator.pl -d $CodeBase/XORT/Config/idb-full.ddl
+      -v $CodeBase/XORT/Config/function_view.ddl
 
+  9.2 create views in the database by run the following file inside database shell:
+  $CodeBase/XORT/Config/function_view.sql
 
+  9.3 dump chado into ChadoXML with this specific dumpspec file and other options
+     $CodeBase/XORT/bin/dump.pl -f chado_xml_file_name -d database_alias -g $CodeBase/XORT/Config/dumpspec_scaffold_for_apollo_NE.xml -f no_local_id -s module  
+      for not include 'evidence data' or use following to include 'evidence' data  
 
-
-
+     $CodeBase/XORT/bin/dump.pl -f chado_xml_file_name -d database_alias -g $CodeBase/XORT/Config/dumpspec_scaffold_for_apollo.xml -f no_local_id -s module  
 
 
 

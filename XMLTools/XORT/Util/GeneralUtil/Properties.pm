@@ -38,13 +38,13 @@ package XORT::Util::GeneralUtil::Properties;
       #  print "\nfilename:$file_name\n";
              open (IN, $file_name) or die "couldnot open $file_name";
       #     open (IN, 'f:/document/flybase/API/pk.properties') or die "could not open $file_name";
-       my  %dbh_hash=undef; ;
+       my  %dbh_hash; ;
        while (<IN>){
             my  $pair=$_;
             chomp $pair;
-            if(index($pair, '\#') ==-1){
+            if(index($pair, '\#') ==-1 && $pair=~/\w/){
               my @temp=split(/\=/, $pair);
-	      if ($temp[1] ne ''){
+	      if ($temp[1]=~/\w|\W/){
                  $dbh_hash{$temp[0]} =$temp[1];
 	      }
 	}
