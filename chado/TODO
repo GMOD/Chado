@@ -20,6 +20,7 @@ begin-transaction/cache/flush/end-transaction/analyze strategy.
 where to start?
 
 For the next release:
+- fix Makefile.PL to install scripts in $GMOD_ROOT/bin
 - add documentation for creating Class::DBI classes for an existing schema--
 this will no doubt be necessary for future upgrade paths (I'm thinking the way
 to suggest doing this is dumping the schema from the existing database, via
