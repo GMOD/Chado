@@ -1,6 +1,8 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
+# $Id: Makefile.PL,v 1.34 2003-12-03 23:53:53 kycl4rk Exp $
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -17,16 +19,6 @@ use Cwd;
 use File::Copy;
 use File::Spec::Functions qw[ catfile catdir ];
 use Template;
-
-unless ( $ENV{'GMOD_ROOT'} ) {
-  die join("\n",
-    '*' x 65,
-    "\$ENV{'GMOD_ROOT'} not detected.",
-    'Please read install docs and set required environment variables.',
-    '*' x 65,
-    ''
-  );
-} 
 
 my %args    =  (
   DBDRIVER  => {
@@ -54,6 +46,9 @@ my $usage = <<"END";
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
                          CHADO INSTALLATION
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The arguments to this script should be set in your environment per
+the instructions in the Chado INSTALL document.
 
 To customize installation options, provide one or more of the options
 (default values in parentheses):
@@ -97,6 +92,20 @@ foreach ( @argv ) {
     $opts{ $1 } = $2;
   }
 }
+
+#
+# Check to see if the enviroment is there, mostly to make sure
+# other apps can get what they need.
+#
+unless ( $ENV{'GMOD_ROOT'} ) {
+  die join("\n",
+    '*' x 72,
+    "\$ENV{'GMOD_ROOT'} not detected.",
+    'Please read the INSTALL document and set required environment variables.',
+    '*' x 72,
+    ''
+  );
+} 
 
 my %VALID_DBS = (
   Pg => 'PostgreSQL',
