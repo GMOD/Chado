@@ -449,7 +449,7 @@ while(my $gff_feature = $gffio->next_feature()) {
                       synonym_sgml => $target,
                       type_id      => $synonym_type->cvterm_id
                                                      });
-                                                                                       
+
       my($chado_synonym2) = Chado::Feature_Synonym->find_or_create ({
                       synonym_id => $chado_synonym1->synonym_id,
                       feature_id => $chado_feature->feature_id,
@@ -532,9 +532,13 @@ $gffio->close();
 print "$feature_count features added\n";
 
 if (-e $TMPFASTA) {
-  warn "loading sequence data...\n";
-  my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
+  Chado::Feature->set_sql(update_residues => qq{
+    UPDATE feature SET residues = residues || ? WHERE feature_id = ?
+  });
+  my $sth = Chado::Feature->sql_update_residues;
 
+  print STDERR "loading sequence data...\n";
+  my $in = Bio::SeqIO->new(-file => $TMPFASTA, '-format' => 'Fasta');
   my $seqs_loaded = 0; 
   while (my $seq = $in->next_seq() ) {
     my $name = $seq->id;
@@ -542,7 +546,22 @@ if (-e $TMPFASTA) {
     die "couldn't uniquely identify the sequence identified by $name"
       unless (scalar @chado_feature == 1);
 
-    $chado_feature[0]->residues($seq->seq);
+    $chado_feature[0]->residues('') unless $chado_feature[0]->residues();
+    $chado_feature[0]->update;
+    $chado_feature[0]->dbi_commit;
+
+    my $dna = $seq->seq;
+    my $shredsize = 100_000_000; #don't increase this...
+    my $offset = 0;
+    my $dnalen = length($dna);
+
+    while($offset < $dnalen){
+      my $shred = substr($dna,$offset,$shredsize);
+      $sth->execute($shred,$chado_feature[0]->id);
+
+      $offset += $shredsize;
+    }
+
     $chado_feature[0]->update;
     $chado_feature[0]->dbi_commit;
 
