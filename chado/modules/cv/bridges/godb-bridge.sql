@@ -3,8 +3,9 @@
 CREATE VIEW term AS
 SELECT
  cvterm_id AS id,
- accession AS acc,
- termname  AS name,
+--is this correct?  what is acc? -allen
+ termdefinition AS acc,
+ name      AS name,
  0         AS is_obsolete,
  0         AS is_root
 FROM cvterm;
@@ -13,7 +14,7 @@ CREATE RULE "_RuleI_term" AS
  ON INSERT TO term
  DO INSTEAD
   INSERT INTO cvterm
-  (accession, termname)
+  (termdefinition, name)
   VALUES
   (NEW.acc, NEW.name);
 
@@ -22,8 +23,8 @@ CREATE RULE "_RuleU_term" AS
  DO INSTEAD
   UPDATE cvterm
   SET
-  accession = NEW.acc,
-  termname   = NEW.name
+  termdefinition = NEW.acc,
+  name      = NEW.name
   WHERE cvterm_id = OLD.id;
 
 CREATE RULE "_RuleD_term" AS
@@ -157,12 +158,12 @@ CREATE VIEW term_synonym AS
 SELECT
  cvterm_id AS term_id,
  termsynonym  AS term_synonym
-FROM cvterm_synonym;
+FROM cvtermsynonym;
 
 CREATE RULE "_RuleI_term_synonym" AS
  ON INSERT TO term_synonym
  DO INSTEAD
-  INSERT INTO cvterm_synonym
+  INSERT INTO cvtermsynonym
   (cvterm_id, termsynonym)
   VALUES
   (NEW.term_id, NEW.term_synonym);
@@ -170,7 +171,7 @@ CREATE RULE "_RuleI_term_synonym" AS
 CREATE RULE "_RuleU_term_synonym" AS
  ON UPDATE TO term_synonym
  DO INSTEAD
-  UPDATE cvterm_synonym
+  UPDATE cvtermsynonym
   SET
  cvterm_id = NEW.term_id,
  termsynonym  = NEW.term_synonym
@@ -179,7 +180,7 @@ CREATE RULE "_RuleU_term_synonym" AS
 CREATE RULE "_RuleD_term_synonym" AS
  ON DELETE TO term_synonym
  DO INSTEAD
-  DELETE FROM cvterm_synonym
+  DELETE FROM cvtermsynonym
   WHERE cvterm_id = OLD.term_id AND termsynonym = OLD.term_synonym;
 
 --- term_dbxref
