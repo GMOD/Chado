@@ -229,7 +229,7 @@ sub ACTION_ontologies {
   foreach my $ontology ( keys %{ $conf->{ontology} } ) {
     $ont{ $conf->{ontology}->{$ontology}->{order} } = $ontology;
   }
-  foreach my $key ( sort keys %ont ) { print "[$key] ", $ont{$key}, "\n"; }
+  foreach my $key ( sort {$a <=> $b} keys %ont ) { print "[$key] ", $ont{$key}, "\n"; }
   print "\n";
 
   my $chosen = $m->prompt("Which ontologies would you like to load (Comma delimited)? [0]");
@@ -238,8 +238,11 @@ sub ACTION_ontologies {
   my %ontologies = map { $_ => $conf->{ontology}{ $ont{$_} } } split ',',
     $chosen;
 
-  foreach my $ontology ( sort keys %ontologies ) {
+  foreach my $ontology ( sort {$a <=> $b} keys %ontologies ) {
     print "fetching files for ", $ont{$ontology}, "\n";
+
+    my $file = $ontologies{$ontology}{file};
+    warn $file;
 
     my $load = 0;
     foreach my $file ( 
