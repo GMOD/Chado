@@ -247,7 +247,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         }
     }
 
-    cache_cvterm( $gff_feature->primary_tag );
+    cache_cvterm( $gff_feature->primary_tag, 1 );
     my ($chado_type) = $cvterm{ $gff_feature->primary_tag };
 
     die $gff_feature->primary_tag
@@ -1028,6 +1028,7 @@ sub load_feature_locations {
 
 sub cache_cvterm {
     my $name = shift;
+    my $dontcreate = shift;
 
 #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
 #one from SO.
@@ -1037,7 +1038,7 @@ sub cache_cvterm {
     $cvterm{$name} = $cvterm{$name}->next()
       if defined( $cvterm{$name} )
       and $cvterm{$name}->isa('Class::DBI::Iterator');
-    unless ( $cvterm{$name} ) {
+    if ( !$cvterm{$name} && !$dontcreate  ) {
         ( $cvterm{$name} ) = Chado::Cvterm->find_or_create(
             {
                 name       => $name,
@@ -1047,7 +1048,7 @@ sub cache_cvterm {
         );
     }
     die "unable to create a '$name' entry in the cvterm table"
-      unless $cvterm{$name};
+      if (!$cvterm{$name} && !$dontcreate );
 }
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
