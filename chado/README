@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.9 2003-12-04 23:08:49 allenday Exp $
+$Id: README,v 1.10 2003-12-09 22:16:20 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -72,6 +72,9 @@ INSTALLATION
 
 Please read the included INSTALL document for instructions on how to
 install the Chado schema.
+
+You might also want to have a look at the README.* files in this directory
+for instructions on how to deal with specific types of data.
 
 AUTOGENERATION OF SCHEMA FILES, CODE, ETC
 -----------------------------------------
