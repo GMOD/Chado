@@ -48,6 +48,7 @@ insert into arraydesign (name,manufacturer_id,platformtype_id) values ('virtual 
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133A',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133B',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95A' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
+insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95Av2' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
 
 insert into cvterm (name,cv_id) values ('fetus',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,cv_id) values ('neonate',    (select cv_id from cv where name = 'Ad Hoc Ontology'));
