@@ -155,7 +155,7 @@ die "Unable to create a synonym type in cvterm table."
     unless $synonym_type;
 
 my ($note_type) = Chado::Cvterm->search(name => 'note');
-my ($note_type) = Chado::Cvterm->search(name => 'Note') unless $note_type;
+($note_type) = Chado::Cvterm->search(name => 'Note') unless $note_type;
 unless ($note_type) {
   my ($cv_entry) = Chado::Cv->find_or_create({
                     name       => 'autocreated',
@@ -332,7 +332,7 @@ while(my $gff_feature = $gffio->next_feature()) {
       Chado::Featureprop->find_or_create({
                       feature_id => $chado_feature->feature_id,
                       type_id    => $note_type->cvterm_id,
-                      value      => $note;
+                      value      => $note,
                                          });
     }
   } 
