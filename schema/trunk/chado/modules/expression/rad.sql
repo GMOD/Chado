@@ -1,34 +1,11 @@
---changed some of the pk/fk names to conform to chado conventions (removed _)
---changed field names (removed _s)
---changed some tablenames by adding _ to link tables, dropping _ where no link.
---dropped trailing '-imp' off some tablenames
---dropped external_database_release_id fields
---mapped contact links to author table
---mapped bibliographic references to pub table
---source_id changed to dbxref_id
---dropped analysis in favor of companalysis/analysis
---dropped analysisimplementation in favor of companalysis/analysis
---dropped analysisimplementationparam in favor of companalysis/analysis
---dropped analysisinvocation in favor of companalysis/analysisinvocation
---arrayannotation renamed as arrayprop
---dropped projectlink
---dropped studydesign_assay
---renamed studydesigndescription as studydesignprop
---renamed assay_labeledextract as assay_biomaterial for clarity, made channel_id nullable, and dropped old assay_biomaterial table
---dropped compositeelementresult, we can just use elementresult instead for both composite and simple elements
---quantificationparam renamed as quantificationprop
---process* tables have been removed.  processes are analagous to analyses, and unless i can be convinced otherwise, the same tables
---used in companalysis will suffice.  maybe the companalysis should be renamed as compprocess?
---dropped analysisinvocation_quantification in favor of having analysisinvocation_id as a nullable FK in quantification.  how can a quantification ever have more than one associated processing step associated with it?  tableinfo_id is in analysisinvocation, so we can drop it from quantification
---dropped labeledextract table, it's the same thing as biomaterial but with a labelelmethod fk.  let's make the labelmethod a biomaterialprop, so then we can knock out the labelmethod table
---added a biomaterialrelationship table so that we can track biosource->biosample->labeledextract processing steps
-
 create table mageml (
     mageml_id serial not null,
 	primary key (mageml_id),
     mage_package varchar(100) not null,
     mage_ml varchar not null
 );
+
+COMMENT ON TABLE mageml IS 'this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables';
 
 create table magedocumentation (
     magedocumentation_id serial not null,
@@ -43,6 +20,8 @@ create table magedocumentation (
 create index magedocumentation_idx1 on magedocumentation (mageml_id);
 create index magedocumentation_idx2 on magedocumentation (tableinfo_id);
 create index magedocumentation_idx3 on magedocumentation (row_id);
+
+COMMENT ON TABLE magedocumentation IS NULL;
 
 create table protocol (
     protocol_id serial not null,
@@ -64,6 +43,8 @@ create index protocol_idx1 on protocol (type_id);
 create index protocol_idx2 on protocol (pub_id);
 create index protocol_idx3 on protocol (dbxref_id);
 
+COMMENT ON TABLE protocol IS 'procedural notes on how data was prepared and processed';
+
 create table protocolparam (
     protocolparam_id serial not null,
 	primary key (protocolparam_id),
@@ -80,6 +61,8 @@ create index protocolparam_idx1 on protocolparam (protocol_id);
 create index protocolparam_idx2 on protocolparam (datatype_id);
 create index protocolparam_idx3 on protocolparam (unittype_id);
 
+COMMENT ON TABLE protocolparam IS 'parameters related to a protocol.  if the protocol is a soak, this might include attributes of bath temperature and duration';
+
 create table channel (
     channel_id serial not null,
 	primary key (channel_id),
@@ -87,6 +70,8 @@ create table channel (
     definition varchar(500) not null,
     unique(name)
 );
+
+COMMENT ON TABLE channel IS 'different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but affy uses only one)';
 
 create table array (
     array_id serial not null,
@@ -121,6 +106,8 @@ create index array_idx3 on array (substratetype_id);
 create index array_idx4 on array (protocol_id);
 create index array_idx5 on array (dbxref_id);
 
+COMMENT ON TABLE array IS 'general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns).';
+
 create table arrayprop (
     arrayprop_id serial not null,
 	primary key (arrayprop_id),
@@ -132,6 +119,8 @@ create table arrayprop (
 );
 create index arrayprop_idx1 on arrayprop (array_id);
 create index arrayprop_idx2 on arrayprop (type_id);
+
+COMMENT ON TABLE arrayprop IS 'extra array properties that are not accounted for in array';
 
 create table assay (
     assay_id serial not null,
@@ -156,6 +145,8 @@ create index assay_idx2 on assay (protocol_id);
 create index assay_idx3 on assay (operator_id);
 create index assay_idx4 on assay (dbxref_id);
 
+COMMENT ON TABLE assay IS 'an assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician info).  the assay can be thought of as a hybridization';
+
 create table assay_project (
     assay_project_id serial not null,
         primary key (assay_project_id),
@@ -168,6 +159,8 @@ create table assay_project (
 create index assay_project_idx1 on assay_project (assay_id);
 create index assay_project_idx2 on assay_project (project_id);
 
+COMMENT ON TABLE assay_project IS 'link assays to projects';
+
 create table biomaterial (
     biomaterial_id serial not null,
 	primary key (biomaterial_id),
@@ -175,11 +168,8 @@ create table biomaterial (
 	foreign key (taxon_id) references organism (organism_id) on delete set null,
     biosourceprovider_id int null,
 	foreign key (biosourceprovider_id) references contact (contact_id) on delete set null,
---is this table still an imp, needs to have a view to use?
---    subclass_view varchar(27) not null,
     dbxref_id varchar(50) null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null,
---what about these fields?
     name varchar(100) null,
     description varchar(500) null,
     unique(name)
@@ -188,9 +178,11 @@ create index biomaterial_idx1 on biomaterial (taxon_id);
 create index biomaterial_idx2 on biomaterial (biosourceprovider_id);
 create index biomaterial_idx3 on biomaterial (dbxref_id);
 
-create table biomaterialrelationship (
-    biomaterialrelationship_id serial not null,
-        primary key (biomaterialrelationship_id),
+COMMENT ON TABLE biomaterial IS 'a biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract.  it is essentially some biological material (tissue, cells, serum) that may have been processed.  processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table.';
+
+create table biomaterial_relationship (
+    biomaterial_relationship_id serial not null,
+        primary key (biomaterial_relationship_id),
     subject_id int not null,
         foreign key (subject_id) references biomaterial (biomaterial_id),
     type_id int not null,
@@ -199,9 +191,11 @@ create table biomaterialrelationship (
         foreign key (object_id) references biomaterial (biomaterial_id),
     unique(subject_id,type_id,object_id)
 );
-create index biomaterialrelationship_idx1 on biomaterialrelationship (subject_id);
-create index biomaterialrelationship_idx2 on biomaterialrelationship (object_id);
-create index biomaterialrelationship_idx3 on biomaterialrelationship (type_id);
+create index biomaterial_relationship_idx1 on biomaterial_relationship (subject_id);
+create index biomaterial_relationship_idx2 on biomaterial_relationship (object_id);
+create index biomaterial_relationship_idx3 on biomaterial_relationship (type_id);
+
+COMMENT ON TABLE biomaterial_relationship IS 'relate biomaterials to one another.  this is a way to track a series of treatments or material splits/merges, for instance';
 
 create table biomaterialprop (
     biomaterialprop_id serial not null,
@@ -215,12 +209,12 @@ create table biomaterialprop (
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
 create index biomaterialprop_idx2 on biomaterialprop (type_id);
 
+COMMENT ON TABLE biomaterialprop IS 'extra biomaterial properties that are not accounted for in biomaterial';
+
 create table treatment (
     treatment_id serial not null,
 	primary key (treatment_id),
---what is this field for?
-    ordernum int not null,
---and this one?  shouldn't biomaterial reference treatments, not the other way around?
+    rank int not null default 0,
     biomaterial_id int not null,
 	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
     type_id int not null,
@@ -233,20 +227,25 @@ create index treatment_idx1 on treatment (biomaterial_id);
 create index treatment_idx2 on treatment (type_id);
 create index treatment_idx3 on treatment (protocol_id);
 
-create table biomaterialmeasurement (
-    biomaterialmeasurement_id serial not null,
-	primary key (biomaterialmeasurement_id),
-    treatment_id int not null,
-	foreign key (treatment_id) references treatment (treatment_id) on delete cascade,
+COMMENT ON TABLE treatment IS 'a biomaterial may undergo multiple treatments.  this can range from apoxia to fluorophore and biotin labeling';
+
+create table biomaterial_treatment (
+    biomaterial_treatment_id serial not null,
+        primary key (biomaterial_treatment_id),
     biomaterial_id int not null,
 	foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade,
-    value float(15) null,
+    treatment_id int not null,
+	foreign key (treatment_id) references treatment (treatment_id) on delete cascade,
     unittype_id int null,
-	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null
+	foreign key (unittype_id) references cvterm (cvterm_id) on delete set null,
+    value float(15) null,
+    rank int not null default 0
 );
-create index biomaterialmeasurement_idx1 on biomaterialmeasurement (treatment_id);
-create index biomaterialmeasurement_idx2 on biomaterialmeasurement (biomaterial_id);
-create index biomaterialmeasurement_idx3 on biomaterialmeasurement (unittype_id);
+create index biomaterial_treatment_idx1 on biomaterial_treatment (biomaterial_id);
+create index biomaterial_treatment_idx2 on biomaterial_treatment (treatment_id);
+create index biomaterial_treatment_idx3 on biomaterial_treatment (unittype_id);
+
+COMMENT ON TABLE biomaterial_treatment IS 'link biomaterials to treatments.  treatments have an order of operations (rank), and associated measurements (unittype_id, value)';
 
 create table assay_biomaterial (
     assay_biomaterial_id serial not null,
@@ -262,6 +261,8 @@ create table assay_biomaterial (
 create index assay_biomaterial_idx1 on assay_biomaterial (assay_id);
 create index assay_biomaterial_idx2 on assay_biomaterial (biomaterial_id);
 create index assay_biomaterial_idx3 on assay_biomaterial (channel_id);
+
+COMMENT ON TABLE assay_biomaterial IS 'a biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays)';
 
 create table acquisition (
     acquisition_id serial not null,
@@ -281,6 +282,8 @@ create index acquisition_idx1 on acquisition (assay_id);
 create index acquisition_idx2 on acquisition (protocol_id);
 create index acquisition_idx3 on acquisition (channel_id);
 
+COMMENT ON TABLE acquisition IS 'this represents the scanning of hybridized material.  the output of this process is typically a digital image of an array';
+
 create table acquisitionprop (
     acquisitionprop_id serial not null,
 	primary key (acquisitionprop_id),
@@ -293,9 +296,11 @@ create table acquisitionprop (
 create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
 create index acquisitionprop_idx2 on acquisitionprop (type_id);
 
-create table acquisitionrelationship (
-    acquisitionrelationship_id serial not null,
-	primary key (acquisitionrelationship_id),
+COMMENT ON TABLE acquisitionprop IS 'parameters associated with image acquisition';
+
+create table acquisition_relationship (
+    acquisition_relationship_id serial not null,
+	primary key (acquisition_relationship_id),
     subject_id int not null,
 	foreign key (subject_id) references acquisition (acquisition_id) on delete cascade,
     type_id int not null,
@@ -304,9 +309,11 @@ create table acquisitionrelationship (
 	foreign key (object_id) references acquisition (acquisition_id) on delete cascade,
     unique(subject_id,type_id,object_id)
 );
-create index acquisitionrelationship_idx1 on acquisitionrelationship (subject_id);
-create index acquisitionrelationship_idx2 on acquisitionrelationship (type_id);
-create index acquisitionrelationship_idx3 on acquisitionrelationship (object_id);
+create index acquisition_relationship_idx1 on acquisition_relationship (subject_id);
+create index acquisition_relationship_idx2 on acquisition_relationship (type_id);
+create index acquisition_relationship_idx3 on acquisition_relationship (object_id);
+
+COMMENT ON TABLE acquisition_relationship IS 'multiple monochrome images may be merged to form a multi-color image.  red-green images of 2-channel hybridizations are an example of this';
 
 create table quantification (
     quantification_id serial not null,
@@ -329,6 +336,8 @@ create index quantification_idx2 on quantification (operator_id);
 create index quantification_idx3 on quantification (protocol_id);
 create index quantification_idx4 on quantification (analysis_id);
 
+COMMENT ON TABLE quantification IS 'quantification is the transformation of an image acquisition to numeric data.  this typically involves statistical procedures.';
+
 create table quantificationprop (
     quantificationprop_id serial not null,
 	primary key (quantificationprop_id),
@@ -341,9 +350,11 @@ create table quantificationprop (
 create index quantificationprop_idx1 on quantificationprop (quantification_id);
 create index quantificationprop_idx2 on quantificationprop (type_id);
 
-create table quantificationrelationship (
-    quantificationrelationship_id serial not null,
-	primary key (quantificationrelationship_id),
+COMMENT ON TABLE quantificationprop IS 'extra quantification properties that are not accounted for in quantification';
+
+create table quantification_relationship (
+    quantification_relationship_id serial not null,
+	primary key (quantification_relationship_id),
     subject_id int not null,
 	foreign key (subject_id) references quantification (quantification_id) on delete cascade,
     type_id int not null,
@@ -352,9 +363,11 @@ create table quantificationrelationship (
 	foreign key (object_id) references quantification (quantification_id) on delete cascade,
     unique(subject_id,type_id,object_id)
 );
-create index quantificationrelationship_idx1 on quantificationrelationship (subject_id);
-create index quantificationrelationship_idx2 on quantificationrelationship (type_id);
-create index quantificationrelationship_idx3 on quantificationrelationship (object_id);
+create index quantification_relationship_idx1 on quantification_relationship (subject_id);
+create index quantification_relationship_idx2 on quantification_relationship (type_id);
+create index quantification_relationship_idx3 on quantification_relationship (object_id);
+
+COMMENT ON TABLE quantification_relationship IS 'there may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where';
 
 create table control (
     control_id serial not null,
@@ -373,6 +386,8 @@ create index control_idx1 on control (type_id);
 create index control_idx2 on control (assay_id);
 create index control_idx3 on control (tableinfo_id);
 create index control_idx4 on control (row_id);
+
+COMMENT ON TABLE control IS NULL;
 
 create table element (
     element_id serial not null,
@@ -407,6 +422,8 @@ create index element_idx2 on element (array_id);
 create index element_idx3 on element (type_id);
 create index element_idx4 on element (dbxref_id);
 create index element_idx5 on element (subclass_view);
+
+COMMENT ON TABLE element IS 'represents a feature of the array.  this is typically a region of the array coated or bound to DNA';
 
 create table elementresult (
     elementresult_id serial not null,
@@ -458,11 +475,11 @@ create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (subclass_view);
 
---this is so we can knock out the compositeelementresult_id FK from elementresult
---better to just have a part_of relationship between elements
-create table elementresultrelationship (
-    elementresultrelationship_id serial not null,
-        primary key (elementresultrelationship_id),
+COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
+
+create table elementresult_relationship (
+    elementresult_relationship_id serial not null,
+        primary key (elementresult_relationship_id),
     subject_id int not null,
         foreign key (subject_id) references elementresult (elementresult_id),
     type_id int not null,
@@ -471,9 +488,11 @@ create table elementresultrelationship (
         foreign key (object_id) references elementresult (elementresult_id),
     unique(subject_id,type_id,object_id)
 );
-create index elementresultrelationship_idx1 on elementresultrelationship (subject_id);
-create index elementresultrelationship_idx2 on elementresultrelationship (type_id);
-create index elementresultrelationship_idx3 on elementresultrelationship (object_id);
+create index elementresult_relationship_idx1 on elementresult_relationship (subject_id);
+create index elementresult_relationship_idx2 on elementresult_relationship (type_id);
+create index elementresult_relationship_idx3 on elementresult_relationship (object_id);
+
+COMMENT ON TABLE elementresult_relationship IS 'sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance';
 
 create table study (
     study_id serial not null,
@@ -492,6 +511,8 @@ create index study_idx1 on study (contact_id);
 create index study_idx2 on study (pub_id);
 create index study_idx3 on study (dbxref_id);
 
+COMMENT ON TABLE study IS NULL;
+
 create table study_assay (
     study_assay_id serial not null,
 	primary key (study_assay_id),
@@ -504,6 +525,8 @@ create table study_assay (
 create index study_assay_idx1 on study_assay (study_id);
 create index study_assay_idx2 on study_assay (assay_id);
 
+COMMENT ON TABLE study_assay IS NULL;
+
 create table studydesign (
     studydesign_id serial not null,
 	primary key (studydesign_id),
@@ -512,6 +535,8 @@ create table studydesign (
     description varchar(4000) null
 );
 create index studydesign_idx1 on studydesign (study_id);
+
+COMMENT ON TABLE studydesign IS NULL;
 
 create table studydesignprop (
     studydesignprop_id serial not null,
@@ -524,6 +549,8 @@ create table studydesignprop (
 );
 create index studydesignprop_idx1 on studydesignprop (studydesign_id);
 create index studydesignprop_idx2 on studydesignprop (type_id);
+
+COMMENT ON TABLE studydesignprop IS NULL;
 
 create table studyfactor (
     studyfactor_id serial not null,
@@ -538,6 +565,8 @@ create table studyfactor (
 create index studyfactor_idx1 on studyfactor (studydesign_id);
 create index studyfactor_idx2 on studyfactor (type_id);
 
+COMMENT ON TABLE studyfactor IS NULL;
+
 create table studyfactorvalue (
     studyfactorvalue_id serial not null,
 	primary key (studyfactorvalue_id),
@@ -550,3 +579,5 @@ create table studyfactorvalue (
 );
 create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
+
+COMMENT ON TABLE studyfactorvalue IS NULL;
