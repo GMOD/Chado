@@ -42,10 +42,10 @@ if ($type) {
     if (@{$features || []}) {
         my $arm = $ad->get_f({range=>$range}, {feature_types=>'chromosome_arm',noauxillaries=>1});
         my ($fmin, $fmax) = ($range->{fmin},$range->{fmax});
-        my $new_f = $arm->stitch_child_segments($fmin,$fmax);
+        my ($new_f, $segs) = $arm->stitch_child_segments($fmin,$fmax);
         $arm->hash->{residues} = "";
         my $rsets = $ad->get_results({range=>$range});
-        map{$_->transform($new_f)}(@{$features},@{$rsets || []});
+        map{$_->transform($new_f)}(@{$features},@{$rsets || []}, @{$segs || []});
         my $ans = $ad->get_analysis();
         my %an_h;
         map{$an_h{$_->analysis_id}=$_}@{$ans || []};
@@ -53,7 +53,21 @@ if ($type) {
             my $an = $an_h{$rset->analysis_id};
             $an->add_node($rset) if ($an);
         }
-        $arm->nodes([@{$arm->nodes || []},@{$features}, @{$ans || []}]);
+        #golden_path is not an analysis in chado, manufacture one
+        my $g_an = SOI::Feature->new({program=>'assembly',sourcename=>'path', type=>'companalysis'});
+        $g_an->nodes($segs);
+        map{
+            my $g_path = $_;
+            $g_path->residues(undef);
+            $g_path->type('match');
+            my $span = SOI::Feature->new({%{$g_path->hash}});
+            $span->name($span->name.":1");
+            $span->uniquename($span->name);
+            $span->type('match_part');
+            $g_path->nodes([$span]);
+            $span->secondary_nodes([SOI::Feature->new({src_seq=>$g_path->name,fmin=>0,fmax=>$g_path->length,strand=>1})]);
+        }@{$segs || []};
+        $arm->nodes([@{$arm->nodes || []}, @{$features}, $g_an, @{$ans || []}]);
         $arm->to_game_xml;
     }
     else {
