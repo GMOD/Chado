@@ -72,7 +72,7 @@ my $OP_FORCE='force';
 my $OP_UPDATE='update';
 my $OP_INSERT='insert';
 my $OP_DELETE='delete';
-my $OP_lookup='lookup';
+my $OP_LOOKUP='lookup';
 
 # all attribute
 my $ATTRIBUTE_ID='id';
@@ -260,6 +260,7 @@ for my $i(0..$#temp){
        $ref =~ s/\'/\&apos;/g;
        $hash_level_ref{$level}=$ref;
        $AoH_ref[$level]{$element_name}=$ref;
+       print "\nref for this element:$element_name is :$ref";
     }
     else {
        delete $hash_level_ref{$level};
@@ -551,10 +552,10 @@ sub end_element {
         my $hash_ref_cols=&_get_table_columns($element_name);
         my  $hash_data_ref=&_extract_hash($AoH_data[$level+1], $element_name);
         #here derefer to hash, so can test whether there is any data:if (%hash)
-        my %hash_data_temp=\$hash_data_ref;
+        #my %hash_data_temp=%$hash_data_ref;
         # if sub_element is not table_element, and is col of this table, and no 'ref' attribute for this element,  extract data
         # for nesting case, which $hash_level_name{$level+1} is table_element already done in start_element
-        if (defined $hash_ref_cols->{$hash_level_name{$level+1}} && !$hash_ddl{$hash_level_name{$level+1}}  && %hash_data_temp){
+        if (defined $hash_ref_cols->{$hash_level_name{$level+1}} && !(exists $hash_ddl{$hash_level_name{$level+1}})  && defined $hash_data_ref){
  
           # for empty hash_ref, do nothing (already test in last step ???)
           if (defined $hash_data_ref){
@@ -600,9 +601,9 @@ sub end_element {
                print "\nend_element:$element_name is table element, and sub element is col of this table";
                print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
          }
-       }
-        #for case using ref attribuate to ref object
-	elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && !(%hash_data_temp)){
+       }    # end of if defined hash_data_ref, 
+       #for case using ref attribuate to ref object
+       elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && !(defined $hash_data_ref)){
           my  $hash_id_key=$element_name.":".$AoH_ref[$level]{$hash_level_name{$level}};
 
           if (defined $hash_id{$hash_id_key}){
@@ -616,7 +617,7 @@ sub end_element {
           }
 
           # for empty hash_ref, do nothing
-          if (%hash_data_temp){
+          if (defined $hash_data_ref){
             my  $hash_ref=&_data_check($hash_data_ref, $element_name, $level+1, \%hash_level_id, \%hash_level_name );
             # here for different type of op, deal with the $hash_data_ref and return the $db_id
             if ($hash_level_op{$level} eq 'update'){
@@ -665,6 +666,14 @@ sub end_element {
                print "\nlocal_id:$AoH_local_id[$level]{$element_name}:\tdb_id:$db_id:";
          } # end of if (%hash_data_temp)
 	} # end of using ref attribute to refer object
+        elsif (defined $AoH_ref[$level]{$hash_level_name{$level}} && defined $hash_data_ref) {
+           print "\nexist data for ref:$AoH_ref[$level]{$hash_level_name{$level}} and hash_data_temp has value:";
+           foreach my $temp_key (keys %$hash_data_ref){
+             print "\nkey:$temp_key:value:$hash_data_ref->{$temp_key}";
+	   }
+           &create_log(\%hash_trans, \%hash_id, $log_file);
+           exit(1);
+        }
 
 
         #if parent: column element, substitute the foreign key value with db_id
@@ -726,6 +735,7 @@ sub end_element {
 	     }
              else {
                 print "\n$element_name: can't retrieve the id based on the accession:$AoH_data[$level]{$key}";
+                print "\nor correct format for accesion, but op for table:$hash_level_name{$level-1} is 'delete', and record for this accesion is not in db yet";
                  &create_log(\%hash_trans, \%hash_id, $log_file);
                 exit(1);
              }
@@ -751,6 +761,7 @@ sub end_element {
 	     }
              else {
                 print "\n$element_name: can't retrieve the id based on the accession:$AoH_data_new[$level]{$key}";
+
                 &create_log(\%hash_trans, \%hash_id,  $log_file);
                 exit(1);
              }
@@ -832,7 +843,7 @@ sub entity_reference {
 sub _extract_hash(){
     my $hash_ref=shift;
     my $element=shift;
-    my $result;
+    my %result;
 
     my $content=$element.".";
     foreach my $value (keys %$hash_ref){
@@ -842,7 +853,7 @@ sub _extract_hash(){
             my $key=substr($value, $start);
             print "\nextract_hash:content:$content:value:$value:key:$key:$hash_ref->{$value}:";
            # if ($hash_ref->{$value} =~/\w/){
-             $result->{$key}=$hash_ref->{$value};
+             $result{$key}=$hash_ref->{$value};
 
 	   #}
              delete $hash_ref->{$value};
@@ -854,7 +865,10 @@ sub _extract_hash(){
     #foreach my $key (keys %$hash_ref){
       # print "\nleft key:$key:\tvalue:$hash_ref{$key}:";
     #}
-    return $result;
+    if (%result){
+         return \%result;
+    }
+  return ;
 }
 
 
@@ -867,7 +881,7 @@ sub _data_check(){
     my $hash_ref=shift;
     my $table=shift;
     my $level=shift;
-    my $hash_level_id=shift;
+    my $hash_level_id_ref=shift;
     my $hash_level_name_ref=shift;
     my %result;
 
@@ -882,6 +896,13 @@ sub _data_check(){
     my @default=split(/\s+/, $hash_ddl{$table_non_null_default});
     for (@default){
       $hash_non_null_default{$_}++;
+    }
+
+    my %hash_unique_key;
+    my $table_unique_key=$table."_unique";
+    my @unique_key=split(/\s+/, $hash_ddl{$table_unique_key});
+    for (@unique_key){
+      $hash_unique_key{$_}++;
     }
 
     foreach my $key (keys %$hash_ref){
@@ -904,15 +925,66 @@ sub _data_check(){
             $hash_ref->{$temp[$i]}=$retrieved_value;
 	  }
          elsif (!(defined $hash_non_null_default{$temp[$i]})) {
-             print "\n\ncan not find the value for required element:$temp[$i] of table:$table from context .....";
+	   if (exists $hash_unique_key{$temp[$i]}){
+             print "\n\ncan not find the value for required element(unique key):$temp[$i] of table:$table from context .....";
              &create_log(\%hash_trans, \%hash_id, $log_file);
              exit(1);
-          }
-      }
+	   }
+           #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force is already exist in DB, NOT ok for insert
+           else {
+               my $op=$hash_level_op{$level-1};
+               if ($op eq $OP_INSERT){
+                    print "\n\ncan not find the value for required element(foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    exit(1);
+	       }
+               elsif ($op eq $OP_FORCE){
+                  my %hash_temp;
+                  foreach my $key(keys %$hash_ref){
+                     $hash_temp{$key}=$hash_ref->{$key};
+		  }
+
+
+                  my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
+                  if (!($db_id)){
+                    print "\n\n$temp[$i]: is foreign_key, unique_key, unable to retrieve from context, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    exit(1);
+
+		  }
+               }
+	    }
+
+         }
+      }   # end of is foreign_key, try to retrieve from context
       elsif ($temp[$i] ne $table_id &&  !(defined $hash_ref->{$temp[$i]}) && !(defined $hash_foreign_key{$temp[$i]}) && !(defined $hash_non_null_default{$temp[$i]})) {
+	if (exists $hash_unique_key{$temp[$i]}){
           print "\n\nyou missed the required element:$temp[$i] for table:$table, also it is not foreign key";
           &create_log(\%hash_trans, \%hash_id, $log_file);
           exit(1);
+        }
+        else {
+               my $op=$hash_level_op{$level-1};
+               if ($op eq $OP_INSERT){
+                    print "\n\ncan not find the value for required element(not foreign key, not unique, op:$OP_INSERT):$temp[$i] of table:$table from context .....";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    exit(1);
+	       }
+                #if not null, but not unique key, then depend on the op: ok for lookup/delete, ok for force is already exist in DB, NOT ok for insert
+               elsif ($op eq $OP_FORCE){
+                  my %hash_temp;
+                  foreach my $key(keys %$hash_ref){
+                     $hash_temp{$key}=$hash_ref->{$key};
+		  }
+                  my  $db_id=$dbh_obj->db_lookup(-data_hash=>\%hash_temp, -table=>$table,-hash_local_id=>\%hash_id, -hash_trans=>\%hash_trans, -log_file=>$log_file);
+                  if (!($db_id)){
+                    print "\n\n$temp[$i]: not  foreign_key, unique_key, op is $OP_FORCE, and this record is not in DB yet";
+                    &create_log(\%hash_trans, \%hash_id, $log_file);
+                    exit(1);
+
+		  }
+               }
+        }
       }
     }
 
@@ -972,8 +1044,10 @@ sub _get_accession(){
   my $table=shift;
   my $level=shift;
 
+  my $op=$hash_level_op{$level};
   my ($dbname, $acc, $version, $db_id, $stm_select, $stm_insert);
 
+  print "\nget information for table:$table based on accession:$accession";
 
   if ($accession =~ /([a-zA-Z]+)\:([a-zA-Z0-9]+)(\.\d)*/){
       my @temp=split(/\:/, $accession);
@@ -990,10 +1064,10 @@ sub _get_accession(){
 
     my $organism_id;
     #create a pseudo organism record GAME xml loading
-    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster' and  taxgroup='0'");
+    $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
     if (! $organism_id) {
-      $dbh_obj->execute_sql("insert into organism (genus, species, taxgroup) values('Drosophila', 'melanogaster' , '0')");
-      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster' and  taxgroup='0'");
+      $dbh_obj->execute_sql("insert into organism (genus, species) values('Drosophila', 'melanogaster')");
+      $organism_id=$dbh_obj->get_one_value("select organism_id from organism where  genus='Drosophila' and  species='melanogaster'");
     }
 
    my $type_id;
@@ -1024,9 +1098,12 @@ sub _get_accession(){
     my $stm_select_dbxref=sprintf("select dbxref_id from dbxref where dbname='%s' and accession='%s' and version='%s'", $dbname, $acc, $version);
     my $stm_insert_dbxref=sprintf("insert into dbxref (dbname, accession, version) values('%s', '%s', '%s')", $dbname, $acc, $version);
     $dbxref_id=$dbh_obj->get_one_value($stm_select_dbxref);
-    if (!$dbxref_id){
+    if (!$dbxref_id && $op ne $OP_DELETE){
        $dbh_obj->execute_sql($stm_insert_dbxref);
        $dbxref_id=$dbh_obj->get_one_value($stm_select_dbxref);
+    }
+    else {
+       print "\nop is :$OP_DELETE, so no need to insert";
     }
 
     if ($table eq 'dbxref'){
@@ -1036,9 +1113,12 @@ sub _get_accession(){
      my  $stm_select_feature=sprintf("select $table_id from $table where uniquename='%s' and organism_id=%s", $accession, $organism_id);
      my  $stm_insert_feature=sprintf("insert into feature (organism_id, uniquename, type_id) values(%s, '%s', $type_id)", $organism_id, $accession);
        $db_id=$dbh_obj->get_one_value($stm_select_feature);
-       if (!$db_id){
+       if (!$db_id && $op ne $OP_DELETE){
           $dbh_obj->execute_sql($stm_insert_feature);
           $db_id=$dbh_obj->get_one_value($stm_select_feature);
+       }
+       else {
+          print "\nop is :$OP_DELETE, so no need to insert";
        }
     }
   }

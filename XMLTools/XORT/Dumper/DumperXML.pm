@@ -138,7 +138,7 @@ sub Generate_XML {
                print "\nnode name ", $node->getNodeName();
                #the result from get_id($node) is id string separated by '|'
                my $query=$dumpspec_obj->format_sql_id($node);
-               my $query_all=$dumpspec_obj->format_sql_id($node);
+               my $query_all=$dumpspec_obj->format_sql($node);
                if (defined $query){
                    my $primary_key_string=$node_name."_primary_key";
                    my $table_id=$hash_ddl{$primary_key_string};
@@ -149,10 +149,11 @@ sub Generate_XML {
                     foreach my $key(keys %$hash_ref){
                         my $hash_ref_sub=$hash_ref->{$key};
                         my $query_join=&_join_sql($query_all, $node_name, $$hash_ref_sub{$table_id});
+                        print "\nquery_join:$query_join";
                         my $hash_ref_all= $dbh->get_all_hashref($query_join);
 			foreach my $key1(keys %$hash_ref_all){
-                            my $hash_ref_all=$hash_ref->{$key1};
-                            my $xml=&_table2xml($hash_ref_sub, '     ', $node_name, '', $format_type, $MODULE,  $dbh, $ref_obj, $node);
+                            my $hash_ref_sub=$hash_ref_all->{$key1};
+                            my $xml=&_table2xml($hash_ref_sub, '     ', $node_name, $op_type, $format_type, $MODULE,  $dbh, $ref_obj, $node);
                             print LOG $xml;
 			}
                     }
@@ -176,7 +177,7 @@ sub Generate_XML {
        # my $hash_ref=$dbh->get_row_hashref($stm);
        foreach my $key(keys %$hash_ref){
          my $hash_ref_sub=$hash_ref->{$key};
-         my $xml=&_table2xml($hash_ref_sub, '   ', $array_tables[$i], '', $format_type, $struct_type,  $dbh);
+         my $xml=&_table2xml($hash_ref_sub, '   ', $array_tables[$i], $op_type, $format_type, $struct_type,  $dbh);
          print LOG $xml;
        }
     }
@@ -242,7 +243,7 @@ sub _table2xml(){
  # clean the orinal data, eg. remove the serial id column
  print "\n\ndata in main table....:$table";
  foreach my $key (keys %$hash_ref){
-   # print "\nkey:$key\tvalue:$hash_ref->{$key}";
+    #print "\nkey:$key\tvalue:$hash_ref->{$key}";
     if (!(defined $hash_ref->{$key}) || $hash_ref->{$key} eq '' || $key eq $table_id){
       # print "\ndelete key:$key\t$hash_ref->{$key}";
        delete $hash_ref->{$key};
