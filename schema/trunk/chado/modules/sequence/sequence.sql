@@ -267,6 +267,27 @@ create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
 create index feature_cvterm_idx3 on feature_cvterm (pub_id);
 
 -- ================================================
+-- TABLE: feature_cvtermprop
+-- ================================================
+
+-- store attributes of feature_cvterm relationships, for instance GO evidence
+-- codes
+create table feature_cvtermprop (
+    feature_cvtermprop_id serial not null,
+    primary key (feature_cvtermprop_id),
+    feature_cvterm_id int not null,
+    foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint feature_cvtermprop_c1 unique (feature_cvterm_id,type_id,rank)
+);
+create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_id);
+create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
+
+
+-- ================================================
 -- TABLE: synonym
 -- ================================================
 
