@@ -32,7 +32,7 @@ close EXT;
 
 my $extstr = prompt("What extensions to the core schema do you need (comma delimited)?","0");
 
-unless ($extstr == 0) {
+if ($extstr) {
   my @extindex = split /,/, $extstr;
   foreach my $index (@extindex) {
     push @sqlfiles, $extfiles[$index];
@@ -53,9 +53,10 @@ close OUT;
 
 WriteMakefile(
     'NAME'		=> 'chado',
-    'PREREQ_PM'		=> { SQL::Translator => 0.2,
-                             DBI             => 0,
-                             DBD::Pg         => 0 }, 
+    'PREREQ_PM'		=> { #SQL::Translator => 0.2,
+                             #DBI             => 0,
+                             #DBD::Pg         => 0
+                            }, 
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
        AUTHOR     => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>') : ()),
