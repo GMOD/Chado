@@ -18,7 +18,7 @@ create table dbxref (
 -- ================================================
 
 create table tableinfo (
-       table_id serial not null,
+       tableinfo_id serial not null,
        primary key (table_id),
        name varchar(30) not null,
        table_type varchar(40) not null,
@@ -30,4 +30,14 @@ create table tableinfo (
        superclass_table_id int(5) null,
        is_updateable int(1) not null,
        modification_date date not null
+);
+
+-- ================================================
+-- TABLE: projectinfo
+-- ================================================
+create table projectinfo (
+       projectinfo_id not null serial,
+       primary key (projectinfo_id),
+       name varchar(255) not null,
+       description varchar(255) not null,
 );
