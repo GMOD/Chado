@@ -65,7 +65,7 @@ parseKnownPfam(\%xref,$KNOWNPFAM);
 # need to pull in the omim and other annotations too
 
 print "##gff-version 3\n";
-if(0){
+if(1){ #for debugging
 open(KG,$KNOWNGENE) or die "couldn't open('$KNOWNGENE'): $!";
 while (<KG>) {
   chomp;
@@ -212,7 +212,7 @@ while (<KG>) {
   }
 }
 close(KG) or die "couldn't close('$KNOWNGENE'): $!";
-}
+#} for debugging
 
 print "##FASTA\n";
 
@@ -443,9 +443,6 @@ sub parseKgXref {
     $key = uri_escape($key);
     $description = uri_escape($description);
 
-#    my $protAccession = $mrna2protein->{$mRNA}; # pulls out the protein genbank accession
-
-#    $xref->{$key}{'db:genbank:protein'}{$protAccession} = 1 if $protAccession;
     $xref->{$key}{'db:genbank:mrna'}{$kgID}             = 1 if $kgID;
     $xref->{$key}{'db:genbank:mrna'}{$mRNA}             = 1 if $mRNA;
     $xref->{$key}{'db:swissprot'}{$spID}                = 1 if $spID;
