@@ -332,7 +332,7 @@ Relational Schema to DTD Conversion rules:
 	   print $dlm, $join->{table}; $dlm=" | "; }
 	 print ")*\n "; }
 
-       print ")>\n";  # end table element
+       print ">\n";  # end table element
        
        # Table element ttribute list
        print "\n<!ATTLIST $tablename\n\tid CDATA #IMPLIED\n\tref CDATA #IMPLIED\n\top (lookup | insert | update | force | delete) #IMPLIED>\n";
