@@ -229,10 +229,7 @@ BEGIN
       IF f_type=f_type_gene THEN
           RAISE NOTICE ''in f_i, feature type is:%'', f_type;
           SELECT INTO f_row_g * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
-          SELECT INTO maxid nextval(''uniquename_id_generator'');
-          RAISE NOTICE ''maxid is:%'', maxid;
-          id:=lpad(maxid, 6, ''000000'');
-          f_uniquename:=CAST(prefix||id||suffix as TEXT);
+          SELECT INTO f_uniquename next_uniquename();
 
           IF NEW.name like ''%temp%'' or NEW.name IS NULL THEN
                UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=f_row_g.feature_id;
@@ -357,9 +354,7 @@ BEGIN
   END IF;     --ends if misc cases
 
   IF ( f_type=f_type_transposable_element or f_type=f_type_promoter or f_type=f_type_repeat_region or f_type=f_type_remark )  THEN
-      SELECT INTO maxid nextval(''uniquename_id_generator'');
-      id:=lpad(maxid, 6, ''000000'');
-      f_uniquename:=CAST(prefix||id||suffix as TEXT);
+      SELECT INTO f_uniquename next_uniquename();
       IF NEW.name IS NULL THEN
           f_name  :=CAST(f_type||'':''||id as TEXT);
       ELSE
