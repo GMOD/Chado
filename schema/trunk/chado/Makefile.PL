@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.39 2003-12-04 22:55:11 kycl4rk Exp $
+# $Id: Makefile.PL,v 1.40 2003-12-04 23:10:51 allenday Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -410,12 +410,12 @@ WriteMakefile(
 print <<HERE
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-Makefile written.  Now you should do the following:
+Makefile written.  Now you should do the following, in order:
 
-  make             (creates necessary build files)
-  make load_schema (loads SQL schema into database)
-  make prepdb      (loads basic data)
-  make ontologies  (loads data for various ontologies)
+  1. make             (creates necessary build files)
+  2. make load_schema (loads SQL schema into database)
+  3. make prepdb      (loads basic data)
+  4. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
 
