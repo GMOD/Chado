@@ -19,7 +19,7 @@ create table feature (
        timeentered timestamp not null default current_timestamp,
        timelastmod timestamp not null default current_timestamp,
 
-       unique(name, fmin, fmax, fstrand, seqlen, md5checksum, type_id)
+       unique(name, end5, end3, strand, seqlen, md5checksum, type_id)
 );
 ## dbxref should be unique; does that work w/ null values?
 ## every feature has to have an accession (dbxref_id)
@@ -60,7 +60,7 @@ create table feature_pub (
 create table featureprop (
        featureprop_id serial not null,
        primary key (featureprop_id),
-       feature_id int,
+       feature_id int not null,
        foreign key (feature_id) references feature (feature_id),
        pkey_id int not null,
        foreign key (pkey_id) references cvterm (cvterm_id),
