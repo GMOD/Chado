@@ -112,6 +112,13 @@ will assign it the 'region' type which is very general. If that is not what
 you want, use the standard GFF line to specify the reference
 sequence.
 
+=item Uniquename
+
+By providing the command line flag --uniquename, the user indicates what
+GFF tag to uses as the feature.uniquename when inserting into the feature
+table.  Note that this name must be unique among all features in the feature
+table; if it is not, the load of that feature will fail (probably).
+
 =back
 
 =head1 COMMAND-LINE OPTIONS
@@ -124,6 +131,7 @@ can be abbreviated to one letter.
   --srcdb    <dbname>        The name of the source database
                                 (default: 'DB:refseq')
   --gfffile  <filename>      The name of the GFF3 file
+  --uniquename <tag>         The tag to use to provide feature.uniquename
   --cache    <# of features> The number of features to cache before
                                 committing to the database
                                 (default: 1000)
@@ -149,7 +157,7 @@ my ( undef, $TMPGFF )   = tempfile( "XXXXXX", ".gff", SUFFIX => '.gff' );
 #warn $TMPFASTA;
 #warn $TMPGFF;
 
-my ( $ORGANISM, $SRC_DB, $GFFFILE, $CACHE_SIZE, $FORCE_LOAD );
+my ( $ORGANISM, $SRC_DB, $GFFFILE, $UNIQUENAME, $CACHE_SIZE, $FORCE_LOAD );
 my ( $progress, $next_update, $linecount ) =
   ( undef, undef, undef );    #progressbar;
 my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
@@ -277,6 +285,9 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         elsif ( $tag =~ /^[A-Z]/ ) {
             die
 "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the spec?";
+        }
+        elsif ( $tag eq $UNIQUENAME ) {
+           # do nothing--we already used this information to create the feature
         }
         elsif ( $tag =~ /^[a-z]/ ) {
             load_custom_tags( $gff_feature, $chado_feature, $tag );
@@ -682,6 +693,7 @@ sub initialize {
         'organism:s' => \$ORGANISM,
         'srcdb:s'    => \$SRC_DB,
         'gfffile:s'  => \$GFFFILE,
+        'uniquename:s'=>\$UNIQUENAME,
         'cache:s'    => \$CACHE_SIZE,
         'force'      => \$FORCE_LOAD,
       )
@@ -799,6 +811,11 @@ sub load_segments {
         my ($segment) =
           Chado::Feature->search( { name => $gff_segment->display_id } );
         if ( !$segment ) {
+
+# about uniquenames here: since these are coming from ##sequence_region
+# meta stuff in the header, there will be no uniquename attribute, so the
+# only thing to do is to generate one.
+
             my $f = Chado::Feature->create(
                 {
                     organism_id => $chado_organism,
@@ -930,7 +947,18 @@ sub load_feature_locations {
     my $fmax = $gff_feature->end;
 
     my $uniquename = undef;
-    if ( $gff_feature->primary_tag && $gff_feature->seq_id && $fmax ne '.' ) {
+
+    if ( $UNIQUENAME ) {
+        if ($gff_feature->has_tag($UNIQUENAME)) {
+            ($uniquename) = $gff_feature->get_tag_values($UNIQUENAME);
+        } else {
+            die
+              "\nThe --uniquename tag was specified, but a feature was found\n"
+              . "without a $UNIQUENAME tag\n";
+        }
+    }
+    elsif ( $gff_feature->primary_tag &&
+            $gff_feature->seq_id && $fmax ne '.' ) {
         $uniquename = '_'
           . $gff_feature->primary_tag . '_'
           . $gff_feature->seq_id
@@ -947,7 +975,7 @@ sub load_feature_locations {
             {
                 organism_id => $chado_organism,
                 name        => $id,
-                uniquename  => $id . $uniquename,
+                uniquename  => $UNIQUENAME ? $uniquename : $id . $uniquename,
                 type_id     => $chado_type->id,
                 seqlen      => $seqlen
             }
