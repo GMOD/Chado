@@ -234,19 +234,26 @@ while(my $arrayio = $affx->next_array){
 
 
     if(!$feature){
-$progress->message("creating feature: ".$featuregroup->id);
-      $feature = Chado::Feature->find_or_create({
-                                                 organism_id => $human,
-                                                 type_id => $oligo,
-                                                 name => $featuregroup->id,
-                                                 uniquename => 'Affy:Transcript:HG-'. $arraytype .':'. $featuregroup->id,
-                                                });
+      #the feature may exist, but not be linked to an element (ergo array) yet.
+      ($feature) = Chado::Feature->search(name => $featuregroup->id);
+
+      if(!ref($feature)){
+        $feature = Chado::Feature->find_or_create({
+                                                   organism_id => $human,
+                                                   type_id => $oligo,
+                                                   name => $featuregroup->id,
+                                                   uniquename => 'Affy:Transcript:HG-'. $arraytype .':'. $featuregroup->id,
+                                                  });
+
+        $progress->message("creating feature: ".$featuregroup->id);
+      }
       $feature{$featuregroup->id}{feature_id} = $feature->id;
       push @txn, $feature;
     }
 
 	if(!$element){
-$progress->message("creating element for: ".$featuregroup->id);
+      $progress->message("creating element for: ".$featuregroup->id);
+
 	  $element = Chado::Element->find_or_create({
 												 feature_id => $feature,
 												 array_id => $array,
