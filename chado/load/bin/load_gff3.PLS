@@ -973,8 +973,15 @@ sub load_feature_locations {
     }
 
     my $chado_feature;
+    my $name;
     if ( $gff_feature->has_tag('Name') ) {
-        my ($name) = $gff_feature->get_tag_values('Name');
+        ($name) = $gff_feature->get_tag_values('Name');
+    }
+    elsif ( $gff_feature->has_tag('ID') ){
+        ($name) = $gff_feature->get_tag_values('ID');
+    }
+
+    if ( $gff_feature->has_tag('Name') || $gff_feature->has_tag('ID') ) {
         ($chado_feature) = Chado::Feature->find_or_create(
             {
                 organism_id => $chado_organism,
