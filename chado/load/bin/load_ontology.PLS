@@ -70,6 +70,7 @@ my $ontname = $ontology_file2 =~ /^EMAP/            ? "Mouse Embryo Anatomy Onto
               $ontology_file2 =~ /^SO[FD]A|so\./    ? "Sequence Ontology" :
               $ontology_file2 =~ /^MPheno/          ? "Mammalian Phenotype Ontology" :
               $ontology_file2 =~ /^sofa\./          ? "Sequence Ontology Feature Annotation" :
+              $ontology_file2 =~ /^plant\./          ? "Plant Ontology" :
               undef;
 
 die "no ontology name defined for $ontology_file2!" unless defined($ontname);

@@ -86,6 +86,12 @@
     <file type="definitions" local="obo/anatomy/cell_type/cell.definitions" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.definitions?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
+  <ontology name="Plant Ontology" order="10">
+    <file type="ontology" local="po/plant.ontology" remote="http://brebiou.cshl.edu/viewcvs/Poc/anatomy/anatomy.ontology?rev=HEAD&content-type=text/plain" method="lwp-mirror"/>
+    <file type="definitions" local="po/plant.definitions" remote="http://brebiou.cshl.edu/viewcvs/Poc/definitions/anatomy.definition?rev=HEAD&content-type=text/plain" method="lwp-mirror"/>
+  </ontology>
+
+
   <!--            -->
   <!-- MAGE-ML    -->
   <!--            -->
