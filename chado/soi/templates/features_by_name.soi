@@ -44,8 +44,8 @@ cvterm q ON (f.type_id = q.cvterm_id)
 INNER join
 cv ON (q.cv_id = cv.cv_id)
 INNER join
-(select * from feature_ids_by_type(&&type&&, 'f')) as parent ON (f.feature_id = parent.feature_id)
-WHERE f.is_analysis = 'f' AND q.name = 'gene' and cv.name = 'so' [and src.name IN (&&src&&)]
+(select * from feature_ids_by_type_name(&&type&&, &&name&&, 'f')) as parent ON (f.feature_id = parent.feature_id)
+WHERE f.is_analysis = 'f' AND q.name = &&type&& and cv.name = 'so'
 )
 UNION
 (select
@@ -68,14 +68,14 @@ feature_relationship fr ON (f.feature_id = fr.subject_id)
 INNER join
 cvterm frt ON (fr.type_id = frt.cvterm_id)
 INNER join 
-(select * from feature_ids_by_type(&&type&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from feature_ids_by_type_name(&&type&&, &&name&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 (select c.name, c.cvterm_id, max(pathdistance+1) as depth
  FROM cvterm c, cvtermpath path, cvterm p, cv
  WHERE c.cvterm_id = subject_id and p.cvterm_id = object_id
  and path.cv_id =cv.cv_id and cv.name = 'soi'
- and p.name = 'gene' group by c.name, c.cvterm_id) as q ON (f.type_id = q.cvterm_id)
- WHERE f.is_analysis = 'f' [and src.name IN (&&src&&)])) as uf order by depth, parent_id, orderrank, rank;
+ and p.name = &&type&& group by c.name, c.cvterm_id) as q ON (f.type_id = q.cvterm_id)
+ WHERE f.is_analysis = 'f')) as uf order by depth, parent_id, orderrank, rank;
 
 PROPERTY-SQL:
 select
@@ -86,12 +86,12 @@ fp.rank
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_type(&&type&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from feature_ids_by_type_name(&&type&&, &&name&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 featureprop fp ON (fp.feature_id = f.feature_id)
 INNER join
 cvterm t ON (t.cvterm_id = fp.type_id)
-WHERE f.is_analysis = 'f' [and src.name IN (&&src&&)];
+WHERE f.is_analysis = 'f';
 
 ONTOLOLGY-SQL:
 select
@@ -103,7 +103,7 @@ cv.name as cv
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_type(&&type&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from feature_ids_by_type_name(&&type&&, &&name&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 feature_cvterm fcvt ON (f.feature_id = fcvt.feature_id)
 INNER join
@@ -114,7 +114,7 @@ INNER join
 db ON (gfx.db_id = db.db_id)
 INNER join
 cv ON (gf.cv_id = cv.cv_id)
-WHERE db.name = 'GO' and f.is_analysis = 'f' [and src.name IN (&&src&&)];
+WHERE db.name = 'GO' and f.is_analysis = 'f';
 
 DBXREF-SQL:
 select
@@ -124,12 +124,12 @@ db.name as dbname
 FROM
 feature f
 INNER join
-(select * from feature_ids_by_type(&&type&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
+(select * from feature_ids_by_type_name(&&type&&, &&name&&, 'f')) as fa ON (f.feature_id = fa.feature_id)
 INNER join
 feature_dbxref fxref ON (f.feature_id = fxref.feature_id)
 INNER join
 dbxref xref ON (fxref.dbxref_id = xref.dbxref_id)
 INNER join
 db ON (db.db_id = xref.db_id)
-WHERE f.is_analysis = 'f' [and src.name IN (&&src&&)];
+WHERE f.is_analysis = 'f';
 
