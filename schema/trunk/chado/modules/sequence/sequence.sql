@@ -256,7 +256,8 @@ create table feature_cvterm (
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
 
-       unique(feature_id, cvterm_id, pub_id)
+       unique (feature_id, cvterm_id, pub_id)
+
 );
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
 create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
@@ -315,21 +316,3 @@ create table feature_synonym (
 create index feature_synonym_idx1 on feature_synonym (synonym_id);
 create index feature_synonym_idx2 on feature_synonym (feature_id);
 create index feature_synonym_idx3 on feature_synonym (pub_id);
-
-
--- ================================================
--- TABLE: synonym_pub
--- ================================================
-
-create table synonym_pub (
-       synonym_pub_id serial not null,
-       primary key (synonym_pub_id),
-       synonym_id int not null,
-       foreign key (synonym_id) references synonym (synonym_id),
-       pub_id int not null,
-       foreign key (pub_id) references pub (pub_id),
-
-       unique(synonym_id, pub_id)
-);
-create index synonym_pub_idx1 on synonym_pub (synonym_id);
-create index synonym_pub_idx2 on synonym_pub (pub_id);
