@@ -12,14 +12,14 @@ private int m_start=0;
 private int m_end=0;
 private String m_src = null;
 private static SimpleDateFormat GameFormat = new SimpleDateFormat(
-		"EEE MMM d HH:mm:ss z yyyy");
+		"EEE MMM dd HH:mm:ss z yyyy");
 private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 		"yyyy'-'MM'-'dd HH:mm:ss");
 
 	public DateConv(){
 	}
 
-
+	/********
 	public static String GameDateToChadoDate(String the_GameDate){
 		//System.out.println("CONVERTING GAMEDATE<"+
 		//		the_GameDate+"> TO CHADODATE");
@@ -34,6 +34,7 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 			return "NULL";
 		}
 	}
+	******/
 
 	public static String ChadoDateToGameDate(String the_ChadoDate){
 		//System.out.println("CONVERTING CHADODATE<"+
@@ -65,6 +66,7 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 		}
 	}
 
+	/*******
 	public static String GameDateToTimestamp(String the_GameDate){
 		System.out.println("CONVERTING GAMEDATE<"+
 				the_GameDate+"> TO TIMESTAMP");
@@ -79,6 +81,7 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 			return "0";
 		}
 	}
+	********/
 
 	public static String getCurrentDate(){
 		Date dt = new Date(System.currentTimeMillis());
@@ -101,7 +104,8 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 
 	public static void main(String args[]){
 		String gamedate = "Thu Mar 07 16:48:36 EDT 2002";
-		String outdate = DateConv.GameDateToChadoDate(gamedate);
+		String outdate;
+		//String outdate = DateConv.GameDateToChadoDate(gamedate);
 		//System.out.println("RES IN<"+indate+"> OUT<"+outdate+">");
 		String gametimestamp = "1052845690000";
 		//outdate = DateConv.GameTimestampToChadoDate(gametimestamp);

@@ -7,6 +7,7 @@ public class Span {
 private int m_start=0;
 private int m_end=0;
 private String m_src = null;
+private String m_Alignment = null;
 
 	public Span(String the_start,String the_end){
 		try{
@@ -48,6 +49,14 @@ private String m_src = null;
 
 	public String getSrc(){
 		return m_src;
+	}
+
+	public void setAlignment(String the_Alignment){
+		m_Alignment = the_Alignment;
+	}
+
+	public String getAlignment(){
+		return m_Alignment;
 	}
 
 	public int getLength(){

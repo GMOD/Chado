@@ -96,7 +96,10 @@ public boolean m_isReadthrough = false;
 				if(tmpStr.length()>=3){
 					String the_Codon = tmpStr.substring(0,3);
 					String token = (String)CodonMap.get(the_Codon);
-					//System.out.println("\tCONVERTED <"+the_Codon+"> TO <"+token+">");
+					if(token==null){
+						token="-";
+						System.out.println("\tCONVERTED <"+the_Codon+"> TO <"+token+">");
+					}
 					if(token.equals(ENDSYMBOL.toString())){
 						//System.out.println("\t\tEND SYM TMPSTR REMNDR IS<"+tmpStr+"> ENDSYM ADD");
 						if(!m_isReadthrough){

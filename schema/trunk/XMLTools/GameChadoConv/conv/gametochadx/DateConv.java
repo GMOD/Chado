@@ -13,6 +13,8 @@ private int m_end=0;
 private String m_src = null;
 private static SimpleDateFormat GameFormat = new SimpleDateFormat(
 		"EEE MMM d HH:mm:ss z yyyy");
+private static SimpleDateFormat HeterochromatinFormat = new SimpleDateFormat(
+		"EEE MMM d HH:mm:ss yyyy");
 private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 		"yyyy'-'MM'-'dd HH:mm:ss");
 
@@ -21,23 +23,45 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 
 
 	public static String GameDateToChadoDate(String the_GameDate){
-		//System.out.println("CONVERTING GAMEDATE<"+
-		//		the_GameDate+"> TO CHADODATE");
+		System.out.println("CONVERTING GAMEDATE<"+
+				the_GameDate+"> TO CHADODATE");
 		ParsePosition pos = new ParsePosition(0);
 		Date dt = GameFormat.parse(the_GameDate,pos);
+		if(dt!=null){
+			String tmp = ChadoFormat.format(dt);
+			System.out.println("\tRET "+tmp);
+			return tmp;
+		}else{
+			//SEE IF IT IS OF THE FORMAT THAT Chris Smith USES FOR HETEROCHROMATIN
+			//System.out.println("CHRIS SMITHS DATE FORMAT");
+			String csdate = HeterochromatinDateToChadoDate(the_GameDate);
+			if(csdate!=null){
+				System.out.println("\tHET DATE<"+csdate+">");
+				return csdate;
+			}else{
+				System.out.println("\tRET NULL");
+				return "NULL";
+			}
+		}
+	}
+
+	public static String HeterochromatinDateToChadoDate(String the_GameDate){
+		//System.out.println("CONVERTING HETEROCHROMATIN DATE<"+
+		//		the_GameDate+"> TO CHADODATE");
+		ParsePosition pos = new ParsePosition(0);
+		Date dt = HeterochromatinFormat.parse(the_GameDate,pos);
 		if(dt!=null){
 			String tmp = ChadoFormat.format(dt);
 			//System.out.println("\t"+tmp);
 			return tmp;
 		}else{
-			//System.out.println("\tNULL");
-			return "NULL";
+			return null;
 		}
 	}
 
 	public static String ChadoDateToGameDate(String the_ChadoDate){
-		//System.out.println("CONVERTING CHADODATE<"+
-		//		the_ChadoDate+"> TO GAMEDATE");
+		System.out.println("CONVERTING CHADODATE<"+
+				the_ChadoDate+"> TO GAMEDATE");
 		ParsePosition pos = new ParsePosition(0);
 		Date dt = ChadoFormat.parse(the_ChadoDate,pos);
 		if(dt!=null){
@@ -45,7 +69,7 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 			//System.out.println("\t"+tmp);
 			return tmp;
 		}else{
-			//System.out.println("\tNULL");
+			System.out.println("\tNULL");
 			return "NULL";
 		}
 	}
@@ -66,8 +90,8 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 	}
 
 	public static String GameDateToTimestamp(String the_ChadoDate){
-		//System.out.println("CONVERTING GAMEDATE<"+
-		//		the_ChadoDate+"> TO TIMESTAMP");
+		System.out.println("CONVERTING GAMEDATE<"+
+				the_ChadoDate+"> TO TIMESTAMP");
 		ParsePosition pos = new ParsePosition(0);
 		Date dt = GameFormat.parse(the_ChadoDate,pos);
 		if(dt!=null){
@@ -75,7 +99,7 @@ private static SimpleDateFormat ChadoFormat = new SimpleDateFormat(
 			//System.out.println("\t"+tmp);
 			return tmp;
 		}else{
-			//System.out.println("\t0");
+			System.out.println("PROBLEMHERE");
 			return "0";
 		}
 	}

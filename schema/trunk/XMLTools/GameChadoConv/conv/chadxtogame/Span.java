@@ -33,12 +33,26 @@ private String m_src;
 		m_end = the_end;
 	}
 
+	public Span(int the_start,int the_end,String the_src){
+		m_start = the_start;
+		m_end = the_end;
+		m_src = the_src;
+	}
+
+	public void setStart(int the_start){
+		m_start = the_start;
+	}
+
 	public int getStart(){
 		return m_start;
 	}
 
 	public int getEnd(){
 		return m_end;
+	}
+
+	public void setSrc(String the_src){
+		m_src = the_src;
 	}
 
 	public String getSrc(){
@@ -61,25 +75,79 @@ private String m_src;
 		}
 	}
 
+/*************************
 	public boolean precedes(Span the_sp){
 		if(the_sp==null){
 			return false;
 		}
 		if((isForward())&&(the_sp.isForward())){
+			System.out.print("FORWARD ");
 			if(getStart()<the_sp.getStart()){
+				System.out.println("EXON<"+toString()
+					+"> PRECEDES <"+the_sp.toString()+">");
 				return true;
 			//}else if(getStart()==the_sp.getStart()){
 			//	if(getEnd()<the_sp.getEnd()){
 			//		return true;
 			//	}
+			}else{
+				System.out.println("EXON<"+toString()
+					+"> DNP <"+the_sp.toString()+">");
+				return false;
 			}
-		}else if((!isForward())&&(!isForward())){
+		}else if((!isForward())&&(!(the_sp.isForward()))){
+			System.out.print("REVERSE ");
 			if(getStart()>the_sp.getStart()){
+				System.out.println("EXON<"+toString()
+					+"> PRECEDES <"+the_sp.toString()+">");
 				return true;
+			}else{
+				System.out.println("EXON<"+toString()
+					+"> DNP <"+the_sp.toString()+">");
+				return false;
 			}
-		}else if((isForward())&&(!the_sp.isForward())){
+		}else if((isForward())&&(!(the_sp.isForward()))){
 			System.out.println("FEATLOC PRECEDES() MIX1");
 		}else if((!isForward())&&(the_sp.isForward())){
+			System.out.println("FEATLOC PRECEDES() MIX2");
+		}
+		return false;
+	}
+*************************/
+
+	public boolean precedes(Span the_sp,int strandi,int strandj){
+		if(the_sp==null){
+			return false;
+		}
+		if((strandi==1)&&(strandj==1)){
+			//System.out.print("FORWARD ");
+			if(getStart()<the_sp.getStart()){
+				//System.out.println("EXON<"+toString()
+				//	+"> PRECEDES <"+the_sp.toString()+">");
+				return true;
+			//}else if(getStart()==the_sp.getStart()){
+			//	if(getEnd()<the_sp.getEnd()){
+			//		return true;
+			//	}
+			}else{
+				//System.out.println("EXON<"+toString()
+				//	+"> DNP <"+the_sp.toString()+">");
+				return false;
+			}
+		}else if((strandi==-1)&&(strandj==-1)){
+			//System.out.print("REVERSE ");
+			if(getStart()>the_sp.getStart()){
+				//System.out.println("EXON<"+toString()
+				//	+"> PRECEDES <"+the_sp.toString()+">");
+				return true;
+			}else{
+				//System.out.println("EXON<"+toString()
+				//	+"> DNP <"+the_sp.toString()+">");
+				return false;
+			}
+		}else if((strandi==1)&&(strandj==-1)){
+			System.out.println("FEATLOC PRECEDES() MIX1");
+		}else if((strandi==-1)&&(strandj==1)){
 			System.out.println("FEATLOC PRECEDES() MIX2");
 		}
 		return false;
@@ -123,6 +191,7 @@ private String m_src;
 		//System.out.println("RETREAT Span <"+toString()+">");
 		Span sp = new Span((m_start-the_amt),(m_end-the_amt));
 		//System.out.println("         TO  <"+sp.toString()+">");
+		sp.setSrc(m_src);
 		return sp;
 	}
 

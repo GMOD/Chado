@@ -40,6 +40,11 @@ private static HashMap m_FeatSubMap = new HashMap(10);
 		}
 	}
 
+	public static void clear(){
+		m_FeatSubMap.clear();
+		m_FeatSubMap = null;
+	}
+
 	public static void Display(){
 		//System.out.println("MAPPED ATTRIBUTES:");
 		Iterator it = m_FeatSubMap.keySet().iterator();

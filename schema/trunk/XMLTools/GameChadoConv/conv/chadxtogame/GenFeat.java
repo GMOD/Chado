@@ -69,5 +69,9 @@ private Vector m_ComponentList = null;
 			return null;
 		}
 	}
+
+	public void removeGenFeat(int the_index){
+		m_ComponentList.remove(the_index);
+	}
 }
 
