@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README.H_sapiens,v 1.3 2003-12-10 16:04:38 scottcain Exp $
+$Id: README.H_sapiens,v 1.4 2003-12-23 22:19:06 allenday Exp $
 
 INTRODUCTION
 ------------
@@ -30,12 +30,12 @@ LOAD GENOMIC DATA
 1. Download chromosome data.  The following URL provides a GFF describing
 the chromosomes given in UCSC Build 16 (hg16) of the Human genome.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/chromosomes.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.chromosomes.gff
 
 Load the GFF file as below.  Make sure you are in your chado distribution
 directory.
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile chromosomes.gff
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:ucsc' --gfffile Hg16.chromosomes.gff
 
 If you look at the data loaded into the feature table at this point,
 you will notice that the chromosomes have been loaded as objects of
@@ -59,16 +59,28 @@ Now do something akin to this tcsh script:
 and the chromosome DNA is loaded.
 
 3. Download gene model data.  The following URL provides all GenBank mRNA
-records available from UCSC hg16.  Each gene model has extra data attached
+records available from UCSC Hg16.  Each gene model has extra data attached
 to it, such as LocusLink ID, SwissProt ID, gene symbols, and so on.
 
-  wget http://sumo.genetics.ucla.edu/~allenday/chado/knownGene.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.knownGene.gff
 
 Now load the GFF file as:
 
-  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile knownGene.gff
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:genbank' --cache 10000 --gfffile Hg16.knownGene.gff
 
 This will take several hours to complete.
+
+4. Download Affymetrix probeset DesignElement alignments to UCSC Hg16.
+
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.U133.gff
+  wget http://sumo.genetics.ucla.edu/~allenday/chado/Hg16.U95.gff
+
+and load the GFF files as:
+
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:affy:U133' --cache 10000 --gfffile Hg16.U133.gff
+  ./load/bin/load_gff3.pl --organism Human --srcdb 'DB:affy:U95' --cache 10000 --gfffile Hg16.U95.gff
+
+This may take a few hours to complete.
 
 LOAD TRANSCRIPTOMIC DATA
 ------------------------
