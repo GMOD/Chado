@@ -1,17 +1,22 @@
 use strict;
 use lib 'lib';
 use Chado::Builder;
+use Data::Dumper;
 
 my $VERSION = 0.01;
 
-my $m = Chado::Builder->new(dist_name => '', dist_version => $VERSION);
-$m->conf('load/etc/load.conf');
-$m->dispatch('tokenize');
+my $conf = shift;
 
-if($m->y_n("would you like to load ontologies from ___?","y")){
-  $m->dispatch('ontologies');
-}
+my $m = Chado::Builder->new(dist_name => '', dist_version => $VERSION, load_conf => $conf);
+#$m->conf($conf);
 
 
-#$m->create_build_script;
+#print Dumper $m->properties;
+
+print "initializing load scripts...\n";
+#$m->dispatch('tokenize');
+
+#$m->dispatch('ontologies');
+
+$m->create_build_script;
 #$m->dispatch('build');
