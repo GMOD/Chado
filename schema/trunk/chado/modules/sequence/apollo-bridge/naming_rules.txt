@@ -1,23 +1,24 @@
 The triggers contained in the apollo-triggers.sql file assign names according
 to the following rules:
 
-1. If the feature has prefix||'temp' in the uniquename, it gets renamed using a
-   db sequence for generating uniquenames.  
+1. If the feature has 'prefix:temp' in the uniquename, it gets renamed using a
+   db sequence for generating uniquenames.  Note that 'prefix' is a MOD
+   specific string set at the time the chado database is created. 
 
-   a. If the feature is a gene and the name has prefix||'temp' in it, it
+   a. If the feature is a gene and the name has 'prefix:temp' in it, it
       is set equal to the uniquename, otherwise it is left as is.
 
-   b. Otherwise, if the feature name has prefix||'temp' in it, it is set
-      to null so that it can be renamed later.
+   b. Otherwise if the feature is not a gene and the feature name has
+      'prefix:temp' in it, it is set to null so that it can be renamed later.
 
 2. When features are given parents via a part_of or producedby relationship
    (via an insert into feature_relationship), the child feature's name
    is created based on the gene's uniquename.  The rules are these:
 
-   a. If it is a transcript type (ie, mRNA, tRNA, miRNA) or a protein,
+   a. If it is a transcript type (ie, mRNA, tRNA, miRNA) or a polypeptide,
       the name is of the form "gene_uniquename-type_nameNN" where NN
-      is the next available number for that feature type (see the 
-      examples below).
+      is the next available number for that feature type associated
+      with that gene (see the examples below).
 
    b. If the feature is an exon, it is given a name based on the gene's
       uniquename and fmin and fmax for the exon.
@@ -36,3 +37,5 @@ exon	RICE:temp1	RICE:temp1	RICE0003:2-25 		RICE0008
 protein	null		RICE:temp34	RICE0003-protein1	RICE0009
 protein cftr-delF508	RICE:temp44	cftr-delF508		RICE0010
 miRNA	null		RICE:temp22	RICE0001-miRNA1		RICE0011
+mRNA	Adh-mRNA1	RICE:temp9	Adh-mRNA1		RICE0012
+protein	Adh-protein1	RICE:temp8	Adh-protein1		RICE0013
