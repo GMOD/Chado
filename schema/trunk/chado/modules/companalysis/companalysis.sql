@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.13 2002-12-23 20:13:13 cwiel Exp $
+## $Id: companalysis.sql,v 1.14 2002-12-31 01:31:54 cwiel Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -150,3 +150,4 @@ create table analysisfeature (
     unique (feature_id)
 );
 
+create index af_feature_id_ind1 on analysisfeature(feature_id);
