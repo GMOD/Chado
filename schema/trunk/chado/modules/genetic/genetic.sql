@@ -192,7 +192,7 @@
 -- uniquename          : a human-readable unique identifier
 --
 
-CREATE TABLE gcontext (
+create table gcontext (
 	gcontext_id	serial not null,
 	primary key (gcontext_id),
 	uniquename	varchar(255) not null,
@@ -214,7 +214,7 @@ create index gcontext_idx1 on gcontext(uniquename);
 -- they would all be descended from the same parent gcontext
 -- 
 --
-CREATE TABLE gcontext_relationship (
+create table gcontext_relationship (
 	gcontext_relationship_id	serial not null,
 	primary key (gcontext_relationship_id),
 	subjectgc_id	int not null,
@@ -252,7 +252,7 @@ create index gcontext_relationship_idx3 on gcontext_relationship (type_id);
 -- rank                : preserves order
 -- group               : spatially distinguishable group
 --
-CREATE TABLE feature_gcontext (
+create table feature_gcontext (
 	feature_gcontext_id	serial not null,
 	primary key (feature_gcontext_id),
 	feature_id	int not null,
@@ -280,7 +280,7 @@ create index feature_gcontext_idx2 on feature_gcontext (gcontext_id);
 -- 
 -- value               : unconstrained free text value
 --
-CREATE TABLE gcontextprop (
+create table gcontextprop (
 	gcontextprop_id	serial not null,
 	primary key (gcontextprop_id),
 	gcontext_id	int not null,
@@ -313,7 +313,7 @@ create index gcontextprop_idx2 on gcontextprop (type_id);
 -- cvalue_id           : constrained value from ontology, e.g. "abnormal", "big"
 -- assay_id            : e.g. name of specific test
 --
-CREATE TABLE phenstatement (
+create table phenstatement (
 	phenstatement_id	serial not null,
 	primary key (phenstatement_id),
 	gcontext_id int not null,
@@ -345,7 +345,7 @@ create index phenstatement_idx3 on phenstatement (attr_id);
 -- publication
 -- 
 --
-CREATE TABLE phendesc (
+create table phendesc (
 	phendesc_id	serial not null,
 	primary key (phendesc_id),
 	gcontext_id	int not null,
@@ -364,7 +364,7 @@ create index phendesc_idx1 on phendesc (gcontext_id);
 -- are always relationships between phenstatements
 -- 
 --
-CREATE TABLE phenstatement_relationship (
+create table phenstatement_relationship (
 	phenstatement_relationship_id serial not null,
 	primary key (phenstatement_relationship_id),
 	subject_id	int not null,
@@ -390,7 +390,7 @@ create index phenstatement_relationship_idx3 on phenstatement_relationship (type
 -- for anything that doesn't fit into obs/attr/val model
 -- 
 --
-CREATE TABLE phenstatement_cvterm (
+create table phenstatement_cvterm (
 	phenstatement_cvterm_id	serial not null,
 	primary key (phenstatement_cvterm_id),
 	phenstatement_id	int not null,
@@ -412,7 +412,7 @@ create index phenstatement_cvterm_idx2 on phenstatement_cvterm (cvterm_id);
 -- 
 -- value               : unconstrained free text value
 --
-CREATE TABLE phenstatementprop (
+create table phenstatementprop (
 	phenstatementprop_id	serial not null,
 	primary key (phenstatementprop_id),
 	phenstatement_id	int not null,

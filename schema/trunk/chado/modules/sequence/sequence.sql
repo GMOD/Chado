@@ -24,7 +24,7 @@ create table feature (
        timeaccessioned timestamp not null default current_timestamp,
        timelastmodified timestamp not null default current_timestamp,
 
-       unique(organism_id,uniquename, type_id)
+       unique(organism_id, uniquename, type_id)
 );
 -- dbxref_id here is intended for the primary dbxref for this feature.   
 -- Additional dbxref links are made via feature_dbxref
