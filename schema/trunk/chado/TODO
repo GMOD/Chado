@@ -47,6 +47,11 @@ locally.
 - create a method for populating cvtermpath (make_cvtermpath.pl is a starting
 point).
 - add support for relative coordinates in gff3 and the gbrowse adaptor
+- ontology name in cv table needs to be the same as the name of the root node in the dag-edit ontology file,
+  (requested by mungall).
+- gene ontology (GO) needs to have its three aspects split into separate ontologies, so the bullet above would
+  use one term below the root (eg, "biological process") as the cv.name and root node in cvterm/cvtermpath/cvtermrelationship.
+  (requested by mungall).
 
 For following releases:
 - incorporate Pub*
