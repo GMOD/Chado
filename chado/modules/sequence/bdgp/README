@@ -1,0 +1,108 @@
+BDGP Sequence Ontology layer
+============================
+
+This is EXPERIMENTAL
+
+To generate the SO view layer, run this:
+
+bin/mk_views.pl -d chado > so-views.sql
+
+This will create a PORTABLE set of views; one view for every SO type,
+and one view for every SO relationship (eg mrna2gene), as dictated by
+an existing chado db.
+
+For a faster, NON-PORTABLE layer that uses cvterm_ids, run
+
+bin/mk_views.pl -i -d chado > so-views-i.sql
+
+IMPORTANT: If the cvterms are changed, then this needs rebuilt
+
+For an even faster materialized layer that builds tables instead of
+views, change the relation type:
+
+bin/mk_views.pl -rtype TABLE -i -d chado > so-tables-i.sql
+
+This requires A LOT of disk space. you'll be doubling the storage you
+need for features.
+
+A hybrid approach may be workable - you'll have to cut and paste the
+relevant parts yourself. 
+
+
+
+EXAMPLES:
+
+SELECT *
+FROM
+  gene NATURAL JOIN
+  gene2mrna NATURAL JOIN
+  mrna NATURAL JOIN
+  mrna2exon NATURAL JOIN
+  mrna2protein
+WHERE gene.name = 'dpp';
+
+SELECT *
+FROM
+             gene 
+  INNER JOIN gene2mrna ON (gene.gene_id = gene2mrna.gene_id)
+  INNER JOIN mrna      ON (mrna.mrna_id = gene2mrna.mrna_id)
+
+WHERE gene.name = 'dpp';
+
+explain analyze select count(*) from feature where type_id = 257;
+
+explain analyze
+SELECT trna.name AS trna_name, exon.*
+FROM
+  trna INNER JOIN trna2exon USING (trna_id)
+  INNER JOIN
+  exon USING (exon_id);
+
+explain analyze
+SELECT trna.name AS trna_name, exon.*
+FROM
+  gene 
+    INNER JOIN 
+  gene2trna USING (gene_id)
+    INNER JOIN 
+  trna USING (trna_id)
+    INNER JOIN 
+  trna2exon USING (trna_id)
+    INNER JOIN
+  exon USING (exon_id);
+
+explain analyze
+SELECT gene.name AS gene_name,
+       trna.name AS trna_name, 
+       exon.*
+FROM
+  gene 
+    INNER JOIN 
+  gene2trna USING (gene_id)
+    INNER JOIN 
+  trna USING (trna_id)
+    INNER JOIN 
+  trna2exon USING (trna_id)
+    INNER JOIN
+  exon USING (exon_id)
+WHERE 
+  gene.name = 'CR31987';
+
+
+explain analyze
+SELECT gene.name AS gene_name,
+       trna.name AS trna_name, 
+       exon.*
+FROM
+  gene 
+    INNER JOIN 
+  feature_relationship AS gene2trna ON (gene_id = gene2trna.objfeature_id)
+    INNER JOIN 
+  trna ON (trna_id = gene2trna.subjfeature_id)
+    INNER JOIN 
+  feature_relationship AS trna2exon ON (trna_id = trna2exon.objfeature_id)
+    INNER JOIN
+  exon ON (exon_id = trna2exon.subjfeature_id)
+WHERE 
+  gene.name = 'CR31987';
+
