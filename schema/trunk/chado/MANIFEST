@@ -1,6 +1,7 @@
 bin/addcascades
 bin/AutoDBI.PL
 bin/ddltrans
+bin/gmod_dump_gff3.pl
 bin/make_cvtermpath.pl
 bin/make_cvtermpath.sh
 bin/make_partial_indexes.pl
@@ -31,7 +32,7 @@ lib/Bio/GMOD/DB/Config.pm
 lib/Chado/Builder.pm
 lib/Chado/Config.pm
 LICENSE
-load/bin/bulk_load_gff3.pl
+load/bin/gmod_bulk_load_gff3.pl
 load/bin/genbank2gff3.PLS
 load/bin/load_affymetrix.pl
 load/bin/load_affyxls.pl
