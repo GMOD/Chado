@@ -1,0 +1,76 @@
+SYNOPSIS
+      GMODTools is a collection of perl scripts for use
+      with GMOD Chado databases, primarily at this point
+      for loading and extracting miscellaneous sequences.
+  
+      Many of the sequence functions are in library module
+        GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
+      with main programs in bin/ folder as summarized below.
+  
+      It is based on GMOD release 0.001 (January 2004) and can
+      be expected to change or go obsolete.  Besides contents of
+      this package, requirements to run include the perl modules
+      installed with GMOD release, esp. Chado::LoadDBI/AutoDBI and
+      its ancestor classes from CPAN - Class::DBI, Ima::DBI, etc.
+  
+      This was written for use with the nascent Daphnia genome database,
+      wFleaBase, at http://eugenes.org/daphnia/ See also further information
+      at http://eugenes.org/daphnia/database
+
+NAME
+    gmod_init_db.pl
+
+SYNOPSIS
+      A simple script to create the Chado database and tables
+      based on test_load.pl.   d.gilbert added:
+        parts to load in initialize.sql, 
+        add new organisms, 
+        add user choice of ontologies, which must exist in GMOD_ROOT/data/ontologies/
+
+      Assumes that Chado::LoadDBI is available for ontologies
+
+NAME
+    gmod_load_newseq.pl
+
+SYNOPSIS
+    Load a file of miscellany sequences into chado db, generating public
+    IDs. Sequences are assumed to be non-genomic, not located.
+
+NOTES
+    Good for small seqs: cDNA, EST, microsats, ; left out genome-sized
+    methods. Need for nascent daphnia wFleaBase to get sequence public IDs
+    Cut from gmod_load_gff3.pl
+
+NAME
+    gmod_dump_seq.pl - Print sequences from ChadoDB
+
+SYNOPSIS
+    Dump sequence file of Chado features, with feature props, synonyms,
+    dbxrefs xSelect by organism, by 'pub' = input file, seq type, feat props
+    Need for nascent daphnia wFleaBase to use sequence public IDs
+
+    Good for small seqs: cDNA, EST, microsats. Left out genome-sized
+    methods. Only does fasta format now
+
+NAME
+      gmod_list_db.pl
+
+SYNOPSIS
+    Summarize feature entries in a Chado database, by publication (input
+    file), by Seq. Ontology type (cDNA, EST, etc.), by organism. Add other
+    categories as needed.
+
+SEE ALSO
+      gmod_init_db.pl -- initialize a new database, adding organisms, intialize.sql,
+         ontology data sets.
+     
+      gmod_dump_seq.pl -- output sequences selected by organism, publication (input file),
+         seq type.
+     
+      gmod_list_db.pl  -- show feature statistics for chado db: # per organism, per seq type,
+        per publication/infile, and checksum test for sequence duplications.
+
+      GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
+
+AUTHORS
+      Don Gilbert, Feb 2004
