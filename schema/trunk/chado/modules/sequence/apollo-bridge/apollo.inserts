@@ -1,0 +1,129 @@
+--creates several items that Apollo expects to be in the database:
+-- a property type cv and terms
+-- a pub type cv and terms
+-- a pubrelationship type cv and terms
+-- a pubprop type cv and terms
+
+--Rice    EST_match 
+--Rice    cDNA_match
+--Maize   EST_match
+--Maize   cross_genome_match
+--Rice    protein_match
+--FgenesH:Monocot
+
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_EST_match','blat','1','Rice_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_cDNA_match','blat','1','Rice_cDNA');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_EST_match','blat','1','Maize_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_protein_match','blat','1','Rice_protein');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_cross_genome_match','blat','1','Maize_genome');
+insert into analysis (name,program,programversion,sourcename)
+   values ('FgenesH_Monocot','FgenesH','1','na');
+
+insert into cv (name,definition) values ('property type','crude property type cv for Apollo/XORT; should probably be replaced with something else');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'aminoacid');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'anticodon');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'comment');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'date');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'description');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'element');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'encoded_symbol');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'internal_synonym');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'owner');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'problem');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'protein_id');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'qseq_type');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'sp_comment');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'sp_status');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'status');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'symbol');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'unixdate');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'gbunit');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'cyto_range');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'dicistronic');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'validation_flag');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'keywords');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'organism');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'mol_type');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'dev_stage');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'chromosome');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name = 'property type'),'map');
+
+
+insert into cv (name) values ('pub type');
+insert into cvterm (name, cv_id) values ('computer file', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('curator', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('publication', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('Book', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('DNA/RNA sequence record', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('abstract', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('archive', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('automatic genome annotation', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('bibliographic list', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('biography', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('book', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('book review', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('booklet', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('conference report', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('curated genome annotation', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('demonstration', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('editorial', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('erratum', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('film', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('interview', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('jigsaw puzzle', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('letter', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('meeting report', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('microfiche', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('microscope slides', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('news article', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('note', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('obituary', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('other', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('patent', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('personal communication to FlyBase', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('poem', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('press release', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('protein sequence record', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('recording', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('retraction', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('review', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('slides', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('spoof', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('stock list', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('supplementary material', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('tactile diagram', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('teaching note', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('thesis', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('unpublished', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('video', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('paper', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('journal', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('null pub', (select cv_id from cv where name='pub type'));
+insert into cvterm (name, cv_id) values ('submitted', (select cv_id from cv where name='pub type'));
+
+
+insert into cv (name) values ('pub relationship type');
+insert into cvterm (name, cv_id) values('also_in', (select cv_id from cv where name='pub relationship type'));
+insert into cvterm (name, cv_id) values('corrects', (select cv_id from cv where name='pub relationship type'));
+insert into cvterm (name, cv_id) values('makes_obsolete', (select cv_id from cv where name='pub relationship type'));
+insert into cvterm (name, cv_id) values('published_in', (select cv_id from cv where name='pub relationship type'));
+
+
+insert into cv (name) values ('pubprop type');
+insert into cvterm (name, cv_id) values('abbreviation', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('abstract', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('abstract_languages', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('cam_offprint', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('comment', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('errata', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('erratum', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('internalnotes', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('languages', (select cv_id from cv where name='pubprop type'));
+insert into cvterm (name, cv_id) values('series_abbrev', (select cv_id from cv where name='pubprop type'));
+
+

@@ -135,7 +135,7 @@ SELECT
   cv.name        ,
   fl.fmin+1      ,
   fl.fmax        ,
-  '.'            ,
+  af.significance,
   fl.strand      ,
   fl.phase       ,
   gffattstring(f.feature_id),
@@ -148,5 +148,6 @@ FROM feature f
      LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
      LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
      LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
+     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
 WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
 
