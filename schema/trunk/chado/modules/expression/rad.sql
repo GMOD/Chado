@@ -490,6 +490,7 @@ create table elementresult (
 create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (subclass_view);
+create unique index elementresult_idx4 on elementresult (element_id,quantification_id,subclass_view);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the "real" data from the microarray hybridization.  the fields of this table are intentionally generic so that many different platforms can be stored in a common table.  each platform should have a corresponding view onto this table, mapping specific parameters of the platform to generic columns';
 
