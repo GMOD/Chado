@@ -91,11 +91,11 @@ sub get_feature {
 
   valid constraint key: range, src/src_seq, value is a single value or hash ref (range)
 
-  valid options key: feature_types, values is a single SO type or an array ref of SO types
+  valid options key: type, values is a single SO type or an array ref of SO types
                      default to [qw(gene transposable_element remark)]
 
                      source_origin_feature_type, default to chromosome_arm. This is critical option
-                     when getting golden_path_region features in the range since your feature_types
+                     when getting golden_path_region features in the range since your feature types
                      is a feature that does not have src seq (most top level feature in a genome).
                      This is true for getting any feature that is second level to most top feature
                      in the genome (see soi tree, read readme for this)
@@ -111,7 +111,7 @@ sub get_features {
     my $self = shift;
     my $constr = shift;
     my $opts = shift || {};
-    my $typelist = $opts->{feature_types} || [qw(gene transposable_element remark)];
+    my $typelist = $opts->{type} || $opts->{types} || $opts->{feature_types} || [qw(gene transposable_element remark)];
 
     my $f_src_origin_type = $opts->{source_origin_feature_type} || 'chromosome_arm';
 
@@ -236,11 +236,6 @@ sub get_features {
 
   valid constraint key: analysis, program, sourcename/database, value is either single val or arrayref
 
-  valid options key: feature_types, value is a single SO type or an array ref of SO types
-                     default to [qw(match mRNA transposable_element)]
-
-                     noresidues, not to get subject seq residues, default 0
-
   Description - get feature holders (that will hold result feature from the computational analysis)
 
 =cut
@@ -328,7 +323,7 @@ sub _get_progs_dbs {
   valid constraint key: range, src/src_seq, value is a single value or hash ref (range)
                         analysis, program, sourcename/database, value is either single val or arrayref
 
-  valid options key: feature_types, values is a single SO type or an array ref of SO types
+  valid options key: type, values is a single SO type or an array ref of SO types
                      default to [qw(match mRNA transposable_element)]
 
                      noresidues, not to get subject seq residues, default 0
@@ -342,7 +337,7 @@ sub get_results {
     my $constr = shift;
     my $opts = shift || {};
 
-    my $tlist = $opts->{feature_types} || [qw(match mRNA transposable_element)];
+    my $tlist = $opts->{type} || $opts->{types} || $opts->{feature_types} || [qw(match mRNA transposable_element)];
     my $tliststr = join(",", map{"'".$_."'"}@$tlist);
     my ($progs, $dbs) = $self->_get_progs_dbs($constr);
     my $where;
@@ -557,7 +552,7 @@ sub get_features_by_typed_value {
     my $value = shift;
     my $opts = shift || {};
     my $extend =  $opts->{extend} || 0;
-    my $tlist = $opts->{feature_types} || $opts->{types};
+    my $tlist = $opts->{type} || $opts->{feature_types} || $opts->{types};
 
     my $where = "(f.name = '$value' OR f.uniquename = '$value')";
 
