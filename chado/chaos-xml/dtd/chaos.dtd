@@ -1,6 +1,6 @@
 <!--
 
-  $Id: chaos.dtd,v 1.3 2004-10-18 20:49:34 cmungall Exp $
+  $Id: chaos.dtd,v 1.4 2005-02-11 01:50:55 cmungall Exp $
 
   CHAOS XML DTD
 
@@ -21,7 +21,7 @@
 -->
 
 <!-- chaos: this is the top-level node -->
-<!ELEMENT chaos (chaos_metadata,(feature|feature_relationship)+)>
+<!ELEMENT chaos (chaos_metadata?,feature+,feature_relationship*)>
 
 <!-- ======== -->
 <!-- METADATA -->
@@ -90,7 +90,7 @@
      It is equivalent to the chado table "feature"
 
       -->
-<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5?|featureprop*|organismstr?|featureloc*|feature_dbxref*|seqlen?)+>
+<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5?|featureprop*|organismstr?|featureloc*|feature_dbxref*|seqlen?|is_analysis?)+>
 
 <!-- feature_id:
 
@@ -241,6 +241,13 @@
 
  -->
 <!ELEMENT seqlen (#PCDATA)>
+
+<!-- is_analysis:
+
+  Boolean. Set to 1 if this is an analysis feature
+
+-->
+<!ELEMENT is_analysis (#PCDATA)>
 
 <!-- type:
 
@@ -455,5 +462,5 @@
 
 <!--  END OF CHAOS XML DTD -->
 <!--  $Author: cmungall $ -->
-<!--  $Id: chaos.dtd,v 1.3 2004-10-18 20:49:34 cmungall Exp $ -->
+<!--  $Id: chaos.dtd,v 1.4 2005-02-11 01:50:55 cmungall Exp $ -->
 
