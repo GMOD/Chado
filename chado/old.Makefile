@@ -65,4 +65,6 @@ metadata: ./bin/ddltrans
 	./bin/ddltrans -f xml ./dat/chado.ddl > ./dat/chado.xml
 
 
+cascades: 
+	./bin/addcascades `find . -name \*.sql -print`
 
