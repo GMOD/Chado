@@ -45,6 +45,7 @@ sub write_feature {
   my $organism_id = 1; #FIXME
 
   my $feature_id = $self->write_row_feature($feature);
+  next unless $feature_id;
   $self->write_row_featureloc($feature , $feature_id);
   $self->write_row_feature_relationship($feature,$feature_id);
 }
@@ -97,7 +98,11 @@ sub write_row_feature{
 
   my @unames = map {$_->value} $feature->annotation->get_Annotations('ID');
   my $uname = $unames[0];
-  if($uname){
+  if(defined($uname) and $self->feature_id($uname)){
+    my $saw = $self->feature_id($uname);
+    $self->warn("already saw $uname, returning previous record $saw.  FIXME we should still try to extract new attributes");
+    return $saw;
+  } elsif(defined($uname)){
     $self->feature_id($uname,$feature_id);
   } else {
     $uname = $feature->seq_id.':'.$feature->start.','.$feature->end;
