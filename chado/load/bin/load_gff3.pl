@@ -201,6 +201,9 @@ while(my $gff_feature = $gffio->next_feature()) {
     ($chado_type) = $typemap{$gff_feature->primary_tag}; 
   }
 
+  die $gff_feature->primary_tag . " could not be found in your cvterm table.\nEither the Sequence Ontology was incorrectly loaded,\nor this file doesn't contain GFF3" unless $chado_type;
+
+
 #warn $id .'_'. $gff_feature->primary_tag .'_'. $gff_feature->seq_id .':'. $gff_feature->start .'..'. $gff_feature->end;
 #warn "*".$gff_feature->has_tag('ID')." ". $dbxref{$id}->id;
 #warn "organism:$chado_organism";
@@ -221,7 +224,7 @@ while(my $gff_feature = $gffio->next_feature()) {
 
   next if $id eq $gff_feature->seq_id; #ie, this is a srcfeature (ie, fref) so only create the feature
 
-  $chado_feature->dbxref_id($dbxref{$id}) if $gff_feature->has_tag('ID');
+  $chado_feature->dbxref_id($dbxref{$id}) if $gff_feature->has_tag('ID'); # is this the right thing to do here?
   $chado_feature->update;
 
 #warn $chado_feature->name;
@@ -240,34 +243,29 @@ while(my $gff_feature = $gffio->next_feature()) {
   $feature{$id} = $chado_feature if $gff_feature->has_tag('ID');
 
   if($gff_feature->has_tag('ID')){
-    my($id)     = $gff_feature->get_tag_values('ID');
-
-  }
-  if($gff_feature->has_tag('Parent')){
-    my($parent) = $gff_feature->get_tag_values('Parent');
-
-#warn $chado_feature->uniquename ." part of ". $gff_feature{$parent}->uniquename; 
-    Chado::Feature_Relationship->find_or_create({
-      subject_id => $chado_feature,
-      object_id => $feature{$parent},
-      type_id => $part_of,
-                                              });
-  } else { # the feature is the parent, so it's name goes into synonym
-
     my ($synonym) = Chado::Synonym->find_or_create({
                       name    => $id,
                       type_id => $synonym_type->cvterm_id
                                                    });
-
+                                                                                                                                  
     Chado::Feature_synonym->find_or_create ({
                       synonym_id => $synonym->synonym_id,
                       feature_id => $chado_feature->feature_id,
                       pub_id     => 1 ##what should go here?
                                             })
-
   }
 
-    
+  if($gff_feature->has_tag('Parent')){
+    my($parent) = $gff_feature->get_tag_values('Parent');
+
+#warn $chado_feature->uniquename ." part of ". $gff_feature{$parent}->uniquename; 
+    Chado::Feature_Relationship->find_or_create({
+      subject_id => $chado_feature->id,
+      object_id => $feature{$parent}->id,
+      type_id => $part_of
+                                              });
+
+  }
 
 }
 $gffio->close();
