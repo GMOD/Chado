@@ -50,24 +50,21 @@ use FindBin qw( $Bin ); ## dang, this uses system Config.pm, name conflict here
 use Cwd qw(abs_path);
 use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
-# use Exporter;
 
-use Bio::GMOD::Config;
+### use Bio::GMOD::Config;
 
-use vars qw/@ISA @EXPORT @EXPORT_OK $BASE $ROOT $INIT $Variables/;
+use vars qw/@ISA $BASE @CONF_SUF $ROOT $INIT $Variables/;
 
 our $DEBUG;
 our $VERSION = "0.4";
 
 BEGIN {
+### @ISA = qw/ Bio::GMOD::Config /;  ## DO WE NEED THIS base package at all?
 $DEBUG = 0;
-@ISA = qw/ Bio::GMOD::Config /;
-# @ISA = qw(Exporter);
-# @EXPORT_OK = qw(get set);
-#@EXPORT = qw(&get &set);
 $ROOT= "GMOD_ROOT";  
 $INIT= "GMOD_INIT";
 $BASE= undef;
+@CONF_SUF=  (".conf", ".cnf", ".xml", "" );
 $Variables= \%ENV; #?
 }
 
@@ -95,18 +92,39 @@ sub new {
   my $arg  = shift;
 
   my $root;
-  if ($arg) {
-    $root = $arg; #can override the environment variable
-  } elsif($BASE)  {
-    $root= $BASE->{'gmod_root'};
-  } else {
-    $root = $ENV{'GMOD_ROOT'};  #required
-  }
+  my %args=();
+  if (ref($arg) =~ /ARRAY/)   { %args= @$arg;  $root= $args{'gmod_root'}; }
+  elsif (ref($arg) =~ /HASH/) { %args= %$arg;  $root= $args{'gmod_root'}; }
+  elsif ($arg) { $root = $arg; } #can override the environment variable
+  $DEBUG= $args{debug} if defined $args{debug};
+   
+  unless($root){
+    if ($BASE)  { $root= $BASE->{'gmod_root'}; }
+    else { $root = $ENV{'GMOD_ROOT'}; }  #required
+    }
 
-  my $confdir = catdir($root, 'conf'); 
-  my @db= ();
+  my @db= ();   # dgg - drop this ?
   my $confhash= {};
-  my $confpatt= '(gmod|[\w_\-]+db)\.conf$'; # FIXME - need caller opts
+  
+    # need options for subdirs inside conf/ at least: bulkfiles/ gbrowse.conf/ ...
+  my @sp= ();
+  if ($args{searchpath}) {
+  foreach my $sp (@ { $args{searchpath} }) {
+    ##print STDERR "Config2: searchpath $sp\n"; #DEBUG
+    if (-d $sp) { push(@sp, $sp); }
+    else {
+      $sp= catdir($root, $sp);
+      push(@sp, $sp) if (-d $sp);
+      }
+    }
+  }
+  my $searchpath= \@sp;
+  
+  my $confdir = $args{confdir} || 'conf';
+  $confdir= catdir($root, $confdir) unless($confdir =~ m,^/,); #unixism
+    
+  my $confpatt= $args{confpatt} || '(gmod|[\w_\-]+db)\.conf$'; # FIXME - need caller opts
+  
   
 #   die "Please set the GMOD_ROOT environment variable\n"
 #      ."It is required from proper functioning of gmod" unless ($root);
@@ -140,18 +158,32 @@ sub new {
 #   }
 #   close CONF;
 
-  #?? $self= $self->SUPER::new($root || abs_path("$Bin/.."));
-
+  if (%args) {
+    #?? these should go into $confhash ?
+    delete $args{conf};
+    delete $args{confdir};
+    delete $args{confpatt};
+    delete $args{gmod_root};
+    delete $args{searchpath};
+    
+    my @keys= keys %args;
+    @$confhash{@keys}= @args{@keys} if @keys;
+    }
 
   return bless {db       => \@db,
                 conf     => $confhash,
                 confdir  => $confdir,
                 confpatt => $confpatt,
-                gmod_root=> $root}, $self;
+                searchpath => $searchpath,
+                gmod_root=> $root }, $self;
 }
 
 
 =head2 $confhash= config()
+
+=head2 $rootpath= gmod_root()
+
+=head2 $configdir= confdir()
 
 =head2 get(key)
 
@@ -173,9 +205,11 @@ sub new {
 
 =cut
 
-sub config {
-  return shift->{'conf'}; 
-}
+sub config { return shift->{'conf'};  }
+
+# same as Bio::GMOD::Config
+sub gmod_root { return shift->{gmod_root}; }
+sub confdir { return shift->{confdir}; }
 
 sub get {
   my $self = shift;
@@ -204,7 +238,6 @@ sub put {
 
 
 sub _cleanval {
- #?? my $self = shift;
   local $_= shift;
   s/^\s*//; s/\\?\s*$//; if (s/^(["'])//) { s/$1$//; }
   if ($Variables) {
@@ -215,11 +248,9 @@ sub _cleanval {
 
 
 sub _find_file  {
-  #?? my $self = shift;
   my($file, @search_path) = @_;
   my($filename, $filedir) = File::Basename::fileparse($file);
-
-  if($filename ne $file) {        # Ignore searchpath if dir component
+  if(!@search_path || $filename ne $file) { 
     return($file) if(-e $file);
     }
   else {
@@ -228,14 +259,31 @@ sub _find_file  {
       return($fullpath) if(-e $fullpath);
       }
     }
-
-  # If user did not supply a search path, default to current directory
-  if(!@search_path) {
-    if(-e $file) { return($file); }
-    }
   return undef;
 }
 
+sub _find_file2  {
+  my($file, $suffix, $search_path) = @_;
+  my($filename, $filedir) = File::Basename::fileparse($file);
+  
+  if(!$search_path || $filename ne $file) { 
+    foreach my $sf (@$suffix) {
+      my $fullpath = $file . $sf;
+      ##print STDERR "Config2::_find_file2 look at $fullpath\n" ;#if $DEBUG;
+      return($fullpath) if(-e $fullpath);
+      }
+    }
+  else {
+    foreach my $path (@$search_path)  {
+      foreach my $sf (@$suffix) {
+      my $fullpath = catfile($path, $file) .  $sf;
+      ##print STDERR "Config2::_find_file2 look at $fullpath\n" ;#if $DEBUG;
+      return($fullpath) if(-e $fullpath);
+      }
+      }
+    }
+  return undef;
+}
 
 =head2 readKeyValue($confval, $confhash)
 
@@ -282,18 +330,29 @@ sub readConfig
 {
   my $self = shift;
   my($file, $opts, $confhash)= @_;
-  $opts= ($opts) ? { %$opts } : {};
+  $readConfigOk= 0;
+  
+  if(ref $opts) {
+    $opts= { %$opts };
+    $opts->{Variables}= $Variables unless($opts->{Variables});
+  } else {
+    $opts= { debug => $DEBUG, Variables => $Variables };
+  }
   $confhash = $self->{'conf'} unless(ref $confhash); # always exists ?
   $confhash = {} unless(ref $confhash);
-  my $debug= delete $$opts{debug};
+
+  my $debug= delete $opts->{debug};
   $debug= $DEBUG unless defined $debug;
-  $readConfigOk= 0;
+  ##print STDERR "Config2::readConfig in=$file\n" if $debug;
+  
+  unless ($opts->{searchpath}) {
+    $opts->{searchpath}= [ @{$self->{'searchpath'}} ];
+    }
   
   unless ($file && -e $file) {
     my($filename, $filedir);
-    $opts->{searchpath}= [] unless ($opts->{searchpath});
     
-    $filedir= $self->{confdir}; 
+    $filedir= $self->{confdir}; # full path
     push(@{$opts->{searchpath}},$filedir) if (-d $filedir);
 
     $filedir= "conf/";
@@ -313,14 +372,16 @@ sub readConfig
     ($file, $ScriptDir, $Extension) = File::Basename::fileparse($0, '\.[^\.]+');
     }
   
-  if ($file && !-f $file) {
-    foreach my $suf (".conf", ".cnf", ".xml", "" ) {
-      my $cnf= _find_file("$file$suf", @{$opts->{searchpath}});  
-      if ($cnf) { $file= $cnf; last; }
-      }
-   }
-   
-  if (!$file || ($file =~ /\.xml/ && -f $file)) {
+  if ($file && !-e $file) {
+    my @suf= @CONF_SUF; ##(".conf", ".cnf", ".xml", "" );
+    my $cnf= _find_file2( $file, \@suf, $opts->{searchpath} );  
+    if ($cnf) { $file= $cnf;  }
+    }
+  
+  ##print STDERR "Config2::readConfig look at $file\n" if $debug;
+  $self->{filename}= $file;
+  
+  if (!$file || ($file =~ /\.xml/ && -e $file)) {
     require XML::Simple; ## will attemp to read $0.xml file if no file given
     my $xs = new XML::Simple(%$opts); # (NoAttr => 1, KeepRoot => 1);#options
     my $conf1 = $xs->XMLin( $file); 
@@ -331,7 +392,7 @@ sub readConfig
       }  
     }
   
-  elsif (-f $file) {
+  elsif (-e $file) {
     ## handle key-value file OR perl-struct
     open(F,$file); my $confval= join("",<F>); close(F);
     if ($confval =~ m/=>/s && $confval =~ m/[\{\}\(\)]/s) {
@@ -350,7 +411,7 @@ sub readConfig
       }
     }
   
-  warn " reading: $file ok=$readConfigOk\n" if $debug;
+  print STDERR "Config2: read: $file ok=$readConfigOk\n" if $debug;
   return $confhash;
 }
 
@@ -411,7 +472,9 @@ sub _updir
 =head2 $confhash= readConfDir( $dir, $confpatt, $confhash)
 
 Process all config files of confpatt in dir folder.
-
+ note: this can load in things you may not want 
+ (e.g. all the .xml.old files...)
+ 
 =cut
 our $readConfDirOk;
 
@@ -449,9 +512,11 @@ sub init_conf
   unless($readConfDirOk) {
     warn " no $confpatt file at $myroot/conf; setenv $ROOT to locate."
     }
-  else { # if ($SetEnv)
+  else { # if ($SetEnv) 
+    # -- need to be careful here, DONT replace existing key ?
     my @keys= keys %$confhash;
-    @ENV{@keys}= @{%$confhash}{@keys};
+    foreach my $k (@keys) { $ENV{$k}= $$confhash{$k} unless defined $ENV{$k}; } 
+    # @ENV{@keys}= @{%$confhash}{@keys};
     }
 
   $ENV{$INIT}= 1;

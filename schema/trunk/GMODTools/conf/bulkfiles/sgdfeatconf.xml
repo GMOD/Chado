@@ -1,0 +1,244 @@
+<opt
+  name="sgdfeatconv"
+  date="20040821"
+  >
+ 
+  <title>Chado DB Feature info for SGDLite db</title>
+  <about>
+    Edited for SGDLite feature usage (diff. from FlyBase)
+    
+    These are configurations for converting chado feature table dumps to
+    standard feature/sequence files. Much of below specifies how to
+    process different features (tied to methods in ChadoFeatDump.pm
+    
+    These configs should be data-set independent.
+    This works with, but is independent of SeqUtil2 configs.
+  </about>
+  
+  <informat>feature_table</informat>  
+  
+  <outformats>fff</outformats>
+  <outformats>gff</outformats>
+  <outformats>fasta</outformats>
+
+  <!-- copied from db-release config files .. this is mostly common info,
+    but db-release config can override @featset, %featmap -->
+
+  <!-- feature sets to make fasta bulk files -->
+  <featset>chromosome</featset>
+  <featset>gene</featset>
+  <featset>CDS</featset>
+  <featset>translation</featset>
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>gene_extended2000</featset>
+  <featset>intergenic</featset>
+
+  <!-- 
+   featmap for feature sets that need reprocessing, attributes: 
+    name = feature set name
+    types = feature types, space delimited (in fff/gff)
+    typelabel = type to use in output header, paired with types list
+    subrange = expansion/extraction range to add to feature location;
+             readseq syntax not yet supported, i.e. {start,end}+/-offset)
+    fromdb = extract from chado database feature.residues field
+             rather than chromosome dna file,
+             for curated residues - transcript, translation)
+    get_id = save id, dbxref fields for add to other (genemodel) features
+    add_id = add id of parent feature (genemodel)
+    note: translation type=protein is coded into various seq fetch programs
+  -->
+  
+  
+  <featmap name="gene" get_id="1" />
+  <featmap name="five_prime_UTR" add_id="gene" />
+  <featmap name="three_prime_UTR" add_id="gene" />
+  <featmap name="intron" add_id="gene" />
+  <featmap name="mRNA" add_id="gene" />
+  <featmap name="CDS" add_id="gene" />
+
+  <featmap
+    name="translation"
+    types="CDS"
+    typelabel="protein"
+    fromdb="1"
+    />
+  <featmap
+    name="transcript"
+    types="mRNA"
+    typelabel="transcript"
+    fromdb="1"
+    />
+  <featmap
+    name="scaffold"
+    types="golden_path_region"
+    typelabel="scaffold"
+    fromdb="1"
+    />
+  <featmap
+    name="transposon"
+    types="transposable_element"
+    typelabel="transposable_element"
+    />
+  <featmap
+    name="miscRNA"
+    types="ncRNA snRNA snoRNA rRNA" 
+    />
+  <featmap
+    name="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+  <featmap
+    name="intergenic"
+    types="gene"
+    typelabel="intergenic"
+    method="between"
+    />
+
+    
+  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+  <mergematch></mergematch>
+
+<!--
+## SONG/so Revision: 1.45
+##     @is_a@oligo ; SO:0000696 ; SOFA:SOFA ; synonym:oligonucleotide
+## 'so' is no longer valid
+##   old value: @is_a@so ; SO:1000000
+##  options are limited: located_sequence_feature, SO:0000110 ??
+##  in flybase, 'so' seems used for protein blast matches?
+## segment not in this    
+## alt choices ...
+#      @is_a@assembly ; SO:0000353 ; SOFA:SOFA
+# **    @is_a@golden_path ; SO:0000688 ; SOFA:SOFA   <<
+# **    @is_a@supercontig ; SO:0000148 ; SOFA:SOFA ; synonym:scaffold    <<
+#     @is_a@tiling_path ; SO:0000472 ; SOFA:SOFA
+#     @is_a@virtual_sequence ; SO:0000499 ; SOFA:SOFA
+#     @is_a@chromosome ; SO:0000340
+#     @part_of@chromosome_arm ; SO:0000105
+
+## aug04: add new analysis features (HDP,RNAiHDP,fgenesh,)
+## these are like exons but parent feature lacks featureloc 
+## - need to join together by object_oid/parent_oid and compute parent feature (has name)
+## SO type.subtype should be match.program
+## SONG: match, match_part match_set nucleotide_match cross_genome_match cDNA_match EST_match
+
+#? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
+-->
+
+  <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
+  <origin_one
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    />
+
+  <topsort
+    chromosome_arm="1"
+    chromosome="1"
+    />
+    
+  <segmentfeats 
+    BAC="1"
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    golden_path_region="1"
+    golden_path="1"
+    source="1"
+    />
+  <!-- 
+      ## segment no longer valid SO; supercontig or golden_path are best
+  -->
+  
+  <!-- simplefeat == segmentfeats + others -->
+  <simplefeat 
+    BAC="1"
+    chromosome_arm="1"
+    chromosome_band="1"
+    chromosome="1"
+    gene="1"
+    golden_path_region="1"
+    golden_path="1"
+    mature_peptide="1"
+    oligonucleotide="1"
+    point_mutation="1"
+    pseudogene="1"
+    region="1"
+    repeat_region="1"
+    segment="1"
+    source="1"
+    transcription_start_site="1"
+    />
+    
+  <dropname 
+    mRNA_genscan="1"
+    mRNA_piecegenie="1"
+    tRNA_trnascan="1"
+    />
+    
+  <dropid 
+    exon="1"
+    intron="1"
+    />
+    
+  <dropfeat_fff 
+    exon="1"
+    remark="1"
+    />
+    
+  <dropfeat_gff 
+    remark="1"
+    />
+
+  <skipaskid 
+    />
+
+  
+  <hasdups 
+    />
+    
+  <maptype 
+    five_prime_untranslated_region="five_prime_UTR"
+    golden_path_region="golden_path"
+    match_fgenesh="match_fgenesh"
+    match_HDP="match_HDP"
+    match_RNAiHDP="match_RNAiHDP"
+    mRNA_genscan="mRNA_genscan"
+    mRNA_piecegenie="mRNA_piecegenie"
+    mRNA_trnascan="tRNA_trnascan"
+    oligonucleotide="oligo"
+    three_prime_untranslated_region="three_prime_UTR"
+    transposable_element_gene="transposable_element"
+    />
+  <!--
+  so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
+  -->
+    
+  <maptype_gff>
+    <!-- FIXME: ordered arrays here .. $type, $gffsource -->
+    <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
+    <match_part_fgenesh>match_part</match_part_fgenesh>
+    <match_part_fgenesh>fgenesh</match_part_fgenesh>
+    <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
+    <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
+    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
+    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
+    <match_part_HDP>match_part</match_part_HDP>
+    <match_part_HDP>HDP</match_part_HDP>
+    <match_HDP>match</match_HDP>
+    <match_HDP>HDP</match_HDP>
+    <tRNA_trnascan>tRNA</tRNA_trnascan>
+    <tRNA_trnascan>trnascan</tRNA_trnascan>
+    <match_fgenesh>match</match_fgenesh>
+    <match_fgenesh>fgenesh</match_fgenesh>
+    <mRNA_genscan>mRNA</mRNA_genscan>
+    <mRNA_genscan>genscan</mRNA_genscan>
+    <match_RNAiHDP>match</match_RNAiHDP>
+    <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
+  </maptype_gff>
+
+  
+</opt>

@@ -21,6 +21,7 @@ use strict;
     chadofeatsql.xml  --  chado db sql calls to dump features
     chadofeatconv.xml --  feature conversion options
 
+  
 =head1 INPUTS
 
   Chado genome databases available (aug 2004) are
@@ -66,7 +67,7 @@ use strict;
   my $featwriter= $sequtil->getFeatureWriter();
   my $result= $featwriter->makeFiles( 
     infiles => [ @$seqfiles, @$chrfeats ], # required
-    formats => [qw(fff gff fasta)] , # optional
+    formats => [qw(fff gff fasta blast)] , # optional
     );
     
     
@@ -127,7 +128,7 @@ use strict;
              (could be ${GMOD_ROOT})
              
     TMP="${ARGOS_ROOT}/flybase/tmp"  -- locate temp folder
-    datadir="data2/fban"   -- subfolder for data releases
+    datadir="genomes/Saccharomyces_cerevisiae"   -- subfolder for data releases
     >
 
   <title>SGD Chado DB Lite r1</title>  -- your release title
@@ -174,7 +175,21 @@ use strict;
   <dnafiles ... />
   <featfiles ... />
   <fastafiles ... />
-
+    changed above tags to be array/hash based on format names
+    so new formats can be added w/o rewriting code
+       
+    <fileset
+      name="fasta"   -- = output format type
+      path="fasta/[\w\-\_]+.fasta" -- subdirectory with files
+      title="Fasta sequence of features"
+      config="toFasta"    -- configurations
+      handler="FastaWriter"  -- perl module to write (makeFiles method)
+      dogzip="1"    -- gzip up output
+      etc="..."
+      -- add this? depends= requires= input= informat= ...
+      depends="format1,format2"  // input="fff,dna"
+      />
+    
     -- feature sets to make fasta bulk files 
   <featset>gene</featset>
   <featset>mRNA</featset>
@@ -215,8 +230,23 @@ use strict;
   cvs -d $cvsd co schema/GMODTools
 
   Backup CVS: set cvsd=':pserver:anonymous@eugenes.org:/bio/cvs'
-  cvs -d $cvsd co gmod/schema/GMODTools
+  cvs -d $cvsd co -d GMODTools gmod/schema/GMODTools
   
+=head1 QUICK TEST (Postgres active):
+
+  # get soft
+  cvs -d $cvsd co -d GMODTools schema/GMODTools 
+  
+  # load a genome chado db to Postgres
+  wget http://http://sgdlite.princeton.edu/download/sgdlite/2004_05_19_sgdlite.sql.gz
+  createdb sgdlite_20040519
+  (zcat *sgdlite.sql.gz | psql -d sgdlite_20040519 -f - ) >& log.load 
+  
+  # set GMOD_ROOT  to here and run default config 
+  cd GMODTools
+  env GMOD_ROOT=$PWD perl -I./lib/ bin/bulkfiles.pl sgdbulk1
+  
+
 =head1 SEE ALSO
 
   GMOD::Chado::SeqUtils  -- older sequence in/out/check methods for Chado DB
@@ -224,6 +254,71 @@ use strict;
 =head1 AUTHOR
 
 D.G. Gilbert, 2004, gilbertd@indiana.edu
+
+=head1 package methods
+
+# -- initialize
+sub new 
+sub closeit
+sub DESTROY 
+sub init 
+sub initData 
+
+sub readConfig
+sub config 
+sub getconfig 
+
+# -- extract data from chado db - move to new package ?
+sub dnafile 
+sub dumpChromosomeBases 
+sub dumpFeatures 
+sub sortNSplitByChromosome
+sub csomeSplit 
+
+sub getDnaSeq 
+sub getBases
+sub getFeaturesFromDb 
+sub getBasesFromDb 
+sub getBasesFromFiles
+
+sub dbiDSN
+sub dbiConnect
+sub getSeqSql
+sub updateSqlViews
+
+sub getChromosomeTable
+sub getChromosomes
+
+# -- file/folder management
+
+sub getReleaseDir 
+sub getReleaseSubdir 
+
+sub getDumpFiles 
+sub getChromosomeFiles
+sub getFastaFiles
+sub getFeatFiles
+sub getFeatTableFiles
+
+sub get_filename
+sub split_filename
+sub maxrange 
+sub _isold  
+
+# -- write files
+
+sub makeFiles
+sub writeDocs
+
+sub getFeatureWriter
+sub getBlastWriter
+sub getFastaWriter
+sub getGnomapWriter
+
+sub splitFFF
+sub intergeneFromFFF2
+
+=cut
 
 =head1 METHODS
 
@@ -247,8 +342,13 @@ use DBI;
 
 use Bio::Location::Simple;
 
-## use Bio::GMOD::Config2; -- see below require
+# could use perl tricks here w/ ISA/can/base class to use any new type writer
 use Bio::GMOD::Bulkfiles::FeatureWriter; ## was ChadoFeatDump;
+use Bio::GMOD::Bulkfiles::BlastWriter;  
+use Bio::GMOD::Bulkfiles::FastaWriter;  
+use Bio::GMOD::Bulkfiles::GnomapWriter;  
+## OR use the Bio::GMOD::Bulkfiles::ToFormat; versions
+
 use Bio::GMOD::Bulkfiles::MyLargePrimarySeq;
 use Bio::GMOD::Bulkfiles::MySplitLocation;
 
@@ -259,8 +359,9 @@ my $VERSION = "1.0";
 ## should be $self instead of package global?
 use vars qw/  @featset @allfeats /;
 
-my $defaultconfigfile="sequtil";  
+my $defaultconfigfile="bulkfiles"; # was 'sequtil'  
 my %dnaseqs=(); #? package global - read only BioseqFile
+my @defaultformats= qw(fff gff fasta blast gnomap); 
  
 
 sub new 
@@ -285,14 +386,14 @@ sub DESTROY
 {
   my $self = shift;
   $self->closeit();
-  # $self->SUPER::DESTROY();
 }
 
 sub init 
 {
 	my $self= shift;
 	# $self->{tag}= 'Bulkfiles' unless (exists $self->{tag} );
-	$self->{outh}= *STDOUT unless ( exists $self->{outh} );
+	## $self->{outh}= *STDOUT unless ( exists $self->{outh} ); ## DROP THIS ??
+	
 	$DEBUG= $self->{debug} if defined $self->{debug};
 
   $self->{failonerror}= 0 unless defined $self->{failonerror};
@@ -300,19 +401,18 @@ sub init
   $self->{ignoredbresidues}= 0 unless defined $self->{ignoredbresidues};
   $self->{addids}= 0 unless defined $self->{addids};
   $self->{date}= POSIX::strftime("%d-%B-%Y", localtime( $^T ));
-  
+  $self->{config}={} unless defined $self->{config};
   $self->{configfile}= $defaultconfigfile unless defined $self->{configfile};
-  if (defined $self->{config}) {
-    $self->initData();  
-  } else {
-    $self->readConfig($self->{configfile});
-  }
+  $self->readConfig($self->{configfile});
+  # calls initData()
 }
 
 =item readConfig($configfile)
 
-read a configuration file - adds to any loaded configs
-
+  read a configuration file - adds to any loaded configs
+  -- changed location to conf/bulkfiles/ -- read all of these (no)
+  but need to locate subdir 
+ 
 =cut
 
 sub readConfig
@@ -322,26 +422,33 @@ sub readConfig
   eval {  
     unless(ref $self->{config2}) { 
       require Bio::GMOD::Config2; 
-      $self->{config2}= Bio::GMOD::Config2->new(); 
+      $self->{config2}= Bio::GMOD::Config2->new( {
+        searchpath => [ 'conf/bulkfiles', 'bulkfiles', 'conf' ],
+        debug => $DEBUG,
+        #gmod_root => $ROOT,
+        #confdir => 'conf', ## << change to conf/bulkfiles ?
+        #confpatt => '(gmod|[\w_\-]+db)\.conf$',
+        } ); 
       }
      
-#     $self->{config}= $self->{config2}->readConfig( $configfile, { Variables => \%ENV } );  
-    $self->{config}= $self->{config2}->readConfDir( 
-      undef, ##$config2->{confdir}, 
-      $configfile, #confpatt
-      undef # confhash
-      );  
-      
-     print STDERR $self->{config2}->showConfig( $self->{config}, { debug => $DEBUG }) 
+    $self->{config}= $self->{config2}->readConfig( $configfile); 
+    print STDERR $self->{config2}->showConfig( $self->{config}, { debug => $DEBUG }) 
       if ($self->{showconfig}); ##if $DEBUG;
-      
-    }; warn "Config2 err: $@" if ($@);
+    }; 
+  if ($@) { 
+    my $cf= $self->{config2}->{filename}; 
+    warn "Config2: file=$cf; err: $@"; 
+    die if $self->{failonerror};
+    }
   
   $self->initData(); 
 }
 
+sub config 
+{ return shift->{config}; }
 
-sub getconfig {
+sub getconfig 
+{
 	my $self= shift;
   my $cf= $self->{config2}; # if missing ??
   # if ($cf && @_) { my %vals= $cf->get(@_); return %vals; } #?? or single val
@@ -349,8 +456,9 @@ sub getconfig {
 }
 
 
-=item $fname= get_filename($org, $chr, $featn, $rel, $format)
+=item get_filename
   
+  $fname= get_filename($org, $chr, $featn, $rel, $format)
   make standard output file name "${org}_${chr}_${featn}_${rel}.${format}"
   
 =cut
@@ -368,6 +476,33 @@ sub get_filename
   return $filename;
 }
 
+=item split_filename
+
+  ( $org, $chr, $featn, $rel, $format)= split_filename($filename)
+  parse standard output file name "${org}_${chr}_${featn}_${rel}.${format}"
+  
+  ## THIS IS problematic - both featn and rel can have _, need other split method
+  
+=cut
+
+sub split_filename
+{
+	my $self= shift;
+	my ($fname)= @_;
+  my( $org, $chr, $featn, $rel, $format, $path, $featORrel,$gz);
+  if ($fname =~ s/(\.gz)$//) { $gz=$1; }
+  ($fname, $path, $format) = File::Basename::fileparse($fname, '\.[^\.]+');
+  $format .= $gz if $gz; #??
+  my @v= split(/[\_]/, $fname, 4); #! rel can have _
+  if (@v == 4) { ($org,$chr,$featn,$rel)= @v; }
+  elsif (@v == 3) { 
+    ($org,$chr,$featORrel)= @v; 
+    if ($featORrel =~ /\d/) { $rel= $featORrel; $featn=''; } 
+    else { $featn= $featORrel; $rel=''; }
+    }
+  elsif (@v == 2) { ($org,$chr)= @v; $featn= $rel='';}
+  return ( $org, $chr, $featn, $rel, $format);
+}
 
 =item dnafile($chr)
 
@@ -399,103 +534,13 @@ sub dnafile
 }
 
 
-=item raw2Fasta( %args )
-
-  ---  MOVE TO Bulkfiles::ToFasta 
-args: 
-  chr => 'X' # required
-  fastafile => $file # opt
-  start => 1  #opt
-  end => 100000 # opt
-  type => 'chromosome' # opt
-  defline => 'fasta defline' # opt
-  
-print fasta from dna-$chr.raw files, given $chr,$start,$end
-
-=cut
-
-sub raw2Fasta 
-{
-  #my ($self, $chr, $fastafile, $start, $end, $defline)= @_;  
-  my $self= shift;
-  my %args= @_;  
-  my $chr= $args{chr};
-  my $fastafile= $args{fastafile};
-  my $start= $args{start};
-  my $end= $args{end};
-  my $defline= $args{defline};
-  my $type=  $args{type} || 'chromosome';
-  
-  my $dnafile= $self->dnafile($chr);  
-  unless($fastafile) {
-    ($fastafile = $dnafile.".fasta") =~ s/\.raw//;  
-    }
-  if (-e $fastafile) { warn "raw2Fasta: wont overwrite $fastafile"; return $fastafile; }
-  my $outh= new FileHandle(">$fastafile"); ## $self->{outh};
-  my $org= $self->{config}->{org};
-  my $rel= $self->{config}->{rel};
-  my $fullchr= 0;
-  $start= 1 unless(defined $start && $start>=1);
-  
-  if (-f $dnafile) {
-    my $fh= new FileHandle($dnafile);
-    unless(defined $end) {
-      $fh->seek(0,2);
-      $end= $fh->tell();
-      $fh->seek(0,0);
-      $fullchr= ($start <= 1);
-      }
-    unless ($end>=$start) { $end= $start; } # what ?
-    my $id= ($fullchr) ? $chr : "$chr:$start..$end";
-    
-    $defline= $self->fastaHeader( 
-      ID => $id, ##"$chr:$start..$end",
-      type => $type,
-      chr => $chr, 
-      location => "$start..$end", 
-      $org ? (species => $org) : (),
-      $rel ? (release => $rel) : (),
-      ) unless $defline;
-
-    print $outh ">$defline\n";
-
-    $fh->seek($start-1,0);
-    my $len= ($end-$start+1);  
-    my ($buf,$sz)=('',50); 
-    for (my $i=0; $i<$len; $i+=50) {
-      if ($sz+$i>=$len) { $sz= $len-$i; }
-      $fh->read($buf,$sz);
-      print $outh $buf,"\n";
-      }
-    close($fh);
-    }
-    
-  else {
-    unless ($end>=$start) { $end= $start; } # what ?
-    $defline= $self->fastaHeader( 
-      ID => "$chr:$start..$end",
-      type => $type,
-      chr => $chr, 
-      location => "$start..$end", 
-      $org ? (species => $org) : (),
-      $rel ? (release => $rel) : (),
-      ) unless $defline;
-    print $outh ">$defline\n";
-    }
-  print $outh "\n";
-  print STDERR "raw2Fasta $fastafile, $defline\n" if $DEBUG;
-  
-  return $fastafile;
-}
-
-
 
 =item dumpChromosomeBases
 
   $sequtil->dumpChromosomeBases( \@chromosomes or $config->chromosomes)
   foreach chr @chromosomes
     write dnafile() getBasesFromDb($chrID)
-    $sequtil->raw2Fasta() if $config->{dofasta}; -- write from db to files
+    >> moved out >>$sequtil->raw2Fasta() if $config->{dofasta}; -- write from db to files
    
 =cut
 
@@ -511,11 +556,11 @@ sub dumpChromosomeBases
   ## using get_filename
   
   foreach my $chr (@$chromosomes) {
+    next if $chr eq 'all';
     my $dnafile= $self->dnafile($chr);  
     print STDERR "dumpChromosomeBases $dnafile\n" if $DEBUG;
     if (-e $dnafile) { 
       warn "dumpChromosomeBases: wont overwrite $dnafile"; 
-      #next;  #? do fasta
       }
     else {
       my $id= $csomeset->{$chr}->{id} || $chr;
@@ -523,22 +568,22 @@ sub dumpChromosomeBases
       if ($bases) { 
         open(DNA,">$dnafile"); print DNA $bases;  close(DNA); 
         print STDERR " dumped length=",length($bases),"\n" if $DEBUG;
-        push(@files, { path => $dnafile, type => 'dna/raw', name => $chr, });
+        push(@files, { path => $dnafile, type => 'dna/raw', name => $chr, chr => $chr, });
         }
-      else { warn "dumpChromosomeBases: no bases for $dnafile\n"; }
+      else { 
+        warn "dumpChromosomeBases: no bases for $dnafile\n"; 
+        die if $self->{failonerror};
+        }
       }
-    
-    if (-e $dnafile && $self->{config}->{dnafiles}->{dofasta}) { 
-      my $ctype= $csomeset->{$chr}->{type};
-      my $fafile= $self->raw2Fasta( chr => $chr, type => $ctype); 
-      push(@files, { path => $fafile, type => 'dna/fasta', name => $chr, });
-      }
+      
     }
 }
+
 
 =item getChromosomeFiles()
 
 return fileset of dna/raw chromosomes 
+## rename this getChromosomeDnaFiles ?
 
 =cut
 
@@ -549,194 +594,16 @@ sub getChromosomeFiles
   my @files=();
   
   foreach my $chr (@$chromosomes) {
+    next if $chr eq 'all';
     my $dnafile= $self->dnafile($chr);  
     if (-e $dnafile) {
-      push(@files, { path => $dnafile, type => 'dna/raw',  name => $chr, });
+      push(@files, { path => $dnafile, type => 'dna/raw',  name => $chr, chr => $chr });
       }
     }
   
   return \@files;
 }
 
-=item sortNSplitByChromosome($fileset)
-
- sort chado feature dump fileset  by arm, location
- and split into chromosome file set
-
-=cut
-
-sub sortNSplitByChromosome
-{
-  my ($self, $fileset)= @_;
-
-  $fileset= $self->getDumpFiles() unless(ref $fileset);
-  # return undef unless(ref $fileset);
-  my $fdump= $self->{config}->{featdump};
-  my $sorter=`which sort`; chomp($sorter); ## '/bin/sort'; '/usr/bin/sort';
-  my $outpath= $self->getReleaseSubdir( $fdump->{'path'} || "tmp") ;
-  my $outname= $fdump->{splitname} || "chadofeat";
-  my $sumfile= catfile( $self->getReleaseDir(), $outname."-summary.txt");
-  $outname= catfile( $outpath, $outname);
-
-  my $intype= $fdump->{type};
-  
-  ## check first existance of outname files, and age 
-  ## if newer than input fileset, leave as is, return file names ?
-  my $chromosomes= $self->getChromosomes(); ## $self->{config}->{chromosomes};
-  my $chr= $$chromosomes[0];
-  my $testout= "$outname-$chr.tsv";
-  my $uptodate= (-e $testout) ? 1 : 0;
-  
-  my $scmd="";
-  foreach my $fs (@$fileset) {
-    my $fp= $fs->{path};
-    next unless($fs->{type} eq $intype); #??
-    unless(-e $fp) { warn "missing dumpfile $fp"; next; }
-    if ($uptodate && _isold($fp, $testout)) { $uptodate= 0 ; }
-    $scmd .= "$fp ";
-    }
-    
-  if($uptodate) {
-    my @files=();
-    foreach my $chr (@$chromosomes) {
-      my $fn= "$outname-$chr.tsv";
-      push(@files, { path => $fn, type => 'feature/table', name => $chr,  });
-      }
-    return \@files;
-    }
-    
-  ## WATCH OUT - TAB here in '	' -- does $t="\t" work?
-  unless($scmd) { warn "sortNSplitByChromosome: no dumpfiles at $outpath"; return undef; }
-  $scmd = "cat ". $scmd ." | $sorter -t'	' -k 1,1 -k 2,2n |"; # uniq | ??
-  print STDERR "sortNSplitByChromosome:\n $scmd\n" if $DEBUG;
-  print STDERR "  to csomeSplit($outname)\n" if $DEBUG;
-  open(FS,$scmd) || die $scmd;
-  my $files= $self->csomeSplit(*FS, $outname, $sumfile);
-  close(FS);
-  return $files;
-}
-
-sub csomeSplit 
-{
-  my($self, $inh, $outname, $sumfile)= @_;
-  $outname ||= "chadofeats";
-  my @files=();
-  my $fh= undef;
-  my %h=();
-  my %csomefeats= ();
-  
-  while(<$inh>) { 
-    next unless(/^\w/); 
-    my ($c, $b, $e, $s, $t, $r)= split "\t",$_,6; 
-    unless($h{$c}) {
-      my $fn= "$outname-$c.tsv";
-      $fh= $h{$c}= new FileHandle(">$fn");
-      push(@files, { path => $fn, name => $c, 
-        type => 'feature/table', # should be   $fs->{type} == feature_table
-        });
- 		  # my $header= feattabheader($org, $c, join('',@srclist));
-		  # print $fh $header;   
-		  }
-		 
-    $fh= $h{$c};  
-    print $fh $_; ## "$t\t$r";  
-    $csomefeats{$c}{$t}++; $csomefeats{all}{$t}++; 
-    }
-    
-  foreach my $c (keys %h) { $fh= $h{$c}; close($fh) if $fh; }
-
-  if ( $sumfile ) {
-    $fh= new FileHandle(">$sumfile");
-    my $title = $self->{config}->{title};
-    my $date = $self->{config}->{date};
-    my $org  = $self->{config}->{species} || $self->{config}->{org};
-    print $fh "# Summary of features for $org from $title [$date]\n";
-    my @fl= grep { 'all' ne $_ } sort keys %csomefeats;
-    foreach my $c ('all', @fl) {
-      print $fh (($c eq 'all') ? "\n# ALL chromosomes\n" : "\n# Chromosome $c\n");
-      foreach my $t (sort keys %{$csomefeats{$c}}) {
-        print  $fh "$t\t$csomefeats{$c}{$t}\n";
-        }
-      print $fh "#","="x50,"\n";
-      }  
-    close($fh);
-    push(@files, { path => $sumfile, type => 'feature/summary',  name => 'summary', });
-    }
-  
-  return \@files;  
-}
-
-=item getSeqSql($sqlconf)
-
- read in config file with feature dump sql scripts
-
-=cut
-
-sub getSeqSql
-{
-  my ($self, $sqlconf)= @_;
-  $sqlconf = 'chadofeatsql' unless($sqlconf);
-  my $seqsql = $self->{$sqlconf} || '';
-  unless($seqsql) {
-    my $config2= $self->{config2}; #?? Config2 object, not hash
-    $seqsql= $config2->readConfig( $sqlconf, {}, {} );
-    #  readConfig($file, $opts, $confhash) << need to pass $confhash param so
-    #    doesnt overwrite $self->config values !
-
-    print STDERR $config2->showConfig($seqsql, { debug => $DEBUG })
-       if ($self->{showconfig}); ##if $DEBUG;      
-    $self->{$sqlconf}= $seqsql;
-    }
-  return $seqsql;
-}
-
-sub updateSqlViews
-{
-  my ($self, $seqsql, $sqltag)= @_;
-  return if $self->{didsqlviews};
-  $self->{didsqlviews}= 1;
-
-  unless($seqsql) {
-    my $fdump  = $self->{config}->{featdump};
-    $seqsql  = $self->getSeqSql($fdump->{config});
-    }
-  $sqltag  ||=  "feature_sql";
-  my $sqltype =  'view';  # other types? procedures ?
- 
-  my $dbh= $self->dbiConnect();
-  my @targets= sort keys %{$seqsql->{$sqltag}}; 
-  foreach my $sname (@targets) 
-  {
-    my $fs= $seqsql->{$sqltag}->{$sname};
-    my $type= $fs->{type};
-    my $sql = $fs->{sql};
-    unless($sql && ( $type =~ m/\b$sqltype\b/) ) { next; } 
-    print STDERR "do sql  $sname $type\n" if $DEBUG; 
-    my $result = $dbh->do($sql) or warn "unable to do  $sql";  
-  } 
-}
-
-=item getFeatureWriter()
-
- return handler to write bulk files, with this primary method
-  $featwriter->makeFiles( 
-    infiles => [ @$seqfiles, @$chrfeats ], # required
-    formats => [ qw(fff gff fasta) ] , # optional
-    );
-    
-=cut
-
-sub getFeatureWriter
-{
-  my ($self, $xxx)= @_;
-  my $fconfig= $self->{config}->{featfiles}->{config} || 'chadofeatconv';
-  my $featwriter= Bio::GMOD::Bulkfiles::FeatureWriter->new( ##ChadoFeatDump
-    configfile => $fconfig,   
-    sequtil => $self, 
-    debug => $DEBUG, showconfig => $self->{showconfig},
-    );
-  return $featwriter;
-}
 
 =item getDumpFiles($targets)
 
@@ -773,17 +640,606 @@ sub getDumpFiles
     my $outf= catfile($outpath,$outn);
     
     if (-e $outf) {
-      push(@files, { 
-        path => $outf,
-        type => $type,
-        name => $sname,
-        file => $outn,
-        });
+      push(@files, { path => $outf, type => $type, name => $sname, file => $outn, });
       }
   }
   
   return \@files;
 }
+
+
+
+=item getFastaFiles()
+
+return fileset of available features/fasta
+
+=cut
+
+sub getFastaFiles
+{
+  my ($self, $chromosomes)= @_;
+  my @files=();
+  
+  $chromosomes= $self->getChromosomes() unless (ref $chromosomes);
+  
+  #? drop this; moved fasta out of dnadir ..
+  foreach my $chr (@$chromosomes) {
+    my $dnafile= $self->dnafile($chr);  
+    (my $fastafile = $dnafile.".fasta") =~ s/\.raw//;  
+    if (-e $fastafile) {
+      push(@files, 
+        { path => $fastafile, type => 'chromosome/fasta',  name => $chr,  chr => $chr});
+      }
+    }
+
+  my $fset= $self->getFilesetInfo('fasta');
+  my $fadir= $self->getReleaseSubdir( $fset->{path} || 'fasta/');
+  if (opendir(D, $fadir)) {
+    foreach my $fa (grep(/^\w/,readdir(D))) { 
+      my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($fa);
+      $featn = 'feature' unless($featn);
+      next unless( grep {$chr eq $_} @$chromosomes ); #?
+      push(@files, 
+        { path => "$fadir/$fa", type => "$featn/fasta",  name => $fa, chr => $chr });
+      }
+    closedir(D);
+    }
+  return \@files;
+}
+
+
+sub getFeatFiles
+{
+  my ($self, $chromosomes)= @_;
+  my @files=();
+
+  my $fset= $self->getFilesetInfo('fff');
+  my $featdir= $self->getReleaseSubdir( $fset->{path} || 'fff/');
+  $chromosomes= $self->getChromosomes() unless (ref $chromosomes);
+
+  if (opendir(D, $featdir)) {
+    foreach my $fa (grep(/^\w/,readdir(D))) { 
+      my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($fa);
+      next unless( grep {$chr eq $_} @$chromosomes );  
+      $featn ||= 'feature';
+      push(@files, 
+        { path => "$featdir/$fa", type => "$featn/fff", name => $fa, chr => $chr });
+      }
+    closedir(D);
+    }
+  return \@files;
+}
+
+
+sub getFeatTableFiles
+{
+  my ($self, $chromosomes)= @_;
+  my @files=();
+  my $fdump= $self->{config}->{featdump};
+  my $outpath= $self->getReleaseSubdir( $fdump->{'path'} || "tmp/") ;
+  my $outname= catfile( $outpath, $fdump->{splitname} || "chadofeat");
+  
+  $chromosomes= $self->getChromosomes() unless (ref $chromosomes); 
+  foreach my $chr (@$chromosomes) {
+    next if $chr eq 'all';
+    my $fn= "$outname-$chr.tsv";
+    push(@files, { path => $fn, type => 'feature_table', name => $chr,  });
+    }
+  return \@files;
+}  
+
+
+
+sub getFilesetInfo
+{
+  my ($self, $type)= @_;
+
+    ## regularize/change configs so new format can be added w/o special tag names ?
+  my $fset= $self->{config}->{fileset}->{$type};
+  return $fset if (ref $fset);
+  
+  my @oldset= qw( featdump dnafiles featfiles fastafiles blastfiles gnomapfiles gbrowsefiles );
+  foreach my $ms (@oldset) {
+    my $fset= $self->{config}->{$ms};
+    if (ref $fset && $fset->{type} eq $type) { return $fset; }
+    }
+  return {};
+}
+
+sub getFilesByType
+{
+  my ($self, $type, $chromosomes)= @_;
+  my @files=();
+  $chromosomes= $self->getChromosomes() unless (ref $chromosomes);
+
+  ## $type maybe [] arrayref
+  my @types= (ref $type) ? @$type : ( $type ) ;
+  foreach $type (@types) {
+    my $fset= $self->getFilesetInfo($type);
+    next unless $fset;
+    
+    my $path= $fset->{path} || $type;
+    my $dir = $self->getReleaseSubdir( $path, 'nocreate' );
+  
+    my $filepattern= '\w';
+    ($filepattern, undef) = File::Basename::fileparse($path) if ($path !~ m,/$,);
+     
+    if (opendir(D, $dir)) {
+      foreach my $fa (grep(/^$filepattern/,readdir(D))) { 
+        my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($fa);
+        next unless( grep {$chr eq $_} @$chromosomes );  
+        $featn ||= 'feature';
+        push(@files, 
+          { path => "$dir/$fa", type => "$featn/$type", name => $fa, 
+            chr => $chr, format => $format, rel => $rel, org => $org });
+        }
+      closedir(D);
+      }
+    }
+    
+  return \@files;
+}
+
+sub getFiles
+{
+  my ($self, $type, $chromosomes)= @_;
+  my @filesets=();
+  ## $type maybe [] arrayref
+  my @types= (ref $type) ? @$type : ( $type ) ;
+  foreach $type (@types) {
+    my $fileset;
+    ## old way
+    CASE: {
+      $type eq 'feature_table' && do { $fileset= $self->getFeatTableFiles($chromosomes); last CASE };
+      $type eq 'dna'    && do { $fileset= $self->getChromosomeFiles($chromosomes); last CASE };
+      #$type eq 'fff'    && do { $fileset= $self->getFeatFiles($chromosomes);  last CASE };
+      #$type eq 'fasta'  && do { $fileset= $self->getFastaFiles($chromosomes); last CASE };
+
+      # new way: 
+      $fileset= $self->getFilesByType($type, $chromosomes);
+      } 
+  
+    push(@filesets, @$fileset) if $fileset;
+    } 
+  
+  return \@filesets;
+}
+
+
+sub gzipFiles
+{
+  my ($self, $formats, $chromosomes)= @_;
+  my @formats= ref $formats ? @$formats : qw( fff gff fasta dna gnomap blast) ;
+  foreach my $type (@formats) {
+    my $finfo= $self->getFilesetInfo($type);
+    if (ref $finfo && $finfo->{dogzip}) {
+      my $fileset= $self->getFiles($type, $chromosomes);
+      print STDERR "gzipping $finfo->{path}\n" if $DEBUG;
+      foreach my $fs (@$fileset) {
+        system("gzip ".$fs->{path}) if -e $fs->{path};
+        }
+      }
+    }
+}
+
+
+
+#=============================================
+
+
+
+=item sortNSplitByChromosome($fileset)
+
+ sort chado feature dump fileset  by arm, location
+ and split into chromosome file set
+
+=cut
+
+sub sortNSplitByChromosome
+{
+  my ($self, $fileset)= @_;
+
+  $fileset= $self->getDumpFiles() unless(ref $fileset);
+  # return undef unless(ref $fileset);
+  my $fdump= $self->{config}->{featdump};
+  my $sorter=`which sort`; chomp($sorter); ## '/bin/sort'; '/usr/bin/sort';
+  my $outpath= $self->getReleaseSubdir( $fdump->{'path'} || "tmp/") ;
+  my $outname= catfile( $outpath, $fdump->{splitname} || "chadofeat");
+  my $sumfile= catfile( $self->getReleaseDir(), "feature_table-summary.txt");
+
+  my $intype= $fdump->{type};
+  
+  ## check first existance of outname files, and age 
+  ## if newer than input fileset, leave as is, return file names ?
+  my $chromosomes= $self->getChromosomes(); ## $self->{config}->{chromosomes};
+  my $chr= $$chromosomes[0];
+  my $testout= "$outname-$chr.tsv";
+  my $uptodate= (-e $testout) ? 1 : 0;
+  
+  my $scmd="";
+  foreach my $fs (@$fileset) {
+    my $fp= $fs->{path};
+    next unless($fs->{type} eq $intype); #??
+    unless(-e $fp) { warn "missing dumpfile $fp"; next; } # die if $self->{failonerror};
+    if ($uptodate && _isold($fp, $testout)) { $uptodate= 0 ; }
+    $scmd .= "$fp ";
+    }
+    
+  if($uptodate) {
+    my @files=();
+    foreach my $chr (@$chromosomes) {
+      my $fn= "$outname-$chr.tsv";
+      push(@files, { path => $fn, type => 'feature_table', name => $chr, chr => $chr,  });
+      }
+    return \@files;
+    }
+    
+  ## WATCH OUT - TAB here in '	' -- does $t="\t" work?
+  unless($scmd) { warn "sortNSplitByChromosome: no dumpfiles at $outpath"; return undef; }
+  # die if $self->{failonerror};
+
+  $scmd = "cat ". $scmd ." | $sorter -t'	' -k 1,1 -k 2,2n |"; # uniq | ??
+  print STDERR "sortNSplitByChromosome:\n $scmd\n" if $DEBUG;
+  print STDERR "  to csomeSplit($outname)\n" if $DEBUG;
+  open(FS,$scmd) || die $scmd;
+  my $files= $self->csomeSplit(*FS, $outname, $sumfile);
+  close(FS);
+  return $files;
+}
+
+sub csomeSplit 
+{
+  my($self, $inh, $outname, $sumfile)= @_;
+  $outname ||= "chadofeats";
+  my @files=();
+  my $fh= undef;
+  my %h=();
+  my %csomefeats= ();
+  my $lastoid='';
+  
+  while(<$inh>) { 
+    next unless(/^\w/); 
+    ##was##my ($c, $b, $e, $s, $t, $r)= split "\t",$_,6; 
+    my ($arm,$fmin,$fmax,$strand,$type,$name,$id,$oid,$attr_type,$attribute)
+      = split("\t"); ##@c;
+    unless($h{$arm}) {
+      my $fn= "$outname-$arm.tsv";
+      $fh= $h{$arm}= new FileHandle(">$fn");
+      push(@files, { path => $fn, name => $arm,  chr => $arm,
+        type => 'feature_table', # should be   $fs->{type} == feature_table
+        });
+ 		  # my $header= feattabheader($org, $arm, join('',@srclist));
+		  # print $fh $header;   
+		  }
+		 
+    $fh= $h{$arm};  
+    print $fh $_; 
+    unless($oid eq $lastoid) {
+      $csomefeats{$arm}{$type}++; $csomefeats{all}{$type}++; 
+      }
+    $lastoid= $oid;
+    }
+    
+  foreach my $arm (keys %h) { $fh= $h{$arm}; close($fh) if $fh; }
+
+  ## these counts are bad; include dup rows/feature (e.g 4x gene count)
+  ## need to use distinct oid .
+  if ( $sumfile ) {
+    $fh= new FileHandle(">$sumfile");
+    my $title = $self->{config}->{title};
+    my $date = $self->{config}->{date};
+    my $org  = $self->{config}->{species} || $self->{config}->{org};
+    print $fh "# Database feature summary for $org from $title [$date]\n";
+    my @fl= grep { 'all' ne $_ } sort keys %csomefeats;
+    foreach my $arm ('all', @fl) {
+      print $fh (($arm eq 'all') ? "\n# ALL chromosomes\n" : "\n# Chromosome $arm\n");
+      foreach my $t (sort keys %{$csomefeats{$arm}}) {
+        print  $fh "$t\t$csomefeats{$arm}{$t}\n";
+        }
+      print $fh "#","="x50,"\n";
+      }  
+    close($fh);
+    push(@files, { path => $sumfile, type => 'feature/summary',  name => 'summary', });
+    }
+  
+  return \@files;  
+}
+
+
+
+
+=item  makeFiles( %args )
+
+  primary method; 
+    mostly it calls FeatureWriter() package to handle
+    also prints any config->doc entries
+
+  arguments: 
+  infiles => \@fileset,   # required
+  formats => [ 'gff', 'fasta', 'fff', 'blast' ] # optional
+
+=cut
+
+
+sub makeFiles
+{
+	my $self= shift;
+  my %args= @_;  
+  my $result='';
+
+  print STDERR "makeFiles\n" if $DEBUG; # debug
+
+  $self->writeDocs(); #? unless already wrote ?
+    
+  my @outformats=(); # check config
+  if ($args{formats}) {
+    my $formats= $args{formats};
+    if(ref $formats) { @outformats= @$formats; } 
+    else { @outformats=($formats); } 
+    print STDERR "makeFiles: outformats= @outformats\n" if $DEBUG; 
+    }
+  else {
+    @outformats=  @{ $self->config->{outformats} || \@defaultformats } ; 
+    }
+    
+  
+  my $chromosomes= undef;
+  if (ref $args{chromosomes}) { $chromosomes= $args{chromosomes};  }
+  elsif (ref $args{chr}) { $chromosomes= $args{chr};  }
+  unless (ref $chromosomes && @$chromosomes > 0) {
+    $chromosomes= [ 'all', @{$self->getChromosomes()} ];
+    }
+  elsif ($chromosomes->[0] eq 'all') {
+    $chromosomes= [ 'all', @{$self->getChromosomes()} ];
+    }
+    
+    # trick- getFeatureWriter loads common config for featmap/featset needed by others
+  # my $featwriter= $self->getFeatureWriter(); 
+  my $featwriter= $self->getWriter('fff');
+  
+    ## this one takes a while; split chromosomes among processors
+  if (grep /fff|gff/, @outformats) {
+    # my $chrfeats= $self->getFeatTableFiles($chromosomes); # for getFeatureWriter
+    my $chrfeats = $self->getFiles('feature_table', $chromosomes);
+    if ($DEBUG) { my @fn= map {$_->{name}} @$chrfeats; print STDERR "read feature tables= @fn\n"; }
+    $result .= $featwriter->makeFiles( %args, 
+      infiles => $chrfeats, chromosomes => $chromosomes );   
+    }
+    
+  # my $featfiles = $self->getFeatFiles($chromosomes);      # need to update after getFeatureWriter
+  # my $dnafiles  = $self->getChromosomeFiles($chromosomes); # for fasta only?
+  my $featfiles = $self->getFiles('fff', $chromosomes);
+  my $dnafiles  = $self->getFiles('dna', $chromosomes);
+  
+  if ($DEBUG) {
+    my @cn= @$chromosomes; print STDERR "make chromosomes= @cn\n";
+    my @fn= map {$_->{name}} @$featfiles; print STDERR "with featfiles= @fn\n";
+    my @dn= map {$_->{name}} @$dnafiles; print STDERR "with dnafiles= @dn\n";
+    }
+  
+  if (grep /fasta/, @outformats) {
+    my $writer= $self->getWriter('fasta');
+    # my $writer= $self->getFastaWriter();  
+    $result .= $writer->makeFiles(%args, 
+      infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes);
+    }
+    
+  if (grep /blast/, @outformats) {
+    my $fafiles = $self->getFiles( 'fasta', $chromosomes);
+    my $writer  = $self->getWriter('blast'); # this works; eval new writer
+    # my $fafiles = $self->getFastaFiles($chromosomes);  # update after getFastaWriter
+    # my $writer= $self->getBlastWriter(); 
+    $result .= $writer->makeFiles( %args, 
+      infiles =>  $fafiles, chromosomes => $chromosomes );  
+    }
+    
+  if (grep /gnomap/, @outformats) {
+    my $writer= $self->getWriter('gnomap');
+    # my $writer= $self->getGnomapWriter(); 
+    $result .= $writer->makeFiles(%args, 
+      infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes); # needs $featfiles
+    }
+  
+  $self->gzipFiles( \@outformats, $chromosomes );
+  
+  return $result; #what?
+}
+
+
+
+=item writeDocs( $docs or $self->{config}->{doc})
+
+  print docs from config file
+  
+=cut
+
+sub writeDocs
+{
+  my ($self, $docs)= @_;
+  my $ndoc= 0;
+  $docs= $self->{config}->{doc} unless ref $docs;
+  if (ref $docs) {
+    # check for 1 or many (name keys, darn xmlsimple)
+    if ($docs->{name} && $docs->{content}) {
+      my %dd= ( $docs->{name} => $docs );
+      $docs= \%dd;
+      }
+    foreach my $dname (keys %$docs) {
+      my $data = $docs->{$dname}->{content} || '';
+      my $dpath= $docs->{$dname}->{path} || $dname;
+      my $fn=  catfile( $self->getReleaseDir(), $dpath);
+      print STDERR "write doc $dname $fn\n" if $DEBUG;
+      open(DOC,">$fn"); print DOC $data; close(DOC); 
+      $ndoc++;
+      }
+    }
+  print STDERR "writeDocs n=$ndoc\n" if $DEBUG; # debug
+  return $ndoc;
+}
+
+
+#==================
+=item
+  
+  Replace these getXxxWriter with below generic getWriter()
+  
+=cut
+
+=item getFeatureWriter()
+
+ return handler to write bulk files, with this primary method
+  $featwriter->makeFiles( 
+    infiles => [ @$seqfiles, @$chrfeats ], # required
+    formats => [ qw(fff gff fasta) ] , # optional
+    );
+    
+=cut
+
+sub getFeatureWriter
+{
+  my ($self)= @_;
+
+  my $fileinfo= $self->{config}->{fileset}->{fff}; # FIXME
+  ##$fileinfo= $self->{config}->{featfiles} unless($fileinfo);
+  my $writer= Bio::GMOD::Bulkfiles::FeatureWriter->new( 
+    configfile => $fileinfo->{config}, fileinfo => $fileinfo,
+    handler => $self, 
+    debug => $DEBUG, showconfig => $self->{showconfig},
+    );
+    
+  ## MOVED THIS TO FeatureWriter.new so will always happen after it reads its config
+  #?? merge config from feature writer chadofeatconf with this config ?
+  ## that is best place to keep common <featmap> and <featset>
+#   my $fset= $writer->{config}->{featset};
+#   if (ref $fset && !$self->{config}->{featset}) {
+#     $self->{config}->{featset}= $fset;
+#     }
+#   my $fmap= $writer->{config}->{featmap};
+#   if (ref $fmap) {
+#     my $smap= $self->{config}->{featmap};
+#     unless(ref $smap) {
+#       $self->{config}->{featmap}= $smap=  {};
+#       }
+#     my @keys= keys %$fmap;
+#     foreach my $k (@keys) { $smap->{$k}= $fmap->{$k} unless defined $smap->{$k}; } 
+#     }
+  
+  return $writer;
+}
+
+
+=item getBlastWriter()
+
+  return handler to write blast index files, with this primary method
+
+  $blastwriter->makeFiles( 
+    infiles => [ @$fastafiles ], # required
+    );
+
+#  my $blastwriter= $self->getBlastWriter();
+#  $result= $blastwriter->makeFiles(%args);
+    
+=cut
+
+sub getBlastWriter
+{
+  my ($self)= @_;
+  
+  my $fileinfo= $self->{config}->{fileset}->{blast};  
+  ##$fileinfo= $self->{config}->{blastfiles} unless($fileinfo); 
+  my $writer= Bio::GMOD::Bulkfiles::BlastWriter->new( 
+    configfile => $fileinfo->{config}, fileinfo => $fileinfo,
+    handler => $self, 
+    debug => $DEBUG, showconfig => $self->{showconfig},
+    );
+  return $writer;
+}
+
+
+=item getFastaWriter()
+
+  return handler to write fasta feature set sequence files, with this primary method
+
+  $fawriter->makeFiles( 
+    infiles => [ @$fastafiles ], # required? or optional
+    );
+
+=cut
+
+sub getFastaWriter
+{
+  my ($self)= @_;
+  my $fileinfo= $self->{config}->{fileset}->{fasta}; # FIXME
+  ##$fileinfo= $self->{config}->{fastafiles} unless($fileinfo); 
+  my $writer= Bio::GMOD::Bulkfiles::FastaWriter->new( 
+    configfile => $fileinfo->{config}, fileinfo => $fileinfo,
+    handler => $self, 
+    debug => $DEBUG, showconfig => $self->{showconfig},
+    );
+  return $writer;
+}
+
+
+=item getGnomapWriter()
+
+  return handler to write gnomap feature files, with this primary method
+
+  $fawriter->makeFiles( 
+    infiles => [ @$fastafiles ], # required? or optional
+    );
+
+=cut
+
+sub getGnomapWriter
+{
+  my ($self)= @_;
+  my $fileinfo= $self->{config}->{fileset}->{gnomap}; # FIXME
+  ##$fileinfo= $self->{config}->{gnomapfiles} unless($fileinfo); 
+  my $writer= Bio::GMOD::Bulkfiles::GnomapWriter->new( 
+    configfile => $fileinfo->{config}, fileinfo => $fileinfo,
+    handler => $self, 
+    debug => $DEBUG, showconfig => $self->{showconfig},
+    );
+  return $writer;
+}
+
+
+
+sub getWriter
+{
+  my ($self, $type)= @_;
+
+  my $finfo= $self->getFilesetInfo($type);
+  if (ref $finfo && $finfo->{handler}) {
+    my $pkg= $finfo->{handler};
+    unless($pkg =~ /\:\:/) { $pkg= "Bio::GMOD::Bulkfiles::".$pkg; }  
+    my $eval=
+     "use $pkg;
+      $pkg->new( configfile => \$finfo->{config}, fileinfo => \$finfo, 
+        handler => \$self, debug => \$DEBUG,  showconfig => \$self->{showconfig},
+        );";
+    ##print STDERR "getWriter: eval $eval\n" if $DEBUG;
+    my $writer= eval $eval; 
+    if ($@) { ($self->{failonerror}) ? die $@ : warn $@;  }
+
+    return $writer if ref $writer; 
+    }
+ 
+  print STDERR "getWriter('$type'): eval failed; fallback to getXxxWriter\n" if $DEBUG;
+  ## old way
+  CASE: {
+    $type eq 'fasta'  && return $self->getFastaWriter(); 
+    $type eq 'blast'  && return $self->getBlastWriter(); 
+    $type eq 'fff'    && return $self->getFeatureWriter(); 
+    $type eq 'gff'    && return $self->getFeatureWriter(); 
+    $type eq 'gnomap' && return $self->getGnomapWriter(); 
+    } 
+
+}
+
+
+#===================================================
+
 
 
 =item getChromosomeTable
@@ -871,6 +1327,212 @@ sub getChromosomes
   return $config->{chromosomes};
 }
 
+
+
+
+=item splitFFF
+
+  split flat feature format line to fields
+   ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes,$chr)
+    = splitFFF($fffeature, $chr)
+
+=cut
+
+sub splitFFF
+{
+  my( $self, $fffeature, $chr)= @_;
+  my($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes,$bstart);
+  chomp($fffeature);
+  my @v= split "\t", $fffeature;
+  foreach (@v) { $_='' if $_ eq '-'; }
+  
+  my $ffformat = $self->{ffformat} || 0; #? test always
+  unless( $ffformat > 0 ) {
+    if ( @v > 7 || ($v[0] =~ /^\w/ && $v[1] =~ /^\d+$/)) { $ffformat= 2; }  
+    else { $ffformat= 1; }  
+    }
+  if ($ffformat == 1) { ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes)= @v; }
+  elsif ($ffformat == 2) { ($chr,$bstart,$type,$name,$cytomap,$baseloc,$id,$dbxref,$notes)= @v; }
+  $self->{gotffformat}= $ffformat;
+  
+  return ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes,$chr);
+}
+
+
+=item $interfff= intergeneFromFFF2($chr,$fff1,$fff2)
+
+  return fff line for region between two features
+  (any feature types ok, intergenic regions most interesting)
+
+=cut
+
+sub intergeneFromFFF2
+{
+  my ($self, $chr, $fff1, $fff2)= @_;
+  my $newfff='';
+  my ($type,$name1,$cytomap,$baseloc1,$id1,$dbxref,$notes);
+  my ($chr2,$name2,$baseloc2,$id2);
+  my $intergenetype='intergene'; # FIXME 
+  
+  ($type,$name1,$cytomap,$baseloc1,$id1,$dbxref,$notes,$chr)
+      = $self->splitFFF( $fff1, $chr);
+  my($start1,$stop1,$strand1)= $self->maxrange($baseloc1);
+  
+  ($type,$name2,$cytomap,$baseloc2,$id2,$dbxref,$notes, $chr2)
+      = $self->splitFFF( $fff2, $chr);
+  my($start2,$stop2,$strand2)= $self->maxrange($baseloc2);
+  
+  if ($chr eq $chr2 && $stop1 < $start2) { 
+    my $iname= "$name1/$name2";
+    my $iid= "$id1/$id2";
+    my $interloc= ($stop1+1)."..".($start2-1);
+    if ($self->{gotffformat} == 2) {
+      $newfff= join("\t", $chr, $stop1, $intergenetype, $iname,'-', $interloc, $iid,$dbxref,$notes);
+    } else {
+      $newfff= join("\t", $intergenetype, $iname,'-', $interloc, $iid,$dbxref,$notes);
+    }
+    }
+  return $newfff;
+}
+
+
+
+sub getDnaSeq 
+{
+  my ($self, $chr)= @_;
+  my $seq= $dnaseqs{$chr};
+  unless($seq) {
+    my $dnafile= $self->dnafile($chr); #"$dnadir/dna-$chr.raw";
+    $seq= Bio::GMOD::Bulkfiles::MyLargePrimarySeq->new( -file => $dnafile);
+    $dnaseqs{$chr}= $seq;
+    print STDERR "open dnafile $dnafile, length=",$seq->length(),"\n" if $DEBUG;
+    }
+  return $seq;
+}
+
+sub getBases
+{
+  my($self, $usedb,$type,$chr,$baseloc,$id,$name,$subrange)= @_;
+  my $bases= undef;
+  if($usedb && $id) { 
+    $bases= $self->getBasesFromDb($id); 
+    return $bases if($bases || $self->{failonerror} || $self->{skiponerror}); 
+    }
+  unless ($bases) { 
+    $bases= $self->getBasesFromFiles($type,$chr,$baseloc,$name,$subrange);   
+    }
+  return $bases;
+}
+
+
+# but see  Bio/GMOD/DB/Config.pm
+sub dbiDSN
+{
+  my ($self, $dsn)= @_;
+  my $config= $self->{config};
+  my ($dbuser,$dbpass)=("","");
+  if ($dsn && $dsn =~ /^dbi:/) { $self->{dsn}= $dsn; }
+  ## if ($self->{dsn}) { $dsn= $self->{dsn}; }
+  if ($config->{db}) { 
+    my $dbname= $config->{db}->{name};
+    my $relid= $config->{relid};
+    my $reldb= ($relid && defined $config->{release}->{$relid}) 
+      ? $config->{release}->{$relid}->{dbname} :'';
+    $dbname= $reldb if ($reldb);
+    unless($dbname) {
+      die "missing dbname";
+      }
+    $dsn  = "dbi:" . $config->{db}->{driver} || "Pg";
+    $dsn .= ":dbname=" .$dbname;
+    $dsn .= ";host=" .$config->{db}->{host} if $config->{db}->{host};
+    $dsn .= ";port=" .$config->{db}->{port} if $config->{db}->{port};
+    #?? $self->{dsn}= $dsn;
+
+    $dbuser= $config->{db}->{user} if $config->{db}->{user};
+    $dbpass= $config->{db}->{password} if $config->{db}->{password};
+    }
+  ## if ($self->{dsn}) { $dsn= $self->{dsn}; }
+  return (wantarray) ? ($dsn,$dbuser,$dbpass) : $dsn;
+}
+
+sub dbiConnect
+{
+  my ($self)= @_;
+  my $dbh= $self->{dbh};
+  unless($dbh) { 
+    my $tdsn= $self->dbiDSN();
+    print STDERR "DBI->connect( $tdsn )\n" if $DEBUG;
+    $dbh = DBI->connect( $self->dbiDSN() )
+      or die("unable to open db( $tdsn )"); # throw ?
+    $self->{dbh}= $dbh;
+    }
+  return $dbh;
+}
+
+
+=item getSeqSql($sqlconf)
+
+ read in config file with feature dump sql scripts
+
+=cut
+
+sub getSeqSql
+{
+  my ($self, $sqlconf)= @_;
+  $sqlconf = 'chadofeatsql' unless($sqlconf);
+  my $seqsql = $self->{$sqlconf} || '';
+  unless($seqsql) {
+    my $config2= $self->{config2}; #?? Config2 object, not hash
+    $seqsql= $config2->readConfig( $sqlconf, {}, {} );
+    print STDERR $config2->showConfig($seqsql, { debug => $DEBUG })
+       if ($self->{showconfig}>1); ##if $DEBUG;      
+    $self->{$sqlconf}= $seqsql;
+    }
+  return $seqsql;
+}
+
+
+=item  updateSqlViews
+
+ add views to db used by sql feature calls.
+ this may fail if one lacks update permissions; assume
+ user knows about such
+ 
+=cut
+
+sub updateSqlViews
+{
+  my ($self, $seqsql, $sqltag)= @_;
+  return if $self->{didsqlviews};
+  $self->{didsqlviews}= 1;
+
+  unless($seqsql) {
+    my $fdump  = $self->{config}->{featdump};
+    $seqsql  = $self->getSeqSql($fdump->{config});
+    }
+  $sqltag  ||=  "feature_sql";
+  my $sqltype = 'view';  # other types? procedures ?
+ 
+  my $dbh= $self->dbiConnect();
+  my @targets= sort keys %{$seqsql->{$sqltag}}; 
+  foreach my $sname (@targets) 
+  {
+    my $fs= $seqsql->{$sqltag}->{$sname};
+    my $type= $fs->{type};
+    my $sql = $fs->{sql};
+    unless($sql && ( $type =~ m/\b$sqltype\b/) ) { next; } 
+    print STDERR "do sql $sname $type\n" if $DEBUG; 
+    my $result = $dbh->do($sql) or warn "unable to do sql $sname $type";  
+  } 
+}
+
+=item dumpFeatures
+  
+    dumpFeatures() - extract featur_table s from chado db using
+      feature sql config info
+    
+=cut
+
 sub dumpFeatures 
 {
   my ($self, $sqlconf)= @_;
@@ -918,248 +1580,16 @@ sub dumpFeatures
       # this works:  perl -i.old rdump $r/tmp/featdump/analysis.tsv
       }
       
-    push(@files,  {
-      path => $outf,
-      type => $type,
-      name => $sname,
-      file => $outn,
-      });
+    push(@files, { path => $outf, type => $type, name => $sname, file => $outn, });
   }
   return \@files;
   
 }
 
 
-=item fastaHeader
-  ---  MOVE TO Bulkfiles::ToFasta 
-
-  my $fah= main->fastaHeader( ID => 'CG123', name => 'MyGene', 
-    chr => '2L', loc => '1234..5678', type => 'pseudogene',
-    db_xref => 'FlyBase:FBgn0000123', note => 'BOGUS',
-    );
-
-  expected keys: type chr/chromosome loc/location ID name db_xref
-   
-=cut
-
-sub fastaHeader
-{
-  my($self,%vals)= @_;
+=item getFeaturesFromDb
   
-  my $type= delete $vals{type};
-  my $chr= delete $vals{chr} || delete $vals{chromosome};
-  my $loc= delete $vals{loc} || delete $vals{location};
-  $loc= "$chr:$loc" if ($chr && $loc !~ /:/);
-  
-  my $ID  = delete $vals{ID} || delete $vals{id} || delete $vals{uniquename};
-  my $name= delete  $vals{name};
-  my $db_xref= delete $vals{db_xref} || delete $vals{dbxref};
-  if ($db_xref) { $db_xref =~ s/\s*;\s*$//; $db_xref =~ s/;/,/g; $db_xref =~ s/,,/,/g;}
-
-  my %primvals=();
-  @primvals{qw(type loc ID name db_xref)}= ($type,$loc,$ID,$name,$db_xref);
-
-  my @d=();
-  foreach my $k (qw(type loc ID name db_xref), keys %vals) {
-    my $v= $primvals{$k} || $vals{$k};
-    push(@d, "$k=$v") if ($v);
-    }
-    
-  my $desc= join("; ", @d);
-  my $fid= ($ID) ? $ID : $name;
-  unless($fid) { $fid= "${type}_${loc}"; $fid =~ tr/a-zA-Z0-9/_/cs; }
-  return "$fid $desc";
-}
-
-
-
-
-=item $fa= $sequtil->fastaFromFFF( $fffeature,$chr,$featset)
-
-  ---  MOVE TO Bulkfiles::ToFasta 
-  return fasta for one input feature line
-   $fffeature = flat-file-feature input line
-   chr = chromosome
-   featset = key for feature type or type-set
- 
-=cut
-
-sub fastaFromFFF
-{
-  my($self,$fffeature,$chr,$featset)= @_;
-  
-  ## revise this param set for more options - expand +/- ends, array of featset types, chr, ...
-  ## gene_extended(\d+)
-  
-  my $config= $self->{config};
-  my $dropnotes= $config->{fastafiles}->{dropnotes} || 'xxx';
-  
-  my $ffformat= 0; my $nout= 0;
-  my $bstart; 
-  my @csomes= @{ $self->getChromosomes() || [] };
-  my($types_ok,$retype,$usedb,$subrange,$types_info)
-        = $self->get_feature_set($featset,$config);
-  return "" unless( ref $types_ok );
-  $usedb= 0 if $self->{ignoredbresidues};
-  ##my $outh= $self->{outh};
-  
-  my($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes);
-  chomp($fffeature);
-  my @v= split "\t", $fffeature;
-    
-  foreach (@v) { $_='' if $_ eq '-'; }
-  if ($ffformat == 0) {
-    if (grep({$v[0] eq $_} @csomes) && $v[1] =~ /^\d+$/) { $ffformat= 2; }
-    ##if ($v[1] =~ /^\d+$/ && grep({$v[2] eq $_} @allfeats)) { $ffformat= 2; }
-    elsif ( grep({$v[0] eq $_} @allfeats) ) { $ffformat= 1; } ## FIXME 
-    else { warn "skipped; not FFF format? @v";  return "";  }
-    }
-  if ($ffformat == 1) { ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes)= @v; }
-  elsif ($ffformat == 2) { ($chr,$bstart,$type,$name,$cytomap,$baseloc,$id,$dbxref,$notes)= @v; }
-   
-  return "" unless( $types_ok->{$type} );
-  
-  ##? patch for adding gene IDs to gene model features missing them
-  if ($self->{addids} && $types_info->{$type} && $types_info->{$type}->{add_id}) {
-    my $pid= ($id ? $id : $name);
-    $pid =~ s/[_-].*$//; # try for parent id - db prefix: ?
-    my $idlist= $self->{idlist}; # from readids ...
-    my $idpattern= $self->{idpattern};
-    if ($idlist->{$pid}) { 
-      my %dtype=();
-      foreach my $x ( $pid, split(/[,;\s]/,$idlist->{$pid})) { 
-        if ( $x =~ m/$idpattern/) { ## /(FBgn|FBti|FBan|CG|CR)\d+/
-          my $dtype= $1;
-          unless( $dtype{$dtype} || ($dbxref && $dbxref =~ m/$x/) ) { 
-            $dbxref .= "," if ($dbxref); 
-            $dbxref .= $x; 
-            } 
-          $dtype{$dtype}++;
-          }
-        }
-      }
-
-    # my $ptype  = $types_info->{$type}->{add_id};
-    # my @pdbxref= @{$idlist->{$ptype}};
-    # foreach my $x (@pdbxref) { $dbxref .= ",$x" unless($dbxref =~ m/$x/); }
-    }
-  
-  ##? check notes for synonyms=, other fields?
-  my @notes= ();
-  if ($notes) {
-    my %notes=();
-    foreach my $n (split(/[;]/,$notes)) {
-      if ($n =~ /^(\w+)=(.+)/) { 
-        my($k,$v)= ($1,$2);
-        if ($dropnotes !~ m/\b$k\b/) { $notes{$k} .= "$v,"; }
-        } 
-      }
-    foreach my $n (sort keys %notes) {
-      $notes{$n} =~ s/,$//;
-      push(@notes, $n, $notes{$n});
-      }
-    }
-  
-  my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
-      name => $name, chr => $chr, location => $baseloc, 
-      ID => $id, db_xref => $dbxref, 
-      # cytomap => $cytomap, 
-      @notes ##notes => $notes
-      );
-  
-  my $bases= $self->getBases($usedb,$type,$chr,$baseloc,$id,$name,$subrange);
-  if ($bases) {
-    $nout++;
-    my $slen= length($bases);
-    $bases =~ s/(.{1,50})/$1\n/g;
-    return ">$header; len=$slen\n".$bases; 
-    }
-  else {
-    warn "ERROR: missing bases for $header\n";
-    if ($self->{failonerror}) {  
-      warn "FAILING: $featset \n";
-      return -1;
-      }
-    return ">$header; ERROR missing data\n"; #? write to file or not
-    }
-}
-
-
-
-
-sub getDnaSeq 
-{
-  my ($self, $chr)= @_;
-  my $seq= $dnaseqs{$chr};
-  unless($seq) {
-    my $dnafile= $self->dnafile($chr); #"$dnadir/dna-$chr.raw";
-    $seq= Bio::GMOD::Bulkfiles::MyLargePrimarySeq->new( -file => $dnafile);
-    $dnaseqs{$chr}= $seq;
-    print STDERR "open dnafile $dnafile, length=",$seq->length(),"\n" if $DEBUG;
-    }
-  return $seq;
-}
-
-sub getBases
-{
-  my($self, $usedb,$type,$chr,$baseloc,$id,$name,$subrange)= @_;
-  my $bases= undef;
-  if($usedb && $id) { 
-    $bases= $self->getBasesFromDb($id); 
-    return $bases if($bases || $self->{failonerror} || $self->{skiponerror}); 
-    }
-  unless ($bases) { 
-    $bases= $self->getBasesFromFiles($type,$chr,$baseloc,$name,$subrange);   
-    }
-  return $bases;
-}
-
-
-# but see  Bio/GMOD/DB/Config.pm
-sub dbiDSN
-{
-  my ($self, $dsn)= @_;
-  my $config= $self->{config};
-  my ($dbuser,$dbpass)=("","");
-  if ($dsn && $dsn =~ /^dbi:/) { $self->{dsn}= $dsn; }
-  ## if ($self->{dsn}) { $dsn= $self->{dsn}; }
-  if ($config->{db}) { 
-    my $dbname= $config->{db}->{name};
-    my $relid= $config->{relid};
-    my $reldb= ($relid && defined $config->{release}->{$relid}) 
-      ? $config->{release}->{$relid}->{db} :'';
-    $dbname= $reldb if ($reldb);
-    unless($dbname) {
-      die "missing dbname";
-      }
-    $dsn  = "dbi:" . $config->{db}->{driver} || "Pg";
-    $dsn .= ":dbname=" .$dbname;
-    $dsn .= ";host=" .$config->{db}->{host} if $config->{db}->{host};
-    $dsn .= ";port=" .$config->{db}->{port} if $config->{db}->{port};
-    #?? $self->{dsn}= $dsn;
-
-    $dbuser= $config->{db}->{user} if $config->{db}->{user};
-    $dbpass= $config->{db}->{password} if $config->{db}->{password};
-    }
-  ## if ($self->{dsn}) { $dsn= $self->{dsn}; }
-  return (wantarray) ? ($dsn,$dbuser,$dbpass) : $dsn;
-}
-
-sub dbiConnect
-{
-  my ($self)= @_;
-  my $dbh= $self->{dbh};
-  unless($dbh) { 
-    my $tdsn= $self->dbiDSN();
-    print STDERR "DBI->connect( $tdsn )\n" if $DEBUG;
-    $dbh = DBI->connect( $self->dbiDSN() )
-      or die("unable to open db( $tdsn )"); # throw ?
-    $self->{dbh}= $dbh;
-    }
-  return $dbh;
-}
-
-=item $n= getFeaturesFromDb( $outh, $sql, @sqlparam)
+  $n= getFeaturesFromDb( $outh, $sql, @sqlparam)
 
 =cut
 
@@ -1168,9 +1598,12 @@ sub getFeaturesFromDb
   my ($self, $outh, $sql, @sqlparam)= @_;
   my $dbh= $self->dbiConnect();
 
-  my $sth = $dbh->prepare($sql) or warn "unable to prepare select $sql";  
-  if (@sqlparam) { $sth->execute(@sqlparam) or warn("failed to get sql"); }
-  else { $sth->execute() or warn("failed to get sql"); }
+  my $err="";
+  my $sth = $dbh->prepare($sql) or $err= "unable to prepare select $sql";  
+  if (@sqlparam) { $sth->execute(@sqlparam) or $err= "failed to get sql" ; }
+  else { $sth->execute() or $err= "failed to get sql"; }
+  if ($err) { ($self->{failonerror}) ? die $err : warn $err;  }
+ 
 # sql dump analysis feature_table /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/featdump/ana
 # lysis.tsv
 # DBD::Pg::st execute failed: ERROR:  No such attribute armft.name at /bio/biodb/common/perl/lib/
@@ -1197,20 +1630,23 @@ sub getBasesFromDb
   my $dbh= $self->dbiConnect();
   my $sql= $self->{config}->{dnadump}->{sql}
       || "select feature_id, residues from feature where uniquename = ?";
-  my $sth = $dbh->prepare($sql)
-    or warn "unable to prepare select feature_id";
-  $sth->execute($uniquename) or warn("failed to get feature_id"); 
+  my $err="";    
+  my $sth = $dbh->prepare($sql) or $err="unable to prepare select feature_id";
+  $sth->execute($uniquename) or $err="failed to get feature_id"; 
+  if ($err) { ($self->{failonerror}) ? die $err : warn $err;  }
+
   my $hashref = $sth->fetchrow_hashref;
   my $feature_id = $$hashref{'feature_id'};
   my $bases= $$hashref{'residues'};
   $sth->finish();
-  warn "getBasesFromDb $uniquename -> $feature_id ;  n bases=",length($bases),"\n" 
+  print STDERR "getBasesFromDb $uniquename -> $feature_id ;  n bases=",length($bases),"\n" 
     if (!$bases || $DEBUG > 1);
   return $bases;
 }
 
 
-sub maxrange {
+sub maxrange 
+{
   my ($self, $range)= @_;
 	my ($pre, $suf,$start,$stop, $b, $u);
 	$start= -9; $stop= $start;
@@ -1274,7 +1710,7 @@ sub getBasesFromFiles
      
     }
   
-  warn "dna-file: $name, bases=",length($bases),"\n" if $DEBUG > 1;
+  print STDERR "dna-file: $name, bases=",length($bases),"\n" if $DEBUG > 1;
   if (!$subrange && ($gotloc ne $baseloc)) {
     my $ok= 0;
     ## check  for silly 123..123 => 123 change 
@@ -1307,60 +1743,10 @@ sub _isold {
   return $res;
 }
 
-=item $fname= get_filename($org, $chr, $featn, $rel, $format)
 
-=cut
 
-sub get_feature_set
+sub getReleaseDir 
 {
-  my($self,$type,$config)= @_;
-  my($fromdb,$subrange) = (0,'');
-  my @ft=(); my @retype= ();
-  my %type_info= ();
-  $type_info{$type}= {};
-  
-  if (defined $config->{featmap}->{$type}) {
-    my $fm= $config->{featmap}->{$type};
-    @ft= split(/[\s,;]/, $fm->{types} || $type ); #? @{$fm->{types}};
-    @retype= split(/[\s,;]/, $fm->{typelabel}) if ($fm->{typelabel});
-    $fromdb= $fm->{fromdb} || 0;
-    $subrange= $fm->{subrange} || '';
-    $type_info{$type}= $fm; # just save all ?
-    #$type_info{$type}->{get_id}= $fm->{get_id} || 0;
-    #$type_info{$type}->{add_id}= $fm->{add_id} || '';
-    }
-  else {  
-  CASE: {
-    $type =~ /^(gene|pseudogene)$/ && do { @ft=($type); $type_info{$type}->{get_id}=1; last CASE; };
-    $type =~ /^(CDS|mRNA)$/ && do { @ft=($type); last CASE; };
-    $type =~ /^(five_prime_UTR|three_prime_UTR|intron)$/ && do { @ft=($type); $type_info{$type}->{add_id}= 'gene'; last CASE; };
-    $type =~ /^(tRNA|ncRNA|snRNA|snoRNA|rRNA)$/ && do { @ft=($type); $type_info{$type}->{get_id}=1; last CASE; };
-    $type =~ /^(miscRNA)$/ && do { @ft=qw(ncRNA snRNA snoRNA rRNA); last CASE; };
-    $type =~ /^(transposable_element|transposon)$/ && do { @ft=('transposable_element'); last CASE; };
-   
-    $type =~ /^gene_extended(\d+)$/ && do { @ft=('gene'); $subrange="-$1..$1"; @retype=("gene_ex$1");  last CASE; };
-
-    $type =~ /^(transcript)$/ && do { @ft=('mRNA'); $fromdb=1; @retype=('transcript'); last CASE; };
-    $type =~ /^(CDS_translation|translation)$/ && do { @ft=('CDS'); $fromdb=1; @retype=('translation'); last CASE; };
-   
-    $type =~ /^(annotation|noncoding-gene)$/ && do { 
-      ##if ($domake == 1) { warn "Feature only for comparison: $@"; }
-      last CASE; };
-    
-    default: { 
-      if ($config->{fastafiles}->{allowanyfeat}) { @ft=($type); }
-      elsif (grep {$type eq $_} @{$config->{fastafeatok}}) { @ft=($type); }
-      else { return undef; } ## warn "Unknown feature option: $@"; 
-      };
-    }
-    }
-    
-  my %types_ok= map { $_,1; } @ft;
-  my %retype  = map { my $f= shift @ft; $f => $_; } @retype;
-  return (\%types_ok, \%retype, $fromdb, $subrange, \%type_info);
-}
-
-sub getReleaseDir {
   my($self)= @_;
   my $config = $self->{config};
   my $releasedir= $config->{releasedir};
@@ -1379,8 +1765,9 @@ sub getReleaseDir {
 # flybase bulk seq/feature release folders:
  
 
-sub getReleaseSubdir {
-  my($self, $subdir)= @_;
+sub getReleaseSubdir 
+{
+  my($self, $subdir, $flags)= @_;
   my $config= $self->{config};
   unless(-d $subdir) {
     my ($filename,$ext);
@@ -1389,13 +1776,14 @@ sub getReleaseSubdir {
       }
     my $reldir= $self->getReleaseDir();
     $subdir= catdir($reldir,$subdir) unless(-d $subdir);
-    mkpath($subdir,$DEBUG) unless(-d $subdir); ## mkdir
+    mkpath($subdir,$DEBUG) unless(-d $subdir || $flags =~ /nocreate|nomake/); ## mkdir
     }
   return $subdir;
 }
 
 
-sub initData {
+sub initData 
+{
   my($self, $config, $oroot)= @_;
   
   # check $self for params
@@ -1407,28 +1795,55 @@ sub initData {
     elsif ($ENV{ARGOS_SERVICE_ROOT}) { $oroot= $ENV{ARGOS_SERVICE_ROOT}; }
     elsif ($ENV{ARGOS_ROOT} && $config->{SERVICE}) { $oroot= $ENV{ARGOS_ROOT}.'/'.$config->{SERVICE}; }
     elsif ($ENV{GMOD_ROOT}) { $oroot= $ENV{GMOD_ROOT}; }
-    unless(-d $oroot) {
-      my $root = "$FindBin::RealBin/../"; 
-      if ( -e "$root/common/") { $oroot= $root; }
+    unless(defined $oroot && -d $oroot) {
+      my $bin = "$FindBin::RealBin"; 
+      if ( -e "$bin/../common/") { $oroot= "$bin/../"; }
+      else { $oroot= "./"; }  
+      $oroot=`cd "$oroot" && pwd`; chomp($oroot);
       }
     }
-  $self->{rootpath} = $oroot;
+  print STDERR "Using rootpath=$oroot\n" if $DEBUG;
+  $self->{rootpath} = $config->{rootpath} =  $oroot; # gmod_root ??
+
+  my $tmpdir= $config->{TMP} || "$oroot/tmp";
+  if (!-d $tmpdir) { mkpath($tmpdir,$DEBUG); }
+  $config->{TMP} = $tmpdir;
   
   ## rewrite this to use $config->{vals} ...
-  my $datadir= $config->{datadir} || "data2/fban"; # flybase - need better config
+  my $datadir= $config->{datadir} || "genomes"; # flybase - need better config
   $datadir= "$oroot/$datadir" unless(-d $datadir);
   if (!-d $datadir && -d $oroot) { mkpath($datadir,$DEBUG); }
   $config->{datadir} = $datadir;
+
+#  ## promote all <release id=relid> to top of config ..
+#   <release id="3" 
+#     rel="r3.2.1" 
+#     relfull="dmel_r3.2.1_07212004"
+#     dbname="chado_r3_2_27" 
+#     date="20040804" 
+#     release_url="/annot/release3.2.1.html"
+#     />
+  my $relid= $config->{relid};
+  if($relid && ref $config->{release}->{$relid}) {
+    my %relh= %{$config->{release}->{$relid}};
+    foreach my $k (keys %relh) {
+      $config->{$k}= $relh{$k} unless($config->{$k});
+      }
+    }
+  if ($relid && !$config->{rel}) { 
+    $config->{rel}= $relid; # used much, relid ~= rel
+    }
   
   $self->{idpattern}= $config->{idpattern} || '(FBgn|FBti)\d+';
   
-  my $dnadir= $self->getReleaseSubdir( $config->{dnafiles}->{path} || 'dna/');
-  $self->{dnadir} = $config->{dnadir} = $dnadir;
+  my $fset= $self->getFilesetInfo('dna');
+  my $dnadir= $self->getReleaseSubdir( $fset->{path} || 'dna/');
+  $self->{dnadir}  = $dnadir;
   
-  my $featdir= $self->getReleaseSubdir( $config->{featfiles}->{path} || 'gnomap/');
-  $self->{featdir} = $config->{featdir} = $featdir;
-
   # see getChromosomeTable: $chromosome= $config->{chromosome} if (ref $config->{chromosome});
+  $self->{addids}= $config->{addids} if defined $config->{addids} ;
+  $self->{ignoredbresidues}= $config->{ignoredbresidues} 
+    if defined $config->{ignoredbresidues} ;
 
     ## FIXME -- tests w/ this allfeats can be bad ... 
   @allfeats= (ref $config->{allfeats}) ? @{$config->{allfeats}}
@@ -1439,7 +1854,6 @@ sub initData {
     pseudogene rRNA region regulatory_region repeat_region rescue_fragment segment golden_path sequence_variant signal_peptide snRNA snoRNA
     so source tRNA tRNA_trnascan three_prime_UTR transcription_start_site
     transposable_element transposable_element_insertion transposable_element_insertion_site transposable_element_pred
-    cyto_insertion cytobreakpoint_inv cytobreakpoint_other cytobreakpoint_ttp cytodeleted_segment cytoduplicated_segment cytogene
     );
   #$config->{allfeats}= \@allfeats;
 
@@ -1453,17 +1867,20 @@ sub initData {
   
   my @fastafeatok=();
   push(@fastafeatok, @featset); # ?? not @allfeats
-  my $fm= $config->{featmap};
-  foreach my $fk (keys %$fm) {
-    push(@fastafeatok, $fk);
-    if (defined $fm->{$fk}->{types}) {
-      my @ft= split(/[\s,;]/, $fm->{$fk}->{types} ); 
-      push(@fastafeatok, @ft);
+
+  if (ref $config->{featmap}) {
+    my $fm= $config->{featmap};
+    foreach my $fk (keys %$fm) {
+      push(@fastafeatok, $fk);
+      if (ref $fm->{$fk} && defined $fm->{$fk}->{types}) {
+        my @ft= split(/[\s,;]/, $fm->{$fk}->{types} ); 
+        push(@fastafeatok, @ft);
+        }
       }
     }
+    
   $config->{fastafeatok}= \@fastafeatok;
 }
-
 
 #-----------
 

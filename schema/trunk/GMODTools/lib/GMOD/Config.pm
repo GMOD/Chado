@@ -1,20 +1,23 @@
 
 =head1 NAME
 
-  GMOD::Config  -- read gmod/conf/gmod.conf main settings to %ENV
+  GMOD::Config  -- read gmod/conf/gmod.conf 
 
-=head1 USAGE
+=head1 SYNOPSIS
 
   use GMOD::Config;  # -- OR --   
   require GMOD::Config;
-   # on use / require, looks for and reads conf/gmod.conf to %ENV
-   # and also sets internal %CONF
+   # on use / require, finds and reads conf/gmod.conf to %ENV / internal %CONF
    # expects gmod.conf to be in {rootpath}/conf/gmod.conf, 
-   # with KEY=value lines
    
-    # also use get()/put() to  access gmod.conf values
+  $confhash= GMOD::Config::readConfig($file,$opthash);
+
+  $confhash= GMOD::Config::readConfDir($root,$dir,$confpattern);
+
   $dbname= GMOD::Config::get('CHADO_DB_NAME');
+  
   $oldname= GMOD::Config::put( CHADO_DB_NAME => 'mydb');
+
 
 =head1 EXAMPLE
 
@@ -63,6 +66,9 @@ Argos ROOT/bin/argos-env sets shell environ in similar manner.
 =cut
 
 package GMOD::Config;
+# should merge/extend Bio::GMOD::Config from Scott Cain
+
+
 
 use strict;
 use Config; # system Config ... namespace problems w/ lib use
@@ -71,15 +77,23 @@ use Cwd qw(getcwd abs_path);
 use File::Spec;
 use Exporter;
 
-use vars qw/$VERSION @ISA @EXPORT @EXPORT_OK %GmodConfig/;
+use vars qw/$VERSION @ISA @EXPORT @EXPORT_OK 
+  %GmodConfig $servkey $ROOT $INIT $confpatt $Variables/;
 
 our $DEBUG;
 
-$VERSION = "0.2";
-%GmodConfig=();
+BEGIN {
+$VERSION = "0.4";
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(get set);
 #@EXPORT = qw(&get &set);
+$servkey = 'GMOD'; 
+$ROOT= $servkey."_ROOT";  
+$INIT= $servkey."_INIT";
+$confpatt= 'gmod\.conf$';
+$Variables= \%ENV; #?
+}
+
 
 =item get(key)
 
@@ -103,7 +117,7 @@ sub get {
   my @keys= @_;
   if (@keys>1 || wantarray) {
     my %vals=();
-    foreach my $key (@keys) { $vals{$key}=  $GmodConfig{$key}; }
+    @vals{@keys} = @GmodConfig{@keys};
     return %vals;
     }
   else {
@@ -114,50 +128,211 @@ sub get {
 sub put {
   my %keyvals= @_;
   my %oldvals=();
-  foreach my $key (keys %keyvals) {
-    $oldvals{$key}= (defined $GmodConfig{$key} ? $GmodConfig{$key} : undef);
-    $GmodConfig{$key}= $keyvals{$key};
-    }
+  my @keys= keys %keyvals;
+  @oldvals{@keys} = @GmodConfig{@keys};
+  @GmodConfig{@keys} = @keyvals{@keys};
   return %oldvals;
 }
 
-=item setenvKeyValueFile($dir,$file)
 
-Read file of simple ^KEY="value"$ format into %ENV.
-Comments are skipped.
+sub cleanval {
+  local $_= shift;
+  s/^\s*//; s/\\?\s*$//; if (s/^(["'])//) { s/$1$//; }
+  if ($Variables) {
+    s/\$\{(\w+)\}/$Variables->{$1}/g; # convert $KEY to $ENV{$KEY} to value
+    }
+  return $_;
+}
+
+sub readKeyValue
+{
+  my ($conf, $confhash)= @_;
+  $confhash= {} unless(ref $confhash);
+  my ($k,$v);
+  foreach (split(/\n/,$conf)) {
+    next if(/^\s*[\#\!]/ || /^\s*$/); # skip comments, etc.
+    if (/^([^\s=:]+)\s*[=:]\s*(.*)$/) { # must have value=(*.) to allow blanks
+      ($k,$v)=($1,$2);
+      $confhash->{$k}= cleanval($v);
+      }
+    elsif ($k && s/^\s+//) {
+      $confhash->{$k} .= cleanval($_);
+      }
+    }
+  return $confhash;
+}
+
+
+
+sub find_file  {
+  my($file, @search_path) = @_;
+  my($filename, $filedir) = File::Basename::fileparse($file);
+
+  if($filename ne $file) {        # Ignore searchpath if dir component
+    return($file) if(-e $file);
+    }
+  else {
+    foreach my $path (@search_path)  {
+      my $fullpath = File::Spec->catfile($path, $file);
+      return($fullpath) if(-e $fullpath);
+      }
+    }
+
+  # If user did not supply a search path, default to current directory
+  if(!@search_path) {
+    if(-e $file) { return($file); }
+    # warn "File does not exist: $file";
+    }
+  # warn "Could not find $file in ", join(':', @search_path);
+  return undef;
+}
+
+
+=head2 readConfig($file, $opts)
+
+Read an XML::Simple OR Perl-struct OR key=value config file
+Parameters
+  $file = input; 
+  $opts = XML::Simple options hash-ref
+Return hash-ref options
 
 =cut
 
-sub setenvKeyValueFile {
-  my($dir,$file)= @_;
-  my $ok= 0;
-  my $path= File::Spec->catfile($dir,$file);
-  return $ok unless(-f $path);
-  warn "GMOD::Config loading: $file\n" if $DEBUG;
-  if (open(CONF,$path)){
-    while(<CONF>){
-      if (m,^(\w+)\s*=\s*["]?([^"\n\r]*),) {
-        my ($k,$v)= ($1,$2); 
-        $v =~ s/\$(\w+)/$ENV{$1}/g; # convert $KEY to $ENV{$KEY} to value
-        $ENV{$k}= $GmodConfig{$k}= $v;
-        $ok= 1;
-        warn "setenv $k=$v\n" if $DEBUG; #> 1
-        }
+our $readConfigOk;
+
+sub readConfig
+{
+  my($file, $opts, $confhash)= @_;
+  $opts= { %$opts }; # copy so delete/change ok
+  $confhash = {} unless(ref $confhash);
+  my $debug= delete $$opts{debug};
+  $readConfigOk= 0;
+  
+  if (!$file || ! -e $file) {
+    my($filename, $filedir);
+    $opts->{searchpath}= [] unless ($opts->{searchpath});
+    
+    $filedir= "conf/";
+    push(@{$opts->{searchpath}},$filedir) if (-d $filedir);
+    
+    #$filedir= "$ENV{ARGOS_SERVICE_ROOT}/conf/";
+    $filedir= "$ENV{$ROOT}/conf/";
+    push(@{$opts->{searchpath}},$filedir) if (-d $filedir);
+    
+    ($filename, $filedir) =  File::Basename::fileparse($0);
+    push(@{$opts->{searchpath}},$filedir)  if (-d $filedir);
+    
+    if ($file) {
+      ($filename, $filedir) =  File::Basename::fileparse($file);
+      push(@{$opts->{searchpath}},$filedir)  if (-d $filedir);
       }
-    close(CONF);
     }
-  return $ok;
+    
+  if (! $file ) {
+    my ($ScriptDir, $Extension);
+    ($file, $ScriptDir, $Extension) = File::Basename::fileparse($0, '\.[^\.]+');
+    }
+  
+  if ($file && !-f $file) {
+    foreach my $suf (".conf", ".cnf", ".xml", "" ) {
+      my $cnf= find_file("$file$suf", @{$opts->{searchpath}});  
+      if ($cnf) { $file= $cnf; last; }
+      #if (-f "$file.$suf") { $file="$file.$suf"; last; }
+      }
+   }
+  warn "GMOD::Config reading: $file\n" if $debug;
+   
+  if (!$file || ($file =~ /\.xml/ && -f $file)) {
+    require XML::Simple; ## will attemp to read $0.xml file if no file given
+    my $xs = new XML::Simple(%$opts); # (NoAttr => 1, KeepRoot => 1);#options
+    my $conf1 = $xs->XMLin( $file); 
+    if ($conf1) { 
+      my @keys= keys %$conf1;
+      @{%$confhash}{@keys}= @{%$conf1}{@keys};
+      $readConfigOk= 1;
+      }  
+    }
+  
+  elsif (-f $file) {
+    ## handle key-value file OR perl-struct
+    open(F,$file); my $conf= join("",<F>); close(F);
+    print STDERR "eval config\n" if $debug;
+    if ($conf =~ m/=>/s && $conf =~ m/[\{\}\(\)]/s) {
+      my $conf1= eval $conf; 
+      if ($@) { warn "error $@"; }
+      else { 
+        my @keys= keys %$conf1;
+        @{%$confhash}{@keys}= @{%$conf1}{@keys};
+        $readConfigOk= 1;
+        }  
+      }
+    else {
+      $confhash= readKeyValue($conf, $confhash);
+      $readConfigOk= 1;
+      }
+    }
+  
+  return $confhash;
 }
 
-=item setenvConfDir($root, $dir, $confpatt)
+
+=head2 printConfig($config, $opts)
+
+  $config = options hash-ref
+  $opts = XML::Simple options hash-ref (debug => 1 Data dumper out)
+  return XML::Simple of input
+  
+=cut
+
+sub showConfig
+{
+  my($config,$opts)= @_;
+  $opts= { %$opts };
+  my $debug= delete $$opts{debug};
+  my $xml ='';
+  
+  if ($debug) {
+    require Data::Dumper;
+    my $dd = Data::Dumper->new([$config]);
+    $dd->Terse(1);
+    $xml.=  "<!-- ========= config struct ===========\n";
+    $xml.=   $dd->Dump();
+    $xml.=   "======================================== -->\n";
+    }
+    
+  require XML::Simple;
+  my $xs = new XML::Simple( %$opts); #NoAttr => 1, KeepRoot => 1 
+  $xml.= $xs->XMLout( $config );  
+  
+  return $xml;
+}
+
+
+sub updir
+{
+  my ($atdir,$todirs)= @_;
+  my $dir= $atdir;
+  my $ok= 0;
+  foreach my $td (@$todirs) { $ok= (-e "$dir/$td"); last if $ok; }
+  while (!$ok && length($dir)>4) {
+    $dir= File::Basename::dirname($dir)."/..";
+    $dir=`cd "$dir" && pwd`; chomp($dir);
+    foreach my $td (@$todirs) { $ok= (-e "$dir/$td"); last if $ok; }
+    }
+  return ($ok) ? $dir : $atdir;
+}
+
+
+=item $confhash= readConfDir($root, $dir, $confpatt, $confhash)
 
 Process all config files of confpatt in dir folder.
 
 =cut
+our readConfDirOk;
 
-sub setenvConfDir {
-  my($root, $dir, $confpatt)= @_;
-  my $ok= 0;
+sub readConfDir {
+  my($root, $dir, $confpatt, $confhash)= @_;
+  $readConfDirOk= 0;
   my $path= File::Spec->catfile($root,$dir);
   return $ok unless(-d $path);
   warn "GMOD::Config reading configs at $path \n" if $DEBUG;
@@ -165,12 +340,15 @@ sub setenvConfDir {
     my @conf = grep ( /$confpatt/, readdir(DIR));
     closedir(DIR);
     foreach my $file (sort @conf) { 
-      my $ok1= setenvKeyValueFile( $path, $file); # check for .xml config?
-      $ok ||= $ok1;
+      my $confpath= File::Spec->catfile($path,$file);
+      $confhash= readConfig( $confpath, { debug => $DEBUG, Variables => $Variables }, $confhash);
+      $readConfDirOk ||= $readConfigOk;
       }
     }
-  return $ok;
+  return $confhash;
 }
+
+
 
 =item BEGIN 
 
@@ -183,29 +361,36 @@ ENV{GMOD_INIT}=1 prevents this loading.
 
 BEGIN {
 
+# $servkey = 'GMOD'; 
+# $confpatt= 'gmod\.conf$';
+
 $DEBUG = $ENV{'DEBUG'} unless defined $DEBUG;
-my $confpatt= 'gmod\.conf$';
-my ($mybin, $myroot, $realroot)= (abs_path("$Bin"), abs_path("$Bin/.."), abs_path("$RealBin/.."));
-my $servkey = 'GMOD'; 
-my $ROOT= $servkey."_ROOT";  
-my $INIT= $servkey."_INIT";
+
+my $mybin= abs_path("$Bin");
+my $myroot= updir( $mybin, ["common","conf"] ); # in case we are not in bin/ folder
 
 unless($ENV{$INIT}) {
   my $ok= 0;
-
+  %GmodConfig= ();
+  
   if (defined $ENV{$ROOT} && -d $ENV{$ROOT}) { $myroot= $ENV{$ROOT}; }
   else { $ENV{$ROOT}= $myroot; }
   
-  my $ok1= setenvConfDir( $myroot, 'conf', $confpatt);
-  $ok ||= $ok1;
-  unless($ok) {
-    $ok1= setenvConfDir( $mybin, 'conf', $confpatt);
-    $ok ||= $ok1;
-    $myroot= $mybin if ($ok1);
+  readConfDir( $myroot, 'conf', $confpatt, \%GmodConfig);
+  $ok= $readConfDirOk;
+  unless($ok && $myroot ne $mybin) {
+    readConfDir( $mybin, 'conf', $confpatt, \%GmodConfig);
+    $ok ||= $readConfDirOk;
+    $myroot= $mybin if ($readConfDirOk);
     }
   
-  die "GMOD::Config - no $confpatt file at $myroot/conf; setenv $ROOT to locate."
-    unless($ok);
+  unless($ok) {
+    warn "GMOD::Config - no $confpatt file at $myroot/conf; setenv $ROOT to locate."
+    }
+  else { # if ($SetEnv)
+    my @keys= keys %GmodConfig;
+    @ENV{@keys}= @GmodConfig{@keys};
+    }
 
   $ENV{$INIT}= 1;
   

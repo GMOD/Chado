@@ -1,0 +1,878 @@
+<opt
+  name="gbrowseconf"
+  date="20040826"
+  >
+ 
+ <!-- need to call XML::Simple w/ ${variables} below in doc
+ 
+  ${species} ${relfull} ${date}
+  ${datapath}
+  ${default_location} 
+  ${chromosomes} == ${examples} ??
+  readConfig( 'gbrowseconfig', { Variables => \%featvars });
+ 
+ -->
+ 
+  <title>Gbrowse conf generator</title>
+  <about>
+  </about>
+  
+
+<!-- add gbrowse.conf file parts here; as per blastfiles.doc -->
+  <doc name="dummy"></doc>
+  
+  <doc name="gbrowse" path="gnomap/gbrowse.conf">
+  <!-- no content tag here -->
+  <header title="header"><![CDATA[ 
+# gbrowse config file for  genome maps
+
+[GENERAL]
+description = ${species} ${relfull} ${date}
+datapath    = ${gnomapdir}
+
+browser title = Genome Browser
+help = /maps/gbrowse
+
+# adaptor     = flybase::gmod::FFFdb
+adaptor     =  
+
+default_name = ${default_location} 
+# X:100000-200000
+default_range = 1-500000
+
+# examples to show in the introduction
+examples =  ${examples}
+
+header = Genome Browser
+footer = <hr>
+ Adapted from GBrowse of the <a href="http://www.gmod.org/">
+ Generic Model Organism Database Project.</a>
+
+debug = 0
+
+plugins = BatchDumper FastaDumper
+
+#fixme ...
+default features =  rev_ruler cytoband gene  tRNA noncodingRNA golden_path segment BAC transposable_element pseudogene
+primary_feature = gene
+scale_feature = cytoband
+
+dumpviews = FastA GenBank GFF
+dataviews = "Default" "Collapse All" "Expand All" 
+
+# Web site configuration info
+stylesheet  = /templates/gbrowse.css
+buttons     = /common/perl/gbrowse_fb/images/buttons
+tmpimages   = /tmp/gbrowse_fb
+
+# max and default segment sizes for detailed view
+max segment     = 1000001
+default segment = 100000
+
+## base range to expand around gene given ID lookup
+expand_by = 20000
+
+zoom levels = 100 200 1000 2000 5000 10000 20000 40000 100000 200000 500000 1000000
+
+searchhelp = Search using Chromosome:base_start..end or FlyBase Gene ID.
+
+#panel property
+pad_left    = 20
+pad_right   = 30
+key_style = bottom
+key bgcolor = whitesmoke
+grid = 1
+overview bgcolor = whitesmoke
+
+
+# # where to link to when user clicks in detaild view
+
+link = sub {
+ my $f= shift;
+ my $d= $f->primary_id() if $f->can('primary_id');
+ $d= $f->source() unless($d);
+ if ($d) {
+ if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
+ elsif ($d =~ /^C[GR]/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
+ elsif ($d =~ /\-\w+/ ){ return '/cgi-bin/fbannq.html?'.$d; }
+ }
+ if ($f->name()) { return '/cgi-bin/fbsymq.html?'.$f->name(); }
+ return '' ; }
+
+title = sub { my $f= shift;
+	return $f->class .":". $f->info . " ". $f->seq_id .':'.$f->start."..".$f->end;
+	}
+
+# "automatic" classes to try when an unqualified identifier is given
+automatic classes = Symbol Gene Clone
+
+# put reversed features on same track or below ?
+mix_strand = 1
+
+# Default glyph settings
+glyph       = generic
+height      = 5
+bgcolor			= palegoldenrod
+fgcolor     = cyan
+boxcolor 		= blue
+label density = 20
+bump density  = 50
+overview label density = 160
+
+image widths  = 450 640 800 950 1024
+default width = 800
+width				= 800
+
+#---------- end [GENERAL] ------------------------
+  ]]></header>
+  
+  <footer  title="footer"><![CDATA[
+  ]]></footer> 
+  </doc>
+
+
+
+
+<fdef name="GENERIC"><![CDATA[
+[GENERIC]
+feature  = GENERIC
+glyph    = segments
+bgcolor  = lightslategray
+fgcolor  = black
+key      = GENERIC
+citation = GENERIC
+keygroup = "Analysis features"
+link     =
+]]></fdef>
+
+
+
+<fdef name="rev_ruler"><![CDATA[
+[rev_ruler]
+glyph = ruler_arrow
+label = 0
+no_53_label = 1
+label_align = center
+tick = 1
+no_tick_label = 0
+units = K
+link =
+key  = Base ruler
+keygroup = "  Genomic features"
+]]></fdef>
+
+<!-- ============   Genomic features  =========== -->
+<fdef name="cytoband"><![CDATA[
+[cytoband]
+feature = cytoband
+glyph = revcomp_arrow
+both = 1
+label_align = center
+fgcolor = black
+bgcolor = black
+linewidth = 2
+label = 1
+label density = 10000
+bump = 0
+bump density = 0
+key  = Cytologic band
+keygroup = "  Genomic features"
+citation     = Cytological bands on the polytene chromosomes
+link = sub { my $f=shift; my $u=$ENV{REQUEST_URI};
+	my $r= $f->ref.":".$f->to_FTstring;
+	$u =~ s/\?.*$//; $u .= '?name='.$r.";doexpand=1";
+	return $u;
+	}
+]]></fdef>
+
+
+
+<fdef name="dna"><![CDATA[
+[dna]
+feature       = source
+glyph         = dnabases
+draw_dna      = 1
+strand        = forward
+label         = 0
+label density = 0
+key           = DNA sequence
+keygroup = "  Genomic features"
+link =
+]]></fdef>
+
+<fdef name="gene" feature="gene mRNA"><![CDATA[
+[gene]
+feature       = gene mRNA
+glyph         = transcript2
+bgcolor       = lightblue
+fgcolor       = blue
+secondary     = mRNA
+secondary_bgcolor = mediumblue
+secondary_fgcolor = mediumblue
+highlight_color = red
+higlighted = 1
+label = 1
+label density = 50
+key           = Gene Model
+keygroup = "  Genomic features"
+citation     = Gene and mRNA (transcript) features  (annotation DB ; Chado)
+link = sub {
+ my $f= shift;
+ my $d= $f->primary_id() if $f->can('primary_id');
+ $d= $f->source() unless($d);
+ if ($d) {
+ if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
+ elsif ($d =~ /^C[GR]/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
+ }
+ if ($f->name()) { return '/cgi-bin/fbgenq.html?symbol='.$f->name(); }
+ return '' ; }
+]]></fdef>
+
+
+<fdef name="CDS"><![CDATA[
+[CDS]
+feature  = CDS
+glyph = segments
+stranded     = 1
+translation  = 1frame
+bgcolor = palegoldenrod
+fgcolor = goldenrod
+label = 1
+key  = CDS
+citation     = Protein coding sequence (CDS or translation; annotation DB ; Chado)
+keygroup = "  Genomic features"
+link =
+]]></fdef>
+
+
+<fdef name="pseudogene"><![CDATA[
+[pseudogene]
+feature  = pseudogene
+glyph = segments
+strand_arrow  = 1
+fgcolor       = orange
+label = 1
+key           = Pseudogene
+keygroup = "  Genomic features"
+]]></fdef>
+
+<fdef name="tRNA"><![CDATA[
+[tRNA]
+feature  = tRNA
+glyph = transcript2
+label = 1
+stranded     = 1
+bgcolor      = white
+fgcolor      = black
+curatedexon  = slateblue
+fontcolor    = slateblue
+key          = tRNA
+keygroup = "  Genomic features"
+citation     = These are tRNA predictions made using Sean Eddy's tRNAscan program.
+]]></fdef>
+
+<fdef name="noncodingRNA" feature="ncRNA snoRNA snRNA miscRNA"><![CDATA[
+[noncodingRNA]
+feature      = ncRNA snoRNA snRNA miscRNA
+glyph        = transcript2
+bgcolor      = peachpuff
+stranded     = 1
+key          = Non-coding RNAs
+citation     = Non-coding RNAs: ncRNA snoRNA snRNA miscRNA
+keygroup = "  Genomic features"
+]]></fdef>
+
+<fdef name="transposable_element"><![CDATA[
+[transposable_element]
+feature  = transposable_element
+bgcolor       = magenta
+fgcolor       = magenta
+label = 1
+glyph         = anchored_arrow
+key           = Natural transposon
+citation     = Natural transposon (annotation DB ; Chado)
+keygroup = "  Genomic features"
+link = sub {
+ my $f= shift;
+ my $d= $f->primary_id() if $f->can('primary_id');
+ $d= $f->source() unless($d);
+ if ($d) {
+ if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
+ #elsif ($d =~ /^TE/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
+ }
+ if ($f->name()) { return '/cgi-bin/fbinsq.html?symbol='.$f->name(); }
+ return '' ; }
+]]></fdef>
+
+
+
+<fdef name="transposable_element_insertion_site"><![CDATA[
+[transposable_element_insertion_site]
+feature  = transposable_element_insertion_site
+glyph         = pinsertion
+bgcolor       = darkturquoise
+fgcolor       = darkturquoise
+bump          = 1
+label         = 0
+key           = Transgene insertion site
+citation     = Transgene insertion site (annotation DB ; Chado)
+keygroup = "  Genomic features"
+]]></fdef>
+
+
+<!-- ============  Misc. Genomic features  =========== -->
+
+<fdef name="polyA_site"><![CDATA[
+[polyA_site]
+feature  = polyA_site
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = polyA_site 
+citation     = polyA_site (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+
+<fdef name="point_mutation"><![CDATA[
+[point_mutation]
+feature  = point_mutation
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = point_mutation 
+citation     = point_mutation (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+ 
+ 
+[protein_binding_site]
+feature  = protein_binding_site
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = protein_binding_site 
+citation     = protein_binding_site (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="rescue_fragment"><![CDATA[
+[rescue_fragment]
+feature  = rescue_fragment
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = rescue_fragment 
+citation     = rescue_fragment (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="mature_peptide"><![CDATA[
+[mature_peptide]
+feature  = mature_peptide
+glyph = segments
+strand_arrow  = 1
+bgcolor = palegoldenrod
+fgcolor       = orange
+label = 1
+key  = mature_peptide
+citation     = mature_peptide (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+  }
+]]></fdef>
+
+<fdef name="signal_peptide"><![CDATA[
+[signal_peptide]
+feature  = signal_peptide
+glyph = segments
+strand_arrow  = 1
+bgcolor = palegoldenrod
+fgcolor       = orange
+label = 1
+key  = signal_peptide
+citation     = signal_peptide (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="enhancer"><![CDATA[
+[enhancer]
+feature  = enhancer
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = enhancer 
+citation     = enhancer (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="aberration_junction"><![CDATA[
+[aberration_junction]
+feature  = aberration_junction
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = aberration_junction 
+citation     = aberration_junction (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="regulatory_region"><![CDATA[
+[regulatory_region]
+feature  = regulatory_region
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = regulatory_region 
+citation     = regulatory_region (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+<fdef name="sequence_variant"><![CDATA[
+[sequence_variant]
+feature  = sequence_variant
+strand_arrow  = 1
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+key           = sequence_variant 
+citation     = sequence_variant (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+link = sub {
+  my $v=shift->name(); $v=~s/\-\d+.*$/\*/; $v=~s/\+/\?/g; return '/cgi-bin/fbannq.html?synonym='.$v;  
+ }
+]]></fdef>
+
+
+<fdef name="DNA_motif" feature="DNA_motif RNA_motif"><![CDATA[
+[DNA_motif]
+feature  = DNA_motif RNA_motif
+bgcolor       = plum
+fgcolor       = plum
+secondary     = RNA_motif
+secondary_bgcolor = mediumseagreen
+secondary_fgcolor = mediumseagreen
+strand_arrow  = 1
+bump          = 1
+label         = 0
+key           = DNA / RNA motif
+citation     = DNA_motif and RNA_motif (annotation DB ; Chado)
+keygroup = "  Misc. Genomic features"
+]]></fdef>
+
+
+
+
+
+<!-- ============  Analysis  =========== -->
+<fdef name="transcription_start_site"><![CDATA[
+[transcription_start_site]
+feature  = transcription_start_site
+glyph         = promoter
+bgcolor       = purple
+fgcolor       = purple
+bump          = 1
+label         = 0
+key = Promoter prediction
+citation     = Transcription promoter prediction (annotation DB ; Chado)
+keygroup = "Analysis features"
+]]></fdef>
+
+
+<fdef name="processed_transcript"><![CDATA[
+[processed_transcript]
+feature  = processed_transcript
+glyph         = processed_transcript
+bgcolor       = plum
+fgcolor       = plum
+height       = 4
+bump          = 1
+label         = 0
+key           = Processed transcript
+citation     = processed_transcript (annotation DB ; Chado)
+keygroup = "Analysis features"
+]]></fdef>
+
+
+<fdef name="protein"><![CDATA[
+[protein]
+feature  = protein
+bgcolor       = salmon
+fgcolor       = salmon
+height       = 3
+strand_arrow  = 1
+bump          = 1
+label         = 1
+key           = Protein BLAST alignment
+citation     = protein from BLAST alignments (annotation DB ; Chado)
+keygroup = "Analysis features"
+link = sub {
+ my $f= shift;
+ my $d= $f->primary_id() if $f->can('primary_id');
+ $d= $f->source() unless($d);
+ if ($d) {
+ if ($d =~ /(FB\w\w\d+)/){ return '/cgi-bin/fbidq.html?'.$1; }
+ elsif ($d =~ /^C[GR]/ ){ return '/cgi-bin/fbannq.html?acc='.$d; }
+ }
+ if ($f->name() =~ /^(\w+):(\w+)/){ return '/cgi-bin/fbannq.html?DBX='.$f->name; }
+ return '' ; }
+   #above DBX should go to swissprot et al web db
+]]></fdef>
+
+<fdef name="repeat_region"><![CDATA[
+[repeat_region]
+feature   = repeat_region
+bgcolor       = darkorchid
+fgcolor       = darkorchid
+height        = 3
+connector     = solid
+bump          = 1
+strand_arrow  = 0
+label         = 0
+key           = Repeat region
+citation     = repeat_region (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="mRNA_genscan"><![CDATA[
+[mRNA_genscan]
+feature   = mRNA_genscan
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = tan
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           = Genscan prediction
+citation     = Genscan (gene prediction) (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="mRNA_piecegenie"><![CDATA[
+[mRNA_piecegenie]
+feature   = mRNA_piecegenie
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = yellow
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           = Genie prediction 
+citation     = PieceGenie (gene prediction) (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="match_fgenesh"><![CDATA[
+[match_fgenesh]
+feature   = match_fgenesh
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = tan
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           = fgenesh prediction 
+citation     = match_fgenesh (gene prediction) (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="match_HDP"><![CDATA[
+[match_HDP]
+feature   = match_HDP
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = yellow
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           =HDP prediction 
+citation     = HDP  (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="match_RNAiHDP"><![CDATA[
+[match_RNAiHDP]
+feature   = match_RNAiHDP
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = tan
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           = RNAiHDP prediction 
+citation     = RNAiHDP  (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+
+<fdef name="tRNA_trnascan"><![CDATA[
+[tRNA_trnascan]
+feature   = tRNA_trnascan
+glyph = transcript2
+bgcolor       = yellow
+fgcolor       = brown
+connector     = solid
+bump          = 1
+label         = 0
+key           = tRNAscan prediction
+citation     = tRNAscan (tRNA prediction) (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<fdef name="transposable_element_pred"><![CDATA[
+[transposable_element_pred]
+feature  = transposable_element_pred
+bgcolor       = tan
+fgcolor       = brown
+label = 1
+glyph         = anchored_arrow
+key           = Transposon prediction
+citation     = Transposon prediction (annotation DB ; Chado)
+keygroup = "Analysis features"
+link =
+]]></fdef>
+
+<!-- ============  Genome reagents  =========== -->
+<fdef name="oligonucleotide"><![CDATA[
+[oligonucleotide]
+feature  = oligonucleotide
+glyph         = generic
+bgcolor       = tomato
+fgcolor       = tomato
+height       = 4
+bump          = 0
+bump density  = 1
+label         = 0
+label density = 0
+key           = Affy Oligo
+citation     = oligonucleotide (annotation DB ; Chado)
+keygroup = " Genome reagents"
+link = sub { my $f= shift;
+ return ($f->name())?'/cgi-bin/fbannq.html?oligo='.$f->name() : ''; }
+]]></fdef>
+
+
+<fdef name="EST" feature="EST cDNA_clone"><![CDATA[
+[EST]
+feature       = EST cDNA_clone
+glyph         = segments
+strand_arrow  = 1
+bgcolor       = lightgreen
+fgcolor       = green
+secondary     = cDNA_clone
+secondary_bgcolor = mediumseagreen
+secondary_fgcolor = mediumseagreen
+key           = cDNA + EST 
+citation     = cDNA_clone and EST (annotation DB ; Chado)
+keygroup = " Genome reagents"
+link = sub {
+  my $v=shift->name();  $v=~s/[:.].*(prime|contig).*$//;  $v=~s/^(GB)[:]//;  
+  return 'http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=Nucleotide&doptcmdl=GenBank&tool=FlyBase&term='.$v;  
+ }
+]]></fdef>
+
+
+<fdef name="blast"><![CDATA[
+[blast]
+feature       = blast
+glyph         = alignment
+bgcolor       = darkorchid
+fgcolor       = darkorchid
+bump          = 1
+label         = 1
+key           = Blast hit
+height        = 8
+citation      = BLAST alignment hit
+keygroup = "hidden"
+link =
+]]></fdef>
+
+<fdef name="BAC"><![CDATA[
+[BAC]
+feature  = BAC
+glyph         = extending_arrow
+no_arrows     = 1
+base          = 0
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+linewidth     = 2
+bump          = 1
+label         = 1
+key           = Tiling BAC
+citation     = BAC (annotation DB ; Chado)
+keygroup = " Genome reagents"
+link = sub { my $f= shift;
+ return ($f->name())?'/cgi-bin/fbannq.html?DBX='.$f->name() : ''; }
+]]></fdef>
+
+<fdef name="golden_path" feature="golden_path segment"><![CDATA[
+[golden_path]
+## aug04 - renamed to SO equivalent golden_path
+feature  = golden_path segment 
+glyph         = anchored_arrow
+no_arrows     = 1
+base          = 0
+fgcolor       = black
+bgcolor       = black
+linewidth     = 2
+bump          = 1
+label         = 1
+height        = 4
+key           = GenBank Scaffold
+citation     = golden_path segment (annotation DB ; Chado)
+keygroup = " Genome reagents"
+link = sub { my $f= shift;
+ return ($f->name())?'/cgi-bin/fbannq.html?ARM='.$f->name() : ''; }
+]]></fdef>
+
+
+
+<!-- ============  Cytology mapped  =========== -->
+
+<fdef name="cytobreakpoint_other"><![CDATA[
+[cytobreakpoint_other]
+feature       = cytobreakpoint_other
+glyph         = cytobar
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector 		= dashed
+connector_color = #8888FF
+bump          = 1
+label         = 1
+key						= Other breakpoints (cytol.)
+citation     	= Other breakpoints (cytology mapped)
+height        = 4
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytodeleted_segment"><![CDATA[
+[cytodeleted_segment]
+feature       = cytodeleted_segment
+glyph         = cytobar
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector 		= dashed
+connector_color = #ff00aa
+bump          = 1
+label         = 1
+key						= Deleted segments (cytol.)
+citation     	= Deleted segments (cytology mapped)
+height        = 2
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytoduplicated_segment"><![CDATA[
+[cytoduplicated_segment]
+feature       = cytoduplicated_segment
+glyph         = cytobar
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector 		= dashed
+connector_color = #88FF88
+bump          = 1
+label         = 1
+key						= Duplicated segments (cytol.)
+citation     	= Duplicated segments (cytology mapped)
+height        = 2
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytobreakpoint_inv"><![CDATA[
+[cytobreakpoint_inv]
+feature       = cytobreakpoint_inv
+glyph         = cytobar
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector 		= dashed
+connector_color = #FF9900
+bump          = 1
+label         = 1
+key						= Inversion breakpoints (cytol.)
+citation     	= Inversion breakpoints (cytology mapped)
+height        = 4
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytobreakpoint_ttp"><![CDATA[
+[cytobreakpoint_ttp]
+feature       = cytobreakpoint_ttp
+glyph         = cytobar
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector 		= dashed
+bump          = 1
+label         = 1
+key						= Translocations & Transpositions (cytol.)
+citation     	= Translocation & Transposition breakpoints (cytology mapped)
+height        = 4
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytoins"><![CDATA[
+[cytoins]
+feature       = cytoins
+glyph         = cytobar
+connector_color = #ffbb00
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector = dashed
+bump          = 1
+label         = 1
+key	= Transgene insertion (cytol.)
+citation     = Chromosomal Insertion (cytologically mapped; CytoSearch DB)
+height        = 2
+keygroup 			= "Cytology mapped features"
+]]></fdef>
+
+<fdef name="cytogene"><![CDATA[
+[cytogene]
+feature       = cytogene
+glyph         = cytobar
+connector = dashed
+connector_color = #ffaa00
+bgcolor       = lightslategray
+fgcolor       = lightslategray
+connector = dashed
+bump          = 1
+label         = 1
+key           = Gene (recomb. only)
+citation      = Genes mapped by cytology/recombination data only (possible orphans; cytologically mapped; CytoSearch DB)
+height        = 4
+keygroup = "Cytology mapped features"
+]]></fdef>
+
+</opt>
