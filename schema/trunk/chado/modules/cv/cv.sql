@@ -1,7 +1,7 @@
-## The cvterm module design is based on the ontology 
-## ================================================
-## TABLE: cvterm
-## ================================================
+-- The cvterm module design is based on the ontology 
+-- ================================================
+-- TABLE: cvterm
+-- ================================================
 
 create table cvterm (
        cvterm_id serial not null,
@@ -14,14 +14,14 @@ create table cvterm (
        timelastmod timestamp not null default current_timestamp,
 
        unique(termname, termtype_id)
-## Its important to use termtype_id properly.  It is *NOT* used for 
-## handling, eg, parent - child relationships.  The unique key on
-## termname, termtype_id ensures that all terms are unique in a given cv
+-- Its important to use termtype_id properly.  It is *NOT* used for 
+-- handling, eg, parent - child relationships.  The unique key on
+-- termname, termtype_id ensures that all terms are unique in a given cv
 );
 
-## ================================================
-## TABLE: cvrelationship
-## ================================================
+-- ================================================
+-- TABLE: cvrelationship
+-- ================================================
 
 create table cvrelationship (
        cvrelationship_id serial not null,
@@ -37,9 +37,9 @@ create table cvrelationship (
 
        unique(reltype_id, subjterm_id, objterm_id)
 );
-## ================================================
-## TABLE: cvpath
-## ================================================
+-- ================================================
+-- TABLE: cvpath
+-- ================================================
 
 create table cvpath (
        cvpath_id serial not null,
@@ -60,9 +60,9 @@ create table cvpath (
 );
 
 
-## ================================================
-## TABLE: cvterm_synonym
-## ================================================
+-- ================================================
+-- TABLE: cvterm_synonym
+-- ================================================
 
 create table cvterm_synonym (
        cvterm_id int not null,
@@ -75,9 +75,9 @@ create table cvterm_synonym (
 );
 
 
-## ================================================
-## TABLE: cvterm_dbxref
-## ================================================
+-- ================================================
+-- TABLE: cvterm_dbxref
+-- ================================================
 
 create table cvterm_dbxref (
        cvterm_id int not null,
@@ -90,8 +90,8 @@ create table cvterm_dbxref (
        unique(cvterm_id, dbxref_id)
 );
 
-## references from other modules:
-##	      sequence: feature_cvterm
+-- references from other modules:
+--	      sequence: feature_cvterm
 
 
 
