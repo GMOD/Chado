@@ -71,14 +71,13 @@ create table cvtermpath (
        foreign key (object_id) references cvterm (cvterm_id) on delete cascade,
        cv_id int not null,
        foreign key (cv_id) references cv (cv_id) on delete cascade,
-       pathdistance int,
-
-       unique (subject_id, object_id)
+       pathdistance int
 );
 create index cvtermpath_idx1 on cvtermpath (type_id);
 create index cvtermpath_idx2 on cvtermpath (subject_id);
 create index cvtermpath_idx3 on cvtermpath (object_id);
 create index cvtermpath_idx4 on cvtermpath (cv_id);
+create unique index cvtermpath_idx5 on cvtermpath (subject_id, object_id, type_id, pathdistance);
 
 
 -- ================================================
