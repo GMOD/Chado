@@ -281,7 +281,7 @@ create table feature_synonym (
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id),
 -- the is_current bit indicates whether the linked synonym is the 
--- current "official" symbol for the linked feature
+-- current -official- symbol for the linked feature
        is_current boolean not null,
 -- typically a synonym exists so that somebody querying the db with an
 -- obsolete name can find the object they're looking for (under its current
