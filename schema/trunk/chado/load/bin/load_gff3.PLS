@@ -1019,7 +1019,7 @@ sub load_feature_locations {
 
         unless ($gff_source_db) {#create a new db for keeping GFF sources
             $gff_source_db = Chado::Db->find_or_create( {
-                name        => 'GFF_sources',
+                name        => 'GFF_source',
                 contact_id  => $nullcontact,
                 description => 'A collection of sources (ie, column 2) from GFF files',
             } );
