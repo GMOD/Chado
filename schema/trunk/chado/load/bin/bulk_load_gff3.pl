@@ -7,86 +7,99 @@ use Bio::Tools::GFF;
 # parents come before features
 # no dbxref_id allowed
 # no residues allowed
-
-#still need to touch for barest of functionality (for me):
-#  featureprop for Notes -- done,not tested
-#  feature_synonym and synonym for Alias and Name -- done, not tested
-#  feature_cvterm for Ontology_term -- done, not tested
+# reference sequences already in db!
 
 my %src = ();
 my %type = ();
 my $pub; # for holding null pub object
 my %synonym;
+my @tables = (
+   "feature",
+   "featureloc",
+   "feature_relationship",
+   "featureprop",
+   "feature_cvterm",
+   "synonym",
+   "feature_synonym"
+);
+my %files = (
+   feature              => "feature.tmp",
+   featureloc           => "featureloc.tmp",
+   feature_relationship => "featurerel.tmp",
+   featureprop          => "featureprop.tmp",
+   feature_cvterm       => "featurecvterm.tmp",
+   synonym              => "synonym.tmp",
+   feature_synonym      => "featuresynonym.tmp",
+);
+my %sequences = (
+   feature              => "feature_feature_id_seq",
+   featureloc           => "featureloc_featureloc_id_seq",
+   feature_relationship => "feature_relationship_feature_relationship_id_seq",
+   featureprop          => "featureprop_featureprop_id_seq",
+   feature_cvterm       => "feature_cvterm_feature_cvterm_id_seq",
+   synonym              => "synonym_synonym_id_seq",
+   feature_synonym      => "feature_synonym_feature_synonym_id_seq",
+);
+my %copystring = (
+   feature              => "(feature_id,organism_id,name,uniquename,type_id)",
+   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase)",
+   feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
+   featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
+   feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
+   synonym              => "(synonym_id,name,type_id,synonym_sgml)",
+   feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
+);
+
 
 ########################
 #my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
-my $db = DBI->connect('dbi:Pg:dbname=chado','scott','');
+my $db = DBI->connect('dbi:Pg:dbname=chado','scott','', {AutoCommit => 0});
 
-my $sth = $db->prepare("select nextval('feature_feature_id_seq')");
+my $sth = $db->prepare("select nextval('$sequences{feature}')");
 $sth->execute;
 my($nextfeature) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('featureloc_featureloc_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{featureloc}')");
 $sth->execute;
 my($nextfeatureloc) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('feature_relationship_feature_relationship_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{feature_relationship}')");
 $sth->execute;
 my($nextfeaturerel) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('featureprop_featureprop_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{featureprop}')");
 $sth->execute;
 my($nextfeatureprop) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('feature_cvterm_feature_cvterm_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{feature_cvterm}')");
 $sth->execute;
 my($nextfeaturecvterm) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('synonym_synonym_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{synonym}')");
 $sth->execute;
 my($nextsynonym) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select nextval('feature_synonym_feature_synonym_id_seq')");
+$sth = $db->prepare("select nextval('$sequences{feature_synonym}')");
 $sth->execute;
 my($nextfeaturesynonym) = $sth->fetchrow_array();
 
 $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
+
+$sth->finish;
 ########################
 
 #my($organism) = Chado::Organism->search( common_name => 'human' ); #FIXME
 my($organism) = Chado::Organism->search( common_name => 'rice' ); #FIXME--I will
 
-
-open F   ,  ">feature.tmp";
-open FLOC,  ">featureloc.tmp";
-open FREL,  ">featurerel.tmp";
-open FPROP, ">featureprop.tmp";
-open FCV,   ">featurecvterm.tmp";
-open SYN,   ">synonym.tmp";
-open FS,    ">featuresynonym.tmp";
-
-print F    "BEGIN;\n";
-print F    "COPY feature (feature_id,organism_id,name,uniquename,type_id) FROM STDIN;\n";
-
-print FLOC "BEGIN;\n";
-print FLOC "COPY featureloc (featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase) FROM STDIN;\n";
-
-print FREL "BEGIN;\n";
-print FREL "COPY feature_relationship (feature_relationship_id,subject_id,object_id,type_id) FROM STDIN;\n";
-
-print FPROP "BEGIN;\n";
-print FPROP "COPY featureprop (featureprop_id,feature_id,type_id,value,rank) FROM STDIN;\n";
-
-print FCV "BEGIN;\n";
-print FCV "COPY feature_cvterm (feature_cvterm_id,feature_id,cvterm_id,pub_id) FROM STDIN;\n";
-
-print SYN "BEGIN;\n";
-print SYN "COPY synonym (synonym_id,name,type_id,synonym_sgml) FROM STDIN;\n";
-
-print FS "BEGIN;\n";
-print FS "COPY feature_synonym (feature_synonym_id,synonym_id,feature_id,pub_id) FROM STDIN;\n";
+open F   ,  ">$files{feature}";
+open FLOC,  ">$files{featureloc}";
+open FREL,  ">$files{feature_relationship}";
+open FPROP, ">$files{featureprop}";
+open FCV,   ">$files{feature_cvterm}";
+open SYN,   ">$files{synonym}";
+open FS,    ">$files{feature_synonym}";
 
 my $gffio = Bio::Tools::GFF->new(-fh => \*STDIN, -gff_version => 3);
 
@@ -147,16 +160,21 @@ while(my $feature = $gffio->next_feature()){
 
   print FLOC join("\t", ($nextfeatureloc, $nextfeature, $src, $start, $end, $feature->strand, $frame)),"\n";
 
-  my @notes = $feature->has_tag('Note') ? $feature->get_tag_values('Note') : [];
-  my $rank = 0;
-  foreach my $note (@notes) {
+  if ($feature->has_tag('Note') or $feature->has_tag('note')) {
+    my @notes;
+    push @notes, $feature->get_tag_values('Note') if $feature->has_tag('Note');
+    push @notes, $feature->get_tag_values('note') if $feature->has_tag('note');
+    my $rank = 0;
+    foreach my $note (@notes) {
 
-    ($type{'Note'}) = Chado::Cvterm->search( name => 'note') unless $type{'Note'};
+      ($type{'Note'}) = Chado::Cvterm->search( name => 'note')
+          unless $type{'Note'};
 
-    print FPROP join("\t",($nextfeatureprop,$nextfeature,$type{'Note'}->id,$note,$rank)),"\n";
+      print FPROP join("\t",($nextfeatureprop,$nextfeature,$type{'Note'}->id,$note,$rank)),"\n";
 
-    $rank++;
-    $nextfeatureprop++;
+      $rank++;
+      $nextfeatureprop++;
+    }
   }
 
   my @cvterms = $feature->has_tag('Ontology_term') 
@@ -227,20 +245,23 @@ while(my $feature = $gffio->next_feature()){
   $nextfeatureloc++;
 }
 
-print F    "\\.\n";
-print F    "COMMIT;\n";
-print FLOC "\\.\n";
-print FLOC "COMMIT;\n";
-print FREL "\\.\n";
-print FREL "COMMIT;\n";
-print FPROP "\\.\n";
-print FPROP "COMMIT;\n";
-print FCV "\\.\n";
-print FCV "COMMIT;\n";
-print SYN "\\.\n";
-print SYN "COMMIT;\n";
-print FS "\\.\n";
-print FS "COMMIT;\n";
+my %nextvalue = (
+   "feature"              => $nextfeature,
+   "featureloc"           => $nextfeatureloc,
+   "feature_relationship" => $nextfeaturerel,
+   "featureprop"          => $nextfeatureprop,
+   "feature_cvterm"       => $nextfeaturecvterm,
+   "synonym"              => $nextsynonym,
+   "feature_synonym"      => $nextfeaturesynonym,
+);
+
+print F    "\\.\n\n";
+print FLOC "\\.\n\n";
+print FREL "\\.\n\n";
+print FPROP "\\.\n\n";
+print FCV "\\.\n\n";
+print SYN "\\.\n\n";
+print FS "\\.\n\n";
 
 close F;
 close FLOC;
@@ -249,3 +270,52 @@ close FPROP;
 close FCV;
 close SYN;
 close FS;
+
+
+foreach my $table (@tables) {
+    copy_from_stdin($db,$table,
+                    $copystring{$table},
+                    $files{$table},
+                    $sequences{$table},
+                    $nextvalue{$table});
+}
+
+$db->commit;
+$db->{AutoCommit}=1;
+
+warn "Optimizing database (this may take a while) ...\n";
+foreach (@tables) {
+  $db->do("VACUUM ANALYZE $_");
+}
+$db->disconnect;
+
+foreach (@tables) {
+  unlink $files{$_};
+}
+
+exit(0);
+
+sub copy_from_stdin {
+  my $dbh      = shift;
+  my $table    = shift;
+  my $fields   = shift;
+  my $file     = shift;
+  my $sequence = shift;
+  my $nextval  = shift;
+
+  warn "Loading data into $table table ...\n";
+  my $query = "COPY $table $fields FROM STDIN;";
+  my $sth = $dbh->prepare($query);
+  $sth->execute();
+
+  open FILE, $file;
+  while (<FILE>) {
+    $dbh->func($_, 'putline');
+  }
+  $dbh->func('endcopy');  # no docs on this func--got from google
+  close FILE;
+
+  $sth->finish;
+  #update the sequence so that later inserts will work 
+  $dbh->do("SELECT setval('public.$sequence', $nextval) FROM $table"); 
+}
