@@ -1,0 +1,29 @@
+We use lowercase in all tables and column names - DBMSs differ in how
+they treat case sensitivity. oracle will auto caps everything. so it's
+best to be neutral and use lowercase.
+
+in table names, we use underscores for linking tables; eg
+feature_dbxref is a linking table between "feature" and "dbxref"
+
+where a table name is a noun phrase rather than a single noun, we
+concatenate the words together. for instance the table for describing
+feature properties is called "featureprop". it could be argued this is
+harder to read, but it does allow consistent usage of underscores as
+above. FeatureProp could be used where it is known the DBMS is case
+insensitive. besides - featureprop appeals to my [cjm] sense of
+laziness.
+
+in column names, we also use concatenated noun phrases, except in the
+case of primary / foreign keys, eg dbxref_id.
+
+we try to keep column names unique where appropriate, which is useful
+for large join statements / views, in avoiding column name clash
+between different tables. the convention is to use an abbreviated form
+of the table name plus a noun describing the column, for instance
+"gsynonynm" in the "genesynonym" table, and "fmin" in the "feature"
+table. by consistently using abbreviated forms we stop column names
+getting too big [many DBMSs will barf on long column names]
+
+we use the same column name for primary and foreign key columns - very
+useful for NATURAL JOIN statements
+

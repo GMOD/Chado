@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+#
+# make_audit_ddl
+#
+#	Perl script reads idb ddl from cvs module directories and
+#	for each table produces the corresponding audit table named
+#       tablename_audit.  
+#
+#       columns of type 'serial' are changed to 'int'
+#       primary key declarations are removed
+#       foreign key declarations are removed
+#       unique column declarations are removed
+#       additional columns added to each table:
+#	         transaction_date timestamp not null
+#	         transaction_type char not null
+#       all priveleges granted to public
+#                
+#
+#---------------------------------------------------------------------------#
+#---------------------------------------------------------------------------#
+
+
+#
+##  General setup
+#
+
+$cvsdir = "/Users/emmert/cvs/scratch/idb/flydb/";
+#$cvsdir = "../";
+
+## open the master module list
+
+$modlist = $cvsdir . "idb-full.modules";
+open(mlist,$modlist);
+
+while (<mlist>) {
+    chop($_) if $_ =~ /\n$/;
+
+## now for each module open the .sql file for parsing
+    $sqlfile = $cvsdir . $_;
+
+#    print "\nopening $sqlfile...\n";
+    open(sfile,$sqlfile);
+
+## for each table we add _audit to the table name, get rid of foreign
+## keys, and set up grant statement.
+##
+## printing here is a little fiddly to handle correct placement of commas
+## in create table statements...
+    while (<sfile>) {
+	if ( ($_ !~ /^#/) && ($_ !~ /^\s*$/) && ($_ !~ /foreign key/) && ($_ !~ /unique/) && ($_ !~ /primary key/) ) {
+	      chop($_) if $_ =~ /\n$/;
+	      chop($_) if $_ =~ /\,$/;
+	      $_ =~ s/serial/int/;
+	      if ($_ =~ /(^.*create table) (.*) \(/) {
+		  $tabst = 0;
+		  $_ = $1 . " " . $2 . "_audit (";
+		  $tname = $2 . "_audit";
+		  print "$_";
+	      }
+	      elsif ($_ =~ /\)\;/) {
+		  print ",\n\ttransaction_date timestamp not null,";
+		  print "\n\ttransaction_type char not null";
+		  print "\n$_\n";
+		  print "GRANT ALL on $tname to PUBLIC;\n\n";
+	      }
+	      elsif ($tabst == 0) {
+		  print "\n$_";
+		  $tabst++;
+	      }
+## when create view statements appear we can assume that the create table
+## statements are all handled...
+	      elsif ($_ =~ /create view/) {
+		  close(sfile);
+	      }
+	      else {
+		  if ($_ =~ /timeentered|timelastmod/) {
+		      $_ =~ s/ default current_timestamp//;
+		  }
+		  print ",\n$_";
+		  $tabst++;
+	      }
+	  }
+     }
+}
+

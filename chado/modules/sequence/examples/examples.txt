@@ -1,0 +1,362 @@
+# $Id: examples.txt,v 1.1.1.1 2002-10-23 16:42:31 scottcain Exp $
+#
+# Sequence module examples
+# 2002/08
+#
+# [NOTE : THIS IS AN EARLY EXAMPLE - DATABASE SCHEMA HAS CHANGED SINCE THIS
+# WAS MADE]
+# accession numbers have been changed to protect the innocent
+
+# EXAMPLE 1
+# a gene model corresponding to fly gene "blah"
+# corresponding transcripts exons etc not shown.
+# a simgle GO assignment is attached
+
+# to get the data at this depth you'd need to query:
+# gene, feature, gene_feature, cvterm [join feature.type_id],
+# featureprop, feature_cvterm, cvterm, feature [on srcfeature_id]
+
+# i'm showing the sourcefeature here (ie the chromosome arm on
+# which the gene model is located). for a sensible tree representation
+# we'd actually cut off here, and just link to the dbxref of the
+# contig/chromosome arm, but i've added it here for illustration
+
+feature
+ dbxref
+  accession: FBan0000001
+  dbname:    FlyBase
+ name: CG1000
+ gene_feature
+  gene
+   name: blah
+   dbxref
+    accession: FBgn0000001
+    dbname:    FlyBase
+ featureprop
+  cvterm
+   termname: internal_note
+  pval: hi there, just saying this gene model is great, i lurrve it
+
+ fmin:    1000
+ fmax:    8000
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+  name: 2L
+  featureprop
+   cvterm
+    termname: description
+   pval: 2L assembly version 5 done on 2005/05/05
+  type
+   cvterm
+    termname: chromosome arm
+    dbxref
+     accession: 000099
+     dbname:    SO
+  residues: ATATTTTTAAATTTAAAAGGGGG...etc
+
+ type
+  cvterm
+   termname: protein-coding gene
+   termdefinition: gene that produces proteins; eg not tRNA wibble wobble
+   dbxref
+    accession: 000001
+    dbname:    SO
+
+ feature_cvterm
+  pub
+   title: i did this experiment and i found fly gene "blah" is a TF
+   dbxref
+    accession: FBrf0000001
+    dbname:    FlyBase
+  cvterm
+   termname: transcription factor
+   dbxref
+    accession: 9999999
+    dbname:    GO
+
+#
+# ------------------------------------------------
+#
+
+# EXAMPLE 2
+# the same gene model as above, but including allele data  
+# instantiate two alleles - the wildtype (which corresponds
+# to the model above) and a mutant 32. the mutant is 
+# caused by an polymorphism/aberration that can be
+# characterized molecularly
+
+# first allele - wildtype
+
+allele
+ dbxref
+  accession:   FBal0000001
+  dbname:      FlyBase
+ fullsymbol:   blah[+]
+ designator:   +
+ is_wildtype:  TRUE
+ gene_feature
+  feature
+   dbxref
+    accession: FBan0000001           # see model above
+    dbname:    FlyBase
+ causative_feature: NULL
+ gene
+  dbxref
+   accession: FBgn0000001
+   dbname:    FlyBase
+
+# second allele - mutant
+
+allele
+ dbxref
+  accession:   FBal0000001
+  dbname:      FlyBase
+ fullsymbol:   blah[32]
+ designator:   32
+ is_wildtype:  FALSE
+ gene_feature: NULL                  # no mutant model instantiated
+ causative_feature
+  feature
+   dbxref
+    accession: FBxx123
+    dbname:    FlyBase
+ gene
+  dbxref
+   accession: FBgn0000001
+   dbname:    FlyBase
+ allele_phenotype
+  phenotype
+   pub
+    title: I mutated some flies and made funny wings
+    dbxref
+     accession:  FBrf9988771
+     dbname:     FlyBase
+  phenotype_cvterm
+   cvterm
+    termname: funny wings
+    dbxref
+     accession:  000001
+     dbname:     PATO
+
+# sequence variation feature that caused the mutation
+# should we use properties for representing the actual seq
+# variation; perhaps decorator tables would be better
+
+feature
+ dbxref
+  accession: FBxx123
+  dbname:    FlyBase
+ name:       blah[32]
+
+ featureprop
+  cvterm
+   termname: new_sequence
+  pval: T
+ featureprop
+  cvterm
+   termname: old_sequence
+  pval: A
+
+ fmin:    789
+ fmax:    790
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+
+ type
+  cvterm
+   termname: single nuclotide polymorphism
+   termdefinition: subclass of variation that affects 1bp
+   dbxref
+    accession: 000003
+    dbname:    SO
+
+#
+# ------------------------------------------------
+#
+
+# EXAMPLE 3
+
+# let's fully flesh out the gene model
+# assume we've declared the feature of type gene as in example1,
+# define transcripts, exons, peptides and links
+
+# transcript
+
+feature
+ dbxref
+  accession: FBtr0000001
+  dbname:    FlyBase
+ name: CG1000-RA
+ featureprop
+  cvterm
+   termname: designator
+  pval: RA
+
+ fmin:    1000
+ fmax:    8000
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+
+ type
+  cvterm
+   termname: coding transcript
+   dbxref
+    accession: 000005
+    dbname:    SO
+ residues: ATTGGTTGATCCTGT.... etc
+ 
+# exon
+
+feature
+ dbxref
+  accession: FBex00001
+  dbname:    FlyBase
+ name: CG1000:1
+ featureprop
+  cvterm
+   termname: designator
+  pval: 1
+
+ fmin:    1000
+ fmax:    8000
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+
+ type
+  cvterm
+   termname: exon
+   dbxref
+    accession: 000005
+    dbname:    SO
+ residues: NULL
+
+# CDS/translation represented using one feature
+# this is how gadfly does it, but we
+# may decide to split this into 2, and explicitly represent
+# both CDS and polypeptide features, with a "produces" relationship
+# between them
+
+feature
+ dbxref
+  accession: FBpp1234567
+  dbname:    FlyBase
+ name: CG1000-P1
+
+ fmin:    1238
+ fmax:    7238
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+
+ type
+  cvterm
+   termname: translation
+   dbxref
+    accession: 000005
+    dbname:    SO
+ residues: MVQQQQQLQQQQQQLLLQQQQQQQSQQQQ...etc
+ seqlen:   2000
+
+# regulatory region
+
+feature
+ dbxref
+  accession: FBpr12345
+  dbname:    FlyBase
+ name: blah-promoter1
+
+ fmin:    700
+ fmax:    1000
+ fstrand: -1
+ sourcefeature
+  dbxref
+   accession:  FBsq1111111
+   dbname:     FlyBase
+   version:    5
+
+ type
+  cvterm
+   termname: regulatory
+   dbxref
+    accession: 000004
+    dbname:    SO
+ residues: NULL
+
+
+# now we represent the relationships between the features
+
+
+feature_relationship
+ subjfeature:  FlyBase:FBtr0000001
+ objfeature:   FlyBase:FBan0000001
+ type
+  cvterm
+   termname: partOf
+   dbxref
+    accession: 009999
+    dbname:    SO
+
+feature_relationship
+ subjfeature:  FlyBase:FBex0000001
+ objfeature:   FlyBase:FBtr0000001
+ type
+  cvterm
+   termname: partOf
+   dbxref
+    accession: 009999
+    dbname:    SO
+
+feature_relationship
+ subjfeature:  FlyBase:FBpp1234567
+ objfeature:   FlyBase:FBtr0000001
+ type
+  cvterm
+   termname: producedBy
+   dbxref
+    accession: 009998
+    dbname:    SO
+
+feature_relationship
+ subjfeature:  FlyBase:FBpr12345
+ objfeature:   FlyBase:FBan0000001
+ type
+  cvterm
+   termname: partOf
+   dbxref
+    accession: 009999
+    dbname:    SO
+
+# throw in a regulatory relationship for fun;
+# we haven't defined pp500000 yet in this file,
+# just assume it's a transcription factor that
+# binds to gene blah
+
+feature_relationship
+ subjfeature:  FlyBase:FBpp5000000
+ objfeature:   FlyBase:FBpr12345
+ type
+  cvterm
+   termname: bindsTo
+   dbxref
+    accession: 009997
+    dbname:    SO
+
