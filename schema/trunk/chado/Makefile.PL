@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.49 2003-12-26 19:47:12 allenday Exp $
+# $Id: Makefile.PL,v 1.50 2004-01-07 15:35:18 scottcain Exp $
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -426,7 +426,7 @@ if (@funcfiles > 0) {
 
 WriteMakefile(
     'NAME'		            => 'chado',
-    'VERSION'             => 0.01,
+    'VERSION'             => 0.001,
     'PREREQ_PM'		        => { 
       'SQL::Translator'   => 0.04,
       'Class::DBI'        => 0.94,
