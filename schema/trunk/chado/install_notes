@@ -1,0 +1,14 @@
+perl Makefile.PL   
+     #creates AutoDBI.pm 
+make
+     #moves AutoDBI.pm to blib
+make test_load
+     #creates database, installs schema
+perl load/Build.PL load_conf=load/etc/load.conf
+     #creates Build (part of Module::Build)
+./Build prepdb
+     #inserts a few useful items into fundamental chado tables
+./Build ontologies
+     #gets and installs various ontologies
+load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile reseq.gff
+     #loads gff file
