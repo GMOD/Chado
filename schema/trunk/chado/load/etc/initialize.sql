@@ -1,7 +1,6 @@
 /* For load_gff3.pl */
 insert into organism (abbreviation, genus, species, common_name)
        values ('H.sapiens', 'Homo','sapiens','Human');
-insert into contact (name) values ('DBUSER');
 insert into contact (name) values ('Affymetrix');
 insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
@@ -17,9 +16,9 @@ insert into cvterm (name,definition,cv_id) values ('glass','glass array',(select
 insert into cvterm (name,definition,cv_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'Ad Hoc Ontology'));
 
 insert into pub (miniref,type_id) values ('null',(select cvterm_id from cvterm where name = 'null'));
-insert into db (name, contact_id) values ('DB:refseq',1);
-insert into db (name, contact_id) values ('DB:genbank',1);
-insert into db (name, contact_id) values ('DB:ucsc',1);
+insert into db (name, contact_id) values ('DB:refseq' ,(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:genbank',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:ucsc'   ,(select contact_id from contact where name = 'null'));
 
 insert into array (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into array (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133A',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
