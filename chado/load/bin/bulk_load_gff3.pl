@@ -10,12 +10,13 @@ use Bio::Tools::GFF;
 
 #still need to touch for barest of functionality (for me):
 #  featureprop for Notes -- done,not tested
-#  feature_synonym and synonym for Alias and Name
-#  feature_cvterm for Ontology_term -- done, not test
+#  feature_synonym and synonym for Alias and Name -- done, not tested
+#  feature_cvterm for Ontology_term -- done, not tested
 
 my %src = ();
 my %type = ();
 my $pub; # for holding null pub object
+my %synonym;
 
 ########################
 #my $db = DBI->connect('dbi:Pg:dbname=chado_amygdala_02','allenday','');
@@ -41,6 +42,14 @@ $sth = $db->prepare("select nextval('feature_cvterm_feature_cvterm_id_seq')");
 $sth->execute;
 my($nextfeaturecvterm) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select nextval('synonym_synonym_id_seq')");
+$sth->execute;
+my($nextsynonym) = $sth->fetchrow_array();
+
+$sth = $db->prepare("select nextval('feature_synonym_feature_synonym_id_seq')");
+$sth->execute;
+my($nextfeaturesynonym) = $sth->fetchrow_array();
+
 $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
@@ -55,6 +64,8 @@ open FLOC,  ">featureloc.tmp";
 open FREL,  ">featurerel.tmp";
 open FPROP, ">featureprop.tmp";
 open FCV,   ">featurecvterm.tmp";
+open SYN,   ">synonym.tmp";
+open FS,    ">featuresynonym.tmp";
 
 print F    "BEGIN;\n";
 print F    "COPY feature (feature_id,organism_id,name,uniquename,type_id) FROM STDIN;\n";
@@ -70,6 +81,12 @@ print FPROP "COPY featureprop (featureprop_id,feature_id,type_id,value,rank) FRO
 
 print FCV "BEGIN;\n";
 print FCV "COPY feature_cvterm (feature_cvterm_id,feature_id,cvterm_id,pub_id) FROM STDIN;\n";
+
+print SYN "BEGIN;\n";
+print SYN "COPY synonym (synonym_id,name,type_id,synonym_sgml) FROM STDIN;\n";
+
+print FS "BEGIN;\n";
+print FS "COPY feature_synonym (feature_synonym_id,synonym_id,feature_id,pub_id) FROM STDIN;\n";
 
 my $gffio = Bio::Tools::GFF->new(-fh => \*STDIN, -gff_version => 3);
 
@@ -87,10 +104,18 @@ while(my $feature = $gffio->next_feature()){
       $src = '\N';
     } else {
       ($src) = Chado::Feature->search( uniquename => $feature->seq_id )
-        || Chado::Feature->search( name => $feature->seq_id );
-warn $feature->seq_id;
-      $src{$feature->seq_id} = $src->id;
-      $src = $src->id;
+            || Chado::Feature->search( name => $feature->seq_id );
+      if ($src->isa('Class::DBI::Iterator')) {
+        my @sources;
+        while (my $tmp = $src->next) {
+          push @sources, $tmp;
+        }
+        die "more that one source for ".$feature->seq_id if (@sources>1);
+        $src{$feature->seq_id} = $sources[0]->id;
+      } else {
+        $src{$feature->seq_id} = $src->id;
+      }
+      $src = $src{$feature->seq_id};
     }
   }
   die "no feature for ".$feature->seq_id unless $src;
@@ -126,9 +151,9 @@ warn $feature->seq_id;
   foreach my $note (@notes) {
     my $rank = 0;
 
-    ($type{'Note'}) = Chado::Cvterm->search( name => 'Note') unless $type{'Note'};
+    ($type{'Note'}) = Chado::Cvterm->search( name => 'note') unless $type{'Note'};
 
-    print FPROP join("\t",($nextfeatureprop,$nextfeature,$$type{'Note'}->id,$note,$rank)),"\n";
+    print FPROP join("\t",($nextfeatureprop,$nextfeature,$type{'Note'}->id,$note,$rank)),"\n";
 
     $rank++;
     $nextfeatureprop++;
@@ -150,8 +175,52 @@ warn $feature->seq_id;
       $pub = $pub->id; #no need to keep whole object when all we want is the id
     }
 
-    print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub));
+    print FCV join("\t",($nextfeaturecvterm,$nextfeature,$type{$term}->id,$pub)),"\n";;
     $nextfeaturecvterm++;
+  }
+
+  my @aliases;
+  if ($feature->has_tag('Alias')) {
+    @aliases =   $feature->get_tag_values('Alias');
+  }
+  if ($name ne '\N') {
+    push @aliases, $name;
+  }
+
+  #need to unique-ify the list
+  my %count;
+  my @ualiases = grep {++$count{$_} < 2} @aliases;
+
+  foreach my $alias (@ualiases) {
+    unless ($synonym{$alias}) {
+      unless ($type{'synonym'}) {
+        ($type{'synonym'}) = Chado::Cvterm->search( name => 'synonym' );
+        warn "unable to find synonym type in cvterm table" 
+            and next unless $type{'synonym'};
+      }
+
+      print SYN join("\t", ($nextsynonym,$alias,$type{'synonym'}->id,$alias)),"\n";
+
+      unless ($pub) {
+        ($pub) = Chado::Pub->search( miniref => 'null' );
+        $pub = $pub->id; #no need to keep whole object when all we want is the id
+      }
+
+      print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$nextfeature,$pub)),"\n";
+
+#        warn "alias:$alias,name:$name\n";
+
+      $nextfeaturesynonym++;
+      $synonym{$alias} = $nextsynonym;
+      $nextsynonym++;
+
+    } else {
+      print FS join("\t", ($nextfeaturesynonym,$synonym{$alias},$nextfeature,$pub)),"\n";
+
+#        warn "in seenit, alias:$alias, name:$name\n";
+
+      $nextfeaturesynonym++;
+    }
   }
 
   $nextfeature++;
@@ -168,9 +237,15 @@ print FPROP "\\.\n";
 print FPROP "COMMIT;\n";
 print FCV "\\.\n";
 print FCV "COMMIT;\n";
+print SYN "\\.\n";
+print SYN "COMMIT;\n";
+print FS "\\.\n";
+print FS "COMMIT;\n";
 
 close F;
 close FLOC;
 close FREL;
 close FPROP;
 close FCV;
+close SYN;
+close FS;
