@@ -292,7 +292,7 @@ BEGIN
       IF f_type is NOT NULL THEN
         RAISE NOTICE ''in f_i, type of this feature is:%'', f_type;
       END IF;
-      IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA or f_type=f_type_transposable_element or f_type=f_type_promoter or f_type=f_type_repeat_region) THEN
+      IF (f_type=f_type_transcript or f_type=f_type_ncRNA or f_type=f_type_snoRNA or f_type=f_type_snRNA or f_type=f_type_tRNA or f_type=f_type_rRNA or f_type=f_type_pseudo or f_type=f_type_miRNA ) THEN
           SELECT INTO f_row_t * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
             IF f_row_t.dbxref_id IS  NULL THEN  
                RAISE NOTICE ''dbxref_id for this feature is null, NEW.uniquename:%'',NEW.uniquename;
@@ -302,22 +302,10 @@ BEGIN
                   INSERT INTO dbxref(db_id, accession ) values(d_id, NEW.uniquename);
                   SELECT INTO f_dbxref_id dbxref_id from dbxref dx, db d where dx.db_id=d.db_id and d.name=f_dbname_gadfly and accession=NEW.uniquename;
                END IF;
-               SELECT INTO maxid to_number(substring(max(uniquename) from (length(f_type)+2) for 6),''999999'') from feature where uniquename like f_type||'':%'';
-               IF maxid IS NULL THEN
-                 maxid:=1;
-               ELSE
-                 maxid:=maxid+1;
-               END IF;
-               id:=lpad(maxid, 6, ''000000'');
-               f_uniquename:=CAST(f_type||'':''||id as TEXT);
-               RAISE NOTICE ''new uniquename:%, old uniquename is:%'', f_uniquename, NEW.uniquename;
-
                IF f_row_t.name like ''%temp%'' or f_row_t.name IS NULL THEN
-                  UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=NEW.feature_id;
---                 UPDATE feature set dbxref_id=f_dbxref_id, name=NEW.uniquename where feature_id=f_row_t.feature_id;
+                 UPDATE feature set dbxref_id=f_dbxref_id, name=NEW.uniquename where feature_id=f_row_t.feature_id;
                ELSE
-                  UPDATE feature set uniquename=f_uniquename, name=f_row_t.name where feature_id=NEW.feature_id;
---                 UPDATE feature set dbxref_id=f_dbxref_id  where feature_id=f_row_t.feature_id;
+                 UPDATE feature set dbxref_id=f_dbxref_id  where feature_id=f_row_t.feature_id;
                END IF;
             ELSE
                f_dbxref_id:=f_row_t.dbxref_id;
@@ -534,18 +522,25 @@ BEGIN
           END IF;
       END IF;
   END IF; 
-  SELECT INTO f_type_id cvterm_id from cvterm where name=f_type_remark;
-  IF NEW.type_id=f_type_id THEN
-       SELECT INTO maxid to_number(substring(max(uniquename) from 8 for 6),''999999'') from feature where uniquename like ''remark:%''; 
-       IF maxid IS NULL THEN
-         maxid:=1;
-       ELSE
-         maxid:=maxid+1;
-       END IF;
-       id:=lpad(maxid, 6, ''000000'');
-       f_uniquename:=CAST(''remark:''||id as TEXT);
-       RAISE NOTICE ''new unquename:%, old remark uniquename is:%'', f_uniquename, NEW.uniquename;
-       UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=NEW.feature_id;
+  --SELECT INTO f_type_id cvterm_id from cvterm where name=f_type_remark;
+  SELECT INTO f_type c.name
+         from feature f, cvterm c, organism o
+         where f.type_id=c.cvterm_id and
+               f.uniquename=NEW.uniquename and
+               f.organism_id =NEW.organism_id;
+  IF ( f_type=f_type_transposable_element or f_type=f_type_promoter or f_type=f_type_repeat_region or f_type=f_type_remark )  THEN
+      SELECT INTO maxid to_number(substring(max(feature.uniquename) from (length(f_type)+2) for 6),''999999'') from feature where uniquename like f_type||'':%'' and uniquename not like ''%temp%'';
+      RAISE NOTICE ''maxid:%, text of type:%-'', maxid,f_type;
+      IF maxid IS NULL THEN
+           maxid:=1;
+      ELSE
+           maxid:=maxid+1;
+      END IF;
+      id:=lpad(maxid, 6, ''000000'');
+      RAISE NOTICE ''id:%'',id;
+      f_uniquename:=CAST(f_type||'':''||id as TEXT);
+      RAISE NOTICE ''new unquename:%, old uniquename is:%'', f_uniquename, NEW.uniquename;
+      UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=NEW.feature_id;
   END IF;
   RAISE NOTICE ''leave f_i .......'';
   return NEW;    
