@@ -86,6 +86,8 @@ create index cvpath_idx4 on cvpath (cv_id);
 -- ================================================
 
 create table cvtermsynonym (
+       cvtermsynonym_id int not null,
+       primary key (cvtermsynonym_id),
        cvterm_id int not null,
        foreign key (cvterm_id) references cvterm (cvterm_id),
        termsynonym varchar(255) not null,
