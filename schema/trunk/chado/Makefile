@@ -56,7 +56,7 @@ cdbi:
 
 metadata: ./bin/ddltrans
 	cat `find . -name \*.sql -print` > ./dat/chado.ddl
-	./bin/ddltrans -f dtd ./dat/chado.ddl > ./dat/chado.dtd
+	./bin/ddltrans -s chado -f dtd ./dat/chado.ddl > ./dat/chado.dtd
 	./bin/ddltrans -f html ./dat/chado.ddl > ./dat/chado.html
 	./bin/ddltrans -f perl ./dat/chado.ddl > ./dat/chado.pl
 	./bin/ddltrans -f xml ./dat/chado.ddl > ./dat/chado.xml
