@@ -72,9 +72,11 @@ sub ACTION_ncbi
   # print out the available refseq datasets
   my %ncbis = printAndReadOptions($m,$conf,"ncbi");
 
-  # now that I know what you want mirror files
-  fetchAndLoadFiles($m,$conf,%ncbis,"load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile");
-
+  # now that I know what you want mirror files and load
+  # fetchAndLoadFiles is called for each possible type
+  # but only actively loaded for those the user selects
+  fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb refseq --gfffile", %ncbis);
+  fetchAndLoadFiles($m, $conf, "locuslink", "./load/bin/load_locuslink.pl", %ncbis);
 }
 
 sub ACTION_mageml {
@@ -210,7 +212,7 @@ sub ACTION_tokenize {
 =head2 fetchAndLoadFiles
 
  Title   : fetchAndLoadFiles
- Usage   : fetchAndLoadFiles(<build_obj>, <xml_conf_obj>, <file_type>)
+ Usage   : fetchAndLoadFiles(<build_obj>, <xml_conf_obj>, <file_type>...)
  Function: Calls internal methods to mirror files specified for this file_type in the xml_conf_obj
  Example :
  Returns : 
@@ -221,35 +223,40 @@ sub ACTION_tokenize {
 
 sub fetchAndLoadFiles
 {
-    my ($m,$conf,%itm,$command,@args) = @_;
+    my ($m,$conf,$type,$command,%itm) = @_;
+
     foreach my $key (keys %itm){
 	print "fetching files for $key\n";
 
 	my $load = 0;
-    foreach my $file (@{ $itm{$key}{file} }){
+    foreach my $file (@{ $itm{$key}{file} })
+    {
+	  # check to see if this command can handle this type
+      if($file->{type} eq $type)
+		{
+		  my $fullpath = $conf->{path}{data}.'/'.$file->{local};
+		  $fullpath =~ s!^(.+)/[^/]*!$1!;
 
-	  my $fullpath = $conf->{path}{data}.'/'.$file->{local};
-	  $fullpath =~ s!^(.+)/[^/]*!$1!;
+		  if(! -d $fullpath){
+			system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
+		  }
 
-      if(! -d $fullpath){
-        system( 'mkdir','-p',$fullpath ) or print "!possible problem, couldn't mkdir -p $fullpath: $!\n";
-      }
+		  print "  +",$file->{remote},"\n";
+		  $load = 1 if $m->_mirror($file->{remote},$file->{local});
+		  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
 
-      print "  +",$file->{remote},"\n";
-      $load = 1 if $m->_mirror($file->{remote},$file->{local});
-	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
+		  next unless $load;
 
-	  next unless $load;
+		  print "    loading...";
 
-      print "    loading...";
-
-      my $result = system($command,
-				  $conf->{'path'}{'data'}.'/'.$file->{'local'}, @args);
-      if($result != 0) { print "failed: $!\n"; die; }
-	  else{
-		$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
-		print "done!\n";
-	  }
+		  my $result = system($command,
+				  $conf->{'path'}{'data'}.'/'.$file->{'local'});
+		  if($result != 0) { print "failed: $!\n"; die; }
+		  else{
+			$m->_loaded( $conf->{'path'}{'data'}.'/'.$file->{'local'} , 1 );
+			print "done!\n";
+		  }
+	   }
 	}
   }
 }
