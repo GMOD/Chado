@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE chado SYSTEM "/users/zhou/work/flybase/xml/chado_stan.dtd">
+<!-- 1. dump all information for gene CG9565 and all information for transcript, all for translation, for feature_evidence, dump all cols of foreign object:featureloc -->
+<chado>
+  <feature dump="all">
+    <type_id test="yes">
+        <cvterm>
+            <termname>gene</termname>
+        </cvterm>
+     </type_id>
+
+
+     <contained_in  fn_arg="(6, 25786, 1130546)"  test="yes">
+         <srcfeature_id>
+            <feature>
+               <uniquename>X.3</uniquename>
+            </feature>
+         </srcfeature_id>         
+     </contained_in>
+
+     <featureloc test="yes">
+           <srcfeature_id test="yes">
+               <feature>
+                  <type_id>
+                      <cvterm>
+                           <termname>translation</termname>
+                      </cvterm>                     
+                  </type_id>
+                </feature>
+            </srcfeature_id>
+            <min>1000</min>
+     </featureloc>
+    
+
+     <feature_relationship dump="all">
+       <subjfeature_id test="yes">
+          <feature>
+              <type_id>
+                 <cvterm>
+                     <termname>transcript</termname>
+                 </cvterm>
+              </type_id>
+          </feature>
+       </subjfeature_id>
+       <subjfeature_id>
+          <feature dump="all">   
+              <feature_relationship dump="all">
+                 <subjfeature_id test="yes">
+                     <feature>
+                        <type_id>
+                           <cvterm>
+                               <termname>translation</termname>
+                           </cvterm>                     
+                        </type_id>
+                     </feature>
+                 </subjfeature_id>
+                 <subjfeature_id>
+                     <feature dump="all">
+                       <feature_evidence dump="all">
+                           <featureloc_id>
+                               <featureloc dump="cols"/>
+                           </featureloc_id>
+                           <hit_id>
+                              <feature dump="cols"/>
+                           </hit_id>
+                       </feature_evidence>  
+                       <contained_in dump="no"/>    
+                     </feature>
+                 </subjfeature_id>
+             </feature_relationship>
+              <feature_evidence dump="all">
+                 <featureloc_id>
+                     <featureloc dump="cols"/>
+                 </featureloc_id>
+                 <hit_id>
+                    <feature dump="cols"/>
+                 </hit_id>
+             </feature_evidence>
+             <contained_in dump="no"/>
+          </feature>
+       </subjfeature_id>                  
+     </feature_relationship>
+     <feature_evidence dump="all">
+         <featureloc_id>
+             <featureloc dump="cols"/>
+         </featureloc_id>
+         <hit_id>
+            <feature dump="cols"/>
+         </hit_id>
+     </feature_evidence>
+     <contained_in dump="no"/>
+
+  </feature>
+</chado>
