@@ -16,6 +16,7 @@ create table tableinfo (
        unique (name)
 );
 
+COMMENT ON TABLE tableinfo IS NULL;
 
 -- ================================================
 -- TABLE: contact
@@ -28,6 +29,8 @@ create table contact (
 
        unique (name)
 );
+
+COMMENT ON TABLE contact IS NULL;
 
 -- ================================================
 -- TABLE: db
@@ -45,6 +48,7 @@ create table db (
        unique (name)
 );
 
+COMMENT ON TABLE db IS NULL;
 
 -- ================================================
 -- TABLE: dbxref
@@ -62,6 +66,8 @@ create table dbxref (
        unique (db_id, accession, version)
 );
 
+COMMENT ON TABLE dbxref IS NULL;
+
 -- ================================================
 -- TABLE: project
 -- ================================================
@@ -73,3 +79,6 @@ create table project (
 
        unique(name)
 );
+
+COMMENT ON TABLE project IS NULL;
+

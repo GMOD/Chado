@@ -74,6 +74,7 @@ sub processBioSequence {
 #  print Dumper($xmld);
 
   my $identifier = $xmld->{identifier};
+  $identifier =~ s/U133[AB]/U133/;
   my($dbname,$name) = $identifier =~ /^(.+:)(.+)$/;
 warn $identifier;
   my($db) = Chado::Db->find_or_create({name => $dbname, contact_id => $nullcontact->id});
@@ -135,20 +136,8 @@ warn $identifier;
 
 
   foreach my $dbentry (@{$xmld->{SequenceDatabases_assnlist}->{DatabaseEntry}}){
-#warn Dumper($dbentry);
 	my $accession = $dbentry->{accession};
 
-#warn $feature->id;
-#warn $dbxref->id;
-
-#	my($fd) = Chado::Feature_Dbxref->search(feature_id => $feature->id, dbxref_id => $dbxref->id);
-#
-#	if(!$fd){
-#	  $fd = Chado::Feature_Dbxref->create({
-#										   feature_id => $feature->id,
-#										   dbxref_id  => $dbxref->id,
-#										  });
-#	}
 
 	my($fd) = Chado::Feature_Dbxref->find_or_create({
 													 feature_id => $feature->id,
@@ -184,7 +173,7 @@ warn $identifier;
 		}
 
 		my $value = ref($nvt) eq 'HASH' ? $nvt->{value} : $nvt;
-#warn "$term\t$value";
+
 		if($term eq 'name'){
 		  $term   = $dbentry->{PropertySets_assnlist}->{NameValueType}->{name};
 		  $value  = $dbentry->{PropertySets_assnlist}->{NameValueType}->{value};
