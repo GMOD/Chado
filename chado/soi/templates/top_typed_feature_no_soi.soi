@@ -1,0 +1,52 @@
+--- get gene model, 
+--- very slow without using soi
+
+SQL:
+select * FROM
+((select
+f.*,
+src.uniquename as src_seq,
+fl.*,
+q.name as type,
+1 as depth,
+NULL as relationship_type,
+NULL as parent_id,
+0 as orderrank
+FROM
+feature f
+INNER join
+featureloc fl ON (f.feature_id = fl.feature_id)
+INNER join
+feature src ON (src.feature_id = fl.srcfeature_id)
+INNER join
+cvterm q ON (f.type_id = q.cvterm_id)
+INNER join
+cv ON (q.cv_id = cv.cv_id)
+WHERE f.is_analysis = 'f' and q.name = &&type&& and cv.name = 'so' and src.uniquename = &&src&& and fl.fmin <= &&fmax&& and fl.fmax >= &&fmin&&
+)
+UNION
+(select
+f.*,
+src.uniquename as src_seq,
+fl.*,
+t.name as type,
+q.depth,
+frt.name as relationship_type,
+fr.object_id as parent_id,
+fr.rank as orderrank
+FROM
+feature f
+INNER join
+featureloc fl ON (f.feature_id = fl.feature_id)
+INNER join
+feature src ON (src.feature_id = fl.srcfeature_id)
+INNER join
+feature_relationship fr ON (f.feature_id = fr.subject_id)
+INNER join
+cvterm frt ON (fr.type_id = frt.cvterm_id)
+INNER join
+cvterm t ON (f.type_id = t.cvterm_id)
+INNER join
+(select feature_id, depth FROM feature_child_ids(&&type&&, &&src&&, 'f')) as q ON (f.feature_id = q.feature_id)
+WHERE f.is_analysis = 'f' and src.uniquename = &&src&& and fl.fmin <= &&fmax&& and fl.fmax >= &&fmin&&
+)) as uf order by depth, parent_id, orderrank, rank;
