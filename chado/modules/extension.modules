@@ -1,6 +1,4 @@
 sequence/gff-bridge/sequence-gff-views.sql
-sequence/gff-bridge/sequence-gff-funcs.pgsql
-sequence/functions/feature_subalignments.plpgsql
 expression/rad.sql
 expression/expression.sql
 #pathway/pathway.sql

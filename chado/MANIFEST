@@ -35,7 +35,7 @@ load/Build.PL
 load/Makefile
 load/bin/load_affymetrix.pl
 load/bin/load_affyxls.pl
-load/bin/load_gff3.pl
+load/bin/load_gff3.PLS
 load/bin/load_ontology.pl
 load/etc/initialize.sql
 load/etc/log.conf
@@ -64,6 +64,7 @@ modules/expression/rad.sql
 modules/expression/rad.views
 modules/expression/readme
 modules/extension.modules
+modules/function.modules
 modules/general/general.sql
 modules/general/metadata.sql
 modules/genetic/genetic.sql
