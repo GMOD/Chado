@@ -18,6 +18,7 @@ my $tr = SQL::Translator->new(
 						   output_type => 'svg',
 						   width => 10,
 						   height => 8,
+						   layout => 'neato',
 						 }
                              );
                                
