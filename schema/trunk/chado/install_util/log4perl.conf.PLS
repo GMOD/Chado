@@ -59,13 +59,16 @@ log4perl.appender.Turnkey_Render.layout.ConversionPattern       =%c - [%d{HH:mm}
 
 if (-e '/etc/log4perl.conf') {
     warn "\n\nYou appear to already have a log4perl.conf file in /etc\n";
-    warn "Append the following to your conf file:\n";
-    warn "#--------------------------------------------------------------#\n";
-    warn "$conf_text\n";
-    warn "#--------------------------------------------------------------#\n\n";
+    warn "Append the contents of ./log4perl.conf to your /etc/log4perl.conf.\n";
+
+    open  OUT, ">log4perl.conf" or die "unable to open log4perl.conf for writing: $!\n";
+    print OUT $conf_text;
+    close OUT;
+    chmod (0666, "log4perl.conf");
+
 } else {
     warn "Installing log4perl.conf in /etc...\n";
-    open CONF, ">/etc/log4perl.conf" or die "unable to open /etc/log4perl.conf: $!\n";
+    open  CONF, ">/etc/log4perl.conf" or die "unable to open /etc/log4perl.conf: $!\n";
     print CONF $conf_text;
     close CONF;
 }

@@ -407,14 +407,6 @@ Chado::Cvterm->has_many(
     'protocol_type_id', 'Chado::Protocol' => 'type_id'
 );
 
-sub arrayprops {
-    return shift->arrayprop_type_id
-}
-
-Chado::Cvterm->has_many(
-    'arrayprop_type_id', 'Chado::Arrayprop' => 'type_id'
-);
-
 sub phenstatementprops {
     return shift->phenstatementprop_type_id
 }
@@ -543,12 +535,28 @@ Chado::Cvterm->has_many(
     'element_type_id', 'Chado::Element' => 'type_id'
 );
 
+sub featuremaps {
+    return shift->featuremap_unittype_id
+}
+
+Chado::Cvterm->has_many(
+    'featuremap_unittype_id', 'Chado::Featuremap' => 'unittype_id'
+);
+
 sub treatments {
     return shift->treatment_type_id
 }
 
 Chado::Cvterm->has_many(
     'treatment_type_id', 'Chado::Treatment' => 'type_id'
+);
+
+sub arraydesignprops {
+    return shift->arraydesignprop_type_id
+}
+
+Chado::Cvterm->has_many(
+    'arraydesignprop_type_id', 'Chado::Arraydesignprop' => 'type_id'
 );
 
 sub synonyms {
@@ -1950,15 +1958,15 @@ Chado::Gcontext->has_many(
 );
 
 sub gcontext_relationships {
-    return shift->gcontext_relationship_subjectgc_id
+    return shift->gcontext_relationship_subject_id
 }
 
 Chado::Gcontext->has_many(
-    'gcontext_relationship_subjectgc_id', 'Chado::Gcontext_Relationship' => 'subjectgc_id'
+    'gcontext_relationship_subject_id', 'Chado::Gcontext_Relationship' => 'subject_id'
 );
 
 Chado::Gcontext->has_many(
-    'gcontext_relationship_objectgc_id', 'Chado::Gcontext_Relationship' => 'objectgc_id'
+    'gcontext_relationship_object_id', 'Chado::Gcontext_Relationship' => 'object_id'
 );
 
 sub phendescs {
@@ -1969,9 +1977,9 @@ Chado::Gcontext->has_many(
     'phendesc_gcontext_id', 'Chado::Phendesc' => 'gcontext_id'
 );
 
-sub gcontext_relationship_subjectgc_ids { my $self = shift; return $self->gcontext_relationship_subjectgc_id(@_) }
+sub gcontext_relationship_subject_ids { my $self = shift; return $self->gcontext_relationship_subject_id(@_) }
 
-sub gcontext_relationship_objectgc_ids { my $self = shift; return $self->gcontext_relationship_objectgc_id(@_) }
+sub gcontext_relationship_object_ids { my $self = shift; return $self->gcontext_relationship_object_id(@_) }
 
 sub gcontextprops {
     return shift->gcontextprop_gcontext_id
@@ -1997,19 +2005,19 @@ sub id {
 }
 
 Chado::Gcontext_Relationship->has_a(
-    subjectgc_id => 'Chado::Gcontext'
+    subject_id => 'Chado::Gcontext'
 );
 
-sub subjectgc {
-    return shift->subjectgc_id
+sub subject {
+    return shift->subject_id
 }
 
 Chado::Gcontext_Relationship->has_a(
-    objectgc_id => 'Chado::Gcontext'
+    object_id => 'Chado::Gcontext'
 );
 
-sub objectgc {
-    return shift->objectgc_id
+sub object {
+    return shift->object_id
 }
 
 Chado::Gcontext_Relationship->has_a(
@@ -2443,6 +2451,14 @@ sub id {
     shift->featuremap_id
 }
 
+Chado::Featuremap->has_a(
+    unittype_id => 'Chado::Cvterm'
+);
+
+sub unittype {
+    return shift->unittype_id
+}
+
 sub featureranges {
     return shift->featurerange_featuremap_id
 }
@@ -2872,12 +2888,12 @@ sub dbxref {
     return shift->dbxref_id
 }
 
-sub arrayprops {
-    return shift->arrayprop_arraydesign_id
+sub arraydesignprops {
+    return shift->arraydesignprop_arraydesign_id
 }
 
 Chado::Arraydesign->has_many(
-    'arrayprop_arraydesign_id', 'Chado::Arrayprop' => 'arraydesign_id'
+    'arraydesignprop_arraydesign_id', 'Chado::Arraydesignprop' => 'arraydesign_id'
 );
 
 sub assays {
@@ -2897,21 +2913,21 @@ Chado::Arraydesign->has_many(
 );
 
 # -------------------------------------------------------------------
-package Chado::Arrayprop;
+package Chado::Arraydesignprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::Arrayprop->set_up_table('arrayprop');
+Chado::Arraydesignprop->set_up_table('arraydesignprop');
 
 
 #
 # Primary key accessor
 #
 sub id {
-    shift->arrayprop_id
+    shift->arraydesignprop_id
 }
 
-Chado::Arrayprop->has_a(
+Chado::Arraydesignprop->has_a(
     arraydesign_id => 'Chado::Arraydesign'
 );
 
@@ -2919,7 +2935,7 @@ sub arraydesign {
     return shift->arraydesign_id
 }
 
-Chado::Arrayprop->has_a(
+Chado::Arraydesignprop->has_a(
     type_id => 'Chado::Cvterm'
 );
 
