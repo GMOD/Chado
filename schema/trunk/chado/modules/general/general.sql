@@ -38,7 +38,7 @@ create table db (
     db_id serial not null,
     primary key (db_id),
     name varchar(255) not null,
-    contact_id int not null,
+    contact_id int,
     foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     description varchar(255) null,
     urlprefix varchar(255) null,

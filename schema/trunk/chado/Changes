@@ -258,3 +258,6 @@ VERSION 0.04
 	www
 		no change
 
+2005-02-08      - [cjm] db.contact_id nullable
+                -       cvterm.dbxref_id NOT NULL
+                -       added comments to cv table
