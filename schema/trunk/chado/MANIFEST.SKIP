@@ -15,7 +15,8 @@ _blib$
 ^Build$
 build.conf
 ^load/etc/load.conf$
-^load/logs/
+^lib/Chado/AutoDBI.pm$
+^lib/Chado/LoadDBI.pm$
 ^doc/diagrams
 ^modules/complete.sql
 ^modules/www
