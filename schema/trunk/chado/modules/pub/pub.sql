@@ -22,7 +22,7 @@ create table pub (
     is_obsolete boolean default 'false',
     publisher varchar(255),
     pubplace varchar(255),
-    constraint pub_c1 unique (uniquename,type_id)
+    constraint pub_c1 unique (uniquename)
 );
 -- title: title of paper, chapter of book, journal, etc
 -- volumetitle: title of part if one of a series
@@ -76,26 +76,6 @@ create table pub_dbxref (
 create index pub_dbxref_idx1 on pub_dbxref (pub_id);
 create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 
--- ================================================
--- TABLE: author
--- ================================================
-
--- using the FB author table columns
-
-create table author (
-    author_id serial not null,
-    primary key (author_id),
-    contact_id int null,
-    foreign key (contact_id) references contact (contact_id) INITIALLY DEFERRED,
-    surname varchar(100) not null,
-    givennames varchar(100),
-    suffix varchar(100),
-
-    constraint author_c1 unique (surname,givennames,suffix)
-);
--- givennames: first name, initials
--- suffix: Jr., Sr., etc       
-
 
 -- ================================================
 -- TABLE: pub_author
@@ -104,18 +84,20 @@ create table author (
 create table pub_author (
     pub_author_id serial not null,
     primary key (pub_author_id),
-    author_id int not null,
-    foreign key (author_id) references author (author_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     rank int not null,
     editor boolean default 'false',
+    surname varchar(100) not null,
+    givennames varchar(100),
+    suffix varchar(100),
 
-    constraint pub_author_c1 unique (author_id,pub_id)
+    constraint pub_author_c1 unique (pub_id, rank)
 );
+-- givennames: first name, initials
+-- suffix: Jr., Sr., etc       
 -- rank: order of author in author list for this pub
 -- editor: indicates whether the author is an editor for linked publication
-create index pub_author_idx1 on pub_author (author_id);
 create index pub_author_idx2 on pub_author (pub_id);
 
 
