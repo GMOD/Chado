@@ -127,3 +127,26 @@ insert into cvterm (name, cv_id) values('languages', (select cv_id from cv where
 insert into cvterm (name, cv_id) values('series_abbrev', (select cv_id from cv where name='pubprop type'));
 
 insert into dbxref (db_id, accession,description) values ((select db_id from db where name='DB:GR'), 'CG30000','fake dbxref to make renaming trigger happy');
+
+--for the new triggers
+
+create sequence uniquename_id_generator;
+
+create table constants (
+   constants_id serial not null,
+   primary key (constants_id),
+   application_id int not null,
+   foreign key (application_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+   type_id int,
+   foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+   name varchar(100),
+   value text not null
+);
+
+insert into cv (name, definition) values ('application', 'A cv for holding names of applications that interact with chado');
+insert into cvterm (cv_id,name) values ((select cv_id from cv where name ='application'), 'apollo');
+
+insert into constants (application_id,name,value) values ((select cvterm_id from cvterm where name='apollo' and cv_id in (select cv_id from cv where name='application')),'prefix','ABC');
+insert into constants (application_id,name,value) values ((select cvterm_id from cvterm where name='apollo' and cv_id in (select cv_id from cv where name='application')),'suffix','XYZ');
+
+
