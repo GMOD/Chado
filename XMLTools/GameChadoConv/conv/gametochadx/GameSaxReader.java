@@ -194,26 +194,30 @@ private StringBuffer m_SB;
 
 		}else if(qualifiedName.equals("computational_analysis")){
 			String idTxt = attributes.getValue("id");
-			//System.out.println("MAKE CompAnal NODE<"+idTxt+">");
+			//System.out.println("START COMPUTATIONAL_ANALYSIS<"+idTxt+">");
 			m_CurrFeat = m_CurrCompAnal = new ComputationalAnalysis(idTxt);
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_set"))){
 			String idTxt = attributes.getValue("id");
-			//System.out.println("\tMAKE ResultSet NODE<"+idTxt+">");
+			System.out.println("\tSTART RESULT_SET <"+idTxt+">");
 			m_CurrFeat = m_CurrResultSet = new ResultSet(idTxt);
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_span"))){
 			String idTxt = attributes.getValue("id");
-			//System.out.println("\t\tMAKE ResultSpan NODE<"+idTxt+">");
+			System.out.println("\t\tSTART RESULT_SPAN <"+idTxt+">");
 			m_CurrFeat = m_CurrResultSpan = new ResultSpan(idTxt);
 
 		//ATTRIBUTES
 		}else if(qualifiedName.equals("property")){
 			m_CurrAttr = m_CurrPropAttr = new Attrib("property");
+			//System.out.println("MADE PROPERTY");
 		}else if(qualifiedName.equals("gene")){
 			m_CurrAttr = m_CurrGeneAttr = new Attrib("gene");
+			//System.out.println("MADE GENE");
 		}else if(qualifiedName.equals("dbxref")){
 			m_CurrAttr = m_CurrDbxrefAttr = new Attrib("dbxref");
+			//System.out.println("MADE DBXREF");
 		}else if(qualifiedName.equals("comment")){
 			m_CurrAttr = m_CurrCommentAttr = new Attrib("comment");
+			//System.out.println("MADE COMMENT");
 		}
 	}
 
@@ -247,6 +251,7 @@ private StringBuffer m_SB;
 				System.out.println("********No CurrFeat FOR SPAN!");
 			}
 		}else if(qualifiedName.equals("map_position")){
+			//System.out.println("********END MAP_POSITION!");
 			if(m_CurrGame!=null){
 				if(m_Span!=null){
 					m_CurrGame.setSpan(m_Span);
@@ -278,6 +283,11 @@ private StringBuffer m_SB;
 			m_Alignment = m_SB.toString().trim();
 			//System.out.println("\t\tSAVING ALIGNMENT OF LEN<"
 			//		+m_Alignment.length()+">");
+			if(m_CurrSeqRel!=null){
+				//System.out.println("\t\t\tIN SEQREL<"
+				//		+m_CurrSeqRel.getId()+">");
+				m_CurrSeqRel.setAlignment(m_Alignment);
+			}
 		}else if(qualifiedName.equals("type")){
 			m_typeTxt = m_SB.toString();
 			if((m_CurrAttr!=null)&&(m_CurrAttr.getAttribType().equals("property"))){
@@ -304,17 +314,42 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("date")){
 			if(m_SB.toString()!=null){
 				m_CurrDate.setdate(m_SB.toString().trim());
+				//System.out.println("FOUND DATE STR <"
+				//		+m_CurrDate.getdate()+">");
 			}
 			if(m_CurrAttr!=null){
+				//System.out.println(" IN ATTR <"+m_CurrAttr.gettype()+">");
 				m_CurrAttr.setdate(m_CurrDate.getdate());
 				m_CurrAttr.settimestamp(m_CurrDate.gettimestamp());
 			}else if(m_CurrFeat!=null){
 				m_CurrFeat.setdate(m_CurrDate.getdate());
 				m_CurrFeat.settimestamp(m_CurrDate.gettimestamp());
+				//System.out.println("DATE <"
+				//		+m_CurrDate.getdate()
+				//		+"> PUT INTO Feature <"
+				//		+m_CurrFeat.getId()
+				//		+"> OF TYPE <"
+				//		+m_CurrFeat.getType()+">");
+				if((m_CurrAnnot!=null)&&(m_CurrDate.getdate()!=null)){
+					//PUSH UP TO ANNOTATION ALSO
+					m_CurrAnnot.setdate(
+							m_CurrDate.getdate());
+					m_CurrAnnot.settimestamp(
+							m_CurrDate.gettimestamp());
+				//	System.out.println("\tALSO PUT IN ANNOT<"+m_CurrAnnot.getId()+">");
+				}
 			}
 			m_CurrDate = null;
 		}else if((m_ParseFlag<=1)&&(qualifiedName.equals("annotation"))){
+			//System.out.println("DONE WITH ANNOTATION\n");
 			//System.out.println("ADDING Annot TO GAME\n");
+			//FIRST, CHECK THIS ANNOTATIONS TRANSCRIPTS
+			//AND STEAL ITS DATE
+			//for(int i=0;i<m_CurrAnnot.getGenFeatCount();i++){
+			//	GenFeat gf = m_CurrAnnot.getGenFeat(i);
+			//	System.out.println("STEAL TYPE<"+gf.getType()+">");
+			//	System.out.println("\tDATE<"+gf.getdate()+">");
+			//}
 			if(m_CurrGame!=null){
 				m_CurrGame.addGenFeat(m_CurrAnnot);
 				m_CurrAnnot = null;
@@ -392,6 +427,7 @@ private StringBuffer m_SB;
 
 		//COMPUTATIONAL_ANALYSIS
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("computational_analysis"))){
+			System.out.println("FINISH COMPUTATIONAL_ANALYSIS");
 			if(m_CurrGame!=null){
 				m_CurrGame.addGenFeat(m_CurrCompAnal);
 				m_CurrCompAnal = null;
@@ -399,15 +435,26 @@ private StringBuffer m_SB;
 				System.out.println("********No CurrGame FOR COMP_ANAL!");
 			}
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_set"))){
+			System.out.println("\tFINISH RESULT_SET");
 			if(m_CurrCompAnal!=null){
 				m_CurrCompAnal.addGenFeat(m_CurrResultSet);
+				System.out.println("\t\tWITH NAME<"
+					+m_CurrResultSet.getName()+">");
 				m_CurrResultSet = null;
 			}else{
 				System.out.println("********No CurrCompAnal FOR RESULT_SET!");
 			}
 		}else if((m_ParseFlag>=1)&&(qualifiedName.equals("result_span"))){
+			System.out.println("\t\tFINISH RESULT_SPAN");
 			if(m_CurrResultSpan!=null){
+				if(m_CurrSeqRel!=null){
+					m_CurrResultSpan.setResidues(
+							m_CurrSeqRel.getAlignment());
+					m_CurrSeqRel = null;
+				}
 				m_CurrResultSet.addGenFeat(m_CurrResultSpan);
+				System.out.println("\t\tWITH NAME<"
+					+m_CurrResultSpan.getName()+">");
 				m_CurrResultSpan = null;
 			}else{
 				System.out.println("********No CurrResultSet FOR RESULT_SPAN!");
@@ -423,6 +470,12 @@ private StringBuffer m_SB;
 		}else if(qualifiedName.equals("property")){
 			m_CurrAttr.settype(m_typeTxt);
 			m_CurrAttr.setvalue(m_valueTxt);
+			//System.out.println("READ GAME PROPERTY OF TYPE<"
+			//		+m_typeTxt
+			//		+"> VALUE<"+m_valueTxt+">");
+			if((m_typeTxt!=null)&&(m_typeTxt.startsWith("internal"))){
+				m_CurrAttr.setisinternal("1");
+			}
 			if(m_CurrCompAnal!=null){
 				m_CurrCompAnal.addAttrib(m_CurrAttr);
 			}else if(m_CurrFeat!=null){
@@ -430,6 +483,7 @@ private StringBuffer m_SB;
 			}else{
 				System.out.println("********No CurrFeat FOR ATTR property!");
 			}
+			//System.out.println("CONSUME PROPERTY");
 			m_CurrAttr = null;
 		}else if(qualifiedName.equals("gene")){
 			//System.out.println("GENE NAME<"+m_nameTxt+">");
@@ -442,6 +496,7 @@ private StringBuffer m_SB;
 			}else{
 				System.out.println("********No CurrFeat FOR ATTR gene!");
 			}
+			//System.out.println("CONSUME GENE");
 			m_CurrAttr = null;
 		}else if(qualifiedName.equals("dbxref")){
 			if(m_CurrDbxrefAttr!=null){
@@ -458,6 +513,8 @@ private StringBuffer m_SB;
 				}else{
 					System.out.println("****No CurrFeat FOR ATTR dbxref!");
 				}
+				//System.out.println("CONSUME DBXREF");
+				m_CurrAttr =null;
 			}
 		}else if(qualifiedName.equals("comment")){
 			m_CurrAttr.settext(m_textTxt);
@@ -472,6 +529,7 @@ private StringBuffer m_SB;
 			}else{
 				System.out.println("********No CurrFeat FOR ATTR comment!");
 			}
+			//System.out.println("CONSUME COMMENT");
 			m_CurrAttr = null;
 		//ATTRIBUTE FIELDS
 		}else if(qualifiedName.equals("value")){
@@ -553,13 +611,20 @@ private StringBuffer m_SB;
 			}
 		}else if((qualifiedName.equals("synonym"))
 				||(qualifiedName.equals("internal_synonym"))){
+			//System.out.println("READ SYN OF TYPE<"
+			//		+qualifiedName+">");
 			if(m_SB.toString()!=null){
 				m_synonymTxt = m_SB.toString().trim();
-				System.out.println("READ SYNONYM<"+m_synonymTxt+">");
+				//System.out.println("READ SYNONYM<"
+				//		+m_synonymTxt+">");
 				Attrib tmp = new Attrib("property");
-				//tmp.settype("synonym");
 				tmp.settype("internal_synonym");
 				tmp.setvalue(m_synonymTxt);
+				if(qualifiedName.startsWith("internal")){
+					tmp.setisinternal("1");
+				}else{
+					tmp.setisinternal("0");
+				}
 				m_CurrFeat.addAttrib(tmp);
 			}
 		}else if(qualifiedName.equals("organism")){

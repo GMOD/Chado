@@ -40,7 +40,7 @@ ctg	:
 
 upgrade:
 	cp -r ./${CTG_SRCPATH}/*.java ${GMOD_PATH}/${CTG_SRCPATH}
-	cp -r ./${CTG_SRCPATH}/*.java ${GMOD_PATH}/${GTC_SRCPATH}
+	cp -r ./${GTC_SRCPATH}/*.java ${GMOD_PATH}/${GTC_SRCPATH}
 	cp -r ./CTG.java ${GMOD_PATH}/CTG.java
 	cp -r ./GTC.java ${GMOD_PATH}/GTC.java
 	cp -r ./makefile ${GMOD_PATH}/makefile

@@ -14,6 +14,7 @@ private String m_person;
 private String m_date;
 private String m_timestamp;
 private String m_text;
+private String m_isinternal;
 
 	public Attrib(String the_AttribType){
 		m_AttribType = the_AttribType;
@@ -97,6 +98,14 @@ private String m_text;
 
 	public String gettext(){
 		return m_text;
+	}
+
+	public void setisinternal(String the_isinternal){
+		m_isinternal = the_isinternal;
+	}
+
+	public String getisinternal(){
+		return m_isinternal;
 	}
 
 	public void Display(int the_depth){
