@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
 
-$Id: INSTALL,v 1.4 2003-12-04 23:08:49 allenday Exp $
+$Id: INSTALL,v 1.5 2003-12-06 06:21:07 allenday Exp $
 
 This document describes how to install the Chado schema:
 
@@ -12,18 +12,85 @@ This document describes how to install the Chado schema:
 
 *   CHADO_DB_USERNAME: The username to connect to Chado
 
-*   CHADO_DB_PASSWORD: The password for the database user
+*   CHADO_DB_PASSWORD: The password for the database user [opt]
 
 *   CHADO_DB_HOST: The host on which the database runs (e.g. "localhost") [opt]
 
 *   CHADO_DB_PORT: The port on which the database is listening [opt]
 
-As indicated, the host and port are optional.
+As indicated, the host, port, and password are optional.
+
+*   Note: a mechanism exists to pass these variables directly to the
+    installer during the "perl Makefile.PL" step.  By giving key=value pairs,
+    it is possible to avoid setting environmental variables.  The syntax is as:
+
+       perl Makefile.PL GMOD_ROOT=/usr/local/gmod CHADO_DB_NAME=dev_chado_01
+
+    Backward compatibility may not be maintained for this method of configuring
+    the install process will work.  You have been warned.
 
 2.  Next, run the following commands:
 
 *   perl Makefile.PL   
     Creates AutoDBI.pm.
+
+      During this step you are prompted for several configuration values
+      used by Chado and its associated tools:
+
+        *   What database server will you be using? [PostgreSQL] 
+
+        Specify what database vendor to use.  Currently only PostgreSQL works.
+
+        *   What is the Chado database name? [dev_chado_allenday_05] 
+
+        This will be the name of the created chado database.
+
+        *   What is the database username? [allenday] 
+
+        Default user that the installed libraries should try to
+        connect to the database as.
+
+        *   What is the password for 'allenday'?  
+
+        Password for the default user.
+
+        *   What is the database host? [sumo.genetics.ucla.edu] 
+
+        Host of the database daemon.
+
+        *   What is your database port? [5432] 
+
+        Port of the database daemon.
+
+        *   Available extensions to the core schema:
+            [1] sequence/gff-bridge/sequence-gff-views.sql
+            [2] sequence/gff-bridge/sequence-gff-funcs.pgsql
+            [3] expression/rad.sql
+            [4] expression/expression.sql
+
+            What extensions to the core schema would you like?
+            (Note that selecting any of these will force the
+            rebuilding of Class::DBI classes.)
+            (Comma-delimited)? [0] 
+
+        !!!!!IMPORTANT!!!!!
+        This section is where you choose optional extensions to the
+        base Chado schema.
+
+        If you plan to use Chado in combination with GBrowse, make
+        sure you select (1) and (2).
+
+        If you plan to represent gene expression data in a way that
+        is compliant with MIAME standards, make sure you select (3).
+        !!!!!IMPORTANT!!!!!
+
+        *   Enter the full path of an external DDL file [none] 
+
+        Path to a file containing external SQL commands to execute
+        after the database has been created.  This will typically be
+        extra modules/views/tables not distributed with the core schema,
+        or default data to insert into the database to fulfill the
+        specialized needs of a MOD.
 
 *   make
     Creates necessary files for the rest of the build process.
