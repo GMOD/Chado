@@ -30,24 +30,14 @@ insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:swissprot',(select contact_id from contact where name = 'null'));
+insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
+
 
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('unknown',(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('virtual array' ,(select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133A',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id,num_of_elements,num_array_rows,num_array_columns) values ('U133B',(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'),506944,712,712);
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('U95A' ,(select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
-
-/* we need to have the ontologies loaded before we can do this.  "make prepdb" now needs to come after "make ontologies" */
-insert into cvterm_relationship (subject_id,object_id,type_id) values (
-  (select cvterm_id from cvterm where name = 'blood_cell' and cv_id = (select cv_id from cv where name = 'Cell Ontology')),
-  (select cvterm_id from cvterm where name = 'blood' and cv_id = (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')),
-  (select cvterm_id from cvterm where name = 'part_of' and cv_id = (select cv_id from cv where name = 'Relationship Ontology'))
-);
-insert into cvterm_relationship (subject_id,object_id,type_id) values (
-  (select cvterm_id from cvterm where name = 'chondrocyte' and cv_id = (select cv_id from cv where name = 'Cell Ontology')),
-  (select cvterm_id from cvterm where name = 'cartilage' and cv_id = (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')),
-  (select cvterm_id from cvterm where name = 'part_of' and cv_id = (select cv_id from cv where name = 'Relationship Ontology'))
-);
 
 insert into cvterm (name,cv_id) values ('fetus',      (select cv_id from cv where name = 'Ad Hoc Ontology'));
 insert into cvterm (name,cv_id) values ('neonate',    (select cv_id from cv where name = 'Ad Hoc Ontology'));
