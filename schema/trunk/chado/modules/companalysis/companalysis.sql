@@ -1,5 +1,3 @@
-## $Id: companalysis.sql,v 1.20 2003-02-28 17:45:21 emmert Exp $
-
 -- ================================================
 -- TABLE: analysis
 -- ================================================
@@ -64,7 +62,7 @@ create table analysis (
     foreign key (queryfeature_id) references feature (feature_id),
     timeexecuted timestamp not null default current_timestamp,
 
-    unique(program(85), programversion(85), sourcename(85))
+    unique(program, programversion, sourcename)
 );
 create index analysis_idx1 on analysis (queryfeature_id);
 
@@ -85,7 +83,7 @@ create table analysisprop (
     foreign key (pkey_id) references cvterm (cvterm_id),
     pval text,
 
-    unique(analysis_id, pkey_id, pval(255))
+    unique(analysis_id, pkey_id, pval)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
 create index analysisprop_idx2 on analysisprop (pkey_id);
@@ -155,10 +153,10 @@ create table analysisfeature (
     foreign key (feature_id) references feature (feature_id),
     analysis_id int,
     foreign key (analysis_id) references analysis (analysis_id),
-    rawscore double,
-    normscore double,
-    significance double,
-    identity double,
+    rawscore double precision,
+    normscore double precision,
+    significance double precision,
+    identity double precision,
 
     unique (feature_id,analysis_id)
 );
