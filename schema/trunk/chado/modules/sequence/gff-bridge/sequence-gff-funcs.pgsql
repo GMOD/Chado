@@ -140,7 +140,8 @@ SELECT
   fl.phase       ,
   gffattstring(f.feature_id),
   f.seqlen       ,
-  f.name
+  f.name         ,
+  f.organism_id
 FROM feature f
      LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
      LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id) 
