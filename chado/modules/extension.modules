@@ -1,4 +1,5 @@
 sequence/gff-bridge/sequence-gff-views.sql
 sequence/gff-bridge/sequence-gff-funcs.pgsql
 expression/rad.sql
+expression/expression.sql
 www/www.sql
