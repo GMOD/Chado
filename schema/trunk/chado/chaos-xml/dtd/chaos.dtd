@@ -1,8 +1,7 @@
-<?xml version="1.0">
-<!DOCTYPE note SYSTEM "chaos.dtd">
+<?xml version="1.0"?>
 <!--
 
-  $Id: chaos.dtd,v 1.5 2005-02-11 01:55:54 cmungall Exp $
+  $Id: chaos.dtd,v 1.6 2005-02-11 01:58:55 cmungall Exp $
 
   CHAOS XML DTD
 
@@ -464,5 +463,5 @@
 
 <!--  END OF CHAOS XML DTD -->
 <!--  $Author: cmungall $ -->
-<!--  $Id: chaos.dtd,v 1.5 2005-02-11 01:55:54 cmungall Exp $ -->
+<!--  $Id: chaos.dtd,v 1.6 2005-02-11 01:58:55 cmungall Exp $ -->
 
