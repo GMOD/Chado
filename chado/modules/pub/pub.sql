@@ -87,9 +87,6 @@ create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 create table author (
        author_id serial not null,
        primary key (author_id),
-       contact_id int not null,
-       foreign key (contact_id) references contact (contact_id) on delete cascade,
--- these fields may be moving to the contact table...
        surname varchar(100) not null,
        givennames varchar(100),
        suffix varchar(100),
