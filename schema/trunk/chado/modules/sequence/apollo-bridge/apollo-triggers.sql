@@ -131,7 +131,7 @@ BEGIN
    RAISE NOTICE ''leave f_d ....'';
    RETURN OLD; 
 END;
-'LANGUAGE plpgsql;
+'LANGUAGE 'plpgsql';
 
 GRANT ALL ON FUNCTION fn_feature_del() TO PUBLIC;
 
@@ -630,10 +630,10 @@ CREATE OR REPLACE FUNCTION feature_fn_u() RETURNS TRIGGER AS
 DECLARE
   f_type	cvterm.name%TYPE;
   f_type_gene	CONSTANT varchar :=''gene'';
-  f_row         feature%ROW;
+  f_row         feature%ROWTYPE;
   name_suffix   varchar;
 BEGIN
-  IF OLD.uniquename <> NEW.uniquename THEN
+  IF OLD.uniquename <> NEW.uniquename AND OLD.uniquename NOT LIKE ''%temp%'' THEN
       RAISE NOTICE ''You may not change the uniquename of a feature'';
       RAISE NOTICE ''if you feel you must, contact your database admin'';
       RETURN OLD;
@@ -646,11 +646,11 @@ BEGIN
   SELECT INTO f_type cv.name FROM feature f, cvterm cv WHERE f.feature_id = OLD.feature_id and f.type_id = cv.cvterm_id; 
 
   IF f_type <> f_type_gene THEN
-      --it's not a gene, so go ahead
+      --its not a gene, so go ahead
       RETURN NEW;
   END IF;
 
-  --OK, so it's a gene, and were changing the name...
+  --OK, so its a gene, and were changing the name...
 
   FOR f_row IN SELECT f.* FROM feature f, get_sub_feature_ids(OLD.feature_id) ch WHERE f.feature_id = ch.feature_id LOOP
       IF f_row.name LIKE OLD.name||''-%'' THEN
@@ -663,4 +663,4 @@ BEGIN
 END;
 'LANGUAGE plpgsql;
 
-CREATE TRIGGER feature_update_name_tr_u BEFORE INSERT ON feature FOR EACH ROW EXECUTE PROCEDURE feature_fn_u();
+CREATE TRIGGER feature_update_name_tr_u BEFORE UPDATE ON feature FOR EACH ROW EXECUTE PROCEDURE feature_fn_u();
