@@ -14,9 +14,6 @@ Chado::DBI->set_db(
 
 sub _set_db {
 
-  warn $USER;
-  warn $PASS;
-
   Chado::DBI->set_db(
 			'Main',
 			'dbi:mysql:chado_wax;host=sumo',
