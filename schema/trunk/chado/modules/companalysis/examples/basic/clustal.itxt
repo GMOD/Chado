@@ -1,0 +1,90 @@
+# Programs such as clustal produce multiple alignments;
+# storing a multiple alignment in chado is similar to
+# storing a pairwise alignment; instead of two locations
+# per leaf analysisresult, we store N
+#
+# this example is an alignment of 3 proteins (fly, human and yeast).
+# the data is made up. a faked clustal report for this may look like:
+#
+#    +++++     ++++++
+# P0 MSGQADIALIGL-AVMG
+# P1 MS-QACCCCCGLQAVMC
+# P2 MSGQAQQQQQGLQ-VMQ
+#    +++++     ++++++
+#
+# there are two conserved blocks between the 3 proteins
+#
+data:
+  analysis:
+    name: MultAlignDehydrogenase
+    program: clustalw
+    sourcename: 
+    queryfeature:
+
+    # ----- First Protein --------
+    analysisresult:      
+      type: protein
+      # ---- First Block ----
+      analysisresult:                         # First block
+        resultlocation:
+          nbeg: 0
+          nend: 5
+          strand: 1
+          rank: 0
+          srcfeature: FB:FBpp0000001          # fly protein
+          alignment: MSGQA
+        resultlocation:
+          nbeg: 0
+          nend: 4
+          strand: 1
+          rank: 1
+          srcfeature: SwissProt:P00001.1      # non-fly protein 1
+          alignment: MS-QA
+        resultlocation:
+          nbeg: 0
+          nend: 5
+          strand: 1
+          rank: 1
+          srcfeature: SwissProt:P00002.1      # non-fly protein 2
+          alignment: MSGGA
+      # ---- Seconds Block ----
+      analysisresult:                         # First block
+        resultlocation:
+          nbeg: 10
+          nend: 15
+          strand: 1
+          rank: 0
+          srcfeature: FB:FBpp0000001          # fly protein
+          alignment: GL-AVM
+        resultlocation:
+          nbeg: 10
+          nend: 16
+          strand: 1
+          rank: 1
+          srcfeature: SwissProt:P00001.1      # non-fly protein 1
+          alignment: GLQAVM
+        resultlocation:
+          nbeg: 10
+          nend: 15
+          strand: 1
+          rank: 1
+          srcfeature: SwissProt:P00002.1      # non-fly protein 2
+          alignment: GLQ-VM
+
+# -- End of Hits --
+  feature:
+    dbxref: FB:FBpp0000001
+    type: protein
+    name: Pgd-P1
+    residues: MSGQA.....
+  feature:
+    dbxref: SwissProt:P00001.1
+    type: protein
+    name: 6PGD_HUMAN
+    residues: MSQAD....
+  feature:
+    dbxref: SwissProt:P00002.1
+    type: protein
+    name: 6PGD_YEAST
+    residues: MSGQA.....
+

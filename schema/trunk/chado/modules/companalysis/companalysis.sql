@@ -1,4 +1,4 @@
-## $Id: companalysis.sql,v 1.8 2002-11-11 19:11:43 cwiel Exp $
+## $Id: companalysis.sql,v 1.9 2002-11-13 02:35:52 cmungall Exp $
 
 # an analysis is a particular execution of a computational analysis;
 # it may be a blast of one sequence against another, or an all by all
@@ -26,6 +26,12 @@
 #
 # MAPPING (bioperl): maps to Bio::Search::Result::ResultI
 
+#
+# sourceuri: 
+#   This is an optional permanent URL/URI for the source of the
+#   analysis. The idea is that someone could recreate the analysis
+#   directly by going to this URI and fetching the source data
+#   (eg the blast database, or the training model).
 create table analysis (
     analysis_id serial not null,
     primary key (analysis_id),
@@ -36,6 +42,7 @@ create table analysis (
     algorithm varchar(255),
     sourcename varchar(255),
     sourceversion varchar(255),
+    sourceuri text,
     queryfeature_id int,
     foreign key (queryfeature_id) references feature (feature_id),
 
@@ -164,6 +171,9 @@ create table analysisresult (
 # the alignment string can also be optionally stored; this can be
 # used to reconstuct an actual residue to residue mapping
 #
+# we use the same definition of 'phase' as in GFF2;
+# see http://www.sanger.ac.uk/Software/formats/GFF/GFF_Spec.shtml
+#
 create table resultlocation (
        analysisresult_id int,
        foreign key (analysisresult_id) references analysisresult (analysisresult_id),
@@ -177,10 +187,20 @@ create table resultlocation (
 
        rank int not null,
 
+       phase smallint,
+
        unique (analysisresult_id, fnbeg, fnend, strand),
        unique (analysisresult_id, rank)
 );
 
+# analysisresults can have properties attached to them
+create table resultprop (
+    analysisresult_id int not null,
+    foreign key (analysisresult_id) references analysisresult (analysisresult_id),
+    pkey_id int not null,
+    foreign key (pkey_id) references cvterm (cvterm_id),
+    pval text
+);
 
 
 
