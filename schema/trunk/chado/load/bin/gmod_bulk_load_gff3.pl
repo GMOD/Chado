@@ -293,8 +293,6 @@ while(my $feature = $gffio->next_feature()){
 
   my $type = $type{$featuretype};
   if(!$type){
-warn $featuretype;
-warn $sofa_id;
     ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
     $type{$featuretype} = $type->id;
   }
@@ -554,6 +552,15 @@ warn $sofa_id;
 
       unless($analysis{$ankey}) {
         my ($ana) = Chado::Analysis->search( name => $ankey );
+        if(!$ana){
+          ($ana) = Chado::Analysis->create({
+                                            name           => $ankey,
+                                            program        => "autocreated by $0",
+                                            programversion => "autocreated by $0",
+                                           });
+          $ana->dbi_commit();
+          warn "created analysis for '$ankey'";
+        }
         $analysis{$ankey} = $ana->id;
       }
       die unless $analysis{$ankey};
