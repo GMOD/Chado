@@ -3,17 +3,17 @@
 -- ================================================
 
 create table tableinfo (
-       tableinfo_id serial not null,
-       primary key (tableinfo_id),
-       name varchar(30) not null,
-       primary_key_column varchar(30) null,
-       is_view int not null default 0,
-       view_on_table_id int null,
-       superclass_table_id int null,
-       is_updateable int not null default 1,
-       modification_date date not null default now()
+    tableinfo_id serial not null,
+    primary key (tableinfo_id),
+    name varchar(30) not null,
+    primary_key_column varchar(30) null,
+    is_view int not null default 0,
+    view_on_table_id int null,
+    superclass_table_id int null,
+    is_updateable int not null default 1,
+    modification_date date not null default now(),
+    constraint tableinfo_c1 unique (name)
 );
-create unique index tableinfo_idx1 on tableinfo (name);
 
 COMMENT ON TABLE tableinfo IS NULL;
 
@@ -21,12 +21,12 @@ COMMENT ON TABLE tableinfo IS NULL;
 -- TABLE: contact
 -- ================================================
 create table contact (
-       contact_id serial not null,
-       primary key (contact_id),
-       name varchar(30) not null,
-       description varchar(255) null
+    contact_id serial not null,
+    primary key (contact_id),
+    name varchar(30) not null,
+    description varchar(255) null,
+    constraint contact_c1 unique (name)
 );
-create unique index contact_idx1 on contact (name);
 
 COMMENT ON TABLE contact IS NULL;
 
@@ -35,16 +35,16 @@ COMMENT ON TABLE contact IS NULL;
 -- ================================================
 
 create table db (
-       db_id serial not null,
-       primary key (db_id),
-       name varchar(255) not null,
-       contact_id int not null,
-       foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-       description varchar(255) null,
-       urlprefix varchar(255) null,
-       url varchar(255) null
+    db_id serial not null,
+    primary key (db_id),
+    name varchar(255) not null,
+    contact_id int not null,
+    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
+    description varchar(255) null,
+    urlprefix varchar(255) null,
+    url varchar(255) null,
+    constraint db_c1 unique (name)
 );
-create unique index db_idx1 on db (name);
 
 COMMENT ON TABLE db IS NULL;
 
@@ -53,18 +53,18 @@ COMMENT ON TABLE db IS NULL;
 -- ================================================
 
 create table dbxref (
-       dbxref_id serial not null,
-       primary key (dbxref_id),
-       db_id int not null,
-       foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
-       accession varchar(255) not null,
-       version varchar(255) not null default '',
-       description text
+    dbxref_id serial not null,
+    primary key (dbxref_id),
+    db_id int not null,
+    foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
+    accession varchar(255) not null,
+    version varchar(255) not null default '',
+    description text,
+    constraint dbxref_c1 unique (db_id,accession,version)
 );
 create index dbxref_idx1 on dbxref (db_id);
 create index dbxref_idx2 on dbxref (accession);
 create index dbxref_idx3 on dbxref (version);
-create unique index dbxref_idx4 on dbxref (db_id,accession,version);
 
 COMMENT ON TABLE dbxref IS NULL;
 
@@ -72,11 +72,11 @@ COMMENT ON TABLE dbxref IS NULL;
 -- TABLE: project
 -- ================================================
 create table project (
-       project_id serial not null,  
-       primary key (project_id),
-       name varchar(255) not null,
-       description varchar(255) not null
+    project_id serial not null,  
+    primary key (project_id),
+    name varchar(255) not null,
+    description varchar(255) not null,
+    constraint project_c1 unique (name)
 );
-create unique index project_idx1 on project (name);
 
 COMMENT ON TABLE project IS NULL;
