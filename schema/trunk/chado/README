@@ -1,6 +1,6 @@
                             CHADO README
 
-$Id: README,v 1.5 2003-12-03 23:17:20 kycl4rk Exp $
+$Id: README,v 1.6 2003-12-04 00:01:35 kycl4rk Exp $
 
 INTRODUCTION
 ------------
@@ -90,8 +90,8 @@ AUTOGENERATION OF SCHEMA FILES, CODE, ETC
 
 The Chado Makefile currently supports:
 
-trigger			purpose
----------------------------------------------------------------------------
+Target			Purpose
+--------------- -----------------------------------------------------------
 all				makes cdbi, see below
 cdbi			make Class::DBI interface classes (Chado::*) from pgsql and
 				mysql files
@@ -100,25 +100,26 @@ graphviz		make graphviz diagrams, one per module
 mysql			create mysql schema (sql) files from postgres sql files
 
 
-These transforms depend on a set of Perl scripts in "chado/bin," and
-Ken Clark's SQL::Translator module (with all of its dependencies),
+These transforms depend on the Perl scripts in "chado/bin" and the
+SQL::Translator module (with all of its dependencies), which is
 available on CPAN.
 
 CHADO WEBSITE
 -------------
 
-See http://www.gmod.org
+Please see http://www.gmod.org/ for more information on Chado and
+GMOD.
 
-Currently minimal docs
+You can browse the schema CVS repository here:
 
-You can browse the schema:
-
-http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
+    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
 
 COPYRIGHT
 ---------
 This software is free.  You can use it under the terms of the
 Perl Artistic License.
 
+AUTHORS
+-------
 Chris Mungall, David Emmert and the GMOD team
 October 2, 2003
