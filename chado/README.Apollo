@@ -6,12 +6,15 @@ be done:
   - grant privileges to users to several tables (list here) --in the  
     meantime, you can grant all using sqlt and the template, 
     bin/privileges.tmpl 
-  - insert several controlled vocabularies and terms found in 
+  - insert several ad hoc ontology terms found in 
+    modules/sequence/apollo-bridge/ontology_inserts.sql
+  - insert a few misc items like those found in 
     modules/sequence/apollo-bridge/apollo.inserts
-  - add the functions and triggers in 
-    modules/sequence/apollo-bridge/apollo-triggers.sql.  Do this with the
-    command
-
-      % cat modules/sequence/apollo-bridge/apollo-triggers.sql | psql <DBNAME>
+    (heh! try to be a little more vague next time!) 
+  - add the functions and triggers to chado.  Use the perl script:
+      % /usr/local/bin/gmod_apollo_triggers.pl create
+    Note that this script can also be used to drop and add the triggers
+    in case you want to do some bulk loading and want to disactivate
+    the triggers for that. 
 
 
