@@ -28,9 +28,6 @@ install_util/src_install.PLS
 install_util/log4perl.conf.PLS
 lib/Bio/GMOD/Config.pm
 lib/Bio/GMOD/DB/Config.pm
-lib/Bio/GMOD/Load.pm
-lib/Bio/GMOD/Load/GFF.pm
-lib/Bio/GMOD/Util.pm
 lib/Chado/Builder.pm
 lib/Chado/Config.pm
 LICENSE
