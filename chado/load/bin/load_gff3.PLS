@@ -34,6 +34,20 @@ gmod_load_gff3.pl - Load gff3 files into a chado database.
 
   % gmod_load_gff3.pl --organism Human --srcdb 'DB:refseq' --gfffile refseq.gff
 
+=head1 COMMAND-LINE OPTIONS
+
+The following command line options are available.  Note that they
+can be abbreviated to one letter.
+
+  --cache      (optional, defaults to 1000)         The number of features to cache before
+                                                    committing to the database
+  --force      (optional, defaults to false)        Force the file to load, even if it has already
+                                                    been loaded before
+  --gfffile    (required)                           The name of the GFF3 file
+  --organism   (optional, defaults to 'Human')      Common name of the organism
+  --srcdb      (optional, defaults to 'DB:refseq')  The name of the source database
+  --uniquename (optional                            The tag to use to provide feature.uniquename
+
 =head1 DESCRIPTION
 
 The gmod_load_gff3.pl script takes genomic annotations in the GFF3 format
@@ -119,35 +133,18 @@ sequence.
 By providing the command line flag --uniquename, the user indicates what
 GFF tag to uses as the feature.uniquename when inserting into the feature
 table.  Note that this name must be unique among all features in the feature
-table; if it is not, the load of that feature will fail (probably).
+table; if it is not, the load of that feature will probably fail.
 
 =back
-
-=head1 COMMAND-LINE OPTIONS
-
-The following command line options are required.  Note that they
-can be abbreviated to one letter.
-
-  --organism <org name>      Common name of the organism
-                                (default: 'Human')
-  --srcdb    <dbname>        The name of the source database
-                                (default: 'DB:refseq')
-  --gfffile  <filename>      The name of the GFF3 file
-  --uniquename <tag>         The tag to use to provide feature.uniquename
-  --cache    <# of features> The number of features to cache before
-                                committing to the database
-                                (default: 1000)
-  --force                    Force the file to load, even if it has already been
-                                loaded before
 
 =head1 AUTHORS
 
 Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>cain@cshl.orgE<gt>
 
-Copyright (c) 2003
+Copyright (c) 2003-2004
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.  
+it under the same terms as Perl itself.
 
 =cut
 
@@ -166,11 +163,11 @@ my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
   ( undef, undef, undef, undef );
 my $feature_count = 0;        #for cache/flush
 my $cv;
-my %srcfeature      = ();
-my %feature         = ();
-my %featureloc_rank = ();
-my %dbxref          = ();
-my %cvterm          = ();
+my %srcfeature        = ();
+my %feature           = ();
+my %featureloc_rank   = ();
+my %dbxref            = ();
+my %cvterm            = ();
 
 initialize();
 
@@ -226,7 +223,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     # might be found: either in the GFF file (in which case, look
     # for it in a hash here) or in the database already.  If it is
     # in the database already, it might be very difficult to look up
-    # via seq_id.  I'll solve the first problem and think about the 
+    # via seq_id.  I'll solve the first problem and think about the
     # second  sjc 3/23/04
     if (  # $gff_feature->has_tag('ID') &&
         !( $id                  eq $gff_feature->seq_id )
@@ -238,8 +235,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
 
         unless ( $srcfeature{$gff_feature->seq_id} ) {
             warn "\n" . "*" x 72 . "\n";
-            warn
-"Unable to find a source feature id for the reference sequence in this line:\n";
+            warn "Unable to find a source feature id for the reference sequence in this line:\n";
             warn $gff_feature->gff_string . "\n\n";
             warn "That is, "
               . $gff_feature->seq_id
@@ -299,8 +295,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
             load_Note_tag( $gff_feature, $chado_feature );
         }
         elsif ( $tag =~ /^[A-Z]/ ) {
-            die
-"$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the spec?";
+            die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the GFF3 spec?";
         }
         elsif ( $tag eq $UNIQUENAME ) {
            # do nothing--we already used this information to create the feature
@@ -361,20 +356,6 @@ sub load_custom_tags {
                 }
             );
 
-#        if(length($d) < 256){
-#          my($synonym) = Chado::Synonym->find_or_create({
-#                                                         name         => $d,
-#                                                         synonym_sgml => $d,
-#                                                         type_id      => $cvterm{description}->id
-#                                                        });
-
-#          my($feature_synonym) = Chado::Feature_Synonym->find_or_create ({
-#                                                                          synonym_id => $synonym->id,
-#                                                                          feature_id => $chado_feature->id,
-#                                                                          pub_id     => $pub->id
-#                                                                         });
-#          push @transaction, ($synonym,$feature_synonym);
-#        }
             push @transaction, ($featureprop);
         }
     }
@@ -436,9 +417,7 @@ sub load_custom_tags {
     else {
         unless ( defined $cvterm{$tag} ) {
             cache_cvterm($tag);
-            $progress->message(
-"Data with the $tag tag are being placed in the featureprop table\n"
-            );
+            $progress->message("Data with the $tag tag are being placed in the featureprop table");
         }
 
         foreach my $d (@d) {
@@ -522,11 +501,11 @@ sub load_Note_tag {
 }
 
 =pod
-                                                                                
+
 =head1 load_Target_tag
-                                                                                
+
 Loads Target values.  These are used for alignment information.
-                                                                                
+
 =cut
 
 sub load_Target_tag {
@@ -587,12 +566,12 @@ sub load_Target_tag {
 }
 
 =pod
-                                                                                
+
 =head1 load_Parent_tag
-                                                                                
+
 Loads Parent tag values.  These are used to denote a parent feature
 of the given feature.
-                                                                                
+
 =cut
 
 sub load_Parent_tag {
@@ -627,11 +606,11 @@ sub load_Parent_tag {
 }
 
 =pod
-                                                                                
+
 =head1 load_Alias_tag
-                                                                                
+
 Loads Alias tag values.  These are used for synonyms.
-                                                                                
+
 =cut
 
 sub load_Alias_tag {
@@ -669,11 +648,11 @@ sub load_Alias_tag {
 }
 
 =pod
-                                                                                
+
 =head1 load_Name_tag
-                                                                                
+
 Loads Name tag values.
-                                                                                
+
 =cut
 
 sub load_Name_tag {
@@ -805,10 +784,10 @@ sub initialize {
     unless ($chado_db) {
       warn "\n\nCouldn't find or create database $SRC_DB.\n";
       warn "The current contents of the database table is:\n\n";
-                                                                                
+
       my @all_columns = Chado::Db->columns;
       printf "%10s %6s %13s %25s %5s %10s\n\n", sort @all_columns;
-                                                                                
+
       my $db_iterator = Chado::Db->retrieve_all();
       while(my $db = $db_iterator->next){
         my @cols = map { $db->$_ } sort $db->columns;
@@ -859,7 +838,7 @@ sub load_sequences {
 
     if ( -e $TMPFASTA ) {
         Chado::Feature->set_sql( update_residues =>
-qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?}
+          qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?}
         );
         my $sth = Chado::Feature->sql_update_residues;
 
@@ -1026,8 +1005,6 @@ sub load_feature_locations {
         return ($chado_feature);
     }
 
- 
-
     $chado_feature->dbxref_id( $dbxref{$id} )
       if $gff_feature->has_tag('ID');    # is this the right thing to do here?
     $chado_feature->update;              # flush updates to this feature object
@@ -1060,8 +1037,8 @@ sub cache_cvterm {
     my $name = shift;
     my $dontcreate = shift;
 
-#we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
-#one from SO.
+    #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
+    #one from SO.
 
     ( $cvterm{$name} ) = Chado::Cvterm->search( name => $name )
       || Chado::Cvterm->search( name => ucfirst($name) );
