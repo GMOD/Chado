@@ -1,0 +1,128 @@
+-- $Id: cv-dbapi.sqli,v 1.1 2005-03-15 21:31:44 sshu Exp $
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- cv-dbapi.sqli
+--
+--  STATUS: alpha
+--
+--  this interface describes the functions implemented by
+--  a chado database over the cv module
+--
+--
+-- the interface is specified in pseudo-SQL function syntax
+-- it is intended as formal documentation for DB Admins and
+-- application programmers. It is not intended to be used
+-- directly by the DB. The DB should implement these functions
+-- using a language pertinent to the DBMS implementing policies
+-- pertinent to the policy chosen by the MOD and DB Admin.
+--
+-- a default postgresql implementation will be provided, in
+-- the functions/ directory. hopefully it should not be difficult
+-- to port these to other DBMS systems
+--
+-- the DB API contains granual 'atomic' functions; that is,
+-- functions that neither accept not return complex datatypes
+-- such as objects, XML or other data structures.
+-- The API accepts/returns primitive values and relations.
+-- As such, the DB API is perhaps mostly useful for applications that
+-- modify the database. The API is intended to be complementary
+-- to APIs that accept or return complex datatypes, such as ChadoXML
+--
+-- CONVENTIONS:
+--   functions are generally named <verb>_<noun_phrase>
+--   the noun phrase typically refers to a chado table name,
+--   a type in some ontology such as SO, or an emergent
+--   table/type, such as "gene model"
+--
+-- TODO: Document possible exceptions raised
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+-- ************************************************************
+-- ** Data Modification Functions                            **
+-- **                                                        **
+-- ** Calling any of these functions can result in data      **
+-- ** being modified                                         **
+-- **                                                        **
+-- ** Each function should note in the comments which        **
+-- ** tables are affected                                    **
+-- **  [d] - may result in deletion                          **
+-- **  [u] - may result in update                            **
+-- **  [i] - may result in insertion                         **
+-- ** Cascading deletes are not explicitly noted;            **
+-- ** (ie if table 'feature' can be deleted then             **
+-- **  'featureloc' may be deleted as a consequence)         **
+-- ************************************************************
+
+-- ============================================================
+-- FUNCTION: fill_cvtermpath
+-- ============================================================
+--  rebuild cvtermpath for the ontology (cv.id or cv.name as arg)
+-- impl: see functions/fill_cvtermpath.plpgsql
+-- TABLES AFFECTED: cvtermpath[d, i]
+DECLARE FUNCTION
+ fill_cvtermpath(cv_id                  integer not null);
+DECLARE FUNCTION
+ fill_cvtermpath(cv_name                varchar not null);
+
+
+-- ************************************************************
+-- ** Non-modifying Functions                                **
+-- ************************************************************
+-- The functions below have no side-effects (ie they never
+-- result in update/delete/insert of any data)
+
+
+-- ============================================================
+-- FUNCTION: get_all_subject_ids
+-- ============================================================
+-- return cvterm child cvterm_id and their child cvterm_id
+-- all way down to leaf nodes of the onotlogy
+-- + root_cvterm_id - root of the cvterm graph
+-- NOTE: be aware of duplicate object_id in the return set
+-- impl: see functions/get_subj_obj_ids.plpgsql
+DECLARE FUNCTION
+ get_all_subject_ids(root_cvterm_id                     integer not null)
+        RETURNS setof subject_id;
+
+-- ============================================================
+-- FUNCTION: get_graph_below
+-- ============================================================
+-- return cvterm graph whose root (object_id) is root_cvterm_id
+-- + root_feature_id - root of the cvterm graph
+-- impl: see functions/get_subj_obj_ids.plpgsql
+DECLARE FUNCTION
+ get_graph_below(root_cvterm_id                         integer not null)
+        RETURNS setof subject_id, object_id, type_id;
+
+-- ============================================================
+-- FUNCTION: get_graph_above
+-- ============================================================
+-- return cvterm graph whose leaf (subject_id) is leaf_cvterm_id
+-- + leaf_feature_id - leaf of the cvterm graph
+-- impl: see functions/get_subj_obj_ids.plpgsql
+DECLARE FUNCTION
+ get_graph_above(leaf_cvterm_id                         integer not null)
+        RETURNS setof subject_id, object_id, type_id;
+
+-- ============================================================
+-- FUNCTION: get_all_object_ids
+-- ============================================================
+-- return cvterm parent cvterm_id and their parent cvterm_id
+-- all way up to root of the ontology
+-- + leaf_cvterm_id - leaf of the cvterm graph
+-- NOTE: be aware of duplicate subject_id in the return set
+-- impl: see functions/get_subj_obj_ids.plpgsql
+DECLARE FUNCTION
+ get_all_object_ids(root_cvterm_id                      integer not null)
+        RETURNS setof object_id;
+
+-- ============================================================
+-- FUNCTION: get_it_sub_cvterm_ids
+-- ============================================================
+-- return all cvterms that are specified by the sql or child terms
+-- of the terms specified by sql or their child terms
+-- + sql -- must be like 'select distinct subject_id from ...'
+-- impl: see functions/get_subj_obj_ids.plpgsql
+DECLARE FUNCTION
+ get_it_sub_cvterm_ids(sql                              text not null)
+        RETURNS setof subject_id;
+
