@@ -1,3 +1,5 @@
 0.001     Initial release
 
-0.002     Added more expressive error messages to load_gff3.pl
+0.002     * Added more expressive error messages to load_gff3.pl
+          * Expanded the search space for organisms in load_gff3.pl
+          * Added more organisms to initialize.sql 
