@@ -162,6 +162,22 @@ sub name {
     shift->get_tag_value('DBNAME');
 }
 
+=head2 sqlfile
+                                                                                
+ Title   : sqlfile
+ Usage   : $sqlfile = $dbconf->sqlfile();
+ Function: returns the path of the sqlfile (ie, ddl file) the defines the schema
+ Returns : see above
+ Args    : none
+ Status  : Public
+                                                                                
+=cut
+
+sub name {
+    shift->get_tag_value('SQLFILE');
+}
+
+
 =head2 dbh
                                                                                 
  Title   : dbh
