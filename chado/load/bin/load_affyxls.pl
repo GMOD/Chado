@@ -101,6 +101,9 @@ while(my $arrayio = $affx->next_array){
     }
   }
 
+  $chip_id   ||= $arrayio->id;
+  $sample_id ||= $arrayio->id;
+
   $LOG->info("chip_id: $chip_id");
   $LOG->info("sample_id: $sample_id");
 
@@ -207,6 +210,7 @@ while(my $arrayio = $affx->next_array){
 												assay_id => $assay->id,
 												protocol_id => $protocol_acquisition->id,
 											   });
+
   if($arrayio->id and !$acquisition->name){
     $acquisition->name($arrayio->id);
     $acquisition->update;
@@ -225,6 +229,7 @@ while(my $arrayio = $affx->next_array){
     $quantification->update;
     $newchip++;
   }
+
   push @txn, $quantification;
 
 
@@ -310,13 +315,18 @@ sub make_cvterms {
   #
   ####
 
-  $cvterm_string ||= 'null';
+  $cvterm_string ||= 'TS28';
   my @cvterms = split /[\;\,]/, $cvterm_string;
   #s/([A-Z]{1,7})(\d{1,7})/$1:$2/g foreach @cvterms;
 
   my %cvterm;
   @cvterms = map {_remap_cvterm($_)} @cvterms;
   foreach my $cvterm (@cvterms){
+    if($cvterm eq 'TS28'){
+      $cvterm{$cvterm} = undef;
+      next;
+    }
+
 	my $val = undef;
 	if($cvterm =~ /\@(.+)$/){
 	  $val = $1;
@@ -329,6 +339,7 @@ sub make_cvterms {
     $cvterm =~ s/:+/:/g while $cvterm =~ /::/;
     $cvterm{$cvterm} = $val;
   }
+
   return %cvterm;
 }
 
@@ -376,7 +387,7 @@ sub _remap_cvterm {
 			 207 => 'MA:0000415',
 			 211 => 'MA:0000134',
 			 223 => 'fetus',#fetus
-             fetal => 'fetus',
+			 fetal => 'fetus',
 			 233 => 'MA:0000404',
 			 238 => 'MA:0000441',
 			 247 => 'MA:0000813',
