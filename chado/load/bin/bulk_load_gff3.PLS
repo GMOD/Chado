@@ -521,7 +521,7 @@ while(my $feature = $gffio->next_feature()){
     $locgroup{$uniquename}++;
   }
   else {
-    print F join("\t", ($nextfeature, $organism->id, $name, $uniquename, $type, $ANALYSIS)),"\n";
+    print F join("\t", ($nextfeature, $organism, $name, $uniquename, $type, $ANALYSIS)),"\n";
     $cache{feature}{$uniquename} = $nextfeature;
     $cache{parent}{$uniquename} = $nextfeature;
     $locgroup{$uniquename} = 0;
@@ -614,7 +614,7 @@ END
       my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
       my $rank=0;
       foreach my $value (@values) {
-        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{$tag}->id,$value,$rank)),"\n";
+        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{$tag},$value,$rank)),"\n";
         $rank++;
         $nextfeatureprop++;
       }
@@ -639,7 +639,7 @@ END
           $cache{dbxref}{$source} = $chado_source;
         } else {
           $cache{dbxref}{$source} = $nextdbxref;
-          print DBX join("\t",($nextdbxref,$gff_source_db->id,$source,1,'\N')),"\n";
+          print DBX join("\t",($nextdbxref,$gff_source_db,$source,1,'\N')),"\n";
           $nextdbxref++; 
         }
       }
@@ -675,7 +675,7 @@ END
         ($pub) = $sth->fetchrow_array;
       }
 
-      print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term}->id,$pub)),"\n";
+      print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
       $nextfeaturecvterm++;
     }
   }
@@ -703,7 +703,7 @@ END
       } else {
           unless ($cache{db}{$database}) {
               $search_db->execute("DB:$database");
-              my($db_id) = $search_db->fetchrow_arrary;
+              my($db_id) = $search_db->fetchrow_array;
               warn "couldn't find database 'DB:$database' in db table"
                  and next unless $db_id;
               $cache{db}{$database} = $db_id;
@@ -714,12 +714,12 @@ END
                                        $version,$cache{db}{$database});
           my ($existing_dbxref) = $search_long_dbxref->fetchrow_array;
           if ($existing_dbxref) {
-            if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}){
-              $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref->id}++;
-              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$existing_dbxref->id)),"\n";
+            if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref}){
+              $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref}++;
+              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$existing_dbxref)),"\n";
               $nextfeaturedbxref++;
             }
-            $cache{dbxref}{"$database|$accession|$version"} = $existing_dbxref->id; 
+            $cache{dbxref}{"$database|$accession|$version"} = $existing_dbxref; 
           } else {
             if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}){
               $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}++;
@@ -765,7 +765,7 @@ END
       $search_analysis->execute($ankey);
       my ($ana) = $search_analysis->fetchrow_array;
       dump_ana_contents($ankey) unless $ana;
-      $cache{analysis}{$ankey} = $ana->id;
+      $cache{analysis}{$ankey} = $ana;
     }
     dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
@@ -810,7 +810,7 @@ END
       } else { #this Target needs a feature too
         $nextfeature++;
         $name ||= "$featuretype-$uniquename";
-        print F join("\t", ($nextfeature, $organism->id, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS)),"\n";
+        print F join("\t", ($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS)),"\n";
         print FLOC join("\t", (
               $nextfeatureloc,
               $nextfeature-1, #broken, needs to use previous $cache{feature}{$uniquename}.  may want to use a $last_uniquename var to track this.
@@ -832,7 +832,7 @@ END
       my $type = $cache{type}{$featuretype};
  #     if(!$type){
  #       ($type) = Chado::Cvterm->search( name => $featuretype, cv_id => $sofa_id );
- #       $cache{type}{$featuretype} = $type->id;
+ #       $cache{type}{$featuretype} = $type;
  #     }
  #     die "no cvterm for ".$featuretype unless $type;
 
@@ -844,7 +844,7 @@ END
         $search_analysis->execute($ankey);
         my ($ana) = $search_analysis->fetchrow_array;
         dump_ana_contents($ankey) unless $ana;
-        $cache{analysis}{$ankey} = $ana->id;
+        $cache{analysis}{$ankey} = $ana;
       }
       dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
@@ -854,7 +854,7 @@ END
  #     my $target_unique = "target_$target_id";
  #     $t_unique_count{$target_unique}++;
  #     $target_unique .= "_part_$t_unique_count{$target_unique}";
- #     print F join("\t", ($nextfeature, $organism->id, $target_id, $target_unique, $type, $ANALYSIS)),"\n";
+ #     print F join("\t", ($nextfeature, $organism, $target_id, $target_unique, $type, $ANALYSIS)),"\n";
 
       $nextfeatureloc++;
       $rank++;
@@ -897,6 +897,18 @@ close FS;
 close FDBX;
 close DBX;
 close AF;
+
+$search_uniquename->finish;
+$search_name->finish;
+$count_name->finish;
+$search_cvterm_id->finish;
+$search_source_dbxref->finish;
+$search_dbxref->finish;
+$search_cvterm_id_w_dbxref->finish;
+$search_db->finish;
+$search_long_dbxref->finish;
+$search_analysis->finish;
+$search_synonym->finish;
 
 if(!$NOLOAD){
   foreach my $table (@tables) {
@@ -972,7 +984,7 @@ sub synonyms  {
 
       #check for pre-existing synonyms with this name
       $search_synonym->execute($alias,$cache{type}{'synonym'});
-      my ($synonym) = $search_synonym->$sth->fetchrow_array;
+      my ($synonym) = $search_synonym->fetchrow_array;
 
       if ($synonym) {
         unless ($pub) {
@@ -982,16 +994,16 @@ sub synonyms  {
         }
 
 
-        if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id } ) {
-          $constraint{feature_synonym_c1}{ $feature_id }{ $synonym->id }++;
-          print FS join("\t", ($nextfeaturesynonym,$synonym->id,$feature_id,$pub)),"\n";
+        if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $synonym } ) {
+          $constraint{feature_synonym_c1}{ $feature_id }{ $synonym }++;
+          print FS join("\t", ($nextfeaturesynonym,$synonym,$feature_id,$pub)),"\n";
 
           $nextfeaturesynonym++;
-          $cache{synonym}{$alias} = $synonym->id;
+          $cache{synonym}{$alias} = $synonym;
         }
 
       } else {
-        print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'}->id,$alias)),"\n";
+        print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'},$alias)),"\n";
 
         unless ($pub) {
             my $sth = $db->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
