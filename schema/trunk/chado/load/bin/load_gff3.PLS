@@ -324,6 +324,9 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         elsif ( $tag eq 'Ontology_term' || $tag =~ /^cvterm/) {
             load_Ontology_term( $gff_feature, $chado_feature, $tag );
         }
+        elsif ( $tag eq 'Dbxref' || $tag =~ /^cvterm/) {
+            load_Dbxref_term( $gff_feature, $chado_feature, $tag );
+        }
         elsif ( $tag =~ /^[A-Z]/ ) {
             die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the GFF3 spec?";
         }
@@ -426,43 +429,7 @@ sub load_custom_tags {
 
     }
     elsif ( $tag eq 'dbxref') {
-        foreach my $d (@d) { 
-            next if $d eq '';
-            if ($d =~ /(.+):(.+)/) {
-                $tag = "DB:$1";
-                $d   = $2;
-            } else {
-                die "unable to determine database for dbxref: $d\n";
-            }
-
-            my $add_db = 0;
-            my ($db) = Chado::Db->search( name => $tag );
-            if ( !$db ) {
-                $add_db = 1;
-                $db = Chado::Db->find_or_create(
-                    {
-                        name       => $tag,
-                        contact_id => $nullcontact,
-                    }
-                );
-            }
-            die "couldn't create db $db" unless $db;
-            push @transaction, $db if $add_db;
-                                                                                
-            my ($dbxref) = Chado::Dbxref->find_or_create(
-                {
-                    db_id     => $db->id,
-                    accession => $d
-                }
-            );
-            my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create(
-                {
-                    feature_id => $chado_feature->id,
-                    dbxref_id  => $dbxref->id,
-                }
-            );
-            push @transaction, ( $dbxref, $feature_dbxref );
-        } 
+        load_Dbxref_term($gff_feature,$chado_feature,$tag); 
     }
     else {
         unless ( defined $cvterm{$tag} ) {
@@ -488,6 +455,58 @@ sub load_custom_tags {
 }
 
 =pod
+
+=head1 load_Dbxref_term
+
+Loads dbxrefs.
+
+=cut
+
+sub load_Dbxref_term {
+    my $gff_feature   = shift;
+    my $chado_feature = shift;
+    my $tag           = shift;
+
+    my @d = $gff_feature->get_tag_values($tag);
+
+    foreach my $d (@d) {
+        next if $d eq '';
+        if ($d =~ /(.+):(.+)/) {
+            $tag = "DB:$1";
+            $d   = $2;
+        } else {
+            die "unable to determine database for dbxref: $d\n";
+        }
+
+        my $add_db = 0;
+        my ($db) = Chado::Db->search( name => $tag );
+        if ( !$db ) {
+            $add_db = 1;
+            $db = Chado::Db->find_or_create(
+                {
+                    name       => $tag,
+                    contact_id => $nullcontact,
+                }
+            );
+        }
+        die "couldn't create db $db" unless $db;
+        push @transaction, $db if $add_db;
+
+        my ($dbxref) = Chado::Dbxref->find_or_create(
+            {
+                db_id     => $db->id,
+                accession => $d
+            }
+        );
+        my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create(
+            {
+                feature_id => $chado_feature->id,
+                dbxref_id  => $dbxref->id,
+            }
+        );
+        push @transaction, ( $dbxref, $feature_dbxref );
+    }
+}
 
 =head1 load_Ontology_term
 
