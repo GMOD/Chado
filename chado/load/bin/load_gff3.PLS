@@ -324,7 +324,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         elsif ( $tag eq 'Ontology_term' || $tag =~ /^cvterm/) {
             load_Ontology_term( $gff_feature, $chado_feature, $tag );
         }
-        elsif ( $tag eq 'Dbxref' || $tag =~ /^cvterm/) {
+        elsif ( $tag eq 'Dbxref' || $tag =~ /^dbxref/) {
             load_Dbxref_term( $gff_feature, $chado_feature, $tag );
         }
         elsif ( $tag =~ /^[A-Z]/ ) {
