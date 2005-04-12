@@ -118,11 +118,11 @@ BEGIN
     IF (exist_c > 0) THEN
         FOR cterm IN SELECT * FROM cvtermpath WEHRE subject_id = leaf AND pathdistance > 0 LOOP
             RETURN NEXT cterm;
-        END LOOP
+        END LOOP;
     ELSE
         FOR cterm IN SELECT * FROM _get_all_object_ids(leaf) LOOP
             RETURN NEXT cterm;
-        END LOOP
+        END LOOP;
     END IF;
     RETURN;
 END;   
