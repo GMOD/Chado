@@ -24,10 +24,10 @@
 CREATE TABLE affymetrixprobeset (
   name varchar(255) NULL
 ) INHERITS ( element );
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id) REFERENCES feature (feature_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)  REFERENCES dbxref  (dbxref_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (array_id)   REFERENCES array   (array_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)    REFERENCES cvterm  (cvterm_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
 
 CREATE TABLE affymetrixprobe (
   name varchar(255) NULL,
@@ -37,10 +37,10 @@ CREATE TABLE affymetrixprobe (
   col int NOT NULL
 ) INHERITS ( element );
 CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id) REFERENCES feature (feature_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)  REFERENCES dbxref  (dbxref_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (array_id)   REFERENCES array   (array_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)    REFERENCES cvterm  (cvterm_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
 
 CREATE TABLE affymetrixcel (
   mean float NOT NULL,
