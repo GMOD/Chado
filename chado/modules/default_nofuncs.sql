@@ -494,7 +494,7 @@ create index feature_idx5 on feature (lower(name));
 --This ALTER TABLE statement changes the way sequence data
 --is stored on disk to make extracting substrings much faster
 --at the expense of more disk space
---ALTER TABLE feature ALTER COLUMN residues SET STORAGE EXTENDED;
+ALTER TABLE feature ALTER COLUMN residues SET STORAGE EXTENDED;
 
 
 -- ================================================

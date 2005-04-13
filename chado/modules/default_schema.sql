@@ -494,7 +494,7 @@ create index feature_idx5 on feature (lower(name));
 --This ALTER TABLE statement changes the way sequence data
 --is stored on disk to make extracting substrings much faster
 --at the expense of more disk space
---ALTER TABLE feature ALTER COLUMN residues SET STORAGE EXTENDED;
+ALTER TABLE feature ALTER COLUMN residues SET STORAGE EXTENDED;
 
 
 -- ================================================
@@ -2588,13 +2588,13 @@ BEGIN
 
     SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = leaf and pathdistance <= 0;
     IF (exist_c > 0) THEN
-        FOR cterm IN SELECT * FROM cvtermpath WEHRE subject_id = leaf AND pathdistance > 0 LOOP
+        FOR cterm IN SELECT * FROM cvtermpath WHERE subject_id = leaf AND pathdistance > 0 LOOP
             RETURN NEXT cterm;
-        END LOOP
+        END LOOP;
     ELSE
         FOR cterm IN SELECT * FROM _get_all_object_ids(leaf) LOOP
             RETURN NEXT cterm;
-        END LOOP
+        END LOOP;
     END IF;
     RETURN;
 END;   
@@ -2635,7 +2635,7 @@ DECLARE
 
 BEGIN
 
-    ----RAISE NOTICE ''depth=% root=%'', depth,child_id;
+    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
     --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
     SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
 
@@ -2666,7 +2666,7 @@ BEGIN
     PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
     FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
         PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
-        --RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
+        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
     END LOOP;
     RETURN 1;
 END;
