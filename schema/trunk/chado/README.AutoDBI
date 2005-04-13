@@ -1,7 +1,7 @@
 Process for makeing AutoDBI.PL:
 
 Run Makefile.PL, answer 'No' to the 'use simple' question and select
-   all sql and function extensions.
+   all sql and function extensions (except the Apollo functions).
    This creates a new AuotDBI.pm and complete.sql defining the current schema.
 
 diff modules/complete.sql  modules/default_schema.sql

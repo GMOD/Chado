@@ -42,6 +42,7 @@ Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHO
 !GROK!THIS!
 
 print OUT <<'!NO!SUBS!';
+# -------------------------------------------------------------------
 package Chado::Tableinfo;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
