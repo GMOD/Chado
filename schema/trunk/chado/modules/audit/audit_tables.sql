@@ -6693,3 +6693,561 @@
        EXECUTE PROCEDURE audit_update_delete_studyfactorvalue ();
 
 
+   DROP TABLE audit_affymetrixprobeset;
+   CREATE TABLE audit_affymetrixprobeset ( 
+       name varchar(255), 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixprobeset to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixprobeset() RETURNS trigger AS
+   '
+   DECLARE
+       name_var varchar(255); 
+       
+       transaction_type_var char;
+   BEGIN
+       name_var = OLD.name;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixprobeset ( 
+             name, 
+             transaction_type
+       ) VALUES ( 
+             name_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixprobeset_audit_ud ON affymetrixprobeset;
+   CREATE TRIGGER affymetrixprobeset_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixprobeset
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixprobeset ();
+
+
+   DROP TABLE audit_affymetrixprobe;
+   CREATE TABLE audit_affymetrixprobe ( 
+       name varchar(255), 
+       affymetrixprobeset_id integer, 
+       row integer, 
+       col integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixprobe to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixprobe() RETURNS trigger AS
+   '
+   DECLARE
+       name_var varchar(255); 
+       affymetrixprobeset_id_var integer; 
+       row_var integer; 
+       col_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       name_var = OLD.name;
+       affymetrixprobeset_id_var = OLD.affymetrixprobeset_id;
+       row_var = OLD.row;
+       col_var = OLD.col;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixprobe ( 
+             name, 
+             affymetrixprobeset_id, 
+             row, 
+             col, 
+             transaction_type
+       ) VALUES ( 
+             name_var, 
+             affymetrixprobeset_id_var, 
+             row_var, 
+             col_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixprobe_audit_ud ON affymetrixprobe;
+   CREATE TRIGGER affymetrixprobe_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixprobe
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixprobe ();
+
+
+   DROP TABLE audit_affymetrixcel;
+   CREATE TABLE audit_affymetrixcel ( 
+       mean float, 
+       sd float, 
+       pixels integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixcel to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixcel() RETURNS trigger AS
+   '
+   DECLARE
+       mean_var float; 
+       sd_var float; 
+       pixels_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       mean_var = OLD.mean;
+       sd_var = OLD.sd;
+       pixels_var = OLD.pixels;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixcel ( 
+             mean, 
+             sd, 
+             pixels, 
+             transaction_type
+       ) VALUES ( 
+             mean_var, 
+             sd_var, 
+             pixels_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixcel_audit_ud ON affymetrixcel;
+   CREATE TRIGGER affymetrixcel_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixcel
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixcel ();
+
+
+   DROP TABLE audit_affymetrixmas5;
+   CREATE TABLE audit_affymetrixmas5 ( 
+       signal float, 
+       detection char(1), 
+       detection_p float, 
+       statpairs integer, 
+       statpairsused integer, 
+       z float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixmas5 to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixmas5() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       detection_var char(1); 
+       detection_p_var float; 
+       statpairs_var integer; 
+       statpairsused_var integer; 
+       z_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       detection_var = OLD.detection;
+       detection_p_var = OLD.detection_p;
+       statpairs_var = OLD.statpairs;
+       statpairsused_var = OLD.statpairsused;
+       z_var = OLD.z;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixmas5 ( 
+             signal, 
+             detection, 
+             detection_p, 
+             statpairs, 
+             statpairsused, 
+             z, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             detection_var, 
+             detection_p_var, 
+             statpairs_var, 
+             statpairsused_var, 
+             z_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixmas5_audit_ud ON affymetrixmas5;
+   CREATE TRIGGER affymetrixmas5_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixmas5
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixmas5 ();
+
+
+   DROP TABLE audit_affymetrixdchip;
+   CREATE TABLE audit_affymetrixdchip ( 
+       signal float, 
+       detection char(1), 
+       se float, 
+       z float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixdchip to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixdchip() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       detection_var char(1); 
+       se_var float; 
+       z_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       detection_var = OLD.detection;
+       se_var = OLD.se;
+       z_var = OLD.z;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixdchip ( 
+             signal, 
+             detection, 
+             se, 
+             z, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             detection_var, 
+             se_var, 
+             z_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixdchip_audit_ud ON affymetrixdchip;
+   CREATE TRIGGER affymetrixdchip_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixdchip
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixdchip ();
+
+
+   DROP TABLE audit_affymetrixvsn;
+   CREATE TABLE audit_affymetrixvsn ( 
+       signal float, 
+       se float, 
+       detection char(1), 
+       z float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixvsn to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixvsn() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       se_var float; 
+       detection_var char(1); 
+       z_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       se_var = OLD.se;
+       detection_var = OLD.detection;
+       z_var = OLD.z;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixvsn ( 
+             signal, 
+             se, 
+             detection, 
+             z, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             se_var, 
+             detection_var, 
+             z_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixvsn_audit_ud ON affymetrixvsn;
+   CREATE TRIGGER affymetrixvsn_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixvsn
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixvsn ();
+
+
+   DROP TABLE audit_affymetrixrma;
+   CREATE TABLE audit_affymetrixrma ( 
+       signal float, 
+       se float, 
+       detection char(1), 
+       z float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixrma to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixrma() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       se_var float; 
+       detection_var char(1); 
+       z_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       se_var = OLD.se;
+       detection_var = OLD.detection;
+       z_var = OLD.z;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixrma ( 
+             signal, 
+             se, 
+             detection, 
+             z, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             se_var, 
+             detection_var, 
+             z_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixrma_audit_ud ON affymetrixrma;
+   CREATE TRIGGER affymetrixrma_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixrma
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixrma ();
+
+
+   DROP TABLE audit_affymetrixgcrma;
+   CREATE TABLE audit_affymetrixgcrma ( 
+       signal float, 
+       se float, 
+       detection char(1), 
+       z float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixgcrma to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixgcrma() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       se_var float; 
+       detection_var char(1); 
+       z_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       se_var = OLD.se;
+       detection_var = OLD.detection;
+       z_var = OLD.z;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixgcrma ( 
+             signal, 
+             se, 
+             detection, 
+             z, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             se_var, 
+             detection_var, 
+             z_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixgcrma_audit_ud ON affymetrixgcrma;
+   CREATE TRIGGER affymetrixgcrma_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixgcrma
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixgcrma ();
+
+
+   DROP TABLE audit_affymetrixprobesetstat;
+   CREATE TABLE audit_affymetrixprobesetstat ( 
+       mean float, 
+       median float, 
+       quartile1 float, 
+       quartile3 float, 
+       sd float, 
+       n integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixprobesetstat to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixprobesetstat() RETURNS trigger AS
+   '
+   DECLARE
+       mean_var float; 
+       median_var float; 
+       quartile1_var float; 
+       quartile3_var float; 
+       sd_var float; 
+       n_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       mean_var = OLD.mean;
+       median_var = OLD.median;
+       quartile1_var = OLD.quartile1;
+       quartile3_var = OLD.quartile3;
+       sd_var = OLD.sd;
+       n_var = OLD.n;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixprobesetstat ( 
+             mean, 
+             median, 
+             quartile1, 
+             quartile3, 
+             sd, 
+             n, 
+             transaction_type
+       ) VALUES ( 
+             mean_var, 
+             median_var, 
+             quartile1_var, 
+             quartile3_var, 
+             sd_var, 
+             n_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixprobesetstat_audit_ud ON affymetrixprobesetstat;
+   CREATE TRIGGER affymetrixprobesetstat_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixprobesetstat
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixprobesetstat ();
+
+
