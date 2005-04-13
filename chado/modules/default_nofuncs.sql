@@ -2470,3 +2470,112 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
+--CREATE OR REPLACE VIEW biomaterial_annotations
+--AS SELECT
+--  b.biomaterial_id,
+--  b.description,
+--  c1.name AS tissue,
+--  c2.name AS cell,
+--  c3.name AS pathology
+--FROM biomaterial b
+--LEFT JOIN (
+--  ( biomaterialprop bp3 JOIN cvterm c3 ON (bp3.type_id = c3.cvterm_id AND c3.cv_id =
+--    (select cv_id from cv where name = 'Mouse Pathology Ontology (Pathbase)')) )
+--  LEFT JOIN (
+--    ( biomaterialprop bp1 JOIN cvterm c1 ON (bp1.type_id = c1.cvterm_id AND c1.cv_id =
+--      (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')) )
+--      FULL JOIN
+--    ( biomaterialprop bp2 JOIN cvterm c2 ON (bp2.type_id = c2.cvterm_id AND c2.cv_id =
+--      (select cv_id from cv where name = 'Cell Ontology')) )
+--      ON (bp1.biomaterial_id = bp2.biomaterial_id)
+--  )
+--  ON (bp1.biomaterial_id = bp3.biomaterial_id OR bp2.biomaterial_id = bp3.biomaterial_id)
+--)
+--ON (b.biomaterial_id = bp3.biomaterial_id);
+
+CREATE TABLE affymetrixprobeset (
+  name varchar(255) NULL
+) INHERITS ( element );
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id) REFERENCES feature (feature_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)  REFERENCES dbxref  (dbxref_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (array_id)   REFERENCES array   (array_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)    REFERENCES cvterm  (cvterm_id);
+
+CREATE TABLE affymetrixprobe (
+  name varchar(255) NULL,
+  affymetrixprobeset_id int NULL,
+  foreign key (affymetrixprobeset_id) references element (element_id),
+  row int NOT NULL,
+  col int NOT NULL
+) INHERITS ( element );
+CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id) REFERENCES feature (feature_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)  REFERENCES dbxref  (dbxref_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (array_id)   REFERENCES array   (array_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)    REFERENCES cvterm  (cvterm_id);
+
+CREATE TABLE affymetrixcel (
+  mean float NOT NULL,
+  sd float NOT NULL,
+  pixels int NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixmas5 (
+  signal float NOT NULL,
+  detection char(1) NOT NULL,
+  detection_p float NOT NULL,
+  statpairs int NOT NULL,
+  statpairsused int NOT NULL,
+  z float NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixdchip (
+  signal float NOT NULL,
+  detection char(1) NOT NULL,
+  se float NOT NULL,
+  z float NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixvsn (
+  signal float NOT NULL,
+  se float NOT NULL,
+  detection char(1) NOT NULL,
+  z float NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixrma (
+  signal float NOT NULL,
+  se float NOT NULL,
+  detection char(1) NOT NULL,
+  z float NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixgcrma (
+  signal float NOT NULL,
+  se float NOT NULL,
+  detection char(1) NOT NULL,
+  z float NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+
+CREATE TABLE affymetrixprobesetstat (
+  mean float NOT NULL,
+  median float NOT NULL,
+  quartile1 float NOT NULL,
+  quartile3 float NOT NULL,
+  sd float NOT NULL,
+  n int NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
