@@ -218,15 +218,15 @@ BEGIN
 
   RAISE NOTICE ''assigning names, prefix:%, suffix:%, type:%, current uniquename:%'',prefix,suffix,f_type,NEW.uniquename;
 
-  IF (NEW.uniquename like prefix||'':temp%''||suffix) THEN
+  IF (NEW.uniquename like prefix||'':temp%''||suffix OR NEW.uniquename like prefix||''%-temp%'') THEN
 
       SELECT INTO f_type c.name
          from feature f, cvterm c
          where f.type_id=c.cvterm_id and
                f.uniquename=NEW.uniquename and
                f.organism_id =NEW.organism_id;
-      SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
-      SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+      --SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
+      --SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
 
       SELECT INTO f_uniquename next_uniquename();
 
@@ -370,7 +370,18 @@ BEGIN
      SELECT INTO f_type c.name from feature f, cvterm c  where f.type_id=c.cvterm_id and f.feature_id=OLD.object_id;
      IF f_type=f_type_gene THEN 
          SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=OLD.subject_id and f.type_id=c.cvterm_id;
-         IF (f_type_temp=f_type_transcript or f_type_temp=f_type_ncRNA or f_type_temp=f_type_snoRNA  or f_type_temp=f_type_snRNA  or f_type_temp=f_type_tRNA  or f_type_temp=f_type_rRNA  or f_type_temp=f_type_miRNA  or f_type_temp=f_type_pseudo or f_type_temp=f_type_transposable_element or f_type_temp=f_type_promoter or f_type_temp=f_type_repeat_region ) THEN
+         IF (f_type_temp=f_type_transcript or 
+             f_type_temp=f_type_ncRNA or 
+             f_type_temp=f_type_snoRNA  or 
+             f_type_temp=f_type_snRNA  or 
+             f_type_temp=f_type_tRNA  or 
+             f_type_temp=f_type_rRNA  or 
+             f_type_temp=f_type_miRNA  or 
+             f_type_temp=f_type_pseudo or 
+             f_type_temp=f_type_transposable_element or 
+             f_type_temp=f_type_promoter or 
+             f_type_temp=f_type_repeat_region ) THEN
+
              SELECT INTO fr_row * from feature_relationship where object_id<>OLD.object_id and subject_id=OLD.subject_id;
              IF fr_row.object_id IS NULL THEN
                  RAISE NOTICE ''delete this lonely transcript:%'', OLD.subject_id;
@@ -496,7 +507,8 @@ BEGIN
 
 
  -- OK, the thing having a child added is a gene
- IF (f_name IS NULL and f_type=f_type_gene) THEN
+ IF ((f_name IS NULL OR f_name like prefix||''%temp%'')
+      and f_type=f_type_gene) THEN
      SELECT INTO f_type_temp c.name from feature f, cvterm c where f.feature_id=NEW.subject_id and f.type_id=c.cvterm_id;
      IF (f_type_temp=f_type_transcript or 
          f_type_temp=f_type_snoRNA or 
@@ -511,15 +523,16 @@ BEGIN
          f_type_temp=f_type_repeat_region) THEN
 
          --generate a new name based on the gene name
+         --the name is like: genename-transcript#
          SELECT INTO f_name_gene name from feature where feature_id=NEW.object_id;
-         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+length(f_type_temp)))), ''99999'') FROM feature where name like f_name_gene||''-''||f_type_temp||''%'';
+         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+10))), ''99999'') FROM feature where name like f_name_gene||''-transcript%'';
          IF maxid IS NULL THEN
              maxid = 1;
          ELSE
              maxid = maxid + 1;
          END IF;
 
-         f_name:=CAST(f_name_gene||''-''||f_type_temp||maxid AS TEXT);
+         f_name:=CAST(f_name_gene||''-transcript''||maxid AS TEXT);
 
          RAISE NOTICE ''start to update feature, gene name:%, new feature name:%'', f_name_gene, f_name;
          UPDATE feature set name=f_name where feature_id=NEW.subject_id;
@@ -537,7 +550,7 @@ BEGIN
      END IF;
 
 -- here the thing having a child added is a second level thing (eg, a transcript is getting an exon or protein)
- ELSIF (f_name IS NULL and
+ ELSIF ((f_name IS NULL OR f_name like prefix||''%temp%'') and
           (f_type=f_type_transcript or 
            f_type=f_type_ncRNA  or 
            f_type=f_type_snoRNA or 
@@ -610,7 +623,8 @@ BEGIN
          END IF;
      END IF;
  ELSE
-     RAISE NOTICE ''no link to gene for this transcript or wrong feature_relationship: transcript->protein/exon:object_id:%, subject_id:%'', NEW.object_id, NEW.subject_id;
+ --nothing to do, the name is not null or containing temp
+ --    RAISE NOTICE ''no link to gene for this transcript or wrong feature_relationship: transcript->protein/exon:object_id:%, subject_id:%'', NEW.object_id, NEW.subject_id;
  END IF;
  RAISE NOTICE ''leave fr_i ....'';
  RETURN NEW;
@@ -627,11 +641,18 @@ DROP TRIGGER feature_update_name_tr_u ON feature;
 CREATE OR REPLACE FUNCTION feature_fn_u() RETURNS TRIGGER AS
 '
 DECLARE
-  f_type	cvterm.name%TYPE;
-  f_type_gene	CONSTANT varchar :=''gene'';
-  f_row         feature%ROWTYPE;
-  s_type_id     synonym.type_id%TYPE;
-  name_suffix   varchar;
+  f_type          cvterm.name%TYPE;
+  f_type_gene     CONSTANT varchar :=''gene'';
+  f_row           feature%ROWTYPE;
+  s_type_id       synonym.type_id%TYPE;
+  s_id            synonym.synonym_id%TYPE;
+  f_s_id          feature_synonym.feature_synonym_id%TYPE;
+  p_id            pub.pub_id%TYPE;
+  p_miniref       CONSTANT varchar:=''null'';
+  c_name_synonym  CONSTANT varchar:=''synonym'';
+  cv_cvname_synonym CONSTANT varchar:=''null'';
+  name_suffix     varchar;
+  child_name      varcher;
 BEGIN
   IF OLD.uniquename <> NEW.uniquename AND OLD.uniquename NOT LIKE ''%temp%'' THEN
       RAISE NOTICE ''You may not change the uniquename of a feature'';
@@ -645,14 +666,26 @@ BEGIN
 
 
 --fetch a few useful things
- SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
-
+  SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
   SELECT INTO f_type cv.name FROM feature f, cvterm cv WHERE f.feature_id = OLD.feature_id and f.type_id = cv.cvterm_id; 
+  SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
 
   IF f_type <> f_type_gene THEN
       --its not a gene, so go ahead
       --but insert the new name into the synonym table
-      
+      IF f_name IS NOT NULL THEN
+
+          SELECT INTO s_id synonym_id from synonym where name=NEW.name and type_id=s_type_id;
+          IF s_id IS NULL THEN
+              INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.name, NEW.name, s_type_id);
+              SELECT INTO s_id synonym_id from synonym where name=NEW.name and type_id=s_type_id;
+          END IF;
+          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=NEW.feature_id and synonym_id=s_id and pub_id=p_id;
+          IF f_s_id IS NULL THEN
+              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (NEW.feature_id, s_id, p_id, ''true'');
+          END IF;
+      END IF;
+    
       RETURN NEW;
   END IF;
 
@@ -661,10 +694,34 @@ BEGIN
   FOR f_row IN SELECT f.* FROM feature f, get_sub_feature_ids(OLD.feature_id) ch WHERE f.feature_id = ch.feature_id LOOP
       IF f_row.name LIKE OLD.name||''-%'' THEN
           SELECT INTO name_suffix  substring(name from OLD.name||''(-.+)'') FROM feature where feature_id = f_row.feature_id;
-          UPDATE feature SET name = NEW.name||name_suffix WHERE feature_id = f_row.feature_id;
+          child_name = NEW.name||name_suffix;
+          UPDATE feature SET name = child_name WHERE feature_id = f_row.feature_id;
+
+          SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
+          IF s_id IS NULL THEN
+              INSERT INTO synonym(name, synonym_sgml, type_id) values(child_name, child_name, s_type_id);
+              SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
+          END IF;
+          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row.feature_id and synonym_id=s_id and pub_id=p_id;
+          IF f_s_id IS NULL THEN
+              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row.feature_id, s_id, p_id, ''true'');
+          END IF;
+      END IF;
+
+
       ELSIF  f_row.name LIKE OLD.name||'':%'' THEN
           SELECT INTO name_suffix  substring(name from OLD.name||''(:.+)'') FROM feature where feature_id = f_row.feature_id;
-          UPDATE feature SET name = NEW.name||name_suffix WHERE feature_id = f_row.feature_id;
+          child_name = NEW.name||name_suffix;
+          UPDATE feature SET name = child_name WHERE feature_id = f_row.feature_id;
+
+          SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
+          IF s_id IS NULL THEN
+              INSERT INTO synonym(name, synonym_sgml, type_id) values(child_name, child_name, s_type_id);
+              SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
+          END IF;
+          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row.feature_id and synonym_id=s_id and pub_id=p_id;
+          IF f_s_id IS NULL THEN
+              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row.feature_id, s_id, p_id, ''true'');          END IF;
 
       END IF; 
 
