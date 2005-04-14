@@ -4669,14 +4669,14 @@ Chado::Element->has_many(
     'element_relationship_object_id', 'Chado::Element_Relationship' => 'object_id'
 );
 
-sub affymetrixprobes {
-    return shift->affymetrixprobe_affymetrixprobeset_id
-}
-
-Chado::Element->has_many(
-    'affymetrixprobe_affymetrixprobeset_id', 'Chado::Affymetrixprobe' => 'affymetrixprobeset_id'
-);
-
+#sub affymetrixprobes {
+#    return shift->affymetrixprobe_affymetrixprobeset_id
+#}
+#
+#Chado::Element->has_many(
+#    'affymetrixprobe_affymetrixprobeset_id', 'Chado::Affymetrixprobe' => 'affymetrixprobeset_id'
+#);
+#
 # -------------------------------------------------------------------
 package Chado::Elementresult;
 use base 'Chado::DBI';
@@ -5042,13 +5042,13 @@ use Class::DBI::Pager;
 Chado::Affymetrixprobe->set_up_table('affymetrixprobe');
 
 
-Chado::Affymetrixprobe->has_a(
-    affymetrixprobeset_id => 'Chado::Element'
-);
-
-sub affymetrixprobeset {
-    return shift->affymetrixprobeset_id
-}
+#Chado::Affymetrixprobe->has_a(
+#    affymetrixprobeset_id => 'Chado::Element'
+#);
+#
+#sub affymetrixprobeset {
+#    return shift->affymetrixprobeset_id
+#}
 
 # -------------------------------------------------------------------
 package Chado::Affymetrixcel;
