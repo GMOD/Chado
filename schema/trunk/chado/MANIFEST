@@ -65,6 +65,7 @@ modules/companalysis/examples/basic/interpro.xml
 modules/cv/bridges/godb-bridge.sql
 modules/cv/cv-intro.txt
 modules/cv/cv.sql
+modules/default_nofuncs.sql
 modules/default_schema.sql
 modules/expression/expression.sql
 modules/expression/rad.oracle
@@ -112,3 +113,4 @@ src/test/perl/t/data/bf.itxt
 src/test/README
 t/01_okay.t
 TODO
+META.yml                                 Module meta-data (added by MakeMaker)
