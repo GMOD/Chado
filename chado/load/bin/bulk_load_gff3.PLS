@@ -254,7 +254,7 @@ my @tables = (
    "analysisfeature",
 );
 my %files = (
-   feature              => "/feature.tmp",
+   feature              => "/tmp/feature.tmp",
    featureloc           => "/tmp/featureloc.tmp",
    feature_relationship => "/tmp/feature_relationship.tmp",
    featureprop          => "/tmp/featureprop.tmp",
