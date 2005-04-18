@@ -407,9 +407,9 @@ my $count_name
 my $search_cvterm_id
    = $db->prepare("SELECT cvterm_id FROM cvterm WHERE name=? AND cv_id=?");
 my $search_source_dbxref
-   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? and db_id=?");
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id=?");
 my $search_dbxref
-   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? and db_id = (SELECT db_id FROM db WHERE name = ?)");
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id = (SELECT db_id FROM db WHERE name = ?)");
 my $search_cvterm_id_w_dbxref
    = $db->prepare("SELECT cvterm_id FROM cvterm WHERE dbxref_id=?");
 my $search_db
