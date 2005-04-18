@@ -679,7 +679,7 @@ END
       }
 
       if(!$constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }){
-        $constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }++
+        $constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }++;
         print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
         $nextfeaturecvterm++;
       }
