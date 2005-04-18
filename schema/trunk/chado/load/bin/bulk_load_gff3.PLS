@@ -517,7 +517,7 @@ while(my $feature = $gffio->next_feature()){
   $name = $name->value if ref($name);
 
   #my $uniquename = $nextfeature;
-  $cache{parent}{$uniquename} = $nextfeature;
+  $cache{parent}{$uniquename} ||= $nextfeature;
   if($cache{feature}{$uniquename}){
     #seen this feature before
     $locgroup{$uniquename}++;
