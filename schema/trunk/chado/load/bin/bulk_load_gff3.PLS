@@ -408,7 +408,7 @@ my $search_cvterm_id
 my $search_source_dbxref
    = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? and db_id=?");
 my $search_dbxref
-   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=?");
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? and db_id = (SELECT db_id FROM db WHERE name = ?)");
 my $search_cvterm_id_w_dbxref
    = $db->prepare("SELECT cvterm_id FROM cvterm WHERE dbxref_id=?");
 my $search_db
@@ -662,7 +662,8 @@ END
     foreach my $term (@ucvterms) {
       next unless $term;
       unless ($cache{type}{$term}) {
-        $search_dbxref->execute($term);
+        my($d,$a) = $term =~ /^(.+?):(.+?)$/;
+        $search_dbxref->execute($a,$d);
         my ($dbxref) = $search_dbxref->fetchrow_array;
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
         $search_cvterm_id_w_dbxref->execute($dbxref);
