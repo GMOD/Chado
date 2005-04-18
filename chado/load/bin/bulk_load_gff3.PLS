@@ -228,6 +228,7 @@ my %cache = (
 
 #let's track unique constraints
 my %constraint = ();
+#feature_cvterm_c1 => {}, #{feature_id}{cvterm_id}
 #feature_dbxref_c1 => {}, #{feature_id}{dbxref_id}
 #featureprop_c1     => {}, #{feature_id}{type_id}{rank}
 #feature_synonym_c1 => {}, #{feature_id}{synonym_id}
@@ -677,8 +678,11 @@ END
         ($pub) = $sth->fetchrow_array;
       }
 
-      print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
-      $nextfeaturecvterm++;
+      if(!$constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }){
+        $constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }++
+        print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
+        $nextfeaturecvterm++;
+      }
     }
   }
 
