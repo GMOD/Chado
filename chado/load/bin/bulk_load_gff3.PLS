@@ -462,7 +462,8 @@ while(my $feature = $gffio->next_feature()){
   my $type = $cache{type}{$featuretype};
   if(!$type){
     $search_cvterm_id->execute($featuretype, $sofa_id);
-    $type = ($cache{type}{$featuretype}) = $search_cvterm_id->fetchrow_array;
+    ($cache{type}{$featuretype}) = $search_cvterm_id->fetchrow_array;
+    $type = $cache{type}{$featuretype};
   }
   die "no cvterm for ".$featuretype unless $type;
 
