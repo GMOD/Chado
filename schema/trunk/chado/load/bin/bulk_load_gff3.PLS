@@ -254,16 +254,16 @@ my @tables = (
    "analysisfeature",
 );
 my %files = (
-   feature              => "feature.tmp",
-   featureloc           => "featureloc.tmp",
-   feature_relationship => "feature_relationship.tmp",
-   featureprop          => "featureprop.tmp",
-   feature_cvterm       => "feature_cvterm.tmp",
-   synonym              => "synonym.tmp",
-   feature_synonym      => "feature_synonym.tmp",
-   dbxref               => "dbxref.tmp",
-   feature_dbxref       => "feature_dbxref.tmp",
-   analysisfeature      => "analysisfeature.tmp",
+   feature              => "/feature.tmp",
+   featureloc           => "/tmp/featureloc.tmp",
+   feature_relationship => "/tmp/feature_relationship.tmp",
+   featureprop          => "/tmp/featureprop.tmp",
+   feature_cvterm       => "/tmp/feature_cvterm.tmp",
+   synonym              => "/tmp/synonym.tmp",
+   feature_synonym      => "/tmp/feature_synonym.tmp",
+   dbxref               => "/tmp/dbxref.tmp",
+   feature_dbxref       => "/tmp/feature_dbxref.tmp",
+   analysisfeature      => "/tmp/analysisfeature.tmp",
 );
 my %sequences = (
    feature              => "feature_feature_id_seq",
