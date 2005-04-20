@@ -281,9 +281,13 @@ sub load_ontologytermsR {
 
 #warn "oops! ".join '*', ($child->name, $child->identifier, $cv->id) unless $child->name;
     next unless $child->name;
+          my $accession = $child->identifier;
+          if ($accession =~ /\S+\:(\S+)/) {
+              $accession = $1;
+          }
 	  my $dbxref = Chado::Dbxref->find_or_create({
 				  db_id => $db->id,
-				  accession => $child->identifier,
+				  accession => $accession,
 						 });
 	  $child_db = Chado::Cvterm->find_or_create({
 				name => $child->name,
