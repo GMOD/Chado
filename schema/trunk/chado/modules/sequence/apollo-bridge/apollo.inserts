@@ -23,6 +23,19 @@ insert into analysis (name,program,programversion,sourcename)
    values ('Maize_cross_genome_match','blat','1','Maize_genome');
 insert into analysis (name,program,programversion,sourcename)
    values ('FgenesH_Monocot','FgenesH','1','na');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_EST_match','blat','1','Sourghum_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_EST_match','blat','1','Barley_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_EST_match','blat','1','Wheat_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_cross_genome_match','blat','1','Rice_genome');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Millet_EST_match','blat','1','Millet_EST');
+
+
+insert into db (name) values ('DB:TIGR_Maize');
 
 insert into pub (uniquename, title, type_id) values ('none', 'none', (select cvterm_id from cvterm where name = 'null pub' and cv_id in (select cv_id from cv where name='pub type') ) );
 
