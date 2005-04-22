@@ -4669,14 +4669,6 @@ Chado::Element->has_many(
     'element_relationship_object_id', 'Chado::Element_Relationship' => 'object_id'
 );
 
-#sub affymetrixprobes {
-#    return shift->affymetrixprobe_affymetrixprobeset_id
-#}
-#
-#Chado::Element->has_many(
-#    'affymetrixprobe_affymetrixprobeset_id', 'Chado::Affymetrixprobe' => 'affymetrixprobeset_id'
-#);
-#
 # -------------------------------------------------------------------
 package Chado::Elementresult;
 use base 'Chado::DBI';
@@ -5025,86 +5017,6 @@ Chado::Studyfactorvalue->has_a(
 sub assay {
     return shift->assay_id
 }
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixprobeset;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixprobeset->set_up_table('affymetrixprobeset');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixprobe;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixprobe->set_up_table('affymetrixprobe');
-
-
-#Chado::Affymetrixprobe->has_a(
-#    affymetrixprobeset_id => 'Chado::Element'
-#);
-#
-#sub affymetrixprobeset {
-#    return shift->affymetrixprobeset_id
-#}
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixcel;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixcel->set_up_table('affymetrixcel');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixmas5;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixmas5->set_up_table('affymetrixmas5');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixdchip;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixdchip->set_up_table('affymetrixdchip');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixvsn;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixvsn->set_up_table('affymetrixvsn');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixrma;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixrma->set_up_table('affymetrixrma');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixgcrma;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixgcrma->set_up_table('affymetrixgcrma');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixprobesetstat;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixprobesetstat->set_up_table('affymetrixprobesetstat');
-
 
 1;
 !NO!SUBS!
