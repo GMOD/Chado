@@ -3,6 +3,8 @@
 
 use strict;
 use SQL::Translator;
+use lib './bin';
+use Skip_tables qw( @skip_tables );
 
 unless ( scalar @ARGV > 3 ) {
   die "USAGE: $0 <dbname> <username> <password> <sql file> [<sql files>]\n";
@@ -21,6 +23,14 @@ my $translator  = SQL::Translator->new(
     db_pass     => $db_password,
     dsn         => $dsn,
   },
+  filters       => [
+                   sub {
+                     my $schema = shift;
+                     foreach (@skip_tables) {
+                       $schema->drop_table($_);
+                     }  
+                   },
+  ],
 );
 
 $translator->format_package_name(\&x);
