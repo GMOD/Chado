@@ -2,6 +2,8 @@
 
 use SQL::Translator;
 use Data::Dumper;   
+use lib './bin';
+use Skip_tables qw( @skip_tables );
 
 $SQL::Translator::DEBUG = 0;
 
@@ -16,7 +18,15 @@ my $tr = SQL::Translator->new(
 				producer => "HTML",
                                 producer_args => {
                                                    pretty => 1,
-                                                 }
+                                                 },
+                                filters       => [
+                                    sub {
+                                        my $schema = shift;
+                                        foreach (@skip_tables) {
+                                            $schema->drop_table($_);
+                                        }
+                                    },
+                                ],
                              );
                                
 print $tr->translate(\$create);
