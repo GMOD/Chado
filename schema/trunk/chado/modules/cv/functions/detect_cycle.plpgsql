@@ -1,0 +1,171 @@
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    cvid alias for $3;
+    typeid alias for $4;
+    depth alias for $5;
+    cterm cvterm_relationship%ROWTYPE;
+    exist_c int;
+    ccount  int;
+    ecount  int;
+    rtn     int;
+BEGIN
+
+    EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id = ''|| origin || '' AND p2.subject_id = '' || child_id || ''AND '' || depth || ''> 0'';
+    GET DIAGNOSTICS ccount = ROW_COUNT;
+    IF (ccount > 0) THEN
+        --RAISE EXCEPTION ''FOUND CYCLE: node % on cycle path'',origin;
+        RETURN origin;
+    END IF;
+
+    EXECUTE ''SELECT * FROM tmpcvtermpath WHERE cv_id = '' || cvid || '' AND object_id = '' || origin || '' AND subject_id = '' || child_id || '' AND '' || origin || ''<>'' || child_id;
+    GET DIAGNOSTICS ecount = ROW_COUNT;
+    IF (ecount > 0) THEN
+        --RAISE NOTICE ''FOUND TWICE (node), will check root obj % subj %'',origin, child_id;
+        SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(child_id, cvid);
+        IF (rtn > 0) THEN
+            RETURN rtn;
+        END IF;
+    END IF;
+
+    EXECUTE ''SELECT * FROM tmpcvtermpath WHERE cv_id = '' || cvid || '' AND object_id = '' || origin || '' AND subject_id = '' || child_id || '' AND pathdistance = '' || depth;
+    GET DIAGNOSTICS exist_c = ROW_COUNT;
+    IF (exist_c = 0) THEN
+        EXECUTE ''INSERT INTO tmpcvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES('' || origin || '', '' || child_id || '', '' || cvid || '', '' || typeid || '', '' || depth || '')'';
+    END IF;
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
+        --RAISE NOTICE ''DOING for node, % %'', origin, cterm.subject_id;
+        SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+        IF (rtn > 0) THEN
+            RETURN rtn;
+        END IF;
+    END LOOP;
+    RETURN 0;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    ttype int;
+    ccount int;
+    cterm cvterm_relationship%ROWTYPE;
+    child cvterm_relationship%ROWTYPE;
+    rtn     int;
+BEGIN
+
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
+    SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(rootid, rootid, cvid, ttype, 0);
+    IF (rtn > 0) THEN
+        RETURN rtn;
+    END IF;
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
+        EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id='' || rootid || '' AND p1.subject_id='' || cterm.subject_id;
+        GET DIAGNOSTICS ccount = ROW_COUNT;
+        IF (ccount > 0) THEN
+            --RAISE NOTICE ''FOUND TWICE (root), will check root obj % subj %'',rootid,cterm.subject_id;
+            SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(rootid, cterm.subject_id, cvid, ttype, 0);
+            IF (rtn > 0) THEN
+                RETURN rtn;
+            END IF;
+        ELSE
+            SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(cterm.subject_id, cvid);
+            IF (rtn > 0) THEN
+                RETURN rtn;
+            END IF;
+        END IF;
+    END LOOP;
+    RETURN 0;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    rootid alias for $2;
+    rtn     int;
+BEGIN
+
+    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
+
+    SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(rootid, cvid);
+    IF (rtn > 0) THEN
+        DROP TABLE tmpcvtermpath;
+        RETURN rtn;
+    END IF;
+    DROP TABLE tmpcvtermpath;
+    RETURN 0;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(INTEGER) RETURNS SETOF INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+    rtn     int;
+BEGIN
+
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t WHERE cv_id = cvid LOOP
+        SELECT INTO rtn get_cycle_cvterm_id(cvid,root.cvterm_id);
+        IF (rtn > 0) THEN
+            RETURN NEXT rtn;
+        END IF;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+    rtn     int;
+BEGIN
+
+    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
+        SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(root.cvterm_id, root.cv_id);
+        IF (rtn > 0) THEN
+            DROP TABLE tmpcvtermpath;
+            RETURN rtn;
+        END IF;
+    END LOOP;
+    DROP TABLE tmpcvtermpath;
+    RETURN 0;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
+'
+DECLARE
+    cvname alias for $1;
+    cv_id int;
+    rtn int;
+BEGIN
+
+    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
+    SELECT INTO rtn  get_cycle_cvterm_id(cv_id);
+
+    RETURN rtn;
+END;   
+'
+LANGUAGE 'plpgsql';

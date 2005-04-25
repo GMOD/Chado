@@ -73,14 +73,13 @@ CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cvrecord cv%ROWTYPE;
+    cv_id   int;
+    rtn     int;
 BEGIN
 
-    EXECUTE ''DELETE FROM cvtermpath WHERE cv_id IN (SELECT cv_id FROM cv WHERE name = '' || quote_literal(cvname) || '');'';
-    FOR cvrecord IN EXECUTE ''SELECT cv.* from cv WHERE cv.name = '' || quote_literal(cvname) LOOP
-        PERFORM fill_cvtermpath(cvrecord.cv_id);
-    END LOOP;
-    RETURN 1;
+    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
+    SELECT INTO rtn fill_cvtermpath(cv_id);
+    RETURN rtn;
 END;   
 '
 LANGUAGE 'plpgsql';

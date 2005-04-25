@@ -1,4 +1,4 @@
--- $Id: cv-dbapi.sqli,v 1.1 2005-03-15 21:31:44 sshu Exp $
+-- $Id: cv-dbapi.sqli,v 1.2 2005-04-25 20:59:24 sshu Exp $
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- cv-dbapi.sqli
 --
@@ -126,3 +126,47 @@ DECLARE FUNCTION
  get_it_sub_cvterm_ids(sql                              text not null)
         RETURNS setof subject_id;
 
+
+-- ============================================================
+-- FUNCTION: get_cycle_cvterm_ids
+-- ============================================================
+-- return all cvterms that are on cycle paths
+-- + sql -- must be like 'select distinct * from get_cycle_cvterm_ids(cvid)'
+-- as a term may appear multiple times in the return set if there is multiple-path to it from root
+-- impl: see functions/detect_cycle.plpgsql
+DECLARE FUNCTION
+ get_cycle_cvterm_ids(cvid                              integer not null)
+        RETURNS setof integer;
+
+
+-- ============================================================
+-- FUNCTION: get_cycle_cvterm_id
+-- ============================================================
+-- return cvterm id that is on cycle paths,
+-- the first term on cycle path found starting from ontology root
+-- impl: see functions/detect_cycle.plpgsql
+DECLARE FUNCTION
+ get_cycle_cvterm_id(ontology_name                      varchar not null)
+        RETURNS integer;
+
+
+-- ============================================================
+-- FUNCTION: get_cycle_cvterm_id
+-- ============================================================
+-- return cvterm id that is on cycle path,
+-- the first term on cycle path found starting from ontology root
+-- impl: see functions/detect_cycle.plpgsql
+DECLARE FUNCTION
+ get_cycle_cvterm_id(cvid                              integer not null)
+        RETURNS integer;
+
+
+-- ============================================================
+-- FUNCTION: get_cycle_cvterm_id
+-- ============================================================
+-- return cvterm id that is on cycle path,
+-- the first term on cycle path found starting from root term passed in
+-- impl: see functions/detect_cycle.plpgsql
+DECLARE FUNCTION
+ get_cycle_cvterm_id(cvid integer not null, rootid      integer not null)
+        RETURNS integer;
