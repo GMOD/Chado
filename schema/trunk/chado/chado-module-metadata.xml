@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <schema_metadata id='chado'>
+    <title>Chado: A generic model organism database schema</title>
+    <description>
+      Chado is a modular schema for biological data
+    </description>
+    <about>
+      This is a metadata file describing chado and its components,
+      specified in XML. The path to each module SQL file is described,
+      as well as other files which that module may require or use
+    </about>
+
+    <modules>
+      <source type='dir' path='modules'/>
+
+      <module id='general' required='true'>
+        <description>
+          General purpose tables, including dbxrefs
+        </description>
+        <source type='sql' path='general/general.sql'/>
+      </module>
+
+      <module id='cv' required='true'>
+        <dependency to='general'/>
+        <description>
+          Controlled vocabularies and ontologies
+        </description>
+        <source type='sql' path='cv/cv.sql'/>
+
+        <component id='cv-dbapi' type='dbapi'>
+          <description>
+            A DBMS API for the cv module
+          </description>
+          <source type='sqli' path='cv/cv-dbapi.sqli'/>
+        </component>
+
+        <component id='cv-funcs' type='code'>
+          <description>
+            Postgres code for populating the cvtermpath table
+          </description>
+          <implements to='cv-dbapi'/>
+          <source type='plpgsql' path='cv/functions/fill_cvtermpath.plpgsql'/>
+        </component>
+      </module>
+
+      <module id='organism' required='true'>
+        <dependency to='general'/>
+        <dependency to='cv'/>
+        <description>
+          Species data - does not include phylogeny
+        </description>
+        <source type='sql' path='organism/organism.sql'/>
+      </module>
+
+      <module id='pub' required='true'>
+        <dependency to='general'/>
+        <dependency to='cv'/>
+        <description>
+          Bibliographic data on publications
+        </description>
+        <source type='sql' path='pub/pub.sql'/>
+      </module>
+
+      <module id='sequence' required='true'>
+        <dependency to='general'/>
+        <dependency to='organism'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <description>
+          Sequence and sequence features, their localization and properties
+        </description>
+        <source type='sql' path='sequence/sequence.sql'/>
+
+        <component id='sequence-dbapi' type='dbapi'>
+          <description>
+            A DBMS API for the sequence module
+          </description>
+          <source type='sqli' path='sequence/sequence-dbapi.sqli'/>
+        </component>
+
+        <component id='sequence_opt type='optimizations'>
+          <description>
+            Optional optimizations to be applied to the sequence module
+          </description>
+          <source type='sql-in-xml' path='sequence/sequence_opt.xml'/>
+        </component>
+
+        <component id='gff-bridge' type='bridge'>
+          <description>
+            A GFF-view over chado. Required by Gbrowse
+          </description>
+          <source type='sql' path='sequence/gff-bridge/sequence-gff-views.sql'/>
+          <source type='pgsql' path='sequence/gff-bridge/sequence-gff-funcs.pgsql'/>
+        </component>
+      </module>
+
+      <module id='companalysis'>
+        <dependency to='general'/>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <description>
+          Augments sequence module with descriptions of computational
+          analyses and features resulting from those analyses
+        </description>
+        <source type='sql' path='companalysis/companalysis.sql'/>
+      </module>
+
+      <module id='genetic'>
+        <dependency to='general'/>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <status code='beta'>
+          In use right now in FlyBase
+        </status>
+        <description>
+          Genetic and phenotypic data
+        </description>
+        <source type='sql' path='genetic/genetic.sql'/>
+      </module>
+
+      <module id='map'>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <status code='alpha'>
+          Not yet in production use anywhere?
+        </status>
+        <description>
+          Non-sequence maps: genetic, radiation hybrid, cytogenetic, etc
+        </description>
+        <source type='sql' path='map/map.sql'/>
+      </module>
+
+      <module id='phylogeny'>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <dependency to='general'/>
+        <dependency to='organism'/>
+        <status code='beta'>
+          In use at IRRI
+        </status>
+        <description>
+          For representing phylogenetic trees; the trees represent the
+          phylogeny of some some kind of sequence feature (mainly
+          proteins) or actual organism taxonomy trees
+        </description>
+        <source type='sql' path='phylogeny/phylogeny.sql'/>
+      </module>
+
+      <module id='expression'>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <dependency to='general'/>
+        <status code='alpha'>
+          Not yet in use
+        </status>
+        <description>
+          transcript or protein expression data
+        </description>
+        <source type='sql' path='expression/expression.sql'/>
+      </module>
+
+      <module id='rad'>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <dependency to='general'/>
+        <status code='beta'>
+          In use at...?
+        </status>
+        <description>
+          Alternative expression module, based on MAGE model
+        </description>
+        <source type='sql' path='expression/rad.sql'/>
+      </module>
+
+      <module id='audit'>
+        <status code='beta'>
+          In use at...?
+        </status>
+        <description>
+          Table auditing for whole database; autogenerated tables
+        </description>
+        <source type='sql' path='audit/audit_tables.sql'/>
+      </module>
+    </modules>
+
+  </schema_metadata>
