@@ -1,5 +1,5 @@
 CREATE TABLE affymetrixprobeset (
-  name varchar(255) NULL
+  name varchar(255) NULL,
   constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
 ) INHERITS ( element );
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
@@ -55,7 +55,7 @@ CREATE INDEX affymetrixsnp_idx5 ON affymetrixsnp (quantification_id);
 CREATE TABLE affymetrixmas5 (
   signal float NOT NULL,
   call char(1) NOT NULL,
-  detection_p float NOT NULL,
+  call_p float NOT NULL,
   statpairs int NOT NULL,
   statpairsused int NOT NULL,
   z float NULL
@@ -64,7 +64,7 @@ ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c1 FOREIGN KEY (element
 ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixmas5_idx1 ON affymetrixmas5 (signal);
 CREATE INDEX affymetrixmas5_idx2 ON affymetrixmas5 (call);
-CREATE INDEX affymetrixmas5_idx3 ON affymetrixmas5 (detection_p);
+CREATE INDEX affymetrixmas5_idx3 ON affymetrixmas5 (call_p);
 CREATE INDEX affymetrixmas5_idx4 ON affymetrixmas5 (element_id);
 CREATE INDEX affymetrixmas5_idx5 ON affymetrixmas5 (quantification_id);
 CREATE INDEX affymetrixmas5_idx6 ON affymetrixmas5 (z);
@@ -98,6 +98,33 @@ CREATE INDEX affymetrixvsn_idx3 ON affymetrixvsn (signal);
 CREATE INDEX affymetrixvsn_idx4 ON affymetrixvsn (call);
 CREATE INDEX affymetrixvsn_idx5 ON affymetrixvsn (se);
 CREATE INDEX affymetrixvsn_idx6 ON affymetrixvsn (z);
+
+CREATE TABLE affymetrixsea (
+  signal float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixsea_idx1 ON affymetrixsea (element_id);
+CREATE INDEX affymetrixsea_idx2 ON affymetrixsea (quantification_id);
+CREATE INDEX affymetrixsea_idx3 ON affymetrixsea (signal);
+
+CREATE TABLE affymetrixplier (
+  signal float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixplier_idx1 ON affymetrixplier (element_id);
+CREATE INDEX affymetrixplier_idx2 ON affymetrixplier (quantification_id);
+CREATE INDEX affymetrixplier_idx3 ON affymetrixplier (signal);
+
+CREATE TABLE affymetrixdabg (
+  call_p float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixdabg_idx1 ON affymetrixdabg (element_id);
+CREATE INDEX affymetrixdabg_idx2 ON affymetrixdabg (quantification_id);
+CREATE INDEX affymetrixdabg_idx3 ON affymetrixdabg (call_p);
 
 CREATE TABLE affymetrixrma (
   signal float NOT NULL,
