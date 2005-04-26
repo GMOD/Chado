@@ -6859,11 +6859,58 @@
        EXECUTE PROCEDURE audit_update_delete_affymetrixcel ();
 
 
+   DROP TABLE audit_affymetrixsnp;
+   CREATE TABLE audit_affymetrixsnp ( 
+       call integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixsnp to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixsnp() RETURNS trigger AS
+   '
+   DECLARE
+       call_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       call_var = OLD.call;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixsnp ( 
+             call, 
+             transaction_type
+       ) VALUES ( 
+             call_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixsnp_audit_ud ON affymetrixsnp;
+   CREATE TRIGGER affymetrixsnp_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixsnp
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixsnp ();
+
+
    DROP TABLE audit_affymetrixmas5;
    CREATE TABLE audit_affymetrixmas5 ( 
        signal float, 
-       detection char(1), 
-       detection_p float, 
+       call char(1), 
+       call_p float, 
        statpairs integer, 
        statpairsused integer, 
        z float, 
@@ -6876,8 +6923,8 @@
    '
    DECLARE
        signal_var float; 
-       detection_var char(1); 
-       detection_p_var float; 
+       call_var char(1); 
+       call_p_var float; 
        statpairs_var integer; 
        statpairsused_var integer; 
        z_var float; 
@@ -6885,8 +6932,8 @@
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       detection_var = OLD.detection;
-       detection_p_var = OLD.detection_p;
+       call_var = OLD.call;
+       call_p_var = OLD.call_p;
        statpairs_var = OLD.statpairs;
        statpairsused_var = OLD.statpairsused;
        z_var = OLD.z;
@@ -6899,16 +6946,16 @@
 
        INSERT INTO audit_affymetrixmas5 ( 
              signal, 
-             detection, 
-             detection_p, 
+             call, 
+             call_p, 
              statpairs, 
              statpairsused, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             detection_var, 
-             detection_p_var, 
+             call_var, 
+             call_p_var, 
              statpairs_var, 
              statpairsused_var, 
              z_var, 
@@ -6934,7 +6981,7 @@
    DROP TABLE audit_affymetrixdchip;
    CREATE TABLE audit_affymetrixdchip ( 
        signal float, 
-       detection char(1), 
+       call char(1), 
        se float, 
        z float, 
        transaction_date timestamp not null default now(),
@@ -6946,14 +6993,14 @@
    '
    DECLARE
        signal_var float; 
-       detection_var char(1); 
+       call_var char(1); 
        se_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       detection_var = OLD.detection;
+       call_var = OLD.call;
        se_var = OLD.se;
        z_var = OLD.z;
        
@@ -6965,13 +7012,13 @@
 
        INSERT INTO audit_affymetrixdchip ( 
              signal, 
-             detection, 
+             call, 
              se, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             detection_var, 
+             call_var, 
              se_var, 
              z_var, 
              transaction_type_var
@@ -6997,7 +7044,7 @@
    CREATE TABLE audit_affymetrixvsn ( 
        signal float, 
        se float, 
-       detection char(1), 
+       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7009,14 +7056,14 @@
    DECLARE
        signal_var float; 
        se_var float; 
-       detection_var char(1); 
+       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
        se_var = OLD.se;
-       detection_var = OLD.detection;
+       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7028,13 +7075,13 @@
        INSERT INTO audit_affymetrixvsn ( 
              signal, 
              se, 
-             detection, 
+             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
              se_var, 
-             detection_var, 
+             call_var, 
              z_var, 
              transaction_type_var
        );
@@ -7055,11 +7102,152 @@
        EXECUTE PROCEDURE audit_update_delete_affymetrixvsn ();
 
 
+   DROP TABLE audit_affymetrixsea;
+   CREATE TABLE audit_affymetrixsea ( 
+       signal float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixsea to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixsea() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixsea ( 
+             signal, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixsea_audit_ud ON affymetrixsea;
+   CREATE TRIGGER affymetrixsea_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixsea
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixsea ();
+
+
+   DROP TABLE audit_affymetrixplier;
+   CREATE TABLE audit_affymetrixplier ( 
+       signal float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixplier to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixplier() RETURNS trigger AS
+   '
+   DECLARE
+       signal_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       signal_var = OLD.signal;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixplier ( 
+             signal, 
+             transaction_type
+       ) VALUES ( 
+             signal_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixplier_audit_ud ON affymetrixplier;
+   CREATE TRIGGER affymetrixplier_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixplier
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixplier ();
+
+
+   DROP TABLE audit_affymetrixdabg;
+   CREATE TABLE audit_affymetrixdabg ( 
+       call_p float, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_affymetrixdabg to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixdabg() RETURNS trigger AS
+   '
+   DECLARE
+       call_p_var float; 
+       
+       transaction_type_var char;
+   BEGIN
+       call_p_var = OLD.call_p;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_affymetrixdabg ( 
+             call_p, 
+             transaction_type
+       ) VALUES ( 
+             call_p_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER affymetrixdabg_audit_ud ON affymetrixdabg;
+   CREATE TRIGGER affymetrixdabg_audit_ud
+       BEFORE UPDATE OR DELETE ON affymetrixdabg
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_affymetrixdabg ();
+
+
    DROP TABLE audit_affymetrixrma;
    CREATE TABLE audit_affymetrixrma ( 
        signal float, 
        se float, 
-       detection char(1), 
+       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7071,14 +7259,14 @@
    DECLARE
        signal_var float; 
        se_var float; 
-       detection_var char(1); 
+       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
        se_var = OLD.se;
-       detection_var = OLD.detection;
+       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7090,13 +7278,13 @@
        INSERT INTO audit_affymetrixrma ( 
              signal, 
              se, 
-             detection, 
+             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
              se_var, 
-             detection_var, 
+             call_var, 
              z_var, 
              transaction_type_var
        );

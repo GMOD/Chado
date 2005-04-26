@@ -2584,95 +2584,148 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
---CREATE OR REPLACE VIEW biomaterial_annotations
---AS SELECT
---  b.biomaterial_id,
---  b.description,
---  c1.name AS tissue,
---  c2.name AS cell,
---  c3.name AS pathology
---FROM biomaterial b
---LEFT JOIN (
---  ( biomaterialprop bp3 JOIN cvterm c3 ON (bp3.type_id = c3.cvterm_id AND c3.cv_id =
---    (select cv_id from cv where name = 'Mouse Pathology Ontology (Pathbase)')) )
---  LEFT JOIN (
---    ( biomaterialprop bp1 JOIN cvterm c1 ON (bp1.type_id = c1.cvterm_id AND c1.cv_id =
---      (select cv_id from cv where name = 'Mouse Adult Anatomy Ontology')) )
---      FULL JOIN
---    ( biomaterialprop bp2 JOIN cvterm c2 ON (bp2.type_id = c2.cvterm_id AND c2.cv_id =
---      (select cv_id from cv where name = 'Cell Ontology')) )
---      ON (bp1.biomaterial_id = bp2.biomaterial_id)
---  )
---  ON (bp1.biomaterial_id = bp3.biomaterial_id OR bp2.biomaterial_id = bp3.biomaterial_id)
---)
---ON (b.biomaterial_id = bp3.biomaterial_id);
-
 CREATE TABLE affymetrixprobeset (
-  name varchar(255) NULL
+  name varchar(255) NULL,
+  constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
 ) INHERITS ( element );
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
+CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name_id);
+CREATE INDEX affymetrixprobeset_idx2 ON affymetrixprobeset (feature_id);
+CREATE INDEX affymetrixprobeset_idx3 ON affymetrixprobeset (dbxref_id);
+CREATE INDEX affymetrixprobeset_idx4 ON affymetrixprobeset (arraydesign_id);
+CREATE INDEX affymetrixprobeset_idx5 ON affymetrixprobeset (type_id);
 
 CREATE TABLE affymetrixprobe (
   name varchar(255) NULL,
   affymetrixprobeset_id int NULL,
-  foreign key (affymetrixprobeset_id) references element (element_id),
   row int NOT NULL,
   col int NOT NULL
 ) INHERITS ( element );
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c5 FOREIGN KEY (affymetrixprobeset_id) REFERENCES element       (element_id);
 CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
+CREATE INDEX affymetrixprobe_idx2 ON affymetrixprobe (name);
+CREATE INDEX affymetrixprobe_idx3 ON affymetrixprobe (feature_id);
+CREATE INDEX affymetrixprobe_idx4 ON affymetrixprobe (dbxref_id);
+CREATE INDEX affymetrixprobe_idx5 ON affymetrixprobe (arraydesign_id);
+CREATE INDEX affymetrixprobe_idx6 ON affymetrixprobe (type_id);
 
 CREATE TABLE affymetrixcel (
   mean float NOT NULL,
   sd float NOT NULL,
   pixels int NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c1 FOREIGN KEY (element_id)        REFERENCES element         (element_id);
 ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixcel_idx1 ON affymetrixcel (mean);
+CREATE INDEX affymetrixcel_idx2 ON affymetrixcel (sd);
+CREATE INDEX affymetrixcel_idx3 ON affymetrixcel (pixels);
+CREATE INDEX affymetrixcel_idx4 ON affymetrixcel (element_id);
+CREATE INDEX affymetrixcel_idx5 ON affymetrixcel (quantification_id);
+
+CREATE TABLE affymetrixsnp (
+  call smallint NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixsnp_c1 FOREIGN KEY (element_id)        REFERENCES element         (element_id);
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixsnp_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixsnp_idx1 ON affymetrixsnp (call);
+CREATE INDEX affymetrixsnp_idx4 ON affymetrixsnp (element_id);
+CREATE INDEX affymetrixsnp_idx5 ON affymetrixsnp (quantification_id);
 
 CREATE TABLE affymetrixmas5 (
   signal float NOT NULL,
-  detection char(1) NOT NULL,
-  detection_p float NOT NULL,
+  call char(1) NOT NULL,
+  call_p float NOT NULL,
   statpairs int NOT NULL,
   statpairsused int NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixmas5_idx1 ON affymetrixmas5 (signal);
+CREATE INDEX affymetrixmas5_idx2 ON affymetrixmas5 (call);
+CREATE INDEX affymetrixmas5_idx3 ON affymetrixmas5 (call_p);
+CREATE INDEX affymetrixmas5_idx4 ON affymetrixmas5 (element_id);
+CREATE INDEX affymetrixmas5_idx5 ON affymetrixmas5 (quantification_id);
+CREATE INDEX affymetrixmas5_idx6 ON affymetrixmas5 (z);
 
 CREATE TABLE affymetrixdchip (
   signal float NOT NULL,
-  detection char(1) NOT NULL,
+  call char(1) NOT NULL,
   se float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixdchip_idx1 ON affymetrixdchip (element_id);
+CREATE INDEX affymetrixdchip_idx2 ON affymetrixdchip (quantification_id);
+CREATE INDEX affymetrixdchip_idx3 ON affymetrixdchip (signal);
+CREATE INDEX affymetrixdchip_idx4 ON affymetrixdchip (call);
+CREATE INDEX affymetrixdchip_idx5 ON affymetrixdchip (se);
+CREATE INDEX affymetrixdchip_idx6 ON affymetrixdchip (z);
 
 CREATE TABLE affymetrixvsn (
   signal float NOT NULL,
   se float NOT NULL,
-  detection char(1) NOT NULL,
+  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixvsn_idx1 ON affymetrixvsn (element_id);
+CREATE INDEX affymetrixvsn_idx2 ON affymetrixvsn (quantification_id);
+CREATE INDEX affymetrixvsn_idx3 ON affymetrixvsn (signal);
+CREATE INDEX affymetrixvsn_idx4 ON affymetrixvsn (call);
+CREATE INDEX affymetrixvsn_idx5 ON affymetrixvsn (se);
+CREATE INDEX affymetrixvsn_idx6 ON affymetrixvsn (z);
+
+CREATE TABLE affymetrixsea (
+  signal float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixsea_idx1 ON affymetrixsea (element_id);
+CREATE INDEX affymetrixsea_idx2 ON affymetrixsea (quantification_id);
+CREATE INDEX affymetrixsea_idx3 ON affymetrixsea (signal);
+
+CREATE TABLE affymetrixplier (
+  signal float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixplier_idx1 ON affymetrixplier (element_id);
+CREATE INDEX affymetrixplier_idx2 ON affymetrixplier (quantification_id);
+CREATE INDEX affymetrixplier_idx3 ON affymetrixplier (signal);
+
+CREATE TABLE affymetrixdabg (
+  call_p float NOT NULL
+) INHERITS ( elementresult );
+ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixdabg_idx1 ON affymetrixdabg (element_id);
+CREATE INDEX affymetrixdabg_idx2 ON affymetrixdabg (quantification_id);
+CREATE INDEX affymetrixdabg_idx3 ON affymetrixdabg (call_p);
 
 CREATE TABLE affymetrixrma (
   signal float NOT NULL,
   se float NOT NULL,
-  detection char(1) NOT NULL,
+  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixrma_idx1 ON affymetrixrma (element_id);
+CREATE INDEX affymetrixrma_idx2 ON affymetrixrma (quantification_id);
+CREATE INDEX affymetrixrma_idx3 ON affymetrixrma (signal);
+CREATE INDEX affymetrixrma_idx4 ON affymetrixrma (call);
+CREATE INDEX affymetrixrma_idx5 ON affymetrixrma (se);
+CREATE INDEX affymetrixrma_idx6 ON affymetrixrma (z);
 
 CREATE TABLE affymetrixgcrma (
   signal float NOT NULL,
@@ -2682,6 +2735,12 @@ CREATE TABLE affymetrixgcrma (
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixgcrma_idx1 ON affymetrixgcrma (element_id);
+CREATE INDEX affymetrixgcrma_idx2 ON affymetrixgcrma (quantification_id);
+CREATE INDEX affymetrixgcrma_idx3 ON affymetrixgcrma (signal);
+CREATE INDEX affymetrixgcrma_idx4 ON affymetrixgcrma (call);
+CREATE INDEX affymetrixgcrma_idx5 ON affymetrixgcrma (se);
+CREATE INDEX affymetrixgcrma_idx6 ON affymetrixgcrma (z);
 
 CREATE TABLE affymetrixprobesetstat (
   mean float NOT NULL,
@@ -2693,6 +2752,99 @@ CREATE TABLE affymetrixprobesetstat (
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
 ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+CREATE INDEX affymetrixprobesetstat_idx1 ON affymetrixprobesetstat (element_id);
+CREATE INDEX affymetrixprobesetstat_idx2 ON affymetrixprobesetstat (quantification_id);
+CREATE INDEX affymetrixprobesetstat_idx3 ON affymetrixprobesetstat (mean);
+CREATE INDEX affymetrixprobesetstat_idx4 ON affymetrixprobesetstat (median);
+CREATE INDEX affymetrixprobesetstat_idx5 ON affymetrixprobesetstat (quartile1);
+CREATE INDEX affymetrixprobesetstat_idx6 ON affymetrixprobesetstat (quartile3);
+CREATE INDEX affymetrixprobesetstat_idx7 ON affymetrixprobesetstat (sd);
+CREATE INDEX affymetrixprobesetstat_idx8 ON affymetrixprobesetstat (n);
+--- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
+--- fill path from the node to its children and their children
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    cvid alias for $3;
+    typeid alias for $4;
+    depth alias for $5;
+    cterm cvterm_relationship%ROWTYPE;
+    exist_c int;
+
+BEGIN
+
+    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
+    --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
+
+    IF (exist_c = 0) THEN
+        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
+    END IF;
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
+        PERFORM _fill_cvtermpath4node(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    ttype int;
+    cterm cvterm_relationship%ROWTYPE;
+    child cvterm_relationship%ROWTYPE;
+
+BEGIN
+
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
+    PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
+        PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
+        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+
+BEGIN
+
+    DELETE FROM cvtermpath WHERE cv_id = cvid;
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
+        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
+    END LOOP;
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
+'
+DECLARE
+    cvname alias for $1;
+    cv_id   int;
+    rtn     int;
+BEGIN
+
+    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
+    SELECT INTO rtn fill_cvtermpath(cv_id);
+    RETURN rtn;
+END;   
+'
+LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
 '
@@ -2843,9 +2995,8 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
---- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
---- fill path from the node to its children and their children
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     origin alias for $1;
@@ -2855,77 +3006,163 @@ DECLARE
     depth alias for $5;
     cterm cvterm_relationship%ROWTYPE;
     exist_c int;
-
+    ccount  int;
+    ecount  int;
+    rtn     int;
 BEGIN
 
-    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
-    --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
-
-    IF (exist_c = 0) THEN
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
+    EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id = ''|| origin || '' AND p2.subject_id = '' || child_id || ''AND '' || depth || ''> 0'';
+    GET DIAGNOSTICS ccount = ROW_COUNT;
+    IF (ccount > 0) THEN
+        --RAISE EXCEPTION ''FOUND CYCLE: node % on cycle path'',origin;
+        RETURN origin;
     END IF;
+
+    EXECUTE ''SELECT * FROM tmpcvtermpath WHERE cv_id = '' || cvid || '' AND object_id = '' || origin || '' AND subject_id = '' || child_id || '' AND '' || origin || ''<>'' || child_id;
+    GET DIAGNOSTICS ecount = ROW_COUNT;
+    IF (ecount > 0) THEN
+        --RAISE NOTICE ''FOUND TWICE (node), will check root obj % subj %'',origin, child_id;
+        SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(child_id, cvid);
+        IF (rtn > 0) THEN
+            RETURN rtn;
+        END IF;
+    END IF;
+
+    EXECUTE ''SELECT * FROM tmpcvtermpath WHERE cv_id = '' || cvid || '' AND object_id = '' || origin || '' AND subject_id = '' || child_id || '' AND pathdistance = '' || depth;
+    GET DIAGNOSTICS exist_c = ROW_COUNT;
+    IF (exist_c = 0) THEN
+        EXECUTE ''INSERT INTO tmpcvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES('' || origin || '', '' || child_id || '', '' || cvid || '', '' || typeid || '', '' || depth || '')'';
+    END IF;
+
     FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4node(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+        --RAISE NOTICE ''DOING for node, % %'', origin, cterm.subject_id;
+        SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+        IF (rtn > 0) THEN
+            RETURN rtn;
+        END IF;
     END LOOP;
-    RETURN 1;
+    RETURN 0;
 END;
 '
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(INTEGER, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
     ttype int;
+    ccount int;
     cterm cvterm_relationship%ROWTYPE;
     child cvterm_relationship%ROWTYPE;
-
+    rtn     int;
 BEGIN
 
     SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
-    PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
+    SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(rootid, rootid, cvid, ttype, 0);
+    IF (rtn > 0) THEN
+        RETURN rtn;
+    END IF;
     FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
-        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
+        EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id='' || rootid || '' AND p1.subject_id='' || cterm.subject_id;
+        GET DIAGNOSTICS ccount = ROW_COUNT;
+        IF (ccount > 0) THEN
+            --RAISE NOTICE ''FOUND TWICE (root), will check root obj % subj %'',rootid,cterm.subject_id;
+            SELECT INTO rtn _fill_cvtermpath4node2detect_cycle(rootid, cterm.subject_id, cvid, ttype, 0);
+            IF (rtn > 0) THEN
+                RETURN rtn;
+            END IF;
+        ELSE
+            SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(cterm.subject_id, cvid);
+            IF (rtn > 0) THEN
+                RETURN rtn;
+            END IF;
+        END IF;
     END LOOP;
-    RETURN 1;
+    RETURN 0;
 END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     cvid alias for $1;
-    root cvterm%ROWTYPE;
-
+    rootid alias for $2;
+    rtn     int;
 BEGIN
 
-    DELETE FROM cvtermpath WHERE cv_id = cvid;
+    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
 
-    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
-        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
-    END LOOP;
-    RETURN 1;
+    SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(rootid, cvid);
+    IF (rtn > 0) THEN
+        DROP TABLE tmpcvtermpath;
+        RETURN rtn;
+    END IF;
+    DROP TABLE tmpcvtermpath;
+    RETURN 0;
 END;   
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(INTEGER) RETURNS SETOF INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+    rtn     int;
+BEGIN
+
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t WHERE cv_id = cvid LOOP
+        SELECT INTO rtn get_cycle_cvterm_id(cvid,root.cvterm_id);
+        IF (rtn > 0) THEN
+            RETURN NEXT rtn;
+        END IF;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+    rtn     int;
+BEGIN
+
+    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
+        SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(root.cvterm_id, root.cv_id);
+        IF (rtn > 0) THEN
+            DROP TABLE tmpcvtermpath;
+            RETURN rtn;
+        END IF;
+    END LOOP;
+    DROP TABLE tmpcvtermpath;
+    RETURN 0;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cvrecord cv%ROWTYPE;
+    cv_id int;
+    rtn int;
 BEGIN
 
-    EXECUTE ''DELETE FROM cvtermpath WHERE cv_id IN (SELECT cv_id FROM cv WHERE name = '' || quote_literal(cvname) || '');'';
-    FOR cvrecord IN EXECUTE ''SELECT cv.* from cv WHERE cv.name = '' || quote_literal(cvname) LOOP
-        PERFORM fill_cvtermpath(cvrecord.cv_id);
-    END LOOP;
-    RETURN 1;
+    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
+    SELECT INTO rtn  get_cycle_cvterm_id(cv_id);
+
+    RETURN rtn;
 END;   
 '
 LANGUAGE 'plpgsql';
@@ -3082,6 +3319,222 @@ FROM feature f
      LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
 WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
 
+CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
+DECLARE
+  return_data featureloc%ROWTYPE;
+  f_id ALIAS FOR $1;
+  feature_data feature%rowtype;
+  featureloc_data featureloc%rowtype;
+
+  s text;
+
+  fmin integer;
+  slen integer;
+BEGIN
+  --RAISE NOTICE ''feature_id is %'', featureloc_data.feature_id;
+  SELECT INTO feature_data * FROM feature WHERE feature_id = f_id;
+
+  FOR featureloc_data IN SELECT * FROM featureloc WHERE feature_id = f_id LOOP
+
+    --RAISE NOTICE ''fmin is %'', featureloc_data.fmin;
+
+    return_data.feature_id      = f_id;
+    return_data.srcfeature_id   = featureloc_data.srcfeature_id;
+    return_data.is_fmin_partial = featureloc_data.is_fmin_partial;
+    return_data.is_fmax_partial = featureloc_data.is_fmax_partial;
+    return_data.strand          = featureloc_data.strand;
+    return_data.phase           = featureloc_data.phase;
+    return_data.residue_info    = featureloc_data.residue_info;
+    return_data.locgroup        = featureloc_data.locgroup;
+    return_data.rank            = featureloc_data.rank;
+
+    s = feature_data.residues;
+    fmin = featureloc_data.fmin;
+    slen = char_length(s);
+
+    WHILE char_length(s) LOOP
+      --RAISE NOTICE ''residues is %'', s;
+
+      --trim off leading match
+      s = trim(leading ''|ATCGNatcgn'' from s);
+      --if leading match detected
+      IF slen > char_length(s) THEN
+        return_data.fmin = fmin;
+        return_data.fmax = featureloc_data.fmin + (slen - char_length(s));
+
+        --if the string started with a match, return it,
+        --otherwise, trim the gaps first (ie do not return this iteration)
+        RETURN NEXT return_data;
+      END IF;
+
+      --trim off leading gap
+      s = trim(leading ''-'' from s);
+
+      fmin = featureloc_data.fmin + (slen - char_length(s));
+    END LOOP;
+  END LOOP;
+
+  RETURN;
+
+END;
+' LANGUAGE 'plpgsql';
+--- create ontology that has instantiated located_sequence_feature part of SO
+--- way as it is written, the function can not be execute more than once in one connection
+--- when you get error like ERROR:  relation with OID NNNNN does not exist
+--- as this is not meant to execute >1 times in one session so it should never happen
+--- except at testing and test failed
+--- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
+--- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
+
+--NOTE: private, don't call directly as relying on having temp table tmpcvtr
+
+DROP TYPE soi_type CASCADE;
+CREATE TYPE soi_type AS (
+    type_id INT,
+    subject_id INT,
+    object_id INT
+);
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    cvid alias for $3;
+    typeid alias for $4;
+    depth alias for $5;
+    cterm soi_type%ROWTYPE;
+    exist_c int;
+
+BEGIN
+
+    --RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
+    --- longest path
+    IF (exist_c > 0) THEN
+        UPDATE cvtermpath SET pathdistance = depth WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id;
+    ELSE
+        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
+    END IF;
+
+    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = child_id LOOP
+        PERFORM _fill_cvtermpath4soinode(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    ttype int;
+    cterm soi_type%ROWTYPE;
+
+BEGIN
+    
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
+    --RAISE NOTICE ''got ttype %'',ttype;
+    PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
+    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
+        PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
+    END LOOP;
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+--- use tmpcvtr to temp store soi (virtural ontology)
+--- using tmp tables is faster than using recursive function to create feature type relationship
+--- since it gets feature type rel set by set instead of one by one
+--- and getting feature type rel is very expensive
+--- call _fillcvtermpath4soi to create path for the virtual ontology
+
+CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
+'
+DECLARE
+    parent soi_type%ROWTYPE;
+    isa_id cvterm.cvterm_id%TYPE;
+    soi_term TEXT := ''soi'';
+    soi_def TEXT := ''ontology of SO feature instantiated in database'';
+    soi_cvid INTEGER;
+    soiterm_id INTEGER;
+    pcount INTEGER;
+    count INTEGER := 0;
+    cquery TEXT;
+BEGIN
+
+    SELECT INTO isa_id cvterm_id FROM cvterm WHERE name = ''isa'';
+
+    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
+    IF (soi_cvid > 0) THEN
+        DELETE FROM cvtermpath WHERE cv_id = soi_cvid;
+        DELETE FROM cvterm WHERE cv_id = soi_cvid;
+    ELSE
+        INSERT INTO cv (name, definition) VALUES(soi_term, soi_def);
+    END IF;
+    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
+    INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
+    SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
+
+    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
+    CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
+
+    INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
+        SELECT DISTINCT isa_id, soiterm_id, f.type_id, soiterm_id FROM feature f, cvterm t
+        WHERE f.type_id = t.cvterm_id AND f.type_id > 0;
+    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
+    get diagnostics pcount = row_count;
+    raise notice ''all types in feature %'',pcount;
+--- do it hard way, delete any child feature type from above (NOT IN clause did not work)
+    FOR parent IN SELECT DISTINCT 0, t.cvterm_id, 0 FROM feature c, feature_relationship fr, cvterm t
+            WHERE t.cvterm_id = c.type_id AND c.feature_id = fr.subject_id LOOP
+        DELETE FROM tmpcvtr WHERE type_id = soiterm_id and object_id = soiterm_id
+            AND subject_id = parent.subject_id;
+    END LOOP;
+    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
+    get diagnostics pcount = row_count;
+    raise notice ''all types in feature after delete child %'',pcount;
+
+    --- create feature type relationship (store in tmpcvtr)
+    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
+    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
+    ---temp use tmpcvtr to hold instantiated SO relationship for speed
+    ---use soterm_id as type_id, will delete from tmpcvtr
+    ---us tmproot for this as well
+    INSERT INTO tmproot (cv_id, cvterm_id, status) SELECT DISTINCT soi_cvid, c.subject_id, 0 FROM tmpcvtr c
+        WHERE c.object_id = soiterm_id;
+    EXECUTE cquery;
+    GET DIAGNOSTICS pcount = ROW_COUNT;
+    WHILE (pcount > 0) LOOP
+        RAISE NOTICE ''num child temp (to be inserted) in tmpcvtr: %'',pcount;
+        INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
+            SELECT DISTINCT fr.type_id, soiterm_id, c.type_id, p.cvterm_id FROM feature c, feature_relationship fr,
+            tmproot p, feature pf, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = pf.feature_id
+            AND p.cvterm_id = pf.type_id AND t.cvterm_id = c.type_id AND p.status = 0;
+        UPDATE tmproot SET status = 1 WHERE status = 0;
+        INSERT INTO tmproot (cv_id, cvterm_id, status)
+            SELECT DISTINCT soi_cvid, c.type_id, 0 FROM feature c, feature_relationship fr,
+            tmproot tmp, feature p, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
+            AND tmp.cvterm_id = p.type_id AND t.cvterm_id = c.type_id AND tmp.status = 1;
+        UPDATE tmproot SET status = 2 WHERE status = 1;
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT; 
+    END LOOP;
+    DELETE FROM tmproot;
+
+    ---get transitive closure for soi
+    PERFORM _fill_cvtermpath4soi(soiterm_id, soi_cvid);
+
+    DROP TABLE tmpcvtr;
+    DROP TABLE tmproot;
+
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
 
 ---bad precedence: change customed type name
 ---drop here to remove old function
@@ -3511,219 +3964,3 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
---- create ontology that has instantiated located_sequence_feature part of SO
---- way as it is written, the function can not be execute more than once in one connection
---- when you get error like ERROR:  relation with OID NNNNN does not exist
---- as this is not meant to execute >1 times in one session so it should never happen
---- except at testing and test failed
---- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
---- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
-
---NOTE: private, don't call directly as relying on having temp table tmpcvtr
-
-DROP TYPE soi_type CASCADE;
-CREATE TYPE soi_type AS (
-    type_id INT,
-    subject_id INT,
-    object_id INT
-);
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    origin alias for $1;
-    child_id alias for $2;
-    cvid alias for $3;
-    typeid alias for $4;
-    depth alias for $5;
-    cterm soi_type%ROWTYPE;
-    exist_c int;
-
-BEGIN
-
-    --RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
-    --- longest path
-    IF (exist_c > 0) THEN
-        UPDATE cvtermpath SET pathdistance = depth WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id;
-    ELSE
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
-    END IF;
-
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4soinode(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    rootid alias for $1;
-    cvid alias for $2;
-    ttype int;
-    cterm soi_type%ROWTYPE;
-
-BEGIN
-    
-    SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
-    --RAISE NOTICE ''got ttype %'',ttype;
-    PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
-
---- use tmpcvtr to temp store soi (virtural ontology)
---- using tmp tables is faster than using recursive function to create feature type relationship
---- since it gets feature type rel set by set instead of one by one
---- and getting feature type rel is very expensive
---- call _fillcvtermpath4soi to create path for the virtual ontology
-
-CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
-'
-DECLARE
-    parent soi_type%ROWTYPE;
-    isa_id cvterm.cvterm_id%TYPE;
-    soi_term TEXT := ''soi'';
-    soi_def TEXT := ''ontology of SO feature instantiated in database'';
-    soi_cvid INTEGER;
-    soiterm_id INTEGER;
-    pcount INTEGER;
-    count INTEGER := 0;
-    cquery TEXT;
-BEGIN
-
-    SELECT INTO isa_id cvterm_id FROM cvterm WHERE name = ''isa'';
-
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    IF (soi_cvid > 0) THEN
-        DELETE FROM cvtermpath WHERE cv_id = soi_cvid;
-        DELETE FROM cvterm WHERE cv_id = soi_cvid;
-    ELSE
-        INSERT INTO cv (name, definition) VALUES(soi_term, soi_def);
-    END IF;
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
-    SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
-
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
-    CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
-
-    INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-        SELECT DISTINCT isa_id, soiterm_id, f.type_id, soiterm_id FROM feature f, cvterm t
-        WHERE f.type_id = t.cvterm_id AND f.type_id > 0;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature %'',pcount;
---- do it hard way, delete any child feature type from above (NOT IN clause did not work)
-    FOR parent IN SELECT DISTINCT 0, t.cvterm_id, 0 FROM feature c, feature_relationship fr, cvterm t
-            WHERE t.cvterm_id = c.type_id AND c.feature_id = fr.subject_id LOOP
-        DELETE FROM tmpcvtr WHERE type_id = soiterm_id and object_id = soiterm_id
-            AND subject_id = parent.subject_id;
-    END LOOP;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature after delete child %'',pcount;
-
-    --- create feature type relationship (store in tmpcvtr)
-    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
-    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
-    ---temp use tmpcvtr to hold instantiated SO relationship for speed
-    ---use soterm_id as type_id, will delete from tmpcvtr
-    ---us tmproot for this as well
-    INSERT INTO tmproot (cv_id, cvterm_id, status) SELECT DISTINCT soi_cvid, c.subject_id, 0 FROM tmpcvtr c
-        WHERE c.object_id = soiterm_id;
-    EXECUTE cquery;
-    GET DIAGNOSTICS pcount = ROW_COUNT;
-    WHILE (pcount > 0) LOOP
-        RAISE NOTICE ''num child temp (to be inserted) in tmpcvtr: %'',pcount;
-        INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-            SELECT DISTINCT fr.type_id, soiterm_id, c.type_id, p.cvterm_id FROM feature c, feature_relationship fr,
-            tmproot p, feature pf, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = pf.feature_id
-            AND p.cvterm_id = pf.type_id AND t.cvterm_id = c.type_id AND p.status = 0;
-        UPDATE tmproot SET status = 1 WHERE status = 0;
-        INSERT INTO tmproot (cv_id, cvterm_id, status)
-            SELECT DISTINCT soi_cvid, c.type_id, 0 FROM feature c, feature_relationship fr,
-            tmproot tmp, feature p, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
-            AND tmp.cvterm_id = p.type_id AND t.cvterm_id = c.type_id AND tmp.status = 1;
-        UPDATE tmproot SET status = 2 WHERE status = 1;
-        EXECUTE cquery;
-        GET DIAGNOSTICS pcount = ROW_COUNT; 
-    END LOOP;
-    DELETE FROM tmproot;
-
-    ---get transitive closure for soi
-    PERFORM _fill_cvtermpath4soi(soiterm_id, soi_cvid);
-
-    DROP TABLE tmpcvtr;
-    DROP TABLE tmproot;
-
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
-DECLARE
-  return_data featureloc%ROWTYPE;
-  f_id ALIAS FOR $1;
-  feature_data feature%rowtype;
-  featureloc_data featureloc%rowtype;
-
-  s text;
-
-  fmin integer;
-  slen integer;
-BEGIN
-  --RAISE NOTICE ''feature_id is %'', featureloc_data.feature_id;
-  SELECT INTO feature_data * FROM feature WHERE feature_id = f_id;
-
-  FOR featureloc_data IN SELECT * FROM featureloc WHERE feature_id = f_id LOOP
-
-    --RAISE NOTICE ''fmin is %'', featureloc_data.fmin;
-
-    return_data.feature_id      = f_id;
-    return_data.srcfeature_id   = featureloc_data.srcfeature_id;
-    return_data.is_fmin_partial = featureloc_data.is_fmin_partial;
-    return_data.is_fmax_partial = featureloc_data.is_fmax_partial;
-    return_data.strand          = featureloc_data.strand;
-    return_data.phase           = featureloc_data.phase;
-    return_data.residue_info    = featureloc_data.residue_info;
-    return_data.locgroup        = featureloc_data.locgroup;
-    return_data.rank            = featureloc_data.rank;
-
-    s = feature_data.residues;
-    fmin = featureloc_data.fmin;
-    slen = char_length(s);
-
-    WHILE char_length(s) LOOP
-      --RAISE NOTICE ''residues is %'', s;
-
-      --trim off leading match
-      s = trim(leading ''|ATCGNatcgn'' from s);
-      --if leading match detected
-      IF slen > char_length(s) THEN
-        return_data.fmin = fmin;
-        return_data.fmax = featureloc_data.fmin + (slen - char_length(s));
-
-        --if the string started with a match, return it,
-        --otherwise, trim the gaps first (ie do not return this iteration)
-        RETURN NEXT return_data;
-      END IF;
-
-      --trim off leading gap
-      s = trim(leading ''-'' from s);
-
-      fmin = featureloc_data.fmin + (slen - char_length(s));
-    END LOOP;
-  END LOOP;
-
-  RETURN;
-
-END;
-' LANGUAGE 'plpgsql';
