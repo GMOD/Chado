@@ -1,7 +1,6 @@
-<?xml version="1.0"?>
 <!--
 
-  $Id: chaos.dtd,v 1.6 2005-02-11 01:58:55 cmungall Exp $
+  $Id: chaos.dtd,v 1.7 2005-04-27 19:32:45 cmungall Exp $
 
   CHAOS XML DTD
 
@@ -22,14 +21,14 @@
 -->
 
 <!-- chaos: this is the top-level node -->
-<!ELEMENT chaos (chaos_metadata?,feature+,feature_relationship*)>
+<!ELEMENT chaos (chaos_metadata?,feature+,feature_relationship*)+>
 
 <!-- ======== -->
 <!-- METADATA -->
 <!-- ======== -->
 
 <!-- chaos_metadata: information about the document file itself (node) -->
-<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?|export_module_cvs_id?)+>
+<!ELEMENT chaos_metadata (chaos_version|chaos_flavour?|focus_feature_id?|feature_unique_key?|equiv_chado_release?|sequence_ontology_revision?|dsn?|dbname?|prog_args?|export_unixtime?|export_localtime?|export_host?|export_user?|export_perl5lib?|export_program?|export_module_cvs_id?)+>
 
 <!-- chaos_version: (s) -->
 <!ELEMENT chaos_version (#PCDATA)>
@@ -53,6 +52,12 @@
      version release that corresponds to the chaos xml. If set, this
      should be equal to "chado_1_01"    -->
 <!ELEMENT equiv_chado_release (#PCDATA)>
+
+<!-- various metadata tags; may be specific to export program   -->
+<!ELEMENT sequence_ontology_revision (#PCDATA)>
+<!ELEMENT dsn (#PCDATA)>
+<!ELEMENT prog_args (#PCDATA)>
+<!ELEMENT dbname (#PCDATA)>
 
 <!-- export_unixtime: unixtime (seconds since 1970) at which the
      document was exported       -->
@@ -91,7 +96,7 @@
      It is equivalent to the chado table "feature"
 
       -->
-<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5?|featureprop*|organismstr?|featureloc*|feature_dbxref*|seqlen?|is_analysis?)+>
+<!ELEMENT feature (feature_id|dbxrefstr?|name?|uniquename|type|residues?|md5checksum?|featureprop*|organismstr?|featureloc*|feature_dbxref*|seqlen?|is_analysis?)+>
 
 <!-- feature_id:
 
@@ -220,14 +225,14 @@
  -->
 <!ELEMENT residues (#PCDATA)>
 
-<!-- md5:
+<!-- md5checksum:
 
-  The MD5 checksum of the residues
+  The unique 32 character signature of the residues
 
-  The md5 may be present even if the residues are not
+  The md5checksum may be present even if the residues are not
 
  -->
-<!ELEMENT md5 (#PCDATA)>
+<!ELEMENT md5checksum (#PCDATA)>
 
 <!-- seqlen:
 
@@ -267,6 +272,18 @@
 
  -->
 <!ELEMENT type (#PCDATA)>
+
+
+
+<!-- feature_cvterm:
+
+features can be associated with cvterms (eg GO IDs)
+
+-->
+
+<!ELEMENT feature_cvterm (cvterm)>
+<!ELEMENT cvterm (dbxrefstr)>
+
 
 <!-- featureprop:
 
@@ -445,7 +462,7 @@
   
 
  -->
-<!ELEMENT feature_relationship (subject_id|object_id|type)+>
+<!ELEMENT feature_relationship (subject_id|object_id|type|rank?)+>
 
 <!-- subject_id:
 
@@ -463,5 +480,5 @@
 
 <!--  END OF CHAOS XML DTD -->
 <!--  $Author: cmungall $ -->
-<!--  $Id: chaos.dtd,v 1.6 2005-02-11 01:58:55 cmungall Exp $ -->
+<!--  $Id: chaos.dtd,v 1.7 2005-04-27 19:32:45 cmungall Exp $ -->
 

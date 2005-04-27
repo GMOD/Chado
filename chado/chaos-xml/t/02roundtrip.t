@@ -1,5 +1,5 @@
 # -*-Perl-*- mode (to keep my emacs happy)
-# $Id: 02roundtrip.t,v 1.1 2005-02-18 20:26:40 cmungall Exp $
+# $Id: 02roundtrip.t,v 1.2 2005-04-27 19:32:45 cmungall Exp $
 
 use strict;
 use vars qw($DEBUG);
@@ -11,7 +11,6 @@ use Bio::Root::IO;
 BEGIN {     
     plan tests => 1;
 }
-
 
 my ($file) = (Bio::Root::IO->catfile("t","data",
                                      "CG10833.with-macros.chado-xml"));
@@ -30,7 +29,6 @@ foreach my $f (@$features) {
 }
 
 exit 0;
-
 
 sub chado2chaos {
     convert('chado','chaos',@_);

@@ -48,6 +48,15 @@
   <!-- block; we have already placed these at top-level -->
   <xsl:template match="feature_relationship">
   </xsl:template>
+
+  <!-- filter out -->
+  <xsl:template match="feature_pub">
+  </xsl:template>
+
+  <!-- filter for now -->
+  <xsl:template match="feature_cvterm">
+  </xsl:template>
+
   <xsl:template match="feature">
   </xsl:template>
 
@@ -58,15 +67,11 @@
       <xsl:when test="name(.)='is_fmax_partial'"/>
       <xsl:when test="name(.)='timeaccessioned'"/>
       <xsl:when test="name(.)='timelastmodified'"/>
+      <xsl:when test="name(.)='pub_id'"/>
       <xsl:when test="name(.)='srcfeature_id'">
         <srcfeature_id>
           <xsl:apply-templates mode="make-link" select="."/>
         </srcfeature_id>
-      </xsl:when>
-      <xsl:when test="name(.)='pub_id'">
-        <pub>
-          <xsl:value-of select="pub/uniquename"/>
-        </pub>
       </xsl:when>
       <xsl:when test="name(.)='cv_id'">
         <cv>

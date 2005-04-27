@@ -1,4 +1,4 @@
-# $Id: FeatureUtil.pm,v 1.2 2004-07-23 22:15:43 cmungall Exp $
+# $Id: FeatureUtil.pm,v 1.3 2005-04-27 19:32:45 cmungall Exp $
 #
 #
 
@@ -246,5 +246,6 @@ sub md5 {
     $md5->add($res);
     return $md5->hexdigest;
 }
+
 
 1;

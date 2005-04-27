@@ -1,4 +1,4 @@
-# $Id: Root.pm,v 1.3 2004-10-18 20:49:35 cmungall Exp $
+# $Id: Root.pm,v 1.4 2005-04-27 19:32:45 cmungall Exp $
 #
 #
 
@@ -34,7 +34,7 @@ package Bio::Chaos::Root;
 
 use Exporter;
 use Bio::Root::Root;
-@ISA = qw(Bio::Root::Root Exporter);
+@ISA = qw(Bio::Root::Root Exporter); # TODO -- make independent
 
 use strict;
 
