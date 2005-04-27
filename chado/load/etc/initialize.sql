@@ -95,6 +95,7 @@ insert into analysis (name,program,programversion) values ('dabg' ,'dabg' ,'dabg
 insert into analysis (name,program,programversion) values ('dchip','dchip','dchip');
 insert into analysis (name,program,programversion) values ('gcrma','gcrma','gcrma');
 insert into analysis (name,program,programversion) values ('mas5' ,'mas5' ,'mas5' );
+insert into analysis (name,program,programversion) values ('mpam' ,'mpam' ,'mpam' );
 insert into analysis (name,program,programversion) values ('plier','plier','plier');
 insert into analysis (name,program,programversion) values ('rma'  ,'rma'  ,'rma'  );
 insert into analysis (name,program,programversion) values ('sea'  ,'sea'  ,'sea'  );
