@@ -6,7 +6,7 @@ ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY 
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
-CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name_id);
+CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name);
 CREATE INDEX affymetrixprobeset_idx2 ON affymetrixprobeset (feature_id);
 CREATE INDEX affymetrixprobeset_idx3 ON affymetrixprobeset (dbxref_id);
 CREATE INDEX affymetrixprobeset_idx4 ON affymetrixprobeset (arraydesign_id);
@@ -144,7 +144,7 @@ CREATE INDEX affymetrixrma_idx6 ON affymetrixrma (z);
 CREATE TABLE affymetrixgcrma (
   signal float NOT NULL,
   se float NOT NULL,
-  detection char(1) NOT NULL,
+  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);

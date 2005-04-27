@@ -7309,7 +7309,7 @@
    CREATE TABLE audit_affymetrixgcrma ( 
        signal float, 
        se float, 
-       detection char(1), 
+       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7321,14 +7321,14 @@
    DECLARE
        signal_var float; 
        se_var float; 
-       detection_var char(1); 
+       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
        se_var = OLD.se;
-       detection_var = OLD.detection;
+       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7340,13 +7340,13 @@
        INSERT INTO audit_affymetrixgcrma ( 
              signal, 
              se, 
-             detection, 
+             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
              se_var, 
-             detection_var, 
+             call_var, 
              z_var, 
              transaction_type_var
        );

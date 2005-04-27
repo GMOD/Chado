@@ -136,22 +136,22 @@ insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) 
 
 insert into cv (name) values ('developmental stages');
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:fetus');
-insert into cvterm (name,cv_id,dbxref_id) values ('fetus',      (select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='developmental statges:fetus'));
+insert into cvterm (name,cv_id,dbxref_id) values ('fetus',      (select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='developmental stages:fetus'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:neonate');
-insert into cvterm (name,cv_id,dbxref_id) values ('neonate',    (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental statges:neonate'));
+insert into cvterm (name,cv_id,dbxref_id) values ('neonate',    (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental stages:neonate'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:child');
-insert into cvterm (name,cv_id,dbxref_id) values ('child',      (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental statges:child'));
+insert into cvterm (name,cv_id,dbxref_id) values ('child',      (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental stages:child'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:adult_young');
-insert into cvterm (name,cv_id,dbxref_id) values ('adult_young',(select cv_id from cv where name = 'developmental stages'),(select dbxref_id from dbxref where accession='developmental statges:adult_young'));
+insert into cvterm (name,cv_id,dbxref_id) values ('adult_young',(select cv_id from cv where name = 'developmental stages'),(select dbxref_id from dbxref where accession='developmental stages:adult_young'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:adult');
-insert into cvterm (name,cv_id,dbxref_id) values ('adult',      (select cv_id from cv where name = 'developmental stages'),(select dbxref_id from dbxref where accession='developmental statges:adult'));
+insert into cvterm (name,cv_id,dbxref_id) values ('adult',      (select cv_id from cv where name = 'developmental stages'),(select dbxref_id from dbxref where accession='developmental stages:adult'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'developmental stages:adult_old');
-insert into cvterm (name,cv_id,dbxref_id) values ('adult_old',  (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental statges:adult_old'));
+insert into cvterm (name,cv_id,dbxref_id) values ('adult_old',  (select cv_id from cv where name = 'developmental stages'), (select dbxref_id from dbxref where accession='developmental stages:adult_old'));
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:survival_time');
 insert into cvterm (name,cv_id,dbxref_id) values ('survival_time',(select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='local:survival_time'));
