@@ -1,5 +1,5 @@
 # -*-Perl-*- mode (to keep my emacs happy)
-# $Id: 00parse_gb_to_chaos.t,v 1.4 2005-02-18 20:26:40 cmungall Exp $
+# $Id: 00parse_gb_to_chaos.t,v 1.5 2005-04-27 19:32:45 cmungall Exp $
 
 use strict;
 use vars qw($DEBUG);
@@ -128,6 +128,8 @@ sub process_seq {
         printf "RES:%s ID:%s Pname:%s nbeg:$nbeg SEGSTR:%s SEGLEN:%d \n", $res, $p->get_feature_id, $p->get_name, $srcf->sget("featureloc/strand"), length($srcres);
         if ($res ne 'ATG') {
             $failed = 1;
+            printf STDERR "Expected 'ATG' got '$res' for %s\n",
+              $f->get_name;
         }
     }
     ok(!$failed);

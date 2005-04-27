@@ -33,14 +33,15 @@
     <h2>Status</h2>
     <p>
       This software and data format will be officially released on
-      Jan 1 2005. Until then that time it is to be considered alpha
+      Jun 1 2005. Until then that time it is to be considered alpha
       software.
     </p>
 
     <h2>Downloading and Installation</h2>
     <p>
       Currently the only way to obtain this software is to cvs
-      checkout "schema/chado/chaos-xml" from the GMOD CVS repository.
+      checkout "schema/chado/chaos-xml" from the GMOD CVS
+      repository. Release 1 of this software will be available shortly.
     </p>
 
     <h2>Motivation</h2>
@@ -91,13 +92,13 @@
     </p>
     <p>
       Features are interconnected in a feature graph using the
-      "feature_relationship" element. This is to indicate which exons
+      <i>feature_relationship</i> element. This is to indicate which exons
       and proteins belong to which transcript, which transcripts
       belong to which gene.
     </p>
     <p>
       The location of a feature, relative to another feature, is
-      described by the "featureloc" element. All locations are
+      described by the <i>featureloc</i> element. All locations are
       interbase (ie counting from 0, not 1. It is the gaps between
       bases that are counted, not the bases themselves). In contrast
       to chado, which uses fmin/fmax to indicate the left and right
@@ -105,40 +106,20 @@
       (natural start) and three prime (natural end) coordinates.
     </p>
     <p>
-      For more details, see the dtd/ directory
+      For more details, see the <a href="dtd">dtd/</a> directory
     </p>
 
     <h2>Differences between Chaos XML and the Chado Relational Database Schema</h2>
-    <dl>
-      <dt>Coordinates</dt>
-      <dd>Chaos uses nbeg/nend as opposed to fmin/fam, as descibed above
-      </dd>
+    <p>
+      Chaos-XML is based on the Chado relational model. For a full
+      explanation of the meaning of the elements in Chaos-XML, please
+      refer to the Chado documentation
+    </p>
+    <p>
+      For a full explanation of the differences, see <a
+        href="doc/chaos-and-chado.html">Chaos and Chado</a>
+    </p>
 
-      <dt>Dbxref flattening</dt>
-      <dd>
-        Chaos collapses the normalised chado table "dbxref" into a
-        single "dbxrefstr" PCDATA element. See the <a href="dtd/chaos.dtd">DTD</a> for more
-        details.
-      </dd>
-
-      <dt>Type flattening</dt> 
-
-      <dd>
-        Chaos uses a PCDATA element "type" in both feature and
-        feature_relationship.
-        
-        In Chado, types are represented as a foreign key into the
-        cvterm table
-
-        In Chaos the type string is implicitly mapped to cvterm with
-        the same name as the type, from the Sequence Ontology (SO) CV
-      </dd>
-
-      <dt>Organism flattening</dt>
-      <dd>Chaos uses an "organismstr" PCDATA element to represent the
-        normalised chado table "organism". See the <a href="dtd/chaos.dtd">DTD</a> for more details.
-      </dd>
-    </dl>
     <h2>Library Contents</h2>
     <p>
       The Chaos-XML Library consists of specifications and software
@@ -146,16 +127,19 @@
     </p>
     <h3>DTD</h3>
     <p>The DTD specification can be found in <a
-        href="dtd/chaos.dtd">dtd/chaos.dtd</a>. [XLS file TODO]
-      
+        href="dtd/chaos.dtd">dtd/chaos.dtd</a>
+    </p>
+    <p>
+      Soon there will also be specifications as XML Schema and/or Relax-NG
+    </p>
     <h3>XSL Stylesheets</h3>
     <p>XSL transformations can be found in the <a
         href="xsl/">xsl/</a> directory.
-      
+    </p>  
     <h3>Example Chaos XML</h3>
     <p>Example Chaos-XML can be found in the <a
         href="sample-data/">sample-data/</a> directory.
-      
+    </p>
     <h3>Scripts</h3>
     <p>The scripts are in the <a href="bin/">bin/</a> directory. You
       need to install the perl chaos library before running these scripts.
@@ -166,6 +150,21 @@
     <p>You can browse the perl modules in the <a href="lib/">lib/</a>
     directory. To install, download the chaos-xml library and follow
     the instructions in the <a href="INSTALL">INSTALL</a> file.
+    </p>
+
+    <h2>Converting between Chaos-XML and Chado-XML</h2>
+    <p>
+      There are XSLT stylesheets defined for mapping between these two
+      similar formats, see the <a href="xsl">xsl/</a> directory.
+    </p>
+    <p>
+      If you are not familiar with XSLT, you can use these scripts,
+      part of this distribution (see the <a href="bin/">bin/</a>
+      directory
+      <ul>
+        <li>cx-chaos2chadoxml.pl</li>
+        <li>cx-chadoxml2chaos.pl</li>
+      </ul>
     </p>
 
     <h2>Future Extensions</h2>
@@ -192,7 +191,7 @@
     <address><a href="mailto:cjm@fruitfly.org">Chris Mungall</a></address>
 <!-- Created: Tue Jun 15 17:44:18 PDT 2004 -->
 <!-- hhmts start -->
-Last modified: Thu Dec  9 13:30:22 PST 2004
+Last modified: Wed Apr 20 10:12:40 PDT 2005
 <!-- hhmts end -->
   </body>
 </html>
