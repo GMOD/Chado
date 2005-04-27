@@ -91,6 +91,15 @@ insert into db (name, contact_id, description, urlprefix) values ('DB:genbank:pr
 insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot:display',(select contact_id from contact where name = 'null'),'SwissProt','http://http://us.expasy.org/cgi-bin/niceprot.pl?');
 insert into db (name, contact_id, description, urlprefix) values ('DB:pfam',(select contact_id from contact where name = 'null'),'Pfam','http://http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
 
+insert into analysis (name,program,programversion) values ('dabg' ,'dabg' ,'dabg' );
+insert into analysis (name,program,programversion) values ('dchip','dchip','dchip');
+insert into analysis (name,program,programversion) values ('gcrma','gcrma','gcrma');
+insert into analysis (name,program,programversion) values ('mas5' ,'mas5' ,'mas5' );
+insert into analysis (name,program,programversion) values ('plier','plier','plier');
+insert into analysis (name,program,programversion) values ('rma'  ,'rma'  ,'rma'  );
+insert into analysis (name,program,programversion) values ('sea'  ,'sea'  ,'sea'  );
+insert into analysis (name,program,programversion) values ('vsn'  ,'vsn'  ,'vsn'  );
+
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('unknown'                                    , (select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into arraydesign (name,manufacturer_id,platformtype_id) values ('virtual array'                              , (select contact_id from contact where name = 'null'),(select cvterm_id from cvterm where name = 'null'));
 insert into arraydesign (name,manufacturer_id,platformtype_id,substratetype_id) values ('Affymetrix_HG-U133_Plus_2' , (select contact_id from contact where name = 'Affymetrix'),(select cvterm_id from cvterm where name = 'photochemical_oligo'),(select cvterm_id from cvterm where name = 'glass'));
