@@ -11,9 +11,13 @@ require Exporter;
 @skip_tables = ('affymetrixprobeset',
                 'affymetrixprobe',
                 'affymetrixcel',
+                'affymetrixsnp',
                 'affymetrixmas5',
                 'affymetrixdchip',
                 'affymetrixvsn',
+                'affymetrixsea',
+                'affymetrixplier',
+                'affymetrixdabg',
                 'affymetrixrma',
                 'affymetrixgcrma',
                 'affymetrixprobesetstat',);

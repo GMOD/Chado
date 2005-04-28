@@ -5018,38 +5018,6 @@ sub assay {
     return shift->assay_id
 }
 
-# -------------------------------------------------------------------
-package Chado::Affymetrixsnp;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixsnp->set_up_table('affymetrixsnp');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixsea;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixsea->set_up_table('affymetrixsea');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixplier;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixplier->set_up_table('affymetrixplier');
-
-
-# -------------------------------------------------------------------
-package Chado::Affymetrixdabg;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::Affymetrixdabg->set_up_table('affymetrixdabg');
-
-
 1;
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
