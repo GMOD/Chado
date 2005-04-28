@@ -403,7 +403,7 @@ my $search_cvterm_id
 my $search_source_dbxref
    = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id=?");
 my $search_dbxref
-   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id in (SELECT db_id FROM db WHERE name like ?)");
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id in (SELECT db_id FROM db WHERE name like ? OR name like ?)");
 my $search_cvterm_id_w_dbxref
    = $db->prepare("SELECT cvterm_id FROM cvterm WHERE dbxref_id=?");
 my $search_db
@@ -673,16 +673,15 @@ END
 
         my $db_name;
         if ($d eq 'GO') {
-          $db_name = '%Gene Ontology%';
+          $search_dbxref->execute($a,'%Gene Ontology%','GO');
         } elsif ($d eq 'SO') {
-          $db_name = 'Sequence Ontology';
+          $search_dbxref->execute($a,'Sequence Ontology','SO');
         } else {
             warn "currently, only GO and SO Ontology_terms are supported;\n"
                  ."contact the author to complain\n";
             next;
         }
 
-        $search_dbxref->execute($a,$db_name);
         my ($dbxref) = $search_dbxref->fetchrow_array;
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
 
