@@ -100,33 +100,32 @@ about the GFF3 that will work with this bulk loader:
 
 =over
 
-=item Reference sequences
-
-This loader requires that the reference sequence features be already
-loaded into the database (for instance, by using gmod_load_gff3.pl).
-Future versions of this bulk loader will not have this restriction.
-
 =item Parents/children order
 
 Parents must come before children in the GFF file.
 
-=item Several GFF tags (both reserved and custom) not supported
+=item The Gap GFF reserved tag not supported
 
-These include:
+Just flat out not supported--if you would like to see support, contact 
+the authors
 
-=over
+=item Any custom (ie, lowercase-first) tag is supported
 
-=item Gap
+Custom tags are supported, provided they already have an entry in the cvterm table.
+For example, if you have a custom tab, 'orf_classification', you need
+an entry in the dbxref and cvterm tables something like this:
 
-=item Any custom (ie, lowercase-first) tag is supported, provided they already have an entry in the cvterm table
 
-=back
+  INSERT INTO dbxref (db_id,accession)
+    VALIES ( (SELECT db_id FROM db WHERE name='null'),
+             'autocreated:orf_classification');
+  INSERT INTO cvterm (name,dbxref_id,cv_id) 
+    VALUES ('orf_classification',
+             (SELECT cv_id FROM cv WHERE name='local'),
+             (SELECT dbxref_id FROM dbxref WHERE accession='autocreated:orf_classification'));
 
-=item No sequences
-
-This loader does not load DNA sequences, though chromosome sequences
-can be loaded with gmod_load_gff3 when the reference sequence features
-are loaded.
+You may also need to create an appropriate controlled vocabulary
+in the cv table and an entry in the db table.
 
 =item Analysis
 
@@ -582,11 +581,12 @@ while(my $feature = $gffio->next_feature()){
   my @unreserved_tags = grep {/^[a-z]/} $feature->annotation->get_all_annotation_keys();
   if ( @unreserved_tags > 0 ) {
     foreach my $tag (@unreserved_tags) {
-      next unless (ref($feature->annotation) eq 'Bio::Annotation::SimpleValue');
       next if $tag eq 'source';
       next if $tag eq 'phase';
       next if $tag eq 'seq_id';
-      my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
+      next if $tag eq 'type';
+      next if $tag eq 'score';
+      next if $tag eq 'dbxref';
 
       unless ($auto_cv_id){
         my $sth = $db->prepare("SELECT cv_id FROM cv WHERE name='autocreated'");
@@ -610,7 +610,7 @@ to execute the following SQL commands in the psql shell:
     VALUES ((select db_id from db where name='null'),'autocreated:$tag');
   INSERT INTO cvterm (cv_id,name,dbxref_id)
     VALUES ((select cv_id from cv where name='autocreated'), '$tag',
-            (select dbxref_id from dbxref where accession='autocreated:$tag');
+            (select dbxref_id from dbxref where accession='autocreated:$tag'));
 
 and then rerun this loader.  You other main option is to 
 write a special handler for this tag so that it will
