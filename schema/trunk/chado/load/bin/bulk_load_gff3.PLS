@@ -262,6 +262,7 @@ my %files = (
    dbxref               => "/tmp/dbxref.tmp",
    feature_dbxref       => "/tmp/feature_dbxref.tmp",
    analysisfeature      => "/tmp/analysisfeature.tmp",
+   sequence             => "/tmp/sequence.tmp",
 );
 my %sequences = (
    feature              => "feature_feature_id_seq",
@@ -679,7 +680,7 @@ END
         } elsif ($d eq 'SO') {
           $db_name = 'Sequence Ontology';
         } else {
-            warn "currently, only GO and SO Ontology_terms are support;\n"
+            warn "currently, only GO and SO Ontology_terms are supported;\n"
                  ."contact the author to complain\n";
             next;
         }
@@ -937,6 +938,15 @@ $search_long_dbxref->finish;
 $search_analysis->finish;
 $search_synonym->finish;
 
+#deal with sequence 
+open SEQ, ">$files{sequence}" or die;
+while (my $seq = $gffio->next_seq) {
+  my $string = $seq->seq();
+  my $name   = $seq->display_id();
+  print SEQ "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
+}
+close SEQ;
+
 if(!$NOLOAD){
   foreach my $table (@tables) {
     copy_from_stdin($db,$table,
@@ -948,6 +958,15 @@ if(!$NOLOAD){
 
   $db->commit || die "commit failed: ".$db->errstr();
   $db->{AutoCommit}=1;
+
+  #load sequence
+  warn "Loading sequences (if any) ...\n";
+  open SEQ, $files{sequence} or die;
+  while (<SEQ>) {
+    chomp;
+    $db->do($_);
+  }
+  close SEQ;
 
   warn "Optimizing database (this may take a while) ...\n";
   print STDERR "  (";
