@@ -124,9 +124,6 @@ an entry in the dbxref and cvterm tables something like this:
              (SELECT cv_id FROM cv WHERE name='local'),
              (SELECT dbxref_id FROM dbxref WHERE accession='autocreated:orf_classification'));
 
-You may also need to create an appropriate controlled vocabulary
-in the cv table and an entry in the db table.
-
 =item Analysis
 
 If you are loading analysis results (ie, blat results, gene predictions), 
