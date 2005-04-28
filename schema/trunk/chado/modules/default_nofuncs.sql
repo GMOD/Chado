@@ -2588,10 +2588,10 @@ CREATE TABLE affymetrixprobeset (
   name varchar(255) NULL,
   constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
 ) INHERITS ( element );
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c1 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c5 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
 CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name);
 CREATE INDEX affymetrixprobeset_idx2 ON affymetrixprobeset (feature_id);
 CREATE INDEX affymetrixprobeset_idx3 ON affymetrixprobeset (dbxref_id);
