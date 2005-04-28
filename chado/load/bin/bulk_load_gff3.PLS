@@ -33,7 +33,6 @@ if ($OPTIONS{PREFIX}) {
 print OUT <<'!NO!SUBS!';
 use strict;
 use DBI;
-#use Chado::LoadDBI;
 use Bio::FeatureIO;
 use Getopt::Long;
 #use Data::Dumper;
@@ -212,8 +211,6 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
 } else {
   $ANALYSIS = 0;
 }
-
-#Chado::DBI->set_db('Main',"dbi:Pg:dbname=$DBNAME;host=$DBHOST",$DBUSER,$DBPASS,{AutoCommit=>0});
 
 my %cache = (
              analysis => {},
@@ -409,7 +406,7 @@ my $search_cvterm_id
 my $search_source_dbxref
    = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id=?");
 my $search_dbxref
-   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id = (SELECT db_id FROM db WHERE name = ?)");
+   = $db->prepare("SELECT dbxref_id FROM dbxref WHERE accession=? AND db_id in (SELECT db_id FROM db WHERE name like ?)");
 my $search_cvterm_id_w_dbxref
    = $db->prepare("SELECT cvterm_id FROM cvterm WHERE dbxref_id=?");
 my $search_db
@@ -468,7 +465,15 @@ while(my $feature = $gffio->next_feature()){
   }
   die "no cvterm for ".$featuretype unless $type;
 
-  my $src = $cache{parent}{$feature->seq_id->value};
+  my $src;
+  if ($feature->seq_id->value
+      eq ($feature->annotation->get_Annotations('ID'))[0]) {
+      #this is a srcfeature (ie, a reference sequence)
+    $src = $nextfeature;
+    $cache{parent}{$feature->seq_id->value} = $src;
+  } else { # normal case
+    $src = $cache{parent}{$feature->seq_id->value};
+  }
 
   if(!$src){
     if($feature->seq_id->value eq '.'){
@@ -537,12 +542,15 @@ while(my $feature = $gffio->next_feature()){
   }
 
 
+#don't write a featureloc entry for srcfeatures
+  unless ($src == $nextfeature) {
 #need to convert from base to interbase coords
-  my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
-  my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
-  my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
+    my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
+    my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
+    my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
 
-  print FLOC join("\t", ($nextfeatureloc, $cache{feature}{$uniquename}, $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename})),"\n";
+    print FLOC join("\t", ($nextfeatureloc, $cache{feature}{$uniquename}, $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename})),"\n";
+  }
 
   if ($feature->annotation->get_Annotations('Note')) {
     my @notes = map {$_->value} $feature->annotation->get_Annotations('Note');
@@ -664,9 +672,22 @@ END
       next unless $term;
       unless ($cache{type}{$term}) {
         my($d,$a) = $term =~ /^(.+?):(.+?)$/;
-        $search_dbxref->execute($a,$d);
+
+        my $db_name;
+        if ($d eq 'GO') {
+          $db_name = '%Gene Ontology%';
+        } elsif ($d eq 'SO') {
+          $db_name = 'Sequence Ontology';
+        } else {
+            warn "currently, only GO and SO Ontology_terms are support;\n"
+                 ."contact the author to complain\n";
+            next;
+        }
+
+        $search_dbxref->execute($a,$db_name);
         my ($dbxref) = $search_dbxref->fetchrow_array;
         warn "couldn't find $term in dbxref\n" and next unless $dbxref;
+
         $search_cvterm_id_w_dbxref->execute($dbxref);
         ($cache{type}{$term}) = $search_cvterm_id_w_dbxref->fetchrow_array;
         warn "couldn't find $term's cvterm_id in cvterm table\n" 
