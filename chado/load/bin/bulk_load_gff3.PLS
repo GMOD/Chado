@@ -636,7 +636,7 @@ to execute the following SQL commands in the psql shell:
     VALUES ((select cv_id from cv where name='autocreated'), '$tag',
             (select dbxref_id from dbxref where accession='autocreated:$tag'));
 
-and then rerun this loader.  You other option is to 
+and then rerun this loader.  Your other option is to 
 write a special handler for this tag so that it will
 go where you want it in the database.
 
