@@ -63,7 +63,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --analysis    The GFF data is from computational analysis
  --noload      Create bulk load files, but don't actually load them.
  --nosequence  Don't load sequence even if it is in the file
- --notranscat  Don't use a single transaction to load the database
+ --notransact  Don't use a single transaction to load the database
  --validate    Validate SOFA terms before attempting insert (can cause
                  script startup to be slow, 0 (false) by default)
 
