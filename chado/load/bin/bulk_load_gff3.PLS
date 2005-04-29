@@ -62,6 +62,8 @@ $0 - Bulk loads gff3 files into a chado database.
  --dbport      Database port
  --analysis    The GFF data is from computational analysis
  --noload      Create bulk load files, but don't actually load them.
+ --nosequence  Don't load sequence even if it is in the file
+ --notranscat  Don't use a single transaction to load the database
  --validate    Validate SOFA terms before attempting insert (can cause
                  script startup to be slow, 0 (false) by default)
 
@@ -73,6 +75,27 @@ by Bio::GMOD::Config, which was installed when 'make install' was run.
 =head2 NOTES
 
 =over
+
+=item Transactions
+
+This application will, by default, try to load all of the data at
+once as a single transcation.  This is safer from the database's
+point of view, since if anything bad happens during the load, the 
+transaction will be rolled back and the database will be untouched.  
+The problem occurs if there are many (say, greater than a 2-300,000)
+rows in the GFF file.  When that is the case, doing the load as 
+a single transcation can result in the machine running out of memory
+and killing processes.  If --notranscat is provided on the commandline,
+each table will be loaded as a separate transaction.
+
+=item Sequence
+
+By default, if there is sequence in the GFF file, it will be loaded
+into the residues column in the feature table row that corresponds
+to that feature.  By supplying the --nosequence option, the sequence
+will be skipped.  You might want to do this if you have very large
+sequences, which can be difficult to load.  In this context, "very large"
+means more than 200MB.
 
 =item The ORGANISM table
 
@@ -106,14 +129,14 @@ Parents must come before children in the GFF file.
 
 =item The Gap GFF reserved tag not supported
 
-Just flat out not supported--if you would like to see support, contact 
+Just flat out not supported yet--if you would like to see support, contact 
 the authors
 
 =item Any custom (ie, lowercase-first) tag is supported
 
-Custom tags are supported, provided they already have an entry in the cvterm table.
-For example, if you have a custom tab, 'orf_classification', you need
-an entry in the dbxref and cvterm tables something like this:
+Custom tags are supported, provided they already have an entry in the
+cvterm table. For example, if you have a custom tab, 'orf_classification',
+you need an entry in the dbxref and cvterm tables something like this:
 
 
   INSERT INTO dbxref (db_id,accession)
@@ -157,7 +180,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -187,6 +210,8 @@ GetOptions(
     'analysis:s' => \$ANALYSIS, # = means it is required, : means optional
     'noload'     => \$NOLOAD,
     'validate'   => \$VALIDATE,
+    'notransact' => \$NOTRANSACT,
+    'nosequence' => \$NOSEQUENCE,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -196,6 +221,8 @@ $DBPASS   ||='';
 $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
 $VALIDATE ||=0;
+$NOTRANSACT ||=0;
+$NOSEQUENCE ||=0;
 
 $GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
@@ -288,7 +315,7 @@ my %copystring = (
 
 ########################
 my $db = DBI->connect("dbi:Pg:dbname=$DBNAME;port=$DBPORT;host=$DBHOST",
-                       $DBUSER,$DBPASS, {AutoCommit => 0});
+                       $DBUSER,$DBPASS, {AutoCommit => $NOTRANSACT});
 
 my $sth = $db->prepare("select nextval('$sequences{feature}')");
 $sth->execute;
@@ -935,13 +962,15 @@ $search_analysis->finish;
 $search_synonym->finish;
 
 #deal with sequence 
-open SEQ, ">$files{sequence}" or die;
-while (my $seq = $gffio->next_seq) {
-  my $string = $seq->seq();
-  my $name   = $seq->display_id();
-  print SEQ "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
+unless ($NOSEQUENCE) {
+  open SEQ, ">$files{sequence}" or die;
+  while (my $seq = $gffio->next_seq) {
+    my $string = $seq->seq();
+    my $name   = $seq->display_id();
+    print SEQ "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
+  }
+  close SEQ;
 }
-close SEQ;
 
 if(!$NOLOAD){
   foreach my $table (@tables) {
@@ -952,17 +981,19 @@ if(!$NOLOAD){
                     $nextvalue{$table});
   }
 
-  $db->commit || die "commit failed: ".$db->errstr();
+  ($db->commit || die "commit failed: ".$db->errstr()) unless $NOTRANSACT;
   $db->{AutoCommit}=1;
 
   #load sequence
-  warn "Loading sequences (if any) ...\n";
-  open SEQ, $files{sequence} or die;
-  while (<SEQ>) {
-    chomp;
-    $db->do($_);
+  unless ($NOSEQUENCE) {
+    warn "Loading sequences (if any) ...\n";
+    open SEQ, $files{sequence} or die;
+    while (<SEQ>) {
+      chomp;
+      $db->do($_);
+    }
+    close SEQ;
   }
-  close SEQ;
 
   warn "Optimizing database (this may take a while) ...\n";
   print STDERR "  (";
