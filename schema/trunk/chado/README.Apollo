@@ -6,15 +6,40 @@ be done:
   - grant privileges to users to several tables (list here) --in the  
     meantime, you can grant all using sqlt and the template, 
     bin/privileges.tmpl 
-  - insert several ad hoc ontology terms found in 
-    modules/sequence/apollo-bridge/ontology_inserts.sql
+
+    sqlt -f PostgreSQL -t TTSchema --template bin/privileges.tmpl modules/nofuncs.sql | psql <databasename>
+
+    You can edit the template to grant privileges to just specific
+    users instead of PUBLIC.
+
+  - insert several ad hoc cv terms found in 
+    modules/sequence/apollo-bridge/cv_inserts.sql. This file
+    contains sql commands to insert several controlled vocabulary terms
+    that Apollo expects to be in the database.  This file can be recreated
+    with additional terms as needed by editing the file
+    modules/sequence/apollo-bridge/ad_hoc_cv and running the perl script
+    modules/sequence/apollo-bridge/insert_ad_doc_cv.pl.  The resulting 
+    sql file can be inserted into the database with this command:
+
+      $ psql $DBNAME <modules/sequence/apollo-bridge/cv_inserts.sql 
+
   - insert a few misc items like those found in 
     modules/sequence/apollo-bridge/apollo.inserts
-    (heh! try to be a little more vague next time!) 
+    
+    Essentially, Apollo and chado have to agree about what the names
+    in the analysis table are, and there needs to be a few terms in 
+    the cv table. 
+
   - add the functions and triggers to chado.  Use the perl script:
       % /usr/local/bin/gmod_apollo_triggers.pl create
     Note that this script can also be used to drop and add the triggers
     in case you want to do some bulk loading and want to disactivate
     the triggers for that. 
 
+I understand that these directions are somewhat vague.  Getting Apollo to
+work with chado requires a little hands on tinkering.  If you find yourself
+having difficulties, please contact me.
 
+Scott Cain
+cain@cshl.edu
+4/29/05

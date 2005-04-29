@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-open ONTO, "ad_hoc_ontologies" or die "couldn't ope ad_hoc_ontologies:$!\n"; 
-open INSERTS, ">ontology_inserts.sql" or die "couldn't open ontology_inserts.sql: $!\n";
+open ONTO, "ad_hoc_cv" or die "couldn't open ad_hoc_cv:$!\n"; 
+open INSERTS, ">cv_inserts.sql" or die "couldn't open cv_inserts.sql: $!\n";
 
 my $cv;
 
