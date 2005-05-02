@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.84 2005-03-24 16:09:52 scottcain Exp $
+# $Id: Makefile.PL,v 1.85 2005-05-02 19:22:35 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -332,8 +332,8 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
     $conf{'DBORGANISM'} || $args{'DBORGANISM'}{'default'}
   );
 
-  $APOLLO||=prompt('Create files to use Apollo with chado?'),
-    $conf{'APOLLO'} || $args{'APOLLO'}{'default'}
+#  $APOLLO||=prompt('Create files to use Apollo with chado?'),
+#    $conf{'APOLLO'} || $args{'APOLLO'}{'default'}
 }
 
 $DBORGANISM = '' if $DBORGANISM =~ /none/i;
