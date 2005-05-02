@@ -165,6 +165,28 @@ psql shell:
 There are other columns in the analysis table that are optional; see
 the schema documentation and '\d analysis' in psql for more information.
 
+Chado has four possible columns for storing the score in the GFF score 
+column; please use whichever is most appropriate and identifiy it 
+with --score_col flag (significance is the default). Note that the name
+of the column can be shortened to one letter.  If you have more than
+one score associated with each feature, you can put the other scores in
+the ninth column as a tag=value pair, like 'identity=99', and the
+bulk loader will put it in the featureprop table (provided there
+is a cvterm for identity; see the section above concerning custom
+tags).  Available options are:
+
+=over
+
+=item significance (default)
+
+=item identity
+
+=item normscore
+
+=item rawscore
+
+=back
+
 =back
 
 =back
@@ -180,7 +202,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -212,6 +234,7 @@ GetOptions(
     'validate'   => \$VALIDATE,
     'notransact' => \$NOTRANSACT,
     'nosequence' => \$NOSEQUENCE,
+    'score_col=s'=> \$SCORE_COL,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -223,6 +246,7 @@ $DBPORT   ||='5432';
 $VALIDATE ||=0;
 $NOTRANSACT ||=0;
 $NOSEQUENCE ||=0;
+$SCORE_COL  ||='significance';
 
 $GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
@@ -309,7 +333,7 @@ my %copystring = (
    feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
    dbxref               => "(dbxref_id,db_id,accession,version,description)",
    feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
-   analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance)",
+   analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance,rawscore,normscore,identity)",
 );
 
 
@@ -820,7 +844,18 @@ END
     }
     dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
-    print AF join("\t", ($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score)), "\n";
+    my $score_string;
+    if      ($SCORE_COL =~ /^[Ss]/) {
+      $score_string = "$score,\\N,\\N,\\N";
+    } elsif ($SCORE_COL =~ /^[Rr]/) {
+      $score_string = "\\N,$score,\\N,\\N";
+    } elsif ($SCORE_COL =~ /^[Nn]/) {
+      $score_string = "\\N,\\N,$score,\\N";
+    } elsif ($SCORE_COL =~ /^[Ii]/) {
+      $score_string = "\\N,\\N,\\N,$score";
+    }
+
+    print AF join("\t", ($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score_string)), "\n";
     $nextanalysisfeature++;
   }
 
@@ -899,7 +934,18 @@ END
       }
       dump_ana_contents($ankey) unless $cache{analysis}{$ankey};
 
-      print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score)), "\n"; 
+      my $score_string;
+      if      ($SCORE_COL =~ /^[Ss]/) {
+        $score_string = "$score,\\N,\\N,\\N";
+      } elsif ($SCORE_COL =~ /^[Rr]/) {
+        $score_string = "\\N,$score,\\N,\\N";
+      } elsif ($SCORE_COL =~ /^[Nn]/) {
+        $score_string = "\\N,\\N,$score,\\N";
+      } elsif ($SCORE_COL =~ /^[Ii]/) {
+        $score_string = "\\N,\\N,\\N,$score";
+      }
+
+      print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score_string)), "\n"; 
       $nextanalysisfeature++;
 
  #     my $target_unique = "target_$target_id";
