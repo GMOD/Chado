@@ -192,6 +192,16 @@ tags).  Available options are:
 
 =back
 
+A planned addtion to the functionality of handling analysis results
+is to allow "mixed" GFF files, where some lines are analysis results
+and some are not.  Additionally, one will be able to supply lists
+of types (optionally with sources) and their associated entry in the
+analysis table.  The format will probably be tag value pairs:
+
+  --analysis match:Rice_est=rice_est_blast, \
+             match:Maize_cDNA=maize_cdna_blast, \
+             mRNA=genscan_prediction,exon=genscan_prediction
+
 =back
 
 =back
