@@ -97,6 +97,11 @@ will be skipped.  You might want to do this if you have very large
 sequences, which can be difficult to load.  In this context, "very large"
 means more than 200MB.
 
+Also note that for sequences to load properly, the GFF file must have
+the ##FASTA directive (it is required for proper parsing by Bio::FeatureIO),
+and the ID of the feature must be exactly the same as the name of the
+sequence following the > in the fasta section.
+
 =item The ORGANISM table
 
 This script assumes that the organism table is populated with information
