@@ -1029,6 +1029,7 @@ unless ($NOSEQUENCE) {
     my $string = $seq->seq();
     my $name   = $seq->display_id();
     print SEQ "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
+    print SEQ "UPDATE feature set seqlen=length(residues) WHERE uniquename='$name';\n";
   }
   close SEQ;
 }
