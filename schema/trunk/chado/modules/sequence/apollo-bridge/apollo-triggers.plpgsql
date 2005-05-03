@@ -652,7 +652,7 @@ DECLARE
   c_name_synonym  CONSTANT varchar:=''synonym'';
   cv_cvname_synonym CONSTANT varchar:=''null'';
   name_suffix     varchar;
-  child_name      varcher;
+  child_name      varchar;
 BEGIN
   IF OLD.uniquename <> NEW.uniquename AND OLD.uniquename NOT LIKE ''%temp%'' THEN
       RAISE NOTICE ''You may not change the uniquename of a feature'';
@@ -673,7 +673,8 @@ BEGIN
   IF f_type <> f_type_gene THEN
       --its not a gene, so go ahead
       --but insert the new name into the synonym table
-      IF f_name IS NOT NULL THEN
+      IF NEW.name IS NOT NULL THEN
+
 
           SELECT INTO s_id synonym_id from synonym where name=NEW.name and type_id=s_type_id;
           IF s_id IS NULL THEN
@@ -709,7 +710,7 @@ BEGIN
       END IF;
 
 
-      ELSIF  f_row.name LIKE OLD.name||'':%'' THEN
+      IF  f_row.name LIKE OLD.name||'':%'' THEN
           SELECT INTO name_suffix  substring(name from OLD.name||''(:.+)'') FROM feature where feature_id = f_row.feature_id;
           child_name = NEW.name||name_suffix;
           UPDATE feature SET name = child_name WHERE feature_id = f_row.feature_id;
