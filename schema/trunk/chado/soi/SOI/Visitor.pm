@@ -29,9 +29,6 @@ use vars qw($AUTOLOAD);
 
 use strict;
 
-=head1 FUNCTIONS
-
-=cut
 
 #only relationship of part_of (may need to use more defined part_of, later)
 sub set_location_from_component {
@@ -39,7 +36,7 @@ sub set_location_from_component {
     if ($node->isa('SOI::Visitor')) {
         $node = shift;
     }
-    return $node if (defined($node->fmax)); #already set
+    return $node if (defined($node->fmax) && defined($node->strand)); #already set
     map{&set_loc($_)}@{$node->nodes || []};
     my @children = grep{$_->relationship_type && ($_->relationship_type  eq 'part_of' || $_->relationship_type eq 'partof')}@{$node->nodes || []};
     return $node unless (@children);
@@ -79,6 +76,34 @@ sub delete_property {
     my $props = $node->properties;
     my @remains = grep{$_->{type} ne $key}@{$props || []};
     $node->properties(\@remains);
+}
+
+#must be mini-view feature
+sub remove_strand {
+    my $node = shift;
+    if ($node->isa('SOI::Visitor')) {
+        $node = shift;
+    }
+    my $gone = shift || confess("must pass in strand that is to be removed");
+    my ($contig,@features);
+    map{if ($_->type eq 'contig') {$contig = $_} else {push @features, $_}}@{$node->nodes || []};
+    my (@ans,@fs);
+    map{if ($_->type eq 'companalysis') {push @ans, $_} else {push @fs, $_}}@features;
+    my (@keep_ans, @keep_fs);
+    foreach my $an (@ans) {
+        my @rsets;
+        map{
+            SOI::Visitor->set_loc($_);
+            push @rsets, $_ if ($_->strand != $gone);
+        }@{$an->nodes || []};
+        if (@rsets) {
+            $an->nodes([@rsets]);
+            push @keep_ans, $an;
+        }
+    }
+    @keep_fs = grep{$_->strand != $gone}@fs;
+    $node->nodes([$contig,@keep_ans,@keep_fs]);
+    return $node;
 }
 
 1;
