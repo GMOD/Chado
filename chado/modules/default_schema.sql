@@ -2761,6 +2761,241 @@ CREATE INDEX affymetrixprobesetstat_idx6 ON affymetrixprobesetstat (quartile3);
 CREATE INDEX affymetrixprobesetstat_idx7 ON affymetrixprobesetstat (sd);
 CREATE INDEX affymetrixprobesetstat_idx8 ON affymetrixprobesetstat (n);
 
+CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_subject_ids(cterm.subject_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+---arg: parent term id
+---return: all children term id and their parent term id with relationship type id
+CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    exist_c int;
+BEGIN
+
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = root and pathdistance <= 0;
+    IF (exist_c > 0) THEN
+        FOR cterm IN SELECT * FROM cvtermpath WHERE object_id = root and pathdistance > 0 LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    ELSE
+        FOR cterm IN SELECT * FROM _get_all_subject_ids(root) LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    END IF;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM get_all_subject_ids(cterm.subject_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM get_all_object_ids(cterm.object_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION _get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    cterm2 cvtermpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_object_ids(cterm.object_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+---arg: child term id
+---return: all parent term id and their childrent term id with relationship type id
+CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm cvtermpath%ROWTYPE;
+    exist_c int;
+BEGIN
+
+
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = leaf and pathdistance <= 0;
+    IF (exist_c > 0) THEN
+        FOR cterm IN SELECT * FROM cvtermpath WHERE subject_id = leaf AND pathdistance > 0 LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    ELSE
+        FOR cterm IN SELECT * FROM _get_all_object_ids(leaf) LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    END IF;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+---arg: sql statement which must be in the form of select cvterm_id from ...
+---return: a set of cvterm ids that includes what is in sql statement and their children (subject ids)
+CREATE OR REPLACE FUNCTION get_it_sub_cvterm_ids(text) RETURNS SETOF cvterm AS
+'
+DECLARE
+    query alias for $1;
+    cterm cvterm%ROWTYPE;
+    cterm2 cvterm%ROWTYPE;
+BEGIN
+    FOR cterm IN EXECUTE query LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT subject_id as cvterm_id FROM get_all_subject_ids(cterm.cvterm_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+--- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
+--- fill path from the node to its children and their children
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    cvid alias for $3;
+    typeid alias for $4;
+    depth alias for $5;
+    cterm cvterm_relationship%ROWTYPE;
+    exist_c int;
+
+BEGIN
+
+    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
+    --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
+
+    IF (exist_c = 0) THEN
+        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
+    END IF;
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
+        PERFORM _fill_cvtermpath4node(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    ttype int;
+    cterm cvterm_relationship%ROWTYPE;
+    child cvterm_relationship%ROWTYPE;
+
+BEGIN
+
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
+    PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
+    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
+        PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
+        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    cvid alias for $1;
+    root cvterm%ROWTYPE;
+
+BEGIN
+
+    DELETE FROM cvtermpath WHERE cv_id = cvid;
+
+    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
+        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
+    END LOOP;
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
+'
+DECLARE
+    cvname alias for $1;
+    cv_id   int;
+    rtn     int;
+BEGIN
+
+    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
+    SELECT INTO rtn fill_cvtermpath(cv_id);
+    RETURN rtn;
+END;   
+'
+LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
@@ -2931,398 +3166,159 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
---- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
---- fill path from the node to its children and their children
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+-- FUNCTION gfffeatureatts (integer) is a function to get 
+-- data in the same format as the gffatts view so that 
+-- it can be easily converted to GFF attributes.
+
+CREATE FUNCTION  gfffeatureatts (integer)
+RETURNS SETOF gffatts
+AS
 '
-DECLARE
-    origin alias for $1;
-    child_id alias for $2;
-    cvid alias for $3;
-    typeid alias for $4;
-    depth alias for $5;
-    cterm cvterm_relationship%ROWTYPE;
-    exist_c int;
+SELECT feature_id, ''cvterm'' AS type,  s.name AS attribute
+FROM cvterm s, feature_cvterm fs
+WHERE fs.feature_id= $1 AND fs.cvterm_id = s.cvterm_id
+UNION
+SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
+--UNION
+--SELECT feature_id, ''expression'' AS type, s.description AS attribute
+--FROM expression s, feature_expression fs
+--WHERE fs.feature_id= $1 AND fs.expression_id = s.expression_id
+--UNION
+--SELECT fg.feature_id, ''genotype'' AS type, g.uniquename||'': ''||g.description AS attribute
+--FROM gcontext g, feature_gcontext fg
+--WHERE fg.feature_id= $1 AND g.gcontext_id = fg.gcontext_id
+--UNION
+--SELECT feature_id, ''genotype'' AS type, s.description AS attribute
+--FROM genotype s, feature_genotype fs
+--WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
+--UNION
+--SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
+--FROM phenotype s, feature_phenotype fs
+--WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
+UNION
+SELECT feature_id, ''synonym'' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs
+WHERE fs.feature_id= $1 AND fs.synonym_id = s.synonym_id
+UNION
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.feature_id= $1 AND fp.type_id = cv.cvterm_id 
+UNION
+SELECT feature_id, ''pub'' AS type, s.series_name || '':'' || s.title AS attribute
+FROM pub s, feature_pub fs
+WHERE fs.feature_id= $1 AND fs.pub_id = s.pub_id
+'
+LANGUAGE SQL;
 
+
+--
+-- functions for creating coordinate based functions
+--
+-- create a point
+CREATE OR REPLACE FUNCTION p (int, int) RETURNS point AS
+ 'SELECT point ($1, $2)'
+LANGUAGE 'sql';
+
+-- create a range box
+-- (make this immutable so we can index it)
+CREATE OR REPLACE FUNCTION boxrange (int, int) RETURNS box AS
+ 'SELECT box (p(0, $1), p($2,500000000))'
+LANGUAGE 'sql' IMMUTABLE;
+
+-- create a query box
+CREATE OR REPLACE FUNCTION boxquery (int, int) RETURNS box AS
+ 'SELECT box (p($1, $2), p($1, $2))'
+LANGUAGE 'sql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
+  'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
+LANGUAGE 'sql';
+
+--functional index that depends on the above functions
+CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
+
+--uses the gff3atts to create a GFF3 compliant attribute string
+CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
+'DECLARE
+  return_string      varchar;
+  f_id               ALIAS FOR $1;
+  atts_view          gffatts%ROWTYPE;
+  feature_row        feature%ROWTYPE;
+  name               varchar;
+  uniquename         varchar;
+  parent             varchar;
+                                                                                
 BEGIN
-
-    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
-    --- not check type_id as it may be null and not very meaningful in cvtermpath when pathdistance > 1
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
-
-    IF (exist_c = 0) THEN
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
-    END IF;
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4node(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
-    END LOOP;
-    RETURN 1;
+  --Get name from feature.name
+  --Get ID from feature.uniquename
+                                                                                
+  SELECT INTO feature_row * FROM feature WHERE feature_id = f_id;
+  name  = feature_row.name;
+  return_string = ''ID='' || feature_row.uniquename;
+  IF name IS NOT NULL AND name != ''''
+  THEN
+    return_string = return_string ||'';'' || ''Name='' || name;
+  END IF;
+                                                                                
+  --Get Parent from feature_relationship
+  SELECT INTO feature_row * FROM feature f, feature_relationship fr
+    WHERE fr.subject_id = f_id AND fr.object_id = f.feature_id;
+  IF FOUND
+  THEN
+    return_string = return_string||'';''||''Parent=''||feature_row.uniquename;
+  END IF;
+                                                                                
+  FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
+    return_string = return_string || '';''
+                     || atts_view.type || ''=''
+                     || atts_view.attribute;
+  END LOOP;
+                                                                                
+  RETURN return_string;
 END;
 '
-LANGUAGE 'plpgsql';
+LANGUAGE plpgsql;
 
+--creates a view that is suitable for creating a GFF3 string
+CREATE OR REPLACE VIEW gff3view (
+  feature_id,
+  ref,
+  source,
+  type,
+  fstart,
+  fend,
+  score,
+  strand,
+  phase,
+  attributes,
+  seqlen,
+  name
+) AS
+SELECT
+  f.feature_id   ,
+  sf.name        ,
+  dbx.accession  ,
+  cv.name        ,
+  fl.fmin+1      ,
+  fl.fmax        ,
+  af.significance,
+  fl.strand      ,
+  fl.phase       ,
+  gffattstring(f.feature_id),
+  f.seqlen       ,
+  f.name         ,
+  f.organism_id
+FROM feature f
+     LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
+     LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id) 
+     LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
+     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
+     LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
+     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
+WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    rootid alias for $1;
-    cvid alias for $2;
-    ttype int;
-    cterm cvterm_relationship%ROWTYPE;
-    child cvterm_relationship%ROWTYPE;
-
-BEGIN
-
-    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
-    PERFORM _fill_cvtermpath4node(rootid, rootid, cvid, ttype, 0);
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4root(cterm.subject_id, cvid);
-        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    cvid alias for $1;
-    root cvterm%ROWTYPE;
-
-BEGIN
-
-    DELETE FROM cvtermpath WHERE cv_id = cvid;
-
-    FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
-        PERFORM _fill_cvtermpath4root(root.cvterm_id, root.cv_id);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
-'
-DECLARE
-    cvname alias for $1;
-    cv_id   int;
-    rtn     int;
-BEGIN
-
-    SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
-    SELECT INTO rtn fill_cvtermpath(cv_id);
-    RETURN rtn;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    root alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM _get_all_subject_ids(cterm.subject_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
----arg: parent term id
----return: all children term id and their parent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    root alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    exist_c int;
-BEGIN
-
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = root and pathdistance <= 0;
-    IF (exist_c > 0) THEN
-        FOR cterm IN SELECT * FROM cvtermpath WHERE object_id = root and pathdistance > 0 LOOP
-            RETURN NEXT cterm;
-        END LOOP;
-    ELSE
-        FOR cterm IN SELECT * FROM _get_all_subject_ids(root) LOOP
-            RETURN NEXT cterm;
-        END LOOP;
-    END IF;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    root alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE object_id = root LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM get_all_subject_ids(cterm.subject_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-
-CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    leaf alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM get_all_object_ids(cterm.object_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION _get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    leaf alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    cterm2 cvtermpath%ROWTYPE;
-BEGIN
-
-    FOR cterm IN SELECT * FROM cvterm_relationship WHERE subject_id = leaf LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT * FROM _get_all_object_ids(cterm.object_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
----arg: child term id
----return: all parent term id and their childrent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
-'
-DECLARE
-    leaf alias for $1;
-    cterm cvtermpath%ROWTYPE;
-    exist_c int;
-BEGIN
-
-
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE object_id = leaf and pathdistance <= 0;
-    IF (exist_c > 0) THEN
-        FOR cterm IN SELECT * FROM cvtermpath WHERE subject_id = leaf AND pathdistance > 0 LOOP
-            RETURN NEXT cterm;
-        END LOOP;
-    ELSE
-        FOR cterm IN SELECT * FROM _get_all_object_ids(leaf) LOOP
-            RETURN NEXT cterm;
-        END LOOP;
-    END IF;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
-
----arg: sql statement which must be in the form of select cvterm_id from ...
----return: a set of cvterm ids that includes what is in sql statement and their children (subject ids)
-CREATE OR REPLACE FUNCTION get_it_sub_cvterm_ids(text) RETURNS SETOF cvterm AS
-'
-DECLARE
-    query alias for $1;
-    cterm cvterm%ROWTYPE;
-    cterm2 cvterm%ROWTYPE;
-BEGIN
-    FOR cterm IN EXECUTE query LOOP
-        RETURN NEXT cterm;
-        FOR cterm2 IN SELECT subject_id as cvterm_id FROM get_all_subject_ids(cterm.cvterm_id) LOOP
-            RETURN NEXT cterm2;
-        END LOOP;
-    END LOOP;
-    RETURN;
-END;   
-'
-LANGUAGE 'plpgsql';
---- create ontology that has instantiated located_sequence_feature part of SO
---- way as it is written, the function can not be execute more than once in one connection
---- when you get error like ERROR:  relation with OID NNNNN does not exist
---- as this is not meant to execute >1 times in one session so it should never happen
---- except at testing and test failed
---- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
---- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
-
---NOTE: private, don't call directly as relying on having temp table tmpcvtr
-
-DROP TYPE soi_type CASCADE;
-CREATE TYPE soi_type AS (
-    type_id INT,
-    subject_id INT,
-    object_id INT
-);
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    origin alias for $1;
-    child_id alias for $2;
-    cvid alias for $3;
-    typeid alias for $4;
-    depth alias for $5;
-    cterm soi_type%ROWTYPE;
-    exist_c int;
-
-BEGIN
-
-    --RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
-    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
-    --- longest path
-    IF (exist_c > 0) THEN
-        UPDATE cvtermpath SET pathdistance = depth WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id;
-    ELSE
-        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
-    END IF;
-
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = child_id LOOP
-        PERFORM _fill_cvtermpath4soinode(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
-    END LOOP;
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
-'
-DECLARE
-    rootid alias for $1;
-    cvid alias for $2;
-    ttype int;
-    cterm soi_type%ROWTYPE;
-
-BEGIN
-    
-    SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
-    --RAISE NOTICE ''got ttype %'',ttype;
-    PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
-    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
-        PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
-    END LOOP;
-    RETURN 1;
-END;   
-'
-LANGUAGE 'plpgsql';
-
---- use tmpcvtr to temp store soi (virtural ontology)
---- using tmp tables is faster than using recursive function to create feature type relationship
---- since it gets feature type rel set by set instead of one by one
---- and getting feature type rel is very expensive
---- call _fillcvtermpath4soi to create path for the virtual ontology
-
-CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
-'
-DECLARE
-    parent soi_type%ROWTYPE;
-    isa_id cvterm.cvterm_id%TYPE;
-    soi_term TEXT := ''soi'';
-    soi_def TEXT := ''ontology of SO feature instantiated in database'';
-    soi_cvid INTEGER;
-    soiterm_id INTEGER;
-    pcount INTEGER;
-    count INTEGER := 0;
-    cquery TEXT;
-BEGIN
-
-    SELECT INTO isa_id cvterm_id FROM cvterm WHERE name = ''isa'';
-
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    IF (soi_cvid > 0) THEN
-        DELETE FROM cvtermpath WHERE cv_id = soi_cvid;
-        DELETE FROM cvterm WHERE cv_id = soi_cvid;
-    ELSE
-        INSERT INTO cv (name, definition) VALUES(soi_term, soi_def);
-    END IF;
-    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
-    INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
-    SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
-
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
-    CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
-
-    INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-        SELECT DISTINCT isa_id, soiterm_id, f.type_id, soiterm_id FROM feature f, cvterm t
-        WHERE f.type_id = t.cvterm_id AND f.type_id > 0;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature %'',pcount;
---- do it hard way, delete any child feature type from above (NOT IN clause did not work)
-    FOR parent IN SELECT DISTINCT 0, t.cvterm_id, 0 FROM feature c, feature_relationship fr, cvterm t
-            WHERE t.cvterm_id = c.type_id AND c.feature_id = fr.subject_id LOOP
-        DELETE FROM tmpcvtr WHERE type_id = soiterm_id and object_id = soiterm_id
-            AND subject_id = parent.subject_id;
-    END LOOP;
-    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
-    get diagnostics pcount = row_count;
-    raise notice ''all types in feature after delete child %'',pcount;
-
-    --- create feature type relationship (store in tmpcvtr)
-    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
-    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
-    ---temp use tmpcvtr to hold instantiated SO relationship for speed
-    ---use soterm_id as type_id, will delete from tmpcvtr
-    ---us tmproot for this as well
-    INSERT INTO tmproot (cv_id, cvterm_id, status) SELECT DISTINCT soi_cvid, c.subject_id, 0 FROM tmpcvtr c
-        WHERE c.object_id = soiterm_id;
-    EXECUTE cquery;
-    GET DIAGNOSTICS pcount = ROW_COUNT;
-    WHILE (pcount > 0) LOOP
-        RAISE NOTICE ''num child temp (to be inserted) in tmpcvtr: %'',pcount;
-        INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
-            SELECT DISTINCT fr.type_id, soiterm_id, c.type_id, p.cvterm_id FROM feature c, feature_relationship fr,
-            tmproot p, feature pf, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = pf.feature_id
-            AND p.cvterm_id = pf.type_id AND t.cvterm_id = c.type_id AND p.status = 0;
-        UPDATE tmproot SET status = 1 WHERE status = 0;
-        INSERT INTO tmproot (cv_id, cvterm_id, status)
-            SELECT DISTINCT soi_cvid, c.type_id, 0 FROM feature c, feature_relationship fr,
-            tmproot tmp, feature p, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
-            AND tmp.cvterm_id = p.type_id AND t.cvterm_id = c.type_id AND tmp.status = 1;
-        UPDATE tmproot SET status = 2 WHERE status = 1;
-        EXECUTE cquery;
-        GET DIAGNOSTICS pcount = ROW_COUNT; 
-    END LOOP;
-    DELETE FROM tmproot;
-
-    ---get transitive closure for soi
-    PERFORM _fill_cvtermpath4soi(soiterm_id, soi_cvid);
-
-    DROP TABLE tmpcvtr;
-    DROP TABLE tmproot;
-
-    RETURN 1;
-END;
-'
-LANGUAGE 'plpgsql';
 
 ---bad precedence: change customed type name
 ---drop here to remove old function
@@ -3752,6 +3748,163 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
+--- create ontology that has instantiated located_sequence_feature part of SO
+--- way as it is written, the function can not be execute more than once in one connection
+--- when you get error like ERROR:  relation with OID NNNNN does not exist
+--- as this is not meant to execute >1 times in one session so it should never happen
+--- except at testing and test failed
+--- disconnect and try again, in other words, it can NOT be executed >1 time in one connection
+--- if using EXECUTE, we can avoid this problem but code is hard to write and read (lots of ', escape char)
+
+--NOTE: private, don't call directly as relying on having temp table tmpcvtr
+
+DROP TYPE soi_type CASCADE;
+CREATE TYPE soi_type AS (
+    type_id INT,
+    subject_id INT,
+    object_id INT
+);
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    cvid alias for $3;
+    typeid alias for $4;
+    depth alias for $5;
+    cterm soi_type%ROWTYPE;
+    exist_c int;
+
+BEGIN
+
+    --RAISE NOTICE ''depth=% o=%, root=%, cv=%, t=%'', depth,origin,child_id,cvid,typeid;
+    SELECT INTO exist_c count(*) FROM cvtermpath WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id AND pathdistance = depth;
+    --- longest path
+    IF (exist_c > 0) THEN
+        UPDATE cvtermpath SET pathdistance = depth WHERE cv_id = cvid AND object_id = origin AND subject_id = child_id;
+    ELSE
+        INSERT INTO cvtermpath (object_id, subject_id, cv_id, type_id, pathdistance) VALUES(origin, child_id, cvid, typeid, depth);
+    END IF;
+
+    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = child_id LOOP
+        PERFORM _fill_cvtermpath4soinode(origin, cterm.subject_id, cvid, cterm.type_id, depth+1);
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    cvid alias for $2;
+    ttype int;
+    cterm soi_type%ROWTYPE;
+
+BEGIN
+    
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE name = ''isa'';
+    --RAISE NOTICE ''got ttype %'',ttype;
+    PERFORM _fill_cvtermpath4soinode(rootid, rootid, cvid, ttype, 0);
+    FOR cterm IN SELECT tmp_type AS type_id, subject_id FROM tmpcvtr WHERE object_id = rootid LOOP
+        PERFORM _fill_cvtermpath4soi(cterm.subject_id, cvid);
+    END LOOP;
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+--- use tmpcvtr to temp store soi (virtural ontology)
+--- using tmp tables is faster than using recursive function to create feature type relationship
+--- since it gets feature type rel set by set instead of one by one
+--- and getting feature type rel is very expensive
+--- call _fillcvtermpath4soi to create path for the virtual ontology
+
+CREATE OR REPLACE FUNCTION create_soi() RETURNS INTEGER AS
+'
+DECLARE
+    parent soi_type%ROWTYPE;
+    isa_id cvterm.cvterm_id%TYPE;
+    soi_term TEXT := ''soi'';
+    soi_def TEXT := ''ontology of SO feature instantiated in database'';
+    soi_cvid INTEGER;
+    soiterm_id INTEGER;
+    pcount INTEGER;
+    count INTEGER := 0;
+    cquery TEXT;
+BEGIN
+
+    SELECT INTO isa_id cvterm_id FROM cvterm WHERE name = ''isa'';
+
+    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
+    IF (soi_cvid > 0) THEN
+        DELETE FROM cvtermpath WHERE cv_id = soi_cvid;
+        DELETE FROM cvterm WHERE cv_id = soi_cvid;
+    ELSE
+        INSERT INTO cv (name, definition) VALUES(soi_term, soi_def);
+    END IF;
+    SELECT INTO soi_cvid cv_id FROM cv WHERE name = soi_term;
+    INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
+    SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
+
+    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
+    CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
+
+    INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
+        SELECT DISTINCT isa_id, soiterm_id, f.type_id, soiterm_id FROM feature f, cvterm t
+        WHERE f.type_id = t.cvterm_id AND f.type_id > 0;
+    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
+    get diagnostics pcount = row_count;
+    raise notice ''all types in feature %'',pcount;
+--- do it hard way, delete any child feature type from above (NOT IN clause did not work)
+    FOR parent IN SELECT DISTINCT 0, t.cvterm_id, 0 FROM feature c, feature_relationship fr, cvterm t
+            WHERE t.cvterm_id = c.type_id AND c.feature_id = fr.subject_id LOOP
+        DELETE FROM tmpcvtr WHERE type_id = soiterm_id and object_id = soiterm_id
+            AND subject_id = parent.subject_id;
+    END LOOP;
+    EXECUTE ''select * from tmpcvtr where type_id = '' || soiterm_id || '';'';
+    get diagnostics pcount = row_count;
+    raise notice ''all types in feature after delete child %'',pcount;
+
+    --- create feature type relationship (store in tmpcvtr)
+    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
+    cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
+    ---temp use tmpcvtr to hold instantiated SO relationship for speed
+    ---use soterm_id as type_id, will delete from tmpcvtr
+    ---us tmproot for this as well
+    INSERT INTO tmproot (cv_id, cvterm_id, status) SELECT DISTINCT soi_cvid, c.subject_id, 0 FROM tmpcvtr c
+        WHERE c.object_id = soiterm_id;
+    EXECUTE cquery;
+    GET DIAGNOSTICS pcount = ROW_COUNT;
+    WHILE (pcount > 0) LOOP
+        RAISE NOTICE ''num child temp (to be inserted) in tmpcvtr: %'',pcount;
+        INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
+            SELECT DISTINCT fr.type_id, soiterm_id, c.type_id, p.cvterm_id FROM feature c, feature_relationship fr,
+            tmproot p, feature pf, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = pf.feature_id
+            AND p.cvterm_id = pf.type_id AND t.cvterm_id = c.type_id AND p.status = 0;
+        UPDATE tmproot SET status = 1 WHERE status = 0;
+        INSERT INTO tmproot (cv_id, cvterm_id, status)
+            SELECT DISTINCT soi_cvid, c.type_id, 0 FROM feature c, feature_relationship fr,
+            tmproot tmp, feature p, cvterm t WHERE c.feature_id = fr.subject_id AND fr.object_id = p.feature_id
+            AND tmp.cvterm_id = p.type_id AND t.cvterm_id = c.type_id AND tmp.status = 1;
+        UPDATE tmproot SET status = 2 WHERE status = 1;
+        EXECUTE cquery;
+        GET DIAGNOSTICS pcount = ROW_COUNT; 
+    END LOOP;
+    DELETE FROM tmproot;
+
+    ---get transitive closure for soi
+    PERFORM _fill_cvtermpath4soi(soiterm_id, soi_cvid);
+
+    DROP TABLE tmpcvtr;
+    DROP TABLE tmproot;
+
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
 DECLARE
   return_data featureloc%ROWTYPE;
@@ -3811,156 +3964,3 @@ BEGIN
 
 END;
 ' LANGUAGE 'plpgsql';
--- FUNCTION gfffeatureatts (integer) is a function to get 
--- data in the same format as the gffatts view so that 
--- it can be easily converted to GFF attributes.
-
-CREATE FUNCTION  gfffeatureatts (integer)
-RETURNS SETOF gffatts
-AS
-'
-SELECT feature_id, ''cvterm'' AS type,  s.name AS attribute
-FROM cvterm s, feature_cvterm fs
-WHERE fs.feature_id= $1 AND fs.cvterm_id = s.cvterm_id
-UNION
-SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
---UNION
---SELECT feature_id, ''expression'' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.feature_id= $1 AND fs.expression_id = s.expression_id
---UNION
---SELECT fg.feature_id, ''genotype'' AS type, g.uniquename||'': ''||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE fg.feature_id= $1 AND g.gcontext_id = fg.gcontext_id
---UNION
---SELECT feature_id, ''genotype'' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
---UNION
---SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
-UNION
-SELECT feature_id, ''synonym'' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.feature_id= $1 AND fs.synonym_id = s.synonym_id
-UNION
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.feature_id= $1 AND fp.type_id = cv.cvterm_id 
-UNION
-SELECT feature_id, ''pub'' AS type, s.series_name || '':'' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.feature_id= $1 AND fs.pub_id = s.pub_id
-'
-LANGUAGE SQL;
-
-
---
--- functions for creating coordinate based functions
---
--- create a point
-CREATE OR REPLACE FUNCTION p (int, int) RETURNS point AS
- 'SELECT point ($1, $2)'
-LANGUAGE 'sql';
-
--- create a range box
--- (make this immutable so we can index it)
-CREATE OR REPLACE FUNCTION boxrange (int, int) RETURNS box AS
- 'SELECT box (p(0, $1), p($2,500000000))'
-LANGUAGE 'sql' IMMUTABLE;
-
--- create a query box
-CREATE OR REPLACE FUNCTION boxquery (int, int) RETURNS box AS
- 'SELECT box (p($1, $2), p($1, $2))'
-LANGUAGE 'sql' IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
-  'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
-LANGUAGE 'sql';
-
---functional index that depends on the above functions
-CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
-
---uses the gff3atts to create a GFF3 compliant attribute string
-CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
-'DECLARE
-  return_string      varchar;
-  f_id               ALIAS FOR $1;
-  atts_view          gffatts%ROWTYPE;
-  feature_row        feature%ROWTYPE;
-  name               varchar;
-  uniquename         varchar;
-  parent             varchar;
-                                                                                
-BEGIN
-  --Get name from feature.name
-  --Get ID from feature.uniquename
-                                                                                
-  SELECT INTO feature_row * FROM feature WHERE feature_id = f_id;
-  name  = feature_row.name;
-  return_string = ''ID='' || feature_row.uniquename;
-  IF name IS NOT NULL AND name != ''''
-  THEN
-    return_string = return_string ||'';'' || ''Name='' || name;
-  END IF;
-                                                                                
-  --Get Parent from feature_relationship
-  SELECT INTO feature_row * FROM feature f, feature_relationship fr
-    WHERE fr.subject_id = f_id AND fr.object_id = f.feature_id;
-  IF FOUND
-  THEN
-    return_string = return_string||'';''||''Parent=''||feature_row.uniquename;
-  END IF;
-                                                                                
-  FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
-    return_string = return_string || '';''
-                     || atts_view.type || ''=''
-                     || atts_view.attribute;
-  END LOOP;
-                                                                                
-  RETURN return_string;
-END;
-'
-LANGUAGE plpgsql;
-
---creates a view that is suitable for creating a GFF3 string
-CREATE OR REPLACE VIEW gff3view (
-  feature_id,
-  ref,
-  source,
-  type,
-  fstart,
-  fend,
-  score,
-  strand,
-  phase,
-  attributes,
-  seqlen,
-  name
-) AS
-SELECT
-  f.feature_id   ,
-  sf.name        ,
-  dbx.accession  ,
-  cv.name        ,
-  fl.fmin+1      ,
-  fl.fmax        ,
-  af.significance,
-  fl.strand      ,
-  fl.phase       ,
-  gffattstring(f.feature_id),
-  f.seqlen       ,
-  f.name         ,
-  f.organism_id
-FROM feature f
-     LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
-     LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id) 
-     LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
-     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
-     LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
-     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
-WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
-
