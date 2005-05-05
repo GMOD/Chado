@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.85 2005-05-02 19:22:35 scottcain Exp $
+# $Id: Makefile.PL,v 1.86 2005-05-05 15:37:20 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -668,8 +668,10 @@ graphviz :: \
 	make $working_dir/modules/expression/rad.graphviz.png \
 	make $working_dir/modules/general/general.graphviz.png \
 	make $working_dir/modules/genetic/genetic.graphviz.png \
+	make $working_dir/modules/library/library.graphviz.png \
 	make $working_dir/modules/map/map.graphviz.png \
 	make $working_dir/modules/organism/organism.graphviz.png \
+	make $working_dir/modules/phylogeny/phylogeny.graphviz.png \
 	make $working_dir/modules/pub/pub.graphviz.png \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
 	make $working_dir/modules/www/www.graphviz.png \
@@ -682,8 +684,10 @@ graphviz_svg :: \
 	make $working_dir/modules/expression/rad.graphviz.svg \
 	make $working_dir/modules/general/general.graphviz.svg \
 	make $working_dir/modules/genetic/genetic.graphviz.svg \
+	make $working_dir/modules/library/library.graphviz.svg \
 	make $working_dir/modules/map/map.graphviz.svg \
 	make $working_dir/modules/organism/organism.graphviz.svg \
+	make $working_dir/modules/phylogeny/phylogeny.graphviz.svg \
 	make $working_dir/modules/pub/pub.graphviz.svg \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
 	make $working_dir/modules/www/www.graphviz.svg \
@@ -696,8 +700,10 @@ diagram :: \
 	make $working_dir/modules/expression/rad.diagram.png \
 	make $working_dir/modules/general/general.diagram.png \
 	make $working_dir/modules/genetic/genetic.diagram.png \
+	make $working_dir/modules/library/library.diagram.png \
 	make $working_dir/modules/map/map.diagram.png \
 	make $working_dir/modules/organism/organism.diagram.png \
+	make $working_dir/modules/phylogeny/phylogeny.diagram.png \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
 	make $working_dir/modules/www/www.diagram.png \
@@ -711,8 +717,10 @@ html :: \
 	make $working_dir/modules/expression/rad.html \
 	make $working_dir/modules/general/general.html \
 	make $working_dir/modules/genetic/genetic.html \
+	make $working_dir/modules/library/library.html \
 	make $working_dir/modules/map/map.html \
 	make $working_dir/modules/organism/organism.html \
+	make $working_dir/modules/phylogeny/phylogeny.html \
 	make $working_dir/modules/pub/pub.html \
 	make $working_dir/modules/sequence/sequence.html \
 	make $working_dir/modules/www/www.html \
