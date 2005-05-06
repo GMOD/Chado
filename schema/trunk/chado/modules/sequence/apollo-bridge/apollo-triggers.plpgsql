@@ -218,7 +218,7 @@ BEGIN
 
   RAISE NOTICE ''assigning names, prefix:%, suffix:%, type:%, current uniquename:%'',prefix,suffix,f_type,NEW.uniquename;
 
-  IF (NEW.uniquename like prefix||'':temp%''||suffix OR NEW.uniquename like prefix||''%-temp%'') THEN
+  IF (NEW.uniquename like prefix||''%:temp%''||suffix OR NEW.uniquename like prefix||''%-temp%'') THEN
 
       SELECT INTO f_type c.name
          from feature f, cvterm c
