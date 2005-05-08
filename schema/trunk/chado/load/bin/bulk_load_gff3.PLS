@@ -861,13 +861,13 @@ END
 
     my $score_string;
     if      ($SCORE_COL =~ /^[Ss]/) {
-      $score_string = "$score,\\N,\\N,\\N";
-    } elsif ($SCORE_COL =~ /^[Rr]/) {
-      $score_string = "\\N,$score,\\N,\\N";
-    } elsif ($SCORE_COL =~ /^[Nn]/) {
-      $score_string = "\\N,\\N,$score,\\N";
-    } elsif ($SCORE_COL =~ /^[Ii]/) {
-      $score_string = "\\N,\\N,\\N,$score";
+        $score_string = "$score\t\\N\t\\N\t\\N";
+      } elsif ($SCORE_COL =~ /^[Rr]/) {
+        $score_string = "\\N\t$score\t\\N\t\\N";
+      } elsif ($SCORE_COL =~ /^[Nn]/) {
+        $score_string = "\\N\t\\N\t$score\t\\N";
+      } elsif ($SCORE_COL =~ /^[Ii]/) {
+        $score_string = "\\N\t\\N\t\\N\t$score";
     }
 
     print AF join("\t", ($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score_string)), "\n";
@@ -951,13 +951,13 @@ END
 
       my $score_string;
       if      ($SCORE_COL =~ /^[Ss]/) {
-        $score_string = "$score,\\N,\\N,\\N";
+        $score_string = "$score\t\\N\t\\N\t\\N";
       } elsif ($SCORE_COL =~ /^[Rr]/) {
-        $score_string = "\\N,$score,\\N,\\N";
+        $score_string = "\\N\t$score\t\\N\t\\N";
       } elsif ($SCORE_COL =~ /^[Nn]/) {
-        $score_string = "\\N,\\N,$score,\\N";
+        $score_string = "\\N\t\\N\t$score\t\\N";
       } elsif ($SCORE_COL =~ /^[Ii]/) {
-        $score_string = "\\N,\\N,\\N,$score";
+        $score_string = "\\N\t\\N\t\\N\t$score";
       }
 
       print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score_string)), "\n"; 
