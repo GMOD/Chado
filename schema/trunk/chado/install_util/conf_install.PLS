@@ -74,7 +74,6 @@ foreach my $key (keys %confitems) {
 print DBCONF  "SQLFILE=$gmod_root/src/chado/modules/complete.sql\n";
 close DBCONF;
 
-warn $confitems{'DEFAULT'};
 if (lc($confitems{'DEFAULT'}) =~ /^y/) {
   unlink $defaultconf;
   symlink($dbconf,$defaultconf);
