@@ -52,7 +52,7 @@ open LOCALCONF, $localconf or die "unable to open $localconf: $!";
 while (<LOCALCONF>) {
     chomp;
     my ($key, $value) = split /=/;
-    if ($key =~ /^DB/) {
+    if ($key =~ /^DB/ or $key eq 'DEFAULT') {
         $confitems{$key} = $value;
     }
 }
@@ -74,7 +74,11 @@ foreach my $key (keys %confitems) {
 print DBCONF  "SQLFILE=$gmod_root/src/chado/modules/complete.sql\n";
 close DBCONF;
 
-symlink($dbconf,$defaultconf);
+warn $confitems{'DEFAULT'};
+if (lc($confitems{'DEFAULT'}) =~ /^y/) {
+  unlink $defaultconf;
+  symlink($dbconf,$defaultconf);
+}
 
 chdir $origdir;
 
