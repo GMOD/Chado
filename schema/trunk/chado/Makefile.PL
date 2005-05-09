@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.86 2005-05-05 15:37:20 scottcain Exp $
+# $Id: Makefile.PL,v 1.87 2005-05-09 17:43:08 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -83,6 +83,9 @@ my %args    =  (
   },
   APOLLO    => {
     default => 'n'
+  },
+  DEFAULT   => {
+    default => 'y'
   },
 );
 
@@ -236,7 +239,7 @@ my %db_lookup = reverse %VALID_DBS;
 # command-line, or prompt().
 #
 my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
-  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO);
+  $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO, $DEFAULT);
 
 $O{'SIMPLE'} = prompt(
    "Use the simple install (uses default database schema, which contains\nall of the extenstions to the schema and all of the non-trigger functions.\nThis is probably what you want)", 'Y'
@@ -260,6 +263,7 @@ if ( $opts{'RECONFIGURE'} && %conf ) {
   $LOCAL_TMP= $conf{'LOCAL_TMP'}|| '';
   $DBORGANISM=$conf{'DBORGANISM'}|| '';
   $APOLLO   = $conf{'APOLLP'}   || '';
+  $DEFAULT  = $conf{'DEFAULT'}  || '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -271,6 +275,7 @@ elsif ( $opts{'DEFAULTS'} ) {
   $LOCAL_TMP= $args{'LOCAL_TMP'}{'default'};
   $DBORGANISM=$args{'DBORGANISM'}{'default'};
   $APOLLO   = $args{'APOLLO'}{'default'};
+  $DEFAULT  = $args{'DEFAULT'}{'default'};
 }
 elsif ( %opts ) {
   $DBDRIVER = $opts{'DBDRIVER'} || '';
@@ -282,6 +287,7 @@ elsif ( %opts ) {
   $LOCAL_TMP= $opts{'LOCAL_TMP'}|| '';
   $DBORGANISM=$opts{'DBORGANISM'}|| '';
   $APOLLO   = $opts{'APOLLO'}   || '';
+  $DEFAULT  = $opts{'DEFAULT'}  || '';
 }
 
 if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
@@ -330,6 +336,10 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
 
   $DBORGANISM||=prompt('What is the default organism (common name, or "none")?',
     $conf{'DBORGANISM'} || $args{'DBORGANISM'}{'default'}
+  );
+
+  $DEFAULT ||=prompt('Do you want to make this the default chado instance?',
+    $conf{'DEFAULT'} || $args{'DEFAULT'}{'default'}
   );
 
 #  $APOLLO||=prompt('Create files to use Apollo with chado?'),
@@ -459,6 +469,7 @@ print join("\n",
   "  DBPORT=$DBPORT",
   "  LOCAL_TMP=$LOCAL_TMP",
   "  DBORGANISM=$DBORGANISM",
+  "  DEFAULT=$DEFAULT",
   '',
   $O{'SIMPLE'}!~ /^[Yy]/ ? 'And the following core modules and extensions:' : ''  , 
   $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
@@ -479,6 +490,7 @@ if ( open CONF, ">$build_config" ) {
   $conf{'DBORGANISM'}=$DBORGANISM;
   $conf{'PREFIX'}   = $opts{'PREFIX'};
   $conf{'LIB'}      = $opts{'LIB'};
+  $conf{'DEFAULT'}  = $DEFAULT;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";
@@ -645,13 +657,13 @@ sub MY::postamble {
   my $root = "GMOD_ROOT=$O{GMOD_ROOT}";
   qq{
 conf_install ::
-	$root \$(PERL) \"$working_dir/install_util/conf_install.pl\" '$root'
+	\$(PERL) \"$working_dir/install_util/conf_install.pl\" '$root'
 
 src_install ::
-	$root \$(PERL) \"$working_dir/install_util/src_install.pl\" '$root'
+	\$(PERL) \"$working_dir/install_util/src_install.pl\" '$root'
 
 log4perl.conf ::
-	$root \$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" '$root'
+	\$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" '$root'
 
 cvtermpath ::
 	$working_dir/bin/make_cvtermpath.sh
