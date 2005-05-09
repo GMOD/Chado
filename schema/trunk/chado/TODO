@@ -1,7 +1,10 @@
 - modify the bulk loader to allow 'mixed' GFF3 files (that is, containing 
   both analysis results and annotations). See perldoc gmod_bulk_load_gff3.pl
   for more info
-
+- modify the bulk loader to optionally spit INSERT statements in the the
+  files rather than the COPY FROM STDIN format as a fall back for really
+  big files
+- deprecate the use of gmod_load_gff3.pl in favor of the bulk loader
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
