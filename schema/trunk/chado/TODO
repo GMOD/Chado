@@ -12,6 +12,8 @@
   (except for turnkey))
 - Flesh out Apollo stuff to be more transparent to the person doing the
   installation
+- Make a decision on sequence shredding and implement appropriate views 
+  and functions
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
