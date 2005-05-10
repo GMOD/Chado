@@ -10,6 +10,8 @@
 - migrate ontology loading to use go-perl (instead of Class::DBI--which
   may completely eliminate the need for having Class::DBI installed 
   (except for turnkey))
+- Flesh out Apollo stuff to be more transparent to the person doing the
+  installation
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
