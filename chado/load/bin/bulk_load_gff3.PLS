@@ -254,7 +254,7 @@ GetOptions(
 
 $ORGANISM ||='human';
 $GFFFILE  ||='stdin';  #nobody better name their file 'stdin'
-$DBNAME   ||='chado';
+#$DBNAME   ||='chado';
 $DBPASS   ||='';
 $DBHOST   ||='localhost';
 $DBPORT   ||='5432';
