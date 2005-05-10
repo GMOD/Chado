@@ -517,6 +517,9 @@ if ($GFFFILE eq 'stdin') {
                                  -validate_terms => $VALIDATE);
 }
 
+warn "Preparing data for inserting into the $DBNAME database\n";
+warn "(This may take a while ...)\n";
+
 while(my $feature = $gffio->next_feature()){
   my $nextfeature_increment = 1;
 
