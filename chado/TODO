@@ -4,7 +4,12 @@
 - modify the bulk loader to optionally spit INSERT statements in the the
   files rather than the COPY FROM STDIN format as a fall back for really
   big files
+- modify the bulk loader to (optionally) make gene (foster) parents for 
+  orphan transcript types.
 - deprecate the use of gmod_load_gff3.pl in favor of the bulk loader
+- migrate ontology loading to use go-perl (instead of Class::DBI--which
+  may completely eliminate the need for having Class::DBI installed 
+  (except for turnkey))
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
