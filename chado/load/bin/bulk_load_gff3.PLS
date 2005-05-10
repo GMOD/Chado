@@ -263,6 +263,8 @@ $NOTRANSACT ||=0;
 $NOSEQUENCE ||=0;
 $SCORE_COL  ||='significance';
 
+die "You must supply a database name" unless $DBNAME;
+
 $GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
   $ANALYSIS = 1; #ie, it was specified on the command line with no arg
