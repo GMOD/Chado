@@ -158,14 +158,6 @@ modules/sequence/bdgp/doc/chado-sequence-ontology-layer.sxi
 modules/sequence/bdgp/populate-match-floc.sql
 modules/sequence/bdgp/README
 modules/sequence/bdgp/so-views.sql
-modules/sequence/examples/examples.txt
-modules/sequence/examples/gene_split/index.html
-modules/sequence/examples/gene_split/notes.txt
-modules/sequence/examples/gene_split/split-t0.dat
-modules/sequence/examples/gene_split/split-t0.itxt
-modules/sequence/examples/gene_split/split-t0.WL.xml
-modules/sequence/examples/gene_split/split-t0.xml
-modules/sequence/examples/gene_split/split-t1.itxt
 modules/sequence/functions/create_soi.plpgsql
 modules/sequence/functions/feature_ids_fx.plpgsql
 modules/sequence/functions/feature_subalignments.plpgsql
