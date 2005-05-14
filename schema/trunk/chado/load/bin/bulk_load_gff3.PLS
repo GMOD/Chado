@@ -66,6 +66,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --notransact  Don't use a single transaction to load the database
  --validate    Validate SOFA terms before attempting insert (can cause
                  script startup to be slow, 0 (false) by default)
+ --ontology    Give directions for handling misc Ontology_terms
 
 Note that all of the arguments that begin 'db' can be provided by default
 by Bio::GMOD::Config, which was installed when 'make install' was run.
@@ -204,6 +205,21 @@ analysis table.  The format will probably be tag value pairs:
 
 =back
 
+=item Ontology_term
+
+When the Ontology_term tags are used, items from the Gene Ontology
+and Sequence Ontology will be processed automatically when the standard
+DB:accession format is used (e.g. GO:0001234).  To use other ontology
+terms, you must specify that mapping of the DB indentifiers in the GFF
+file and the name of the ontologies in the cv table as a comma separated
+tag=value pairs.  For example, to use plant and cell ontology terms,
+you would supply on the command line:
+
+  --ontology 'PO=plant ontology,CL:cell ontology'
+
+where 'plant ontology' and 'cell ontology' are the names in the cv table
+exactly as they appear.
+
 =back
 
 =head1 AUTHORS
@@ -217,7 +233,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY);
 
 if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -250,6 +266,7 @@ GetOptions(
     'notransact' => \$NOTRANSACT,
     'nosequence' => \$NOSEQUENCE,
     'score_col=s'=> \$SCORE_COL,
+    'ontology=s' => \$ONTOLOGY
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 $ORGANISM ||='human';
@@ -285,7 +302,18 @@ my %cache = (
              source   => {}, #dbxref.dbxref_id ; gff_source
              synonym  => {},
              type     => {}, #cvterm.cvterm_id cache
+             ontology => {},
             );
+
+#if we need custom ontology mapping, cache them here
+if ($ONTOLOGY) {
+  my @pairs = split /\,/, $ONTOLOGY;
+  foreach @pairs {
+    my ($tag, $value) = split/\=/;
+    $cache{ontology}{$tag} = $value;
+  } 
+}
+
 
 #let's track unique constraints
 my %constraint = ();
@@ -744,13 +772,11 @@ END
 
         my $db_name;
         if ($d eq 'GO') {
-          $search_dbxref->execute($a,'%Gene Ontology%','GO');
+          $search_dbxref->execute($a,'%Gene Ontology%'   ,'GO');
         } elsif ($d eq 'SO') {
-          $search_dbxref->execute($a,'Sequence Ontology','SO');
-        } else {
-            warn "currently, only GO and SO Ontology_terms are supported;\n"
-                 ."contact the author to complain\n";
-            next;
+          $search_dbxref->execute($a,'Sequence Ontology' ,'SO');
+        } elsif ($cache{ontology}{$d}) {
+          $search_dbxref->execute($a,$cache{ontology}{$d}, $d );
         }
 
         my ($dbxref) = $search_dbxref->fetchrow_array;
