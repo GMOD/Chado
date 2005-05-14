@@ -52,8 +52,8 @@
   </ontology>
 
   <ontology name="Sequence Ontology Feature Annotation" order="2">
-    <file type="ontology"    local="sofa/sofa.ontology"   remote="http://voxel.dl.sourceforge.net/sourceforge/song/sofa.ontology"   method="lwp-mirror"/>
-    <file type="definitions" local="sofa/so.definition" remote="http://voxel.dl.sourceforge.net/sourceforge/song/sofa.definition" method="lwp-mirror"/>
+    <file type="ontology"    local="sofa/sofa.ontology"   remote="http://easynews.dl.sourceforge.net/sourceforge/song/sofa.ontology"   method="lwp-mirror"/>
+    <file type="definitions" local="sofa/so.definition" remote="http://easynews.dl.sourceforge.net/sourceforge/song/sofa.definition" method="lwp-mirror"/>
   </ontology>
 
   <ontology name="Gene Ontology" order="4">
