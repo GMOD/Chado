@@ -32,6 +32,10 @@ insert into cvterm (name,cv_id,dbxref_id) values ('null',(select cv_id from cv w
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:Note');
 insert into cvterm (name,cv_id,dbxref_id) values ('Note', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:Note'));
 
+insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:Gap');
+insert into cvterm (name,cv_id,dbxref_id) values ('Gap', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:Gap'));
+
+
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:computer file');
 insert into cvterm (name,cv_id,dbxref_id) values ('computer file', (select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:computer file'));
 
