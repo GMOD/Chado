@@ -14,6 +14,7 @@
   installation
 - Make a decision on sequence shredding and implement appropriate views 
   and functions
+- fix perl modules to conform with Todd's Bio::GMOD namespace
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
