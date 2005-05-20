@@ -238,6 +238,20 @@ a look at it soon.
 
 =over
 
+=item ##sequence-region
+
+This script does not use sequence-region directives for anything.
+If it represents a feature that needs to be inserted into the database,
+it should be represented with a full GFF line.  This includes the
+reference sequence for the features if it is not already in the database,
+like a chromosome.  For example, this:
+
+  ##sequence-region chr1 1	213456789
+
+should change to this:
+
+  chr1	UCSC	chromosome	1	213456789	.	.	.	ID=chr1
+
 =item Transactions
 
 This application will, by default, try to load all of the data at
