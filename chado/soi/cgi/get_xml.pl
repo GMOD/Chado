@@ -40,7 +40,10 @@ if ($type) {
     }
 
     if (@{$features || []}) {
-        my $arm = $ad->get_f({range=>$range}, {feature_types=>'chromosome_arm',noauxillaries=>1});
+        #get around arm residues stored problem (wastefull & slow)
+        my $GBs = $ad->get_f({range=>$range}, {feature_types=>'golden_path_region',noauxillaries=>1});
+        my $arm = SOI::Feature->new({type=>'chromosome_arm',name=>$range->{src}});
+        $arm->nodes($GBs);
         my ($fmin, $fmax) = ($range->{fmin},$range->{fmax});
         my ($segs, $new_f) = $arm->stitch_child_segments($fmin,$fmax);
         $arm->hash->{residues} = "";
