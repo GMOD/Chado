@@ -261,3 +261,10 @@ VERSION 0.04
 2005-02-08      - [cjm] db.contact_id nullable
                 -       cvterm.dbxref_id NOT NULL
                 -       added comments to cv table
+
+2005-03-10      - [cjm] feature_cvterm_dbxref added
+
+2005-04-20      - [cjm] changed comment style and added new comments
+                        cv and sequence modules only
+
+2005-06-07      - [cjm] added: feature_cvterm.is_not and feature_cvterm_dbxref
