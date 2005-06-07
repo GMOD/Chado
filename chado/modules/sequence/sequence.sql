@@ -22,8 +22,9 @@ create table feature (
 
 COMMENT ON TABLE feature IS 'A feature is a biological sequence or a
 section of a biological sequence, or a collection of such
-sections. Examples include exons, transcripts, regulatory regions,
-chromosome sequences, sequence variations, hits and HSPs, genes and so
+sections. Examples include genes, exons, transcripts, regulatory
+regions, polypeptides, protein domains, chromosome sequences, sequence
+variations, cross-genome match regions such as hits and HSPs and so
 on; see the Sequence Ontology for more';
 
 COMMENT ON COLUMN feature.dbxref_id IS 'An optional primary public stable
@@ -142,8 +143,8 @@ query feature, one on the subject feature.  features representing
 sequence variation could have alternate locations instantiated on a
 feature on the mutant strain.  the column:rank is used to
 differentiate these different locations. Reflexive locations should
-never be stored - this is for propert locations only; ie nothing
-should be located relative to itself';
+never be stored - this is for -proper- (ie non-self) locations only;
+i.e. nothing should be located relative to itself';
 
 COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin';
 
@@ -152,14 +153,16 @@ COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the line
 COMMENT ON COLUMN featureloc.strand IS 'The orientation/directionality of the
 location. Should be 0,-1 or +1';
 
-COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No localization cycles are allowed';
+COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
 
-COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1 location,
-otherwise the default rank 0 is used. Some features (eg blast hits
-and HSPs) have two locations - one on the query and one on the
-subject. Rank is used to differentiate these. Rank=0 is always used
-for the query, Rank=1 for the subject. For multiple alignments,
-assignment of rank is arbitrary';
+COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1
+location, otherwise the default rank 0 is used. Some features (eg
+blast hits and HSPs) have two locations - one on the query and one on
+the subject. Rank is used to differentiate these. Rank=0 is always
+used for the query, Rank=1 for the subject. For multiple alignments,
+assignment of rank is arbitrary. Rank is also used for
+sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
+(or baseline) feature, Rank=1 indicates the mutant (or compared) feature';
 
 COMMENT ON COLUMN featureloc.locgroup IS 'This is used to manifest redundant,
 derivable extra locations for a feature. The default locgroup=0 is
@@ -182,14 +185,15 @@ contigs and chromosomes. we would thus have 4 locations for the single
 conserved region feature - two distinct locgroups (contig level and
 chromosome level) and two distinct ranks (for the two species)';
 
-COMMENT ON COLUMN featureloc.residue_info IS 'Alternative residues, when these
-differ from feature.residues. for instance, a SNP feature located on a
-wild and mutant protein would have different alresidues.  for
-alignment/similarity features, the altresidues is used to represent
-the alignment string. Note on variation features; even if we dont
-want to instantiate a mutant chromosome/contig feature, we can still
-represent a SNP etc with 2 locations, one (rank 0) on the genome, the
-other (rank 1) would have most fields null, except for altresidues';
+COMMENT ON COLUMN featureloc.residue_info IS 'Alternative residues,
+when these differ from feature.residues. for instance, a SNP feature
+located on a wild and mutant protein would have different alresidues.
+for alignment/similarity features, the altresidues is used to
+represent the alignment string (CIGAR format). Note on variation
+features; even if we dont want to instantiate a mutant
+chromosome/contig feature, we can still represent a SNP etc with 2
+locations, one (rank 0) on the genome, the other (rank 1) would have
+most fields null, except for altresidues';
 
 COMMENT ON COLUMN featureloc.phase IS 'phase of translation wrt srcfeature_id.
 Values are 0,1,2. It may not be possible to manifest this column for
@@ -395,6 +399,7 @@ create table feature_cvterm (
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    is_not boolean not null default false,
     constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id)
 );
 
@@ -440,6 +445,26 @@ create index feature_cvterm_dbxref_idx2 on feature_cvterm_dbxref (dbxref_id);
 
 COMMENT ON TABLE feature_cvterm_dbxref IS
  'Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details';
+
+--
+
+create table feature_cvterm_pub (
+    feature_cvterm_pub_id serial not null,
+    primary key (feature_cvterm_pub_id),
+    feature_cvterm_id int not null,
+    foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint feature_cvterm_pub_c1 unique (feature_cvterm_id,pub_id)
+);
+create index feature_cvterm_pub_idx1 on feature_cvterm_pub (feature_cvterm_id);
+create index feature_cvterm_pub_idx2 on feature_cvterm_pub (pub_id);
+
+COMMENT ON TABLE feature_cvterm_pub IS 'Secondary pubs for an
+association. Each feature_cvterm association is supported by a single
+primary publication. Additional secondary pubs can be added using this
+linking table (in a GO gene association file, these corresponding to
+any IDs after the pipe symbol in the publications column';
 
 --
 
