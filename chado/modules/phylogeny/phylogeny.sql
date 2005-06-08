@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.1 2005-04-25 21:06:20 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.2 2005-06-08 05:47:40 cmungall Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -214,7 +214,8 @@ create table phylonode_organism (
        organism_id int not null,
        foreign key (organism_id) references organism (organism_id) on delete cascade,
 
-       unique(phylonode_id)             -- one phylonode cannot refer to >1 organism
+       unique(phylonode_id)
+-- one phylonode cannot refer to >1 organism
 );
 create index phylonode_organism_idx1 on phylonode_pub (phylonode_id);
 create index phylonode_organism_idx2 on phylonode_pub (organism_id);
