@@ -166,12 +166,12 @@ sub create_schema {
         if ($fh) {
             print $fh join('',@sql_lines);
             $fh->close;
-            print `cat $SCHEMA_FILE`;
+            #print `cat $SCHEMA_FILE`;
+            $mw->messageBox(-message=>"schema created in file $SCHEMA_FILE");
         } else {
             $mw->messageBox(-message=>"cannot write to $SCHEMA_FILE");
         }
     }
-    $mw->messageBox(-message=>"schema created in file $SCHEMA_FILE");
 }
 
 sub read_source {
@@ -205,6 +205,7 @@ chado-build-schema CHADO_METADATA_XML_FILE
 
 Tk interface for generating a custome chado xml schema
 ;
+EOM
 }
 
 # createdb DBNAME
