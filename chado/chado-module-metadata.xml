@@ -78,7 +78,7 @@
           <source type='sqli' path='sequence/sequence-dbapi.sqli'/>
         </component>
 
-        <component id='sequence_opt type='optimizations'>
+        <component id='sequence_opt' type='optimizations'>
           <description>
             Optional optimizations to be applied to the sequence module
           </description>
@@ -130,6 +130,19 @@
           Non-sequence maps: genetic, radiation hybrid, cytogenetic, etc
         </description>
         <source type='sql' path='map/map.sql'/>
+      </module>
+
+      <module id='events'>
+        <dependency to='sequence'/>
+        <dependency to='cv'/>
+        <dependency to='pub'/>
+        <status code='pre-alpha'>
+          discussion stage
+        </status>
+        <description>
+          Pathways and quantitative models
+        </description>
+        <source type='sql' path='events/events.sql'/>
       </module>
 
       <module id='phylogeny'>
