@@ -22,7 +22,7 @@ CREATE VIEW godb.dbxref AS
   db.name                            AS xref_dbname,
   dbxref.accession                   AS xref_key,
   CAST(NULL AS VARCHAR)              AS xref_keytype,
-  description                        AS xref_desc
+  dbxref.description                 AS xref_desc
  FROM dbxref
   INNER JOIN db USING (db_id);
 
@@ -94,12 +94,15 @@ SELECT
  pathdistance   AS distance
 FROM cvtermpath;
 
+--Activate this to make this bridge take precedence
+--SET SEARCH PATH TO godb,public;
+
 -- species
 
 CREATE VIEW species AS
  SELECT
-  species_id                            AS id,
-  CAST(accession AS INT)                AS ncbi_taxa_id,
+  organism_id                        AS id,
+  CAST(accession AS INT)             AS ncbi_taxa_id,
   common_name,
   CAST(NULL AS VARCHAR)              AS lineage_string,
   genus,
@@ -140,7 +143,7 @@ CREATE VIEW gene_product_synonym AS
 
 CREATE VIEW gene_product_property AS
  SELECT
-  feature_id                    AS gene_product_id
+  feature_id                    AS gene_product_id,
   prop.name                     AS property_key,
   value                         AS property_value
  FROM
@@ -172,7 +175,7 @@ CREATE VIEW association_qualifier AS
  FROM feature_cvtermprop;
 
 -- evidence
-TODO
+-- TODO!!
 
 CREATE VIEW evidence AS
  SELECT
@@ -184,7 +187,7 @@ CREATE VIEW evidence AS
  INNER JOIN feature_cvterm_dbxref USING (feature_cvterm_id);
 
 -- evidence_dbxref
-TODO
+-- TODO
 
 CREATE VIEW evidence_dbxref AS
  SELECT
@@ -200,15 +203,15 @@ CREATE VIEW evidence_dbxref AS
 CREATE VIEW seq AS
  SELECT
   feature_id                    AS id,
-  name                          AS display_id,
-  name                          AS description,
+  feature.name                  AS display_id,
+  feature.name                  AS description,
   residues                      AS seq,
   seqlen                        AS seq_len,
   md5checksum,
   type.name                     AS moltype,
 -- this is never used
   0                             AS timestamp
- FROM feature INNER JOIN cvterm AS name ON (type_id=cvterm_id);
+ FROM feature INNER JOIN cvterm AS type ON (type_id=cvterm_id);
 
 -- seq_property [not used?]
 
@@ -244,6 +247,7 @@ CREATE VIEW gene_product_count AS
  SELECT
   *
  FROM feature WHERE NULL;
+
 
 
 -- ************************************************************
@@ -389,5 +393,3 @@ CREATE RULE "_RuleD_term_dbxref" AS
  DO INSTEAD
   DELETE FROM cvterm_dbxref
   WHERE cvterm_id = OLD.term_id AND dbxref_id = OLD.dbxref_id;
-
-

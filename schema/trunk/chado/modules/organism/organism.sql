@@ -13,6 +13,9 @@ create table organism (
     constraint organism_c1 unique (genus,species)
 );
 
+COMMENT ON COLUMN organism.species IS
+ 'A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples)';
+
 -- Compared to mol5..Species, organism table lacks "approved char(1) null".  
 -- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
 -- future [dave]
