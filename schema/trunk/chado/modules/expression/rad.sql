@@ -232,6 +232,19 @@ create index biomaterialprop_idx2 on biomaterialprop (type_id);
 
 COMMENT ON TABLE biomaterialprop IS 'extra biomaterial properties that are not accounted for in biomaterial';
 
+create table biomaterial_dbxref (
+    biomaterial_dbxref_id serial not null,
+    primary key (biomaterial_dbxref_id),
+    biomaterial_id int not null,
+    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint biomaterial_dbxref_c1 unique (biomaterial_id,dbxref_id)
+);
+create index biomaterial_dbxref_idx1 on biomaterial_dbxref (biomaterial_id);
+create index biomaterial_dbxref_idx2 on biomaterial_dbxref (dbxref_id);
+
+
 create table treatment (
     treatment_id serial not null,
     primary key (treatment_id),
