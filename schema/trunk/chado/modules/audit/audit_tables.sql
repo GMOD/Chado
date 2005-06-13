@@ -2145,6 +2145,7 @@
        feature_id integer, 
        cvterm_id integer, 
        pub_id integer, 
+       is_not boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2157,6 +2158,7 @@
        feature_id_var integer; 
        cvterm_id_var integer; 
        pub_id_var integer; 
+       is_not_var boolean; 
        
        transaction_type_var char;
    BEGIN
@@ -2164,6 +2166,7 @@
        feature_id_var = OLD.feature_id;
        cvterm_id_var = OLD.cvterm_id;
        pub_id_var = OLD.pub_id;
+       is_not_var = OLD.is_not;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -2176,12 +2179,14 @@
              feature_id, 
              cvterm_id, 
              pub_id, 
+             is_not, 
              transaction_type
        ) VALUES ( 
              feature_cvterm_id_var, 
              feature_id_var, 
              cvterm_id_var, 
              pub_id_var, 
+             is_not_var, 
              transaction_type_var
        );
 
@@ -2323,6 +2328,63 @@
        BEFORE UPDATE OR DELETE ON feature_cvterm_dbxref
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_feature_cvterm_dbxref ();
+
+
+   DROP TABLE audit_feature_cvterm_pub;
+   CREATE TABLE audit_feature_cvterm_pub ( 
+       feature_cvterm_pub_id integer, 
+       feature_cvterm_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_feature_cvterm_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_feature_cvterm_pub() RETURNS trigger AS
+   '
+   DECLARE
+       feature_cvterm_pub_id_var integer; 
+       feature_cvterm_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       feature_cvterm_pub_id_var = OLD.feature_cvterm_pub_id;
+       feature_cvterm_id_var = OLD.feature_cvterm_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_feature_cvterm_pub ( 
+             feature_cvterm_pub_id, 
+             feature_cvterm_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             feature_cvterm_pub_id_var, 
+             feature_cvterm_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER feature_cvterm_pub_audit_ud ON feature_cvterm_pub;
+   CREATE TRIGGER feature_cvterm_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON feature_cvterm_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_feature_cvterm_pub ();
 
 
    DROP TABLE audit_synonym;
@@ -5318,6 +5380,63 @@
        EXECUTE PROCEDURE audit_update_delete_biomaterialprop ();
 
 
+   DROP TABLE audit_biomaterial_dbxref;
+   CREATE TABLE audit_biomaterial_dbxref ( 
+       biomaterial_dbxref_id integer, 
+       biomaterial_id integer, 
+       dbxref_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_biomaterial_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_biomaterial_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       biomaterial_dbxref_id_var integer; 
+       biomaterial_id_var integer; 
+       dbxref_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       biomaterial_dbxref_id_var = OLD.biomaterial_dbxref_id;
+       biomaterial_id_var = OLD.biomaterial_id;
+       dbxref_id_var = OLD.dbxref_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_biomaterial_dbxref ( 
+             biomaterial_dbxref_id, 
+             biomaterial_id, 
+             dbxref_id, 
+             transaction_type
+       ) VALUES ( 
+             biomaterial_dbxref_id_var, 
+             biomaterial_id_var, 
+             dbxref_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER biomaterial_dbxref_audit_ud ON biomaterial_dbxref;
+   CREATE TRIGGER biomaterial_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON biomaterial_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_biomaterial_dbxref ();
+
+
    DROP TABLE audit_treatment;
    CREATE TABLE audit_treatment ( 
        treatment_id integer, 
@@ -6981,8 +7100,6 @@
    DROP TABLE audit_affymetrixdchip;
    CREATE TABLE audit_affymetrixdchip ( 
        signal float, 
-       call char(1), 
-       se float, 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -6993,15 +7110,11 @@
    '
    DECLARE
        signal_var float; 
-       call_var char(1); 
-       se_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       call_var = OLD.call;
-       se_var = OLD.se;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7012,14 +7125,10 @@
 
        INSERT INTO audit_affymetrixdchip ( 
              signal, 
-             call, 
-             se, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             call_var, 
-             se_var, 
              z_var, 
              transaction_type_var
        );
@@ -7043,8 +7152,6 @@
    DROP TABLE audit_affymetrixvsn;
    CREATE TABLE audit_affymetrixvsn ( 
        signal float, 
-       se float, 
-       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7055,15 +7162,11 @@
    '
    DECLARE
        signal_var float; 
-       se_var float; 
-       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       se_var = OLD.se;
-       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7074,14 +7177,10 @@
 
        INSERT INTO audit_affymetrixvsn ( 
              signal, 
-             se, 
-             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             se_var, 
-             call_var, 
              z_var, 
              transaction_type_var
        );
@@ -7246,8 +7345,6 @@
    DROP TABLE audit_affymetrixrma;
    CREATE TABLE audit_affymetrixrma ( 
        signal float, 
-       se float, 
-       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7258,15 +7355,11 @@
    '
    DECLARE
        signal_var float; 
-       se_var float; 
-       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       se_var = OLD.se;
-       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7277,14 +7370,10 @@
 
        INSERT INTO audit_affymetrixrma ( 
              signal, 
-             se, 
-             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             se_var, 
-             call_var, 
              z_var, 
              transaction_type_var
        );
@@ -7308,8 +7397,6 @@
    DROP TABLE audit_affymetrixgcrma;
    CREATE TABLE audit_affymetrixgcrma ( 
        signal float, 
-       se float, 
-       call char(1), 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7320,15 +7407,11 @@
    '
    DECLARE
        signal_var float; 
-       se_var float; 
-       call_var char(1); 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
        signal_var = OLD.signal;
-       se_var = OLD.se;
-       call_var = OLD.call;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7339,14 +7422,10 @@
 
        INSERT INTO audit_affymetrixgcrma ( 
              signal, 
-             se, 
-             call, 
              z, 
              transaction_type
        ) VALUES ( 
              signal_var, 
-             se_var, 
-             call_var, 
              z_var, 
              transaction_type_var
        );

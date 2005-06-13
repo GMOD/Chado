@@ -214,6 +214,14 @@ Chado::Dbxref->has_many(
     'feature_dbxref_dbxref_id', 'Chado::Feature_Dbxref' => 'dbxref_id'
 );
 
+sub biomaterial_dbxrefs {
+    return shift->biomaterial_dbxref_dbxref_id
+}
+
+Chado::Dbxref->has_many(
+    'biomaterial_dbxref_dbxref_id', 'Chado::Biomaterial_Dbxref' => 'dbxref_id'
+);
+
 sub features { my $self = shift; return map $_->feature_id, $self->element_dbxref_id }
 
 Chado::Dbxref->has_many(
@@ -272,12 +280,6 @@ Chado::Dbxref->has_many(
     'feature_cvterm_dbxref_dbxref_id', 'Chado::Feature_Cvterm_Dbxref' => 'dbxref_id'
 );
 
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_dbxref_id }
-
-Chado::Dbxref->has_many(
-    'cvterm_dbxref_id', 'Chado::Cvterm' => 'dbxref_id'
-);
-
 sub elements {
     return shift->element_dbxref_id
 }
@@ -286,9 +288,13 @@ Chado::Dbxref->has_many(
     'element_dbxref_id', 'Chado::Element' => 'dbxref_id'
 );
 
-sub biomaterials {
-    return shift->biomaterial_dbxref_id
-}
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_dbxref_id }
+
+Chado::Dbxref->has_many(
+    'cvterm_dbxref_id', 'Chado::Cvterm' => 'dbxref_id'
+);
+
+sub biomaterials { my $self = shift; return map $_->biomaterial_id, $self->biomaterial_dbxref_dbxref_id }
 
 Chado::Dbxref->has_many(
     'biomaterial_dbxref_id', 'Chado::Biomaterial' => 'dbxref_id'
@@ -1191,7 +1197,7 @@ Chado::Pub->has_many(
     'expression_pub_pub_id', 'Chado::Expression_Pub' => 'pub_id'
 );
 
-sub features { my $self = shift; return map $_->feature_id, $self->feature_cvterm_pub_id }
+sub features { my $self = shift; return map $_->feature_id, $self->feature_pub_pub_id }
 
 sub library_pubs {
     return shift->library_pub_pub_id
@@ -1201,9 +1207,7 @@ Chado::Pub->has_many(
     'library_pub_pub_id', 'Chado::Library_Pub' => 'pub_id'
 );
 
-sub feature_cvterms {
-    return shift->feature_cvterm_pub_id
-}
+sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_pub_pub_id }
 
 Chado::Pub->has_many(
     'feature_cvterm_pub_id', 'Chado::Feature_Cvterm' => 'pub_id'
@@ -1245,6 +1249,14 @@ sub pubprops {
 
 Chado::Pub->has_many(
     'pubprop_pub_id', 'Chado::Pubprop' => 'pub_id'
+);
+
+sub feature_cvterm_pubs {
+    return shift->feature_cvterm_pub_pub_id
+}
+
+Chado::Pub->has_many(
+    'feature_cvterm_pub_pub_id', 'Chado::Feature_Cvterm_Pub' => 'pub_id'
 );
 
 sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_pub_id }
@@ -1578,7 +1590,7 @@ Chado::Feature->has_many(
     'feature_synonym_feature_id', 'Chado::Feature_Synonym' => 'feature_id'
 );
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_feature_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_pub_feature_id }
 
 sub library_features {
     return shift->library_feature_feature_id
@@ -2060,6 +2072,14 @@ sub pub {
     return shift->pub_id
 }
 
+sub feature_cvterm_pubs {
+    return shift->feature_cvterm_pub_feature_cvterm_id
+}
+
+Chado::Feature_Cvterm->has_many(
+    'feature_cvterm_pub_feature_cvterm_id', 'Chado::Feature_Cvterm_Pub' => 'feature_cvterm_id'
+);
+
 sub feature_cvterm_dbxrefs {
     return shift->feature_cvterm_dbxref_feature_cvterm_id
 }
@@ -2068,6 +2088,8 @@ Chado::Feature_Cvterm->has_many(
     'feature_cvterm_dbxref_feature_cvterm_id', 'Chado::Feature_Cvterm_Dbxref' => 'feature_cvterm_id'
 );
 
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_pub_feature_cvterm_id }
+
 sub feature_cvtermprops {
     return shift->feature_cvtermprop_feature_cvterm_id
 }
@@ -2075,6 +2097,8 @@ sub feature_cvtermprops {
 Chado::Feature_Cvterm->has_many(
     'feature_cvtermprop_feature_cvterm_id', 'Chado::Feature_Cvtermprop' => 'feature_cvterm_id'
 );
+
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->feature_cvterm_dbxref_feature_cvterm_id }
 
 # -------------------------------------------------------------------
 package Chado::Feature_Cvtermprop;
@@ -2136,6 +2160,37 @@ Chado::Feature_Cvterm_Dbxref->has_a(
 
 sub dbxref {
     return shift->dbxref_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Feature_Cvterm_Pub;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Feature_Cvterm_Pub->set_up_table('feature_cvterm_pub');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->feature_cvterm_pub_id
+}
+
+Chado::Feature_Cvterm_Pub->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
+);
+
+sub feature_cvterm {
+    return shift->feature_cvterm_id
+}
+
+Chado::Feature_Cvterm_Pub->has_a(
+    pub_id => 'Chado::Pub'
+);
+
+sub pub {
+    return shift->pub_id
 }
 
 # -------------------------------------------------------------------
@@ -4028,26 +4083,6 @@ sub dbxref {
     return shift->dbxref_id
 }
 
-sub biomaterial_relationship_subject_ids { my $self = shift; return $self->biomaterial_relationship_subject_id(@_) }
-
-sub biomaterial_relationship_object_ids { my $self = shift; return $self->biomaterial_relationship_object_id(@_) }
-
-sub treatments {
-    return shift->treatment_biomaterial_id
-}
-
-Chado::Biomaterial->has_many(
-    'treatment_biomaterial_id', 'Chado::Treatment' => 'biomaterial_id'
-);
-
-sub biomaterialprops {
-    return shift->biomaterialprop_biomaterial_id
-}
-
-Chado::Biomaterial->has_many(
-    'biomaterialprop_biomaterial_id', 'Chado::Biomaterialprop' => 'biomaterial_id'
-);
-
 sub assays { my $self = shift; return map $_->assay_id, $self->assay_biomaterial_biomaterial_id }
 
 sub assay_biomaterials {
@@ -4058,7 +4093,37 @@ Chado::Biomaterial->has_many(
     'assay_biomaterial_biomaterial_id', 'Chado::Assay_Biomaterial' => 'biomaterial_id'
 );
 
+sub biomaterial_dbxrefs {
+    return shift->biomaterial_dbxref_biomaterial_id
+}
+
+Chado::Biomaterial->has_many(
+    'biomaterial_dbxref_biomaterial_id', 'Chado::Biomaterial_Dbxref' => 'biomaterial_id'
+);
+
 sub channels { my $self = shift; return map $_->channel_id, $self->assay_biomaterial_biomaterial_id }
+
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->biomaterial_dbxref_biomaterial_id }
+
+sub biomaterial_relationship_subject_ids { my $self = shift; return $self->biomaterial_relationship_subject_id(@_) }
+
+sub biomaterial_relationship_object_ids { my $self = shift; return $self->biomaterial_relationship_object_id(@_) }
+
+sub biomaterialprops {
+    return shift->biomaterialprop_biomaterial_id
+}
+
+Chado::Biomaterial->has_many(
+    'biomaterialprop_biomaterial_id', 'Chado::Biomaterialprop' => 'biomaterial_id'
+);
+
+sub treatments {
+    return shift->treatment_biomaterial_id
+}
+
+Chado::Biomaterial->has_many(
+    'treatment_biomaterial_id', 'Chado::Treatment' => 'biomaterial_id'
+);
 
 sub biomaterial_treatments {
     return shift->biomaterial_treatment_biomaterial_id
@@ -4148,6 +4213,37 @@ Chado::Biomaterialprop->has_a(
 
 sub type {
     return shift->type_id
+}
+
+# -------------------------------------------------------------------
+package Chado::Biomaterial_Dbxref;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::Biomaterial_Dbxref->set_up_table('biomaterial_dbxref');
+
+
+#
+# Primary key accessor
+#
+sub id {
+    shift->biomaterial_dbxref_id
+}
+
+Chado::Biomaterial_Dbxref->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
+);
+
+sub biomaterial {
+    return shift->biomaterial_id
+}
+
+Chado::Biomaterial_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
+);
+
+sub dbxref {
+    return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------

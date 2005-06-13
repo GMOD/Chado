@@ -747,7 +747,7 @@ while(my $feature = $gffio->next_feature()){
   
   #check here to see if this uniquename is valid!
 
-  my($name) = ($feature->annotation->get_Annotations('Name'))[0] || "$featuretype-$uniquename";
+  my($name) = ($feature->annotation->get_Annotations('Name'))[0] ||($feature->annotation->get_Annotations('ID'))[0] || "$featuretype-$uniquename";
   $name = $name->value if ref($name);
 
   #my $uniquename = $nextfeature;

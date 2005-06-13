@@ -303,6 +303,9 @@ create table organism (
     constraint organism_c1 unique (genus,species)
 );
 
+COMMENT ON COLUMN organism.species IS
+ 'A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples)';
+
 -- Compared to mol5..Species, organism table lacks "approved char(1) null".  
 -- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
 -- future [dave]
@@ -492,8 +495,9 @@ create table feature (
 
 COMMENT ON TABLE feature IS 'A feature is a biological sequence or a
 section of a biological sequence, or a collection of such
-sections. Examples include exons, transcripts, regulatory regions,
-chromosome sequences, sequence variations, hits and HSPs, genes and so
+sections. Examples include genes, exons, transcripts, regulatory
+regions, polypeptides, protein domains, chromosome sequences, sequence
+variations, cross-genome match regions such as hits and HSPs and so
 on; see the Sequence Ontology for more';
 
 COMMENT ON COLUMN feature.dbxref_id IS 'An optional primary public stable
@@ -612,8 +616,8 @@ query feature, one on the subject feature.  features representing
 sequence variation could have alternate locations instantiated on a
 feature on the mutant strain.  the column:rank is used to
 differentiate these different locations. Reflexive locations should
-never be stored - this is for propert locations only; ie nothing
-should be located relative to itself';
+never be stored - this is for -proper- (ie non-self) locations only;
+i.e. nothing should be located relative to itself';
 
 COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin';
 
@@ -622,14 +626,16 @@ COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the line
 COMMENT ON COLUMN featureloc.strand IS 'The orientation/directionality of the
 location. Should be 0,-1 or +1';
 
-COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No localization cycles are allowed';
+COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
 
-COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1 location,
-otherwise the default rank 0 is used. Some features (eg blast hits
-and HSPs) have two locations - one on the query and one on the
-subject. Rank is used to differentiate these. Rank=0 is always used
-for the query, Rank=1 for the subject. For multiple alignments,
-assignment of rank is arbitrary';
+COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1
+location, otherwise the default rank 0 is used. Some features (eg
+blast hits and HSPs) have two locations - one on the query and one on
+the subject. Rank is used to differentiate these. Rank=0 is always
+used for the query, Rank=1 for the subject. For multiple alignments,
+assignment of rank is arbitrary. Rank is also used for
+sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
+(or baseline) feature, Rank=1 indicates the mutant (or compared) feature';
 
 COMMENT ON COLUMN featureloc.locgroup IS 'This is used to manifest redundant,
 derivable extra locations for a feature. The default locgroup=0 is
@@ -652,14 +658,15 @@ contigs and chromosomes. we would thus have 4 locations for the single
 conserved region feature - two distinct locgroups (contig level and
 chromosome level) and two distinct ranks (for the two species)';
 
-COMMENT ON COLUMN featureloc.residue_info IS 'Alternative residues, when these
-differ from feature.residues. for instance, a SNP feature located on a
-wild and mutant protein would have different alresidues.  for
-alignment/similarity features, the altresidues is used to represent
-the alignment string. Note on variation features; even if we dont
-want to instantiate a mutant chromosome/contig feature, we can still
-represent a SNP etc with 2 locations, one (rank 0) on the genome, the
-other (rank 1) would have most fields null, except for altresidues';
+COMMENT ON COLUMN featureloc.residue_info IS 'Alternative residues,
+when these differ from feature.residues. for instance, a SNP feature
+located on a wild and mutant protein would have different alresidues.
+for alignment/similarity features, the altresidues is used to
+represent the alignment string (CIGAR format). Note on variation
+features; even if we dont want to instantiate a mutant
+chromosome/contig feature, we can still represent a SNP etc with 2
+locations, one (rank 0) on the genome, the other (rank 1) would have
+most fields null, except for altresidues';
 
 COMMENT ON COLUMN featureloc.phase IS 'phase of translation wrt srcfeature_id.
 Values are 0,1,2. It may not be possible to manifest this column for
@@ -865,6 +872,7 @@ create table feature_cvterm (
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    is_not boolean not null default false,
     constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id)
 );
 
@@ -910,6 +918,26 @@ create index feature_cvterm_dbxref_idx2 on feature_cvterm_dbxref (dbxref_id);
 
 COMMENT ON TABLE feature_cvterm_dbxref IS
  'Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details';
+
+--
+
+create table feature_cvterm_pub (
+    feature_cvterm_pub_id serial not null,
+    primary key (feature_cvterm_pub_id),
+    feature_cvterm_id int not null,
+    foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint feature_cvterm_pub_c1 unique (feature_cvterm_id,pub_id)
+);
+create index feature_cvterm_pub_idx1 on feature_cvterm_pub (feature_cvterm_id);
+create index feature_cvterm_pub_idx2 on feature_cvterm_pub (pub_id);
+
+COMMENT ON TABLE feature_cvterm_pub IS 'Secondary pubs for an
+association. Each feature_cvterm association is supported by a single
+primary publication. Additional secondary pubs can be added using this
+linking table (in a GO gene association file, these corresponding to
+any IDs after the pipe symbol in the publications column';
 
 --
 
@@ -2234,6 +2262,19 @@ create index biomaterialprop_idx2 on biomaterialprop (type_id);
 
 COMMENT ON TABLE biomaterialprop IS 'extra biomaterial properties that are not accounted for in biomaterial';
 
+create table biomaterial_dbxref (
+    biomaterial_dbxref_id serial not null,
+    primary key (biomaterial_dbxref_id),
+    biomaterial_id int not null,
+    foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint biomaterial_dbxref_c1 unique (biomaterial_id,dbxref_id)
+);
+create index biomaterial_dbxref_idx1 on biomaterial_dbxref (biomaterial_id);
+create index biomaterial_dbxref_idx2 on biomaterial_dbxref (dbxref_id);
+
+
 create table treatment (
     treatment_id serial not null,
     primary key (treatment_id),
@@ -2588,6 +2629,7 @@ CREATE TABLE affymetrixprobeset (
   name varchar(255) NULL,
   constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
 ) INHERITS ( element );
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_pkey PRIMARY KEY (element_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
 ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
@@ -2604,11 +2646,12 @@ CREATE TABLE affymetrixprobe (
   row int NOT NULL,
   col int NOT NULL
 ) INHERITS ( element );
+ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobe_pkey PRIMARY KEY (element_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c5 FOREIGN KEY (affymetrixprobeset_id) REFERENCES element       (element_id);
+ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c5 FOREIGN KEY (affymetrixprobeset_id) REFERENCES affymetrixprobeset (element_id);
 CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
 CREATE INDEX affymetrixprobe_idx2 ON affymetrixprobe (name);
 CREATE INDEX affymetrixprobe_idx3 ON affymetrixprobe (feature_id);
@@ -2621,7 +2664,7 @@ CREATE TABLE affymetrixcel (
   sd float NOT NULL,
   pixels int NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c1 FOREIGN KEY (element_id)        REFERENCES element         (element_id);
+ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobe (element_id);
 ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixcel_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixcel_idx1 ON affymetrixcel (mean);
 CREATE INDEX affymetrixcel_idx2 ON affymetrixcel (sd);
@@ -2632,8 +2675,8 @@ CREATE INDEX affymetrixcel_idx5 ON affymetrixcel (quantification_id);
 CREATE TABLE affymetrixsnp (
   call smallint NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixsnp_c1 FOREIGN KEY (element_id)        REFERENCES element         (element_id);
-ALTER TABLE affymetrixcel ADD CONSTRAINT affymetrixsnp_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
+ALTER TABLE affymetrixsnp ADD CONSTRAINT affymetrixsnp_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
+ALTER TABLE affymetrixsnp ADD CONSTRAINT affymetrixsnp_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixsnp_idx1 ON affymetrixsnp (call);
 CREATE INDEX affymetrixsnp_idx4 ON affymetrixsnp (element_id);
 CREATE INDEX affymetrixsnp_idx5 ON affymetrixsnp (quantification_id);
@@ -2646,7 +2689,7 @@ CREATE TABLE affymetrixmas5 (
   statpairsused int NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixmas5 ADD CONSTRAINT affymetrixmas5_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixmas5_idx1 ON affymetrixmas5 (signal);
 CREATE INDEX affymetrixmas5_idx2 ON affymetrixmas5 (call);
@@ -2657,38 +2700,30 @@ CREATE INDEX affymetrixmas5_idx6 ON affymetrixmas5 (z);
 
 CREATE TABLE affymetrixdchip (
   signal float NOT NULL,
-  call char(1) NOT NULL,
-  se float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixdchip_idx1 ON affymetrixdchip (element_id);
 CREATE INDEX affymetrixdchip_idx2 ON affymetrixdchip (quantification_id);
 CREATE INDEX affymetrixdchip_idx3 ON affymetrixdchip (signal);
-CREATE INDEX affymetrixdchip_idx4 ON affymetrixdchip (call);
-CREATE INDEX affymetrixdchip_idx5 ON affymetrixdchip (se);
 CREATE INDEX affymetrixdchip_idx6 ON affymetrixdchip (z);
 
 CREATE TABLE affymetrixvsn (
   signal float NOT NULL,
-  se float NOT NULL,
-  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixvsn_idx1 ON affymetrixvsn (element_id);
 CREATE INDEX affymetrixvsn_idx2 ON affymetrixvsn (quantification_id);
 CREATE INDEX affymetrixvsn_idx3 ON affymetrixvsn (signal);
-CREATE INDEX affymetrixvsn_idx4 ON affymetrixvsn (call);
-CREATE INDEX affymetrixvsn_idx5 ON affymetrixvsn (se);
 CREATE INDEX affymetrixvsn_idx6 ON affymetrixvsn (z);
 
 CREATE TABLE affymetrixsea (
   signal float NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixsea_idx1 ON affymetrixsea (element_id);
 CREATE INDEX affymetrixsea_idx2 ON affymetrixsea (quantification_id);
@@ -2697,7 +2732,7 @@ CREATE INDEX affymetrixsea_idx3 ON affymetrixsea (signal);
 CREATE TABLE affymetrixplier (
   signal float NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixplier_idx1 ON affymetrixplier (element_id);
 CREATE INDEX affymetrixplier_idx2 ON affymetrixplier (quantification_id);
@@ -2706,7 +2741,7 @@ CREATE INDEX affymetrixplier_idx3 ON affymetrixplier (signal);
 CREATE TABLE affymetrixdabg (
   call_p float NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixdabg ADD CONSTRAINT affymetrixdabg_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixdabg_idx1 ON affymetrixdabg (element_id);
 CREATE INDEX affymetrixdabg_idx2 ON affymetrixdabg (quantification_id);
@@ -2714,32 +2749,24 @@ CREATE INDEX affymetrixdabg_idx3 ON affymetrixdabg (call_p);
 
 CREATE TABLE affymetrixrma (
   signal float NOT NULL,
-  se float NOT NULL,
-  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixrma_idx1 ON affymetrixrma (element_id);
 CREATE INDEX affymetrixrma_idx2 ON affymetrixrma (quantification_id);
 CREATE INDEX affymetrixrma_idx3 ON affymetrixrma (signal);
-CREATE INDEX affymetrixrma_idx4 ON affymetrixrma (call);
-CREATE INDEX affymetrixrma_idx5 ON affymetrixrma (se);
 CREATE INDEX affymetrixrma_idx6 ON affymetrixrma (z);
 
 CREATE TABLE affymetrixgcrma (
   signal float NOT NULL,
-  se float NOT NULL,
-  call char(1) NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixgcrma_idx1 ON affymetrixgcrma (element_id);
 CREATE INDEX affymetrixgcrma_idx2 ON affymetrixgcrma (quantification_id);
 CREATE INDEX affymetrixgcrma_idx3 ON affymetrixgcrma (signal);
-CREATE INDEX affymetrixgcrma_idx4 ON affymetrixgcrma (call);
-CREATE INDEX affymetrixgcrma_idx5 ON affymetrixgcrma (se);
 CREATE INDEX affymetrixgcrma_idx6 ON affymetrixgcrma (z);
 
 CREATE TABLE affymetrixprobesetstat (
@@ -2750,7 +2777,7 @@ CREATE TABLE affymetrixprobesetstat (
   sd float NOT NULL,
   n int NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c1 FOREIGN KEY (element_id)        REFERENCES element (element_id);
+ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixprobesetstat ADD CONSTRAINT affymetrixprobesetstat_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixprobesetstat_idx1 ON affymetrixprobesetstat (element_id);
 CREATE INDEX affymetrixprobesetstat_idx2 ON affymetrixprobesetstat (quantification_id);
