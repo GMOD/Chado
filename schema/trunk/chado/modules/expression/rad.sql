@@ -458,10 +458,12 @@ create table elementresult (
     foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
     quantification_id int not null,
     foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
+    signal float not null,
     constraint elementresult_c1 unique (element_id,quantification_id)
 );
 create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
+create index elementresult_idx3 on elementresult (signal);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit';
 
