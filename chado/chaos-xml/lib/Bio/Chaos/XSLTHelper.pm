@@ -1,4 +1,4 @@
-# $Id: XSLTHelper.pm,v 1.2 2005-02-11 01:50:55 cmungall Exp $
+# $Id: XSLTHelper.pm,v 1.3 2005-06-15 16:21:09 cmungall Exp $
 #
 #
 
@@ -57,7 +57,6 @@ sub xsltchain {
         my $xslt = XML::LibXSLT->new;        
         my $xf = _expand_xslt_name($xn);
         my $ss = $xslt->parse_stylesheet_file($xf);
-        #print STDERR "Transforming $infile => $outfile [$xf]\n";
         my $results = $ss->transform_file($infile);
         if ($outfile) {
             $ss->output_file($results, $outfile);

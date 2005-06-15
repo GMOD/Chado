@@ -294,13 +294,12 @@ an alternative haplotype that will skew analyses. this is removed by
 default, unless this switch is set
 
 For an example, see contigs NG_002432 and NT_007592 (the former is an
-alt hap of the latter)
+alternate haplotype of the latter)
 
 
 =head1 REQUIREMENTS
 
-You will need a very up to date bioperl, probably from cvs, with the
-Unflattener modules added
+bioperl 1.5 or later
 
 =cut
 

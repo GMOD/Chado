@@ -15,6 +15,8 @@ GetOptions(
 while (my $file = shift @ARGV) {
     my $cx = Bio::Chaos::ChaosGraph->new(-file=>$file);
     print "** REPORT FOR: $file\n";
+    my $ufs = $cx->unlocalized_features;
+    printf "number of unlocalized features: %d\n", scalar(@$ufs);
     print $cx->asciitree;
     print "\n";
 }
