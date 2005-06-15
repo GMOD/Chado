@@ -2,6 +2,8 @@
 
 <!-- Creates macros for repeated cv, cvterm and organism elements -->
 
+<!-- All macros must be fully expanded before using this -->
+
 <!-- Macro IDs correspond to unique key constraints in chado db -->
 <!-- UK constraints are combined using double-underscore: '__' -->
 
@@ -57,6 +59,13 @@
 
   <!-- INITIAL MATCH -->
   <xsl:template match="/chado">
+    <xsl:if test="count(//*[@id])">
+      <xsl:message terminate="yes">
+        The input already includes macros; if you wish to convert
+        a partially macro-ized file you must first expand them
+        using chado-expand-macros.xsl
+      </xsl:message>
+    </xsl:if>
     <chado>
       <!-- insect organism macro -->
       <xsl:for-each select="$u-organism_id">

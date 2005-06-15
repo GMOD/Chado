@@ -9,7 +9,7 @@ my $conffile;
 my $build;
 my $nodownload;
 my $speciesl = [qw(mouse human anopheles)];
-my $dbhost = "space";
+my $dbhost = "localhost";
 my $dbuser = $ENV{USER};
 my $quiet;
 my $recreate;
@@ -78,10 +78,10 @@ GetOptions("interactive|i"=>\$interactive,
 my @datasets =
   (
    map {
-       my $match = '*_{core,lite}_*';
+       my $match = '*_{core,cdna,lite}_*';
        $match = 'ensembl_mart_*' if /^mart$/;
        $match = 'ensembl_compara_*' if /^multispecies$/;
-       ("ftp.ensembl.org/pub/current_$_/data/mysql" => '*_{core,lite}_*')
+       ("ftp.ensembl.org/pub/current_$_/data/mysql" => '*_{core,cdna,lite}_*')
    } @ORGLIST,
   );
    

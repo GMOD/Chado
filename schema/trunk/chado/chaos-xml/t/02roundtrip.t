@@ -1,5 +1,5 @@
 # -*-Perl-*- mode (to keep my emacs happy)
-# $Id: 02roundtrip.t,v 1.2 2005-04-27 19:32:45 cmungall Exp $
+# $Id: 02roundtrip.t,v 1.3 2005-06-15 16:21:10 cmungall Exp $
 
 use strict;
 use vars qw($DEBUG);
@@ -12,26 +12,46 @@ BEGIN {
     plan tests => 1;
 }
 
-my ($file) = (Bio::Root::IO->catfile("t","data",
-                                     "CG10833.with-macros.chado-xml"));
+my @files = (Bio::Root::IO->catfile("t","data",
+                                    "CG10833.with-macros.chado-xml"));
 
-my $cxfile = "$file-converted.chaos-xml";
-chado2chaos($file,$cxfile);
-my $cx = Bio::Chaos::ChaosGraph->new(-file=>$cxfile);
-print $cx->asciitree;
+foreach my $file (@files) {
 
-my $features = $cx->get_features;
+    my $cxfile = "$file-converted.chaos-xml";
+    chado2chaos($file,$cxfile);
+    check_cx($cxfile, 10);
 
-ok(scalar(@$features),10);
+    my $chfile = "$file-converted.chado-xml";
+    chaos2chado($cxfile,$chfile);
 
-foreach my $f (@$features) {
-    #print $f->sxpr;
+    exit;
+    chado2chaos($chfile,$cxfile);
+    check_cx($cxfile, 10);
 }
+
+sub check_cx {
+    my $cxfile = shift;
+    my $expected_features = 10;
+
+    my $cx = Bio::Chaos::ChaosGraph->new(-file=>$cxfile);
+    print $cx->asciitree;
+
+    my $features = $cx->get_features;
+    
+    ok(scalar(@$features),$expected_features);
+    
+    foreach my $f (@$features) {
+        #print $f->sxpr;
+    }
+} 
 
 exit 0;
 
 sub chado2chaos {
     convert('chado','chaos',@_);
+}
+sub chaos2chado {
+    convert('chaos','chado',@_);
 }
 
 sub convert {
@@ -44,7 +64,7 @@ sub convert {
         Bio::Chaos::XSLTHelper->xsltchain($infile, $outfile, @chain);
     }
     elsif ($from eq 'chaos' && $to eq 'chado') {
-        my @chain = qw(cx-chaos-to-chado chado-insert-macros);
+        my @chain = qw(cx-chaos-to-chado chado-expand-macros chado-insert-macros);
         Bio::Chaos::XSLTHelper->xsltchain($infile, $outfile, @chain);
     }
     else {

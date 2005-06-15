@@ -1,4 +1,4 @@
-# $Id: ChaosGraph.pm,v 1.6 2005-02-18 20:26:39 cmungall Exp $
+# $Id: ChaosGraph.pm,v 1.7 2005-06-15 16:21:09 cmungall Exp $
 #
 #
 
@@ -54,8 +54,10 @@ sub new {
     if ($stag && $file) {
         $self->freak("use -stag OR -file as arguments");
     }
-    $self->graph(Graph->new);
-    $self->locgraph(Graph->new);
+    my @g_opt = (compat02=>1);
+    #my @g_opt = ();
+    $self->graph(Graph->new(@g_opt));
+    $self->locgraph(Graph->new(@g_opt));
     $self->feature_idx({});
     $self->init_from_stag($stag) if $stag;
     $self->init_from_file($file,$fmt) if $file;
@@ -469,6 +471,7 @@ sub unlocalised_features {
     }
     return \@fl;
 }
+*unlocalized_features = \&unlocalised_features;
 
 # features at top of location AND containment graph
 sub top_unlocalised_features {
