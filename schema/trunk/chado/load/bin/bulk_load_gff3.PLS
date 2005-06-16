@@ -566,7 +566,7 @@ my($sofa_id) =  $sth->fetchrow_array();
 
 #backup plan for old chado instances
 if(!defined($sofa_id)){
-  $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Feature Annotation'");
+  $sth = $db->prepare("select cv_id from cv where name = 'Sequence Ontology Feature Annotation' or name='sofa.ontology'");
   $sth->execute;
   ($sofa_id) =  $sth->fetchrow_array();
 }
