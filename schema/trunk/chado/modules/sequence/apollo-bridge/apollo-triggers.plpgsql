@@ -617,7 +617,11 @@ BEGIN
                  INSERT INTO synonym(name, synonym_sgml, type_id) values(f_name, f_name, s_type_id);
                  SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
              END IF;
-             INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
+
+             SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_e.feature_id and synonym_id=s_id;
+             IF f_s_id is NULL THEN
+                 INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_e.feature_id, s_id, p_id, ''true'');
+             END IF;
          ELSE
              RAISE NOTICE ''Couldnt find a gene to add this exon to (feature_id:%)'',NEW.subject_id;
          END IF;
