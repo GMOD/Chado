@@ -188,7 +188,7 @@ DECLARE
   o_species  CONSTANT varchar:=''sativa'';
   c_name_synonym CONSTANT varchar:=''synonym'';
   cv_cvname_synonym CONSTANT varchar:=''null'';
-  p_miniref         CONSTANT varchar:=''null'';
+  p_miniref         CONSTANT varchar:=''none'';
   p_id  pub.pub_id%TYPE;
 BEGIN
   SELECT INTO is_anal is_analysis FROM feature WHERE uniquename = NEW.uniquename and 
@@ -360,7 +360,7 @@ DECLARE
   f_dbname_FB          CONSTANT varchar :=''FlyBase'';
   c_name_synonym       CONSTANT varchar:=''synonym'';
   cv_cvname_synonym    CONSTANT varchar:=''synonym type'';
-  p_miniref            CONSTANT varchar:=''GadFly'';
+  p_miniref            CONSTANT varchar:=''none'';
 BEGIN
  RAISE NOTICE ''enter fr_d, fr.object_id:%, fr.subject_id:%'', OLD.object_id, OLD.subject_id;
  SELECT INTO f_type name from cvterm  where cvterm_id=OLD.type_id;
@@ -648,7 +648,7 @@ DECLARE
   s_id            synonym.synonym_id%TYPE;
   f_s_id          feature_synonym.feature_synonym_id%TYPE;
   p_id            pub.pub_id%TYPE;
-  p_miniref       CONSTANT varchar:=''null'';
+  p_miniref       CONSTANT varchar:=''none'';
   c_name_synonym  CONSTANT varchar:=''synonym'';
   cv_cvname_synonym CONSTANT varchar:=''null'';
   name_suffix     varchar;
