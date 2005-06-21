@@ -85,9 +85,7 @@ COMMENT ON TABLE cvterm_relationship IS
   for example "wing part_of body"';
 
 COMMENT ON COLUMN cvterm_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
-
 COMMENT ON COLUMN cvterm_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
-
 COMMENT ON COLUMN cvterm_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
 
 create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
@@ -206,3 +204,4 @@ COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not d
 
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
+

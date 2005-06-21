@@ -18,19 +18,6 @@ create table tableinfo (
 COMMENT ON TABLE tableinfo IS NULL;
 
 -- ================================================
--- TABLE: contact
--- ================================================
-create table contact (
-    contact_id serial not null,
-    primary key (contact_id),
-    name varchar(30) not null,
-    description varchar(255) null,
-    constraint contact_c1 unique (name)
-);
-
-COMMENT ON TABLE contact IS NULL;
-
--- ================================================
 -- TABLE: db
 -- ================================================
 
@@ -38,8 +25,8 @@ create table db (
     db_id serial not null,
     primary key (db_id),
     name varchar(255) not null,
-    contact_id int,
-    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
+--    contact_id int,
+--    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     description varchar(255) null,
     urlprefix varchar(255) null,
     url varchar(255) null,
