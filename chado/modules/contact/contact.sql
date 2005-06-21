@@ -31,7 +31,7 @@ create index contact_relationship_idx1 on contact_relationship (type_id);
 create index contact_relationship_idx2 on contact_relationship (subject_id);
 create index contact_relationship_idx3 on contact_relationship (object_id);
 
-COMMENT ON TABLE contact_relationship IS 'model relationships between contacts'
+COMMENT ON TABLE contact_relationship IS 'model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
 COMMENT ON COLUMN contact_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
 COMMENT ON COLUMN contact_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
