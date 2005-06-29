@@ -80,6 +80,20 @@ of feature types must be exactly those in the Sequence Ontology Feature
 Annotation (SOFA), not the synonyms and not the accession numbers (SO
 accession numbers may be supported in future versions of this script).
 
+Note that the ##sequence-region directive is not supported as a way of
+declaring a reference sequence for a GFF3 file.  The ##sequence-region
+directive is not expressive enough to define what type of thing the
+sequence is (ie, is it a chromosome, a contig, an arm, etc?).  If
+your GFF file uses a ##sequence-region directive in this way, you
+must convert it to a full GFF3 line.  For example, if you have 
+this line:
+
+  ##sequence-region chrI 1 9999999
+
+Then is should be converted to a GFF3 line like this:
+
+  chrI	.	chromosome	1	9999999	.	.	.	ID=chrI
+
 =head2 How GFF3 is stored in chado
 
 Here is summary of how GFF3 data is stored in chado:
