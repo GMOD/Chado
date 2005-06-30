@@ -5,6 +5,12 @@ CREATE SCHEMA godb;
 -- (note that placing godb first in the search path means
 --  that godb.dbxref takes precedence over public.dbxref)
 
+CREATE TABLE godb.instance_data (
+  release_name varchar(255),
+  release_type varchar(255),
+  release_notes text
+);
+
 --- helper views
 
 --view
@@ -111,6 +117,7 @@ CREATE INDEX term_idx4 ON godb.term (is_obsolete);
 CREATE INDEX term_idx5 ON godb.term (is_root);
 --load
 INSERT INTO godb.term SELECT * FROM godb.v_term;
+UPDATE term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM cvterm WHERE cvterm_id NOT IN (SELECT DISTINCT subject_id FROM cvterm_relationship) AND is_obsolete = 0 AND is_relationshiptype = 0);
 
 --- term_definition
 --view
@@ -126,7 +133,8 @@ WHERE definition IS NOT NULL;
 CREATE VIEW godb.term_dbxref AS
 SELECT
  cvterm_id AS term_id,
- dbxref_id  AS dbxref_id
+ dbxref_id  AS dbxref_id,
+ 0 AS is_for_definition
 FROM public.cvterm_dbxref;
 
 --- term_synonym
@@ -134,7 +142,8 @@ FROM public.cvterm_dbxref;
 CREATE VIEW godb.term_synonym AS
 SELECT
  cvterm_id AS term_id,
- synonym  AS term_synonym
+ synonym  AS term_synonym,
+ type_id AS synonym_type_id
 FROM public.cvtermsynonym;
 
 --- term2term
@@ -147,7 +156,7 @@ SELECT
  subject_id        AS term2_id
 FROM public.cvterm_relationship;
 --materialized view
-CREATE TABLE term2term (
+CREATE TABLE godb.term2term (
   id int,
   relationship_type_id int,
   term1_id int,
@@ -170,7 +179,7 @@ SELECT
  pathdistance   AS distance
 FROM public.cvtermpath;
 --materialized view
-CREATE TABLE graph_path (
+CREATE TABLE godb.graph_path (
   id int,
   term1_id int,
   term2_id int,
