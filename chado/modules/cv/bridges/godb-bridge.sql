@@ -117,7 +117,7 @@ CREATE INDEX term_idx4 ON godb.term (is_obsolete);
 CREATE INDEX term_idx5 ON godb.term (is_root);
 --load
 INSERT INTO godb.term SELECT * FROM godb.v_term;
-UPDATE term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM cvterm WHERE cvterm_id NOT IN (SELECT DISTINCT subject_id FROM cvterm_relationship) AND is_obsolete = 0 AND is_relationshiptype = 0);
+UPDATE godb.term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM public.cvterm WHERE cvterm_id NOT IN (SELECT DISTINCT subject_id FROM public.cvterm_relationship) AND is_obsolete = 0 AND is_relationshiptype = 0);
 
 --- term_definition
 --view
