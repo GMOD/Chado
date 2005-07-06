@@ -67,6 +67,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --validate    Validate SOFA terms before attempting insert (can cause
                  script startup to be slow, 0 (false) by default)
  --ontology    Give directions for handling misc Ontology_terms
+ --skip_vacuum Skip vacuuming the tables after the inserts
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -374,7 +375,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -391,6 +392,7 @@ GetOptions(
     'nosequence' => \$NOSEQUENCE,
     'score_col=s'=> \$SCORE_COL,
     'ontology=s' => \$ONTOLOGY,
+    'skip_vacuum'=> \$SKIP_VACUUM,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 
@@ -1259,12 +1261,15 @@ if(!$NOLOAD){
     close SEQ;
   }
 
-  warn "Optimizing database (this may take a while) ...\n";
-  print STDERR "  (";
-  foreach (@tables) {
-    print STDERR "$_ "; 
-    $db->do("VACUUM ANALYZE $_");
+  unless ($SKIP_VACUUM) {
+    warn "Optimizing database (this may take a while) ...\n";
+    print STDERR "  (";
+    foreach (@tables) {
+      print STDERR "$_ "; 
+      $db->do("VACUUM ANALYZE $_");
+    }
   }
+
   print STDERR ") Done.\n";
   $db->disconnect;
 
