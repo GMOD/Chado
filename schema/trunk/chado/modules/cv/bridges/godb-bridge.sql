@@ -359,33 +359,33 @@ CREATE VIEW godb.gene_product_count AS
 -- to do with xslts
 
 CREATE RULE "_RuleI_term_definition" AS
- ON INSERT TO term_definition
+ ON INSERT TO godb.term_definition
  DO INSTEAD
-  UPDATE cvterm
+  UPDATE public.cvterm
   SET
   definition = NEW.term_definition
   WHERE cvterm_id = NEW.term_id;
 
 CREATE RULE "_RuleU_term_definition" AS
- ON UPDATE TO term_definition
+ ON UPDATE TO godb.term_definition
  DO INSTEAD
-  UPDATE cvterm
+  UPDATE public.cvterm
   SET
   definition = NEW.term_definition
   WHERE cvterm_id = OLD.term_id;
 
 CREATE RULE "_RuleD_term_definition" AS
- ON DELETE TO term_definition
+ ON DELETE TO godb.term_definition
  DO INSTEAD
-  UPDATE cvterm
+  UPDATE public.cvterm
   SET
   definition = NULL
   WHERE cvterm_id = OLD.term_id;
 
 CREATE RULE "_RuleI_term2term" AS
- ON INSERT TO term2term
+ ON INSERT TO godb.term2term
  DO INSTEAD
-  INSERT INTO cvterm_relationship
+  INSERT INTO public.cvterm_relationship
   (
    type_id,
    object_id,
@@ -398,9 +398,9 @@ CREATE RULE "_RuleI_term2term" AS
   );
 
 CREATE RULE "_RuleU_term2term" AS
- ON UPDATE TO term2term
+ ON UPDATE TO godb.term2term
  DO INSTEAD
-  UPDATE cvterm_relationship
+  UPDATE public.cvterm_relationship
   SET
  type_id        = NEW.relationship_type_id,
  object_id        = NEW.term1_id,
@@ -408,15 +408,15 @@ CREATE RULE "_RuleU_term2term" AS
   WHERE cvterm_relationship_id = OLD.id;
 
 CREATE RULE "_RuleD_term2term" AS
- ON DELETE TO term2term
+ ON DELETE TO godb.term2term
  DO INSTEAD
-  DELETE FROM cvterm_relationship
+  DELETE FROM public.cvterm_relationship
   WHERE cvterm_relationship_id = OLD.id;
 
 CREATE RULE "_RuleI_graph_path" AS
- ON INSERT TO graph_path
+ ON INSERT TO godb.graph_path
  DO INSTEAD
-  INSERT INTO cvtermpath
+  INSERT INTO public.cvtermpath
   (
    type_id,
    object_id,
@@ -431,9 +431,9 @@ CREATE RULE "_RuleI_graph_path" AS
   );
 
 CREATE RULE "_RuleU_graph_path" AS
- ON UPDATE TO graph_path
+ ON UPDATE TO godb.graph_path
  DO INSTEAD
-  UPDATE cvtermpath
+  UPDATE public.cvtermpath
   SET
  type_id        = NULL,
  object_id        = NEW.term1_id,
@@ -442,54 +442,54 @@ CREATE RULE "_RuleU_graph_path" AS
   WHERE cvtermpath_id = OLD.id;
 
 CREATE RULE "_RuleD_graph_path" AS
- ON DELETE TO graph_path
+ ON DELETE TO godb.graph_path
  DO INSTEAD
-  DELETE FROM cvtermpath
+  DELETE FROM public.cvtermpath
   WHERE cvtermpath_id = OLD.id;
 
 
 CREATE RULE "_RuleI_term_synonym" AS
- ON INSERT TO term_synonym
+ ON INSERT TO godb.term_synonym
  DO INSTEAD
-  INSERT INTO cvtermsynonym
+  INSERT INTO public.cvtermsynonym
   (cvterm_id, synonym)
   VALUES
   (NEW.term_id, NEW.term_synonym);
 
 CREATE RULE "_RuleU_term_synonym" AS
- ON UPDATE TO term_synonym
+ ON UPDATE TO godb.term_synonym
  DO INSTEAD
-  UPDATE cvtermsynonym
+  UPDATE public.cvtermsynonym
   SET
  cvterm_id = NEW.term_id,
  synonym  = NEW.term_synonym
   WHERE cvterm_id = OLD.term_id AND synonym = OLD.term_synonym;
 
 CREATE RULE "_RuleD_term_synonym" AS
- ON DELETE TO term_synonym
+ ON DELETE TO godb.term_synonym
  DO INSTEAD
-  DELETE FROM cvtermsynonym
+  DELETE FROM public.cvtermsynonym
   WHERE cvterm_id = OLD.term_id AND synonym = OLD.term_synonym;
 
 CREATE RULE "_RuleI_term_dbxref" AS
- ON INSERT TO term_dbxref
+ ON INSERT TO godb.term_dbxref
  DO INSTEAD
-  INSERT INTO cvterm_dbxref
+  INSERT INTO public.cvterm_dbxref
   (cvterm_id, dbxref_id)
   VALUES
   (NEW.term_id, NEW.dbxref_id);
 
 CREATE RULE "_RuleU_term_dbxref" AS
- ON UPDATE TO term_dbxref
+ ON UPDATE TO godb.term_dbxref
  DO INSTEAD
-  UPDATE cvterm_dbxref
+  UPDATE public.cvterm_dbxref
   SET
  cvterm_id = NEW.term_id,
  dbxref_id  = NEW.dbxref_id
   WHERE cvterm_id = OLD.term_id AND dbxref_id = OLD.dbxref_id;
 
 CREATE RULE "_RuleD_term_dbxref" AS
- ON DELETE TO term_dbxref
+ ON DELETE TO godb.term_dbxref
  DO INSTEAD
-  DELETE FROM cvterm_dbxref
+  DELETE FROM public.cvterm_dbxref
   WHERE cvterm_id = OLD.term_id AND dbxref_id = OLD.dbxref_id;
