@@ -484,6 +484,7 @@ DECLARE
   p_miniref         CONSTANT varchar:=''none'';
   p_cvterm_name     CONSTANT varchar:=''computer file'';
   p_cv_name         CONSTANT varchar:=''pub type'';
+  fng_type_id       cvterm.cvterm_id%TYPE;
 BEGIN
  SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv
                              WHERE cvterm.name = ''prefix'' and
@@ -525,7 +526,10 @@ BEGIN
          --generate a new name based on the gene name
          --the name is like: genename-transcript#
          SELECT INTO f_name_gene name from feature where feature_id=NEW.object_id;
-         SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+10))), ''99999'') FROM feature where name like f_name_gene||''-transcript%'';
+        -- SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+10))), ''99999'') FROM feature where name like f_name_gene||''-transcript%'';
+         SELECT INTO c_cv_id cv_id FROM cv WHERE name = ''Sequence Ontology Feature Annotation'';
+         SELECT INTO fng_type_id cvterm_id FROM cvterm WHERE name = ''transcript'' AND cv_id = c_cv_id;
+         SELECT INTO maxid count FROM feature_namegenerator WHERE name = f_name_gene AND type_id = fng_type_id;
          IF maxid IS NULL THEN
              maxid = 1;
          ELSE
@@ -536,6 +540,9 @@ BEGIN
 
          RAISE NOTICE ''start to update feature, gene name:%, new feature name:%'', f_name_gene, f_name;
          UPDATE feature set name=f_name where feature_id=NEW.subject_id;
+
+         DELETE FROM feature_namegenerator WHERE name = f_name_gene AND type_id = fng_type_id;
+         INSERT INTO feature_namegenerator (name,type_id,count) VALUES (f_name_gene, fng_type_id, maxid);
 
          SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
          IF s_id IS NULL THEN
@@ -571,7 +578,10 @@ BEGIN
              SELECT INTO f_row_p * from feature where feature_id=NEW.subject_id;
 
              --create a new name for this protein (again repeating code in assign_names)
-             SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+8))), ''99999'') FROM feature where name like f_name_gene||''-protein%'';
+             --SELECT INTO maxid to_number(max(substring(name from (length(f_name_gene)+1+8))), ''99999'') FROM feature where name like f_name_gene||''-protein%'';
+             SELECT INTO c_cv_id cv_id FROM cv WHERE name = ''Sequence Ontology'';
+             SELECT INTO fng_type_id cvterm_id FROM cvterm WHERE name = ''protein'' AND cv_id = c_cv_id;
+             SELECT INTO maxid count FROM feature_namegenerator WHERE name = f_name_gene AND type_id = fng_type_id;
              IF maxid IS NULL THEN
                  maxid = 1;
              ELSE
@@ -582,6 +592,9 @@ BEGIN
 
              RAISE NOTICE ''update name of protein:% to new name:%'',f_row_p.name, f_name;
              UPDATE feature set name=f_name where feature_id=NEW.subject_id;
+
+             DELETE FROM feature_namegenerator WHERE name = f_name_gene AND type_id = fng_type_id;
+             INSERT INTO feature_namegenerator (name,type_id,count) VALUES (f_name_gene, fng_type_id, maxid);
 
              SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
              IF s_id IS NULL THEN

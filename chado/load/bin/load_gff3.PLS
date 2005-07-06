@@ -521,7 +521,36 @@ sub load_Ontology_term {
 
     foreach my $d (@d) {
         next if $d eq '';
-        my ($dbxref) = Chado::DBI::Chado::Dbxref->search( accession => $d );
+        my $db;
+        if ($d =~ /([^:]+)\:([^:]+)/ ) {
+            $db = $1;
+            $d  = $2;
+        }
+
+        my $dbxref;
+        my $db_obj_iterator; 
+        if ($db) {
+            if ($db eq 'GO') {
+                $db_obj_iterator
+                      = Chado::DBI::Chado::Db->search_like( name =>"%Gene Ontology%" );
+            } elsif ($db eq 'SO') {
+                $db_obj_iterator 
+                      = Chado::DBI::Chado::Db->search( name =>"Sequence Ontology" );
+            } else {
+                $progress->message(
+                  "I don't know how to deal with OntologyTerms like $db:$d\n")
+                  and next;
+            }
+
+            my @db_list;
+            while (!$dbxref and my $db_obj = $db_obj_iterator->next) {
+                ($dbxref) = Chado::DBI::Chado::Dbxref->search( 
+                                         accession => $d ,
+                                         db_id     => $db_obj->id );
+            } 
+        } else {
+            ($dbxref) = Chado::DBI::Chado::Dbxref->search( accession => $d );
+        }
         $progress->message("couldn't find cvterm in dbxref: $d") and next
           unless $dbxref;
         my ($cvterm) = Chado::DBI::Chado::Cvterm->search( dbxref_id => $dbxref->id );
