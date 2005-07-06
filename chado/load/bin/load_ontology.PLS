@@ -122,11 +122,9 @@ my %predmap = (
 		'rel:0001'      => 'transitive_relationship',
 			  );
 
-#create some default entries to satisfy chado FK requirements of ontology on contact and db tables
+#create some default entries to satisfy chado FK requirements of ontology on db table
 
-my($nullcontact) = Chado::Contact->find_or_create({ name => 'null', description => 'null' });
-$nullcontact->dbi_commit;
-my($db) = Chado::Db->find_or_create({name => $ontname, contact_id => $nullcontact->id});
+my($db) = Chado::Db->find_or_create({name => $ontname});
 $db->dbi_commit;
 my($cv) = Chado::Cv->find_or_create({name => $ontname});
 $cv->dbi_commit;
