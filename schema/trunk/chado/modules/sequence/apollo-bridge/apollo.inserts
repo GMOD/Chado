@@ -48,3 +48,30 @@ insert into cvtermprop (cvterm_id,type_id,value) values ((select cvterm_id from 
 
 insert into dbxref (db_id, accession) values ((select db_id from db where name='null'),'Relationship Ontology:producedby');
 insert into cvterm (name, cv_id, dbxref_id, is_relationshiptype) values ('producedby',(select cv_id from cv where name='Relationship Ontology'),(select dbxref_id from dbxref where accession = 'Relationship Ontology:producedby'),1);
+
+CREATE TABLE feature_namegenerator (
+  feature_namegenerator_id serial not null,
+  primary key (feature_namegenerator_id),
+  name varchar(255),
+  type_id int,
+  foreign key (type_id)  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+  count int
+--  constraint feature_namegenerator_c1 unique (name,type_id)
+);
+
+INSERT INTO feature_namegenerator (name,type_id,count)
+SELECT substr(name, 0 , (position('-' in name))),
+      (select cvterm_id from cvterm where cv_id=7 and name='transcript'),
+       to_number(max(substring(name from 21)), '99999')
+FROM feature WHERE name like 'RICE%-transcript%' group by name;
+
+INSERT INTO feature_namegenerator (name,type_id,count)
+SELECT substr(name, 0 , (position('-' in name))),
+      (select cvterm_id from cvterm where cv_id=14 and name='protein'),
+       to_number(max(substring(name from 19)), '99999')
+FROM feature WHERE name like 'RICE%-protein%' group by name;
+
+delete from  feature_namegenerator where feature_namegenerator_id not in
+(select feature_namegenerator_id from feature_namegenerator where count = max(count) group by name,type_id);
+
+alter table feature_namegenerator add constraint feature_namegenerator_c1 unique (name,type_id);
