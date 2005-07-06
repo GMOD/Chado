@@ -128,7 +128,7 @@ execute this command:
 
 If you do not see your database listed, execute this command:
 
-  insert into db (name, contact_id) values ('DB:refseq',1);
+  insert into db (name) values ('DB:refseq');
 
 Substituting for the name of your database.  A more complete insert
 command may be appropriate in your case, but this should work in a pinch.
@@ -186,8 +186,8 @@ warn $TMPGFF if DEBUG;
 my ( $ORGANISM,$SRC_DB,$GFFFILE,$UNIQUENAME,$CACHE_SIZE,$FORCE_LOAD,$ONTOLOGY );
 my ( $progress, $next_update, $linecount ) =
   ( undef, undef, undef );    #progressbar;
-my ( $chado_db, $chado_organism, $nullpub, $nullcontact ) =
-  ( undef, undef, undef, undef );
+my ( $chado_db, $chado_organism, $nullpub ) =
+  ( undef, undef, undef );
 my $feature_count = 0;        #for cache/flush
 my $cv;
 my $null_db_id;
@@ -203,7 +203,7 @@ my %gff_source;
 initialize();
 
 my $mtime = ( stat($GFFFILE) )[9];
-my ($pub) = Chado::Pub->search( title => $GFFFILE . " " . $mtime );
+my ($pub) = Chado::DBI::Chado::Pub->search( title => $GFFFILE . " " . $mtime );
 if ( $pub and !$FORCE_LOAD ) {
     print "\nIt appears that you have already loaded this exact file\n";
     print "Do you want to continue [no]? ";
@@ -214,7 +214,7 @@ if ( $pub and !$FORCE_LOAD ) {
     }
 }
 else {
-    $pub = Chado::Pub->find_or_create(
+    $pub = Chado::DBI::Chado::Pub->find_or_create(
         {
             title      => $GFFFILE . " " . $mtime,
             miniref    => $GFFFILE . " " . $mtime,
@@ -258,7 +258,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     # second  sjc 3/23/04
     if ( ($id ne $gff_feature->seq_id) && ($gff_feature->seq_id ne '.') ) {
         ( $srcfeature{$gff_feature->seq_id} ) =
-            Chado::Feature->search( name => $gff_feature->seq_id )
+            Chado::DBI::Chado::Feature->search( name => $gff_feature->seq_id )
                 unless $srcfeature{$gff_feature->seq_id};
 
         unless ( $srcfeature{$gff_feature->seq_id} ) {
@@ -277,7 +277,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
 
     #is this general, or what should really be done here?
     if ( $id && !$dbxref{$id} ) {
-        my ($chado_dbxref) = Chado::Dbxref->find_or_create(
+        my ($chado_dbxref) = Chado::DBI::Chado::Dbxref->find_or_create(
             {
                 db_id     => $chado_db->id,
                 accession => $id,
@@ -382,7 +382,7 @@ sub load_custom_tags {
     elsif ( $tag eq 'description' ) {
         foreach my $d (@d) {
             next if $d eq '';
-            my ($featureprop) = Chado::Featureprop->find_or_create(
+            my ($featureprop) = Chado::DBI::Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
                     type_id    => $cvterm{description}->id,
@@ -397,13 +397,12 @@ sub load_custom_tags {
         $tag =~ s/^db:/DB:/;
 
         my $add_db = 0;
-        my ($db) = Chado::Db->search( name => $tag );
+        my ($db) = Chado::DBI::Chado::Db->search( name => $tag );
         if ( !$db ) {
             $add_db = 1;
-            $db = Chado::Db->find_or_create(
+            $db = Chado::DBI::Chado::Db->find_or_create(
                 {
                     name       => $tag,
-                    contact_id => $nullcontact,
                 }
             );
         }
@@ -412,13 +411,13 @@ sub load_custom_tags {
 
         foreach my $d (@d) {
             next if $d eq '';
-            my ($dbxref) = Chado::Dbxref->find_or_create(
+            my ($dbxref) = Chado::DBI::Chado::Dbxref->find_or_create(
                 {
                     db_id     => $db->id,
                     accession => $d
                 }
             );
-            my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create(
+            my ($feature_dbxref) = Chado::DBI::Chado::Feature_Dbxref->find_or_create(
                 {
                     feature_id => $chado_feature->id,
                     dbxref_id  => $dbxref->id,
@@ -440,7 +439,7 @@ sub load_custom_tags {
         my $rank = 0;
         foreach my $d (@d) {
             next if $d eq '';
-            my ($featureprop) = Chado::Featureprop->find_or_create(
+            my ($featureprop) = Chado::DBI::Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
                     type_id    => $cvterm{$tag}->id,
@@ -479,26 +478,25 @@ sub load_Dbxref_term {
         }
 
         my $add_db = 0;
-        my ($db) = Chado::Db->search( name => $tag );
+        my ($db) = Chado::DBI::Chado::Db->search( name => $tag );
         if ( !$db ) {
             $add_db = 1;
-            $db = Chado::Db->find_or_create(
+            $db = Chado::DBI::Chado::Db->find_or_create(
                 {
                     name       => $tag,
-                    contact_id => $nullcontact,
                 }
             );
         }
         die "couldn't create db $db" unless $db;
         push @transaction, $db if $add_db;
 
-        my ($dbxref) = Chado::Dbxref->find_or_create(
+        my ($dbxref) = Chado::DBI::Chado::Dbxref->find_or_create(
             {
                 db_id     => $db->id,
                 accession => $d
             }
         );
-        my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create(
+        my ($feature_dbxref) = Chado::DBI::Chado::Feature_Dbxref->find_or_create(
             {
                 feature_id => $chado_feature->id,
                 dbxref_id  => $dbxref->id,
@@ -523,14 +521,14 @@ sub load_Ontology_term {
 
     foreach my $d (@d) {
         next if $d eq '';
-        my ($dbxref) = Chado::Dbxref->search( accession => $d );
+        my ($dbxref) = Chado::DBI::Chado::Dbxref->search( accession => $d );
         $progress->message("couldn't find cvterm in dbxref: $d") and next
           unless $dbxref;
-        my ($cvterm) = Chado::Cvterm->search( dbxref_id => $dbxref->id );
+        my ($cvterm) = Chado::DBI::Chado::Cvterm->search( dbxref_id => $dbxref->id );
                                                                                 
         next unless $cvterm;
                               
-        my ($feature_cvterm) = Chado::Feature_Cvterm->find_or_create(
+        my ($feature_cvterm) = Chado::DBI::Chado::Feature_Cvterm->find_or_create(
             {
                 feature_id => $chado_feature->id,
                 cvterm_id  => $cvterm->id,
@@ -559,7 +557,7 @@ sub load_Note_tag {
     my $rank = 0;
     foreach my $d (@d) {
         next if $d eq '';
-        my ($featureprop) = Chado::Featureprop->find_or_create(
+        my ($featureprop) = Chado::DBI::Chado::Featureprop->find_or_create(
             {
                 feature_id => $chado_feature->id,
                 type_id    => $cvterm{'Note'}->id,
@@ -595,7 +593,7 @@ sub load_Target_tag {
                 die "your Target attribute seems to be improperly formated";
             }
 
-            my ($chado_synonym1) = Chado::Synonym->find_or_create(
+            my ($chado_synonym1) = Chado::DBI::Chado::Synonym->find_or_create(
                 {
                     name         => $target,
                     synonym_sgml => $target,
@@ -603,7 +601,7 @@ sub load_Target_tag {
                 }
             );
 
-            my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
+            my ($chado_synonym2) = Chado::DBI::Chado::Feature_Synonym->find_or_create(
                 {
                     synonym_id => $chado_synonym1->id,
                     feature_id => $chado_feature->id,
@@ -611,7 +609,7 @@ sub load_Target_tag {
                 }
             );
 
-            my ($chado_featureloc) = Chado::Featureloc->find_or_create(
+            my ($chado_featureloc) = Chado::DBI::Chado::Featureloc->find_or_create(
                 {
                     feature_id    => $chado_feature->id,
                     srcfeature_id => $chado_feature->id,
@@ -621,7 +619,7 @@ sub load_Target_tag {
                 }
             );
 
-            my ($chado_featureprop) = Chado::Featureprop->find_or_create(
+            my ($chado_featureprop) = Chado::DBI::Chado::Featureprop->find_or_create(
                 {
                     feature_id => $chado_feature->id,
                     type_id    => $cvterm{score}->id,
@@ -662,11 +660,11 @@ sub load_Parent_tag {
               : $cvterm{part_of};
 
            #unhandled exception: what if $feature{$parent} hasn't been seen yet?
-            ( $feature{$parent} ) = Chado::Feature->search( name => $parent )
+            ( $feature{$parent} ) = Chado::DBI::Chado::Feature->search( name => $parent )
               unless $feature{$parent};
 
             my $chado_feature_relationship =
-              Chado::Feature_Relationship->find_or_create(
+              Chado::DBI::Chado::Feature_Relationship->find_or_create(
                 {
                     subject_id => $chado_feature->id,
                     object_id  => $feature{$parent}->id,
@@ -698,7 +696,7 @@ sub load_Alias_tag {
         foreach my $alias (@aliases) {
             next if $alias eq '';
             #create the synonym
-            my ($chado_synonym1) = Chado::Synonym->find_or_create(
+            my ($chado_synonym1) = Chado::DBI::Chado::Synonym->find_or_create(
                 {
                     name         => $alias,
                     synonym_sgml => $alias,
@@ -707,7 +705,7 @@ sub load_Alias_tag {
             );
 
             #and link it to the feature via feature_synonym
-            my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
+            my ($chado_synonym2) = Chado::DBI::Chado::Feature_Synonym->find_or_create(
                 {
                     synonym_id => $chado_synonym1->id,
                     feature_id => $chado_feature->id,
@@ -743,7 +741,7 @@ sub load_Name_tag {
 
     foreach my $name (@names) {
         next if $name eq '';
-        my ($chado_synonym1) = Chado::Synonym->find_or_create(
+        my ($chado_synonym1) = Chado::DBI::Chado::Synonym->find_or_create(
             {
                 name         => $name,
                 synonym_sgml => $name,
@@ -751,7 +749,7 @@ sub load_Name_tag {
             }
         );
 
-        my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
+        my ($chado_synonym2) = Chado::DBI::Chado::Feature_Synonym->find_or_create(
             {
                 synonym_id => $chado_synonym1->id,
                 feature_id => $chado_feature->id,
@@ -822,13 +820,13 @@ sub initialize {
     $next_update = 0;
 
     Chado::LoadDBI->init();
-    ($cv) = Chado::Cv->search(
+    ($cv) = Chado::DBI::Chado::Cv->search(
         {
             name       => 'autocreated',
         }
     );
     die "Unable to find a 'autocreated' cv in the cv table; please add one" unless $cv;
-    ($so) = Chado::Cv->search( { name => $ONTOLOGY } );
+    ($so) = Chado::DBI::Chado::Cv->search( { name => $ONTOLOGY } );
     die "Unable to find $ONTOLOGY in cv table; that is a pretty big problem" unless $so;
 
     # find needed cvterm and other pieces of information
@@ -839,25 +837,24 @@ sub initialize {
     }
     cache_cvterm('region',$so->id); #make sure to get the SO region term
 
-    ($chado_organism) = Chado::Organism->search( common_name => lc($ORGANISM))
+    ($chado_organism) = Chado::DBI::Chado::Organism->search( common_name => lc($ORGANISM))
         unless $chado_organism;
-    ($chado_organism) = Chado::Organism->search( abbreviation => ucfirst($ORGANISM))
+    ($chado_organism) = Chado::DBI::Chado::Organism->search( abbreviation => ucfirst($ORGANISM))
         unless($chado_organism);
-    ($chado_organism) = Chado::Organism->search( genus => $ORGANISM  )
+    ($chado_organism) = Chado::DBI::Chado::Organism->search( genus => $ORGANISM  )
         unless($chado_organism);
 
-    ($chado_db)       = Chado::Db->search( name              => $SRC_DB );
-    ($nullpub)        = Chado::Pub->search( miniref          => 'null' );
-    ($nullcontact)    = Chado::Contact->search( name         => 'null' );
+    ($chado_db)       = Chado::DBI::Chado::Db->search( name              => $SRC_DB );
+    ($nullpub)        = Chado::DBI::Chado::Pub->search( miniref          => 'null' );
 
     unless ($chado_organism) {
       warn "\n\nCouldn't find or create organism $ORGANISM.\n";
       warn "The current contents of the organism table is:\n\n";
 
-      my @all_columns = Chado::Organism->columns;
+      my @all_columns = Chado::DBI::Chado::Organism->columns;
       printf "%15s %8s %11s %11s %12s %15s\n\n", sort @all_columns;
 
-      my $organism_iterator = Chado::Organism->retrieve_all();
+      my $organism_iterator = Chado::DBI::Chado::Organism->retrieve_all();
       while(my $organism = $organism_iterator->next){ 
         my @cols = map { $organism->$_ } sort $organism->columns;
         printf "%15s %8s %11s %11s %12s %15s\n", @cols;
@@ -870,10 +867,10 @@ sub initialize {
       warn "\n\nCouldn't find or create database $SRC_DB.\n";
       warn "The current contents of the database table is:\n\n";
 
-      my @all_columns = Chado::Db->columns;
+      my @all_columns = Chado::DBI::Chado::Db->columns;
       printf "%10s %6s %13s %25s %5s %10s\n\n", sort @all_columns;
 
-      my $db_iterator = Chado::Db->retrieve_all();
+      my $db_iterator = Chado::DBI::Chado::Db->retrieve_all();
       while(my $db = $db_iterator->next){
         my @cols = map { $db->$_ } sort $db->columns;
         printf "%10s %6s %13s %25s %5s %10s\n", @cols;
@@ -890,14 +887,14 @@ sub load_segments {
     # creates the features for each gff segment
     while ( my $gff_segment = $gffio->next_segment() ) {
         my ($segment) =
-          Chado::Feature->search( { name => $gff_segment->display_id , organism_id => $chado_organism } );
+          Chado::DBI::Chado::Feature->search( { name => $gff_segment->display_id , organism_id => $chado_organism } );
         if ( !$segment ) {
 
 # about uniquenames here: since these are coming from ##sequence_region
 # meta stuff in the header, there will be no uniquename attribute, so the
 # only thing to do is to generate one.
 
-            my $f = Chado::Feature->create(
+            my $f = Chado::DBI::Chado::Feature->create(
                 {
                     organism_id => $chado_organism,
                     name        => $gff_segment->display_id,
@@ -922,10 +919,10 @@ sub load_sequences {
     my $seqs_loaded = 0;
 
     if ( -e $TMPFASTA ) {
-        Chado::Feature->set_sql( update_residues =>
+        Chado::DBI::Chado::Feature->set_sql( update_residues =>
           qq{UPDATE feature SET residues = residues || ? WHERE feature_id = ?}
         );
-        my $sth = Chado::Feature->sql_update_residues;
+        my $sth = Chado::DBI::Chado::Feature->sql_update_residues;
 
         print STDERR "loading sequence data...\n";
 
@@ -949,7 +946,7 @@ sub load_sequences {
         my $in = Bio::SeqIO->new( -file => $TMPFASTA, '-format' => 'Fasta' );
         while ( my $seq = $in->next_seq() ) {
             my $name          = $seq->id;
-            my @chado_feature = Chado::Feature->search( { 'name' => $name , organism_id => $chado_organism} );
+            my @chado_feature = Chado::DBI::Chado::Feature->search( { 'name' => $name , organism_id => $chado_organism} );
 
             unless (@chado_feature) { #check synonym and dbxref
                 my ($dbh) = Chado::DBI->db_handles();
@@ -972,7 +969,7 @@ sub load_sequences {
                 } 
 
                 while (my $hashref =  $sth->fetchrow_hashref) {
-                    my @temp_feat = Chado::Feature->search( {'feature_id' => $$hashref{'feature_id'} } );
+                    my @temp_feat = Chado::DBI::Chado::Feature->search( {'feature_id' => $$hashref{'feature_id'} } );
                     push @chado_feature, @temp_feat;
                 }
             }
@@ -1130,7 +1127,7 @@ sub load_feature_locations {
         ($name) = $gff_feature->get_tag_values('ID');
     }
 
-    ($chado_feature) = Chado::Feature->find_or_create(\%feature_attributes);
+    ($chado_feature) = Chado::DBI::Chado::Feature->find_or_create(\%feature_attributes);
 
     if(!defined($chado_feature->seqlen)){
         $chado_feature->seqlen($seqlen);
@@ -1148,9 +1145,8 @@ sub load_feature_locations {
     if ( $source && $source ne '.') { #make source a feature prop
 
         unless ($gff_source_db) {#create a new db for keeping GFF sources
-            $gff_source_db = Chado::Db->find_or_create( {
+            $gff_source_db = Chado::DBI::Chado::Db->find_or_create( {
                 name        => 'GFF_source',
-                contact_id  => $nullcontact,
                 description => 'A collection of sources (ie, column 2) from GFF files',
             } );
 
@@ -1158,7 +1154,7 @@ sub load_feature_locations {
         }
 
         unless ($gff_source{$source}) { #now make a dbxref for the source
-            $gff_source{$source} = Chado::Dbxref->find_or_create( {
+            $gff_source{$source} = Chado::DBI::Chado::Dbxref->find_or_create( {
                 db_id     => $gff_source_db->id,
                 accession => $source,
             } );
@@ -1166,7 +1162,7 @@ sub load_feature_locations {
         }
 
         #now tie feature and source together in feature_dbxref
-        my $feature_dbxref = Chado::Feature_Dbxref->find_or_create( {
+        my $feature_dbxref = Chado::DBI::Chado::Feature_Dbxref->find_or_create( {
             feature_id => $chado_feature->id,
             dbxref_id  => $gff_source{$source}->id
         }); 
@@ -1188,7 +1184,7 @@ sub load_feature_locations {
     # to this GFF3 file.
     if(!$featureloc_locgroup{ $chado_feature->id }){
       my $max_locgroup = undef;
-      foreach my $previous_featureloc (Chado::Featureloc->search(
+      foreach my $previous_featureloc (Chado::DBI::Chado::Featureloc->search(
         feature_id => $chado_feature->id,
       )){
         if($fmin == $previous_featureloc->fmin and
@@ -1228,7 +1224,7 @@ sub load_feature_locations {
         }
     }
 
-    my $chado_featureloc = Chado::Featureloc->find_or_create(
+    my $chado_featureloc = Chado::DBI::Chado::Featureloc->find_or_create(
         {
             feature_id    => $chado_feature->id,
             fmin          => $fmin,
@@ -1252,16 +1248,16 @@ sub cache_cvterm {
     #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
     #one from SO.
 
-    ( $cvterm{$name} ) = Chado::Cvterm->search( {
+    ( $cvterm{$name} ) = Chado::DBI::Chado::Cvterm->search( {
                                                   name => $name,
                                                   cv_id=> $soid } ) 
-                      || Chado::Cvterm->search( {
+                      || Chado::DBI::Chado::Cvterm->search( {
                                                   name => ucfirst($name),
                                                   cv_id=> $soid } );
 
     if (!$cvterm{$name} and !$soid) {
-        ( $cvterm{$name} )=Chado::Cvterm->search( { name => $name } )
-                         ||Chado::Cvterm->search( { name => ucfirst($name) } );
+        ( $cvterm{$name} )=Chado::DBI::Chado::Cvterm->search( { name => $name } )
+                         ||Chado::DBI::Chado::Cvterm->search( { name => ucfirst($name) } );
     }
 
     $cvterm{$name} = $cvterm{$name}->next()
@@ -1271,7 +1267,7 @@ sub cache_cvterm {
     if ( !$cvterm{$name} && !$soid  ) {
 
         unless ($null_db_id) {
-            my ($null_db)  = Chado::Db->search(
+            my ($null_db)  = Chado::DBI::Chado::Db->search(
                 {
                     name   => 'null'
                 }
@@ -1279,14 +1275,14 @@ sub cache_cvterm {
             $null_db_id = $null_db->id;
         }
 
-        my ($dbxref)       = Chado::Dbxref->find_or_create(
+        my ($dbxref)       = Chado::DBI::Chado::Dbxref->find_or_create(
             {
                 db_id      => $null_db_id,
                 accession  => $cv->name.":".$name,
             }
         );
 
-        ( $cvterm{$name} ) = Chado::Cvterm->find_or_create(
+        ( $cvterm{$name} ) = Chado::DBI::Chado::Cvterm->find_or_create(
             {
                 name       => $name,
                 cv_id      => $cv->id,
