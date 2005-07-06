@@ -1,6 +1,7 @@
-sequence/gff-bridge/sequence-gff-views.sql
+contact/contact.sql
 expression/rad.sql
 expression/rad.views
+sequence/gff-bridge/sequence-gff-views.sql
 #sequence/bdgp/bdgp-views.sql
 #pathway/pathway.sql
 #www/www.sql
