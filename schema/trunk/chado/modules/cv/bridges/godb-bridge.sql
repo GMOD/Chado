@@ -256,9 +256,7 @@ CREATE VIEW godb.association AS
   feature_cvterm_id             AS id,
   cvterm_id                     AS term_id,
   feature_id                    AS gene_product_id,
-  cast(NULL AS INT)             AS is_not,
---FIXME THIS MAY BE IN THE SCHEMA NOW
--- is_not,
+  is_not                        AS is_not,
 -- not used in godb; maybe never will be
   0                             AS role_group,
 -- lets be lazy for now; these are actually feature_cvtermprops
