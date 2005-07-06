@@ -84,68 +84,10 @@
        EXECUTE PROCEDURE audit_update_delete_tableinfo ();
 
 
-   DROP TABLE audit_contact;
-   CREATE TABLE audit_contact ( 
-       contact_id integer, 
-       name varchar(30), 
-       description varchar(255), 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_contact to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_contact() RETURNS trigger AS
-   '
-   DECLARE
-       contact_id_var integer; 
-       name_var varchar(30); 
-       description_var varchar(255); 
-       
-       transaction_type_var char;
-   BEGIN
-       contact_id_var = OLD.contact_id;
-       name_var = OLD.name;
-       description_var = OLD.description;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_contact ( 
-             contact_id, 
-             name, 
-             description, 
-             transaction_type
-       ) VALUES ( 
-             contact_id_var, 
-             name_var, 
-             description_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return null;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER contact_audit_ud ON contact;
-   CREATE TRIGGER contact_audit_ud
-       BEFORE UPDATE OR DELETE ON contact
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_contact ();
-
-
    DROP TABLE audit_db;
    CREATE TABLE audit_db ( 
        db_id integer, 
        name varchar(255), 
-       contact_id integer, 
        description varchar(255), 
        urlprefix varchar(255), 
        url varchar(255), 
@@ -159,7 +101,6 @@
    DECLARE
        db_id_var integer; 
        name_var varchar(255); 
-       contact_id_var integer; 
        description_var varchar(255); 
        urlprefix_var varchar(255); 
        url_var varchar(255); 
@@ -168,7 +109,6 @@
    BEGIN
        db_id_var = OLD.db_id;
        name_var = OLD.name;
-       contact_id_var = OLD.contact_id;
        description_var = OLD.description;
        urlprefix_var = OLD.urlprefix;
        url_var = OLD.url;
@@ -182,7 +122,6 @@
        INSERT INTO audit_db ( 
              db_id, 
              name, 
-             contact_id, 
              description, 
              urlprefix, 
              url, 
@@ -190,7 +129,6 @@
        ) VALUES ( 
              db_id_var, 
              name_var, 
-             contact_id_var, 
              description_var, 
              urlprefix_var, 
              url_var, 
@@ -4419,6 +4357,130 @@
        EXECUTE PROCEDURE audit_update_delete_library_feature ();
 
 
+   DROP TABLE audit_contact;
+   CREATE TABLE audit_contact ( 
+       contact_id integer, 
+       type_id integer, 
+       name varchar(255), 
+       description varchar(255), 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_contact() RETURNS trigger AS
+   '
+   DECLARE
+       contact_id_var integer; 
+       type_id_var integer; 
+       name_var varchar(255); 
+       description_var varchar(255); 
+       
+       transaction_type_var char;
+   BEGIN
+       contact_id_var = OLD.contact_id;
+       type_id_var = OLD.type_id;
+       name_var = OLD.name;
+       description_var = OLD.description;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_contact ( 
+             contact_id, 
+             type_id, 
+             name, 
+             description, 
+             transaction_type
+       ) VALUES ( 
+             contact_id_var, 
+             type_id_var, 
+             name_var, 
+             description_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER contact_audit_ud ON contact;
+   CREATE TRIGGER contact_audit_ud
+       BEFORE UPDATE OR DELETE ON contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_contact ();
+
+
+   DROP TABLE audit_contact_relationship;
+   CREATE TABLE audit_contact_relationship ( 
+       contact_relationship_id integer, 
+       type_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_contact_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_contact_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       contact_relationship_id_var integer; 
+       type_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       contact_relationship_id_var = OLD.contact_relationship_id;
+       type_id_var = OLD.type_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_contact_relationship ( 
+             contact_relationship_id, 
+             type_id, 
+             subject_id, 
+             object_id, 
+             transaction_type
+       ) VALUES ( 
+             contact_relationship_id_var, 
+             type_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER contact_relationship_audit_ud ON contact_relationship;
+   CREATE TRIGGER contact_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON contact_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_contact_relationship ();
+
+
    DROP TABLE audit_mageml;
    CREATE TABLE audit_mageml ( 
        mageml_id integer, 
@@ -5587,6 +5649,7 @@
        assay_id integer, 
        biomaterial_id integer, 
        channel_id integer, 
+       rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5599,6 +5662,7 @@
        assay_id_var integer; 
        biomaterial_id_var integer; 
        channel_id_var integer; 
+       rank_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5606,6 +5670,7 @@
        assay_id_var = OLD.assay_id;
        biomaterial_id_var = OLD.biomaterial_id;
        channel_id_var = OLD.channel_id;
+       rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -5618,12 +5683,14 @@
              assay_id, 
              biomaterial_id, 
              channel_id, 
+             rank, 
              transaction_type
        ) VALUES ( 
              assay_biomaterial_id_var, 
              assay_id_var, 
              biomaterial_id_var, 
              channel_id_var, 
+             rank_var, 
              transaction_type_var
        );
 
@@ -6224,6 +6291,7 @@
        elementresult_id integer, 
        element_id integer, 
        quantification_id integer, 
+       signal float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -6235,12 +6303,14 @@
        elementresult_id_var integer; 
        element_id_var integer; 
        quantification_id_var integer; 
+       signal_var float; 
        
        transaction_type_var char;
    BEGIN
        elementresult_id_var = OLD.elementresult_id;
        element_id_var = OLD.element_id;
        quantification_id_var = OLD.quantification_id;
+       signal_var = OLD.signal;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -6252,11 +6322,13 @@
              elementresult_id, 
              element_id, 
              quantification_id, 
+             signal, 
              transaction_type
        ) VALUES ( 
              elementresult_id_var, 
              element_id_var, 
              quantification_id_var, 
+             signal_var, 
              transaction_type_var
        );
 
@@ -6814,6 +6886,11 @@
 
    DROP TABLE audit_affymetrixprobeset;
    CREATE TABLE audit_affymetrixprobeset ( 
+       element_id integer, 
+       feature_id integer, 
+       arraydesign_id integer, 
+       type_id integer, 
+       dbxref_id integer, 
        name varchar(255), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -6823,10 +6900,20 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixprobeset() RETURNS trigger AS
    '
    DECLARE
+       element_id_var integer; 
+       feature_id_var integer; 
+       arraydesign_id_var integer; 
+       type_id_var integer; 
+       dbxref_id_var integer; 
        name_var varchar(255); 
        
        transaction_type_var char;
    BEGIN
+       element_id_var = OLD.element_id;
+       feature_id_var = OLD.feature_id;
+       arraydesign_id_var = OLD.arraydesign_id;
+       type_id_var = OLD.type_id;
+       dbxref_id_var = OLD.dbxref_id;
        name_var = OLD.name;
        
        IF TG_OP = ''DELETE'' THEN
@@ -6836,9 +6923,19 @@
        END IF;
 
        INSERT INTO audit_affymetrixprobeset ( 
+             element_id, 
+             feature_id, 
+             arraydesign_id, 
+             type_id, 
+             dbxref_id, 
              name, 
              transaction_type
        ) VALUES ( 
+             element_id_var, 
+             feature_id_var, 
+             arraydesign_id_var, 
+             type_id_var, 
+             dbxref_id_var, 
              name_var, 
              transaction_type_var
        );
@@ -6861,6 +6958,11 @@
 
    DROP TABLE audit_affymetrixprobe;
    CREATE TABLE audit_affymetrixprobe ( 
+       element_id integer, 
+       feature_id integer, 
+       arraydesign_id integer, 
+       type_id integer, 
+       dbxref_id integer, 
        name varchar(255), 
        affymetrixprobeset_id integer, 
        row integer, 
@@ -6873,6 +6975,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixprobe() RETURNS trigger AS
    '
    DECLARE
+       element_id_var integer; 
+       feature_id_var integer; 
+       arraydesign_id_var integer; 
+       type_id_var integer; 
+       dbxref_id_var integer; 
        name_var varchar(255); 
        affymetrixprobeset_id_var integer; 
        row_var integer; 
@@ -6880,6 +6987,11 @@
        
        transaction_type_var char;
    BEGIN
+       element_id_var = OLD.element_id;
+       feature_id_var = OLD.feature_id;
+       arraydesign_id_var = OLD.arraydesign_id;
+       type_id_var = OLD.type_id;
+       dbxref_id_var = OLD.dbxref_id;
        name_var = OLD.name;
        affymetrixprobeset_id_var = OLD.affymetrixprobeset_id;
        row_var = OLD.row;
@@ -6892,12 +7004,22 @@
        END IF;
 
        INSERT INTO audit_affymetrixprobe ( 
+             element_id, 
+             feature_id, 
+             arraydesign_id, 
+             type_id, 
+             dbxref_id, 
              name, 
              affymetrixprobeset_id, 
              row, 
              col, 
              transaction_type
        ) VALUES ( 
+             element_id_var, 
+             feature_id_var, 
+             arraydesign_id_var, 
+             type_id_var, 
+             dbxref_id_var, 
              name_var, 
              affymetrixprobeset_id_var, 
              row_var, 
@@ -7027,7 +7149,6 @@
 
    DROP TABLE audit_affymetrixmas5;
    CREATE TABLE audit_affymetrixmas5 ( 
-       signal float, 
        call char(1), 
        call_p float, 
        statpairs integer, 
@@ -7041,7 +7162,6 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixmas5() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        call_var char(1); 
        call_p_var float; 
        statpairs_var integer; 
@@ -7050,7 +7170,6 @@
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        call_var = OLD.call;
        call_p_var = OLD.call_p;
        statpairs_var = OLD.statpairs;
@@ -7064,7 +7183,6 @@
        END IF;
 
        INSERT INTO audit_affymetrixmas5 ( 
-             signal, 
              call, 
              call_p, 
              statpairs, 
@@ -7072,7 +7190,6 @@
              z, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              call_var, 
              call_p_var, 
              statpairs_var, 
@@ -7099,7 +7216,6 @@
 
    DROP TABLE audit_affymetrixdchip;
    CREATE TABLE audit_affymetrixdchip ( 
-       signal float, 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7109,12 +7225,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixdchip() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7124,11 +7238,9 @@
        END IF;
 
        INSERT INTO audit_affymetrixdchip ( 
-             signal, 
              z, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              z_var, 
              transaction_type_var
        );
@@ -7151,7 +7263,6 @@
 
    DROP TABLE audit_affymetrixvsn;
    CREATE TABLE audit_affymetrixvsn ( 
-       signal float, 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7161,12 +7272,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixvsn() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7176,11 +7285,9 @@
        END IF;
 
        INSERT INTO audit_affymetrixvsn ( 
-             signal, 
              z, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              z_var, 
              transaction_type_var
        );
@@ -7203,7 +7310,6 @@
 
    DROP TABLE audit_affymetrixsea;
    CREATE TABLE audit_affymetrixsea ( 
-       signal float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -7212,11 +7318,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixsea() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -7225,10 +7329,8 @@
        END IF;
 
        INSERT INTO audit_affymetrixsea ( 
-             signal, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              transaction_type_var
        );
 
@@ -7250,7 +7352,6 @@
 
    DROP TABLE audit_affymetrixplier;
    CREATE TABLE audit_affymetrixplier ( 
-       signal float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -7259,11 +7360,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixplier() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -7272,10 +7371,8 @@
        END IF;
 
        INSERT INTO audit_affymetrixplier ( 
-             signal, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              transaction_type_var
        );
 
@@ -7344,7 +7441,6 @@
 
    DROP TABLE audit_affymetrixrma;
    CREATE TABLE audit_affymetrixrma ( 
-       signal float, 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7354,12 +7450,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixrma() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7369,11 +7463,9 @@
        END IF;
 
        INSERT INTO audit_affymetrixrma ( 
-             signal, 
              z, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              z_var, 
              transaction_type_var
        );
@@ -7396,7 +7488,6 @@
 
    DROP TABLE audit_affymetrixgcrma;
    CREATE TABLE audit_affymetrixgcrma ( 
-       signal float, 
        z float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7406,12 +7497,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_affymetrixgcrma() RETURNS trigger AS
    '
    DECLARE
-       signal_var float; 
        z_var float; 
        
        transaction_type_var char;
    BEGIN
-       signal_var = OLD.signal;
        z_var = OLD.z;
        
        IF TG_OP = ''DELETE'' THEN
@@ -7421,11 +7510,9 @@
        END IF;
 
        INSERT INTO audit_affymetrixgcrma ( 
-             signal, 
              z, 
              transaction_type
        ) VALUES ( 
-             signal_var, 
              z_var, 
              transaction_type_var
        );

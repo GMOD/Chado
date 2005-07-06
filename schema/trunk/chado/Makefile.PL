@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.87 2005-05-09 17:43:08 scottcain Exp $
+# $Id: Makefile.PL,v 1.88 2005-07-06 21:08:44 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -675,6 +675,7 @@ instructions ::
 
 graphviz :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.png \
+	make $working_dir/modules/contact/contact.png \
 	make $working_dir/modules/cv/cv.graphviz.png \
 	make $working_dir/modules/expression/expression.graphviz.png \
 	make $working_dir/modules/expression/rad.graphviz.png \
@@ -691,6 +692,7 @@ graphviz :: \
 
 graphviz_svg :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.svg \
+	make $working_dir/modules/contact/contact.graphviz.svg \
 	make $working_dir/modules/cv/cv.graphviz.svg \
 	make $working_dir/modules/expression/expression.graphviz.svg \
 	make $working_dir/modules/expression/rad.graphviz.svg \
@@ -707,6 +709,7 @@ graphviz_svg :: \
 
 diagram :: \
 	make $working_dir/modules/companalysis/companalysis.diagram.png \
+	make $working_dir/modules/contact/contact.diagram.png \
 	make $working_dir/modules/cv/cv.diagram.png \
 	make $working_dir/modules/expression/expression.diagram.png \
 	make $working_dir/modules/expression/rad.diagram.png \
@@ -724,6 +727,7 @@ diagram :: \
 
 html :: \
 	make $working_dir/modules/companalysis/companalysis.html \
+	make $working_dir/modules/contact/contact.html \
 	make $working_dir/modules/cv/cv.html \
 	make $working_dir/modules/expression/expression.html \
 	make $working_dir/modules/expression/rad.html \
