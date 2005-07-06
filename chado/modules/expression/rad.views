@@ -1,27 +1,48 @@
 CREATE TABLE affymetrixprobeset (
-  name varchar(255) NULL,
-  constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
-) INHERITS ( element );
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c5 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
+  element_id serial not null,
+  primary key (element_id),
+  feature_id int null,
+  foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+  arraydesign_id int not null,
+  foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
+  type_id int null,
+  foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+  dbxref_id int null,
+  foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
+  name varchar(255) NULL
+);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c5 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
 CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name);
 CREATE INDEX affymetrixprobeset_idx2 ON affymetrixprobeset (feature_id);
 CREATE INDEX affymetrixprobeset_idx3 ON affymetrixprobeset (dbxref_id);
 CREATE INDEX affymetrixprobeset_idx4 ON affymetrixprobeset (arraydesign_id);
 CREATE INDEX affymetrixprobeset_idx5 ON affymetrixprobeset (type_id);
+CREATE UNIQUE INDEX affymetrixprobeset_idx6 ON affymetrixprobeset (name,arraydesign_id);
+CREATE UNIQUE INDEX affymetrixprobeset_idx7 ON affymetrixprobeset (feature_id,arraydesign_id);
 
 CREATE TABLE affymetrixprobe (
+  element_id serial not null,
+  primary key (element_id),
+  feature_id int null,
+  foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+  arraydesign_id int not null,
+  foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
+  type_id int null,
+  foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+  dbxref_id int null,
+  foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
   name varchar(255) NULL,
   affymetrixprobeset_id int NULL,
   row int NOT NULL,
   col int NOT NULL
-) INHERITS ( element );
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
+);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c5 FOREIGN KEY (affymetrixprobeset_id) REFERENCES affymetrixprobeset (element_id);
 CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
 CREATE INDEX affymetrixprobe_idx2 ON affymetrixprobe (name);
@@ -91,7 +112,7 @@ CREATE INDEX affymetrixvsn_idx6 ON affymetrixvsn (z);
 
 CREATE TABLE affymetrixsea (
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
+--ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixsea_idx1 ON affymetrixsea (element_id);
 CREATE INDEX affymetrixsea_idx2 ON affymetrixsea (quantification_id);
