@@ -18,19 +18,6 @@ create table tableinfo (
 COMMENT ON TABLE tableinfo IS NULL;
 
 -- ================================================
--- TABLE: contact
--- ================================================
-create table contact (
-    contact_id serial not null,
-    primary key (contact_id),
-    name varchar(30) not null,
-    description varchar(255) null,
-    constraint contact_c1 unique (name)
-);
-
-COMMENT ON TABLE contact IS NULL;
-
--- ================================================
 -- TABLE: db
 -- ================================================
 
@@ -38,8 +25,8 @@ create table db (
     db_id serial not null,
     primary key (db_id),
     name varchar(255) not null,
-    contact_id int,
-    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
+--    contact_id int,
+--    foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     description varchar(255) null,
     urlprefix varchar(255) null,
     url varchar(255) null,
@@ -167,9 +154,7 @@ COMMENT ON TABLE cvterm_relationship IS
   for example "wing part_of body"';
 
 COMMENT ON COLUMN cvterm_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
-
 COMMENT ON COLUMN cvterm_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
-
 COMMENT ON COLUMN cvterm_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
 
 create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
@@ -288,6 +273,7 @@ COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not d
 
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
+
 -- ================================================
 -- TABLE: organism
 -- ================================================
@@ -1952,81 +1938,43 @@ create table library_feature (
 create index library_feature_idx1 on library_feature (library_id);
 create index library_feature_idx2 on library_feature (feature_id);
 
--- VIEW gffatts: a view to get feature attributes in a format that
--- will make it easy to convert them to GFF attributes
+-- ================================================
+-- TABLE: contact
+-- ================================================
+create table contact (
+    contact_id serial not null,
+    primary key (contact_id),
+    type_id int null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    name varchar(255) not null,
+    description varchar(255) null,
+    constraint contact_c1 unique (name)
+);
+COMMENT ON TABLE contact IS 'model persons, institutes, groups, organizations, etc';
+COMMENT ON COLUMN contact.type_id IS 'what type of contact is this?  e.g. "person", "lab", etc.';
 
-CREATE OR REPLACE VIEW gffatts (
-    feature_id,
-    type,
-    attribute
-) AS
-SELECT feature_id, 'cvterm' AS type,  s.name AS attribute
-FROM cvterm s, feature_cvterm fs
-WHERE fs.cvterm_id = s.cvterm_id
-UNION ALL
-SELECT feature_id, 'dbxref' AS type, d.name || ':' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
---SELECT feature_id, 'expression' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.expression_id = s.expression_id
---UNION ALL
---SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE g.gcontext_id = fg.gcontext_id
---UNION ALL
---SELECT feature_id, 'genotype' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.genotype_id = s.genotype_id
---UNION ALL
---SELECT feature_id, 'phenotype' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.phenotype_id = s.phenotype_id
-UNION ALL
-SELECT feature_id, 'synonym' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs
-WHERE fs.synonym_id = s.synonym_id
-UNION ALL
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.type_id = cv.cvterm_id
-UNION ALL
-SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.pub_id = s.pub_id;
+-- ================================================
+-- TABLE: contact_relationship
+-- ================================================
+create table contact_relationship (
+    contact_relationship_id serial not null,
+    primary key (contact_relationship_id),
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    subject_id int not null,
+    foreign key (subject_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
+    object_id int not null,
+    foreign key (object_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
+    constraint contact_relationship_c1 unique (subject_id,object_id,type_id)
+);
+create index contact_relationship_idx1 on contact_relationship (type_id);
+create index contact_relationship_idx2 on contact_relationship (subject_id);
+create index contact_relationship_idx3 on contact_relationship (object_id);
 
---creates a view that can be used to assemble a GFF3 compliant attribute string
-CREATE OR REPLACE VIEW gff3atts (
-    feature_id,
-    type,
-    attribute
-) AS
-SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
-FROM cvterm s, dbxref dbx, feature_cvterm fs
-WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
-UNION ALL
-SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
-FROM dbxref s, feature_dbxref fs, db d
-WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
-      d.name != 'GFF_source'
---UNION ALL
---SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE g.gcontext_id = fg.gcontext_id
-UNION ALL
-SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
-FROM synonym s, feature_synonym fs, feature f
-WHERE fs.synonym_id = s.synonym_id and f.feature_id = fs.feature_id and
-      f.name != s.name
-UNION ALL
-SELECT fp.feature_id,cv.name,fp.value
-FROM featureprop fp, cvterm cv
-WHERE fp.type_id = cv.cvterm_id
-UNION ALL
-SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
-FROM pub s, feature_pub fs
-WHERE fs.pub_id = s.pub_id;
-
+COMMENT ON TABLE contact_relationship IS 'model relationships between contacts';
+COMMENT ON COLUMN contact_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
+COMMENT ON COLUMN contact_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
+COMMENT ON COLUMN contact_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
 
 create table mageml (
     mageml_id serial not null,
@@ -2254,7 +2202,7 @@ create table biomaterialprop (
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank int not null,
+    rank int not null default 0,
     constraint biomaterialprop_c1 unique (biomaterial_id,type_id,rank)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
@@ -2321,7 +2269,8 @@ create table assay_biomaterial (
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     channel_id int null,
     foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
-    constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id)
+    rank int not null default 0,
+    constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id,rank)
 );
 create index assay_biomaterial_idx1 on assay_biomaterial (assay_id);
 create index assay_biomaterial_idx2 on assay_biomaterial (biomaterial_id);
@@ -2488,10 +2437,12 @@ create table elementresult (
     foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
     quantification_id int not null,
     foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
+    signal float not null,
     constraint elementresult_c1 unique (element_id,quantification_id)
 );
 create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
+create index elementresult_idx3 on elementresult (signal);
 
 COMMENT ON TABLE elementresult IS 'an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit';
 
@@ -2626,31 +2577,50 @@ create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
 CREATE TABLE affymetrixprobeset (
-  name varchar(255) NULL,
-  constraint affymetrixprobeset_c1 unique (name,arraydesign_id)
-) INHERITS ( element );
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_pkey PRIMARY KEY (element_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c5 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
+  element_id serial not null,
+  primary key (element_id),
+  feature_id int null,
+  foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+  arraydesign_id int not null,
+  foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
+  type_id int null,
+  foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+  dbxref_id int null,
+  foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
+  name varchar(255) NULL
+);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c2 FOREIGN KEY (dbxref_id)        REFERENCES dbxref        (dbxref_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c3 FOREIGN KEY (arraydesign_id)   REFERENCES arraydesign   (arraydesign_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c4 FOREIGN KEY (type_id)          REFERENCES cvterm        (cvterm_id);
+--ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobeset_c5 FOREIGN KEY (feature_id)       REFERENCES feature       (feature_id);
 CREATE INDEX affymetrixprobeset_idx1 ON affymetrixprobeset (name);
 CREATE INDEX affymetrixprobeset_idx2 ON affymetrixprobeset (feature_id);
 CREATE INDEX affymetrixprobeset_idx3 ON affymetrixprobeset (dbxref_id);
 CREATE INDEX affymetrixprobeset_idx4 ON affymetrixprobeset (arraydesign_id);
 CREATE INDEX affymetrixprobeset_idx5 ON affymetrixprobeset (type_id);
+CREATE UNIQUE INDEX affymetrixprobeset_idx6 ON affymetrixprobeset (name,arraydesign_id);
+CREATE UNIQUE INDEX affymetrixprobeset_idx7 ON affymetrixprobeset (feature_id,arraydesign_id);
 
 CREATE TABLE affymetrixprobe (
+  element_id serial not null,
+  primary key (element_id),
+  feature_id int null,
+  foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
+  arraydesign_id int not null,
+  foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
+  type_id int null,
+  foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
+  dbxref_id int null,
+  foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
   name varchar(255) NULL,
   affymetrixprobeset_id int NULL,
   row int NOT NULL,
   col int NOT NULL
-) INHERITS ( element );
-ALTER TABLE affymetrixprobeset ADD CONSTRAINT affymetrixprobe_pkey PRIMARY KEY (element_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
-ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
+);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c1 FOREIGN KEY (feature_id)            REFERENCES feature       (feature_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c2 FOREIGN KEY (dbxref_id)             REFERENCES dbxref        (dbxref_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c3 FOREIGN KEY (arraydesign_id)        REFERENCES arraydesign   (arraydesign_id);
+--ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c4 FOREIGN KEY (type_id)               REFERENCES cvterm        (cvterm_id);
 ALTER TABLE affymetrixprobe ADD CONSTRAINT affymetrixprobe_c5 FOREIGN KEY (affymetrixprobeset_id) REFERENCES affymetrixprobeset (element_id);
 CREATE INDEX affymetrixprobe_idx1 ON affymetrixprobe (affymetrixprobeset_id);
 CREATE INDEX affymetrixprobe_idx2 ON affymetrixprobe (name);
@@ -2673,16 +2643,16 @@ CREATE INDEX affymetrixcel_idx4 ON affymetrixcel (element_id);
 CREATE INDEX affymetrixcel_idx5 ON affymetrixcel (quantification_id);
 
 CREATE TABLE affymetrixsnp (
-  call smallint NOT NULL
+  call smallint NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixsnp ADD CONSTRAINT affymetrixsnp_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixsnp ADD CONSTRAINT affymetrixsnp_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixsnp_idx1 ON affymetrixsnp (call);
+CREATE INDEX affymetrixsnp_idx2 ON affymetrixsnp (signal);
 CREATE INDEX affymetrixsnp_idx4 ON affymetrixsnp (element_id);
 CREATE INDEX affymetrixsnp_idx5 ON affymetrixsnp (quantification_id);
 
 CREATE TABLE affymetrixmas5 (
-  signal float NOT NULL,
   call char(1) NOT NULL,
   call_p float NOT NULL,
   statpairs int NOT NULL,
@@ -2699,7 +2669,6 @@ CREATE INDEX affymetrixmas5_idx5 ON affymetrixmas5 (quantification_id);
 CREATE INDEX affymetrixmas5_idx6 ON affymetrixmas5 (z);
 
 CREATE TABLE affymetrixdchip (
-  signal float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixdchip ADD CONSTRAINT affymetrixdchip_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
@@ -2710,7 +2679,6 @@ CREATE INDEX affymetrixdchip_idx3 ON affymetrixdchip (signal);
 CREATE INDEX affymetrixdchip_idx6 ON affymetrixdchip (z);
 
 CREATE TABLE affymetrixvsn (
-  signal float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixvsn ADD CONSTRAINT affymetrixvsn_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
@@ -2721,16 +2689,14 @@ CREATE INDEX affymetrixvsn_idx3 ON affymetrixvsn (signal);
 CREATE INDEX affymetrixvsn_idx6 ON affymetrixvsn (z);
 
 CREATE TABLE affymetrixsea (
-  signal float NOT NULL
 ) INHERITS ( elementresult );
-ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
+--ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixsea ADD CONSTRAINT affymetrixsea_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
 CREATE INDEX affymetrixsea_idx1 ON affymetrixsea (element_id);
 CREATE INDEX affymetrixsea_idx2 ON affymetrixsea (quantification_id);
 CREATE INDEX affymetrixsea_idx3 ON affymetrixsea (signal);
 
 CREATE TABLE affymetrixplier (
-  signal float NOT NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
 ALTER TABLE affymetrixplier ADD CONSTRAINT affymetrixplier_c2 FOREIGN KEY (quantification_id) REFERENCES quantification  (quantification_id);
@@ -2748,7 +2714,6 @@ CREATE INDEX affymetrixdabg_idx2 ON affymetrixdabg (quantification_id);
 CREATE INDEX affymetrixdabg_idx3 ON affymetrixdabg (call_p);
 
 CREATE TABLE affymetrixrma (
-  signal float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixrma ADD CONSTRAINT affymetrixrma_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
@@ -2759,7 +2724,6 @@ CREATE INDEX affymetrixrma_idx3 ON affymetrixrma (signal);
 CREATE INDEX affymetrixrma_idx6 ON affymetrixrma (z);
 
 CREATE TABLE affymetrixgcrma (
-  signal float NOT NULL,
   z float NULL
 ) INHERITS ( elementresult );
 ALTER TABLE affymetrixgcrma ADD CONSTRAINT affymetrixgcrma_c1 FOREIGN KEY (element_id)        REFERENCES affymetrixprobeset (element_id);
@@ -2787,3 +2751,79 @@ CREATE INDEX affymetrixprobesetstat_idx5 ON affymetrixprobesetstat (quartile1);
 CREATE INDEX affymetrixprobesetstat_idx6 ON affymetrixprobesetstat (quartile3);
 CREATE INDEX affymetrixprobesetstat_idx7 ON affymetrixprobesetstat (sd);
 CREATE INDEX affymetrixprobesetstat_idx8 ON affymetrixprobesetstat (n);
+-- VIEW gffatts: a view to get feature attributes in a format that
+-- will make it easy to convert them to GFF attributes
+
+CREATE OR REPLACE VIEW gffatts (
+    feature_id,
+    type,
+    attribute
+) AS
+SELECT feature_id, 'cvterm' AS type,  s.name AS attribute
+FROM cvterm s, feature_cvterm fs
+WHERE fs.cvterm_id = s.cvterm_id
+UNION ALL
+SELECT feature_id, 'dbxref' AS type, d.name || ':' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+--SELECT feature_id, 'expression' AS type, s.description AS attribute
+--FROM expression s, feature_expression fs
+--WHERE fs.expression_id = s.expression_id
+--UNION ALL
+--SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+--FROM gcontext g, feature_gcontext fg
+--WHERE g.gcontext_id = fg.gcontext_id
+--UNION ALL
+--SELECT feature_id, 'genotype' AS type, s.description AS attribute
+--FROM genotype s, feature_genotype fs
+--WHERE fs.genotype_id = s.genotype_id
+--UNION ALL
+--SELECT feature_id, 'phenotype' AS type, s.description AS attribute
+--FROM phenotype s, feature_phenotype fs
+--WHERE fs.phenotype_id = s.phenotype_id
+UNION ALL
+SELECT feature_id, 'synonym' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs
+WHERE fs.synonym_id = s.synonym_id
+UNION ALL
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.type_id = cv.cvterm_id
+UNION ALL
+SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
+FROM pub s, feature_pub fs
+WHERE fs.pub_id = s.pub_id;
+
+--creates a view that can be used to assemble a GFF3 compliant attribute string
+CREATE OR REPLACE VIEW gff3atts (
+    feature_id,
+    type,
+    attribute
+) AS
+SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
+FROM cvterm s, dbxref dbx, feature_cvterm fs
+WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
+UNION ALL
+SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
+FROM dbxref s, feature_dbxref fs, db d
+WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
+      d.name != 'GFF_source'
+--UNION ALL
+--SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
+--FROM gcontext g, feature_gcontext fg
+--WHERE g.gcontext_id = fg.gcontext_id
+UNION ALL
+SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
+FROM synonym s, feature_synonym fs, feature f
+WHERE fs.synonym_id = s.synonym_id and f.feature_id = fs.feature_id and
+      f.name != s.name
+UNION ALL
+SELECT fp.feature_id,cv.name,fp.value
+FROM featureprop fp, cvterm cv
+WHERE fp.type_id = cv.cvterm_id
+UNION ALL
+SELECT feature_id, 'pub' AS type, s.series_name || ':' || s.title AS attribute
+FROM pub s, feature_pub fs
+WHERE fs.pub_id = s.pub_id;
+
+
