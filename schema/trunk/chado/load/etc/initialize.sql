@@ -53,6 +53,9 @@ insert into cvterm (name,definition,cv_id,dbxref_id) values ('photochemical_olig
 
 insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
 insert into db (name, contact_id,description) values ('GFF_source', (select contact_id from contact where name = 'null'), 'A collection of sources (ie, column 2) from GFF files');
+
+insert into db (name, contact_id) values ('ATCC'                  ,(select contact_id from contact where name = 'null'));
+
 insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
 insert into db (name, contact_id) values ('DB:EMBL'     ,(select contact_id from contact where name = 'null'));
