@@ -24,7 +24,7 @@ insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
 insert into cv (name,definition) values ('local','Locally created terms');
 insert into cv (name,definition) values ('Statistical Terms','Locally created terms for statistics');
-insert into db (name, contact_id,description) values ('null',(select contact_id from contact where name = 'null'),'a fake database for local items');
+insert into db (name, description) values ('null','a fake database for local items');
 
 insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'local:null');
 insert into cvterm (name,cv_id,dbxref_id) values ('null',(select cv_id from cv where name = 'null'),(select dbxref_id from dbxref where accession='local:null'));
@@ -52,51 +52,51 @@ insert into dbxref (db_id,accession) values ((select db_id from db where name='n
 insert into cvterm (name,definition,cv_id,dbxref_id) values ('photochemical_oligo','in-situ photochemically synthesized oligoes',(select cv_id from cv where name = 'local'),(select dbxref_id from dbxref where accession='local:photochemical_oligo'));
 
 insert into pub (miniref,uniquename,type_id) values ('null','null',(select cvterm_id from cvterm where name = 'null'));
-insert into db (name, contact_id,description) values ('GFF_source', (select contact_id from contact where name = 'null'), 'A collection of sources (ie, column 2) from GFF files');
+insert into db (name, description) values ('GFF_source', 'A collection of sources (ie, column 2) from GFF files');
 
-insert into db (name, contact_id) values ('ATCC'                  ,(select contact_id from contact where name = 'null'));
+insert into db (name) values ('ATCC');
 
-insert into db (name, contact_id) values ('DB:refseq'   ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:genbank'  ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:EMBL'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:TIGR'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:ucsc'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:ucla'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:SGD',(select contact_id from contact where name = 'null'));
+insert into db (name) values ('DB:refseq');
+insert into db (name) values ('DB:genbank');
+insert into db (name) values ('DB:EMBL');
+insert into db (name) values ('DB:TIGR');
+insert into db (name) values ('DB:ucsc');
+insert into db (name) values ('DB:ucla');
+insert into db (name) values ('DB:SGD');
 
-insert into db (name, contact_id) values ('DB:PFAM',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:SUPERFAMILY',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:PROFILE',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:PRODOM',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:PRINTS',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:SMART',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:TIGRFAMs',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:PIR',(select contact_id from contact where name = 'null'));
+insert into db (name) values ('DB:PFAM');
+insert into db (name) values ('DB:SUPERFAMILY');
+insert into db (name) values ('DB:PROFILE');
+insert into db (name) values ('DB:PRODOM');
+insert into db (name) values ('DB:PRINTS');
+insert into db (name) values ('DB:SMART');
+insert into db (name) values ('DB:TIGRFAMs');
+insert into db (name) values ('DB:PIR');
 
-insert into db (name, contact_id) values ('DB:Affymetrix_U133'    ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:Affymetrix_U133PLUS',(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:Affymetrix_U95'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:LocusLink'          ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:RefSeq_protein'     ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:GenBank_protein'    ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:OMIM'               ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:Swiss'              ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:RefSNP'             ,(select contact_id from contact where name = 'null'));
-insert into db (name, contact_id) values ('DB:TSC'                ,(select contact_id from contact where name = 'null'));
+insert into db (name) values ('DB:Affymetrix_U133');
+insert into db (name) values ('DB:Affymetrix_U133PLUS');
+insert into db (name) values ('DB:Affymetrix_U95');
+insert into db (name) values ('DB:LocusLink');
+insert into db (name) values ('DB:RefSeq_protein');
+insert into db (name) values ('DB:GenBank_protein');
+insert into db (name) values ('DB:OMIM');
+insert into db (name) values ('DB:Swiss');
+insert into db (name) values ('DB:RefSNP');
+insert into db (name) values ('DB:TSC');
 --insert into db (name, contact_id, description, urlprefix) values ('DB:affy:U133',(select contact_id from contact where name = 'null'),'Affymetrix U133','http://https://www.affymetrix.com/analysis/netaffx/fullrecord.affx?pk=HG-U133_PLUS_2:');
 --insert into db (name, contact_id, description, urlprefix) values ('DB:affy:U95',(select contact_id from contact where name = 'null'),'Affymetrix U95','http://https://www.affymetrix.com/analysis/netaffx/fullrecord.affx?pk=HG-U95AV2:');
 
-insert into db (name, contact_id,description) values ('DB:GR',(select contact_id from contact where name = 'null'),'Gramene');
-insert into db (name, contact_id, description, urlprefix) values ('DB:uniprot',(select contact_id from contact where name = 'null'),'UniProt/TrEMBL','http://us.expasy.org/cgi-bin/niceprot.pl?');
-insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:mrna',(select contact_id from contact where name = 'null'),'RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:refseq:protein',(select contact_id from contact where name = 'null'),'RefSeq Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:unigene',(select contact_id from contact where name = 'null'),'Unigene','http://http://www.ncbi.nih.gov/entrez/query.fcgi?db=unigene&cmd=search&term=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:omim',(select contact_id from contact where name = 'null'),'OMIM','http://http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:locuslink',(select contact_id from contact where name = 'null'),'LocusLink','http://http://www.ncbi.nlm.nih.gov/LocusLink/LocRpt.cgi?l=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:genbank:mrna',(select contact_id from contact where name = 'null'),'GenBank mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:genbank:protein',(select contact_id from contact where name = 'null'),'GenBank Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
-insert into db (name, contact_id, description, urlprefix) values ('DB:swissprot:display',(select contact_id from contact where name = 'null'),'SwissProt','http://http://us.expasy.org/cgi-bin/niceprot.pl?');
-insert into db (name, contact_id, description, urlprefix) values ('DB:pfam',(select contact_id from contact where name = 'null'),'Pfam','http://http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
+insert into db (name, description) values ('DB:GR','Gramene');
+insert into db (name, description, urlprefix) values ('DB:uniprot','UniProt/TrEMBL','http://us.expasy.org/cgi-bin/niceprot.pl?');
+insert into db (name, description, urlprefix) values ('DB:refseq:mrna','RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:refseq:protein','RefSeq Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:unigene','Unigene','http://http://www.ncbi.nih.gov/entrez/query.fcgi?db=unigene&cmd=search&term=');
+insert into db (name, description, urlprefix) values ('DB:omim','OMIM','http://http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=');
+insert into db (name, description, urlprefix) values ('DB:locuslink','LocusLink','http://http://www.ncbi.nlm.nih.gov/LocusLink/LocRpt.cgi?l=');
+insert into db (name, description, urlprefix) values ('DB:genbank:mrna','GenBank mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:genbank:protein','GenBank Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:swissprot:display','SwissProt','http://http://us.expasy.org/cgi-bin/niceprot.pl?');
+insert into db (name, description, urlprefix) values ('DB:pfam','Pfam','http://http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
 
 insert into analysis (name,program,programversion) values ('dabg' ,'dabg' ,'dabg' );
 insert into analysis (name,program,programversion) values ('dchip','dchip','dchip');
