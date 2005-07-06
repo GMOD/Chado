@@ -224,7 +224,7 @@ create table biomaterialprop (
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank int not null,
+    rank int not null default 0,
     constraint biomaterialprop_c1 unique (biomaterial_id,type_id,rank)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
@@ -291,7 +291,8 @@ create table assay_biomaterial (
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
     channel_id int null,
     foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
-    constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id)
+    rank int not null default 0,
+    constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id,rank)
 );
 create index assay_biomaterial_idx1 on assay_biomaterial (assay_id);
 create index assay_biomaterial_idx2 on assay_biomaterial (biomaterial_id);
