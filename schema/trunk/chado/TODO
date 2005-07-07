@@ -1,3 +1,6 @@
+- address flybase's use of of analysisfeature combined with feature to
+  give source-type information (in GFF terms).  This will need to 
+  be addressed in the GBrowse adaptor.
 - modify the bulk loader to allow 'mixed' GFF3 files (that is, containing 
   both analysis results and annotations). See perldoc gmod_bulk_load_gff3.pl
   for more info
