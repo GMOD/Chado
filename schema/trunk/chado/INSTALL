@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.40 2005-05-02 16:13:09 scottcain Exp $
+$Id: INSTALL,v 1.41 2005-07-08 16:26:53 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -122,7 +122,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
     * DBD::Pg                  (GBrowse,chado)
-    * SQL::Translator (0.05 or cvs) (chado) (optional)
+    * SQL::Translator (from cvs) (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
     * Module::Build            (chado)
@@ -284,16 +284,6 @@ As indicated, the host, port, and password are optional.
 
         $ gmod_load_ontology.pl /path/to/onto_file [/path/to/def_file]
 
-    If you plan on using gmod-web, it might also be a good idea to 
-    compute the closures on the ontology relationships.  To do this,
-    execute the make_cvtermpath.sh shell script:
-
-        $ bin/make_cvtermpath.sh
-
-    This script takes a very long time to execute, so be prepared to wait,
-    or go home for the night.  Also be aware that it will spout many 
-    warnings from the database; these can safely be ignored.
-
     It is not a bad idea at this point to make a back up of the database,
     particularly if you loaded a large ontology like GO.  To make a complete
     dump of the database, issue this command:
@@ -334,20 +324,13 @@ Then execute gmod_bulk_load_gff3.pl:
     more information on adding other organisms and databases, as well as
     other available commandline flags.
 
-    GFF3 files can also be generated from GenBank entries with a few scripts.
-    One is included with this package (but not documented):
-    gmod_genbank2gff3.pl script:
-
-        $ gmod_genbank2gff3.pl <genbank file> > <gff file>
-
-    Note that is a redirect of standard out to a GFF file to collect the 
-    results of the script.  GFF3 can also be generated via a script provided
-    with bioperl, bp_genbank2gff.pl:
+    GFF3 can also be generated via a script provided with bioperl,
+    bp_genbank2gff.pl:
 
         $ bp_genbank2gff.pl --stdout --file <genbank file> > <gff file>
 
-    Again note the redirection of standard out.  Note that neither of
-    these methods for generating GFF3 files is completely satisfactory and
+    Note the redirection of standard out.  Note that this method
+    for generating GFF3 files is not completely satisfactory and
     development is ongoing to provide better translation.
 
 DUMPING GFF3
