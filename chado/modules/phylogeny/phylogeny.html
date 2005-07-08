@@ -1,0 +1,1586 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
+</head><body>
+
+<h1 class="SchemaDescription">
+	Description of Schema
+</h1>
+
+<hr />
+
+<!-- 
+	Table listing (8 tables)
+ -->
+
+<a name="top" />
+
+<table class="LinkTable" width="100%">
+
+<tr>
+	<td class="LinkTableCell"><h2 class="LinkTableTitle">
+	Tables
+</h2></td>
+</tr>
+
+<!-- 
+	Start link to table 'phylotree'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylotree-link" href="#phylotree">phylotree</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylotree'
+ -->
+
+<!-- 
+	Start link to table 'phylotree_pub'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylotree_pub-link" href="#phylotree_pub">phylotree_pub</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylotree_pub'
+ -->
+
+<!-- 
+	Start link to table 'phylonode'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonode-link" href="#phylonode">phylonode</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonode'
+ -->
+
+<!-- 
+	Start link to table 'phylonode_dbxref'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonode_dbxref-link" href="#phylonode_dbxref">phylonode_dbxref</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonode_dbxref'
+ -->
+
+<!-- 
+	Start link to table 'phylonode_pub'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonode_pub-link" href="#phylonode_pub">phylonode_pub</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonode_pub'
+ -->
+
+<!-- 
+	Start link to table 'phylonode_organism'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonode_organism-link" href="#phylonode_organism">phylonode_organism</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonode_organism'
+ -->
+
+<!-- 
+	Start link to table 'phylonodeprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonodeprop-link" href="#phylonodeprop">phylonodeprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonodeprop'
+ -->
+
+<!-- 
+	Start link to table 'phylonode_relationship'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylonode_relationship-link" href="#phylonode_relationship">phylonode_relationship</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylonode_relationship'
+ -->
+
+</table>
+
+<!-- 
+	Starting table 'phylotree'
+ -->
+
+<a name="phylotree" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylotree
+</h3></td>
+		<a name="phylotree"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	$Id: phylogeny.html,v 1.1 2005-07-08 14:39:35 scottcain Exp $ <br />
+	========================================== <br />
+	Chado phylogenetics module <br />
+	Richard Bruskiewich <br />
+	Chris Mungall <br />
+	nested set tree implementation by way of Joe Celko; <br />
+	see the excellent intro by Aaron Mackey here <br />
+	http://www.oreillynet.com/pub/a/network/2002/11/27/bioconf.html <br />
+	Initial design: 2004-05-27 <br />
+	For representing phylogenetic trees; the trees represent the <br />
+	phylogeny of some some kind of sequence feature (mainly proteins) <br />
+	or actual organism taxonomy trees <br />
+	This module relies heavily on the sequence module <br />
+	in particular, all the leaf nodes in a tree correspond to features; <br />
+	these will usually be features of type SO:protein or SO:polypeptide <br />
+	(but other trees are possible - eg intron trees) <br />
+	if it is desirable to store multiple alignments for each non-leaf node, <br />
+	then each node can be mapped to a feature of type SO:match <br />
+	refer to the sequence module docs for details on storing multiple alignments <br />
+	Annotating nodes: <br />
+	Each node can have a feature attached; this 'feature' is the multiple <br />
+	alignment for non-leaf nodes. It is these features that are annotated <br />
+	rather than annotating the nodes themselves. This has lots of advantages - <br />
+	we can piggyback off of the sequence module and reuse the tables there <br />
+	the leaf nodes may have annotations already attached - for example, GO <br />
+	associations <br />
+	In fact, it is even possible to annotate ranges along an alignment - <br />
+	this would entail creating a new feature which has a featureloc on <br />
+	the alignment feature <br />
+	========================================== <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	============ <br />
+	DEPENDENCIES <br />
+	============ <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	:import dbxref from general <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	============ <br />
+	RELATIONS <br />
+	============ <br />
+	================================================ <br />
+	TABLE: phylotree <br />
+	Global anchor for phylogenetic tree <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree-phylotree_id">phylotree_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree-dbxref_id">dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree-name">name</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL, type: protein, nucleotide, taxonomy, ???</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther">REMOVED BY cjm; this is implicit from indexing - see phylonode</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylotree_idx1</td>
+	<td>phylotree_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylotree_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylotree_pub'
+ -->
+
+<a name="phylotree_pub" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylotree_pub
+</h3></td>
+		<a name="phylotree_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylotree_pub <br />
+	Tracks citations global to the tree <br />
+	e.g. multiple sequence alignment <br />
+	supporting tree construction <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree_pub-phylotree_pub_id">phylotree_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree_pub-phylotree_id">phylotree_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylotree_pub-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylotree_pub_idx1</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylotree_pub_idx2</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylotree_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonode'
+ -->
+
+<a name="phylonode" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonode
+</h3></td>
+		<a name="phylonode"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonode <br />
+	This is the most pervasive element in the <br />
+	phylogeny module, cataloging the 'phylonodes' <br />
+	of tree graphs. Edges are implied <br />
+	by the parent_phylonode_id reflexive closure <br />
+	================================================ <br />
+	bootstrap float null,
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-phylonode_id">phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-phylotree_id">phylotree_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-phylonode_idx">phylonode_idx</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-parent_phylonode_id">parent_phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther">root phylonode can have null parent_phylonode_id value</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-left_idx">left_idx</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, nested set implementation</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-right_idx">right_idx</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL, type: root, interior, leaf</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL, phylonodes can have optional features attached to them</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-label">label</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode-distance">distance</a></td>
+	<td class="FieldCellType">float</td>
+	<td class="FieldCellSize">20</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_idx</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>parent_phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>left_idx</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>right_idx</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylotree_id, phylonode_idx</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylotree_id, left_idx</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylotree_id, right_idx</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonode_dbxref'
+ -->
+
+<a name="phylonode_dbxref" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonode_dbxref
+</h3></td>
+		<a name="phylonode_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonode_dbxref <br />
+	e.g. for orthology, paralogy group identifiers; <br />
+	could also be used for NCBI taxonomy; <br />
+	for sequences, refer to 'phylonode_feature' <br />
+	feature associated dbxrefs <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_dbxref_id">phylonode_dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_id">phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_dbxref-dbxref_id">dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_dbxref_idx1</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_dbxref_idx2</td>
+	<td>dbxref_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylonode_id, dbxref_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonode_pub'
+ -->
+
+<a name="phylonode_pub" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonode_pub
+</h3></td>
+		<a name="phylonode_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonode_pub <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_pub-phylonode_pub_id">phylonode_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_pub-phylonode_id">phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_pub-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_pub_idx1</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_pub_idx2</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_organism_idx1</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_organism_idx2</td>
+	<td>organism_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylonode_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonode_organism'
+ -->
+
+<a name="phylonode_organism" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonode_organism
+</h3></td>
+		<a name="phylonode_organism"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonode_organism <br />
+	this linking table should only be used <br />
+	for nodes in taxonomy trees; it provides <br />
+	a mapping between the node and an organism <br />
+	one node can have zero or one organisms <br />
+	one organism can have zero or more nodes <br />
+	(although typically it should only have one, <br />
+	in the standard NCBI taxonomy tree. should we <br />
+	enforce one only, or allow competing taxonomy trees?) <br />
+	================================================ <br />
+	one phylonode cannot refer to >1 organism
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_organism-phylonode_organism_id">phylonode_organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_organism-phylonode_id">phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_organism-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylonode_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonodeprop'
+ -->
+
+<a name="phylonodeprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonodeprop
+</h3></td>
+		<a name="phylonodeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonodeprop <br />
+	e.g. "type_id" could designate phylonode hierarchy <br />
+	relationships, for example: species taxonomy <br />
+	(kingdom, order, family, genus, species), <br />
+	"ortholog/paralog", "fold/superfold", etc. <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonodeprop-phylonodeprop_id">phylonodeprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonodeprop-phylonode_id">phylonode_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonodeprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonodeprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonodeprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, not sure how useful the rank concept is here, but I'll leave it in for now</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonodeprop_idx1</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonodeprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonodeprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>value</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phylonode_id, type_id, value, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylonode_relationship'
+ -->
+
+<a name="phylonode_relationship" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylonode_relationship
+</h3></td>
+		<a name="phylonode_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylonode_relationship <br />
+	this is for exotic relationships that are <br />
+	not strictly hierarchical; for example, <br />
+	horizontal gene transfer <br />
+	use of this table would be highly unusual; <br />
+	most phylogenetic trees are strictly <br />
+	hierarchical. <br />
+	nevertheless, it is here for completion <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_relationship-phylonode_relationship_id">phylonode_relationship_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_relationship-subject_id">subject_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_relationship-object_id">object_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_relationship-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phylonode_relationship-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_relationship_idx1</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_relationship_idx2</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_relationship_idx3</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylonode_relationship_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>subject_id, object_id, type_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+Created by <a href="http://sqlfairy.sourceforge.net">
+SQL::Translator 0.06</a>
+</body></html>
