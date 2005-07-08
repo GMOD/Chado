@@ -29,4 +29,3 @@ xsl/chado-expand-macros.xsl
 xsl/chado-insert-macros.xsl
 xsl/cx-chaos-to-gff3.xsl
 xsl/cx-chado-to-chaos.xsl
-META.yml                                Module meta-data (added by MakeMaker)
