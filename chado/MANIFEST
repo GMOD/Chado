@@ -49,7 +49,6 @@ chaos-xml/lib/Bio/Chaos/ChaosGraph.pm
 chaos-xml/lib/Bio/Chaos/FeatureUtil.pm
 chaos-xml/lib/Bio/Chaos/Root.pm
 chaos-xml/lib/Bio/Chaos/XSLTHelper.pm
-chaos-xml/Makefile
 chaos-xml/Makefile.PL
 chaos-xml/MANIFEST
 chaos-xml/README
