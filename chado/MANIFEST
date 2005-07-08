@@ -1,9 +1,10 @@
 bin/addcascades
 bin/AutoDBI.PL
+bin/chado-build-schema.pl
+bin/ddltrans
 bin/gmod_apollo_triggers.pl
 bin/gmod_dump_gff3.pl
-bin/make_cvtermpath.pl
-bin/make_cvtermpath.sh
+bin/interactions2SIF.pl
 bin/make_partial_indexes.pl
 bin/pg2cdbi.pl
 bin/pg2diagram.pl
@@ -16,6 +17,7 @@ bin/test_load.pl
 bin/test_load.sh
 bin/ucsc_genes2gff.pl
 bin/ucsc_snp2gff.pl
+chado-module-metadata.xml
 chado-xml/doc/Chado-XML-overview.asc
 chado-xml/doc/Chado-XML-overview.html
 chado-xml/doc/Chado-XML-overview.pdf
@@ -38,6 +40,7 @@ chaos-xml/bin/cx-download-enscore.pl
 chaos-xml/bin/cx-enscore2chaos.pl
 chaos-xml/bin/cx-genbank2chaos.pl
 chaos-xml/create-manifest.sh
+chaos-xml/doc/chaos-and-chado.html
 chaos-xml/doc/css/stylesheet.css
 chaos-xml/dtd/chaos.dtd
 chaos-xml/index.html
@@ -46,11 +49,13 @@ chaos-xml/lib/Bio/Chaos/ChaosGraph.pm
 chaos-xml/lib/Bio/Chaos/FeatureUtil.pm
 chaos-xml/lib/Bio/Chaos/Root.pm
 chaos-xml/lib/Bio/Chaos/XSLTHelper.pm
+chaos-xml/Makefile
 chaos-xml/Makefile.PL
 chaos-xml/MANIFEST
 chaos-xml/README
 chaos-xml/sample-data/AE003734.chaos.xml
 chaos-xml/sample-data/AE003734.gbk
+chaos-xml/sample-data/Rab1.chaos-xml
 chaos-xml/t/00parse_gb_to_chaos.t
 chaos-xml/t/02roundtrip.t
 chaos-xml/t/data/AE003734_modmdg4.gb
@@ -62,13 +67,18 @@ chaos-xml/xsl/cx-chaos-to-dbxref-tbl.xsl
 chaos-xml/xsl/cx-chaos-to-feature-summary-tbl.xsl
 chaos-xml/xsl/cx-chaos-to-gff3.xsl
 chaos-xml/xsl/README
+doc/chado-policy.txt
+doc/Chado_Schema_Documentation.doc
+doc/ChadoCSHMay03Slides.pdf
+doc/cjm-notes.txt
+doc/design.txt
+doc/implementation.txt
+doc/snps.txt
 INSTALL
 install_util/conf_install.PLS
 install_util/install.pm
 install_util/log4perl.conf.PLS
 install_util/src_install.PLS
-lib/Bio/FeatureIO/chado.pm
-lib/Bio/FeatureIO/chadobulk.pm
 lib/Bio/GMOD/Config.pm
 lib/Bio/GMOD/DB/Config.pm
 lib/Bio/GMOD/Load.pm
@@ -77,7 +87,6 @@ lib/Chado/Builder.pm
 lib/Chado/Config.pm
 LICENSE
 load/bin/bulk_load_gff3.PLS
-load/bin/genbank2gff3.PLS
 load/bin/load_affymetrix.pl
 load/bin/load_affyxls.pl
 load/bin/load_gff3.PLS
@@ -107,6 +116,7 @@ modules/companalysis/examples/basic/genscan.xml
 modules/companalysis/examples/basic/index.html
 modules/companalysis/examples/basic/interpro.itxt
 modules/companalysis/examples/basic/interpro.xml
+modules/contact/contact.sql
 modules/cv/bridges/godb-bridge.sql
 modules/cv/cv-dbapi.sqli
 modules/cv/cv-intro.txt
@@ -182,6 +192,7 @@ soi/scripts/dump_generegion_soi.pl
 soi/scripts/dump_segment.pl
 soi/SOI/Adapter.pm
 soi/SOI/Feature.pm
+soi/SOI/FeatureDecor.pm
 soi/SOI/GAMEHandler.pm
 soi/SOI/GFF3Parser.pm
 soi/SOI/IntersectGraph.pm
@@ -215,4 +226,3 @@ stag-templates/make-publish
 stag-templates/README
 t/01_okay.t
 TODO
-META.yml                                 Module meta-data (added by MakeMaker)
