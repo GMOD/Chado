@@ -124,9 +124,9 @@ my %predmap = (
 
 #create some default entries to satisfy chado FK requirements of ontology on db table
 
-my($db) = Chado::DBI::Chado::Db->find_or_create({name => $ontname});
+my($db) = Chado::Db->find_or_create({name => $ontname});
 $db->dbi_commit;
-my($cv) = Chado::DBI::Chado::Cv->find_or_create({name => $ontname});
+my($cv) = Chado::Cv->find_or_create({name => $ontname});
 $cv->dbi_commit;
 
 my $termfact = Bio::Ontology::TermFactory->new();
@@ -202,15 +202,15 @@ sub load_ontologyterms{
     }
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
-	my($predicate_db) = Chado::DBI::Chado::Cvterm->search(name => predmap($predicate->name));
+	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
 
 	if(!$predicate_db){
 		$progress->message("creating predicate term for: ".predmap($predicate->name));
-		my $dbxref = Chado::DBI::Chado::Dbxref->find_or_create({
+		my $dbxref = Chado::Dbxref->find_or_create({
 				db_id => $db->id,
 				accession => $oborelmap{ predmap($predicate->name) } || predmap($predicate->name),
 							   });
-		$predicate_db = Chado::DBI::Chado::Cvterm->create({
+		$predicate_db = Chado::Cvterm->create({
 			   name => predmap($predicate->name),
 			   cv_id => $cv->id,
 			   dbxref_id => $dbxref->id,
@@ -230,16 +230,16 @@ sub load_ontologyterms{
   #load root terms
   foreach my $root (@roots) {
     $progress->update(++$loaded);
-    my($root_db) = Chado::DBI::Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
+    my($root_db) = Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
 
         if(!$root_db){
           #warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
           next unless $root->name;
-		  my $dbxref = Chado::DBI::Chado::Dbxref->find_or_create({
+		  my $dbxref = Chado::Dbxref->find_or_create({
 			db_id => $db->id,
 			accession => $root->identifier,
 							   });
-		  $root_db = Chado::DBI::Chado::Cvterm->find_or_create({
+		  $root_db = Chado::Cvterm->find_or_create({
 			 name                => $root->name || $oborelmap{ predmap($root->identifier) },
 			 cv_id               => $cv->id,
 			 dbxref_id           => $dbxref->id,
@@ -274,7 +274,7 @@ sub load_ontologytermsR {
 	if (!(exists $allterms{$child->name})) {
 	  warn  "$tab", $child->name , "\n" if DEBUG;
 
-        my($child_db) = Chado::DBI::Chado::Cvterm->search({name => $child->name, cv_id => $cv->id});
+        my($child_db) = Chado::Cvterm->search({name => $child->name, cv_id => $cv->id});
 	if(!$child_db){
 
 #warn "oops! ".join '*', ($child->name, $child->identifier, $cv->id) unless $child->name;
@@ -283,11 +283,11 @@ sub load_ontologytermsR {
           if ($accession =~ /\S+\:(\S+)/) {
               $accession = $1;
           }
-	  my $dbxref = Chado::DBI::Chado::Dbxref->find_or_create({
+	  my $dbxref = Chado::Dbxref->find_or_create({
 				  db_id => $db->id,
 				  accession => $accession,
 						 });
-	  $child_db = Chado::DBI::Chado::Cvterm->find_or_create({
+	  $child_db = Chado::Cvterm->find_or_create({
 				name => $child->name,
 				cv_id => $cv->id,
 				dbxref_id => $dbxref->id,
@@ -343,7 +343,7 @@ sub load_ontologyrels {
 	  $skip++ unless defined $subj_id;
 
 	  next if $skip;
-	  my ($cvtermrel) = Chado::DBI::Chado::Cvterm_Relationship->find_or_create ({
+	  my ($cvtermrel) = Chado::Cvterm_Relationship->find_or_create ({
 					  subject_id => $subj_id,
 					  object_id => $obj_id,
 					  type_id => $pred_id,
@@ -370,14 +370,14 @@ sub load_dblinks {
       $term_link = substr($term_link, 0, 255);
     }
 
-	my $dbxref_db = Chado::DBI::Chado::Dbxref->find_or_create ({
+	my $dbxref_db = Chado::Dbxref->find_or_create ({
 				accession => $term_link,
 				db_id => $db->id,
 				version => 0
 						   });
         $dbxref_db->dbi_commit;
 
-	my ($cvtermdbxref) = Chado::DBI::Chado::Cvterm_Dbxref->find_or_create ({
+	my ($cvtermdbxref) = Chado::Cvterm_Dbxref->find_or_create ({
 			   cvterm_id => $term_db->id,
 			   dbxref_id => $dbxref_db->id
 						  });
@@ -392,11 +392,11 @@ sub load_synonyms {
   my @term_syns = $term->get_synonyms();
   foreach my $term_syn (@term_syns) {
 
-#	Chado::DBI::Chado::Cvtermsynonym->find_or_create ({
+#	Chado::Cvtermsynonym->find_or_create ({
 #						cvterm_id => $term_db->id,
 #						synonym => $term_syn,
 #					     });
-	my ($synonym) = Chado::DBI::Chado::Cvtermsynonym->find_or_create ({
+	my ($synonym) = Chado::Cvtermsynonym->find_or_create ({
 						cvterm_id => $term_db->id,
 						synonym => $term_syn,
 					     });

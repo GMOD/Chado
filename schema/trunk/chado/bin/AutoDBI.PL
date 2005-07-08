@@ -43,395 +43,395 @@ Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHO
 
 print OUT <<'!NO!SUBS!';
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Tableinfo;
+package Chado::Tableinfo;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Tableinfo->set_up_table('tableinfo');
+Chado::Tableinfo->set_up_table('tableinfo');
 
 
-Chado::DBI::Chado::Tableinfo->has_many(
-    'magedocumentation_tableinfo_id', 'Chado::DBI::Chado::Magedocumentation' => 'tableinfo_id'
+Chado::Tableinfo->has_many(
+    'magedocumentation_tableinfo_id', 'Chado::Magedocumentation' => 'tableinfo_id'
 );
 
-Chado::DBI::Chado::Tableinfo->has_many(
-    'control_tableinfo_id', 'Chado::DBI::Chado::Control' => 'tableinfo_id'
+Chado::Tableinfo->has_many(
+    'control_tableinfo_id', 'Chado::Control' => 'tableinfo_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Db;
+package Chado::Db;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Db->set_up_table('db');
+Chado::Db->set_up_table('db');
 
 
-Chado::DBI::Chado::Db->has_many(
-    'dbxref_db_id', 'Chado::DBI::Chado::Dbxref' => 'db_id'
+Chado::Db->has_many(
+    'dbxref_db_id', 'Chado::Dbxref' => 'db_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Dbxref;
+package Chado::Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Dbxref->set_up_table('dbxref');
+Chado::Dbxref->set_up_table('dbxref');
 
 
-Chado::DBI::Chado::Dbxref->has_a(
-    db_id => 'Chado::DBI::Chado::Db'
+Chado::Dbxref->has_a(
+    db_id => 'Chado::Db'
 );
 
-sub Chado::DBI::Chado::Dbxref::db {
+sub Chado::Dbxref::db {
     return shift->db_id
 }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'protocol_dbxref_id', 'Chado::DBI::Chado::Protocol' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'protocol_dbxref_id', 'Chado::Protocol' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'assay_dbxref_id', 'Chado::DBI::Chado::Assay' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'assay_dbxref_id', 'Chado::Assay' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'feature_dbxref_dbxref_id', 'Chado::DBI::Chado::Feature_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'feature_dbxref_dbxref_id', 'Chado::Feature_Dbxref' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'biomaterial_dbxref_dbxref_id', 'Chado::DBI::Chado::Biomaterial_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'biomaterial_dbxref_dbxref_id', 'Chado::Biomaterial_Dbxref' => 'dbxref_id'
 );
 
 sub features { my $self = shift; return map $_->feature_id, $self->element_dbxref_id }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'feature_dbxref_id', 'Chado::DBI::Chado::Feature' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'feature_dbxref_id', 'Chado::Feature' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'organism_dbxref_dbxref_id', 'Chado::DBI::Chado::Organism_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'organism_dbxref_dbxref_id', 'Chado::Organism_Dbxref' => 'dbxref_id'
 );
 
 sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_dbxref_dbxref_id }
 
 sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_dbxref_id }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'arraydesign_dbxref_id', 'Chado::DBI::Chado::Arraydesign' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'arraydesign_dbxref_id', 'Chado::Arraydesign' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'study_dbxref_id', 'Chado::DBI::Chado::Study' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'study_dbxref_id', 'Chado::Study' => 'dbxref_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->pub_dbxref_dbxref_id }
 
 sub organisms { my $self = shift; return map $_->organism_id, $self->organism_dbxref_dbxref_id }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'dbxrefprop_dbxref_id', 'Chado::DBI::Chado::Dbxrefprop' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'dbxrefprop_dbxref_id', 'Chado::Dbxrefprop' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'cvterm_dbxref_dbxref_id', 'Chado::DBI::Chado::Cvterm_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'cvterm_dbxref_dbxref_id', 'Chado::Cvterm_Dbxref' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'feature_cvterm_dbxref_dbxref_id', 'Chado::DBI::Chado::Feature_Cvterm_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'feature_cvterm_dbxref_dbxref_id', 'Chado::Feature_Cvterm_Dbxref' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'element_dbxref_id', 'Chado::DBI::Chado::Element' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'element_dbxref_id', 'Chado::Element' => 'dbxref_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_dbxref_id }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'cvterm_dbxref_id', 'Chado::DBI::Chado::Cvterm' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'cvterm_dbxref_id', 'Chado::Cvterm' => 'dbxref_id'
 );
 
 sub biomaterials { my $self = shift; return map $_->biomaterial_id, $self->biomaterial_dbxref_dbxref_id }
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'biomaterial_dbxref_id', 'Chado::DBI::Chado::Biomaterial' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'biomaterial_dbxref_id', 'Chado::Biomaterial' => 'dbxref_id'
 );
 
-Chado::DBI::Chado::Dbxref->has_many(
-    'pub_dbxref_dbxref_id', 'Chado::DBI::Chado::Pub_Dbxref' => 'dbxref_id'
+Chado::Dbxref->has_many(
+    'pub_dbxref_dbxref_id', 'Chado::Pub_Dbxref' => 'dbxref_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Project;
+package Chado::Project;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Project->set_up_table('project');
+Chado::Project->set_up_table('project');
 
 
-Chado::DBI::Chado::Project->has_many(
-    'assay_project_project_id', 'Chado::DBI::Chado::Assay_Project' => 'project_id'
+Chado::Project->has_many(
+    'assay_project_project_id', 'Chado::Assay_Project' => 'project_id'
 );
 
 sub assays { my $self = shift; return map $_->assay_id, $self->assay_project_project_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cv;
+package Chado::Cv;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cv->set_up_table('cv');
+Chado::Cv->set_up_table('cv');
 
 
-Chado::DBI::Chado::Cv->has_many(
-    'cvtermpath_cv_id', 'Chado::DBI::Chado::Cvtermpath' => 'cv_id'
+Chado::Cv->has_many(
+    'cvtermpath_cv_id', 'Chado::Cvtermpath' => 'cv_id'
 );
 
-Chado::DBI::Chado::Cv->has_many(
-    'cvterm_cv_id', 'Chado::DBI::Chado::Cvterm' => 'cv_id'
+Chado::Cv->has_many(
+    'cvterm_cv_id', 'Chado::Cvterm' => 'cv_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvterm;
+package Chado::Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvterm->set_up_table('cvterm');
+Chado::Cvterm->set_up_table('cvterm');
 
 
-Chado::DBI::Chado::Cvterm->has_a(
-    cv_id => 'Chado::DBI::Chado::Cv'
+Chado::Cvterm->has_a(
+    cv_id => 'Chado::Cv'
 );
 
-sub Chado::DBI::Chado::Cvterm::cv {
+sub Chado::Cvterm::cv {
     return shift->cv_id
 }
 
-Chado::DBI::Chado::Cvterm->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Cvterm->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Cvterm::dbxref {
+sub Chado::Cvterm::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'protocol_type_id', 'Chado::DBI::Chado::Protocol' => 'type_id'
+Chado::Cvterm->has_many(
+    'protocol_type_id', 'Chado::Protocol' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'elementresult_relationship_type_id', 'Chado::DBI::Chado::Elementresult_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'elementresult_relationship_type_id', 'Chado::Elementresult_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'studyfactor_type_id', 'Chado::DBI::Chado::Studyfactor' => 'type_id'
+Chado::Cvterm->has_many(
+    'studyfactor_type_id', 'Chado::Studyfactor' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermsynonym_cvterm_id', 'Chado::DBI::Chado::Cvtermsynonym' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'cvtermsynonym_cvterm_id', 'Chado::Cvtermsynonym' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermsynonym_type_id', 'Chado::DBI::Chado::Cvtermsynonym' => 'type_id'
+Chado::Cvterm->has_many(
+    'cvtermsynonym_type_id', 'Chado::Cvtermsynonym' => 'type_id'
 );
 
 sub quantification_relationships { my $self = shift; return $self->quantification_relationship_type_id(@_) }
 
 sub features { my $self = shift; return map $_->feature_id, $self->element_type_id }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_type_id', 'Chado::DBI::Chado::Feature' => 'type_id'
+Chado::Cvterm->has_many(
+    'feature_type_id', 'Chado::Feature' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'biomaterialprop_type_id', 'Chado::DBI::Chado::Biomaterialprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'biomaterialprop_type_id', 'Chado::Biomaterialprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_cvterm_cvterm_id', 'Chado::DBI::Chado::Feature_Cvterm' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'feature_cvterm_cvterm_id', 'Chado::Feature_Cvterm' => 'cvterm_id'
 );
 
 sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_type_id }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'arraydesign_platformtype_id', 'Chado::DBI::Chado::Arraydesign' => 'platformtype_id'
+Chado::Cvterm->has_many(
+    'arraydesign_platformtype_id', 'Chado::Arraydesign' => 'platformtype_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'arraydesign_substratetype_id', 'Chado::DBI::Chado::Arraydesign' => 'substratetype_id'
+Chado::Cvterm->has_many(
+    'arraydesign_substratetype_id', 'Chado::Arraydesign' => 'substratetype_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'library_cvterm_cvterm_id', 'Chado::DBI::Chado::Library_Cvterm' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'library_cvterm_cvterm_id', 'Chado::Library_Cvterm' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'biomaterial_relationship_type_id', 'Chado::DBI::Chado::Biomaterial_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'biomaterial_relationship_type_id', 'Chado::Biomaterial_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'analysisprop_type_id', 'Chado::DBI::Chado::Analysisprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'analysisprop_type_id', 'Chado::Analysisprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvterm_dbxref_cvterm_id', 'Chado::DBI::Chado::Cvterm_Dbxref' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'cvterm_dbxref_cvterm_id', 'Chado::Cvterm_Dbxref' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_relationshipprop_type_id', 'Chado::DBI::Chado::Feature_Relationshipprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'feature_relationshipprop_type_id', 'Chado::Feature_Relationshipprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermprop_cvterm_id', 'Chado::DBI::Chado::Cvtermprop' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'cvtermprop_cvterm_id', 'Chado::Cvtermprop' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermprop_type_id', 'Chado::DBI::Chado::Cvtermprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'cvtermprop_type_id', 'Chado::Cvtermprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'element_relationship_type_id', 'Chado::DBI::Chado::Element_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'element_relationship_type_id', 'Chado::Element_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'quantification_relationship_type_id', 'Chado::DBI::Chado::Quantification_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'quantification_relationship_type_id', 'Chado::Quantification_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'element_type_id', 'Chado::DBI::Chado::Element' => 'type_id'
+Chado::Cvterm->has_many(
+    'element_type_id', 'Chado::Element' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'featuremap_unittype_id', 'Chado::DBI::Chado::Featuremap' => 'unittype_id'
+Chado::Cvterm->has_many(
+    'featuremap_unittype_id', 'Chado::Featuremap' => 'unittype_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'treatment_type_id', 'Chado::DBI::Chado::Treatment' => 'type_id'
+Chado::Cvterm->has_many(
+    'treatment_type_id', 'Chado::Treatment' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'arraydesignprop_type_id', 'Chado::DBI::Chado::Arraydesignprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'arraydesignprop_type_id', 'Chado::Arraydesignprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'synonym_type_id', 'Chado::DBI::Chado::Synonym' => 'type_id'
+Chado::Cvterm->has_many(
+    'synonym_type_id', 'Chado::Synonym' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'pubprop_type_id', 'Chado::DBI::Chado::Pubprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'pubprop_type_id', 'Chado::Pubprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermpath_type_id', 'Chado::DBI::Chado::Cvtermpath' => 'type_id'
+Chado::Cvterm->has_many(
+    'cvtermpath_type_id', 'Chado::Cvtermpath' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermpath_subject_id', 'Chado::DBI::Chado::Cvtermpath' => 'subject_id'
+Chado::Cvterm->has_many(
+    'cvtermpath_subject_id', 'Chado::Cvtermpath' => 'subject_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvtermpath_object_id', 'Chado::DBI::Chado::Cvtermpath' => 'object_id'
+Chado::Cvterm->has_many(
+    'cvtermpath_object_id', 'Chado::Cvtermpath' => 'object_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'quantificationprop_type_id', 'Chado::DBI::Chado::Quantificationprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'quantificationprop_type_id', 'Chado::Quantificationprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'libraryprop_type_id', 'Chado::DBI::Chado::Libraryprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'libraryprop_type_id', 'Chado::Libraryprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'biomaterial_treatment_unittype_id', 'Chado::DBI::Chado::Biomaterial_Treatment' => 'unittype_id'
+Chado::Cvterm->has_many(
+    'biomaterial_treatment_unittype_id', 'Chado::Biomaterial_Treatment' => 'unittype_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'expression_cvterm_cvterm_id', 'Chado::DBI::Chado::Expression_Cvterm' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'expression_cvterm_cvterm_id', 'Chado::Expression_Cvterm' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvterm_relationship_type_id', 'Chado::DBI::Chado::Cvterm_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'cvterm_relationship_type_id', 'Chado::Cvterm_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvterm_relationship_subject_id', 'Chado::DBI::Chado::Cvterm_Relationship' => 'subject_id'
+Chado::Cvterm->has_many(
+    'cvterm_relationship_subject_id', 'Chado::Cvterm_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'cvterm_relationship_object_id', 'Chado::DBI::Chado::Cvterm_Relationship' => 'object_id'
+Chado::Cvterm->has_many(
+    'cvterm_relationship_object_id', 'Chado::Cvterm_Relationship' => 'object_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'acquisitionprop_type_id', 'Chado::DBI::Chado::Acquisitionprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'acquisitionprop_type_id', 'Chado::Acquisitionprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'studydesignprop_type_id', 'Chado::DBI::Chado::Studydesignprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'studydesignprop_type_id', 'Chado::Studydesignprop' => 'type_id'
 );
 
 sub contact_relationships { my $self = shift; return $self->contact_relationship_type_id(@_) }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'contact_type_id', 'Chado::DBI::Chado::Contact' => 'type_id'
+Chado::Cvterm->has_many(
+    'contact_type_id', 'Chado::Contact' => 'type_id'
 );
 
 sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_cvterm_id }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'library_type_id', 'Chado::DBI::Chado::Library' => 'type_id'
+Chado::Cvterm->has_many(
+    'library_type_id', 'Chado::Library' => 'type_id'
 );
 
 sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'featureprop_type_id', 'Chado::DBI::Chado::Featureprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'featureprop_type_id', 'Chado::Featureprop' => 'type_id'
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_type_id }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'assayprop_type_id', 'Chado::DBI::Chado::Assayprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'assayprop_type_id', 'Chado::Assayprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'environment_cvterm_cvterm_id', 'Chado::DBI::Chado::Environment_Cvterm' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'environment_cvterm_cvterm_id', 'Chado::Environment_Cvterm' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'contact_relationship_type_id', 'Chado::DBI::Chado::Contact_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'contact_relationship_type_id', 'Chado::Contact_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'protocolparam_datatype_id', 'Chado::DBI::Chado::Protocolparam' => 'datatype_id'
+Chado::Cvterm->has_many(
+    'protocolparam_datatype_id', 'Chado::Protocolparam' => 'datatype_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'protocolparam_unittype_id', 'Chado::DBI::Chado::Protocolparam' => 'unittype_id'
+Chado::Cvterm->has_many(
+    'protocolparam_unittype_id', 'Chado::Protocolparam' => 'unittype_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_cvterm_id }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'pub_type_id', 'Chado::DBI::Chado::Pub' => 'type_id'
+Chado::Cvterm->has_many(
+    'pub_type_id', 'Chado::Pub' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'control_type_id', 'Chado::DBI::Chado::Control' => 'type_id'
+Chado::Cvterm->has_many(
+    'control_type_id', 'Chado::Control' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'organismprop_type_id', 'Chado::DBI::Chado::Organismprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'organismprop_type_id', 'Chado::Organismprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'dbxrefprop_type_id', 'Chado::DBI::Chado::Dbxrefprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'dbxrefprop_type_id', 'Chado::Dbxrefprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_cvterm_cvterm_id', 'Chado::DBI::Chado::Phenotype_Cvterm' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'phenotype_cvterm_cvterm_id', 'Chado::Phenotype_Cvterm' => 'cvterm_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_genotype_cvterm_id', 'Chado::DBI::Chado::Feature_Genotype' => 'cvterm_id'
+Chado::Cvterm->has_many(
+    'feature_genotype_cvterm_id', 'Chado::Feature_Genotype' => 'cvterm_id'
 );
 
 sub cvterm_relationship_type_ids { my $self = shift; return $self->cvterm_relationship_type_id(@_) }
@@ -440,358 +440,358 @@ sub cvterm_relationship_subject_ids { my $self = shift; return $self->cvterm_rel
 
 sub cvterm_relationship_object_ids { my $self = shift; return $self->cvterm_relationship_object_id(@_) }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_relationship_type_id', 'Chado::DBI::Chado::Feature_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'feature_relationship_type_id', 'Chado::Feature_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'acquisition_relationship_type_id', 'Chado::DBI::Chado::Acquisition_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'acquisition_relationship_type_id', 'Chado::Acquisition_Relationship' => 'type_id'
 );
 
 sub biomaterial_relationships { my $self = shift; return $self->biomaterial_relationship_type_id(@_) }
 
 sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenstatement_type_id', 'Chado::DBI::Chado::Phenstatement' => 'type_id'
+Chado::Cvterm->has_many(
+    'phenstatement_type_id', 'Chado::Phenstatement' => 'type_id'
 );
 
 sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_type_id(@_) }
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_observable_id', 'Chado::DBI::Chado::Phenotype' => 'observable_id'
+Chado::Cvterm->has_many(
+    'phenotype_observable_id', 'Chado::Phenotype' => 'observable_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_attr_id', 'Chado::DBI::Chado::Phenotype' => 'attr_id'
+Chado::Cvterm->has_many(
+    'phenotype_attr_id', 'Chado::Phenotype' => 'attr_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_cvalue_id', 'Chado::DBI::Chado::Phenotype' => 'cvalue_id'
+Chado::Cvterm->has_many(
+    'phenotype_cvalue_id', 'Chado::Phenotype' => 'cvalue_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_assay_id', 'Chado::DBI::Chado::Phenotype' => 'assay_id'
+Chado::Cvterm->has_many(
+    'phenotype_assay_id', 'Chado::Phenotype' => 'assay_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'pub_relationship_type_id', 'Chado::DBI::Chado::Pub_Relationship' => 'type_id'
+Chado::Cvterm->has_many(
+    'pub_relationship_type_id', 'Chado::Pub_Relationship' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'feature_cvtermprop_type_id', 'Chado::DBI::Chado::Feature_Cvtermprop' => 'type_id'
+Chado::Cvterm->has_many(
+    'feature_cvtermprop_type_id', 'Chado::Feature_Cvtermprop' => 'type_id'
 );
 
-Chado::DBI::Chado::Cvterm->has_many(
-    'phenotype_comparison_type_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'type_id'
+Chado::Cvterm->has_many(
+    'phenotype_comparison_type_id', 'Chado::Phenotype_Comparison' => 'type_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvterm_Relationship;
+package Chado::Cvterm_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvterm_Relationship->set_up_table('cvterm_relationship');
+Chado::Cvterm_Relationship->set_up_table('cvterm_relationship');
 
 
-Chado::DBI::Chado::Cvterm_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvterm_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvterm_Relationship::type {
+sub Chado::Cvterm_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Cvterm_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvterm_Relationship->has_a(
+    subject_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvterm_Relationship::subject {
+sub Chado::Cvterm_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Cvterm_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvterm_Relationship->has_a(
+    object_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvterm_Relationship::object {
+sub Chado::Cvterm_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvtermpath;
+package Chado::Cvtermpath;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvtermpath->set_up_table('cvtermpath');
+Chado::Cvtermpath->set_up_table('cvtermpath');
 
 
-Chado::DBI::Chado::Cvtermpath->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermpath->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermpath::type {
+sub Chado::Cvtermpath::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Cvtermpath->has_a(
-    subject_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermpath->has_a(
+    subject_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermpath::subject {
+sub Chado::Cvtermpath::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Cvtermpath->has_a(
-    object_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermpath->has_a(
+    object_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermpath::object {
+sub Chado::Cvtermpath::object {
     return shift->object_id
 }
 
-Chado::DBI::Chado::Cvtermpath->has_a(
-    cv_id => 'Chado::DBI::Chado::Cv'
+Chado::Cvtermpath->has_a(
+    cv_id => 'Chado::Cv'
 );
 
-sub Chado::DBI::Chado::Cvtermpath::cv {
+sub Chado::Cvtermpath::cv {
     return shift->cv_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvtermsynonym;
+package Chado::Cvtermsynonym;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvtermsynonym->set_up_table('cvtermsynonym');
+Chado::Cvtermsynonym->set_up_table('cvtermsynonym');
 
 
-Chado::DBI::Chado::Cvtermsynonym->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermsynonym->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermsynonym::cvterm {
+sub Chado::Cvtermsynonym::cvterm {
     return shift->cvterm_id
 }
 
-Chado::DBI::Chado::Cvtermsynonym->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermsynonym->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermsynonym::type {
+sub Chado::Cvtermsynonym::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvterm_Dbxref;
+package Chado::Cvterm_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvterm_Dbxref->set_up_table('cvterm_dbxref');
+Chado::Cvterm_Dbxref->set_up_table('cvterm_dbxref');
 
 
-Chado::DBI::Chado::Cvterm_Dbxref->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvterm_Dbxref->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvterm_Dbxref::cvterm {
+sub Chado::Cvterm_Dbxref::cvterm {
     return shift->cvterm_id
 }
 
-Chado::DBI::Chado::Cvterm_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Cvterm_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Cvterm_Dbxref::dbxref {
+sub Chado::Cvterm_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Cvtermprop;
+package Chado::Cvtermprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Cvtermprop->set_up_table('cvtermprop');
+Chado::Cvtermprop->set_up_table('cvtermprop');
 
 
-Chado::DBI::Chado::Cvtermprop->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermprop->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermprop::cvterm {
+sub Chado::Cvtermprop::cvterm {
     return shift->cvterm_id
 }
 
-Chado::DBI::Chado::Cvtermprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Cvtermprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Cvtermprop::type {
+sub Chado::Cvtermprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Dbxrefprop;
+package Chado::Dbxrefprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Dbxrefprop->set_up_table('dbxrefprop');
+Chado::Dbxrefprop->set_up_table('dbxrefprop');
 
 
-Chado::DBI::Chado::Dbxrefprop->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Dbxrefprop->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Dbxrefprop::dbxref {
+sub Chado::Dbxrefprop::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Dbxrefprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Dbxrefprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Dbxrefprop::type {
+sub Chado::Dbxrefprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Organism;
+package Chado::Organism;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Organism->set_up_table('organism');
+Chado::Organism->set_up_table('organism');
 
 
-Chado::DBI::Chado::Organism->has_many(
-    'biomaterial_taxon_id', 'Chado::DBI::Chado::Biomaterial' => 'taxon_id'
+Chado::Organism->has_many(
+    'biomaterial_taxon_id', 'Chado::Biomaterial' => 'taxon_id'
 );
 
-Chado::DBI::Chado::Organism->has_many(
-    'feature_organism_id', 'Chado::DBI::Chado::Feature' => 'organism_id'
+Chado::Organism->has_many(
+    'feature_organism_id', 'Chado::Feature' => 'organism_id'
 );
 
-Chado::DBI::Chado::Organism->has_many(
-    'organism_dbxref_organism_id', 'Chado::DBI::Chado::Organism_Dbxref' => 'organism_id'
+Chado::Organism->has_many(
+    'organism_dbxref_organism_id', 'Chado::Organism_Dbxref' => 'organism_id'
 );
 
-Chado::DBI::Chado::Organism->has_many(
-    'library_organism_id', 'Chado::DBI::Chado::Library' => 'organism_id'
+Chado::Organism->has_many(
+    'library_organism_id', 'Chado::Library' => 'organism_id'
 );
 
-Chado::DBI::Chado::Organism->has_many(
-    'organismprop_organism_id', 'Chado::DBI::Chado::Organismprop' => 'organism_id'
+Chado::Organism->has_many(
+    'organismprop_organism_id', 'Chado::Organismprop' => 'organism_id'
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->organism_dbxref_organism_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Organism_Dbxref;
+package Chado::Organism_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Organism_Dbxref->set_up_table('organism_dbxref');
+Chado::Organism_Dbxref->set_up_table('organism_dbxref');
 
 
-Chado::DBI::Chado::Organism_Dbxref->has_a(
-    organism_id => 'Chado::DBI::Chado::Organism'
+Chado::Organism_Dbxref->has_a(
+    organism_id => 'Chado::Organism'
 );
 
-sub Chado::DBI::Chado::Organism_Dbxref::organism {
+sub Chado::Organism_Dbxref::organism {
     return shift->organism_id
 }
 
-Chado::DBI::Chado::Organism_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Organism_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Organism_Dbxref::dbxref {
+sub Chado::Organism_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Organismprop;
+package Chado::Organismprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Organismprop->set_up_table('organismprop');
+Chado::Organismprop->set_up_table('organismprop');
 
 
-Chado::DBI::Chado::Organismprop->has_a(
-    organism_id => 'Chado::DBI::Chado::Organism'
+Chado::Organismprop->has_a(
+    organism_id => 'Chado::Organism'
 );
 
-sub Chado::DBI::Chado::Organismprop::organism {
+sub Chado::Organismprop::organism {
     return shift->organism_id
 }
 
-Chado::DBI::Chado::Organismprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Organismprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Organismprop::type {
+sub Chado::Organismprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Pub;
+package Chado::Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Pub->set_up_table('pub');
+Chado::Pub->set_up_table('pub');
 
 
-Chado::DBI::Chado::Pub->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Pub->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Pub::type {
+sub Chado::Pub::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Pub->has_many(
-    'protocol_pub_id', 'Chado::DBI::Chado::Protocol' => 'pub_id'
+Chado::Pub->has_many(
+    'protocol_pub_id', 'Chado::Protocol' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'expression_pub_pub_id', 'Chado::DBI::Chado::Expression_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'expression_pub_pub_id', 'Chado::Expression_Pub' => 'pub_id'
 );
 
 sub features { my $self = shift; return map $_->feature_id, $self->feature_pub_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'library_pub_pub_id', 'Chado::DBI::Chado::Library_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'library_pub_pub_id', 'Chado::Library_Pub' => 'pub_id'
 );
 
 sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_pub_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_cvterm_pub_id', 'Chado::DBI::Chado::Feature_Cvterm' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_cvterm_pub_id', 'Chado::Feature_Cvterm' => 'pub_id'
 );
 
 sub expressions { my $self = shift; return map $_->expression_id, $self->expression_pub_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'library_cvterm_pub_id', 'Chado::DBI::Chado::Library_Cvterm' => 'pub_id'
+Chado::Pub->has_many(
+    'library_cvterm_pub_id', 'Chado::Library_Cvterm' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'study_pub_id', 'Chado::DBI::Chado::Study' => 'pub_id'
+Chado::Pub->has_many(
+    'study_pub_id', 'Chado::Study' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_relationship_pub_pub_id', 'Chado::DBI::Chado::Feature_Relationship_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_relationship_pub_pub_id', 'Chado::Feature_Relationship_Pub' => 'pub_id'
 );
 
 sub feature_relationshipprops { my $self = shift; return map $_->feature_relationshipprop_id, $self->feature_relationshipprop_pub_pub_id }
 
 sub featuremaps { my $self = shift; return map $_->featuremap_id, $self->featuremap_pub_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'pubprop_pub_id', 'Chado::DBI::Chado::Pubprop' => 'pub_id'
+Chado::Pub->has_many(
+    'pubprop_pub_id', 'Chado::Pubprop' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_cvterm_pub_pub_id', 'Chado::DBI::Chado::Feature_Cvterm_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_cvterm_pub_pub_id', 'Chado::Feature_Cvterm_Pub' => 'pub_id'
 );
 
 sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_pub_id }
@@ -802,744 +802,744 @@ sub featureprops { my $self = shift; return map $_->featureprop_id, $self->featu
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->pub_dbxref_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'pubauthor_pub_id', 'Chado::DBI::Chado::Pubauthor' => 'pub_id'
+Chado::Pub->has_many(
+    'pubauthor_pub_id', 'Chado::Pubauthor' => 'pub_id'
 );
 
 sub pub_relationship_subject_ids { my $self = shift; return $self->pub_relationship_subject_id(@_) }
 
 sub pub_relationship_object_ids { my $self = shift; return $self->pub_relationship_object_id(@_) }
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_synonym_pub_id', 'Chado::DBI::Chado::Feature_Synonym' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_synonym_pub_id', 'Chado::Feature_Synonym' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_pub_pub_id', 'Chado::DBI::Chado::Feature_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_pub_pub_id', 'Chado::Feature_Pub' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'featuremap_pub_pub_id', 'Chado::DBI::Chado::Featuremap_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'featuremap_pub_pub_id', 'Chado::Featuremap_Pub' => 'pub_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->library_cvterm_pub_id }
 
 sub feature_relationships { my $self = shift; return map $_->feature_relationship_id, $self->feature_relationship_pub_pub_id }
 
-Chado::DBI::Chado::Pub->has_many(
-    'feature_relationshipprop_pub_pub_id', 'Chado::DBI::Chado::Feature_Relationshipprop_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'feature_relationshipprop_pub_pub_id', 'Chado::Feature_Relationshipprop_Pub' => 'pub_id'
 );
 
 sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_pub_id(@_) }
 
-Chado::DBI::Chado::Pub->has_many(
-    'phenstatement_pub_id', 'Chado::DBI::Chado::Phenstatement' => 'pub_id'
+Chado::Pub->has_many(
+    'phenstatement_pub_id', 'Chado::Phenstatement' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'pub_dbxref_pub_id', 'Chado::DBI::Chado::Pub_Dbxref' => 'pub_id'
+Chado::Pub->has_many(
+    'pub_dbxref_pub_id', 'Chado::Pub_Dbxref' => 'pub_id'
 );
 
 sub phenotype_comparisons { my $self = shift; return $self->phenotype_comparison_pub_id(@_) }
 
-Chado::DBI::Chado::Pub->has_many(
-    'phendesc_pub_id', 'Chado::DBI::Chado::Phendesc' => 'pub_id'
+Chado::Pub->has_many(
+    'phendesc_pub_id', 'Chado::Phendesc' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'featureprop_pub_pub_id', 'Chado::DBI::Chado::Featureprop_Pub' => 'pub_id'
+Chado::Pub->has_many(
+    'featureprop_pub_pub_id', 'Chado::Featureprop_Pub' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'library_synonym_pub_id', 'Chado::DBI::Chado::Library_Synonym' => 'pub_id'
+Chado::Pub->has_many(
+    'library_synonym_pub_id', 'Chado::Library_Synonym' => 'pub_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'pub_relationship_subject_id', 'Chado::DBI::Chado::Pub_Relationship' => 'subject_id'
+Chado::Pub->has_many(
+    'pub_relationship_subject_id', 'Chado::Pub_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'pub_relationship_object_id', 'Chado::DBI::Chado::Pub_Relationship' => 'object_id'
+Chado::Pub->has_many(
+    'pub_relationship_object_id', 'Chado::Pub_Relationship' => 'object_id'
 );
 
-Chado::DBI::Chado::Pub->has_many(
-    'phenotype_comparison_pub_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'pub_id'
+Chado::Pub->has_many(
+    'phenotype_comparison_pub_id', 'Chado::Phenotype_Comparison' => 'pub_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Pub_Relationship;
+package Chado::Pub_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Pub_Relationship->set_up_table('pub_relationship');
+Chado::Pub_Relationship->set_up_table('pub_relationship');
 
 
-Chado::DBI::Chado::Pub_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Pub'
+Chado::Pub_Relationship->has_a(
+    subject_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Pub_Relationship::subject {
+sub Chado::Pub_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Pub_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Pub'
+Chado::Pub_Relationship->has_a(
+    object_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Pub_Relationship::object {
+sub Chado::Pub_Relationship::object {
     return shift->object_id
 }
 
-Chado::DBI::Chado::Pub_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Pub_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Pub_Relationship::type {
+sub Chado::Pub_Relationship::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Pub_Dbxref;
+package Chado::Pub_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Pub_Dbxref->set_up_table('pub_dbxref');
+Chado::Pub_Dbxref->set_up_table('pub_dbxref');
 
 
-Chado::DBI::Chado::Pub_Dbxref->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Pub_Dbxref->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Pub_Dbxref::pub {
+sub Chado::Pub_Dbxref::pub {
     return shift->pub_id
 }
 
-Chado::DBI::Chado::Pub_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Pub_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Pub_Dbxref::dbxref {
+sub Chado::Pub_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Pubauthor;
+package Chado::Pubauthor;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Pubauthor->set_up_table('pubauthor');
+Chado::Pubauthor->set_up_table('pubauthor');
 
 
-Chado::DBI::Chado::Pubauthor->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Pubauthor->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Pubauthor::pub {
+sub Chado::Pubauthor::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Pubprop;
+package Chado::Pubprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Pubprop->set_up_table('pubprop');
+Chado::Pubprop->set_up_table('pubprop');
 
 
-Chado::DBI::Chado::Pubprop->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Pubprop->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Pubprop::pub {
+sub Chado::Pubprop::pub {
     return shift->pub_id
 }
 
-Chado::DBI::Chado::Pubprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Pubprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Pubprop::type {
+sub Chado::Pubprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature;
+package Chado::Feature;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature->set_up_table('feature');
+Chado::Feature->set_up_table('feature');
 
 
-Chado::DBI::Chado::Feature->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Feature->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Feature::dbxref {
+sub Chado::Feature::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Feature->has_a(
-    organism_id => 'Chado::DBI::Chado::Organism'
+Chado::Feature->has_a(
+    organism_id => 'Chado::Organism'
 );
 
-sub Chado::DBI::Chado::Feature::organism {
+sub Chado::Feature::organism {
     return shift->organism_id
 }
 
-Chado::DBI::Chado::Feature->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature::type {
+sub Chado::Feature::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_dbxref_feature_id', 'Chado::DBI::Chado::Feature_Dbxref' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_dbxref_feature_id', 'Chado::Feature_Dbxref' => 'feature_id'
 );
 
 sub librarys { my $self = shift; return map $_->library_id, $self->library_feature_feature_id }
 
-Chado::DBI::Chado::Feature->has_many(
-    'featureprop_feature_id', 'Chado::DBI::Chado::Featureprop' => 'feature_id'
+Chado::Feature->has_many(
+    'featureprop_feature_id', 'Chado::Featureprop' => 'feature_id'
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_feature_id }
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_expression_feature_id', 'Chado::DBI::Chado::Feature_Expression' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_expression_feature_id', 'Chado::Feature_Expression' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_cvterm_feature_id', 'Chado::DBI::Chado::Feature_Cvterm' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_cvterm_feature_id', 'Chado::Feature_Cvterm' => 'feature_id'
 );
 
 sub expressions { my $self = shift; return map $_->expression_id, $self->feature_expression_feature_id }
 
 sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->element_feature_id }
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_synonym_feature_id', 'Chado::DBI::Chado::Feature_Synonym' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_synonym_feature_id', 'Chado::Feature_Synonym' => 'feature_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_pub_feature_id }
 
-Chado::DBI::Chado::Feature->has_many(
-    'library_feature_feature_id', 'Chado::DBI::Chado::Library_Feature' => 'feature_id'
+Chado::Feature->has_many(
+    'library_feature_feature_id', 'Chado::Library_Feature' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurerange_feature_id', 'Chado::DBI::Chado::Featurerange' => 'feature_id'
+Chado::Feature->has_many(
+    'featurerange_feature_id', 'Chado::Featurerange' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurerange_leftstartf_id', 'Chado::DBI::Chado::Featurerange' => 'leftstartf_id'
+Chado::Feature->has_many(
+    'featurerange_leftstartf_id', 'Chado::Featurerange' => 'leftstartf_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurerange_leftendf_id', 'Chado::DBI::Chado::Featurerange' => 'leftendf_id'
+Chado::Feature->has_many(
+    'featurerange_leftendf_id', 'Chado::Featurerange' => 'leftendf_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurerange_rightstartf_id', 'Chado::DBI::Chado::Featurerange' => 'rightstartf_id'
+Chado::Feature->has_many(
+    'featurerange_rightstartf_id', 'Chado::Featurerange' => 'rightstartf_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurerange_rightendf_id', 'Chado::DBI::Chado::Featurerange' => 'rightendf_id'
+Chado::Feature->has_many(
+    'featurerange_rightendf_id', 'Chado::Featurerange' => 'rightendf_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featureloc_feature_id', 'Chado::DBI::Chado::Featureloc' => 'feature_id'
+Chado::Feature->has_many(
+    'featureloc_feature_id', 'Chado::Featureloc' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featureloc_srcfeature_id', 'Chado::DBI::Chado::Featureloc' => 'srcfeature_id'
+Chado::Feature->has_many(
+    'featureloc_srcfeature_id', 'Chado::Featureloc' => 'srcfeature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'analysisfeature_feature_id', 'Chado::DBI::Chado::Analysisfeature' => 'feature_id'
+Chado::Feature->has_many(
+    'analysisfeature_feature_id', 'Chado::Analysisfeature' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_pub_feature_id', 'Chado::DBI::Chado::Feature_Pub' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_pub_feature_id', 'Chado::Feature_Pub' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_phenotype_feature_id', 'Chado::DBI::Chado::Feature_Phenotype' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_phenotype_feature_id', 'Chado::Feature_Phenotype' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_genotype_feature_id', 'Chado::DBI::Chado::Feature_Genotype' => 'feature_id'
+Chado::Feature->has_many(
+    'feature_genotype_feature_id', 'Chado::Feature_Genotype' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_genotype_chromosome_id', 'Chado::DBI::Chado::Feature_Genotype' => 'chromosome_id'
+Chado::Feature->has_many(
+    'feature_genotype_chromosome_id', 'Chado::Feature_Genotype' => 'chromosome_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'element_feature_id', 'Chado::DBI::Chado::Element' => 'feature_id'
+Chado::Feature->has_many(
+    'element_feature_id', 'Chado::Element' => 'feature_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_feature_id }
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_relationship_subject_id', 'Chado::DBI::Chado::Feature_Relationship' => 'subject_id'
+Chado::Feature->has_many(
+    'feature_relationship_subject_id', 'Chado::Feature_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'feature_relationship_object_id', 'Chado::DBI::Chado::Feature_Relationship' => 'object_id'
+Chado::Feature->has_many(
+    'feature_relationship_object_id', 'Chado::Feature_Relationship' => 'object_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurepos_feature_id', 'Chado::DBI::Chado::Featurepos' => 'feature_id'
+Chado::Feature->has_many(
+    'featurepos_feature_id', 'Chado::Featurepos' => 'feature_id'
 );
 
-Chado::DBI::Chado::Feature->has_many(
-    'featurepos_map_feature_id', 'Chado::DBI::Chado::Featurepos' => 'map_feature_id'
+Chado::Feature->has_many(
+    'featurepos_map_feature_id', 'Chado::Featurepos' => 'map_feature_id'
 );
 
 sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->feature_phenotype_feature_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featureloc;
+package Chado::Featureloc;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featureloc->set_up_table('featureloc');
+Chado::Featureloc->set_up_table('featureloc');
 
 
-Chado::DBI::Chado::Featureloc->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featureloc->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featureloc::feature {
+sub Chado::Featureloc::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Featureloc->has_a(
-    srcfeature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featureloc->has_a(
+    srcfeature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featureloc::srcfeature {
+sub Chado::Featureloc::srcfeature {
     return shift->srcfeature_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Pub;
+package Chado::Feature_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Pub->set_up_table('feature_pub');
+Chado::Feature_Pub->set_up_table('feature_pub');
 
 
-Chado::DBI::Chado::Feature_Pub->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Pub->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Pub::feature {
+sub Chado::Feature_Pub::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Pub::pub {
+sub Chado::Feature_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featureprop;
+package Chado::Featureprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featureprop->set_up_table('featureprop');
+Chado::Featureprop->set_up_table('featureprop');
 
 
-Chado::DBI::Chado::Featureprop->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featureprop->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featureprop::feature {
+sub Chado::Featureprop::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Featureprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Featureprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Featureprop::type {
+sub Chado::Featureprop::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Featureprop->has_many(
-    'featureprop_pub_featureprop_id', 'Chado::DBI::Chado::Featureprop_Pub' => 'featureprop_id'
+Chado::Featureprop->has_many(
+    'featureprop_pub_featureprop_id', 'Chado::Featureprop_Pub' => 'featureprop_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->featureprop_pub_featureprop_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featureprop_Pub;
+package Chado::Featureprop_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featureprop_Pub->set_up_table('featureprop_pub');
+Chado::Featureprop_Pub->set_up_table('featureprop_pub');
 
 
-Chado::DBI::Chado::Featureprop_Pub->has_a(
-    featureprop_id => 'Chado::DBI::Chado::Featureprop'
+Chado::Featureprop_Pub->has_a(
+    featureprop_id => 'Chado::Featureprop'
 );
 
-sub Chado::DBI::Chado::Featureprop_Pub::featureprop {
+sub Chado::Featureprop_Pub::featureprop {
     return shift->featureprop_id
 }
 
-Chado::DBI::Chado::Featureprop_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Featureprop_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Featureprop_Pub::pub {
+sub Chado::Featureprop_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Dbxref;
+package Chado::Feature_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Dbxref->set_up_table('feature_dbxref');
+Chado::Feature_Dbxref->set_up_table('feature_dbxref');
 
 
-Chado::DBI::Chado::Feature_Dbxref->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Dbxref->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Dbxref::feature {
+sub Chado::Feature_Dbxref::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Feature_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Feature_Dbxref::dbxref {
+sub Chado::Feature_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Relationship;
+package Chado::Feature_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Relationship->set_up_table('feature_relationship');
+Chado::Feature_Relationship->set_up_table('feature_relationship');
 
 
-Chado::DBI::Chado::Feature_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Relationship->has_a(
+    subject_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Relationship::subject {
+sub Chado::Feature_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Feature_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Relationship->has_a(
+    object_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Relationship::object {
+sub Chado::Feature_Relationship::object {
     return shift->object_id
 }
 
-Chado::DBI::Chado::Feature_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Relationship::type {
+sub Chado::Feature_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Feature_Relationship->has_many(
-    'feature_relationshipprop_feature_relationship_id', 'Chado::DBI::Chado::Feature_Relationshipprop' => 'feature_relationship_id'
+Chado::Feature_Relationship->has_many(
+    'feature_relationshipprop_feature_relationship_id', 'Chado::Feature_Relationshipprop' => 'feature_relationship_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_relationship_pub_feature_relationship_id }
 
-Chado::DBI::Chado::Feature_Relationship->has_many(
-    'feature_relationship_pub_feature_relationship_id', 'Chado::DBI::Chado::Feature_Relationship_Pub' => 'feature_relationship_id'
+Chado::Feature_Relationship->has_many(
+    'feature_relationship_pub_feature_relationship_id', 'Chado::Feature_Relationship_Pub' => 'feature_relationship_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Relationship_Pub;
+package Chado::Feature_Relationship_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Relationship_Pub->set_up_table('feature_relationship_pub');
+Chado::Feature_Relationship_Pub->set_up_table('feature_relationship_pub');
 
 
-Chado::DBI::Chado::Feature_Relationship_Pub->has_a(
-    feature_relationship_id => 'Chado::DBI::Chado::Feature_Relationship'
+Chado::Feature_Relationship_Pub->has_a(
+    feature_relationship_id => 'Chado::Feature_Relationship'
 );
 
-sub Chado::DBI::Chado::Feature_Relationship_Pub::feature_relationship {
+sub Chado::Feature_Relationship_Pub::feature_relationship {
     return shift->feature_relationship_id
 }
 
-Chado::DBI::Chado::Feature_Relationship_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Relationship_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Relationship_Pub::pub {
+sub Chado::Feature_Relationship_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Relationshipprop;
+package Chado::Feature_Relationshipprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Relationshipprop->set_up_table('feature_relationshipprop');
+Chado::Feature_Relationshipprop->set_up_table('feature_relationshipprop');
 
 
-Chado::DBI::Chado::Feature_Relationshipprop->has_a(
-    feature_relationship_id => 'Chado::DBI::Chado::Feature_Relationship'
+Chado::Feature_Relationshipprop->has_a(
+    feature_relationship_id => 'Chado::Feature_Relationship'
 );
 
-sub Chado::DBI::Chado::Feature_Relationshipprop::feature_relationship {
+sub Chado::Feature_Relationshipprop::feature_relationship {
     return shift->feature_relationship_id
 }
 
-Chado::DBI::Chado::Feature_Relationshipprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature_Relationshipprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Relationshipprop::type {
+sub Chado::Feature_Relationshipprop::type {
     return shift->type_id
 }
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_relationshipprop_pub_feature_relationshipprop_id }
 
-Chado::DBI::Chado::Feature_Relationshipprop->has_many(
-    'feature_relationshipprop_pub_feature_relationshipprop_id', 'Chado::DBI::Chado::Feature_Relationshipprop_Pub' => 'feature_relationshipprop_id'
+Chado::Feature_Relationshipprop->has_many(
+    'feature_relationshipprop_pub_feature_relationshipprop_id', 'Chado::Feature_Relationshipprop_Pub' => 'feature_relationshipprop_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Relationshipprop_Pub;
+package Chado::Feature_Relationshipprop_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Relationshipprop_Pub->set_up_table('feature_relationshipprop_pub');
+Chado::Feature_Relationshipprop_Pub->set_up_table('feature_relationshipprop_pub');
 
 
-Chado::DBI::Chado::Feature_Relationshipprop_Pub->has_a(
-    feature_relationshipprop_id => 'Chado::DBI::Chado::Feature_Relationshipprop'
+Chado::Feature_Relationshipprop_Pub->has_a(
+    feature_relationshipprop_id => 'Chado::Feature_Relationshipprop'
 );
 
-sub Chado::DBI::Chado::Feature_Relationshipprop_Pub::feature_relationshipprop {
+sub Chado::Feature_Relationshipprop_Pub::feature_relationshipprop {
     return shift->feature_relationshipprop_id
 }
 
-Chado::DBI::Chado::Feature_Relationshipprop_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Relationshipprop_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Relationshipprop_Pub::pub {
+sub Chado::Feature_Relationshipprop_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Cvterm;
+package Chado::Feature_Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Cvterm->set_up_table('feature_cvterm');
+Chado::Feature_Cvterm->set_up_table('feature_cvterm');
 
 
-Chado::DBI::Chado::Feature_Cvterm->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Cvterm->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm::feature {
+sub Chado::Feature_Cvterm::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm::cvterm {
+sub Chado::Feature_Cvterm::cvterm {
     return shift->cvterm_id
 }
 
-Chado::DBI::Chado::Feature_Cvterm->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Cvterm->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm::pub {
+sub Chado::Feature_Cvterm::pub {
     return shift->pub_id
 }
 
-Chado::DBI::Chado::Feature_Cvterm->has_many(
-    'feature_cvterm_pub_feature_cvterm_id', 'Chado::DBI::Chado::Feature_Cvterm_Pub' => 'feature_cvterm_id'
+Chado::Feature_Cvterm->has_many(
+    'feature_cvterm_pub_feature_cvterm_id', 'Chado::Feature_Cvterm_Pub' => 'feature_cvterm_id'
 );
 
-Chado::DBI::Chado::Feature_Cvterm->has_many(
-    'feature_cvterm_dbxref_feature_cvterm_id', 'Chado::DBI::Chado::Feature_Cvterm_Dbxref' => 'feature_cvterm_id'
+Chado::Feature_Cvterm->has_many(
+    'feature_cvterm_dbxref_feature_cvterm_id', 'Chado::Feature_Cvterm_Dbxref' => 'feature_cvterm_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_pub_feature_cvterm_id }
 
-Chado::DBI::Chado::Feature_Cvterm->has_many(
-    'feature_cvtermprop_feature_cvterm_id', 'Chado::DBI::Chado::Feature_Cvtermprop' => 'feature_cvterm_id'
+Chado::Feature_Cvterm->has_many(
+    'feature_cvtermprop_feature_cvterm_id', 'Chado::Feature_Cvtermprop' => 'feature_cvterm_id'
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->feature_cvterm_dbxref_feature_cvterm_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Cvtermprop;
+package Chado::Feature_Cvtermprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Cvtermprop->set_up_table('feature_cvtermprop');
+Chado::Feature_Cvtermprop->set_up_table('feature_cvtermprop');
 
 
-Chado::DBI::Chado::Feature_Cvtermprop->has_a(
-    feature_cvterm_id => 'Chado::DBI::Chado::Feature_Cvterm'
+Chado::Feature_Cvtermprop->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Cvtermprop::feature_cvterm {
+sub Chado::Feature_Cvtermprop::feature_cvterm {
     return shift->feature_cvterm_id
 }
 
-Chado::DBI::Chado::Feature_Cvtermprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature_Cvtermprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Cvtermprop::type {
+sub Chado::Feature_Cvtermprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Cvterm_Dbxref;
+package Chado::Feature_Cvterm_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Cvterm_Dbxref->set_up_table('feature_cvterm_dbxref');
+Chado::Feature_Cvterm_Dbxref->set_up_table('feature_cvterm_dbxref');
 
 
-Chado::DBI::Chado::Feature_Cvterm_Dbxref->has_a(
-    feature_cvterm_id => 'Chado::DBI::Chado::Feature_Cvterm'
+Chado::Feature_Cvterm_Dbxref->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm_Dbxref::feature_cvterm {
+sub Chado::Feature_Cvterm_Dbxref::feature_cvterm {
     return shift->feature_cvterm_id
 }
 
-Chado::DBI::Chado::Feature_Cvterm_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Feature_Cvterm_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm_Dbxref::dbxref {
+sub Chado::Feature_Cvterm_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Cvterm_Pub;
+package Chado::Feature_Cvterm_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Cvterm_Pub->set_up_table('feature_cvterm_pub');
+Chado::Feature_Cvterm_Pub->set_up_table('feature_cvterm_pub');
 
 
-Chado::DBI::Chado::Feature_Cvterm_Pub->has_a(
-    feature_cvterm_id => 'Chado::DBI::Chado::Feature_Cvterm'
+Chado::Feature_Cvterm_Pub->has_a(
+    feature_cvterm_id => 'Chado::Feature_Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm_Pub::feature_cvterm {
+sub Chado::Feature_Cvterm_Pub::feature_cvterm {
     return shift->feature_cvterm_id
 }
 
-Chado::DBI::Chado::Feature_Cvterm_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Cvterm_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Cvterm_Pub::pub {
+sub Chado::Feature_Cvterm_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Synonym;
+package Chado::Synonym;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Synonym->set_up_table('synonym');
+Chado::Synonym->set_up_table('synonym');
 
 
-Chado::DBI::Chado::Synonym->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Synonym->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Synonym::type {
+sub Chado::Synonym::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Synonym->has_many(
-    'library_synonym_synonym_id', 'Chado::DBI::Chado::Library_Synonym' => 'synonym_id'
+Chado::Synonym->has_many(
+    'library_synonym_synonym_id', 'Chado::Library_Synonym' => 'synonym_id'
 );
 
-Chado::DBI::Chado::Synonym->has_many(
-    'feature_synonym_synonym_id', 'Chado::DBI::Chado::Feature_Synonym' => 'synonym_id'
+Chado::Synonym->has_many(
+    'feature_synonym_synonym_id', 'Chado::Feature_Synonym' => 'synonym_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Synonym;
+package Chado::Feature_Synonym;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Synonym->set_up_table('feature_synonym');
+Chado::Feature_Synonym->set_up_table('feature_synonym');
 
 
-Chado::DBI::Chado::Feature_Synonym->has_a(
-    synonym_id => 'Chado::DBI::Chado::Synonym'
+Chado::Feature_Synonym->has_a(
+    synonym_id => 'Chado::Synonym'
 );
 
-sub Chado::DBI::Chado::Feature_Synonym::synonym {
+sub Chado::Feature_Synonym::synonym {
     return shift->synonym_id
 }
 
-Chado::DBI::Chado::Feature_Synonym->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Synonym->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Synonym::feature {
+sub Chado::Feature_Synonym::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Synonym->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Feature_Synonym->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Feature_Synonym::pub {
+sub Chado::Feature_Synonym::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Genotype;
+package Chado::Genotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Genotype->set_up_table('genotype');
+Chado::Genotype->set_up_table('genotype');
 
 
-Chado::DBI::Chado::Genotype->has_many(
-    'phenstatement_genotype_id', 'Chado::DBI::Chado::Phenstatement' => 'genotype_id'
+Chado::Genotype->has_many(
+    'phenstatement_genotype_id', 'Chado::Phenstatement' => 'genotype_id'
 );
 
 sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenotype_comparison_genotype1_id(@_) }
 
 sub phenotype_comparison_genotype2_ids { my $self = shift; return $self->phenotype_comparison_genotype2_id(@_) }
 
-Chado::DBI::Chado::Genotype->has_many(
-    'phendesc_genotype_id', 'Chado::DBI::Chado::Phendesc' => 'genotype_id'
+Chado::Genotype->has_many(
+    'phendesc_genotype_id', 'Chado::Phendesc' => 'genotype_id'
 );
 
 sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenotype_comparison_genotype1_id(@_) }
@@ -1550,80 +1550,80 @@ sub phenotype_comparison_genotype1_ids { my $self = shift; return $self->phenoty
 
 sub phenotype_comparison_genotype2_ids { my $self = shift; return $self->phenotype_comparison_genotype2_id(@_) }
 
-Chado::DBI::Chado::Genotype->has_many(
-    'feature_genotype_genotype_id', 'Chado::DBI::Chado::Feature_Genotype' => 'genotype_id'
+Chado::Genotype->has_many(
+    'feature_genotype_genotype_id', 'Chado::Feature_Genotype' => 'genotype_id'
 );
 
-Chado::DBI::Chado::Genotype->has_many(
-    'phenotype_comparison_genotype1_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'genotype1_id'
+Chado::Genotype->has_many(
+    'phenotype_comparison_genotype1_id', 'Chado::Phenotype_Comparison' => 'genotype1_id'
 );
 
-Chado::DBI::Chado::Genotype->has_many(
-    'phenotype_comparison_genotype2_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'genotype2_id'
+Chado::Genotype->has_many(
+    'phenotype_comparison_genotype2_id', 'Chado::Phenotype_Comparison' => 'genotype2_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Genotype;
+package Chado::Feature_Genotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Genotype->set_up_table('feature_genotype');
+Chado::Feature_Genotype->set_up_table('feature_genotype');
 
 
-Chado::DBI::Chado::Feature_Genotype->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Genotype->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Genotype::feature {
+sub Chado::Feature_Genotype::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Genotype->has_a(
-    genotype_id => 'Chado::DBI::Chado::Genotype'
+Chado::Feature_Genotype->has_a(
+    genotype_id => 'Chado::Genotype'
 );
 
-sub Chado::DBI::Chado::Feature_Genotype::genotype {
+sub Chado::Feature_Genotype::genotype {
     return shift->genotype_id
 }
 
-Chado::DBI::Chado::Feature_Genotype->has_a(
-    chromosome_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Genotype->has_a(
+    chromosome_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Genotype::chromosome {
+sub Chado::Feature_Genotype::chromosome {
     return shift->chromosome_id
 }
 
-Chado::DBI::Chado::Feature_Genotype->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Feature_Genotype->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Feature_Genotype::cvterm {
+sub Chado::Feature_Genotype::cvterm {
     return shift->cvterm_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Environment;
+package Chado::Environment;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Environment->set_up_table('environment');
+Chado::Environment->set_up_table('environment');
 
 
-Chado::DBI::Chado::Environment->has_many(
-    'phenstatement_environment_id', 'Chado::DBI::Chado::Phenstatement' => 'environment_id'
+Chado::Environment->has_many(
+    'phenstatement_environment_id', 'Chado::Phenstatement' => 'environment_id'
 );
 
 sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phenotype_comparison_environment1_id(@_) }
 
 sub phenotype_comparison_environment2_ids { my $self = shift; return $self->phenotype_comparison_environment2_id(@_) }
 
-Chado::DBI::Chado::Environment->has_many(
-    'environment_cvterm_environment_id', 'Chado::DBI::Chado::Environment_Cvterm' => 'environment_id'
+Chado::Environment->has_many(
+    'environment_cvterm_environment_id', 'Chado::Environment_Cvterm' => 'environment_id'
 );
 
-Chado::DBI::Chado::Environment->has_many(
-    'phendesc_environment_id', 'Chado::DBI::Chado::Phendesc' => 'environment_id'
+Chado::Environment->has_many(
+    'phendesc_environment_id', 'Chado::Phendesc' => 'environment_id'
 );
 
 sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phenotype_comparison_environment1_id(@_) }
@@ -1634,80 +1634,80 @@ sub phenotype_comparison_environment1_ids { my $self = shift; return $self->phen
 
 sub phenotype_comparison_environment2_ids { my $self = shift; return $self->phenotype_comparison_environment2_id(@_) }
 
-Chado::DBI::Chado::Environment->has_many(
-    'phenotype_comparison_environment1_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'environment1_id'
+Chado::Environment->has_many(
+    'phenotype_comparison_environment1_id', 'Chado::Phenotype_Comparison' => 'environment1_id'
 );
 
-Chado::DBI::Chado::Environment->has_many(
-    'phenotype_comparison_environment2_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'environment2_id'
+Chado::Environment->has_many(
+    'phenotype_comparison_environment2_id', 'Chado::Phenotype_Comparison' => 'environment2_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Environment_Cvterm;
+package Chado::Environment_Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Environment_Cvterm->set_up_table('environment_cvterm');
+Chado::Environment_Cvterm->set_up_table('environment_cvterm');
 
 
-Chado::DBI::Chado::Environment_Cvterm->has_a(
-    environment_id => 'Chado::DBI::Chado::Environment'
+Chado::Environment_Cvterm->has_a(
+    environment_id => 'Chado::Environment'
 );
 
-sub Chado::DBI::Chado::Environment_Cvterm::environment {
+sub Chado::Environment_Cvterm::environment {
     return shift->environment_id
 }
 
-Chado::DBI::Chado::Environment_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Environment_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Environment_Cvterm::cvterm {
+sub Chado::Environment_Cvterm::cvterm {
     return shift->cvterm_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenotype;
+package Chado::Phenotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Phenotype->set_up_table('phenotype');
+Chado::Phenotype->set_up_table('phenotype');
 
 
-Chado::DBI::Chado::Phenotype->has_a(
-    observable_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype->has_a(
+    observable_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype::observable {
+sub Chado::Phenotype::observable {
     return shift->observable_id
 }
 
-Chado::DBI::Chado::Phenotype->has_a(
-    attr_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype->has_a(
+    attr_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype::attr {
+sub Chado::Phenotype::attr {
     return shift->attr_id
 }
 
-Chado::DBI::Chado::Phenotype->has_a(
-    cvalue_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype->has_a(
+    cvalue_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype::cvalue {
+sub Chado::Phenotype::cvalue {
     return shift->cvalue_id
 }
 
-Chado::DBI::Chado::Phenotype->has_a(
-    assay_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype->has_a(
+    assay_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype::assay {
+sub Chado::Phenotype::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenstatement_phenotype_id', 'Chado::DBI::Chado::Phenstatement' => 'phenotype_id'
+Chado::Phenotype->has_many(
+    'phenstatement_phenotype_id', 'Chado::Phenstatement' => 'phenotype_id'
 );
 
 sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
@@ -1716,1046 +1716,1046 @@ sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenot
 
 sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
 
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_cvterm_phenotype_id', 'Chado::DBI::Chado::Phenotype_Cvterm' => 'phenotype_id'
+Chado::Phenotype->has_many(
+    'phenotype_cvterm_phenotype_id', 'Chado::Phenotype_Cvterm' => 'phenotype_id'
 );
 
 sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
 
 sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
 
-Chado::DBI::Chado::Phenotype->has_many(
-    'feature_phenotype_phenotype_id', 'Chado::DBI::Chado::Feature_Phenotype' => 'phenotype_id'
+Chado::Phenotype->has_many(
+    'feature_phenotype_phenotype_id', 'Chado::Feature_Phenotype' => 'phenotype_id'
 );
 
 sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
 
 sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
 
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_comparison_phenotype1_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype1_id'
+Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype1_id', 'Chado::Phenotype_Comparison' => 'phenotype1_id'
 );
 
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_comparison_phenotype2_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype2_id'
+Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype2_id', 'Chado::Phenotype_Comparison' => 'phenotype2_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenotype_Cvterm;
+package Chado::Phenotype_Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
+Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
 
 
-Chado::DBI::Chado::Phenotype_Cvterm->has_a(
-    phenotype_id => 'Chado::DBI::Chado::Phenotype'
+Chado::Phenotype_Cvterm->has_a(
+    phenotype_id => 'Chado::Phenotype'
 );
 
-sub Chado::DBI::Chado::Phenotype_Cvterm::phenotype {
+sub Chado::Phenotype_Cvterm::phenotype {
     return shift->phenotype_id
 }
 
-Chado::DBI::Chado::Phenotype_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype_Cvterm::cvterm {
+sub Chado::Phenotype_Cvterm::cvterm {
     return shift->cvterm_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenstatement;
+package Chado::Phenstatement;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Phenstatement->set_up_table('phenstatement');
+Chado::Phenstatement->set_up_table('phenstatement');
 
 
-Chado::DBI::Chado::Phenstatement->has_a(
-    genotype_id => 'Chado::DBI::Chado::Genotype'
+Chado::Phenstatement->has_a(
+    genotype_id => 'Chado::Genotype'
 );
 
-sub Chado::DBI::Chado::Phenstatement::genotype {
+sub Chado::Phenstatement::genotype {
     return shift->genotype_id
 }
 
-Chado::DBI::Chado::Phenstatement->has_a(
-    environment_id => 'Chado::DBI::Chado::Environment'
+Chado::Phenstatement->has_a(
+    environment_id => 'Chado::Environment'
 );
 
-sub Chado::DBI::Chado::Phenstatement::environment {
+sub Chado::Phenstatement::environment {
     return shift->environment_id
 }
 
-Chado::DBI::Chado::Phenstatement->has_a(
-    phenotype_id => 'Chado::DBI::Chado::Phenotype'
+Chado::Phenstatement->has_a(
+    phenotype_id => 'Chado::Phenotype'
 );
 
-sub Chado::DBI::Chado::Phenstatement::phenotype {
+sub Chado::Phenstatement::phenotype {
     return shift->phenotype_id
 }
 
-Chado::DBI::Chado::Phenstatement->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenstatement->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenstatement::type {
+sub Chado::Phenstatement::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Phenstatement->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Phenstatement->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Phenstatement::pub {
+sub Chado::Phenstatement::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Phenotype;
+package Chado::Feature_Phenotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Phenotype->set_up_table('feature_phenotype');
+Chado::Feature_Phenotype->set_up_table('feature_phenotype');
 
 
-Chado::DBI::Chado::Feature_Phenotype->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Phenotype->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Phenotype::feature {
+sub Chado::Feature_Phenotype::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Feature_Phenotype->has_a(
-    phenotype_id => 'Chado::DBI::Chado::Phenotype'
+Chado::Feature_Phenotype->has_a(
+    phenotype_id => 'Chado::Phenotype'
 );
 
-sub Chado::DBI::Chado::Feature_Phenotype::phenotype {
+sub Chado::Feature_Phenotype::phenotype {
     return shift->phenotype_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phendesc;
+package Chado::Phendesc;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Phendesc->set_up_table('phendesc');
+Chado::Phendesc->set_up_table('phendesc');
 
 
-Chado::DBI::Chado::Phendesc->has_a(
-    genotype_id => 'Chado::DBI::Chado::Genotype'
+Chado::Phendesc->has_a(
+    genotype_id => 'Chado::Genotype'
 );
 
-sub Chado::DBI::Chado::Phendesc::genotype {
+sub Chado::Phendesc::genotype {
     return shift->genotype_id
 }
 
-Chado::DBI::Chado::Phendesc->has_a(
-    environment_id => 'Chado::DBI::Chado::Environment'
+Chado::Phendesc->has_a(
+    environment_id => 'Chado::Environment'
 );
 
-sub Chado::DBI::Chado::Phendesc::environment {
+sub Chado::Phendesc::environment {
     return shift->environment_id
 }
 
-Chado::DBI::Chado::Phendesc->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Phendesc->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Phendesc::pub {
+sub Chado::Phendesc::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenotype_Comparison;
+package Chado::Phenotype_Comparison;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Phenotype_Comparison->set_up_table('phenotype_comparison');
+Chado::Phenotype_Comparison->set_up_table('phenotype_comparison');
 
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    genotype1_id => 'Chado::DBI::Chado::Genotype'
+Chado::Phenotype_Comparison->has_a(
+    genotype1_id => 'Chado::Genotype'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::genotype1 {
+sub Chado::Phenotype_Comparison::genotype1 {
     return shift->genotype1_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    environment1_id => 'Chado::DBI::Chado::Environment'
+Chado::Phenotype_Comparison->has_a(
+    environment1_id => 'Chado::Environment'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::environment1 {
+sub Chado::Phenotype_Comparison::environment1 {
     return shift->environment1_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    genotype2_id => 'Chado::DBI::Chado::Genotype'
+Chado::Phenotype_Comparison->has_a(
+    genotype2_id => 'Chado::Genotype'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::genotype2 {
+sub Chado::Phenotype_Comparison::genotype2 {
     return shift->genotype2_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    environment2_id => 'Chado::DBI::Chado::Environment'
+Chado::Phenotype_Comparison->has_a(
+    environment2_id => 'Chado::Environment'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::environment2 {
+sub Chado::Phenotype_Comparison::environment2 {
     return shift->environment2_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    phenotype1_id => 'Chado::DBI::Chado::Phenotype'
+Chado::Phenotype_Comparison->has_a(
+    phenotype1_id => 'Chado::Phenotype'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::phenotype1 {
+sub Chado::Phenotype_Comparison::phenotype1 {
     return shift->phenotype1_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    phenotype2_id => 'Chado::DBI::Chado::Phenotype'
+Chado::Phenotype_Comparison->has_a(
+    phenotype2_id => 'Chado::Phenotype'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::phenotype2 {
+sub Chado::Phenotype_Comparison::phenotype2 {
     return shift->phenotype2_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Phenotype_Comparison->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::type {
+sub Chado::Phenotype_Comparison::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Phenotype_Comparison->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Phenotype_Comparison->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Phenotype_Comparison::pub {
+sub Chado::Phenotype_Comparison::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Analysis;
+package Chado::Analysis;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Analysis->set_up_table('analysis');
+Chado::Analysis->set_up_table('analysis');
 
 
-Chado::DBI::Chado::Analysis->has_many(
-    'analysisfeature_analysis_id', 'Chado::DBI::Chado::Analysisfeature' => 'analysis_id'
+Chado::Analysis->has_many(
+    'analysisfeature_analysis_id', 'Chado::Analysisfeature' => 'analysis_id'
 );
 
-Chado::DBI::Chado::Analysis->has_many(
-    'quantification_analysis_id', 'Chado::DBI::Chado::Quantification' => 'analysis_id'
+Chado::Analysis->has_many(
+    'quantification_analysis_id', 'Chado::Quantification' => 'analysis_id'
 );
 
-Chado::DBI::Chado::Analysis->has_many(
-    'analysisprop_analysis_id', 'Chado::DBI::Chado::Analysisprop' => 'analysis_id'
+Chado::Analysis->has_many(
+    'analysisprop_analysis_id', 'Chado::Analysisprop' => 'analysis_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Analysisprop;
+package Chado::Analysisprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Analysisprop->set_up_table('analysisprop');
+Chado::Analysisprop->set_up_table('analysisprop');
 
 
-Chado::DBI::Chado::Analysisprop->has_a(
-    analysis_id => 'Chado::DBI::Chado::Analysis'
+Chado::Analysisprop->has_a(
+    analysis_id => 'Chado::Analysis'
 );
 
-sub Chado::DBI::Chado::Analysisprop::analysis {
+sub Chado::Analysisprop::analysis {
     return shift->analysis_id
 }
 
-Chado::DBI::Chado::Analysisprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Analysisprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Analysisprop::type {
+sub Chado::Analysisprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Analysisfeature;
+package Chado::Analysisfeature;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Analysisfeature->set_up_table('analysisfeature');
+Chado::Analysisfeature->set_up_table('analysisfeature');
 
 
-Chado::DBI::Chado::Analysisfeature->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Analysisfeature->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Analysisfeature::feature {
+sub Chado::Analysisfeature::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Analysisfeature->has_a(
-    analysis_id => 'Chado::DBI::Chado::Analysis'
+Chado::Analysisfeature->has_a(
+    analysis_id => 'Chado::Analysis'
 );
 
-sub Chado::DBI::Chado::Analysisfeature::analysis {
+sub Chado::Analysisfeature::analysis {
     return shift->analysis_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Expression;
+package Chado::Expression;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Expression->set_up_table('expression');
+Chado::Expression->set_up_table('expression');
 
 
-Chado::DBI::Chado::Expression->has_many(
-    'expression_pub_expression_id', 'Chado::DBI::Chado::Expression_Pub' => 'expression_id'
+Chado::Expression->has_many(
+    'expression_pub_expression_id', 'Chado::Expression_Pub' => 'expression_id'
 );
 
 sub features { my $self = shift; return map $_->feature_id, $self->feature_expression_expression_id }
 
 sub eimages { my $self = shift; return map $_->eimage_id, $self->expression_image_expression_id }
 
-Chado::DBI::Chado::Expression->has_many(
-    'feature_expression_expression_id', 'Chado::DBI::Chado::Feature_Expression' => 'expression_id'
+Chado::Expression->has_many(
+    'feature_expression_expression_id', 'Chado::Feature_Expression' => 'expression_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->expression_pub_expression_id }
 
-Chado::DBI::Chado::Expression->has_many(
-    'expression_image_expression_id', 'Chado::DBI::Chado::Expression_Image' => 'expression_id'
+Chado::Expression->has_many(
+    'expression_image_expression_id', 'Chado::Expression_Image' => 'expression_id'
 );
 
-Chado::DBI::Chado::Expression->has_many(
-    'expression_cvterm_expression_id', 'Chado::DBI::Chado::Expression_Cvterm' => 'expression_id'
+Chado::Expression->has_many(
+    'expression_cvterm_expression_id', 'Chado::Expression_Cvterm' => 'expression_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Expression;
+package Chado::Feature_Expression;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Feature_Expression->set_up_table('feature_expression');
+Chado::Feature_Expression->set_up_table('feature_expression');
 
 
-Chado::DBI::Chado::Feature_Expression->has_a(
-    expression_id => 'Chado::DBI::Chado::Expression'
+Chado::Feature_Expression->has_a(
+    expression_id => 'Chado::Expression'
 );
 
-sub Chado::DBI::Chado::Feature_Expression::expression {
+sub Chado::Feature_Expression::expression {
     return shift->expression_id
 }
 
-Chado::DBI::Chado::Feature_Expression->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Feature_Expression->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Feature_Expression::feature {
+sub Chado::Feature_Expression::feature {
     return shift->feature_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Expression_Cvterm;
+package Chado::Expression_Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Expression_Cvterm->set_up_table('expression_cvterm');
+Chado::Expression_Cvterm->set_up_table('expression_cvterm');
 
 
-Chado::DBI::Chado::Expression_Cvterm->has_a(
-    expression_id => 'Chado::DBI::Chado::Expression'
+Chado::Expression_Cvterm->has_a(
+    expression_id => 'Chado::Expression'
 );
 
-sub Chado::DBI::Chado::Expression_Cvterm::expression {
+sub Chado::Expression_Cvterm::expression {
     return shift->expression_id
 }
 
-Chado::DBI::Chado::Expression_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Expression_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Expression_Cvterm::cvterm {
+sub Chado::Expression_Cvterm::cvterm {
     return shift->cvterm_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Expression_Pub;
+package Chado::Expression_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Expression_Pub->set_up_table('expression_pub');
+Chado::Expression_Pub->set_up_table('expression_pub');
 
 
-Chado::DBI::Chado::Expression_Pub->has_a(
-    expression_id => 'Chado::DBI::Chado::Expression'
+Chado::Expression_Pub->has_a(
+    expression_id => 'Chado::Expression'
 );
 
-sub Chado::DBI::Chado::Expression_Pub::expression {
+sub Chado::Expression_Pub::expression {
     return shift->expression_id
 }
 
-Chado::DBI::Chado::Expression_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Expression_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Expression_Pub::pub {
+sub Chado::Expression_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Eimage;
+package Chado::Eimage;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Eimage->set_up_table('eimage');
+Chado::Eimage->set_up_table('eimage');
 
 
 sub expressions { my $self = shift; return map $_->expression_id, $self->expression_image_eimage_id }
 
-Chado::DBI::Chado::Eimage->has_many(
-    'expression_image_eimage_id', 'Chado::DBI::Chado::Expression_Image' => 'eimage_id'
+Chado::Eimage->has_many(
+    'expression_image_eimage_id', 'Chado::Expression_Image' => 'eimage_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Expression_Image;
+package Chado::Expression_Image;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Expression_Image->set_up_table('expression_image');
+Chado::Expression_Image->set_up_table('expression_image');
 
 
-Chado::DBI::Chado::Expression_Image->has_a(
-    expression_id => 'Chado::DBI::Chado::Expression'
+Chado::Expression_Image->has_a(
+    expression_id => 'Chado::Expression'
 );
 
-sub Chado::DBI::Chado::Expression_Image::expression {
+sub Chado::Expression_Image::expression {
     return shift->expression_id
 }
 
-Chado::DBI::Chado::Expression_Image->has_a(
-    eimage_id => 'Chado::DBI::Chado::Eimage'
+Chado::Expression_Image->has_a(
+    eimage_id => 'Chado::Eimage'
 );
 
-sub Chado::DBI::Chado::Expression_Image::eimage {
+sub Chado::Expression_Image::eimage {
     return shift->eimage_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featuremap;
+package Chado::Featuremap;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featuremap->set_up_table('featuremap');
+Chado::Featuremap->set_up_table('featuremap');
 
 
-Chado::DBI::Chado::Featuremap->has_a(
-    unittype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Featuremap->has_a(
+    unittype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Featuremap::unittype {
+sub Chado::Featuremap::unittype {
     return shift->unittype_id
 }
 
-Chado::DBI::Chado::Featuremap->has_many(
-    'featurerange_featuremap_id', 'Chado::DBI::Chado::Featurerange' => 'featuremap_id'
+Chado::Featuremap->has_many(
+    'featurerange_featuremap_id', 'Chado::Featurerange' => 'featuremap_id'
 );
 
-Chado::DBI::Chado::Featuremap->has_many(
-    'featurepos_featuremap_id', 'Chado::DBI::Chado::Featurepos' => 'featuremap_id'
+Chado::Featuremap->has_many(
+    'featurepos_featuremap_id', 'Chado::Featurepos' => 'featuremap_id'
 );
 
-Chado::DBI::Chado::Featuremap->has_many(
-    'featuremap_pub_featuremap_id', 'Chado::DBI::Chado::Featuremap_Pub' => 'featuremap_id'
+Chado::Featuremap->has_many(
+    'featuremap_pub_featuremap_id', 'Chado::Featuremap_Pub' => 'featuremap_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->featuremap_pub_featuremap_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featurerange;
+package Chado::Featurerange;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featurerange->set_up_table('featurerange');
+Chado::Featurerange->set_up_table('featurerange');
 
 
-Chado::DBI::Chado::Featurerange->has_a(
-    featuremap_id => 'Chado::DBI::Chado::Featuremap'
+Chado::Featurerange->has_a(
+    featuremap_id => 'Chado::Featuremap'
 );
 
-sub Chado::DBI::Chado::Featurerange::featuremap {
+sub Chado::Featurerange::featuremap {
     return shift->featuremap_id
 }
 
-Chado::DBI::Chado::Featurerange->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurerange->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurerange::feature {
+sub Chado::Featurerange::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Featurerange->has_a(
-    leftstartf_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurerange->has_a(
+    leftstartf_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurerange::leftstartf {
+sub Chado::Featurerange::leftstartf {
     return shift->leftstartf_id
 }
 
-Chado::DBI::Chado::Featurerange->has_a(
-    leftendf_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurerange->has_a(
+    leftendf_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurerange::leftendf {
+sub Chado::Featurerange::leftendf {
     return shift->leftendf_id
 }
 
-Chado::DBI::Chado::Featurerange->has_a(
-    rightstartf_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurerange->has_a(
+    rightstartf_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurerange::rightstartf {
+sub Chado::Featurerange::rightstartf {
     return shift->rightstartf_id
 }
 
-Chado::DBI::Chado::Featurerange->has_a(
-    rightendf_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurerange->has_a(
+    rightendf_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurerange::rightendf {
+sub Chado::Featurerange::rightendf {
     return shift->rightendf_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featurepos;
+package Chado::Featurepos;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featurepos->set_up_table('featurepos');
+Chado::Featurepos->set_up_table('featurepos');
 
 
-Chado::DBI::Chado::Featurepos->has_a(
-    featuremap_id => 'Chado::DBI::Chado::Featuremap'
+Chado::Featurepos->has_a(
+    featuremap_id => 'Chado::Featuremap'
 );
 
-sub Chado::DBI::Chado::Featurepos::featuremap {
+sub Chado::Featurepos::featuremap {
     return shift->featuremap_id
 }
 
-Chado::DBI::Chado::Featurepos->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurepos->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurepos::feature {
+sub Chado::Featurepos::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Featurepos->has_a(
-    map_feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Featurepos->has_a(
+    map_feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Featurepos::map_feature {
+sub Chado::Featurepos::map_feature {
     return shift->map_feature_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Featuremap_Pub;
+package Chado::Featuremap_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Featuremap_Pub->set_up_table('featuremap_pub');
+Chado::Featuremap_Pub->set_up_table('featuremap_pub');
 
 
-Chado::DBI::Chado::Featuremap_Pub->has_a(
-    featuremap_id => 'Chado::DBI::Chado::Featuremap'
+Chado::Featuremap_Pub->has_a(
+    featuremap_id => 'Chado::Featuremap'
 );
 
-sub Chado::DBI::Chado::Featuremap_Pub::featuremap {
+sub Chado::Featuremap_Pub::featuremap {
     return shift->featuremap_id
 }
 
-Chado::DBI::Chado::Featuremap_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Featuremap_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Featuremap_Pub::pub {
+sub Chado::Featuremap_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Library;
+package Chado::Library;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Library->set_up_table('library');
+Chado::Library->set_up_table('library');
 
 
-Chado::DBI::Chado::Library->has_a(
-    organism_id => 'Chado::DBI::Chado::Organism'
+Chado::Library->has_a(
+    organism_id => 'Chado::Organism'
 );
 
-sub Chado::DBI::Chado::Library::organism {
+sub Chado::Library::organism {
     return shift->organism_id
 }
 
-Chado::DBI::Chado::Library->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Library->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Library::type {
+sub Chado::Library::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Library->has_many(
-    'library_feature_library_id', 'Chado::DBI::Chado::Library_Feature' => 'library_id'
+Chado::Library->has_many(
+    'library_feature_library_id', 'Chado::Library_Feature' => 'library_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->library_cvterm_library_id }
 
 sub features { my $self = shift; return map $_->feature_id, $self->library_feature_library_id }
 
-Chado::DBI::Chado::Library->has_many(
-    'library_pub_library_id', 'Chado::DBI::Chado::Library_Pub' => 'library_id'
+Chado::Library->has_many(
+    'library_pub_library_id', 'Chado::Library_Pub' => 'library_id'
 );
 
-Chado::DBI::Chado::Library->has_many(
-    'libraryprop_library_id', 'Chado::DBI::Chado::Libraryprop' => 'library_id'
+Chado::Library->has_many(
+    'libraryprop_library_id', 'Chado::Libraryprop' => 'library_id'
 );
 
-Chado::DBI::Chado::Library->has_many(
-    'library_cvterm_library_id', 'Chado::DBI::Chado::Library_Cvterm' => 'library_id'
+Chado::Library->has_many(
+    'library_cvterm_library_id', 'Chado::Library_Cvterm' => 'library_id'
 );
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_library_id }
 
-Chado::DBI::Chado::Library->has_many(
-    'library_synonym_library_id', 'Chado::DBI::Chado::Library_Synonym' => 'library_id'
+Chado::Library->has_many(
+    'library_synonym_library_id', 'Chado::Library_Synonym' => 'library_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Library_Synonym;
+package Chado::Library_Synonym;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Library_Synonym->set_up_table('library_synonym');
+Chado::Library_Synonym->set_up_table('library_synonym');
 
 
-Chado::DBI::Chado::Library_Synonym->has_a(
-    synonym_id => 'Chado::DBI::Chado::Synonym'
+Chado::Library_Synonym->has_a(
+    synonym_id => 'Chado::Synonym'
 );
 
-sub Chado::DBI::Chado::Library_Synonym::synonym {
+sub Chado::Library_Synonym::synonym {
     return shift->synonym_id
 }
 
-Chado::DBI::Chado::Library_Synonym->has_a(
-    library_id => 'Chado::DBI::Chado::Library'
+Chado::Library_Synonym->has_a(
+    library_id => 'Chado::Library'
 );
 
-sub Chado::DBI::Chado::Library_Synonym::library {
+sub Chado::Library_Synonym::library {
     return shift->library_id
 }
 
-Chado::DBI::Chado::Library_Synonym->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Library_Synonym->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Library_Synonym::pub {
+sub Chado::Library_Synonym::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Library_Pub;
+package Chado::Library_Pub;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Library_Pub->set_up_table('library_pub');
+Chado::Library_Pub->set_up_table('library_pub');
 
 
-Chado::DBI::Chado::Library_Pub->has_a(
-    library_id => 'Chado::DBI::Chado::Library'
+Chado::Library_Pub->has_a(
+    library_id => 'Chado::Library'
 );
 
-sub Chado::DBI::Chado::Library_Pub::library {
+sub Chado::Library_Pub::library {
     return shift->library_id
 }
 
-Chado::DBI::Chado::Library_Pub->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Library_Pub->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Library_Pub::pub {
+sub Chado::Library_Pub::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Libraryprop;
+package Chado::Libraryprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Libraryprop->set_up_table('libraryprop');
+Chado::Libraryprop->set_up_table('libraryprop');
 
 
-Chado::DBI::Chado::Libraryprop->has_a(
-    library_id => 'Chado::DBI::Chado::Library'
+Chado::Libraryprop->has_a(
+    library_id => 'Chado::Library'
 );
 
-sub Chado::DBI::Chado::Libraryprop::library {
+sub Chado::Libraryprop::library {
     return shift->library_id
 }
 
-Chado::DBI::Chado::Libraryprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Libraryprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Libraryprop::type {
+sub Chado::Libraryprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Library_Cvterm;
+package Chado::Library_Cvterm;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Library_Cvterm->set_up_table('library_cvterm');
+Chado::Library_Cvterm->set_up_table('library_cvterm');
 
 
-Chado::DBI::Chado::Library_Cvterm->has_a(
-    library_id => 'Chado::DBI::Chado::Library'
+Chado::Library_Cvterm->has_a(
+    library_id => 'Chado::Library'
 );
 
-sub Chado::DBI::Chado::Library_Cvterm::library {
+sub Chado::Library_Cvterm::library {
     return shift->library_id
 }
 
-Chado::DBI::Chado::Library_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Library_Cvterm->has_a(
+    cvterm_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Library_Cvterm::cvterm {
+sub Chado::Library_Cvterm::cvterm {
     return shift->cvterm_id
 }
 
-Chado::DBI::Chado::Library_Cvterm->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Library_Cvterm->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Library_Cvterm::pub {
+sub Chado::Library_Cvterm::pub {
     return shift->pub_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Library_Feature;
+package Chado::Library_Feature;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Library_Feature->set_up_table('library_feature');
+Chado::Library_Feature->set_up_table('library_feature');
 
 
-Chado::DBI::Chado::Library_Feature->has_a(
-    library_id => 'Chado::DBI::Chado::Library'
+Chado::Library_Feature->has_a(
+    library_id => 'Chado::Library'
 );
 
-sub Chado::DBI::Chado::Library_Feature::library {
+sub Chado::Library_Feature::library {
     return shift->library_id
 }
 
-Chado::DBI::Chado::Library_Feature->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Library_Feature->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Library_Feature::feature {
+sub Chado::Library_Feature::feature {
     return shift->feature_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Contact;
+package Chado::Contact;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Contact->set_up_table('contact');
+Chado::Contact->set_up_table('contact');
 
 
-Chado::DBI::Chado::Contact->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Contact->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Contact::type {
+sub Chado::Contact::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Contact->has_many(
-    'biomaterial_biosourceprovider_id', 'Chado::DBI::Chado::Biomaterial' => 'biosourceprovider_id'
+Chado::Contact->has_many(
+    'biomaterial_biosourceprovider_id', 'Chado::Biomaterial' => 'biosourceprovider_id'
 );
 
-Chado::DBI::Chado::Contact->has_many(
-    'assay_operator_id', 'Chado::DBI::Chado::Assay' => 'operator_id'
+Chado::Contact->has_many(
+    'assay_operator_id', 'Chado::Assay' => 'operator_id'
 );
 
-Chado::DBI::Chado::Contact->has_many(
-    'contact_relationship_subject_id', 'Chado::DBI::Chado::Contact_Relationship' => 'subject_id'
+Chado::Contact->has_many(
+    'contact_relationship_subject_id', 'Chado::Contact_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Contact->has_many(
-    'contact_relationship_object_id', 'Chado::DBI::Chado::Contact_Relationship' => 'object_id'
+Chado::Contact->has_many(
+    'contact_relationship_object_id', 'Chado::Contact_Relationship' => 'object_id'
 );
 
-Chado::DBI::Chado::Contact->has_many(
-    'arraydesign_manufacturer_id', 'Chado::DBI::Chado::Arraydesign' => 'manufacturer_id'
+Chado::Contact->has_many(
+    'arraydesign_manufacturer_id', 'Chado::Arraydesign' => 'manufacturer_id'
 );
 
 sub contact_relationship_subject_ids { my $self = shift; return $self->contact_relationship_subject_id(@_) }
 
 sub contact_relationship_object_ids { my $self = shift; return $self->contact_relationship_object_id(@_) }
 
-Chado::DBI::Chado::Contact->has_many(
-    'study_contact_id', 'Chado::DBI::Chado::Study' => 'contact_id'
+Chado::Contact->has_many(
+    'study_contact_id', 'Chado::Study' => 'contact_id'
 );
 
-Chado::DBI::Chado::Contact->has_many(
-    'quantification_operator_id', 'Chado::DBI::Chado::Quantification' => 'operator_id'
+Chado::Contact->has_many(
+    'quantification_operator_id', 'Chado::Quantification' => 'operator_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Contact_Relationship;
+package Chado::Contact_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Contact_Relationship->set_up_table('contact_relationship');
+Chado::Contact_Relationship->set_up_table('contact_relationship');
 
 
-Chado::DBI::Chado::Contact_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Contact_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Contact_Relationship::type {
+sub Chado::Contact_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Contact_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Contact'
+Chado::Contact_Relationship->has_a(
+    subject_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Contact_Relationship::subject {
+sub Chado::Contact_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Contact_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Contact'
+Chado::Contact_Relationship->has_a(
+    object_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Contact_Relationship::object {
+sub Chado::Contact_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Mageml;
+package Chado::Mageml;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Mageml->set_up_table('mageml');
+Chado::Mageml->set_up_table('mageml');
 
 
-Chado::DBI::Chado::Mageml->has_many(
-    'magedocumentation_mageml_id', 'Chado::DBI::Chado::Magedocumentation' => 'mageml_id'
+Chado::Mageml->has_many(
+    'magedocumentation_mageml_id', 'Chado::Magedocumentation' => 'mageml_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Magedocumentation;
+package Chado::Magedocumentation;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Magedocumentation->set_up_table('magedocumentation');
+Chado::Magedocumentation->set_up_table('magedocumentation');
 
 
-Chado::DBI::Chado::Magedocumentation->has_a(
-    mageml_id => 'Chado::DBI::Chado::Mageml'
+Chado::Magedocumentation->has_a(
+    mageml_id => 'Chado::Mageml'
 );
 
-sub Chado::DBI::Chado::Magedocumentation::mageml {
+sub Chado::Magedocumentation::mageml {
     return shift->mageml_id
 }
 
-Chado::DBI::Chado::Magedocumentation->has_a(
-    tableinfo_id => 'Chado::DBI::Chado::Tableinfo'
+Chado::Magedocumentation->has_a(
+    tableinfo_id => 'Chado::Tableinfo'
 );
 
-sub Chado::DBI::Chado::Magedocumentation::tableinfo {
+sub Chado::Magedocumentation::tableinfo {
     return shift->tableinfo_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Protocol;
+package Chado::Protocol;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Protocol->set_up_table('protocol');
+Chado::Protocol->set_up_table('protocol');
 
 
-Chado::DBI::Chado::Protocol->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Protocol->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Protocol::type {
+sub Chado::Protocol::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Protocol->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Protocol->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Protocol::pub {
+sub Chado::Protocol::pub {
     return shift->pub_id
 }
 
-Chado::DBI::Chado::Protocol->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Protocol->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Protocol::dbxref {
+sub Chado::Protocol::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Protocol->has_many(
-    'treatment_protocol_id', 'Chado::DBI::Chado::Treatment' => 'protocol_id'
+Chado::Protocol->has_many(
+    'treatment_protocol_id', 'Chado::Treatment' => 'protocol_id'
 );
 
-Chado::DBI::Chado::Protocol->has_many(
-    'assay_protocol_id', 'Chado::DBI::Chado::Assay' => 'protocol_id'
+Chado::Protocol->has_many(
+    'assay_protocol_id', 'Chado::Assay' => 'protocol_id'
 );
 
-Chado::DBI::Chado::Protocol->has_many(
-    'acquisition_protocol_id', 'Chado::DBI::Chado::Acquisition' => 'protocol_id'
+Chado::Protocol->has_many(
+    'acquisition_protocol_id', 'Chado::Acquisition' => 'protocol_id'
 );
 
-Chado::DBI::Chado::Protocol->has_many(
-    'arraydesign_protocol_id', 'Chado::DBI::Chado::Arraydesign' => 'protocol_id'
+Chado::Protocol->has_many(
+    'arraydesign_protocol_id', 'Chado::Arraydesign' => 'protocol_id'
 );
 
-Chado::DBI::Chado::Protocol->has_many(
-    'protocolparam_protocol_id', 'Chado::DBI::Chado::Protocolparam' => 'protocol_id'
+Chado::Protocol->has_many(
+    'protocolparam_protocol_id', 'Chado::Protocolparam' => 'protocol_id'
 );
 
-Chado::DBI::Chado::Protocol->has_many(
-    'quantification_protocol_id', 'Chado::DBI::Chado::Quantification' => 'protocol_id'
+Chado::Protocol->has_many(
+    'quantification_protocol_id', 'Chado::Quantification' => 'protocol_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Protocolparam;
+package Chado::Protocolparam;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Protocolparam->set_up_table('protocolparam');
+Chado::Protocolparam->set_up_table('protocolparam');
 
 
-Chado::DBI::Chado::Protocolparam->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Protocolparam->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Protocolparam::protocol {
+sub Chado::Protocolparam::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Protocolparam->has_a(
-    datatype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Protocolparam->has_a(
+    datatype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Protocolparam::datatype {
+sub Chado::Protocolparam::datatype {
     return shift->datatype_id
 }
 
-Chado::DBI::Chado::Protocolparam->has_a(
-    unittype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Protocolparam->has_a(
+    unittype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Protocolparam::unittype {
+sub Chado::Protocolparam::unittype {
     return shift->unittype_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Channel;
+package Chado::Channel;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Channel->set_up_table('channel');
+Chado::Channel->set_up_table('channel');
 
 
-Chado::DBI::Chado::Channel->has_many(
-    'acquisition_channel_id', 'Chado::DBI::Chado::Acquisition' => 'channel_id'
+Chado::Channel->has_many(
+    'acquisition_channel_id', 'Chado::Acquisition' => 'channel_id'
 );
 
-Chado::DBI::Chado::Channel->has_many(
-    'assay_biomaterial_channel_id', 'Chado::DBI::Chado::Assay_Biomaterial' => 'channel_id'
+Chado::Channel->has_many(
+    'assay_biomaterial_channel_id', 'Chado::Assay_Biomaterial' => 'channel_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Arraydesign;
+package Chado::Arraydesign;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Arraydesign->set_up_table('arraydesign');
+Chado::Arraydesign->set_up_table('arraydesign');
 
 
-Chado::DBI::Chado::Arraydesign->has_a(
-    manufacturer_id => 'Chado::DBI::Chado::Contact'
+Chado::Arraydesign->has_a(
+    manufacturer_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Arraydesign::manufacturer {
+sub Chado::Arraydesign::manufacturer {
     return shift->manufacturer_id
 }
 
-Chado::DBI::Chado::Arraydesign->has_a(
-    platformtype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Arraydesign->has_a(
+    platformtype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Arraydesign::platformtype {
+sub Chado::Arraydesign::platformtype {
     return shift->platformtype_id
 }
 
-Chado::DBI::Chado::Arraydesign->has_a(
-    substratetype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Arraydesign->has_a(
+    substratetype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Arraydesign::substratetype {
+sub Chado::Arraydesign::substratetype {
     return shift->substratetype_id
 }
 
-Chado::DBI::Chado::Arraydesign->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Arraydesign->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Arraydesign::protocol {
+sub Chado::Arraydesign::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Arraydesign->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Arraydesign->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Arraydesign::dbxref {
+sub Chado::Arraydesign::dbxref {
     return shift->dbxref_id
 }
 
 sub features { my $self = shift; return map $_->feature_id, $self->element_arraydesign_id }
 
-Chado::DBI::Chado::Arraydesign->has_many(
-    'arraydesignprop_arraydesign_id', 'Chado::DBI::Chado::Arraydesignprop' => 'arraydesign_id'
+Chado::Arraydesign->has_many(
+    'arraydesignprop_arraydesign_id', 'Chado::Arraydesignprop' => 'arraydesign_id'
 );
 
-Chado::DBI::Chado::Arraydesign->has_many(
-    'assay_arraydesign_id', 'Chado::DBI::Chado::Assay' => 'arraydesign_id'
+Chado::Arraydesign->has_many(
+    'assay_arraydesign_id', 'Chado::Assay' => 'arraydesign_id'
 );
 
-Chado::DBI::Chado::Arraydesign->has_many(
-    'element_arraydesign_id', 'Chado::DBI::Chado::Element' => 'arraydesign_id'
+Chado::Arraydesign->has_many(
+    'element_arraydesign_id', 'Chado::Element' => 'arraydesign_id'
 );
 
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_arraydesign_id }
@@ -2763,178 +2763,178 @@ sub cvterms { my $self = shift; return map $_->cvterm_id, $self->element_arrayde
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->element_arraydesign_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Arraydesignprop;
+package Chado::Arraydesignprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Arraydesignprop->set_up_table('arraydesignprop');
+Chado::Arraydesignprop->set_up_table('arraydesignprop');
 
 
-Chado::DBI::Chado::Arraydesignprop->has_a(
-    arraydesign_id => 'Chado::DBI::Chado::Arraydesign'
+Chado::Arraydesignprop->has_a(
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub Chado::DBI::Chado::Arraydesignprop::arraydesign {
+sub Chado::Arraydesignprop::arraydesign {
     return shift->arraydesign_id
 }
 
-Chado::DBI::Chado::Arraydesignprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Arraydesignprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Arraydesignprop::type {
+sub Chado::Arraydesignprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Assay;
+package Chado::Assay;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Assay->set_up_table('assay');
+Chado::Assay->set_up_table('assay');
 
 
-Chado::DBI::Chado::Assay->has_a(
-    arraydesign_id => 'Chado::DBI::Chado::Arraydesign'
+Chado::Assay->has_a(
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub Chado::DBI::Chado::Assay::arraydesign {
+sub Chado::Assay::arraydesign {
     return shift->arraydesign_id
 }
 
-Chado::DBI::Chado::Assay->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Assay->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Assay::protocol {
+sub Chado::Assay::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Assay->has_a(
-    operator_id => 'Chado::DBI::Chado::Contact'
+Chado::Assay->has_a(
+    operator_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Assay::operator {
+sub Chado::Assay::operator {
     return shift->operator_id
 }
 
-Chado::DBI::Chado::Assay->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Assay->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Assay::dbxref {
+sub Chado::Assay::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Assay->has_many(
-    'study_assay_assay_id', 'Chado::DBI::Chado::Study_Assay' => 'assay_id'
+Chado::Assay->has_many(
+    'study_assay_assay_id', 'Chado::Study_Assay' => 'assay_id'
 );
 
 sub projects { my $self = shift; return map $_->project_id, $self->assay_project_assay_id }
 
-Chado::DBI::Chado::Assay->has_many(
-    'acquisition_assay_id', 'Chado::DBI::Chado::Acquisition' => 'assay_id'
+Chado::Assay->has_many(
+    'acquisition_assay_id', 'Chado::Acquisition' => 'assay_id'
 );
 
-Chado::DBI::Chado::Assay->has_many(
-    'assay_biomaterial_assay_id', 'Chado::DBI::Chado::Assay_Biomaterial' => 'assay_id'
+Chado::Assay->has_many(
+    'assay_biomaterial_assay_id', 'Chado::Assay_Biomaterial' => 'assay_id'
 );
 
-Chado::DBI::Chado::Assay->has_many(
-    'studyfactorvalue_assay_id', 'Chado::DBI::Chado::Studyfactorvalue' => 'assay_id'
+Chado::Assay->has_many(
+    'studyfactorvalue_assay_id', 'Chado::Studyfactorvalue' => 'assay_id'
 );
 
-Chado::DBI::Chado::Assay->has_many(
-    'assay_project_assay_id', 'Chado::DBI::Chado::Assay_Project' => 'assay_id'
+Chado::Assay->has_many(
+    'assay_project_assay_id', 'Chado::Assay_Project' => 'assay_id'
 );
 
-Chado::DBI::Chado::Assay->has_many(
-    'assayprop_assay_id', 'Chado::DBI::Chado::Assayprop' => 'assay_id'
+Chado::Assay->has_many(
+    'assayprop_assay_id', 'Chado::Assayprop' => 'assay_id'
 );
 
 sub studys { my $self = shift; return map $_->study_id, $self->study_assay_assay_id }
 
-Chado::DBI::Chado::Assay->has_many(
-    'control_assay_id', 'Chado::DBI::Chado::Control' => 'assay_id'
+Chado::Assay->has_many(
+    'control_assay_id', 'Chado::Control' => 'assay_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Assayprop;
+package Chado::Assayprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Assayprop->set_up_table('assayprop');
+Chado::Assayprop->set_up_table('assayprop');
 
 
-Chado::DBI::Chado::Assayprop->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Assayprop->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Assayprop::assay {
+sub Chado::Assayprop::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Assayprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Assayprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Assayprop::type {
+sub Chado::Assayprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Assay_Project;
+package Chado::Assay_Project;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Assay_Project->set_up_table('assay_project');
+Chado::Assay_Project->set_up_table('assay_project');
 
 
-Chado::DBI::Chado::Assay_Project->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Assay_Project->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Assay_Project::assay {
+sub Chado::Assay_Project::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Assay_Project->has_a(
-    project_id => 'Chado::DBI::Chado::Project'
+Chado::Assay_Project->has_a(
+    project_id => 'Chado::Project'
 );
 
-sub Chado::DBI::Chado::Assay_Project::project {
+sub Chado::Assay_Project::project {
     return shift->project_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Biomaterial;
+package Chado::Biomaterial;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Biomaterial->set_up_table('biomaterial');
+Chado::Biomaterial->set_up_table('biomaterial');
 
 
-Chado::DBI::Chado::Biomaterial->has_a(
-    taxon_id => 'Chado::DBI::Chado::Organism'
+Chado::Biomaterial->has_a(
+    taxon_id => 'Chado::Organism'
 );
 
-sub Chado::DBI::Chado::Biomaterial::taxon {
+sub Chado::Biomaterial::taxon {
     return shift->taxon_id
 }
 
-Chado::DBI::Chado::Biomaterial->has_a(
-    biosourceprovider_id => 'Chado::DBI::Chado::Contact'
+Chado::Biomaterial->has_a(
+    biosourceprovider_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Biomaterial::biosourceprovider {
+sub Chado::Biomaterial::biosourceprovider {
     return shift->biosourceprovider_id
 }
 
-Chado::DBI::Chado::Biomaterial->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Biomaterial->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Biomaterial::dbxref {
+sub Chado::Biomaterial::dbxref {
     return shift->dbxref_id
 }
 
@@ -2942,374 +2942,374 @@ sub biomaterial_relationship_subject_ids { my $self = shift; return $self->bioma
 
 sub biomaterial_relationship_object_ids { my $self = shift; return $self->biomaterial_relationship_object_id(@_) }
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'treatment_biomaterial_id', 'Chado::DBI::Chado::Treatment' => 'biomaterial_id'
+Chado::Biomaterial->has_many(
+    'treatment_biomaterial_id', 'Chado::Treatment' => 'biomaterial_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'biomaterialprop_biomaterial_id', 'Chado::DBI::Chado::Biomaterialprop' => 'biomaterial_id'
+Chado::Biomaterial->has_many(
+    'biomaterialprop_biomaterial_id', 'Chado::Biomaterialprop' => 'biomaterial_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'assay_biomaterial_biomaterial_id', 'Chado::DBI::Chado::Assay_Biomaterial' => 'biomaterial_id'
+Chado::Biomaterial->has_many(
+    'assay_biomaterial_biomaterial_id', 'Chado::Assay_Biomaterial' => 'biomaterial_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'biomaterial_dbxref_biomaterial_id', 'Chado::DBI::Chado::Biomaterial_Dbxref' => 'biomaterial_id'
+Chado::Biomaterial->has_many(
+    'biomaterial_dbxref_biomaterial_id', 'Chado::Biomaterial_Dbxref' => 'biomaterial_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'biomaterial_treatment_biomaterial_id', 'Chado::DBI::Chado::Biomaterial_Treatment' => 'biomaterial_id'
+Chado::Biomaterial->has_many(
+    'biomaterial_treatment_biomaterial_id', 'Chado::Biomaterial_Treatment' => 'biomaterial_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'biomaterial_relationship_subject_id', 'Chado::DBI::Chado::Biomaterial_Relationship' => 'subject_id'
+Chado::Biomaterial->has_many(
+    'biomaterial_relationship_subject_id', 'Chado::Biomaterial_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Biomaterial->has_many(
-    'biomaterial_relationship_object_id', 'Chado::DBI::Chado::Biomaterial_Relationship' => 'object_id'
+Chado::Biomaterial->has_many(
+    'biomaterial_relationship_object_id', 'Chado::Biomaterial_Relationship' => 'object_id'
 );
 
 sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->biomaterial_dbxref_biomaterial_id }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Biomaterial_Relationship;
+package Chado::Biomaterial_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Biomaterial_Relationship->set_up_table('biomaterial_relationship');
+Chado::Biomaterial_Relationship->set_up_table('biomaterial_relationship');
 
 
-Chado::DBI::Chado::Biomaterial_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Biomaterial_Relationship->has_a(
+    subject_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Relationship::subject {
+sub Chado::Biomaterial_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Biomaterial_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Biomaterial_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Relationship::type {
+sub Chado::Biomaterial_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Biomaterial_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Biomaterial_Relationship->has_a(
+    object_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Relationship::object {
+sub Chado::Biomaterial_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Biomaterialprop;
+package Chado::Biomaterialprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Biomaterialprop->set_up_table('biomaterialprop');
+Chado::Biomaterialprop->set_up_table('biomaterialprop');
 
 
-Chado::DBI::Chado::Biomaterialprop->has_a(
-    biomaterial_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Biomaterialprop->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Biomaterialprop::biomaterial {
+sub Chado::Biomaterialprop::biomaterial {
     return shift->biomaterial_id
 }
 
-Chado::DBI::Chado::Biomaterialprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Biomaterialprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Biomaterialprop::type {
+sub Chado::Biomaterialprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Biomaterial_Dbxref;
+package Chado::Biomaterial_Dbxref;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Biomaterial_Dbxref->set_up_table('biomaterial_dbxref');
+Chado::Biomaterial_Dbxref->set_up_table('biomaterial_dbxref');
 
 
-Chado::DBI::Chado::Biomaterial_Dbxref->has_a(
-    biomaterial_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Biomaterial_Dbxref->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Dbxref::biomaterial {
+sub Chado::Biomaterial_Dbxref::biomaterial {
     return shift->biomaterial_id
 }
 
-Chado::DBI::Chado::Biomaterial_Dbxref->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Biomaterial_Dbxref->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Dbxref::dbxref {
+sub Chado::Biomaterial_Dbxref::dbxref {
     return shift->dbxref_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Treatment;
+package Chado::Treatment;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Treatment->set_up_table('treatment');
+Chado::Treatment->set_up_table('treatment');
 
 
-Chado::DBI::Chado::Treatment->has_a(
-    biomaterial_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Treatment->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Treatment::biomaterial {
+sub Chado::Treatment::biomaterial {
     return shift->biomaterial_id
 }
 
-Chado::DBI::Chado::Treatment->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Treatment->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Treatment::type {
+sub Chado::Treatment::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Treatment->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Treatment->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Treatment::protocol {
+sub Chado::Treatment::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Treatment->has_many(
-    'biomaterial_treatment_treatment_id', 'Chado::DBI::Chado::Biomaterial_Treatment' => 'treatment_id'
+Chado::Treatment->has_many(
+    'biomaterial_treatment_treatment_id', 'Chado::Biomaterial_Treatment' => 'treatment_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Biomaterial_Treatment;
+package Chado::Biomaterial_Treatment;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Biomaterial_Treatment->set_up_table('biomaterial_treatment');
+Chado::Biomaterial_Treatment->set_up_table('biomaterial_treatment');
 
 
-Chado::DBI::Chado::Biomaterial_Treatment->has_a(
-    biomaterial_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Biomaterial_Treatment->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Treatment::biomaterial {
+sub Chado::Biomaterial_Treatment::biomaterial {
     return shift->biomaterial_id
 }
 
-Chado::DBI::Chado::Biomaterial_Treatment->has_a(
-    treatment_id => 'Chado::DBI::Chado::Treatment'
+Chado::Biomaterial_Treatment->has_a(
+    treatment_id => 'Chado::Treatment'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Treatment::treatment {
+sub Chado::Biomaterial_Treatment::treatment {
     return shift->treatment_id
 }
 
-Chado::DBI::Chado::Biomaterial_Treatment->has_a(
-    unittype_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Biomaterial_Treatment->has_a(
+    unittype_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Biomaterial_Treatment::unittype {
+sub Chado::Biomaterial_Treatment::unittype {
     return shift->unittype_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Assay_Biomaterial;
+package Chado::Assay_Biomaterial;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Assay_Biomaterial->set_up_table('assay_biomaterial');
+Chado::Assay_Biomaterial->set_up_table('assay_biomaterial');
 
 
-Chado::DBI::Chado::Assay_Biomaterial->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Assay_Biomaterial->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Assay_Biomaterial::assay {
+sub Chado::Assay_Biomaterial::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Assay_Biomaterial->has_a(
-    biomaterial_id => 'Chado::DBI::Chado::Biomaterial'
+Chado::Assay_Biomaterial->has_a(
+    biomaterial_id => 'Chado::Biomaterial'
 );
 
-sub Chado::DBI::Chado::Assay_Biomaterial::biomaterial {
+sub Chado::Assay_Biomaterial::biomaterial {
     return shift->biomaterial_id
 }
 
-Chado::DBI::Chado::Assay_Biomaterial->has_a(
-    channel_id => 'Chado::DBI::Chado::Channel'
+Chado::Assay_Biomaterial->has_a(
+    channel_id => 'Chado::Channel'
 );
 
-sub Chado::DBI::Chado::Assay_Biomaterial::channel {
+sub Chado::Assay_Biomaterial::channel {
     return shift->channel_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Acquisition;
+package Chado::Acquisition;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Acquisition->set_up_table('acquisition');
+Chado::Acquisition->set_up_table('acquisition');
 
 
-Chado::DBI::Chado::Acquisition->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Acquisition->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Acquisition::assay {
+sub Chado::Acquisition::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Acquisition->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Acquisition->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Acquisition::protocol {
+sub Chado::Acquisition::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Acquisition->has_a(
-    channel_id => 'Chado::DBI::Chado::Channel'
+Chado::Acquisition->has_a(
+    channel_id => 'Chado::Channel'
 );
 
-sub Chado::DBI::Chado::Acquisition::channel {
+sub Chado::Acquisition::channel {
     return shift->channel_id
 }
 
-Chado::DBI::Chado::Acquisition->has_many(
-    'acquisition_relationship_subject_id', 'Chado::DBI::Chado::Acquisition_Relationship' => 'subject_id'
+Chado::Acquisition->has_many(
+    'acquisition_relationship_subject_id', 'Chado::Acquisition_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Acquisition->has_many(
-    'acquisition_relationship_object_id', 'Chado::DBI::Chado::Acquisition_Relationship' => 'object_id'
+Chado::Acquisition->has_many(
+    'acquisition_relationship_object_id', 'Chado::Acquisition_Relationship' => 'object_id'
 );
 
-Chado::DBI::Chado::Acquisition->has_many(
-    'acquisitionprop_acquisition_id', 'Chado::DBI::Chado::Acquisitionprop' => 'acquisition_id'
+Chado::Acquisition->has_many(
+    'acquisitionprop_acquisition_id', 'Chado::Acquisitionprop' => 'acquisition_id'
 );
 
-Chado::DBI::Chado::Acquisition->has_many(
-    'quantification_acquisition_id', 'Chado::DBI::Chado::Quantification' => 'acquisition_id'
+Chado::Acquisition->has_many(
+    'quantification_acquisition_id', 'Chado::Quantification' => 'acquisition_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Acquisitionprop;
+package Chado::Acquisitionprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Acquisitionprop->set_up_table('acquisitionprop');
+Chado::Acquisitionprop->set_up_table('acquisitionprop');
 
 
-Chado::DBI::Chado::Acquisitionprop->has_a(
-    acquisition_id => 'Chado::DBI::Chado::Acquisition'
+Chado::Acquisitionprop->has_a(
+    acquisition_id => 'Chado::Acquisition'
 );
 
-sub Chado::DBI::Chado::Acquisitionprop::acquisition {
+sub Chado::Acquisitionprop::acquisition {
     return shift->acquisition_id
 }
 
-Chado::DBI::Chado::Acquisitionprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Acquisitionprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Acquisitionprop::type {
+sub Chado::Acquisitionprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Acquisition_Relationship;
+package Chado::Acquisition_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Acquisition_Relationship->set_up_table('acquisition_relationship');
+Chado::Acquisition_Relationship->set_up_table('acquisition_relationship');
 
 
-Chado::DBI::Chado::Acquisition_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Acquisition'
+Chado::Acquisition_Relationship->has_a(
+    subject_id => 'Chado::Acquisition'
 );
 
-sub Chado::DBI::Chado::Acquisition_Relationship::subject {
+sub Chado::Acquisition_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Acquisition_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Acquisition_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Acquisition_Relationship::type {
+sub Chado::Acquisition_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Acquisition_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Acquisition'
+Chado::Acquisition_Relationship->has_a(
+    object_id => 'Chado::Acquisition'
 );
 
-sub Chado::DBI::Chado::Acquisition_Relationship::object {
+sub Chado::Acquisition_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Quantification;
+package Chado::Quantification;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Quantification->set_up_table('quantification');
+Chado::Quantification->set_up_table('quantification');
 
 
-Chado::DBI::Chado::Quantification->has_a(
-    acquisition_id => 'Chado::DBI::Chado::Acquisition'
+Chado::Quantification->has_a(
+    acquisition_id => 'Chado::Acquisition'
 );
 
-sub Chado::DBI::Chado::Quantification::acquisition {
+sub Chado::Quantification::acquisition {
     return shift->acquisition_id
 }
 
-Chado::DBI::Chado::Quantification->has_a(
-    operator_id => 'Chado::DBI::Chado::Contact'
+Chado::Quantification->has_a(
+    operator_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Quantification::operator {
+sub Chado::Quantification::operator {
     return shift->operator_id
 }
 
-Chado::DBI::Chado::Quantification->has_a(
-    protocol_id => 'Chado::DBI::Chado::Protocol'
+Chado::Quantification->has_a(
+    protocol_id => 'Chado::Protocol'
 );
 
-sub Chado::DBI::Chado::Quantification::protocol {
+sub Chado::Quantification::protocol {
     return shift->protocol_id
 }
 
-Chado::DBI::Chado::Quantification->has_a(
-    analysis_id => 'Chado::DBI::Chado::Analysis'
+Chado::Quantification->has_a(
+    analysis_id => 'Chado::Analysis'
 );
 
-sub Chado::DBI::Chado::Quantification::analysis {
+sub Chado::Quantification::analysis {
     return shift->analysis_id
 }
 
-Chado::DBI::Chado::Quantification->has_many(
-    'elementresult_quantification_id', 'Chado::DBI::Chado::Elementresult' => 'quantification_id'
+Chado::Quantification->has_many(
+    'elementresult_quantification_id', 'Chado::Elementresult' => 'quantification_id'
 );
 
-Chado::DBI::Chado::Quantification->has_many(
-    'quantificationprop_quantification_id', 'Chado::DBI::Chado::Quantificationprop' => 'quantification_id'
+Chado::Quantification->has_many(
+    'quantificationprop_quantification_id', 'Chado::Quantificationprop' => 'quantification_id'
 );
 
-Chado::DBI::Chado::Quantification->has_many(
-    'quantification_relationship_subject_id', 'Chado::DBI::Chado::Quantification_Relationship' => 'subject_id'
+Chado::Quantification->has_many(
+    'quantification_relationship_subject_id', 'Chado::Quantification_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Quantification->has_many(
-    'quantification_relationship_object_id', 'Chado::DBI::Chado::Quantification_Relationship' => 'object_id'
+Chado::Quantification->has_many(
+    'quantification_relationship_object_id', 'Chado::Quantification_Relationship' => 'object_id'
 );
 
 sub quantification_relationship_subject_ids { my $self = shift; return $self->quantification_relationship_subject_id(@_) }
@@ -3317,404 +3317,404 @@ sub quantification_relationship_subject_ids { my $self = shift; return $self->qu
 sub quantification_relationship_object_ids { my $self = shift; return $self->quantification_relationship_object_id(@_) }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Quantificationprop;
+package Chado::Quantificationprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Quantificationprop->set_up_table('quantificationprop');
+Chado::Quantificationprop->set_up_table('quantificationprop');
 
 
-Chado::DBI::Chado::Quantificationprop->has_a(
-    quantification_id => 'Chado::DBI::Chado::Quantification'
+Chado::Quantificationprop->has_a(
+    quantification_id => 'Chado::Quantification'
 );
 
-sub Chado::DBI::Chado::Quantificationprop::quantification {
+sub Chado::Quantificationprop::quantification {
     return shift->quantification_id
 }
 
-Chado::DBI::Chado::Quantificationprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Quantificationprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Quantificationprop::type {
+sub Chado::Quantificationprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Quantification_Relationship;
+package Chado::Quantification_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Quantification_Relationship->set_up_table('quantification_relationship');
+Chado::Quantification_Relationship->set_up_table('quantification_relationship');
 
 
-Chado::DBI::Chado::Quantification_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Quantification'
+Chado::Quantification_Relationship->has_a(
+    subject_id => 'Chado::Quantification'
 );
 
-sub Chado::DBI::Chado::Quantification_Relationship::subject {
+sub Chado::Quantification_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Quantification_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Quantification_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Quantification_Relationship::type {
+sub Chado::Quantification_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Quantification_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Quantification'
+Chado::Quantification_Relationship->has_a(
+    object_id => 'Chado::Quantification'
 );
 
-sub Chado::DBI::Chado::Quantification_Relationship::object {
+sub Chado::Quantification_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Control;
+package Chado::Control;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Control->set_up_table('control');
+Chado::Control->set_up_table('control');
 
 
-Chado::DBI::Chado::Control->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Control->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Control::type {
+sub Chado::Control::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Control->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Control->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Control::assay {
+sub Chado::Control::assay {
     return shift->assay_id
 }
 
-Chado::DBI::Chado::Control->has_a(
-    tableinfo_id => 'Chado::DBI::Chado::Tableinfo'
+Chado::Control->has_a(
+    tableinfo_id => 'Chado::Tableinfo'
 );
 
-sub Chado::DBI::Chado::Control::tableinfo {
+sub Chado::Control::tableinfo {
     return shift->tableinfo_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Element;
+package Chado::Element;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Element->set_up_table('element');
+Chado::Element->set_up_table('element');
 
 
-Chado::DBI::Chado::Element->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
+Chado::Element->has_a(
+    feature_id => 'Chado::Feature'
 );
 
-sub Chado::DBI::Chado::Element::feature {
+sub Chado::Element::feature {
     return shift->feature_id
 }
 
-Chado::DBI::Chado::Element->has_a(
-    arraydesign_id => 'Chado::DBI::Chado::Arraydesign'
+Chado::Element->has_a(
+    arraydesign_id => 'Chado::Arraydesign'
 );
 
-sub Chado::DBI::Chado::Element::arraydesign {
+sub Chado::Element::arraydesign {
     return shift->arraydesign_id
 }
 
-Chado::DBI::Chado::Element->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Element->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Element::type {
+sub Chado::Element::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Element->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Element->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Element::dbxref {
+sub Chado::Element::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Element->has_many(
-    'elementresult_element_id', 'Chado::DBI::Chado::Elementresult' => 'element_id'
+Chado::Element->has_many(
+    'elementresult_element_id', 'Chado::Elementresult' => 'element_id'
 );
 
-Chado::DBI::Chado::Element->has_many(
-    'element_relationship_subject_id', 'Chado::DBI::Chado::Element_Relationship' => 'subject_id'
+Chado::Element->has_many(
+    'element_relationship_subject_id', 'Chado::Element_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Element->has_many(
-    'element_relationship_object_id', 'Chado::DBI::Chado::Element_Relationship' => 'object_id'
+Chado::Element->has_many(
+    'element_relationship_object_id', 'Chado::Element_Relationship' => 'object_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Elementresult;
+package Chado::Elementresult;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Elementresult->set_up_table('elementresult');
+Chado::Elementresult->set_up_table('elementresult');
 
 
-Chado::DBI::Chado::Elementresult->has_a(
-    element_id => 'Chado::DBI::Chado::Element'
+Chado::Elementresult->has_a(
+    element_id => 'Chado::Element'
 );
 
-sub Chado::DBI::Chado::Elementresult::element {
+sub Chado::Elementresult::element {
     return shift->element_id
 }
 
-Chado::DBI::Chado::Elementresult->has_a(
-    quantification_id => 'Chado::DBI::Chado::Quantification'
+Chado::Elementresult->has_a(
+    quantification_id => 'Chado::Quantification'
 );
 
-sub Chado::DBI::Chado::Elementresult::quantification {
+sub Chado::Elementresult::quantification {
     return shift->quantification_id
 }
 
-Chado::DBI::Chado::Elementresult->has_many(
-    'elementresult_relationship_subject_id', 'Chado::DBI::Chado::Elementresult_Relationship' => 'subject_id'
+Chado::Elementresult->has_many(
+    'elementresult_relationship_subject_id', 'Chado::Elementresult_Relationship' => 'subject_id'
 );
 
-Chado::DBI::Chado::Elementresult->has_many(
-    'elementresult_relationship_object_id', 'Chado::DBI::Chado::Elementresult_Relationship' => 'object_id'
+Chado::Elementresult->has_many(
+    'elementresult_relationship_object_id', 'Chado::Elementresult_Relationship' => 'object_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Element_Relationship;
+package Chado::Element_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Element_Relationship->set_up_table('element_relationship');
+Chado::Element_Relationship->set_up_table('element_relationship');
 
 
-Chado::DBI::Chado::Element_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Element'
+Chado::Element_Relationship->has_a(
+    subject_id => 'Chado::Element'
 );
 
-sub Chado::DBI::Chado::Element_Relationship::subject {
+sub Chado::Element_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Element_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Element_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Element_Relationship::type {
+sub Chado::Element_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Element_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Element'
+Chado::Element_Relationship->has_a(
+    object_id => 'Chado::Element'
 );
 
-sub Chado::DBI::Chado::Element_Relationship::object {
+sub Chado::Element_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Elementresult_Relationship;
+package Chado::Elementresult_Relationship;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Elementresult_Relationship->set_up_table('elementresult_relationship');
+Chado::Elementresult_Relationship->set_up_table('elementresult_relationship');
 
 
-Chado::DBI::Chado::Elementresult_Relationship->has_a(
-    subject_id => 'Chado::DBI::Chado::Elementresult'
+Chado::Elementresult_Relationship->has_a(
+    subject_id => 'Chado::Elementresult'
 );
 
-sub Chado::DBI::Chado::Elementresult_Relationship::subject {
+sub Chado::Elementresult_Relationship::subject {
     return shift->subject_id
 }
 
-Chado::DBI::Chado::Elementresult_Relationship->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Elementresult_Relationship->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Elementresult_Relationship::type {
+sub Chado::Elementresult_Relationship::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Elementresult_Relationship->has_a(
-    object_id => 'Chado::DBI::Chado::Elementresult'
+Chado::Elementresult_Relationship->has_a(
+    object_id => 'Chado::Elementresult'
 );
 
-sub Chado::DBI::Chado::Elementresult_Relationship::object {
+sub Chado::Elementresult_Relationship::object {
     return shift->object_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Study;
+package Chado::Study;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Study->set_up_table('study');
+Chado::Study->set_up_table('study');
 
 
-Chado::DBI::Chado::Study->has_a(
-    contact_id => 'Chado::DBI::Chado::Contact'
+Chado::Study->has_a(
+    contact_id => 'Chado::Contact'
 );
 
-sub Chado::DBI::Chado::Study::contact {
+sub Chado::Study::contact {
     return shift->contact_id
 }
 
-Chado::DBI::Chado::Study->has_a(
-    pub_id => 'Chado::DBI::Chado::Pub'
+Chado::Study->has_a(
+    pub_id => 'Chado::Pub'
 );
 
-sub Chado::DBI::Chado::Study::pub {
+sub Chado::Study::pub {
     return shift->pub_id
 }
 
-Chado::DBI::Chado::Study->has_a(
-    dbxref_id => 'Chado::DBI::Chado::Dbxref'
+Chado::Study->has_a(
+    dbxref_id => 'Chado::Dbxref'
 );
 
-sub Chado::DBI::Chado::Study::dbxref {
+sub Chado::Study::dbxref {
     return shift->dbxref_id
 }
 
-Chado::DBI::Chado::Study->has_many(
-    'studydesign_study_id', 'Chado::DBI::Chado::Studydesign' => 'study_id'
+Chado::Study->has_many(
+    'studydesign_study_id', 'Chado::Studydesign' => 'study_id'
 );
 
 sub assays { my $self = shift; return map $_->assay_id, $self->study_assay_study_id }
 
-Chado::DBI::Chado::Study->has_many(
-    'study_assay_study_id', 'Chado::DBI::Chado::Study_Assay' => 'study_id'
+Chado::Study->has_many(
+    'study_assay_study_id', 'Chado::Study_Assay' => 'study_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Study_Assay;
+package Chado::Study_Assay;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Study_Assay->set_up_table('study_assay');
+Chado::Study_Assay->set_up_table('study_assay');
 
 
-Chado::DBI::Chado::Study_Assay->has_a(
-    study_id => 'Chado::DBI::Chado::Study'
+Chado::Study_Assay->has_a(
+    study_id => 'Chado::Study'
 );
 
-sub Chado::DBI::Chado::Study_Assay::study {
+sub Chado::Study_Assay::study {
     return shift->study_id
 }
 
-Chado::DBI::Chado::Study_Assay->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Study_Assay->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Study_Assay::assay {
+sub Chado::Study_Assay::assay {
     return shift->assay_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Studydesign;
+package Chado::Studydesign;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Studydesign->set_up_table('studydesign');
+Chado::Studydesign->set_up_table('studydesign');
 
 
-Chado::DBI::Chado::Studydesign->has_a(
-    study_id => 'Chado::DBI::Chado::Study'
+Chado::Studydesign->has_a(
+    study_id => 'Chado::Study'
 );
 
-sub Chado::DBI::Chado::Studydesign::study {
+sub Chado::Studydesign::study {
     return shift->study_id
 }
 
-Chado::DBI::Chado::Studydesign->has_many(
-    'studydesignprop_studydesign_id', 'Chado::DBI::Chado::Studydesignprop' => 'studydesign_id'
+Chado::Studydesign->has_many(
+    'studydesignprop_studydesign_id', 'Chado::Studydesignprop' => 'studydesign_id'
 );
 
-Chado::DBI::Chado::Studydesign->has_many(
-    'studyfactor_studydesign_id', 'Chado::DBI::Chado::Studyfactor' => 'studydesign_id'
+Chado::Studydesign->has_many(
+    'studyfactor_studydesign_id', 'Chado::Studyfactor' => 'studydesign_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Studydesignprop;
+package Chado::Studydesignprop;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Studydesignprop->set_up_table('studydesignprop');
+Chado::Studydesignprop->set_up_table('studydesignprop');
 
 
-Chado::DBI::Chado::Studydesignprop->has_a(
-    studydesign_id => 'Chado::DBI::Chado::Studydesign'
+Chado::Studydesignprop->has_a(
+    studydesign_id => 'Chado::Studydesign'
 );
 
-sub Chado::DBI::Chado::Studydesignprop::studydesign {
+sub Chado::Studydesignprop::studydesign {
     return shift->studydesign_id
 }
 
-Chado::DBI::Chado::Studydesignprop->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Studydesignprop->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Studydesignprop::type {
+sub Chado::Studydesignprop::type {
     return shift->type_id
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Studyfactor;
+package Chado::Studyfactor;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Studyfactor->set_up_table('studyfactor');
+Chado::Studyfactor->set_up_table('studyfactor');
 
 
-Chado::DBI::Chado::Studyfactor->has_a(
-    studydesign_id => 'Chado::DBI::Chado::Studydesign'
+Chado::Studyfactor->has_a(
+    studydesign_id => 'Chado::Studydesign'
 );
 
-sub Chado::DBI::Chado::Studyfactor::studydesign {
+sub Chado::Studyfactor::studydesign {
     return shift->studydesign_id
 }
 
-Chado::DBI::Chado::Studyfactor->has_a(
-    type_id => 'Chado::DBI::Chado::Cvterm'
+Chado::Studyfactor->has_a(
+    type_id => 'Chado::Cvterm'
 );
 
-sub Chado::DBI::Chado::Studyfactor::type {
+sub Chado::Studyfactor::type {
     return shift->type_id
 }
 
-Chado::DBI::Chado::Studyfactor->has_many(
-    'studyfactorvalue_studyfactor_id', 'Chado::DBI::Chado::Studyfactorvalue' => 'studyfactor_id'
+Chado::Studyfactor->has_many(
+    'studyfactorvalue_studyfactor_id', 'Chado::Studyfactorvalue' => 'studyfactor_id'
 );
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Studyfactorvalue;
+package Chado::Studyfactorvalue;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
 
-Chado::DBI::Chado::Studyfactorvalue->set_up_table('studyfactorvalue');
+Chado::Studyfactorvalue->set_up_table('studyfactorvalue');
 
 
-Chado::DBI::Chado::Studyfactorvalue->has_a(
-    studyfactor_id => 'Chado::DBI::Chado::Studyfactor'
+Chado::Studyfactorvalue->has_a(
+    studyfactor_id => 'Chado::Studyfactor'
 );
 
-sub Chado::DBI::Chado::Studyfactorvalue::studyfactor {
+sub Chado::Studyfactorvalue::studyfactor {
     return shift->studyfactor_id
 }
 
-Chado::DBI::Chado::Studyfactorvalue->has_a(
-    assay_id => 'Chado::DBI::Chado::Assay'
+Chado::Studyfactorvalue->has_a(
+    assay_id => 'Chado::Assay'
 );
 
-sub Chado::DBI::Chado::Studyfactorvalue::assay {
+sub Chado::Studyfactorvalue::assay {
     return shift->assay_id
 }
 
