@@ -16,6 +16,7 @@ my $create = join '', @create;
 my $tr = SQL::Translator->new(
 				parser   => "PostgreSQL",
 				producer => "Diagram",
+                                producer_args => {add_color=>1},
                                 filters       => [
                                       sub {
                                         my $schema = shift;
