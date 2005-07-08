@@ -1,3 +1,10 @@
+0.003     * added a gff3 bulk loader
+          * brought schema up to date; the most noticable change (and
+            not backward compatible) is the removal of contact_id from
+            the db table.
+          * Lots more stuff, since it has been quite some time since
+            the 0.002 release
+
 0.002     * Added more expressive error messages to load_gff3.pl
           * Expanded the search space for organisms in load_gff3.pl
           * Added more organisms to initialize.sql 
