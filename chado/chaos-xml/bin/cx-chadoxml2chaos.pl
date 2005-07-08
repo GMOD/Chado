@@ -69,7 +69,7 @@ you omit the expansion step if it is not required
 =back 
 
 
-=Head1 REQUIREMENTS
+=head1 REQUIREMENTS
 
 You need an XSLT Processor, such as xsltproc, available as part of libxslt
 
