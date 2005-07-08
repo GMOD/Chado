@@ -1,0 +1,2128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
+</head><body>
+
+<h1 class="SchemaDescription">
+	Description of Schema
+</h1>
+
+<hr />
+
+<!-- 
+	Table listing (10 tables)
+ -->
+
+<a name="top" />
+
+<table class="LinkTable" width="100%">
+
+<tr>
+	<td class="LinkTableCell"><h2 class="LinkTableTitle">
+	Tables
+</h2></td>
+</tr>
+
+<!-- 
+	Start link to table 'genotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="genotype-link" href="#genotype">genotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'genotype'
+ -->
+
+<!-- 
+	Start link to table 'feature_genotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_genotype-link" href="#feature_genotype">feature_genotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_genotype'
+ -->
+
+<!-- 
+	Start link to table 'environment'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="environment-link" href="#environment">environment</a></td>
+</tr>
+
+<!-- 
+	End link to table 'environment'
+ -->
+
+<!-- 
+	Start link to table 'environment_cvterm'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="environment_cvterm-link" href="#environment_cvterm">environment_cvterm</a></td>
+</tr>
+
+<!-- 
+	End link to table 'environment_cvterm'
+ -->
+
+<!-- 
+	Start link to table 'phenotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype-link" href="#phenotype">phenotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype'
+ -->
+
+<!-- 
+	Start link to table 'phenotype_cvterm'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype_cvterm-link" href="#phenotype_cvterm">phenotype_cvterm</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype_cvterm'
+ -->
+
+<!-- 
+	Start link to table 'phenstatement'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenstatement-link" href="#phenstatement">phenstatement</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenstatement'
+ -->
+
+<!-- 
+	Start link to table 'feature_phenotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_phenotype-link" href="#feature_phenotype">feature_phenotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_phenotype'
+ -->
+
+<!-- 
+	Start link to table 'phendesc'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phendesc-link" href="#phendesc">phendesc</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phendesc'
+ -->
+
+<!-- 
+	Start link to table 'phenotype_comparison'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype_comparison-link" href="#phenotype_comparison">phenotype_comparison</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype_comparison'
+ -->
+
+</table>
+
+<!-- 
+	Starting table 'genotype'
+ -->
+
+<a name="genotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	genotype
+</h3></td>
+		<a name="genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	========================================== <br />
+	Chado genetics module <br />
+	redesigned 2003-10-28 <br />
+	changes 2003-11-10: <br />
+	incorporating suggestions to make everything a gcontext; use <br />
+	gcontext_relationship to make some gcontexts derivable from others. we <br />
+	would incorporate environment this way - just add the environment <br />
+	descriptors as properties of the child gcontext <br />
+	changes 2004-06 (Documented by DE: 10-MAR-2005): <br />
+	Many, including rename of gcontext to genotype,  split <br />
+	phenstatement into phenstatement & phenotype, created environment <br />
+	for modeling simple or complex genetic screens <br />
+	most genetic statements are about "alleles", although <br />
+	sometimes the definition of allele is stretched <br />
+	(RNAi, engineered construct). genetic statements can <br />
+	also be about large aberrations that take out <br />
+	multiple genes (in FlyBase the policy here is to create <br />
+	alleles for genes within the end-points only, and to <br />
+	attach phenotypic data and so forth to the aberration) <br />
+	in chado, a mutant allele is just another feature of type "gene"; <br />
+	it is just another form of the canonical wild-type gene feature. <br />
+	it is related via an "allele-of" feature_relationship; eg <br />
+	[id:FBgn001, type:gene] <-- [id:FBal001, type:gene] <br />
+	with the genetic module, features can either be attached <br />
+	to features of type sequence_variation, or to features of <br />
+	type 'gene' (in the case of mutant alleles). <br />
+	if a sequence_variation is large (eg a deficiency) and <br />
+	knocks out multiple genes, then we want to attach the <br />
+	phenotype directly to the sequence variation. <br />
+	if the mutation is simple, and affects a single wild-type <br />
+	gene feature, then we would create the mutant allele <br />
+	(another gene feature) and attach the phenotypic data via <br />
+	that feature <br />
+	this allows us the option of doing a full structural <br />
+	annotation of the mutant allele gene feature in the future <br />
+	we don't necessarily know the molecular details of the <br />
+	the sequence variation (but if we later discover them, <br />
+	we can simply add a featureloc to the sequence_variation <br />
+	we can also have sequence variations (of type haplotype_block) <br />
+	that are collections of smaller variations (i.e. via <br />
+	"part_of" feature_relationships) - we could attach phenotypic <br />
+	stuff via this haplotype_block feature or to the alleles it <br />
+	causes <br />
+	if we have a mutation affecting the shared region of a nested <br />
+	gene, and we did not know which of the two mutant gene forms were <br />
+	responsible for the resulting phenotype, we would attach the <br />
+	phenotype directly to sequence_variation feature; if we knew <br />
+	which of the two mutant forms of the gene were responsible for <br />
+	the phenotype, we would attach it to them <br />
+	we leave open the opportunity for attaching phenotypes via <br />
+	mutant forms of transcripts/proteins/promoters <br />
+	we can represent the relationship between a variation and <br />
+	the mutant gene features via a "causes" feature_relationship <br />
+	LINKING ALLELES AND VARIATIONS TO PHENOTYPES <br />
+	we link via a "genetic context" table - this is essentially <br />
+	the genotype <br />
+	most genetic statements take the form <br />
+	"allele x[1] shows phenotype P" <br />
+	which we represent as "the genetic context defined by x[1] shows P" <br />
+	we also allow <br />
+	"allele x[1] shows phenotypes P, Q against a background of sev[3]" <br />
+	but we actually represent it as <br />
+	"x[1], sev[3] shows phenotypes P, Q" <br />
+	x[1] sev[3] is the geneticcontext - genetic contexts can also <br />
+	include things not part of a genotype - e.g. RNAi introduced into cell <br />
+	representing environment: <br />
+	"allele x[1] shows phenotype P against a background of sev[TS1] at 38 degrees" <br />
+	"allele x[1] shows NO phenotype P against a background of sev[TS1] at 36 degrees" <br />
+	we specify this with an environmental context <br />
+	we use the phendesc relation to represent the actual organismal <br />
+	context under observation <br />
+	for the description of the phenotype, we are using the standard <br />
+	Observable/Attribute/Value model from the Phenotype Ontology <br />
+	we also allow genetic interactions: <br />
+	"dx[24] suppresses the wing vein phenotype of H[2]" <br />
+	but we actually represent this as: <br />
+	"H[2] -> wing vein phenotype P1" <br />
+	"dx[24] -> wing vein phenotype P2" <br />
+	"P2 < P1" <br />
+	from this we can do the necessary inference <br />
+	complementation: <br />
+	"x[1] complements x[2]" <br />
+	is actually <br />
+	"x[1] -> P1" <br />
+	"x[2] -> P2" <br />
+	"x[2],x[2] -> P3" <br />
+	P3 < P1, P3 < P2 <br />
+	complementation can be qualified, (eg due to transvection/transsplicing) <br />
+	RNAi can be handled - in this case the "allele" is a RNA construct (another <br />
+	feature type) introduced to the cell (but not the genome??) which has an <br />
+	observable phenotypic effect <br />
+	"foo[RNAi.1] shows phenotype P" <br />
+	mis-expression screens (eg GAL4/UAS) are handled - here the <br />
+	"alleles" are either the construct features, or the insertion features <br />
+	holding the construct (we may need SO type "gal4_insertion" etc); <br />
+	we actually need two alleles in these cases - for both GAL4 and UAS <br />
+	we then record statements such as: <br />
+	"Ras85D[V12.S35], gal4[dpp.blk1]  shows phenotype P" <br />
+	we use feature_relationships to represent the relationship between <br />
+	the construct and the original non-Scer gene <br />
+	we can also record experiments made with other engineered constructs: <br />
+	for example, rescue constructs made from transcripts with an without <br />
+	introns, and recording the difference in phenotype <br />
+	the design here is heavily indebted to Rachel Drysdale's paper <br />
+	"Genetic Data in FlyBase" <br />
+	ALLELE CLASS <br />
+	alleles are amorphs, hypomorphs, etc <br />
+	since alleles are features of type gene, we can just use feature_cvterm <br />
+	for this <br />
+	SHOULD WE ALSO MAKE THIS CONTEXTUAL TO PHENOTYPE?? <br />
+	OPEN QUESTION: homologous recombination events <br />
+	STOCKS <br />
+	this should be in a sub-module of this one; basically we want some <br />
+	kind of linking table between stock and genotype <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	============ <br />
+	DEPENDENCIES <br />
+	============ <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import dbxref from general <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	================================================ <br />
+	TABLE: genotype <br />
+	================================================ <br />
+	genetic context <br />
+	the uniquename should be derived from the features <br />
+	making up the genoptype <br />
+	uniquename: a human-readable unique identifier <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="genotype-genotype_id">genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="genotype-description">description</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>genotype_idx1</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_genotype'
+ -->
+
+<a name="feature_genotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_genotype
+</h3></td>
+		<a name="feature_genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	=============================================== <br />
+	TABLE: feature_genotype <br />
+	================================================ <br />
+	A genotype is defined by a collection of features <br />
+	mutations, balancers, deficiencies, haplotype blocks, engineered <br />
+	constructs <br />
+	rank can be used for n-ploid organisms <br />
+	group can be used for distinguishing the chromosomal groups <br />
+	(RNAi products and so on can be treated as different groups, as <br />
+	they do not fall on a particular chromosome) <br />
+	OPEN QUESTION: for multicopy transgenes, should we include a 'n_copies' <br />
+	column as well? <br />
+	chromosome_id       : a feature of SO type 'chromosome' <br />
+	rank                : preserves order <br />
+	group               : spatially distinguishable group <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-feature_genotype_id">feature_genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-genotype_id">genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-chromosome_id">chromosome_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-cgroup">cgroup</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_genotype-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_genotype_idx1</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_genotype_idx2</td>
+	<td>genotype_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>chromosome_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cgroup</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_id, genotype_id, cvterm_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'environment'
+ -->
+
+<a name="environment" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	environment
+</h3></td>
+		<a name="environment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: environment <br />
+	================================================ <br />
+	The environmental component of a phenotype description <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment-environment_id">environment_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment-description">description</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>environment_idx1</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'environment_cvterm'
+ -->
+
+<a name="environment_cvterm" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	environment_cvterm
+</h3></td>
+		<a name="environment_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: environment_cvterm <br />
+	================================================ <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment_cvterm-environment_cvterm_id">environment_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment_cvterm-environment_id">environment_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="environment_cvterm-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>environment_cvterm_idx1</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>environment_cvterm_idx2</td>
+	<td>cvterm_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>environment_id, cvterm_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenotype'
+ -->
+
+<a name="phenotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype
+</h3></td>
+		<a name="phenotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phenotype <br />
+	================================================ <br />
+	a phenotypic statement, or a single atomic phenotypic <br />
+	observation <br />
+	a controlled sentence describing observable effect of non-wt function <br />
+	e.g. Obs=eye, attribute=color, cvalue=red <br />
+	see notes from Phenotype Ontology meeting <br />
+	observable_id       : e.g. anatomy_part, biological_process <br />
+	attr_id             : e.g. process <br />
+	value               : unconstrained free text value <br />
+	cvalue_id           : constrained value from ontology, e.g. "abnormal", "big" <br />
+	assay_id            : e.g. name of specific test <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-observable_id">observable_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-attr_id">attr_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-cvalue_id">cvalue_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype-assay_id">assay_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx1</td>
+	<td>cvalue_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx2</td>
+	<td>observable_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx3</td>
+	<td>attr_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>observable_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>attr_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvalue_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>assay_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenotype_cvterm'
+ -->
+
+<a name="phenotype_cvterm" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype_cvterm
+</h3></td>
+		<a name="phenotype_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phenotype_cvterm <br />
+	================================================ <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_cvterm-phenotype_cvterm_id">phenotype_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_cvterm-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_cvterm-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_cvterm_idx1</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_cvterm_idx2</td>
+	<td>cvterm_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phenotype_id, cvterm_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenstatement'
+ -->
+
+<a name="phenstatement" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenstatement
+</h3></td>
+		<a name="phenstatement"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phenstatement <br />
+	================================================ <br />
+	Phenotypes are things like "larval lethal".  Phenstatements are things <br />
+	like "dpp[1] is recessive larval lethal". So essentially phenstatement <br />
+	is a linking table expressing the relationship between genotype, environment, <br />
+	and phenotype. <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-phenstatement_id">phenstatement_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-genotype_id">genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-environment_id">environment_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenstatement-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenstatement_idx1</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenstatement_idx2</td>
+	<td>phenotype_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenstatement_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genotype_id, phenotype_id, environment_id, type_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_phenotype'
+ -->
+
+<a name="feature_phenotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_phenotype
+</h3></td>
+		<a name="feature_phenotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: feature_phenotype <br />
+	================================================ <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_phenotype-feature_phenotype_id">feature_phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_phenotype-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="feature_phenotype-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_phenotype_idx1</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_phenotype_idx2</td>
+	<td>phenotype_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_id, phenotype_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phendesc'
+ -->
+
+<a name="phendesc" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phendesc
+</h3></td>
+		<a name="phendesc"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phendesc <br />
+	================================================ <br />
+	RELATION: phendesc <br />
+	a summary of a _set_ of phenotypic statements for any one <br />
+	gcontext made in any one <br />
+	publication <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phendesc-phendesc_id">phendesc_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phendesc-genotype_id">genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phendesc-environment_id">environment_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phendesc-description">description</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phendesc-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phendesc_idx1</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phendesc_idx2</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phendesc_idx3</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phendesc_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>environment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>description</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genotype_id, environment_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenotype_comparison'
+ -->
+
+<a name="phenotype_comparison" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype_comparison
+</h3></td>
+		<a name="phenotype_comparison"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phenotype_comparison <br />
+	================================================ <br />
+	comparison of phenotypes <br />
+	eg, genotype1/environment1/phenotype1 "non-suppressible" wrt <br />
+	genotype2/environment2/phenotype2 <br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype_comparison_id">phenotype_comparison_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-genotype1_id">genotype1_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-environment1_id">environment1_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-genotype2_id">genotype2_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-environment2_id">environment2_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype1_id">phenotype1_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype2_id">phenotype2_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="phenotype_comparison-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_comparison_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>environment1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>environment2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>environment2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genotype1_id, environment1_id, genotype2_id, environment2_id, phenotype1_id, type_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+Created by <a href="http://sqlfairy.sourceforge.net">
+SQL::Translator 0.06</a>
+</body></html>

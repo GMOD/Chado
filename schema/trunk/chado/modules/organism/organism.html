@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
+</head><body>
+
+<h1 class="SchemaDescription">
+	Description of Schema
+</h1>
+
+<hr />
+
+<!-- 
+	Table listing (3 tables)
+ -->
+
+<a name="top" />
+
+<table class="LinkTable" width="100%">
+
+<tr>
+	<td class="LinkTableCell"><h2 class="LinkTableTitle">
+	Tables
+</h2></td>
+</tr>
+
+<!-- 
+	Start link to table 'organism'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organism-link" href="#organism">organism</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organism'
+ -->
+
+<!-- 
+	Start link to table 'organism_dbxref'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organism_dbxref-link" href="#organism_dbxref">organism_dbxref</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organism_dbxref'
+ -->
+
+<!-- 
+	Start link to table 'organismprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organismprop-link" href="#organismprop">organismprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organismprop'
+ -->
+
+</table>
+
+<!-- 
+	Starting table 'organism'
+ -->
+
+<a name="organism" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organism
+</h3></td>
+		<a name="organism"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organism <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-abbreviation">abbreviation</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-genus">genus</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-species">species</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples) </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-common_name">common_name</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism-comment">comment</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genus</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>species</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genus, species</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organism_dbxref'
+ -->
+
+<a name="organism_dbxref" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organism_dbxref
+</h3></td>
+		<a name="organism_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	Compared to mol5..Species, organism table lacks "approved char(1) null". <br />
+	We need to work w/ Aubrey & Michael to ensure that we don't need this in <br />
+	future [dave] <br />
+	in response: this is very specific to a limited use case I think; <br />
+	if it's really necessary we can have an organismprop table <br />
+	for adding internal project specific data <br />
+	[cjm] <br />
+	done (below) 19-MAY-03 [dave] <br />
+	================================================ <br />
+	TABLE: organism_dbxref <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism_dbxref-organism_dbxref_id">organism_dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism_dbxref-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organism_dbxref-dbxref_id">dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_dbxref_idx1</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_dbxref_idx2</td>
+	<td>dbxref_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>organism_id, dbxref_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organismprop'
+ -->
+
+<a name="organismprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organismprop
+</h3></td>
+		<a name="organismprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organismprop <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organismprop-organismprop_id">organismprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organismprop-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organismprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organismprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr>
+	<td class="FieldCellName"><a name="organismprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismprop_idx1</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organismprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>organism_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+Created by <a href="http://sqlfairy.sourceforge.net">
+SQL::Translator 0.06</a>
+</body></html>
