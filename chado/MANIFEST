@@ -161,7 +161,6 @@ modules/sequence/apollo-bridge/apollo.inserts
 modules/sequence/apollo-bridge/cv_inserts.sql
 modules/sequence/apollo-bridge/insert_ad_doc_cv.pl
 modules/sequence/apollo-bridge/naming_rules.txt
-modules/sequence/bdgp/bdgp-fix.sql
 modules/sequence/bdgp/bdgp-indexes.sql
 modules/sequence/bdgp/bdgp-views.sql
 modules/sequence/bdgp/bin/create-so-layer.pl
@@ -174,8 +173,6 @@ modules/sequence/functions/feature_ids_fx.plpgsql
 modules/sequence/functions/feature_subalignments.plpgsql
 modules/sequence/gff-bridge/sequence-gff-funcs.plpgsql
 modules/sequence/gff-bridge/sequence-gff-views.sql
-modules/sequence/seq_triggers.sql
-modules/sequence/seq_triggers.sql~
 modules/sequence/sequence-dbapi.sqli
 modules/sequence/sequence.html
 modules/sequence/sequence.pgfunc
