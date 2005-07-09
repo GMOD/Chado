@@ -1,0 +1,77 @@
+<bridge_layer schema="chaos">
+  <notes>
+    Chaos is a simplified view layer over Chado. 
+  </notes>
+
+  <relation id="dbxref">
+    <notes>table name clash - be sure to prefix with schema name</notes>
+    <sql>
+ SELECT
+  dbxref.*,
+  db.name                            AS dbname,
+  db.name || ':' || accession        AS dbxrefstr
+ FROM public.dbxref
+  INNER JOIN public.db USING (db_id);
+    </sql>
+  </relation>
+
+  <relation id="organism">
+    <notes>table name clash - be sure to prefix with schema name</notes>
+    <sql>
+ SELECT
+  *,
+  genus || ' ' || species || ' (' || common_name || ')' AS organismstr
+ FROM organism
+    </sql>
+  </relation>
+
+  <relation id="feature">
+    <notes>table name clash - be sure to prefix with schema name</notes>
+    <sql>
+ SELECT 
+  feature_id,
+  f.name,
+  uniquename,
+  t.name         AS type,
+  organismstr,
+  dbxrefstr,
+  residues,
+  seqlen,
+  md5checksum
+ FROM public.feature AS f
+  INNER JOIN chaos.dbxref USING (dbxref_id)
+  INNER JOIN chaos.organism USING (organism_id)
+  INNER JOIN cvterm AS t ON (t.cvterm_id=type_id)
+    </sql>
+  </relation>
+
+  <relation id="featureprop">
+    <notes>table name clash - be sure to prefix with schema name</notes>
+    <sql>
+ SELECT 
+  feature_id,
+  t.name         AS type,
+  value
+ FROM public.featureprop
+  INNER JOIN cvterm AS t ON (t.cvterm_id=type_id)
+    </sql>
+  </relation>
+
+  <relation id="featureloc">
+    <notes>table name clash - be sure to prefix with schema name</notes>
+    <sql>
+<![CDATA[
+ SELECT 
+  feature_id,
+  srcfeature_id,
+  CASE WHEN strand < 0 THEN fmax ELSE fmin END AS nbeg,
+  CASE WHEN strand < 0 THEN fmin ELSE fmax END AS nend,
+  strand,
+  rank,
+  locgroup
+ FROM public.featureloc
+]]>
+    </sql>
+  </relation>
+
+</bridge_layer>
