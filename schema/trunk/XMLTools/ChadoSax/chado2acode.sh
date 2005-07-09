@@ -3,6 +3,8 @@
 
 ##set args="-version=3.2.0 -fbgn2id=FBgn2ndary.list -debug"
 set args="-version=4.1 -skip=residues -debug"
+set indexargs="-debug"
+# dpse# set indexargs="-idprefix=GA -debug"
 #  -skip=residues -- if don't want amino,transcript .fasta
 
 set csp="./ChadoSax/src"
@@ -46,7 +48,7 @@ perl -I$csp -M'org::gmod::chado::ix::ToAcode' -e 'acode;' -- \
  $args -feat=$outf.feats $xml  >> $outf
 end
 
-perl -I$csp -M'org::gmod::chado::ix::ToAcode' -e 'acodeindex;' -- $outf
+perl -I$csp -M'org::gmod::chado::ix::ToAcode' -e 'acodeindex;' -- $indexargs $outf
 
 # echo "Also need to generate FBan.list RETE header files"
 

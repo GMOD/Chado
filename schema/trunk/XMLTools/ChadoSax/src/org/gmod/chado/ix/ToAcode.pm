@@ -93,7 +93,7 @@ use vars qw/
   @cmt_props @skip_props
   $AnnoDbName $GeneDbName
   $RECSEP
-  $indexanyid
+  $indexanyid $idprefix
   /;
 
 =item 
@@ -174,6 +174,7 @@ sub acode {
     'debug!' => \$debug,
     'index!' => \$doindex,
     'anyidindex!' => \$indexanyid,
+    'idprefix=s' => \$idprefix,
     'outfile=s' => \$outf,
     'tefile=s' => \$outte,
     'featfile=s' => \$ftoutf,
@@ -193,6 +194,7 @@ sub acode {
   -index = index output.acode
   -fbgn2id = table of FBgn 2ndary id -> primary id to patch in
   -skipfeat = residues  -- optionally drop xml tags during parse
+  -idprefix = GA ... -- index ID|GAnnnnn numeric part (specify ID prefix)
   -anyidindex -- index any/all ID|XXnnnnn numeric part (not just FBan)
   -[no]debug     
   ";
@@ -286,7 +288,8 @@ sub acode {
 =cut
 
   if ($doindex && $outf) {
-    if ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
+    if ($idprefix) { indexAcode( $outf, $idprefix, "FBgn"); }
+    elsif ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
     else { indexAcode( $outf, "FBan", "FBgn"); }
     }  
   if ($doindex && $outte) {
@@ -307,11 +310,15 @@ sub acode {
 =cut
 
 sub acodeindex {
-  unless(@ARGV) { die "usage: acodeindex [-anyid -out=f.acode -te=te.acode] FBan.acode\n"; }
+  unless(@ARGV) { 
+    die "usage: acodeindex [-idprefix=GA | -anyid ] 
+      [ -out=f.acode -te=te.acode] FBan.acode\n"; 
+      }
   #? no need for new ToAcode()
   my ($outf,$outte);
   my $optok= Getopt::Long::GetOptions( 
     'debug!' => \$debug,
+    'idprefix=s' => \$idprefix,
     'anyidindex!' => \$indexanyid,
     'outfile=s' => \$outf,
     'tefile=s' => \$outte,
@@ -320,14 +327,15 @@ sub acodeindex {
   unless($outf) { $outf= shift @ARGV; }
   unless(-e $outf) { warn "acodeindex: cannot index $outf\n"; }
   else {
-    if ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
+    if ($idprefix) { indexAcode( $outf, $idprefix, "FBgn"); }
+    elsif ($indexanyid) { indexAcode( $outf, '[A-Za-z]+', "FBgn"); }
     else { indexAcode( $outf, "FBan", "FBgn"); }
     }
     
   unless ($outte) {
     ($outte= $outf) =~ s/\./-TE\./;  # transposable_element have separate ID class - FBti
     }
-  if (-e $outte) { indexAcode( $outte, "FBti"); }
+  if (-e $outte) { indexAcode( $outte, "FBti"); } # only if non-zero -s ?
 }
 
 
@@ -1161,6 +1169,7 @@ feb05 -- missing valid is_current here ?
         ($ftag,$ftype)= $dft->id2name('type_id', $dft->{type_id});
         $attr= "$forg/$ftype:$nm";
         
+        ##  ORTHO; have already defined ORTH for this ...
         $ftd->{ORTHO} .= "$rtype=$attr".$RECSEP ;  ## fixme NOT right field for this
         $notdone= 0; 
         }
