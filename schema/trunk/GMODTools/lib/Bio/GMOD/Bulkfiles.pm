@@ -626,6 +626,10 @@ sub remapArm
 #  my $armfile= $arm;
   ##my $csomeset= $self->getChromosomeTable(); ## pass value
 
+  if ($csomeset->{'_part2chr'}->{$arm}) {
+    $arm= $csomeset->{'_part2chr'}->{$arm};
+    }
+  else {
   foreach my $mp (sort keys %mapchr_pattern) {
     next if ($mp eq 'null'); # dummy?
     my $from= $mapchr_pattern{$mp}->{from}; next unless($from);
@@ -633,6 +637,7 @@ sub remapArm
     $arm =~ s/$from/$to/g;
     # if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
     }
+  }
 
   ## need to trap $arm not in $csomeset -- errors like Contig_Contig below
   ## which either need to be remapped or otherwise handled.
@@ -1029,8 +1034,11 @@ sub sortNSplitByChromosome
   my $fdump  = $self->{config}->{featdump};
   my $outpath= $self->getReleaseSubdir( $fdump->{'path'} || "tmp/") ;
   my $outname= catfile( $outpath, $fdump->{splitname} || "chadofeat");
-  my $sumfile= catfile( $self->getReleaseDir(), "feature_table-summary.txt");
   my $intype = $fdump->{type};
+
+  my $tfset  = $self->getFilesetInfo('tables');
+  my $tabdir = $self->getReleaseSubdir( $tfset->{path} || 'tables/');
+  my $sumfile= catfile( $tabdir, "feature_table-summary.txt");
   
   ## check first existance of outname files, and age 
   ## if newer than input fileset, leave as is, return file names ?
@@ -1282,6 +1290,7 @@ sub makeFiles
 =item writeDocs( $docs or $self->{config}->{doc})
 
   print docs from config file
+  .. move this into own BulkWriter subclass ?
   
 =cut
 
@@ -1527,6 +1536,7 @@ sub getChromosomeTable
   
   my $chromosome= {};
   my $chrparts  = {}; # for dpse map Unknown ultra_scaffold/golden_path_fragment to U
+  my $part2chr  = {}; # map golden_path_region name to chr-arm name
   my $chrpartpattern= $config->{chrpart_pattern};
   my %orgset    = ();
   
@@ -1543,6 +1553,8 @@ sub getChromosomeTable
     next unless($id); #?
     ## sgdlite uses messy chr ID -- use name instead here ? better: $arm is best of both
 
+    ## use $strand == rank here -- assume input file is ordered by that.
+    
     ## need ($arm,$golden_path,...)= mapChr($arm)
     ## ? need some compound chr{arm} with multiple ids for Unknown bag?
     
@@ -1571,23 +1583,27 @@ sub getChromosomeTable
       fullspecies => $species,
       };
       
-    if ($chrpartpattern && $type =~ /$chrpartpattern/) {
+    if ($chrpartpattern && $type =~ /$chrpartpattern/) { #== golden_path_fragment|golden_path_region, other?
       unless($chrparts->{$arm}) { $chrparts->{$arm}= []; }
       push(@{$chrparts->{$arm}}, $chrvals);
+      $part2chr->{$id}= $arm;
       }
     else {
+      #? check type =~ <chr_pattern>^(chromosome_arm|golden_path|ultra_scaffold)$</chr_pattern>
       $chromosome->{$arm}= $chrvals;
       }
     }
   close(CF);
   }
   
+  $chromosome->{'_part2chr'}= $part2chr;
   foreach my $arm (keys %$chrparts) {
     unless($chromosome->{$arm}) {  ## make pseudochr from parts?
       $chromosome->{$arm}= { 
         arm => $arm, name => $arm, id => $arm, 
         type => 'golden_path', # fixme
-        start => 1, length => 0, # fixme
+        start => 1, 
+        length => 0, # fixme
         strand => 0, oid => 0, species => '', org => '', # fixme
         }; 
       } 
@@ -1607,10 +1623,11 @@ sub getChromosomeTable
     }
     
   $config->{chromosome}= $chromosome;
-  unless(ref $config->{chromosomes}) {
-    my @csomes= sort keys %$chromosome;
-    $config->{chromosomes}= \@csomes;
-    }
+  $self->getChromosomes();
+#   unless(ref $config->{chromosomes}) {
+#     my @csomes= sort keys %$chromosome;
+#     $config->{chromosomes}= \@csomes;
+#     }
   return $chromosome;
 }
 
@@ -1621,7 +1638,7 @@ sub getChromosomes
   my $config= $self->{config};
   unless(ref $config->{chromosomes}) {
     my $chromosome= $self->getChromosomeTable();
-    my @csomes= sort keys %$chromosome;
+    my @csomes= grep !/^_/, sort keys %$chromosome;
     $config->{chromosomes}= \@csomes;
     }
   return $config->{chromosomes};
@@ -1905,9 +1922,14 @@ sub dumpFeatures
     if ($fixme && $fixme->{type} eq 'postprocess') {
       my $shell=  $fixme->{shell} || $fixme->{language};  
       my $spath=  catfile( $self->{config}->{TMP}, $fixme->{name});
-      print STDERR "postprocess $shell $spath $outf\n" if $DEBUG;
+      my $fixinput= $outf;
+      # if ($fixme->{input}) {
+      # $fixinput= catfile($self->getReleaseDir(),$fixme->{input});
+      # }
+      
+      print STDERR "postprocess $shell $spath $fixinput\n" if $DEBUG;
       open(SH,">$spath"); print SH $fixme->{content}; close(SH);
-      my $sresult= `$shell $spath $outf`; #?? what of perl params 
+      my $sresult= `$shell $spath $fixinput`; #?? what of perl params 
       # how do i pipe table into script ?? and out again to replace old
       # this works:  perl -i.old rdump $r/tmp/featdump/analysis.tsv
       }
@@ -1915,7 +1937,6 @@ sub dumpFeatures
     push(@files, { path => $outf, type => $type, name => $sname, file => $outn, });
   }
   return \@files;
-  
 }
 
 

@@ -105,7 +105,9 @@
 
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
-
+  <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
+  <gmodel_parts_rename>0</gmodel_parts_rename>
+  
   <!-- feature sets to make fasta bulk files -->
   <include>featuresets</include>
 

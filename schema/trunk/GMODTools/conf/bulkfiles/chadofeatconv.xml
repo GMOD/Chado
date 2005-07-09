@@ -150,13 +150,15 @@ This is what it looks like to me, but you all have more experience:
 
 contig
   => supercontig/scaffold/golden_path_fragment 
-   [  databank_scaffold  ]
+   [  databank_scaffold  ]   
     => golden_path/ultracontig 
       => chromosome/chromosome_arm
 
 Here is a suggested term:
   databank_scaffold ; def: A golden_path_fragment unit for genbank/embl/ddbj databank
  submission ; syn: genbank_entry, embl_entry, ddbj_entry
+
+golden_path_region, not SO term is now used in flybase chadodb as databank_scaffold 
   
 -->
 
@@ -343,6 +345,13 @@ name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnasca
 2L      22221   98619   0       match:aubrey_cytolocator:cytology               band-21B1-hsp   
 8331270 parent_oid      8331271
 
+mar05: dpse1.04 - these are not public features:
+golden_path_region      Contig4967_Contig2069
+However, Dmel chado uses golden_path_region for databank_scaffold !
+  golden_path_region="scaffold"
+retype in dpse db all dpse golden_path_region to supercontig
+   UPDATE feature set type_id = 556 where organism_id = 3 and type_id = 553;
+
 -->
     
   <maptype 
@@ -350,6 +359,7 @@ name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnasca
     CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="scaffold"
+    supercontig="skip"
     oligonucleotide="oligo"
     three_prime_untranslated_region="three_prime_UTR"
     transposable_element_pred="transposable_element_pred"

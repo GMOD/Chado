@@ -150,9 +150,9 @@ sub initData
   $dnareldir = "../$dnareldir";
   $self->{dnareldir}= $dnareldir;
 
-  my $sumfile= catfile( $reldir, "feature_map-summary.txt"); 
-    # or $finfo->{summaryfile} || $config->{summaryfile}
-  $self->{summaryfile} = $sumfile;
+  my $tfset  = $self->handler()->getFilesetInfo('tables');
+  my $tabdir = $self->handler()->getReleaseSubdir( $tfset->{path} || 'tables/');
+  $self->{summaryfile}= catfile( $tabdir, "feature_map-summary.txt"); 
 
   my @copytypes=();  
   foreach my $type ( keys %{$config->{fileset}} ) {
@@ -895,6 +895,7 @@ sub makeAllIdmaps
       unshift(@ids,$sym);
       }
     elsif ($notes && $notes =~ /to_name=([^;,\s]+)/ ) {  
+      ## added to_name=name, id << keep id?
       my $tosym = $1; $tosym =~ s/\-\w\w$//; # drop prot suffix
       my $toorg = ($notes =~ /to_species=([^;,\s]+)/) ? $1 : $org;
       unshift(@ids,ucfirst($toorg).'\\'.$tosym);

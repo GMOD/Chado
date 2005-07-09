@@ -1,0 +1,612 @@
+<opt
+  name="fbbulk-r411" 
+  relid="411"
+  date="20050421"
+  ROOT="${GMOD_ROOT}/"
+  TMP="${GMOD_ROOT}/tmp"
+  datadir="data/genomes/Drosophila_melanogaster"
+>
+<!--   datadir="data2/fban" -->
+
+  <title>FlyBase Chado DB r4.1.1</title>
+  <about>
+   Configurations to extract feature and sequence data for
+   bulk files from FlyBase chado databases, including various
+   release information.
+  </about>
+
+  <notes id="r411">
+   Update r4.1.1 notes:  this release contains
+    1) Changes to gene models due to problems found in the GB-submission process
+    2) Fixes and additions of non-gm / non-gb-submitted data (eg, evidence, 
+insertions, and I believe loads of ARGS data).
+
+  </notes>
+  
+  <doc name="README"><![CDATA[
+    D. melanogaster euchromatin genome data from FlyBase
+    Release  ${rel}, dated ${date}.
+    
+    This release data synchronizes with Genbank submission, including 
+    1) Changes to gene models due to problems found in the GB-submission process
+    2) Fixes and additions of non-gm / non-gb-submitted data.
+    
+    See release notes at <a href="http://flybase.net${release_url}">
+    http://flybase.net${release_url}</a>
+  ]]></doc>
+
+  <doc name="release_changes" path="tables/release_changes.txt"><![CDATA[
+D. melanogaster euchromatin genome data from FlyBase
+Release  ${rel}, dated ${date}.
+
+General changes:
+1. fix some type errors for EST/cDNA_clone
+2. migrated missed BACs on arms 3L and part of X
+3. updated 26 accession.version dbxrefs associated with proteins
+4. fix evidence for all sim4 and blast*, which have incorrect alignment string
+5. re-load missed sim4tandem evidence for arm 4 and 2L
+6. updates for insertions
+
+Gene model changes from release 4.1.0 to release 4.1.1
+
+R4.1.0       R4.1.1
+
+CR31541      delete a comment
+CG7210       CG7210-PB length 
+CG31931-PA   residues changed
+CG31243-PG   residues changed
+CG32922-PC   CDS edit
+CG11177-PA   CDS edit
+CG3985-RD    CDS edit
+CG33217-RA      add comment:CDS has unusual splice
+CG17521-RA      add comment:CDS has unusual splice
+CG17521-RB      add comment:CDS has unusual splice
+CG3638-RA       add comment:CDS has unusual splice
+CG3638-RB       add comment:CDS has unusual splice
+CG32806-RB      add comment:CDS has unusual splice
+CG3206-RA       add comment:CDS has unusual splice
+CG2713-RA       add comment:CDS has unusual splice
+CG5014-RA       add comment:CDS has unusual splice
+CG4208-RA       add comment:CDS has unusual splice
+CG15771-RB      add comment:CDS has unusual splice
+CG1636-RA       add comment:CDS has unusual splice
+CG2890-RA       add comment:CDS has unusual splice
+CG2890-RB       add comment:CDS has unusual splice
+CG2890-RC       add comment:CDS has unusual splice
+CG10543-RC      add comment:CDS has unusual splice
+CG30389-RB      add comment:CDS has unusual splice
+CG33226-RA      add comment:CDS has unusual splice
+CG2835-RB       add comment:CDS has unusual splice
+CG4012-RA       add comment:CDS has unusual splice
+CG3616-RA       add comment:CDS has unusual splice
+CG3894-RA       add comment:CDS has unusual splice
+CG9071-RA       add comment:CDS has unusual splice
+CG3533-RA       add comment:CDS has unusual splice
+CG16932-RC      add comment:CDS has unusual splice
+CG16932-RB      add comment:CDS has unusual splice
+CG16932-RA      add comment:CDS has unusual splice
+CG6851-RB       add comment:CDS has unusual splice
+CG6851-RA       add comment:CDS has unusual splice
+CG6851-RC       add comment:CDS has unusual splice
+CG32476-RA      add comment:CDS has unusual splice
+CG17142-RA      add comment:CDS has unusual splice
+CG6936-RA       add comment:CDS has unusual splice
+CG6936-RB       add comment:CDS has unusual splice
+CG1086-RB       add comment:CDS has unusual splice
+CG1086-RC       add comment:CDS has unusual splice
+CG32320-RA      add comment:CDS has unusual splice
+CG32313-RA      add comment:CDS has unusual splice
+CG1960-RA       add comment:CDS has unusual splice
+CG1960-RB       add comment:CDS has unusual splice
+CG16973-RA      add comment:CDS has unusual splice
+CG16973-RB      add comment:CDS has unusual splice
+CG16973-RD      add comment:CDS has unusual splice
+CG16973-RC      add comment:CDS has unusual splice
+CG16973-RE      add comment:CDS has unusual splice
+CG16757-RA      add comment:CDS has unusual splice
+CG11505-RC      add comment:CDS has unusual splice
+CG14959-RB      add comment:CDS has unusual splice
+CG32253-RA      add comment:CDS has unusual splice
+CG2174-RA       add comment:CDS has unusual splice
+CG4187-RA       add comment:CDS has unusual splice
+CG11063-RB      add comment:CDS has unusual splice
+CG10986-RB      add comment:CDS has unusual splice
+CG14414-RB      add comment:CDS has unusual splice
+CG9030-RA       add comment:CDS has unusual splice
+CG8239-RA       add comment:CDS has unusual splice
+CG3606-RB       add comment:CDS has unusual splice
+CG7178-RB       add comment:CDS has unusual splice
+CG12609-RA      add comment:CDS has unusual splice
+CG6857-RA       add comment:CDS has unusual splice
+CG7990-RB       add comment:CDS has unusual splice
+CG6571-RB       add comment:CDS has unusual splice
+CG6571-RC       add comment:CDS has unusual splice
+CG6571-RD       add comment:CDS has unusual splice
+CG7298-RA       add comment:CDS has unusual splice
+CG14183-RA      add comment:CDS has unusual splice
+CG6812-RA       add comment:CDS has unusual splice
+CG6896-RA       add comment:CDS has unusual splice
+CG7408-RB       add comment:CDS has unusual splice
+CG7402-RA       add comment:CDS has unusual splice
+CG7692-RA       add comment:CDS has unusual splice
+CG16793-RA      add comment:CDS has unusual splice
+CG7656-RB       add comment:CDS has unusual splice
+CG13476-RA      add comment:CDS has unusual splice
+CG32138-RA      add comment:CDS has unusual splice
+CG32138-RB      add comment:CDS has unusual splice
+CG7283-RC       add comment:CDS has unusual splice
+CG32096-RB      add comment:CDS has unusual splice
+CG32096-RE      add comment:CDS has unusual splice
+CG32096-RC      add comment:CDS has unusual splice
+CG32085-RA      add comment:CDS has unusual splice
+CG7573-RA       add comment:CDS has unusual splice
+CG7573-RB       add comment:CDS has unusual splice
+CG6279-RA       add comment:CDS has unusual splice
+CG18628-RA      add comment:CDS has unusual splice
+CG32068-RA      add comment:CDS has unusual splice
+CG32056-RA      add comment:CDS has unusual splice
+CG6711-RA       add comment:CDS has unusual splice
+CG32045-RB      add comment:CDS has unusual splice
+CG4821-RA       add comment:CDS has unusual splice
+CG5194-RA       add comment:CDS has unusual splice
+CG7999-RA       add comment:CDS has unusual splice
+CG16992-RA      add comment:CDS has unusual splice
+CG32402-RA      add comment:CDS has unusual splice
+CG15445-RB      add comment:CDS has unusual splice
+CG15445-RC      add comment:CDS has unusual splice
+CG2816-RA       add comment:CDS has unusual splice
+CG33122-RA      add comment:CDS has unusual splice
+CG31779-RA      add comment:CDS has unusual splice
+CG3524-RA       add comment:CDS has unusual splice
+CG3539-RC       add comment:CDS has unusual splice
+CG3539-RD       add comment:CDS has unusual splice
+CG4629-RA       add comment:CDS has unusual splice
+CG4629-RB       add comment:CDS has unusual splice
+CG4184-RA       add comment:CDS has unusual splice
+CG11601-RA      add comment:CDS has unusual splice
+CG3164-RA       add comment:CDS has unusual splice
+CG3164-RB       add comment:CDS has unusual splice
+CG12178-RA      add comment:CDS has unusual splice
+CG5498-RB       add comment:CDS has unusual splice
+CG18332-RA      add comment:CDS has unusual splice
+CG7177-RA       add comment:CDS has unusual splice
+CG7448-RB       add comment:CDS has unusual splice
+CG2095-RA       add comment:CDS has unusual splice
+CG12746-RA      add comment:CDS has unusual splice
+CG1081-RA       add comment:CDS has unusual splice
+CG1081-RB       add comment:CDS has unusual splice
+CG2902-RA       add comment:CDS has unusual splice
+CG1116-RB       add comment:CDS has unusual splice
+CG1116-RA       add comment:CDS has unusual splice
+CG1116-RC       add comment:CDS has unusual splice
+CG12005-RB      add comment:CDS has unusual splice
+CG31531-RA      add comment:CDS has unusual splice
+CG31531-RB      add comment:CDS has unusual splice
+CG31531-RC      add comment:CDS has unusual splice
+CG1102-RA       add comment:CDS has unusual splice
+CG1084-RA       add comment:CDS has unusual splice
+CG10520-RA      add comment:CDS has unusual splice
+CG9780-RB       add comment:CDS has unusual splice
+CG14031-RA      add comment:CDS has unusual splice
+CG31647-RA      add comment:CDS has unusual splice
+CG9042-RB       add comment:CDS has unusual splice
+CG9042-RC       add comment:CDS has unusual splice
+CG9042-RA       add comment:CDS has unusual splice
+CG9154-RA       add comment:CDS has unusual splice
+CG9092-RA       add comment:CDS has unusual splice
+CG11098-RB      add comment:CDS has unusual splice
+CG11328-RA      add comment:CDS has unusual splice
+CG11328-RB      add comment:CDS has unusual splice
+CG7068-RA       add comment:CDS has unusual splice
+CG13795-RA      add comment:CDS has unusual splice
+CG8086-RC       add comment:CDS has unusual splice
+CG31756-RA      add comment:CDS has unusual splice
+CG33085-RD      add comment:CDS has unusual splice
+CG18660-RC      add comment:CDS has unusual splice
+CG4926-RA       add comment:CDS has unusual splice
+CG6176-RA       add comment:CDS has unusual splice
+CG7456-RA       add comment:CDS has unusual splice
+CG5603-RC       add comment:CDS has unusual splice
+CG5603-RD       add comment:CDS has unusual splice
+CG5603-RE       add comment:CDS has unusual splice
+CG5603-RB       add comment:CDS has unusual splice
+CG33114-RA      add comment:CDS has unusual splice
+CG12403-RA      add comment:CDS has unusual splice
+CG9431-RA       add comment:CDS has unusual splice
+CG31847-RA      add comment:CDS has unusual splice
+CG32975-RA      add comment:CDS has unusual splice
+CG10846-RA      add comment:CDS has unusual splice
+CG31822-RA      add comment:CDS has unusual splice
+CG17927-RB      add comment:CDS has unusual splice
+CG17927-RC      add comment:CDS has unusual splice
+CG17927-RD      add comment:CDS has unusual splice
+CG17927-RF      add comment:CDS has unusual splice
+CG17927-RI      add comment:CDS has unusual splice
+CG17927-RL      add comment:CDS has unusual splice
+CG17927-RK      add comment:CDS has unusual splice
+CG17927-RM      add comment:CDS has unusual splice
+CG6605-RA       add comment:CDS has unusual splice
+CG5674-RA       add comment:CDS has unusual splice
+CG5674-RC       add comment:CDS has unusual splice
+CG10346-RA      add comment:CDS has unusual splice
+CG31691-RA      add comment:CDS has unusual splice
+CG1028-RM       add comment:CDS has unusual splice
+CG1028-RE       add comment:CDS has unusual splice
+CG1028-RL       add comment:CDS has unusual splice
+CG1028-RF       add comment:CDS has unusual splice
+CG1028-RI       add comment:CDS has unusual splice
+CG1028-RJ       add comment:CDS has unusual splice
+CG17603-RA      add comment:CDS has unusual splice
+CG17603-RB      add comment:CDS has unusual splice
+CG17603-RC      add comment:CDS has unusual splice
+CG10277-RA      add comment:CDS has unusual splice
+CG10277-RB      add comment:CDS has unusual splice
+CG10277-RC      add comment:CDS has unusual splice
+CG1021-RA       add comment:CDS has unusual splice
+CG1021-RB       add comment:CDS has unusual splice
+CG11671-RA      add comment:CDS has unusual splice
+CG8202-RA       add comment:CDS has unusual splice
+CG17227-RA      add comment:CDS has unusual splice
+CG11608-RA      add comment:CDS has unusual splice
+CG7091-RA       add comment:CDS has unusual splice
+CG3508-RB       add comment:CDS has unusual splice
+CG31302-RA      add comment:CDS has unusual splice
+CG31302-RB      add comment:CDS has unusual splice
+CG5404-RA       add comment:CDS has unusual splice
+CG14889-RA      add comment:CDS has unusual splice
+CG17931-RB      add comment:CDS has unusual splice
+CG16941-RA      add comment:CDS has unusual splice
+CG7665-RA       add comment:CDS has unusual splice
+CG7665-RB       add comment:CDS has unusual splice
+CG7131-RA       add comment:CDS has unusual splice
+CG7131-RB       add comment:CDS has unusual splice
+CG31122-RA      add comment:CDS has unusual splice
+CG5558-RA       add comment:CDS has unusual splice
+CG6195-RA       add comment:CDS has unusual splice
+CG32921-RB      add comment:CDS has unusual splice
+CG32921-RD      add comment:CDS has unusual splice
+CG5067-RA       add comment:CDS has unusual splice
+CG5483-RA       add comment:CDS has unusual splice
+CG4217-RA       add comment:CDS has unusual splice
+CG16791-RA      add comment:CDS has unusual splice
+CG7956-RA       add comment:CDS has unusual splice
+CG18596-RA      add comment:CDS has unusual splice
+CG31156-RA      add comment:CDS has unusual splice
+CG4677-RA       add comment:CDS has unusual splice
+CG4656-RA       add comment:CDS has unusual splice
+CG16723-RA      add comment:CDS has unusual splice
+CG33106-RA      add comment:CDS has unusual splice
+CG33106-RB      add comment:CDS has unusual splice
+CG5501-RB       add comment:CDS has unusual splice
+CG5501-RD       add comment:CDS has unusual splice
+CG33342-RA      add comment:CDS has unusual splice
+CG18528-RA      add comment:CDS has unusual splice
+CG6677-RA       add comment:CDS has unusual splice
+CG8384-RB       add comment:CDS has unusual splice
+CG8384-RA       add comment:CDS has unusual splice
+CG8384-RD       add comment:CDS has unusual splice
+CG8384-RC       add comment:CDS has unusual splice
+CG8384-RE       add comment:CDS has unusual splice
+CG6323-RB       add comment:CDS has unusual splice
+CG6378-RA       add comment:CDS has unusual splice
+CG6134-RE       add comment:CDS has unusual splice
+CG6134-RG       add comment:CDS has unusual splice
+CG6134-RH       add comment:CDS has unusual splice
+CG3339-RA       add comment:CDS has unusual splice
+CG16918-RA      add comment:CDS has unusual splice
+CG1842-RA       add comment:CDS has unusual splice
+CG31037-RA      add comment:CDS has unusual splice
+CG31033-RC      add comment:CDS has unusual splice
+CG31033-RA      add comment:CDS has unusual splice
+CG31033-RB      add comment:CDS has unusual splice
+CG1416-RA       add comment:CDS has unusual splice
+CG1416-RB       add comment:CDS has unusual splice
+CG1416-RC       add comment:CDS has unusual splice
+CG7865-RB       add comment:CDS has unusual splice
+CG7865-RA       add comment:CDS has unusual splice
+CG3427-RA       add comment:CDS has unusual splice
+CG33348-RA      add comment:CDS has unusual splice
+CG9204-RA       add comment:CDS has unusual splice
+CG9204-RB       add comment:CDS has unusual splice
+CG9204-RC       add comment:CDS has unusual splice
+CG7626-RB       add comment:CDS has unusual splice
+CG15081-RC      add comment:CDS has unusual splice
+CG15081-RB      add comment:CDS has unusual splice
+CG15081-RA      add comment:CDS has unusual splice
+CG15093-RC      add comment:CDS has unusual splice
+CG9635-RE       add comment:CDS has unusual splice
+CG9635-RF       add comment:CDS has unusual splice
+CG9635-RD       add comment:CDS has unusual splice
+CG30097-RB      add comment:CDS has unusual splice
+CG8048-RD       add comment:CDS has unusual splice
+CG33462-RA      add comment:CDS has unusual splice
+CG8155-RA       add comment:CDS has unusual splice
+CG7761-RA       add comment:CDS has unusual splice
+CG18324-RB      add comment:CDS has unusual splice
+CG8536-RA       add comment:CDS has unusual splice
+CG8118-RC       add comment:CDS has unusual splice
+CG30483-RA      add comment:CDS has unusual splice
+CG8502-RA       add comment:CDS has unusual splice
+CG8858-RA       add comment:CDS has unusual splice
+CG7736-RE       add comment:CDS has unusual splice
+CG7736-RD       add comment:CDS has unusual splice
+CG4001-RA       add comment:CDS has unusual splice
+CG4001-RB       add comment:CDS has unusual splice
+CG8232-RA       add comment:CDS has unusual splice
+CG8235-RA       add comment:CDS has unusual splice
+CG8247-RA       add comment:CDS has unusual splice
+CG30361-RA      add comment:CDS has unusual splice
+CG8696-RA       add comment:CDS has unusual splice
+CG8707-RA       add comment:CDS has unusual splice
+CG1925-RA       add comment:CDS has unusual splice
+CG2064-RA       add comment:CDS has unusual splice
+CG11217-RA      add comment:CDS has unusual splice
+CG4445-RA       add comment:CDS has unusual splice
+CG1748-RA       add comment:CDS has unusual splice
+CG2380-RB       add comment:CDS has unusual splice
+CG11186-RA      add comment:CDS has unusual splice
+CG32530-RB      add comment:CDS has unusual splice
+CG10390-RA      add comment:CDS has unusual splice
+CG10861-RA      add comment:CDS has unusual splice
+CG13207-RC      add comment:CDS has unusual splice
+CG1354-RA       add comment:CDS has unusual splice
+CG1354-RC       add comment:CDS has unusual splice
+CG1354-RD       add comment:CDS has unusual splice
+CG15899-RB      add comment:CDS has unusual splice
+CG18177-RB      add comment:CDS has unusual splice
+CG33204-RA      add comment:CDS has unusual splice
+CG4118-RA       add comment:CDS has unusual splice
+CG4118-RB       add comment:CDS has unusual splice
+CG5472-RA       add comment:CDS has unusual splice
+CG5842-RA       add comment:CDS has unusual splice
+CG6686-RA       add comment:CDS has unusual splice
+CG6867-RA       add comment:CDS has unusual splice
+CG7234-RI       add comment:CDS has unusual splice
+CG7467-RB       add comment:CDS has unusual splice
+CG7730-RC       add comment:CDS has unusual splice
+CG10327-RB      add comment:CDS has unusual splice
+CG10327-RC      add comment:CDS has unusual splice
+CG10327-RD      add comment:CDS has unusual splice
+CG1225-RC       add comment:CDS has unusual splice
+CG1391-RD       add comment:CDS has unusual splice
+CG1391-RC       add comment:CDS has unusual splice
+CG1391-RB       add comment:CDS has unusual splice
+CG17228-RD      add comment:CDS has unusual splice
+CG17228-RA      add comment:CDS has unusual splice
+CG18004-RB      add comment:CDS has unusual splice
+CG18217-RA      add comment:CDS has unusual splice
+CG2184-RB       add comment:CDS has unusual splice
+CG30423-RB      add comment:CDS has unusual splice
+CG31305-RB      add comment:CDS has unusual splice
+CG3277-RB       add comment:CDS has unusual splice
+CG33067-RB      add comment:CDS has unusual splice
+CG33187-RC      add comment:CDS has unusual splice
+CG33267-RA      add comment:CDS has unusual splice
+CG33298-RB      add comment:CDS has unusual splice
+CG33298-RA      add comment:CDS has unusual splice
+CG33317-RA      add comment:CDS has unusual splice
+CG33472-RA      add comment:CDS has unusual splice
+CG3566-RC       add comment:CDS has unusual splice
+CG3566-RB       add comment:CDS has unusual splice
+CG3911-RA       add comment:CDS has unusual splice
+CG5442-RB       add comment:CDS has unusual splice
+CG6695-RB       add comment:CDS has unusual splice
+CG6695-RA       add comment:CDS has unusual splice
+CG8585-RA       add comment:CDS has unusual splice
+CG9527-RA       add comment:CDS has unusual splice
+CG9765-RB       add comment:CDS has unusual splice
+CG15102-RB      add comment:CDS has unusual splice
+CG32717-RD      add comment:CDS has unusual splice
+CG13207-RD      add comment:CDS has unusual splice
+CG5472-RC       add comment:CDS has unusual splice
+CG5472-RB       add comment:CDS has unusual splice
+CG7467-RC       add comment:CDS has unusual splice
+CG1447-RC       add comment:CDS has unusual splice
+CG5320-RA       add comment:CDS has unusual splice
+CG5320-RF       add comment:CDS has unusual splice
+CG18177-RA      add comment:CDS has unusual splice
+CG1519-RB       add comment:CDS has unusual splice
+CG4894-RD       add comment:CDS has unusual splice
+CG4894-RC       add comment:CDS has unusual splice
+CG4894-RB       add comment:CDS has unusual splice
+CG4894-RA       add comment:CDS has unusual splice
+CG11870-RB      add comment:CDS has unusual splice
+CG11870-RA      add comment:CDS has unusual splice
+CG11870-RC      add comment:CDS has unusual splice
+CG11870-RD      add comment:CDS has unusual splice
+CG32261-RA      add comment:CDS has unusual splice
+CG12179-RB      add comment:CDS has unusual splice
+CG12877-RB      add comment:CDS has unusual splice
+CG1772-RB       add comment:CDS has unusual splice
+CG12697-RA      add comment:CDS has unusual splice
+CG13125-RB      add comment:CDS has unusual splice
+CG18582-RA      add comment:CDS has unusual splice
+CG14762-RA      add comment:CDS has unusual splice
+CG8405-RA       add comment:CDS has unusual splice
+CG18026-RA      add comment:CDS has unusual splice
+CG31156-RB      add comment:CDS has unusual splice
+CG33525-RF      add comment:CDS has unusual splice
+CG4805-RB       add comment:CDS has unusual splice
+CG11049-RA      add comment:CDS has unusual splice
+CG11049-RE      add comment:CDS has unusual splice
+CG11049-RF      add comment:CDS has unusual splice
+CG11049-RH      add comment:CDS has unusual splice
+CG11155-RA      add comment:CDS has unusual splice
+CG11155-RB      add comment:CDS has unusual splice
+CG11352-RC      add comment:CDS has unusual splice
+CG11352-RB      add comment:CDS has unusual splice
+CG11352-RD      add comment:CDS has unusual splice
+CG12154-RA      add comment:CDS has unusual splice
+CG1322-RC       add comment:CDS has unusual splice
+CG14039-RC      add comment:CDS has unusual splice
+CG14039-RD      add comment:CDS has unusual splice
+CG1980-RA       add comment:CDS has unusual splice
+CG31349-RE      add comment:CDS has unusual splice
+CG32602-RA      add comment:CDS has unusual splice
+CG33070-RK      add comment:CDS has unusual splice
+CG3985-RC       add comment:CDS has unusual splice
+CG3985-RA       add comment:CDS has unusual splice
+CG3985-RF       add comment:CDS has unusual splice
+CG3985-RD       add comment:CDS has unusual splice
+CG3985-RE       add comment:CDS has unusual splice
+CG4435-RA       add comment:CDS has unusual splice
+CG4630-RA       add comment:CDS has unusual splice
+CG8318-RB       add comment:CDS has unusual splice
+CG8318-RC       add comment:CDS has unusual splice
+CG8318-RD       add comment:CDS has unusual splice
+CG8478-RB       add comment:CDS has unusual splice
+CG9918-RD       add comment:CDS has unusual splice
+CG15109-RB      add comment:CDS has unusual splice
+CG1511-RB       add comment:CDS has unusual splice
+CG1511-RC       add comment:CDS has unusual splice
+CG1511-RD       add comment:CDS has unusual splice
+CG1511-RE       add comment:CDS has unusual splice
+CG1511-RA       add comment:CDS has unusual splice
+CG3651-RA       add comment:CDS has unusual splice
+CG5077-RA       add comment:CDS has unusual splice
+CG5077-RB       add comment:CDS has unusual splice
+CG6169-RB       add comment:CDS has unusual splice
+CG6169-RA       add comment:CDS has unusual splice
+CG6169-RD       add comment:CDS has unusual splice
+CG8710-RD       add comment:CDS has unusual splice
+CG8920-RB       add comment:CDS has unusual splice
+CG8920-RC       add comment:CDS has unusual splice
+CG14575-RB      add comment:CDS has unusual splice
+CG2225-RC       add comment:CDS has unusual splice
+CG2225-RE       add comment:CDS has unusual splice
+CG2225-RB       add comment:CDS has unusual splice
+CG2225-RA       add comment:CDS has unusual splice
+CG2225-RF       add comment:CDS has unusual splice
+CG31795-RB      add comment:CDS has unusual splice
+CG10524-RA      deleted outdated comments referring unusual splice
+CG11061-RA      deleted outdated comments referring unusual splice
+CG11061-RB      deleted outdated comments referring unusual splice 
+CG14616-RA      deleted outdated comments referring unusual splice
+CG16885-RB      deleted outdated comments referring unusual splice
+CG1693-RA      deleted outdated comments referring unusual splice
+CG1693-RB      deleted outdated comments referring unusual splice
+CG17870-RF      deleted outdated comments referring unusual splice
+CG18471-RA      deleted outdated comments referring unusual splice
+CG31187-RA      deleted outdated comments referring unusual splice
+CG31302-RC      deleted outdated comments referring unusual splice
+CG32171-RA      deleted outdated comments referring unusual splice
+CG3508-RA      deleted outdated comments referring unusual splice
+CG6456-RA      deleted outdated comments referring unusual splice
+CG8851-RB      deleted outdated comments referring unusual splice
+CG1683  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG16944 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG1977  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG32315 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG4711  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG17161 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG5271  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG5277  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG5992  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG32178 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG7955  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33230 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG8165  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG8176  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG8229  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33199 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG12022 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG13923 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG12345 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG32848 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG14235 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG18809 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG32177 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG32179 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG17724 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33054 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33056 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33201 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG14672 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG8201  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG7753  add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG31510 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG31108 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33331 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+CG33332 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
+
+  ]]></doc>
+   
+
+  <include>fbreleases</include>
+
+  <!-- db is release-dependent ; use fbreleases info 
+    this is standard public access to curren dmel_chado
+  -->
+  <db
+    driver="Pg"
+    name="BOGUS_dmel_chado"
+    host="localhost"
+    port="7302"
+    user=""
+    password=""
+    />
+
+  <org>dmel</org>
+  <species>Drosophila melanogaster</species>
+  <include>organisms</include>
+  
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
+
+  <include>filesets</include>
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <ENV 
+      est_where_clause="AND (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      analysis_where_clause="AND NOT (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      golden_path="'chromosome_arm'"
+      />
+    <!-- note: ests target replaces analysis EST exclusion above -->
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+    <target>ests</target>
+    <!-- <target>matches</target> -->  
+    <!-- <target>synteny</target> -->
+  </featdump>
+
+  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+  <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
+  <gmodel_parts_rename>0</gmodel_parts_rename>
+
+  <!-- feature sets to make fasta bulk files -->
+  <include>featuresets</include>
+
+  <!-- note 19nov04 - override scaffold default featmap.
+      fb dmel chado scaffold residues come from
+      chromosome dna; but had out-of-date errors, safer to use
+      chromosome, not fromdb for these? 
+  -->
+  <!--
+  <featmap
+    name="scaffold"   
+    alt_name0 = "golden_path_region" 
+    alt_name1 = "golden_path_fragment" 
+    alt_name2 = "databank_scaffold"
+    alt_name3 = "scaffold"
+    alt_name4 = "supercontig"
+    types="golden_path_region scaffold"
+    typelabel="scaffold"
+    NOT_fromdb="1"
+    />
+  <featmap name="dummy" note="here for xml parser" />
+  -->
+
+</opt>
