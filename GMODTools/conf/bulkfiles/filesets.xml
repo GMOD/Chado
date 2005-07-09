@@ -63,6 +63,7 @@
     >
     <ENV 
       golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
+      analysis_where_clause=""
       dummy="dummy"
       />
 
@@ -70,7 +71,7 @@
     <target>features</target>
     <target>analysis</target>
     <!-- <target>matches</target> -->
-    <!-- <target>synteny</target> -->
+    <target>synteny</target>
   </fileset>
 
 
@@ -110,6 +111,30 @@
     title="GnoMap features"
     indexonly="0"
     />
+    
+    <!-- test way to make misc. tables given perl/other scripts +sql? -->
+  <fileset
+    name="id_tables"
+    path="tables/.+\.txt"
+    x_input="fff"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="list"
+    x_config="tognomap"
+    x_handler="BulkWriter"
+    title="Summary Tables"
+    >
+    <ENV 
+      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
+      dummy="dummy"
+      />
+    <target>id_table</target>
+    <target>ortho_table</target>
+    <target>countfeats</target>
+    <target>fbids</target>
+  </fileset>
+
+
     
   <fileset
     name="gbrowse"

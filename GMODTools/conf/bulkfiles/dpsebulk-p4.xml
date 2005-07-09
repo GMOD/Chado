@@ -1,0 +1,149 @@
+<opt
+  name="dpsebulk-p4" 
+  relid="p4"
+  ROOT="${GMOD_ROOT}/"
+  TMP="${GMOD_ROOT}/tmp"
+  datadir="genomes/Drosophila_pseudoobscura"
+>
+ 
+  <title>FlyBase Chado Dpse r1.0.4</title>
+  <about>
+   Configurations to extract feature and sequence data for
+   bulk files from FlyBase chado databases, for data release r1.0
+  </about>
+
+  <org>dpse</org>
+  <species>Drosophila pseudoobscura</species>
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
+  <!-- <include>organisms</include> -->
+
+  <doc name="README"><![CDATA[
+    D. pseudoobscura genome data from FlyBase
+    Release  ${rel}, dated ${date}.
+
+    See release notes at <a href="http://flybase.net${release_url}">
+    http://flybase.net${release_url}</a>
+  ]]></doc>
+
+
+  <include>fbreleases</include>
+
+  <!-- oct04: patch for utr fmax < fmin when 0 length -->
+  <!-- oct04: patch for intron  fmin - no+1,fmax, add+1 -->
+  <!-- nov04; chadodb corrected, turn off -->
+  <utrpatch>0</utrpatch>
+  <intronpatch>0</intronpatch>
+
+  <!-- db.name  is release-dependent ; use fbreleases -->
+  <db
+    driver="Pg"
+    name="bogus"
+    host="localhost"
+    port="7302"
+    user=""
+    password=""
+    />
+  
+  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+
+  <include>filesets</include>
+
+  <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
+  <dnadump
+    path="dna/.+\.raw"
+    sql="select feature_id, residues from feature where uniquename = ?"
+    />
+  
+  <chr_pattern>^(chromosome_arm|golden_path|ultra_scaffold)$</chr_pattern>
+  <chrpart_pattern>^(golden_path_fragment)$</chrpart_pattern>
+
+  <unknown_chr>U</unknown_chr>
+  <!-- Unknown_group and Unknown_singleton go to one bag chromosome U -->
+  <mapchr_pattern name="1unknown" from="Unknown\S+" to="U"/>
+  <mapchr_pattern name="2contig"  from="^Contig[^_]+_Contig\w+" to="ctg2"/>
+  <mapchr_pattern name="3contig"  from="^Contig\w+" to="ctg1"/>
+  <mapchr_pattern name="null" from="" to=""/>
+  
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <!-- need to put in ENV for subsequent chadofeatsql.xml config -->
+    <ENV 
+      golden_path="'chromosome_arm','ultra_scaffold'"
+      species="Drosophila_pseudoobscura"
+      unknown_chr="U"
+      analysis_where_clause=""
+      est_where_clause=""
+     />
+     <!-- // dmel only?
+      est_where_clause="AND (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      analysis_where_clause="AND NOT (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      -->
+    
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>synteny</target>
+    <target>analysis</target>
+  </featdump>
+
+    <!-- this match tblastn == orthology feature duplicate, same oid -->
+  <maptype_pattern name="orthodup" from="match:tblastn:Dmel.*" to="skip"/>
+  <maptype_pattern name="orthodup2" from="match_part:tblastn:Dmel.*" to="skip"/>
+  <maptype_pattern name="null" from="null" to="null"/>
+
+  <include>featuresets</include>
+
+  <!-- override scaffold default featmap; no scaffolds in dpse 1.04; 
+    alt_name0 = "golden_path_region" 
+    alt_name1 = "golden_path_fragment" 
+    alt_name4 = "supercontig"
+    .. instead change golden_path_region to   supercontig="skip"
+  <featmap
+    name="scaffold"   
+    alt_name2 = "databank_scaffold"
+    alt_name3 = "scaffold"
+    types="scaffold"
+    typelabel="scaffold"
+    fromdb="0"
+    />
+   <featmap name="dummy" />
+    -->
+    
+  <!-- feature sets to make fasta bulk files; 
+    needs update for dpse syntenic_block and homology features
+    feb05: drop mRNA fasta as confusing duplicate to transcript set
+    no UTR's but have introns
+  -->
+  <!-- feature sets to make fasta bulk files -->
+  <featset>gene</featset>
+<!--   <featset>mRNA</featset> -->
+  <featset>CDS</featset>
+  <featset>transcript</featset>
+  <featset>translation</featset>
+  <!-- <featset>tRNA</featset> -->
+  <!-- <featset>miscRNA</featset> -->
+  <!-- <featset>transposon</featset> -->
+  <!-- <featset>pseudogene</featset> -->
+  <featset>gene_extended2000</featset>
+  <!-- <featset>five_prime_UTR</featset> -->
+  <!-- <featset>three_prime_UTR</featset> -->
+  <featset>intron</featset>
+  <featset>intergenic</featset>
+  <featset>syntenic_region</featset>
+  <!-- <featset>scaffold</featset> --> <!-- not scaffs in  dpse 1.04 -->
+  <featset>chromosome</featset>
+
+
+</opt>
+

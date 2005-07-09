@@ -33,7 +33,7 @@ D.G. Gilbert, 2004, gilbertd@indiana.edu
 
 
 # debug
-use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
+#use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
 
 use POSIX;
 use FileHandle;

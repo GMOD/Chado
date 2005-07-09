@@ -39,7 +39,7 @@ D.G. Gilbert, 2004, gilbertd@indiana.edu
 
 
 # debug
-use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
+#use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
 
 use POSIX;
 use FileHandle;
@@ -143,6 +143,7 @@ sub initData
   $self->{idpattern}   = $sconfig->{idpattern} || $config->{idpattern} || '';
   $self->{intronpatch}  = $sconfig->{intronpatch}  || '';
   $self->{utrpatch}  = $sconfig->{utrpatch}  || '';
+  $self->{gmodel_parts_rename}  = $sconfig->{'gmodel_parts_rename'} || $config->{'gmodel_parts_rename'} || '';
   
   ## should get this from  $sconfig->{fileset}->{gff}->{noforwards}
   my $gffinfo= $self->handler()->getFilesetInfo('gff');
@@ -821,7 +822,14 @@ sub processChadoTable
       $sameoid= ($ioid==$joid && substr($nextin,0,$ioid) eq substr($fin,0,$ioid) );
       if ($sameoid) {
         $fin= $self->popline();
-        if ($attribute) { push( @addattr, "$attr_type\t$attribute");  $attribute= undef; }
+        if ($attribute) { 
+      # nasty fix for _Escape ; to_name=Aaa,CGid should probably be two table lines
+      if ($attr_type eq 'to_name' && $attribute =~ /,/) {
+        my $attr1; ($attr1,$attribute)= split(/,/,$attribute,2);
+        push( @addattr, "$attr_type\t$attr1");  
+        }
+	 push( @addattr, "$attr_type\t$attribute");  $attribute= undef; 
+         }
         }
       }
     } while ($sameoid);
@@ -861,7 +869,9 @@ sub processChadoTable
     if (!$type && $DEBUG && !/NULL|repeatmask/) { print STDERR "missing type: $_\n";  } ##<< repeatmasker kid objs
     if ($type eq 'skip' || !$type) { # or what? undef? got some bad feats w/ no type??
        ## dont keep old oid: ($l_arm,$l_oid,$l_fmin)= ($arm,$oid,$fmin);
-      ($l_arm,$l_oid,$l_fmin)= ($arm,-1,$fmin);
+       ##dont save arm for skip !? if changed here, cant miss below openout..
+       ##($l_arm,$l_oid,$l_fmin)= ($arm,-1,$fmin);
+       ($l_oid,$l_fmin)= (-1,$fmin);
 	    next;
 	    }
     
@@ -891,6 +901,12 @@ sub processChadoTable
       }
 
     if ($attribute) {  
+
+      # nasty fix for _Escape ; to_name=Aaa,CGid should probably be two table lines
+      if ($attr_type eq 'to_name' && $attribute =~ /,/) {
+        my $attr1; ($attr1,$attribute)= split(/,/,$attribute,2);
+        push( @addattr, "$attr_type\t$attr1");
+        }
 
       # $attr_type='species2' if ($attr_type eq 'to_species'); #??why; add config attr remappers?
       ##if ($to_species) {  push( @addattr, "species2\t$to_species");  }
@@ -1249,6 +1265,7 @@ sub  makeFlatFeats
 #     regulatory_region rescue_fragment sequence_variant);
   
   my @cobs=();
+  my $gmodel_parts_rename= $self->{gmodel_parts_rename};
   foreach my $fob (@$fobs) {  
     my $oid= $fob->{oid};
     my ($iskid,$ispar)= (0,0);
@@ -1404,19 +1421,25 @@ DEBUG obj: par=CG18001-RA objects={
             $utrob= $kidob unless($utrob);
             push(@$kidobs, $kidob); 
             
-            # repair bad names
-            my $part="";
-            if ($ftname eq 'three_prime_UTR') {  $part= "-u3";  }
-            elsif ($ftname eq 'five_prime_UTR') {  $part= "-u5";  }
-            elsif ($ftname eq 'intron') {  $part= "-in";  }
-            if ($part) {
-              $utrob->{name}= $fob->{name}.$part;  
-              $utrob->{id}= $fob->{id}.$part;
+            ## repair bad names; only if bad !?
+            ## FIXME apr05 - intron,UTR fff output needs CG ids (in gff, not fff, due to
+            ##   name = gene-symbol, FBgn ID; ... need uniquename
+            ## apr05 - is this renaming bad now ? at keep old name,id as 2ndary ?
+            if ($gmodel_parts_rename) {
+              my $part="";
+              if ($ftname eq 'three_prime_UTR') {  $part= "-u3";  }
+              elsif ($ftname eq 'five_prime_UTR') {  $part= "-u5";  }
+              elsif ($ftname eq 'intron') {  $part= "-in";  }
+              if ($part) {
+                $utrob->{name}= $fob->{name}.$part;  
+                $utrob->{id}= $fob->{id}.$part;
+                }
               }
             }
             
           }
         
+          
           ## ERROR -  CDS/protein w/o CDS_exon parts - not harvard chado 'reporting' db
           ## fixme ... recreate from cds start/stop + mrna location ?
         if ($utrob && !@$kidobs) {
@@ -1433,7 +1456,7 @@ DEBUG obj: par=CG18001-RA objects={
             next if ($pidattr =~ m/2nd/);   #dbxref_2nd:
             if (!$idpattern || $pidattr =~ m/$idpattern/) { 
               push( @{$utrob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$utrob->{attr}});  
-              last; # add only 1st/primary
+              last; # add only 1st/primary ?? also add CG/CR .. ? or is that always there?
               }
             }
             
@@ -1911,8 +1934,8 @@ sub putFeats
     
     my $nout= 0;
     foreach my $fob (@$cobs) {  
-      ##$self->writeFFF( $outh->{fff}, $fob);
-      my $fffline= $self->getFFF( $fob );
+      ##$self->writeFFF( $outh->{fff}, $fob, $oidobs);
+      my $fffline= $self->getFFF( $fob, $oidobs );
       if($fffline) {
         print $ffh $fffline;
         $nout++;
@@ -2198,12 +2221,13 @@ sub _fffEscape
 sub getFFF 
 {
 	my $self= shift;
-  my($fob)= @_;
+  my($fob,$oidobs)= @_;
   return if ($fob->{'writefff'}); #?? so far ok but for mature_peptide/CDS thing
   $fob->{'writefff'}=1;
   my @loc= @{$fob->{loc}};
   my @attr= @{$fob->{attr}};
   
+  my $oid= $fob->{oid};  
   my $featname= $fob->{type};
   my $fulltype= $fob->{fulltype};
   my($id,$s_id)= $self->remapId($featname,$fob->{id},'-'); 
@@ -2218,15 +2242,51 @@ sub getFFF
   my $map= '-';
   my $dbxref=""; my $dbxref_2nd="";
   my $notes= "";
+  my %at=(); 
   foreach (@attr) {
     my ($k,$v)= split "\t";
 
     ## synonym_2nd=ribosomal protein S3&agr;; << problem; escape
     $v = _fffEscape($v);  # _gffEscape; at least any [\t\n\=&;,]
 
-    if ($k eq "parent_oid" || $k eq "object_oid") {
-      ##$v =~ s/:.*$//; #$v= $oidmap{$v} || $v;
-      ##$at .= "Parent=$v;" 
+    if ($k eq "object_oid") {
+      # skip
+      }
+      
+    elsif ($k eq "parent_oid") { ## added apr05
+      next if $segmentfeats{$featname}; # dont do parent for these ... ?
+      $v =~ s/:.*$//; #$v= $oidmap{$v} || $v;
+      $k= 'Parent'; 
+      
+      my $parob= $oidobs->{$v}->{fob};
+      if ($parob && $parob->{id}) {
+        $v= $parob->{id};
+        #? if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
+        
+        if ($v eq $id) { ## FIXME .. ? try to use index in parent->{child} array ?
+          my $i= 1;
+          my $paroid= $parob->{oid};
+          my $kids  = $oidobs->{$paroid}->{child};
+          if ($kids) { 
+          foreach my $kidob (@{$kids}) {
+            last if ($kidob->{oid} eq $oid);
+            $i++;
+            }
+           }
+          $id= "$id.$i";
+          # $at[0]= "ID="._gffEscape($id);
+          }
+
+        $at{$k} .= ',' if $at{$k};
+        $at{$k} .= $v;  
+        }
+      else {
+        #next if ($fulltype =~ /match_part|cytology|band|oligo|BAC/ || $id =~ /GA\d/); 
+        #print STDERR "GFF: missed Parent ID for i/o/t:",$id,"/",$oid,"/",$fulltype,
+        #  " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
+        next; # always skip writing bogus Parent= to gff
+        }
+
       }
     elsif ($k eq "cyto_range") { $map= $v; }
     elsif ($k eq "dbxref") { ## and dbxref_2nd; put after dbxref !
@@ -2235,10 +2295,16 @@ sub getFFF
     elsif ($k eq "dbxref_2nd") {  
       $dbxref_2nd .= "$v;"; 
       }
-    else {
-      $notes .= "$k=$v;" 
+    elsif ($k) {
+      #$notes .= "$k=$v;" 
+      $at{$k} .= ',' if $at{$k};
+      $at{$k} .= $v;  
       }
     }
+
+  my @at=();
+  foreach my $k (sort keys %at) { push(@at, "$k=$at{$k}"); }
+  $notes = join(";",@at);
 
   $dbxref .= $dbxref_2nd; # aug04: making sure 2nd are last is enough to get 1st ID
   
@@ -2265,8 +2331,8 @@ sub getFFF
 sub writeFFF 
 {
 	my $self= shift;
-  my($fh,$fob)= @_;
-  my $fffline= $self->getFFF($fob);
+  my($fh,$fob,$oidobs)= @_;
+  my $fffline= $self->getFFF($fob,$oidobs);
   print $fh $fffline if $fffline;
 }
 

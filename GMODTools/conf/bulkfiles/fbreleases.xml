@@ -18,6 +18,15 @@
 
   </about>
   
+
+  <release id="411"
+    rel="r4.1.1"
+    dbname="chado_dmel_r4_1_13"
+    relfull="dmel_r4.1.1_20050421"
+    date="20050421"
+    release_url="/annot/dmel_release4.1.1.txt"
+    />
+
   <release id="41" 
     rel="r4.1"  
     dbname="chado_dmel_r4_1_8"  

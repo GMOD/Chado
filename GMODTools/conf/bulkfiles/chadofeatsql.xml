@@ -25,17 +25,93 @@
   </about>
   
   
-  <feature_sql id="countfeats" type="list" output="chadofeats.count">
-  <sql><![CDATA[
+  <feature_sql id="countfeats" type="SKIP_list" output="feature-counts.txt">
+  
+  <note>this method has many flaws; instead calc stats from fff features ** </note>
+  
+  <sqlbad><![CDATA[
   -- use for overview of chado feature contents
-  SELECT featcv.name, featcv.cvterm_id, count(armft.feature_id)
-  FROM feature armft, cvterm featcv
-  WHERE armft.type_id = featcv.cvterm_id
-  GROUP by featcv.name;
-  ]]></sql>
+  -- need to rename feature types to match feature outputs; see
+  -- chadofeatconv.xml:maptype 
+  -- also many with featureloc.fmin,fmax have NULL seqlen; use featureloc length ?
+  -- add ? STDDEV(seqlen), MIN(seqlen), MAX(seqlen)
+  SELECT 
+    featcv.name as type, 
+    count( ft.feature_id) as N_features,
+    round( AVG(ff.flength), 0 ) as Ave_seqlen,
+    round( STDDEV(ff.flength),2 ) as Stddev,
+    MIN(ff.flength) as Min_seqlen,
+    MAX(ff.flength) as Max_seqlen
+  FROM 
+    cvterm featcv,  
+    feature ft left outer join 
+    ( SELECT fl.feature_id,  
+      CASE 
+        WHEN ft.seqlen IS NULL THEN abs(fl.fmax - fl.fmin) 
+        ELSE ft.seqlen END as flength
+      FROM featureloc fl, feature ft
+      WHERE fl.feature_id = ft.feature_id ) as ff
+      ON (ft.feature_id = ff.feature_id)
+  WHERE 
+    ft.type_id = featcv.cvterm_id
+    and NOT (featcv.name like 'sim4:wrap%')
+  GROUP BY type;
+
+    -- and ft.feature_id = fl.feature_id  
+    --? and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  ]]></sqlbad>
+  
+  <sql>
+  -- useless for types w/ null seqlen
+  SELECT 
+    featcv.name as type, 
+    count( armft.feature_id) as N_features,
+    round( AVG(armft.seqlen), 0 ) as Ave_seqlen,
+    round( STDDEV(armft.seqlen),2 ) as Stddev,
+    MIN(armft.seqlen) as Min_seqlen,
+    MAX(armft.seqlen) as Max_seqlen
+  FROM 
+    feature armft, cvterm featcv
+  WHERE 
+    armft.type_id = featcv.cvterm_id
+    and NOT ( featcv.name like 'sim4:wrap%')
+  GROUP BY type;
+  </sql>  
+  
+  <note>
+Date: Tue, 26 Apr 2005 15:11:46 -0400 (EDT)
+From: Andy Schroeder andy@morgan.harvard.edu
+Subject: Re: FB-NG Help Mail: Genome statistics for melanogaster
+
+Can get numbers of desired features using count function and average size using avg 
+function.
+
+1) for gene
+chado_dmel_r4_2_2=> select avg(seqlen) from feature where type_id = 219;       
+ avg         
+ 4883.0054419870230
+
+chado_dmel_r4_2_2=> select count(*) from feature where type_id = 219;
+ count 
+ 14399
+
+2) for exon
+
+...
+Perhaps this sort of info could be included in the release note statistics?
+
+Gene: number = 14066; avg_length = 4955
+Exon: number = 63053; avg_length = 486
+5'UTR: number = 19833; avg_length = 186
+3'UTR: number = 14348; avg_length = 408
+intron: number = 49927; avg_length = 1147
+intergenic regions avg_length = 5087
+
+</note>
+
   </feature_sql>
   
-  <feature_sql id="fbids" type="list" output="chado-fb.ids">
+  <feature_sql id="fbids" type="SKIP_list" output="fbid-list.txt">
   <sql><![CDATA[
     -- used for flybase to exclude cytologic features with same genome feature id
     SELECT accession FROM dbxref 
@@ -43,6 +119,78 @@
     ;
   ]]></sql>
   </feature_sql>
+
+
+  <feature_sql id="id_table" type="list" output="id_table.txt">
+  <sql>;</sql>
+  
+  <script name="idtab" input="-" type="postprocess"  language="perl"
+    shell="cat fff/*.fff |  egrep '\b(gene|transposable_element)\b' | grep '\bFB' | perl " notshell="perl ">
+<![CDATA[
+# idtab2.pl ; cat fff/*.fff | egrep '\b(gene|transposable_element)\b' | grep '\bFB' | perl -n idtab.pl | sort > id_table.txt
+  BEGIN{
+  print qq{#   Database ID table for primary gene model features
+#  gene,ncRNA,pseudogene,rRNA,snRNA,snoRNA,tRNA,transposable_element,
+#  transposable_element_insertion_site
+# ANID = Annotation ID ;  FBID = primary FlyBase ID ; SYM = gene symbol ; ID2 = secondary IDs
+}, join"\t",qw(ANID FBID SYM ID2),"\n";
+  }
+  ($a,$b,$ft,$sm,$cm,$r,$id,$dx,$nt)=split"\t"; 
+  @gnid=(); @gn2=();
+  push(@gnid, ($dx=~/(FBgn\d+)/g)); 
+  push(@gnid, ($dx=~/(FBti\d+)/g)); 
+  unshift(@gnid,$id) if (!@gnid && $id =~ /FB\w\w\d+/);
+  $gnid= shift @gnid;
+  ($anid2)=($dx=~/(FBan\d+)/); 
+  push(@gnid,$anid2) if($anid2);
+  push(@gn2, ($nt=~/synonym_2nd=(FB\w\w\d+)/g));  #?? getting prime id ?
+  push(@gn2, ($nt=~/synonym_2nd=(C[GR]\d+)/g));   
+  push(@gn2, ($nt=~/synonym_2nd=(G\w\d+)/g));   #dpse, others?
+  foreach $gn2 (@gn2) { push(@gnid,$gn2) unless(grep /$gn2/,@gnid); }
+  $gnid2= join(",",@gnid);
+  print join("\t",$id,$gnid,$sm,$gnid2),"\n";
+]]></script>
+  </feature_sql>
+
+
+  <feature_sql id="ortho_table" type="list" output="ortho_table.txt">
+  <sql>;</sql>
+
+  <script name="orthotab" input="-" type="postprocess"  language="perl"
+    shell="cat tmp/featdump/features.tsv tmp/featdump/synteny.tsv | egrep 'putative_ortholog_of|orthologous_region' | perl " notshell="perl ">
+<![CDATA[
+# orthotab3.pl
+# egrep -h 'putative_ortholog_of|orthologous_region' $dp/tmp/featdump/features.tsv $dp/tmp/featdump/synteny.tsv | perl -n orthotab.pl
+BEGIN { 
+ %po=(); %sppmap= ('1' => 'Dmel', '3' => 'Dpse' ); 
+ print qq{#
+#  Ortholog table for Drosophila species 
+# OrthoID = orthology ID and protein annotation ID for each orthology pair
+}, join"\t",qw(OrthoID DpseID DmelID Dmel_Symbol),"\n";
+# was qw(OrthoID Spp1 Spp2) 
+}
+chomp; 
+($a,$b,$e,$s,$org,$t,$n,$id,$oid,$atype,$att)=split"\t";
+if ($atype eq 'putative_ortholog_of') {
+  $att =~ s/FlyBase://;
+  $po{$att}= $id;
+} else {
+if($atype eq 'to_species') { $to_species= $att; }
+if($atype eq 'to_name') { $to_name= $att; }
+if($l_oid == $oid && $org == 3) { # paired to_ attr per oid; !to_dpse lack to_name !???
+  $spp = $sppmap{$org};
+  $spp2= $sppmap{$to_species};
+  $ga= ($to_name =~ /(C[GR]\d+)/) ? $po{$1} : '';
+  @to_name= reverse split(/,/,$to_name); # name,ID -> ID,name
+  $id =~ s/ortho://; 
+  print join("\t",$id,$ga,@to_name),"\n";
+  #print join("\t",$id,"$spp:$ga","$spp2:$to_name"),"\n";
+}
+$l_oid= $oid; 
+}
+]]></script>
+  </feature_sql>
+
 
 <!-- ? add organism table output and use organism_id in all feature_tables ? -->
   <feature_sql id="organism" type="organism_table" output="organism.tsv">
@@ -59,6 +207,145 @@
 
   </feature_sql>
 
+  <feature_sql id="chromosomes_dpse" type="feature_table" output="chromosomes.tsv">
+
+<!-- need also
+  <script name="remapUandMISC" type="postprocess" shell="perl -i.old" language="perl">
+-->
+  <sql><![CDATA[
+-- get chromosome/arm/supercontig/ ; mess needed for dpse with mixture of
+-- assembly-ness
+CREATE TEMP TABLE chromosomes AS
+SELECT 
+  armft.uniquename as arm,
+  1 as fmin, armft.seqlen as fmax, 0 as strand,
+  armft.organism_id,
+  featcv.name as type,
+  armft.name as name,
+  armft.uniquename as id,
+  armft.feature_id as foid,
+  'species' as attr_type, 
+  org.genus || '_' || org.species AS attribute
+FROM 
+  feature armft, organism org, cvterm featcv, cv socv
+WHERE 
+  featcv.name in ( 'chromosome_arm', 'ultra_scaffold' )      
+  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armft.organism_id = org.organism_id
+  and armft.type_id = featcv.cvterm_id
+  and armft.seqlen IS NOT NULL  -- ? want this
+  and NOT (armft.uniquename like 'Unknown%') -- these should not be ultrascafs
+;
+
+INSERT INTO chromosomes 
+SELECT 
+  armft.uniquename as arm,
+  1 as fmin, fctg.seqlen as fmax, fr.rank as strand,  
+  armft.organism_id,
+  CASE WHEN (armft.uniquename = 'U') -- fctg.uniquename like 'Unknown%'
+    THEN 'golden_path_region' 
+    ELSE ctgcv.name
+    END AS type,
+  fctg.name as name,fctg.uniquename as id,
+  fctg.feature_id as foid,
+  'species' as attr_type, 
+  org.genus || '_' || org.species AS attribute
+FROM 
+  feature armft, feature fctg, feature_relationship fr,
+  cvterm featcv, cvterm ctgcv, cv socv, organism org
+WHERE 
+  (
+   (featcv.name = 'chromosome_arm' AND armft.uniquename = 'U')
+    --^ this needed for U-Unknowns
+    -- dont want other arms here with XR_group, 4_group parts 
+  OR
+   ( featcv.name = 'ultra_scaffold' ) 
+    -- ^ this gets groupMISC parts, with rank order
+  )
+  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and fr.object_id = armft.feature_id
+  and fr.subject_id = fctg.feature_id
+  and armft.type_id = featcv.cvterm_id  
+  and armft.seqlen IS NULL 
+  and armft.organism_id = org.organism_id
+  and fctg.type_id = ctgcv.cvterm_id  
+;
+
+SELECT * from chromosomes
+ORDER BY organism_id, arm, strand, id
+;
+
+]]>
+  </sql>
+  
+  <script name="remapUandMISC" type="postprocess" shell="perl -i.old" language="perl">
+<![CDATA[
+
+BEGIN { %armpart=(); $spp= ${species} || 'Drosophila_pseudoobscura'; }  
+while(<>) { 
+  if (/^arm\t/) { print $_; next; } #header
+  elsif (/\(\d+ rows\)/) { next; } #tail
+  my @v= split "\t"; # [0] == arm; [-1] == species; [5]== type; [7] == uniquename
+  
+  if ($v[-1] !~ /$spp/) { print join("\t",@v); }
+  else {  
+  if ($v[5] =~ /^golden_path_region$/) { 
+    $arm = $v[0]; ## $v[0] is correct arm name now, not Unknown...
+    $rank= $v[3]; # == strand field
+    if ($rank) {
+      $rank= sprintf("%08d",$rank);  
+      } 
+    elsif ($v[7] =~ /^(Unknown\D*)(\d*)$/) {
+      my ($t,$n)= ($1,$2); $n= 0 unless($n);
+      $rank= sprintf("$t%08d",$n);  # make sortable
+      }
+    else {
+      $rank= 'zzz';
+      }
+    $v[0] = $rank; # for sort
+    $armpart{$arm}= [] unless $armpart{$arm};
+    push( @{$armpart{$arm}}, \@v);
+    }
+  else { 
+    if ($v[0] =~ /group/) { $v[5] = 'golden_path';  } # was ultra_scaffold
+    else { $v[5] = 'chromosome_arm'; } # was ultra_scaffold
+    print join("\t",@v);
+    }
+  }  
+   
+} 
+END { mapparts(); }
+
+sub mapparts {
+  foreach my $arm (sort keys %armpart) {
+  @r= @{$armpart{$arm}};
+  if (@r) { # need hash per chr now !
+    open(ARGVOUT, ">>$ARGV"); select(ARGVOUT); # perl closes before this
+    @r= sort{ $$a[0] cmp $$b[0] } @r; # sort by rank
+    my ($totlen,$orgid,$rank, $spp)= (0,0,0,'unknown');
+    foreach my $r (@r) {
+      $$r[0] = $arm;  ## $$r[0] =  $Uchr; 
+      $$r[1] += $totlen;
+      $$r[2] += $totlen;
+      $rank++; $$r[3]= $rank unless($$r[3]);
+      $orgid = $$r[4];
+      $spp   = $$r[-1];
+      $$r[5] = 'golden_path_fragment'; # need new type for part of unknown...
+      $totlen= $$r[2];
+      }
+    chomp($spp);
+    print join("\t", $arm, 1, $totlen, 0, $orgid, "golden_path", 0, "species",$spp), "\n";
+    foreach my $r (@r) { print join("\t",@$r); } ## put fragments at end 
+    }
+  @r=(); 
+  }
+} 
+
+]]>
+  </script>
+  
+  </feature_sql>
+  
 <!-- dmel r4 note: uniquename == chromosome name; name == genbank accession  -->
 
   <feature_sql id="chromosomes" type="feature_table" output="chromosomes.tsv">
@@ -93,6 +380,9 @@ ORDER BY arm ;
 # remap dpse Unknown ultra_scaffold singletons and groups to one bag U chromosome
 # need to impose artificial ordering; rewrite start/stop locations after sort by name
 # species set in release.xml as ENV variable ; Drosophila_pseudoobscura
+# mar05: need to handle dpse 4MISC link Unknown; is bag chr with ordered Contig_contigs
+# but db lacks featurelocs assigning these to 4MISC locations.  Need to use featrel rank
+## for ordering : rename Contig_contig to 4MISC:1, 4MISC:2 ... ?
 
 BEGIN { @r=(); $Uchr= "${unknown_chr}" || "U"; }  
 while(<>) { 
@@ -199,6 +489,56 @@ egrep 'to_species.1' synteny.tsv | perl -ne \
 -->
 
   <feature_sql id="synteny" type="feature_table"  output="synteny.tsv">
+
+  <!-- 
+  add this to make tables of synt/org  for  gbrowse maps
+
+  egrep 'to_species.1' synteny.tsv | perl -ne \
+'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b\t$e\n";' \
+> dpse-synt-idmap.tsv
+egrep 'to_species.3' synteny.tsv | perl -ne \
+'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b\t$e\n";' \
+> dmel-synt-idmap.tsv
+
+   -->
+   
+  <script name="orthofix" type="FIXME_postprocess" shell="perl -i.old" language="perl">
+<![CDATA[
+# orthofix.pl 
+# patch for dpse chado with missing ortho to_names
+# needs data from features.tsv 
+# could do as sql select: ortho featureloc -> gene featureloc -> featprop putative_ortho
+# egrep -h 'putative_ortholog_of|orthologous_region|syntenic_region' features.tsv synteny.tsv | perl -n orthofix.pl
+BEGIN { 
+ %po=(); %sppmap= ('1' => 'Dmel', '3' => 'Dpse' ); 
+}
+chomp; 
+($a,$b,$e,$s,$org,$t,$n,$id,$oid,$atype,$att)=split"\t";
+$loc="$a:$b-$e";
+if ($atype eq 'putative_ortholog_of') {
+  $att =~ s/FlyBase://;
+  $po{$loc}= $att;
+} elsif ($org == 3 && $t eq 'orthologous_region') {
+  # row order in synt.tsv is to_name > to_species
+  if($atype eq 'to_species') { $to_species= $att; }
+  elsif($atype eq 'to_name') { $to_name= $att; }
+  if($to_species == 1) { # no to_name case; $l_oid != $oid && 
+    unless($to_name) { $to_name= $po{$loc}; }
+    if ($to_name) {
+      print join("\t",($a,$b,$e,$s,$org,$t,$n,$id,$oid,'to_name',$to_name)),"\n" ;
+      print join("\t",($a,$b,$e,$s,$org,$t,$n,$id,$oid,'to_species',$to_species)),"\n" ;
+    } else { $nmiss++; }
+    $to_name= $to_species= '';
+  }
+} else {
+  print "$_\n"; # for rest of synt.tsv
+  $to_name= $to_species= '';
+}
+$l_oid= $oid; 
+END{print STDERR "missing ortho names=$nmiss\n"; }
+]]>
+  </script>
+   
   <sql><![CDATA[
   -- dpse-synteny.sql for cross-species features (syntenic_region, orthologous_region)
   -- split output by species ? 
@@ -206,7 +546,6 @@ egrep 'to_species.1' synteny.tsv | perl -ne \
   -- need other type="synteny_table"? or  use attr: species2=Dpse  ?
   
 SELECT distinct
-  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   armft.uniquename as arm,
   armloc.fmin, armloc.fmax, armloc.strand, 
   armft.organism_id,
@@ -467,6 +806,11 @@ sub rdump() {
 -- change 'match_' leading type ; drop or make option?
 -- ? problem for null sourcename? got an.program = pinsertion, null source, no type output
 --  WHEN an.sourcename = 'dummy' THEN 'match:' || an.program
+--  example where clauses from release configs:
+--      est_where_clause="AND (an.program = 'sim4' AND
+--        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+--      analysis_where_clause="AND NOT (an.program = 'sim4' AND
+--        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
 SELECT 
   armft.arm, armft.fmin, armft.fmax, armft.strand, 
   armft.organism_id,  
@@ -527,8 +871,9 @@ UNION ALL
   SELECT feature_id, cv.name AS type, fp.value AS attribute
   FROM featureprop fp, cvterm cv
   WHERE fp.type_id = cv.cvterm_id
-    and (cv.name = 'cyto_range' or cv.name = 'gbunit')
+    and (cv.name = 'cyto_range' or cv.name = 'gbunit') 
     -- keep this restriction - other props not useful here: comments, sp_comment, owner ...
+    -- mar05: add 'putative_ortholog_of' cv for dpse/..; this is in feature_relationship
 
 UNION ALL
   SELECT feature_id,
@@ -539,6 +884,20 @@ UNION ALL
 
 UNION ALL
   -- add parent feat ids for exons, etc.
+  -- putative_ortholog_of=dmel/gene:CG31648
+  -- BLOC|dmel/2L:5519290..5520012
+  -- BLOC|dmel/CG31648-PA:1..241
+  -- BLOC|dpse/4_group1:4867835..4868569
+  SELECT pk.subject_id AS feature_id, cv.name AS type, 
+    'FlyBase:' || fo.uniquename  AS attribute
+    --'dmel' || ':' || fo.uniquename 
+  FROM feature_relationship pk, feature fo, cvterm cv
+  WHERE 
+    cv.name = 'putative_ortholog_of' and pk.type_id = cv.cvterm_id 
+    and pk.object_id = fo.feature_id
+    
+UNION ALL
+  -- add parent feat ids for exons, etc.
   SELECT pk.subject_id AS feature_id, 'parent_oid' AS type, 
     CASE  
       WHEN pk.rank IS NULL THEN text(pk.object_id)
@@ -547,6 +906,15 @@ UNION ALL
   FROM feature_relationship pk
 ;
 GRANT SELECT ON gffattr_gmodel TO PUBLIC;
+
+
+-- seqlen/featloc-length view
+-- CREATE OR REPLACE VIEW feature_length ( feature_id, flength ) AS
+--   SELECT feature_id,  
+--     CASE WHEN seqlen IS NULL THEN (fl.fmax - fl.fmin) ELSE  fs.seqlen END AS flength, 
+--   FROM featureloc fl
+--   WHERE fl.feature_id = feature_id 
+-- ;
 
 -- attr view for match features
 CREATE OR REPLACE VIEW gffattr_match (
@@ -562,7 +930,7 @@ UNION ALL
   SELECT feature_id, cv.name AS type, fp.value AS attribute
   FROM featureprop fp, cvterm cv
   WHERE fp.type_id = cv.cvterm_id
-    and (cv.name = 'cyto_range' or cv.name = 'gbunit')
+    and (cv.name = 'cyto_range' or cv.name = 'gbunit') 
 
 UNION ALL
   SELECT feature_id,
@@ -594,8 +962,13 @@ CREATE OR REPLACE VIEW gffattr_synt2 (
   SELECT feature_id, text('to_species') AS type, text(targ.organism_id) AS attribute
   FROM feature targ
 
+-- see above orthofix.pl: add case when this select is missing, use ortho featloc
+-- to find equal gene feature and putative_ortholog_of 
 UNION ALL
-  SELECT feature_id, text('to_name') AS type, targ.name AS attribute
+  SELECT feature_id, text('to_name') AS type, 
+    CASE WHEN targ.uniquename = targ.name THEN targ.name 
+    ELSE targ.name || ',' || targ.uniquename 
+    END AS attribute 
   FROM feature targ
   WHERE NOT( targ.type_id IN (
     select cvterm_id from cvterm 
