@@ -453,7 +453,7 @@ create table pubprop (
     value text not null,
     rank integer,
 
-    constraint pubprop_c1 unique (pub_id,type_id,value)
+    constraint pubprop_c1 unique (pub_id,type_id,rank)
 );
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
