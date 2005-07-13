@@ -10,11 +10,11 @@ use Bio::GMOD::DB::Config;
 
 =head1 NAME
                                                                                 
-$0 - Make materialized views of the GFF schema in chado
+$O - Make materialized views of the GFF schema in chado
                                                                                 
 =head1 SYNOPSIS
                                                                                 
-  % $0 [--organism human] [--refseq Chr_1] 
+  % $O [--organism human] [--refseq Chr_1] 
                                                                                 
 =head1 COMMAND-LINE OPTIONS
 
