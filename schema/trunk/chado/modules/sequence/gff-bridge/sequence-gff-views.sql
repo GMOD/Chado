@@ -47,18 +47,19 @@ CREATE OR REPLACE VIEW gff3atts (
     type,
     attribute
 ) AS
-SELECT feature_id, 'Ontology_term' AS type,  dbx.accession AS attribute
-FROM cvterm s, dbxref dbx, feature_cvterm fs
-WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id
+SELECT feature_id, 
+      'Ontology_term' AS type, 
+      CASE WHEN db.name like '%Gene Ontology%'    THEN 'GO:'||dbx.accession
+           WHEN db.name like 'Sequence Ontology%' THEN 'SO:'||dbx.accession
+      END 
+FROM cvterm s, dbxref dbx, feature_cvterm fs, db
+WHERE fs.cvterm_id = s.cvterm_id and s.dbxref_id=dbx.dbxref_id and
+      db.db_id = dbx.db_id 
 UNION ALL
 SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id and
       d.name != 'GFF_source'
---UNION ALL
---SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE g.gcontext_id = fg.gcontext_id
 UNION ALL
 SELECT f.feature_id, 'Alias' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs, feature f
