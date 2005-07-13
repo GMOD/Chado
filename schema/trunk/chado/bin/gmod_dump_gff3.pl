@@ -96,6 +96,7 @@ $min_feature_id = $$arrayref[0] - 1;
 
 my $CHUNK = 1000;
 my @ref_seqs;
+print "##gff-version   3\n";
 for (my $i = $min_feature_id; $i<=$max_feature_id;$i = $i + $CHUNK) {
     my $upper = $i+$CHUNK+1;
     $sth->execute($i,$upper,$organism_id);
