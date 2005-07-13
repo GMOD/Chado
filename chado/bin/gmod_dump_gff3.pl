@@ -91,14 +91,13 @@ my $min_feature_id = $dbh->prepare("select min(feature_id) from feature
 $min_feature_id->execute($organism_id);
 
 $arrayref       = $min_feature_id->fetchrow_arrayref;
-$min_feature_id = $$arrayref[0];
+$min_feature_id = $$arrayref[0] - 1;
 
 
 my $CHUNK = 1000;
 my @ref_seqs;
 for (my $i = $min_feature_id; $i<=$max_feature_id;$i = $i + $CHUNK) {
     my $upper = $i+$CHUNK+1;
-    warn "start:$i, end:$upper\n";
     $sth->execute($i,$upper,$organism_id);
 
     while (my $hashref = $sth->fetchrow_hashref) {

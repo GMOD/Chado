@@ -81,7 +81,7 @@ CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
   name               varchar;
   uniquename         varchar;
   parent             varchar;
-                                                                                
+  escape_loc         int; 
 BEGIN
   --Get name from feature.name
   --Get ID from feature.uniquename
@@ -103,6 +103,10 @@ BEGIN
   END IF;
                                                                                 
   FOR atts_view IN SELECT * FROM gff3atts WHERE feature_id = f_id  LOOP
+    escape_loc = position('';'' in atts_view.attribute);
+    IF escape_loc > 0 THEN
+      atts_view.attribute = replace(atts_view.attribute, '';'', ''%3B'');
+    END IF;
     return_string = return_string || '';''
                      || atts_view.type || ''=''
                      || atts_view.attribute;
