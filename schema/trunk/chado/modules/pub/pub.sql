@@ -70,7 +70,7 @@ create table pub_dbxref (
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id int not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
-
+    is_current boolean not null default 'true',
     constraint pub_dbxref_c1 unique (pub_id,dbxref_id)
 );
 create index pub_dbxref_idx1 on pub_dbxref (pub_id);
