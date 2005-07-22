@@ -1,6 +1,7 @@
 --
--- functions for creating coordinate based functions
+-- functions operating on featureloc ranges
 --
+
 -- create a point
 CREATE OR REPLACE FUNCTION create_point (int, int) RETURNS point AS
  'SELECT point ($1, $2)'
@@ -20,16 +21,25 @@ LANGUAGE 'sql' IMMUTABLE;
 --functional index that depends on the above functions
 CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
 
-CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
+
+CREATE OR REPLACE FUNCTION featureloc_slice(int, int) RETURNS setof featureloc AS
   'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION featureslice(varchar, int, int)
+CREATE OR REPLACE FUNCTION featureloc_slice(varchar, int, int)
   RETURNS setof featureloc AS
   'SELECT featureloc.* 
    FROM featureloc 
    INNER JOIN feature AS srcf ON (srcf.feature_id = featureloc.srcfeature_id)
    WHERE boxquery($2, $3) @ boxrange(fmin,fmax)
-   AND srcf.name = ''$1'' '
+   AND srcf.name = $1 '
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
+  RETURNS setof featureloc AS
+  'SELECT * 
+   FROM featureloc 
+   WHERE boxquery($2, $3) @ boxrange(fmin,fmax)
+   AND srcfeature_id = $1 '
 LANGUAGE 'sql';
 
