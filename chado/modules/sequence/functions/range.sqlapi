@@ -1,0 +1,35 @@
+--
+-- functions operating on featureloc ranges
+--
+
+DECLARE FUNCTION featureloc_slice(
+   fmin INTEGER,
+   fmax INTEGER)
+ RETURNS SETOF featureloc;
+COMMENT ON FUNCTION featureloc_slice(INT,INT) IS
+ '
+  returns all featurelocs with coordinates that intersect fmin and fmax
+ ';
+
+DECLARE FUNCTION featureloc_slice(
+    srcfeature_name VARCHAR,
+    fmin            INTEGER,
+    fmax            INTEGER)
+ RETURNS SETOF featureloc;
+COMMENT ON FUNCTION featureloc_slice(INT,INT) IS
+ '
+  returns all featurelocs with coordinates that intersect fmin and fmax
+  and located relative to srcfeature (specified by srcfeature.name)
+ ';
+
+DECLARE FUNCTION featureloc_slice(
+    srcfeature_id   INTEGER,
+    fmin            INTEGER,
+    fmax            INTEGER)
+ RETURNS SETOF featureloc;
+COMMENT ON FUNCTION featureloc_slice(INT,INT) IS
+ '
+  returns all featurelocs with coordinates that intersect fmin and fmax
+  and located relative to srcfeature (specified by id)
+ ';
+
