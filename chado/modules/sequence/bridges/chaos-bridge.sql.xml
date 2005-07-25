@@ -1,6 +1,8 @@
 <bridge_layer schema="chaos">
   <notes>
     Chaos is a simplified view layer over Chado. 
+    To activate, SET search_path=chaos,public;
+    Be warned - this rewrites standard chado tables like feature
   </notes>
 
   <relation id="dbxref">
@@ -32,6 +34,8 @@
   feature_id,
   f.name,
   uniquename,
+  type_id,
+  dbxref_id,
   t.name         AS type,
   organismstr,
   dbxrefstr,
@@ -66,6 +70,8 @@
   srcfeature_id,
   CASE WHEN strand < 0 THEN fmax ELSE fmin END AS nbeg,
   CASE WHEN strand < 0 THEN fmin ELSE fmax END AS nend,
+  fmin,
+  fmax
   strand,
   rank,
   locgroup

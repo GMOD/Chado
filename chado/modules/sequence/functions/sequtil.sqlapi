@@ -1,0 +1,32 @@
+--
+-- functions for bio sequences
+--
+
+DECLARE FUNCTION reverse_complement(
+   residues TEXT)
+ RETURNS TEXT;
+COMMENT ON FUNCTION reverse_complement(TEXT) IS
+ '
+Calculates the reverse complement of a DNA sequence. The value of the argument must an an IUPAC compliant string
+ ';
+
+-- Requires: gencode module; see modules/sequence/gencode
+DECLARE FUNCTION translate_dna(
+   residues TEXT)
+ RETURNS TEXT;
+COMMENT ON FUNCTION translate_dna(TEXT) IS
+ '
+Translates a DNA sequence to AA sequence based on standard genetic code
+ ';
+
+-- Requires: gencode schema; see modules/sequence/gencode
+DECLARE FUNCTION translate_dna(
+   residues TEXT,
+   gencode_id INT)
+ RETURNS TEXT;
+COMMENT ON FUNCTION translate_dna(TEXT,INT) IS
+ '
+Translates a DNA sequence to AA sequence based on NCBI genetic code ID (1=standard). See gencode schema module for details
+ ';
+
+

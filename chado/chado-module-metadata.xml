@@ -11,6 +11,14 @@
     as well as other files which that module may require or use
   </about>
 
+  <!-- source types -->
+  <!--  dir: a directory relative to the chado root dir -->
+  <!--  sql: SQL DDL statements that are largely DBMS neutral-->
+  <!--  plpgsql: PostgreSQL functions and triggers -->
+  <!--  bridge-xml: Can be converted with chado/bin/create-bridge-sql.pl -->
+  <!--  sqlapi: Pseudo-SQL public function interface declarations -->
+  <!-- -->
+
   <modules>
     <source type='dir' path='modules'/>
 
@@ -47,7 +55,7 @@
           Postgres code for populating the cvtermpath table
         </description>
         <implements to='cv-dbapi'/>
-        <source type='pgsql' path='cv/functions/fill_cvtermpath.plpgsql'/>
+        <source type='plpgsql' path='cv/functions/fill_cvtermpath.plpgsql'/>
       </component>
 
     </module>
@@ -80,18 +88,50 @@
       </description>
       <source type='sql' path='sequence/sequence.sql'/>
 
+      <component id='gencode' type='sql' required='true'>
+        <description>
+          Genetic code - maps codons to amino acids according to
+          species specific translation table
+        </description>
+        <source type='sql' path='sequence/gencode/gencode.sql'/>
+        <source type='sqldump' path='sequence/gencode/gencode_data.sql'/>
+      </component>
+
       <component id='sequence-views' type='views' required='true'>
         <description>
           Standard Chado SQL Views for the sequence module
         </description>
         <source type='sql' path='sequence/sequence-views.sql'/>
+        <component id='range-views' type='views' required='true'>
+          <description>
+            Views for operating on featureloc ranges. Overlap,
+            intersection, union, difference etc
+          </description>
+          <source type='sql' path='sequence/views/range-views.sql'/>
+        </component>
       </component>
 
       <component id='sequence-dbapi' type='dbapi'>
         <description>
-          A DBMS API for the sequence module
+          A SQL/DBMS API for the sequence module. Currently only plpgsql
+          implementations exist
         </description>
-        <source type='sqli' path='sequence/sequence-dbapi.sqli'/>
+        <!-- subcomponents -->
+        <component id='sequence-dbapi-range' type='dbapi'>
+          <description>
+            Functions for operating on interval ranges
+          </description>
+          <source type='sqlapi' path='sequence/functions/range.sqlapi'/>
+          <source type='plpgsql' path='sequence/functions/range.plpgsql'/>
+        </component>
+        <component id='sequence-dbapi-sequtil type='dbapi'>
+          <dependency to='gencode'/>
+          <description>
+            Utility functions for biological sequences
+          </description>
+          <source type='sqlapi' path='sequence/functions/sequtil.sqlapi'/>
+          <source type='plpgsql' path='sequence/functions/sequtil.plpgsql'/>
+        </component>
       </component>
 
       <component id='sequence_opt' type='optimizations'>
@@ -106,7 +146,7 @@
           A GFF-view over chado. Required by Gbrowse
         </description>
         <source type='sql' path='sequence/gff-bridge/sequence-gff-views.sql'/>
-        <source type='pgsql' path='sequence/gff-bridge/sequence-gff-funcs.pgsql'/>
+        <source type='plpgsql' path='sequence/gff-bridge/sequence-gff-funcs.pgsql'/>
       </component>
 
       <component id='godb-bridge' type='bridge'>
@@ -118,7 +158,15 @@
         <status code='alpha'>
           Requires testing with AmiGO
         </status>
-        <source type='sql' path='cv/bridges/godb-bridge.sql'/>
+        <source type='bridge-xml' path='cv/bridges/godb-bridge.sql.xml'/>
+      </component>
+
+      <component id='chaos-bridge' type='bridge'>
+        <description>
+          Chaos is a simplified layer over chado
+        </description>
+        <status code='alpha'/>
+        <source type='bridge-xml' path='sequence/bridges/chaos-bridge.sql'/>
       </component>
 
     </module>
