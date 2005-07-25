@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.2 2005-06-08 05:47:40 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.3 2005-07-25 16:27:17 cmungall Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -260,7 +260,7 @@ create index phylonodeprop_idx2 on phylonodeprop (type_id);
 
 create table phylonode_relationship (
        phylonode_relationship_id serial not null,
-       primary key (phylonode_relationship),
+       primary key (phylonode_relationship_id),
 
        subject_id int not null,
        foreign key (subject_id) references phylonode (phylonode_id) on delete cascade,
