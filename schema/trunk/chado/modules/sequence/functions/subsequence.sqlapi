@@ -1,0 +1,100 @@
+-- this API imports sequtil.sqlapi
+
+-----------------------------------
+-- basic subsequencing functions --
+-----------------------------------
+
+DECLARE FUNCTION subsequence(
+   srcfeature_id        INT REFERENCES feature(feature_id),
+   fmin                 INT,
+   fmax                 INT,
+   strand               INT
+)
+ RETURNS TEXT;
+COMMENT ON FUNCTION subsequence(INT,INT,INT,INT) IS
+ 'extracts a subsequence, reverse complementing if range <1';
+
+DECLARE FUNCTION subsequence_by_feature(
+   feature_id           INT REFERENCES feature(feature_id)
+)
+ RETURNS TEXT;
+COMMENT ON FUNCTION subsequence_by_feature(INT) IS
+ 'extracts a subsequence for a feature, using featureloc (rank,group=0)';
+
+DECLARE FUNCTION subsequence_by_feature(
+   feature_id           INT REFERENCES feature(feature_id),
+   rank                 INT,
+   locgroup             INT
+)
+ RETURNS TEXT;
+COMMENT ON FUNCTION subsequence_by_feature(INT) IS
+ 'extracts a subsequence for a feature, using featureloc (rank,group=0)';
+
+-------------------------------------------------------
+-- subsequences based on discontiguous featurelocs  ---
+-------------------------------------------------------
+
+-- a feature can contain subfeatures (eg transcripts 
+-- containing exons and polypeptides)
+-- these functions automatically extract the concatenated
+-- sequence of the multiple featurelocs defined by the
+-- subfeatures of any containing feature
+
+-- ** typed subfeatures **
+--  here subfeatures are constrained by their type; eg exon
+
+DECLARE FUNCTION subsequence_set_by_typed_subfeatures(
+   feature_id           INT REFERENCES feature(feature_id),
+   type_id              INT REFERENCES cvterm(cvterm_id)
+)
+ RETURNS SETOF TEXT;
+
+COMMENT ON FUNCTION subsequence_set_by_typed_subfeatures(INT,INT) IS
+'extracts a subsequence for a featureset. a featureset contains
+subfeatures, as defined by feature_relationship (the set is the object
+of the relation, the subfeature is the subject). the subfeatures are
+constrained by a type_id (this allows you to get the subsequence of a
+transcript based on exon featurelocs only). The rank and locgroup are
+set to 0';
+
+DECLARE FUNCTION subsequence_set_by_typed_subfeatures(
+   feature_id           INT REFERENCES feature(feature_id),
+   type_id              INT REFERENCES cvterm(cvterm_id),
+   rank                 INT,
+   locgroup             INT
+)
+ RETURNS SETOF TEXT;
+
+COMMENT ON FUNCTION subsequence_set_by_typed_subfeatures(INT,INT,INT,INT) IS
+'See the 2-arg version of this function; this allows the featurelocs
+to be constrained by rank and locgroup';
+
+-- ** typed relations **
+--  here subfeatures are constrained by the type of the relationship
+--  between subfeature and container feature
+
+DECLARE FUNCTION subsequence_set_by_subfeatures(
+   feature_id           INT REFERENCES feature(feature_id),
+   type_id              INT REFERENCES cvterm(cvterm_id)
+)
+ RETURNS SETOF TEXT;
+
+COMMENT ON FUNCTION subsequence_set_by_subfeatures(INT,INT) IS
+'extracts a subsequence for a featureset. a featureset contains
+subfeatures, as defined by feature_relationship (the set is the object
+of the relation, the subfeature is the subject). the subfeatures are
+constrained by a type_id (this allows you to get the subsequence of a
+transcript based on exon featurelocs only). The rank and locgroup are
+set to 0';
+
+DECLARE FUNCTION subsequence_set_by_subfeatures(
+   feature_id           INT REFERENCES feature(feature_id),
+   type_id              INT REFERENCES cvterm(cvterm_id),
+   rank                 INT,
+   locgroup             INT
+)
+ RETURNS SETOF TEXT;
+
+COMMENT ON FUNCTION subsequence_set_by_subfeatures(INT,INT,INT,INT) IS
+'See the 2-arg version of this function; this allows the featurelocs
+to be constrained by rank and locgroup';

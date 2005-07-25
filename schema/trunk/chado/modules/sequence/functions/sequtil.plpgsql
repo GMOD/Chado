@@ -62,3 +62,13 @@ LANGUAGE 'sql';
 
 
 
+CREATE OR REPLACE FUNCTION concat_pair (text, text) RETURNS text AS
+ 'SELECT $1 || $2'
+LANGUAGE 'sql';
+
+CREATE AGGREGATE concat (
+sfunc = concat_pair,
+basetype = text,
+stype = text,
+initcond = ''
+);
