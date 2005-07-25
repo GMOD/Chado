@@ -1,0 +1,124 @@
+-- dependency_on: [sequtil]
+
+CREATE OR REPLACE FUNCTION subsequence(INT,INT,INT,INT)
+ RETURNS TEXT AS
+ 'SELECT 
+  CASE WHEN $4<0 
+   THEN reverse_complement(substring(srcf.residues,$2+1,($3-$2)))
+   ELSE substring(residues,$2+1,($3-$2))
+  END AS residues
+  FROM feature AS srcf
+  WHERE
+   srcf.feature_id=$1'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_featureloc(INT)
+ RETURNS TEXT AS
+ 'SELECT 
+  CASE WHEN strand<0 
+   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
+   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+  END AS residues
+  FROM feature AS srcf
+   INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
+  WHERE
+   featureloc_id=$1'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_feature(INT,INT,INT)
+ RETURNS TEXT AS
+ 'SELECT 
+  CASE WHEN strand<0 
+   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
+   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+  END AS residues
+  FROM feature AS srcf
+   INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
+  WHERE
+   featureloc.feature_id=$1 AND
+   featureloc.rank=$2 AND
+   featureloc.locgroup=$3'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_feature(INT)
+ RETURNS TEXT AS 'SELECT residues FROM subsequence_by_feature($1,0,0)'
+LANGUAGE 'sql';
+
+-- constrained by feature_relationship.type_id
+--   (allows user to construct queries that only get subsequences of
+--    part_of subfeatures)
+CREATE OR REPLACE FUNCTION subsequence_set_by_subfeatures(INT,INT,INT,INT)
+ RETURNS setof TEXT AS
+ 'SELECT 
+  CASE WHEN strand<0 
+   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
+   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+  END AS residues
+  FROM feature AS srcf
+   INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
+   INNER JOIN feature_relationship AS fr
+     ON (fr.subject_id=featureloc.feature_id)
+  WHERE
+   fr.object_id=$1 AND
+   fr.type_id=$2 AND
+   featureloc.rank=$3 AND
+   featureloc.locgroup=$4
+  ORDER BY fr.rank
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION subsequence_set_by_subfeatures(INT,INT,INT,INT)
+ RETURNS SETOF TEXT AS
+ 'SELECT * FROM subsequence_set_by_subfeatures($1,$2,0,0)'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT,INT,INT)
+ RETURNS TEXT AS
+ 'SELECT concat(residues) FROM subsequence_set_by_subfeatures($1,$2,$3,$4)'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT)
+ RETURNS TEXT AS
+ 'SELECT concat(residues) FROM subsequence_set_by_subfeatures($1,$2,0,0)'
+LANGUAGE 'sql';
+
+
+-- constrained by subfeature.type_id (eg exons of a transcript)
+CREATE OR REPLACE FUNCTION subsequence_set_by_typed_subfeatures(INT,INT,INT,INT)
+ RETURNS setof TEXT AS
+ 'SELECT 
+  CASE WHEN strand<0 
+   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
+   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+  END AS residues
+  FROM feature AS srcf
+   INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
+   INNER JOIN feature AS subf ON (subf.feature_id=featureloc.feature_id)
+   INNER JOIN feature_relationship AS fr ON (fr.subject_id=subf.feature_id)
+  WHERE
+   fr.object_id=$1 AND
+   subf.type_id=$2 AND
+   featureloc.rank=$3 AND
+   featureloc.locgroup=$4
+  ORDER BY fr.rank
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION subsequence_set_by_typed_subfeatures(INT,INT,INT,INT)
+ RETURNS SETOF TEXT AS
+ 'SELECT * FROM subsequence_set_by_typed_subfeatures($1,$2,0,0)'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT,INT,INT)
+ RETURNS TEXT AS
+ 'SELECT concat(residues) FROM subsequence_set_by_typed_subfeatures($1,$2,$3,$4)'
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT)
+ RETURNS TEXT AS
+ 'SELECT concat(residues) FROM subsequence_set_by_typed_subfeatures($1,$2,0,0)'
+LANGUAGE 'sql';
+
+ 
+
+
