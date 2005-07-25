@@ -1,0 +1,64 @@
+
+-- reverse_string
+CREATE OR REPLACE FUNCTION reverse_string(TEXT) RETURNS TEXT AS 
+'
+ DECLARE 
+  reversed_string TEXT;
+  incoming ALIAS FOR $1;
+ BEGIN
+   reversed_string = '''';
+   FOR i IN REVERSE char_length(incoming)..1 loop
+     reversed_string = reversed_string || substring(incoming FROM i FOR 1);
+   END loop;
+ RETURN reversed_string;
+END'
+language plpgsql;
+
+-- complements DNA
+CREATE OR REPLACE FUNCTION complement_residues(text) RETURNS text AS
+ 'SELECT (translate($1, 
+                   ''acgtrymkswhbvdnxACGTRYMKSWHBVDNX'',
+                   ''tgcayrkmswdvbhnxTGCAYRKMSWDVBHNX''))'
+LANGUAGE 'sql';
+
+-- revcomp
+CREATE OR REPLACE FUNCTION reverse_complement(TEXT) RETURNS TEXT AS
+ 'SELECT reverse_string(complement_residues($1))'
+LANGUAGE 'sql';
+
+-- DNA to AA, default genetic code
+CREATE OR REPLACE FUNCTION translate_dna(TEXT) RETURNS TEXT AS 
+ 'SELECT translate_dna($1,1)'
+LANGUAGE 'sql';
+
+-- DNA to AA
+CREATE OR REPLACE FUNCTION translate_dna(TEXT,INT) RETURNS TEXT AS 
+'
+ DECLARE 
+  dnaseq ALIAS FOR $1;
+  gcode ALIAS FOR $2;
+  translation TEXT;
+  dnaseqlen INT;
+  codon CHAR(3);
+  aa CHAR(1);
+  i INT;
+ BEGIN
+   translation = '''';
+   dnaseqlen = char_length(dnaseq);
+   i=1;
+   WHILE i+1 < dnaseqlen loop
+     codon = substring(dnaseq,i,3);
+     aa = translate_codon(codon,gcode);
+     translation = translation || aa;
+     i = i+3;
+   END loop;
+ RETURN translation;
+END'
+language plpgsql;
+
+CREATE OR REPLACE FUNCTION translate_codon(TEXT,INT) RETURNS CHAR AS
+ 'SELECT aa FROM genetic_code.gencode_codon_aa WHERE codon=$1 AND gencode_id=$2'
+LANGUAGE 'sql';
+
+
+

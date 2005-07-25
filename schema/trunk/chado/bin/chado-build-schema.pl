@@ -162,15 +162,15 @@ sub create_schema {
             }
         
         }
-        my $fh = FileHandle->new(">$SCHEMA_FILE");
-        if ($fh) {
-            print $fh join('',@sql_lines);
-            $fh->close;
-            #print `cat $SCHEMA_FILE`;
-            $mw->messageBox(-message=>"schema created in file $SCHEMA_FILE");
-        } else {
-            $mw->messageBox(-message=>"cannot write to $SCHEMA_FILE");
-        }
+    }
+    my $fh = FileHandle->new(">$SCHEMA_FILE");
+    if ($fh) {
+        print $fh join('',@sql_lines);
+        $fh->close;
+        #print `cat $SCHEMA_FILE`;
+        $mw->messageBox(-message=>"schema created in file $SCHEMA_FILE");
+    } else {
+        $mw->messageBox(-message=>"cannot write to $SCHEMA_FILE");
     }
 }
 
