@@ -1,0 +1,5 @@
+Example data for phylogeny module in chado-xml
+
+Use a generic loader to put this in db; either XML::XORT or DBIx::DBStag
+
+If your test db does not have organisms loaded, first load org.chado-xml

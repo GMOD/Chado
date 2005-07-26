@@ -1,0 +1,32 @@
+<chado>
+  <organism id="NCBITaxon:4751">
+    <common_name>Fungi</common_name>
+    <genus>Fungi</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:33208">
+    <common_name>Metazoa</common_name>
+    <genus>Metazoa</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:9443">
+    <common_name>Primates</common_name>
+    <genus>Primates</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:9606">
+    <common_name>human</common_name>
+    <genus>Homo</genus>
+    <species>sapiens</species>
+  </organism>
+  <organism id="NCBITaxon:6231">
+    <common_name>nematode</common_name>
+    <genus>Nematoda</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:4932">
+    <common_name>yeast</common_name>
+    <genus>Saccharomyces</genus>
+    <species>cerevisiae</species>
+  </organism>
+</chado>

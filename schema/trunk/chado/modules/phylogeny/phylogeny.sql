@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.3 2005-07-25 16:27:17 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.4 2005-07-26 20:05:27 cmungall Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -68,7 +68,7 @@ create table phylotree (
 
 -- type: protein, nucleotide, taxonomy, ???
 -- the type should be any SO type, or "taxonomy"
-	type_id int not null,
+	type_id int,
 	foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
 
 -- REMOVED BY cjm; this is implicit from indexing - see phylonode
@@ -117,7 +117,6 @@ create table phylonode (
 
        phylotree_id int not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
-       phylonode_idx int not null,
 
 -- root phylonode can have null parent_phylonode_id value
        parent_phylonode_id int null,
@@ -130,7 +129,7 @@ create table phylonode (
        right_idx int not null,
 
 -- type: root, interior, leaf
-       type_id int not null,
+       type_id int,
        foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
 
 --     phylonodes can have optional features attached to them
@@ -140,7 +139,7 @@ create table phylonode (
 --        a feature that is an instance of SO:match;
 --        this feature is the alignment of all leaf
 --        features beneath it
-       feature_id int not null,
+       feature_id int,
        foreign key (feature_id) references feature (feature_id) on delete cascade,
 
        label varchar(255) null,
