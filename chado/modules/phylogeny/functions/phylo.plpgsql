@@ -1,0 +1,28 @@
+
+CREATE OR REPLACE FUNCTION phylonode_depth(INT)
+ RETURNS FLOAT AS
+ 'DECLARE  id    ALIAS FOR $1;
+  DECLARE  depth FLOAT := 0;
+  DECLARE  curr_node phylonode%ROWTYPE;
+  BEGIN
+   SELECT INTO curr_node *
+    FROM phylonode 
+    WHERE phylonode_id=id;
+   depth = depth + curr_node.distance;
+   IF curr_node.parent_phylonode_id IS NULL
+    THEN RETURN depth;
+    ELSE RETURN depth + phylonode_depth(curr_node.parent_phylonode_id);
+   END IF;
+ END
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION phylonode_height(INT)
+ RETURNS FLOAT AS
+'
+  SELECT coalesce(max(phylonode_height(phylonode_id) + distance), 0.0)
+    FROM phylonode
+    WHERE parent_phylonode_id = $1
+'
+LANGUAGE 'sql';
+

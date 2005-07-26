@@ -1,0 +1,8 @@
+COMMENT ON FUNCTION phylonode_depth(INT) IS 'returns as a FLOAT the
+depth of the node with a particular phylonode_id - depth is defined as
+the sum of distances from the node to the root';
+
+COMMENT ON FUNCTION phylonode_height(INT) IS 'returns as a FLOAT the
+height of the node with a particular phylonode_id - height is defined as
+the maximum total distance from the node to the leaves';
+

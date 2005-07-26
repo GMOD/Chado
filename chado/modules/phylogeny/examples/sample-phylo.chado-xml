@@ -67,7 +67,7 @@
       <label></label>
       <distance>0</distance>
       <left_idx>1</left_idx>
-      <right_idx>20</right_idx>
+      <right_idx>24</right_idx>
       <phylonodeprop>
         <type_id>D</type_id>
         <value>N</value>
@@ -81,8 +81,8 @@
       <label></label>
       <distance>0.1</distance>
       <parent_phylonode_id>node1</parent_phylonode_id>
-      <left_idx>11</left_idx>
-      <right_idx>19</right_idx>
+      <left_idx>14</left_idx>
+      <right_idx>23</right_idx>
       <phylonodeprop>
         <type_id>S</type_id>
         <value>Fungi</value>
@@ -95,8 +95,8 @@
       <label>ADH1</label>
       <distance>0.11</distance>
       <parent_phylonode_id>node8</parent_phylonode_id>
-      <left_idx>15</left_idx>
-      <right_idx>16</right_idx>
+      <left_idx>19</left_idx>
+      <right_idx>20</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -113,8 +113,8 @@
       <label>ADH2</label>
       <distance>0.12</distance>
       <parent_phylonode_id>node8</parent_phylonode_id>
-      <left_idx>13</left_idx>
-      <right_idx>14</right_idx>
+      <left_idx>17</left_idx>
+      <right_idx>18</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -131,8 +131,8 @@
       <label>ADH3</label>
       <distance>0.13</distance>
       <parent_phylonode_id>node8</parent_phylonode_id>
-      <left_idx>11</left_idx>
-      <right_idx>12</right_idx>
+      <left_idx>15</left_idx>
+      <right_idx>16</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -149,8 +149,8 @@
       <label>ADH4</label>
       <distance>0.09</distance>
       <parent_phylonode_id>node8</parent_phylonode_id>
-      <left_idx>17</left_idx>
-      <right_idx>18</right_idx>
+      <left_idx>21</left_idx>
+      <right_idx>22</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -167,8 +167,8 @@
       <label></label>
       <distance>0.1</distance>
       <parent_phylonode_id>node1</parent_phylonode_id>
-      <left_idx>1</left_idx>
-      <right_idx>10</right_idx>
+      <left_idx>2</left_idx>
+      <right_idx>13</right_idx>
       <phylonodeprop>
         <type_id>D</type_id>
         <value>N</value>
@@ -189,8 +189,8 @@
       <label>ADHX</label>
       <distance>0.12</distance>
       <parent_phylonode_id>node2</parent_phylonode_id>
-      <left_idx>8</left_idx>
-      <right_idx>9</right_idx>
+      <left_idx>11</left_idx>
+      <right_idx>12</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -204,8 +204,8 @@
       <label>ADHY</label>
       <distance>0.1</distance>
       <parent_phylonode_id>node2</parent_phylonode_id>
-      <left_idx>6</left_idx>
-      <right_idx>7</right_idx>
+      <left_idx>9</left_idx>
+      <right_idx>10</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -222,8 +222,8 @@
       <label></label>
       <distance>0.05</distance>
       <parent_phylonode_id>node2</parent_phylonode_id>
-      <left_idx>1</left_idx>
-      <right_idx>5</right_idx>
+      <left_idx>3</left_idx>
+      <right_idx>8</right_idx>
       <phylonodeprop>
         <type_id>B</type_id>
         <value>100</value>
@@ -248,8 +248,8 @@
       <label>ADH1</label>
       <distance>0.11</distance>
       <parent_phylonode_id>node3</parent_phylonode_id>
-      <left_idx>3</left_idx>
-      <right_idx>4</right_idx>
+      <left_idx>6</left_idx>
+      <right_idx>7</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
@@ -266,8 +266,8 @@
       <label>ADH2</label>
       <distance>0.1</distance>
       <parent_phylonode_id>node3</parent_phylonode_id>
-      <left_idx>1</left_idx>
-      <right_idx>2</right_idx>
+      <left_idx>4</left_idx>
+      <right_idx>5</right_idx>
       <phylonodeprop>
         <type_id>E</type_id>
         <value>1.1.1.1</value>
