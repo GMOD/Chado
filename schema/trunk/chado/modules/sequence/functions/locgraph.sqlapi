@@ -1,0 +1,8 @@
+COMMENT ON FUNCTION project_point_up(INT,INT,INT,INT) IS
+'(p,fmin,fmax,strand). p is relative to some feature f; fmin and fmax are also relative to this feature. p will be relocated relative to fmin/fmax (eg fmin/fmax may be for some contig, the desired behaviour is to project p from the chromosome onto the contig)';
+
+COMMENT ON FUNCTION project_point_down(INT,INT,INT,INT) IS
+'(p,fmin,fmax,strand). p is relative to fmin/fmax. p will be relocated from fmin/fmax (eg fmin/fmax may be for some contig, the desired behaviour is to project p from the contig onto the chromosme)';
+
+COMMENT ON FUNCTION project_featureloc_up(INT,INT) IS
+'(in_featureloc_id,up_srcfeature_id). will return a new featureloc (with the same featureloc_id) projected up the featureloc graph';

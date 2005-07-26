@@ -1,0 +1,72 @@
+-- down the graph: eg from  chromosome to contig
+CREATE OR REPLACE FUNCTION project_point_up(int,int,int,int)
+ RETURNS int AS
+'SELECT
+  CASE WHEN $4<0
+   THEN $3-$1             -- rev strand
+   ELSE $1-$2             -- fwd strand
+  END AS p'
+LANGUAGE 'sql'; 
+
+-- down the graph: eg from contig to chromosome
+CREATE OR REPLACE FUNCTION project_point_down(int,int,int,int)
+ RETURNS int AS
+'SELECT
+  CASE WHEN $4<0
+   THEN $3-$1
+   ELSE $1+$2
+  END AS p'
+LANGUAGE 'sql'; 
+
+CREATE OR REPLACE FUNCTION project_featureloc_up(int,int)
+ RETURNS featureloc AS
+'DECLARE
+    in_featureloc_id alias for $1;
+    up_srcfeature_id alias for $2;
+    in_featureloc featureloc%ROWTYPE;
+    up_featureloc featureloc%ROWTYPE;
+    nu_featureloc featureloc%ROWTYPE;
+    nu_fmin INT;
+    nu_fmax INT;
+    nu_strand INT;
+BEGIN
+ SELECT INTO in_featureloc
+   featureloc.*
+  FROM featureloc
+  WHERE featureloc_id = in_featureloc_id;
+
+ SELECT INTO up_featureloc
+   up_fl.*
+  FROM featureloc AS in_fl
+  INNER JOIN featureloc AS up_fl
+    ON (in_fl.srcfeature_id = up_fl.feature_id)
+  WHERE
+   in_fl.featureloc_id = in_featureloc_id AND
+   up_fl.srcfeature_id = up_srcfeature_id;
+
+  IF up_featureloc.strand IS NULL
+   THEN RETURN NULL;
+  END IF;
+  
+  IF up_featureloc.strand < 0
+  THEN
+   nu_fmin = project_point_up(in_featureloc.fmax,
+                              up_featureloc.fmin,up_featureloc.fmax,-1);
+   nu_fmax = project_point_up(in_featureloc.fmin,
+                              up_featureloc.fmin,up_featureloc.fmax,-1);
+   nu_strand = -in_featureloc.strand;
+  ELSE
+   nu_fmin = project_point_up(in_featureloc.fmin,
+                              up_featureloc.fmin,up_featureloc.fmax,1);
+   nu_fmax = project_point_up(in_featureloc.fmax,
+                              up_featureloc.fmin,up_featureloc.fmax,1);
+   nu_strand = in_featureloc.strand;
+  END IF;
+  in_featureloc.fmin = nu_fmin;
+  in_featureloc.fmax = nu_fmax;
+  in_featureloc.strand = nu_strand;
+  in_featureloc.srcfeature_id = up_featureloc.srcfeature_id;
+  RETURN in_featureloc;
+END'   
+LANGUAGE 'plpgsql';
+
