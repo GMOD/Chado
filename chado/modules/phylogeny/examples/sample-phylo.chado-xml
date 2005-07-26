@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+
+<chado>
+  <!-- chado macros -->
+  <organism id="NCBITaxon:4751" op="lookup">
+    <common_name>Fungi</common_name>
+    <genus>Fungi</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:33208" op="lookup">
+    <common_name>Metazoa</common_name>
+    <genus>Metazoa</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:9443" op="lookup">
+    <common_name>Primates</common_name>
+    <genus>Primates</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:9606" op="lookup">
+    <common_name>human</common_name>
+    <genus>Homo</genus>
+    <species>sapiens</species>
+  </organism>
+  <organism id="NCBITaxon:6231" op="lookup">
+    <common_name>nematode</common_name>
+    <genus>Nematoda</genus>
+    <species></species>
+  </organism>
+  <organism id="NCBITaxon:4932" op="lookup">
+    <common_name>yeast</common_name>
+    <genus>Saccharomyces</genus>
+    <species>cerevisiae</species>
+  </organism>
+  <cv id="phylogenetic_property" op="lookup">
+    <name>phylogenetic_property</name>
+  </cv>
+  <cvterm id="B" op="lookup">
+    <cv_id>phylogenetic_property</cv_id>
+    <name>B</name>
+  </cvterm>
+  <cvterm id="D" op="lookup">
+    <cv_id>phylogenetic_property</cv_id>
+    <name>D</name>
+  </cvterm>
+  <cvterm id="E" op="lookup">
+    <cv_id>phylogenetic_property</cv_id>
+    <name>E</name>
+  </cvterm>
+  <cvterm id="S" op="lookup">
+    <cv_id>phylogenetic_property</cv_id>
+    <name>S</name>
+  </cvterm>
+  <!-- main data -->
+  <phylotree id="node1-tree">
+    <dbxref_id>
+      <dbxref>
+        <accession>1</accession>
+        <db_id>
+          <db>
+            <name>test</name>
+          </db>
+        </db_id>
+      </dbxref>
+    </dbxref_id>
+    <phylonode id="node1">
+      <label></label>
+      <distance>0</distance>
+      <left_idx>1</left_idx>
+      <right_idx>20</right_idx>
+      <phylonodeprop>
+        <type_id>D</type_id>
+        <value>N</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+    </phylonode>
+    <phylonode id="node8">
+      <label></label>
+      <distance>0.1</distance>
+      <parent_phylonode_id>node1</parent_phylonode_id>
+      <left_idx>11</left_idx>
+      <right_idx>19</right_idx>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>Fungi</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:4751</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node12">
+      <label>ADH1</label>
+      <distance>0.11</distance>
+      <parent_phylonode_id>node8</parent_phylonode_id>
+      <left_idx>15</left_idx>
+      <right_idx>16</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>yeast</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:4932</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node11">
+      <label>ADH2</label>
+      <distance>0.12</distance>
+      <parent_phylonode_id>node8</parent_phylonode_id>
+      <left_idx>13</left_idx>
+      <right_idx>14</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>yeast</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:4932</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node10">
+      <label>ADH3</label>
+      <distance>0.13</distance>
+      <parent_phylonode_id>node8</parent_phylonode_id>
+      <left_idx>11</left_idx>
+      <right_idx>12</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>yeast</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:4932</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node9">
+      <label>ADH4</label>
+      <distance>0.09</distance>
+      <parent_phylonode_id>node8</parent_phylonode_id>
+      <left_idx>17</left_idx>
+      <right_idx>18</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>yeast</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:4932</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node2">
+      <label></label>
+      <distance>0.1</distance>
+      <parent_phylonode_id>node1</parent_phylonode_id>
+      <left_idx>1</left_idx>
+      <right_idx>10</right_idx>
+      <phylonodeprop>
+        <type_id>D</type_id>
+        <value>N</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>Metazoa</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:33208</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node7">
+      <label>ADHX</label>
+      <distance>0.12</distance>
+      <parent_phylonode_id>node2</parent_phylonode_id>
+      <left_idx>8</left_idx>
+      <right_idx>9</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>insect</value>
+      </phylonodeprop>
+    </phylonode>
+    <phylonode id="node6">
+      <label>ADHY</label>
+      <distance>0.1</distance>
+      <parent_phylonode_id>node2</parent_phylonode_id>
+      <left_idx>6</left_idx>
+      <right_idx>7</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>nematode</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:6231</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node3">
+      <label></label>
+      <distance>0.05</distance>
+      <parent_phylonode_id>node2</parent_phylonode_id>
+      <left_idx>1</left_idx>
+      <right_idx>5</right_idx>
+      <phylonodeprop>
+        <type_id>B</type_id>
+        <value>100</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>D</type_id>
+        <value>Y</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>Primates</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:9443</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node5">
+      <label>ADH1</label>
+      <distance>0.11</distance>
+      <parent_phylonode_id>node3</parent_phylonode_id>
+      <left_idx>3</left_idx>
+      <right_idx>4</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>human</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:9606</organism_id>
+      </phylonode_organism>
+    </phylonode>
+    <phylonode id="node4">
+      <label>ADH2</label>
+      <distance>0.1</distance>
+      <parent_phylonode_id>node3</parent_phylonode_id>
+      <left_idx>1</left_idx>
+      <right_idx>2</right_idx>
+      <phylonodeprop>
+        <type_id>E</type_id>
+        <value>1.1.1.1</value>
+      </phylonodeprop>
+      <phylonodeprop>
+        <type_id>S</type_id>
+        <value>human</value>
+      </phylonodeprop>
+      <phylonode_organism>
+        <organism_id>NCBITaxon:9606</organism_id>
+      </phylonode_organism>
+    </phylonode>
+  </phylotree>
+</chado>
