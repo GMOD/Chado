@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.4 2005-07-26 20:05:27 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.5 2005-07-26 20:06:40 cmungall Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -146,7 +146,6 @@ create table phylonode (
        distance float  null,
 --       bootstrap float null,
 
-       unique(phylotree_id, phylonode_idx),
        unique(phylotree_id, left_idx),
        unique(phylotree_id, right_idx)
 );
