@@ -43,7 +43,7 @@
   seqlen,
   md5checksum
  FROM public.feature AS f
-  INNER JOIN chaos.dbxref USING (dbxref_id)
+  LEFT OUTER JOIN chaos.dbxref USING (dbxref_id)
   INNER JOIN chaos.organism USING (organism_id)
   INNER JOIN cvterm AS t ON (t.cvterm_id=type_id)
     </sql>
