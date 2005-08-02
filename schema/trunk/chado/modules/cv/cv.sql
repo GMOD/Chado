@@ -45,7 +45,8 @@ COMMENT ON COLUMN cvterm.dbxref_id IS
 COMMENT ON COLUMN cvterm.is_obsolete IS
  'Boolean 0=false,1=true; see GO documentation for details of obsoletion.
   note that two terms with different primary dbxrefs may exist if one
-  is obsolete';
+  is obsolete. Values >1 may be allowed to circumvent uniqueness constraint
+  since there may be many obsoleted terms with the same name';
 COMMENT ON COLUMN cvterm.is_relationshiptype IS
  'Boolean 0=false,1=true
   Relationship types (also known as Typedefs in OBO format, or as
