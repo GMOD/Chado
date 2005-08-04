@@ -221,6 +221,10 @@ sub ACTION_ontologies {
   my $m    = shift;
   my $conf = $m->conf;
 
+  my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $db_host   = $conf->{'database'}{'db_host'}  || '';
+  my $db_port   = $conf->{'database'}{'db_port'}  || '';
+
   $m->log->info("entering ACTION_ontologies");
 
   print "Available ontologies:\n";
@@ -247,7 +251,7 @@ sub ACTION_ontologies {
     foreach my $file ( 
       grep { $_->{type} eq 'definitions' } @{ $ontologies{$ontology}{file} }
     ) {
-      my $fullpath = catfile $conf->{path}{data}, $file->{local};
+      my $fullpath = catfile($conf->{path}{data}, $file->{local});
       $fullpath =~ s!^(.+)/[^/]*!$1!;
       unless ( -d $fullpath ) {
         $m->log->debug("mkpath $fullpath");
@@ -263,9 +267,9 @@ sub ACTION_ontologies {
       @{ $ontologies{$ontology}{file} };
 
     foreach my $file (
-      grep { $_->{type} eq 'ontology' } @{ $ontologies{$ontology}{file} }
+      grep { ($_->{type} eq 'ontology') or ($_->{type} eq 'obo') } @{ $ontologies{$ontology}{file} }
     ) {
-      my $fullpath = catfile $conf->{path}{data}, $file->{local};
+      my $fullpath = catfile($conf->{path}{data}, $file->{local});
       $fullpath =~ s!^(.+)/[^/]*!$1!;
       unless ( -d $fullpath ) {
         $m->log->debug("mkpath $fullpath");
@@ -277,17 +281,37 @@ sub ACTION_ontologies {
 
       $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
 
- #	  $load = 1 if !$m->_loaded($conf->{'path'}{'data'}.'/'.$file->{'local'});
-
       next unless $load;
 
       print "    loading...";
 
-      my $sys_call = join( ' ', 
-        './load/bin/gmod_load_ontology.pl',
-        catfile( $conf->{'path'}{'data'}, $file->{'local'} ),
-        catfile( $conf->{'path'}{'data'}, $deffile->{'local'} )
-      );
+#      my $sys_call = join( ' ', 
+#        './load/bin/gmod_load_ontology.pl',
+#        catfile( $conf->{'path'}{'data'}, $file->{'local'} ),
+#        catfile( $conf->{'path'}{'data'}, $deffile->{'local'} )
+#      );
+
+
+      #creating chadoxml from either obo or ontology files
+      my $sys_call;
+      if ($file->{type} eq 'obo') {
+        $sys_call = join( ' ',
+           'go2fmt.pl -p obo_text -w xml',
+           catfile( $conf->{'path'}{'data'}, $file->{'local'}),
+           '| go-apply-xslt oboxml_to_chadoxml - >',
+           catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
+        );
+      } elsif ($file->{type} eq 'ontology') {
+        $sys_call = join( ' ',
+           'go2fmt.pl -p go_ont -w xml',
+           catfile( $conf->{'path'}{'data'}, $file->{'local'}),
+           '| go-apply-xslt oboxml_to_chadoxml - >',
+           catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
+        );
+      } else {
+        die "what kind of file is ".$_->{type}."?";
+      }
+
       $m->log->debug( "system call: $sys_call" );
 
       my $result = system( $sys_call );
@@ -297,9 +321,61 @@ sub ACTION_ontologies {
         $m->log->fatal("failed: $?");
         die;
       }
+
+      # loading chadoxml
+      $sys_call = join( ' ',
+        "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'",
+        catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
+      ); 
+
+      $m->log->debug( "system call: $sys_call" );
+
+      $result = system( $sys_call );
+
+      if ( $result != 0 ) {
+        print "System call '$sys_call' failed: $?\n";
+        $m->log->fatal("failed: $?");
+        die;
+      }
+
+      if ($deffile) {
+        $sys_call = join( ' ',
+          'go2fmt.pl -p go_def -w xml',
+          catfile( $conf->{'path'}{'data'}, $deffile->{'local'}),
+          '|  go-apply-xslt oboxml_to_chadoxml - >',
+          catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
+        );
+
+        $m->log->debug( "system call: $sys_call" );
+
+        $result = system( $sys_call );
+
+        if ( $result != 0 ) {
+          print "System call '$sys_call' failed: $?\n";
+          $m->log->fatal("failed: $?");
+          die;
+        }
+
+
+        $sys_call = join( ' ',
+          "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'",
+          catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
+        );
+
+        $m->log->debug( "system call: $sys_call" );
+
+        $result = system( $sys_call );
+
+      }
+
+      if ( $result != 0 ) {
+        print "System call '$sys_call' failed: $?\n";
+        $m->log->fatal("failed: $?");
+        die;
+      }
       else {
         $m->_loaded( catfile($conf->{'path'}{'data'}, $file->{'local'}), 1 );
-        $m->_loaded( catfile($conf->{'path'}{'data'}, $deffile->{'local'}), 1 );
+        $m->_loaded( catfile($conf->{'path'}{'data'}, $deffile->{'local'}), 1 ) if $deffile;
         print "done!\n";
         $m->log->debug("done!");
       }
