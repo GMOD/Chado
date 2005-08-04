@@ -487,6 +487,7 @@ COMMENT ON COLUMN synonym.synonym_sgml IS 'The fully specified synonym, with any
 COMMENT ON COLUMN synonym.type_id IS 'types would be symbol and fullname for now';
 
 create index synonym_idx1 on synonym (type_id);
+create index synonym_idx2 on synonym ((lower(synonym_sgml)));
 
 --
 
