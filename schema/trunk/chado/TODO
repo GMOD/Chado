@@ -1,3 +1,5 @@
+- add the ability to pass a dbprofile name to scripts
+
 - address flybase's use of of analysisfeature combined with feature to
   give source-type information (in GFF terms).  This will need to 
   be addressed in the GBrowse adaptor.
