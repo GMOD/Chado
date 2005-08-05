@@ -21,7 +21,7 @@ if (open F,"$Bin/../../build.conf") {
 }
 
 open OUT,">$file" or die "Can't create $file: $!";
-print OUT "$Config{startperl}\n";
+print OUT "$Config{startperl} -w\n";
 
 if ($OPTIONS{LIB}) {
   print OUT "use lib '$OPTIONS{LIB}';\n";
@@ -406,12 +406,12 @@ unless ($DBNAME) {
                         Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} || "/var/lib/gmod") :
                         Bio::GMOD::Config->new();
         my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,'default');
-        $DBNAME = $db_conf->name();
-        $DBUSER = $db_conf->user();
-        $DBPASS = $db_conf->password();
-        $DBHOST = $db_conf->host();
-        $DBPORT = $db_conf->port();
-        $ORGANISM=$db_conf->organism();
+        $DBNAME  ||= $db_conf->name();
+        $DBUSER  ||= $db_conf->user();
+        $DBPASS  ||= $db_conf->password();
+        $DBHOST  ||= $db_conf->host();
+        $DBPORT  ||= $db_conf->port();
+        $ORGANISM||=$db_conf->organism();
     }
 }
 
@@ -708,8 +708,9 @@ while(my $feature = $gffio->next_feature()){
   die "no cvterm for ".$featuretype unless $type;
 
   my $src;
-  if ($feature->seq_id->value
-      eq ($feature->annotation->get_Annotations('ID'))[0]) {
+  if ( defined ($feature->annotation->get_Annotations('ID'))[0])
+       && $feature->seq_id->value
+          eq ($feature->annotation->get_Annotations('ID'))[0]) {
       #this is a srcfeature (ie, a reference sequence)
     $src = $nextfeature;
     $cache{parent}{$feature->seq_id->value} = $src;
@@ -747,8 +748,8 @@ while(my $feature = $gffio->next_feature()){
   die "no feature for ".$feature->seq_id->value unless $src;
 
   if($feature->annotation->get_Annotations('Parent')){
-    my $pname = undef;
-    my($pname) = ($feature->annotation->get_Annotations('Parent'))[0]->value;
+    my $pname  = undef;
+    ($pname)   = ($feature->annotation->get_Annotations('Parent'))[0]->value;
     my $parent = $cache{parent}{$pname};
     die "no parent ".$pname unless $parent;
 
@@ -957,7 +958,7 @@ END
 
         $search_cvterm_id_w_dbxref->execute($dbxref);
         ($cache{type}{$term}) = $search_cvterm_id_w_dbxref->fetchrow_array;
-        warn "couldn't find $term's cvterm_id in cvterm table\n" 
+        warn "couldn't find $term 's cvterm_id in cvterm table\n" 
           and next unless $cache{type}{$term}; 
       }
       unless ($pub) {
@@ -1301,7 +1302,13 @@ sub copy_from_stdin {
 
   open FILE, $file;
   while (<FILE>) {
-    $dbh->func($_, 'putline');
+    if ( ! ($dbh->func($_, 'putline')) ) {
+      #error, disconecting
+      $dbh->func('endcopy');#$dbh->pg_endcopy;
+      $dbh->rollback;
+      $dbh->disconnect;
+      die "error while copying data's of file $file, line $.\n";
+    } #putline returns 1 if succesful
   }
   $dbh->func('endcopy');  # no docs on this func--got from google
   close FILE;
