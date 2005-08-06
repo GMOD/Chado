@@ -22,7 +22,7 @@ if (open F,"$Bin/../../build.conf") {
 
 
 open OUT,">$file" or die "Can't create $file: $!";
-print OUT "$Config{startperl}\n";
+print OUT "$Config{startperl} -w\n";
 
 if ($OPTIONS{LIB}) {
   print OUT "use lib '$OPTIONS{LIB}';\n";
