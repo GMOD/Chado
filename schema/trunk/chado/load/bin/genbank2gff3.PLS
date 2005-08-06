@@ -11,7 +11,7 @@ $file = basename($0, '.PL','.PLS');
 $file = "gmod_$file.pl";
                                                                                 
 open OUT,">$file" or die "Can't create $file: $!";
-print OUT "$Config{startperl}\n";
+print OUT "$Config{startperl} -w\n";
                                                                                 
 
 print OUT <<'!NO!SUBS!';
