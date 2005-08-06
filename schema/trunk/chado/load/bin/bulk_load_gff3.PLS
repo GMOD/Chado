@@ -576,7 +576,7 @@ $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
 
-$sth = $db->prepare("select cv_id from cv where name = 'sofa.ontology'");
+$sth = $db->prepare("select cv_id from cv where name = 'sequence'");
 $sth->execute;
 my($sofa_id) =  $sth->fetchrow_array();
 
@@ -708,7 +708,7 @@ while(my $feature = $gffio->next_feature()){
   die "no cvterm for ".$featuretype unless $type;
 
   my $src;
-  if ( defined ($feature->annotation->get_Annotations('ID'))[0])
+  if ( defined (($feature->annotation->get_Annotations('ID'))[0])
        && $feature->seq_id->value
           eq ($feature->annotation->get_Annotations('ID'))[0]) {
       #this is a srcfeature (ie, a reference sequence)
