@@ -1,3 +1,6 @@
+
+- add a function to the apollo triggers to simplify the merge and split
+  operations
 - add the ability to pass a dbprofile name to scripts
 
 - address flybase's use of of analysisfeature combined with feature to
