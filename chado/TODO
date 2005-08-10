@@ -1,4 +1,5 @@
-
+- write a GFF3 validator that checks GFF3 syntax and that uniquenames 
+  generated from ID tag values are valid.
 - add a function to the apollo triggers to simplify the merge and split
   operations
 - add the ability to pass a dbprofile name to scripts
