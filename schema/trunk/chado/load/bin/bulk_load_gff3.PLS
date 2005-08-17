@@ -515,7 +515,7 @@ my %sequences = (
    analysisfeature      => "analysisfeature_analysisfeature_id_seq"
 );
 my %copystring = (
-   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis)",
+   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen)",
    featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
    feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
    featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
@@ -708,14 +708,17 @@ while(my $feature = $gffio->next_feature()){
   die "no cvterm for ".$featuretype unless $type;
 
   my $src;
+  my $seqlen;
   if ( defined (($feature->annotation->get_Annotations('ID'))[0])
        && $feature->seq_id->value
           eq ($feature->annotation->get_Annotations('ID'))[0]) {
       #this is a srcfeature (ie, a reference sequence)
     $src = $nextfeature;
     $cache{parent}{$feature->seq_id->value} = $src;
+    $seqlen = $feature->end - $feature->start +1;
   } else { # normal case
     $src = $cache{parent}{$feature->seq_id->value};
+    $seqlen = '\N';
   }
 
   if(!$src){
@@ -774,7 +777,7 @@ while(my $feature = $gffio->next_feature()){
     $locgroup{$uniquename}++;
   }
   else {
-    print F join("\t", ($nextfeature, $organism, $name, $uniquename, $type, $ANALYSIS)),"\n";
+    print F join("\t", ($nextfeature, $organism, $name, $uniquename, $type, $ANALYSIS),$seqlen),"\n";
     $cache{feature}{$uniquename} = $nextfeature;
     $cache{parent}{$uniquename} = $nextfeature;
     $locgroup{$uniquename} = 0;
@@ -1116,7 +1119,7 @@ END
       } else { #this Target needs a feature too
         $nextfeature++;
         $name ||= "$featuretype-$uniquename";
-        print F join("\t", ($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS)),"\n";
+        print F join("\t", ($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS,'\N')),"\n";
         print FLOC join("\t", (
               $nextfeatureloc,
               $nextfeature-1, #broken, needs to use previous $cache{feature}{$uniquename}.  may want to use a $last_uniquename var to track this.
