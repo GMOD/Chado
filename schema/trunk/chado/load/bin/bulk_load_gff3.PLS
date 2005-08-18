@@ -1039,6 +1039,7 @@ END
   if ($name ne '\N') {
     push @aliases, $name;
   }
+  push @aliases, $uniquename;
 
   #need to unique-ify the list
   my %count;
