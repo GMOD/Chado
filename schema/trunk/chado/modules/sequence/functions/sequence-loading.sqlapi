@@ -1,0 +1,16 @@
+DECLARE FUNCTION store_feature
+( v_srcfeature_id       INT,
+  v_fmin                INT,
+  v_fmax                INT,
+  v_strand              INT,
+  v_dbxref_id           INT,
+  v_organism_id         INT,
+  v_name                VARCHAR,
+  v_uniquename          VARCHAR,
+  v_type_id             INT,
+  v_is_analysis         BOOLEAN)
+RETURNS INT;
+
+COMMENT ON FUNCTION store_feature (INT,INT,INT,INT,
+INT,INT,VARCHAR,VARCHAR,INT,BOOLEAN) RETURN INT IS 'stores a feature and its featureloc. The featureloc is assumed to be primary (rank and locgroup=0). Performs UPDATE on feature if either (dbxref_id) or (uniquename,organism_id,type_id) correspond to a row in the database, INSERTs otherwise. Will replace any existing primary featureloc';
+

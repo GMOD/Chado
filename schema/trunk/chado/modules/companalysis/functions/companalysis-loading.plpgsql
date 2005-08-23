@@ -1,0 +1,31 @@
+
+CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR) 
+  RETURNS INT AS 
+'DECLARE
+   v_program            ALIAS FOR $1;
+   v_programversion     ALIAS FOR $2;
+   v_sourcename         ALIAS FOR $3;
+   pkval                INTEGER;
+ BEGIN
+    SELECT INTO pkval analysis_id
+      FROM analysis
+      WHERE program=v_program AND
+            programversion=v_programversion AND
+            sourcename=v_sourcename;
+    IF NOT FOUND THEN
+      INSERT INTO analysis 
+       (program,programversion,sourcename)
+         VALUES
+       (v_program,v_programversion,v_sourcename);
+      RETURN currval(''analysis_analysis_id_seq'');
+    END IF;
+    RETURN pkval;
+ END;
+' LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION store_analysisfeature
+()
+RETURNS INT AS
+'DECLARE
+  v_srcfeature_id       ALIAS FOR $1;
+  
