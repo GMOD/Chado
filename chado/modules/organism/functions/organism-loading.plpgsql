@@ -1,0 +1,25 @@
+
+CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR) 
+  RETURNS INT AS 
+'DECLARE
+   v_genus            ALIAS FOR $1;
+   v_species          ALIAS FOR $2;
+   v_common_name      ALIAS FOR $3;
+
+   v_organism_id      INTEGER;
+ BEGIN
+    SELECT INTO v_organism_id organism_id
+      FROM organism
+      WHERE genus=v_genus               AND
+            species=v_species;
+    IF NOT FOUND THEN
+      INSERT INTO organism
+       (genus,species,common_name)
+         VALUES
+       (v_genus,v_species,v_common_name);
+       RETURN currval(''organism_organism_id_seq'');
+    END IF;
+    RETURN v_organism_id;
+ END;
+' LANGUAGE 'plpgsql';
+  
