@@ -18,6 +18,10 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
          VALUES
        (v_genus,v_species,v_common_name);
        RETURN currval(''organism_organism_id_seq'');
+    ELSE
+      UPDATE organism
+       SET common_name=v_common_name
+      WHERE organism_id = v_organism_id;
     END IF;
     RETURN v_organism_id;
  END;
