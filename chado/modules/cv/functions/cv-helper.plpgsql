@@ -1,0 +1,6 @@
+
+CREATE OR REPLACE FUNCTION get_cv_id_for_relation() RETURNS INT
+ AS 'SELECT cv_id FROM cv WHERE name=''relationship''' LANGUAGE 'sql';
+CREATE OR REPLACE FUNCTION get_cvterm_id_for_is_a() RETURNS INT
+ AS 'SELECT cvterm_id FROM cvterm WHERE name=''is_a'' AND cv_id=get_cv_id_for_relation()' LANGUAGE 'sql';
+
