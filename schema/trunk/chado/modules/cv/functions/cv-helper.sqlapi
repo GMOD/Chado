@@ -1,0 +1,3 @@
+COMMENT ON FUNCTION get_cv_id_for_relation() IS 'returns the cv.cv_id for the foundational relations ontology (OBO_REL)';
+
+COMMENT ON FUNCTION get_cvterm_id_for_is_a() IS 'returns the cvterm.cvterm_id for the foundational is_a relation';
