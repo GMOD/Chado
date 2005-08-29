@@ -91,7 +91,7 @@ use Exporter;
 
 use strict;
 use Carp;
-use SOI::Outputter qw(chaos_xml soi_xml game_xml gff3);
+use SOI::Outputter qw(chaos_xml soi_xml game_xml gff3 fasta);
 use base qw(Exporter);
 use vars qw($AUTOLOAD);
 
@@ -115,6 +115,10 @@ sub hash {
         my $h = shift;
         confess("must be a hash ref") unless (ref($h) eq 'HASH');
         $self->{hash} = $h;
+        #take care of alias
+        if ($h->{src}) {
+            $h->{src_seq} = $h->{src};
+        }
         #do some compu: convert db fmin/fmax to nbeg/nend (directional interbase 0 system)
         $self->nbeg($h);
         $self->nend($h);
@@ -584,6 +588,10 @@ sub to_gff {
 }
 *to_gff3 =\&to_gff;
 *to_GFF3 =\&to_gff;
+sub to_fasta {
+    my $self = shift;
+    return fasta($self, @_);
+}
 
 sub _min_attr {
     my $self = shift;

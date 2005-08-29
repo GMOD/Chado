@@ -20,6 +20,7 @@ Email sshu@fruitfly.org
 use Exporter;
 
 use SOI::Feature;
+use SOI::IntersectGraph;
 use Carp;
 use base qw(Exporter);
 use vars qw($AUTOLOAD);
@@ -105,5 +106,76 @@ sub remove_strand {
     $node->nodes([$contig,@keep_ans,@keep_fs]);
     return $node;
 }
+
+sub make_CDS_feature {
+    my $mRNA = shift;
+
+    if ($mRNA->isa('SOI::Visitor')) {
+        $mRNA = shift;
+    }
+
+    my ($protein) = grep{$_->type eq 'protein' or $_->type eq 'poly_peptide'}@{$mRNA->nodes || []};
+    my @exons = sort{$a->fmin <=> $b->fmin}grep{$_->type eq 'exon'}@{$mRNA->nodes || []};
+    my $ig = SOI::IntersectGraph->new;
+
+    my ($startc_fmin, $stopc_fmin) = ($protein->fmin, $protein->fmax);
+    if ($protein->strand < 0) {
+        ($startc_fmin, $stopc_fmin) = ($protein->fmax-3, $protein->fmin-3);
+    }
+    my $start_codon = SOI::Feature->new({name=>$mRNA->name."_start_codon",type=>'codon',src_seq=>$mRNA->src,fmin=>$startc_fmin,fmax=>$startc_fmin+3, strand=>$protein->strand});
+    $ig->find_intersects([@exons],[$start_codon], {query_type=>'exon',subject_type=>'codon',same_strand=>1});
+    my $cds1exon = $ig->query_overlaps->[0];
+    my $cds_b = $start_codon->fmin  - $cds1exon->fmin;
+    if ($start_codon->strand < 0) {
+        $cds_b = $cds1exon->fmax - $start_codon->fmax;
+    }
+    map{$cds_b += $_->length}@{&front_of($cds1exon, [@exons]) || []};
+
+    my $stop_codon = SOI::Feature->new({name=>$mRNA->name."_start_codon",type=>'codon',src=>$mRNA->src,fmin=>$stopc_fmin,fmax=>$stopc_fmin+3, strand=>$protein->strand});
+    $ig->find_intersects([@exons],[$stop_codon], {query_type=>'exon',subject_type=>'codon',same_strand=>1});
+    my $cdslastexon = $ig->query_overlaps->[0];
+    my $cds_e = $mRNA->seqlen - ($cdslastexon->fmax - $stop_codon->fmax);
+    if ($stop_codon->strand < 0) {
+        $cds_e = $mRNA->seqlen - ($stop_codon->fmin - $cdslastexon->fmin);
+    }
+    map{$cds_e -= $_->length}@{&behind_of($cdslastexon, [@exons]) || []};
+    printf STDERR "mRNA len: %d cds: $cds_b-$cds_e\n", $mRNA->seqlen if ($ENV{DEBUG});
+    my $res = substr($mRNA->residues, $cds_b, $cds_e - $cds_b);
+    return SOI::Feature->new
+      ({type=>'CDS',name=>$mRNA->name."_CDS",
+        src_seq=>$protein->src,
+        fmin=>$startc_fmin,fmax=>$stopc_fmin+3,strand=>$protein->strand,
+        residues=>$res,
+        seqlen=>length($res)}
+      );
+}
+
+sub front_of {
+    my $it = shift;
+    if ($it->strand > 0) {
+        return &_smaller_than($it, @_);
+    } else {
+        return &_bigger_than($it, @_);
+    }
+}
+sub _smaller_than {
+    my $it = shift;
+    my $all = shift;
+    return [grep{$_->fmax < $it->fmin && $_->type eq $it->type}@{$all || []}];
+}
+sub behind_of {
+    my $it = shift;
+    if ($it->strand > 0) {
+        return &_bigger_than($it, @_);
+    } else {
+        return &_smaller_than($it, @_);
+    }
+}
+sub _bigger_than {
+    my $it = shift;
+    my $all = shift;
+    return [grep{$_->fmin > $it->fmax && $_->type eq $it->type}@{$all || []}];
+}
+
 
 1;

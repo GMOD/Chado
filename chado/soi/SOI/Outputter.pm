@@ -19,7 +19,7 @@ use Carp;
 use base qw(Exporter);
 use vars qw($AUTOLOAD);
 
-@EXPORT_OK = qw(chaos_xml soi_xml game_xml gff3);
+@EXPORT_OK = qw(chaos_xml soi_xml game_xml gff3 fasta);
 %EXPORT_TAGS = (all=> [@EXPORT_OK]);
 
 use strict;
@@ -36,7 +36,7 @@ sub _analysis_params {
     return qw(description program programversion algorithm sourcename sourceversion sourceuri timeexecuted);
 }
 sub _chaos_hidden_params {
-    return qw(analysis_id parent_id featureloc_id analysisfeature_id organism_id dbxref_id type_id nbeg nend start end fmin fmax depth timelastmodified timeaccessioned relationship_type locgroup);
+    return qw(analysis_id parent_id featureloc_id analysisfeature_id organism_id dbxref_id type_id nbeg nend start end fmin fmax depth timelastmodified timeaccessioned relationship_type rank locgroup);
 }
 #if not in the list, field value to property in gff3
 sub _gff_hidden_prop_params {
@@ -94,7 +94,7 @@ sub _chaos_xml {
       ('feature', 'featureloc', 'featureprop', 'feature_dbxref', 'feature_relationship', 'feature_cvterm');
 
     my @loc_params =
-      qw(srcfeature_id src_seq nbeg nend strand phase residue_info locgroup );
+      qw(srcfeature_id src_seq nbeg nend strand phase residue_info rank locgroup );
 
     $w->startTag($ft);
     foreach my $k (sort{$a cmp $b}keys %{$h || {}}) {
@@ -605,6 +605,22 @@ sub _an_game_xml {
 
     $w->endTag($game_t);
 }
+sub fasta {
+    my $node = shift;
+    my $fh = shift;
+    my $opts = shift || {};
+
+    my $opath = $fh;
+    unless ($opath) {
+        $opath ||= ">-"; #default to STDOUT
+    }
+    $fh = new IO::File(">$opath") unless (ref($fh));
+    my $lw = $opts->{line_width} || $opts->{linewidth} || 50;
+    my $res = $node->residues;
+    $res =~ s/(.{$lw})/$1\n/g;
+    chomp $res;
+    printf $fh ">%s\n%s\n",$node->uniquename,$res;
+}
 
 sub gff3 {
     my $top = shift;
@@ -615,7 +631,7 @@ sub gff3 {
     unless ($opath) {
         $opath ||= ">-"; #default to STDOUT
     }
-    $fh = new IO::File(">$opath");
+    $fh = new IO::File(">$opath") unless (ref($fh));
 
     require SOI::Visitor;
     SOI::Visitor->set_loc($top);

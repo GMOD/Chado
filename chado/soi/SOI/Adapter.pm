@@ -78,8 +78,23 @@ sub get_adapter {
     return $class;
 }
 
+#ok, give up, want to know sequence ontology cv name
+sub SO_cv_name {
+    my $self = shift;
+
+    unless ($self->{SO_cv_name}) {
+        my $so = shift || $ENV{SO_CV_NAME} || 'so';
+        my $hl = $self->_select_hashlist("select cv_id from cv where name = '$so'");
+        unless (@{$hl || []}) {
+            confess("Invalid SO cv name: $so, which could be set via this adapter method: SO_cv_name or env SO_CV_NAME");
+        }
+        $self->{SO_cv_name} = $so;
+    }
+    return $self->{SO_cv_name};
+}
+
 sub get_feature {
-    return shift @{shift->get_features(@_)};
+    return shift @{shift->get_features(@_) || []};
 }
 *get_f = \&get_feature;
 
@@ -153,6 +168,7 @@ sub get_features {
         $sec_where = " WHERE f.is_analysis = 'f'";
     }
     my $soi_children_sql = $self->_soi_children_select($typelist);
+    my $so_cv = $self->SO_cv_name;
     my $sql =
       qq(
          select * FROM
@@ -171,7 +187,7 @@ sub get_features {
            INNER join
            cv ON (q.cv_id = cv.cv_id)
            $sp_from
-           WHERE q.name in ($tlist) and cv.name = 'so' and f.is_analysis = 'f' $first_add_w
+           WHERE q.name in ($tlist) and cv.name = '$so_cv' and f.is_analysis = 'f' $first_add_w
           )
           UNION
           (select
@@ -375,6 +391,7 @@ sub get_results {
 
     #soi children only
     my $soi_sql = $self->_soi_children_select($tlist);
+    my $so_cv = $self->SO_cv_name;
     my $sub_select = 
       qq(select DISTINCT feature_id, name, depth, object_id, rank, relationship_type FROM
          ((select
@@ -398,7 +415,7 @@ sub get_results {
            cvterm q ON (f.type_id = q.cvterm_id)
            INNER join
            cv ON (cv.cv_id = q.cv_id)
-           WHERE cv.name = 'so' AND q.name IN ($tliststr) and $where
+           WHERE cv.name = '$so_cv' AND q.name IN ($tliststr) and $where
           )
           UNION
           (select
@@ -871,11 +888,12 @@ sub _soi_select {
 
     $tlist = [$tlist] unless (ref($tlist) eq 'ARRAY');
     my $tliststr = join(",",map{sql_q($_)}@$tlist);
+    my $so_cv = $self->SO_cv_name;
     my $soi =
       qq
         ((select c.name, c.cvterm_id, 1 as depth
           FROM cvterm c, cv
-          WHERE c.cv_id = cv.cv_id and c.name IN ($tliststr) and cv.name = 'so')
+          WHERE c.cv_id = cv.cv_id and c.name IN ($tliststr) and cv.name = '$so_cv')
          UNION
          (select c.name, c.cvterm_id, max(pathdistance+1) as depth
           FROM cvterm c, cvtermpath path, cvterm p, cv
