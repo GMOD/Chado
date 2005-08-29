@@ -294,7 +294,10 @@ sub find_intersects {
             $c = $_->secondary_loc;
             $self->_qsec2sf_h($c, $_);
         }
-        next unless ($c->src_seq);
+        unless ($c->src_seq) {
+            warn("no src seq: ".$c->name);
+            next;
+        }
         $sfh1{$c->src_seq} = [] unless $sfh1{$c->src_seq};
         push(@{$sfh1{$c->src_seq}}, $c);
     }
@@ -529,7 +532,7 @@ sub _icheck {
             }
         }
         #any depth of said types, the type must be unique in the tree
-        #in other words, the type SHOUD NOT be at diff depth or you WILL get wrong answer
+        #in other words, the type SHOULD NOT be at diff depth or you WILL get wrong answer
         else {
             my ($qtype, $stype) = ($self->get_property('query_type'),$self->get_property('subject_type'));
             $qtype = [$qtype] unless (ref($qtype) eq 'ARRAY');

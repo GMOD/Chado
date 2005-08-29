@@ -392,7 +392,7 @@ sub glyph_type {
 }
 
 
-#conform to Bio::FeatureI for drawing
+#conform to Bio::FeatureI or Gadfly API for drawing
 sub seq_id {return shift->src}
 sub display_name {
     my $self = shift;
