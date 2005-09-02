@@ -61,6 +61,7 @@ sub chaos_xml {
     }
     $output = new IO::File(">$opath") unless (ref($output));
     my $w = new XML::Writer(OUTPUT => $output, DATA_MODE => 1, DATA_INDENT => 2);
+    $w->startTag('chaos');
     if ($node->hash->{program}) {
         my $pt = 'property';
         my $t = "companalysis";
@@ -78,8 +79,9 @@ sub chaos_xml {
         map{_chaos_xml($_, $output, $w)}@{$node->nodes || []};
         $w->endTag($t);
     } else {
-        _chaos_xml($node, $output);
+        _chaos_xml($node, $output, $w);
     }
+    $w->endTag('chaos');
 }
 sub _chaos_xml {
     my $node = shift;
@@ -185,6 +187,7 @@ sub soi_xml {
     $w = new XML::Writer(OUTPUT => $output, DATA_MODE => 1, DATA_INDENT => 2) unless ($w);
 
     $node->_setup_coord;
+    $w->startTag('soi');
     $w->startTag($node->type);
     foreach my $k (sort{$a cmp $b}keys %{$h || {}}) {
         next if (grep{$k eq $_}(_soi_hidden_params));
@@ -256,6 +259,7 @@ sub soi_xml {
     }@{$node->comments || []};
     map{soi_xml($_, $output, $w)}@{$node->nodes || []};
     $w->endTag($node->type);
+    $w->endTag('soi');
 }
 
 sub game_xml {
