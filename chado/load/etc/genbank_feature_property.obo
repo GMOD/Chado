@@ -1,0 +1,723 @@
+format-version: 1.2
+date: 24:05:2005 17:23
+saved-by: cjm
+auto-generated-by: DAG-Edit 1.419 rev 3
+default-namespace: feature_property
+remark: cvs version: $Revision: 1.1 $
+remark: converted by Chris Mungall; source: http://www.ncbi.nlm.nih.gov/collab/FT
+
+[Typedef]
+id: GENBANK_SOFP:allele
+name: allele
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of the allele for the given gene " []
+range: xsd:string
+comment: all gene-related features (exon, CDS etc) for a given  gene should share the same /allele qualifier value;  the /allele qualifier value must, by definition, be  different from the /gene qualifier value; when used with  the variation feature key, the allele qualifier value  should be that of the variant.
+
+[Typedef]
+id: GENBANK_SOFP:anticodon
+name: genbank:anticodon
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "location of the anticodon of tRNA and the amino acid for which it codes" []
+range: xsd:string
+range_def: "(pos:<base_range>,aa:<amino_acid>) where base_range is the position of the anticodon and amino_acid is the abbreviation for the amino acid encoded" []
+comments: Note the difference between GENBANK_SOFP:anticodon and SOFP:anticodon; the former includes the base range
+
+[Typedef]
+id: GENBANK_SOFP:bound_moiety
+name: bound_moiety
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of the molecule/complex that may bind to the  given feature " []
+range: xsd:string
+comment: Multiple /bound_moiety qualifiers are legal on 'promoter'  and 'enhancer' features. A single /bound_moiety qualifier  is legal on the 'misc_binding', 'oriT' and 'protein_bind' features.
+
+[Typedef]
+id: GENBANK_SOFP:cell_line
+name: cell_line
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "cell line from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:cell_type
+name: cell_type
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "cell type from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:chromosome
+name: chromosome
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "chromosome (e.g. Chromosome number) from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:citation
+name: citation
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "reference to a citation listed in the entry reference field" []
+range: xsd:integer
+range_def: "[integer-number] where integer-number is the number of the reference as enumerated in the reference field" []
+comment: used to indicate the citation providing the claim of and/or evidence for a feature; brackets are used for conformity.
+
+[Typedef]
+id: GENBANK_SOFP:clone
+name: clone
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "clone from which the sequence was obtained" []
+range: xsd:string
+comment: not more than one clone should be specified for a given source  feature; to indicate that the sequence was obtained from multiple clones, multiple source features should be given.
+
+[Typedef]
+id: GENBANK_SOFP:clone_lib
+name: clone_lib
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "clone library from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:codon
+name: codon
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "specifies a codon which is different from any found in the reference genetic code" []
+range: xsd:string
+range_def: "(seq:'codon-sequence',aa:<amino_acid>) where 'codon-sequence' contains the bases of the codon  and <amino_acid> is the abbreviation for the translated amino  acid, the abbreviation for a modified unusual amino_acids from  section 7.5, or the word OTHER" []
+comment: used to specify unusual genetic codes, organellar codes, etc, that are different from the 'normal' code for the organism; the codon specified by 'seq' codes for the amino acid or stop codon specified by 'aa'; the codon that is specified is used throughout the CDS; amino acids that are not on the controlled vocabulary list  can be annotated by using 'aa:OTHER' as the amino acid  designation, and by giving the name of the residue in a /note  qualifier; only nucleotides a, g, c or t can be used in  'codon-sequence'; multiple /codon qualifiers should be used to describe ambiguous nucleotides.
+
+[Typedef]
+id: GENBANK_SOFP:codon_start
+name: codon_start
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "indicates the offset at which the first complete codon of a coding feature can be found, relative to the first base of that feature." []
+range: xsd:integer
+range_def: "1 or 2 or 3" []
+
+[Typedef]
+id: GENBANK_SOFP:compare
+name: compare
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "Reference details of an existing public INSD entry  to which a comparison is made" []
+range: xsd:string
+comment: This qualifier may be used on the following features: misc_difference, conflict, unsure, old_sequence  and variation. The features 'old_sequence' and 'conflict' must have either a /citation or a /compare qualifier.  Multiple /compare qualifiers with different contents are  allowed within a single feature.  This qualifier is not intended for large-scale annotation  of variations, such as SNPs.
+
+[Typedef]
+id: GENBANK_SOFP:cons_splice
+name: cons_splice
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "differentiates between intron splice sites that conform to the 5'-GT ... AG-3' splice site consensus" []
+range: xsd:string
+range_def: "(5'site:<value>, 3'site:<value>), where <value>  can be 'YES', 'NO' or 'ABSENT'" [] /cons_splice=(5'site:ABSENT, 3'site:NO)
+comment: since the vast majority of splice sites conform to the  consensus, this qualifier should be used only when one  does not and the sequence has been checked; 'ABSENT'  can be used when one of the termini is not part of the  sequence and information on splice site is not  available.
+
+[Typedef]
+id: GENBANK_SOFP:country
+name: country
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "Geographical origin of sequenced sample, intended for epidemiological or population studies." []
+range: xsd:string
+range_def: "'<country_value>[:<region>][, <locality>]' where  country_value is any value from the controlled vocabulary at  URL:http://www.ncbi.nlm.nih.gov/projects/collab/country.html " [] /country='France:Cote d'Azur, Antibes' /country='Atlantic Ocean:Charlie Gibbs Fracture Zone'
+comment: Intended to provide a reference to the site where the source organism was isolated or sampled. Regions and localities should be indicated where possible. Note that the physical geography  of the isolation or sampling site should be represented in /isolation_source. 
+
+[Typedef]
+id: GENBANK_SOFP:cultivar
+name: cultivar
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "cultivar (cultivated variety) of plant from which sequence was  obtained. " []
+range: xsd:string /cultivar='Tenuifolius' /cultivar='Candy Cane' /cultivar='IR36'
+comment: 'cultivar' is applied solely to products of artificial  selection; use the variety qualifier for natural, named  plant and fungal varieties; 
+
+[Typedef]
+id: GENBANK_SOFP:db_xref
+name: db_xref
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "database cross-reference: pointer to related information in  another database." []
+range: xsd:string
+range_def: "'<database>:<identifier>' where database is the name of the database containing related information, and  identifier is the internal identifier of the related information according to the naming conventions of the cross-referenced  database." []
+comment: the complete list of allowed database types is kept on  NCBI's public WWW server, at URL:  http://www.ncbi.nlm.nih.gov/projects/collab/
+
+[Typedef]
+id: GENBANK_SOFP:dev_stage
+name: dev_stage
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "if the sequence was obtained from an organism in a specific  developmental stage, it is specified with this qualifier" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:direction
+name: direction
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "direction of DNA replication" []
+range: xsd:string
+range_def: "left, right, or both where left indicates toward the 5' end of the entry sequence (as presented) and right indicates toward the 3' end" []
+
+[Typedef]
+id: GENBANK_SOFP:EC_number
+name: EC_number
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "Enzyme Commission number for enzyme product of sequence" []
+range: xsd:string
+comment: valid values for EC numbers are defined in the list prepared by the IUPAC-IUB Commission on Biochemical Enzyme Nomenclature  (published in Enzyme Nomenclature 1984 New York: Academic  Press (1984) or a more recent revision thereof).
+
+[Typedef]
+id: GENBANK_SOFP:ecotype
+name: ecotype
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "a population within a given species displaying genetically  based, phenotypic traits that reflect adaptation to a local  habitat." []
+comment: an example of such a population is one that has adapted hairier than normal leaves as a response to an especially sunny habitat. 'Ecotype' is often applied to standard genetic stocks of Arabidopsis thaliana, but it can be applied to any sessile  organism.
+
+[Typedef]
+id: GENBANK_SOFP:environmental_sample
+name: environmental_sample
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "identifies sequences derived by direct molecular isolation (PCR, DGGE, or other anonymous methods) from  an environmental sample with no reliable identification  of the source organism" []
+range: xsd:boolean
+comment: used only with the source feature key; source feature  keys containing the /environmental_sample qualifier  should also contain the /isolation_source qualifier.
+
+[Typedef]
+id: GENBANK_SOFP:estimated_length
+name: estimated_length
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "estimated length of the gap in the sequence" []
+range: xsd:string
+range_def: "unknown or <integer>" [] /estimated_length=342
+
+[Typedef]
+id: GENBANK_SOFP:evidence
+name: evidence
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "value indicating the nature of supporting evidence, distinguishing between experimentally determined and theoretically derived data" []
+range: xsd:string
+range_def: "experimental, not_experimental" []
+comment: experimental indicates that the feature identification or assignment is supported by direct experimental evidence; not_experimental indicates that the data for the feature are derived (eg promotor as identified by consensus match). 
+
+[Typedef]
+id: GENBANK_SOFP:exception
+name: exception
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "indicates that the amino acid or RNA sequence will not translate or agree with the DNA sequence according  to standard biological rules." []
+range: xsd:string /exception='reasons given in citation'
+comment: only to be used to describe biological mechanisms such  as RNA editing; where the exception cannot easily be described  a published citation must be referred to; protein translation of /exception CDS will be different from the according conceptual  translation;  - must not be used where transl_except would be adequate, e.g. in case of stop codon completion use: /transl_except=(pos:6883,aa:TERM) /note='TAA stop codon is completed by addition of 3' A  residues to mRNA'. - must not be used for ribosomal slippage, instead use join  operator, e.g.: CDS join(486..1784,1787..4810) /note='ribosomal slip on tttt sequence at 1784..1787'
+
+[Typedef]
+id: GENBANK_SOFP:focus
+name: focus
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "defines the source feature of primary biological interest for  records that have multiple source features originating from  different organisms " []
+range: xsd:boolean
+comment: the /focus qualifier identifies the organism which is  displayed in the organism line and determines the  DDBJ/EMBL/GenBank taxonomic division the entry will appear in; if no translation table is specified, the organism with /focus  will define the translation table; within an entry with several  source features, only one will exist with /focus on it; multi-source entries with a /transgenic source feature  do not require a /focus qualifier.
+
+[Typedef]
+id: GENBANK_SOFP:frequency
+name: frequency
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "frequency of the occurrence of a feature" []
+range: xsd:string
+range_def: "text representing the fraction of population carrying the variation expressed as a decimal fraction" []
+
+[Typedef]
+id: GENBANK_SOFP:function
+name: function
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "function attributed to a sequence" []
+range: xsd:string
+comment: /function is used when the gene name and/or product name do not  convey the function attributable to a sequence.
+
+[Typedef]
+id: GENBANK_SOFP:gene
+name: gene
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "symbol of the gene corresponding to a sequence region" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:germline
+name: germline
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "if the sequence shown is DNA and a member of the immunoglobulin  family, this qualifier is used to denote that the sequence is from unrearranged DNA. " []
+range: xsd:boolean
+comment: /germline cannot be used in the same entry/record as /rearranged
+
+[Typedef]
+id: GENBANK_SOFP:haplotype
+name: haplotype
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "haplotype of organism from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:insertion_seq
+name: insertion_seq
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "insertion sequence element from which the sequence  was obtained" []
+range: xsd:string
+comment: /insertion_seq is legal on repeat_region feature key;   
+
+[Typedef]
+id: GENBANK_SOFP:isolate
+name: isolate
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "individual isolate from which the sequence was obtained" []
+range: xsd:string /isolate='DGGE band PSBAC-13'
+
+[Typedef]
+id: GENBANK_SOFP:isolation_source
+name: isolation_source
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "describes the physical, environmental and/or local geographical source of the biological sample from which the sequence was derived" []
+range: xsd:string Pelleted ration-fed steer #67' /isolation_source='permanent Antarctic sea ice' /isolation_source='denitrifying activated sludge from carbon_limited continuous reactor' 
+comment: used only with the source feature key; source feature keys containing an /environmental_sample qualifier should also contain an /isolation_source qualifier; the /country qualifier should be used to  describe the country and major geographical sub-region.
+
+[Typedef]
+id: GENBANK_SOFP:label
+name: label
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "a label used to permanently tag a feature" []
+range: xsd:string
+range_def: "feature_label " []
+comment: feature labels follow the naming conventions for all feature table objects (see Sections 3.1 and 3.4)
+
+[Typedef]
+id: GENBANK_SOFP:lab_host
+name: lab_host
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "laboratory host used to propagate the organism from which the  sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:locus_tag
+name: locus_tag
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "feature tag assigned for tracking purposes " [] but not '<1-5 letters><5-9 digit integer>[.<integer>]' /locus_tag='YPO0002'
+comment: /locus_tag can be used with any feature where /gene is valid;  identical /locus_tag values may be used within an entry/record,  but only if the identical /locus_tag values are associated  with the same gene; in all other circumstances the /locus_tag  value must be unique within that entry/record. Multiple  /locus_tag values are not allowed within one feature for  entries created after 15-OCT-2004.  If a /locus_tag needs to be re-assigned the /old_locus_tag  qualifier should be used to store the old value. Existing  records where multiple /locus_tag qualifiers are present  will be retrofitted by January 2005.  The /locus_tag value should not be in a format which resembles  INSD accession numbers, accession.version, or /proteid_id  identifiers.
+
+[Typedef]
+id: GENBANK_SOFP:map
+name: map
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "genomic map position of feature" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:macronuclear
+name: macronuclear
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "if the sequence shown is DNA and from an organism which  undergoes chromosomal differentiation between macronuclear and micronuclear stages, this qualifier is used to denote that the  sequence is from macronuclear DNA. " []
+range: xsd:boolean
+
+[Typedef]
+id: GENBANK_SOFP:mod_base
+name: mod_base
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "abbreviation for a modified nucleotide base" []
+range: xsd:string
+comment: modified nucleotides not found in the restricted vocabulary list can be annotated by entering '/mod_base=OTHER' with '/note='name of modified base''
+
+[Typedef]
+id: GENBANK_SOFP:mol_type
+name: mol_type
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "in vivo molecule type of sequence " []
+range: xsd:string
+range_def: "'genomic DNA', 'genomic RNA', 'mRNA', 'tRNA', 'rRNA', 'snoRNA', 'snRNA', 'scRNA', 'pre-RNA', 'other RNA', 'other DNA', 'unassigned DNA', 'unassigned RNA'" []
+comment: these text values describe the in vivo molecule that has been sequenced and not the sequencing technique that has been used (e.g. mRNA is a valid value, cDNA is not); the value 'genomic DNA' does not imply that the molecule is nuclear (e.g. organelle and plasmid DNA should be described  using 'genomic DNA'); ribosomal RNA genes should be described using 'genomic DNA'; 'rRNA' should only be used if the ribosomal RNA molecule itself has been sequenced; /mol_type is mandatory on every source feature key; all /mol_type values within one entry/record must be the same; values 'other RNA' and 'other DNA' should be applied to  synthetic molecules, values 'unassigned DNA', 'unassigned  RNA' should be applied were in vivo molecule is unknown;
+
+[Typedef]
+id: GENBANK_SOFP:note
+name: note
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "any comment or additional information" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:number
+name: number
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "a number to indicate the order of genetic elements (e.g., exons or introns) in the 5' to 3' direction" []
+range: xsd:string
+range_def: "unquoted text (single token) " [] /number=6B
+comment: text limited to integers, letters or combination of integers  and/or letters represented as an unquoted single token  (e.g. 5a, XIIb); any additional terms should be included in  /standard_name. Example: /number=2A /standard_name='long'
+
+[Typedef]
+id: GENBANK_SOFP:old_locus_tag
+name: old_locus_tag
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "feature tag assigned for tracking purposes " [] /locus_tag='YPO0002'
+comment: /old_locus_tag can be used with any feature where /gene is  valid and where a /locus_tag qualifier is present.  Identical /old_locus_tag values may be used within an  entry/record, but only if the identical /old_locus_tag values  are associated with the same gene; in all other circumstances  the /old_locus_tag value must be unique within that entry/record.  Multiple/old_locus_tag qualifiers with distinct values are  allowed within a single feature; /old_locus_tag and /locus_tag  values must not be identical within a single feature.
+
+[Typedef]
+id: GENBANK_SOFP:operon 
+name: operon 
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of the operon the feature belongs to" []
+range: xsd:string
+comment: currently valid only on Prokaryota-specific features
+
+[Typedef]
+id: GENBANK_SOFP:organelle
+name: organelle
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "type of membrane-bound intracellular structure from which the  sequence was obtained" []
+range: xsd:string
+range_def: "mitochondrion, nucleomorph, plastid, mitochondrion:kinetoplast, plastid:chloroplast, plastid:apicoplast, plastid:chromoplast, plastid:cyanelle, plastid:leucoplast, plastid:proplastid," [] /organelle='nucleomorph' /organelle='plastid' /organelle='mitochondrion:kinetoplast' /organelle='plastid:chloroplast' /organelle='plastid:apicoplast' /organelle='plastid:chromoplast' /organelle='plastid:cyanelle' /organelle='plastid:leucoplast' /organelle='plastid:proplastid'
+
+[Typedef]
+id: GENBANK_SOFP:organism
+name: organism
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "scientific name of the organism that provided the  sequenced genetic material. " []
+range: xsd:string
+comment: the organism name which appears on the OS or ORGANISM line  will match the value of the /organism qualifier of the  source key in the simplest case of a one-source sequence. NOTE: in chado, this is redundant with the organism table
+
+[Typedef]
+id: GENBANK_SOFP:partial
+name: partial
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "differentiates between complete regions and partial ones" []
+range: xsd:boolean
+comment: not to be used for new entries from 15-DEC-2001; use '<' and '>' signs in the location descriptors to indicate that the sequence is partial. 
+
+[Typedef]
+id: GENBANK_SOFP:PCR_conditions
+name: PCR_conditions
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "description of reaction conditions and components for PCR " []
+range: xsd:string
+range_def: "'text' " []
+comment: used with primer_bind key
+
+[Typedef]
+id: GENBANK_SOFP:phenotype
+name: phenotype
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "phenotype conferred by the feature" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:pop_variant
+name: pop_variant
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "population variant from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:plasmid
+name: plasmid
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of plasmid from which sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:product
+name: product
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of a product encoded by a sequence" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:protein_id
+name: protein_id
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "protein identifier, issued by International collaborators. this qualifier consists of a stable ID portion (3+5 format with 3 position letters and 5 numbers) plus a version number after the decimal point." []
+range: xsd:string
+comment: when the protein sequence encoded by the CDS changes, only  the version number of the /protein_id value is incremented;  the stable part of the /protein_id remains unchanged and as a result will permanently be associated with a given protein; this qualifier is valid only on CDS features which translate into a valid protein. 
+
+[Typedef]
+id: GENBANK_SOFP:proviral
+name: proviral
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "if the sequence shown is viral and integrated into another organism's genome, this qualifier is used to denote that " []
+range: xsd:boolean
+comment: /proviral cannot be used in the same entry/record as /virion
+
+[Typedef]
+id: GENBANK_SOFP:pseudo
+name: pseudo
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "indicates that this feature is a non-functional version of the element named by the feature key" []
+range: xsd:boolean
+
+[Typedef]
+id: GENBANK_SOFP:rearranged
+name: rearranged
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "if the sequence shown is DNA and a member of the immunoglobulin  family, this qualifier is used to denote that the sequence is from rearranged DNA. " []
+range: xsd:boolean
+comment: /rearranged cannot be used in the same entry/record as /germline
+
+[Typedef]
+id: GENBANK_SOFP:replace
+name: replace
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "indicates that the sequence identified a feature's intervals is replaced by the sequence shown in 'text'; if no sequence is  contained within the qualifier, this indicates a deletion." []
+range: xsd:string /replace='' 
+
+[Typedef]
+id: GENBANK_SOFP:rpt_family
+name: rpt_family
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "type of repeated sequence; 'Alu' or 'Kpn', for example" []
+range: xsd:string
+comment: preferred usage is to qualify the repeat_region instead of any of the constituent repeat_units
+
+[Typedef]
+id: GENBANK_SOFP:rpt_type
+name: rpt_type
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "organization of repeated sequence" []
+range: xsd:string
+range_def: "tandem, inverted, flanking, terminal, direct, dispersed, and other" []
+comment: preferred usage is to qualify the repeat_region instead of any of the constituent repeat_units. definitions of these values will be added in a future release of this document. see Singer, M. Int Rev Cytol 76, 67-112 (1982); Cell 26, 293-95 (1981); Hardman, N. Biochem J 234, 1-11 (1986).
+
+[Typedef]
+id: GENBANK_SOFP:rpt_unit
+name: rpt_unit
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "identity of repeat unit" []
+range: xsd:string
+range_def: "'text' or <base_range>" [] /rpt_unit=202..245
+comment: used to indicate the literal sequence, or the base range of the sequence that constitutes a repeat_region or a single repeat_unit; the repeat family name should not be entered in /rpt_unit='text'; /rpt_family should be used instead.
+
+[Typedef]
+id: GENBANK_SOFP:segment
+name: segment
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of viral or phage segment sequenced" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:serotype
+name: serotype
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "serological variety of a species characterized by its antigenic properties" []
+range: xsd:string
+comment: used only with the source feature key; the Bacteriological Code recommends the use of the term 'serovar' instead of 'serotype' for the  prokaryotes; see the International Code of Nomenclature of Bacteria (1990 Revision) Appendix 10.B 'Infraspecific Terms'.
+
+[Typedef]
+id: GENBANK_SOFP:serovar
+name: serovar
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "serological variety of a species (usually a prokaryote) characterized by its antigenic properties" []
+range: xsd:string
+comment: used only with the source feature key; the Bacteriological Code recommends the use of the term 'serovar' instead of 'serotype' for prokaryotes; see the International Code of Nomenclature of Bacteria (1990 Revision) Appendix 10.B 'Infraspecific Terms'.
+
+[Typedef]
+id: GENBANK_SOFP:sex
+name: sex
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "sex of the organism from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:specific_host
+name: specific_host
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "natural host from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:specimen_voucher
+name: specimen_voucher
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "an identifier of the individual or collection of the source organism and the place where it is currently stored, usually an institution." []
+range: xsd:string Herbarium)'
+
+[Typedef]
+id: GENBANK_SOFP:standard_name
+name: standard_name
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "accepted standard name for this feature" []
+range: xsd:string
+comment: use /standard_name to give full gene name, but use /gene to give gene symbol (in the above example /gene='Dt').
+
+[Typedef]
+id: GENBANK_SOFP:strain
+name: strain
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "strain from which sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:sub_clone
+name: sub_clone
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "sub-clone from which sequence was obtained" []
+range: xsd:string
+comment: the comments on /clone apply to /sub_clone
+
+[Typedef]
+id: GENBANK_SOFP:sub_species
+name: sub_species
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "name of sub-species of organism from which sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:sub_strain
+name: sub_strain
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "sub_strain from which sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:tissue_lib
+name: tissue_lib
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "tissue library from which sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:tissue_type
+name: tissue_type
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "tissue type from which the sequence was obtained" []
+range: xsd:string
+
+[Typedef]
+id: GENBANK_SOFP:transgenic
+name: transgenic
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "identifies the source feature of the organism which was the recipient of transgenic DNA" []
+range: xsd:boolean
+comment: transgenic sequences must at least have two source  feature keys; the source feature key describing the  organism of the recipient DNA must span the whole  sequence; the /transgenic qualifier identifies the  organism which is displayed in the organism line and  determines that the entry will appear in the  DDBJ/EMBL/GenBank Synthetic Construct division; multi-source entries including a /transgenic source  feature should not have a /focus qualifier.  
+
+[Typedef]
+id: GENBANK_SOFP:translation
+name: translation
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "automatically generated one-letter abbreviated amino acid sequence derived from either the universal genetic code or the table as specified in /transl_table and as determined by exceptions in the /transl_except and /codon qualifiers" []
+range: xsd:string
+range_def: "IUPAC one-letter amino acid abbreviation, 'X' is to be used for AA exceptions." []
+comment: to be used with CDS feature only; this is a mandatory qualifier  to the CDS feature key except for /pseudo CDSs; see /transl_table for definition and location of genetic code Tables. 
+
+[Typedef]
+id: GENBANK_SOFP:transl_except
+name: transl_except
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "translational exception: single codon the translation of which does not conform to genetic code defined by Organism and /codon=" []
+range: xsd:string
+range_def: "(pos:location,aa:<amino_acid>) where amino_acid is the amino acid coded by the codon at the base_range position" [] /transl_except=(pos:1017,aa:TERM) /transl_except=(pos:2000..2001,aa:TERM) /transl_except=(pos:X22222:15..17,aa:Ala)
+comment: if the amino acid is not on the restricted vocabulary list use e.g., '/transl_except=(pos:213..215,aa:OTHER)' with '/note='name of unusual amino acid''; for modified amino-acid selenocysteine use three letter code 'Sec' (one letter code 'U' in amino-acid sequence) /transl_except=(pos:1002..1004,aa:Sec); for partial termination codons where TAA stop codon is completed by the addition of 3' A residues to the mRNA either a single base_position or a base_range is used, e.g. if partial stop codon is a single base: /transl_except=(pos:1017,aa:TERM) if partial stop codon consists of two bases: /transl_except=(pos:2000..2001,aa:TERM) with '/note='stop codon completed by the addition of 3' A residues  to the mRNA'.
+
+[Typedef]
+id: GENBANK_SOFP:transl_table
+name: transl_table
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "definition of genetic code table used if other than universal genetic code table. Tables used are described in appendix V, section 7.5.5." []
+range: xsd:integer
+range_def: "<integer; 1=universal table 1;2=non-universal table 2;..." []
+comment: genetic code exceptions outside range of specified tables are reported in /codon or /transl_except qualifiers.
+
+[Typedef]
+id: GENBANK_SOFP:transposon
+name: transposon
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "transposable element from which the sequence was  obtained" []
+range: xsd:string
+comment: /transposon is legal on repeat_region feature key; 
+
+[Typedef]
+id: GENBANK_SOFP:usedin
+name: usedin
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "indicates that the feature is used in a compound feature in another entry" []
+range: xsd:string
+range_def: "Accession-number:feature-name or  Database_name::Acc_number:feature_label" []
+comment: database_name is an abbreviation for the name of the database in which the entry for the accession number can be found.
+
+[Typedef]
+id: GENBANK_SOFP:variety
+name: variety
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "variety (= varietas, a formal Linnaean rank) of organism  from which sequence was derived." []
+range: xsd:string
+comment: use the cultivar qualifier for cultivated plant  varieties, i.e., products of artificial selection; varieties other than plant and fungal variatas should be annotated via /note, e.g. /note='breed:Cukorova'
+
+[Typedef]
+id: GENBANK_SOFP:virion
+name: virion
+is_a: SOFP:feature_property
+domain: SO:000110
+def: "viral genomic sequence as it is encapsidated (distinguished  from its proviral form integrated in a host cell's chromosome) " []
+range: xsd:boolean
+comment: /virion cannot be used in the same entry/record as /proviral
