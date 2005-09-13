@@ -36,6 +36,7 @@ insert into analysis (name,program,programversion,sourcename)
 
 
 insert into db (name) values ('DB:TIGR_Maize');
+insert into db (name) values ('DB:TIGR_Osa');
 
 insert into pub (uniquename, title, type_id) values ('none', 'none', (select cvterm_id from cvterm where name = 'null pub' and cv_id in (select cv_id from cv where name='pub type') ) );
 

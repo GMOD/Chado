@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.92 2005-08-04 17:56:18 scottcain Exp $
+# $Id: Makefile.PL,v 1.93 2005-09-13 14:36:08 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -205,6 +205,7 @@ foreach ( @argv ) {
 }
 @ARGV = ();
 push @ARGV, "PREFIX=$opts{PREFIX}" if $opts{PREFIX};
+$O{'GMOD_ROOT'} = $opts{PREFIX} if $opts{PREFIX};
 push @ARGV, "INSTALLSITEMAN1DIR=$opts{INSTALLSITEMAN1DIR}" if $opts{INSTALLSITEMAN1DIR};
 push @ARGV, "INSTALLSITEMAN3DIR=$opts{INSTALLSITEMAN3DIR}" if $opts{INSTALLSITEMAN3DIR};
 push @ARGV, "LIB=$opts{LIB}" if $opts{LIB};
