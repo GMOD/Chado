@@ -65,7 +65,7 @@ GetOptions(
   'get_tag_value=s' => \$GET_TAG_VALUE,
   'confdir'         => \$CONFDIR,
   'tmpdir'          => \$TMPDIR,
-  'gmod_root'       => \$GMOD_ROOT,
+  'gmod_root:s'     => \$GMOD_ROOT,
   'user'            => \$USER,
   'password'        => \$PASSWORD,
   'host'            => \$HOST,
@@ -78,6 +78,9 @@ GetOptions(
 ) or ( system ('pod2text', $0), exit -1);
 
 
+
+
+my $gmod_conf = $ENV{'GMOD_ROOT'} || "/var/lib/gmod";
 
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";

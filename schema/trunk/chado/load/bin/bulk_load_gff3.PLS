@@ -636,6 +636,10 @@ $sth->finish;
 #
 my $search_uniquename 
    = $db->prepare("SELECT feature_id FROM feature WHERE uniquename=?");
+my $validate_uniquename
+   = $db->prepare("SELECT count(*) FROM feature where uniquename=?
+                                                  and type_id = ?
+                                                  and organism_id = ?");
 my $search_name
    = $db->prepare("SELECT feature_id FROM feature WHERE name=?");
 my $count_name
@@ -764,8 +768,11 @@ while(my $feature = $gffio->next_feature()){
 
   my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0] || "auto$nextfeature";
   $uniquename = $uniquename->value if ref($uniquename);
-  
-  #check here to see if this uniquename is valid!
+
+  $uniquename = uniquename_validation( $uniquename,
+                                       $type,
+                                       $organism,
+                                       $nextfeature);
 
   my($name) = ($feature->annotation->get_Annotations('Name'))[0] ||($feature->annotation->get_Annotations('ID'))[0] || "$featuretype-$uniquename";
   $name = $name->value if ref($name);
@@ -1402,6 +1409,15 @@ sub dump_ana_contents {
 
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
   exit 1;
+}
+
+sub uniquename_validation {
+  my ($uniquename, $type, $organism, $nextfeature) = @_;
+  $validate_uniquename->execute($uniquename, $type, $organism);
+  my $count = $validate_uniquename->fetch_rowarray;
+  return $uniquename if ($$count[0] == 0);
+  $uniquename = "$uniquename-$nextfeature";
+  return uniquename_validation($uniquename, $type, $organism, $nextfeature);
 }
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
