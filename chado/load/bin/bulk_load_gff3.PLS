@@ -1227,6 +1227,7 @@ close DBX;
 close AF;
 
 $search_uniquename->finish;
+$validate_uniquename->finish;
 $search_name->finish;
 $count_name->finish;
 $search_cvterm_id->finish;
@@ -1308,23 +1309,21 @@ sub copy_from_stdin {
   warn "Loading data into $table table ...\n";
   my $query = "COPY $table $fields FROM STDIN;";
   #warn "\t".$query;
-  my $sth = $dbh->prepare($query);
-  $sth->execute();
+  $dbh->do($query) or die "Error when executing: $query: $!\n";
 
   open FILE, $file;
   while (<FILE>) {
-    if ( ! ($dbh->func($_, 'putline')) ) {
+    if ( ! ($dbh->pg_putline($_)) ) {
       #error, disconecting
-      $dbh->func('endcopy');#$dbh->pg_endcopy;
+      $dbh->pg_endcopy;
       $dbh->rollback;
       $dbh->disconnect;
       die "error while copying data's of file $file, line $.\n";
     } #putline returns 1 if succesful
   }
-  $dbh->func('endcopy');  # no docs on this func--got from google
+  $dbh->pg_endcopy or die "calling endcopy for $table failed: $!\n"; 
   close FILE;
 
-  $sth->finish;
   #update the sequence so that later inserts will work 
   $dbh->do("SELECT setval('public.$sequence', $nextval) FROM $table"); 
 }
@@ -1414,8 +1413,8 @@ sub dump_ana_contents {
 sub uniquename_validation {
   my ($uniquename, $type, $organism, $nextfeature) = @_;
   $validate_uniquename->execute($uniquename, $type, $organism);
-  my $count = $validate_uniquename->fetch_rowarray;
-  return $uniquename if ($$count[0] == 0);
+  my @count = $validate_uniquename->fetchrow_array;
+  return $uniquename if ($count[0] == 0);
   $uniquename = "$uniquename-$nextfeature";
   return uniquename_validation($uniquename, $type, $organism, $nextfeature);
 }
