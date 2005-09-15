@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.5 2005-07-26 20:06:40 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.6 2005-09-15 01:07:18 cmungall Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -215,8 +215,8 @@ create table phylonode_organism (
        unique(phylonode_id)
 -- one phylonode cannot refer to >1 organism
 );
-create index phylonode_organism_idx1 on phylonode_pub (phylonode_id);
-create index phylonode_organism_idx2 on phylonode_pub (organism_id);
+create index phylonode_organism_idx1 on phylonode_organism (phylonode_id);
+create index phylonode_organism_idx2 on phylonode_organism (organism_id);
 
 -- ================================================
 -- TABLE: phylonodeprop
