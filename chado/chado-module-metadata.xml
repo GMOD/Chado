@@ -124,13 +124,27 @@
           <source type='sqlapi' path='sequence/functions/range.sqlapi'/>
           <source type='plpgsql' path='sequence/functions/range.plpgsql'/>
         </component>
-        <component id='sequence-dbapi-sequtil type='dbapi'>
+        <component id='sequence-dbapi-sequtil' type='dbapi'>
           <dependency to='gencode'/>
           <description>
             Utility functions for biological sequences
           </description>
           <source type='sqlapi' path='sequence/functions/sequtil.sqlapi'/>
           <source type='plpgsql' path='sequence/functions/sequtil.plpgsql'/>
+        </component>
+        <component id='sequence-dbapi-locgraph' type='dbapi'>
+          <description>
+            Projections on graph defined by featureloc
+          </description>
+          <source type='sqlapi' path='sequence/functions/locgraph.sqlapi'/>
+          <source type='plpgsql' path='sequence/functions/locgraph.plpgsql'/>
+        </component>
+        <component id='sequence-dbapi-cv-helper' type='dbapi'>
+          <description>
+            feature types
+          </description>
+          <source type='sqlapi' path='sequence/functions/sequence-cv-helper.sqlapi'/>
+          <source type='plpgsql' path='sequence/functions/sequence-cv-helper.plpgsql'/>
         </component>
       </component>
 
