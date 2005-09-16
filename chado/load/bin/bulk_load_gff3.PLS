@@ -53,21 +53,23 @@ $0 - Bulk loads gff3 files into a chado database.
 
 =head1 COMMAND-LINE OPTIONS
 
- --gfffile     The file containing GFF3 (optional, can read from stdin)
- --organism    The organism for the data
- --dbname      Database name
- --dbuser      Database user name
- --dbpass      Database password
- --dbhost      Database host
- --dbport      Database port
- --analysis    The GFF data is from computational analysis
- --noload      Create bulk load files, but don't actually load them.
- --nosequence  Don't load sequence even if it is in the file
- --notransact  Don't use a single transaction to load the database
- --validate    Validate SOFA terms before attempting insert (can cause
-                 script startup to be slow, 0 (false) by default)
- --ontology    Give directions for handling misc Ontology_terms
- --skip_vacuum Skip vacuuming the tables after the inserts
+ --gfffile         The file containing GFF3 (optional, can read from stdin)
+ --organism        The organism for the data
+ --dbname          Database name
+ --dbuser          Database user name
+ --dbpass          Database password
+ --dbhost          Database host
+ --dbport          Database port
+ --analysis        The GFF data is from computational analysis
+ --noload          Create bulk load files, but don't actually load them.
+ --nosequence      Don't load sequence even if it is in the file
+ --notransact      Don't use a single transaction to load the database
+ --drop_indexes    Drop indexes of affected tables before starting load
+                     and recreate after load is finished (not implemented yet)
+ --validate        Validate SOFA terms before attempting insert (can cause
+                     script startup to be slow, off by default)
+ --ontology        Give directions for handling misc Ontology_terms
+ --skip_vacuum     Skip vacuuming the tables after the inserts
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -1417,6 +1419,90 @@ sub uniquename_validation {
   return $uniquename if ($count[0] == 0);
   $uniquename = "$uniquename-$nextfeature";
   return uniquename_validation($uniquename, $type, $organism, $nextfeature);
+}
+
+sub drop_indexes {
+  $dbh->do("ALTER TABLE feature DROP CONSTRAINT feature_c1");
+  $dbh->do("DROP INDEX feature_name_ind1  ON feature");
+  $dbh->do("DROP INDEX feature_idx1  ON feature");
+  $dbh->do("DROP INDEX feature_idx2  ON feature");
+  $dbh->do("DROP INDEX feature_idx3  ON feature");
+  $dbh->do("DROP INDEX feature_idx4  ON feature");
+  $dbh->do("DROP INDEX feature_idx5  ON feature");
+
+  $dbh->do("ALTER TABLE featureloc DROP CONSTRAINT featureloc_c1");
+  $dbh->do("DROP INDEX featureloc_idx1  ON featureloc");
+  $dbh->do("DROP INDEX featureloc_idx2  ON featureloc");
+  $dbh->do("DROP INDEX featureloc_idx3  ON featureloc");
+
+  $dbh->do("ALTER TABLE feature_dbxref DROP CONSTRAINT feature_dbxref_c1");
+  $dbh->do("DROP INDEX feature_dbxref_idx1  ON feature_dbxref");
+  $dbh->do("DROP INDEX feature_dbxref_idx2  ON feature_dbxref");
+
+  $dbh->do("ALTER TABLE feature_relationship DROP CONSTRAINT feature_relationship_c1");
+  $dbh->do("DROP INDEX feature_relationship_idx1  ON feature_relationship");
+  $dbh->do("DROP INDEX feature_relationship_idx2  ON feature_relationship");
+  $dbh->do("DROP INDEX feature_relationship_idx3  ON feature_relationship");
+
+  $dbh->do("ALTER TABLE feature_cvterm DROP CONSTRAINT feature_cvterm_c1");
+  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
+  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
+  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
+
+  $dbh->do("ALTER TABLE synonym DROP CONSTRAINT synonym_c1");
+  $dbh->do("DROP INDEX synonym_idx1  ON synonym");
+  $dbh->do("DROP INDEX synonym_idx2  ON synonym");
+
+  $dbh->do("ALTER TABLE feature_synonym DROP CONSTRAINT feature_synonym_c1");
+  $dbh->do("DROP INDEX feature_synonym_idx1  ON feature_synonym");
+  $dbh->do("DROP INDEX feature_synonym_idx2  ON feature_synonym");
+  $dbh->do("DROP INDEX feature_synonym_idx3  ON feature_synonym");
+
+  $dbh->do("ALTER TABLE analysisfeature DROP CONSTRAINT analysisfeature_c1"); 
+  $dbh->do("DROP INDEX analysisfeature_idx1 ON analysisfeature");
+  $dbh->do("DROP INDEX analysisfeature_idx2 ON analysisfeature");
+}
+
+sub recreate_indexes {
+  $dbh->do("ALTER TABLE feature ADD CONSTRAINT feature_c1 unique (organism_id,uniquename,type_id)");
+  $dbh->do("CREATE INDEX feature_name_ind1  ON feature (name)");
+  $dbh->do("CREATE INDEX feature_idx1  ON feature (dbxref_id)");
+  $dbh->do("CREATE INDEX feature_idx2  ON feature (organism_id)");
+  $dbh->do("CREATE INDEX feature_idx3  ON feature (type_id)");
+  $dbh->do("CREATE INDEX feature_idx4  ON feature (uniquename)");
+  $dbh->do("CREATE INDEX feature_idx5  ON feature (lower(name))");
+
+  $dbh->do("ALTER TABLE featureloc ADD CONSTRAINT featureloc_c1 unique (feature_id,locgroup,rank)");
+  $dbh->do("CREATE INDEX featureloc_idx1  ON featureloc (feature_id)");
+  $dbh->do("CREATE INDEX featureloc_idx2  ON featureloc (srcfeature_id)");
+  $dbh->do("CREATE INDEX featureloc_idx3  ON featureloc (srcfeature_id,fmin,fmax)");
+
+  $dbh->do("ALTER TABLE feature_dbxref ADD CONSTRAINT feature_dbxref_c1 unique (feature_id,dbxref_id)");
+  $dbh->do("CREATE INDEX feature_dbxref_idx1  ON feature_dbxref (feature_id)");
+  $dbh->do("CREATE INDEX feature_dbxref_idx2  ON feature_dbxref (dbxref_id)");
+
+  $dbh->do("ALTER TABLE feature_relationship ADD CONSTRAINT feature_relationship_c1 unique (subject_id,object_id,type_id,rank)");
+  $dbh->do("CREATE INDEX feature_relationship_idx1  ON feature_relationship (subject_id)");
+  $dbh->do("CREATE INDEX feature_relationship_idx2  ON feature_relationship (object_id)");
+  $dbh->do("CREATE INDEX feature_relationship_idx3  ON feature_relationship (type_id)");
+
+  $dbh->do("ALTER TABLE feature_cvterm ADD CONSTRAINT feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id)");
+  $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (feature_id)");
+  $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (cvterm_id)");
+  $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (pub_id)");
+
+  $dbh->do("ALTER TABLE synonym ADD CONSTRAINT synonym_c1 unique (name,type_id)");
+  $dbh->do("CREATE INDEX synonym_idx1  ON synonym (type_id)");
+  $dbh->do("CREATE INDEX synonym_idx2  ON synonym ((lower(synonym_sgml)))");
+
+  $dbh->do("ALTER TABLE feature_synonym ADD CONSTRAINT feature_synonym_c1 unique (synonym_id,feature_id,pub_id)");
+  $dbh->do("CREATE INDEX feature_synonym_idx1  ON feature_synonym (synonym_id)");
+  $dbh->do("CREATE INDEX feature_synonym_idx2  ON feature_synonym (feature_id)");
+  $dbh->do("CREATE INDEX feature_synonym_idx3  ON feature_synonym (pub_id)");
+
+  $dbh->do("ALTER TABLE analysisfeature ADD CONSTRAINT analysisfeature_c1 unique (feature_id,analysis_id)");
+  $dbh->do("CREATE INDEX analysisfeature_idx1 ON analysisfeature (feature_id)");
+  $dbh->do("CREATE INDEX analysisfeature_idx2 ON analysisfeature (analysis_id)");
 }
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
