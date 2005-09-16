@@ -377,7 +377,9 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM);
+my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, 
+    $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, 
+    $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,$DROP_INDEX);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -395,6 +397,7 @@ GetOptions(
     'score_col=s'=> \$SCORE_COL,
     'ontology=s' => \$ONTOLOGY,
     'skip_vacuum'=> \$SKIP_VACUUM,
+    'drop_indexes'=>\$DROP_INDEX,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 
@@ -1254,6 +1257,8 @@ unless ($NOSEQUENCE) {
 }
 
 if(!$NOLOAD){
+  drop_indexes($db) if $DROP_INDEX;
+
   foreach my $table (@tables) {
     copy_from_stdin($db,$table,
                     $copystring{$table},
@@ -1275,6 +1280,8 @@ if(!$NOLOAD){
     }
     close SEQ;
   }
+
+  create_indexes($db) if $DROP_INDEX;
 
   unless ($SKIP_VACUUM) {
     warn "Optimizing database (this may take a while) ...\n";
@@ -1422,48 +1429,51 @@ sub uniquename_validation {
 }
 
 sub drop_indexes {
+  my $dbh = shift;
+
   $dbh->do("ALTER TABLE feature DROP CONSTRAINT feature_c1");
-  $dbh->do("DROP INDEX feature_name_ind1  ON feature");
-  $dbh->do("DROP INDEX feature_idx1  ON feature");
-  $dbh->do("DROP INDEX feature_idx2  ON feature");
-  $dbh->do("DROP INDEX feature_idx3  ON feature");
-  $dbh->do("DROP INDEX feature_idx4  ON feature");
-  $dbh->do("DROP INDEX feature_idx5  ON feature");
+  $dbh->do("DROP INDEX feature_name_ind1");
+  $dbh->do("DROP INDEX feature_idx1");
+  $dbh->do("DROP INDEX feature_idx2");
+  $dbh->do("DROP INDEX feature_idx3");
+  $dbh->do("DROP INDEX feature_idx4");
+  $dbh->do("DROP INDEX feature_idx5");
 
   $dbh->do("ALTER TABLE featureloc DROP CONSTRAINT featureloc_c1");
-  $dbh->do("DROP INDEX featureloc_idx1  ON featureloc");
-  $dbh->do("DROP INDEX featureloc_idx2  ON featureloc");
-  $dbh->do("DROP INDEX featureloc_idx3  ON featureloc");
+  $dbh->do("DROP INDEX featureloc_idx1");
+  $dbh->do("DROP INDEX featureloc_idx2");
+  $dbh->do("DROP INDEX featureloc_idx3");
 
   $dbh->do("ALTER TABLE feature_dbxref DROP CONSTRAINT feature_dbxref_c1");
-  $dbh->do("DROP INDEX feature_dbxref_idx1  ON feature_dbxref");
-  $dbh->do("DROP INDEX feature_dbxref_idx2  ON feature_dbxref");
+  $dbh->do("DROP INDEX feature_dbxref_idx1");
+  $dbh->do("DROP INDEX feature_dbxref_idx2");
 
   $dbh->do("ALTER TABLE feature_relationship DROP CONSTRAINT feature_relationship_c1");
-  $dbh->do("DROP INDEX feature_relationship_idx1  ON feature_relationship");
-  $dbh->do("DROP INDEX feature_relationship_idx2  ON feature_relationship");
-  $dbh->do("DROP INDEX feature_relationship_idx3  ON feature_relationship");
+  $dbh->do("DROP INDEX feature_relationship_idx1");
+  $dbh->do("DROP INDEX feature_relationship_idx2");
+  $dbh->do("DROP INDEX feature_relationship_idx3");
 
   $dbh->do("ALTER TABLE feature_cvterm DROP CONSTRAINT feature_cvterm_c1");
-  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
-  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
-  $dbh->do("DROP INDEX feature_cvterm_idx1  ON feature_cvterm");
+  $dbh->do("DROP INDEX feature_cvterm_idx1");
+  $dbh->do("DROP INDEX feature_cvterm_idx2");
+  $dbh->do("DROP INDEX feature_cvterm_idx3");
 
   $dbh->do("ALTER TABLE synonym DROP CONSTRAINT synonym_c1");
-  $dbh->do("DROP INDEX synonym_idx1  ON synonym");
-  $dbh->do("DROP INDEX synonym_idx2  ON synonym");
+  $dbh->do("DROP INDEX synonym_idx1");
+  $dbh->do("DROP INDEX synonym_idx2");
 
   $dbh->do("ALTER TABLE feature_synonym DROP CONSTRAINT feature_synonym_c1");
-  $dbh->do("DROP INDEX feature_synonym_idx1  ON feature_synonym");
-  $dbh->do("DROP INDEX feature_synonym_idx2  ON feature_synonym");
-  $dbh->do("DROP INDEX feature_synonym_idx3  ON feature_synonym");
+  $dbh->do("DROP INDEX feature_synonym_idx1");
+  $dbh->do("DROP INDEX feature_synonym_idx2");
+  $dbh->do("DROP INDEX feature_synonym_idx3");
 
   $dbh->do("ALTER TABLE analysisfeature DROP CONSTRAINT analysisfeature_c1"); 
-  $dbh->do("DROP INDEX analysisfeature_idx1 ON analysisfeature");
-  $dbh->do("DROP INDEX analysisfeature_idx2 ON analysisfeature");
+  $dbh->do("DROP INDEX analysisfeature_idx1");
+  $dbh->do("DROP INDEX analysisfeature_idx2");
 }
 
-sub recreate_indexes {
+sub create_indexes {
+  my $dbh = shift;
   $dbh->do("ALTER TABLE feature ADD CONSTRAINT feature_c1 unique (organism_id,uniquename,type_id)");
   $dbh->do("CREATE INDEX feature_name_ind1  ON feature (name)");
   $dbh->do("CREATE INDEX feature_idx1  ON feature (dbxref_id)");
@@ -1488,8 +1498,8 @@ sub recreate_indexes {
 
   $dbh->do("ALTER TABLE feature_cvterm ADD CONSTRAINT feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id)");
   $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (feature_id)");
-  $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (cvterm_id)");
-  $dbh->do("CREATE INDEX feature_cvterm_idx1  ON feature_cvterm (pub_id)");
+  $dbh->do("CREATE INDEX feature_cvterm_idx2  ON feature_cvterm (cvterm_id)");
+  $dbh->do("CREATE INDEX feature_cvterm_idx3  ON feature_cvterm (pub_id)");
 
   $dbh->do("ALTER TABLE synonym ADD CONSTRAINT synonym_c1 unique (name,type_id)");
   $dbh->do("CREATE INDEX synonym_idx1  ON synonym (type_id)");
