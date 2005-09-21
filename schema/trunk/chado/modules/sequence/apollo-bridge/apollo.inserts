@@ -33,10 +33,178 @@ insert into analysis (name,program,programversion,sourcename)
    values ('Rice_cross_genome_match','blat','1','Rice_genome');
 insert into analysis (name,program,programversion,sourcename)
    values ('Millet_EST_match','blat','1','Millet_EST');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Japonica_BACend_nucleotide_match','blat','1','Rice_Japonica_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceSativa_bacends_omap_nucleotide_match','blat','1','riceSativa_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Australiensis_BACend_nucleotide_match','blat','1','Rice_Australiensis_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceAustraliensis_bacends_omap_nucleotide_match','blat','1','riceAustraliensis_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Punctata_BACend_nucleotide_match','blat','1','Rice_Punctata_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('ricePunctata_bacends_omap_nucleotide_match','blat','1','ricePunctata_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_MAGI_ISU_cross_genome_match','blat','1','Maize_MAGI_ISU'); 
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_hi_cot_Bennetzen_cross_genome_match','blat','1','Maize_hi_cot_Bennetzen');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_meth_filt_hi_cot_cluster_cross_genome_match','blat','1','Maize_meth_filt_hi_cot_cluster');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_hi_cot_TIGR_cross_genome_match','blat','1','Maize_hi_cot_TIGR');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_BACend_cross_genome_match','blat','1','Maize_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Nivara_BACend_nucleotide_match','blat','1','Rice_Nivara_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceNivara_bacends_omap_nucleotide_match','blat','1','riceNivara_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Rufipogon_BACend_nucleotide_match','blat','1','Rice_Rufipogon_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceRufipogon_bacends_omap_nucleotide_match','blat','1','riceRufipogon_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_orion_cross_genome_match','blat','1','Sorghum_orion');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_meth_filt_CSHL_Mccombie_cross_genome_match','blat','1','Maize_meth_filt_CSHL_Mccombie');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_meth_filt_TIGR_cross_genome_match','blat','1','Maize_meth_filt_TIGR');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Ryegrass_Sequence_cross_genome_match','blat','1','Ryegrass_Sequence');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Ryegrass_Assembly_cross_genome_match','blat','1','Ryegrass_Assembly');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Glaberrima_BACend_nucleotide_match','blat','1','Rice_Glaberrima_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceGlaberrima_bacends_omap_nucleotide_match','blat','1','riceGlaberrima_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_unmapped_BAC_back_nucleotide_match','blat','1','Rice_unmapped_BAC_back');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_ArrayTarget_Affy57K_cDNA_match','blat','1','Rice_ArrayTarget_Affy57K');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_GI_EST_match','blat','1','Rice_GI');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_jap_cDNA_KOME_cDNA_match','blat','1','Rice_jap_cDNA_KOME');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Brachyantha_BACend_nucleotide_match','blat','1','Rice_Brachyantha_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceBrachyantha_bacends_omap_nucleotide_match','blat','1','riceBrachyantha_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Osativa_TUG_PlantGDB_EST_match','blat','1','Osativa_TUG_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_tug_EST_match','blat','1','Rice_tug');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_Alta_BACend_nucleotide_match','blat','1','Rice_Alta_BACend');
+insert into analysis (name,program,programversion,sourcename)
+   values ('riceAlta_bacends_omap_nucleotide_match','blat','1','riceAlta_bacends_omap');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_cluster_Pratt_EST_match','blat','1','Sorghum_cluster_Pratt');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_est_EST_match','blat','1','Maize_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_GI_EST_match','blat','1','Maize_GI');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_ArrayTarget_NSF58K_cDNA_match','blat','1','Maize_ArrayTarget_NSF58K');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Zmays_TUG_PlantGDB_EST_match','blat','1','Zmays_TUG_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_est_EST_match','blat','1','Wheat_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_GI_EST_match','blat','1','Wheat_GI');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_tug_EST_match','blat','1','Wheat_tug');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Taestivum_TUG_PlantGDB_EST_match','blat','1','Taestivum_TUG_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_ArrayTarget_Affy61K_cDNA_match','blat','1','Wheat_ArrayTarget_Affy61K');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_est_EST_match','blat','1','Barley_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_GI_EST_match','blat','1','Barley_GI');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_ArrayTarget_Affy22K_cDNA_match','blat','1','Barley_ArrayTarget_Affy22K');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Hvulgare_TUG_PlantGDB_EST_match','blat','1','Hvulgare_TUG_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sugarcane_est_EST_match','blat','1','Sugarcane_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_tug_EST_match','blat','1','Barley_tug');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_markers_cross_genome_match','blat','1','Maize_markers');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_ind_est_EST_match','blat','1','Rice_ind_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_ind_cluster_EST_match','blat','1','Rice_ind_cluster');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_GI_EST_match','blat','1','Sorghum_GI');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_est_EST_match','blat','1','Rice_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_CDNA_cDNA_match','blat','1','Sorghum_CDNA');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_est_EST_match','blat','1','Sorghum_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sbicolor_TUG_PlantGDB_EST_match','blat','1','Sbicolor_TUG_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_tug_EST_match','blat','1','Maize_tug');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_ArrayTarget_Affy18K_cDNA_match','blat','1','Maize_ArrayTarget_Affy18K');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_tug_EST_match','blat','1','Sorghum_tug');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_cornsensus_cDNA_match','blat','1','Maize_cornsensus');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Millet_est_EST_match','blat','1','Millet_est');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_CDs_cDNA_match','blat','1','Maize_CDs');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_Unigene_Panzea_EST_match','blat','1','Maize_Unigene_Panzea');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_markers_cross_genome_match','blat','1','Wheat_markers');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_BAC_nucleotide_match','blat','1','Rice_BAC');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_unmapped_BAC_front_nucleotide_match','blat','1','Rice_unmapped_BAC_front');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_Markers_cross_genome_match','blat','1','Sorghum_Markers');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_CDS_cDNA_match','blat','1','Rice_CDS');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_gss-read_Klein_cross_genome_match','blat','1','Sorghum_gss-read_Klein');
 
 
+insert into db (name) values ('DB:Sorghum_gss-read_Klein');
+insert into db (name) values ('DB:Rice_CDS');
+insert into db (name) values ('DB:Sorghum_Markers');
+insert into db (name) values ('DB:Rice_BAC');
+insert into db (name) values ('DB:Wheat_Markers');
+insert into db (name) values ('DB:Maize_cornsensus');
+insert into db (name) values ('DB:Sorghum_tug');
+insert into db (name) values ('DB:Maize_tug');
+insert into db (name) values ('DB:Sorghum_CDNA');
+insert into db (name) values ('DB:Sorghum_GI');
+insert into db (name) values ('DB:Rice_ind_cluster');
+insert into db (name) values ('DB:Rice_ind_est');
+insert into db (name) values ('DB:Maize_markers');
+insert into db (name) values ('DB:Barley_tug');
+insert into db (name) values ('DB:Sugarcane_est');
+insert into db (name) values ('DB:Barley_GI');
+insert into db (name) values ('DB:Wheat_tug');
+insert into db (name) values ('DB:Wheat_GI');
+insert into db (name) values ('DB:Wheat_est');
+insert into db (name) values ('DB:Maize_GI');
+insert into db (name) values ('DB:Sorghum_cluster_Pratt');
+insert into db (name) values ('DB:EST_match');
+insert into db (name) values ('DB:Rice_tug');
+insert into db (name) values ('DB:cDNA_match');
+insert into db (name) values ('DB:Rice_GI');
 insert into db (name) values ('DB:TIGR_Maize');
 insert into db (name) values ('DB:TIGR_Osa');
+insert into db (name) values ('DB:nucleotide_match');
+insert into db (name) values ('DB:Sorghum_Orion');
+insert into db (name) values ('DB:cross_genome_match');
+insert into db (name) values ('DB:Maize_hi_cot_TIGR');
+insert into db (name) values ('DB:Maize_meth_filt_TIGR');
 
 insert into pub (uniquename, title, type_id) values ('none', 'none', (select cvterm_id from cvterm where name = 'null pub' and cv_id in (select cv_id from cv where name='pub type') ) );
 
