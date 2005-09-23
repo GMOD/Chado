@@ -84,7 +84,11 @@ FROM feature
 WHERE type_id NOT IN (SELECT cvterm_id FROM cvterm WHERE name='CDS')
 UNION ALL
 SELECT feature_id, 'chado_feature_id' as type, CAST(feature_id AS varchar) as attribute
+FROM feature
+UNION ALL
+SELECT feature_id, 'Name' as type, name as attribute
 FROM feature;
+
 
 CREATE OR REPLACE VIEW gff3view (
   feature_id,
