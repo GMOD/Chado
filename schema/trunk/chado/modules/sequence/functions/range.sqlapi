@@ -16,7 +16,7 @@ DECLARE FUNCTION featureloc_slice(
     fmin            INTEGER,
     fmax            INTEGER)
  RETURNS SETOF featureloc;
-COMMENT ON FUNCTION featureloc_slice(INT,INT) IS
+COMMENT ON FUNCTION featureloc_slice(VARCHAR,INT,INT) IS
  '
   returns all featurelocs with coordinates that intersect fmin and fmax
   and located relative to srcfeature (specified by srcfeature.name)
@@ -27,7 +27,7 @@ DECLARE FUNCTION featureloc_slice(
     fmin            INTEGER,
     fmax            INTEGER)
  RETURNS SETOF featureloc;
-COMMENT ON FUNCTION featureloc_slice(INT,INT) IS
+COMMENT ON FUNCTION featureloc_slice(INT,INT,INT) IS
  '
   returns all featurelocs with coordinates that intersect fmin and fmax
   and located relative to srcfeature (specified by id)
