@@ -804,7 +804,7 @@ while(my $feature = $gffio->next_feature()){
 
 
 #don't write a featureloc entry for srcfeatures
-  unless ($src == $nextfeature) {
+  unless ($src eq '\N' or $src == $nextfeature) {
 #need to convert from base to interbase coords
     my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
     my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
@@ -1431,45 +1431,45 @@ sub uniquename_validation {
 sub drop_indexes {
   my $dbh = shift;
 
-  $dbh->do("ALTER TABLE feature DROP CONSTRAINT feature_c1");
-  $dbh->do("DROP INDEX feature_name_ind1");
-  $dbh->do("DROP INDEX feature_idx1");
-  $dbh->do("DROP INDEX feature_idx2");
-  $dbh->do("DROP INDEX feature_idx3");
-  $dbh->do("DROP INDEX feature_idx4");
-  $dbh->do("DROP INDEX feature_idx5");
+  $dbh->do("ALTER TABLE feature DROP CONSTRAINT feature_c1") or die "$!";
+  $dbh->do("DROP INDEX feature_name_ind1") or die "$!";
+  $dbh->do("DROP INDEX feature_idx1") or die "$!";
+  $dbh->do("DROP INDEX feature_idx2") or die "$!";
+  $dbh->do("DROP INDEX feature_idx3") or die "$!";
+  $dbh->do("DROP INDEX feature_idx4") or die "$!";
+  $dbh->do("DROP INDEX feature_idx5") or die "$!";
 
-  $dbh->do("ALTER TABLE featureloc DROP CONSTRAINT featureloc_c1");
-  $dbh->do("DROP INDEX featureloc_idx1");
-  $dbh->do("DROP INDEX featureloc_idx2");
-  $dbh->do("DROP INDEX featureloc_idx3");
+  $dbh->do("ALTER TABLE featureloc DROP CONSTRAINT featureloc_c1") or die "$!";
+  $dbh->do("DROP INDEX featureloc_idx1") or die "$!";
+  $dbh->do("DROP INDEX featureloc_idx2") or die "$!";
+  $dbh->do("DROP INDEX featureloc_idx3") or die "$!";
 
-  $dbh->do("ALTER TABLE feature_dbxref DROP CONSTRAINT feature_dbxref_c1");
-  $dbh->do("DROP INDEX feature_dbxref_idx1");
-  $dbh->do("DROP INDEX feature_dbxref_idx2");
+  $dbh->do("ALTER TABLE feature_dbxref DROP CONSTRAINT feature_dbxref_c1") or die "$!";
+  $dbh->do("DROP INDEX feature_dbxref_idx1") or die "$!";
+  $dbh->do("DROP INDEX feature_dbxref_idx2") or die "$!";
 
-  $dbh->do("ALTER TABLE feature_relationship DROP CONSTRAINT feature_relationship_c1");
-  $dbh->do("DROP INDEX feature_relationship_idx1");
-  $dbh->do("DROP INDEX feature_relationship_idx2");
-  $dbh->do("DROP INDEX feature_relationship_idx3");
+  $dbh->do("ALTER TABLE feature_relationship DROP CONSTRAINT feature_relationship_c1") or die "$!";
+  $dbh->do("DROP INDEX feature_relationship_idx1") or die "$!";
+  $dbh->do("DROP INDEX feature_relationship_idx2") or die "$!";
+  $dbh->do("DROP INDEX feature_relationship_idx3") or die "$!";
 
-  $dbh->do("ALTER TABLE feature_cvterm DROP CONSTRAINT feature_cvterm_c1");
-  $dbh->do("DROP INDEX feature_cvterm_idx1");
-  $dbh->do("DROP INDEX feature_cvterm_idx2");
-  $dbh->do("DROP INDEX feature_cvterm_idx3");
+  $dbh->do("ALTER TABLE feature_cvterm DROP CONSTRAINT feature_cvterm_c1") or die "$!";
+  $dbh->do("DROP INDEX feature_cvterm_idx1") or die "$!";
+  $dbh->do("DROP INDEX feature_cvterm_idx2") or die "$!";
+  $dbh->do("DROP INDEX feature_cvterm_idx3") or die "$!";
 
-  $dbh->do("ALTER TABLE synonym DROP CONSTRAINT synonym_c1");
-  $dbh->do("DROP INDEX synonym_idx1");
-  $dbh->do("DROP INDEX synonym_idx2");
+  $dbh->do("ALTER TABLE synonym DROP CONSTRAINT synonym_c1") or die "$!";
+  $dbh->do("DROP INDEX synonym_idx1") or die "$!";
+  $dbh->do("DROP INDEX synonym_idx2") or die "$!";
 
-  $dbh->do("ALTER TABLE feature_synonym DROP CONSTRAINT feature_synonym_c1");
-  $dbh->do("DROP INDEX feature_synonym_idx1");
-  $dbh->do("DROP INDEX feature_synonym_idx2");
-  $dbh->do("DROP INDEX feature_synonym_idx3");
+  $dbh->do("ALTER TABLE feature_synonym DROP CONSTRAINT feature_synonym_c1") or die "$!";
+  $dbh->do("DROP INDEX feature_synonym_idx1") or die "$!";
+  $dbh->do("DROP INDEX feature_synonym_idx2") or die "$!";
+  $dbh->do("DROP INDEX feature_synonym_idx3") or die "$!";
 
-  $dbh->do("ALTER TABLE analysisfeature DROP CONSTRAINT analysisfeature_c1"); 
-  $dbh->do("DROP INDEX analysisfeature_idx1");
-  $dbh->do("DROP INDEX analysisfeature_idx2");
+  $dbh->do("ALTER TABLE analysisfeature DROP CONSTRAINT analysisfeature_c1") or die "$!";
+  $dbh->do("DROP INDEX analysisfeature_idx1") or die "$!";
+  $dbh->do("DROP INDEX analysisfeature_idx2") or die "$!";
 }
 
 sub create_indexes {
