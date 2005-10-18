@@ -81,12 +81,14 @@ BEGIN
         SELECT INTO s feature_id FROM feature WHERE uniquename = srcs[i];
         FOR f IN
             SELECT *
-            FROM  featuregroup
-            WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
-              AND group_id IN (
-                  SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
-                  WHERE  srcfeature_id = s
-              )
+            FROM  featuregroup WHERE group_id IN (
+                SELECT group_id FROM featuregroup
+                WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
+                  AND group_id IN (
+                      SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
+                      WHERE  srcfeature_id = s
+                  )
+            )
         LOOP
             RETURN NEXT f;
         END LOOP;
@@ -109,14 +111,16 @@ BEGIN
         SELECT INTO s feature_id FROM feature WHERE uniquename = srcs[i];
         FOR f IN
             SELECT *
-            FROM  featuregroup
-            WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
-              AND fmin <= mins[i]
-              AND fmax >= maxs[i]
-              AND group_id IN (
-                  SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
-                  WHERE  srcfeature_id = s
-              )
+            FROM  featuregroup WHERE group_id IN (
+                SELECT group_id FROM featuregroup
+                WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
+                  AND fmin <= mins[i]
+                  AND fmax >= maxs[i]
+                  AND group_id IN (
+                      SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
+                      WHERE  srcfeature_id = s
+                  )
+            )
         LOOP
             RETURN NEXT f;
         END LOOP;
@@ -139,14 +143,16 @@ BEGIN
         SELECT INTO s feature_id FROM feature WHERE uniquename = srcs[i];
         FOR f IN
             SELECT *
-            FROM  featuregroup
-            WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
-              AND fmin >= mins[i]
-              AND fmax <= maxs[i]
-              AND group_id IN (
-                  SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
-                  WHERE  srcfeature_id = s
-              )
+            FROM  featuregroup WHERE group_id IN (
+                SELECT group_id FROM featuregroup
+                WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
+                  AND fmin >= mins[i]
+                  AND fmax <= maxs[i]
+                  AND group_id IN (
+                      SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
+                      WHERE  srcfeature_id = s
+                  )
+            )
         LOOP
             RETURN NEXT f;
         END LOOP;
@@ -169,14 +175,16 @@ BEGIN
         SELECT INTO s feature_id FROM feature WHERE uniquename = srcs[i];
         FOR f IN
             SELECT *
-            FROM  featuregroup
-            WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
-              AND fmin = mins[i]
-              AND fmax = maxs[i]
-              AND group_id IN (
-                  SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
-                  WHERE  srcfeature_id = s
-              )
+            FROM  featuregroup WHERE group_id IN (
+                SELECT group_id FROM featuregroup
+                WHERE (srcfeature_id = s OR srcfeature_id IS NULL)
+                  AND fmin = mins[i]
+                  AND fmax = maxs[i]
+                  AND group_id IN (
+                      SELECT group_id FROM groupoverlaps( mins[i], maxs[i] )
+                      WHERE  srcfeature_id = s
+                  )
+            )
         LOOP
             RETURN NEXT f;
         END LOOP;
