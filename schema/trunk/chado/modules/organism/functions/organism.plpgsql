@@ -1,0 +1,24 @@
+
+CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS INT
+ AS $$
+  SELECT organism_id 
+  FROM organism
+  WHERE genus=$1
+    AND species=$2
+ $$ LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR) RETURNS INT
+ AS $$
+SELECT organism_id
+  FROM organism
+  WHERE genus=substring($1,1,position(' ' IN $1)-1)
+    AND species=substring($1,position(' ' IN $1)+1)
+ $$ LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION get_organism_id_abbrev(VARCHAR) RETURNS INT
+ AS $$
+SELECT organism_id
+  FROM organism
+  WHERE substr(genus,1,1)=substring($1,1,1)
+    AND species=substring($1,position(' ' IN $1)+1)
+ $$ LANGUAGE 'sql';

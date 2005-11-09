@@ -45,23 +45,24 @@ COMMENT ON COLUMN cvterm.dbxref_id IS
 COMMENT ON COLUMN cvterm.is_obsolete IS
  'Boolean 0=false,1=true; see GO documentation for details of obsoletion.
   note that two terms with different primary dbxrefs may exist if one
-  is obsolete. Values >1 may be allowed to circumvent uniqueness constraint
-  since there may be many obsoleted terms with the same name';
+  is obsolete';
 COMMENT ON COLUMN cvterm.is_relationshiptype IS
  'Boolean 0=false,1=true
   Relationship types (also known as Typedefs in OBO format, or as
   properties or slots) form a cv/ontology in themselves. We use this
   flag to indicate whether this cvterm is an actual term/concept or
   a relationship type';
-COMMENT ON INDEX cvterm_c1 IS 
- 'the OBO identifier is globally unique';
+COMMENT ON INDEX cvterm_c1 IS 'a name can mean different things in
+different contexts; for example "chromosome" in SO and GO. A name
+should be unique within an ontology/cv. A name may exist twice in a
+cv, in both obsolete and non-obsolete forms - these will be for
+different cvterms with different OBO identifiers; so GO documentation
+for more details on obsoletion. Note that occasionally multiple
+obsolete terms with the same name will exist in the same cv. If this
+is a possibility for the ontology under consideration (eg GO) then the
+ID should be appended to the name to ensure uniqueness';
 COMMENT ON INDEX cvterm_c2 IS 
- 'a name can mean different things in different contexts;
-  for example "chromosome" in SO and GO. A name should be unique
-  within an ontology/cv. A name may exist twice in a cv, in both
-  obsolete and non-obsolete forms - these will be for different
-  cvterms with different OBO identifiers; so GO documentation for
-  more details on obsoletion';
+ 'the OBO identifier is globally unique';
 
 create index cvterm_idx1 on cvterm (cv_id);
 create index cvterm_idx2 on cvterm (name);

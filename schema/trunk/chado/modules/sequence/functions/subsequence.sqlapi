@@ -15,14 +15,14 @@ DECLARE FUNCTION subsequence(
 COMMENT ON FUNCTION subsequence(INT,INT,INT,INT) IS
  'extracts a subsequence, reverse complementing if range <1';
 
-DECLARE FUNCTION subsequence_by_feature(
+DECLARE FUNCTION subsequence_by_feature (
    feature_id           INT REFERENCES feature(feature_id)
 )
  RETURNS TEXT;
 COMMENT ON FUNCTION subsequence_by_feature(INT) IS
- 'extracts a subsequence for a feature, using featureloc (rank,group=0)';
+ 'extracts a subsequence for a feature, using featureloc (rank,group=0). The subsequence will be extracted from the featureloc.srcfeature from fmin to fmax, revcomping if required';
 
-DECLARE FUNCTION subsequence_by_feature(
+DECLARE FUNCTION subsequence_by_feature (
    feature_id           INT REFERENCES feature(feature_id),
    rank                 INT,
    locgroup             INT
