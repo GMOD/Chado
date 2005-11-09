@@ -35,7 +35,7 @@
   f.name,
   uniquename,
   type_id,
-  dbxref_id,
+  f.dbxref_id,
   t.name         AS type,
   organismstr,
   dbxrefstr,
@@ -71,7 +71,7 @@
   CASE WHEN strand < 0 THEN fmax ELSE fmin END AS nbeg,
   CASE WHEN strand < 0 THEN fmin ELSE fmax END AS nend,
   fmin,
-  fmax
+  fmax,
   strand,
   rank,
   locgroup

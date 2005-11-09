@@ -20,7 +20,8 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION project_featureloc_up(int,int)
  RETURNS featureloc AS
-'DECLARE
+$$
+DECLARE
     in_featureloc_id alias for $1;
     up_srcfeature_id alias for $2;
     in_featureloc featureloc%ROWTYPE;
@@ -67,6 +68,37 @@ BEGIN
   in_featureloc.strand = nu_strand;
   in_featureloc.srcfeature_id = up_featureloc.srcfeature_id;
   RETURN in_featureloc;
-END'   
+END
+$$   
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
+ RETURNS INT AS $$
+ DECLARE
+    in_p             alias for $1;
+    srcf_id          alias for $2;
+    t_id             alias for $3;
+    e_floc           featureloc%ROWTYPE;
+    out_p            INT;
+    exon_cvterm_id   INT;
+BEGIN
+ SELECT INTO exon_cvterm_id get_feature_type_id('exon');
+ SELECT INTO out_p
+  CASE 
+   WHEN strand<0 THEN fmax-p
+   ELSE p-fmin
+   END AS p
+  FROM featureloc
+   INNER JOIN feature USING (feature_id)
+   INNER JOIN feature_relationship ON (feature.feature_id=subject_id)
+  WHERE
+   object_id = t_id                     AND
+   feature.type_id = exon_cvterm_id     AND
+   featureloc.srcfeature_id = srcf_id   AND
+   in_p >= fmin                         AND
+   in_p <= fmax;
+  RETURN in_featureloc;
+END
+$$   
 LANGUAGE 'plpgsql';
 
