@@ -26,6 +26,7 @@ my $counts;
 my $RTYPE = 'VIEW';
 my $schema = 'sofa';
 my $verbose;
+my $do_closure=1;
 GetOptions(
            "help|h"=>\$help,
 	   "db|d=s"=>\$db,
@@ -87,15 +88,19 @@ my @terms = grep {!$_->is_relationship_type} @{$graph->get_all_terms};
 # GET CVTERM IDS
 # ==============================================================
 my $trows = [];
+my $used_type_ids;
 if ($dbh) {
     msg("getting type to prop mappings");
     $trows =
       $dbh->selectall_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
 			     FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
     die "could not find terms" unless @$trows;
+    $used_type_ids =
+      $dbh->selectcol_arrayref("SELECT DISTINCT type_id FROM feature");
 }
+my %used_type_idh = map { $_=>1 } @$used_type_ids;
 my %n2id = map { $_->[1] => $_->[0] } @$trows;
-
+my %id2n = reverse %n2id;
 
 my %namemap = ();
 my %abbrev = ();
@@ -110,6 +115,7 @@ foreach my $term (@terms) {
     my $tname = $term->name;
     my $def = $term->definition || '';
     my $vname = safename($tname);
+
 
     my (@cols, @selcols, $sel);
 
@@ -152,6 +158,29 @@ foreach my $term (@terms) {
 	  );
     my $from = "INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)";
     my $where = "cvterm.name = '$tname'";
+    if ($id_based) {
+        my $id = $n2id{$tname};        
+        $where = "feature.type_id = $id";
+    }
+    if ($do_closure) {
+        my $cterms = 
+          $graph->get_recursive_child_terms_by_type($term->acc);
+        my @pnames = map {$_->name} @$cterms;
+        if (%used_type_idh) {
+            @pnames = grep { $used_type_idh{$n2id{$_}} } @pnames;
+        }
+        @pnames = map {safename($_)} @pnames;
+        if ($id_based) {
+            $where = join(' OR ',
+                          map {"cvterm.name = '$_'"} map {$n2id{$_}} @pnames);
+        }
+        else {
+            $where = join(' OR ',
+                          map {"cvterm.name = '$_'"} @pnames);
+        }
+              
+    }
+    
     my $cmnt = "";
     if ($id_based) {
         my $id = $n2id{$tname};        
@@ -160,7 +189,6 @@ foreach my $term (@terms) {
             next;
         }
 	$from = "";
-	$where = "feature.type_id = $id";
 	$cmnt = "--- This view is derived from the cvterm database ID.\n".
 	  "--- This will be more efficient, but the views MUST be regenerated\n".
 	    "--- when the Sequence Ontology in the database changes\n";
