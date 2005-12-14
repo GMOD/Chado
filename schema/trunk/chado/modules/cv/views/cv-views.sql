@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW common_ancestor_cvterm AS
   p1.pathdistance        AS pathdistance1,
   p2.pathdistance        AS pathdistance2,
   p1.pathdistance + p2.pathdistance
-                         AS total_pathdistance,
+                         AS total_pathdistance
  FROM
   cvtermpath AS p1,
   cvtermpath AS p2
@@ -52,7 +52,7 @@ CREATE OR REPLACE VIEW common_desendent_cvterm AS
   p1.pathdistance        AS pathdistance1,
   p2.pathdistance        AS pathdistance2,
   p1.pathdistance + p2.pathdistance
-                         AS total_pathdistance,
+                         AS total_pathdistance
  FROM
   cvtermpath AS p1,
   cvtermpath AS p2
