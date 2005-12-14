@@ -6,12 +6,13 @@ use FileHandle;
 use Getopt::Long;
 use Tk;
 
-my ($HELP, $OUTFILE, $INFILE);
+my ($HELP, $OUTFILE, $INFILE, $ONLY_SQL);
 
 GetOptions(
   'help'      => \$HELP,
   'outfile=s' => \$OUTFILE,
   'infile=s'  => \$INFILE,
+  'only_sql'  => \$ONLY_SQL
 );
 
 if ($HELP) {
@@ -186,7 +187,11 @@ sub read_source {
     foreach my $source (@sources) {
         my $type = $source->sget('@/type');
         my $path = $source->sget('@/path');
-        if ($type ne 'sql' && $type ne 'pgsql') {
+        if ($ONLY_SQL && $type ne 'sql') {
+            print STDERR "Skipping source $type $path for $id\n";
+            next;
+        }
+        elsif ($type ne 'sql' && $type ne 'plpgsql') {
             print STDERR "Skipping source $type $path for $id\n";
             next;
         }
