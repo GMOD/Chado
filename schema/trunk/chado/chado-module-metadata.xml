@@ -40,7 +40,7 @@
         <description>
           Standard Chado SQL Views for the cv module
         </description>
-        <source type='sql' path='cv/cv-views.sql'/>
+        <source type='sql' path='cv/views/cv-views.sql'/>
       </component>
 
       <component id='cv-dbapi' type='dbapi'>
@@ -101,7 +101,7 @@
         <description>
           Standard Chado SQL Views for the sequence module
         </description>
-        <source type='sql' path='sequence/sequence-views.sql'/>
+        <source type='sql' path='sequence/sequence_views.sql'/>
         <component id='range-views' type='views' required='true'>
           <description>
             Views for operating on featureloc ranges. Overlap,
@@ -160,7 +160,7 @@
           A GFF-view over chado. Required by Gbrowse
         </description>
         <source type='sql' path='sequence/gff-bridge/sequence-gff-views.sql'/>
-        <source type='plpgsql' path='sequence/gff-bridge/sequence-gff-funcs.pgsql'/>
+        <source type='plpgsql' path='sequence/gff-bridge/sequence-gff-funcs.plpgsql'/>
       </component>
 
       <component id='godb-bridge' type='bridge'>
@@ -223,6 +223,8 @@
       <source type='sql' path='map/map.sql'/>
     </module>
 
+<!--
+    This module isn't in cvs
     <module id='event'>
       <dependency to='sequence'/>
       <dependency to='cv'/>
@@ -235,6 +237,7 @@
       </description>
       <source type='sql' path='event/event.sql'/>
     </module>
+-->
 
     <module id='phylogeny'>
       <dependency to='sequence'/>
@@ -253,13 +256,26 @@
       <source type='sql' path='phylogeny/phylogeny.sql'/>
     </module>
 
+    <module id='contact'>
+      <dependency to='cv'/>
+      <dependency to='general'/>
+      <status code='alpha'>
+        In use at UCLA/Allen Day
+      </status>
+      <description>
+        model persons, institutes, groups, organizations, etc
+      </description>
+      <source type='sql' path='contact/contact.sql'/>
+    </module>
+
+
     <module id='expression'>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
       <dependency to='general'/>
       <status code='alpha'>
-        Not yet in use
+        In use at UCLA/Allen Day
       </status>
       <description>
         transcript or protein expression data
@@ -273,7 +289,7 @@
       <dependency to='pub'/>
       <dependency to='general'/>
       <status code='beta'>
-        In use at...?
+        In use at UCLA/Allen Day
       </status>
       <description>
         Alternative expression module, based on MAGE model
@@ -281,7 +297,26 @@
       <source type='sql' path='expression/rad.sql'/>
     </module>
 
+<!--
+    Since this is dynamically generated from a given schema, this should
+    either be done at a later step, or if requested, dynamically generated
+    at run time after the rest of the schema has been generated
     <module id='audit'>
+     <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='general'/>
+      <dependency to='companalysis'/>
+      <dependency to='contact'/>
+      <dependency to='expression'/>
+      <dependency to='event'/>
+      <dependency to='genetic'/>
+      <dependency to='library'/>
+      <dependency to='map'/>
+      <dependency to='organism'/>
+      <dependency to='phylogeny'/>
+      <dependency to='rad'/>
+
       <status code='beta'>
         In use at...?
       </status>
@@ -290,5 +325,6 @@
       </description>
       <source type='sql' path='audit/audit_tables.sql'/>
     </module>
+-->
   </modules>
 </schema_metadata>
