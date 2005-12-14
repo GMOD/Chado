@@ -5,7 +5,7 @@
       This page contains a selection of Chado best-practices for
       different usage scenarios. It is designed to complement the
       Chado SQL DDL (you should familiarize yourself with this first)
-      and the Sequence Ontology. 
+      and the Sequence Ontology. This document status is ALPHA - in progress
     </abstract>
     <scenario id="canonical-gene-model" status="final">
       <module name="sequence"/>
@@ -53,7 +53,14 @@
       </alternate>
       <support tool="apollo" status="supported"></support>
       <support tool="gbrowse" status="supported"></support>
-      <example src='MSGEFTUA'/>
+    <example id="examples/dmel_NPFR1">
+      <caption>A Drosophila gene with 5 exons and a single
+        spliceform</caption>
+      <img type="png"/>
+      <src type="game"/>
+      <src type="chado"/>
+      <src type="chaos"/>
+    </example>
       <parts>
         <part required='true' table='feature' type='SO:gene' number='1'>
           <comment>The gene must always be provided</comment>
