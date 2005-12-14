@@ -67,6 +67,7 @@
       <xsl:apply-templates select="description"/>
       <xsl:apply-templates select="parts"/>
       <xsl:apply-templates select="support"/>
+      <xsl:apply-templates select="example"/>
     </div>
   </xsl:template>
 
@@ -79,6 +80,24 @@
   <xsl:template match="description">
     <div class="description">
       <xsl:apply-templates select="*|text()"/>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="example">
+    <div class="example">
+      <h4>Example</h4>
+      <xsl:apply-templates select="caption"/>
+      <img src="{@id}.{img/@type}"/>
+      <span class="download">
+        <xsl:text>Download: </xsl:text>
+        <xsl:for-each select="src">
+          <xsl:text> [</xsl:text>
+          <a href="{../@id}.{@type}">
+            <xsl:value-of select="@type"/>
+          </a>
+          <xsl:text>] </xsl:text>
+        </xsl:for-each>
+      </span>
     </div>
   </xsl:template>
 
