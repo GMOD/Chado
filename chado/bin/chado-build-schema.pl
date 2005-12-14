@@ -52,6 +52,8 @@ foreach my $id (@module_ids) {
 }
 $mframe->Button(-text=>"Create Schema",
                 -command=>\&create_schema)->grid;
+$mframe->Button(-text=>"Select All",
+                -command=>\&select_all)->grid;
 $mframe->pack(-side=>'bottom');
 MainLoop;
 
@@ -206,6 +208,13 @@ sub read_source {
         }
     }
     return @lines;
+}
+
+sub select_all {
+    foreach (keys %button_h) {
+       $button_h{$_}->{'Value'} = 1;
+    }
+    return;
 }
 
 sub usage {

@@ -67,6 +67,21 @@
         Species data - does not include phylogeny
       </description>
       <source type='sql' path='organism/organism.sql'/>
+
+      <component id='organism-dbapi' type='dbapi'>
+        <description>
+          A DBMS API for the organism module
+        </description>
+        <source type='sqli' path='organism/functions/organism.sqlapi'/>
+      </component>
+
+      <component id='organism-funcs' type='code'>
+        <description>
+          Postgres code retrieving organism data
+        </description>
+        <implements to='organism-dbapi'/>
+        <source type='plpgsql' path='organism/functions/organism.plpgsql'/>
+      </component>
     </module>
 
     <module id='pub' required='true'>
@@ -254,6 +269,23 @@
         proteins) or actual organism taxonomy trees
       </description>
       <source type='sql' path='phylogeny/phylogeny.sql'/>
+
+      <component id='phylogeny-dbapi' type='dbapi'>
+        <description>
+          A DBMS API for the phylogeny module
+        </description>
+        <source type='sqli' path='phylogeny/functions/phylo.sqlapi'/>
+      </component>
+
+      <component id='phylogeny-funcs' type='code'>
+        <description>
+          Postgres code retrieving phylogeny data
+        </description>
+        <implements to='phylogeny-dbapi'/>
+        <source type='plpgsql' path='phylogeny/functions/phylo.plpgsql'/>
+      </component>
+
+
     </module>
 
     <module id='contact'>
