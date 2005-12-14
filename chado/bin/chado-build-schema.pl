@@ -3,20 +3,24 @@
 use strict;
 use Data::Stag;
 use FileHandle;
+use Getopt::Long;
 use Tk;
 
-while ($ARGV[0] =~ /^\-/) {
-    my $switch = shift @ARGV;
-    if ($switch eq '-h' || $switch eq '--help') {
-        print usage();
-        exit 0;
-    }
+my ($HELP, $OUTFILE, $INFILE);
+
+GetOptions(
+  'help'      => \$HELP,
+  'outfile=s' => \$OUTFILE,
+  'infile=s'  => \$INFILE,
+);
+
+if ($HELP) {
+    print usage();
+    exit 0;
 }
 
-my $metafile = shift @ARGV;
-my $SCHEMA_FILE = "chado_schema.sql";
-
-$metafile = "chado-module-metadata.xml" unless $metafile;
+my $SCHEMA_FILE  = $OUTFILE || "chado_schema.sql";
+my $metafile     = $INFILE  || "chado-module-metadata.xml";
 
 my $schema_md = Data::Stag->parse($metafile);
 
@@ -201,10 +205,18 @@ sub read_source {
 
 sub usage {
     return <<EOM
-chado-build-schema CHADO_METADATA_XML_FILE
+
+chado-build-schema [options]
 
 Tk interface for generating a custome chado xml schema
-;
+
+Options:
+    --help		This usage statement
+    --infile		The name of the metadata xml file
+                          (default: chado-module-metadata.xml)
+    --outfile		The name of the output ddl file
+                          (default: chado_schema.sql)
+
 EOM
 }
 
