@@ -39,13 +39,12 @@ WHERE (strand is NULL or strand >= 0 or phase >= 0) ;
 --------------------------------
 ---- f_type --------------------
 --------------------------------
-DROP VIEW f_type;
-CREATE VIEW f_type
+CREATE OR REPLACE VIEW f_type
 AS
   SELECT  f.feature_id,
           f.name,
-          f.dbxrefstr,
-          c.termname AS type,
+          f.dbxref_id,
+          c.name AS type,
           f.residues,
           f.seqlen,
           f.md5checksum,
@@ -58,13 +57,12 @@ AS
 --------------------------------
 ---- fnr_type ------------------
 --------------------------------
-DROP VIEW fnr_type;
-CREATE VIEW fnr_type
+CREATE OR REPLACE VIEW fnr_type
 AS
   SELECT  f.feature_id,
           f.name,
-          f.dbxrefstr,
-          c.termname AS type,
+          f.dbxref_id,
+          c.name AS type,
           f.residues,
           f.seqlen,
           f.md5checksum,
@@ -84,8 +82,7 @@ AS
 -- be transparent.  I also changed dbxrefstr to dbxref_id since
 -- dbxrefstr is no longer in feature
 
-DROP VIEW f_loc;
-CREATE VIEW f_loc
+CREATE OR REPLACE VIEW f_loc
 AS
   SELECT  f.feature_id,
           f.name,
@@ -99,11 +96,10 @@ AS
 --------------------------------
 ---- fp_key -------------------
 --------------------------------
-DROP VIEW fp_key;
-CREATE VIEW fp_key
+CREATE OR REPLACE VIEW fp_key
 AS
   SELECT  fp.feature_id,
-          c.termname AS pkey,
+          c.name AS pkey,
           fp.pval
     FROM  featureprop fp, cvterm c
    WHERE  fp.pkey_id = c.cvterm_id;
