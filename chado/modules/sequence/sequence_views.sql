@@ -49,8 +49,8 @@ AS
           f.seqlen,
           f.md5checksum,
           f.type_id,
-          f.timeentered,
-          f.timelastmod
+          f.timeaccessioned,
+          f.timelastmodified
     FROM  feature f, cvterm c
    WHERE  f.type_id = c.cvterm_id;
 
@@ -67,8 +67,8 @@ AS
           f.seqlen,
           f.md5checksum,
           f.type_id,
-          f.timeentered,
-          f.timelastmod
+          f.timeaccessioned,
+          f.timelastmodified
     FROM  feature f left outer join analysisfeature af
           on (f.feature_id = af.feature_id), cvterm c
    WHERE  f.type_id = c.cvterm_id
@@ -100,7 +100,7 @@ CREATE OR REPLACE VIEW fp_key
 AS
   SELECT  fp.feature_id,
           c.name AS pkey,
-          fp.pval
+          fp.value
     FROM  featureprop fp, cvterm c
-   WHERE  fp.pkey_id = c.cvterm_id;
+   WHERE  fp.featureprop_id = c.cvterm_id;
 
