@@ -171,6 +171,7 @@
       </component>
 
       <component id='gff-bridge' type='bridge'>
+        <dependency to='companalysis'/>
         <description>
           A GFF-view over chado. Required by Gbrowse
         </description>
