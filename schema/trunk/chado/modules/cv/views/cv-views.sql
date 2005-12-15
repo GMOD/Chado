@@ -44,7 +44,7 @@ two terms is the intersection of both terms ancestors. Two terms can
 have multiple common ancestors. Use total_pathdistance to get the
 least common ancestor';
 
-CREATE OR REPLACE VIEW common_desendent_cvterm AS
+CREATE OR REPLACE VIEW common_descendant_cvterm AS
  SELECT
   p1.object_id           AS cvterm1_id,
   p2.object_id           AS cvterm2_id,
@@ -59,9 +59,9 @@ CREATE OR REPLACE VIEW common_desendent_cvterm AS
  WHERE 
   p1.subject_id = p2.subject_id;
 
-COMMENT ON VIEW common_descendent_cvterm IS 'The common descendent of
-any two terms is the intersection of both terms descendents. Two terms
-can have multiple common descendents. Use total_pathdistance to get
+COMMENT ON VIEW common_descendant_cvterm IS 'The common descendant of
+any two terms is the intersection of both terms descendants. Two terms
+can have multiple common descendants. Use total_pathdistance to get
 the least common ancestor';
 
 CREATE OR REPLACE VIEW stats_paths_to_root AS

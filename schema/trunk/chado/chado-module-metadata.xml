@@ -58,6 +58,14 @@
         <source type='plpgsql' path='cv/functions/fill_cvtermpath.plpgsql'/>
       </component>
 
+      <component id='cv-cycle' type='code'>
+        <description>
+          Postgres code for working with cvterm cycles
+        </description>
+        <source type='plpgsql' path='cv/functions/detect_cycle.plpgsql'/>
+      </component>
+
+
     </module>
 
     <module id='organism' required='true'>
@@ -112,20 +120,6 @@
         <source type='sqldump' path='sequence/gencode/gencode_data.sql'/>
       </component>
 
-      <component id='sequence-views' type='views' required='true'>
-        <description>
-          Standard Chado SQL Views for the sequence module
-        </description>
-        <source type='sql' path='sequence/sequence_views.sql'/>
-        <component id='range-views' type='views' required='true'>
-          <description>
-            Views for operating on featureloc ranges. Overlap,
-            intersection, union, difference etc
-          </description>
-          <source type='sql' path='sequence/views/range-views.sql'/>
-        </component>
-      </component>
-
       <component id='sequence-dbapi' type='dbapi'>
         <description>
           A SQL/DBMS API for the sequence module. Currently only plpgsql
@@ -170,15 +164,6 @@
         <source type='sql-in-xml' path='sequence/sequence_opt.xml'/>
       </component>
 
-      <component id='gff-bridge' type='bridge'>
-        <dependency to='companalysis'/>
-        <description>
-          A GFF-view over chado. Required by Gbrowse
-        </description>
-        <source type='sql' path='sequence/gff-bridge/sequence-gff-views.sql'/>
-        <source type='plpgsql' path='sequence/gff-bridge/sequence-gff-funcs.plpgsql'/>
-      </component>
-
       <component id='godb-bridge' type='bridge'>
         <description>
           Views that let Chado masquerade as a GO Database. 
@@ -201,7 +186,8 @@
 
     </module>
 
-    <module id='companalysis'>
+    <module id='companalysis'  required='true'>
+      <!--added required, since sequence_views is requred and it depends on companalysis-->
       <dependency to='general'/>
       <dependency to='sequence'/>
       <dependency to='cv'/>
@@ -329,6 +315,47 @@
       </description>
       <source type='sql' path='expression/rad.sql'/>
     </module>
+
+    <module id='composite'>
+      <status code='beta'>
+      </status>
+      <description>
+          A collection of bridge codes that have multiple dependancies
+          so they don't happily go where is most obvious
+      </description>
+
+      <component id='gff-bridge' type='bridge'>
+        <dependency to='pub'/>
+        <dependency to='sequence'/>
+        <dependency to='companalysis'/>
+        <dependency to='cv'/>
+        <description>
+          A GFF-view over chado. Required by Gbrowse
+        </description>
+        <source type='sql' path='sequence/gff-bridge/sequence-gff-views.sql'/>
+        <source type='plpgsql' path='sequence/gff-bridge/sequence-gff-funcs.plpgsql'/>
+      </component>
+
+      <component id='sequence-views' type='views' required='true'>
+        <dependency to='sequence'/>
+        <dependency to='companalysis'/>
+        <dependency to='cv'/>
+        <description>
+          Standard Chado SQL Views for the sequence module
+        </description>
+        <source type='sql' path='sequence/sequence_views.sql'/>
+        <component id='range-views' type='views' required='true'>
+          <description>
+            Views for operating on featureloc ranges. Overlap,
+            intersection, union, difference etc
+          </description>
+          <source type='sql' path='sequence/views/range-views.sql'/>
+        </component>
+      </component>
+
+
+    </module>
+
 
 <!--
     Since this is dynamically generated from a given schema, this should
