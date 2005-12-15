@@ -50,10 +50,18 @@ foreach my $id (@module_ids) {
     }
 
 }
-$mframe->Button(-text=>"Create Schema",
-                -command=>\&create_schema)->grid;
+
+
+$mframe->Checkbutton(-text=>"SQL only",
+                     -variable => \$ONLY_SQL)->grid;
 $mframe->Button(-text=>"Select All",
                 -command=>\&select_all)->grid;
+$mframe->Button(-text=>"Deselect All",
+                -command=>\&deselect_all)->grid;
+
+$mframe->Button(-text=>"Create Schema",
+                -command=>\&create_schema)->grid;
+
 $mframe->pack(-side=>'bottom');
 MainLoop;
 
@@ -216,6 +224,14 @@ sub select_all {
     }
     return;
 }
+
+sub deselect_all {
+    foreach (keys %button_h) {
+       $button_h{$_}->{'Value'} = 0;
+    }
+    return;
+}
+
 
 sub usage {
     return <<EOM
