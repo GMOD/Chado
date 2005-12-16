@@ -907,6 +907,10 @@ DECLARE
   f_type_gene           CONSTANT varchar :=''gene'';
   c_cvterm_id           cvterm.cvterm_id%TYPE;
   s_id                  synonym.synonym_id%TYPE;
+  dbxref_id             dbxref.dbxref_id%TYPE;
+  p_id                  pub.pub_id%TYPE;
+  fp_row                featureprop%ROWTYPE;
+  fc_row                feature_cvterm%ROWTYPE;
 BEGIN
   SELECT INTO f1_type c.name FROM feature f, cvterm c
                             WHERE f.uniquename = f_uniquename AND
