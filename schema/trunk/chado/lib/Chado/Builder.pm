@@ -4,6 +4,7 @@ package Chado::Builder;
 use strict;
 use base 'Module::Build';
 use Carp;
+use Data::Dumper;
 use File::Spec::Functions 'catfile';
 use File::Path;
 use Data::Dumper;
@@ -79,6 +80,7 @@ sub ACTION_radviews {
   my $db_host   = $conf->{'database'}{'db_host'}  || '';
   my $db_port   = $conf->{'database'}{'db_port'}  || '';
   my $db_user   = $conf->{'database'}{'db_username'}  || '';
+  my $db_pass   = $conf->{'database'}{'db_password'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
   my $init_sql  = catfile( $build_dir, 'modules', 'expression', 'rad.views' );
   my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
@@ -224,6 +226,10 @@ sub ACTION_ontologies {
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
   my $db_host   = $conf->{'database'}{'db_host'}  || '';
   my $db_port   = $conf->{'database'}{'db_port'}  || '';
+  my $db_user   = $conf->{'database'}{'db_username'}  || '';
+  my $db_pass   = $conf->{'database'}{'db_password'}  || '';
+
+  $db_pass = '' if (ref $db_pass eq 'HASH');
 
   $m->log->info("entering ACTION_ontologies");
 
@@ -323,8 +329,11 @@ sub ACTION_ontologies {
       }
 
       # loading chadoxml
+      my $stag_string = "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'";
+      $stag_string .= " --user $db_user " if $db_user;
+      $stag_string .= " --password $db_pass " if $db_pass;
       $sys_call = join( ' ',
-        "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'",
+        $stag_string,
         catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
       ); 
 
