@@ -764,3 +764,176 @@ END;
 
 CREATE TRIGGER feature_update_name_tr_u BEFORE UPDATE ON feature FOR EACH ROW EXECUTE PROCEDURE feature_fn_u();
 
+-- function to fascilitate gene merges
+-- returns the uniquename of the merged gene
+--WARNING: COMPLETELY UNTESTED
+CREATE OR REPLACE FUNCTION apollo_merge(varchar, varchar) RETURNS varchar AS
+'
+DECLARE
+  f1_uniquename		ALIAS FOR $1;
+  f2_uniquename		ALIAS FOR $2;
+  f_uniquename		feature.uniquename%TYPE;
+  f1_fid		feature.feature_id%TYPE;
+  f2_fid		feature.feature_id%TYPE;
+  f_id			feature.feature_id%TYPE;
+  f1_type		cvterm.name%TYPE;
+  f2_type		cvterm.name%TYPE;
+  f1_organism_id	feature.organism_id%TYPE;
+  f2_organism_id        feature.organism_id%TYPE;	
+  f_type_gene		CONSTANT varchar :=''gene'';
+  c_cvterm_id		cvterm.cvterm_id%TYPE;
+  s_id			synonym.synonym_id%TYPE;
+BEGIN
+--check that they are both genes
+  SELECT INTO f1_type c.name FROM feature f, cvterm c
+                            WHERE f.uniquename = f1_uniquename AND
+                                  f.type_id    = c.cvterm_id;
+  SELECT INTO f2_type c.name FROM feature f, cvterm c
+                            WHERE f.uniquename = f1_uniquename AND
+                                  f.type_id    = c.cvterm_id;
+
+  IF f1_type <> f_type_gene OR f2_type <> f_type_gene THEN
+      RAISE NOTICE ''The uniquenames for the features provided must be those of genes'';
+      RETURN OLD;
+  END IF;
+
+--check that they come from the same organism
+  SELECT INTO f1_organism_id FROM feature WHERE uniquename=f1_uniquename;
+  SELECT INTO f2_organism_id FROM feature WHERE uniquename=f2_uniquename;
+
+  IF f1_organism_id <> f2_organism_id THEN
+      RAISE NOTICE ''The merged genes must come from the same organism'';
+      RETURN OLD;
+  END IF;
+
+  SELECT INTO c_cvterm_id type_id FROM feature
+                                 WHERE uniquename = f1_uniquename;
+
+  SELECT INTO f_uniquename next_uniquename();
+
+--create the new gene
+  INSERT INTO feature (organism_id, uniquename, type_id)
+              VALUES  (f1_organism_id, f_uniquename, c_cvterm_id);
+
+  SELECT INTO f_id feature_id FROM feature
+                             WHERE uniquename  = f_uniquename AND
+                                   organism_id = f_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+  SELECT INTO f1_id feature_id FROM feature
+                             WHERE uniquename  = f1_uniquename AND
+                                   organism_id = f1_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+  SELECT INTO f2_id feature_id FROM feature
+                             WHERE uniquename  = f2_uniquename AND
+                                   organism_id = f2_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+--add synonyms to new feature for all of the synonyms of the old feature
+  FOR s_id IN SELECT synonym_id FROM feature_synonym
+                               WHERE feature_id = f1_id OR
+                                     feature_id = f2_id LOOP
+      INSERT INTO feature_synonym (feature_id, synonym_id)
+            VALUES (f_id, s_id);
+  END LOOP;
+
+--delete featureloc entries for old genes
+  DELETE FROM featureloc WHERE feature_id=f1_id;
+  DELETE FROM featureloc WHERE feature_id=f2_id;
+
+--mark old gene features as obsolete
+  UPDATE feature SET is_obsolete=1 WHERE feature_id=f1_id;
+  UPDATE feature SET is_obsolete=1 WHERE feature_id=f2_id;
+
+--note in either feature_relationship or featureprop the origin of this gene
+
+
+
+  RETURN f_uniquename;
+END;
+'LANGUAGE plpgsql; 
+
+
+-- function to fascilitate gene splits
+-- returns two space-separated uniquenames
+--WARNING: COMPLETELY UNTESTED
+CREATE OR REPLACE FUNCTION apollo_split(varchar) RETURNS varchar AS
+'
+DECLARE
+  f1_uniquename         feature.uniquename%TYPE;
+  f2_uniquename         feature.uniquename%TYPE;
+  f_uniquename          ALIAS FOR $1;
+  f1_fid                feature.feature_id%TYPE;
+  f2_fid                feature.feature_id%TYPE;
+  f_id                  feature.feature_id%TYPE;
+  f1_type               cvterm.name%TYPE;
+  f2_type               cvterm.name%TYPE;
+  f1_organism_id        feature.organism_id%TYPE;
+  f2_organism_id        feature.organism_id%TYPE;
+  f_type_gene           CONSTANT varchar :=''gene'';
+  c_cvterm_id           cvterm.cvterm_id%TYPE;
+  s_id                  synonym.synonym_id%TYPE;
+BEGIN
+  SELECT INTO f1_type c.name FROM feature f, cvterm c
+                            WHERE f.uniquename = f_uniquename AND
+                                  f.type_id    = c.cvterm_id;
+
+  IF f1_type <> f_type_gene THEN
+      RAISE NOTICE ''The uniquename for the feature provided must be that of a gene'';
+      RETURN OLD;
+  END IF;
+
+  SELECT INTO f1_organism_id FROM feature WHERE uniquename=f_uniquename;
+
+  SELECT INTO c_cvterm_id type_id FROM feature
+                                 WHERE uniquename = f_uniquename;
+
+  SELECT INTO f1_uniquename next_uniquename();
+  SELECT INTO f2_uniquename next_uniquename();
+
+--create the new gene
+  INSERT INTO feature (organism_id, uniquename, type_id)
+              VALUES  (f1_organism_id, f1_uniquename, c_cvterm_id);
+  INSERT INTO feature (organism_id, uniquename, type_id)
+              VALUES  (f1_organism_id, f2_uniquename, c_cvterm_id);
+
+
+  SELECT INTO f_id feature_id FROM feature
+                             WHERE uniquename  = f_uniquename AND
+                                   organism_id = f_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+  SELECT INTO f1_id feature_id FROM feature
+                             WHERE uniquename  = f1_uniquename AND
+                                   organism_id = f1_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+  SELECT INTO f2_id feature_id FROM feature
+                             WHERE uniquename  = f2_uniquename AND
+                                   organism_id = f2_organism_id AND
+                                   type_id     = c_cvterm_id;
+
+--add synonyms to new feature for all of the synonyms of the old feature
+  FOR s_id IN SELECT synonym_id FROM feature_synonym
+                               WHERE feature_id = f_id LOOP
+      INSERT INTO feature_synonym (feature_id, synonym_id)
+            VALUES (f1_id, s_id);
+      INSERT INTO feature_synonym (feature_id, synonym_id)
+            VALUES (f2_id, s_id);
+  END LOOP;
+
+--delete featureloc entries for old genes
+  DELETE FROM featureloc WHERE feature_id=f_id;
+
+--mark old gene features as obsolete
+  UPDATE feature SET is_obsolete=1 WHERE feature_id=f_id;
+
+--note in either feature_relationship or featureprop the origin of this gene
+
+
+
+  RETURN f1_uniquename ||'' ''||f2_uniquename;
+END;
+'LANGUAGE plpgsql;
+
