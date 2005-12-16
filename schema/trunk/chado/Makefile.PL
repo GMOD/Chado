@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.93 2005-09-13 14:36:08 scottcain Exp $
+# $Id: Makefile.PL,v 1.94 2005-12-16 15:10:52 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -445,7 +445,7 @@ if ($O{'SIMPLE'} =~ /^[Yy]/) {
   print "Only load triggers if you know what you are doing!\n";
   my $funcstr = prompt("(Comma-delimited)?","0");
 
-  my @indexes = split /,\s*/, $funcstr;
+  my @indexes = split /,\s*/, $funcstr if $funcstr;
 
   my @temparray = @funcfiles;
   @funcfiles = ();
@@ -476,6 +476,14 @@ print join("\n",
   $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
   ''
 );
+
+#warn about GO_ROOT for loading ontologies
+unless ($ENV{GO_ROOT}) {
+  warn "\n\n--WARNING-------------------------------------------------\n";
+  warn "The envirnment variable GO_ROOT is not set.\n";
+  warn "Ontology loading may not work correctly without it.\n";
+  warn "----------------------------------------------------------\n\n";
+}
 
 #
 # Save build options.
@@ -602,7 +610,7 @@ WriteMakefile(
       'XML::Simple'       => 2.09,
       'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.07,
-      'GO::Parser'        => 0.03,
+      'GO::Parser'        => 0,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
