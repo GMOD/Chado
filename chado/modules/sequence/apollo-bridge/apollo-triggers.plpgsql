@@ -783,6 +783,10 @@ DECLARE
   f_type_gene		CONSTANT varchar :=''gene'';
   c_cvterm_id		cvterm.cvterm_id%TYPE;
   s_id			synonym.synonym_id%TYPE;
+  dbxref_id		dbxref.dbxref_id%TYPE;
+  p_id			pub.pub_id%TYPE;
+  fp_row		featureprop%ROWTYPE;
+  fc_row		feature_cvterm%ROWTYPE;
 BEGIN
 --check that they are both genes
   SELECT INTO f1_type c.name FROM feature f, cvterm c
@@ -837,6 +841,35 @@ BEGIN
       INSERT INTO feature_synonym (feature_id, synonym_id)
             VALUES (f_id, s_id);
   END LOOP;
+
+--copy dbxref, featureprop, cvterms, pubs to the new gene
+  FOR dbxref_id IN SELECT dbxref_id FROM feature_dbxref 
+                                   WHERE feature_id = f1_id OR
+                                         feature_id = f2_id LOOP
+      INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
+            VALUES (f_id, dbxref_id, 0);
+  END LOOP;
+
+  FOR fp_row IN SELECT * FROM featureprop
+                        WHERE feature_id = f1_id OR
+                              feature_id = f2_id LOOP
+      INSERT INTO featureprop (feature_id,type_id,value,rank)
+            VALUES (f_id,fp_row.type_id,fp_row.value,fp_row.rank);
+  LOOP;
+
+  FOR fc_row IN SELECT * FROM feature_cvterm
+                        WHERE feature_id = f1_id OR
+                              feature_id = f2_id LOOP
+      INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
+            VALUES (f_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
+  LOOP; 
+
+  FOR p_id IN SELECT pub_id FROM feature_pub
+                           WHERE feature_id = f1_id OR
+                                 feature_id = f2_id LOOP
+      INSERT INTO feature_pub (feature_id,pub_id)
+            VALUES (f_id,p_id);
+  LOOP;
 
 --delete featureloc entries for old genes
   DELETE FROM featureloc WHERE feature_id=f1_id;
@@ -922,6 +955,41 @@ BEGIN
       INSERT INTO feature_synonym (feature_id, synonym_id)
             VALUES (f2_id, s_id);
   END LOOP;
+
+--copy dbxref, featureprop, cvterms, pubs to the new gene
+  FOR dbxref_id IN SELECT dbxref_id FROM feature_dbxref
+                                   WHERE feature_id = f_id LOOP
+      INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
+            VALUES (f1_id, dbxref_id, 0);
+      INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
+            VALUES (f2_id, dbxref_id, 0);
+  END LOOP;
+
+  FOR fp_row IN SELECT * FROM featureprop
+                        WHERE feature_id = f_id LOOP
+      INSERT INTO featureprop (feature_id,type_id,value,rank)
+            VALUES (f1_id,fp_row.type_id,fp_row.value,fp_row.rank);
+      INSERT INTO featureprop (feature_id,type_id,value,rank)
+            VALUES (f2_id,fp_row.type_id,fp_row.value,fp_row.rank);
+
+  LOOP;
+
+  FOR fc_row IN SELECT * FROM feature_cvterm
+                        WHERE feature_id = f_id LOOP
+      INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
+            VALUES (f1_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
+      INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
+            VALUES (f2_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
+  LOOP;
+
+  FOR p_id IN SELECT pub_id FROM feature_pub
+                           WHERE feature_id = f_id LOOP
+      INSERT INTO feature_pub (feature_id,pub_id)
+            VALUES (f1_id,p_id);
+      INSERT INTO feature_pub (feature_id,pub_id)
+            VALUES (f2_id,p_id);
+  LOOP;
+
 
 --delete featureloc entries for old genes
   DELETE FROM featureloc WHERE feature_id=f_id;
