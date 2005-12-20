@@ -27,6 +27,23 @@
         General purpose tables, including dbxrefs
       </description>
       <source type='sql' path='general/general.sql'/>
+
+      <component id='general-loading-api' type='dbapi'>
+        <description>
+          A DBMS API for the general module's loading functions
+        </description>
+        <source type='sqli' path='general/functions/general-loading.sqlapi'/>
+      </component>
+
+      <component id='general-loading' type='code'>
+        <description>
+          Postgres code for helping with loading the general module
+        </description>
+        <implements to='general-loading-api'/>
+        <source type='plpgsql' path='general/functions/general-loading.plpgsql'/>
+      </component>
+
+
     </module>
 
     <module id='cv' required='true'>
@@ -48,6 +65,13 @@
           A DBMS API for the cv module
         </description>
         <source type='sqli' path='cv/cv-dbapi.sqli'/>
+      </component>
+
+      <component id='cv-subj-obj' type='code'>
+        <description>
+          Postgres code for finding parent and child cvterms
+        </description>
+        <source type='plpgsql' path='cv/functions/get_subj_obj_ids.plpgsql'/>
       </component>
 
       <component id='cv-funcs' type='code'>
@@ -89,6 +113,13 @@
         </description>
         <implements to='organism-dbapi'/>
         <source type='plpgsql' path='organism/functions/organism.plpgsql'/>
+      </component>
+
+      <component id='organism-loading' type='code'>
+        <description>
+          Postgres code for helping with loading organism data
+        </description>
+        <source type='plpgsql' path='organism/functions/organism-loading.plpgsql'/>
       </component>
     </module>
 
@@ -196,6 +227,22 @@
         analyses and features resulting from those analyses
       </description>
       <source type='sql' path='companalysis/companalysis.sql'/>
+
+      <component id='companalysis-loading-api' type='dbapi'>
+        <description>
+          A DBMS API for the companalysis module's loading functions
+        </description>
+        <source type='sqli' path='companalysis/functions/companalysis-loading.sqlapi'/>
+      </component>
+
+      <component id='companalysis-loading' type='code'>
+        <description>
+          Postgres code for helping with loading the companalysis module
+        </description>
+        <implements to='companalysis-loading-api'/>
+        <source type='plpgsql' path='companalysis/functions/companalysis-loading.plpgsql'/>
+      </component>
+
     </module>
 
     <module id='genetic'>
