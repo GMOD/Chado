@@ -37,6 +37,7 @@ $mw->title("Chado Admin Tool");
 my $mframe = $mw->Frame;
 
 my $row = 0;
+my $column1 = 1;
 my %button_h = ();
 foreach my $id (@module_ids) {
     my $mod = $module_h{$id};
@@ -73,6 +74,18 @@ sub attach_module_checkbutton {
     my $indent = shift || 0;
     $row++;
 
+    my $col;
+    if ($row == 21) {
+        $col+=4;
+        $row=1;
+        $column1=0;
+    } elsif ($column1) {
+        $col=0;
+    } else {
+        $col=4;
+    }
+
+
     my $mod = $module_h{$id};
     my $desc = $mod->sget('description');
     my $status = $mod->sget('status');
@@ -93,7 +106,7 @@ sub attach_module_checkbutton {
         $cb->pack(-anchor=>'w',-side=>'left',-fill=>'x',-padx=>0);
         $button_h{$id} = $cb;
     }
-    my $col = 0;
+
     $bframe->grid(-column=>$col++,-row=>$row,-sticky=>'w');
 
     $mframe->Label(-text=>substr($desc,0,40))->grid(-column=>$col++,-row=>$row,-sticky=>'w');
