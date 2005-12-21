@@ -5,14 +5,17 @@ use Data::Stag;
 use FileHandle;
 use Getopt::Long;
 use Tk;
+use SQL::Translator;
 
 my ($HELP, $OUTFILE, $INFILE, $ONLY_SQL);
+
+my $rows_of_stuff=20;
 
 GetOptions(
   'help'      => \$HELP,
   'outfile=s' => \$OUTFILE,
   'infile=s'  => \$INFILE,
-  'only_sql'  => \$ONLY_SQL
+  'only_sql'  => \$ONLY_SQL,
 );
 
 if ($HELP) {
@@ -56,12 +59,18 @@ foreach my $id (@module_ids) {
 $mframe->Checkbutton(-text=>"SQL only",
                      -variable => \$ONLY_SQL)->grid;
 $mframe->Button(-text=>"Select All",
-                -command=>\&select_all)->grid;
+                -command=>\&select_all)->grid(-column=>1,-row=>$rows_of_stuff+2);
 $mframe->Button(-text=>"Deselect All",
-                -command=>\&deselect_all)->grid;
+                -command=>\&deselect_all)->grid(-column=>2,-row=>$rows_of_stuff+2);
 
-$mframe->Button(-text=>"Create Schema",
-                -command=>\&create_schema)->grid;
+$mframe->Button(-text=>"Create Pg Schema",
+                -command=>\&create_schema)->grid(-column=>3,-row=>$rows_of_stuff+2);
+$mframe->Button(-text=>"Create Oracle Schema",
+                -command=>\&create_oracle_schema)->grid(-column=>4,-row=>$rows_of_stuff+2);
+$mframe->Button(-text=>"Create MySQL Schema",
+                -command=>\&create_mysql_schema)->grid(-column=>5,-row=>$rows_of_stuff+2);
+
+
 
 $mframe->pack(-side=>'bottom');
 MainLoop;
@@ -75,7 +84,7 @@ sub attach_module_checkbutton {
     $row++;
 
     my $col;
-    if ($row == 21) {
+    if ($row == $rows_of_stuff+1) {
         $col+=4;
         $row=1;
         $column1=0;
@@ -196,11 +205,66 @@ sub create_schema {
         print $fh join('',@sql_lines);
         $fh->close;
         #print `cat $SCHEMA_FILE`;
-        $mw->messageBox(-message=>"schema created in file $SCHEMA_FILE");
+        $mw->messageBox(-message=>"Pg schema created in file $SCHEMA_FILE");
     } else {
         $mw->messageBox(-message=>"cannot write to $SCHEMA_FILE");
     }
 }
+
+sub create_oracle_schema {
+    $ONLY_SQL = 1;
+    create_schema();
+
+    $mw->messageBox(-message=>"Please wait for the translation (it can take several minutes)");
+
+    my $ORACLE_FILE = $SCHEMA_FILE."_oracle";
+    my $translator = SQL::Translator->new(
+        show_warnings       => 1,
+    );
+   
+    my $output = $translator->translate(
+        from                => 'PostgreSQL',
+        to                  => 'Oracle',
+        filename            => $SCHEMA_FILE,
+    ) or warn $translator->error; 
+
+    my $fh = FileHandle->new(">$ORACLE_FILE");
+    if ($fh) {
+        print $fh $output;
+        $fh->close;
+        $mw->messageBox(-message=>"Oracle schema created in file $ORACLE_FILE");
+    } else {
+        $mw->messageBox(-message=>"cannot write to $ORACLE_FILE");
+    }
+}
+
+sub create_mysql_schema {
+    $ONLY_SQL = 1;
+    create_schema();
+
+    $mw->messageBox(-message=>"Please wait for the translation (it can take several minutes)");
+
+    my $MYSQL_FILE = $SCHEMA_FILE."_mysql";
+    my $translator = SQL::Translator->new(
+        show_warnings       => 1,
+    );
+
+    my $output = $translator->translate(
+        from                => 'PostgreSQL',
+        to                  => 'MySQL',
+        filename            => $SCHEMA_FILE,
+    ) or warn $translator->error;
+
+    my $fh = FileHandle->new(">$MYSQL_FILE");
+    if ($fh) {
+        print $fh $output;
+        $fh->close;
+        $mw->messageBox(-message=>"MySQL schema created in file $MYSQL_FILE");
+    } else {
+        $mw->messageBox(-message=>"cannot write to $MYSQL_FILE");
+    }
+}
+
 
 sub read_source {
     my $mod = shift;
@@ -210,7 +274,7 @@ sub read_source {
     foreach my $source (@sources) {
         my $type = $source->sget('@/type');
         my $path = $source->sget('@/path');
-        if ($ONLY_SQL && $type ne 'sql') {
+        if ($ONLY_SQL && ($type ne 'sql' || $path =~ /view/ ) ) {
             print STDERR "Skipping source $type $path for $id\n";
             next;
         }
