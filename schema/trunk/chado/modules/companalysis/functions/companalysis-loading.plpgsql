@@ -23,9 +23,9 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION store_analysisfeature
-()
-RETURNS INT AS
-'DECLARE
-  v_srcfeature_id       ALIAS FOR $1;
+--CREATE OR REPLACE FUNCTION store_analysisfeature
+--()
+--RETURNS INT AS
+--'DECLARE
+--  v_srcfeature_id       ALIAS FOR $1;
   
