@@ -188,6 +188,22 @@
         </component>
       </component>
 
+      <component id='feature-util-api' type='dbapi'>
+        <description>
+          A DBMS API for general feature queries
+        </description>
+        <source type='sqli' path='sequence/functions/feature.sqlapi'/>
+      </component>
+
+      <component id='feature-util' type='code'>
+        <dependency to='sequence-dbapi'/>
+        <description>
+          Postgres code for general feature queries
+        </description>
+        <implements to='feature-util-api' />
+        <source type='plpgsql' path='sequence/functions/feature.plpgsql'/>
+      </component>
+
       <component id='sequence_opt' type='optimizations'>
         <description>
           Optional optimizations to be applied to the sequence module
