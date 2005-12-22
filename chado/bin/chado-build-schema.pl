@@ -55,6 +55,7 @@ foreach my $id (@module_ids) {
 
 }
 
+my $translate_to;
 
 $mframe->Checkbutton(-text=>"SQL only",
                      -variable => \$ONLY_SQL)->grid;
@@ -65,10 +66,13 @@ $mframe->Button(-text=>"Deselect All",
 
 $mframe->Button(-text=>"Create Pg Schema",
                 -command=>\&create_schema)->grid(-column=>3,-row=>$rows_of_stuff+2);
-$mframe->Button(-text=>"Create Oracle Schema",
-                -command=>\&create_oracle_schema)->grid(-column=>4,-row=>$rows_of_stuff+2);
-$mframe->Button(-text=>"Create MySQL Schema",
-                -command=>\&create_mysql_schema)->grid(-column=>5,-row=>$rows_of_stuff+2);
+
+my @optionlist = ('Oracle','MySQL','Diagram','GraphViz','HTML');
+$mframe->Label( -text=>"Translate to:")->grid(-column=>4,-row=>$rows_of_stuff+2);
+$mframe->Optionmenu (-options => \@optionlist,
+                -variable => \$translate_to)->grid(-column=>5,-row=>$rows_of_stuff+2);
+$mframe->Button(-text=>"Translate Schema",
+                -command=>\&translate_schema)->grid(-column=>6,-row=>$rows_of_stuff+2);
 
 
 
@@ -211,60 +215,32 @@ sub create_schema {
     }
 }
 
-sub create_oracle_schema {
+sub translate_schema {
     $ONLY_SQL = 1;
     create_schema();
 
     $mw->messageBox(-message=>"Please wait for the translation (it can take several minutes)");
 
-    my $ORACLE_FILE = $SCHEMA_FILE."_oracle";
+    my $TRANS_FILE = $SCHEMA_FILE."_$translate_to";
     my $translator = SQL::Translator->new(
         show_warnings       => 1,
     );
    
     my $output = $translator->translate(
         from                => 'PostgreSQL',
-        to                  => 'Oracle',
+        to                  => $translate_to,
         filename            => $SCHEMA_FILE,
     ) or warn $translator->error; 
 
-    my $fh = FileHandle->new(">$ORACLE_FILE");
+    my $fh = FileHandle->new(">$TRANS_FILE");
     if ($fh) {
         print $fh $output;
         $fh->close;
-        $mw->messageBox(-message=>"Oracle schema created in file $ORACLE_FILE");
+        $mw->messageBox(-message=>"$translate_to schema created in file $TRANS_FILE");
     } else {
-        $mw->messageBox(-message=>"cannot write to $ORACLE_FILE");
+        $mw->messageBox(-message=>"cannot write to $TRANS_FILE");
     }
 }
-
-sub create_mysql_schema {
-    $ONLY_SQL = 1;
-    create_schema();
-
-    $mw->messageBox(-message=>"Please wait for the translation (it can take several minutes)");
-
-    my $MYSQL_FILE = $SCHEMA_FILE."_mysql";
-    my $translator = SQL::Translator->new(
-        show_warnings       => 1,
-    );
-
-    my $output = $translator->translate(
-        from                => 'PostgreSQL',
-        to                  => 'MySQL',
-        filename            => $SCHEMA_FILE,
-    ) or warn $translator->error;
-
-    my $fh = FileHandle->new(">$MYSQL_FILE");
-    if ($fh) {
-        print $fh $output;
-        $fh->close;
-        $mw->messageBox(-message=>"MySQL schema created in file $MYSQL_FILE");
-    } else {
-        $mw->messageBox(-message=>"cannot write to $MYSQL_FILE");
-    }
-}
-
 
 sub read_source {
     my $mod = shift;
