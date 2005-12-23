@@ -19,8 +19,8 @@ GetOptions(
 );
 
 if ($HELP) {
-    print usage();
-    exit 0;
+    system ("pod2text", $0);
+    exit(0);
 }
 
 my $SCHEMA_FILE  = $OUTFILE || "chado_schema.sql";
@@ -287,21 +287,49 @@ sub deselect_all {
 
 
 sub usage {
-    return <<EOM
-
-chado-build-schema [options]
-
-Tk interface for generating a custome chado xml schema
-
-Options:
-    --help		This usage statement
-    --infile		The name of the metadata xml file
-                          (default: chado-module-metadata.xml)
-    --outfile		The name of the output ddl file
-                          (default: chado_schema.sql)
-
-EOM
+    system( 'pod2usage', $0 );
+    exit(0);
 }
 
-# createdb DBNAME
-# createlang plpgsql DBNAME
+
+=pod
+
+=head1 NAME
+
+chado-build-schema.pl - PerlTk application to build and translate a chado schema
+
+=head1 SYNOPSIS
+
+  % chado-build-schema.pl [options]
+
+=head1 COMMAND-LINE OPTIONS
+
+    --help              This usage statement
+    --infile            The name of the metadata xml file
+                          (default: chado-module-metadata.xml)
+    --outfile           The name of the output ddl file
+                          (default: chado_schema.sql)
+    --only_sql          Only use pure sql (ie, no views or functions)
+
+
+=head1 DESCRIPTION
+
+This is a perlTk application to help uses interactively build
+a chado data definition langauge (ddl/sql) file.  By default, it
+builds a PostgreSQL compatible file, but by making use of SQL::Translator,
+it can translate the ddl to Oracle or MySQL ddl, or create schema diagrams
+or html documentation.  Use of this application is not required if 
+the standard default chado schema will be used.
+
+=head1 AUTHORS
+
+Chris Mungall, Scott Cain E<lt>cain@cshl.eduE<gt>
+
+Copyright (c) 2005
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
