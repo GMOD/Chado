@@ -393,6 +393,7 @@
         <dependency to='sequence'/>
         <dependency to='companalysis'/>
         <dependency to='cv'/>
+        <dependency to='sequence-dbapi'/>
         <description>
           A GFF-view over chado. Required by Gbrowse
         </description>
