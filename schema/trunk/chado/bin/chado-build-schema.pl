@@ -6,6 +6,7 @@ use FileHandle;
 use Getopt::Long;
 use Tk;
 use SQL::Translator;
+use Data::Dumper;
 
 my ($HELP, $OUTFILE, $INFILE, $ONLY_SQL);
 
@@ -248,6 +249,7 @@ sub read_source {
     my @sources = $mod->get_source;
     my @lines = ();
     foreach my $source (@sources) {
+        print STDERR Dumper($source);
         my $type = $source->sget('@/type');
         my $path = $source->sget('@/path');
         if ($ONLY_SQL && ($type ne 'sql' || $path =~ /view/ ) ) {
