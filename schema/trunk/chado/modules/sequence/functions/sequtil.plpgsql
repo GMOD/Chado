@@ -26,11 +26,6 @@ CREATE OR REPLACE FUNCTION reverse_complement(TEXT) RETURNS TEXT AS
  'SELECT reverse_string(complement_residues($1))'
 LANGUAGE 'sql';
 
--- DNA to AA, default genetic code
-CREATE OR REPLACE FUNCTION translate_dna(TEXT) RETURNS TEXT AS 
- 'SELECT translate_dna($1,1)'
-LANGUAGE 'sql';
-
 -- DNA to AA
 CREATE OR REPLACE FUNCTION translate_dna(TEXT,INT) RETURNS TEXT AS 
 '
@@ -55,6 +50,12 @@ CREATE OR REPLACE FUNCTION translate_dna(TEXT,INT) RETURNS TEXT AS
  RETURN translation;
 END'
 language plpgsql;
+
+-- DNA to AA, default genetic code
+CREATE OR REPLACE FUNCTION translate_dna(TEXT) RETURNS TEXT AS
+ 'SELECT translate_dna($1,1)'
+LANGUAGE 'sql';
+
 
 CREATE OR REPLACE FUNCTION translate_codon(TEXT,INT) RETURNS CHAR AS
  'SELECT aa FROM genetic_code.gencode_codon_aa WHERE codon=$1 AND gencode_id=$2'

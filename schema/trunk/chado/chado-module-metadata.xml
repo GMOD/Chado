@@ -152,6 +152,7 @@
       </component>
 
       <component id='sequence-dbapi' type='dbapi'>
+        <dependency to='gencode'/>
         <description>
           A SQL/DBMS API for the sequence module. Currently only plpgsql
           implementations exist

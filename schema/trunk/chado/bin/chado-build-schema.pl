@@ -201,8 +201,14 @@ sub create_schema {
             my $c_id = $component->sget('@/id');
             if ($button_h{$c_id}->{'Value'}) {
                 push(@sql_lines, read_source($component));
+                if (my @subs = $component->get('component')) {
+                    foreach my $subcomp (@subs) {
+                        push(@sql_lines, read_source($subcomp));
+                    }
+                }
+
             }
-        
+
         }
     }
     my $fh = FileHandle->new(">$SCHEMA_FILE");
@@ -249,7 +255,6 @@ sub read_source {
     my @sources = $mod->get_source;
     my @lines = ();
     foreach my $source (@sources) {
-        print STDERR Dumper($source);
         my $type = $source->sget('@/type');
         my $path = $source->sget('@/path');
         if ($ONLY_SQL && ($type ne 'sql' || $path =~ /view/ ) ) {
