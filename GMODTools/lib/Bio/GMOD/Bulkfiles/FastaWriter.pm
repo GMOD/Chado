@@ -40,21 +40,31 @@ use FileHandle;
 use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
 
-use vars qw(@ISA);
 use Bio::GMOD::Bulkfiles::BulkWriter;       
-@ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/); ## want interface class
+# use Bio::GMOD::Bulkfiles::SWISS_CRC64; # see below require
+
+use base qw(Bio::GMOD::Bulkfiles::BulkWriter);
+#use vars qw(@ISA); @ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/);  
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
-my $configfile= "fastawriter"; #? BulkFiles/FastaWriter.xml 
+my $VERSION = "1.1";
+#my $configfile= "fastawriter"; #? BulkFiles/FastaWriter.xml 
 
+#?? how do constants overload in perl object inheritance ??
+# perldoc constant:  Subclasses may .. override those in their base class.
+# BUT? need to do $obj->CONSTANT not CONSTANT ???
+use constant BULK_TYPE => 'fasta';
+use constant CONFIG_FILE => 'fastawriter';
 
 sub init 
 {
 	my $self= shift;
   $self->SUPER::init();
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  $self->{configfile}= $configfile unless defined $self->{configfile};
+  
+  $DEBUG= $self->{debug} if defined $self->{debug};
+  ## super does
+#   $self->{bulktype}= BULK_TYPE;
+#   $self->{configfile}= CONFIG_FILE unless defined $self->{configfile};
 }
 
 
@@ -68,20 +78,34 @@ sub initData
 {
   my($self)= @_;
   $self->SUPER::initData();
-  # my $config = $self->{config};
-  # my $sconfig= $self->handler()->{config};
  
-  ##  fastafiles
-  my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo('fasta');
-  my $fastadir= $self->handler()->getReleaseSubdir( $finfo->{path} || 'fasta/');
-  $self->{fastadir} = $fastadir;
+  ##  fastafiles -- use $self->{config} instead / also with finfo ??
+  # my $outdir= $self->handler()->getReleaseSubdir( $self->getconfig('path') || $self->BULK_TYPE);
+  # $self->{outdir} = $outdir;
 
-  $self->{addids} = $finfo->{addids};
-  $self->{dropnotes} = $finfo->{dropnotes};
-  $self->{allowanyfeat} = $finfo->{allowanyfeat};
-  $self->{makeall} = $finfo->{makeall};
-  $self->{dogzip} = $finfo->{dogzip};
-  $self->{perchr} = $finfo->{perchr};
+  ## $self->promoteconfigs(); << now in base class
+#  ##? test: see fastawriter.xml for valid keys
+#   my @mykeys= sort keys %{$self->{config}}; 
+#   my %cvals= $self->getconfig(@mykeys); # debug
+#   @{%$self}{@mykeys}= @{%cvals}{@mykeys}; 
+#   if($DEBUG){
+#     print STDERR "### initData: getconfig(@mykeys)= \n";
+#     foreach my $key (@mykeys) {
+#       print STDERR "$key => ",$self->{$key}," <",$cvals{$key},"\n";
+#       }
+#     }
+
+## now done by promoteconfigs()
+#  # my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo($self->BULK_TYPE);# 
+#   $self->{addids} = $finfo->{addids};
+#   $self->{dropnotes} = $finfo->{dropnotes};
+#   $self->{allowanyfeat} = $finfo->{allowanyfeat};
+#   $self->{makeall} = $finfo->{makeall};
+#   $self->{dogzip} = $finfo->{dogzip};
+#   $self->{perchr} = $finfo->{perchr};
+#   $self->{addmd5sum} = $finfo->{addmd5sum};
+#   $self->{addcrc64} = $finfo->{addcrc64};
+
 }
 
 
@@ -106,18 +130,20 @@ sub makeFiles
   # more sensible that writer should ask handler for kind of files it wants
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes};
-  unless(ref $fileset) { 
+  unless(@$fileset) { 
     my $intype= $self->{config}->{informat} || 'fff'; #? maybe array
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
-    }
-  unless(ref $fileset) { 
-    warn "FastaWriter: no input 'fff' feature files found\n"; 
-    return;  
+    unless(@$fileset) { 
+      warn "FastaWriter: no input '$intype' files found\n"; 
+      return $self->status(-1);
+      }
     }
  
   my $featset= $self->handler->{config}->{featset} || []; #? or default set ?
-  my $addids = defined $args{addids} ? $args{addids} : $self->{addids};
+  my $addids = defined $args{addids} ? $args{addids} : $self->getconfig('addids');
   
+  my %chrset=();
+  my $status= 0;
   my $ok= 1;
   for (my $ipart= 0; $ok; $ipart++) {
     $ok= 0;
@@ -125,6 +151,7 @@ sub makeFiles
     if ($infile && $infile->{inh}) {
       my $inh= $infile->{inh};
       my $chr= $infile->{chr};
+      $chrset{$chr}++;
       
       if ($addids) {
         my $idlist= $self->readIdsFromFFF( $inh, $chr, $self->handler()->{config}); # for featmap ?
@@ -136,14 +163,57 @@ sub makeFiles
       
       my $res= $self->processFasta( $inh, $chr, $featset);
       close($inh); delete $infile->{inh};
+      $status += $res;
       $ok= 1;
       }
     }
     
-  print STDERR "FastaWriter::makeFiles: done\n" if $DEBUG; 
-  return 1; #what?
+   #? use found $chromosomes= [sort keys %chrset] ; want to keep original sort order
+  $self->makeall( $chromosomes, $featset) if ($self->config->{makeall} && $status > 0) ;
+  
+  print STDERR "FastaWriter::makeFiles: done n=$status\n" if $DEBUG; 
+  return $self->status($status);
 }
 
+sub makeall 
+{
+	my $self= shift;
+  my( $chromosomes, $featset )=  @_;
+  my $outdir= $self->outputpath();
+  my @features= @$featset;
+  $chromosomes= $self->handler()->getChromosomes() unless (ref $chromosomes);
+
+  foreach my $featn (@features) {
+  
+    ## this loop can be common to other writers: makeall( $chromosomes, $feature, $format) ...
+    # $self->SUPER::makeall($chromosomes, $featn, $self->BULK_TYPE);
+    
+    my $allfn= $self->get_filename ( $self->{org}, 'all', $featn, $self->{rel}, $self->BULK_TYPE);
+    $allfn= catfile( $outdir, $allfn);
+    
+    my @parts=();
+    foreach my $chr (@$chromosomes) {
+      next if ('all' eq $chr);
+      my $fn= $self->get_filename ( $self->{org}, $chr, $featn, $self->{rel}, $self->BULK_TYPE);
+      $fn= catfile( $outdir, $fn);
+      next unless (-e $fn);
+      push(@parts, $fn);
+      }
+      
+    if (@parts) {
+      unlink $allfn if -e $allfn; # dont append existing
+      my $allfh= new FileHandle(">$allfn"); ## DONT open-append
+      foreach my $fn (@parts) {
+        my $fh= new FileHandle("$fn");
+        while (<$fh>) { print $allfh $_; }
+        close($fh); 
+        unlink $fn if (defined $self->config->{perchr} && $self->config->{perchr} == 0);
+        } 
+      close($allfh);
+      }
+    }
+}
+  
 
 =item openInput( $fileset )
 
@@ -156,9 +226,9 @@ sub openInput
 {
 	my $self= shift;
   my( $fileset, $ipart )= @_; # do per-csome/name
-  my $intype= $self->{config}->{informat} || 'fff'; #? maybe array
+  my $intype= $self->config->{informat} || 'fff'; #? maybe array
   my $atpart= 0;
-  print STDERR "openInput: type=$intype part=$ipart \n" if $DEBUG; 
+  # print STDERR "openInput: type=$intype part=$ipart \n" if $DEBUG; 
   
   foreach my $fs (@$fileset) {
     my $fp  = $fs->{path};
@@ -168,7 +238,7 @@ sub openInput
     unless(-e $fp) { warn "missing infile $fp"; next; }
     $atpart++;
     next unless($atpart > $ipart);
-    print STDERR "openInput: name=$name, type=$type, $fp\n" if $DEBUG; 
+    print STDERR "openInput[$ipart]: name=$name, type=$type, $fp\n" if $DEBUG; 
     
     my ( $org, $chr1, $featn, $rel, $format )= $self->split_filename($fp);
     $fs->{org}= $org;
@@ -183,7 +253,7 @@ sub openInput
     $fs->{inh}= $inh;
     return $fs;   
     }
-  print STDERR "openInput: nothing matches part=$ipart\n" if $DEBUG; 
+  print STDERR "openInput: nothing matches part=$ipart, type=$intype\n" if $DEBUG; 
   return undef;  
 }
 
@@ -217,57 +287,49 @@ sub processFasta
   my( $inh, $chr, $featset )=  @_;
   my $ndone= 0;
   my $outh= {};
-  my $fastadir= $self->{fastadir};
+  my $outdir= $self->outputpath();
   my @features= @$featset;
+
+  my @dbfeatures= ();
+  $self->{diddbfa}= {} unless($self->{diddbfa});
+  my $featmap = $self->handler->config->{featmap}; # NOT local config ; for main config's featmap
   
     # special case for feat == chromosome/dna -> raw2Fasta 
+    # add something like this, but dump direct from db, for EST, reagent seqs w/o csome loc
   my @fffeatures= @features;
   if (my ($featn)= grep /^chromosome/, @features) {
-    my $fn= $self->get_filename ( $self->{org}, $chr, 'chromosome', $self->{rel}, 'fasta');
-    $fn= catfile($fastadir, $fn);
+    my $fn= $self->get_filename ( $self->{org}, $chr, 'chromosome', $self->{rel}, $self->BULK_TYPE);
+    $fn= catfile($outdir, $fn);
     $self->raw2Fasta( chr => $chr, fastafile => $fn); $ndone++;
     @fffeatures= grep !/^chromosome/, @features;
     }
 
   foreach my $featn (@fffeatures) {
-    my $fn= $self->get_filename ( $self->{org}, $chr, $featn, $self->{rel}, 'fasta');
-    $fn= catfile( $fastadir, $fn);
+    my $fn= $self->get_filename ( $self->{org}, $chr, $featn, $self->{rel}, $self->BULK_TYPE);
+    $fn= catfile( $outdir, $fn);
     $outh->{$featn}= new FileHandle(">$fn");
+    
+    ## check featmap for db vs fff features !?
+    my $fm= $featmap->{$featn};
+    if($fm && $fm->{onlydb}) {
+      push(@dbfeatures, $featn) unless($self->{diddbfa}->{$featn});
+      $self->{diddbfa}->{$featn}++;
+      @fffeatures= grep !/^$featn/, @fffeatures;
+      }
     }
     
-  $ndone += $self->fastaFromFFFloop( $inh, $outh, $chr, \@fffeatures);
+  $ndone += $self->fastaFromFFFloop( $inh, $outh, $chr, \@fffeatures) if (@fffeatures);
+  
+  ## dang do this only once; this method called inside chromosome loop;
+  $ndone += $self->fastaFromDb( $outh, \@dbfeatures) if (@dbfeatures);
 
   foreach my $featn (keys %$outh) { 
     my $fh= $outh->{$featn}; 
     close($fh); 
-    #? check size and delete if zero ?
+    #? check size and delete if zero or leave for check ?
     }
 
-  if ($self->{makeall}) {
-  foreach my $featn (@features) {
-    my $fn= $self->get_filename ( $self->{org}, $chr, $featn, $self->{rel}, 'fasta');
-    $fn= catfile( $fastadir, $fn);
-    next unless -e $fn;
-    my $fh= new FileHandle("$fn");
-    if ($fh) {
-      my $allfn= $self->get_filename ( $self->{org}, 'all', $featn, $self->{rel}, 'fasta');
-      $allfn= catfile( $fastadir, $allfn);
-      my $allfh= new FileHandle(">>$allfn"); ## append !?
-      while (<$fh>) { print $allfh $_; }
-      close($fh); close($allfh);
-      }
-    }
-  }
-  
-  if (defined $self->{perchr} && $self->{perchr} == 0) {
-  foreach my $featn (@features) {
-    my $fn= $self->get_filename ( $self->{org}, $chr, $featn, $self->{rel}, 'fasta');
-    $fn= catfile( $fastadir, $fn);
-    unlink $fn if -e $fn;
-    }
-  }
-
-  print STDERR "process ndone = $ndone\n" if $DEBUG;
+  #print STDERR "process ndone = $ndone\n" if $DEBUG;
   return $ndone;
 }
 
@@ -354,17 +416,22 @@ sub fastaHeader
   $loc= "$chr:$loc" if ($chr && $loc !~ /:/);
   
   my $ID  = delete $vals{ID} || delete $vals{id} || delete $vals{uniquename};
-  my $name= delete  $vals{name};
+  my $name= delete $vals{name};
   my $db_xref= delete $vals{db_xref} || delete $vals{dbxref};
   if ($db_xref) { $db_xref =~ s/\s*;\s*$//; $db_xref =~ s/;/,/g; $db_xref =~ s/,,/,/g;}
 
   my %primvals=();
   @primvals{qw(type loc ID name db_xref)}= ($type,$loc,$ID,$name,$db_xref);
-
+  
   my @d=();
-  foreach my $k (qw(type loc ID name db_xref), keys %vals) {
-    my $v= $primvals{$k} || $vals{$k};
-    push(@d, "$k=$v") if ($v);
+  foreach my $hk (qw(type loc ID name db_xref), sort keys %vals) {
+    my $v= $primvals{$hk} || $vals{$hk};
+    next unless($v);
+    my $key= $hk;
+    if($self->config->{recodekey}->{$hk}) {
+      $key= $self->config->{recodekey}->{$hk}->{content}; 
+      }
+    push(@d, "$key=$v");  
     }
     
   my $desc= join("; ", @d);
@@ -384,12 +451,12 @@ sub fastaFromFFFloop
   my $sconfig= $self->handler->{config};
   $self->{ffformat}= 0; 
   my %lastfff= ();
-  my $org= $self->{org} || $self->handler()->{config}->{org};
-  my $rel= $self->{rel} || $self->handler()->{config}->{rel};
+  my $org= $self->{org}; # || $self->handler()->{config}->{org};
+  my $rel= $self->{rel}; # || $self->handler()->{config}->{rel};
 
   my $allowanyfeat= 
     (!$featset || $featset =~ /^(any|all)/i) ? 1 
-    : (defined $self->{allowanyfeat}) ?  $self->{allowanyfeat} 
+    : (defined $self->config->{allowanyfeat}) ? $self->config->{allowanyfeat} 
       : 0;
       
   while(<$fffin>) {
@@ -413,14 +480,17 @@ sub fastaFromFFFloop
     
     foreach my $featn (@features) {
         
-        ## this loop is not right - print each input fff only once UNLESS special
+        ## this loop is tricky - print each input fff only once UNLESS special
         ## case of showing in other types_ok
         
       ($type,$name,$cytomap,$baseloc,$id,$dbxref,$notes,$chr)= @fvals;
+      my @fnotes= @notes;
       
       my($types_ok,$retype,$usedb,$subrange,$types_info)
           = $self->get_feature_set( $featn, $sconfig, $allowanyfeat);
       next unless( ($types_ok && $types_ok->{$type}) || ($allowanyfeat && !$didfeat) );
+
+      $self->{use_dbmd5}= $usedb; #? want sep. flag in featmap.xml ? 
 
       if ($types_info->{method} eq 'between') {
         my $lastf= $lastfff{$type};
@@ -434,6 +504,7 @@ sub fastaFromFFFloop
              = $self->handler()->splitFFF( $ffftween, $chr);
           }
         else { next; }
+        $self->{use_dbmd5}= 0;
         }
 
       if ($self->{idlist} && $types_info->{add_id}) { ## addids
@@ -442,19 +513,27 @@ sub fastaFromFFFloop
       
       my $fah= $outh->{$featn};
       unless($fah) { next; } #??
-
-      my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
-          name => $name, chr => $chr, location => $baseloc, 
-          ID => $id, db_xref => $dbxref, 
-          $org ? (species => $org) : (),
-          $rel ? (release => $rel) : (),
-          @notes  
-          );
       
-      print STDERR "getBases id=$id type=$type chr=$chr loc=$baseloc\n" if $DEBUG>1;
+      my ($start,$stop,$strand)= $self->handler()->maxrange($baseloc);
+      my $shortloc= ($stop<0) ? $baseloc : ($strand<0) ? "complement($start..$stop)" : "$start..$stop"; 
+      # option for full/short loc in header?
+
+      print STDERR "getBases id=$id type=$type chr=$chr loc=$baseloc\n" if $DEBUG>2;
       
       my $bases= $self->handler()->getBases( 
                  $usedb, $type, $chr, $baseloc, $id, $name, $subrange);
+      
+      ## add optional md5checksum, SwissProt CRC64 calcs; 
+      ##  check if last getBases returned md5checksum 
+      my @crcs= $self->getCRCs( $id, \$bases, \@fnotes);
+      
+      my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
+          name => $name, chr => $chr, location => $shortloc, 
+          ID => $id, db_xref => $dbxref, 
+          $org ? (species => $org) : (),
+          $rel ? (release => $rel) : (),
+          @fnotes, @crcs,  
+          );
       
       if ($bases) {
         my $slen= length($bases);
@@ -467,7 +546,8 @@ sub fastaFromFFFloop
         if ($self->handler()->{failonerror}) {  
           warn "FAILING: $chrIn $featset \n"; return undef;
           }
-        print $fah ">$header; ERROR missing data\n"; #? write to file or not
+        # write at least one dummy base so user soft wont screw up
+        print $fah ">$header; ERROR missing data\nN\n" if($self->config->{writeemptyrecords}); #? write to file or not
         }
         
       $didfeat++;
@@ -480,6 +560,45 @@ sub fastaFromFFFloop
   return $nout;    
 }
 
+sub getCRCs {
+  my($self, $id, $basesref, $notesref)= @_;
+  ## add optional md5checksum, SwissProt CRC64 calcs; 
+  ##  check if last getBases returned md5checksum 
+  my @retcrcs=();
+  
+  my($addmd5sum,$addcrc64)= ($self->config->{addmd5sum},$self->config->{addcrc64});
+  my $use_dbmd5= $self->{use_dbmd5};
+  if ($addmd5sum) {
+    my $md5='';
+    my $baseft= ($use_dbmd5) ? $self->handler()->getLastBasesFeature() : undef; 
+    if ($baseft && ref($baseft) =~ /HASH/ && $$baseft{'uniquename'} eq $id) {
+      $md5= $$baseft{'md5checksum'};
+      }
+    if ($md5) {
+      # maybe calc and compare if want to verify ?
+    } else {
+    require Digest::MD5;
+    my $md5sum= Digest::MD5->new;
+    if($md5sum) {
+      $md5sum->add($$basesref);
+      $md5= $md5sum->hexdigest();
+      }
+    }
+# warn "CRC id=$id md5=$md5\n" if $DEBUG > 1;
+      push(@retcrcs, "MD5",$md5) if ($md5);
+    }
+    
+  if ($addcrc64) {  
+    require Bio::GMOD::Bulkfiles::SWISS_CRC64;
+    my $crc64sum= SWISS_CRC64->new;
+    if($crc64sum) {
+      $crc64sum->add($$basesref);
+      my $crc= $crc64sum->hexsum();
+      push(@retcrcs, "CRC64",$crc) if ($crc);
+      }
+    }
+  return @retcrcs;
+}
 
 =item fastaFromFFF
 
@@ -506,12 +625,12 @@ sub fastaFromFFF
   
   my $allowanyfeat= 
     (!$featset || $featset =~ /^(any|all)/i) ? 1 
-    : (defined $self->{allowanyfeat}) ?  $self->{allowanyfeat} 
+    : (defined $self->config->{allowanyfeat}) ?  $self->config->{allowanyfeat} 
       : 0;
   
   # print STDERR "fastaFromFFF: 1\n" if $DEBUG>1;
-  my $org= $self->{org} || $self->handler()->{config}->{org};
-  my $rel= $self->{rel} || $self->handler()->{config}->{rel};
+  my $org= $self->{org}; # || $self->handler()->{config}->{org};
+  my $rel= $self->{rel}; # || $self->handler()->{config}->{rel};
   
   my($types_ok,$retype,$usedb,$subrange,$types_info)
         = $self->get_feature_set( $featset, undef, $allowanyfeat);
@@ -524,21 +643,29 @@ sub fastaFromFFF
   return "" unless( $allowanyfeat || $types_ok->{$type} );
   # print STDERR "fastaFromFFF: 2\n" if $DEBUG>1;
 
+  $self->{use_dbmd5}= $usedb; #? want sep. flag in featmap.xml ? 
   if ($self->{idlist} && $types_info->{add_id}) {
     $dbxref= $self->addIdsToDbxref( ($id ? $id : $name), $dbxref );
     }
   my @notes= $self->cleanNotes($notes);
-  
-  my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
-      name => $name, chr => $chr, location => $baseloc, 
-      ID => $id, db_xref => $dbxref, 
-      $org ? (species => $org) : (),
-      $rel ? (release => $rel) : (),
-      @notes  
-      );
+  my ($start,$stop,$strand)= $self->handler()->maxrange($baseloc);
+  my $shortloc= ($stop<0) ? $baseloc : ($strand<0) ? "complement($start..$stop)" : "$start..$stop"; 
+  # option for full/short loc in header?
   
   my $bases= $self->handler()->getBases( 
              $usedb, $type, $chr, $baseloc, $id, $name, $subrange);
+
+  ## add optional md5checksum, SwissProt CRC64 calcs; 
+  my @crcs= $self->getCRCs( $id, \$bases, \@notes);
+
+  my $header= $self->fastaHeader( type => $retype->{$type}||$type, 
+      name => $name, chr => $chr, location => $shortloc, 
+      ID => $id, db_xref => $dbxref, 
+      $org ? (species => $org) : (),
+      $rel ? (release => $rel) : (),
+      @notes, @crcs,  
+      );
+  
   if ($bases) {
     my $slen= length($bases);
     $bases =~ s/(.{1,50})/$1\n/g;
@@ -549,9 +676,129 @@ sub fastaFromFFF
     if ($self->handler()->{failonerror}) {  
       warn "FAILING: $featset \n"; return undef;
       }
-    return ">$header; ERROR missing data\n"; #? write to file or not
+        # write at least one dummy base so user soft wont screw up
+    return ">$header; ERROR missing data\nN\n" if($self->config->{writeemptyrecords}); #? write to file or not
     }
 }
+
+=item fastaFromDb
+
+For sequences not part of golden_path; not in genome feature table files
+E.g. reagent sequences (EST, cDNA, misc ..)
+See <featmap fromdb=1 onlydb=1 ?? >
+
+=cut
+
+sub fastaFromDb
+{
+  my($self, $outh, $featset)= @_;
+  my @features= (ref $featset) ? @$featset : ($featset);
+
+  my $org= $self->{org};  
+  my $rel= $self->{rel};  
+  my($species,$genus) = ($self->handler->speciesFull($org),'');
+  ($genus,$species)= split(/[_ ]/,$species,2);  
+  my $dbh= $self->handler->dbiConnect();
+  my $nout= 0;
+  
+  foreach my $featn (@features) {
+    print STDERR "fastaFromDb featn=$featn ?\n" if $DEBUG;
+    
+    my $allowanyfeat= 1;  # ????
+#       (!$featn || $featn =~ /^(any|all)/i) ? 1 
+#       : (defined $self->config->{allowanyfeat}) ?  $self->config->{allowanyfeat} 
+#         : 0;
+    
+    my($types_ok,$retype,$usedb,$subrange,$types_info)
+          = $self->get_feature_set( $featn, undef, $allowanyfeat);
+    next unless($DEBUG || ref $types_ok );
+
+    my $onlydb= $types_info->{onlydb} || 0;  ## is this right featmap flag ??
+    next unless($DEBUG || $onlydb); #??    
+    $usedb= 1;
+    
+    my ($chr,$cytomap)= (undef,undef);
+    my ($baseloc)= (undef); # no location or dummy ??
+    my $outhandle= $outh->{$featn};
+    next unless($DEBUG || $outhandle); #??
+
+    my $err="";    
+    my $sql="";
+    my $ftypes= "'" . join("','", sort keys %$types_ok) ."'" ;
+
+    ### FIXME ... look in chadofeatsql ...
+    ## $sql = $self->config->{feature2fastasql}; 
+    $sql = " 
+select f.feature_id, t.name as type, f.residues, f.md5checksum, f.seqlen, f.name, f.uniquename
+from feature f, organism o, cvterm t
+where t.name in ($ftypes) and t.cvterm_id = f.type_id
+and o.genus = '$genus' and o.species = '$species' and o.organism_id = f.organism_id
+      " unless($sql);
+    print STDERR "fastaFromDb sql=$sql\n" if ($DEBUG );
+
+    my $sth = $dbh->prepare($sql) or $err="unable to prepare feature_id";
+    #$sth->execute($ftypes,$genus,$species) or $err="failed to execute feature_id"; 
+    $sth->execute() or $err="failed to execute feature_id"; 
+    if ($err) { ($self->{failonerror}) ? die $err : warn $err; return undef;  }
+  
+    while (my $nextrow = $sth->fetchrow_hashref) {
+      my $type= $$nextrow{'type'};   
+      my $name= $$nextrow{'name'};
+      my $id  = $$nextrow{'uniquename'};
+      my $feature_id = $$nextrow{'feature_id'};
+      my $bases= $$nextrow{'residues'};
+      my $seqlen= length($bases); ## $$nextrow{'seqlen'};
+
+      # my ($start,$stop,$strand)= (1,$seqlen,0);
+      # my $shortloc= "$start..$stop"; 
+
+      my @notes= (); #what: featureprop, featuresynonym; others? $self->cleanNotes($notes);
+
+      my $dbxref= ''; ##FIXME: $$nextrow{'dbxref'};
+      if ($self->{idlist} && $types_info->{add_id}) {
+        $dbxref= $self->addIdsToDbxref( ($id ? $id : $name), $dbxref );
+        }
+  
+      my @crcs= ();
+      ## $self->{use_dbmd5}= $usedb;  
+      ## $self->getCRCs( $id, \$bases, \@notes);
+      if ($self->config->{addmd5sum}) {
+        my $md5= $$nextrow{'md5checksum'};
+        push(@crcs, "MD5",$md5) if ($md5);
+        }
+        
+      my $header= $self->fastaHeader( 
+          type => $retype->{$type}||$type, 
+          name => $name, ID => $id, db_xref => $dbxref, 
+          # location => $shortloc, # chr => $chr, 
+          $org ? (species => $org) : (),
+          $rel ? (release => $rel) : (),
+          @notes, @crcs,  
+          );
+          
+      print STDERR "fastaFromDb[$nout]=$header\n" if ($DEBUG && $nout<4);
+  
+      if ($bases) {
+        $bases =~ s/(.{1,50})/$1\n/g;
+        print $outhandle ">$header; len=$seqlen\n".$bases; 
+        }
+      else {
+        warn "ERROR: missing bases for $header\n";
+        if ($self->handler()->{failonerror}) {  
+          warn "FAILING: $featset \n"; return -1;
+          }
+        # write at least one dummy base so user soft wont screw up
+        print $outhandle ">$header; ERROR missing data\nN\n" 
+          if($self->config->{writeemptyrecords}); #? write to file or not
+        }
+      $nout++;
+      }  # db row
+    $sth->finish();
+      
+  }
+  return $nout;
+}
+
 
  ## patch for adding gene IDs to gene model features missing them
 
@@ -585,17 +832,17 @@ sub cleanNotes
   my ($self, $notes)= @_;
   my @notes= ();
   if ($notes) {
-    my $dropnotes= $self->{dropnotes} || 'xxx';
+    my $dropnotes= $self->config->{dropnotes} || 'xxx';
     my %notes=();
     foreach my $n (split(/[;]/,$notes)) {
       if ($n =~ /^(\w+)=(.+)/) { 
-        my($k,$v)= ($1,$2);
-        if ($dropnotes !~ m/\b$k\b/) { $notes{$k} .= "$v,"; }
+        my($k,$v)= ($1,$2); $v=~s/\s+$//;
+        if ($v && $dropnotes !~ m/\b$k\b/) { $notes{$k} .= "$v,"; }
         } 
       }
     foreach my $n (sort keys %notes) {
       $notes{$n} =~ s/,$//;
-      push(@notes, $n, $notes{$n});
+      push(@notes, $n, $notes{$n}) if($notes{$n});
       }
     }
   return @notes;
@@ -655,6 +902,9 @@ sub raw2Fasta
       }
     unless ($end>=$start) { $end= $start; } # what ?
     my $id= ($fullchr) ? $chr : "$chr:$start..$end";
+    
+    #?? add: $self->getCRCs( $id, \$bases, \@notes);
+    ## but need to read dna 1st; revise crc to do add-lines
     
     $defline= $self->fastaHeader( 
       ID => $id, ##"$chr:$start..$end",

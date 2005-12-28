@@ -2,11 +2,9 @@
   name="fbbulk-r411" 
   relid="411"
   date="20050421"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="data/genomes/Drosophila_melanogaster"
 >
-<!--   datadir="data2/fban" -->
+  <!-- see site_defaults for more included configs -->
+  <include>site_defaults</include>
 
   <title>FlyBase Chado DB r4.1.1</title>
   <about>
@@ -23,7 +21,7 @@ insertions, and I believe loads of ARGS data).
 
   </notes>
   
-  <doc name="README"><![CDATA[
+  <doc name="Release.txt"><![CDATA[
     D. melanogaster euchromatin genome data from FlyBase
     Release  ${rel}, dated ${date}.
     
@@ -34,6 +32,62 @@ insertions, and I believe loads of ARGS data).
     See release notes at <a href="http://flybase.net${release_url}">
     http://flybase.net${release_url}</a>
   ]]></doc>
+
+ 
+
+  <include>fbreleases</include>
+
+  <!-- db is release-dependent ; use fbreleases info 
+    this is standard public access to curren dmel_chado
+  -->
+  <db
+    driver="Pg"
+    name="BOGUS_dmel_chado"
+    host="localhost"
+    port="7302"
+    user=""
+    password=""
+    />
+
+  <org>dmel</org>
+  <species>Drosophila melanogaster</species>
+  <golden_path>'chromosome_arm'</golden_path>
+  <seq_ontology>SO</seq_ontology>
+
+  <!-- note organism_id is db specific; may change ; here for temp use only -->
+  <organism id="dpse" species="Drosophila_pseudoobscura" 
+    organism_id="3"/>
+  <organism id="dmel" species="Drosophila_melanogaster" 
+    organism_id="1"/>
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <ENV 
+      seq_ontology="SO"
+      est_where_clause="AND (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      analysis_where_clause="AND NOT (an.program = 'sim4' AND
+        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
+      golden_path="'chromosome_arm'"
+      />
+    <!-- note: ests target replaces analysis EST exclusion above -->
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>analysis</target>
+    <target>ests</target>
+    <!-- <target>matches</target> -->  
+    <!-- <target>synteny</target> -->
+  </featdump>
+
+  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
+  <idpattern>(FBgn|FBti)\d+</idpattern>
+  <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
+  <gmodel_parts_rename>0</gmodel_parts_rename>
 
   <doc name="release_changes" path="tables/release_changes.txt"><![CDATA[
 D. melanogaster euchromatin genome data from FlyBase
@@ -530,83 +584,5 @@ CG33331 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
 CG33332 add comment:gene_with_dicistronic_primary_transcript ; SO:0000721
 
   ]]></doc>
-   
-
-  <include>fbreleases</include>
-
-  <!-- db is release-dependent ; use fbreleases info 
-    this is standard public access to curren dmel_chado
-  -->
-  <db
-    driver="Pg"
-    name="BOGUS_dmel_chado"
-    host="localhost"
-    port="7302"
-    user=""
-    password=""
-    />
-
-  <org>dmel</org>
-  <species>Drosophila melanogaster</species>
-  <include>organisms</include>
   
-  <!-- note organism_id is db specific; may change ; here for temp use only -->
-  <organism id="dpse" species="Drosophila_pseudoobscura" 
-    organism_id="3"/>
-  <organism id="dmel" species="Drosophila_melanogaster" 
-    organism_id="1"/>
-
-  <include>filesets</include>
-
-  <featdump
-    path="tmp/featdump/\w+.tsv"
-    config="chadofeatsql"
-    tag="feature_sql"
-    type="feature_table"
-    splitname="chadofeat"
-    >
-    <ENV 
-      est_where_clause="AND (an.program = 'sim4' AND
-        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
-      analysis_where_clause="AND NOT (an.program = 'sim4' AND
-        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
-      golden_path="'chromosome_arm'"
-      />
-    <!-- note: ests target replaces analysis EST exclusion above -->
-    <target>chromosomes</target>
-    <target>features</target>
-    <target>analysis</target>
-    <target>ests</target>
-    <!-- <target>matches</target> -->  
-    <!-- <target>synteny</target> -->
-  </featdump>
-
-  <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
-  <idpattern>(FBgn|FBti)\d+</idpattern>
-  <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
-  <gmodel_parts_rename>0</gmodel_parts_rename>
-
-  <!-- feature sets to make fasta bulk files -->
-  <include>featuresets</include>
-
-  <!-- note 19nov04 - override scaffold default featmap.
-      fb dmel chado scaffold residues come from
-      chromosome dna; but had out-of-date errors, safer to use
-      chromosome, not fromdb for these? 
-  -->
-  <!--
-  <featmap
-    name="scaffold"   
-    alt_name0 = "golden_path_region" 
-    alt_name1 = "golden_path_fragment" 
-    alt_name2 = "databank_scaffold"
-    alt_name3 = "scaffold"
-    alt_name4 = "supercontig"
-    types="golden_path_region scaffold"
-    typelabel="scaffold"
-    NOT_fromdb="1"
-    />
-  <featmap name="dummy" note="here for xml parser" />
-  -->
-
 </opt>

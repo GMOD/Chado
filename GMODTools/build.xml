@@ -1,0 +1,136 @@
+<project name="GMODTools" default="all" basedir=".">
+
+<description>
+This ant build.xml makes a GMODTools file release.  It excludes
+some old cruft files, and maybe renames/relocates some others for
+handier use. Since the GMODTools is in Perl, ant doesn't do much else.
+</description> 
+
+<!-- ===================== Property Definitions =========================== -->
+
+  <property file="build.properties"/>
+	<property environment="env"/>
+  <property name="app"       value="GMODTools"/>
+  <property name="app.version"   value="1.0"/>
+
+<!-- ==================== File and Directory Names ======================== -->
+  
+  <property name="dist.home"     value="${basedir}"/>  
+  <property name="build.home"    value="${basedir}/build"/>
+  <property name="appsrc.jar"    value="${dist.home}/${app}-${app.version}.zip"/>
+
+<!-- ==================== All Target ====================================== -->
+
+  <target name="all" depends="prepare,dist" 
+   description="Make all"/>
+
+
+<!-- ==================== Dist Target ===================================== -->
+
+
+  <target name="dist"  depends="perldoc" description="Create source file">
+    <zip  destfile="${appsrc.jar}" >
+
+    <!-- do perldoc gmod-tools-readme.pod > build/README ? -->
+    <zipfileset file="README"   fullpath="${app}/README"/>
+    
+    <!-- dont need for file release
+    <zipfileset file="${basedir}/build.xml"   prefix="${app}"/>
+    <zipfileset file="${basedir}/build.properties"   prefix="${app}"/>
+    -->
+    
+    <!--  
+    lib/Bio/GMOD/Bulkfiles/ToFasta.pm, To*.pm are old, not used
+    what of lib/GMOD/..  lib/GMOD/Chado/SeqUtils may have value when updated
+    -->
+    <zipfileset dir="${basedir}/lib"      prefix="${app}/lib"
+      excludes="Bio/GMOD/Bulkfiles/To*.pm GMOD/** **/*.old/**"
+      />
+    
+    <!--  
+      bulkfastafromfff.pl is old; exclude?
+      gmod_install, .. gmod_load_newseq are from gmod001 release; need updates
+    -->
+    
+    <zipfileset dir="${basedir}/bin"  filemode="755" prefix="${app}/bin"
+       excludes="gmod_*.pl **/*.old/**"
+      />
+ 
+    <!--  
+    gmodconfig.cgi is old cruft
+    -->
+    <zipfileset dir="${basedir}/cgi-bin" filemode="755" prefix="${app}/cgi-bin"
+       excludes="gmodconfig.cgi **/*.old/**"
+      />
+
+    <!--  
+    gmod.conf needs dropping or update ?
+    BUT need empty gmod.conf for bulktools Config2.pm !!
+    -->
+    <zipfileset dir="${basedir}/conf"   prefix="${app}/conf"
+      excludes="**/*.old/**"
+      />
+      
+    <zipfileset dir="${basedir}/doc"   prefix="${app}/doc"
+       excludes="**/*.old/**"
+      />
+
+    </zip>
+  </target>
+
+
+<!-- ==================== Prepare Target ================================== -->
+  <target name="prepare">
+
+<!--
+    <mkdir  dir="${build.home}"/>
+           
+     <copy preservelastmodified="true"  todir="${build.web}/classes">
+      <fileset dir="${src.home}" defaultexcludes="yes"  
+     	excludes="META-INF/** **/*.java **/*.old/** org/eugenes/lusearch/** org/argos/** tlds/** "
+     	/>
+    </copy>
+-->
+     
+  </target>
+
+
+<!-- ==================== Javadoc / Perldoc? Target ================================== -->
+
+  <target name="chkDocBuild" >
+  <uptodate property="doc.isUpToDate"
+            srcfile="${basedir}/doc/gmod-tools-readme.pod"
+            targetfile="${basedir}/README"/>
+  </target>
+
+  <target name="perldoc"  depends="chkDocBuild"  unless="doc.isUpToDate"
+   description="Create Perl documentation">
+
+    <exec executable="perldoc">
+      <env key="PERL5LIB" value="lib"/>
+      <arg line="-otext -d${basedir}/README ${basedir}/doc/gmod-tools-readme.pod"/>
+    </exec>
+
+  </target>
+
+  <!-- 
+  <target name="javadoc" depends="compile"
+   description="Create Javadoc API documentation">
+
+    <mkdir  dir="${dist.home}/doc/api"/>
+    <javadoc breakiterator="yes" destdir="${dist.home}/doc/api" packagenames="*">
+
+    <fileset dir="${src.home}" 
+      defaultexcludes="yes" 
+      excludes="org/eugenes/lusearch/** org/argos/**"
+      includes="**/*.java"
+      />
+    	 
+    <classpath refid="compile.classpath"/>
+    </javadoc>
+
+  </target>
+  -->
+
+
+</project>

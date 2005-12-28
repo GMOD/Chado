@@ -44,14 +44,16 @@ use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
 
 use Bio::GMOD::Bulkfiles::BulkWriter;       
-use vars qw(@ISA);
-@ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/); ## want interface class
+use base qw(Bio::GMOD::Bulkfiles::BulkWriter);
 
 use constant RECSIZE => length(pack("NN", 1, 50000));
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
-my $configfile= "tognomap"; #? BulkFiles/GnomapWriter.xml 
+my $VERSION = "1.1";
+#my $configfile= "tognomap"; #? BulkFiles/GnomapWriter.xml 
+use constant BULK_TYPE => 'gnomap';
+use constant CONFIG_FILE => 'tognomap';
+
 my $kMissingValue= -99999999;
 my $kMaxValue= 999999999;
 my $kMinValue= $kMissingValue+1;
@@ -62,8 +64,11 @@ sub init
 {
 	my $self= shift;
   $self->SUPER::init();
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  $self->{configfile}= $configfile unless defined $self->{configfile};
+  
+  ## superclass does these??
+  $DEBUG= $self->{debug} if defined $self->{debug};
+  # $self->{bulktype} =  $self->BULK_TYPE; # dont need hash val?
+  # $self->{configfile}= $self->CONFIG_FILE unless defined $self->{configfile};
 }
 
 
@@ -84,15 +89,16 @@ sub initData
 #  my $org= $self->{org} || $self->handler()->{config}->{org};
 
   ##  gnomapfiles
-  my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo('gnomap');
+  my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo($self->BULK_TYPE);
   my $dnainfo= $self->handler()->getFilesetInfo('dna');
 
-  $self->{indexonly} = $finfo->{indexonly};
+  # $self->{indexonly} = $finfo->{indexonly};
+  # $self->{skipdata} = $finfo->{skipdata};
 
 #   $noIDmap = $finfo->{noIDmap} 
 #     || $config->{noIDmap} 
 #     || 'cytowalk|protein|mRNA|CDS|EST|cDNA|oligo|processed|repeat|sim4';
-  $noIDmap =  $finfo->{noIDmap} || $config->{noIDmap};
+  $noIDmap =  $self->getconfig('noIDmap');
   unless($noIDmap) {
   $noIDmap= join '|',
   qw(cytowalk 
@@ -119,16 +125,12 @@ sub initData
   $noIDmap .= '|\bregion';
   $noIDmap =~ s/\|\|/|/g;
   
-  $nameIsId= $finfo->{nameisid} || $config->{nameisid} || '^(BAC)';
-  $nameIsSpeciesId= $finfo->{nameisorgid} || $config->{nameisorgid} || '^(gene)$';  # others? rnas?
-  $cutdbpattern=  $finfo->{idcutdb} || $config->{idcutdb} || '^(FlyBase|GadFly|GB_protein|GO):';
+  $nameIsId= $self->getconfig('nameisid') || '^(BAC)';
+  $nameIsSpeciesId= $self->getconfig('nameisorgid') || '^(gene)$';  # others? rnas?
+  $cutdbpattern=  $self->getconfig('idcutdb') || '^(FlyBase|GadFly|GB_protein|GO):';
 
-  $indexidtype= $finfo->{indexidtype} 
-    || $config->{indexidtype} 
-    || '^(gene|pseudogene|\w+RNA)';
-  $indexidpattern= $finfo->{indexidpattern} 
-    || $config->{indexidpattern} 
-    || '[A-Z]{2}gn\d+';
+  $indexidtype= $self->getconfig('indexidtype')  || '^(gene|pseudogene|\w+RNA)';
+  $indexidpattern= $self->getconfig('indexidpattern') || '[A-Z]{2}gn\d+';
     
   %flycsomebands = (
     'X'  => [ '1A1','20F4'],
@@ -140,11 +142,10 @@ sub initData
     );
  
   
-  my $gnomapdir= $self->handler()->getReleaseSubdir( $finfo->{path} || 'gnomap/');
-  $self->{gnomapdir} = $config->{gnomapdir}= $gnomapdir;
+#   my $gnomapdir= $self->handler()->getReleaseSubdir( $finfo->{path} || $self->BULK_TYPE);
+#   $self->{gnomapdir} = $config->{gnomapdir}= $gnomapdir;
 
   my $reldir= $self->handler()->getReleaseDir();
-  
   my $dnareldir= $self->handler()->getReleaseSubdir( $dnainfo->{path} || 'dna/');
   $dnareldir =~ s,^$reldir,,;
   $dnareldir = "../$dnareldir";
@@ -153,6 +154,10 @@ sub initData
   my $tfset  = $self->handler()->getFilesetInfo('tables');
   my $tabdir = $self->handler()->getReleaseSubdir( $tfset->{path} || 'tables/');
   $self->{summaryfile}= catfile( $tabdir, "feature_map-summary.txt"); 
+
+  ## 05dec
+#  my $gbset  = $self->handler()->getFilesetInfo('gbrowse_fb');
+#  $self->{gbset}= $gbset;
 
   my @copytypes=();  
   foreach my $type ( keys %{$config->{fileset}} ) {
@@ -215,24 +220,23 @@ sub makeFiles
   print STDERR "makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes};
-  unless(ref $fileset) { 
-    my $intype= $self->{config}->{informat} || ['fff','dna']; #? maybe array
+  unless(@$fileset) { 
+    my $intype= $self->config->{informat} || ['fff','dna']; #? maybe array
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
-    # warn "makeFiles: no infiles => \@filesets given"; return;  
-    }
-  unless(ref $fileset) { 
-    warn "GnomapWriter: no input 'fff' feature or dna files found\n"; 
-    return;  
+    unless(@$fileset) { 
+      warn "GnomapWriter: no input '$intype' files found\n"; 
+      return $self->status(-1);  
+      }
     }
 
   ## infiles => [ @$featfiles, @$dnafiles ]
  
   ## $self->readflysorsa(); #? here or wait
 
-  if ($self->{indexonly}) {
-    warn "Indexing only features in $self->{gnomapdir}\n" if $DEBUG;
-    $self->indexfeatdir($self->{gnomapdir});
-    return 1;
+  if ($self->config->{indexonly}) {
+    warn "Indexing only features in ",$self->outputpath(),"\n" if $DEBUG;
+    $self->indexfeatdir($self->outputpath());
+    return  $self->status(1);
     }
 
 ## ---------- get cytology set ----------
@@ -262,13 +266,14 @@ sub makeFiles
     # 2. copy fff/release-$chr.fff to gnomap/features-$chr.tsv , stripping lead 2 cols
 
   # $self->addDnaSymlinks($fileset);
-  $self->makeSymlinks( $fileset, 'dna/raw', "dna-\$chr.raw", $self->{dnareldir}, $self->{gnomapdir});
+  $self->makeSymlinks( $fileset, 'dna/raw', "dna-\$chr.raw", $self->{dnareldir}, $self->outputpath());
  
   if (@{$self->{copytypes}}) {
     my $fset= $self->handler->getFiles( $self->{copytypes}, $chromosomes);  
-    $self->copyFiles( $fset, '', '',  $self->{gnomapdir});
+    $self->copyFiles( $fset, '', '',  $self->outputpath());
     }
   
+  #? option to skip gnomap data; semi-obsolete; want summary table, maybe gbrowse.conf
   if($addcyto) {
     $self->mergeFeats($fileset);
   } else {
@@ -277,7 +282,7 @@ sub makeFiles
   
   $self->printSummary( $self->{summaryfile}, $self->{featnames});
   
-  $self->indexfeatdir($self->{gnomapdir})  
+  $self->indexfeatdir($self->outputpath())  
     ; #if ($doindex);
 
   my @featnames= ();
@@ -285,8 +290,7 @@ sub makeFiles
   $self->makeGbrowseConf(\@featnames); # should pass array of feature names !
 
   print STDERR "GnomapWriter::makeFiles: done\n" if $DEBUG; 
-
-  return 1; #what?
+  return  $self->status(1);
 }
 
 
@@ -296,7 +300,7 @@ sub mergeFeats
   my( $fileset )= @_; # do per-csome/name
   my $ok= 1;
   my $filterids= 1; #?? config
-  my $gnomapdir= $self->{gnomapdir};
+  my $gnomapdir= $self->outputpath();
   my $sorter=`which sort`; chomp($sorter); ## '/bin/sort'; '/usr/bin/sort';
   print STDERR "mergeFeats\n" if $DEBUG; 
   
@@ -388,40 +392,13 @@ sub merge2gnomap
   ##$self->printSummary( $self->{summaryfile}, $self->{featnames});
 }
 
-# sub addDnaSymlinks
-# {
-# 	my $self= shift;
-#   my( $fileset )= @_; # do per-csome/name
-#   my $intype =   'dna/raw';  
-#   my $gnomapdir= $self->{gnomapdir};
-#   my $dnareldir= $self->{dnareldir};
-# 
-#   $self->makeSymlinks($fileset, $intype, "dna-\$chr.raw", $dnareldir, $gnomapdir);
-#   
-# #   foreach my $fs (@$fileset) {
-# #     my $fp= $fs->{path};
-# #     my $name= $fs->{name};
-# #     my $type= $fs->{type};  
-# #     my $chr= $fs->{chr};  
-# #     next unless( $fs->{type} eq $intype);  
-# #     ## unless(-e $fp) { warn "missing intype file $fp"; next; }
-# #     my($filename, $dir) = File::Basename::fileparse($fp);
-# #     
-# #     my $relpath= catfile($dnareldir, $filename); #?
-# #     my $symname= catfile($gnomapdir,"dna-$chr.raw");
-# #     symlink( $relpath, $symname);
-# #     print STDERR "symlink dna-$chr.raw -> $relpath\n" if $DEBUG; 
-# #     }
-# 
-# }
-
 
 sub copyFFF2Gnomap
 {
 	my $self= shift;
   my( $fileset )= @_; # do per-csome/name
   my $intype =   'fff';  
-  my $gnomapdir= $self->{gnomapdir};
+  my $gnomapdir= $self->outputpath();
   # my %csomefeats=();
   $self->{featnames}= {};
   print STDERR "copyFFF2Gnomap\n" if $DEBUG; 
@@ -470,8 +447,8 @@ sub printSummary
   my( $sumfile, $csomefeats )= @_; 
   if ( $sumfile && $csomefeats ) {
     my $fh= new FileHandle(">$sumfile");
-    my $title = $self->{config}->{title};
-    my $date  = $self->{config}->{date};
+    my $title = $self->config->{title};
+    my $date  = $self->config->{date};
     ##my $org   = $self->{config}->{species} || $self->{config}->{org};
     my $org= $self->{org} || $self->handler()->{config}->{org};
     print $fh "# Genome feature summary of $org from $title [$date]\n";
@@ -501,13 +478,13 @@ sub makeGbrowseConf
 	$config= $self->handler->{config};
   ##my $gbrowseconf= $config->{gbrowsefiles}->{config};
   ##my $gbrowseconf= $self->{gbrowseconf};
-  my $gbset= $self->handler->getFilesetInfo('gbrowse');
+  my $gbset= $self->handler->getFilesetInfo('gbrowse_fb');
   my $gbrowseconf= $gbset->{config};
   
   # add vars to config
   # description = ${species} ${relfull} ${date} OR ${title} ??
   # datapath    = ${gnomapdir}
-  $config->{gnomapdir}= $self->{gnomapdir};
+  $config->{gnomapdir}= $self->outputpath(); #??
   
   my ($loc, $ex)= ('','');
   my $chromosomes= $self->handler->getChromosomes(); 
@@ -550,8 +527,8 @@ sub makeGbrowseConf
     
   $content .= $doc->{footer}->{content} || '';
   $doc->{content}= $content;
-  $doc->{path}= $gbset->{path}; #$config->{gbrowsefiles}->{path}; #??
-  $self->handler()->writeDocs( { gbrowseconf => $doc });
+  $doc->{path}= $gbset->{path} if $gbset->{path}; #$config->{gbrowsefiles}->{path}; #??
+  $self->handler()->writeDocs( $doc );
 }
 
 

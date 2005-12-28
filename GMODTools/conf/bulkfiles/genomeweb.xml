@@ -1,0 +1,297 @@
+<opt 
+  name="genomeweb"
+  date="20051225"
+  >
+  
+  <title>Genome Web docs</title>
+  <about>
+    These are configurations for creating
+    web access to genome data files.
+  </about>
+
+
+  <doc id="topreadme" type="html" path="${datadir}/README.html"><![CDATA[
+<h1>Genome Data Sets</h1>
+
+<div class="description">
+In order to simplify the retrieval of common datasets, the Generic
+Model Organisms Database (GMOD) community has implemented a series
+of standard URLs. Each MOD {will/should} have an index page like
+this one describing the species and datasets that are available.
+Read more about the GMOD project at <a href="http://www.gmod.org/">www.gmod.org</a>.
+<p>
+Use below links to choose among Sequence (FastA),  Features (GFF),
+Summary tables and other bulk genome data.  Select among 
+species, feature type, chromosomes, data release versions. 
+<br>
+
+</div>
+<div class="header3">Available URLs</div>
+
+<p>
+
+<!-- list available species here -->
+
+<div class="specification">
+<table cellpadding="3" cellspacing="1" border="1">
+<tr><td class="mono">/genome</td>
+<td>Display this HTML-formatted index page that contains links to each of the
+                        species available through common URLs. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name<br>
+<a href="/genome/${species}/">/genome/${species}/</a>
+</td>
+<td>An index page for species "Binomial_name". This will be an HTML-format page
+                        containing links to each of the genome releases. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/release</td>
+<td>Leads to index for the named release. It should be an HTML-format page
+                        containing links to each of the data sets described below. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current</td>
+<td>Leads to an index of the most current release, symbolic link style. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current/dna<br>
+<a href="/genome/${species}/current/dna">/genome/${species}/current/dna</a>
+</td>
+<td>Returns a FASTA file containing big DNA fragments (e.g. chromosomes). MIME
+                        type is application/x-fasta. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current/mrna</br>
+<a href="/genome/${species}/current/mrna">/genome/${species}/current/mrna</a>
+</td>
+<td>Returns a FASTA file containing spliced mRNA transcript sequences. MIME type
+                        is application/x-fasta. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current/ncrna<br>
+<a href="/genome/${species}/current/ncrna">/genome/${species}/current/ncrna</a>
+</td>
+<td>Returns a FASTA file containing non-coding RNA sequences. MIME type is
+                        application/x-fasta. </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current/protein<br>
+<a href="/genome/${species}/current/protein">/genome/${species}/current/protein</a>
+</td>
+<td>Returns a FASTA file containing all the protein sequences known to be
+                        encoded by the genome. MIME type is application/x-fasta </td>
+</tr>
+<tr><td class="mono">/genome/Binomial_name/current/feature<br>
+<a href="/genome/${species}/current/feature">/genome/${species}/current/feature</a>
+</td>
+<td>Returns a GFF3 file describing genome annotations. MIME type is
+                        application/x-gff3. </td>
+</tr>
+</table></div>
+
+  ]]></doc>
+
+
+  <doc id="releaseheader" type="html" path="HEADER.html"><![CDATA[
+  <h1>Bulk genome data</h1> 
+  <big>
+  Database: <b>${title}</b><br>
+  Species:  <i>${species}</i><br>
+  Release:  ${rel}, dated ${date} as ${relfull}<br>
+  </big>
+  <hr>
+  ]]></doc>
+  
+  <!-- FIXME: this needs programming to put right selection of features, chromsomes
+    into html doc
+    -->
+    
+  <doc id="releasereadme" FIXME="FIXME" type="html" path="README.html"><![CDATA[
+<script type="text/javascript">
+var release="${rel}";
+var org="${org}";
+var gzipped=false; // fixme config
+var csomes= [${chromosomes}];
+var ftp_url="${ftp_url}/${species}/${relfull}/";
+var http_url="/genome/${species}/${relfull}/";
+
+function initform() {
+  var cdiv= document.getElementById("csomes"); // DOM
+  var content=""; 
+  for(var i = 0;i < csomes.length;i++) {
+    var c= csomes[i];
+    content += "<INPUT type='radio' value='"+c+"'  name='seq_region'>"+c+" ..\n";
+    }
+  content += "or <INPUT type='radio' value='all' checked='checked' name='seq_region'>All\n";
+  //? cdiv.document.write(content);
+  cdiv.innerHTML= content;
+  return false;
+}
+
+function radioval(radio) {
+ for(var i = 0;i < radio.length;i++) if(radio[i].checked) return radio[i].value;
+}
+
+function opendata(via) {  
+  var fm= document.forms["datachooser"];
+  var region= radioval(fm.elements["seq_region"]);
+  var format= radioval(fm.elements["seq_format"]);
+  var type  = radioval(fm.elements["seq_type"]);
+  var filename = org +"-" + region;
+  if (format == "fasta") filename +="-"+type;
+  filename +="-"+release + "."+format;
+  if (gzipped) filename +=".gz";
+  var fullurl= (via == "http")? http_url: ftp_url;
+  fullurl += format + "/" + filename;
+  fm.elements["URL"].value= fullurl;
+  window.open( fullurl, "download"); 
+  return true;
+}
+</script>
+
+<body onLoad="return initform();" >
+
+<form method="GET" name="datachooser" action="" onSubmit="return false;">
+<table align="center" bgcolor="#e8e8e8" xwidth="100%" border="1" cellpadding="5">
+<tr><td>
+  <table border="0" cellpadding="0" cellspacing="0" >
+    <tr>
+      <td colspan="5">
+      Select <B>Format, Feature Type and Sequence Region</B> below and click on a
+      <b>Download</b> button to get data</td>
+    </tr>
+    <tr> <td  colspan="5" > &nbsp;</td> </tr>  
+
+    <tr>
+      <td colspan=5 align="center"> 
+       <INPUT type=submit value="Download by FTP" onClick="opendata('ftp');">
+       &nbsp; &nbsp; <INPUT type=submit value="Download by HTTP" onClick="opendata('http');">
+       &nbsp; &nbsp; <INPUT type=reset value="Reset" name='Reset'>
+    </tr>
+    <tr> <td colspan="5" > &nbsp;</td> </tr>  
+ 
+    <tr>
+      <td > <font size="4"><b>Format</b></font> </td>
+      <td >&nbsp;</td>
+      <td > <INPUT type=radio value=fasta name=seq_format checked>Sequence (FastA)</td>
+      <td > <INPUT type=radio value=gff name=seq_format>Features (GFF)</td>
+      <td width="20%" >&nbsp;</td>
+    </tr>
+    <tr> <td colspan="5" > <hr></td> </tr>  
+    
+    <tr>
+      <td width="37%" colspan="5" >
+      <FONT  size=4><B>Feature Type</B> (for FastA)</FONT></td>
+    </tr>
+    <tr> 
+      <td colspan="2" > <INPUT type=radio value=gene name=seq_type>Protein-coding Gene</td>
+      <td > <INPUT type=radio value=transcript name=seq_type>Transcript</td>
+      <td > <INPUT type=radio value=translation name=seq_type checked>Protein</td>
+      <td > <INPUT type=radio value=CDS name=seq_type>CDS</td>
+    </tr>
+    <tr>
+      <td colspan="2"> <INPUT type=radio value=gene_extended2000 name=seq_type>Gene region +/- 2000bp</td>
+      <td > <INPUT type=radio value=five_prime_UTR name=seq_type>5' UTR</td>
+      <td > <INPUT type=radio value=three_prime_UTR name=seq_type>3' UTR</td>
+      <td > <INPUT type=radio value=intron name=seq_type>Intron</td>
+    </tr>
+    <tr>
+      <td colspan="2"> <INPUT type=radio value=transposon name=seq_type>Transposable Element</td>
+      <td > <INPUT type=radio value=tRNA name=seq_type>tRNA</td>
+      <td > <INPUT type=radio value=miscRNA name=seq_type>misc RNA</td>
+      <td > <INPUT type=radio value=pseudogene name=seq_type>Pseudogene</td>
+    </tr>
+    
+    <tr> <td width="100%" colspan="5" > <hr></td> </tr>
+
+    <tr>
+    <td colspan="5">
+    <FONT size=4><B>Sequence Region</B></FONT> <br> 
+      Chromosome arm
+    <div id="csomes">
+      <INPUT type=radio value=2L name=seq_region>2L ..
+      <INPUT type=radio value=2R name=seq_region>2R ..
+      <INPUT type=radio value=3L name=seq_region>3L ..
+      <INPUT type=radio value=3R name=seq_region>3R ..
+      <INPUT type=radio value=4 name=seq_region>4 ..
+      <INPUT type=radio value=X name=seq_region >X ..
+        or
+      <INPUT type=radio value=all name=seq_region checked>All chromosomes
+    </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="5">
+      <hr> 
+      URL: <INPUT type=text name='URL' size="80"> <br>
+      </td>
+    </tr>
+
+  </table>
+  
+</td></tr>
+</table>
+</form>
+  ]]></doc>
+
+
+<!-- doesnt this need to be appended??; or write for all species + releases -->
+  <doc id="htaccess" type="text" append="1" path="${datadir}/genome.htaccess"><![CDATA[
+## support for GMOD common /genome/ data urls 
+## web /genome/ is assumed to be symlink to ${datadir} folder
+## use as .htaccess in Directory "${datadir}" for apache web server 
+## needs /cgi-bin/genomepathmap.pl
+
+IndexIgnore *htaccess dna fff tmp
+
+RewriteEngine on
+
+# cgi will handle gzip-enabled and non-gz browsers; knows HEAD vs GET/POST
+# make sure we don't rewrite real files: genome/species/release/gff/somefile.gff
+RewriteRule /(dna|genome|feature|gff|protein|mrna|transcript|ncrna)$ \
+ /cgi-bin/genomepathmap.pl?%{REQUEST_URI} 
+
+]]></doc>
+
+
+  <doc id="apacheconf" hidden="1" type="text" path="${datadir}/apache.include"><![CDATA[
+#------- GMOD genome data path  --------------
+## support for GMOD common /genome/ data urls 
+## web /genomes/ is assumed to be symlink to ${datadir} folder
+## insert for Apache web server .conf 
+# Include "genomes-apache.include"
+
+RewriteEngine on
+RewriteRule  ^/genome$   /genome/     [R]
+RewriteRule  ^/genome/(.*)   /genomes/$1  [PT]
+##RewriteMap    genomedata-map       prg:/bio/argos/${species}/cgi-bin/genomepathmap.pl
+
+# ? change to <Location "/genomes/">
+<Directory "${datadir}">
+  Order Allow,Deny
+  Allow from all
+  # Deny from  env=is_nasty env=is_robot
+
+  RewriteEngine on
+  RewriteRule help$   "" [L]
+  RewriteRule (species)$  /cgi-bin/genomepathmap.pl?%{REQUEST_URI} [L]
+  
+  ## -- only if using RewriteMap genomedata-map 
+  # RewriteCond %{REQUEST_URI} \
+  #  (dna|genome|feature|gff|protein|mrna|transcript|ncrna)$
+  # RewriteCond %{HTTP:Accept-encoding}  gzip
+  # RewriteCond ${genomedata-map:%{REQUEST_URI}/gzip}  (.+)
+  # RewriteRule  . %1 [L]
+  
+  # cgi works; will handle gzip-enabled and non-gz browsers
+  RewriteRule /(dna|genome|feature|gff|protein|mrna|transcript|ncrna)$ \
+   /cgi-bin/genomepathmap.pl?%{REQUEST_URI} 
+   
+  <IfModule mod_layout.c>
+    ## was problem for .cgi calls 
+    LayoutDefaultHandlers Off
+    LayoutHandler text/html
+    LayoutMerge Off
+  </IfModule>
+  
+</Directory>
+#------- END GMOD genome data path  --------------
+  ]]></doc>
+
+
+</opt>

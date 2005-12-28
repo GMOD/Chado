@@ -1,26 +1,27 @@
 <opt
-  name="fbbulk-r4" 
-  relid="4"
+  name="dmelr420"
+  relid="420"
+  date="20051104"
 >
   <!-- see site_defaults for more included configs -->
   <include>site_defaults</include>
+  
+<!--  949997852  4 Nov 13:40 chado_dmel_r4_2_16.gz =?  dmel_r4.2_20050909 at fb.net -->
 
-  <title>FlyBase Chado DB r4.0</title>
+  <title>FlyBase Chado DB r4 </title>
   <about>
    Configurations to extract feature and sequence data for
    bulk files from FlyBase chado databases, including various
    release information.
   </about>
-  
+
   <doc name="Release.txt"><![CDATA[
-    D. melanogaster euchromatin genome data from FlyBase
-    Release  ${rel}, dated ${date}.
-    This release provides new chromosomal dna from release 3, and associated features.
-    
-    See release notes at <a href="http://flybase.net${release_url}">
-    http://flybase.net${release_url}</a>
+    Genome data from FlyBase
+    Species:  ${species}
+    Release:  ${rel}, dated ${date} as ${relfull}
+
+    See release notes at <a href="${release_url}">${release_url}</a>
   ]]></doc>
-   
 
   <include>fbreleases</include>
 
@@ -29,7 +30,7 @@
   -->
   <db
     driver="Pg"
-    name="dmel_chado"
+    name="chado_dmel_r4_2_16"
     host="localhost"
     port="7302"
     user=""
@@ -37,11 +38,18 @@
     />
 
   <org>dmel</org>
-  <species>Drosophila melanogaster</species>
+  <species>Drosophila_melanogaster</species>
   <golden_path>'chromosome_arm'</golden_path>
   <seq_ontology>SO</seq_ontology>
   <featureprops>'cyto_range','dicistronic','gbunit'</featureprops>
-  
+
+  <est_where_clause>AND (an.program = 'sim4' AND
+    an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))
+  </est_where_clause>
+  <analysis_where_clause>AND NOT (an.program = 'sim4' AND
+    an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))
+  </analysis_where_clause>
+
   <featdump
     path="tmp/featdump/\w+.tsv"
     config="chadofeatsql"
@@ -49,27 +57,19 @@
     type="feature_table"
     splitname="chadofeat"
     >
+    <!-- ENV values moved up -->
+    <!-- note: ests target replaces analysis EST exclusion above -->
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
-    <!-- <target>matches</target> -->
-    <target>synteny</target>
+    <target>ests</target>
+    <!-- <target>matches</target> -->  
+    <!-- <target>synteny</target> -->
   </featdump>
 
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
-
-  <featmap
-    name="scaffold"   
-    alt_name0 = "golden_path_region" 
-    alt_name1 = "golden_path_fragment" 
-    alt_name2 = "databank_scaffold"
-    alt_name3 = "scaffold"
-    alt_name4 = "supercontig"
-    types="golden_path_region scaffold"
-    typelabel="scaffold"
-    NOT_fromdb="1"
-    />
-  <featmap name="dummy" note="here for xml parser" />
+  <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
+  <gmodel_parts_rename>0</gmodel_parts_rename>
 
 </opt>

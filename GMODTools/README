@@ -12,6 +12,31 @@ SYNOPSIS
       ======================================================================  
   
 NAME
+      bulkfiles.pl -- command-line program for Bio::GMOD::Bulkfiles
+  
+SYNOPSIS
+      This program generates bulk genome annotation files from a Chado genome
+      database, including Fasta, GFF, DNA, Blast indices.
+  
+      # get bulkfiles software
+      curl -O http://eugenes.org/gmod/GMODTools/GMODTools-1.0.zip
+      unzip GMODTools*zip
+      -- OR --
+      cvs -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gmod \
+        co -d GMODTools schema/GMODTools 
+
+      # load a genome chado db to Postgres database
+      curl -O http://sgdlite.princeton.edu/download/sgdlite/sgdlite.sql.gz
+      createdb sgdlite
+      (gunzip -c sgdlite.sql.gz | psql -d sgdlite -f - ) >& log.load 
+
+      # extract bulk files from database
+      cd GMODTools 
+      perl -Ilib bin/bulkfiles.pl -conf sgdbulk -make 
+
+      ======================================================================  
+
+NAME
       Bio::GMOD::Bulkfiles -- produce bulk sequence and feature files
         from Chado genome database for public distribution.
 
@@ -99,12 +124,11 @@ WHY Bulkfiles?
           respect to feature, vocabulary and other data.  A highly configurable
           tool, with data extraction and correction methods that are separate
           and tunable is needed to adapt to such variation in genome databases.
-
+      
      ==========================================================================  
 
-
-ABOUT Chado::SeqUtils
-      Chado::SeqUtils is based on GMOD release 0.001 (January 2004) and can
+ABOUT GMOD::SeqUtils
+      GMOD::SeqUtils is based on GMOD release 0.001 (January 2004) and can
       be expected to change or go obsolete.  Besides contents of
       this package, requirements to run include the perl modules
       installed with GMOD release, esp. Chado::LoadDBI/AutoDBI and
@@ -120,27 +144,18 @@ NAME
     gmod_init_db.pl
 
 SYNOPSIS
+      *** from GMOD 0.001; needs updating to be useful
       A simple script to create the Chado database and tables
-      based on test_load.pl.   d.gilbert added:
-        parts to load in initialize.sql, 
-        add new organisms, 
-        add user choice of ontologies, which must exist in GMOD_ROOT/data/ontologies/
-
-      Assumes that Chado::LoadDBI is available for ontologies
-
-      ======================================================================  
 
 NAME
     gmod_load_newseq.pl
 
 SYNOPSIS
-    Load a file of miscellany sequences into chado db, generating public
-    IDs. Sequences are assumed to be non-genomic, not located.
+    *** from GMOD 0.001; needs updating to be useful
 
-NOTES
-    Good for small seqs: cDNA, EST, microsats, ; left out genome-sized
-    methods. Need for nascent daphnia wFleaBase to get sequence public IDs
-    Cut from gmod_load_gff3.pl
+    Load a file of miscellany sequences: cDNA, EST, microsats into chado db,
+    generating public IDs. Sequences are assumed to be non-genomic, not
+    located.
 
       ======================================================================  
 
@@ -148,33 +163,23 @@ NAME
     gmod_dump_seq.pl - Print sequences from ChadoDB
 
 SYNOPSIS
+      *** from GMOD 0.001; needs updating to be useful
+
     Dump sequence file of Chado features, with feature props, synonyms,
     dbxrefs xSelect by organism, by 'pub' = input file, seq type, feat props
     Need for nascent daphnia wFleaBase to use sequence public IDs
 
-    Good for small seqs: cDNA, EST, microsats. Left out genome-sized
-    methods. Only does fasta format now
-    ======================================================================
+      ======================================================================  
 
 NAME
       gmod_list_db.pl
 
 SYNOPSIS
+      *** from GMOD 0.001; needs updating to be useful
+
     Summarize feature entries in a Chado database, by publication (input
     file), by Seq. Ontology type (cDNA, EST, etc.), by organism. Add other
     categories as needed.
-
-SEE ALSO
-      gmod_init_db.pl -- initialize a new database, adding organisms, intialize.sql,
-         ontology data sets.
-     
-      gmod_dump_seq.pl -- output sequences selected by organism, publication (input file),
-         seq type.
-     
-      gmod_list_db.pl  -- show feature statistics for chado db: # per organism, per seq type,
-        per publication/infile, and checksum test for sequence duplications.
-
-      GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
 
 AUTHORS
       Don Gilbert, Feb 2004

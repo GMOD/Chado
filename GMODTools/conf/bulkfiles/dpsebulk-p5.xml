@@ -1,39 +1,44 @@
 <opt
-  name="dpsebulk-r2" 
-  relid="p3"
+  name="dpsebulk-p5" 
+  relid="p5"
 >
    <!-- see site_defaults for more included configs -->
   <include>site_defaults</include>
 
-  <title>FlyBase Chado Dpse r1.0.3</title>
+  <title>FlyBase Chado Dpse r2.0.1</title>
   <about>
    Configurations to extract feature and sequence data for
-   bulk files from FlyBase chado databases, for data release r1.0
+   bulk files from FlyBase chado databases, for data release r2.0
   </about>
 
   <org>dpse</org>
   <species>Drosophila_pseudoobscura</species>
-  
-  <doc name="Release.txt"><![CDATA[
-    D. pseudoobscura genome data from FlyBase 
-    Release ${rel}. 
-    NOTE: prerelease of this data was erroneously labelled r2.1.
+  <golden_path>'chromosome_arm','ultra_scaffold'</golden_path>
+  <seq_ontology>SO</seq_ontology>
+  <featureprops>'gbunit'</featureprops>
 
-    See release notes at <a href="http://flybase.net/${release_url}">
-    http://flybase.net/${release_url}</a>
+
+  <doc name="Release.txt"><![CDATA[
+    Genome data from FlyBase
+    Species:  ${species}
+    Release:  ${rel}, dated ${date} as ${relfull}
+
+    See release notes at <a href="${release_url}"> ${release_url}</a>
   ]]></doc>
+
 
   <include>fbreleases</include>
 
   <!-- oct04: patch for utr fmax < fmin when 0 length -->
-  <utrpatch>1</utrpatch>
   <!-- oct04: patch for intron  fmin - no+1,fmax, add+1 -->
-  <intronpatch>1</intronpatch>
+  <!-- nov04; chadodb corrected, turn off -->
+  <utrpatch>0</utrpatch>
+  <intronpatch>0</intronpatch>
 
   <!-- db.name  is release-dependent ; use fbreleases -->
   <db
     driver="Pg"
-    no_name=""
+    name="bogus"
     host="localhost"
     port="7302"
     user=""
@@ -43,15 +48,30 @@
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 
+  
+  <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent 
+    dpse: match_tblastn_Dmel_r3_1; match:tblastn:Dmel_r3.1; gene
+  -->
+  <maptype_ignore_missingparent>^(match_part|match|gene|cytology|chromosome_band|oligo|BAC|protein_binding_site)</maptype_ignore_missingparent>
+
   <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
+  <!-- //fixme// dpse dup features w/ same uniqname; 
+    empty chromosome_arm features;
+    only golden_path_region,ultrascaf have csome bases 
+    BUT this extra type_id no good for proteins, other fasta using this
+  -->
   <dnadump
     path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"
+    sql_csome="select feature_id, residues from feature 
+       where type_id in 
+       (select cvterm_id from cvterm where name in ('golden_path_region','ultra_scaffold')) 
+       and uniquename = ?"
     />
-
   
+  <!-- old flybase SO cv uses golden_path_region instead of golden_path_fragment -->
   <chr_pattern>^(chromosome_arm|golden_path|ultra_scaffold)$</chr_pattern>
-  <chrpart_pattern>^(golden_path_fragment)$</chrpart_pattern>
+  <chrpart_pattern>^(golden_path_fragment|golden_path_region)$</chrpart_pattern>
 
   <unknown_chr>U</unknown_chr>
   <!-- Unknown_group and Unknown_singleton go to one bag chromosome U -->
@@ -60,6 +80,11 @@
   <mapchr_pattern name="3contig"  from="^Contig\w+" to="ctg1"/>
   <mapchr_pattern name="null" from="" to=""/>
   
+  <analysis_where_clause>
+  AND NOT (an.program in ('genewise','genscan','twinscan'))
+  </analysis_where_clause>
+  <est_where_clause> -- none </est_where_clause>  
+  
   <featdump
     path="tmp/featdump/\w+.tsv"
     config="chadofeatsql"
@@ -67,17 +92,10 @@
     type="feature_table"
     splitname="chadofeat"
     >
-    <!-- need to put in ENV for subsequent chadofeatsql.xml config -->
-    <ENV 
-      golden_path="'chromosome_arm','ultra_scaffold'"
-      species="Drosophila_pseudoobscura"
-      analysis_where_clause=""
-      unknown_chr="U"
-      />
+    <!-- need to put in ENV for subsequent chadofeatsql.xml config ; moved up -->
     
     <target>chromosomes</target>
     <target>features</target>
-    <!-- <target>matches</target> -->
     <target>synteny</target>
     <target>analysis</target>
   </featdump>
@@ -87,28 +105,21 @@
   <maptype_pattern name="orthodup2" from="match_part:tblastn:Dmel.*" to="skip"/>
   <maptype_pattern name="null" from="null" to="null"/>
 
-  <!-- feature sets to make fasta bulk files; 
+  <!-- overrides to featuresets.xml; 
+    feature sets to make fasta bulk files; 
     needs update for dpse syntenic_block and homology features
+    feb05: drop mRNA fasta as confusing duplicate to transcript set
+    no UTR's but have introns
   -->
   <!-- feature sets to make fasta bulk files -->
   <featset>gene</featset>
-  <featset>mRNA</featset>
   <featset>CDS</featset>
   <featset>transcript</featset>
   <featset>translation</featset>
-  <!-- <featset>tRNA</featset> -->
-  <!-- <featset>miscRNA</featset> -->
-  <!-- <featset>transposon</featset> -->
-  <!-- <featset>pseudogene</featset> -->
   <featset>gene_extended2000</featset>
-  <featset>five_prime_UTR</featset>
-  <featset>three_prime_UTR</featset>
   <featset>intron</featset>
   <featset>intergenic</featset>
-
   <featset>syntenic_region</featset>
-
-  <featset>scaffold</featset> <!-- see below confusion -->
   <featset>chromosome</featset>
 
 

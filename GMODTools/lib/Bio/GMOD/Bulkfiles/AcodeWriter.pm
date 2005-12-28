@@ -39,14 +39,16 @@ use POSIX;
 use FileHandle;
 use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
-
-use vars qw(@ISA);
 use Bio::GMOD::Bulkfiles::BulkWriter;       
-@ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/); ## want interface class
+
+use base qw(Bio::GMOD::Bulkfiles::BulkWriter);
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
-my $configfile= "toacode"; #? BulkFiles/AcodeWriter.xml 
+my $VERSION = "1.1";
+
+#my $configfile= "toacode"; #? BulkFiles/AcodeWriter.xml 
+use constant BULK_TYPE => 'acode';
+use constant CONFIG_FILE => 'toacode';
 
 use vars qw/  $noIDmap $nameIsId $nameIsSpeciesId $cutdbpattern $indexidtype $gnidpattern $anidpattern /;
 
@@ -54,8 +56,11 @@ sub init
 {
 	my $self= shift;
   $self->SUPER::init();
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  $self->{configfile}= $configfile unless defined $self->{configfile};
+  
+  $DEBUG= $self->{debug} if defined $self->{debug};
+  ## superclass does these??
+  # $self->{bulktype} =  $self->BULK_TYPE; # dont need hash val?
+  # $self->{configfile}= $self->CONFIG_FILE unless defined $self->{configfile};
 }
 
 
@@ -69,22 +74,19 @@ sub initData
 {
   my($self)= @_;
   $self->SUPER::initData();
-  my $config = $self->{config};
-  my $sconfig= $self->handler()->{config};
- 
-  ##  fastafiles
-  my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo('acode');
-  my $outdir= $self->handler()->getReleaseSubdir( $finfo->{path} || 'acode/');
-  $self->{fastadir} = $outdir;
+  
+#   my $config = $self->{config};
+#   my $sconfig= $self->handler()->{config};
+#   my $finfo= $self->{fileinfo} || $self->handler()->getFilesetInfo($self->BULK_TYPE);
+#   my $outdir= $self->handler()->getReleaseSubdir( $self->getconfig('path') || $self->BULK_TYPE);
+#   $self->{outdir} = $outdir;
 
-  $self->{addids} = $finfo->{addids};
-  $self->{dropnotes} = $finfo->{dropnotes};
-  $self->{allowanyfeat} = $finfo->{allowanyfeat};
-  $self->{makeall} = $finfo->{makeall};
-  $self->{dogzip} = $finfo->{dogzip};
-  $self->{perchr} = $finfo->{perchr};
+## see instead super.. promoteconfigs
+#   $self->{addids} = $self->getconfig('addids');
+#   $self->{dropnotes} = $self->getconfig('dropnotes');
+#   $self->{allowanyfeat} = $self->getconfig('allowanyfeat');
 
-  $noIDmap =  $finfo->{noidmap} || $config->{noidmap};
+  $noIDmap =  $self->getconfig('noidmap');
   unless($noIDmap) {
   $noIDmap= join '|',
   qw(cytowalk 
@@ -106,14 +108,13 @@ sub initData
   #   
   $noIDmap =~ s/\s+/|/g;
   $noIDmap .= '|\bregion';
-  $nameIsId= $finfo->{nameisid} || $config->{nameisid} || '^(BAC)';
-  $nameIsSpeciesId= $finfo->{nameisorgid} || $config->{nameisorgid} || '^(gene)$';  # others? rnas?
-  $cutdbpattern=  $finfo->{idcutdb} || $config->{idcutdb} || '^(FlyBase|GadFly|GB_protein|GO):';
+  $nameIsId= $self->getconfig('nameisid')  || '^(BAC)';
+  $nameIsSpeciesId= $self->getconfig('nameisorgid')  || '^(gene)$';  # others? rnas?
+  $cutdbpattern=  $self->getconfig('idcutdb') || '^(FlyBase|GadFly|GB_protein|GO):';
 
-  $indexidtype= $finfo->{indexidtype}|| $config->{indexidtype} || '^(gene|pseudogene|\w+RNA)';
-  $gnidpattern= $finfo->{gnidpattern}|| $config->{gnidpattern} || '[A-Z]{2}gn\d+';
-  $anidpattern= $finfo->{anidpattern}|| $config->{anidpattern} || '[A-Z]{2}an\d+';
-    
+  $indexidtype= $self->getconfig('indexidtype') || '^(gene|pseudogene|\w+RNA)';
+  $gnidpattern= $self->getconfig('gnidpattern') || '[A-Z]{2}gn\d+';
+  $anidpattern= $self->getconfig('anidpattern') || '[A-Z]{2}an\d+';
 }
 
 
@@ -136,22 +137,21 @@ sub makeFiles
   print STDERR "AcodeWriter::makeFiles\n" if $DEBUG; # debug
   
   # more sensible that writer should ask handler for kind of files it wants
-  my $intype= $self->{config}->{informat} || 'fff'; #? maybe array
+  my $intype= $self->config->{informat} || 'fff'; #? maybe array
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes};
-
-  unless(ref $fileset) { 
+  unless(@$fileset) { 
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
-    # warn "makeFiles: no infiles => \@filesets given"; return;  
-    }
-  unless(ref $fileset) { 
-    warn "AcodeWriter: no input 'fff' feature files found\n"; 
-    return;  
+    unless(@$fileset) { 
+      warn "AcodeWriter: no input '$intype' files found\n"; 
+      return  $self->status(-1);
+      }
     }
  
   my $featset= $self->handler->{config}->{featset} || []; #? or default set ?
-  my $addids = defined $args{addids} ? $args{addids} : $self->{addids};
+  my $addids = defined $args{addids} ? $args{addids} : $self->config->{addids};
   
+  my $status= 0;
   my $ok= 1;
   for (my $ipart= 0; $ok; $ipart++) {
     $ok= 0;
@@ -170,12 +170,13 @@ sub makeFiles
       
       my $res= $self->process( $inh, $chr, $featset);
       close($inh); delete $infile->{inh};
+      $status += $res;
       $ok= 1;
       }
     }
     
   print STDERR "AcodeWriter::makeFiles: done\n" if $DEBUG; 
-  return 1; #what?
+  return  $self->status($status);
 }
 
 
@@ -190,7 +191,7 @@ sub openInput
 {
 	my $self= shift;
   my( $fileset, $ipart, $intype )= @_; # do per-csome/name
-  $intype ||= $self->{config}->{informat} || 'fff'; #? maybe array
+  $intype ||= $self->config->{informat} || 'fff'; #? maybe array
   my $atpart= 0;
   print STDERR "openInput: type=$intype part=$ipart \n" if $DEBUG; 
   
@@ -251,12 +252,12 @@ sub process
   my( $inh, $chr, $featset )=  @_;
   my $ndone= 0;
   my $outh= {};
-  my $fastadir= $self->{fastadir};
+  my $outdir= $self->outputpath();
   my @features= @$featset;
 
   my @fffeatures= grep !/^chromosome/, @features;
-  my $fn= $self->get_filename ( $self->{org}, $chr, 'all', $self->{rel}, 'acode');
-  $fn= catfile( $fastadir, $fn);
+  my $fn= $self->get_filename ( $self->{org}, $chr, 'all', $self->{rel}, $self->BULK_TYPE);
+  $fn= catfile( $outdir, $fn);
   $outh->{all}= new FileHandle(">$fn");
   $self->{outh}= $outh->{all};
   
@@ -537,7 +538,7 @@ sub fromFFFloop
 
   my $allowanyfeat= 1; 
 #     (!$featset || $featset =~ /^(any|all)/i) ? 1 
-#     : (defined $self->{allowanyfeat}) ?  $self->{allowanyfeat} 
+#     : (defined $self->config->{allowanyfeat}) ?  $self->config->{allowanyfeat} 
 #       : 0;
   my @gmsub;
   my $gmain;
@@ -637,7 +638,7 @@ sub cleanNotes
   my ($self, $notes)= @_;
   my @notes= ();
   if ($notes) {
-    my $dropnotes= $self->{dropnotes} || 'xxx';
+    my $dropnotes= $self->config->{dropnotes} || 'xxx';
     my %notes=();
     foreach my $n (split(/[;]/,$notes)) {
       if ($n =~ /^(\w+)=(.+)/) { 

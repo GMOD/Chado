@@ -2,11 +2,9 @@
   name="fbbulk-r41" 
   relid="41"
   date="20050207"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="data/genomes/Drosophila_melanogaster"
 >
-<!--   datadir="data2/fban" -->
+  <!-- see site_defaults for more included configs -->
+  <include>site_defaults</include>
 
   <title>FlyBase Chado DB r4.1</title>
   <about>
@@ -38,7 +36,7 @@
 
   </notes>
   
-  <doc name="README"><![CDATA[
+  <doc name="Release.txt"><![CDATA[
     D. melanogaster euchromatin genome data from FlyBase
     Release  ${rel}, dated ${date}.
     
@@ -67,15 +65,16 @@
 
   <org>dmel</org>
   <species>Drosophila melanogaster</species>
-  <include>organisms</include>
-  
-  <!-- note organism_id is db specific; may change ; here for temp use only -->
-  <organism id="dpse" species="Drosophila_pseudoobscura" 
-    organism_id="3"/>
-  <organism id="dmel" species="Drosophila_melanogaster" 
-    organism_id="1"/>
 
-  <include>filesets</include>
+  <golden_path>'chromosome_arm'</golden_path>
+  <seq_ontology>SO</seq_ontology>
+  <featureprops>'cyto_range','dicistronic','gbunit'</featureprops>
+  <est_where_clause>AND (an.program = 'sim4' AND
+    an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))
+  </est_where_clause>
+  <analysis_where_clause>AND NOT (an.program = 'sim4' AND
+    an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))
+  </analysis_where_clause>
 
   <featdump
     path="tmp/featdump/\w+.tsv"
@@ -84,17 +83,6 @@
     type="feature_table"
     splitname="chadofeat"
     >
-    <ENV 
-      dummy="dummy"
-      golden_path="'chromosome_arm'"
-      est_where_clause="AND (an.program = 'sim4' AND
-        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
-      analysis_where_clause="AND NOT (an.program = 'sim4' AND
-        an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))"
-      />
-    <!-- note: ests target replaces analysis EST exclusion above -->
-    <!-- dang analysis_where_clause failed to work.. -->
-    
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
@@ -108,8 +96,7 @@
   <!-- rename intron,UTRs to Parent-mRNA-in/utr ? -->
   <gmodel_parts_rename>0</gmodel_parts_rename>
   
-  <!-- feature sets to make fasta bulk files -->
-  <include>featuresets</include>
+  <!-- featuresets = feature sets to make fasta bulk files -->
 
   <!-- note 19nov04 - override scaffold default featmap.
       fb dmel chado scaffold residues come from

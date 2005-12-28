@@ -13,9 +13,10 @@ use strict;
   
 =cut
 
-use vars qw(@ISA);
+
 use Bio::Seq::LargePrimarySeq;
-BEGIN{ @ISA = qw(Bio::Seq::LargePrimarySeq); }
+use base qw(Bio::Seq::LargePrimarySeq);
+#use vars qw(@ISA); BEGIN{ @ISA = qw(Bio::Seq::LargePrimarySeq); }
 
 sub new {
   my ($class, %params) = @_;

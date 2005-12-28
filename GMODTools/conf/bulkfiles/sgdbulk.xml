@@ -1,0 +1,95 @@
+<opt
+  name="sgdbulk"
+  relid="5"
+  date="20051129"
+  make_current="1"
+  >
+  
+  <about id="sgdbulk"><![CDATA[
+   See bulkfiles_template.xml for further documentation. 
+   See site_defaults for included configurations.
+  ]]></about>
+  
+  <include>site_defaults</include>
+  
+  <title>SGD Lite</title>
+  
+  <doc id="Release.txt"><![CDATA[
+  Bulk output for Chado genome databases
+  Database: ${title} 
+  Species:  ${species}
+  Release:  ${rel}, dated ${date} as ${relfull}
+  ]]></doc>
+  
+  <doc id="Example.txt"><![CDATA[
+  Bulkfiles Example:
+  # get software
+  curl -O http://eugenes.org/gmod/GMODTools/GMODTools-1.0.zip
+  unzip GMODTools*.zip
+
+  # load a genome chado db to Postgres database
+  curl -O http://sgdlite.princeton.edu/download/sgdlite/sgdlite.sql.gz
+  createdb sgdlite
+  (gunzip -c sgdlite.sql.gz | psql -d sgdlite -f - ) >& log.load 
+
+  # extract bulk files from database
+  cd GMODTools 
+  perl -Ilib bin/bulkfiles.pl -conf sgdbulk -make 
+
+  # if failed
+  perl -Ilib bin/bulkfiles.pl -conf sgdbulk -make -debug \
+    |& mail -s gmodtools-debug gilbertd@indiana.edu 
+
+  ]]></doc>
+  
+  
+  <release id="5" rel="sgdr5"  dbname="sgdlite" date="20050823"
+    relfull="sgdlite_2005_08_23"
+    release_url="/genome/Saccharomyces_cerevisiae/sgdlite-release5.html"
+    />
+  <release id="1" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
+    relfull="sgdlite_20040519"
+    release_url="/genome/Saccharomyces_cerevisiae/sgdlite-release1.html"
+    />
+
+  <org>scer</org>
+  <species>Saccharomyces_cerevisiae</species>
+  <!-- see chadofeatsql ENV_default -->
+  <golden_path>'chromosome'</golden_path>
+  <featureprops>'Note','orf_classification'</featureprops>
+
+  <fileset_override
+    name="fff"
+    path="fff/.+\.fff"
+    input="feature_table"
+    title="Genome features"
+    config="sgdfeatconf"
+    handler="FeatureWriter"
+    dogzip="0"
+    />
+  <fileset_override id="dummy" title="placeholder for xmlsimple"/>
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>matches</target> <!--  //none in sgdlite1//  -->
+    <target>analysis</target> <!--  //none in sgdlite1//  -->
+  </featdump>
+  
+  <!-- feature sets to make fasta bulk files -->
+  <featset>chromosome</featset>
+  <featset>gene</featset>
+  <featset>ncRNA</featset>
+  <featset>transposon</featset>
+  <featset>gene_extended2000</featset>
+  <featset>intergenic</featset>
+<!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
+
+
+</opt>

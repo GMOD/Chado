@@ -1,0 +1,36 @@
+<opt
+  name="site_eugenes_defaults"
+  ROOT="${GMOD_ROOT}/"
+  datadir="data/genomes"
+  ftp_url="ftp://ftp.eugenes.org/genomes"
+  web_url="http://www.eugenes.org/genome"
+>
+  <title>euGenes Site settings for GMODTools</title>
+
+  <db
+    driver="Pg"
+    name="releasedb_placeholder"
+    host="localhost"
+    port="7302" 
+    user="flybase"
+    password=""
+    />
+  
+  <!-- list of species, abbreviations -->
+  <include>organisms</include>
+  
+  <!-- how to make bulk files -->
+  <include>filesets</include>
+
+  <!-- feature sets to make fasta bulk files -->
+  <include>featuresets</include>
+
+    <!-- or use bulkfiles defaults/user choice -->
+  <outformats>overview</outformats>
+  <outformats>fff</outformats>
+  <outformats>gff</outformats>
+  <outformats>fasta</outformats>
+  <outformats>tables</outformats>
+  <outformats>blast</outformats>
+
+</opt>

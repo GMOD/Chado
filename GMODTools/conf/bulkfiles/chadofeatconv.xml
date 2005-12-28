@@ -18,6 +18,8 @@
   <outformats>gff</outformats>
   <outformats>fasta</outformats>
 
+  <gff_addchromosome>0</gff_addchromosome>
+
   <!-- copied from db-release config files .. this is mostly common info,
     but db-release config can override @featset, %featmap -->
 
@@ -30,6 +32,9 @@
   
   <!-- remapType: append this name pattern to type; works with maptype below -->
   <name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan)</name2type_pattern>
+
+  <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent -->
+  <maptype_ignore_missingparent>^(match_part|match|gene|cytology|chromosome_band|oligo|BAC|protein_binding_site|rescue_fragment)</maptype_ignore_missingparent>
 
   <!-- drop lengthy program.source from match name 
   
@@ -61,6 +66,8 @@ feb05: dmelr4.1 fixes; new name for matches oligos .. cytology .. BAC
 
   mapname_pattern name="bac2" type="^BAC" from="(\-hsp.*)" to=""
 
+nov05: dpse2; remove redundant messy Dpse\\ prefix from GA00 genes (not in tr; prot names)
+
 -->
 
   <mapname_pattern name="1match" type="^(match|oligo)" cuttype="1" from="null" to="null"/>
@@ -81,6 +88,8 @@ feb05: dmelr4.1 fixes; new name for matches oligos .. cytology .. BAC
   <mapname_pattern name="genscann" type="genscan" from="_GENSCAN_predicted_peptide.*" to=""/>
   <mapname_pattern name="pinsert"  type="pinsertion" from="\-insertion\-on\-.*$" to=""/>
 
+  <mapname_pattern name="dpsegn1" type="gene" from="Dpse\\GA" to="GA"/>
+
   <mapname_pattern name="dum" from="\-dummy\-" to=""/>
   <mapname_pattern name="tep" type="transposable_element_pred" 
     from="JOSHTRANSPOSON\-" to=""/>
@@ -98,8 +107,8 @@ assembly:path-AE002603.4
   <maptype_pattern name="3masked" from="_masked" to=""/>
   <!-- <maptype_pattern name="3match" from=":Dmel r3.1" to="dmel_r31"/> -->
 
-<!--   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/> -->
-  <maptype_pattern name="null" typename="noname" from="null" to="null"/> -->
+  <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/>
+  <maptype_pattern name="null" typename="noname" from="null" to="null"/>  
 
 <!--
   dmel r4 ugly match types: see below maptype changes
@@ -162,22 +171,16 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
   
 -->
 
+  
+   <!-- dpse chado duplicate 0-length chromosome entries; why? -->
+  <nozombiechromosomes>1</nozombiechromosomes>
+  
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
-  <!-- oct04 : intron here only temp. till fix chadodb intron calculator; offbyone now 
-    is 5/3prime like calc-feature offbyone?
-    feb05: possibly the 0-base insertion sites are origin_one; min==max
-2L      67576   67576           1       transposable_element_insertion_site     P{EPgy2}CG11371[EY
-04764]  FBti0039195     4547923 synonym P{EPgy2}CG11371<up>EY04764</up>
-2L      80708   80708           1       transposable_element_insertion_site     P{EPgy2}EY09207 FB
-ti0039584       4548312 synonym P{EPgy2}EY09207
-
-    -->
   <origin_one
     chromosome_arm="1"
     chromosome_band="1"
     chromosome="1"
     golden_path="1"
-    NOTNOWintron="1"
     transposable_element_insertion_site="1"
     />
 
@@ -239,6 +242,7 @@ ti0039584       4548312 synonym P{EPgy2}EY09207
     pinsertion="1"
     />
 
+    
   <dropname 
     transcription_start_site="1"
     mRNA_genscan="1"
@@ -454,47 +458,17 @@ retype in dpse db all dpse golden_path_region to supercontig
   -->
 
   <maptype_gff>
-    <!-- FIXME: ordered arrays here .. $type, $gffsource -->
-    <transposable_element_pred>transposable_element</transposable_element_pred>
-    <transposable_element_pred>predicted</transposable_element_pred>
-    <tRNA_trnascan>tRNA</tRNA_trnascan>
-    <tRNA_trnascan>trnascan</tRNA_trnascan>
-    
+    <transposable_element_pred>transposable_element:predicted</transposable_element_pred>
+    <match_fgenesh>match:fgenesh</match_fgenesh>
+    <match_part_fgenesh>match_part:fgenesh</match_part_fgenesh>
+    <match_HDP>match:HDP</match_HDP>
+    <match_part_HDP>match_part:HDP</match_part_HDP>
+    <match_RNAiHDP>match:RNAiHDP</match_RNAiHDP>
+    <match_part_RNAiHDP>match_part:RNAiHDP</match_part_RNAiHDP>
+    <mRNA_genscan>mRNA:genscan</mRNA_genscan>
+    <mRNA_piecegenie>mRNA:piecegenie</mRNA_piecegenie>
+    <tRNA_trnascan>tRNA:trnascan</tRNA_trnascan>
   </maptype_gff>
-
-  <!-- old gff typing
-      ? drop this; software handles?
-    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
-    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
-    <mRNA_genscan>mRNA</mRNA_genscan>
-    <mRNA_genscan>genscan</mRNA_genscan>
-    <mRNA_twinscan>mRNA</mRNA_twinscan>
-    <mRNA_twinscan>twinscan</mRNA_twinscan>
-    <mRNA_genewise>mRNA</mRNA_genewise>
-    <mRNA_genewise>genewise</mRNA_genewise>
-
-    <gene_piecegenie>gene</gene_piecegenie>
-    <gene_piecegenie>piecegenie</gene_piecegenie>
-    <gene_genscan>gene</gene_genscan>
-    <gene_genscan>genscan</gene_genscan>
-    <gene_twinscan>gene</gene_twinscan>
-    <gene_twinscan>twinscan</gene_twinscan>
-    <gene_genewise>gene</gene_genewise>
-    <gene_genewise>genewise</gene_genewise>
-
-    <match_part_fgenesh>match_part</match_part_fgenesh>
-    <match_part_fgenesh>fgenesh</match_part_fgenesh>
-    <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
-    <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
-    <match_part_HDP>match_part</match_part_HDP>
-    <match_part_HDP>HDP</match_part_HDP>
-    <match_HDP>match</match_HDP>
-    <match_HDP>HDP</match_HDP>
-    <match_fgenesh>match</match_fgenesh>
-    <match_fgenesh>fgenesh</match_fgenesh>
-    <match_RNAiHDP>match</match_RNAiHDP>
-    <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
-  -->
   
   
 </opt>

@@ -1,10 +1,31 @@
 <opt
   name="chadofeatsql" 
-  date="20040821"
+  date="20051129"
   >
 
-  <title>FlyBase Chado DB SQL</title>
+  <title>Chado DB SQL</title>
   
+<!-- ENV_default:
+  Variables below of form '$ {xxx}' for XML::Simple are handy, 
+  however things fail if (a) they are not defined by caller
+  or (b) defined badly. Need default config vars (XML::Simple doesn't do )
+  
+  seq_ontology is name in CV table (SO, Sequence Ontology, etc.)
+  golden_path value is set of quoted names for chromosome/.. type
+  'chromosome', 'chromosome_arm', 'ultra_scaffold' ..
+  feature.type.name IN ($ {golden_path})
+-->
+  <ENV_default
+    seq_ontology="Sequence Ontology Feature Annotation"
+    golden_path="'chromosome', 'chromosome_arm', 'ultra_scaffold'"
+    featureprops="'Note','cyto_range','gbunit'"
+    species="Unknown_species"
+    unknown_chr="U"
+    analysis_where_clause=""
+    est_where_clause=""
+  />
+
+
   <about>
     This is a collection of Chado DB SQL calls to extract
     all basic genome features, into intermediate feature_table form
@@ -22,96 +43,148 @@
     Logic in Bulkfiles::FeatureWriter then merges, selects/reformats
     these feature_tables and writes bulk files per chromosome.  One can
     also attach post-processing scripts (see matches below).
+    
+    Written originally for the FlyBase  project, it attempts to work
+    for a range of Chado databases.
   </about>
   
+  <feature_sql id="organism_summary" type="summary" output="organisms-overview.txt">
+  <sql><![CDATA[
+    SELECT o.organism_id,o.abbreviation,o.genus,o.species,o.common_name, 
+           count(f.feature_id) as n_features, o.comment
+    FROM organism o LEFT JOIN feature f USING (organism_id)
+    GROUP by o.organism_id,o.abbreviation,o.genus,o.species,o.common_name,o.comment
+    ORDER BY o.genus,o.species
+    ;
+  ]]></sql>
   
-  <feature_sql id="countfeats" type="SKIP_list" output="feature-counts.txt">
+  <script name="orgsum" type="postprocess" shell="perl -ni" language="perl">
+  <![CDATA[
+  unless($header++){ print join("\t",
+   qw(Organism_id Abbreviation Genus Species Common_name N_features Comment)),"\n"; } 
+  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
+  print join("\t",@v),"\n";
+  ]]></script>
   
-  <note>this method has many flaws; instead calc stats from fff features ** </note>
-  
-  <sqlbad><![CDATA[
-  -- use for overview of chado feature contents
-  -- need to rename feature types to match feature outputs; see
-  -- chadofeatconv.xml:maptype 
-  -- also many with featureloc.fmin,fmax have NULL seqlen; use featureloc length ?
-  -- add ? STDDEV(seqlen), MIN(seqlen), MAX(seqlen)
-  SELECT 
-    featcv.name as type, 
-    count( ft.feature_id) as N_features,
-    round( AVG(ff.flength), 0 ) as Ave_seqlen,
-    round( STDDEV(ff.flength),2 ) as Stddev,
-    MIN(ff.flength) as Min_seqlen,
-    MAX(ff.flength) as Max_seqlen
-  FROM 
-    cvterm featcv,  
-    feature ft left outer join 
-    ( SELECT fl.feature_id,  
-      CASE 
-        WHEN ft.seqlen IS NULL THEN abs(fl.fmax - fl.fmin) 
-        ELSE ft.seqlen END as flength
-      FROM featureloc fl, feature ft
-      WHERE fl.feature_id = ft.feature_id ) as ff
-      ON (ft.feature_id = ff.feature_id)
-  WHERE 
-    ft.type_id = featcv.cvterm_id
-    and NOT (featcv.name like 'sim4:wrap%')
-  GROUP BY type;
-
-    -- and ft.feature_id = fl.feature_id  
-    --? and featcv.cv_id = socv.cv_id and socv.name = 'SO'
-  ]]></sqlbad>
-  
-  <sql>
-  -- useless for types w/ null seqlen
-  SELECT 
-    featcv.name as type, 
-    count( armft.feature_id) as N_features,
-    round( AVG(armft.seqlen), 0 ) as Ave_seqlen,
-    round( STDDEV(armft.seqlen),2 ) as Stddev,
-    MIN(armft.seqlen) as Min_seqlen,
-    MAX(armft.seqlen) as Max_seqlen
-  FROM 
-    feature armft, cvterm featcv
-  WHERE 
-    armft.type_id = featcv.cvterm_id
-    and NOT ( featcv.name like 'sim4:wrap%')
-  GROUP BY type;
-  </sql>  
-  
-  <note>
-Date: Tue, 26 Apr 2005 15:11:46 -0400 (EDT)
-From: Andy Schroeder andy@morgan.harvard.edu
-Subject: Re: FB-NG Help Mail: Genome statistics for melanogaster
-
-Can get numbers of desired features using count function and average size using avg 
-function.
-
-1) for gene
-chado_dmel_r4_2_2=> select avg(seqlen) from feature where type_id = 219;       
- avg         
- 4883.0054419870230
-
-chado_dmel_r4_2_2=> select count(*) from feature where type_id = 219;
- count 
- 14399
-
-2) for exon
-
-...
-Perhaps this sort of info could be included in the release note statistics?
-
-Gene: number = 14066; avg_length = 4955
-Exon: number = 63053; avg_length = 486
-5'UTR: number = 19833; avg_length = 186
-3'UTR: number = 14348; avg_length = 408
-intron: number = 49927; avg_length = 1147
-intergenic regions avg_length = 5087
-
-</note>
-
   </feature_sql>
-  
-  <feature_sql id="fbids" type="SKIP_list" output="fbid-list.txt">
+
+
+  <feature_sql id="analysis_summary" type="summary" output="analyses-overview.txt">
+  <sql><![CDATA[
+  SELECT 
+    an.analysis_id,
+    CASE WHEN (an.sourcename IS NULL OR an.sourcename = 'dummy') THEN 'match:' || an.program
+      ELSE 'match:' || an.program || ':' || an.sourcename
+    END AS Analysis_type, 
+    count(f.feature_id) as N_features,
+    ROUND( (AVG(af.rawscore)::numeric), 2 ) as Ave_score,
+    ROUND( (AVG(af.significance)::numeric),  2 ) as Ave_sig,
+    (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
+  FROM feature f, analysisfeature af, analysis an
+  WHERE an.analysis_id = af.analysis_id and af.feature_id = f.feature_id
+  GROUP BY f.organism_id, an.analysis_id, Analysis_type  
+  ORDER BY species, Analysis_type
+  ;
+  ]]></sql>  
+
+  <script name="anasum" type="postprocess" shell="perl -ni" language="perl">
+  <![CDATA[
+  unless($header++){ print join("\t",
+   qw(Analysis_id Analysis_type N_features Ave_score Ave_sig Species)),"\n"; } 
+  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
+  print join("\t",@v),"\n";
+  ]]></script>
+  </feature_sql>
+
+  <feature_sql id="property_summary" type="summary" output="properties-overview.txt">
+  <sql><![CDATA[
+  SELECT 
+    fp.type_id,
+    t.name as Property_type,
+    count(fp.featureprop_id) as N_properties,
+    count(distinct f.feature_id) as N_features,
+    count(distinct fp.value) as N_values,
+    (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
+  FROM feature f, featureprop fp, cvterm t
+  WHERE fp.type_id = t.cvterm_id and fp.feature_id = f.feature_id
+  GROUP BY f.organism_id, fp.type_id, t.name
+  ORDER BY Species, Property_type
+  ;
+  ]]></sql>  
+
+  <script name="propsum" type="postprocess" shell="perl -ni" language="perl">
+  <![CDATA[
+  unless($header++){ print join("\t",
+   qw(Type_id Property_type N_properties N_features N_values Species)),"\n"; } 
+  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
+  print join("\t",@v),"\n";
+  ]]></script>
+  </feature_sql>
+
+
+  <feature_sql id="feature_summary" type="summary" output="features-overview.txt">
+  <sql><![CDATA[
+  SELECT 
+    f.type_id,
+    t.name as Feature_type,
+    count(f.feature_id) as N_features,
+    sum(length(f.residues)) as N_residues,
+    sum(f.seqlen) as Tot_len,
+    ROUND( AVG(f.seqlen), 0 ) as Ave_len,
+    MIN(f.seqlen) as Min_len,
+    MAX(f.seqlen) as Max_len,
+    (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
+  FROM feature f, cvterm t
+  WHERE f.type_id = t.cvterm_id
+      AND NOT (t.name like 'sim4:wrap%') -- ignore flybase misuse of SO feat types
+  GROUP BY f.organism_id, f.type_id, t.name
+  ORDER BY species, feature_type
+  ;
+
+  ]]></sql>  
+
+  <script name="featsum" type="postprocess" shell="perl -ni" language="perl">
+  <![CDATA[
+  unless($header++){ print join("\t",
+   qw(Type_id Feature_type N_features N_residues Tot_len Ave_len Min_len Max_len Species)),"\n"; } 
+  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
+  print join("\t",@v),"\n";
+  ]]></script>
+  </feature_sql>
+
+  <feature_sql id="chromosome_summary" type="NOTYET_summary" output="chromosomes-overview.txt">
+  <sql><![CDATA[
+  -- this is slow for an overview table
+  SELECT 
+    f.type_id,
+    t.name as Feature_type,
+    count(f.feature_id) as N_features,
+    sum(length(f.residues)) as N_residues,
+    sum(f.seqlen) as Tot_len,
+    sum(CASE WHEN fl.srcfeature_id = f.feature_id THEN 1 ELSE 0 END) as N_issource,
+    sum(CASE WHEN fl.feature_id = f.feature_id THEN 1 ELSE 0 END) as N_istarget,
+    (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
+  FROM cvterm t, feature f 
+    left join featureloc fl on (fl.srcfeature_id = f.feature_id or fl.feature_id = f.feature_id)
+  WHERE f.type_id = t.cvterm_id
+      AND NOT (t.name like 'sim4:wrap%') -- ignore flybase misuse of SO feat types
+  GROUP BY f.organism_id, f.type_id, t.name
+  ORDER BY species, feature_type
+  ;
+  ]]></sql>  
+
+  <script name="csum" type="postprocess" shell="perl -i" language="perl">
+  <![CDATA[
+  unless($header++){ print join("\t",
+   qw(Type_id Feature_type Name Seqlen Feature_id Species)),"\n"; } 
+  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
+  print join("\t",@v),"\n";
+  ]]></script>
+  </feature_sql>
+ 
+
+
+  <feature_sql id="fbids" type="SKIP" output="fbid_table1.txt">
   <sql><![CDATA[
     -- used for flybase to exclude cytologic features with same genome feature id
     SELECT accession FROM dbxref 
@@ -120,8 +193,7 @@ intergenic regions avg_length = 5087
   ]]></sql>
   </feature_sql>
 
-
-  <feature_sql id="id_table" type="list" output="id_table.txt">
+  <feature_sql id="fbid_table" type="SKIP" output="fbid_table.txt">
   <sql>;</sql>
   
   <script name="idtab" input="-" type="postprocess"  language="perl"
@@ -167,7 +239,6 @@ BEGIN {
 #  Ortholog table for Drosophila species 
 # OrthoID = orthology ID and protein annotation ID for each orthology pair
 }, join"\t",qw(OrthoID DpseID DmelID Dmel_Symbol),"\n";
-# was qw(OrthoID Spp1 Spp2) 
 }
 chomp; 
 ($a,$b,$e,$s,$org,$t,$n,$id,$oid,$atype,$att)=split"\t";
@@ -192,21 +263,6 @@ $l_oid= $oid;
   </feature_sql>
 
 
-<!-- ? add organism table output and use organism_id in all feature_tables ? -->
-  <feature_sql id="organism" type="organism_table" output="organism.tsv">
-  <sql><![CDATA[
-  SELECT organism_id,abbreviation,genus,species,common_name,comment FROM organism;
-  ]]></sql>
-  
-  <script name="orgtab" type="IGNORE_postprocess" shell="perl -ni.old" language="perl">
-<![CDATA[
-  #? create genus_species column ?
-  print unless (/Computational/i);
-]]>
-  </script>
-
-  </feature_sql>
-
   <feature_sql id="chromosomes_dpse" type="feature_table" output="chromosomes.tsv">
 
 <!-- need also
@@ -230,7 +286,7 @@ FROM
   feature armft, organism org, cvterm featcv, cv socv
 WHERE 
   featcv.name in ( 'chromosome_arm', 'ultra_scaffold' )      
-  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and featcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
   and armft.seqlen IS NOT NULL  -- ? want this
@@ -262,7 +318,7 @@ WHERE
    ( featcv.name = 'ultra_scaffold' ) 
     -- ^ this gets groupMISC parts, with rank order
   )
-  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and featcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and fr.object_id = armft.feature_id
   and fr.subject_id = fctg.feature_id
   and armft.type_id = featcv.cvterm_id  
@@ -368,8 +424,8 @@ SELECT
 FROM 
   feature armft, organism org, cvterm featcv, cv socv
 WHERE 
-  featcv.name in ( ${golden_path} ) -- 'chromosome_arm', 'ultra_scaffold'   
-  and featcv.cv_id = socv.cv_id and socv.name = 'SO'
+  featcv.name in ( ${golden_path} )    
+  and featcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
 ORDER BY arm ;
@@ -384,7 +440,11 @@ ORDER BY arm ;
 # but db lacks featurelocs assigning these to 4MISC locations.  Need to use featrel rank
 ## for ordering : rename Contig_contig to 4MISC:1, 4MISC:2 ... ?
 
-BEGIN { @r=(); $Uchr= "${unknown_chr}" || "U"; }  
+BEGIN { 
+  @r=(); $Uchr= "${unknown_chr}" || "U"; 
+  @gpaths= (${golden_path}); # may be several, should be quoted
+  $gpath= shift @gpaths || "chromosome";  $gpath =~ s/['"]//g;
+  }  
 while(<>) { 
   if (/^arm\t/) { print $_; next; } #header
   my @v= split "\t"; # [0] == arm; [-1] == species
@@ -398,7 +458,7 @@ while(<>) {
       $v[5] = 'golden_path'; 
       }
     elsif ($v[-1] =~ /${species}/) {
-      $v[5] = 'chromosome_arm'; 
+      $v[5] = $gpath; 
       }
     print join("\t",@v);
     }
@@ -462,31 +522,9 @@ WHERE
 ORDER BY arm, armloc.fmin --, targcv.name
 ;
 
--- add this arm type restriction ?
--- , cvterm armcv, cv socv
---   and armcv.name in ( ${golden_path} )  
---   and armcv.cv_id = socv.cv_id and socv.name = 'SO'
---   and armcv.cvterm_id = armft.type_id  
-
   ]]></sql>
   </feature_sql>
   
-<!--
-# make gnomap/synteny-idmap.tsv for gbrowse ;
-# idmap for use w/ dpse gbrowse table like
-# synt:id   dmel-chr  dmel-range
-# ortho:id  ... use dpse synt/ortho 'name' field, not id field for now.
-# lookup by FFFdb.pm is hashmap by synt:id, ortho:id ...
-
-egrep 'to_species.3' synteny.tsv | perl -ne \
-'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b..$e\n";' \
-> dmel-synt-idmap.tsv
-
-egrep 'to_species.1' synteny.tsv | perl -ne \
-'($c,$b,$e,$t,$og,$ft,$nm,$id,$xx)=split"\t";print"$id\t$c\t$b..$e\n";' \
-> dpse-synt-idmap.tsv
-
--->
 
   <feature_sql id="synteny" type="feature_table"  output="synteny.tsv">
 
@@ -568,8 +606,8 @@ WHERE
   matchcv.name in ( 'syntenic_region', 'orthologous_region' )
   and matchcv.cvterm_id = matchft.type_id 
 
-  and armcv.name in ( ${golden_path} ) -- 'chromosome_arm', 'ultra_scaffold' 
-  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.name in ( ${golden_path} ) 
+  and armcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armcv.cvterm_id = armft.type_id  
   and armft.organism_id != targft.organism_id
     
@@ -628,8 +666,8 @@ FROM
 WHERE
   matchcv.name = 'match' 
   and matchcv.cvterm_id = matchft.type_id 
-  and armcv.name in ( ${golden_path} ) -- 'chromosome', 'chromosome_arm', 'ultra_scaffold')
-  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.name in ( ${golden_path} )  
+  and armcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armcv.cvterm_id = armft.type_id  
 
   and targft.type_id = targcv.cvterm_id 
@@ -683,14 +721,12 @@ FROM
   cvterm armcv, cv socv
 
 WHERE 
-  -- armft.name = '4' and armft.type_id = 210 -- TEST
   armcv.name in ( ${golden_path} ) 
-  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+  and armcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armcv.cvterm_id = armft.type_id  
   
   ${est_where_clause} 
-  -- should be inverse of analysis_where_clause
-  -- and an.analysis_id in (40,48,42)  -- na_dbEST*dmel, drop 42,na_DGC ??
+  -- inverse of analysis_where_clause
   
   and anft.analysis_id = an.analysis_id
   and anft.feature_id = anfr.object_id
@@ -705,45 +741,6 @@ ORDER BY arm, armloc.fmin
 ;
   ]]></sql>
 
-<sqlold1><![CDATA[
-SELECT distinct
-  armft.uniquename as arm,
-  armloc.fmin, armloc.fmax, armloc.strand,
-  armft.organism_id,
-  estcv.name as type, 
-  estft.name as name,
-  estft.uniquename as id,
-  estft.feature_id as oid, -- this is bad; postprocess joins all w/ same oid
-                  -- need instead analysisfeature.feature_id as above
-  attr.type as attr_type, attr.attribute
- 
-FROM
-  feature partft, feature armft, 
-  feature estft 
-    left outer join gffattr_match attr
-    on (estft.feature_id = attr.feature_id),
-  featureloc armloc, featureloc partloc,
-  cvterm partcv, cvterm estcv, cvterm armcv, cv socv
-   
-WHERE
-  estcv.name in ('EST') -- 'cDNA_clone' also ??
-  and estcv.cvterm_id = estft.type_id 
-  
-  and armcv.name in ( ${golden_path} ) -- 'chromosome_arm'
-  and armcv.cv_id = socv.cv_id and socv.name = 'SO'
-  and armcv.cvterm_id = armft.type_id  
-
-  and partcv.name = 'match' and partft.type_id = partcv.cvterm_id 
-  
-  and armft.feature_id  = armloc.srcfeature_id
-  and partft.feature_id = armloc.feature_id  
-    
-  and estft.feature_id  = partloc.srcfeature_id  
-  and partft.feature_id = partloc.feature_id 
-
-ORDER BY arm, armloc.fmin
-;
-  ]]></sqlold1>
   </feature_sql>
   
   
@@ -848,6 +845,71 @@ WHERE
   </feature_sql>
 
 
+<!-- featureprops  user lists 
+ select cv.name,type_id,count(fp.featureprop_id) 
+ from cvterm cv,featureprop fp where fp.type_id = cv.cvterm_id
+ group by cv.name,type_id;
+
+sgdlite=#
+        name        | type_id | count 
+ Note               |       2 | 19206  * keep
+ gene               |     124 | 10022  x same as synonym
+ orf_classification |   20614 | 13790  * keep
+
+chado_dmel_r4_1_13-#  
+           name            | type_id | count  
+ aminoacid                 |       3 |    223
+ anticodon                 |       4 |    185
+ bound_moiety              |   57126 |    102
+ citation                  |   57127 |   2188
+ citation                  |   57633 |     10
+ comment                   |       5 |  11545
+ comment                   |   57156 |   1453
+ cyto_range                |      21 |  15523   * keep
+ description               |       7 | 699692
+ dicistronic               |      22 |     53 ??
+ element                   |       8 |   1365
+ element                   |   55064 |      1
+ encoded_symbol            |       9 |   1310
+ evidence                  |   57134 |   5536
+ evidence                  |   57267 |      8
+ evidenceGB                |   59009 |     32
+ gbunit                    |      20 |  15570   * keep
+ linked_to                 |   57157 |    372
+ missing_start_codon       |   57557 |      1
+ missing_stop_codon        |   57558 |      1
+ na_change                 |   57158 |    493
+ non_canonical_start_codon |   57556 |     19
+ owner                     |      11 |  19412
+ phenotype                 |   57145 |      3
+ pr_change                 |   57159 |    469
+ problem                   |      12 |    566
+ product                   |   57146 |      2
+ protein_id                |      13 |  16959
+ readthrough_stop_codon    |   57553 |      4
+ reported_na_change        |   57160 |     81
+ reported_pr_change        |   57161 |    142
+ sp_comment                |      15 |  17915
+ sp_status                 |      16 |  13658
+ standard_name             |   57151 |      9
+ status                    |      17 |    459
+ symbol                    |      18 |  12310
+ tag                       |     610 |      1
+ validation_flag           |   57034 |   1552
+
+ select cv.name,fp.type_id,count(fp.featureprop_id) 
+ from cvterm cv,featureprop fp, feature f
+ where fp.type_id = cv.cvterm_id 
+ and fp.feature_id = f.feature_id and f.organism_id = 4  
+ group by cv.name,fp.type_id;
+
+chado_dpse_r20_1-# 
+  name   | type_id | count 
+ Alias   |   59645 | 10374
+ comment |       5 |  5585
+ gbunit  |      20 | 12197   * keep
+
+-->
 
   <feature_sql id="views" type="view">
   <sql><![CDATA[
@@ -871,7 +933,7 @@ UNION ALL
   SELECT feature_id, cv.name AS type, fp.value AS attribute
   FROM featureprop fp, cvterm cv
   WHERE fp.type_id = cv.cvterm_id
-    and (cv.name = 'cyto_range' or cv.name = 'gbunit') 
+    and (cv.name in ( ${featureprops} ))
     -- keep this restriction - other props not useful here: comments, sp_comment, owner ...
     -- mar05: add 'putative_ortholog_of' cv for dpse/..; this is in feature_relationship
 
@@ -885,12 +947,8 @@ UNION ALL
 UNION ALL
   -- add parent feat ids for exons, etc.
   -- putative_ortholog_of=dmel/gene:CG31648
-  -- BLOC|dmel/2L:5519290..5520012
-  -- BLOC|dmel/CG31648-PA:1..241
-  -- BLOC|dpse/4_group1:4867835..4868569
   SELECT pk.subject_id AS feature_id, cv.name AS type, 
     'FlyBase:' || fo.uniquename  AS attribute
-    --'dmel' || ':' || fo.uniquename 
   FROM feature_relationship pk, feature fo, cvterm cv
   WHERE 
     cv.name = 'putative_ortholog_of' and pk.type_id = cv.cvterm_id 
@@ -930,7 +988,7 @@ UNION ALL
   SELECT feature_id, cv.name AS type, fp.value AS attribute
   FROM featureprop fp, cvterm cv
   WHERE fp.type_id = cv.cvterm_id
-    and (cv.name = 'cyto_range' or cv.name = 'gbunit') 
+    and (cv.name in ( ${featureprops} )) 
 
 UNION ALL
   SELECT feature_id,
@@ -972,7 +1030,7 @@ UNION ALL
   FROM feature targ
   WHERE NOT( targ.type_id IN (
     select cvterm_id from cvterm 
-    where name in ( ${golden_path} ) -- ('chromosome_arm', 'ultra_scaffold')
+    where name in ( ${golden_path} )   
     ) )
 ;
 GRANT SELECT ON gffattr_synt2 TO PUBLIC;
@@ -991,8 +1049,8 @@ CREATE OR REPLACE VIEW gffatts_anfloc (
   FROM  feature armft, featureloc armloc, cvterm armcv, cv socv
   WHERE 
     armft.type_id = armcv.cvterm_id
-    and armcv.name in ( ${golden_path} ) -- ('chromosome_arm', 'ultra_scaffold')
-    and armcv.cv_id = socv.cv_id and socv.name = 'SO'
+    and armcv.name in ( ${golden_path} ) 
+    and armcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
     and armft.feature_id = armloc.srcfeature_id
 ;
 GRANT SELECT ON gffatts_anfloc TO PUBLIC;

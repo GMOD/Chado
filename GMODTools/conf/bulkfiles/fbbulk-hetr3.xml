@@ -1,21 +1,21 @@
 <opt
   name="fbbulk-hetr3"
   relid="h3b2"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Drosophila_melanogaster"
+  make_current="1"
   >
 
-  <title>DHGP/FlyBase Heterochromatin rel 3.2</title>
+  <!-- see site_defaults for more included configs -->
+<include>site_defaults</include>
+
+<title>DHGP/FlyBase Heterochromatin rel 3.2</title>
   
-<doc name="README">
+<doc name="Release.txt"><![CDATA[
   D. melanogaster heterochomatin genome data from 
   Drosophila Heterochromatin Genome Project, www.dhgp.org
   Release  ${rel}, dated ${date}.
   
-  See release notes at <a href="http://flybase.net${release_url}">
-  http://flybase.net${release_url}</a>
-</doc>
+  See release notes at <a href="${release_url}">${release_url}</a>
+ ]]></doc>
   
   <include>fbreleases</include>
   
@@ -27,35 +27,30 @@
   heterchrom/chado_dmel_h_r3_2b.gz for pg dump
   -->
 
-
-  <db
-    driver="Pg"
-    name="BOGUS"
-    host="localhost"
-    alt_host="bugbane.bio.indiana.edu"
-    port="7302"
-    user=""
-    password=""
-    />
-
   <org>dmel</org>
-  <species>Drosophila melanogaster</species>
-  <include>organisms</include>
+  <species>Drosophila_melanogaster</species>
+  <golden_path>'chromosome_arm'</golden_path>
+  <seq_ontology>SO</seq_ontology>
 
-  <include>hetfilesets</include>
-  
-<!-- 
-    ////hetfilesets == filesets buf for dmelhetfeatconv
-  <fileset
-    name="fff"
-    path="fff/[\w\-\_]+.fff"
+  <!-- dang; blank here becomes {} in xmlsimple -->
+  <analysis_where_clause> -- none  </analysis_where_clause>
+  <est_where_clause> -- none  </est_where_clause>
+
+
+  <!-- override default fff config; 
+  dang xmlsimple/config2 cant handle joining included config + override here array entry
+  -->
+  <fileset_override
+    id="fff"
+    path="fff/.+\.fff"
     input="feature_table"
     title="FFF Genome features"
     config="dmelhetfeatconv"
     handler="FeatureWriter"
     dogzip="0"
     />
--->
+  <fileset_override id="dummy" title="placeholder for xmlsimple"/>
+
 
     <!-- need to put in ENV for subsequent chadofeatsql.xml config -->
   <featdump
@@ -65,53 +60,35 @@
     type="feature_table"
     splitname="chadofeat"
     >
-    <ENV 
-      golden_path="'chromosome_arm'"
-      species="Drosophila_melanogaster"
-      analysis_where_clause=""
-      unknown_chr="U"
-      />
     
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
   </featdump>
-    <!--  <target>matches</target>  -->
-    <!-- drop matches for analysis which has same/better info 
-      hetr32 matches has only generic 'alignment' and 'sim4:wrap...'
-    -->
 
  
   <!-- use to add parent ids to features .. change tag parentidpattern ? -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 
-  <!-- feature sets to make fasta bulk files 
-      .. change tag to fastaset ?
-      .. add intergene set ?
-  -->
   <!-- feature sets to make fasta bulk files -->
-  <include>featuresets</include>
+  <featset>gene</featset>
+  <featset>transcript</featset>
+  <featset>CDS</featset>  <!-- dna of protein coding sequence -->
+  <featset>translation</featset> <!-- protein aminos -->
+  <featset>ncRNA</featset> <!-- combines tRNA, miscRNA -->
+  <featset>transposon</featset>
+  <featset>gene_extended2000</featset>
+  <featset>pseudogene</featset>
+  <featset>intergenic</featset>
+  <featset>chromosome</featset>
 
-<!--   <featset>chromosome</featset> -->
-<!--   <featset>scaffold</featset> <!-- ? no het scaffolds? --> -->
-<!--  -->
-<!--   <featset>gene</featset> -->
-<!--   <featset>mRNA</featset> -->
-<!--   <featset>CDS</featset> -->
-<!--   <featset>transcript</featset> -->
-<!--   <featset>translation</featset> -->
-<!--   <featset>tRNA</featset> -->
-<!--   <featset>miscRNA</featset> -->
-<!--   <featset>transposon</featset> -->
-<!--   <featset>pseudogene</featset> -->
-<!--   <featset>gene_extended2000</featset> -->
-<!--    -->
-<!--   <featset>intergenic</featset> -->
-<!--    -->
-<!--   <!--  no het gmodel parts ? --> -->
-<!--    <featset>five_prime_UTR</featset>  -->
-<!--    <featset>three_prime_UTR</featset> -->
-<!--    <featset>intron</featset> -->
+  <!-- feature sets to make blast indices -->
+  <blastset>gene</blastset>
+  <blastset>transcript</blastset>
+  <blastset>translation</blastset>
+  <blastset>ncRNA</blastset>
+  <blastset>intergenic</blastset>
+  <blastset>chromosome</blastset>
 
- 
+
 </opt>

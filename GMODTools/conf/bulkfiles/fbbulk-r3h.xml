@@ -1,14 +1,13 @@
 <opt
   name="fbbulk-r3h"
   relid="h3"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Drosophila_melanogaster"
   >
+  <!-- see site_defaults for more included configs -->
+  <include>site_defaults</include>
   
   <title>DHGP/FlyBase Heterochromatin rel 3.2</title>
   
-  <doc name="README"><![CDATA[
+  <doc name="Release.txt"><![CDATA[
     D. melanogaster heterochomatin genome data from 
     Drosophila Heterochromatin Genome Project, www.dhgp.org
     Release 3.2
@@ -55,7 +54,6 @@
 
   <org>dmel</org>
   <species>Drosophila melanogaster</species>
-  <include>organisms</include>
 
   <dnadump
     path="dna/.+\.raw"
@@ -82,31 +80,8 @@
 
   </featdump>
   
-  <fileset
-    name="feature_table"
-    path="tmp/featdump/\w+.tsv"
-    config="chadofeatsql"
-    tag="feature_sql"
-    splitname="chadofeat"
-    >
-    <target>chromosomes</target>
-    <target>features</target>
-    <target>analysis</target>
-  </fileset>
-
-  <!-- 
-    fileset are output formats w/ config, perl handler, location, etc.
-    -->
-    
-  <fileset
-    name="dna"
-    path="dna/.+\.raw"
-    input="dna_dump"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    title="Chromosome dna"
-    />
-
-  <fileset
+  
+  <fileset_override
     name="fff"
     path="fff/.+\.fff"
     input="feature_table"
@@ -115,99 +90,11 @@
     handler="FeatureWriter"
     dogzip="1"
     />
-
-  <fileset
-    name="gff"
-    path="gff/.+\.gff"
-    input="feature_table"
-    title="GFF Genome features"
-    dogzip="1"
-    />
-
-  <fileset
-    name="gnomap"
-    path="gnomap/.+\.tsv"
-    input="fff"
-    config="tognomap"
-    handler="GnomapWriter"
-    title="GnoMap features"
-    indexonly="0"
-    />
-  <fileset
-    name="gbrowse"
-    path="gnomap/gbrowse.conf"
-    config="gbrowseconf" 
-    handler="GnomapWriter"
-    withvars="1"
-    />
-
-  <fileset
-    name="fasta"
-    path="fasta/.+\.fasta"
-    input="fff"
-    config="tofasta"
-    handler="FastaWriter"
-    dropnotes="synonym_2nd,synonym"
-    makeall="1"
-    perchr="1"
-    dogzip="1"
-    title="Genome feature sequence fasta" 
-    />
-  <fileset
-    name="blast"
-    path="blast/.+\.*"
-    input="fasta"
-    config="blastfiles"
-    handler="BlastWriter"
-    title="Blast indices" 
-    />
-
-<!--   <fileset -->
-<!--     name="luseq" -->
-<!--     input="fasta" -->
-<!--     path="indices/lucene/seqs/.*" -->
-<!--     title="lucene sequence indices" -->
-<!--     config="lucegene" -->
-<!--     handler="LucegeneWriter" -->
-<!--     /> -->
-<!--   <fileset -->
-<!--     name="lufeat" -->
-<!--     input="fff" -->
-<!--     path="indices/lucene/gnomap/.*" -->
-<!--     config="lucegene" -->
-<!--     handler="LucegeneWriter" -->
-<!--     title="lucene map indices" -->
-<!--     /> -->
+  <fileset_override name="dummy"/>
+  
  
   <!-- use to add parent ids to features .. change tag parentidpattern ? -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 
-  <!-- feature sets to make fasta bulk files 
-      .. change tag to fastaset ?
-      .. add intergene set ?
-  -->
-
-  <featset>chromosome</featset>
-<!--   <featset>scaffold</featset> ? no het scaffolds? -->
-
-  <featset>gene</featset>
-  <featset>mRNA</featset>
-  <featset>CDS</featset>
-  <featset>transcript</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
-  <featset>transposon</featset>
-  <featset>pseudogene</featset>
-  <featset>gene_extended2000</featset>
-  
-  <featset>intergenic</featset>
-  
-  <!--  no het gmodel parts ! -->
-<!--   <featset>five_prime_UTR</featset> -->
-<!--   <featset>three_prime_UTR</featset> -->
-<!--   <featset>intron</featset> -->
-
-  <!-- see featmap in chadofeatconf -->
-
+ 
 </opt>

@@ -10,7 +10,7 @@
   NOTE: RewriteMap is started/attached by mod_rewrite at apache-start-time
   gets NO browser/caller info (unless we send with calling params)
 
-  Add to GMOD Bulkfiles toolset.
+  Added to GMOD Bulkfiles toolset.
  
   D. Gilbert, mar 2005
 
@@ -48,6 +48,7 @@
   RewriteMap    genomedata-map       prg:/bio/argos/flybase/cgi-bin/genomepathmap.pl
   
   # -- these settings for local .htaccess (path relative)
+  # -- change to <Location "/genome/">
   <Directory "/bio/argos/flybase/data/genomes">
   RewriteRule help$   "" [L]
   RewriteRule (species)$  /cgi-bin/genomepathmap.pl?%{REQUEST_URI} [L]
@@ -73,46 +74,69 @@
 
 =cut
 
+use strict;
 use POSIX;
+use constant DEBUG => 0;
 
-my $webroot="/data/genomes";
-my $realroot="$ENV{ARGOS_ROOT}/flybase/web$webroot";
+#my $webroot="/data/genomes";
+my $webroot="/genome";
+my $realroot="$ENV{ARGOS_ROOT}/MY_SPECIES/web$webroot";
+if ($ENV{DOCUMENT_ROOT}) { $realroot="$ENV{DOCUMENT_ROOT}$webroot"; }
 
-my $genus="Drosophila"; #? could be regex pattern; check $ENV ? config files?
-my $defaultspp="Drosophila_melanogaster"; 
+my $genus= $ENV{GENUS} || "MY_GENUS"; #? could be regex pattern; check $ENV ? config files?
+my $defaultspp= $ENV{SPECIES} || "MY_SPECIES"; 
+my $LOGFILE="$realroot/url2file.log"; # debug only
 
 ## problem here -- get releases from file path
 my %orgrel= ( 
 #   dmel => "r4.1", 
 #   dpse => "r1.03", 
-#   dmelhet => "hetr32b2",
 );
 
 my $ok_gzip= 0; ## assume apache map caller knows
 $| = 1;  # unbuffer for handleRewriteMap
 
 if ($ENV{GATEWAY_INTERFACE} =~ /CGI/) {  
-  if ($ENV{DOCUMENT_ROOT}) { $realroot="$ENV{DOCUMENT_ROOT}$webroot"; }
   handleCgi(); 
   }
 else {
-  handleRewriteMap();
+  ## this call is for use from apache 
+  ## RewriteMap    genomedata-map       prg:/bio/argos/flybase/cgi-bin/genomepathmap.pl
+  handleRewriteMap();  
+}
+
+sub getspecies {
+  my @spp=();
+  if (opendir(D,$realroot)) { @spp= grep(/[A-Z]\w*_\w+/,readdir(D)); closedir(D); }
+  return sort @spp;
 }
 
 
-
 sub handleCgi {
-
   my $pathinfo= shift @ARGV;
   
   if ($pathinfo =~ /help$/) { notfound($pathinfo); } # shouldn't be here
   elsif ($pathinfo =~/species$/) {  # list
     print STDOUT "Content-Type: text/plain\n\n";
-    my @spp=();
-    if (opendir(D,$realroot)) { @spp= grep(/Drosophila/i,readdir(D)); closedir(D); }
+    print STDOUT "# $pathinfo \n";
+    my @spp= getspecies();
     print STDOUT join("\n",@spp),"\n";
     exit;
     }
+#   elsif ($pathinfo =~/release$/) {  # list; check for species in pathinfo
+#     print STDOUT "Content-Type: text/plain\n\n";
+#     print STDOUT "# $pathinfo \n";
+#     my @rels=();
+#     my @spp= getspecies();
+#     foreach my $spp (@spp) {
+#       if (opendir(D,"$realroot/$spp")) { 
+#         push @rels, map { "$spp/$_"; } grep(/^\w/,readdir(D)); 
+#         closedir(D); 
+#         }
+#       }
+#     print STDOUT join("\n",@rels),"\n";
+#     exit;
+#     }
 
   $ok_gzip= ($ENV{HTTP_ACCEPT_ENCODING} =~ /gzip/);
 
@@ -123,6 +147,7 @@ sub handleCgi {
     $pathtrans= "$pathtrans.gz";
     } 
   elsif (-f $pathtrans) {  
+    #?? make gzip if $ok_gzip 
     } 
   elsif (-f "$pathtrans.gz") {  
     $pathtrans= "$pathtrans.gz";
@@ -137,32 +162,41 @@ sub handleCgi {
   $fdate= POSIX::strftime( "%a, %d %b %Y %T GMT", @tm); ## apache is picky about format here
   ## see HTTP::Date: sub time2str (;$)
   ## Last-Modified: Tue, 15 Feb 2005 02:10:15 GMT
-
-  print STDERR "genomepathmap.cgi $pathinfo => $fdate, $path\n";
+  my $contype="text/plain";
+  if ($file =~ /fasta/) { $contype="application/x-fasta"; }
+  elsif($file =~ /gff/) { $contype="application/x-gff3";  }
+  
+  print STDERR "genomepathmap.cgi $pathinfo => $fdate, $path\n" if DEBUG;
   
   if ($ok_gzip && $pathtrans =~ /.gz$/) {
     print STDOUT "Content-Disposition: attachment; filename=$file.gz\n";
     print STDOUT "Last-Modified: $fdate\n";  
     print STDOUT "Content-Length: $flen\n";
     print STDOUT "Content-Encoding: gzip\n";
-    print STDOUT "Content-Type: text/plain\n\n";
+    print STDOUT "Content-Type: $contype\n\n";
+    ##print STDOUT "Content-Type: text/plain\n\n";
+    # ^^ wormbase spec says: MIME  type is application/x-fasta or application/x-gff3
     if ($doget && open(F, $pathtrans)) {
-      $nt= 0;
-      while( ($n= read(F,$buf,16384))>0 ) { print STDOUT $buf; $nt += $n;} 
+      my ($n,$buf,$nt);
+      binmode(F);
+      binmode(STDOUT);
+      ## apache-melon is trashing gzip output above; closes after 8 bytes received; read is ok
+      # while( ($n= read(F,$buf,16384))>0 ) { print STDOUT $buf; }  # $nt += $n;
+      while( ($n= sysread(F,$buf,16384))>0 ) { syswrite STDOUT,$buf,$n; $nt += $n; }
       close(F);
-      ##print STDERR "url2gnofile $pathinfo ; nt=$nt\n";
+      print STDERR "url2gnofile $pathinfo ; nt=$nt\n";
       }
     } 
   else {
     print STDOUT "Content-Disposition: attachment; filename=$file\n";
     print STDOUT "Last-Modified: $fdate\n";
     if ($pathtrans =~ /.gz$/) {
-      print STDOUT "Content-type: text/plain\n\n";
+      print STDOUT "Content-Type: $contype\n\n";
       if ($doget && open(F,"gunzip -c $pathtrans|")){  print STDOUT join("",<F>); close(F); }
       }
     else {
       print STDOUT "Content-Length: $flen\n";
-      print STDOUT "Content-type: text/plain\n\n";
+      print STDOUT "Content-Type: $contype\n\n";
       if ($doget && open(F,"$pathtrans")){  print STDOUT join("",<F>); close(F); }
       }
     }
@@ -170,10 +204,11 @@ sub handleCgi {
 }
 
 sub handleRewriteMap {
-
-  open(LOG,">>$realroot/url2file.log"); 
+  if (DEBUG && $LOGFILE){
+  open(LOG,">>$LOGFILE"); 
   print LOG "getfile ENV:\n",join("\n ",map{ "$_ => $ENV{$_}" } sort keys %ENV),"\n"; 
   close(LOG);
+  }
 
   $| = 1;  # unbuffer for handleRewriteMap
   while(<STDIN>) 
@@ -190,9 +225,10 @@ sub handleRewriteMap {
       } 
   
     print STDOUT "$pathtrans\n";
-    open(LOG,">>$realroot/url2file.log"); print LOG "url2genomap $_ => $path,$pathtrans\n"; close(LOG);
+    if (DEBUG && $LOGFILE){ open(LOG,">>$LOGFILE"); print LOG "genomepath $_ => $path,$pathtrans\n"; close(LOG); }
   }
 }
+
 
 sub notfound {
   my($file)=@_;
@@ -208,61 +244,85 @@ The requested URL $file  was not found on this server.<P>
 }   
 
 
-sub getrelease {
-  my( $uri, $org, $path, $filepatt, $suff)= @_;
-  my $rel;
-  if ($uri =~ /hetero/) { $org= $org.'het'; } ## $org eq "dmel" && 
-  ##if ($org eq "dmel" && $uri =~ /hetero/) { $rel= $orgrel{$org.'het'}; }
-  $rel= $orgrel{$org};
-  if ($rel && $rel !~ /^-/) { $rel="-$rel"; }
-  
-  #check path for $org-release(.*).txt ??
-  unless($rel) {
-    if(opendir(D,"$realroot/$path")) {
-      my ($relf,@rels)=  grep(/^$filepatt/, readdir(D));
-      closedir(D);
-      $relf =~ s/^$filepatt//;
-      $relf =~ s/$suff.*$//;
-      $rel= $relf;
-      $orgrel{$org}= $rel; 
-      }
+
+# sub getrelease {
+#   my( $uri, $org, $path, $filepatt, $suff)= @_;
+#   my $rel;
+#   
+#   ##hack##if ($uri =~ /hetero/) { $org= $org.'het'; } ## $org eq "dmel" && 
+#   ##if ($org eq "dmel" && $uri =~ /hetero/) { $rel= $orgrel{$org.'het'}; }
+# 
+#   $rel= $orgrel{$org};
+#   if ($rel && $rel !~ /^-/) { $rel="-$rel"; }
+#   
+#   #check path for $org-release(.*).txt ??
+#   unless($rel) 
+#   {
+#     if(opendir(D,"$realroot/$path")) {
+#       my ($relf,@rels)=  grep(/^$filepatt/, readdir(D));
+#       closedir(D);
+#       $relf =~ s/^$filepatt//;
+#       $relf =~ s/$suff.*$//;
+#       $rel= $relf;
+#       $orgrel{$org}= $rel; 
+#       }
+#   }
+#   return $rel;
+# }
+
+sub getreleasefile {
+  my( $uri, $path, $filepatt, $suff)= @_;
+  my($file)=('');
+  if(opendir(D,"$realroot/$path")) {
+    my @files=  grep(/$filepatt/, readdir(D));
+    closedir(D);
+    ## need .gz check; more, do what?
+    ($file,my @more) = grep(/$suff(.gz)?$/,@files);
+    $file=~s/\.gz$//; # handler checks for .gz
     }
-  return $rel;
+  return $file;
 }
 
+
+## FIXME ....
 sub getdatapath {
   my($uri)= @_;
   
   my $format="fasta";
   my $spp= $defaultspp; 
-  my $org="dmel";
+  my $org=""; ##"dmel";
   my $part="-all";
   my $folder="current";
   
-  if ($uri =~ /(${genus}_\w+)/) { $spp= $1; } 
+  if ($uri =~ m,/(${genus}_\w+),) { $spp= $1; } 
+  elsif ($uri =~ m,/([A-Z]\w+_\w+),) { $spp= $1; } 
   
-  if ($spp =~ /^(\w)[^_]*_(\w{1,3})/) {
+  if ($spp =~ m/^(\w)[^_]*_(\w{1,3})/) {
     $org= lc("$1$2"); # Gspp 4 letter abbrev.
     }
+
+  if ($uri =~ m,/$spp/(\w[^/]+)/.+,) { $folder= $1; } 
   
   my $type="-NULL"; ## need to fail if no primary verb: dna,protein,transcript or alias
-  if ($uri =~ /(gff|features)$/i) { $format="gff"; $type=""; }
-  elsif($uri =~ /(protein|proteome|translation)$/i) { $type="-translation"; }
-  elsif($uri =~ /(transcript|transcriptome)$/i) { $type="-transcript"; }
+  if ($uri =~ /(gff|feature)$/i) { $format="gff"; $type=""; }
   elsif($uri =~ /(genome|dna|chromosome)$/i) { $type="-chromosome"; }
+  elsif($uri =~ /(protein|proteome|translation)$/i) { $type="-translation"; }
+  elsif($uri =~ /(mrna|transcript|transcriptome)$/i) { $type="-transcript"; }
+  elsif($uri =~ /(ncrna|miscrna)$/i) { $type="-miscRNA"; } # add -tRNA ***
+    ## ^^ need to know what fasta labels are being used: ncRNA? miscRNA? tRNA ?
   ## else error ?
   
   ## fixme - also check $uri for real version-folder 
   ## e.g. if ($uri =~ /(version|release)([\w..])/)
-  if ($org eq "dmel" && $uri =~ /hetero/i) { $folder="current_hetchr"; }
+  ##if ($org eq "dmel" && $uri =~ /hetero/i) { $folder="current_hetchr"; }
   
   my $path = "$spp/$folder/$format";
-  my $file = "$org$part$type";
+  ##my $file = "$org$part$type";
+  my $filepatt = "$part$type";
   
-  my $rel= getrelease( $uri, $org, $path, $file,".$format"); #, $defaultrelease);
-  
-  $file = "$file$rel.$format";
+  ## need .gz, no.gz option, check for both
+  my $file= getreleasefile( $uri, $path, $filepatt,".$format"); 
+  ##$file = "$file$rel.$format";
   $path = "$path/$file";
-
   return (wantarray) ? ($path,$file) : $path;
 }

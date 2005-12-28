@@ -18,6 +18,14 @@
 
   </about>
   
+ 
+  <release id="420" 
+    rel="r4.2.0"
+    dbname="chado_dmel_r4_2_16"
+    relfull="dmel_r4.2_20051104"
+    date="20051104"
+    release_url="/annot/dmel_release4.2.txt"
+    />
 
   <release id="411"
     rel="r4.1.1"
@@ -111,7 +119,17 @@
     date="20040821" 
     release_url="/annot/dmel_het_release3.2.txt"
     />
-    
+ 
+  <!-- listed as dpse_r20_20051018 at flybase.net; dated 20051111 -->
+  <release id="p5" 
+    rel="r2.0"  
+    old_relfull="dpse_r201_20051111"
+    relfull="dpse_r20_20051018"
+    dbname="chado_dpse_r20_1"
+    date="20051111" 
+    release_url="/annot/dpse_release2.01.txt"
+    />
+
 <!--
 Date: Wed, 8 Dec 2004 10:36:08 -0500 (EST)
 From: Peili Zhang <peili@morgan.harvard.edu>

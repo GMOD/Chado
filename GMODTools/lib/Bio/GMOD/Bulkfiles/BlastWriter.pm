@@ -45,12 +45,15 @@ use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
 
 use Bio::GMOD::Bulkfiles::BulkWriter;       
-use vars qw(@ISA);
-@ISA= (qw/Bio::GMOD::Bulkfiles::BulkWriter/); ## want interface class
+
+use base qw(Bio::GMOD::Bulkfiles::BulkWriter);
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
-my $configfile= "blastfiles"; #? BulkFiles/BlastWriter.xml 
+my $VERSION = "1.1";
+#my $configfile= "blastfiles"; #? BulkFiles/BlastWriter.xml 
+use constant BULK_TYPE => 'blast';
+use constant CONFIG_FILE => 'blastfiles';
+
 use vars qw/ $formatdb  /;
 
 
@@ -59,10 +62,10 @@ sub init
 	my $self= shift;
   $self->SUPER::init();
   
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  $self->{configfile}= $configfile unless defined $self->{configfile};
+  $DEBUG= $self->{debug} if defined $self->{debug};
+  # $self->{bulktype} =  $self->BULK_TYPE; # dont need hash val?
+  # $self->{configfile}= $self->CONFIG_FILE unless defined $self->{configfile};
   # $self->{failonerror}= 0 unless defined $self->{failonerror};
-  ## $self->setDefaultValues(); #?? use or not?
 }
 
 
@@ -77,17 +80,22 @@ sub initData
 {
   my($self)= @_;
   $self->SUPER::initData();
+  
   my $config = $self->{config};
- 
-  my $blastdir= $self->handler()->getReleaseSubdir( $self->{finfo}->{path} || 'blast/');
-  $self->{blastdir} = $blastdir;
+#   my $blastdir= $self->handler()->getReleaseSubdir( $self->{finfo}->{path} || 'blast/');
+#   $self->{blastdir} = $blastdir;
   
   $config->{isprot_patt} ||= '(translation|aa_)';
 
   my $blasthome= $config->{blasthome} ; #|| "$oroot/common/servers/blast/Bin";
   $formatdb= $config->{formatdb} || "$blasthome/formatdb";
-  unless(-e $formatdb) { warn "Missing formatdb: $formatdb"; }
-  
+  unless(-e $formatdb) { 
+    #? check ENV{NCBI} ? sys path ? BioPerl.. ?
+    #formatdbpath = $self->findExecs('formatdb','blastall');
+    warn "Missing formatdb: $formatdb";  # fail *Module*
+    $self->status(-1,"missing formatdb"); 
+    }
+    
   my $formatdbopts= $config->{formatdbopts} || '-o F '; # T - True: Parse SeqId and create indexes. # -t Title
   $config->{formatdbopts}= $formatdbopts;
 }
@@ -115,14 +123,13 @@ sub makeFiles
   print STDERR "BlastWriter::makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes};
-  unless(ref $fileset) { 
-    my $intype= $self->{config}->{informat} || 'fasta'; #? maybe array
+  unless(@$fileset) { 
+    my $intype= $self->getconfig('informat') || 'fasta'; #? maybe array
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
-    # warn "makeFiles: no infiles => \@filesets given"; return;  
-    }
-  unless(ref $fileset) { 
-    warn "GnomapWriter: no input 'fasta' files found\n"; 
-    return;  
+    unless(@$fileset) { 
+      warn "BlastWriter: no input '$intype' files found\n"; 
+      return $self->status(-1);  
+      }
     }
  
   my @seqfiles= $self->openInput( $fileset );
@@ -130,7 +137,7 @@ sub makeFiles
   
   print STDERR "BlastWriter::makeFiles: done\n" if $DEBUG; 
 
-  return 1; #what?
+  return $self->status($res); #what?
 }
 
 =item openInput( $fileset )
@@ -147,8 +154,8 @@ sub openInput
   my $inh= undef;
   return undef unless(ref $fileset);
 
-  my $intype = $self->{config}->{informat} || 'fasta'; #? maybe array
-  my $featset= $self->{config}->{blastset} || [];
+  my $intype = $self->getconfig('informat') || 'fasta'; #? maybe array
+  my $featset= $self->getconfig('blastset') || [];
   my @featset= @$featset;
     
   print STDERR "openInput: type=$intype blastset=",join(",",@featset),"\n" if $DEBUG; 
@@ -156,22 +163,15 @@ sub openInput
   foreach my $fs (@$fileset) {
     my $fp= $fs->{path};
     my $name= $fs->{name};
-    my $type= $fs->{type}; # want also/instead featset type here ? gene,mrna,cds,...
-    # next unless( $type =~ /$intype/); # could it be 'dna/fasta', 'amino/fasta' ?
+    my $type= $fs->{type}; 
     
     my ($featn,$format)= split /[\/]/, $type;
-    my $ok= ( $type =~ /$intype/) ;
-    $ok = grep({$_ eq $featn} @featset) if ($ok && @featset);
+    next if( @featset && ! grep({$_ eq $featn} @featset) );
     
-    # NO: do below; check for 'all' chr, skip or use instead if there ?? -- need some option
-    #### $ok= 0 if ($fs->{chr} eq 'all'); #  || $name =~ m/_all_/
-      
-    print STDERR "$name $featn, $type, ok=$ok\n" if $DEBUG;
-    next unless $ok; ##( !@featset || grep /^$featn/, @featset);
-    
-    unless(-e $fp) { warn "missing intype file $fp"; next; }
-
-    push(@files, $fp); #?? return full $fs struct w/ $featn ?
+    my $ok= ( $type =~ /$intype/ && -e $fp) ;
+    print STDERR "openInput: name=$name $featn, type=$type, ok=$ok\n" if $DEBUG;
+    next unless $ok;  
+    push(@files, $fp); # return full $fs struct w/ $featn ?
     }
     
   return @files;  
@@ -189,10 +189,17 @@ sub get_filename
   return shift->blastname(@_); ## {sequtil}->get_filename( @_);
 }
 
-# sub split_filename
-# {
-#   return shift->handler()->split_filename( @_);
-# }
+sub split_filename
+{
+	my $self= shift;
+	my ($fname)= @_;
+  my $fndel= $self->getconfig('filepart_delimiter') || '-';
+  my @v= split(/$fndel/, $fname, 4); 
+  if (@v == 2) {  splice(@v, 1, 0, 'all'); $fname= join($fndel,@v); } #OR# return ( $v[0], "all", $v[1], "", "");
+  ## created name w/o -all- chr; fails split
+  ##  my $blname= $self->handler->get_filename($org,'',$featn,'',$format);
+  return $self->handler()->split_filename( $fname );
+}
 
 sub blastname {
 	my $self= shift;
@@ -216,7 +223,7 @@ sub processBlastInput
 	my $self= shift;
   my( $rseqfiles )=  @_;
   
-  my $blastdir= $self->{blastdir};
+  my $blastdir= $self->outputpath();
   my ($doformat, $doconfig)= (1,1);
   my $ndone= 0;
   
@@ -250,7 +257,7 @@ sub update_blastrc
 {
 	my $self= shift;
 	my($path, $rdir)= @_;
-  my $rcdoc= $self->{config}->{doc}->{dbrc};
+  my $rcdoc= $self->config->{'doc'}->{dbrc};
 	my @dir= @$rdir;
 
 	warn "update_blastrc()\n" if $DEBUG;
@@ -268,7 +275,8 @@ sub update_blastrc
     s/^blastx.*$/blastx $aalist/;
     }
   $rcdoc->{content}= join("\n", @rc);
-  $self->handler()->writeDocs( { dbrc => $rcdoc });
+  $rcdoc->{id}= 'dbrc';
+  $self->handler()->writeDocs( $rcdoc );
 }
 
 
@@ -278,6 +286,8 @@ sub getDbInfo
 	my $self= shift;
 	my ( $dbhash, $path, $blastfile)= @_;
   my $blname = $self->blastname($blastfile);
+  ## >> creates name w/o -all- chr; fails split
+  ##  my $blname= $self->handler->get_filename($org,'',$featn,'',$format);
   my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($blname);
 
   my $db= $dbhash->{$featn}; # probably this
@@ -311,7 +321,7 @@ sub getDbDirInfoByTitle
 	my $self= shift;
 	my($path, $dirlist)= @_;
 
-  my $dbhash= $self->{config}->{db};
+  my $dbhash= $self->config->{blastdb};
   my @blf= grep(/\.(nhr|phr|nal|pal)$/, @$dirlist);
   my %dbh=();
   foreach my $blf (@blf) {
@@ -330,7 +340,7 @@ sub update_dbhtml
 	my($dbh)= @_;
 	warn "update_dbhtml\n" if $DEBUG;
     
-  my $dbtable= $self->{config}->{doc}->{dbtable};
+  my $dbtable= $self->config->{doc}->{dbtable};
   my $content= $dbtable->{header}->{content} || '<html><body><table> ';
   $content  .= $dbtable->{tableheader}->{content} || "<tr bgcolor='#a0a0a0'>
     <td color='white'>Pull-down Menu</td>
@@ -349,7 +359,8 @@ sub update_dbhtml
     }
   $content .= $dbtable->{footer}->{content} || ' </table></body></html>';
   $dbtable->{content}= $content;
-  $self->handler()->writeDocs( { dbtable => $dbtable });
+  $dbtable->{dbtable}= 'dbrc';
+  $self->handler()->writeDocs(  $dbtable );
 }
 
 
@@ -359,7 +370,7 @@ sub update_dbselect
 	my($dbh)= @_;
 	warn "update_dbselect \n" if $DEBUG;
 	
-  my $dbselect= $self->{config}->{doc}->{dbselect};
+  my $dbselect= $self->config->{doc}->{dbselect};
   my $content= $dbselect->{header}->{content} || '';
   $content .= "<select name = \"DATALIB\">\n";
   foreach my $title (sort keys %$dbh) {
@@ -368,8 +379,9 @@ sub update_dbselect
     }
   $content .= "</select>\n";
   $content .= $dbselect->{footer}->{content} || '';
+  $dbselect->{id}= 'dbselect';
   $dbselect->{content}= $content;
-  $self->handler()->writeDocs( { dbselect => $dbselect });
+  $self->handler()->writeDocs( $dbselect );
 }
 
 
@@ -415,7 +427,7 @@ sub updateformat
       push( @{$dbset{$blname}}, $fa);
       }
     }
-    
+  warn "BlastWriter: Missing $formatdb" and return -1 unless(-e $formatdb);
   foreach my $blname (keys %dbset) {
     my $doprot= ($blname =~ m/$isprot_patt/) ? 1 : 0;
     my $seqlist= $dbset{$blname};
@@ -437,7 +449,7 @@ sub formatdb_list
 	my $self= shift;
 	my( $seqlist, $blastdir, $blastname,  $doprot)= @_;
 	warn "formatdb( $blastname )\n" if $DEBUG;
-	my $opts= $self->{config}->{formatdbopts}; ##$formatdbopts;  
+	my $opts= $self->getconfig('formatdbopts'); ##$formatdbopts;  
 	if ($doprot) { $opts .= ' -p T ';} else { $opts .= ' -p F '; }
 
   warn("#$blastname:  cat ",join(" ",@$seqlist)," | $formatdb $opts -i stdin \n") if $DEBUG;
@@ -463,7 +475,8 @@ sub formatdb
 	my $self= shift;
 	my($seqlib, $blastdir, $doprot)= @_;
 	warn "formatdb($seqlib)\n" if $DEBUG;
-	my $opts= $self->{config}->{formatdbopts}; ##$formatdbopts;  
+  warn "BlastWriter: Missing $formatdb" and return -1 unless(-e $formatdb);
+	my $opts= $self->getconfig('formatdbopts'); ##$formatdbopts;  
 	if ($doprot) { $opts .= ' -p T ';} else { $opts .= ' -p F '; }
 
   my ($sfile, $spath, $ext) = File::Basename::fileparse($seqlib, '\.[^\.]+');
