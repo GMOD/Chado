@@ -30,4 +30,12 @@ The source installs will still then follow the same sort of outline:
   make load_schema
   make prepdb
   make ontologies (using go-perl DBIx::DBStag)
- 
+
+
+Other notes:
+
+Needed for 'make ontologies' is go-perl; it can be obtained from
+http://www.godatabase.org/dev/database/ and downloading any of the
+monthly, weekly, or daily version of go_*-utilities.tar.gz and then 
+setting the GO_ROOT environment variable to the path to the directory that
+contains the go-perl directory. 
