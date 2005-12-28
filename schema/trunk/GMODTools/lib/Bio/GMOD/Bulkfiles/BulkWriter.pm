@@ -10,6 +10,14 @@ use strict;
 =head1 SYNOPSIS
   
   base class for other Bulkfiles writers
+
+New output formats are added by subclassing the
+Bio::GMOD::Bulkfiles::BulkWriter module, which basically
+takes tabular inputs from the intermediary SQL output and
+does something with it.  
+    
+Primary methods to subclass: 'makefiles' and 'readInput'
+    
     
 =head1 AUTHOR
 
@@ -28,8 +36,13 @@ use File::Spec::Functions qw/ catdir catfile /;
 use File::Basename;
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
-my $configfile= "bulkwriter";
+sub DEBUG { return $DEBUG; }
+#use constant DEBUG => 1;
+
+my $VERSION = "1.1";
+#my $configfile= "bulkwriter";
+use constant BULK_TYPE => 'other';
+use constant CONFIG_FILE => 'bulkwriter';
 
 
 sub new 
@@ -39,7 +52,7 @@ sub new
 	my %fields = @_;   
 	my $self = \%fields; # config should be one
 	bless $self, $class;
-	$self->init_base();
+	$self->_init_base();
 	return $self;
 }
 
@@ -49,14 +62,15 @@ sub DESTROY
   my $self = shift;
 }
 
-sub init_base 
+
+sub _init_base 
 {
 	my $self= shift;
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  $self->{configfile}= $configfile unless defined $self->{configfile};
-  $self->{failonerror}= 0 unless defined $self->{failonerror};
-  $self->{skiponerror}= 1 unless defined $self->{skiponerror};
-  
+	$DEBUG= $self->{debug};
+  $self->{bulktype}  = $self->BULK_TYPE; #"other"; # dont need this hash val?
+  $self->{configfile}= $self->CONFIG_FILE unless defined $self->{configfile};
+	$self->{status}=0; $self->{error}= undef;
+
   # new common caller arg: fileinfo  is the fileset data
   # <fileset
   #   name="fasta"
@@ -74,7 +88,6 @@ sub init_base
     if(ref $self->{sequtil}) { $self->{handler}= $self->{sequtil}; }
     elsif(ref $self->{bulkfiles}) { $self->{handler}= $self->{bulkfiles}; }
     else { die "Should make ->new(handler => Bio::GMOD::Bulkfiles object)"; }
-    ##$self->{bulkfiles}= $self->{sequtil}= $self->{handler}; # dang namechange .. or 'bulkfiles' .. which ?
     }
     
   ## add these to %ENV before reading blastfiles.xml so ${vars} get replaced ..
@@ -83,7 +96,11 @@ sub init_base
   @ENV{@keys} = @{%$sconfig}{@keys};
 
 	$self->init(); # preconfig inits
+	
   $self->readConfig($self->{configfile});
+	# == $self->{config}= $self->handler()->callReadConfig($self->{configfile});
+  
+  $self->initData(); 
 }
 
 =item init()
@@ -96,16 +113,36 @@ sub init
 {
 	my $self= shift;
 	# for subclasses
-	
-	$DEBUG= $self->{debug} if defined $self->{debug};
-  # $self->{configfile}= $configfile unless defined $self->{configfile};
 }
 
-sub config { return shift->{config}; }
+sub handler { return shift->{handler}; }  
+sub sequtil { return shift->{handler}; }  # old method; drop
+sub bulkfiles { return shift->{handler}; }   # old method; drop
 
-sub handler { return shift->{handler}; } #$self->{bulkfiles}= $self->{sequtil}= $self->{handler}
-sub sequtil { return shift->{handler}; }  
-sub bulkfiles { return shift->{handler}; }  
+sub outputpath 
+{
+  my $self = shift;
+  unless($self->{outputpath}) {
+    my $outputpath= $self->handler()->getReleaseSubdir( $self->getconfig('path') || $self->BULK_TYPE);
+    $self->{outputpath} = $outputpath;
+    }
+  return $self->{outputpath};
+}
+
+sub status {
+	my $self= shift;
+	if(@_) {  
+	  ## if status/error already set?
+	  $self->{status}= shift; # unless ($self->{status});
+	  $self->{error}= join(",",@_) if (@_);
+	  }
+  my $stat= $self->{status}; # check {error} ??
+  $self->handler()->{didmake}{ $self->BULK_TYPE }= $stat;
+
+  if ($stat < 0) { $stat="error ".$stat; }
+  elsif ($stat == 1) { $stat='ok'; }
+  return $self->BULK_TYPE."=".$stat; #what?
+}
 
 =item readConfig($configfile)
 
@@ -116,31 +153,10 @@ read a configuration file - adds to any loaded configs
 sub readConfig
 {
 	my $self= shift;
-	my ($configfile)= @_;
-  eval {  
-    ## >> no good unless(ref $self->{config2}) { $self->{config2}= $self->{sequtil}->{config2}; }
-    unless(ref $self->{config2}) { 
-      require Bio::GMOD::Config2; 
-      my @showtags= ($self->{verbose}) ? qw(name title about) : qw(name title);
-      $self->{config2}= Bio::GMOD::Config2->new( {
-        searchpath => [ 'conf/bulkfiles', 'bulkfiles', 'conf' ],
-        showtags => \@showtags, # another debug/verbose option - print these if found
-        read_includes => 1, # process include = 'conf.file'
-        #gmod_root => $ROOT,
-        } ); 
-      }
-     
-    $self->{config}= $self->{config2}->readConfig( $configfile); 
-    print STDERR $self->{config2}->showConfig( $self->{config}, { debug => $DEBUG }) 
-      if ($self->{showconfig});  
-  }; 
-  if ($@) { 
-    my $cf= $self->{config2}->{filename}; 
-    warn "Config2: file=$cf; err: $@"; 
-    die if $self->{failonerror};
-    }
-  
-  $self->initData(); 
+	# my ($configfile)= @_;
+	
+  # ?? dont dupl this elsewhere: BulkWriter.pm subs
+	$self->{config}= $self->handler()->callReadConfig(@_);
 }
 
 
@@ -157,44 +173,130 @@ sub initData
   my $sconfig= $self->handler()->{config};
   my $oroot= $sconfig->{rootpath};
   
-  $self->{failonerror}= $sconfig->{failonerror} unless defined $self->{failonerror};
+  $self->{failonerror}= $sconfig->{failonerror}||0 unless defined $self->{failonerror};
+  $self->{skiponerror}= $sconfig->{skiponerror}||1 unless defined $self->{skiponerror};
     
-    ## use instead $self->handler()->{config} values here?
+    ## use instead $self->getconfig('key')  
   $self->{org}= $sconfig->{org} || $config->{org} || 'noname';
   $self->{rel}= $sconfig->{rel} || $config->{rel} || 'noname';  
   $self->{sourcetitle}= $sconfig->{title} || $config->{title} || 'untitled'; 
   $self->{sourcefile} = $config->{input}  || '';  
-  $self->{date}= $sconfig->{date} || $config->{date} ||  POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+  $self->{date}= $sconfig->{date} || $config->{date} || POSIX::strftime("%d-%B-%Y", localtime( $^T ));
 
-  # copy any fsets to handler for those functions
+  # copy any filesets to handler for those functions
   foreach my $type ( keys %{$config->{fileset}} ) {
     $sconfig->{fileset}->{$type}= $config->{fileset}->{$type}
       unless(defined $sconfig->{fileset}->{$type});
     }
 
-  #?? copy any release-specific additions/changes to config from sconfig
-  foreach my $key ( keys %{$config} ) {
-    my $sc= $sconfig->{$key};
-    if ($sc) {  $config->{$key}= _mergevars($config->{$key},$sc); }
+  $self->{fileinfo} = $self->handler()->getFilesetInfo($self->BULK_TYPE)
+    unless($self->{fileinfo}); 
+
+  $self->promoteconfigs(); # uses above configs
+}
+
+
+=item promoteconfigs()
+
+  copy fileinfo (1) and main config (2nd) values to self->config
+  
+=cut
+
+sub promoteconfigs
+{
+  my $self = shift;
+  my @mykeys= @_;
+  my $config= $self->{config};
+  ## $self->{config}= {}; # dont re-getconfig same
+
+  my %nopromo= map { $_,1; } qw( id doc title about name date );
+  unless(@mykeys) {
+    @mykeys= grep !$nopromo{$_}, sort keys %{$config};
     }
   
+  my $fileinfo = $self->{fileinfo} || {};  
+  my $mainconf = $self->handler()->{config} || {}; 
+
+  # copy any release-specific additions/changes to config from mainconf
+  foreach my $key ( @mykeys ) {
+    my $sc= $mainconf->{$key};
+    $config->{$key}= _mergevars($config->{$key},$sc) if ($sc);
+    }
+#   foreach my $k (@mykeys) { # only main if not fileinfo
+#      $config->{$k}= $mainconf->{$k} 
+#        if(defined $mainconf->{$k} && !defined $fileinfo->{$k}); 
+#      }
+
+  # use all of fileinfo
+  foreach my $k (keys %$fileinfo) { $config->{$k}= $fileinfo->{$k}; } 
+  
+  $self->{config}= $config;
 }
 
 sub _mergevars {
   my($v,$add)= @_;
   if (!$add) { return $v; }
   elsif (!$v) { return $add; }
+  elsif (!ref($v) && !ref($add)) { return $add; } # new?
   elsif (ref($v) =~ /HASH/ && ref($add) =~ /HASH/) {
-    foreach my $k (keys %$add) {
-      $v->{$k}= $add->{$k};
-      }
+    foreach my $k (keys %$add) { $v->{$k}= $add->{$k}; }
     }
+    
+=item not this ??  duplicates data ; check for new ? 
   elsif (ref($v) =~ /ARRAY/) {
     if (ref($add) =~ /ARRAY/) { push(@$v, @$add); }
     else { push(@$v, $add); }
     }
+=cut
+
   return $v;
 }  
+
+sub config { return shift->{config}; }
+#?? sub config { my $self = shift; return (@_) ? $self->{config}->{$_[0]} : $self->{config}; }
+
+=item getconfig(@keys)
+
+  return config value(s) for key(s); 
+  look for key(s) in (1) fileset info; 
+    (2) handler.config ?? should this preceed default?
+    (3) default package config
+  
+=cut
+
+
+sub getconfig {
+  my $self = shift;
+  my @keys= @_;
+  
+  ## need option to choose among fileinfo, handler, default
+  my $fileinfo = $self->{fileinfo} || {}; # 1st priority or drop???
+  my $mainconf = $self->handler()->{config} || {}; # 2nd priority; e.g. main release config
+  my $deconfig = $self->{config} || {}; # 3rd priority; default settings
+
+  if (wantarray) {
+    my %vals=();
+    foreach my $key (@keys) {
+      $vals{$key}= 
+          (defined $fileinfo->{$key}) ? $fileinfo->{$key}
+        : (defined $mainconf->{$key}) ? $mainconf->{$key}
+        : (defined $deconfig->{$key}) ? $deconfig->{$key} 
+        : undef;
+      }
+    return %vals;  
+    }
+  else {
+    my $key= $keys[0];
+    return(defined $fileinfo->{$key}) ? $fileinfo->{$key}
+        : (defined $mainconf->{$key}) ? $mainconf->{$key}
+        : (defined $deconfig->{$key}) ? $deconfig->{$key} 
+        : undef;
+    }
+  return undef;
+}
+
+
+
 
 #-------------- subs -------------
 
@@ -216,14 +318,53 @@ sub makeFiles
   my %args= @_;  
   print STDERR "makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
+  my $status= 0;
   unless(ref $fileset) { warn "makeFiles: needs infiles => \@filesets "; return; }
- 
+  
 #   my @seqfiles= $self->openInput( $fileset );
 #   my $res= $self->processBlastInput( \@seqfiles);
 
-  return 1; #what?
+  if ($self->config->{makeall} && $status > 0) {
+    my $chromosomes= "";
+    my $feature= "";
+    $self->makeall( $chromosomes, $feature, $self->BULK_TYPE); 
+    }
+
+  return  $self->status($status); #?? check files made
 }
 
+sub makeall 
+{
+	my $self= shift;
+  my( $chromosomes, $feature, $format )=  @_;
+  my $outdir= $self->outputpath();
+  $chromosomes= $self->handler()->getChromosomes() unless (ref $chromosomes);
+
+    ## this loop can be common to other writers: makeall( $chromosomes, $feature, $format) ...
+  my $allfn= $self->get_filename ( $self->{org}, 'all', $feature, $self->{rel}, $format);
+  $allfn= catfile( $outdir, $allfn);
+  
+  my @parts=();
+  foreach my $chr (@$chromosomes) {
+    next if ('all' eq $chr);
+    my $fn= $self->get_filename ( $self->{org}, $chr, $feature, $self->{rel}, $format);
+    $fn= catfile( $outdir, $fn);
+    next unless (-e $fn);
+    push(@parts, $fn);
+    }
+    
+  if (@parts) {
+    unlink $allfn if -e $allfn; # dont append existing
+    my $allfh= new FileHandle(">$allfn"); ## DONT open-append
+    foreach my $fn (@parts) {
+      my $fh= new FileHandle("$fn");
+      while (<$fh>) { print $allfh $_; }
+      close($fh); 
+      unlink $fn if (defined $self->config->{perchr} && $self->config->{perchr} == 0);
+      } 
+    close($allfh);
+    }
+}
 =item openInput( $fileset )
 
   handle input files
@@ -240,7 +381,9 @@ sub openInput
 {
 	my $self= shift;
   my( $fileset, $ipart, $intype )= @_; # do per-csome/name
-  $intype= $self->{config}->{informat} unless ($intype); #? maybe array
+  
+  ## $intype ||= $self->getconfig('informat')  
+  $intype= $self->config->{informat} unless ($intype); #? maybe array
   print STDERR "openInput: type=$intype part=$ipart \n" if $DEBUG; 
   
   my $atpart= 0;

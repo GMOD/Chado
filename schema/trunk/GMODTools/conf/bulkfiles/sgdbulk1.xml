@@ -1,14 +1,13 @@
 <opt
   name="sgdbulk1"
   relid="1"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Saccharomyces_cerevisiae"
   >
+  <!-- see site_defaults for more included configs -->
+  <include>site_defaults</include>
   
   <title>SGD Lite rel 1</title>
   
-  <doc name="README"><![CDATA[
+  <doc name="Release.txt"><![CDATA[
   Genome file output for Chado genome databases
   Database: SGD Lite rel 1
   Software: Bio::GMOD::Bulkfiles
@@ -32,6 +31,81 @@
    perl -I./GMODTools/lib/ GMODTools/bin/bulkfiles.pl sgdbulk1
   ]]></doc>
   
+
+  <release id="1" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
+    relfull="sgdlite_20040519"
+    release_url="/annot/sgdlite-release1.html"
+    />
+  <release id="0" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
+    relfull="sgdlite_20040519"
+    release_url="/annot/sgdlite-release1.html"
+    />
+  <!-- need two+ release entries for config reader .. -->
+
+
+  <db
+    driver="Pg"
+    name="sgdlite_20040519"
+    host="localhost"
+    port="7302"
+    user=""
+    password=""
+    />
+
+  <org>scer</org>
+  <species>Saccharomyces cerevisiae</species>
+  
+
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+<!--  //none in sgdlite1//  <target>matches</target> -->
+<!--  //none in sgdlite1//  <target>analysis</target> -->
+  </featdump>
+  
+
+  <fileset_override
+    name="fff"
+    path="fff/.+\.fff"
+    title="FFF Genome features"
+    config="sgdfeatconf"
+    handler="FeatureWriter"
+    dogzip="1"
+    />
+  <fileset_override name="dummy"/>
+  
+
+  <idpattern></idpattern>
+
+  <!-- feature sets to make fasta bulk files -->
+  <featset>chromosome</featset>
+
+  <featset>gene</featset>
+  <featset>CDS</featset>
+<!--   <featset>translation</featset> // no translations in sgdlite db -->
+  <featset>tRNA</featset>
+  <featset>miscRNA</featset>
+  <featset>transposon</featset>
+  <featset>gene_extended2000</featset>
+  <featset>intergenic</featset>
+
+
+  <!-- featmap moved to common bulkfiles/chadofeatconv
+    but can override here if desired to add/replace/delete -->
+
+<!-- sgd variant for this feature -->
+  <featmap
+    name="transposon"
+    types="transposable_element_gene"
+    typelabel="transposable_element"
+    />
+
   <doc name="Test-results.txt"><![CDATA[
   Test for GMOD::Bulkfile processor
   aug 04, d.gilbert 
@@ -104,133 +178,5 @@
   openInput: nothing matches part=18
   makeFiles: done
   ]]></doc>
-
-  <release id="1" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
-    relfull="sgdlite_20040519"
-    release_url="/annot/sgdlite-release1.html"
-    />
-  <release id="0" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
-    relfull="sgdlite_20040519"
-    release_url="/annot/sgdlite-release1.html"
-    />
-  <!-- need two+ release entries for config reader .. -->
-
-
-  <db
-    driver="Pg"
-    name="sgdlite_20040519"
-    host="localhost"
-    port="7302"
-    user=""
-    password=""
-    />
-
-  <org>scer</org>
-  <species>Saccharomyces cerevisiae</species>
-  
-  <dnadump
-    path="dna/dna-\w+.raw"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    />
-
-  <featdump
-    path="tmp/featdump/\w+.tsv"
-    config="chadofeatsql"
-    tag="feature_sql"
-    type="feature_table"
-    splitname="chadofeat"
-    >
-    <target>chromosomes</target>
-    <target>features</target>
-<!--  //none in sgdlite1//  <target>matches</target> -->
-<!--  //none in sgdlite1//  <target>analysis</target> -->
-    
-    <!-- ? use this for sql arguments ? -->
-    <!-- <target name="chromosomes" arg1="chromosome,chromosome_arm"/> -->
-  </featdump>
-  
-
-  <fileset
-    name="dna"
-    path="dna/.+\.raw"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    title="Chromosome dna"
-    />
-
-  <fileset
-    name="fff"
-    path="fff/.+\.fff"
-    title="FFF Genome features"
-    config="sgdfeatconf"
-    handler="FeatureWriter"
-    dogzip="1"
-    />
-  <fileset
-    name="gff"
-    path="gff/.+\.gff"
-    title="GFF Genome features"
-    dogzip="1"
-    />
-
-  <fileset
-    name="gnomap"
-    path="gnomap/.+\.tsv"
-    config="tognomap"
-    handler="GnomapWriter"
-    title="GnoMap features"
-    />
-  <fileset
-    name="gbrowse"
-    path="gnomap/gbrowse.conf"
-    config="gbrowseconf" 
-    handler="GnomapWriter"
-    withvars="1"
-  />
-
-  <fileset
-    name="fasta"
-    path="fasta/.+\.fasta"
-    config="tofasta"
-    handler="FastaWriter"
-    dropnotes="synonym_2nd,synonym"
-    makeall="1"
-    perchr="0"
-    dogzip="1"
-    title="Genome feature sequence fasta" 
-    />
-  <fileset
-    name="blast"
-    path="blast/.+\.*"
-    config="blastfiles"
-    handler="BlastWriter"
-    title="Blast indices" 
-  />
-
-
-  <idpattern></idpattern>
-
-  <!-- feature sets to make fasta bulk files -->
-  <featset>chromosome</featset>
-
-  <featset>gene</featset>
-  <featset>CDS</featset>
-<!--   <featset>translation</featset> // no translations in sgdlite db -->
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
-  <featset>transposon</featset>
-  <featset>gene_extended2000</featset>
-  <featset>intergenic</featset>
-
-
-  <!-- featmap moved to common bulkfiles/chadofeatconv
-    but can override here if desired to add/replace/delete -->
-
-<!-- sgd variant for this feature -->
-  <featmap
-    name="transposon"
-    types="transposable_element_gene"
-    typelabel="transposable_element"
-    />
-
 
 </opt>

@@ -28,9 +28,8 @@
   <featset>chromosome</featset>
   <featset>gene</featset>
   <featset>CDS</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
+<!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
+  <featset>ncRNA</featset>
   <featset>transposon</featset>
   <featset>gene_extended2000</featset>
   <featset>intergenic</featset>
@@ -51,48 +50,55 @@
   -->
   
   
-  <featmap name="gene" get_id="1" />
-  <featmap name="five_prime_UTR" add_id="gene" />
-  <featmap name="three_prime_UTR" add_id="gene" />
-  <featmap name="intron" add_id="gene" />
-  <featmap name="mRNA" add_id="gene" />
-  <featmap name="CDS" add_id="gene" />
+  <featmap id="gene" get_id="1" />
 
+  <!-- sgd variant; is this a gene or a transposon? 
+ SO mail  2005-08-05  http://sourceforge.net/mailarchive/message.php?msg_id=12570320
+ "The term "transposable_element_gene" is_a "gene_class" which is a sequence attribute"
+  "The features are "gene" and "transposable_element""; see below maptype
+ -->
+ 
+  <featmap id="five_prime_UTR" add_id="gene" />
+  <featmap id="three_prime_UTR" add_id="gene" />
+  <featmap id="intron" add_id="gene" />
+  <featmap id="mRNA" add_id="gene" />
+  <featmap id="CDS" add_id="gene" />
+
+  <!-- sgdlite doesnt have translation/transcript residues in sgdlite chado -->
   <featmap
-    name="translation"
-    types="CDS"
+    id="translation"
+    types="protein"
     typelabel="protein"
     fromdb="1"
     />
   <featmap
-    name="transcript"
+    id="transcript"
     types="mRNA"
     typelabel="transcript"
     fromdb="1"
     />
   <featmap
-    name="scaffold"
-    types="golden_path_region"
-    typelabel="scaffold"
-    fromdb="1"
-    />
-  <featmap
-    name="transposon"
+    id="transposon"
     types="transposable_element"
     typelabel="transposable_element"
     />
+    <!-- note this variant includes all non-prot-coding rnas -->
   <featmap
-    name="miscRNA"
+    name="ncRNA"
+    types="ncRNA snRNA snoRNA rRNA tRNA"
+    />
+  <featmap
+    id="miscRNA"
     types="ncRNA snRNA snoRNA rRNA" 
     />
   <featmap
-    name="gene_extended2000"
+    id="gene_extended2000"
     types="gene"
     typelabel="gene_ex2000"
     subrange="-2000..2000"
     />
   <featmap
-    name="intergenic"
+    id="intergenic"
     types="gene"
     typelabel="intergenic"
     method="between"
@@ -100,7 +106,49 @@
 
     
   <rename_child_type>pseudogene|\w+RNA</rename_child_type>
-  <mergematch></mergematch>
+
+<!-- 
+this is sgd chado gene model ; uses introns instead of exons; no mRNAs (gene == mRNA?)
+
+sgdlite=# SELECT f.name,f.uniquename,t.name
+          FROM feature f, cvterm t WHERE f.type_id=t.cvterm_id
+          AND f.name = 'YFL039C';
+  name   |           uniquename                     | name
+ YFL039C | YFL039C_gene_chrVI:53259..54695          | gene
+ YFL039C | YFL039C_intron_intron_chrVI:54377..54685 | intron
+ YFL039C | YFL039C_CDS_CDS_chrVI:54685..54695       | CDS
+ YFL039C | YFL039C_CDS_CDS_chrVI:53259..54377       | CDS
+
+?? rename the above as exon ? or leave as CDS ?
+gene_is_complex does this for mRNA-less sgd data, 
+instead of simple gene + complex mRNA
+fff/scer-chrVI-sgdr5.fff:
+chrVI  53260   gene    YFL039C -       complement(53260..54377,54686..54695)   YFL039C SGD:S000001855; synonym=ABY1,ACT1,END7,YFL039C,actin
+
+ncRNA is the exon child part for RNA genes (tRNA only?; can also have intron part)
+pseudogenes have 'CDS'/exon, intron child parts
+
+Also, centromere  has  region child parts  (named? curated?)
+Also, repeat_family has nucleotide_match child parts  (named? curated?)
+-->
+
+  <gene_is_complex>1</gene_is_complex>
+  
+  <feat_model id="gene" make_mrna="1">
+    <part>CDS</part> <!-- exon equivalent -->
+    <part>intron</part>  <!-- dont need; inverse of exons -->
+  </feat_model>
+  <feat_model id="pseudogene">
+    <part>CDS</part> <!-- exon equivalent -->
+    <part>intron</part> 
+  </feat_model>
+  <feat_model id="tRNA">
+    <part>ncRNA</part> <!-- exon equivalent -->
+    <part>intron</part>  
+  </feat_model>
+  
+  <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent -->
+  <maptype_ignore_missingparent>^(gene|match_part|match)</maptype_ignore_missingparent>
 
 <!--
 ## SONG/so Revision: 1.45
@@ -127,8 +175,10 @@
 
 #? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
 -->
-
-  <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
+  
+  <!-- move these odd groupings into featmap structures ?? -->
+  
+  <!-- chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
     chromosome_arm="1"
     chromosome_band="1"
@@ -153,24 +203,21 @@
       ## segment no longer valid SO; supercontig or golden_path are best
   -->
   
-  <!-- simplefeat == segmentfeats + others -->
+  <!-- simplefeat == segmentfeats + others 
+    NOT_gene="1"
+    NOT_SGD_pseudogene="1"
+    what is problem with ncRNA ??
+  -->
   <simplefeat 
-    BAC="1"
-    chromosome_arm="1"
-    chromosome_band="1"
-    chromosome="1"
-    gene="1"
-    golden_path_region="1"
-    golden_path="1"
-    mature_peptide="1"
-    oligonucleotide="1"
+    oligo="1"
+    intron="1"
+    nucleotide_match="1"
     point_mutation="1"
-    pseudogene="1"
     region="1"
     repeat_region="1"
     segment="1"
-    source="1"
     transcription_start_site="1"
+    binding_site="1"
     />
     
   <dropname 
@@ -179,14 +226,20 @@
     tRNA_trnascan="1"
     />
     
+    <!-- these are child parts; id is autogenerated -->
   <dropid 
     exon="1"
     intron="1"
+    CDS="1"
+    ncRNA="1"
     />
     
   <dropfeat_fff 
     exon="1"
     remark="1"
+    intron="1"
+    CDS="1"
+    ncRNA="1"
     />
     
   <dropfeat_gff 
@@ -199,8 +252,15 @@
   
   <hasdups 
     />
-    
+
+<!-- try this for sgd gene models:
+    ncRNA="exon"
+    CDS="exon"
+-->
+
   <maptype 
+    ncRNA="exon"
+    CDS="exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="golden_path"
     match_fgenesh="match_fgenesh"
@@ -211,33 +271,27 @@
     mRNA_trnascan="tRNA_trnascan"
     oligonucleotide="oligo"
     three_prime_untranslated_region="three_prime_UTR"
-    transposable_element_gene="transposable_element"
+    transposable_element_gene="gene"
     />
   <!--
   so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
   -->
     
-  <maptype_gff>
     <!-- FIXME: ordered arrays here .. $type, $gffsource -->
     <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
-    <match_part_fgenesh>match_part</match_part_fgenesh>
-    <match_part_fgenesh>fgenesh</match_part_fgenesh>
-    <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
-    <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
-    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
-    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
-    <match_part_HDP>match_part</match_part_HDP>
-    <match_part_HDP>HDP</match_part_HDP>
-    <match_HDP>match</match_HDP>
-    <match_HDP>HDP</match_HDP>
-    <tRNA_trnascan>tRNA</tRNA_trnascan>
-    <tRNA_trnascan>trnascan</tRNA_trnascan>
-    <match_fgenesh>match</match_fgenesh>
-    <match_fgenesh>fgenesh</match_fgenesh>
-    <mRNA_genscan>mRNA</mRNA_genscan>
-    <mRNA_genscan>genscan</mRNA_genscan>
-    <match_RNAiHDP>match</match_RNAiHDP>
-    <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
+
+  <maptype_gff>
+    <exon_SGD>CDS:SGD</exon_SGD>
+    <!-- urk; want also exon_SGD -> ncRNA:SGD for rna types -->
+    <match_fgenesh>match:fgenesh</match_fgenesh>
+    <match_part_fgenesh>match_part:fgenesh</match_part_fgenesh>
+    <match_HDP>match:HDP</match_HDP>
+    <match_part_HDP>match_part:HDP</match_part_HDP>
+    <match_RNAiHDP>match:RNAiHDP</match_RNAiHDP>
+    <match_part_RNAiHDP>match_part:RNAiHDP</match_part_RNAiHDP>
+    <mRNA_genscan>mRNA:genscan</mRNA_genscan>
+    <mRNA_piecegenie>mRNA:piecegenie</mRNA_piecegenie>
+    <tRNA_trnascan>tRNA:trnascan</tRNA_trnascan>
   </maptype_gff>
 
   

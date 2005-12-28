@@ -1,25 +1,51 @@
 <opt
   name="organisms"
-  date="20041002"
+  date="20051129"
+  title="Species abbreviations"
   >
 
   <about>
   Table of organism species, abbreviation-id values.
   Cannot assume chado organism table has values we need.
   
-  Added for D.pseudoobscura db which has 2 species (others have one;
-  may not need this then).
-  
   Can optionally add other attributes here.
   Note that species == Genus_species; all spaces are underscored.
   </about>
   
-  <!-- note organism_id is db specific; may change ; here for temp use only -->
-  <organism id="dpse" species="Drosophila_pseudoobscura" 
-    organism_id="3"/>
-  <organism id="dmel" species="Drosophila_melanogaster" 
-    organism_id="1"/>
+  <organism id="dpse" species="Drosophila_pseudoobscura"  />
+  <organism id="dmel" species="Drosophila_melanogaster" />
 
+  <organism id="agam" species="Anopheles_gambiae" />
+  <organism id="amel" species="Apis_mellifera" />
+  <organism id="atha" species="Arabidopsis_thaliana" />
+  <organism id="cbri" species="Caenorhabditis_briggsae" />
+  <organism id="cele" species="Caenorhabditis_elegans" />
+  <organism id="cfam" species="Canis_familiaris" />
+  <organism id="dana" species="Drosophila_ananassae" />
+  <organism id="ddis" species="Dictyostelium_discoideum" />
+  <organism id="dere" species="Drosophila_erecta" />
+  <organism id="dgri" species="Drosophila_grimshawi" />
+  <organism id="dmag" species="Daphnia_magna" />
+  <organism id="dmoj" species="Drosophila_mojavensis" />
+  <organism id="dper" species="Drosophila_persimilis" />
+  <organism id="dpul" species="Daphnia_pulex" />
+  <organism id="drer" species="Danio_rerio" />
+  <organism id="dsec" species="Drosophila_sechellia" />
+  <organism id="dsim" species="Drosophila_simulans" />
+  <organism id="dvir" species="Drosophila_virilis" />
+  <organism id="dwil" species="Drosophila_willistoni" />
+  <organism id="dyak" species="Drosophila_yakuba" />
+  <organism id="ecol" species="Escherichia_coli" />
+  <organism id="frub" species="Fugu_rubripes" />
+  <organism id="ggal" species="Gallus_gallus" />
+  <organism id="hsap" species="Homo_sapiens" />
+  <organism id="mmus" species="Mus_musculus" />
+  <organism id="osat" species="Oryza_sativa" />
+  <organism id="pfal" species="Plasmodium_falciparum" />
+  <organism id="ptro" species="Pan_troglodytes" />
+  <organism id="rnor" species="Rattus_norvegicus" />
   <organism id="scer" species="Saccharomyces_cerevisiae" />
+  <organism id="spom" species="Schizosaccharomyces_pombe" />
+  <organism id="tnig" species="Tetraodon_nigroviridi" />
 
 </opt>

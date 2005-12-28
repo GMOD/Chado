@@ -34,11 +34,16 @@
   <!-- remapType: append this name pattern to type; works with maptype below -->
   <name2type_pattern>[-_](repeatmasker|genscan|piecegenie|twinscan|genewise|trnascan)</name2type_pattern>
 
+  <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent -->
+  <maptype_ignore_missingparent>^(match_part|match|gene|cytology|chromosome_band|oligo|BAC|protein_binding_site)</maptype_ignore_missingparent>
+
   <!-- drop lengthy program.source from match name 
   match_sim4_na_EST_complete_dros RE37642.5prime-2L_wgs2cex-na_EST.complete.dros
   also fix these ugly names repeating feature types;
   match:sim4:na_STS.dros  BACN11E12-T7-211000022278175-na_STS.dros-sim4
     cuttype=1
+    
+    match_part_blastx_aa_SPTR_dros
     
   more cuttype names
   -211000022278591-aa_SP.real.dros-blastx
@@ -313,43 +318,13 @@ Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d
     match_part_tblastxwrap_na_scf_chunk_agambiae_fa="match_part:tblastx:na_agambiae"
     />
     
-<!--
-    match_fgenesh="match_fgenesh"
-    match_HDP="match_HDP"
-    match_RNAiHDP="match_RNAiHDP"
--->
-
   <!--
   so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
   -->
     
   <maptype_gff>
-    <!-- FIXME: ordered arrays here .. $type, $gffsource -->
-    <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
-    <transposable_element_pred>transposable_element</transposable_element_pred>
-    <transposable_element_pred>predicted</transposable_element_pred>
-    <tRNA_trnascan>tRNA</tRNA_trnascan>
-    <tRNA_trnascan>trnascan</tRNA_trnascan>
+    <transposable_element_pred>transposable_element:predicted</transposable_element_pred>
+    <tRNA_trnascan>tRNA:trnascan</tRNA_trnascan>
   </maptype_gff>
 
-  <!-- old gff typing
-      ? drop this; software handles?
-    <match_part_fgenesh>match_part</match_part_fgenesh>
-    <match_part_fgenesh>fgenesh</match_part_fgenesh>
-    <match_part_RNAiHDP>match_part</match_part_RNAiHDP>
-    <match_part_RNAiHDP>RNAiHDP</match_part_RNAiHDP>
-    <mRNA_piecegenie>mRNA</mRNA_piecegenie>
-    <mRNA_piecegenie>piecegenie</mRNA_piecegenie>
-    <match_part_HDP>match_part</match_part_HDP>
-    <match_part_HDP>HDP</match_part_HDP>
-    <match_HDP>match</match_HDP>
-    <match_HDP>HDP</match_HDP>
-    <match_fgenesh>match</match_fgenesh>
-    <match_fgenesh>fgenesh</match_fgenesh>
-    <mRNA_genscan>mRNA</mRNA_genscan>
-    <mRNA_genscan>genscan</mRNA_genscan>
-    <match_RNAiHDP>match</match_RNAiHDP>
-    <match_RNAiHDP>RNAiHDP</match_RNAiHDP>
-
-  -->  
 </opt>

@@ -1,5 +1,5 @@
 <opt
-  name="filesets"
+  id="filesets"
   date="20040821"
   filepart_delimiter="-"
   >
@@ -11,9 +11,17 @@
   These are configurations producing bulk file sets.
   Use as include="filesets" to data release config file,
   or copy into primary config file and edit to taste.
-
+  
+  Note on overriding some of these:
+  Use the 'fileset_override' option, currently, to replace
+  one or a few of these settings, while including these defaults.
+  Because of the way settings are read, any included ones will
+  not replace main settings.  The 'fileset' options become
+  one large hash table.  'fileset_override' will replace one
+  or more of these.
+  
   Common fileset tags:
-    name="fasta"   -- name tag
+    id="fasta"   -- name tag
     path="fasta/.+\.fasta"   -- path regex for output files
     input="fff"    -- input data (but see informat in other configs)
     config="tofasta"  -- config file (depends on handler needs)
@@ -30,7 +38,19 @@
     Bulkfiles is current handler for dnadump, featdump ; change? -->
   <dnadump
     path="dna/.+\.raw"
-    sql="select feature_id, residues from feature where uniquename = ?"
+    old_sql="select feature_id, residues from feature where uniquename = ?"
+    sql="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
+    sql_csome="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
+    />
+  <!-- rewrite of dnadump; handler is Bulkfiles.pm -->
+  <fileset
+    id="dna"
+    path="dna/.+\.raw"
+    input="dna_dump"
+    handler="Bulkfiles"
+    sql="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
+    sql_csome="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
+    title="Chromosome dna in raw format (file of bases only)"
     />
 
   <featdump
@@ -40,51 +60,30 @@
     type="feature_table"
     splitname="chadofeat"
     >
-    <ENV 
-      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
-      analysis_where_clause=""
-      dummy="dummy"
-      />
-<!--     <target>fbids</target> // accessory table ; fixme -->
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
-    <!-- <target>matches</target> -->
     <target>synteny</target>
   </featdump>
   
-  <!-- rewrite of featdump -->
+  <!-- rewrite of featdump; handler is Bulkfiles.pm -->
   <fileset
-    name="feature_table"
+    id="feature_table"
     path="tmp/featdump/\w+.tsv"
+    handler="Bulkfiles"
     config="chadofeatsql"
     tag="feature_sql"
     splitname="chadofeat"
     >
-    <ENV 
-      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
-      analysis_where_clause=""
-      dummy="dummy"
-      />
-
     <target>chromosomes</target>
     <target>features</target>
     <target>analysis</target>
-    <!-- <target>matches</target> -->
     <target>synteny</target>
   </fileset>
 
 
   <fileset
-    name="dna"
-    path="dna/.+\.raw"
-    input="dna_dump"
-    sql="select feature_id, residues from feature where uniquename = ?"
-    title="Chromosome dna in raw format (file of bases only)"
-    />
-
-  <fileset
-    name="fff"
+    id="fff"
     path="fff/.+\.fff"
     input="feature_table"
     title="FFF Genome features"
@@ -94,16 +93,97 @@
     />
     
   <fileset
-    name="gff"
+    id="gff"
     path="gff/.+\.gff"
     input="feature_table"
+    handler="FeatureWriter"
     title="GFF Genome features"
-    dogzip="1"
     noforwards="1"
+    makeall="1"
+    perchr="0"
+    dogzip="0"
     />
 
   <fileset
-    name="gnomap"
+    id="fasta"
+    path="fasta/.+\.fasta"
+    config="fastawriter"
+    handler="FastaWriter"
+    dropnotes="synonym_2nd,synonym,Note,orf_classification"
+    addmd5sum="1" 
+    addcrc64="0" 
+    makeall="1"
+    perchr="0"
+    dogzip="0"
+    />
+
+    <!-- add module to make summary tables given scripts+sql -->
+  <fileset
+    id="overview"
+    path="tables/.+\.txt"
+    config="chadofeatsql"
+    handler="Bulkfiles"
+    tag="feature_sql"
+    type="summary"
+    >
+    <target>organism_summary</target>
+    <target>feature_summary</target>
+    <target>analysis_summary</target>
+    <target>property_summary</target>
+    <target>chromosome_summary</target>
+  </fileset>
+
+    <!-- add module to make summary tables given scripts+sql -->
+  <fileset
+    id="tables"
+    path="tables/.+\.txt"
+    input="fff"
+    config="tablewriter"
+    config_sql="chadofeatsql"
+    handler="TableWriter"
+    tag="feature_sql"
+    type="list"
+    title="Summary Tables"
+    >
+    <target>id_table</target>
+    <target>ortho_table</target>
+    <target>feature_map</target>
+    <target>gbrowse_conf</target>
+    <target>genomeweb</target>
+    <target>overviewhtml</target>
+  </fileset>
+
+  <fileset
+    id="gbrowse_conf"
+    path="gff/gbrowse.conf"
+    config="gbrowseconf" 
+    handler="TableWriter"
+    withvars="1"
+    
+    db_adaptor_class = "Bio::DB::GFF"
+    db_adaptor = "lucene"
+    db_dsn  = "${outputpath}/lucene/"
+    db_user = "flybase"
+    />
+
+  <fileset
+    id="genomeweb"
+    path=""
+    config="genomeweb" 
+    handler="TableWriter"
+    other_path="tables/.+\.txt"
+    />
+
+  <fileset
+    id="gbrowse_fb"
+    path="gnomap/gbrowse.conf"
+    config="gbrowseconf_fb" 
+    handler="GnomapWriter"
+    withvars="1"
+    />
+
+  <fileset
+    id="gnomap"
     path="gnomap/.+\.tsv"
     input="fff"
     config="tognomap"
@@ -112,70 +192,22 @@
     indexonly="0"
     />
     
-    <!-- test way to make misc. tables given perl/other scripts +sql? -->
   <fileset
-    name="id_tables"
-    path="tables/.+\.txt"
-    x_input="fff"
-    config="chadofeatsql"
-    tag="feature_sql"
-    type="list"
-    x_config="tognomap"
-    x_handler="BulkWriter"
-    title="Summary Tables"
-    >
-    <ENV 
-      golden_path="'chromosome_arm','chromosome','ultra_scaffold'"
-      dummy="dummy"
-      />
-    <target>id_table</target>
-    <target>ortho_table</target>
-    <target>countfeats</target>
-    <target>fbids</target>
-  </fileset>
-
-
-    
-  <fileset
-    name="gbrowse"
-    path="gnomap/gbrowse.conf"
-    config="gbrowseconf" 
-    handler="GnomapWriter"
-    withvars="1"
-    />
-
-  <fileset
-    name="fasta"
-    path="fasta/.+\.fasta"
-    input="fff"
-    config="tofasta"
-    handler="FastaWriter"
-    dropnotes="synonym_2nd,synonym"
-    makeall="1"
-    perchr="1"
-    dogzip="0"
-    title="Genome feature sequence fasta" 
-    />
-    
-  <fileset
-    name="blast"
+    id="blast"
     path="blast/.+\.*"
-    input="fasta"
     config="blastfiles"
     handler="BlastWriter"
-    title="Blast indices" 
+    dogzip="0"
     />
 
   <fileset
-    name="acode"
+    id="acode"
     path="fbobs/.+\.acode"
-    input="fff"
     config="toacode"
     handler="AcodeWriter"
     makeall="1"
     perchr="0"
     dogzip="0"
-    title="Gene objects (acode)" 
     />
     
 

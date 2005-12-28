@@ -1,6 +1,8 @@
 <opt
   name="tognomap"
   date="20040821"
+  
+  indexonly="0"
   >
  
   <title>Genome Feature merge (genomic and cytology features)</title>

@@ -23,12 +23,10 @@
   <blastset>gene</blastset>
   <blastset>transcript</blastset>
   <blastset>translation</blastset>
-  <blastset>tRNA</blastset>
-  <blastset>miscRNA</blastset>
+  <blastset>ncRNA</blastset>
 <!--   <blastset>transposon</blastset> -->
   <blastset>pseudogene</blastset>
   <blastset>intergenic</blastset>
-  <blastset>syntenic_region</blastset>
   <blastset>scaffold</blastset>
   <blastset>chromosome</blastset>
   <blastset>syntenic_region</blastset>
@@ -37,13 +35,8 @@
     chromosome/golden_path/ultracontig
 -->
 
-  <blastmap
-    name="miscRNA"
-    types="ncRNA snRNA snoRNA rRNA" 
-    />
-
   
-  <doc name="dbrc" path="blast/blast.rc"><![CDATA[
+  <doc id="dbrc" path="blast/blast.rc"><![CDATA[
 # blast.rc 
 # This is dynamic configuration file for NCBI WWW BLAST service
 #
@@ -67,7 +60,7 @@ tblastx
     .. put tag into individual ones to join, eg. nalfile="na_all na_est"
   -->
   
-  <doc name="dbselect" path="blast/blastdb.in">
+  <doc id="dbselect" path="blast/blastdb.in">
   <!-- database <select> include file html; no content tag here -->
   <!-- change this to be entire blast html form instead of using shtml #include ? -->
   <header title=""><![CDATA[ ]]></header>
@@ -76,7 +69,7 @@ tblastx
  
  
  
-  <doc name="dbtable" path="blast/blast_databases.html">
+  <doc id="dbtable" path="blast/blast_databases.html">
   <!-- no content tag here -->
   <!-- optional <tableheader> four fields are dbname, dbfile, update-date, description -->
   <header title=""><![CDATA[<HTML>
@@ -114,35 +107,35 @@ tblastx
    <!-- want sorted in given order; as array not hash -->
    <!-- FIXME: $org name ... -->
    
-  <db name="na_all" title="  All ${species} sequences (NT)"><![CDATA[
+  <blastdb id="na_all" title="  All ${species} sequences (NT)"><![CDATA[
     Euchromatin,  heterochromatin, and predicted genes; 
     genomic clones, ESTs, STSs, P-element 
     insertion sites, and public sequences from GenBank (see below)
   ]]>
-  </db> 
+  </blastdb> 
 
     <!-- these are generic for any organism -->
-  <db name="chromosome" title="  All ${species} genome chromosome arms (NT)"
+  <blastdb id="chromosome" title="  All ${species} genome chromosome arms (NT)"
       nalfile="na_all"
   ><![CDATA[  
     Whole genome by chromosome arms
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="transcript" title="  Predicted ${species} genes (NT)"
+  <blastdb id="transcript" title="  Predicted ${species} genes (NT)"
     nalfile="na_all"
     ><![CDATA[
     Complete transcript (CDS + UTR) for all of the genes 
    ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="translation" title="  Predicted ${species} proteins (AA)"><![CDATA[
+  <blastdb id="translation" title="  Predicted ${species} proteins (AA)"><![CDATA[
     Peptide translations for all of the genes 
   ]]>
-  </db> 
+  </blastdb> 
 
   <!-- fixme; need to extract scaffold dna from chado db -->
-  <db name="golden_path" old_name="scaffold"
+  <blastdb id="golden_path" old_name="scaffold"
     title=" Euchromatin and heterochromatin ${species} scaffolds (NT)"
     nalfile="na_all"
     ><![CDATA[
@@ -150,114 +143,114 @@ tblastx
      and from the heterochromatin assembly,
      divided into ~350kb GenBank scaffolds 
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="intergenic" title="Intergenic ${species} sequence (NT)"
+  <blastdb id="intergenic" title="Intergenic ${species} sequence (NT)"
     nalfile="na_all"
     ><![CDATA[
   Intergeneic regions -- genome sequence between genes  
   ]]>
-  </db> 
+  </blastdb> 
 
- <db name="transposon" skip="1" title="Transposon insertions (NT)"><![CDATA[
+ <blastdb id="transposon" skip="1" title="Transposon insertions (NT)"><![CDATA[
   Transposon insertion sites in genome 
   ]]>
-  </db> 
+  </blastdb> 
 
 
 
   <!-- these are flybase specific -->
   
-  <db name="na_cDNA" title=" BDGP full-length cDNAs (NT)"
+  <blastdb id="na_cDNA" title=" BDGP full-length cDNAs (NT)"
     nalfile="na_all" org="dmel"
     ><![CDATA[
   <I>${species}</I> full-length cDNAs from the BDGP
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="na_geno_clones" title=" BDGP/EDGP genomic clones (NT)"
+  <blastdb id="na_geno_clones" title=" BDGP/EDGP genomic clones (NT)"
     nalfile="na_all"  org="dmel"
     ><![CDATA[
   P1, BAC, and cosmid sequences from the BDGP & EDGP that have been submitted 
         to GenBank -- this does not include whole genome shotgun sequence 
   ]]>
-  </db> 
+  </blastdb> 
 
 
-<!--   <db name="dmel_hetero_scaffolds" title=" Heterochromatin scaffolds (NT)"><![CDATA[ -->
+<!--   <blastdb id="dmel_hetero_scaffolds" title=" Heterochromatin scaffolds (NT)"><![CDATA[ -->
 <!--   Genomic sequence from <a href="http://www.celera.com" target="_self">Celera</a>  -->
 <!--         for the heterochromatin from the WGS3 assembly -->
 <!--   ]]> -->
-<!--   </db>  -->
+<!--   </blastdb>  -->
 
  
-  <db name="dmel_aa_swall" title=" SwissProt and TREMBL proteins (SWALL) (AA)"><![CDATA[
+  <blastdb id="dmel_aa_swall" title=" SwissProt and TREMBL proteins (SWALL) (AA)"><![CDATA[
   A non-redundant combination of the <i>${species}</i> entries from the 
         SwissProt+TrEMBL+TrEMBLNew databases (SWALL)
   ]]>
-  </db> 
+  </blastdb> 
   
-  <db name="dmel_aa_uniprot" title=" UniProt proteins (AA)"><![CDATA[
+  <blastdb id="dmel_aa_uniprot" title=" UniProt proteins (AA)"><![CDATA[
   <i>${species}</i> proteins from UniProt
   ]]>
-  </db> 
+  </blastdb> 
   
-  <db name="dmel_aa_refseq" title=" RefSeq proteins (AA)"><![CDATA[
+  <blastdb id="dmel_aa_refseq" title=" RefSeq proteins (AA)"><![CDATA[
   <i>${species}</i> proteins from  RefSeq
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="dmel_na_refseq" title=" RefSeq Sequences (NT)"><![CDATA[
+  <blastdb id="dmel_na_refseq" title=" RefSeq Sequences (NT)"><![CDATA[
   <i>${species}</i> nucleic sequences from  RefSeq
   ]]>
-  </db>
+  </blastdb>
   
-  <db name="na_gb" title=" GenBank (without BDGP, EDGP, Celera or dbEST) (NT)"
+  <blastdb id="na_gb" title=" GenBank (without BDGP, EDGP, Celera or dbEST) (NT)"
       nalfile="na_all"
   ><![CDATA[
    <i>${species}</i> sequences collected from public sequence databases 
         (but without BDGP, EDGP, Celera, or dbEST sequences)
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="na_est" title="ESTs from BDGP and dbEST cDNAs (NT)" org="dmel" ><![CDATA[
+  <blastdb id="na_est" title="ESTs from BDGP and dbEST cDNAs (NT)" org="dmel" ><![CDATA[
    <I>Drosophila</I> Expressed Sequence Tags from the BDGP and from dbEST 
         cDNAs (redundant)
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="na_EST" part_of="na_est" title="" skip="1"
+  <blastdb id="na_EST" part_of="na_est" title="" skip="1"
     nalfile="na_all na_est"
   ><![CDATA[
    Expressed Sequence Tags
   ]]>
-  </db> 
-  <db name="na_dbEST" part_of="na_est" title="" skip="1"
+  </blastdb> 
+  <blastdb id="na_dbEST" part_of="na_est" title="" skip="1"
     nalfile="na_all na_est"
     ><![CDATA[
   dbEST  cDNAs
   ]]>
-  </db> 
+  </blastdb> 
   
-  <db name="na_pe" title=" P element insertion sites (NT)" nalfile="na_all" org="dmel"><![CDATA[
+  <blastdb id="na_pe" title=" P element insertion sites (NT)" nalfile="na_all" org="dmel"><![CDATA[
   Genomic sequence flanking BDGP P-element insertions (BDGP)
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="na_re" title=" Repeats (NT)"  nalfile="na_all" ><![CDATA[
+  <blastdb id="na_re" title=" Repeats (NT)"  nalfile="na_all" ><![CDATA[
   a curated set of <i>${species}</i> known repeats
   ]]>
-  </db> 
+  </blastdb> 
 
-  <db name="na_STS" title=" STSs (NT)"  nalfile="na_all"><![CDATA[
+  <blastdb id="na_STS" title=" STSs (NT)"  nalfile="na_all"><![CDATA[
    <I>Drosophila</I> STSs from the BDGP and EDGP mapping projects 
   ]]>
-  </db> 
+  </blastdb> 
  
- <db name="na_te" title=" Transposons (NT)" nalfile="na_all"><![CDATA[
+ <blastdb id="na_te" title=" Transposons (NT)" nalfile="na_all"><![CDATA[
   a curated set of <i>${species}</i> transposable elements 
   ]]>
-  </db> 
+  </blastdb> 
 
 
 </opt>

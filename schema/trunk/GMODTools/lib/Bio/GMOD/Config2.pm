@@ -56,7 +56,7 @@ use File::Basename;
 use vars qw/@ISA $BASE @CONF_SUF $ROOT $INIT $Variables/;
 
 our $DEBUG;
-our $VERSION = "0.4";
+our $VERSION = "0.5";
 
 BEGIN {
 ### @ISA = qw/ Bio::GMOD::Config /;  ## DO WE NEED THIS base package at all?
@@ -150,6 +150,14 @@ sub new {
                 gmod_root=> $root }, $self;
 }
 
+sub setargs {
+  my $self = shift;
+  my %args= @_;
+  # searchpath confdir need handlin.... 
+  foreach my $k (qw(confpatt read_includes showtags)) {
+    $self->{$k}= $args{$k} if defined $args{$k};
+    }
+}
 
 =head2 $confhash= config()
 
@@ -310,6 +318,8 @@ sub readKeyValue
 
 our $readConfigOk;
 
+sub readConfigOk { return $readConfigOk; }
+
 =head2 readConfigFile($file, $opts)
 
 read one file; see readConfig 
@@ -360,7 +370,7 @@ sub readConfigFile
     $confhash = $xs->XMLin( $file); 
     }
   
-  elsif (-e $file) {
+  elsif (-f $file) {
     ## handle key-value file OR perl-struct
     open(F,$file); my $confval= join("",<F>); close(F);
     if ($confval =~ m/=>/s && $confval =~ m/[\{\}\(\)]/s) {
@@ -372,13 +382,29 @@ sub readConfigFile
       $confhash= $self->readKeyValue($confval, $confhash);
       }
     }
-  if (scalar($confhash)) { $readConfigOk= 1; }
+  if (scalar(%$confhash)) { $readConfigOk= 1; }
 
   print STDERR "Config2: read: $file ok=$readConfigOk\n" if $DEBUG;
-  if (ref $self->{showtags}) {
+  if (ref $self->{showtags} &&  !$self->{showntags}{$file}) {
+    $self->{showntags}{$file}=1;
+    my $show='';  
     foreach my $tag (@{$self->{showtags}}) { 
-      print "$tag = ",$$confhash{$tag},"\n" if $$confhash{$tag}; 
+      my $showval='';
+      my $val= $$confhash{$tag};
+      if( ref($val) eq 'HASH') { # hash of hash :(
+        my @keys = sort keys %$val;
+        foreach my $k (@keys) {
+          $showval .= "\n $k = ". $$val{$k}->{content};
+          } 
+        ##$showval .= join("\n", @{$val}{@keys});
+      } elsif( ref($val) eq 'ARRAY') {
+        $showval .= join("\n", @{$val});
+      } elsif($val) { 
+        $showval .="$val"; 
       }
+      $show.= "$tag = $showval; " if $showval; 
+      }
+    print STDERR "Config: $show from $file\n" if $show;
     }
     
   return $confhash;
@@ -426,12 +452,25 @@ sub readConfig
   
   if ($self->{read_includes} && $$confhash{include}) {
     ## $self->{read_includes}= 0; ## MUST NOT RECURSE HERE...
+    ##? but can we do nested includes ?? need to check each conf1
+    my %didinc=();
     my $inc= $$confhash{include};
     my @inc= (ref($inc) =~ /ARRAY/) ? @$inc : ($inc);
+    my $saveConfigOk= $readConfigOk;
     foreach $inc (@inc) {
+      next if ($didinc{$inc}); $didinc{$inc}++;
+      $readConfigOk= 0;
       $conf1= $self->readConfigFile($inc, $opts, 1);
-      $self->appendHash($confhash, $conf1, 0) if ($conf1);
+      ## need some warning/die if not found 
+      warn "Config2: MISSING include=$inc \n" unless $readConfigOk;
+      if ($conf1) {
+        my $inc1= delete $$conf1{include};
+        if($inc1) { push(@inc, (ref($inc1) =~ /ARRAY/) ? @$inc1 : ($inc1)); }
+        $self->appendHash($confhash, $conf1, 0);
+        }
+      $saveConfigOk=0 unless($readConfigOk);
       }
+    $readConfigOk= $saveConfigOk;
     }
     
   return $confhash;

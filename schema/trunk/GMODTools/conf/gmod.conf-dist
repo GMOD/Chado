@@ -20,7 +20,7 @@ GMOD_ROOT=/bio/argos/flybase
 CHADO_DB_NAME=chado001
 
 #n User name in Postgres db for access
-CHADO_DB_USERNAME=chadouser
+CHADO_DB_USERNAME=
 
 #n User password in Postgres db for access
 CHADO_DB_PASSWORD=
@@ -28,9 +28,9 @@ CHADO_DB_PASSWORD=
 #n Internet host name running Postgres chado db
 CHADO_DB_HOST=localhost
 
-#n Port number that Postgres DB listens on
-#n should use same as Argos Postgres port; CHADO_DB_PORT=$PGPORT
-CHADO_DB_PORT=7302
+#n Port number that Postgres DB responds to (5432 is factory default)
+#n Argos uses PGPORT=7302
+CHADO_DB_PORT=
 
 #n need local PERL lib .. should go elsewhere?
 PERL5LIB=${GMOD_ROOT}/lib:${PERL5LIB}

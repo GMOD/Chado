@@ -6,7 +6,6 @@
   <title>Chado Feature mapping info</title>
  
   <about>
-    Use as include="featmap" to data release config file. (?)
     
     These are configurations for converting chado feature table dumps to
     standard feature/sequence files. Much of below specifies how to
@@ -33,15 +32,15 @@
   </about>
 
   <!-- feature sets to make fasta bulk files 
-    feb05: drop mRNA fasta(only?) as confusing duplicate to transcript set
   -->
   <featset>gene</featset>
-<!--   <featset>mRNA</featset> -->
-  <featset>CDS</featset>
+<!--   <featset>mRNA</featset> // duplicates transcript -->
   <featset>transcript</featset>
-  <featset>translation</featset>
-  <featset>tRNA</featset>
-  <featset>miscRNA</featset>
+  <featset>CDS</featset>  <!-- dna of protein coding sequence -->
+  <featset>translation</featset> <!-- protein aminos -->
+<!--   <featset>tRNA</featset>  -->
+<!--   <featset>miscRNA</featset> -->
+  <featset>ncRNA</featset> <!-- combines tRNA, miscRNA -->
   <featset>transposon</featset>
   <featset>pseudogene</featset>
   <featset>gene_extended2000</featset>
@@ -54,6 +53,7 @@
   <featset>scaffold</featset> <!-- see below confusion -->
   <featset>chromosome</featset>
 
+<!--   <featset>EST</featset> // if wanted; reagent seqs not on chromosomes -->
   
   <featmap name="gene" get_id="1" />
   <featmap name="five_prime_UTR" add_id="gene" />
@@ -87,6 +87,11 @@
     name="miscRNA"
     types="ncRNA snRNA snoRNA rRNA" 
     />
+    <!-- this variant includes all non-prot-coding rnas -->
+  <featmap
+    name="ncRNA"
+    types="ncRNA snRNA snoRNA rRNA tRNA" 
+    />
   <featmap
     name="gene_extended2000"
     types="gene"
@@ -99,8 +104,15 @@
     typelabel="intergenic"
     method="between"
     />
+  <featmap
+    name="EST"
+    types="EST"
+    fromdb="1"
+    onlydb="1"
+    />
 
-  <!-- golden_path_region may be alternate, or supercontig -->
+
+  <!-- many names used for this: golden_path_region may be alternate, or supercontig -->
   <featmap
     name="scaffold"   
     alt_name0 = "golden_path_region" 

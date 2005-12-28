@@ -3,11 +3,11 @@ use strict;
 
 =head1 Bio::GMOD::Bulkfiles::MySplitLocation
 
-  patch for Bio::Location::Split 
+  patch for Bio::Location::Split for error in strand usage
   
 =cut
 
-use vars qw(@ISA);
+use base qw(Bio::Location::Split);
   ## REV COMP NOT WORKING!  LargeSeq looks ok ... Bio::Location::Split is bad for strand !
 
 use Bio::Root::Root;
@@ -15,9 +15,6 @@ use Bio::Location::SplitLocationI;
 use Bio::Location::Atomic;
 use Bio::Location::Split;
 
-BEGIN{
-@ISA = qw(Bio::Location::Split);
-}
 
 sub new {
     my ($class, @args) = @_;

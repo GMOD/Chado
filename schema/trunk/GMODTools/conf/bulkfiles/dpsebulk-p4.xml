@@ -1,11 +1,10 @@
 <opt
   name="dpsebulk-p4" 
   relid="p4"
-  ROOT="${GMOD_ROOT}/"
-  TMP="${GMOD_ROOT}/tmp"
-  datadir="genomes/Drosophila_pseudoobscura"
 >
- 
+   <!-- see site_defaults for more included configs -->
+  <include>site_defaults</include>
+
   <title>FlyBase Chado Dpse r1.0.4</title>
   <about>
    Configurations to extract feature and sequence data for
@@ -14,14 +13,11 @@
 
   <org>dpse</org>
   <species>Drosophila pseudoobscura</species>
-  <!-- note organism_id is db specific; may change ; here for temp use only -->
-  <organism id="dpse" species="Drosophila_pseudoobscura" 
-    organism_id="3"/>
-  <organism id="dmel" species="Drosophila_melanogaster" 
-    organism_id="1"/>
-  <!-- <include>organisms</include> -->
+  <golden_path>'chromosome_arm','ultra_scaffold'</golden_path>
+  <seq_ontology>SO</seq_ontology>
 
-  <doc name="README"><![CDATA[
+
+  <doc name="Release.txt"><![CDATA[
     D. pseudoobscura genome data from FlyBase
     Release  ${rel}, dated ${date}.
 
@@ -51,16 +47,15 @@
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 
-  <include>filesets</include>
 
   <!-- dnadump FIXME; need to extract scaffold dna from chado db -->
-  <dnadump
+  <!-- dnadump
     path="dna/.+\.raw"
     sql="select feature_id, residues from feature where uniquename = ?"
-    />
+    / -->
   
   <chr_pattern>^(chromosome_arm|golden_path|ultra_scaffold)$</chr_pattern>
-  <chrpart_pattern>^(golden_path_fragment)$</chrpart_pattern>
+  <chrpart_pattern>^(golden_path_fragment|golden_path_region)$</chrpart_pattern>
 
   <unknown_chr>U</unknown_chr>
   <!-- Unknown_group and Unknown_singleton go to one bag chromosome U -->
@@ -102,24 +97,6 @@
   <maptype_pattern name="orthodup2" from="match_part:tblastn:Dmel.*" to="skip"/>
   <maptype_pattern name="null" from="null" to="null"/>
 
-  <include>featuresets</include>
-
-  <!-- override scaffold default featmap; no scaffolds in dpse 1.04; 
-    alt_name0 = "golden_path_region" 
-    alt_name1 = "golden_path_fragment" 
-    alt_name4 = "supercontig"
-    .. instead change golden_path_region to   supercontig="skip"
-  <featmap
-    name="scaffold"   
-    alt_name2 = "databank_scaffold"
-    alt_name3 = "scaffold"
-    types="scaffold"
-    typelabel="scaffold"
-    fromdb="0"
-    />
-   <featmap name="dummy" />
-    -->
-    
   <!-- feature sets to make fasta bulk files; 
     needs update for dpse syntenic_block and homology features
     feb05: drop mRNA fasta as confusing duplicate to transcript set

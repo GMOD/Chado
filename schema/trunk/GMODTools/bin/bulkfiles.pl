@@ -2,36 +2,152 @@
 
 =head1 NAME
 
-  bulkfiles.pl --  command-line program to Bio::GMOD::Bulkfiles
+  bulkfiles.pl -- command-line program for Bio::GMOD::Bulkfiles
   
 =head1 SYNOPSIS
 
-  perl bulkfiles.pl --help  for command details
+  This program generates bulk genome annotation files from a Chado genome
+  database, including Fasta, GFF, DNA, Blast indices.
   
-  This generates bulk genome annotation files from a Chado genome
-  database, including Fasta, GFF, DNA, Blast indices, as found at 
-    ftp://flybase.net/genomes/Drosophila_melanogaster/ ..
-    (and other species soon)
-  
-  Most all of the database and data-release information, including
-  what features to extract, how to make files, is in xml configuration
-  files (see GMODTools/conf/bulkfiles/)
-  See perldoc Bio::GMOD::Bulkfiles for more information.
-  
-=head1 Quick Start
-
-  # get software
+  # get bulkfiles software
   cvs -d :pserver:anonymous@cvs.sourceforge.net:/cvsroot/gmod \
     co -d GMODTools schema/GMODTools 
+  -- OR --
+  curl  -O http://eugenes.org/gmod/GMODTools/GMODTools-1.0.zip 
+   unzip GMODTools*zip
 
-  # load a genome chado db to Postgres
-  wget http://http://sgdlite.princeton.edu/download/sgdlite/2004_05_19_sgdlite.sql.gz
-  createdb sgdlite_20040519
-  (zcat *sgdlite.sql.gz | psql -d sgdlite_20040519 -f - ) >& log.load 
+  # load a genome chado db to Postgres database
+  curl -O http://sgdlite.princeton.edu/download/sgdlite/sgdlite.sql.gz
+  createdb sgdlite
+  (gunzip -c sgdlite.sql.gz | psql -d sgdlite -f - ) >& log.load 
 
-  setenv GMOD_ROOT=$PWD/GMODTools
-  perl ./bin/bulkfiles.pl -help
-  perl ./bin/bulkfiles.pl -conf sgdbulk1 -dnadump -featdump -make -debug
+  # extract bulk files from database
+  cd GMODTools 
+  perl -Ilib bin/bulkfiles.pl -conf sgdbulk -make 
+
+=head1 DETAILED USAGE
+
+  Generate genome bulk files from Chado database.
+  Usage: bulkfiles.pl [ -conf sgdbulk -chr chrIII -format fasta -make  ]
+  
+    -config=bulkfile-config 
+      A configuration xml-simple file pointing to genome data files,
+      e.g., sgdbulk  or  conf/bulkfiles/sgdbulk.xml
+      
+      See conf/bulkfiles/bulkfiles-template.xml  to create a new database
+      release 
+      
+    -format=gff,fasta    
+      repeat for multiple formats [defaults: @defformats]
+      
+    -chromosome=2L   
+      repeat for multiple chromosomes: -chr=2 -chr=3 -chr=X   
+      All chromosomes are processed by default.
+      
+    -dnadump  
+      extract chromosome dna from database [default $dnadump]
+      
+    -featdump  
+      extract features from database [default $featdump]
+      intermediate step option:
+        -[no]splitfeat = split by chromosome [default with -featdump] )
+        
+    -failonerror  
+      die if error is encountered (otherwise read log to see it)
+      
+    -make  
+      make output bulk files [default $makeout]
+      
+    -showconfig
+      prints the parsed configuration file(s); pay attention
+        to ROOT= for location of output (set by \$GMOD_ROOT)
+        
+    -help
+      more info
+    -debug  
+      turn on debug output for progress info [$debug]
+  
+=head1 REQUIREMENTS
+
+Mimimal additional software is required. It is assumed you
+have installed a Chado database (as in synopsis).  This
+sofware requires perl DBI for database access, and XML::Simple
+for configurations, and a few bits of BioPerl,
+all part of GMOD database installation.
+
+=head1 CONFIGURATION
+
+The operation of this program is controlled by several
+configuration files (in simple xml format), including database location, 
+feature construction and data-release information.  
+The defaults for these are in GMODTools/conf/bulkfiles/.  These can be
+tuned for specific data sets, releases.  You can override these
+with a conf/ folder containing updated versions, and use the
+primary -conf=my-bulkfile.xml to point to alternate configurations.
+
+The concept of data-release set is important here.  If you use
+a Chado database release  for which there is a configuration
+set, you should get the same outputs as provided by the originators.
+With a new database, or new release, you may need to go thru rounds
+of tuning the configurations, and possibly software, to specifics
+of the data-release.  As genome databases mature, they can get more
+complex.  E.g. a new FlyBase D.pseudoobscura release added complexity
+to the 'chromosome/superscaffold' structure, necessitating editing
+of this basic aspect data configurations and outputs.
+
+Configurations include the SQL statements used for extracting
+table files, as the primary functions of these need to be tuned
+for specific Chado data sets (conf/bulkfiles/chadofeatsql.xml).  
+There are additional configurations for each type of output bulkfile
+in 'filesets.xml' with options for those operations.  Operations for
+converting and renaming features (e.g. change non-SO names to Sequence Ontology
+compliant names for GFF, regular expressions for converting unweildy
+database names, values to publicly usable content) are in
+'chadofeatconv.xml', along with 'featuresets.xml'.   Each bulkfile
+module can have a module.xml for further instructions.
+
+=head1 NOTES
+
+Much of the operation of this program has been dictated by practical
+needs to create usable public data releases from FlyBase Chado databases
+starting in year 2004.  There remain aspects of the package internal
+software that warrants improvement and extention to additional cases.
+If there were such a thing as a 'perfect' genome database, much of this
+tool would not be needed, as it basically dumps tables and adds some
+reformatting for standard output file formats.  But along the way it
+also has necessarily added options to correct what is in the database to
+meet criteria for public data consumption.
+
+-dnadump and -featdump are prerequisites, but you need run only once.
+These create intermediate output files used in make steps.  
+featdump = extract feature table files, first in feature-groups
+then join and split by chromosome/scaffold.
+dnadump = extract chromosome/scaffold raw dna files.
+
+The first stage of -featdump will extract a table
+of chromosomes or your ${golden_path} feature.
+If this fails to work right, the other steps will fail.
+With a new genome dataset, test this first.  Read the
+{release_path}/tmp/featdump/chromosomes.tsv to see if correct.
+Hand-edit if need be; this file will be used as provided.
+Format of the tmp/featdump/tables.tsv is tab-separated columns:
+
+  ($arm,$fmin,$fmax,$strand,$orgid,$type,$name,$id,$oid,$attr_type,$attribute)
+  chrI    1       230208  0       10      chromosome      chrI    chrI    212     species Saccharomyces_cerevisiae
+  chrII   1       813178  0       10      chromosome      chrII   chrII   507     species Saccharomyces_cerevisiae
+  
+
+-format 'fff' is an intermediate flat-feature-format, required for making 
+fasta and additional formats.  FFF and GFF are produced together
+by one module reading the intermediate feature tables.
+Making FFF and GFF are the time consuming steps and may be split
+by chromosome across processors.  Processing time may be hours for
+complex databases.
+
+New output formats are added by subclassing the
+Bio::GMOD::Bulkfiles::BulkWriter module, which basically
+takes tabular inputs from the intermediary SQL output and
+does something with it.  
 
 =head1 AUTHOR
 
@@ -39,27 +155,43 @@
 
 =cut
 
+BEGIN{
+ unless($ENV{GMOD_ROOT}){
+   require Bio::GMOD::Config2; 
+   my $root= Bio::GMOD::Config2->new()->gmod_root();
+   warn "* Setting GMOD_ROOT=$root\n";
+   $ENV{GMOD_ROOT}=$root;
+   }
+}
+
 use Bio::GMOD::Bulkfiles;    
 use Getopt::Long;    
 
-my ($dnadump,$featdump,$makeout,$failonerror,$debug,$showconfig)
+my ($dnadump,$featdump,$makeout,$failonerror,$debug,$verbose,$showconfig)
   = (0) x 10;
 my $splitfeat=-1;  
-my $config= undef;  ## 'sgdbulk1' or 'fbbulk-r4' or 'fbbulk-dpse1'
+my $automake=1;  # make this easier for general user
+my $config= undef;   
 my @formats= ();
-my @defformats= qw(fff gff fasta blast gnomap);
+
+#? let release.xml formats replace this?
+my @defformats= qw(overview fff gff fasta tables blast ); #gnomap
 my @chr=();
+
+#? add makeclean/overwrite option ??
 
 my $ok= Getopt::Long::GetOptions( 
 'config=s' => \$config,
 'formats=s' => \@formats,  
 'chromosome=s' => \@chr,
+'automake!' => \$automake,
 'dnadump!' => \$dnadump,
 'featdump!' => \$featdump, 
 'splitfeat!' => \$splitfeat,  
 'failonerror!' => \$failonerror,
 'makeout!' => \$makeout,
 'debug!' => \$debug,
+'verbose!' => \$verbose,
 'bugger=s' => \$debug, # more debug levels
 'showconfig!' => \$showconfig,
 );
@@ -70,39 +202,40 @@ if ($splitfeat == -1) { $splitfeat= $featdump; }
 @formats = split(/,/,join(',',@formats));
 @formats= @defformats unless(@formats);
 
-warn " ** Specify -config=config-name\n" unless($config);
+warn "** Please specify -config=config-name\n" unless($config);
 die <<"USAGE" unless ($ok && $config);
 Generate genome bulk files from Chado database.
-Usage: $0 [ -conf fbbulk-r4 -chr X -format fff -make  ]
-  -config=bulkfile-config 
-    A Bio::GMOD::Bulkfiles config file pointing to genome data files,
-    e.g., sgdbulk1, conf/bulkfiles/fbbulk-r4
-  -format=fff    
-    repeat for multiple; [defaults: @defformats]
-  -chromosome=2L   
-    repeat for multiple: -chr=2 -chr=3 -chr=X   
-    All chromosomes are processed unless specified.
-  -dnadump  
-    extract chromosome dna from database [default $dnadump]
-  -featdump  
-    extract features from database [default $featdump]
-    ( -[no]splitfeat = split by chromosome [default with -featdump] )
-  -failonerror  
+Usage: $0  -conf sgdbulk -make [ -format gff,fasta ... ]
+Options:
+  -config=bulkfile-config    
+    Configuration file for genome data release  [required, no default]
+  -format=gff,fasta    
+    output formats [default: @defformats]
+  -chromosome=2L      
+    chromosome(s) to work with: -chr=3,4,5 [default: all chromosomes]
+  -[no]dnadump  
+    extract chromosome dna from database [intermediate step; default $dnadump]
+  -[no]featdump  
+    extract features from database [intermediate step; default $featdump]
+    ( -[no]splitfeat = collate primary table files, sortin and splitting  by chromosome 
+      [default with -featdump] )
+  -[no]failonerror  
     die if error is encountered (otherwise read log to see it)
-  -make  
+  -[no]make  
     make output bulk files [default $makeout]
-  -showconfig
-    prints the parsed configuration file(s); pay attention
+  -[no]automake  
+    auto-make required preliminary data [default $automake]
+  -[no]verbose  
+    turn on verbose output info [$verbose]
+  -[no]showconfig
+    print the parsed configuration file(s); pay attention
       to ROOT= for location of output (set by \$GMOD_ROOT)
-  -debug  
+  -[no]debug  
     turn on debug output for progress info [$debug]
-    
-NOTES: 
- -dnadump and -featdump are prerequisites, but you need run only once 
-   ( ~1 hr for all drosophila m. genome )
- -format 'fff' is required for making fasta, blast, gnomap formats
-   making fff and gff are the time consuming steps and may be split
-   by chromosome across processors ( ~3 hr / chr for drosophila)
+
+MORE INFO:
+  perldoc $0
+  perldoc Bio::GMOD::Bulkfiles
 USAGE
   
 my $result= 'none';
@@ -110,8 +243,11 @@ my $result= 'none';
 my $sequtil= Bio::GMOD::Bulkfiles->new( configfile => $config, 
   debug => $debug, showconfig => $showconfig,
   failonerror => $failonerror,
+  verbose => $verbose,
+  automake => $automake,
   );
 
+# automake will do these now if need be.
 $sequtil->dumpFeatures() if ($featdump); 
 $sequtil->sortNSplitByChromosome() if ($splitfeat); 
 $sequtil->dumpChromosomeBases() if ($dnadump);

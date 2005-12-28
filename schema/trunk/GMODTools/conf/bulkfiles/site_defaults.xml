@@ -1,0 +1,83 @@
+<opt
+  name="site_defaults"
+  ROOT="${GMOD_ROOT}/"
+  datadir="data/genomes"
+  ftp_url="ftp://ftp.mygenome.org/genome"
+  web_url="http://www.mygenome.org/genome"
+>
+  <title>Site Default settings for GMODTools</title>
+
+  <about id="site_defaults">
+  This is a configuration file for GMODTools Bulkfiles
+  which can be included into data release configuration
+  files.  Enter common settings, include other portions
+  of the configurations settings here.  
+  
+  Simple tags that go well here:
+    ROOT = where the base path for data is
+    datadir = sub directory from ROOT
+    ftp_url, web_url = used in output documents
+    verbose = show these 'about' comments.
+  
+  Using 'include' options in the xml configurations will
+  add these to main configuration, but not replace main
+  settings.  Includes can be nested.
+  </about>
+
+  <db
+    driver="Pg"
+    name="${CHADO_DB_NAME}"
+    host="${CHADO_DB_HOST}"
+    port="${CHADO_DB_PORT}" 
+    user="${CHADO_DB_USERNAME}"
+    password="${CHADO_DB_PASSWORD}"
+    />
+  <about id="db"
+    driver="Pg"
+    name="chado_release_db"
+    host="localhost"
+    port="5432" 
+    user=""
+    password=""
+    >
+  This is an example setting for database access.
+  If your system defines the values in gmod.conf, they
+  will be used. If you dont use thse CHADO_ from gmod.conf,
+  change above db settings.
+  </about>
+  
+  
+  <include>organisms</include>
+  <about id="organisms" >
+  list of species and their abbreviations. Include your
+  species .
+  </about>
+  
+  <!-- how to make bulk files -->
+  <include>filesets</include>
+  <about id="filesets" >
+  How to make bulk files.
+  </about>
+
+  <!-- feature sets to make fasta bulk files -->
+  <include>featuresets</include>
+  <about id="featuresets" >
+  What feature sets for bulk files (esp. fasta sequence)
+  and how they are grouped from primary features.
+  </about>
+
+    <!-- or use bulkfiles defaults/user choice -->
+  <outformats>overview</outformats>
+  <outformats>fff</outformats>
+  <outformats>gff</outformats>
+  <outformats>fasta</outformats>
+  <outformats>tables</outformats>
+  <outformats>blast</outformats>
+  <about id="outformats" >
+  ARRAY of default output files. Generally each of
+  these has a Bulkfiles::BulkWriter perl subclass,
+  and xml configuration.   fileset details these, including
+  the Perl handler.
+  </about>
+
+</opt>
