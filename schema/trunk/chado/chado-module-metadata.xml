@@ -378,6 +378,16 @@
         Alternative expression module, based on MAGE model
       </description>
       <source type='sql' path='expression/rad.sql'/>
+
+      <component id='rad-views' type='views'>
+        <description>
+          A set of table descriptions for the rad module that
+          includes several tables that use Postgres' INHERIT function.
+        </description>
+        <source type='sql' path='expression/rad.views'/>
+      </component>
+
+
     </module>
 
     <module id='composite'>
