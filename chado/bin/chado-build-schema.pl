@@ -10,7 +10,7 @@ use Data::Dumper;
 
 my ($HELP, $OUTFILE, $INFILE, $ONLY_SQL);
 
-my $rows_of_stuff=20;
+my $rows_of_stuff=23;
 
 GetOptions(
   'help'      => \$HELP,
