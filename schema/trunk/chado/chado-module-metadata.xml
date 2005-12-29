@@ -232,6 +232,66 @@
         <source type='bridge-xml' path='sequence/bridges/chaos-bridge.sql'/>
       </component>
 
+      <component id='sequence-loading-api' type='dbapi'>
+        <description>
+          A DBMS API for loading feature tables
+        </description>
+        <source type='sqli' path='sequence/functions/sequence-loading.plpgsql'/>
+      </component>
+
+      <component id='sequence-loading' type='code'>
+        <description>
+          Postgres code for loading feature tables
+        </description>
+        <implements to='sequence-loading-api' />
+        <source type='plpgsql' path='sequence/functions/sequence-loading.plpgsql'/>
+      </component>
+
+      <component id='subsequence-api' type='dbapi'>
+        <description>
+          A DBMS API for doing subsequence queries
+        </description>
+        <source type='sqli' path='sequence/functions/subsequence.sqlapi'/>
+      </component>
+
+      <component id='subsequence' type='code'>
+        <description>
+          Postgres code for doing subsequence queries
+        </description>
+        <implements to='subsequence-api' />
+        <source type='plpgsql' path='sequence/functions/subsequence.plpgsql'/>
+      </component>
+
+      <component id='feature_subalignments' type='code'>
+        <description>
+          Postgres code for doing something with feature subalignments,
+          but I don't remember what.  Allen?
+        </description>
+        <source type='plpgsql' path='sequence/functions/feature_subalignments.plpgsql'/>
+      </component>
+
+      <component id='frange' type='code'>
+        <description>
+          Postgres code for fast feature 'contains' query, requried
+          for the DAS2 server (right?)
+        </description>
+        <source type='plpgsql' path='sequence/functions/frange.plpgsql'/>
+      </component>
+
+      <component id='create_soi' type='code'>
+        <description>
+          Postgres code to flatten feature relationships; it is in some
+          ways similar to frange.
+        </description>
+        <source type='plpgsql' path='sequence/functions/create_soi.plpgsql'/>
+      </component>
+
+      <component id='feature_ids_fx' type='code'>
+        <description>
+          Postgres code to simplify feature relationship queries
+        </description>
+        <source type='plpgsql' path='sequence/functions/feature_ids_fx.plpgsql'/>
+      </component>
     </module>
 
     <module id='companalysis'  required='true'>
