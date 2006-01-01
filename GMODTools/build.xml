@@ -50,10 +50,11 @@ handier use. Since the GMODTools is in Perl, ant doesn't do much else.
     <!--  
       bulkfastafromfff.pl is old; exclude?
       gmod_install, .. gmod_load_newseq are from gmod001 release; need updates
+      these drop also: bulkfastafromfff.pl fbcggntab.pl  
     -->
     
     <zipfileset dir="${basedir}/bin"  filemode="755" prefix="${app}/bin"
-       excludes="gmod_*.pl **/*.old/**"
+       excludes="bulkfastafromfff.pl fbcggntab.pl gmod_*.pl **/*.old/**"
       />
  
     <!--  

@@ -229,8 +229,31 @@ function opendata(via) {
 </form>
   ]]></doc>
 
+  <!-- 
+    need per-species .htacces for translating feature types or config for genomepathmap.pl
+  -->
+  <doc hidden="1" FIXME="1" 
+  id="rel-htaccess" type="text" append="1" path="genome.htaccess"><![CDATA[
+## support for GMOD common /genome/ data urls 
+## web /genome/ is assumed to be symlink to ${datadir} folder
+## use as .htaccess in Directory "${datadir}" for apache web server 
+## needs /cgi-bin/genomepathmap.pl
 
-<!-- doesnt this need to be appended??; or write for all species + releases -->
+IndexIgnore *htaccess dna fff tmp
+
+RewriteEngine on
+
+# ${type_map} should be inserted here, saying what type(s) are used
+# by this species/database for standards, esp. ncrna, mrna (== gene for sgd), ...
+# ? use <featmap> entries, or add <genomemap> entries ?
+
+# cgi will handle gzip-enabled and non-gz browsers; knows HEAD vs GET/POST
+# make sure we don't rewrite real files: genome/species/release/gff/somefile.gff
+RewriteRule /(dna|genome|feature|gff|protein|mrna|transcript|ncrna)$ \
+ /cgi-bin/genomepathmap.pl?typemap=${type_map};uri=%{REQUEST_URI} 
+
+]]></doc>
+
   <doc id="htaccess" type="text" append="1" path="${datadir}/genome.htaccess"><![CDATA[
 ## support for GMOD common /genome/ data urls 
 ## web /genome/ is assumed to be symlink to ${datadir} folder
