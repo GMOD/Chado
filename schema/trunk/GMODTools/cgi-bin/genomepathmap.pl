@@ -113,6 +113,8 @@ sub getspecies {
 
 
 sub handleCgi {
+
+  ##  add optional params: uri=%{REQUEST_URI} ; config= ; type_map= ? ;  
   my $pathinfo= shift @ARGV;
   
   if ($pathinfo =~ /help$/) { notfound($pathinfo); } # shouldn't be here
@@ -303,26 +305,31 @@ sub getdatapath {
 
   if ($uri =~ m,/$spp/(\w[^/]+)/.+,) { $folder= $1; } 
   
-  my $type="-NULL"; ## need to fail if no primary verb: dna,protein,transcript or alias
+  my $type="NULL"; ## need to fail if no primary verb: dna,protein,transcript or alias
   if ($uri =~ /(gff|feature)$/i) { $format="gff"; $type=""; }
-  elsif($uri =~ /(genome|dna|chromosome)$/i) { $type="-chromosome"; }
-  elsif($uri =~ /(protein|proteome|translation)$/i) { $type="-translation"; }
-  elsif($uri =~ /(mrna|transcript|transcriptome)$/i) { $type="-transcript"; }
-  elsif($uri =~ /(ncrna|miscrna)$/i) { $type="-miscRNA"; } # add -tRNA ***
+  elsif($uri =~ /(genome|dna|chromosome)$/i) { $type="chromosome"; }
+  elsif($uri =~ /(protein|proteome|translation)$/i) { $type="translation"; }
+  elsif($uri =~ /(mrna|transcript|transcriptome)$/i) { $type="transcript"; }
+  elsif($uri =~ /(ncrna|miscrna)$/i) { $type="miscRNA"; } ## change ot ncRNA
     ## ^^ need to know what fasta labels are being used: ncRNA? miscRNA? tRNA ?
   ## else error ?
+
+  # hack needs some config file... check in $spp/ path ?
+  if ($spp =~ /Saccharomyces/) { 
+    $type =~ s/transcript/gene/;
+    $type =~ s/miscRNA/ncRNA/;
+    ## no protein data here ??
+  }
   
   ## fixme - also check $uri for real version-folder 
   ## e.g. if ($uri =~ /(version|release)([\w..])/)
-  ##if ($org eq "dmel" && $uri =~ /hetero/i) { $folder="current_hetchr"; }
   
   my $path = "$spp/$folder/$format";
-  ##my $file = "$org$part$type";
-  my $filepatt = "$part$type";
+  my $filepatt = $part;
+  $filepatt .= "-$type" if $type;
   
   ## need .gz, no.gz option, check for both
   my $file= getreleasefile( $uri, $path, $filepatt,".$format"); 
-  ##$file = "$file$rel.$format";
   $path = "$path/$file";
   return (wantarray) ? ($path,$file) : $path;
 }

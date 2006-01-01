@@ -41,6 +41,8 @@ use strict;
   Fasta sequence for each selected feature set,
      with headers from feature files
   BLAST Index files (NCBI)
+  Chado database overview tables. 
+  A standard genome webpage for access to bulk data.
   
   
 =head1 REQUIREMENTS and INSTALLATION
