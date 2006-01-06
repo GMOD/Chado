@@ -875,28 +875,28 @@ create index organismprop_idx1 on organismprop (organism_id);
 create index organismprop_idx2 on organismprop (type_id);
 
 CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT organism_id 
   FROM organism
   WHERE genus=$1
     AND species=$2
- $$ LANGUAGE 'sql';
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR) RETURNS INT
- AS $$
+ AS ' 
 SELECT organism_id
   FROM organism
-  WHERE genus=substring($1,1,position(' ' IN $1)-1)
-    AND species=substring($1,position(' ' IN $1)+1)
- $$ LANGUAGE 'sql';
+  WHERE genus=substring($1,1,position('' '' IN $1)-1)
+    AND species=substring($1,position('' '' IN $1)+1)
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_organism_id_abbrev(VARCHAR) RETURNS INT
- AS $$
+ AS '
 SELECT organism_id
   FROM organism
   WHERE substr(genus,1,1)=substring($1,1,1)
-    AND species=substring($1,position(' ' IN $1)+1)
- $$ LANGUAGE 'sql';
+    AND species=substring($1,position('' '' IN $1)+1)
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR) 
   RETURNS INT AS 
@@ -1751,7 +1751,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION project_featureloc_up(int,int)
  RETURNS featureloc AS
-$$
+'
 DECLARE
     in_featureloc_id alias for $1;
     up_srcfeature_id alias for $2;
@@ -1800,11 +1800,11 @@ BEGIN
   in_featureloc.srcfeature_id = up_featureloc.srcfeature_id;
   RETURN in_featureloc;
 END
-$$   
+'   
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
- RETURNS INT AS $$
+ RETURNS INT AS '
  DECLARE
     in_p             alias for $1;
     srcf_id          alias for $2;
@@ -1813,7 +1813,7 @@ CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
     out_p            INT;
     exon_cvterm_id   INT;
 BEGIN
- SELECT INTO exon_cvterm_id get_feature_type_id('exon');
+ SELECT INTO exon_cvterm_id get_feature_type_id(''exon'');
  SELECT INTO out_p
   CASE 
    WHEN strand<0 THEN fmax-p
@@ -1830,47 +1830,47 @@ BEGIN
    in_p <= fmax;
   RETURN in_featureloc;
 END
-$$   
+'   
 LANGUAGE 'plpgsql';
 
 
 CREATE OR REPLACE FUNCTION get_cv_id_for_feature() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='sequence'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''sequence''' LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION get_cv_id_for_featureprop() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='feature_property'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''feature_property''' LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION get_cv_id_for_feature_relationsgip() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='relationship'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''relationship''' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_feature_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS ' 
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='sequence'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''sequence''
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_featureprop_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='feature_property'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''feature_property''
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_feature_relationship_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='relationship'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''relationship''
+ ' LANGUAGE 'sql';
 
 -- depends on sequence-cv-helper
 CREATE OR REPLACE FUNCTION get_feature_id(VARCHAR,VARCHAR,VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT feature_id 
   FROM feature
   WHERE uniquename=$1
     AND type_id=get_feature_type_id($2)
     AND organism_id=get_organism_id($3)
- $$ LANGUAGE 'sql';
+ ' LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION store_feature 
 (INT,INT,INT,INT,
  INT,INT,VARCHAR,VARCHAR,INT,BOOLEAN)
@@ -2045,7 +2045,7 @@ LANGUAGE 'sql';
 --    part_of subfeatures)
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT,INT,INT)
- RETURNS TEXT AS $$
+ RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_rtype_id   ALIAS FOR $2;
 DECLARE v_rank       ALIAS FOR $3;
@@ -2053,7 +2053,7 @@ DECLARE v_locgroup   ALIAS FOR $4;
 DECLARE subseq       TEXT;
 DECLARE seqrow       RECORD;
 BEGIN 
-  subseq = '';
+  subseq = '''';
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
@@ -2075,7 +2075,7 @@ BEGIN
   END LOOP;
  RETURN subseq;
 END
-$$
+'
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT)
@@ -2085,15 +2085,15 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT)
  RETURNS TEXT AS
-$$
-SELECT subsequence_by_subfeatures($1,get_feature_relationship_type_id('part_of'),0,0)
-$$
+'
+SELECT subsequence_by_subfeatures($1,get_feature_relationship_type_id(''part_of''),0,0)
+'
 LANGUAGE 'sql';
 
 
 -- constrained by subfeature.type_id (eg exons of a transcript)
 CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT,INT,INT)
- RETURNS TEXT AS $$
+ RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_ftype_id   ALIAS FOR $2;
 DECLARE v_rank       ALIAS FOR $3;
@@ -2101,7 +2101,7 @@ DECLARE v_locgroup   ALIAS FOR $4;
 DECLARE subseq       TEXT;
 DECLARE seqrow       RECORD;
 BEGIN 
-  subseq = '';
+  subseq = '''';
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
@@ -2123,7 +2123,7 @@ BEGIN
   END LOOP;
  RETURN subseq;
 END
-$$
+'
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT)
@@ -3797,7 +3797,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_schema.sql,v 1.37 2005-12-29 18:30:02 scottcain Exp $
+-- $Id: default_schema.sql,v 1.38 2006-01-06 19:24:47 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
