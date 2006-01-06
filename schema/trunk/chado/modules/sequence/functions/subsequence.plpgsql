@@ -51,7 +51,7 @@ LANGUAGE 'sql';
 --    part_of subfeatures)
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT,INT,INT)
- RETURNS TEXT AS $$
+ RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_rtype_id   ALIAS FOR $2;
 DECLARE v_rank       ALIAS FOR $3;
@@ -59,7 +59,7 @@ DECLARE v_locgroup   ALIAS FOR $4;
 DECLARE subseq       TEXT;
 DECLARE seqrow       RECORD;
 BEGIN 
-  subseq = '';
+  subseq = '''';
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
@@ -81,7 +81,7 @@ BEGIN
   END LOOP;
  RETURN subseq;
 END
-$$
+'
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT)
@@ -91,15 +91,15 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT)
  RETURNS TEXT AS
-$$
-SELECT subsequence_by_subfeatures($1,get_feature_relationship_type_id('part_of'),0,0)
-$$
+'
+SELECT subsequence_by_subfeatures($1,get_feature_relationship_type_id(''part_of''),0,0)
+'
 LANGUAGE 'sql';
 
 
 -- constrained by subfeature.type_id (eg exons of a transcript)
 CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT,INT,INT)
- RETURNS TEXT AS $$
+ RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_ftype_id   ALIAS FOR $2;
 DECLARE v_rank       ALIAS FOR $3;
@@ -107,7 +107,7 @@ DECLARE v_locgroup   ALIAS FOR $4;
 DECLARE subseq       TEXT;
 DECLARE seqrow       RECORD;
 BEGIN 
-  subseq = '';
+  subseq = '''';
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
@@ -129,7 +129,7 @@ BEGIN
   END LOOP;
  RETURN subseq;
 END
-$$
+'
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT)

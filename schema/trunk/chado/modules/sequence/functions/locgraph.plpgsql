@@ -20,7 +20,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION project_featureloc_up(int,int)
  RETURNS featureloc AS
-$$
+'
 DECLARE
     in_featureloc_id alias for $1;
     up_srcfeature_id alias for $2;
@@ -69,11 +69,11 @@ BEGIN
   in_featureloc.srcfeature_id = up_featureloc.srcfeature_id;
   RETURN in_featureloc;
 END
-$$   
+'   
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
- RETURNS INT AS $$
+ RETURNS INT AS '
  DECLARE
     in_p             alias for $1;
     srcf_id          alias for $2;
@@ -82,7 +82,7 @@ CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
     out_p            INT;
     exon_cvterm_id   INT;
 BEGIN
- SELECT INTO exon_cvterm_id get_feature_type_id('exon');
+ SELECT INTO exon_cvterm_id get_feature_type_id(''exon'');
  SELECT INTO out_p
   CASE 
    WHEN strand<0 THEN fmax-p
@@ -99,6 +99,6 @@ BEGIN
    in_p <= fmax;
   RETURN in_featureloc;
 END
-$$   
+'   
 LANGUAGE 'plpgsql';
 
