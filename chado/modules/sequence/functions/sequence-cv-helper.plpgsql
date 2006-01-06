@@ -1,29 +1,29 @@
 
 CREATE OR REPLACE FUNCTION get_cv_id_for_feature() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='sequence'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''sequence''' LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION get_cv_id_for_featureprop() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='feature_property'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''feature_property''' LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION get_cv_id_for_feature_relationsgip() RETURNS INT
- AS $$SELECT cv_id FROM cv WHERE name='relationship'$$ LANGUAGE 'sql';
+ AS 'SELECT cv_id FROM cv WHERE name=''relationship''' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_feature_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS ' 
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='sequence'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''sequence''
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_featureprop_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='feature_property'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''feature_property''
+ ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION get_feature_relationship_type_id(VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT cvterm_id 
   FROM cv INNER JOIN cvterm USING (cv_id)
-  WHERE cvterm.name=$1 AND cv.name='relationship'
- $$ LANGUAGE 'sql';
+  WHERE cvterm.name=$1 AND cv.name=''relationship''
+ ' LANGUAGE 'sql';
 

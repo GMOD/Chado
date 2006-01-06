@@ -1,9 +1,9 @@
 -- depends on sequence-cv-helper
 CREATE OR REPLACE FUNCTION get_feature_id(VARCHAR,VARCHAR,VARCHAR) RETURNS INT
- AS $$
+ AS '
   SELECT feature_id 
   FROM feature
   WHERE uniquename=$1
     AND type_id=get_feature_type_id($2)
     AND organism_id=get_organism_id($3)
- $$ LANGUAGE 'sql';
+ ' LANGUAGE 'sql';
