@@ -182,9 +182,10 @@ Bio::DB::GFF uses, and may need to be revisited.
 =item Assigning feature_relationship entries
 
 All Parent tagged features are assigned feature_relationship
-entries of 'part_of' to their parent features.  Note that
+entries of 'part_of' to their parent features.  Derived_from
+tags are assigned 'derived_from' relationships.  Note that
 parent features must appear in the file before any features
-use a Parent tag referring to that feature.
+use a Parent or Derived_from tags referring to that feature.
 
 =item Alias tags
 
@@ -581,6 +582,10 @@ $sth = $db->prepare("select cvterm_id from cvterm where name = 'part_of'");
 $sth->execute;
 my($part_of) = $sth->fetchrow_array();
 
+$sth = $db->prepare("select cvterm_id from cvterm where name = 'derives_from'");
+$sth->execute;
+my($derives_from) = $sth->fetchrow_array();
+
 $sth = $db->prepare("select cv_id from cv where name = 'sequence'");
 $sth->execute;
 my($sofa_id) =  $sth->fetchrow_array();
@@ -766,6 +771,16 @@ while(my $feature = $gffio->next_feature()){
     die "no parent ".$pname unless $parent;
 
     print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$part_of)),"\n";
+    $nextfeaturerel++;
+  }
+
+  if($feature->annotation->get_Annotations('Derives_from')){
+    my $pname  = undef;
+    ($pname)   = ($feature->annotation->get_Annotations('Derives_from'))[0]->value;
+    my $parent = $cache{parent}{$pname};
+    die "no parent ".$pname unless $parent;
+
+    print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$derives_from)),"\n";
     $nextfeaturerel++;
   }
 
