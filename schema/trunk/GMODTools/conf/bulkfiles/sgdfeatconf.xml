@@ -28,27 +28,14 @@
   <featset>chromosome</featset>
   <featset>gene</featset>
   <featset>CDS</featset>
+  <featset>CDS_translation</featset>
 <!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
   <featset>ncRNA</featset>
   <featset>transposon</featset>
   <featset>gene_extended2000</featset>
   <featset>intergenic</featset>
 
-  <!-- 
-   featmap for feature sets that need reprocessing, attributes: 
-    name = feature set name
-    types = feature types, space delimited (in fff/gff)
-    typelabel = type to use in output header, paired with types list
-    subrange = expansion/extraction range to add to feature location;
-             readseq syntax not yet supported, i.e. {start,end}+/-offset)
-    fromdb = extract from chado database feature.residues field
-             rather than chromosome dna file,
-             for curated residues - transcript, translation)
-    get_id = save id, dbxref fields for add to other (genemodel) features
-    add_id = add id of parent feature (genemodel)
-    note: translation type=protein is coded into various seq fetch programs
-  -->
-  
+  <!-- see featuresets.xml -->
   
   <featmap id="gene" get_id="1" />
 
@@ -70,6 +57,13 @@
     types="protein"
     typelabel="protein"
     fromdb="1"
+    />
+  <featmap
+    id="CDS_translation"
+    types="CDS"
+    typelabel="protein"
+    dotranslate="1"
+    fromdb="0"
     />
   <featmap
     id="transcript"
@@ -132,49 +126,32 @@ Also, centromere  has  region child parts  (named? curated?)
 Also, repeat_family has nucleotide_match child parts  (named? curated?)
 -->
 
-  <gene_is_complex>1</gene_is_complex>
+  <gene_is_complex>1</gene_is_complex> <!-- has mRNA structure instead of begin,end -->
+  <GModelParts>CDS,exon,ncRNA</GModelParts>
+  <GModelParents>gene</GModelParents>
+  <CDS_spanType>gene</CDS_spanType>
+  <CDS_exonType>CDS</CDS_exonType>
   
-  <feat_model id="gene" make_mrna="1">
-    <part>CDS</part> <!-- exon equivalent -->
-    <part>intron</part>  <!-- dont need; inverse of exons -->
+  <!-- 
+  feat_model: 
+    revision of above mess for gene models; handle pseudogene; ncRNAs ...
+    see chadofeatconv.xml doc
+  -->
+  <feat_model id="gene" is_simple="0">
+    <parts>CDS</parts> <!-- exon equivalent -->
+    <skipparts>intron</skipparts>  <!-- dont need; inverse of exons -->
   </feat_model>
   <feat_model id="pseudogene">
-    <part>CDS</part> <!-- exon equivalent -->
-    <part>intron</part> 
+    <parts>CDS</parts> <!-- exon equivalent -->
+    <skipparts>intron</skipparts> 
   </feat_model>
   <feat_model id="tRNA">
-    <part>ncRNA</part> <!-- exon equivalent -->
-    <part>intron</part>  
+    <parts>ncRNA</parts> <!-- exon equivalent -->
+    <skipparts>intron</skipparts>  
   </feat_model>
   
   <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent -->
   <maptype_ignore_missingparent>^(gene|match_part|match)</maptype_ignore_missingparent>
-
-<!--
-## SONG/so Revision: 1.45
-##     @is_a@oligo ; SO:0000696 ; SOFA:SOFA ; synonym:oligonucleotide
-## 'so' is no longer valid
-##   old value: @is_a@so ; SO:1000000
-##  options are limited: located_sequence_feature, SO:0000110 ??
-##  in flybase, 'so' seems used for protein blast matches?
-## segment not in this    
-## alt choices ...
-#      @is_a@assembly ; SO:0000353 ; SOFA:SOFA
-# **    @is_a@golden_path ; SO:0000688 ; SOFA:SOFA   <<
-# **    @is_a@supercontig ; SO:0000148 ; SOFA:SOFA ; synonym:scaffold    <<
-#     @is_a@tiling_path ; SO:0000472 ; SOFA:SOFA
-#     @is_a@virtual_sequence ; SO:0000499 ; SOFA:SOFA
-#     @is_a@chromosome ; SO:0000340
-#     @part_of@chromosome_arm ; SO:0000105
-
-## aug04: add new analysis features (HDP,RNAiHDP,fgenesh,)
-## these are like exons but parent feature lacks featureloc 
-## - need to join together by object_oid/parent_oid and compute parent feature (has name)
-## SO type.subtype should be match.program
-## SONG: match, match_part match_set nucleotide_match cross_genome_match cDNA_match EST_match
-
-#? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
--->
   
   <!-- move these odd groupings into featmap structures ?? -->
   
@@ -253,14 +230,18 @@ Also, repeat_family has nucleotide_match child parts  (named? curated?)
   <hasdups 
     />
 
-<!-- try this for sgd gene models:
-    ncRNA="exon"
+<!-- 
+  FIXME: GFFv3 is using CDS to mean coding_exon, not coding span (like mRNA)
+    dont recode CDS; revise FeatureWriter to handle as an exon-equivalent/duplicate.
+    But do recode ncRNA as exon; sgd is using it that way (part of other ncRNA's)
+    did try this for sgd gene models:
     CDS="exon"
+    ncRNA="exon"
 -->
 
   <maptype 
+    OLD_USAGE_CDS="exon"
     ncRNA="exon"
-    CDS="exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="golden_path"
     match_fgenesh="match_fgenesh"
@@ -274,15 +255,13 @@ Also, repeat_family has nucleotide_match child parts  (named? curated?)
     transposable_element_gene="gene"
     />
   <!--
-  so => "located_sequence_feature", ## leave in for now; no replacement for so ; SO:1000000
+  so => "located_sequence_feature", ## no replacement for so ; SO:1000000
   -->
     
-    <!-- FIXME: ordered arrays here .. $type, $gffsource -->
-    <!-- change to hash of hash : { fulltype => { gfftype => val, gffsource => val } } -->
-
+ 
   <maptype_gff>
-    <exon_SGD>CDS:SGD</exon_SGD>
-    <!-- urk; want also exon_SGD -> ncRNA:SGD for rna types -->
+    <OLD_USAGE_exon_SGD>CDS:SGD</OLD_USAGE_exon_SGD>
+    <!-- urk; want also exon_SGD > ncRNA:SGD for rna types -->
     <match_fgenesh>match:fgenesh</match_fgenesh>
     <match_part_fgenesh>match_part:fgenesh</match_part_fgenesh>
     <match_HDP>match:HDP</match_HDP>

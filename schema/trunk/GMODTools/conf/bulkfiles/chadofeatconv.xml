@@ -175,6 +175,57 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
    <!-- dpse chado duplicate 0-length chromosome entries; why? -->
   <nozombiechromosomes>1</nozombiechromosomes>
   
+  <gene_is_complex>0</gene_is_complex> 
+  <GModelParents>mRNA</GModelParents>
+  <GModelParts>protein,CDS,three_prime_UTR,five_prime_UTR</GModelParts>
+  <CDS_spanType>protein</CDS_spanType>
+  <CDS_exonType>CDS</CDS_exonType>
+
+  <about id="feat_model"><![CDATA[
+    feat_model:
+    revision of above mess for gene models; handle pseudogene; ncRNAs ...
+  
+    feat_model keys:
+    id = ? type of feature, cant do with multiples
+    simple = 1; not structure for this, write just span 
+      (gene may be span or structured); replaces "simplefeat" list
+    types   = list of types (replaces id?)
+    submodels = list of features in kid array that become new structured features
+    parent  = feature holding all kid objects (e.g. exons) (for submodel)
+        ? is this valid, use featob->parent instead
+    typelabel = what to write in place of id type (protein -> CDS)
+    hasspan = this feature has start,stop (e.g. gene, mRNA, protein)
+        discard/cut parts that fall outside
+    part(s) = array of kid types (e.g. exons, UTRs) making structure
+    makepartsfrom = list? of parts to make parts from if not given
+      (e.g. exons => cds)
+  ]]></about>
+  
+  <!-- 3 level model here -->
+  <feat_model id="gene" simple="1" >
+    <submodels>mRNA</submodels> <!-- ? link to below -->
+    <submodels>tRNA</submodels> 
+      <!-- data may or may not have gene parent for other rnas ; pseudogene ? -->
+  </feat_model>
+  <feat_model id="mRNA">
+    <parts>exon</parts> 
+    <parts>three_prime_UTR</parts>  
+    <parts>five_prime_UTR</parts> 
+    <submodels>protein</submodels><!-- ? link to below -->
+  </feat_model>
+  <feat_model id="protein" 
+    typelabel="CDS" 
+    parent="mRNA" 
+    hasspan="1" makepartsfrom="exon" 
+    >
+    <parts>CDS</parts> <!-- exon equivalent may need to create from exons -->
+  </feat_model>
+  
+  <!-- default structure for non-simple 'mRNA' types -->
+  <feat_model id="rnatype" types="pseudogene tRNA snRNA snoRNA rRNA tRNA miRNA">
+    <parts>exon</parts> 
+  </feat_model>
+  
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
     chromosome_arm="1"
@@ -282,6 +333,10 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
     EST="1"
     exon="1"
     intron="1"
+    CDS="1"
+    three_prime_UTR="1"
+    five_prime_UTR="1"
+    match_part="1"
     oligo="1" oligonucleotide="1"
     processed_transcript="1"
     repeat_region="1"
@@ -293,10 +348,10 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
     CDS_exon="1"
     CDS="1"
     exon="1"
-    five_prime_UTR="1"
     intron="1"
     remark="1"
-    three_prime_UTR="1"
+    OLD_USAGE_five_prime_UTR="1"
+    OLD_USAGE_three_prime_UTR="1"
     />
     
   <dropfeat_gff 
@@ -356,11 +411,14 @@ However, Dmel chado uses golden_path_region for databank_scaffold !
 retype in dpse db all dpse golden_path_region to supercontig
    UPDATE feature set type_id = 556 where organism_id = 3 and type_id = 553;
 
+jan06: OLD_USAGE_: 
+  changed CDS/CDS_exon mapping to GFFv3 usage: CDS == coding_exon not mRNA-like span
+
 -->
     
   <maptype 
-    protein="CDS"
-    CDS="CDS_exon"
+    OLD_USAGE_protein="CDS"
+    OLD_USAGE_CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="scaffold"
     supercontig="skip"

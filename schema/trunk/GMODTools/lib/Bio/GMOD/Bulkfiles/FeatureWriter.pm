@@ -64,7 +64,6 @@ my $gff_keepoids= 0; # $self->{gff_keepoids}
 my @outformats= (); 
 my @defaultformats= qw(fff gff); # cmap ?? fasta - no
 my %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
-my @GModelParts= qw( CDS  five_prime_UTR three_prime_UTR intron );
 
 my $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
 my $append=0; # $self->{append}
@@ -94,6 +93,10 @@ use vars qw/
   %keepstrand
   $rename_child_type
   $name2type_pattern
+  @GModelParts
+  %GModelParents
+  $CDS_spanType
+  $CDS_exonType
   /;
   ## $duptype_pattern
 
@@ -135,6 +138,7 @@ sub initData
   
   ## should get this from  $sconfig->{fileset}->{gff}->{noforwards}
   my $gffinfo= $self->handler()->getFilesetInfo('gff');
+  $gffinfo->{GFF_source} = $sconfig->{GFF_source} if( $sconfig->{GFF_source});
   $self->{gff_config}= $gffinfo;
   $config->{noforwards} = ($gffinfo && defined $gffinfo->{noforwards}) 
     ? $gffinfo->{noforwards}
@@ -176,8 +180,20 @@ sub initData
   %keepstrand   = %{ $config->{'keepstrand'} } if ref $config->{'keepstrand'};
   %oidisid_gff  = %{ $config->{'oidisid_gff'} } if ref $config->{'oidisid_gff'};
 
-  @GModelParts  = qw( CDS five_prime_UTR three_prime_UTR intron );
-  @GModelParts  = @{ $config->{'gmodel_parts'} } if ref $config->{'gmodel_parts'};
+  my $gmp= $config->{'GModelParts'} || 'CDS five_prime_UTR three_prime_UTR intron';
+  @GModelParts= (ref $gmp) ? @$gmp : split(/[,\s]+/,$gmp);
+  #@GModelParts  = qw( CDS five_prime_UTR three_prime_UTR intron );
+  #@GModelParts  = @{ $config->{'GModelParts'} } if ref $config->{'GModelParts'};
+
+    ## jan06: replace CDS/CDS_exon with protein/CDS ... per GFFv3 usage
+    ## fly chado uses 'protein' for mRNA equivalent feature (start,stop) of cds
+    ## and same exons for mRNA and protein
+  $gmp= $config->{'GModelParents'} || 'mRNA';
+  %GModelParents = map { $_, 1; } ((ref $gmp) ? @$gmp : split(/[,\s]+/,$gmp));
+  
+  $CDS_spanType= $config->{'CDS_spanType'} || 'CDS'; # change to 'protein' or other ...
+  $CDS_exonType= $config->{'CDS_exonType'} || 'CDS_exon';# change back to CDS
+  push(@GModelParts,$CDS_spanType) unless(grep(/$CDS_spanType/,@GModelParts));
   
   #? require segmentfeats be simplefeat ?
   map { $simplefeat{$_}=1; } keys %segmentfeats;
@@ -257,7 +273,7 @@ sub makeFiles
       }
     }
     
-  my $makeall= $self->config->{makeall} || $self->{gff_config}->{makeall};
+  my $makeall= !$args{noall} && ($self->config->{makeall} || $self->{gff_config}->{makeall});
   if ($makeall && $status > 0) {
     foreach my $fmt (@outformats) { 
       $self->makeall( $chromosomes, "", $fmt) unless ($fmt eq 'fff'); 
@@ -1347,8 +1363,15 @@ DEBUG obj: par=CG18001-RA objects={
 
 =cut
 
-    if ($ispar && $ftype eq 'mRNA') {
-
+    #  
+    ## %GModelParents = ( mRNA => 1, otherRnas ?? => );
+    ## $CDS_spanType = 'CDS' ; # change to 'protein' or other ...
+    ## $CDS_exonType = 'CDS_exon' ; # change to 'CDS'
+    ## But for fff, need to rename $CDS_spanType 'protein' to 'CDS' for output fff type
+    
+    #if ($ispar && $ftype eq 'mRNA')
+    if ($ispar && $GModelParents{$ftype})
+    {
       foreach my $ftname (@GModelParts) {
         my $utrob= undef; 
         my $cdsob= undef;
@@ -1358,33 +1381,34 @@ DEBUG obj: par=CG18001-RA objects={
         
         foreach my $kidob (@{$oidob->{child}}) {  
  
-          if ($kidob->{type} eq 'exon') { ## $ftname eq 'CDS' && 
+          if ($kidob->{type} eq 'exon') {  
             push(@$mrnaexons, $kidob); # save in case missing CDS_exon
             }
-          if ($kidob->{type} eq 'CDS') { $cdsob= $kidob; } # only for utr patch ?
+          if ($kidob->{type} eq $CDS_spanType) { $cdsob= $kidob; } # only for utr patch ?
             
-          if ($ftname eq 'CDS' && $kidob->{type} eq 'CDS') {
+          if ($ftname eq $CDS_spanType && $kidob->{type} eq $CDS_spanType) {
             $utrob= $kidob unless($utrob);
             ## urk - need to keep loc:start/stop to adjust CDS_exon end points !
             }
-          elsif ($id =~ /CG32491/ && $ftname eq 'CDS' && $kidob->{type} eq 'exon') {
+          elsif ($id =~ /CG32491/ && $ftname eq $CDS_spanType && $kidob->{type} eq 'exon') {
             ## patch for mdg4 bug
             push(@$exonobs, $kidob);
             }
-          elsif ($ftname eq 'CDS' && $kidob->{type} eq 'CDS_exon') {
+          elsif ($ftname eq $CDS_spanType && $kidob->{type} eq $CDS_exonType) {
             push(@$kidobs, $kidob);
             ## missing this for het db ... FIXME 
             # bad CDS_exon for transspliced mdg4 ... sigh ... need to keep also regular exons?
             }
-
-          elsif ($kidob->{type} eq $ftname) { 
-            $utrob= $kidob unless($utrob);
+          
+          ## ?? want instead: if(kidob->type in (UTR,...)) add to kids
+          elsif ($kidob->{type} eq $ftname) {  # these will be UTR's, other things (?)
+            $utrob= $kidob unless($utrob); #?? dont do this?
             push(@$kidobs, $kidob); 
             
             ## repair bad names; only if bad !?
             ## FIXME apr05 - intron,UTR fff output needs CG ids (in gff, not fff, due to
             ##   name = gene-symbol, FBgn ID; ... need uniquename
-            ## apr05 - is this renaming bad now ? at keep old name,id as 2ndary ?
+            ## apr05 -  this renaming bad now ? at keep old name,id as 2ndary ?
             if ($gmodel_parts_rename) {
               my $part="";
               if ($ftname eq 'three_prime_UTR') {  $part= "-u3";  }
@@ -1403,12 +1427,12 @@ DEBUG obj: par=CG18001-RA objects={
           ## ERROR -  CDS/protein w/o CDS_exon parts - not harvard chado 'reporting' db
           ## fixme ... recreate from cds start/stop + mrna location ?
         if ($utrob && !@$kidobs) {
-          if ($ftname eq 'CDS' && @$mrnaexons) {
+          if ($ftname eq $CDS_spanType && @$mrnaexons) {
             $kidobs= $self->getCDSexons($utrob, $mrnaexons);
             }
           }
          
-        if ($utrob) { ## @$kidobs < do even if no kidobs ???
+        if ($utrob) { 
 
             ## copy gene model dbxref id into  these features, as per above
           my $idpattern= $self->config->{idpattern};
@@ -1426,11 +1450,15 @@ DEBUG obj: par=CG18001-RA objects={
 
           ##print STDERR "makeCompound $ftname par=$id, kid=",$utrob->{id},  "\n" if $DEBUG;
           # below # if ($ftname eq 'CDS') { $kidobs= adjustCDSendpoints( $utrob, $kidobs); }
+          
+          ## jan06: problem here w/ change to protein/cds: all GModelParts end up fff feature
+          ## CDS_exon, exon  end up as compound types same as mRNA, CDS/protein
+          
           my $cob= $self->makeCompound( $utrob, $kidobs, $ftname); 
           # $self->listkids($cob,$kidobs) if($DEBUG);  ## was loosing kids to bad $oidobs
 
             # patch bad data -- use getCDSexons above ??
-          if ($id =~ /CG32491/ && $ftname eq 'CDS') {  
+          if ($id =~ /CG32491/ && $ftname eq $CDS_spanType) {  
             my @exlocs=();
             foreach my $kid (@$exonobs) {
               foreach my $loc (@{$kid->{loc}}) { push( @exlocs, $loc);  }
@@ -1438,6 +1466,148 @@ DEBUG obj: par=CG18001-RA objects={
             $cob->{exons}= \@exlocs;
             }
             
+          push(@cobs, $cob);
+          }
+        }
+      }
+    ## else {  } # $iskid only - dont save
+    }
+    
+  return \@cobs;
+}
+
+
+
+## jan06: makeFlatFeats -> makeFlatFeatsNew
+## change to config->{feat_model}->{$type}: @parts, $parent, $typelabel, $types
+
+sub  makeFlatFeatsNew 
+{
+	my $self= shift;
+  my ($fobs,$oidobs)= @_;
+  
+## debug missing from fff: insertion_site, regulatory
+#   my %GMM= map { $_,1; } qw(enhancer insertion_site aberration_junction 
+#     regulatory_region rescue_fragment sequence_variant);
+  
+  my @cobs=(); # these compound features get added to output
+  foreach my $fob (@$fobs) {  
+    my $oid= $fob->{oid};
+    my ($iskid,$ispar)= (0,0);
+    my $oidob= $oidobs->{$oid};
+    my $ftype= $fob->{type};
+    #my $fulltype= $fob->{fulltype};
+    my $id= $fob->{id};
+    my $issimple= $simplefeat{$ftype};
+    my $feat_model= $self->config->{'feat_model'}->{$ftype};
+      ## get issimple from feat_model
+      
+    my $GMM= 0; ##($DEBUG && $id =~ /CG4993|CG11798|CG10272|CG3973/) ? 1 : 0; # feb05 bug test, mRNA misses last 2 exons
+    
+    if (!$issimple && $oidob) {
+      $iskid= (defined $oidob->{parent} && @{$oidob->{parent}} > 0);
+      $ispar= (defined $oidob->{child} && @{$oidob->{child}} > 0);
+      if ($iskid) { # check we have backref to parend obj ??
+        my $ok= 0;
+        foreach my $poid (@{$oidob->{parent}}) {
+          if ($oidobs->{$poid}) { $ok=1; last; }
+          }
+        $iskid= $ok;
+        }
+      }
+    warn ">gmm1 $ftype $id ispar=$ispar iskid=$iskid\n" if $GMM;
+      
+    my $keepfeat= ($ispar || $self->keepfeat_fff($ftype));
+    if ($keepfeat) {
+      if(!$ispar) { $issimple=1; } 
+      elsif($feat_model && defined($feat_model->{simple})) { $issimple= $feat_model->{simple}; }
+      elsif($ftype eq 'gene' && !$self->config->{gene_is_complex}) { $issimple=1; }
+      
+      #NEED THIS# $issimple = 1 if ($ftype =~ m/^gene$/); #?? otherwise misc. gene parts GMM get flagged as written
+      #BUT for complex flybase data; not for sgdlite w/o mrna features
+      
+      if ($issimple) { push(@cobs, $fob); } # simple feature
+      else {              # has kids, make compound feature >> (m,t,s)RNA here
+        my $kidobs= $oidob->{child};
+        my $cob= $self->makeCompound( $fob, $kidobs, $ftype); 
+        push(@cobs, $cob);
+        # $self->listkids($cob,$kidobs) if($DEBUG && $ftype =~ m/^(gene|mRNA)$/);  ## was loosing kids to bad $oidobs
+        }
+      warn ">gmm2 add $ftype $id \n" if $GMM;
+      }
+    
+    ## %GModelParents = ( mRNA => 1, otherRnas ?? => );
+    ## $CDS_spanType = 'CDS' ; # change to 'protein' or other ...
+    ## $CDS_exonType = 'CDS_exon' ; # change to 'CDS'
+    ## But for fff, need to rename $CDS_spanType 'protein' to 'CDS' for output fff type
+    ## ?? this is only for 3-level models (gene/mRNA/protein) where
+    ## submodel parts are contained in mainmodel kid list (protein-CDS in mRNA)
+    
+    if ($ispar && $feat_model && $feat_model->{submodels})
+    {
+      my $submodels = $feat_model->{submodels};
+      my @submodels = (ref $submodels) ? @$submodels : split(/[,\s]+/,$submodels);
+       
+      foreach my $subtype (@submodels) {
+        my $sub_model= $self->config->{'feat_model'}->{$subtype};
+        my $makepartsfrom = $sub_model->{makepartsfrom} || 'exon';
+        my $hasspan  = (defined $sub_model->{hasspan}) ? $sub_model->{hasspan} 
+                     : ($subtype eq $CDS_spanType); # old version
+        my $typelabel=  $sub_model->{typelabel} || $subtype;
+        # my $parent=  $sub_model->{parent};
+        my $kidparts = $sub_model->{parts} || 'exon';
+
+        my @kidparts = (ref $kidparts) ? @$kidparts : split(/[,\s]+/,$kidparts);
+        my %kidparts = map { $_,1; } @kidparts;
+        
+        my $subob= undef; 
+        my $spanob= undef;
+        my $mrnaexons=[];
+        my $kidobs=[];
+        
+        foreach my $kidob (@{$oidob->{child}}) {  
+          my $ktype= $kidob->{type};
+          if ($ktype =~ /^$makepartsfrom$/) {  
+            push(@$mrnaexons, $kidob); # save in case missing CDS_exon
+            }
+          if ( $ktype eq $CDS_spanType ) { $spanob= $kidob; }  # only for utr patch !
+          if ( $ktype eq $subtype ) {
+            $subob= $kidob unless($subob);
+            }
+          elsif ($kidparts{$ktype}) {
+            push(@$kidobs, $kidob);
+            }
+          }
+          
+          ## CDS/protein w/o CDS_exon parts ... recreate from cds start/stop + mrna location 
+        if ($subob && !@$kidobs) {
+          if ($hasspan && @$mrnaexons) {
+            $kidobs= $self->getCDSexons($subob, $mrnaexons);
+            }
+          }
+         
+        if ($subob) { 
+            ## copy gene model dbxref id into  these features, as per above
+          my $idpattern= $self->config->{idpattern};
+          foreach my $pidattr (@{$fob->{attr}}) { 
+            next if ($pidattr =~ m/2nd/);   #dbxref_2nd:
+            if (!$idpattern || $pidattr =~ m/$idpattern/) { 
+              push( @{$subob->{attr}}, $pidattr) unless( grep {$pidattr eq $_} @{$subob->{attr}});  
+              last; # add only 1st/primary 
+              }
+            }
+            
+          if ($subtype =~ /UTR/ && $self->config->{utrpatch}) {
+            $self->patchUTRs( $subob, $spanob, $mrnaexons, $kidobs);
+            }
+
+          ## jan06: problem here w/ change to protein/cds: all GModelParts end up fff feature
+          ## CDS_exon, exon  end up as compound types same as mRNA, CDS/protein
+          
+          my $cob= $self->makeCompound( $subob, $kidobs, $subtype); 
+          # $self->listkids($cob,$kidobs) if($DEBUG);  ## was loosing kids to bad $oidobs
+          $cob->{type}= $typelabel;
+          
           push(@cobs, $cob);
           }
         }
@@ -1585,8 +1755,8 @@ sub makeCompound
     #  push(@kidlist, $kid->{name}, $kid->{type});
     #  }
       
-    next if ($fob->{type} =~ m/^(mRNA|gene)$/ && $kid->{type} ne 'exon'); # was (mRNA|gene)
-    if ($ftype eq 'CDS' && $kid->{type} eq 'mature_peptide')
+    next if ($fob->{type} =~ m/^(mRNA|gene)$/ && $kid->{type} ne 'exon');  
+    if ($ftype eq $CDS_spanType && $kid->{type} eq 'mature_peptide')
     {
       $ftype= $cob->{type}= 'mature_peptide';
     }
@@ -1595,9 +1765,10 @@ sub makeCompound
     foreach my $loc (@{$kid->{loc}}) { push( @locs, $loc);  }
     }
 
-  if ($ftype eq 'CDS') { 
+  if ($ftype eq $CDS_spanType) { 
     my $offsetloc = $fob->{loc}->[0]; # only 1 we hope
     $cob->{offloc}= $offsetloc;
+    # $ftype= $cob->{type}= 'CDS' if(1); ## FIXME another flag to rename CDS spantype?
     }
   
   unless(@locs) {
@@ -1889,7 +2060,7 @@ sub putFeats
     my $ffh= $outh->{fff};
     # my $fah= $outh->{fasta};
     $self->{curformat}= 'fff';  
-    my $cobs= $self->makeFlatFeats($fobs,$oidobs);
+    my $cobs= $self->makeFlatFeatsNew($fobs,$oidobs);
     # need to undef @$cobs when done !
     
     my $nout= 0;
@@ -2330,7 +2501,7 @@ sub splitGffType
     ($type,$newgffs)=($1,$2);
     }
   else { $type= $fulltype; } #?? feb05; want snRNA not mRNA .. leave in fulltype ?
-  $gffsource= $newgffs if($newgffs); # && $gffsource eq '.'); #?? or always
+  $gffsource= $newgffs if($newgffs && $newgffs ne '.'); 
   
   return($gffsource,$type);
 }
@@ -2359,7 +2530,7 @@ sub writeGFF
   return if ($fob->{'writegff'});
   $fob->{'writegff'}=1;
   if ($dropfeat_gff{$type}) { return; }
-  my $gffsource= $fob->{gffsource} || ".";
+  my $gffsource= $fob->{gffsource} || $self->{gff_config}->{GFF_source} ||  ".";
   my $oid= $fob->{oid};  
   my $id = $fob->{id}; ## was: $fob->{oid}; -- preserve uniquename ?
   my $chr= $fob->{chr};

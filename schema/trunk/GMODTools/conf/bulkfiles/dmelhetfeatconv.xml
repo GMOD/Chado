@@ -112,6 +112,27 @@ Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d
 #? use '.' instead of '_' for part type? would that throw gnomap/gbrowse usage? probably
 -->
 
+  <gene_is_complex>0</gene_is_complex>
+  <GModelParents>mRNA</GModelParents>
+  <GModelParts>protein,CDS,three_prime_UTR,five_prime_UTR</GModelParts>
+  <CDS_spanType>protein</CDS_spanType>
+  <CDS_exonType>exon</CDS_exonType>
+
+  <!-- rework above mess for gene models; handle pseudogene; ncRNAs ... -->
+  <feat_model id="mRNA">
+    <parts>exon</parts> 
+    <parts>three_prime_UTR</parts>  
+    <parts>five_prime_UTR</parts> 
+    <submodels>protein</submodels> <!-- link to protein feat_model -->
+  </feat_model>
+  <feat_model id="protein" 
+    typelabel="CDS" 
+    parent="mRNA" 
+    hasspan="1" makepartsfrom="exon" 
+    >
+    <parts>CDS</parts> 
+  </feat_model>
+ 
   <!-- flybase chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
     chromosome_arm="1"
@@ -206,6 +227,8 @@ Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d
     EST="1"
     exon="1"
     intron="1"
+    five_prime_UTR="1"
+    three_prime_UTR="1"
     oligo="1" oligonucleotide="1"
     processed_transcript="1"
     repeat_region="1"
@@ -217,10 +240,10 @@ Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d
     CDS_exon="1"
     CDS="1"
     exon="1"
-    five_prime_UTR="1"
     intron="1"
     remark="1"
-    three_prime_UTR="1"
+    OLD_USAGE_five_prime_UTR="1"
+    OLD_USAGE_three_prime_UTR="1"
     />
     
   <dropfeat_gff 
@@ -238,15 +261,18 @@ Dpf1glom15-1-AE002603.4_22263978_22335911-na_baylorf1_scfchunk.d
     match_repeat_runner="1"
     />
     
-    <!--   hasdups  match_repeat_runner="1"
+  <!--   hasdups  match_repeat_runner="1"
     ? drop match_repeat_runner for match_repeat_runner_seg 
     match_repeat_runner="skip"
-    -->
+
+  jan06: OLD_USAGE_: 
+  changed CDS/CDS_exon mapping to GFFv3 usage: CDS == coding_exon not mRNA-like span
+  -->
     
     
   <maptype 
-    protein="CDS"
-    CDS="CDS_exon"
+    OLD_USAGE_protein="CDS"
+    OLD_USAGE_CDS="CDS_exon"
     five_prime_untranslated_region="five_prime_UTR"
     golden_path_region="scaffold"
     oligonucleotide="oligo"

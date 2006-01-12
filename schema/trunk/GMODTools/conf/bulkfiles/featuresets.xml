@@ -68,6 +68,13 @@
     typelabel="protein"
     fromdb="1"
     />
+  <featmap
+    id="CDS_translation"
+    types="CDS"
+    typelabel="protein"
+    dotranslate="1"
+    fromdb="0"
+    />
   <!-- feb05: problems here with mRNA vs ncRNA snRNA snoRNA rRNA tRNA 
     need a 'transcript' equivalent type in input data - fff ? 
     but for gff, other public files, need to use real RNA type.
@@ -85,12 +92,12 @@
     />
   <featmap
     name="miscRNA"
-    types="ncRNA snRNA snoRNA rRNA" 
+    types="ncRNA snRNA snoRNA rRNA miRNA" 
     />
     <!-- this variant includes all non-prot-coding rnas -->
   <featmap
     name="ncRNA"
-    types="ncRNA snRNA snoRNA rRNA tRNA" 
+    types="ncRNA snRNA snoRNA rRNA tRNA miRNA" 
     />
   <featmap
     name="gene_extended2000"

@@ -57,7 +57,8 @@
   <!-- see chadofeatsql ENV_default -->
   <golden_path>'chromosome'</golden_path>
   <featureprops>'Note','orf_classification'</featureprops>
-
+  <GFF_source>SGD</GFF_source>
+  
   <fileset_override
     name="fff"
     path="fff/.+\.fff"
@@ -85,11 +86,19 @@
   <!-- feature sets to make fasta bulk files -->
   <featset>chromosome</featset>
   <featset>gene</featset>
+  <!-- <featset>CDS</featset> -->
+  <featset>CDS_translation</featset>
   <featset>ncRNA</featset>
   <featset>transposon</featset>
   <featset>gene_extended2000</featset>
   <featset>intergenic</featset>
 <!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
 
+  <!-- feature sets to make blast indices -->
+  <blastset>chromosome</blastset>
+  <blastset>gene</blastset>
+  <blastset>CDS_translation</blastset>
+  <blastset>ncRNA</blastset>
+  <blastset>intergenic</blastset>
 
 </opt>
