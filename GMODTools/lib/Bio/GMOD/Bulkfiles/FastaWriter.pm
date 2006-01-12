@@ -169,7 +169,8 @@ sub makeFiles
     }
     
    #? use found $chromosomes= [sort keys %chrset] ; want to keep original sort order
-  $self->makeall( $chromosomes, $featset) if ($self->config->{makeall} && $status > 0) ;
+  $self->makeall( $chromosomes, $featset) 
+   if (!$args{noall} && $self->config->{makeall} && $status > 0) ;
   
   print STDERR "FastaWriter::makeFiles: done n=$status\n" if $DEBUG; 
   return $self->status($status);
@@ -521,7 +522,8 @@ sub fastaFromFFFloop
       print STDERR "getBases id=$id type=$type chr=$chr loc=$baseloc\n" if $DEBUG>2;
       
       my $bases= $self->handler()->getBases( 
-                 $usedb, $type, $chr, $baseloc, $id, $name, $subrange);
+                 $usedb, $type, $chr, $baseloc, $id, $name, $subrange,
+                 $types_info->{dotranslate});
       
       ## add optional md5checksum, SwissProt CRC64 calcs; 
       ##  check if last getBases returned md5checksum 
@@ -653,7 +655,8 @@ sub fastaFromFFF
   # option for full/short loc in header?
   
   my $bases= $self->handler()->getBases( 
-             $usedb, $type, $chr, $baseloc, $id, $name, $subrange);
+             $usedb, $type, $chr, $baseloc, $id, $name, $subrange,
+             $types_info->{dotranslate});
 
   ## add optional md5checksum, SwissProt CRC64 calcs; 
   my @crcs= $self->getCRCs( $id, \$bases, \@notes);

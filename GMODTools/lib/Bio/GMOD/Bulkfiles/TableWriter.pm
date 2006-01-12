@@ -134,6 +134,12 @@ sub makeFiles
  
   $self->readFFF($fileset); # collate feature info
   
+  ## chromosome_summary ; do this before in Bulkfiles with others?
+  ## this file is named in chadosql entry - fixme
+  my $cfile= catfile( $self->outputpath(), "chromosomes-overview.txt"); 
+  $self->chromosomeSummary( $cfile, $chromosomes); # always?
+    delete $targets{'chromosome_summary'};
+  
   ## if doFeatSum  
   my $summaryfile= catfile( $self->outputpath(), "feature_map-summary.txt"); 
   $self->featureSummary( $summaryfile, $self->{featnames})
@@ -185,10 +191,10 @@ sub table2html {
   foreach my $sname (@$targets) 
   {
     my $fs= $seqsql->{$sqltag}->{$sname};
-    unless($fs) { next; }
+    unless($fs) { next; } ## FIXME for chromosome_summary
     my $type= $fs->{type};
-    my $outn= $fs->{output} || $sname.".tsv";
-    unless( (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
+    my $outn= $fs->{output} || $sname.".txt";
+    #?? unless( (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
 
     my $outf= catfile($outpath,$outn);
     print STDERR "TableWriter::table2html: $sname, $type, $outf\n" if $DEBUG; 
@@ -283,6 +289,48 @@ sub writeTargetDocs
   my $docs  = $tconfig->{doc};
   $self->handler()->writeDocs( $docs ) if ($docs);
 }
+
+sub chromosomeSummary 
+{
+	my $self= shift;
+  my( $sumfile, $csomelist )= @_; 
+  ## chromosome_summary ; do this before in Bulkfiles with others?
+  my $ctab= $self->handler->getChromosomeTable();
+
+  my $fh= new FileHandle(">$sumfile");
+  my $title = $self->config->{title};
+  my $date  = $self->{reldate}; 
+  my $org= $self->{org} || $self->handler()->{config}->{org};
+
+  ## Name and ID ?? # make it gff or not? : Source, Attribs
+  my @flds= qw(Ref Feature_type Start Length Rank ID Feature_id Species);
+
+  print $fh "# Chromosomes of $org from $title [$date]\n";
+  print $fh join("\t",@flds),"\n";
+  foreach my $chr (@$csomelist) { #? or use keys of $ctab 
+    my $cv= $ctab->{$chr};
+    if(!ref $cv) { next; }  #what? print something?
+    print $fh join("\t",
+      $cv->{arm}, $cv->{type}, 
+      $cv->{start}, $cv->{length}, #fmax - fmin + 1
+      $cv->{strand}, #== Rank
+      $cv->{id}, $cv->{oid}, $cv->{species}, ),"\n";
+    my $cparts= $ctab->{$chr}->{parts};
+    if (ref $cparts) {
+      foreach $cv (@$cparts) {
+        print $fh join("\t",
+          $cv->{arm}, $cv->{type}, 
+          $cv->{start}, $cv->{length}, #fmax - fmin + 1
+          $cv->{strand}, #== Rank
+          $cv->{id}, $cv->{oid}, $cv->{species}, ),"\n";
+        }
+      }
+   }
+  close($fh);
+}
+
+
+
 
 sub featureSummary 
 {

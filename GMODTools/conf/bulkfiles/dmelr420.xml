@@ -25,23 +25,12 @@
 
   <include>fbreleases</include>
 
-  <!-- db is release-dependent ; use fbreleases info 
-    this is standard public access to curren dmel_chado
-  -->
-  <db
-    driver="Pg"
-    name="chado_dmel_r4_2_16"
-    host="localhost"
-    port="7302"
-    user=""
-    password=""
-    />
-
   <org>dmel</org>
   <species>Drosophila_melanogaster</species>
   <golden_path>'chromosome_arm'</golden_path>
   <seq_ontology>SO</seq_ontology>
   <featureprops>'cyto_range','dicistronic','gbunit'</featureprops>
+  <GFF_source>FlyBase</GFF_source>
 
   <est_where_clause>AND (an.program = 'sim4' AND
     an.sourcename IN ('na_dbEST.same.dmel','na_dbEST.diff.dmel','na_DGC.in_process.dros'))

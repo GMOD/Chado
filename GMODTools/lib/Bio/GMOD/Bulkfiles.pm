@@ -1320,10 +1320,13 @@ sub makeFiles
   $self->missingData( $fileset, 'feature_table', "chromosomes.tsv table file; make with -featdump");
     
   my $chromosomes= undef;
-  if (ref $args{chromosomes}) { $chromosomes= $args{chromosomes};  }
-  elsif (ref $args{chr}) { $chromosomes= $args{chr};  }
+  if (ref $args{chromosomes}) { $chromosomes= $args{chromosomes}; $args{noall}=1; }
+  elsif (ref $args{chr}) { $chromosomes= $args{chr};  $args{noall}=1; }
+    ## dont do 'all' if subset !
+
   unless (ref $chromosomes && @$chromosomes > 0 && $chromosomes->[0] ne 'all') {
     $chromosomes= [ 'all', @{$self->getChromosomes()} ];
+    $args{noall}=0;
     }
   
     # FIXME trick - getFeatureWriter loads common config for featmap/featset needed by others
@@ -1905,7 +1908,7 @@ sub getDnaSeq
 
 sub getBases
 {
-  my($self, $usedb,$type,$chr,$baseloc,$id,$name,$subrange)= @_;
+  my($self, $usedb,$type,$chr,$baseloc,$id,$name,$subrange,$makeaa)= @_;
   my $bases= undef;
   if($usedb && $id) { 
     $bases= $self->getBasesFromDb($id); 
@@ -1913,6 +1916,7 @@ sub getBases
     }
   unless ($bases) { 
     $bases= $self->getBasesFromFiles($type,$chr,$baseloc,$name,$subrange);   
+    if($makeaa) { $bases= $self->dna2protein($bases); }
     }
   return $bases;
 }
@@ -2206,6 +2210,22 @@ sub maxrange
 }
 
 
+sub dna2protein
+{
+  my($self, $dna)= @_;
+  my $aa= undef;
+  eval {
+    require Bio::Tools::CodonTable;
+    my $codonTable   = Bio::Tools::CodonTable->new();
+    $aa = $codonTable->translate($dna);
+    }; 
+    
+  if ($@) { 
+    warn "dna2protein: err: $@"; 
+    die if ($self->{failonerror} || $self->{automake});
+    }
+  return $aa;
+}
 
 sub getBasesFromFiles
 {

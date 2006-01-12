@@ -16,6 +16,7 @@
   <golden_path>'chromosome_arm','ultra_scaffold'</golden_path>
   <seq_ontology>SO</seq_ontology>
   <featureprops>'gbunit'</featureprops>
+  <GFF_source>FlyBase</GFF_source>
 
 
   <doc name="Release.txt"><![CDATA[
@@ -35,16 +36,6 @@
   <utrpatch>0</utrpatch>
   <intronpatch>0</intronpatch>
 
-  <!-- db.name  is release-dependent ; use fbreleases -->
-  <db
-    driver="Pg"
-    name="bogus"
-    host="localhost"
-    port="7302"
-    user=""
-    password=""
-    />
-  
   <!-- use to add parent ids to features FBgn|FBti ; NOT these - FBan|CG|CR -->
   <idpattern>(FBgn|FBti)\d+</idpattern>
 

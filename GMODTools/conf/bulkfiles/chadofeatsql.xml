@@ -154,7 +154,8 @@
 
   <feature_sql id="chromosome_summary" type="NOTYET_summary" output="chromosomes-overview.txt">
   <sql><![CDATA[
-  -- this is slow for an overview table
+  -- this is slow for an overview table; see instead tmp/featdump/chromosomes.tsv 
+  -- from below chromosomes feature_table
   SELECT 
     f.type_id,
     t.name as Feature_type,

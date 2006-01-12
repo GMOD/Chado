@@ -35,6 +35,7 @@
   <!-- dang; blank here becomes {} in xmlsimple -->
   <analysis_where_clause> -- none  </analysis_where_clause>
   <est_where_clause> -- none  </est_where_clause>
+  <GFF_source>DHGP</GFF_source>
 
 
   <!-- override default fff config; 
