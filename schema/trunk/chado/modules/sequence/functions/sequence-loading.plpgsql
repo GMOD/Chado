@@ -119,3 +119,64 @@ CREATE OR REPLACE FUNCTION store_featureloc
   RETURN v_featureloc_id;
  END;
 ' LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION store_feature_synonym
+(INT,VARCHAR,INT,BOOLEAN,BOOLEAN,INT)
+ RETURNS INT AS 
+'DECLARE
+  v_feature_id          ALIAS FOR $1;
+  v_syn                 ALIAS FOR $2;
+  v_type_id             ALIAS FOR $3;
+  v_is_current          ALIAS FOR $4;
+  v_is_internal         ALIAS FOR $5;
+  v_pub_id              ALIAS FOR $6;
+  v_synonym_id          INT;
+  v_feature_synonym_id  INT;
+ BEGIN
+    IF v_feature_id IS NULL THEN RAISE EXCEPTION ''feature_id cannot be null'';
+    END IF;
+    SELECT INTO v_synonym_id synonym_id
+      FROM synonym
+      WHERE name=v_syn                  AND
+            type_id=v_type_id;
+    IF NOT FOUND THEN
+      INSERT INTO synonym
+        ( name,
+          synonym_sgml,
+          type_id)
+        VALUES
+        ( v_syn,
+          v_syn,
+          v_type_id);
+      v_synonym_id = currval(''synonym_synonym_id_seq'');
+    END IF;
+    SELECT INTO v_feature_synonym_id feature_synonym_id
+        FROM feature_synonym
+        WHERE feature_id=v_feature_id   AND
+              synonym_id=v_synonym_id   AND
+              pub_id=v_pub_id;
+    IF NOT FOUND THEN
+      INSERT INTO feature_synonym
+        ( feature_id,
+          synonym_id,
+          pub_id,
+          is_current,
+          is_internal)
+        VALUES
+        ( v_feature_id,
+          v_synonym_id,
+          v_pub_id,
+          v_is_current,
+          v_is_internal);
+      v_feature_synonym_id = currval(''feature_synonym_feature_synonym_id_seq'');
+    ELSE
+      UPDATE feature_synonym
+        SET is_current=v_is_current, is_internal=v_is_internal
+        WHERE feature_synonym_id=v_feature_synonym_id;
+    END IF;
+  RETURN v_feature_synonym_id;
+ END;
+' LANGUAGE 'plpgsql';
+
+
+

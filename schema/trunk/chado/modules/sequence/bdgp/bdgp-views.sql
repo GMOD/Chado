@@ -169,3 +169,20 @@ CREATE OR REPLACE VIEW featurepair AS
   INNER JOIN featureloc AS fl1 USING (feature_id)
   INNER JOIN featureloc AS fl2 USING (feature_id)
  WHERE fl1.rank=0 AND fl2.rank=0 AND fl1.locgroup=0 AND fl2.locgroup=0;
+
+-- ================================================
+-- featuresyn = feature * feature_synonym * synonym
+-- ================================================
+CREATE OR REPLACE VIEW featuresyn AS
+ SELECT feature.*,
+        pub_id,
+        is_current,
+        is_internal,
+        synonym.synonym_id,
+        synonym.type_id AS synonym_type_id,
+        synonym.name AS synonym_name,
+        synonym.synonym_sgml
+ FROM feature
+ INNER JOIN feature_synonym USING (feature_id)
+ INNER JOIN synonym USING (synonym_id);
+

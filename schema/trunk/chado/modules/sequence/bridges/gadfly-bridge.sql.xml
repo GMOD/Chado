@@ -4,6 +4,10 @@
     as a GadFly Schema, which means we can use (legacy) GadFly software; 
     GadFly is still in use at the BDGP/DHGP
 
+    Activate this to make this bridge take precedence
+    SET SEARCH_PATH TO gadfly,public;
+    (note that placing gadfly first in the search path means
+    that gadfly.dbxref takes precedence over public.dbxref)
   </notes>
 
   <relation id="seq_feature">

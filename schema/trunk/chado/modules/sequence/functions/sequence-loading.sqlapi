@@ -1,16 +1,47 @@
 DECLARE FUNCTION store_feature
-( v_srcfeature_id       INT,
-  v_fmin                INT,
-  v_fmax                INT,
-  v_strand              INT,
-  v_dbxref_id           INT,
-  v_organism_id         INT,
-  v_name                VARCHAR,
-  v_uniquename          VARCHAR,
-  v_type_id             INT,
-  v_is_analysis         BOOLEAN)
+( srcfeature_id       INT,
+  fmin                INT,
+  fmax                INT,
+  strand              INT,
+  dbxref_id           INT,
+  organism_id         INT,
+  name                VARCHAR,
+  uniquename          VARCHAR,
+  type_id             INT,
+  is_analysis         BOOLEAN)
 RETURNS INT;
 
 COMMENT ON FUNCTION store_feature (INT,INT,INT,INT,
 INT,INT,VARCHAR,VARCHAR,INT,BOOLEAN) RETURN INT IS 'stores a feature and its featureloc. The featureloc is assumed to be primary (rank and locgroup=0). Performs UPDATE on feature if either (dbxref_id) or (uniquename,organism_id,type_id) correspond to a row in the database, INSERTs otherwise. Will replace any existing primary featureloc';
+
+DECLARE FUNCTION store_featureloc
+( feature_id          INT,
+  srcfeature_id       INT,
+  fmin                INT,
+  fmax                INT,
+  strand              INT,
+  rank                INT,
+  locgroup            INT);
+RETURNS INT;
+
+COMMENT ON FUNCTION store_featureloc (INT,INT,INT,INT,INT,INT,INT)
+RETURNS INT AS 'stores the featureloc for a given feature. If a
+featureloc with the same (feature_id,rank,locgroup) exists, will
+replace - otherwise inserts new featureloc';
+
+DECLARE FUNCTION store_feature_synonym
+( feature_id          INT,
+  syn                 VARCHAR,
+  type_id             INT,
+  is_current          BOOLEAN,
+  is_internal         BOOLEAN,
+  pub_id              INT)
+RETURN INT;
+
+COMMENT ON FUNCTION store_feature_synonym
+(INT,VARCHAR,INT,BOOLEAN,BOOLEAN,INT) RETURNS INT IS 'stores a synonym
+and feature_synonym link for a given feature. inserts new synonym if
+not present. if feature_synonym link exists for this synonym, will
+update the boolean flags';
+
 
