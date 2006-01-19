@@ -43,6 +43,7 @@ CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
    AND srcfeature_id = $1 '
 LANGUAGE 'sql';
 
+
 -- can we not just do these as views?
 CREATE OR REPLACE FUNCTION feature_overlaps(int)
  RETURNS setof feature AS
