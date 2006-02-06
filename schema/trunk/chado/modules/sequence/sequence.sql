@@ -218,6 +218,22 @@ create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
 
 --
 
+create table featureloc_pub (
+    featureloc_pub_id serial not null,
+    primary key (featureloc_pub_id),
+    featureloc_id int not null,
+    foreign key (featureloc_id) references featureloc (featureloc_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint featureloc_pub_c1 unique (featureloc_id,pub_id)
+);
+COMMENT ON TABLE featureloc_pub IS 'Provenance of featureloc. Linking table between featurelocs and publications that mention them';
+
+create index featureloc_pub_idx1 on featureloc_pub (featureloc_id);
+create index featureloc_pub_idx2 on featureloc_pub (pub_id);
+
+--
+
 create table feature_pub (
     feature_pub_id serial not null,
     primary key (feature_pub_id),
