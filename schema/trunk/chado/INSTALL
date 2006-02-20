@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.41 2005-07-08 16:26:53 scottcain Exp $
+$Id: INSTALL,v 1.42 2006-02-20 18:31:23 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -112,6 +112,10 @@ host    all         all         127.0.0.1         255.255.255.255   trust
 
   BioPerl (bioperl-live or greater than 1.5)
           (-microarray 0.1 --required for microarray data)
+
+  go-perl
+      Get from http://archive.godatabase.org/latest-full/go_200602-utilities-src.tar.gz.
+      Be sure to set GO_ROOT as directed in the go-perl INSTALL doc.
 
   Standard Perl modules:
       The perl modules can be installed via the cpan shell and by issuing 
