@@ -10,6 +10,7 @@ Build demo system (based on current, 0.1 schema) on new gmod server, with
   -gbrowse
   -apollo functions? (ie, do we want to allow live, guest editting?)
   -turnkey
+  -biomart
   -drupal (separate from gmod.org, for community stuff)?
   -cmap
   -BLAST/blastGraphic?
@@ -24,7 +25,8 @@ For the 0.1 release:
 - add a function to the apollo triggers to simplify the merge and split
   operations (LOW-Apollo development currently unfunded)
 - add the ability to pass a dbprofile name to scripts (HI - should be easy)
-
+- add bioperl patching functionality similar to GBrowse (though make sure
+  they don't stomp on each other (HI)
 - address flybase's use of of analysisfeature combined with feature to
   give source-type information (in GFF terms).  This will need to 
   be addressed in the GBrowse adaptor. (MED - not sure what is involved)
