@@ -1,29 +1,54 @@
+In preparation for the 0.1 release and a talk/poster at the Biology
+of Genomes meeting, here is a new TODO list:
+
+BioMart bridge layer (functions and views)
+Complete most or all items in chado TODO list (needs prioritized, see below)
+  -put todo items in sf system to allow comments
+Build demo system (based on current, 0.1 schema) on new gmod server, with
+  (organism?  yeast, rice, fly, other?)
+  -chado
+  -gbrowse
+  -apollo functions? (ie, do we want to allow live, guest editting?)
+  -turnkey
+  -drupal (separate from gmod.org, for community stuff)?
+  -cmap
+  -BLAST/blastGraphic?
+  -AmiGO?
+  -DAS2 server?
+
+
+For the 0.1 release:
 - make the gff3 loaders validate that the uniquename is really unique
-  before trying to insert.
+  before trying to insert. (HI-Done?, should change to get a complete list
+  and cache it to increase speed (although that would be LOW))
 - add a function to the apollo triggers to simplify the merge and split
-  operations
-- add the ability to pass a dbprofile name to scripts
+  operations (LOW-Apollo development currently unfunded)
+- add the ability to pass a dbprofile name to scripts (HI - should be easy)
 
 - address flybase's use of of analysisfeature combined with feature to
   give source-type information (in GFF terms).  This will need to 
-  be addressed in the GBrowse adaptor.
+  be addressed in the GBrowse adaptor. (MED - not sure what is involved)
 - modify the bulk loader to allow 'mixed' GFF3 files (that is, containing 
   both analysis results and annotations). See perldoc gmod_bulk_load_gff3.pl
-  for more info
+  for more info (HI - this is a major pain for non-me users)
 - modify the bulk loader to optionally spit INSERT statements in the the
   files rather than the COPY FROM STDIN format as a fall back for really
-  big files
+  big files (HI)
 - modify the bulk loader to (optionally) make gene (foster) parents for 
-  orphan transcript types.
+  orphan transcript types. (MED)
 - deprecate the use of gmod_load_gff3.pl in favor of the bulk loader
 - migrate ontology loading to use go-perl (instead of Class::DBI--which
   may completely eliminate the need for having Class::DBI installed 
-  (except for turnkey))
+  (except for turnkey)) (Done)
 - Flesh out Apollo stuff to be more transparent to the person doing the
-  installation
+  installation (MED)
 - Make a decision on sequence shredding and implement appropriate views 
-  and functions
-- fix perl modules to conform with Todd's Bio::GMOD namespace
+  and functions (LOW - what we have works)
+- fix perl modules to conform with Todd's Bio::GMOD namespace (MED - shouldn't
+  be too hard)
+- fix Bio::FeatureIO to return at least a simple value for Gap attributes (HI -
+  should be easy)
+- update docs for changes in installation procedures (HI)
 
 The things below here are mostly done and just left here for historical interest
 --------------------------------------------------------------------
