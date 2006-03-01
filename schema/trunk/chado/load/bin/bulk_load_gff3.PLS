@@ -451,6 +451,7 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
   $ANALYSIS = 0;
 }
 
+my %uniquename_cache;
 my %cache = (
              analysis => {},
              db       => {}, #db.db_id cache
@@ -484,7 +485,7 @@ my %constraint = ();
 my %locgroup = ();
 
 
-my %t_unique_count;
+#my %t_unique_count;
 my $pub; # for holding null pub object
 my $gff_source_db;
 my $auto_cv_id;
@@ -650,12 +651,12 @@ $sth->finish;
 #######################################################
 #prepare a bunch of sql queries to be used in the loop:
 #
-my $search_uniquename 
-   = $db->prepare("SELECT feature_id FROM feature WHERE uniquename=?");
-my $validate_uniquename
-   = $db->prepare("SELECT count(*) FROM feature where uniquename=?
-                                                  and type_id = ?
-                                                  and organism_id = ?");
+#my $search_uniquename 
+#   = $db->prepare("SELECT feature_id FROM feature WHERE uniquename=?");
+#my $validate_uniquename
+#  = $db->prepare("SELECT count(*) FROM feature where uniquename=?
+#                                                  and type_id = ?
+#                                                  and organism_id = ?");
 my $search_name
    = $db->prepare("SELECT feature_id FROM feature WHERE name=?");
 my $count_name
@@ -711,6 +712,20 @@ if ($GFFFILE eq 'stdin') {
                                  -validate_terms => $VALIDATE);
 }
 
+print STDERR "Creating a uniquename cache...";
+my $unique_cache = $db->prepare(
+     "select feature_id,uniquename,type_id,organism_id from feature");
+$unique_cache->execute();
+
+while (my $un_hash = $unique_cache->fetchrow_hashref() ) {
+    my $tmp_name = $$un_hash{'uniquename'};
+    $uniquename_cache{$tmp_name}{'feature_id'} = $$un_hash{'feature_id'};
+    $uniquename_cache{$tmp_name}{'type_id'}    = $$un_hash{'type_id'};
+    $uniquename_cache{$tmp_name}{'organism_id'}= $$un_hash{'organism_id'};
+}
+$unique_cache->finish();
+warn "done\n";
+
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
 
@@ -745,10 +760,11 @@ while(my $feature = $gffio->next_feature()){
     if($feature->seq_id->value eq '.'){
       $src = '\N';
     } else {
-      $search_uniquename->execute($feature->seq_id->value) or die;
+      #$search_uniquename->execute($feature->seq_id->value) or die;
 
       ($cache{parent}{$feature->seq_id->value})
-            = $search_uniquename->fetchrow_array;
+            = $uniquename_cache{$feature->seq_id->value}{'feature_id'};
+            #= $search_uniquename->fetchrow_array;
 
       unless ($cache{parent}{$feature->seq_id->value}) {
         $count_name->execute($feature->seq_id->value);
@@ -1252,8 +1268,8 @@ close FDBX;
 close DBX;
 close AF;
 
-$search_uniquename->finish;
-$validate_uniquename->finish;
+#$search_uniquename->finish;
+#$validate_uniquename->finish;
 $search_name->finish;
 $count_name->finish;
 $search_cvterm_id->finish;
@@ -1442,11 +1458,28 @@ sub dump_ana_contents {
 
 sub uniquename_validation {
   my ($uniquename, $type, $organism, $nextfeature) = @_;
-  $validate_uniquename->execute($uniquename, $type, $organism);
-  my @count = $validate_uniquename->fetchrow_array;
-  return $uniquename if ($count[0] == 0);
-  $uniquename = "$uniquename-$nextfeature";
-  return uniquename_validation($uniquename, $type, $organism, $nextfeature);
+
+  if ($uniquename_cache{$uniquename}{'type_id'}     == $type and
+      $uniquename_cache{$uniquename}{'organism_id'} == $organism) {
+
+      $uniquename = "$uniquename-$nextfeature";
+      return uniquename_validation($uniquename, $type, $organism, $nextfeature);
+
+  }
+  else { #this uniquename is valid; cache it and return
+
+      $uniquename_cache{$uniquename}{'type_id'}     = $type;
+      $uniquename_cache{$uniquename}{'organism_id'} = $organism;
+      $uniquename_cache{$uniquename}{'feature_id'}  = $nextfeature;
+
+      return $uniquename;
+  }
+
+#  $validate_uniquename->execute($uniquename, $type, $organism);
+#  my @count = $validate_uniquename->fetchrow_array;
+#  return $uniquename if ($count[0] == 0);
+#  $uniquename = "$uniquename-$nextfeature";
+#  return uniquename_validation($uniquename, $type, $organism, $nextfeature);
 }
 
 sub drop_indexes {
