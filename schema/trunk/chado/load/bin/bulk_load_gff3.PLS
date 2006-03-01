@@ -55,6 +55,7 @@ $0 - Bulk loads gff3 files into a chado database.
 
  --gfffile         The file containing GFF3 (optional, can read from stdin)
  --organism        The organism for the data
+ --dbprofile       Database config profile name
  --dbname          Database name
  --dbuser          Database user name
  --dbpass          Database password
@@ -73,7 +74,9 @@ $0 - Bulk loads gff3 files into a chado database.
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
-'make install' was run.
+'make install' was run.  Also note the the option dbprofile and all other
+db* options are mutually exclusive--if you supply dbprofile, do not
+supply any other db* options, as they will not be used.
 
 =head1 DESCRIPTION
 
@@ -378,13 +381,14 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT, 
+my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, 
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,$DROP_INDEX);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
     'gfffile=s'  => \$GFFFILE,
+    'dbprofile=s'=> \$DBPROFILE,
     'dbname=s'   => \$DBNAME,
     'dbuser=s'   => \$DBUSER,
     'dbpass=s'   => \$DBPASS,
@@ -409,15 +413,17 @@ unless ($DBNAME) {
           Bio::GMOD::DB::Config->import();
           1;  } ) {
         my $gmod_conf = $ENV{'GMOD_ROOT'} || "/var/lib/gmod" ?
-                        Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} || "/var/lib/gmod") :
-                        Bio::GMOD::Config->new();
-        my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,'default');
-        $DBNAME  ||= $db_conf->name();
-        $DBUSER  ||= $db_conf->user();
-        $DBPASS  ||= $db_conf->password();
-        $DBHOST  ||= $db_conf->host();
-        $DBPORT  ||= $db_conf->port();
-        $ORGANISM||=$db_conf->organism();
+                  Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} || "/var/lib/gmod") :
+                  Bio::GMOD::Config->new();
+
+        my $profile = $DBPROFILE || 'default';
+        my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,$profile);
+        $DBNAME    = $db_conf->name();
+        $DBUSER    = $db_conf->user();
+        $DBPASS    = $db_conf->password();
+        $DBHOST    = $db_conf->host();
+        $DBPORT    = $db_conf->port();
+        $ORGANISM ||= $db_conf->organism();
     }
 }
 
