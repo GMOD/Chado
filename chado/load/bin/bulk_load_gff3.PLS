@@ -53,7 +53,8 @@ $0 - Bulk loads gff3 files into a chado database.
 
 =head1 COMMAND-LINE OPTIONS
 
- --gfffile         The file containing GFF3 (optional, can read from stdin)
+ --gfffile         The file containing GFF3 (optional, can read 
+                     from stdin)
  --organism        The organism for the data
  --dbprofile       Database config profile name
  --dbname          Database name
@@ -66,11 +67,13 @@ $0 - Bulk loads gff3 files into a chado database.
  --nosequence      Don't load sequence even if it is in the file
  --notransact      Don't use a single transaction to load the database
  --drop_indexes    Drop indexes of affected tables before starting load
-                     and recreate after load is finished (not implemented yet)
- --validate        Validate SOFA terms before attempting insert (can cause
-                     script startup to be slow, off by default)
+                     and recreate after load is finished; generally
+                     does not help performance.
+ --validate        Validate SOFA terms before attempting insert (can
+                     cause script startup to be slow, off by default)
  --ontology        Give directions for handling misc Ontology_terms
  --skip_vacuum     Skip vacuuming the tables after the inserts
+ --inserts         Print INSERT statements instead of COPY FROM STDIN
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -285,6 +288,17 @@ a single transcation can result in the machine running out of memory
 and killing processes.  If --notranscat is provided on the commandline,
 each table will be loaded as a separate transaction.
 
+=item SQL INSERTs versus COPY FROM
+
+This bulk loader was originally designed to use the PostgreSQL
+COPY FROM syntax for bulk loading of data.  However, as mentioned
+in the 'Transactions' section, memory issues can sometimes interfere
+with such bulk loads.  In another effort to circumvent this issue,
+the bulk loader has been modified to optionally create INSERT statements
+instead of the COPY FROM statements.  INSERT statements will load
+much more slowly than COPY FROM statements, but as they load and
+commit individually, they are more more likely to complete successfully.
+
 =item Sequence
 
 By default, if there is sequence in the GFF file, it will be loaded
@@ -382,7 +396,7 @@ it under the same terms as Perl itself.
 =cut
 
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
-    $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, 
+    $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,$DROP_INDEX);
 
 GetOptions(
@@ -403,6 +417,7 @@ GetOptions(
     'ontology=s' => \$ONTOLOGY,
     'skip_vacuum'=> \$SKIP_VACUUM,
     'drop_indexes'=>\$DROP_INDEX,
+    'inserts'    => \$INSERTS,
 ) or ( system( 'pod2text', $0 ), exit -1 );;
 
 
@@ -436,6 +451,7 @@ $DBPORT   ||='5432';
 $VALIDATE ||=0;
 $NOTRANSACT ||=0;
 $NOSEQUENCE ||=0;
+$INSERTS    ||=0;
 $SCORE_COL  ||='significance';
 
 die "You must supply a database name" unless $DBNAME;
@@ -792,7 +808,8 @@ while(my $feature = $gffio->next_feature()){
     my $parent = $cache{parent}{$pname};
     die "no parent ".$pname unless $parent;
 
-    print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$part_of)),"\n";
+    print_frel($nextfeaturerel,$nextfeature,$parent,$part_of);
+
     $nextfeaturerel++;
   }
 
@@ -802,7 +819,7 @@ while(my $feature = $gffio->next_feature()){
     my $parent = $cache{parent}{$pname};
     die "no parent ".$pname unless $parent;
 
-    print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$derives_from)),"\n";
+    print_frel($nextfeaturerel,$nextfeature,$parent,$derives_from);
     $nextfeaturerel++;
   }
 
@@ -826,7 +843,8 @@ while(my $feature = $gffio->next_feature()){
     $locgroup{$uniquename}++;
   }
   else {
-    print F join("\t", ($nextfeature, $organism, $name, $uniquename, $type, $ANALYSIS),$seqlen),"\n";
+    print_f($nextfeature,$organism,$name,$uniquename,$type,$ANALYSIS,$seqlen);
+
     $cache{feature}{$uniquename} = $nextfeature;
     $cache{parent}{$uniquename} = $nextfeature;
     $locgroup{$uniquename} = 0;
@@ -847,7 +865,7 @@ while(my $feature = $gffio->next_feature()){
     my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
     my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
 
-    print FLOC join("\t", ($nextfeatureloc, $cache{feature}{$uniquename}, $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename})),"\n";
+    print_floc($nextfeatureloc, $cache{feature}{$uniquename}, $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename});
   }
 
   if ($feature->annotation->get_Annotations('Gap')) {
@@ -866,7 +884,7 @@ while(my $feature = $gffio->next_feature()){
 
       if ( !$constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Gap'}}{ $rank } ) {
         $constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Gap'}}{ $rank }++;
-        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Gap'},uri_unescape($note),$rank)),"\n";
+        print_frop($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Gap'},uri_unescape($note),$rank);
         $rank++;
         $nextfeatureprop++;
       }
@@ -890,7 +908,7 @@ while(my $feature = $gffio->next_feature()){
 
       if ( !$constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}}{ $rank } ) {
         $constraint{featureprop_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{'Note'}}{ $rank }++;
-        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Note'},uri_unescape($note),$rank)),"\n";
+        print_fprop($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{'Note'},uri_unescape($note),$rank);
         $rank++;
         $nextfeatureprop++;
       }
@@ -947,7 +965,7 @@ END
       my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
       my $rank=0;
       foreach my $value (@values) {
-        print FPROP join("\t",($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{$tag},$value,$rank)),"\n";
+        print_fprop($nextfeatureprop,$cache{feature}{$uniquename},$cache{type}{$tag},$value,$rank);
         $rank++;
         $nextfeatureprop++;
       }
@@ -972,14 +990,14 @@ END
           $cache{dbxref}{$source} = $chado_source;
         } else {
           $cache{dbxref}{$source} = $nextdbxref;
-          print DBX join("\t",($nextdbxref,$gff_source_db,$source,1,'\N')),"\n";
+          print_dbx($nextdbxref,$gff_source_db,$source,1,'\N');
           $nextdbxref++; 
         }
       }
       my $dbxref_id = $cache{dbxref}{$source};
       if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$dbxref_id}){
         $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$dbxref_id}++;
-        print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$dbxref_id)),"\n";
+        print_fdbx($nextfeaturedbxref,$cache{feature}{$uniquename},$dbxref_id);
         $nextfeaturedbxref++;
       }
     } else {
@@ -1021,7 +1039,8 @@ END
 
       if(!$constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }){
         $constraint{feature_cvterm_c1}{ $cache{feature}{$uniquename} }{ $cache{type}{$term} }++;
-        print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
+        print_fcv($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub);
+        #print FCV join("\t",($nextfeaturecvterm,$cache{feature}{$uniquename},$cache{type}{$term},$pub)),"\n";
         $nextfeaturecvterm++;
       }
     }
@@ -1044,7 +1063,7 @@ END
       if(my $temp_id = $cache{dbxref}{"$database|$accession|$version"}){
         if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$temp_id}){
           $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$temp_id}++;
-          print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$temp_id)),"\n";
+          print_fdbx($nextfeaturedbxref,$cache{feature}{$uniquename},$temp_id);
           $nextfeaturedbxref++;
         }
       } else {
@@ -1063,17 +1082,17 @@ END
           if ($existing_dbxref) {
             if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref}){
               $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$existing_dbxref}++;
-              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$existing_dbxref)),"\n";
+              print_fdbx($nextfeaturedbxref,$cache{feature}{$uniquename},$existing_dbxref);
               $nextfeaturedbxref++;
             }
             $cache{dbxref}{"$database|$accession|$version"} = $existing_dbxref; 
           } else {
             if(!$constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}){
               $constraint{feature_dbxref_c1}{ $cache{feature}{$uniquename} }{$nextdbxref}++;
-              print FDBX join("\t",($nextfeaturedbxref,$cache{feature}{$uniquename},$nextdbxref)),"\n";
+              print_fdbx($nextfeaturedbxref,$cache{feature}{$uniquename},$nextdbxref);
               $nextfeaturedbxref++;
             }
-            print DBX join("\t",($nextdbxref,$cache{db}{$database},$accession,$version,$desc)),"\n";
+            print_dbx($nextdbxref,$cache{db}{$database},$accession,$version,$desc);
             $cache{dbxref}{"$database|$accession|$version"} = $nextdbxref;
             $nextdbxref++;
           }
@@ -1128,7 +1147,7 @@ END
         $score_string = "\\N\t\\N\t\\N\t$score";
     }
 
-    print AF join("\t", ($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score_string)), "\n";
+    print_af($nextanalysisfeature,$cache{feature}{$uniquename},$cache{analysis}{$ankey},$score_string);
     $nextanalysisfeature++;
   }
 
@@ -1161,16 +1180,18 @@ END
 
       if ($feature->annotation->get_Annotations('Parent') 
          && $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value}) { 
-        print FLOC join("\t", (
+        print_floc(
              $nextfeatureloc, 
              $nextfeature, #this is bugridden.  need to use $cache{feature}{$uniquename}, but can't due to -1 logic (see below)
              $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value},
-             $tstart, $tend, $tstrand, '\N',$rank,'0')),"\n"; #this is broken for the same reason as $nextfeature
+             $tstart, $tend, $tstrand, '\N',$rank,'0'); #this is broken for the same reason as $nextfeature
       } else { #this Target needs a feature too
         $nextfeature++;
         $name ||= "$featuretype-$uniquename";
-        print F join("\t", ($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS,'\N')),"\n";
-        print FLOC join("\t", (
+
+        print_f($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS,'\N');
+        #print F join("\t", ($nextfeature, $organism, $name, $target_id.'_'.$nextfeature, $type, $ANALYSIS,'\N')),"\n";
+        print_floc(
               $nextfeatureloc,
               $nextfeature-1, #broken, needs to use previous $cache{feature}{$uniquename}.  may want to use a $last_uniquename var to track this.
               $nextfeature, #broken
@@ -1180,7 +1201,7 @@ END
               '\N',
               $rank,
               '0' #broken
-              )),"\n";
+              );
       }
 
       my $score = $feature->score->value ? $feature->score->value : '\N';
@@ -1218,7 +1239,7 @@ END
         $score_string = "\\N\t\\N\t\\N\t$score";
       }
 
-      print AF join("\t", ($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score_string)), "\n"; 
+      print_af($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score_string); 
       $nextanalysisfeature++;
 
  #     my $target_unique = "target_$target_id";
@@ -1246,16 +1267,16 @@ my %nextvalue = (
    "analysisfeature"      => $nextanalysisfeature,
 );
 
-print F    "\\.\n\n";
-print FLOC "\\.\n\n";
-print FREL "\\.\n\n";
-print FPROP "\\.\n\n";
-print FCV "\\.\n\n";
-print SYN "\\.\n\n";
-print FS "\\.\n\n";
-print FDBX "\\.\n\n";
-print DBX "\\.\n\n";
-print AF "\\.\n\n";
+print F     "\\.\n\n" unless $INSERTS;
+print FLOC  "\\.\n\n" unless $INSERTS;
+print FREL  "\\.\n\n" unless $INSERTS;
+print FPROP "\\.\n\n" unless $INSERTS;
+print FCV   "\\.\n\n" unless $INSERTS;
+print SYN   "\\.\n\n" unless $INSERTS;
+print FS    "\\.\n\n" unless $INSERTS;
+print FDBX  "\\.\n\n" unless $INSERTS;
+print DBX   "\\.\n\n" unless $INSERTS;
+print AF    "\\.\n\n" unless $INSERTS;
 
 close F;
 close FLOC;
@@ -1294,7 +1315,10 @@ unless ($NOSEQUENCE) {
 }
 
 if(!$NOLOAD){
-  drop_indexes($db) if $DROP_INDEX;
+  if ($DROP_INDEX) {
+    warn "Dropping indexes...\n";
+    drop_indexes($db) if $DROP_INDEX;
+  }
 
   foreach my $table (@tables) {
     copy_from_stdin($db,$table,
@@ -1318,7 +1342,10 @@ if(!$NOLOAD){
     close SEQ;
   }
 
-  create_indexes($db) if $DROP_INDEX;
+  if ($DROP_INDEX) {
+    warn "Recreating indexes...\n";
+    create_indexes($db) if $DROP_INDEX;
+  }
 
   unless ($SKIP_VACUUM) {
     warn "Optimizing database (this may take a while) ...\n";
@@ -1353,22 +1380,32 @@ sub copy_from_stdin {
   my $nextval  = shift;
 
   warn "Loading data into $table table ...\n";
-  my $query = "COPY $table $fields FROM STDIN;";
-  #warn "\t".$query;
-  $dbh->do($query) or die "Error when executing: $query: $!\n";
 
-  open FILE, $file;
-  while (<FILE>) {
-    if ( ! ($dbh->pg_putline($_)) ) {
-      #error, disconecting
-      $dbh->pg_endcopy;
-      $dbh->rollback;
-      $dbh->disconnect;
-      die "error while copying data's of file $file, line $.\n";
-    } #putline returns 1 if succesful
+  if ($INSERTS) {
+    # note that if a password is required, the user will have to enter it
+    system("psql -q -f $file -h $DBHOST -p $DBPORT -U $DBUSER -d $DBNAME ") 
+      && die "FAILED: loading $file failed (error:$!); I can't go on\n";
   }
-  $dbh->pg_endcopy or die "calling endcopy for $table failed: $!\n"; 
-  close FILE;
+  else {
+
+    my $query = "COPY $table $fields FROM STDIN;";
+    #warn "\t".$query;
+    $dbh->do($query) or die "Error when executing: $query: $!\n";
+
+    open FILE, $file;
+    while (<FILE>) {
+      if ( ! ($dbh->pg_putline($_)) ) {
+        #error, disconecting
+        $dbh->pg_endcopy;
+        $dbh->rollback;
+        $dbh->disconnect;
+        die "error while copying data's of file $file, line $.\n";
+      } #putline returns 1 if succesful
+    }
+    $dbh->pg_endcopy or die "calling endcopy for $table failed: $!\n"; 
+    close FILE;
+
+  }
 
   #update the sequence so that later inserts will work 
   $dbh->do("SELECT setval('public.$sequence', $nextval) FROM $table"); 
@@ -1401,14 +1438,14 @@ sub synonyms  {
 
         if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $synonym } ) {
           $constraint{feature_synonym_c1}{ $feature_id }{ $synonym }++;
-          print FS join("\t", ($nextfeaturesynonym,$synonym,$feature_id,$pub)),"\n";
+          print_fs($nextfeaturesynonym,$synonym,$feature_id,$pub);
 
           $nextfeaturesynonym++;
           $cache{synonym}{$alias} = $synonym;
         }
 
       } else {
-        print SYN join("\t", ($nextsynonym,$alias,$cache{type}{'synonym'},$alias)),"\n";
+        print_syn($nextsynonym,$alias,$cache{type}{'synonym'},$alias);
 
         unless ($pub) {
             my $sth = $db->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
@@ -1420,7 +1457,7 @@ sub synonyms  {
         if( !$constraint{feature_synonym_c1}{ $feature_id }{ $nextsynonym } ) { 
           $constraint{feature_synonym_c1}{ $feature_id }{ $nextsynonym }++;
 
-          print FS join("\t", ($nextfeaturesynonym,$nextsynonym,$feature_id,$pub)),"\n";
+          print_fs($nextfeaturesynonym,$nextsynonym,$feature_id,$pub);
           $nextfeaturesynonym++;
           $cache{synonym}{$alias} = $nextsynonym;
           $nextsynonym++;
@@ -1431,7 +1468,7 @@ sub synonyms  {
       if ( !$constraint{feature_synonym_c1}{ $feature_id }{ $cache{synonym}{$alias} } ) {
         $constraint{feature_synonym_c1}{ $feature_id }{ $cache{synonym}{$alias} }++;
 
-        print FS join("\t", ($nextfeaturesynonym,$cache{synonym}{$alias},$feature_id,$pub)),"\n";
+        print_fs($nextfeaturesynonym,$cache{synonym}{$alias},$feature_id,$pub);
         $nextfeaturesynonym++;
       }
     }
@@ -1459,7 +1496,9 @@ sub dump_ana_contents {
 sub uniquename_validation {
   my ($uniquename, $type, $organism, $nextfeature) = @_;
 
-  if ($uniquename_cache{$uniquename}{'type_id'}     == $type and
+  if (defined($uniquename_cache{$uniquename}{'type_id'})         and
+      defined($uniquename_cache{$uniquename}{'organism_id'})     and
+      $uniquename_cache{$uniquename}{'type_id'}     == $type     and
       $uniquename_cache{$uniquename}{'organism_id'} == $organism) {
 
       $uniquename = "$uniquename-$nextfeature";
@@ -1568,8 +1607,129 @@ sub create_indexes {
   $dbh->do("CREATE INDEX analysisfeature_idx1 ON analysisfeature (feature_id)");
   $dbh->do("CREATE INDEX analysisfeature_idx2 ON analysisfeature (analysis_id)");
 }
+
+sub print_frel {
+  my ($nextfeaturerel,$nextfeature,$parent,$part_of) = @_;
+  if ($INSERTS) {
+    print FREL "INSERT INTO feature_relationship $copystring{'feature_relationship'} VALUES ($nextfeaturerel,$nextfeature,$parent,$part_of);\n";
+  }
+  else {
+    print FREL join("\t", ($nextfeaturerel,$nextfeature,$parent,$part_of)),"\n";
+  }
+}
+
+sub print_f {
+  my ($nextfeature,$organism,$name,$uniquename,$type,$ANALYSIS,$seqlen) = @_;
+  if ($INSERTS) {
+    my $q_name        = $db->quote($name);
+    my $q_uniquename  = $db->quote($uniquename);
+    my $q_seqlen      = $seqlen eq '\N' ? 'NULL' : $seqlen;
+    my $q_analysis    = $ANALYSIS ? "'true'" : "'false'";
+    print F "INSERT INTO feature $copystring{'feature'} VALUES ($nextfeature,$organism,$q_name,$q_uniquename,$type,$q_analysis,$q_seqlen);\n";
+  }
+  else {
+    print F join("\t", ($nextfeature, $organism, $name, $uniquename, $type, $ANALYSIS),$seqlen),"\n";
+  }
+}
+
+sub print_floc {
+  my ($featureloc_id,$feature_id,$src_id,$start,$end,$strand,$phase,$rank,$locgroup) = @_;
+
+  if ($INSERTS) {
+    my $q_strand= $strand eq '\N'? 'NULL' : $strand;
+    my $q_phase = $phase eq '\N' ? 'NULL' : $phase;
+    print FLOC "INSERT INTO featureloc $copystring{'featureloc'} VALUES ($featureloc_id,$feature_id,$src_id,$start,$end,$q_strand,$q_phase,$rank,$locgroup);\n";
+  }
+  else {
+    print FLOC join("\t", ($featureloc_id, $feature_id, $src_id, $start, $end, $strand, $phase,$rank,$locgroup)),"\n";
+  }
+}
+
+sub print_fprop {
+  my ($fp_id,$f_id,$cvterm_id,$value,$rank) = @_;
+
+  if ($INSERTS) {
+    my $q_value = $db->quote($value);
+    print FPROP "INSERT INTO featureprop $copystring{'featureprop'} VALUES ($fp_id,$f_id,$cvterm_id,$q_value,$rank);\n";
+  }
+  else {
+    print FPROP join("\t",($fp_id,$f_id,$cvterm_id,$value,$rank)),"\n";
+  }
+}
+
+sub print_fcv {
+  my ($fcv_id,$f_id,$cvterm_id,$p_id) = @_;
+
+  if ($INSERTS) {
+    print FCV "INSERT INTO feature_cvterm $copystring{'feature_cvterm'} VALUES ($fcv_id,$f_id,$cvterm_id,$p_id);\n";
+  }
+  else {
+    print FCV join("\t",($fcv_id,$f_id,$cvterm_id,$p_id)),"\n";
+  }
+}
+
+sub print_syn {
+  my ($s_id,$syn,$type_id) = @_;
+
+  if ($INSERTS) {
+    my $q_syn = $db->quote($syn);
+    print SYN "INSERT INTO synonym $copystring{'synonym'} VALUES ($s_id,$q_syn,$type_id,$q_syn);\n";
+  }
+  else {
+    print SYN join("\t", ($s_id,$syn,$type_id,$syn)),"\n";
+  }
+}
+
+sub print_fs {
+  my ($fs_id,$s_id,$f_id,$p_id) = @_;
+
+  if ($INSERTS) {
+    print FS "INSERT INTO feature_synonym $copystring{'feature_synonym'} VALUES ($fs_id,$s_id,$f_id,$p_id);\n";
+  }
+  else {
+    print FS join("\t", ($fs_id,$s_id,$f_id,$p_id)),"\n";
+  }
+}
+
+sub print_fdbx {
+  my ($fd_id,$f_id,$dx_id) = @_;
+
+  if ($INSERTS) {
+    print FDBX "INSERT INTO feature_dbxref $copystring{'feature_dbxref'} VALUES ($fd_id,$f_id,$dx_id);\n";
+  }
+  else {
+    print FDBX join("\t",($fd_id,$f_id,$dx_id)),"\n";
+  }
+}
+
+sub print_dbx {
+  my ($dbx_id,$db_id,$acc,$vers,$desc) = @_;
+
+  if ($INSERTS) {
+    my $q_acc  = $db->quote($acc);
+    my $q_vers = $db->quote($vers);
+    my $q_desc = $desc eq '\N' ? 'NULL' : $db->quote($desc);
+    print DBX "INSERT INTO dbxref $copystring{'dbxref'} VALUES ($dbx_id,$db_id,$q_acc,$q_vers,$q_desc);\n";
+  }
+  else {
+    print DBX join("\t",($dbx_id,$db_id,$acc,$vers,$desc)),"\n";
+  }
+}
+
+sub print_af {
+  my ($af_id,$f_id,$a_id,$score) = @_;
+
+  if ($INSERTS) {
+    my $q_score = $db->quote($score);
+    print AF "INSERT INTO analysisfeature $copystring{'analysisfeature'} VALUES ($af_id,$f_id,$a_id,$q_score);\n";
+  }
+  else {
+    print AF join("\t", ($af_id,$f_id,$a_id,$score)), "\n";
+  }
+}
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 chdir $origdir;
+
 
