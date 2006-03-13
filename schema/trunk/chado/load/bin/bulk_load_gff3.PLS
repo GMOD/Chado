@@ -298,6 +298,9 @@ the bulk loader has been modified to optionally create INSERT statements
 instead of the COPY FROM statements.  INSERT statements will load
 much more slowly than COPY FROM statements, but as they load and
 commit individually, they are more more likely to complete successfully.
+As an indication of the speed differences involved, loading 
+yeast GFF3 annotations (about 16K rows), it takes about 5 times
+longer using INSERTs versus COPY on my laptop.
 
 =item Sequence
 
@@ -746,8 +749,6 @@ warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
 
 while(my $feature = $gffio->next_feature()){
-  my $nextfeature_increment = 1;
-
   my $featuretype = $feature->type->name;
 
   my $type = $cache{type}{$featuretype};
@@ -1251,7 +1252,7 @@ END
       $rank++;
     }
   }
-  $nextfeature++ if $nextfeature_increment;
+  $nextfeature++;
 }
 
 my %nextvalue = (
@@ -1720,7 +1721,8 @@ sub print_af {
   my ($af_id,$f_id,$a_id,$score) = @_;
 
   if ($INSERTS) {
-    my $q_score = $db->quote($score);
+    $score =~ s/\\N/NULL/g;
+    #fix score string!
     print AF "INSERT INTO analysisfeature $copystring{'analysisfeature'} VALUES ($af_id,$f_id,$a_id,$q_score);\n";
   }
   else {
