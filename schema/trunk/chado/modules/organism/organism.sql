@@ -1,6 +1,3 @@
--- ================================================
--- TABLE: organism
--- ================================================
 
 create table organism (
 	organism_id serial not null,
@@ -13,23 +10,18 @@ create table organism (
     constraint organism_c1 unique (genus,species)
 );
 
-COMMENT ON COLUMN organism.species IS
- 'A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples)';
+COMMENT ON TABLE organism IS 'The organismal taxonomic
+classification. Note that phylogenies are represented using the
+phylogeny module, and taxonomies can be represented using the cvterm
+module or the phylogeny module';
 
--- Compared to mol5..Species, organism table lacks "approved char(1) null".  
--- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
--- future [dave]
---
--- in response: this is very specific to a limited use case I think;
--- if it's really necessary we can have an organismprop table
--- for adding internal project specific data
--- [cjm]
--- done (below) 19-MAY-03 [dave]
-
-
--- ================================================
--- TABLE: organism_dbxref
--- ================================================
+COMMENT ON COLUMN organism.species IS 'A type of organism is always
+uniquely identified by genus+species. When mapping from the NCBI
+taxonomy names.dmp file, the unique-name column must be used where it
+is present, as the name column is not always unique (eg environmental
+samples). If a particular strain or subspecies is to be represented,
+this is appended onto the species name. Follows standard NCBI taxonomy
+pattern';
 
 create table organism_dbxref (
     organism_dbxref_id serial not null,
@@ -42,10 +34,6 @@ create table organism_dbxref (
 );
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
-
--- ================================================
--- TABLE: organismprop
--- ================================================
 
 create table organismprop (
     organismprop_id serial not null,
@@ -60,3 +48,6 @@ create table organismprop (
 );
 create index organismprop_idx1 on organismprop (organism_id);
 create index organismprop_idx2 on organismprop (type_id);
+
+COMMENT ON TABLE organismprop IS 'tag-value properties - follows standard chado model';
+

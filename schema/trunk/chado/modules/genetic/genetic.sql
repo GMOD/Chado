@@ -230,7 +230,7 @@ create table feature_genotype (
     chromosome_id int,
     foreign key (chromosome_id) references feature (feature_id) on delete set null,
     rank int not null,
-    cgroup     int not null,
+    cgroup    int not null,
     cvterm_id int not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
     constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id, chromosome_id, rank, cgroup)
