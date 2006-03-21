@@ -93,8 +93,8 @@ accession/modification timestamps (as opposed to db auditing info,
 handled elsewhere). The expectation is that these fields would be
 available to software interacting with chado';
 
-COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified
-by the combination of organism, uniquename and feature type';
+--- COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified
+--- by the combination of organism, uniquename and feature type';
 
 create sequence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
@@ -146,14 +146,16 @@ differentiate these different locations. Reflexive locations should
 never be stored - this is for -proper- (ie non-self) locations only;
 i.e. nothing should be located relative to itself';
 
+COMMENT ON COLUMN featureloc.feature_id IS 'The feature that is being located. Any feature can have zero or more featurelocs';
+
+COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
+
 COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin';
 
 COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (eg GFF, bioperl)';
 
 COMMENT ON COLUMN featureloc.strand IS 'The orientation/directionality of the
 location. Should be 0,-1 or +1';
-
-COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
 
 COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1
 location, otherwise the default rank 0 is used. Some features (eg
@@ -208,8 +210,8 @@ COMMENT ON COLUMN featureloc.is_fmax_partial IS 'This is typically
 false, but may be true if the value for column:fmax is inaccurate or
 the rightmost part of the range is unknown/unbounded';
 
-COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely
-partition locations for any one feature';
+--- COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely
+--- partition locations for any one feature';
 
 
 create index featureloc_idx1 on featureloc (feature_id);
@@ -263,7 +265,11 @@ create table featureprop (
 );
 COMMENT ON TABLE featureprop IS 'A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible';
 
-COMMENT ON COLUMN featureprop.type_id IS 'The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. Certain properties will only apply to certain feature types; this will be handled by the Sequence Ontology';
+COMMENT ON COLUMN featureprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Certain property types will only apply to certain feature
+types (e.g. the anticodon property will only apply to tRNA features) ;
+the types here come from the sequence feature property ontology';
 
 COMMENT ON COLUMN featureprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation. This is less efficient than using native database types, but is easier to query.';
 
@@ -309,6 +315,8 @@ create table feature_dbxref (
 );
 
 COMMENT ON TABLE feature_dbxref IS 'links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id';
+
+COMMENT ON COLUMN feature_dbxref.is_current IS 'the is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature';
 
 create index feature_dbxref_idx1 on feature_dbxref (feature_id);
 create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
@@ -383,7 +391,30 @@ create table feature_relationshipprop (
     rank int not null default 0,
     constraint feature_relationshipprop_c1 unique (feature_relationship_id,type_id,rank)
 );
-COMMENT ON TABLE feature_relationshipprop IS 'Extensible properties for feature_relationships. Analagous structure to featureprop';
+
+COMMENT ON TABLE feature_relationshipprop IS 'Extensible properties
+for feature_relationships. Analagous structure to featureprop. This
+table is largely optional and not used with a high frequency. Typical
+scenarios may be if one wishes to attach additional data to a
+feature_relationship - for example to say that the
+feature_relationship is only true in certain contexts';
+
+COMMENT ON COLUMN feature_relationshipprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Currently there is no standard ontology for
+feature_relationship property types';
+
+COMMENT ON COLUMN feature_relationshipprop.value IS 'The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query.';
+
+COMMENT ON COLUMN feature_relationshipprop.rank IS 'Property-Value
+ordering. Any feature_relationship can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used';
+
 
 create index feature_relationshipprop_idx1 on feature_relationshipprop (feature_relationship_id);
 create index feature_relationshipprop_idx2 on feature_relationshipprop (type_id);
@@ -421,6 +452,9 @@ create table feature_cvterm (
 
 COMMENT ON TABLE feature_cvterm IS 'Associate a term from a cv with a feature, for example, GO annotation';
 
+COMMENT ON COLUMN feature_cvterm.pub_id IS 'Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref';
+
+COMMENT ON COLUMN feature_cvterm.is_not IS 'if this is set to true, then this annotation is interpreted as a NEGATIVE annotation - ie the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details';
 
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
 create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
@@ -440,7 +474,26 @@ create table feature_cvtermprop (
     constraint feature_cvtermprop_c1 unique (feature_cvterm_id,type_id,rank)
 );
 
-COMMENT ON TABLE feature_cvtermprop IS 'Extensible properties for feature to cvterm associations. Examples: GO evidence codes; qualifiers; metadata such as the date on which the entry was curated and the source of the association';
+COMMENT ON TABLE feature_cvtermprop IS 'Extensible properties for
+feature to cvterm associations. Examples: GO evidence codes;
+qualifiers; metadata such as the date on which the entry was curated
+and the source of the association. See the featureprop table for
+meanings of type_id, value and rank';
+
+COMMENT ON COLUMN feature_cvtermprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. cvterms may come from the OBO evidence code cv';
+
+COMMENT ON COLUMN feature_cvtermprop.value IS 'The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query.';
+
+COMMENT ON COLUMN feature_cvtermprop.rank IS 'Property-Value
+ordering. Any feature_cvterm can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used';
 
 create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_cvterm_id);
 create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
@@ -525,9 +578,9 @@ COMMENT ON TABLE feature_synonym IS 'Linking table between feature and synonym';
 
 COMMENT ON COLUMN feature_synonym.pub_id IS 'the pub_id link is for relating the usage of a given synonym to the publication in which it was used';
 
-COMMENT ON COLUMN feature_synonym.is_current IS 'the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature';
+COMMENT ON COLUMN feature_synonym.is_current IS 'the is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature';
 
-COMMENT ON COLUMN feature_synonym.is_internal IS 'typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal bit may be set to -true- so that it is known that the 
+COMMENT ON COLUMN feature_synonym.is_internal IS 'typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the 
 synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym';
 
 create index feature_synonym_idx1 on feature_synonym (synonym_id);
