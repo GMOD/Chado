@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.94 2005-12-16 15:10:52 scottcain Exp $
+# $Id: Makefile.PL,v 1.95 2006-03-22 20:37:48 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -631,6 +631,8 @@ WriteMakefile(
            'bin/gmod_dump_gff3.pl',
            'bin/gmod_materialize_gbrowse_views.pl',
            'bin/gmod_apollo_triggers.pl',
+           'bin/gmod_fasta2gff3.pl',
+           'bin/gmod_sort_gff3.pl',
     ],
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
