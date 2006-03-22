@@ -244,15 +244,22 @@ file and the name of the ontologies in the cv table as a comma separated
 tag=value pairs.  For example, to use plant and cell ontology terms,
 you would supply on the command line:
 
-  --ontology 'PO=plant ontology,CL:cell ontology'
+  --ontology 'PO=plant ontology,CL=cell ontology'
 
 where 'plant ontology' and 'cell ontology' are the names in the cv table
 exactly as they appear.
 
 =item Target tags
 
-Oy! this one is complicated, and perhaps buggy.  I'll take
-a look at it soon.
+Proper processing of Target tags requires that there be two source features
+already available in the database, the 'primary' source feature (the
+chromosome or contig) and the 'subject' from the similarity analysis,
+like an EST, cDNA or syntenic chromosome.  If the subject feature is not
+present, the loader will attempt to create a placeholder feature object
+in its place.  If you have a fasta file the contains the subject, you can
+use the perl script, L<gmod_fasta2gff3.pl>, that comes with this distribution
+to make a GFF3 file suitable for loading into chado before loading your
+analysis results.
 
 =back
 
@@ -1363,20 +1370,19 @@ sub handle_target {
         if ( $uniquename_cache{$target_id} ) {
             print_floc(
                 $nextfeatureloc,
+                $nextfeature,
                 $uniquename_cache{$target_id}{'feature_id'},
-                $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value},
                 $tstart, $tend, $tstrand, '\N',$rank,'0'
             );
         }
-        else { #
-            warn "I don't think this should happen; there is a Target with a Parent, but\n";
-            warn "no feature maps as the Target Parent for this feature:\n";
-            warn $feature->write_feature()."\n";
-#            print_floc(
-#                $nextfeatureloc,
-#                $nextfeature, #this is bugridden.  need to use $cache{feature}{$uniquename}, but can't due to -1 logic (see below)
-#                $cache{feature}{($feature->annotation->get_Annotations('Parent'))[0]->value},
-#                $tstart, $tend, $tstrand, '\N',$rank,'0'); #this is broken for the same reason as $nextfeature
+        else { 
+            my $gffline = $feature->write_feature();
+            die << "END_DIE"
+I don't think this should happen; there is a Target with a Parent, but
+no feature maps as the Target Parent for this feature:
+$gffline
+END_DIE
+;
         }
       } else { #this Target needs a feature too
 
@@ -1384,12 +1390,12 @@ sub handle_target {
         if ( $uniquename_cache{$target_id} ) {
           print_floc(
               $nextfeatureloc,
-              $uniquename_cache{$target_id}{'feature_id'},
               $nextfeature,
+              $uniquename_cache{$target_id}{'feature_id'},
               $tstart, $tend, $tstrand, '\N',$rank,'0'
           );
         }
-        else { #need to create a feature for the Target
+        else { #need to create a 'dummy' feature for the Target
           $nextfeature++;
           $name ||= "$featuretype-$uniquename";
 
@@ -1450,12 +1456,6 @@ sub handle_target {
 
       print_af($nextanalysisfeature,$nextfeature,$cache{analysis}{$ankey},$score_string);
       $nextanalysisfeature++;
-
- #     my $target_unique = "target_$target_id";
- #     $t_unique_count{$target_unique}++;
- #     $target_unique .= "_part_$t_unique_count{$target_unique}";
- #     print F join("\t", ($nextfeature, $organism, $target_id, $target_unique, $type, $ANALYSIS)),"\n";
-
       $nextfeatureloc++;
       $rank++;
     }
@@ -1571,13 +1571,13 @@ sub dump_ana_contents {
   print STDERR "The current contents of the analysis table is:\n\n";
 
   my $sth 
-    = $db->prepare("SELECT analysis_id,name,description,program FROM analysis");
-  printf STDERR "%10s %25s %30s %10s\n\n", 
-    ('analysis_id','name','description','program');
+    = $db->prepare("SELECT analysis_id,name,program FROM analysis");
+  printf STDERR "%10s %25s %10s\n\n", 
+    ('analysis_id','name','program');
 
   $sth->execute;
   while (my $array_ref = $sth->fetchrow_arrayref) {
-    printf STDERR "%10s %25s %30s %10s\n", @$array_ref;
+    printf STDERR "%10s %25s %10s\n", @$array_ref;
   }
 
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
