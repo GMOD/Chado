@@ -428,7 +428,7 @@ GetOptions(
     'skip_vacuum'=> \$SKIP_VACUUM,
     'drop_indexes'=>\$DROP_INDEX,
     'inserts'    => \$INSERTS,
-) or ( system( 'pod2text', $0 ), exit -1 );;
+) or ( system( 'pod2text', $0 ), exit -1 );
 
 
 unless ($DBNAME) {
@@ -1499,7 +1499,7 @@ sub copy_from_stdin {
   }
 
   #update the sequence so that later inserts will work 
-  $dbh->do("SELECT setval('public.$sequence', $nextval) FROM $table"); 
+  $dbh->do("SELECT setval('$sequence', $nextval) FROM $table"); 
 }
 
 sub synonyms  {
