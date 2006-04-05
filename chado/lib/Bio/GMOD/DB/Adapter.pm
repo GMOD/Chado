@@ -37,17 +37,17 @@ my %copystring = (
 );
 
 my %files = (
-   F              => "feature.tmp",
-   FLOC           => "featureloc.tmp",
-   FREL           => "feature_relationship.tmp",
-   FPROP          => "featureprop.tmp",
-   FCV            => "feature_cvterm.tmp",
-   SYN            => "synonym.tmp",
-   FS             => "feature_synonym.tmp",
-   DBX            => "dbxref.tmp",
-   FDBX           => "feature_dbxref.tmp",
-   AF             => "analysisfeature.tmp",
-   SEQ            => "sequence.tmp",
+   feature              => 'F', 
+   featureloc           => 'FLOC',
+   feature_relationship => 'FREL',
+   featureprop          => 'FPROP',
+   feature_cvterm       => 'FCV',
+   synonym              => 'SYN',
+   feature_synonym      => 'FS',
+   dbxref               => 'DBX',
+   feature_dbxref       => 'FDBX',
+   analysisfeature      => 'AF',
+   sequence             => 'SEQ',
 );
 
 # @tables array sets the order for which things will be inserted into
@@ -647,6 +647,41 @@ sub file_handles {
                 = new File::Temp(TEMPLATE => $files{$key});
         }
         return;
+    }
+}
+
+=head2 end_files
+
+=over
+
+=item Usage
+
+  $obj->end_files()
+
+=item Function
+
+Appends proper bulk load terminators
+
+=item Returns
+
+void
+
+=item Arguments
+
+none
+
+=back
+
+=cut
+
+sub end_files {
+    my $self = shift;
+
+    unless ($self->inserts) {
+        foreach my $file (@tables) {
+            my $fh = $self->file_handles($files{$file});
+            print $fh "\\.\n\n";
+        }
     }
 }
 
@@ -1776,6 +1811,67 @@ sub synonyms  {
 }
 
 
+sub load_data {
+  my $self = shift;
+
+  if ($self->drop_index()) {
+    warn "Dropping indexes...\n";
+    $self->drop_indexes();
+  }
+
+  my %nextvalue = (
+   "feature"              => $nextfeature,
+   "featureloc"           => $nextfeatureloc,
+   "feature_relationship" => $nextfeaturerel,
+   "featureprop"          => $nextfeatureprop,
+   "feature_cvterm"       => $nextfeaturecvterm,
+   "synonym"              => $nextsynonym,
+   "feature_synonym"      => $nextfeaturesynonym,
+   "feature_dbxref"       => $nextfeaturedbxref,
+   "dbxref"               => $nextdbxref,
+   "analysisfeature"      => $nextanalysisfeature,
+  );
+
+
+  foreach my $table (@tables) {
+    $self->copy_from_stdin($table,
+                    $copystring{$table},
+                    $files{$table},      #file_handle name
+                    $sequences{$table},
+                    $nextvalue{$table});
+  }
+
+  ($self->dbh->commit() 
+      || die "commit failed: ".$self->dbh->errstr()) unless $self->notransact;
+  $self->dbh->{AutoCommit}=1;
+
+  #load sequence
+  unless ($self->nosequence) {
+    $self->load_sequence();
+  }
+
+  if ($self->drop_index) {
+    warn "Recreating indexes...\n";
+    $self->create_indexes();
+  }
+
+  unless ($self->skip_vacuum) {
+    warn "Optimizing database (this may take a while) ...\n";
+    print STDERR "  (";
+    foreach (@tables) {
+      print STDERR "$_ ";
+      $self->dbh->do("VACUUM ANALYZE $_");
+    }
+  }
+
+  print STDERR ") Done.\n";
+
+  warn "\nWhile this script has made an effort to optimize the database, you\n"
+    ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
+
+}
+
+
 sub copy_from_stdin {
   my $self = shift;
   my $table    = shift;
@@ -1788,12 +1884,15 @@ sub copy_from_stdin {
 
   warn "Loading data into $table table ...\n";
 
+  my $fh = $self->file_handles($file);
+  seek($fh,0,0);
+
   if ($self->inserts()) {
     # note that if a password is required, the user will have to enter it
-    system("psql -q -f $file " .
-                   "-h " . $self->dbhost() .
-                   "-p " . $self->dbport() .
-                   "-U " . $self->dbuser() .
+    system("psql -q -f " . $fh->filename . " " .
+                   "-h " . $self->dbhost() . " " .
+                   "-p " . $self->dbport() . " " .
+                   "-U " . $self->dbuser() . " " .
                    "-d " . $self->dbname()   )
       && die "FAILED: loading $file failed (error:$!); I can't go on\n";
   }
@@ -1803,8 +1902,7 @@ sub copy_from_stdin {
     #warn "\t".$query;
     $dbh->do($query) or die "Error when executing: $query: $!\n";
 
-    open FILE, $file;
-    while (<FILE>) {
+    while (<$fh>) {
       if ( ! ($dbh->pg_putline($_)) ) {
         #error, disconecting
         $dbh->pg_endcopy;
@@ -1814,7 +1912,6 @@ sub copy_from_stdin {
       } #putline returns 1 if succesful
     }
     $dbh->pg_endcopy or die "calling endcopy for $table failed: $!\n";
-    close FILE;
 
   }
   #update the sequence so that later inserts will work
@@ -1825,8 +1922,9 @@ sub load_sequence {
     my $self = shift;
     my $dbh  = $self->dbh();
     warn "Loading sequences (if any) ...\n";
-    seek($self->file_handles('SEQ'),0,0);
-    while (<$self->file_handles('SEQ')>) {
+    my $fh = $self->file_handles('SEQ');
+    seek($fh,0,0);
+    while (<$fh>) {
         chomp;
         $dbh->do($_);
     }
