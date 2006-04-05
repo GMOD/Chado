@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
-</head><body>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -87,9 +91,10 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: organism <br />
-	================================================
+	The organismal taxonomic
+	classification. Note that phylogenies are represented using the
+	phylogeny module, and taxonomies can be represented using the cvterm
+	module or the phylogeny module 
 </em>
 
 <table border="1">
@@ -115,7 +120,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organism-organism_id">organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -124,7 +129,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organism-abbreviation">abbreviation</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -133,7 +138,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organism-genus">genus</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -142,16 +147,22 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organism-species">species</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples) </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always
+uniquely identified by genus+species. When mapping from the NCBI
+taxonomy names.dmp file, the unique-name column must be used where it
+is present, as the name column is not always unique (eg environmental
+samples). If a particular strain or subspecies is to be represented,
+this is appended onto the species name. Follows standard NCBI taxonomy
+pattern </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organism-common_name">common_name</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -160,7 +171,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organism-comment">comment</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -225,27 +236,6 @@
 	</tr>
 </table>
 
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	Compared to mol5..Species, organism table lacks "approved char(1) null". <br />
-	We need to work w/ Aubrey & Michael to ensure that we don't need this in <br />
-	future [dave] <br />
-	in response: this is very specific to a limited use case I think; <br />
-	if it's really necessary we can have an organismprop table <br />
-	for adding internal project specific data <br />
-	[cjm] <br />
-	done (below) 19-MAY-03 [dave] <br />
-	================================================ <br />
-	TABLE: organism_dbxref <br />
-	================================================
-</em>
-
 <table border="1">
 
 <tr>
@@ -269,7 +259,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organism_dbxref-organism_dbxref_id">organism_dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -278,7 +268,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organism_dbxref-organism_id">organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -287,7 +277,7 @@
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organism_dbxref-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -397,9 +387,7 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: organismprop <br />
-	================================================
+	tag-value properties - follows standard chado model 
 </em>
 
 <table border="1">
@@ -425,7 +413,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organismprop-organismprop_id">organismprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -434,7 +422,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organismprop-organism_id">organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -443,7 +431,7 @@
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organismprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -452,7 +440,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="organismprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -461,7 +449,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="organismprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -554,5 +542,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.06</a>
-</body></html>
+SQL::Translator 0.07</a>
+
+</body>
+</html>

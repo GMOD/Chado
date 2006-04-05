@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
 <meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
-</head><body>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -484,13 +488,16 @@
 
 <em>
 	<br />
+	a name can mean different things in
+	different contexts; for example "chromosome" in SO and GO. A name
+	should be unique within an ontology/cv. A name may exist twice in a
+	cv, in both obsolete and non-obsolete forms - these will be for
+	different cvterms with different OBO identifiers; so GO documentation
+	for more details on obsoletion. Note that occasionally multiple
+	obsolete terms with the same name will exist in the same cv. If this
+	is a possibility for the ontology under consideration (eg GO) then the
+	ID should be appended to the name to ensure uniqueness  <br />
 	the OBO identifier is globally unique  <br />
-	a name can mean different things in different contexts;
-	  for example "chromosome" in SO and GO. A name should be unique
-	  within an ontology/cv. A name may exist twice in a cv, in both
-	  obsolete and non-obsolete forms - these will be for different
-	  cvterms with different OBO identifiers; so GO documentation for
-	  more details on obsoletion  <br />
 	A relationship linking two cvterms. A relationship can be thought of
 	  as an edge in a graph, or as a natural language statement about
 	  two cvterms. The statement is of the form SUBJECT PREDICATE OBJECT;
@@ -1551,4 +1558,6 @@ default 0 value should be used </td>
 
 Created by <a href="http://sqlfairy.sourceforge.net">
 SQL::Translator 0.07</a>
-</body></html>
+
+</body>
+</html>

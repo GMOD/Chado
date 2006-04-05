@@ -452,7 +452,6 @@ unless ($DBNAME) {
     }
 }
 
-$ORGANISM ||='human';
 $GFFFILE  ||='stdin';  #nobody better name their file 'stdin'
 #$DBNAME   ||='chado';
 $DBPASS   ||='';
@@ -465,6 +464,8 @@ $INSERTS    ||=0;
 $SCORE_COL  ||='significance';
 
 die "You must supply a database name" unless $DBNAME;
+
+die "You must supply an organism" unless $ORGANISM;
 
 $GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
