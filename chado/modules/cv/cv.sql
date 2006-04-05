@@ -68,7 +68,6 @@ create index cvterm_idx1 on cvterm (cv_id);
 create index cvterm_idx2 on cvterm (name);
 create index cvterm_idx3 on cvterm (dbxref_id);
 
-
 create table cvterm_relationship (
     cvterm_relationship_id serial not null,
     primary key (cvterm_relationship_id),
