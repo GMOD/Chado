@@ -1,7 +1,3 @@
--- ================================================
--- TABLE: tableinfo
--- ================================================
-
 create table tableinfo (
     tableinfo_id serial not null,
     primary key (tableinfo_id),
@@ -17,10 +13,6 @@ create table tableinfo (
 
 COMMENT ON TABLE tableinfo IS NULL;
 
--- ================================================
--- TABLE: db
--- ================================================
-
 create table db (
     db_id serial not null,
     primary key (db_id),
@@ -33,11 +25,13 @@ create table db (
     constraint db_c1 unique (name)
 );
 
-COMMENT ON TABLE db IS NULL;
-
--- ================================================
--- TABLE: dbxref
--- ================================================
+COMMENT ON TABLE db IS 'A database authority. Typical dbs in
+bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority
+is generally known by this sortened form, which is unique within the
+bioinformatics and biomedical realm.  **TODO** - add support for URIs,
+URNs (eg LSIDs). We can do this by treating the url as a uri -
+however, some applications may expect this to be resolvable - to be
+decided';
 
 create table dbxref (
     dbxref_id serial not null,
@@ -53,7 +47,9 @@ create index dbxref_idx1 on dbxref (db_id);
 create index dbxref_idx2 on dbxref (accession);
 create index dbxref_idx3 on dbxref (version);
 
-COMMENT ON TABLE dbxref IS NULL;
+COMMENT ON TABLE dbxref IS 'A unique, global, public, stable identifier. Not necessarily an eXternal reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>. ';
+
+COMMENT ON COLUMN dbxref.accession IS 'The local part of the identifier. Guaranteed by the db authority to be unique for that db';
 
 -- ================================================
 -- TABLE: project
@@ -811,9 +807,6 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- ================================================
--- TABLE: organism
--- ================================================
 
 create table organism (
 	organism_id serial not null,
@@ -826,23 +819,18 @@ create table organism (
     constraint organism_c1 unique (genus,species)
 );
 
-COMMENT ON COLUMN organism.species IS
- 'A type of organism is always uniquely identified by genus+species. When mapping from the NCBI taxonomy names.dmp file, the unique-name column must be used where it is present, as the name column is not always unique (eg environmental samples)';
+COMMENT ON TABLE organism IS 'The organismal taxonomic
+classification. Note that phylogenies are represented using the
+phylogeny module, and taxonomies can be represented using the cvterm
+module or the phylogeny module';
 
--- Compared to mol5..Species, organism table lacks "approved char(1) null".  
--- We need to work w/ Aubrey & Michael to ensure that we don't need this in 
--- future [dave]
---
--- in response: this is very specific to a limited use case I think;
--- if it's really necessary we can have an organismprop table
--- for adding internal project specific data
--- [cjm]
--- done (below) 19-MAY-03 [dave]
-
-
--- ================================================
--- TABLE: organism_dbxref
--- ================================================
+COMMENT ON COLUMN organism.species IS 'A type of organism is always
+uniquely identified by genus+species. When mapping from the NCBI
+taxonomy names.dmp file, the unique-name column must be used where it
+is present, as the name column is not always unique (eg environmental
+samples). If a particular strain or subspecies is to be represented,
+this is appended onto the species name. Follows standard NCBI taxonomy
+pattern';
 
 create table organism_dbxref (
     organism_dbxref_id serial not null,
@@ -855,10 +843,6 @@ create table organism_dbxref (
 );
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
-
--- ================================================
--- TABLE: organismprop
--- ================================================
 
 create table organismprop (
     organismprop_id serial not null,
@@ -873,6 +857,9 @@ create table organismprop (
 );
 create index organismprop_idx1 on organismprop (organism_id);
 create index organismprop_idx2 on organismprop (type_id);
+
+COMMENT ON TABLE organismprop IS 'tag-value properties - follows standard chado model';
+
 
 CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS INT
  AS '
@@ -926,12 +913,6 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- We should take a look in OMG for a standard representation we might use 
--- instead of this.
-
--- ================================================
--- TABLE: pub
--- ================================================
 
 create table pub (
     pub_id serial not null,
@@ -952,22 +933,16 @@ create table pub (
     pubplace varchar(255),
     constraint pub_c1 unique (uniquename)
 );
--- title: title of paper, chapter of book, journal, etc
--- volumetitle: title of part if one of a series
--- series_name: full name of (journal) series
--- pages: page number range[s], eg, 457--459, viii + 664pp, lv--lvii
--- type_id: the type of the publication (book, journal, poem, graffiti, etc)
--- is_obsolete: do we want this even though we have the relationship in pub_relationship?
-create index pub_idx1 on pub (type_id);
 
--- ================================================
--- TABLE: pub_relationship
--- ================================================
+COMMENT ON TABLE pub IS 'A documented provenance artefact - publications,
+documents, personal communication';
 
--- Handle relationships between publications, eg, when one publication
--- makes others obsolete, when one publication contains errata with
--- respect to other publication(s), or when one publication also 
--- appears in another pub (I think these three are it - at least for fb)
+COMMENT ON COLUMN pub.title IS 'descriptive general heading';
+COMMENT ON COLUMN pub.volumetitle IS 'title of part if one of a series';
+COMMENT ON COLUMN pub.series_name IS 'full name of (journal) series';
+COMMENT ON COLUMN pub.pages IS 'page number range[s], eg, 457--459, viii + 664pp, lv--lvii';
+COMMENT ON COLUMN pub.type_id IS  'the type of the publication (book, journal, poem, graffiti, etc). Uses pub cv';
+CREATE INDEX pub_idx1 ON pub (type_id);
 
 create table pub_relationship (
     pub_relationship_id serial not null,
@@ -981,15 +956,16 @@ create table pub_relationship (
 
     constraint pub_relationship_c1 unique (subject_id,object_id,type_id)
 );
+COMMENT ON TABLE pub_relationship IS 'Handle relationships between
+publications, eg, when one publication makes others obsolete, when one
+publication contains errata with respect to other publication(s), or
+when one publication also appears in another pub (I think these three
+are it - at least for fb)';
+
+
 create index pub_relationship_idx1 on pub_relationship (subject_id);
 create index pub_relationship_idx2 on pub_relationship (object_id);
 create index pub_relationship_idx3 on pub_relationship (type_id);
-
--- ================================================
--- TABLE: pub_dbxref
--- ================================================
-
--- Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
 
 create table pub_dbxref (
     pub_dbxref_id serial not null,
@@ -1004,10 +980,10 @@ create table pub_dbxref (
 create index pub_dbxref_idx1 on pub_dbxref (pub_id);
 create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 
+COMMENT ON TABLE pub_dbxref IS 'Handle links to eg, pubmed, biosis,
+zoorec, OCLC, mdeline, ISSN, coden...';
 
--- ================================================
--- TABLE: pubauthor
--- ================================================
+
 
 create table pubauthor (
     pubauthor_id serial not null,
@@ -1022,16 +998,16 @@ create table pubauthor (
 
     constraint pubauthor_c1 unique (pub_id, rank)
 );
--- givennames: first name, initials
--- suffix: Jr., Sr., etc       
--- rank: order of author in author list for this pub
--- editor: indicates whether the author is an editor for linked publication
+
+COMMENT ON TABLE pubauthor IS 'an author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors.';
+
+COMMENT ON COLUMN pubauthor.givennames IS 'first name, initials';
+COMMENT ON COLUMN pubauthor.suffix IS 'Jr., Sr., etc';
+COMMENT ON COLUMN pubauthor.rank IS 'order of author in author list for this pub - order is important';
+
+COMMENT ON COLUMN pubauthor.editor IS 'indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans';
+
 create index pubauthor_idx2 on pubauthor (pub_id);
-
-
--- ================================================
--- TABLE: pubprop
--- ================================================
 
 create table pubprop (
     pubprop_id serial not null,
@@ -1045,6 +1021,9 @@ create table pubprop (
 
     constraint pubprop_c1 unique (pub_id,type_id,rank)
 );
+
+COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern - see sequence module for details';
+
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
@@ -1142,8 +1121,8 @@ accession/modification timestamps (as opposed to db auditing info,
 handled elsewhere). The expectation is that these fields would be
 available to software interacting with chado';
 
-COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified
-by the combination of organism, uniquename and feature type';
+--- COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified
+--- by the combination of organism, uniquename and feature type';
 
 create sequence feature_uniquename_seq;
 create index feature_name_ind1 on feature(name);
@@ -1195,14 +1174,16 @@ differentiate these different locations. Reflexive locations should
 never be stored - this is for -proper- (ie non-self) locations only;
 i.e. nothing should be located relative to itself';
 
+COMMENT ON COLUMN featureloc.feature_id IS 'The feature that is being located. Any feature can have zero or more featurelocs';
+
+COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
+
 COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin';
 
 COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (eg GFF, bioperl)';
 
 COMMENT ON COLUMN featureloc.strand IS 'The orientation/directionality of the
 location. Should be 0,-1 or +1';
-
-COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph';
 
 COMMENT ON COLUMN featureloc.rank IS 'Used when a feature has >1
 location, otherwise the default rank 0 is used. Some features (eg
@@ -1257,13 +1238,29 @@ COMMENT ON COLUMN featureloc.is_fmax_partial IS 'This is typically
 false, but may be true if the value for column:fmax is inaccurate or
 the rightmost part of the range is unknown/unbounded';
 
-COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely
-partition locations for any one feature';
+--- COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely
+--- partition locations for any one feature';
 
 
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
 create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
+
+--
+
+create table featureloc_pub (
+    featureloc_pub_id serial not null,
+    primary key (featureloc_pub_id),
+    featureloc_id int not null,
+    foreign key (featureloc_id) references featureloc (featureloc_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint featureloc_pub_c1 unique (featureloc_id,pub_id)
+);
+COMMENT ON TABLE featureloc_pub IS 'Provenance of featureloc. Linking table between featurelocs and publications that mention them';
+
+create index featureloc_pub_idx1 on featureloc_pub (featureloc_id);
+create index featureloc_pub_idx2 on featureloc_pub (pub_id);
 
 --
 
@@ -1296,7 +1293,11 @@ create table featureprop (
 );
 COMMENT ON TABLE featureprop IS 'A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible';
 
-COMMENT ON COLUMN featureprop.type_id IS 'The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. Certain properties will only apply to certain feature types; this will be handled by the Sequence Ontology';
+COMMENT ON COLUMN featureprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Certain property types will only apply to certain feature
+types (e.g. the anticodon property will only apply to tRNA features) ;
+the types here come from the sequence feature property ontology';
 
 COMMENT ON COLUMN featureprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation. This is less efficient than using native database types, but is easier to query.';
 
@@ -1342,6 +1343,8 @@ create table feature_dbxref (
 );
 
 COMMENT ON TABLE feature_dbxref IS 'links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id';
+
+COMMENT ON COLUMN feature_dbxref.is_current IS 'the is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature';
 
 create index feature_dbxref_idx1 on feature_dbxref (feature_id);
 create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
@@ -1416,7 +1419,30 @@ create table feature_relationshipprop (
     rank int not null default 0,
     constraint feature_relationshipprop_c1 unique (feature_relationship_id,type_id,rank)
 );
-COMMENT ON TABLE feature_relationshipprop IS 'Extensible properties for feature_relationships. Analagous structure to featureprop';
+
+COMMENT ON TABLE feature_relationshipprop IS 'Extensible properties
+for feature_relationships. Analagous structure to featureprop. This
+table is largely optional and not used with a high frequency. Typical
+scenarios may be if one wishes to attach additional data to a
+feature_relationship - for example to say that the
+feature_relationship is only true in certain contexts';
+
+COMMENT ON COLUMN feature_relationshipprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Currently there is no standard ontology for
+feature_relationship property types';
+
+COMMENT ON COLUMN feature_relationshipprop.value IS 'The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query.';
+
+COMMENT ON COLUMN feature_relationshipprop.rank IS 'Property-Value
+ordering. Any feature_relationship can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used';
+
 
 create index feature_relationshipprop_idx1 on feature_relationshipprop (feature_relationship_id);
 create index feature_relationshipprop_idx2 on feature_relationshipprop (type_id);
@@ -1454,6 +1480,9 @@ create table feature_cvterm (
 
 COMMENT ON TABLE feature_cvterm IS 'Associate a term from a cv with a feature, for example, GO annotation';
 
+COMMENT ON COLUMN feature_cvterm.pub_id IS 'Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref';
+
+COMMENT ON COLUMN feature_cvterm.is_not IS 'if this is set to true, then this annotation is interpreted as a NEGATIVE annotation - ie the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details';
 
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
 create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
@@ -1473,7 +1502,26 @@ create table feature_cvtermprop (
     constraint feature_cvtermprop_c1 unique (feature_cvterm_id,type_id,rank)
 );
 
-COMMENT ON TABLE feature_cvtermprop IS 'Extensible properties for feature to cvterm associations. Examples: GO evidence codes; qualifiers; metadata such as the date on which the entry was curated and the source of the association';
+COMMENT ON TABLE feature_cvtermprop IS 'Extensible properties for
+feature to cvterm associations. Examples: GO evidence codes;
+qualifiers; metadata such as the date on which the entry was curated
+and the source of the association. See the featureprop table for
+meanings of type_id, value and rank';
+
+COMMENT ON COLUMN feature_cvtermprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. cvterms may come from the OBO evidence code cv';
+
+COMMENT ON COLUMN feature_cvtermprop.value IS 'The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query.';
+
+COMMENT ON COLUMN feature_cvtermprop.rank IS 'Property-Value
+ordering. Any feature_cvterm can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used';
 
 create index feature_cvtermprop_idx1 on feature_cvtermprop (feature_cvterm_id);
 create index feature_cvtermprop_idx2 on feature_cvtermprop (type_id);
@@ -1558,9 +1606,9 @@ COMMENT ON TABLE feature_synonym IS 'Linking table between feature and synonym';
 
 COMMENT ON COLUMN feature_synonym.pub_id IS 'the pub_id link is for relating the usage of a given synonym to the publication in which it was used';
 
-COMMENT ON COLUMN feature_synonym.is_current IS 'the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature';
+COMMENT ON COLUMN feature_synonym.is_current IS 'the is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature';
 
-COMMENT ON COLUMN feature_synonym.is_internal IS 'typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal bit may be set to -true- so that it is known that the 
+COMMENT ON COLUMN feature_synonym.is_internal IS 'typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the 
 synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym';
 
 create index feature_synonym_idx1 on feature_synonym (synonym_id);
@@ -1630,6 +1678,7 @@ CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
    WHERE boxquery($2, $3) @ boxrange(fmin,fmax)
    AND srcfeature_id = $1 '
 LANGUAGE 'sql';
+
 
 -- can we not just do these as views?
 CREATE OR REPLACE FUNCTION feature_overlaps(int)
@@ -1992,6 +2041,67 @@ CREATE OR REPLACE FUNCTION store_featureloc
   RETURN v_featureloc_id;
  END;
 ' LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION store_feature_synonym
+(INT,VARCHAR,INT,BOOLEAN,BOOLEAN,INT)
+ RETURNS INT AS 
+'DECLARE
+  v_feature_id          ALIAS FOR $1;
+  v_syn                 ALIAS FOR $2;
+  v_type_id             ALIAS FOR $3;
+  v_is_current          ALIAS FOR $4;
+  v_is_internal         ALIAS FOR $5;
+  v_pub_id              ALIAS FOR $6;
+  v_synonym_id          INT;
+  v_feature_synonym_id  INT;
+ BEGIN
+    IF v_feature_id IS NULL THEN RAISE EXCEPTION ''feature_id cannot be null'';
+    END IF;
+    SELECT INTO v_synonym_id synonym_id
+      FROM synonym
+      WHERE name=v_syn                  AND
+            type_id=v_type_id;
+    IF NOT FOUND THEN
+      INSERT INTO synonym
+        ( name,
+          synonym_sgml,
+          type_id)
+        VALUES
+        ( v_syn,
+          v_syn,
+          v_type_id);
+      v_synonym_id = currval(''synonym_synonym_id_seq'');
+    END IF;
+    SELECT INTO v_feature_synonym_id feature_synonym_id
+        FROM feature_synonym
+        WHERE feature_id=v_feature_id   AND
+              synonym_id=v_synonym_id   AND
+              pub_id=v_pub_id;
+    IF NOT FOUND THEN
+      INSERT INTO feature_synonym
+        ( feature_id,
+          synonym_id,
+          pub_id,
+          is_current,
+          is_internal)
+        VALUES
+        ( v_feature_id,
+          v_synonym_id,
+          v_pub_id,
+          v_is_current,
+          v_is_internal);
+      v_feature_synonym_id = currval(''feature_synonym_feature_synonym_id_seq'');
+    ELSE
+      UPDATE feature_synonym
+        SET is_current=v_is_current, is_internal=v_is_internal
+        WHERE feature_synonym_id=v_feature_synonym_id;
+    END IF;
+  RETURN v_feature_synonym_id;
+ END;
+' LANGUAGE 'plpgsql';
+
+
+
 -- dependency_on: [sequtil,sequence-cv-helper]
 
 CREATE OR REPLACE FUNCTION subsequence(INT,INT,INT,INT)
@@ -3480,10 +3590,10 @@ create table feature_genotype (
     chromosome_id int,
     foreign key (chromosome_id) references feature (feature_id) on delete set null,
     rank int not null,
-    cgroup     int not null,
+    cgroup    int not null,
     cvterm_id int not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
-    constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id)
+    constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id, chromosome_id, rank, cgroup)
 );
 create index feature_genotype_idx1 on feature_genotype (feature_id);
 create index feature_genotype_idx2 on feature_genotype (genotype_id);
@@ -3797,7 +3907,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_schema.sql,v 1.38 2006-01-06 19:24:47 scottcain Exp $
+-- $Id: default_schema.sql,v 1.39 2006-04-05 02:43:22 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --

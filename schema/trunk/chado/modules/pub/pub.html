@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
-</head><body>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -111,11 +115,8 @@
 
 <em>
 	<br />
-	We should take a look in OMG for a standard representation we might use <br />
-	instead of this. <br />
-	================================================ <br />
-	TABLE: pub <br />
-	================================================
+	A documented provenance artefact - publications,
+	documents, personal communication 
 </em>
 
 <table border="1">
@@ -141,7 +142,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -150,25 +151,25 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-title">title</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">descriptive general heading </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-volumetitle">volumetitle</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">title of part if one of a series </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-volume">volume</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -177,16 +178,16 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-series_name">series_name</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">full name of (journal) series </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-issue">issue</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -195,7 +196,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-pyear">pyear</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -204,16 +205,16 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-pages">pages</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">page number range[s], eg, 457--459, viii + 664pp, lv--lvii </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-miniref">miniref</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -222,7 +223,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-uniquename">uniquename</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -231,16 +232,16 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, the type of the publication (book, journal, poem, graffiti, etc). Uses pub cv </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-is_obsolete">is_obsolete</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
@@ -249,7 +250,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub-publisher">publisher</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -258,7 +259,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub-pubplace">pubplace</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -358,19 +359,11 @@
 
 <em>
 	<br />
-	title: title of paper, chapter of book, journal, etc <br />
-	volumetitle: title of part if one of a series <br />
-	series_name: full name of (journal) series <br />
-	pages: page number range[s], eg, 457--459, viii + 664pp, lv--lvii <br />
-	type_id: the type of the publication (book, journal, poem, graffiti, etc) <br />
-	is_obsolete: do we want this even though we have the relationship in pub_relationship? <br />
-	================================================ <br />
-	TABLE: pub_relationship <br />
-	================================================ <br />
-	Handle relationships between publications, eg, when one publication <br />
-	makes others obsolete, when one publication contains errata with <br />
-	respect to other publication(s), or when one publication also <br />
-	appears in another pub (I think these three are it - at least for fb)
+	Handle relationships between
+	publications, eg, when one publication makes others obsolete, when one
+	publication contains errata with respect to other publication(s), or
+	when one publication also appears in another pub (I think these three
+	are it - at least for fb) 
 </em>
 
 <table border="1">
@@ -396,7 +389,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub_relationship-pub_relationship_id">pub_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -405,7 +398,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub_relationship-subject_id">subject_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -414,7 +407,7 @@
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub_relationship-object_id">object_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -423,7 +416,7 @@
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub_relationship-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -548,10 +541,8 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: pub_dbxref <br />
-	================================================ <br />
-	Handle links to eg, pubmed, biosis, zoorec, OCLC, mdeline, ISSN, coden...
+	Handle links to eg, pubmed, biosis,
+	zoorec, OCLC, mdeline, ISSN, coden... 
 </em>
 
 <table border="1">
@@ -577,7 +568,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub_dbxref-pub_dbxref_id">pub_dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -586,7 +577,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pub_dbxref-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -595,13 +586,22 @@
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pub_dbxref-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="pub_dbxref-is_current">is_current</a></td>
+	<td class="FieldCellType">boolean</td>
+	<td class="FieldCellSize">0</td>
+	<td class="FieldCellDefault">true</td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -674,6 +674,11 @@
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>is_current</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>pub_id, dbxref_id</td>
 </tr>
@@ -705,9 +710,7 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: pubauthor <br />
-	================================================
+	an author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors. 
 </em>
 
 <table border="1">
@@ -733,7 +736,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubauthor-pubauthor_id">pubauthor_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -742,7 +745,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pubauthor-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -751,25 +754,25 @@
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubauthor-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, order of author in author list for this pub - order is important </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pubauthor-editor">editor</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubauthor-surname">surname</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">100</td>
@@ -778,21 +781,21 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pubauthor-givennames">givennames</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">100</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">first name, initials </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubauthor-suffix">suffix</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">100</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">Jr., Sr., etc </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -892,13 +895,7 @@
 
 <em>
 	<br />
-	givennames: first name, initials <br />
-	suffix: Jr., Sr., etc <br />
-	rank: order of author in author list for this pub <br />
-	editor: indicates whether the author is an editor for linked publication <br />
-	================================================ <br />
-	TABLE: pubprop <br />
-	================================================
+	Property-value pairs for a pub. Follows standard chado pattern - see sequence module for details 
 </em>
 
 <table border="1">
@@ -924,7 +921,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubprop-pubprop_id">pubprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -933,7 +930,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pubprop-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -942,7 +939,7 @@
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -951,21 +948,21 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="pubprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="pubprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">UNIQUE</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1045,7 +1042,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>pub_id, type_id, value</td>
+	<td>pub_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1053,5 +1050,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.06</a>
-</body></html>
+SQL::Translator 0.07</a>
+
+</body>
+</html>

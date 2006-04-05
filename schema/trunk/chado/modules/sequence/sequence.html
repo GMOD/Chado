@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
-</head><body>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -13,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (16 tables)
+	Table listing (17 tables)
  -->
 
 <a name="top" />
@@ -48,6 +52,18 @@
 
 <!-- 
 	End link to table 'featureloc'
+ -->
+
+<!-- 
+	Start link to table 'featureloc_pub'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="featureloc_pub-link" href="#featureloc_pub">featureloc_pub</a></td>
+</tr>
+
+<!-- 
+	End link to table 'featureloc_pub'
  -->
 
 <!-- 
@@ -274,7 +290,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -283,7 +299,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -294,7 +310,7 @@ dbxrefs go in table:feature_dbxref </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-organism_id">organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -304,7 +320,7 @@ belongs. This column is mandatory </td>
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-name">name</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -314,7 +330,7 @@ a feature, for display purposes </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-uniquename">uniquename</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -326,7 +342,7 @@ this organism </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-residues">residues</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -343,7 +359,7 @@ RNA sequence </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-seqlen">seqlen</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -358,7 +374,7 @@ of the sequence is known </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-md5checksum">md5checksum</a></td>
 	<td class="FieldCellType">char</td>
 	<td class="FieldCellSize">32</td>
@@ -370,7 +386,7 @@ identifier on the mathematical sequence </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -381,7 +397,7 @@ identifier. This column is thus used to subclass the feature table </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-is_analysis">is_analysis</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
@@ -397,7 +413,7 @@ multiple times in different analyses </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-is_obsolete">is_obsolete</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
@@ -409,7 +425,7 @@ row in the table </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature-timeaccessioned">timeaccessioned</a></td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
@@ -421,7 +437,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature-timelastmodified">timelastmodified</a></td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
@@ -624,7 +640,7 @@ available to software interacting with chado </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-featureloc_id">featureloc_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -633,16 +649,16 @@ available to software interacting with chado </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The feature that is being located. Any feature can have zero or more featurelocs </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-srcfeature_id">srcfeature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -651,7 +667,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-fmin">fmin</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -660,7 +676,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-is_fmin_partial">is_fmin_partial</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
@@ -671,7 +687,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-fmax">fmax</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -680,7 +696,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-is_fmax_partial">is_fmax_partial</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
@@ -691,7 +707,7 @@ the rightmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-strand">strand</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">5</td>
@@ -701,7 +717,7 @@ location. Should be 0,-1 or +1 </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-phase">phase</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -713,7 +729,7 @@ spliceform (the same exon can appear in multiple spliceforms). This column is mo
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-residue_info">residue_info</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -730,7 +746,7 @@ most fields null, except for altresidues </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureloc-locgroup">locgroup</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -758,7 +774,7 @@ chromosome level) and two distinct ranks (for the two species) </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureloc-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -878,6 +894,162 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 <hr />
 
 <!-- 
+	Starting table 'featureloc_pub'
+ -->
+
+<a name="featureloc_pub" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	featureloc_pub
+</h3></td>
+		<a name="featureloc_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely <br />
+	partition locations for any one feature'; <br />
+	Provenance of featureloc. Linking table between featurelocs and publications that mention them 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="featureloc_pub-featureloc_pub_id">featureloc_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="featureloc_pub-featureloc_id">featureloc_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#featureloc-featureloc_id">featureloc.featureloc_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="featureloc_pub-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>featureloc_pub_idx1</td>
+	<td>featureloc_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>featureloc_pub_idx2</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>featureloc_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>featureloc_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>featureloc_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>featureloc_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
 	Starting table 'feature_pub'
  -->
 
@@ -900,8 +1072,6 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	locgroup and rank serve to uniquely
-	partition locations for any one feature  <br />
 	Provenance. Linking table between features and publications that mention them 
 </em>
 
@@ -928,7 +1098,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_pub-feature_pub_id">feature_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -937,7 +1107,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_pub-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -946,7 +1116,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1082,7 +1252,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureprop-featureprop_id">featureprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1091,7 +1261,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureprop-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1100,16 +1270,20 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. Certain properties will only apply to certain feature types; this will be handled by the Sequence Ontology </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Certain property types will only apply to certain feature
+types (e.g. the anticodon property will only apply to tRNA features) ;
+the types here come from the sequence feature property ontology </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -1118,7 +1292,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1265,7 +1439,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureprop_pub-featureprop_pub_id">featureprop_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1274,7 +1448,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="featureprop_pub-featureprop_id">featureprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1283,7 +1457,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#featureprop-featureprop_id">featureprop.featureprop_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="featureprop_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1419,7 +1593,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_dbxref-feature_dbxref_id">feature_dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1428,7 +1602,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_dbxref-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1437,7 +1611,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_dbxref-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1446,12 +1620,12 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_dbxref-is_current">is_current</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1595,7 +1769,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationship-feature_relationship_id">feature_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1604,7 +1778,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationship-subject_id">subject_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1613,7 +1787,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationship-object_id">object_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1622,7 +1796,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationship-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1631,7 +1805,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationship-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -1640,7 +1814,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationship-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1796,7 +1970,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationship_pub-feature_relationship_pub_id">feature_relationship_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1805,7 +1979,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationship_pub-feature_relationship_id">feature_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1814,7 +1988,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_relationship-feature_relationship_id">feature_relationship.feature_relationship_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationship_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1924,7 +2098,12 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Extensible properties for feature_relationships. Analagous structure to featureprop 
+	Extensible properties
+	for feature_relationships. Analagous structure to featureprop. This
+	table is largely optional and not used with a high frequency. Typical
+	scenarios may be if one wishes to attach additional data to a
+	feature_relationship - for example to say that the
+	feature_relationship is only true in certain contexts 
 </em>
 
 <table border="1">
@@ -1950,7 +2129,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationshipprop-feature_relationshipprop_id">feature_relationshipprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1959,7 +2138,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationshipprop-feature_relationship_id">feature_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1968,30 +2147,40 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_relationship-feature_relationship_id">feature_relationship.feature_relationship_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationshipprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. Currently there is no standard ontology for
+feature_relationship property types </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationshipprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationshipprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
+ordering. Any feature_relationship can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2127,7 +2316,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationshipprop_pub-feature_relationshipprop_pub_id">feature_relationshipprop_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2136,7 +2325,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_relationshipprop_pub-feature_relationshipprop_id">feature_relationshipprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2145,7 +2334,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_relationshipprop-feature_relationshipprop_id">feature_relationshipprop.feature_relationshipprop_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_relationshipprop_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2281,7 +2470,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm-feature_cvterm_id">feature_cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2290,7 +2479,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvterm-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2299,7 +2488,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm-cvterm_id">cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2308,21 +2497,21 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvterm-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm-is_not">is_not</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, if this is set to true, then this annotation is interpreted as a NEGATIVE annotation - ie the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2447,7 +2636,11 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Extensible properties for feature to cvterm associations. Examples: GO evidence codes; qualifiers; metadata such as the date on which the entry was curated and the source of the association 
+	Extensible properties for
+	feature to cvterm associations. Examples: GO evidence codes;
+	qualifiers; metadata such as the date on which the entry was curated
+	and the source of the association. See the featureprop table for
+	meanings of type_id, value and rank 
 </em>
 
 <table border="1">
@@ -2473,7 +2666,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvtermprop-feature_cvtermprop_id">feature_cvtermprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2482,7 +2675,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvtermprop-feature_cvterm_id">feature_cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2491,30 +2684,39 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_cvterm-feature_cvterm_id">feature_cvterm.feature_cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvtermprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. cvterms may come from the OBO evidence code cv </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvtermprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvtermprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
+ordering. Any feature_cvterm can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2650,7 +2852,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm_dbxref-feature_cvterm_dbxref_id">feature_cvterm_dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2659,7 +2861,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvterm_dbxref-feature_cvterm_id">feature_cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2668,7 +2870,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_cvterm-feature_cvterm_id">feature_cvterm.feature_cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm_dbxref-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2808,7 +3010,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm_pub-feature_cvterm_pub_id">feature_cvterm_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2817,7 +3019,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_cvterm_pub-feature_cvterm_id">feature_cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2826,7 +3028,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature_cvterm-feature_cvterm_id">feature_cvterm.feature_cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_cvterm_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2962,7 +3164,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="synonym-synonym_id">synonym_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -2971,7 +3173,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="synonym-name">name</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -2980,7 +3182,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="synonym-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -2989,7 +3191,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="synonym-synonym_sgml">synonym_sgml</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -3120,7 +3322,7 @@ default 0 value should be used </td>
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_synonym-feature_synonym_id">feature_synonym_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -3129,7 +3331,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_synonym-synonym_id">synonym_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -3138,7 +3340,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#synonym-synonym_id">synonym.synonym_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_synonym-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -3147,7 +3349,7 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_synonym-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -3156,21 +3358,21 @@ default 0 value should be used </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="feature_synonym-is_current">is_current</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, the is_current bit indicates whether the linked synonym is the  current -official- symbol for the linked feature </td>
+	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="feature_synonym-is_internal">is_internal</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL, typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal bit may be set to -true- so that it is known that the 
+	<td class="FieldCellOther">NOT NULL, typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the 
 synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym </td>
 	<td class="FieldCellFK"></td>
 </tr>
@@ -3279,5 +3481,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.06</a>
-</body></html>
+SQL::Translator 0.07</a>
+
+</body>
+</html>

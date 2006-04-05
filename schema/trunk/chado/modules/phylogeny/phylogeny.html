@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.14" />
-</head><body>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -147,7 +151,7 @@
 
 <em>
 	<br />
-	$Id: phylogeny.html,v 1.1 2005-07-08 14:39:35 scottcain Exp $ <br />
+	$Id: phylogeny.html,v 1.2 2006-04-05 02:43:23 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -219,7 +223,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylotree-phylotree_id">phylotree_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -228,7 +232,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylotree-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -237,7 +241,7 @@
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylotree-name">name</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -246,16 +250,16 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylotree-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, type: protein, nucleotide, taxonomy, ???</td>
+	<td class="FieldCellOther">type: protein, nucleotide, taxonomy, ???</td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -316,11 +320,6 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>dbxref_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -391,7 +390,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylotree_pub-phylotree_pub_id">phylotree_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -400,7 +399,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylotree_pub-phylotree_id">phylotree_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -409,7 +408,7 @@
 	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylotree_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -552,7 +551,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode-phylonode_id">phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -561,7 +560,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode-phylotree_id">phylotree_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -570,16 +569,7 @@
 	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
-<tr>
-	<td class="FieldCellName"><a name="phylonode-phylonode_idx">phylonode_idx</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode-parent_phylonode_id">parent_phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -588,7 +578,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode-left_idx">left_idx</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -597,7 +587,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode-right_idx">right_idx</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -606,25 +596,25 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, type: root, interior, leaf</td>
+	<td class="FieldCellOther">type: root, interior, leaf</td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode-feature_id">feature_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, phylonodes can have optional features attached to them</td>
+	<td class="FieldCellOther">phylonodes can have optional features attached to them</td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode-label">label</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -633,7 +623,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode-distance">distance</a></td>
 	<td class="FieldCellType">float</td>
 	<td class="FieldCellSize">20</td>
@@ -675,11 +665,6 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_idx</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>parent_phylonode_id</td>
 </tr>
@@ -695,28 +680,13 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>feature_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylotree_id, phylonode_idx</td>
 </tr>
 
 <tr class="IndexCell">
@@ -788,7 +758,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_dbxref_id">phylonode_dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -797,7 +767,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_id">phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -806,7 +776,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_dbxref-dbxref_id">dbxref_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -944,7 +914,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_pub-phylonode_pub_id">phylonode_pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -953,7 +923,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode_pub-phylonode_id">phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -962,7 +932,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_pub-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -996,16 +966,6 @@
 <tr class="IndexCell">
 	<td>phylonode_pub_idx2</td>
 	<td>pub_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>phylonode_organism_idx1</td>
-	<td>phylonode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>phylonode_organism_idx2</td>
-	<td>organism_id</td>
 </tr>
 
 </table>
@@ -1119,7 +1079,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_organism-phylonode_organism_id">phylonode_organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1128,7 +1088,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode_organism-phylonode_id">phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1137,13 +1097,40 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_organism-organism_id">organism_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">NOT NULL</td>
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_organism_idx1</td>
+	<td>phylonode_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_organism_idx2</td>
+	<td>organism_id</td>
 </tr>
 
 </table>
@@ -1252,7 +1239,7 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonodeprop-phylonodeprop_id">phylonodeprop_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -1261,7 +1248,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonodeprop-phylonode_id">phylonode_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1270,7 +1257,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonodeprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1279,7 +1266,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonodeprop-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -1288,7 +1275,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonodeprop-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1443,16 +1430,16 @@
 	</th>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_relationship-phylonode_relationship_id">phylonode_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode_relationship-subject_id">subject_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1461,7 +1448,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_relationship-object_id">object_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1470,7 +1457,7 @@
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylonode_relationship-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1479,7 +1466,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr>
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phylonode_relationship-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1582,5 +1569,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.06</a>
-</body></html>
+SQL::Translator 0.07</a>
+
+</body>
+</html>

@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
 <meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
-</head><body>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -99,9 +103,6 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: tableinfo <br />
-	================================================ <br />
 	NULL
 </em>
 
@@ -274,10 +275,13 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: db <br />
-	================================================ <br />
-	NULL
+	A database authority. Typical dbs in
+	bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority
+	is generally known by this sortened form, which is unique within the
+	bioinformatics and biomedical realm.  **TODO** - add support for URIs,
+	URNs (eg LSIDs). We can do this by treating the url as a uri -
+	however, some applications may expect this to be resolvable - to be
+	decided 
 </em>
 
 <table border="1">
@@ -407,10 +411,7 @@
 
 <em>
 	<br />
-	================================================ <br />
-	TABLE: dbxref <br />
-	================================================ <br />
-	NULL
+	A unique, global, public, stable identifier. Not necessarily an eXternal reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>.  
 </em>
 
 <table border="1">
@@ -459,7 +460,7 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The local part of the identifier. Guaranteed by the db authority to be unique for that db </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -686,4 +687,6 @@
 
 Created by <a href="http://sqlfairy.sourceforge.net">
 SQL::Translator 0.07</a>
-</body></html>
+
+</body>
+</html>
