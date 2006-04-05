@@ -635,7 +635,7 @@ while(my $feature = $gffio->next_feature()){
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !$feature->annotation->get_Annotations('Target')) {
-    $chado->cache('feature',$feature->annotation->get_Annotations('ID'))[0]->value,$nextfeature);
+    $chado->cache('feature',($feature->annotation->get_Annotations('ID'))[0]->value,$nextfeature);
   }
 
 
@@ -712,16 +712,7 @@ while(my $feature = $gffio->next_feature()){
   $chado->nextfeature(++$nextfeature);
 }
 
-print F     "\\.\n\n" unless $INSERTS;
-print FLOC  "\\.\n\n" unless $INSERTS;
-print FREL  "\\.\n\n" unless $INSERTS;
-print FPROP "\\.\n\n" unless $INSERTS;
-print FCV   "\\.\n\n" unless $INSERTS;
-print SYN   "\\.\n\n" unless $INSERTS;
-print FS    "\\.\n\n" unless $INSERTS;
-print FDBX  "\\.\n\n" unless $INSERTS;
-print DBX   "\\.\n\n" unless $INSERTS;
-print AF    "\\.\n\n" unless $INSERTS;
+$chado->end_files();
 
 #$search_uniquename->finish;
 #$validate_uniquename->finish;
@@ -735,48 +726,7 @@ unless ($NOSEQUENCE) {
   }
 }
 
-if(!$NOLOAD){
-  if ($DROP_INDEX) {
-    warn "Dropping indexes...\n";
-    $chado->drop_indexes() if $DROP_INDEX;
-  }
-
-  foreach my $table (@tables) {
-    $chado->copy_from_stdin($table,
-                    $copystring{$table},
-                    $files{$table},
-                    $sequences{$table},
-                    $nextvalue{$table});
-  }
-
-  ($chado->dbh->commit() || die "commit failed: ".$chado->dbh->errstr()) unless $NOTRANSACT;
-  $chado->dbh->{AutoCommit}=1;
-
-  #load sequence
-  unless ($NOSEQUENCE) {
-    $chado->load_sequence();
-  }
-
-  if ($DROP_INDEX) {
-    warn "Recreating indexes...\n";
-    $chado->create_indexes() if $DROP_INDEX;
-  }
-
-  unless ($SKIP_VACUUM) {
-    warn "Optimizing database (this may take a while) ...\n";
-    print STDERR "  (";
-    foreach (@tables) {
-      print STDERR "$_ "; 
-      $chado->dbh->do("VACUUM ANALYZE $_");
-    }
-  }
-
-  print STDERR ") Done.\n";
-
-  warn "\nWhile this script has made an effort to optimize the database, you\n"
-    ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
-
-}
+$chado->load_data() unless $NOLOAD;
 
 exit(0);
 
