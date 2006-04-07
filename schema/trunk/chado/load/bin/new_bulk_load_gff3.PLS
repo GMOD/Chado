@@ -502,7 +502,7 @@ my %locgroup = ();
 
 ########################
 
-my $chado = Bio::GMOD::DB::Adaptor->new(%argv);
+my $chado = Bio::GMOD::DB::Adapter->new(%argv);
 
 #if we need custom ontology mapping, cache them here
 if ($ONTOLOGY) {
@@ -554,7 +554,7 @@ if ($ONTOLOGY) {
 #prepare a bunch of sql queries to be used in the loop:
 #
 
-$chado->organism() or die "$ORGANISM organism not found in the database";
+$chado->organism_id($ORGANISM) or die "$ORGANISM organism not found in the database";
 
 $chado->file_handles();
 
@@ -699,7 +699,7 @@ while(my $feature = $gffio->next_feature()){
     $chado->handle_nontarget_analysis($feature,$uniquename);
   }
 
-  $chado->nextfeatureloc(++$nextfeatureloc);
+  $chado->nextfeatureloc('++');
   #now deal with creating another feature for targets
 
   if (!$ANALYSIS && $feature->annotation->get_Annotations('Target')) {
@@ -709,7 +709,7 @@ while(my $feature = $gffio->next_feature()){
   elsif ($feature->annotation->get_Annotations('Target')) {
       $chado->handle_target($feature, $uniquename,$name,$featuretype,$type);
   }
-  $chado->nextfeature(++$nextfeature);
+  $chado->nextfeature('++');
 }
 
 $chado->end_files();
