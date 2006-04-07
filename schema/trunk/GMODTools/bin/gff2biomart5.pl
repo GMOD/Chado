@@ -109,6 +109,10 @@ biomart metadata xml for interface after creating mart database.
 Found martbuilder not useful enough at present for auto-deciphering
 a genome database structure (e.g. chado db).
 
+Mar06 (version 6): change sql to ?? sometimes want nulls, sometimes not
+   NOT NULL default '' (or default 0 for int)
+   
+   
 =head1 History
  
 Needed genome seq. selector tool for sequence-regions,
@@ -460,24 +464,24 @@ sub structuresql
   -- date: $DATE 
   drop table if exists $tabname;
   create table $tabname (
-    region_id_key   int(10) ,
-    feature_id_key   int(10) ,
-    chr_name    varchar(32),
-    source      varchar(64), 
-    biotype     varchar(32),
-    type_source varchar(128), 
-    chr_start   int(10),
-    chr_end     int(10),
-    score       double(32,5), 
-    chr_strand  int(2),
-    chr_phase   int(2),
-    ID          varchar(128),
-    Name        varchar(128),
-    Parent      varchar(128),
-    Dbxref      text,
-    Target      text,
-    Note        text,
-    attributes  text,
+    region_id_key   int(10) not null,
+    feature_id_key   int(10)  not null,
+    chr_name    varchar(32) not null,
+    source      varchar(64) not null default '', 
+    biotype     varchar(32) not null default '',
+    type_source varchar(128) not null default '', 
+    chr_start   int(10)  not null default 0,
+    chr_end     int(10)  not null default 0,
+    score       double(32,5)  not null default 0, 
+    chr_strand  int(2)  not null default 0,
+    chr_phase   int(2)  not null default 0,
+    ID          varchar(128) not null default '',
+    Name        varchar(128) not null default '',
+    Parent      varchar(128) not null default '',
+    Dbxref      text  not null default '',
+    Target      text  not null default '',
+    Note        text  not null default '',
+    attributes  text  not null default '',
     ";
   print $outh "     key (region_id_key), \n"; #??
   print $outh "     key (feature_id_key) );\n"; #??
@@ -502,27 +506,27 @@ sub featsql
     
     warn "featsql $tabname\n"; ##${tablehead}__${ftkey}__dm\n";
     #? short or long here?
-  if(SHORT_EXTRATAB) { ## (GFFTAB)  
+if(SHORT_EXTRATAB) { ## (GFFTAB)  
     print $outh "
     drop table if exists $tabname;
     create table $tabname (
-      region_id_key   int(10) ,
-      feature_id_key  int(10) ,
+      region_id_key   int(10) not null ,
+      feature_id_key  int(10)  not null,
       ";
   } else {
     print $outh "
     drop table if exists $tabname;
     create table $tabname (
-      region_id_key   int(10) ,
-      feature_id_key  int(10) ,
-      chr_name    varchar(32),
-      chr_start   int(10),
-      chr_end     int(10),
-      chr_strand  int(2),
-      biotype     varchar(32),
-      source      varchar(64), 
+      region_id_key   int(10)  not null,
+      feature_id_key  int(10)  not null,
+      chr_name    varchar(32) not null,
+      chr_start   int(10) not null,
+      chr_end     int(10) not null,
+      chr_strand  int(2) not null  default 0,
+      biotype     varchar(32) not null default '',
+      source      varchar(64) not null default '', 
       ";
-  }
+}
   
   ## see xml_extra_filters : use these fields as filters ??
     attrsql($outh,$ftkey,$atkeys,$nickname);
@@ -553,12 +557,12 @@ sub regionsql
   -- date: $DATE 
   drop table if exists $tabname;
   create table $tabname (
-    region_id_key   int(10) ,
-    region_name     varchar(64),
-    region_start    int(10),
-    region_end      int(10),
-    chr_name        varchar(40),
-    chr_size        int(10), 
+    region_id_key   int(10)  not null,
+    region_name     varchar(64)  not null,
+    region_start    int(10) not null,
+    region_end      int(10) not null,
+    chr_name        varchar(40)  not null,
+    chr_size        int(10)  not null, 
     ";
   
   #my $atkeys= $ftinfo{$ftkey}->{attrkeys};  
@@ -570,7 +574,7 @@ sub regionsql
     ## next  if($MainKeys{$ftkey}); #($ftkey eq $RegionKey);
     my $sqlfield= "${ftkey}_bool";
     $ftinfo{$ftkey}->{regionfield}= $sqlfield;
-    print $outh "   $sqlfield int(1) default NULL,\n"
+    print $outh "   $sqlfield int(1) default null,\n"
     }
   print $outh "     key (region_id_key) );\n"; #??
 }
@@ -607,16 +611,16 @@ sub seqsql
   -- date: $DATE 
   drop table if exists $tabname;
   create table $tabname (
-    region_id_key   int(10) ,
-    name          varchar(128),
-    version       varchar(64),
-    biotype       varchar(255),
-    description   text,
-    chr_size      int(10), 
-    md5checksum   character(32),
-    chr_start     int(10),
-    chunk_size    int(10), 
-    residues      longblob
+    region_id_key   int(10)  not null,
+    name          varchar(128) not null default '',
+    version       varchar(64) not null default '',
+    biotype       varchar(255) not null default '',
+    description   text not null default '',
+    chr_size      int(10) not null, 
+    md5checksum   character(32) not null default '',
+    chr_start     int(10) not null,
+    chunk_size    int(10) not null, 
+    residues      longblob  not null default ''
     );";
   # timelastmodified   timestamp
   #print $outsql "     key (region_id_key) );\n"; #??
@@ -714,8 +718,8 @@ sub attrib4drospege
   my $at= shift;
   ## drop  Protein '-PA' tag from Name, ID like fields, otherwise ID search is messy
   ## biomart could use regexp/wildcard searches.
-  $at->{ID}   =~ s/\-[RP]\w$//;
-  $at->{Name} =~ s/\-[RP]\w$//;
+  $at->{ID}   =~ s/\-[RP]\w$// if($at->{ID});
+  $at->{Name} =~ s/\-[RP]\w$// if($at->{Name});
   # also Dbxref ?
 }
 
@@ -846,7 +850,7 @@ sub gff2featprescan
         $regionhash{$regionkey} = [$regionoid,$c,$ib,$ie,$len,$links]; # instead of @regions
         $regionoid++;
         }
-      }
+    }
     
     $ftinfo{$ftkey}->{count}++;
     my %at= attrhash($a, ((defined $p)?"score=$p":"")); 
@@ -885,7 +889,7 @@ sub regiontab
   my $outh = $ftinfo{$ftkey}->{outh};
   ## use input order# my @regions= sort keys %regionhash; # sort not numeric
   foreach my $r (@regions) {
-  #   push(@regions, [$regionoid,$c,$ib,$ie,$len,$links]);
+#   push(@regions, [$regionoid,$c,$ib,$ie,$len,$links]);
     my $rv= $regionhash{$r}; 
     my($regionoid,$c,$ib,$ie,$len,$links)= @$rv;
     writetab( $outh, $regionoid,"$c.$ib",$ib,$ie,$c,$len);
@@ -959,12 +963,12 @@ sub gff2featdm
     if($ftkey eq $RegionKey) {
 
     } else {  
-      next if($MainKeys{$ftkey});
+      next  if($MainKeys{$ftkey});
       next if($e - $b > $MAX_FEATURE_RANGE); #? skip godawfullong ones/some errors?
 
       my $outh = $ftinfo{$ftkey}->{outh};
       my $atkeys= $ftinfo{$ftkey}->{attrkeys};
-      
+
       my @hitblocks= calcregion($b,$e);
       foreach my $rblock (@hitblocks) { ## loop over feat row adding each regionoid
         my $regionkey= "$c.$rblock";
@@ -978,11 +982,11 @@ sub gff2featdm
         next unless($tabletype{$ftkey}); 
 
   ## drop this extra table data? only need 3 tabs: region, feature, dna
-  if(SHORT_EXTRATAB) {
+if(SHORT_EXTRATAB) {
         writetab( $outh, $regionoid, $featoid);  
-  } else {
+} else {
         writetab( $outh, $regionoid, $featoid, $c,$b,$e,$o,$t,$s);  
-  }        
+}        
         foreach my $ak (@$atkeys) {
           my $av= $at{$ak}; $av= '\N' unless(defined $av); 
           print $outh "\t$av";

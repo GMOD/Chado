@@ -85,7 +85,7 @@
     >
     <!-- need to put in ENV for subsequent chadofeatsql.xml config ; moved up -->
     
-    <target>chromosomes</target>
+    <target>chromosomes</target> <!-- should this become chromosomes_dpse ? -->
     <target>features</target>
     <target>synteny</target>
     <target>analysis</target>
