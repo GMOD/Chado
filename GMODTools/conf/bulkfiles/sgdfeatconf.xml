@@ -99,8 +99,6 @@
     />
 
     
-  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
-
 <!-- 
 this is sgd chado gene model ; uses introns instead of exons; no mRNAs (gene == mRNA?)
 

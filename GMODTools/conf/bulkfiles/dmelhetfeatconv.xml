@@ -26,7 +26,7 @@
 
   <!--  moved featset/featmap tags to separate config file -->
 
-  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+  <OLD_USAGE_rename_child_type>pseudogene|\w+RNA</OLD_USAGE_rename_child_type>
   <mergematch></mergematch>
 
   <noforwards_gff>1</noforwards_gff>

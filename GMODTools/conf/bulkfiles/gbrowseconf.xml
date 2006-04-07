@@ -72,7 +72,7 @@ footer = <hr>
 	</TR>
 	</table>
 	<hr>
-	<pre>$Id: gbrowseconf.xml,v 1.3 2005-12-28 02:22:07 dongilbert Exp $</pre>
+	<pre>$Id: gbrowseconf.xml,v 1.4 2006-04-07 21:01:58 dongilbert Exp $</pre>
 
 plugins = BatchDumper TextMapDumper FeatureFastaDumper FastaDumper GFFDumper 
 

@@ -417,7 +417,8 @@ sub init
   $self->{skiponerror}= 1 unless defined $self->{skiponerror};
   $self->{ignoredbresidues}= 0 unless defined $self->{ignoredbresidues};
   $self->{addids}= 0 unless defined $self->{addids};
-  $self->{date}= POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+  # $self->{date}= POSIX::strftime("%d-%B-%Y", localtime( $^T ));
+  $self->{date}= POSIX::strftime("%F %T", localtime( $^T ));
   $self->{config}={} unless defined $self->{config};
   $self->{configfile}= $defaultconfigfile unless defined $self->{configfile};
   $self->{verbose}=0 unless defined $self->{verbose};
@@ -573,13 +574,19 @@ sub get_filename
 sub split_filename
 {
 	my $self= shift;
-	my ($fname)= @_;
+	my ($fname,$no_orgchr)= @_;
 	
   my( $org, $chr, $featn, $rel, $format, $path, $featORrel, $gz, $xtra);
   if ($fname =~ s/(\.gz)$//) { $gz=$1; }
   ($fname, $path, $format) = File::Basename::fileparse($fname, '\.[^\.]+');
   $format .= $gz if $gz; #??
   
+  if($no_orgchr) {
+    # only fname, format valid ...
+    ($org,$chr,$featn,$rel)= ('')x4;
+    $featn= $fname; #???
+    $chr="all";
+  } else {
   #my $nu= ($fname =~ tr/$fndel/$fndel/);## bad
   my @v= split(/$fndel/, $fname, 4); #! rel can have _; !! chr can have _; feat might have _
   my $nu= scalar(@v); 
@@ -595,6 +602,9 @@ sub split_filename
   if ($nu > 4 || $nu<3) {
     warn "split_filename : ambiguous parts $org,$chr,$featn,$rel from '$fname'\n";
     }
+    
+  }
+  
   return ( $org, $chr, $featn, $rel, $format);
 }
 
@@ -640,10 +650,11 @@ See also FeatureWriter remapName, remapArm ...
 sub remapArm
 {
   my ($self,$arm,$fmin,$fmax,$strand,$csomeset)= @_;
-  my $save= $arm;
+  my $savearm= $arm;
 #  my $armfile= $arm;
   ##my $csomeset= $self->getChromosomeTable(); ## pass value
-
+  $csomeset= {} unless($csomeset);
+  
   if ($csomeset->{'_part2chr'}->{$arm}) {
     $arm= $csomeset->{'_part2chr'}->{$arm};
     }
@@ -652,11 +663,14 @@ sub remapArm
     next if ($mp eq 'null'); # dummy?
     my $from= $mapchr_pattern{$mp}->{from}; next unless($from);
     my $to  = $mapchr_pattern{$mp}->{to};
-    $arm =~ s/$from/$to/g;
-    # if ($to =~ /\$/) { $name =~ s/$from/eval($to)/e; }
+    #$arm =~ s/$from/$to/g;
+    if ($to =~ /\$/) { $arm =~ s/$from/eval($to)/e; }
+    else { $arm =~ s/$from/$to/g; }
     }
   }
 
+  ## drop arm if $arm is mapped to ""
+  
   ## need to trap $arm not in $csomeset -- errors like Contig_Contig below
   ## which either need to be remapped or otherwise handled.
   ## <mapchr_pattern name="3contig"  from="^Contig\w+" to="ctg1"/>
@@ -670,7 +684,7 @@ sub remapArm
   MATCHPART:
     foreach my $p (@$parts) {
       my $nm = $p->{name}; #? or id ?
-      if ($nm eq $save) { #?? is this ok
+      if ($nm eq $savearm) { #?? is this ok
         my $b = $p->{start};
         my $e = $p->{length} + $b;
         my $st= $p->{strand};
@@ -688,7 +702,7 @@ sub remapArm
       }
     }
     
-  return($arm,$fmin,$fmax,$strand,$save); 
+  return($arm,$fmin,$fmax,$strand,$savearm); 
 }
 
 =item dumpChromosomeBases
@@ -801,9 +815,11 @@ sub getChromosomeFiles
 
 sub getDumpFiles 
 {
-  my ($self,$targets)= @_;
-  my $fdump= $self->config->{featdump};
+  my ($self, $targets, $fdump)= @_;
+
+  $fdump= $self->config->{featdump} unless($fdump);
   my @files=();
+  my @missing=();
   
   my $seqsql = $self->getSeqSql($fdump->{config},$fdump->{ENV});
     
@@ -816,23 +832,27 @@ sub getDumpFiles
   unless($targets) { my @tg= sort keys %{$seqsql->{$sqltag}}; $targets= \@tg; }
   unless(ref $targets) { $targets= [ $targets ]; }
   
-  foreach my $sname (@$targets) 
+  foreach my $tgname (@$targets) 
   {
-    my $fs= $seqsql->{$sqltag}->{$sname};
+    my $fs= $seqsql->{$sqltag}->{$tgname};
     unless($fs) {  next; }
     my $type= $fs->{type};
     my $sql = $fs->{sql};
-    my $outn= $fs->{output} || $sname.".tsv";
+    my $outn= $fs->{output} || $tgname.".tsv";
     unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
 
     my $outf= catfile($outpath,$outn);
     if(! -e $outf && -e "$outf.gz") { $outf .=".gz";}
+    # changed keys:  name =>  to target => ; file => to name => 
     if (-e $outf) {
-      push(@files, { path => $outf, type => $type, name => $sname, file => $outn, });
+      push(@files, { path => $outf, type => $type, target => $tgname, name => $outn, });
+      }
+    else {
+      push(@missing, { path => $outf, type => $type, target => $tgname, name => $outn, });
       }
   }
   
-  return \@files;
+  return (wantarray) ? (\@files,\@missing) : \@files;
 }
 
 
@@ -951,6 +971,7 @@ sub getFilesetInfo
   return {};
 }
 
+
 sub getFilesByType
 {
   my ($self, $type, $chromosomes)= @_;
@@ -965,6 +986,7 @@ sub getFilesByType
     
     my $path= $fset->{path} || $type;
     my $dir = $self->getReleaseSubdir( $path, 'nocreate' );
+    my $no_orgchr= (defined $fset->{no_orgchr}) ? $fset->{no_orgchr} : 0;
   
     if (opendir(D, $dir)) {
       my $filepattern= '\w';
@@ -976,12 +998,17 @@ sub getFilesByType
         }
       
       foreach my $fa (grep(/^$filepattern/,readdir(D))) { 
-        my ( $org, $chr, $featn, $rel, $format)= $self->split_filename($fa);
-        next unless( grep {$chr eq $_} @$chromosomes );  
+        my ( $org, $chr, $featn, $rel, $format);
+        ( $org, $chr, $featn, $rel, $format)=$self->split_filename($fa,$no_orgchr);
+        next unless( $no_orgchr || grep {$chr eq $_} @$chromosomes );  
+        
         $featn ||= 'feature';
-        push(@files, 
-          { path => "$dir/$fa", type => "$featn/$type", name => $fa, 
-            chr => $chr, format => $format, rel => $rel, org => $org });
+        push( @files, 
+          { path => "$dir/$fa", type => "$featn/$type", 
+            name => $fa, format => $format, 
+            chr => $chr, rel => $rel, org => $org,
+            no_orgchr => $no_orgchr,
+           });
         }
       closedir(D);
       }
@@ -1144,9 +1171,14 @@ sub csomeSplit
     my $oldarm;
     my $oldfmax= $fmax;
     
-    my $orgabbr= $organisms->{$orgid}->{abbreviation} || 'null';
+    my $orgabbr= $organisms->{$orgid}->{abbreviation};
+    # unless($orgabbr) { } # what?
+    $orgabbr = "org$orgid" unless($orgabbr); #?? skip null orgabbr : not wanted ?
+    
     ($arm,$fmin,$fmax,$strand,$oldarm)= $self->remapArm($arm,$fmin,$fmax,$strand,$csomeset); # for Unknown.. and other fragments ? need to do before sorter call
-    ##  -- BUG: remapArm U isnt sorted; need to check after 1st create files
+    ## -- BUG: remapArm U isnt sorted; need to check after 1st create files
+    ## -- BUG2: renameArm needs to be called other places, change ChromosomeTable
+    next unless($arm && $arm ne 'skip'); #?
     
     if ($attr_type eq 'to_species') {
       my $toorg= $self->speciesAbbrev($attribute);
@@ -1281,7 +1313,6 @@ sub makeFiles
 
   print STDERR "makeFiles\n" if $DEBUG; # debug
 
-  #unless($already_done_doc) ... dont do this each call!
   $self->rereadConfig(); # replace doc ${values}
   
   $self->writeDocs( $self->config->{doc} ); #? unless already wrote ? move this to Writer module
@@ -1301,14 +1332,17 @@ sub makeFiles
   
   if (delete $outformats{'overview'}) {
     my $overviewset  = $self->getFilesetInfo('overview');
+    if($overviewset) {
+    # my $overviewfiles= ($overviewset) ? $self->dumpFeatures($overviewset) : [];
+    # my $ovlist= join(" ",map {$_->{name}} @$overviewfiles);
     ## check for already done overview files ..
-    # need overviewfiles names: my $ovfiles = $self->getFiles('overview');
-
-    my $overviewfiles= ($overviewset) ? $self->dumpFeatures($overviewset) : [];
-    my $ovlist= join(" ",map {$_->{name}} @$overviewfiles);
+    my ($ovfiles,$ovmissing)= $self->getDumpFiles(['overview'], $overviewset);
+    if(scalar(@$ovmissing)) { $ovfiles =  $self->dumpFeatures($overviewset);  }
+    my $ovlist= join(" ",map {$_->{name}} @$ovfiles);
     push @results, "overviews:$ovlist";
     warn "** Please review overview tables for validity **\noverviews:$ovlist\n" if($automake||$DEBUG); # && return ??
-    ## see chromosome/golden_path type matches configured values: $self->config->{golden_path}
+    $self->getOrganismTable() if($ovlist =~ /organism/);
+    }
     }
     
     ## getChromosomes needs chromosomes.tsv .. essential it exist here
@@ -1660,6 +1694,9 @@ sub getChromosomeTable
   my %orgset    = ();
   my $nozombiechromosomes= $config->{nozombiechromosomes};
     # dpse chado duplicate 0-length chromosome entries
+
+## need remapArm() here, but csomeset is result of this method ...
+## BUT featdump tables are not remapped until csomeSplit(); cant use remapped names til after that
     
     #? allow only one species per make run ?
   my $myspp= $config->{species};  $myspp =~ s/ /_/g;
@@ -1673,6 +1710,7 @@ sub getChromosomeTable
     next if(/^arm\tfmin/); # header from sql out -- should be 'chromosome' or 'chr' instead of 'arm'
     chomp;
     
+    my $oldarm;
     my ($arm,$fmin,$fmax,$strand,$orgid,$type,$name,$id,$oid,$attr_type,$attribute)
       = split("\t");  
     next unless($id); #?
@@ -1684,15 +1722,20 @@ sub getChromosomeTable
     
     ## need ($arm,$golden_path,...)= mapChr($arm)
     ## ? need some compound chr{arm} with multiple ids for Unknown bag?
+    ($arm,$fmin,$fmax,$strand,$oldarm)= $self->remapArm($arm,$fmin,$fmax,$strand,undef); 
+    next unless($arm && $arm ne 'skip'); #?
     
     my $species= ($attr_type eq 'species') ? $attribute : $config->{species};
     $species =~ s/ /_/g;
-    my $org= $self->speciesAbbrev($species) || 'null';
+    my $org= $self->speciesAbbrev($species);
+    $org= $self->speciesAbbrev($orgid) unless($org);
+    $org= "null" unless($org); 
     next unless($myorg eq $org || $myspp eq $species); #?? dec05; for dpse+dmel db
     next if ($nozombiechromosomes && $fmax <= $fmin);
     
     my $chrvals= {
       arm => $arm,
+      oldarm => $oldarm, # rarely differs from arm ...
       name => $name || $id,
       id => $id,
       type => $type,
@@ -1741,19 +1784,20 @@ sub getChromosomeTable
     $chromosome->{$arm}->{parts}= $chrparts->{$arm}; 
     }
 
-  ##add db id to <organism id="dpse" species="Drosophila_pseudoobscura"/>
-  $self->config->{organism}={}  unless(ref $self->config->{organism});
-  my $organisms= $self->config->{organism};
-  foreach my $orgid (keys %orgset) {
-    my $org= $orgset{$orgid}->{abbreviation};
-    $organisms->{$org}={} unless(ref $organisms->{$org});
-    
-    $organisms->{$org}->{organism_id}= $orgid; # need this from db
-    $organisms->{$org}->{abbreviation}= $org; 
-    $organisms->{$org}->{species}= $orgset{$orgid}->{fullspecies};
-    $organisms->{$orgid}= $organisms->{$org}; # copy for orgid lookup
-    warn "Organism oid=$orgid abbr=$org species=",$organisms->{$org}->{species},"\n" if $DEBUG;
-    }
+  my $organisms = $self->getOrganismTable(\%orgset);
+
+#   $self->config->{organism}={}  unless(ref $self->config->{organism});
+#   my $organisms= $self->config->{organism};
+#   foreach my $orgid (keys %orgset) {
+#     my $org= $orgset{$orgid}->{abbreviation};
+#     $organisms->{$org}={} unless(ref $organisms->{$org});
+#     
+#     $organisms->{$org}->{organism_id}= $orgid; # need this from db
+#     $organisms->{$org}->{abbreviation}= $org; 
+#     $organisms->{$org}->{species}= $orgset{$orgid}->{fullspecies};
+#     $organisms->{$orgid}= $organisms->{$org}; # copy for orgid lookup
+#     warn "Organism oid=$orgid abbr=$org species=",$organisms->{$org}->{species},"\n" if $DEBUG;
+#     }
     
   $config->{chromosome}= $chromosome;
   $self->getChromosomes();
@@ -1764,6 +1808,71 @@ sub getChromosomeTable
 
   warn "N chromosomes=",scalar(keys %{$chromosome}),"\n" if $DEBUG;
   return $chromosome;
+}
+
+
+sub getOrganismTable
+{
+	my $self= shift;
+	my($orgset)= @_;
+
+ ## add read from overview tables/organisms-overview.txt
+ ## flds: qw(Organism_id Abbreviation Genus Species Common_name N_features Comment)
+  unless($self->{did_organism}) {
+    my $overviewset = $self->getFilesetInfo('overview');
+    my $tabdir = $self->getReleaseSubdir( $overviewset->{path} || 'tables/');
+    my $tabfile= catfile( $tabdir, "organisms-overview.txt");
+    my @colheads;
+    if( open(DOC,$tabfile) ) { 
+      $orgset= {} unless(ref $orgset);
+      $self->{did_organism}++;
+      while(<DOC>){
+        chomp; my @col= split "\t";
+        if(/^Organism_id/i){ @colheads= @col; }
+        elsif(/^\d/ && scalar(@col) > 3) {
+          foreach (@col) { $_='' if($_ eq "\\N"); }
+          my($orgid,$abbreviation,$genus,$species,$common,@xtra)= @col;
+          my $fullspecies= $genus."_".$species;
+          unless($abbreviation) { $abbreviation= $self->speciesAbbrev($fullspecies); }
+          
+          $orgset->{$orgid}= { 
+            organism_id => $orgid, 
+            abbreviation => lc($abbreviation), 
+            genus => $genus, 
+            species => $species,
+            fullspecies => $fullspecies,
+            from_db => 1,
+            };
+          }
+      }
+      close(DOC);  
+    }
+  }
+
+  my $organisms= $self->config->{organism};
+  $organisms= {} unless(ref $organisms);
+  my $norgs;
+  if(ref $orgset) {
+  foreach my $orgid (keys %$orgset) {
+    my $orgref= $orgset->{$orgid};
+    $organisms->{$orgid}={} unless(ref $organisms->{$orgid});
+    next if( $organisms->{$orgid}->{from_db} && ! $orgref->{from_db});
+
+    $organisms->{$orgid}->{organism_id}= $orgid;  
+    my $fullspecies= $orgref->{fullspecies};
+    unless ($fullspecies) { $fullspecies= $orgref->{genus}."_".$orgref->{species}; }
+    $organisms->{$orgid}->{species}= $fullspecies;
+    $organisms->{$orgid}->{from_db}= $orgref->{from_db} || 0;
+    my $abbrev= $orgref->{abbreviation};
+    unless($abbrev) { $abbrev= $self->speciesAbbrev( $fullspecies ); }
+    $organisms->{$orgid}->{abbreviation}= $abbrev; 
+    $organisms->{$abbrev}= $organisms->{$orgid}; # copy for orgid lookup
+    $norgs++; #warn "Organism oid=$orgid abbr=$abbrev species=",$organisms->{$orgid}->{species},"\n" if $DEBUG;
+    }
+  warn "Organisms n_entries=$norgs\n" if $DEBUG;
+  } 
+  $self->config->{organism}= $organisms;
+  return $organisms;
 }
 
 
@@ -1789,7 +1898,9 @@ sub speciesAbbrev
   my $organisms= $self->config->{organism};
   if (ref $organisms) {
     foreach my $org (reverse sort keys %{$organisms}) {
-      if ($spp eq $org || $spp eq $organisms->{$org}->{species}
+      if ($spp eq $org 
+        || $spp eq $organisms->{$org}->{fullspecies}
+        || $spp eq $organisms->{$org}->{species}
         || $spp eq $organisms->{$org}->{organism_id}
         ) {
         if ($org =~ /\d+/) { # watchout for org == orgid here
@@ -2039,14 +2150,14 @@ sub updateSqlViews
  
   my $dbh= $self->dbiConnect();
   my @targets= sort keys %{$seqsql->{$sqltag}}; 
-  foreach my $sname (@targets) 
+  foreach my $tgname (@targets) 
   {
-    my $fs= $seqsql->{$sqltag}->{$sname};
+    my $fs= $seqsql->{$sqltag}->{$tgname};
     my $type= $fs->{type};
     my $sql = $fs->{sql};
     unless($sql && ( $type =~ m/\b$sqltype\b/) ) { next; } 
-    print STDERR "do sql $sname $type\n" if $DEBUG; 
-    my $result = $dbh->do($sql) or warn "unable to do sql $sname $type";  
+    print STDERR "do sql $tgname $type\n" if $DEBUG; 
+    my $result = $dbh->do($sql) or warn "unable to do sql $tgname $type";  
   } 
 }
 
@@ -2079,20 +2190,20 @@ sub dumpFeatures
   unless($targets) { my @tg= sort keys %{$seqsql->{$sqltag}}; $targets= \@tg; }
   unless(ref $targets) { $targets= [ $targets ]; }
   
-  foreach my $sname (@$targets) 
+  foreach my $tgname (@$targets) 
   {
-    my $fs= $seqsql->{$sqltag}->{$sname};
-    unless($fs) { warn "no sql dump target $sname in $sqlconf"; next; }
+    my $fs= $seqsql->{$sqltag}->{$tgname};
+    unless($fs) { warn "no sql dump target $tgname in $sqlconf"; next; }
     my $type= $fs->{type};
     my $sql = $fs->{sql};
-    my $outn= $fs->{output} || $sname.".tsv";
+    my $outn= $fs->{output} || $tgname.".tsv";
     unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
 
     my $outf= catfile($outpath,$outn);
     my $outh= new FileHandle(">$outf");
-    print STDERR "sql dump $sname $type $outf\n" if $DEBUG; # debug
+    print STDERR "sql dump $tgname $type $outf\n" if $DEBUG; # debug
     my $nout= $self->getFeaturesFromDb( $outh, $sql);# @sqlparam ?
-    print STDERR "sql dump $sname n rows=$nout\n" if $DEBUG;  
+    print STDERR "sql dump $tgname n rows=$nout\n" if $DEBUG;  
     close($outh);
     
     my $fixme = $fs->{script}; # may be array/hash of scripts ?
@@ -2111,7 +2222,9 @@ sub dumpFeatures
       # this works:  perl -i.old rdump $r/tmp/featdump/analysis.tsv
       }
       
-    push(@files, { path => $outf, type => $type, name => $sname, file => $outn, });
+      ## changed keys: name=> target; file=> name
+    push(@files, { path => $outf, type => $type, target => $tgname, name => $outn, });
+    # push(@files, { path => $outf, type => $type, name => $tgname, file => $outn, });
   }
   return \@files;
 }

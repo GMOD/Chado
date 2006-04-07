@@ -1,10 +1,21 @@
 SYNOPSIS
-      GMODTools is a collection of perl scripts for use with GMOD Chado
-      databases, primarily at this point for loading and extracting
-      miscellaneous sequences.
+      GMODTools is a collection of perl scripts and modules for use with 
+      GMOD Chado genome databases, primarily at this point for loading and 
+      extracting sequences and annotations.
 
-      Bio::GMOD::Bulkfiles package created from FlyBase file dumper (August 2004)
+        bulkfiles.pl is command-line program for Bio::GMOD::Bulkfiles
+      This program generates bulk genome annotation files from a Chado genome
+      database, including Fasta, GFF, DNA, Blast indices,
+      a standard genome webpage, and Chado database overview tables. 
   
+        gff2biomart.pl creates tables for BioMart from genome GFF annotations.
+      It generates table .sql, .txt and .xml suited to BioMart. With such
+      a BioMart dataset you can select genome regions with the available
+      annotations, and exclude others, and download feature tables or
+      sequences of the  selection set. For instance, select the regions
+      with Mosquito gene homologs, but no D. melanogaster gene homologs.
+      Or select regions  with gene predictions but no known homolog.
+
       Other sequence functions are in library module
       GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
       with main programs in bin/ folder as summarized below.
@@ -133,6 +144,57 @@ WHY Bulkfiles?
           tool, with data extraction and correction methods that are separate
           and tunable is needed to adapt to such variation in genome databases.
       
+     ==========================================================================  
+
+NAME
+    gff2biomart.pl -- create tables for BioMart from genome GFF annotations
+
+EXAMPLE BioMart : DroSpeGe
+      BioMart : DroSpeGe  provides a tool for mining homologies and
+    annotations  of [twelve] Drosophila species genomes.
+    You can select genome regions with the available annotations, and
+    exclude others, and download tables or sequences of the  selection
+    set. For instance, select the regions with Mosquito gene homologs,
+    but no D. melanogaster gene homologs. Or select regions  with
+    gene predictions but no known homolog.
+      DroSpeGe's BioMart is built with the GMOD Tool gff2biomart.pl
+    It converts most genome GFF annotations into a BioMart datamine.
+    Example data sets from this tool are at
+      http://insects.eugenes.org/BioMart/martview
+
+OUTPUTS
+      The script generates table .sql, .txt and .xml suited to BioMart 
+    (MySQL, BioMart version 0.3 tested).  It is a simple script without
+    special requirements, basically a data transformer that writes new
+    files formatted for a BioMart database.  Components created
+
+    1. chromosome region__main tables for biomart with chromosomes broken
+    into Kb bins/regions (5Kb default) Features that overlap each region are
+    tabulated.
+
+    2. per-feature feature__dm link tables store feature attributes
+    (id,dbxref,match stats,..) add __main column feature_bool to indicate
+    where features lie.
+
+    3. __chromosome__dm with dna residues for fasta output
+
+    4. main_biomart.xml and sequence_biomart.xml configurations for biomart
+    usage.
+
+IN BIOMART
+    -- filter (include,exclude) features that exist in regions, including
+    joint filters (has homology to human but not to fly or worm genes; has
+    predicted gene but not homology; any such feature type comparison).
+
+    -- output 4 kinds of attributes: a feature table, per-feature sequence,
+    region table, per-region sequence.
+
+    Please have installed and used BioMart before trying to load the outputs
+    of this.
+
+VERSION
+    This is a alpha-level, not yet fully tested.
+
      ==========================================================================  
 
 NAME

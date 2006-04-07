@@ -31,6 +31,7 @@
     perchr="1"   -- per chr files
     dogzip="0"   -- gzip output files
     title="Genome feature sequence fasta" 
+    no_orgchr="1" -- files have no organism,chromosome naming
 
   </about>
 
@@ -125,6 +126,7 @@
     handler="Bulkfiles"
     tag="feature_sql"
     type="summary"
+    no_orgchr="1"
     >
     <target>organism_summary</target>
     <target>feature_summary</target>
@@ -144,6 +146,7 @@
     tag="feature_sql"
     type="list"
     title="Summary Tables"
+    no_orgchr="1"
     >
     <target>id_table</target>
     <target>ortho_table</target>
@@ -172,6 +175,7 @@
     config="genomeweb" 
     handler="TableWriter"
     other_path="tables/.+\.txt"
+    no_orgchr="1"
     />
 
   <fileset

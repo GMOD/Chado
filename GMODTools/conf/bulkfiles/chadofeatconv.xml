@@ -10,6 +10,7 @@
     process and convert various features extracted from chado db.
     These are tied to methods in Bulkfiles::FeatureWriter.pm)
 
+    Tags with OLD_USAGE_ are depreciated settings (no longer active).
   </about>
   
   <informat>feature_table</informat>  
@@ -25,7 +26,16 @@
 
   <!--  moved featset/featmap tags to separate config file -->
     
-  <rename_child_type>pseudogene|\w+RNA</rename_child_type>
+  <!-- 
+    rename_child_type affects whether these non-coding genes are 
+    segregated at gene level or at (pseudo)rna/transcript level.
+    Esp. affecting which files get the nc type sequence : gene, pseudogene, ncRNA
+    old usage kept nc seq from gene subset, putting in p,nc subsets
+    new usage puts in both.
+    See FeatureWriter.update1ParentKidLinks
+  -->
+  <OLD_USAGE_rename_child_type>pseudogene|\w+RNA</OLD_USAGE_rename_child_type>
+
   <mergematch></mergematch>
   
   <noforwards_gff>1</noforwards_gff>
@@ -74,11 +84,7 @@ nov05: dpse2; remove redundant messy Dpse\\ prefix from GA00 genes (not in tr; p
   <mapname_pattern name="2match" type="^(match|oligo)" from="\-AE\d\S+$" to=""/>
   <mapname_pattern name="6match" type="^match.*" from=";$" to=""/>
 
-  <!-- this is bad pattern ; cuts names like Name1234.5prime  
-  .. drop .. no need in dmel41 for this; 2match cuts junk 
-  <mapname_pattern name="3match" type="^match.*" from="\-?(2L|2R|3L|3R|4|X)[_\.].*$" to=""/>
-  -->
-  
+ 
   <mapname_pattern name="4oligo" type="^oligo" from="\-hsp\S*$" to=""/>
   <mapname_pattern name="4cytol" type="(chromosome_band|cytology)" from="\-hsp\S*$" to=""/>
   <mapname_pattern name="bac" type="^BAC" from="(hit\-|\-hsp|\-cl\-scaffoldBACs)" to=""/>
@@ -91,8 +97,13 @@ nov05: dpse2; remove redundant messy Dpse\\ prefix from GA00 genes (not in tr; p
   <mapname_pattern name="dpsegn1" type="gene" from="Dpse\\GA" to="GA"/>
 
   <mapname_pattern name="dum" from="\-dummy\-" to=""/>
-  <mapname_pattern name="tep" type="transposable_element_pred" 
-    from="JOSHTRANSPOSON\-" to=""/>
+  <mapname_pattern name="tep" type="transposable_element_pred" from="JOSHTRANSPOSON\-" to=""/>
+
+
+  <!-- drop dbxref extra DB: prefix to real DBname: prefix added by old gff loader -->
+  <mapattr_pattern name="1DBexcess" type="^dbxref" from="^DB:(\w+:\w+)" to="$1"/>
+  <mapattr_pattern name="1FBexcess" type="^dbxref" from="^FlyBase Annotation IDs" to="FBannot"/>
+
 
 <!--
   dmel r4 ugly match names: all the data appended  ! see above cuttype=1
@@ -203,26 +214,54 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
   
   <!-- 3 level model here -->
   <feat_model id="gene" simple="1" >
-    <submodels>mRNA</submodels> <!-- ? link to below -->
+<!--     <submodels>mRNA</submodels>   -->
     <submodels>tRNA</submodels> 
       <!-- data may or may not have gene parent for other rnas ; pseudogene ? -->
   </feat_model>
+  
   <feat_model id="mRNA">
     <parts>exon</parts> 
-    <parts>three_prime_UTR</parts>  
-    <parts>five_prime_UTR</parts> 
-    <submodels>protein</submodels><!-- ? link to below -->
+<!--     <parts>three_prime_UTR</parts>   -->
+<!--     <parts>five_prime_UTR</parts>  -->
+    
+    <submodels>protein</submodels> 
+    <submodels>five_prime_UTR</submodels> 
+    <submodels>three_prime_UTR</submodels> 
+    <submodels>intron</submodels> 
   </feat_model>
+  
   <feat_model id="protein" 
     typelabel="CDS" 
     parent="mRNA" 
-    hasspan="1" makepartsfrom="exon" 
+    hasspan="1" 
+    NOT_makemethod="getCDSexons" 
+    makepartsfrom="exon" 
     >
     <parts>CDS</parts> <!-- exon equivalent may need to create from exons -->
   </feat_model>
+
+  <!-- to create UTR, intron from mRNA>exon,protein model -->
+  <feat_model id="five_prime_UTR" 
+    makemethod="makeUtr5" 
+    makepartsfrom="exon|protein" 
+    >
+    <parts>five_prime_UTR</parts>  
+  </feat_model>
+  <feat_model id="three_prime_UTR" 
+    makemethod="makeUtr3" 
+    makepartsfrom="exon|protein" 
+    >
+    <parts>three_prime_UTR</parts>  
+  </feat_model>
+  <feat_model id="intron" 
+    makemethod="makeIntrons" 
+    makepartsfrom="exon" 
+    >
+    <parts>intron</parts>  
+  </feat_model>
   
   <!-- default structure for non-simple 'mRNA' types -->
-  <feat_model id="rnatype" types="pseudogene tRNA snRNA snoRNA rRNA tRNA miRNA">
+  <feat_model id="rnatype" types="pseudogene tRNA snRNA snoRNA rRNA tRNA miRNA ncRNA">
     <parts>exon</parts> 
   </feat_model>
   
@@ -332,10 +371,10 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
     chromosome_band="1"
     EST="1"
     exon="1"
-    intron="1"
-    CDS="1"
-    three_prime_UTR="1"
-    five_prime_UTR="1"
+    OLD_USAGE_intron="1"
+    OLD_USAGE_CDS="1"
+    OLD_USAGE_three_prime_UTR="1"
+    OLD_USAGE_five_prime_UTR="1"
     match_part="1"
     oligo="1" oligonucleotide="1"
     processed_transcript="1"
@@ -414,16 +453,25 @@ retype in dpse db all dpse golden_path_region to supercontig
 jan06: OLD_USAGE_: 
   changed CDS/CDS_exon mapping to GFFv3 usage: CDS == coding_exon not mRNA-like span
 
+mar06: replaced chado 'reporting' UTR, intron calculated features with 
+       better local calc; five_prime_untranslated_region=skip now
+ 
 -->
     
   <maptype 
+    
     OLD_USAGE_protein="CDS"
     OLD_USAGE_CDS="CDS_exon"
-    five_prime_untranslated_region="five_prime_UTR"
+    OLD_USAGE_five_prime_untranslated_region="five_prime_UTR"
+    OLD_USAGE_three_prime_untranslated_region="three_prime_UTR"
+    five_prime_untranslated_region="skip"
+    three_prime_untranslated_region="skip"
+    CDS="skip"
+    intron="skip"
+    
     golden_path_region="scaffold"
     supercontig="skip"
     oligonucleotide="oligo"
-    three_prime_untranslated_region="three_prime_UTR"
     transposable_element_pred="transposable_element_pred"
     
     mRNA_genewise="mRNA:genewise"

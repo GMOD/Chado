@@ -65,6 +65,8 @@ my @outformats= ();
 my @defaultformats= qw(fff gff); # cmap ?? fasta - no
 my %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
 
+my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
+
 my $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
 my $append=0; # $self->{append}
 
@@ -80,6 +82,7 @@ use vars qw/
   %maptype      
   %maptype_pattern
   %mapname_pattern
+  %mapattr_pattern
   %maptype_gff  
   %segmentfeats 
   %simplefeat   
@@ -166,6 +169,7 @@ sub initData
   %maptype      = %{ $config->{'maptype'} } if ref $config->{'maptype'};
   %maptype_pattern= %{ $config->{'maptype_pattern'} } if ref $config->{'maptype_pattern'};
   %mapname_pattern= %{ $config->{'mapname_pattern'} } if ref $config->{'mapname_pattern'};
+  %mapattr_pattern= %{ $config->{'mapattr_pattern'} } if ref $config->{'mapattr_pattern'};
   %maptype_gff  = %{ $config->{'maptype_gff'} } if ref $config->{'maptype_gff'};
   %segmentfeats = %{ $config->{'segmentfeats'} } if ref $config->{'segmentfeats'};
   %simplefeat   = %{ $config->{'simplefeat'} } if ref $config->{'simplefeat'};
@@ -756,7 +760,8 @@ sub add_mRNA
   my $make_mrna;
   $make_mrna= $self->config->{feat_model}->{$type}->{make_mrna};
   if ($make_mrna) {
-    my $mrnaob= { %$geneob }; # shallow clone !
+    # my $mrnaob= { %$geneob }; # shallow clone !
+    my $mrnaob= $self->cloneBase($geneob); # need locs
     $mrnaob->{type}= 'mRNA'; 
     # need new $oid; insert in $oidobs->{$oid}->{parent}; ..
     $self->newParentOid( $mrnaob, 'parent_oid', $geneoid, $oidobs);  
@@ -868,14 +873,32 @@ sub handleAttrib
 
   # chado-gff loader does odd thing like adding unwanted 'DB:' prefix;
   # and dbxref=GFF_source:SGD
-  elsif ($attr_type eq 'dbxref' && $attribute =~ /^DB:\w+:\w+/) {
-    $attribute =~ s/^DB://;
+#   elsif ($attr_type eq 'dbxref' && $attribute =~ /^DB:\w+:\w+/) {
+#     $attribute =~ s/^DB://;
+#     }
+#   elsif ($attr_type =~ /^dbxref/ && $attribute =~ /^FlyBase Annotation IDs/) {
+#     $attribute =~ s/FlyBase Annotation IDs/FBannot/;
+#     }
+#   elsif ($attr_type eq 'dbxref' && $attribute =~ /^GFF_source:(\S+)/) {
+#     if($fobadd) { $fobadd->{gffsource} = $1; } 
+#     $attribute='';
+#     }
+
+  foreach my $mp (sort keys %mapattr_pattern) {
+    next if ($mp eq 'null'); # dummy 
+    my $mtype= $mapattr_pattern{$mp}->{type};
+    next if ($mtype && $attr_type !~ m/$mtype/);
+    my $from= $mapattr_pattern{$mp}->{from}; next unless($from);
+    my $to  = $mapattr_pattern{$mp}->{to};
+    if ($to =~ /\$/) { $attribute =~ s/$from/eval($to)/e; }
+    else { $attribute =~ s/$from/$to/g; }
     }
-  elsif ($attr_type eq 'dbxref' && $attribute =~ /^GFF_source:(\S+)/) {
+
+  if ($attr_type eq 'dbxref' && $attribute =~ /^GFF_source:(\S+)/) {
     if($fobadd) { $fobadd->{gffsource} = $1; } 
     $attribute='';
     }
-
+    
   push( @$addattr, "$attr_type\t$attribute") if $attribute;  
 }
 
@@ -1121,7 +1144,9 @@ sub processChadoTable
       unless( $simplefeat{$type} ) { 
         $oidobs{$oid}->{fob}= $newob; 
         }
-      
+
+# my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
+
       $fob->{chr} = $arm;
       $fob->{type}= $type;  
       $fob->{fulltype}= $fulltype;  # colon-delimited complex type 'match:program:source' 
@@ -1486,10 +1511,6 @@ sub  makeFlatFeatsNew
 	my $self= shift;
   my ($fobs,$oidobs)= @_;
   
-## debug missing from fff: insertion_site, regulatory
-#   my %GMM= map { $_,1; } qw(enhancer insertion_site aberration_junction 
-#     regulatory_region rescue_fragment sequence_variant);
-  
   my @cobs=(); # these compound features get added to output
   foreach my $fob (@$fobs) {  
     my $oid= $fob->{oid};
@@ -1502,7 +1523,7 @@ sub  makeFlatFeatsNew
     my $feat_model= $self->config->{'feat_model'}->{$ftype};
       ## get issimple from feat_model
       
-    my $GMM= 0; ##($DEBUG && $id =~ /CG4993|CG11798|CG10272|CG3973/) ? 1 : 0; # feb05 bug test, mRNA misses last 2 exons
+    my $GMM=0; # ($DEBUG && $id =~ /CG17245|CG32013|CG2125|CG3973/) ? 1 : 0; # feb05 bug test, mRNA misses last 2 exons
     
     if (!$issimple && $oidob) {
       $iskid= (defined $oidob->{parent} && @{$oidob->{parent}} > 0);
@@ -1545,6 +1566,7 @@ sub  makeFlatFeatsNew
     
     if ($ispar && $feat_model && $feat_model->{submodels})
     {
+      my $parob= $fob;
       my $submodels = $feat_model->{submodels};
       my @submodels = (ref $submodels) ? @$submodels : split(/[,\s]+/,$submodels);
        
@@ -1555,11 +1577,12 @@ sub  makeFlatFeatsNew
                      : ($subtype eq $CDS_spanType); # old version
         my $typelabel=  $sub_model->{typelabel} || $subtype;
         # my $parent=  $sub_model->{parent};
-        my $kidparts = $sub_model->{parts} || 'exon';
+        my $kidparts = $sub_model->{parts} || 'exon'; #? no default
 
         my @kidparts = (ref $kidparts) ? @$kidparts : split(/[,\s]+/,$kidparts);
         my %kidparts = map { $_,1; } @kidparts;
-        
+        my $makemethod =  $sub_model->{makemethod}; 
+      
         my $subob= undef; 
         my $spanob= undef;
         my $mrnaexons=[];
@@ -1580,10 +1603,20 @@ sub  makeFlatFeatsNew
           }
           
           ## CDS/protein w/o CDS_exon parts ... recreate from cds start/stop + mrna location 
-        if ($subob && !@$kidobs) {
-          if ($hasspan && @$mrnaexons) {
-            $kidobs= $self->getCDSexons($subob, $mrnaexons);
-            }
+        if ($subob && !@$kidobs && $hasspan && @$mrnaexons) {
+          warn ">gmmC getCDSexons $sub_model $kidparts $subob, ne=",scalar(@$mrnaexons),"\n" if $GMM;
+          $kidobs= $self->getCDSexons($subob, $mrnaexons); 
+          #($subob,$kidobs)= eval "\$self->$makemethod(\$subob, \$mrnaexons);";
+          }
+          
+         ## for making UTRs, introns: mar06 # makemethod == makeUtr5,makeIntrons,...
+        
+        elsif( !@$kidobs && @$mrnaexons && $makemethod) {
+          $subob= $parob unless($subob); #??
+          # warn ">gmmU $makemethod $sub_model $kidparts $subob, ne=",scalar(@$mrnaexons),"\n" if $GMM;
+          ($subob,$kidobs)= eval "\$self->$makemethod(\$subob, \$mrnaexons);";
+          if($@ && $DEBUG){ warn "$makemethod err: $@"; } #? die if ($self->{failonerror}) ?
+          warn ">gmmU $makemethod $sub_model np=",scalar(@$kidobs),"\n" if $GMM;
           }
          
         if ($subob) { 
@@ -1607,6 +1640,7 @@ sub  makeFlatFeatsNew
           my $cob= $self->makeCompound( $subob, $kidobs, $subtype); 
           # $self->listkids($cob,$kidobs) if($DEBUG);  ## was loosing kids to bad $oidobs
           $cob->{type}= $typelabel;
+          warn ">gmmCOB $typelabel $cob np=",scalar(@$kidobs),"\n" if $GMM;
           
           push(@cobs, $cob);
           }
@@ -1664,6 +1698,123 @@ sub patchUTRs
   $utrob->{patched}=1;
 }
 
+=item makeUtr5,3,makeIntron
+
+  generate UTR's, introns from exons, protein-span features
+  added mar06
+  call: 
+    my $makemethod =  $sub_model->{makemethod}; # makeUtr5,makeIntrons,...
+    ($subob,$kidobs)= $self->&{$makemethod}($subob, $mrnaexons);
+  where returned $subob is new feature: UTRs or intron(s)
+  
+=cut
+
+sub makeUtr5 { return shift->makeUtr53(5,@_);  }	
+sub makeUtr3 { return shift->makeUtr53(3,@_);  }	
+sub makeUtr53
+{
+	my $self= shift;
+  my ($uside, $mrnaob, $mrnaexons)= @_;
+  return (undef,[]) unless($uside == 5 || $uside == 3);
+  return (undef,[]) unless ($mrnaob && scalar(@$mrnaexons));
+  my($cdsob); # get from exon list
+  my @kidobs= (); # make from exons
+
+  foreach my $ex (@$mrnaexons) {
+    my $ktype= $ex->{type};
+    if($ktype eq 'protein') { $cdsob= $ex; }
+    }
+# warn "makeUtr$uside $cdsob\n" if $DEBUG;
+  return (undef,[]) unless ($cdsob);
+  
+  my $offsetloc = $cdsob->{loc}->[0] ; # only 1 we hope
+  my ($offstart,$offstop,$offstrand) = split("\t",$offsetloc);
+  ## need to watch strand effect: 5prime for -strand is hi value, not low
+  # but genome-locs are always start<stop; 
+  my $rev= ($offstrand < 0);
+  my $ulow  = (($uside == 5 && !$rev) || ($uside == 3 && $rev));
+  my $uhigh = (($uside == 3 && !$rev) || ($uside == 5 && $rev));
+  
+  foreach my $ex (@$mrnaexons) {
+    my $ktype= $ex->{type};
+    next unless($ktype eq 'exon');
+    my ($start,$stop,$st) = split("\t", $ex->{loc}->[0]);
+    # FIXME strand...
+    next if($ulow && $start >= $offstart); 
+    next if($uhigh && $stop <= $offstop);  
+      
+    # my $cex= { %$ex };  # shallow clone; ok?
+    my $cex= $self->cloneBase($ex); # need locs
+    $cex->{'writefff'}= $cex->{'writegff'}= 0;  # -1 ??
+    $cex->{type}= ($uside == 5) ? 'five_prime_UTR' : 'three_prime_UTR'; 
+
+    my $c= 0;
+    # FIXME strand
+    if ($ulow && $stop >= $offstart) { $c=1; $stop = $offstart - 1;  }  
+    if ($uhigh && $start <= $offstop) { $c=1; $start= $offstop + 1;  } 
+    if ($c) {
+      $cex->{loc}->[0]= join("\t", $start,$stop,$st);
+      }
+
+    push(@kidobs,$cex);  
+    }
+# warn "makeUtr$uside kids=",scalar(@kidobs),"\n" if $DEBUG;
+  return (undef,[]) unless (@kidobs);
+
+  # my $utrob= { %$mrnaob }; # shallow clone !
+  my $utrob= $self->cloneBase($mrnaob); # need locs
+  $utrob->{fulltype}= $utrob->{type}= ($uside == 5) ? 'five_prime_UTR' : 'three_prime_UTR'; 
+  my $part= ($uside == 5) ? "_utr5" : "_utr3";
+  $utrob->{name} .= $part;  
+  $utrob->{id}   .= $part;
+  $utrob->{'writefff'}= $utrob->{'writegff'}= 0;  
+  
+#   # need new $oid; insert in $oidobs->{$oid}->{parent}; ..
+#   $self->newParentOid( $mrnaob, 'parent_oid', $geneoid, $oidobs);  
+   
+  $utrob->{patched}=1;
+  return($utrob,\@kidobs);
+}
+
+sub makeIntrons
+{
+	my $self= shift;
+  my ($mrnaob, $mrnaexons)= @_;
+  return () unless ($mrnaob && scalar(@$mrnaexons));
+
+  my @kidobs= (); # make from exons
+  my ($lstart,$lstop,$lst)= (0)x3;
+  foreach my $ex (@$mrnaexons) {
+    my $ktype= $ex->{type};
+    next unless($ktype eq 'exon');
+    my ($start,$stop,$st) = split("\t", $ex->{loc}->[0]);
+    # FIXME strand...
+    #? assume ordered exons here ?
+    if($lstop>0 && $start > $lstop) { 
+      # my $cex= { %$ex };  # shallow clone; ok?
+      my $cex= $self->cloneBase($ex); # need locs
+      my($istart,$istop,$ist)= ($lstop+1,$start-1,$lst);
+      $cex->{loc}->[0]= join("\t", $istart,$istop,$ist);
+      $cex->{type}= 'intron'; 
+      $cex->{name} .= "_intron";  
+      $cex->{id}   .= "_intron";
+      push(@kidobs,$cex);  
+      }
+    ($lstart,$lstop,$lst)= ($start,$stop,$st);
+    }
+  return () unless (@kidobs);
+
+  # my $intronob= { %$mrnaob }; # shallow clone !
+  my $intronob= $self->cloneBase($mrnaob); # need locs
+  $intronob->{fulltype}=  $intronob->{type}= 'intron_set'; #  intron collection !
+  $intronob->{name} .= "_introns";  
+  $intronob->{id}   .= "_introns";
+  $intronob->{'writefff'}= $intronob->{'writegff'}= 0; #  intron collection !
+  
+  return($intronob,\@kidobs);
+}
+
+
 =item  getCDSexons($cdsob,$exonobs,$ftype)
 
   create compound feature from parent, kids (e.g., mRNA + exons)
@@ -1711,6 +1862,31 @@ sub listkids { ## DEBUG only
 }
 
 
+sub cloneBase ## shallow clone 
+{
+	my $self= shift;
+  my ($fob)= @_;
+  
+  my $cob= {};  # are these all constant per oid ?
+  @{%$cob}{@fclone_fields}= @{%$fob}{@fclone_fields}; #? what is vodoo
+
+#   $cob->{chr} = $fob->{chr};
+#   $cob->{type}= $fob->{type};
+#   $cob->{fulltype}= $fob->{fulltype};
+#   $cob->{name}= $fob->{name};
+#   $cob->{id}  = $fob->{id};
+#   $cob->{oid} = $fob->{oid};
+#  $cob->{'writefff'}= $fob->{'writefff'}; # if ($fob->{'writefff'}<0); # in case flagged in utr checker
+#  $cob->{'writegff'}= $fob->{'writegff'}; # if ($fob->{'writegff'}<0); # in case flagged in utr checker
+
+# ## need locs ...
+  $cob->{loc} = [];  push( @{$cob->{loc}}, $_) foreach (@{$fob->{loc}});
+  $cob->{attr}= [];  push( @{$cob->{attr}}, $_) foreach (@{$fob->{attr}});
+  # foreach my $attr (@{$fob->{attr}}) { push( @{$cob->{attr}}, $attr); }
+  return $cob;  
+}
+
+
 =item  makeCompound($fob,$kidobs,$ftype)
 
   create compound feature from parent, kids (e.g., mRNA + exons)
@@ -1722,22 +1898,25 @@ sub makeCompound
 	my $self= shift;
   my ($fob,$kidobs,$ftype)= @_;
   
-  my $cob= {};  # are these all constant per oid ?
-  $cob->{chr} = $fob->{chr};
-  $cob->{type}= $fob->{type};
-  $cob->{fulltype}= $fob->{fulltype};
-  $cob->{name}= $fob->{name};
-  $cob->{id}  = $fob->{id};
-  $cob->{oid} = $fob->{oid};
-  $cob->{'writefff'}= $fob->{'writefff'} if ($fob->{'writefff'}<0); # in case flagged in utr checker
-  $fob->{'writefff'}=1; # need here also !?
- 
-  #$cob->{attr}= $fob->{attr};
-  $cob->{attr}= [];
-  foreach my $attr (@{$fob->{attr}}) {
-    push( @{$cob->{attr}}, $attr);  
-    }
-    
+  my $cob= $self->cloneBase($fob);
+  $fob->{'writefff'}=1; # need here also !? this is messy...
+   
+#   my $cob= {};  # are these all constant per oid ?
+#   $cob->{chr} = $fob->{chr};
+#   $cob->{type}= $fob->{type};
+#   $cob->{fulltype}= $fob->{fulltype};
+#   $cob->{name}= $fob->{name};
+#   $cob->{id}  = $fob->{id};
+#   $cob->{oid} = $fob->{oid};
+#   $cob->{'writefff'}= $fob->{'writefff'} if ($fob->{'writefff'}<0); # in case flagged in utr checker
+#   $fob->{'writefff'}=1; # need here also !?
+#  
+#   #$cob->{attr}= $fob->{attr};
+#   $cob->{attr}= [];
+#   foreach my $attr (@{$fob->{attr}}) {
+#     push( @{$cob->{attr}}, $attr);  
+#     }
+#     
   ##FIXME - parent loc may need drop for kids locs (mRNA)
   ## bad also to pick all kids - only exon type for mRNA, others?
   ## FIXME - for protein && CDS types which are only child of mRNA, need to merge into
@@ -2164,6 +2343,7 @@ sub setDefaultValues
   
   %maptype_pattern = ();
   %mapname_pattern = ();
+  %mapattr_pattern = ();
   %maptype_gff = ( 
     tRNA_trnascan => "tRNA:trnascan",
     transposable_element_pred => "transposable_element:predicted",
@@ -2244,7 +2424,7 @@ sub setDefaultValues
   ##map { $hasdups{$_}=1; } keys %mergematch;
   
   # these are ones where parent feature == gene needs renaming
-  $rename_child_type = join('|', 'pseudogene','\w+RNA' );
+  $rename_child_type = ""; # old: join('|', 'pseudogene','\w+RNA' );
   
 }
 

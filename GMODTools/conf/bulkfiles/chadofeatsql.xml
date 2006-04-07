@@ -332,6 +332,8 @@ SELECT * from chromosomes
 ORDER BY organism_id, arm, strand, id
 ;
 
+-- DROP TABLE chromosomes;
+
 ]]>
   </sql>
   
@@ -412,7 +414,6 @@ sub mapparts {
 -- add get-residues to file 
 -- made chr == uniqname nov04; new dmel4r uses name == genbank accession
 SELECT 
-  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   armft.uniquename as arm,
   '1' as fmin, armft.seqlen as fmax, '0' as strand,
   armft.organism_id,
