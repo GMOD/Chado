@@ -133,6 +133,7 @@ sub new {
     $self->inserts(         $arg{inserts}         );
     $self->score_col(       $arg{score_col}       );
     $self->global_analysis( $arg{global_analysis} );
+    $self->analysis_group(  $arg{analysis_group}  );
     $self->analysis(        $arg{analysis}        );
     $self->organism(        $arg{organism}        );
     $self->dbprofile(       $arg{dbprofile}       );
@@ -1266,8 +1267,39 @@ new value of score_col (to set)
 
 sub score_col {
     my $self = shift;
-    return $self->{'score_col'} = shift if defined(@_);
+    my $col  = shift if defined(@_);
+    return $self->{'score_col'} = $col if defined($col);
     return $self->{'score_col'};
+}
+
+=head2 analysis_group
+
+=over
+
+=item Usage
+
+  $obj->analysis_group()        #get existing value
+  $obj->analysis_group($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of analysis_group (a scalar)
+
+=item Arguments
+
+new value of analysis_group (to set)
+
+=back
+
+=cut
+
+sub analysis_group {
+    my $self = shift;
+    my $anal = shift if defined(@_);
+    return $self->{'analysis_group'} = $anal if defined($anal);
+    return $self->{'analysis_group'};
 }
 
 =head2 global_analysis
@@ -1295,7 +1327,8 @@ new value of global_analysis (to set)
 
 sub global_analysis {
     my $self = shift;
-    return $self->{'global_analysis'} = shift if defined(@_);
+    my $anal = shift if defined(@_);
+    return $self->{'global_analysis'} = $anal if defined($anal);
     return $self->{'global_analysis'};
 }
 
@@ -1780,6 +1813,8 @@ sub dump_ana_contents {
   print STDERR "\n\nCouldn't find $anakey in analysis table\n";
   print STDERR "The current contents of the analysis table is:\n\n";
 
+  confess;
+
   my $sth
     = $self->dbh->prepare("SELECT analysis_id,name,program FROM analysis");
   printf STDERR "%10s %25s %10s\n\n",
@@ -2112,10 +2147,10 @@ sub handle_nontarget_analysis {
     unless ($self->cache('analysis',$ankey)) {
       $self->{queries}{search_analysis}->execute($ankey);
       my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
-      dump_ana_contents($ankey) unless $ana;
+      $self->dump_ana_contents($ankey) unless $ana;
       $self->cache('analysis',$ankey,$ana);
     }
-    dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
+    $self->dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
 
     my $score_string;
     if      ($self->score_col =~ /^[Ss]/) {
