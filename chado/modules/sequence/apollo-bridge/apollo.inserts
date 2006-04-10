@@ -171,8 +171,57 @@ insert into analysis (name,program,programversion,sourcename)
    values ('Rice_CDS_cDNA_match','blat','1','Rice_CDS');
 insert into analysis (name,program,programversion,sourcename)
    values ('Sorghum_gss-read_Klein_cross_genome_match','blat','1','Sorghum_gss-read_Klein');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceAlta_BACend_OMAP_nucleotide_match','blat','1','RiceAlta_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceBrachyantha_BACend_OMAP_nucleotide_match','blat','1','RiceBrachyantha_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceJaponica_BACend_OMAP_nucleotide_match','blat','1','RiceJaponica_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceAustraliensis_BACend_OMAP_nucleotide_match','blat','1','RiceAustraliensis_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceCoarctata_BACend_OMAP_nucleotide_match','blat','1','RiceCoarctata_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RicePunctata_BACend_OMAP_nucleotide_match','blat','1','RicePunctata_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceGlaberrima_BACend_OMAP_nucleotide_match','blat','1','RiceGlaberrima_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceNivara_BACend_OMAP_nucleotide_match','blat','1','RiceNivara_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Rice_ESTCluster_PlantGDB_EST_match','blat','1','Rice_ESTCluster_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Barley_ESTCluster_PlantGDB_EST_match','blat','1','Barley_ESTCluster_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Wheat_ESTCluster_PlantGDB_EST_match','blat','1','Wheat_ESTCluster_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_ESTCluster3P_LGBPratt_EST_match','blat','1','Sorghum_ESTCluster3P_LGBPratt');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Sorghum_ESTCluster_PlantGDB_EST_match','blat','1','Sorghum_ESTCluster_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_ESTCluster_PlantGDB_EST_match','blat','1','Maize_ESTCluster_PlantGDB');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceRufipogon_BACend_OMAP_nucleotide_match','blat','1','RiceRufipogon_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('Maize_Seq_Panzea_EST_match','blat','1','Maize_Seq_Panzea');
+insert into analysis (name,program,programversion,sourcename)
+   values ('','blat','1','');
 
-
+insert into db (name) values ('DB:TIGR_EGAD');
+insert into db (name) values ('DB:Maize_Seq_Panzea');
+insert into db (name) values ('DB:RiceRufipogon_BACend_OMAP');
+insert into db (name) values ('DB:Maize_ESTCluster_PlantGDB');
+insert into db (name) values ('DB:Sorghum_ESTCluster_PlantGDB');
+insert into db (name) values ('DB:Sorghum_ESTCluster3P_LGBPratt');
+insert into db (name) values ('DB:Wheat_ESTCluster_PlantGDB');
+insert into db (name) values ('DB:Barley_ESTCluster_PlantGDB');
+insert into db (name) values ('DB:Rice_ESTCluster_PlantGDB');
+insert into db (name) values ('DB:RiceNivara_BACend_OMAP');
+insert into db (name) values ('DB:RiceGlaberrima_BACend_OMAP');
+insert into db (name) values ('DB:RicePunctata_BACend_OMAP');
+insert into db (name) values ('DB:RiceCoarctata_BACend_OMAP');
+insert into db (name) values ('DB:RiceJaponica_BACend_OMAP');
+insert into db (name) values ('DB:RiceBrachyantha_BACend_OMAP');
+insert into db (name) values ('DB:RiceAlta_BACend_OMAP');
 insert into db (name) values ('DB:Sorghum_gss-read_Klein');
 insert into db (name) values ('DB:Rice_CDS');
 insert into db (name) values ('DB:Sorghum_Markers');

@@ -36,7 +36,7 @@ use Bio::FeatureIO;
 use Getopt::Long;
 #use Data::Dumper;
 use URI::Escape;
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
+use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use Bio::GMOD::DB::Adapter;
 
 =head1 NAME
@@ -496,6 +496,7 @@ my %argv;
   $argv{drop_indexes} = $DROP_INDEX;
   $argv{inserts}      = $INSERTS;
   $argv{global_analysis}=$GLOBAL_ANALYSIS;
+  $argv{analysis_group}=$ANALYSIS_GROUP;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
