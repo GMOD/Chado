@@ -1,0 +1,543 @@
+<doc>
+  
+  <scenario id="canonical-gene-model" status="final">
+    <module name="sequence"/>
+    <uses table="feature"/>
+    <uses table="featureloc"/>
+    <uses table="feature_relationship"/>
+    <summary>The "central dogma" gene model - gene makes mRNA makes
+      polypeptide</summary>
+    <description>
+      <p>
+        For many people this may be the only data they store in
+        Chado. The typical protein coding gene model consists of a
+        gene, one or more mRNAs, one or more exons, and at least one
+        polypeptide.
+      </p>
+      <p>
+        Alternately spliced genes have a 1 to many relation between
+        gene and mRNA. Exons can be part_of more than one mRNA. No two
+        distinct exon rows should have exact same featureloc
+        coordinates (this indicates they are the same exon).
+      </p>
+      <p>
+        Every <table name="feature"/> must have a <table
+        name="featureloc"/> with rank=0 and locgroup=0. The value of
+        the srcfeature_id column should be identical (i.e. all
+        features are located relative to the same feature), except in
+        rare circumstances such as when a feature crosses two
+        contigs. Software is not guaranteed to support this. The
+        srcfeature_id can point to a <so name="contig"/>, a
+        <so name="chromosome">/<so name="chromosome_arm"/> or other
+          appropriate assembly unit. 
+      </p>
+    </description>
+    <alternate status="deprecated">
+      Older chado installations may use <type cv="SO" name="protein"/>
+      rather than <type cv="SO" name="polypeptide"/>. Some tools such
+      as Apollo still support this (configuration required).
+    </alternate>
+    <alternate status="not-supported">
+      One proposal previously discussed was to only provide
+      featurelocs for the exons and polypeptides, and to derive
+      featurelocs automatically for genes and mRNAs. This is not
+      recommended. All genomic features must have featurelocs. This
+      simplifies software at a small cost in redundancy.
+    </alternate>
+    <support tool="apollo" status="supported"></support>
+    <support tool="gbrowse" status="supported"></support>
+    <example src='MSGEFTUA'/>
+    <parts>
+      <part required='true' table='feature' type='SO:gene' number='1'>
+        <comment>The gene must always be provided</comment>
+      </part>
+      <part required='true' table='feature' type='SO:mRNA'
+        min='1'>
+        <comment>
+          One or more transcripts are required, and these are always
+          of type <so name="mRNA"/> for protein-coding genes.
+        </comment>
+        <link required='true' table='feature_relationship'
+          type='OBO_REL:part_of' to='SO:gene' cardinality='1' inverse_cardinality='1..n'>
+          <comment>
+            transcripts are always linked to genes by a part_of
+            relation. (Note that SO uses member_of here). One gene can
+            have amny transcripts (multiple splicing). A transcript
+            must always belong to exactly one gene (for an exception,
+            see <lookup scenarios='dicistronic-gene'/>.
+          </comment>
+        </link>
+      </part>
+      <part required='true' table='feature' type='exon'
+        min='1'>
+        <comment>
+          Exons are always required, even if the genome under
+          consideration has no introns
+        </comment>
+        <link required='true' table='feature_relationship'
+          type='OBO_REL:part_of' to='SO:mRNA' cardinality='1..n' inverse_cardinality='1..n'>
+          <comment>
+            Exons are always linked to their container transcript
+            (in this case, an mRNA) via the part_of relation. If a
+            transcript is alternately spliced, then an exon can be
+            part_of multiple transcripts
+          </comment>
+        </link>
+      </part>
+      <part required='true' table='feature' type='polypeptide'
+        min='1'>
+        <comment>
+          A protein-coding gene always produces a polypeptide, by
+          definition. The polypeptide is located relative to the same
+          genomic feature as the exons, mRNAs and gene. A single
+          featureloc is used, with fmin and fmax indicating the start
+          and stop codon positions (location is inclusive of stop
+          codon). The polypeptide sequence should be specified as an
+          amino acid sequence.
+        </comment>
+        <link required='true' table='feature_relationship'
+          type='OBO_REL:derived_from' to='SO:mRNA' cardinality='1..n' inverse_cardinality='1'>
+          <comment>
+            The polypeptide is always derived_from the mRNA. If two
+            alternate spliceforms produce the same polypeptide
+            (i.e. their sequence is the same) then the same
+            polypeptide feature should be used. An mRNA can only
+            derive one polypeptide. For exceptions, see <lookup
+            scenario='dicistronic-gene'/>
+          </comment>
+        </link>
+      </part>
+    </parts>
+  </scenario>
+
+  <scenario id="noncoding-gene" status="final">
+    <summary>Similar to <lookup scenario='canonical-gene-model'/>, except with
+      noncoding-RNA</summary>
+    <variant_of scenario="canonical-gene-model"/>
+    <support tool="apollo" status="supported"></support>
+    <support tool="gbrowse" status="supported"></support>
+    <description>
+      <p>
+        Not all genes are protein-coding. Genes can code for tRNA,
+        miRNA, snoRNA, etc. A noncoding gene model is identical to a
+        <lookup scenario="canonical-gene-model"/>, with the following
+        exceptions:
+        <ul>
+          <li>There is no polypeptide feature</li>
+          <li>Instead of an mRNA feature, there is a feature that is
+            some other sub-type of <so name="RNA"/></li>
+        </ul>
+      </p>
+  </scenario>
+
+  <scenario id="pseudogene" status="discussion">
+    <summary>A pseudogene is a non-functional relic of a
+      gene</summary>
+    <description>
+      See <so name="pseudogene"/>. A pseudogene may look like an
+      ordinary gene, and may even have discernable parts such as
+      exons. It may sometimes be desirable to annotate the exon
+      structure of a pseudogene - this can in principle be done using
+      SO types such as <so name="decayed_exon"/>. In practice no-one
+      is using Chado to do this. There are currently two practices:
+      <ul>
+        <li>pseudogenes are treated analagously to <lookup
+        scenario="noncoding-gene"/>s. That is, there are normal "gene"
+        and "exon" features. However, in place of a subtype of RNA,
+        there is a feature of type pseudogene. This practice is
+        STRONGLY DISCOURAGED (it is not compliant with the relations
+        in SO, it gives false counts to the number of real genes in
+        the database). Note that this is the current default for
+        FlyBase.
+        </li>
+        <li>
+          Pseudogenes are normal <lookup
+          scenario="singleton-feature"/>s. There is no annotation of
+          exon structure. This practice is encouraged. If at a later
+          date it becomes desirable to annotated the exon structure of
+          a pseudogene, it will be compatible with this.
+        </li>
+      </ul>
+    </description>
+    <support tool="apollo" status="unclear">
+      Apollo by default treats pseudogenes using the first method,
+      above. It may also be possible to configure it to the second,
+      singleton, method. Annotating the exon structure of pseudogenes
+      the correct way has not yet been attempted to our knowledge.
+    </support>
+  </scenario>
+
+  <scenario id="singleton-feature" status="discussion">
+    <summary>Many types of features are singletons - that is they are
+    not related to other features through
+    feature_relationships. Storage of these is basic and as one may
+    expect</summary>
+    <description>
+      Singleton features present no major problems. Unlike genes,
+      which typically have parts (with the parts having subparts),
+      singletons do not form feature graphs (or rather, they form
+      feature graphs consisting of single nodes). Singleton features
+      are located relative to other features (usually the genome, but
+      once can have singletons that are located relative to other
+      features - this may not be supported by all applications)
+    </description>
+    <support tool="gbrowse" status="suppported"/>
+    <support tool="apollo" status="suppported">
+      Apollo supports singletons provided they are located relative to
+      the genome (singletons located relative to other features will
+      be ignored). It may be necessary to configure apollo to make the
+      feature type "1-level"
+    </support>
+  </scenario>
+
+  <scenario id="dicistronic-gene" status="discussion">
+    <summary>A dicistronic gene is a gene with a mRNA that codes for
+      two distinct non-overlapping CDSs</summary>
+    <description>
+      <p>
+        Dicistronic genes (see for example, the dmel Adh and Adhr
+        genes) have totally distinct gene products deriving from the
+        same transcript. To confuse matters, the two polypeptides are
+        commonly refered to as being derived from two distinct genes
+        (e.g. Adh and Adhr). The entire genomic region comprising the
+        transcript (e.g. Adh+Adhr) that includes both CDSs is refered
+        to as the <so name="gene_cassette"/>. In a database such as
+        FlyBase, there are 3 gene IDs stored in the database - one for
+        each of the two non-overlapping genes, and one for the gene
+        cassette
+      </p>
+      <p>
+        Dicistronic genes make it difficult to have a formal
+        definition of gene that corresponds nicely with how biologists
+        use the term. 
+      </p>
+      <p>
+        There are currently two proposals for handling dicistronic
+        genes. The first is a hack and introduces redundancy, but works
+        well with existing software and tools. The second is prefered
+        from a modeling standpoint, but introduces a lot of complexity
+        to software
+      </p>
+    </description>
+    <proposal id="dicistronic-gene-hack">
+      <summary>This is the standard solution currently used</summary>
+      <description>
+        <p>
+        Typically two distinct gene models are created (e.g. one for
+        Adh, one for Adhr). These gene models would contain mRNA parts
+        that have exact overlaps (e.g. mRNA-1 from gene-1 would
+        exactly match mRNA-2 from gene-2). This means data curators
+        must take care to make sure that the duplicate mRNA feature
+        rows are in sync. The gene would get a featureprop of type
+        <featureprop name="dicistronic"/>='true'. The two duplicate
+        mRNA feature rows would have separate, non-overlapping
+        polypeptides attached to each.
+        </p>
+        <p>
+          In FlyBase, each of the two genes in a dicistronic pair get
+          their own dbxref and name. In addition, there is also a
+          dbxref and name for the gene cassette. The gene cassette
+          feature is not stored explicitly. Each gene has an
+          <featureprop name="encoded_symbol"/> featureprop with the
+          value being the gene cassette symbol. FLYBASE TO COMMENT HERE
+        </p>
+      </description>
+      <support tool="apollo" status="supported">
+        Apollo supports this by default, and is also aware of the
+        dicistornic featureprop
+      </support>
+    </proposal>
+    <proposal id="dicistronic-gene-proposed">
+      <summary>This is a better solution, but involves software being
+        more explicitly aware of dicistronic genes</summary>
+      <description>
+        There are no duplicate mRNA rows. Each mRNA feature in the
+        database represents an actual existing spliceform. A
+        dicistronic mRNA feature can have multiple polypeptide features
+        attached as parts. It would be desirable for modeling purposes
+        to treat the entire dicistronic gene as a single gene, but
+        this may not work well in some cases (e.g. the different
+        dicistronic components may have different genetic data
+        attached). In this case it may be necessary to have two
+        separate gene features, with additional feature_relations from
+        the polypeptides. Each gene feature could link to a
+        gene_cassette feature
+      </description>
+      <support tool="apollo" status="not-supported"/>
+      <support tool="gbrowse" status="not-supported"/>
+    </proposal>
+  </scenario>
+
+  <scenario id="operon" status="discussion">
+    <summary>Bacterial genes are often transcribed in groups; eg LacZ</summary>
+    <description>
+      There are many similarities with <lookup
+        scenario="dicistronic-gene"/>s here.
+    </description>
+  </scenario>
+
+  <scenario id="trans-spliced-gene" status="discussion">
+    <summary>A trans-spliced gene has one or more transcripts in which
+    that transcript may be spliced together from different parts of the
+      genome
+    </summary>
+    <description>
+      <p>
+      A trans spliced transcript is spliced from exons coming from
+      different parts of the genome. The distance between each trans
+      spliced part may be large, or it may be in the same location on
+      the opposite strand.
+      </p>
+      <p>
+      Most C elegans genes have a trans spliced
+      leader sequence. This is different from the trans splicing
+      involved in dmel <fb name="mod(mdg4)"/>, where we observe what
+      appears to be two transcripts on separate strands (both
+      containing coding sequence) joining together in a single
+      functional transcript
+      </p>
+      <p>
+        There are two proposals for dealing with this. One treats the
+        trans spliced transcript as a single transcripts, with
+        exons coming from different locations. The other treats the
+        trans spliced transcript as a mature transcript created from
+        two distinct primary transcripts. Note that these proposals
+        focus on the dmel example. A solution for the C elegans
+        example is not proposed (not sure if we even need one?)
+      </p>
+      <proposal id="trans-spliced-gene-mixed-exons">
+        <summary>
+          We treat this as an ordinary gene model, but relax our rules
+          for exon locations in a transcript
+        </summary>
+        <description>
+          For example, for the canonical Dmel trans spliced gene, we
+          would allow transcripts to have exons on different
+          strands. Note that in Chado, exon ordering comes from <table
+            name="feature_relationship"/>.rank (between exon and
+          transcript), NOT from the featureloc of the exon. Chado has no
+          problem with this. However, some software may make assumptions
+          that all exons are on the same strand, or may try to order
+          exons by their location to get a transcript sequence. This
+          software will have unintended consequences with trans spliced
+          genes modeled using this proposal
+        </description>
+        <support tool="apollo" status="unclear">
+          apollo may accidentally scramble the order of exons. Need to
+          check
+        </support>
+        <support tool="gbrowse" status="unclear">
+          Not sure.
+        </support>
+      </proposal>
+      <proposal id="trans-spliced-gene-mixed-transcripts">
+        <summary>
+          We would introduce extra transcripts, and have relations
+          between the transcripts. Only the mature, spliced,
+          transcript would have a relation to the polypeptide
+        </summary>
+        <description>
+          This may model the biology better. However, it introduces
+           a major departure from the <lookup
+          scenario="canonical-gene-model"/>. For this reason this
+          proposal is unlikely to be adopted
+        </description>
+      </proposal>
+  </scenario>
+
+  <scenario id="gene-with-regulatory-elements" status="discussion">
+    <summary>regulatory elements may be implicitly or explicitly
+      associated with a gene</summary>
+  </scenario>
+
+  <scenario id="transposons" status="discussion">
+    <summary>transposons can be annotated as <lookup
+        scenario="singleton-feature"/>s or as complex annotations</summary>
+    <description>
+      <p>
+        A transposon may consist of various parts such as <so
+          name="long_terminal_repeat"/>s and gene models coding for genes
+        like gag, pol, env. These parts may have all decayed over
+        time. Transposon annotation typically ignores these subtleties
+        as all that is usually required is a <lookup
+          scenario="singleton-feature"/> of type <so
+          name="transposable_element_feature"/>. In this case, there is no
+        difficulty
+      </p>
+      <p>
+        If one requires detailed transposon annotation then one is
+        entering uncharted water as far as both Chado and annotation
+        tools are concerned (which is why this scenario is marked as
+        being under discussion). One option would be to treat each
+        transposon part as distinct singletons, but this may be
+        unsatisfactory as one may desire to have the appropriate
+        part_of relations between the parts.
+      </p>
+    </description>
+  </scenario>
+
+  <scenario id="P-element-insertions" status="final">
+    <summary></summary>
+  </scenario>
+
+  <scenario id="SNPs" status="final">
+    <summary></summary>
+  </scenario>
+
+  <scenario id="gene-with-implicit-features-manifested" status="discussion">
+    <summary>Some feature types such as introns are not normally
+      manifested as rows in chado. They are normally derived
+      on-the-fly from the gaps between consecutive exons. See <view
+        name="inton_view"/> for an example. Occasionally it may be
+      desirable to store the introns actual rows in the feature table
+      - for scenario in a report database</summary>
+  </scenario>
+
+  <scenario id="feature-localization" status="final">
+    <summary>All features with sequence annotation should be localized
+    using featureloc</summary>
+    <description>
+      <p>
+        localized features must have a <table name="featureloc"/> with
+        rank=0 and locgroup=0. This is the primary location of the
+        feature. The location always indicates the boundaries of the
+        feature. If the feature is composed of distinct subfeatures
+        (e.g. a transcript composes of exons), then it is NOT permitted
+        to use multiple featurelocs to indicate this. Instead, there
+        must be rows for the subfeatures, each with their own
+        featureloc
+      </p>
+      <p>
+        In a feature graph (i.e. a group of features connected via
+        <table name="feature_relationship"/> rows, all features will
+        typically be localized relative to the same source feature
+        (i.e. they will all have the same value for
+        featureloc.srcfeature_id)
+      </p>
+      <p>
+        features are typically localized to some kind of genomic or
+        assembly feature, but chado does not constrain you to using
+        only this. For example, localizing features relative to a
+        transcript or polypeptide or even exon is permitted, but
+        unusual practices will most likely not be recognized by most
+        software
+      </p>
+    </description>
+  </scenario>
+
+  <scenario id="feature-localization-to-contigs-in-assembly" status="final">
+    <summary>In an assembled genome, it is common to locate relative
+      to the top-level assembly units (e.g. chromosomes). However, it
+      is also permissable to locate to smaller units such as <so
+        name="contig"/>s or <so name="golden_path_unit"/>s</summary>
+    <description>
+      <p>
+        If a genome assembly is not stable, it is common to locate
+        relative to assembly units such as <so name="contig"/>s. These
+        contigs may then be localized relative to the top-level assembly
+        units. This is known in chado terms as a <b>location
+          graph</b>.
+      </p>
+      <p>We discuss here location graphs of depth 2. See also <lookup
+          scenario="n-level-assemblies"/>. This scenario is often
+        invisible to software interoperating with Chado. The software
+        is free to only look at the main features and the contig-level
+        feature and ignore the top-level assembly feature. It may
+        sometimes be desirable to have software that can perform
+        location transformations, mapping features from contigs to
+        top-level units and back
+      </p>
+    </description>
+    <support tool="apollo" status="unclear">
+      apollo should be happy to treat contigs just as if they were
+      top-level units as chromosome arms. However, the user may have
+      to explicitly provide contigs if location queries are
+      desired. For example, apollo may retrieve nothing if the user
+      asks for a certain range on chromosome 4, and the features are
+      located relative to contigs which are themselves on chromosome 4.
+    </support>
+    <support tool="gbrowse" status="unclear">
+      Gbrowse may expect features to be located relative to top-level
+      units such as chromosomes.
+    </support>
+  </scenario>
+
+  <scenario id="redundant-localizations-to-different-assembly-levels"
+    status="final" usage="infrequent">
+    <summary>Features can be located relative to both contigs and
+      top-level assembly units</summary>
+    <variant_of scenario="feature-localization-to-contigs-in-assembly"/>
+    <description>
+      <p>
+        Chado allows redundant feature localization using <table
+          name="featureloc"/>.locgroup>0. This allows a database to have
+        primary locations for features relative to contigs, and
+        secondary locations relative to top-level units such as
+        chromosomes. The converse is also allowed.
+      </p>
+      <p>
+        This scenario is discouraged unless the chado db admin knows
+        what they are doing. They must implement solutions to ensure
+        that featurelocs with varying locgroup do not get out of
+        sync. These solutions are not part of the standard Chado
+        software suite. Nevertheless, this scenario may be useful for
+        advanced users in certain circumstances
+      </p>
+    </description>
+    <support tool="gbrowse" status="unclear">
+      Not clear if gbrowse uses locgroup in querying. If it constrains
+      by locgroup, then this is essentially the same as 
+      <lookup scenario="feature-localization-to-contigs-in-assembly"/>
+    </support>
+    <support tool="gbrowse" status="partial">
+      Not clear if apollo uses locgroup in querying. If it constrains
+      by locgroup, then this is essentially the same as <lookup
+      scenario="feature-localization-to-contigs-in-assembly"/>. Apollo
+      will not preserve redundant featurelocs when writing back to
+      db. This could lead to db getting out of sync.
+    </support>
+  </scenario>
+
+  <scenario id="n-level-assemblies" status="final" usage="rare">
+    <summary>In theory it is possible (but rare) to have assemblies with variable
+    depths, or with depths>2</summary>
+    <description>
+      This scenario is rare. If required, then Chado can deal with
+      this - there is no theoretical limit to the depth of a location
+      graph. One can have annotated features located relative to
+      minicontigs which are located relative to supercontigs which are
+      located relative to chromosomes. Most software that
+      interoperates with Chado will not be able to deal with this, so
+      this scenario is discouraged except by advanced users who have
+      no other option
+    </description>
+  </scenario>
+
+  <scenario id="unlocalized-gene" status="final">
+    <summary>A gene without sequence based localization</summary>
+    <description>
+      <p>
+        Many chado instances are purely concerned with genome annotation
+        - in these cases it would be strange to have genes or other
+        features such as transcripts with no localization (i.e. no
+        featurelocs). However, this scenario is actually common when
+        Chado is used in a wider context. We may of the existence of
+        genes through non-sequence evidence such as genetics. When we
+        have no sequence-based localization it is perfectly valid to
+        have gene features with no featurelocs. When the time comes to
+        create genome annotations for these, we just 'fill out' the gene
+        feature by adding transcript and exon features.
+      </p>
+    </description>
+    <support tool="gbrowse" status="supported">
+      Gbrowse supports this scenario in that unlocalized features will
+      be ignored from the genome viewer, which is appropriate
+    </support>
+    <support tool="apollo" status="supported">
+      Apollo supports this scenario in that unlocalized features will
+      be ignored, which is appropriate behaviour for a genome
+      annotation tool
+    </support>
+  </scenario>
+  
+</doc>
