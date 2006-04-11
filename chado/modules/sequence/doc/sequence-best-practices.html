@@ -1,18 +1,11 @@
 <doc>
-  <!-- to transform this into HTML, run 
-       xsltproc doc/xsl/scenario-to-html.xsl
-modules/sequence/doc/sequence-best-practices.html.in  >
-modules/sequence/doc/sequence-best-practices.html 
-  -->
   
-  <scenario id="canonical-gene-model" status="final">
-    <module name="sequence"/>
-    <uses table="feature"/>
-    <uses table="featureloc"/>6
-    <uses table="feature_relationship"/>
-    <summary>The "central dogma" gene model - gene makes mRNA makes
-      polypeptide</summary>
-    <description>
+  
+  <a name="canonical-gene-model"></a><div class="scenario">
+<div class="id">canonical-gene-model</div>
+<div class="summary">The "central dogma" gene model - gene makes mRNA makes
+      polypeptide</div>
+<div class="description">
       <p>
         For many people this may be the only data they store in
         Chado. The typical protein coding gene model consists of a
@@ -26,72 +19,52 @@ modules/sequence/doc/sequence-best-practices.html
         coordinates (this indicates they are the same exon).
       </p>
       <p>
-        Every <table name="feature"/> must have a <table
-        name="featureloc"/> with rank=0 and locgroup=0. The value of
+        Every <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature">feature</a></span> must have a <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#featureloc">featureloc</a></span> with rank=0 and locgroup=0. The value of
         the srcfeature_id column should be identical (i.e. all
         features are located relative to the same feature), except in
         rare circumstances such as when a feature crosses two
         contigs. Software is not guaranteed to support this. The
-        srcfeature_id can point to a <so name="contig"/>, a
-        <so name="chromosome"/><so name="chromosome_arm"/> or other
+        srcfeature_id can point to a <span class="term"><a href="http://song.sourceforge.net/#contig">contig</a></span>, a
+        <span class="term"><a href="http://song.sourceforge.net/#chromosome">chromosome</a></span><span class="term"><a href="http://song.sourceforge.net/#chromosome_arm">chromosome_arm</a></span> or other
           appropriate assembly unit. 
       </p>
-    </description>
-    <alternate status="deprecated">
-      Older chado installations may use <type cv="SO" name="protein"/>
-      rather than <type cv="SO" name="polypeptide"/>. Some tools such
-      as Apollo still support this (configuration required).
-    </alternate>
-    <alternate status="not-supported">
-      One proposal previously discussed was to only provide
-      featurelocs for the exons and polypeptides, and to derive
-      featurelocs automatically for genes and mRNAs. This is not
-      recommended. All genomic features must have featurelocs. This
-      simplifies software at a small cost in redundancy.
-    </alternate>
-    <support tool="apollo" status="supported"></support>
-    <support tool="gbrowse" status="supported"></support>
-    <example src='MSGEFTUA'/>
-    <parts>
-      <part required='true' table='feature' type='SO:gene' number='1'>
-        <comment>The gene must always be provided</comment>
-      </part>
-      <part required='true' table='feature' type='SO:mRNA'
-        min='1'>
-        <comment>
+    </div>
+<div class="parts">
+<h4>This scenario involves rows in the following tables:</h4>
+<table>
+<th>table</th>
+<th>type_id</th>
+<th>number</th>
+<th>comments</th>
+<tr>
+<td href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature">feature</td>
+<td><b>SO:gene</b></td>
+<td>1</td>
+<td><span class="comment"><comment>The gene must always be provided</comment></span></td>
+</tr>
+<tr>
+<td href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature">feature</td>
+<td><b>SO:mRNA</b></td>
+<td></td>
+<td><span class="comment"><comment>
           One or more transcripts are required, and these are always
-          of type <so name="mRNA"/> for protein-coding genes.
-        </comment>
-        <link required='true' table='feature_relationship'
-          type='OBO_REL:part_of' to='SO:gene' cardinality='1' inverse_cardinality='1..n'>
-          <comment>
-            transcripts are always linked to genes by a part_of
-            relation. (Note that SO uses member_of here). One gene can
-            have amny transcripts (multiple splicing). A transcript
-            must always belong to exactly one gene (for an exception,
-            see <lookup scenarios='dicistronic-gene'/>.
-          </comment>
-        </link>
-      </part>
-      <part required='true' table='feature' type='exon'
-        min='1'>
-        <comment>
+          of type <span class="term"><a href="http://song.sourceforge.net/#mRNA">mRNA</a></span> for protein-coding genes.
+        </comment></span></td>
+</tr>
+<tr>
+<td href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature">feature</td>
+<td><b>exon</b></td>
+<td></td>
+<td><span class="comment"><comment>
           Exons are always required, even if the genome under
           consideration has no introns
-        </comment>
-        <link required='true' table='feature_relationship'
-          type='OBO_REL:part_of' to='SO:mRNA' cardinality='1..n' inverse_cardinality='1..n'>
-          <comment>
-            Exons are always linked to their container transcript
-            (in this case, an mRNA) via the part_of relation. If a
-            transcript is alternately spliced, then an exon can be
-            part_of multiple transcripts
-          </comment>
-        </link>
-      </part>
-      <part required='true' table='feature' type='polypeptide'
-        min='1'>
-        <comment>
+        </comment></span></td>
+</tr>
+<tr>
+<td href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature">feature</td>
+<td><b>polypeptide</b></td>
+<td></td>
+<td><span class="comment"><comment>
           A protein-coding gene always produces a polypeptide, by
           definition. The polypeptide is located relative to the same
           genomic feature as the exons, mRNAs and gene. A single
@@ -99,56 +72,65 @@ modules/sequence/doc/sequence-best-practices.html
           and stop codon positions (location is inclusive of stop
           codon). The polypeptide sequence should be specified as an
           amino acid sequence.
-        </comment>
-        <link required='true' table='feature_relationship'
-          type='OBO_REL:derived_from' to='SO:mRNA' cardinality='1..n' inverse_cardinality='1'>
-          <comment>
-            The polypeptide is always derived_from the mRNA. If two
-            alternate spliceforms produce the same polypeptide
-            (i.e. their sequence is the same) then the same
-            polypeptide feature should be used. An mRNA can only
-            derive one polypeptide. For exceptions, see <lookup
-            scenario='dicistronic-gene'/>
-          </comment>
-        </link>
-      </part>
-    </parts>
-  </scenario>
+        </comment></span></td>
+</tr>
+</table>
+</div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: supported</div>
+</div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: supported</div>
+</div>
+<div class="example">
+<h4>Example</h4>
+<img src="."><span class="download">Download: </span>
+</div>
+</div>
 
-  <scenario id="noncoding-gene" status="final">
-    <summary>Similar to <lookup scenario='canonical-gene-model'/>, except with
-      noncoding-RNA</summary>
-    <variant_of scenario="canonical-gene-model"/>
-    <support tool="apollo" status="supported"></support>
-    <support tool="gbrowse" status="supported"></support>
-    <description>
+  <a name="noncoding-gene"></a><div class="scenario">
+<div class="id">noncoding-gene</div>
+<div class="summary">Similar to <a href="#canonical-gene-model">canonical-gene-model</a>, except with
+      noncoding-RNA</div>
+<div class="description">
       <p>
         Not all genes are protein-coding. Genes can code for tRNA,
         miRNA, snoRNA, etc. A noncoding gene model is identical to a
-        <lookup scenario="canonical-gene-model"/>, with the following
+        <a href="#canonical-gene-model">canonical-gene-model</a>, with the following
         exceptions:
         <ul>
           <li>There is no polypeptide feature</li>
           <li>Instead of an mRNA feature, there is a feature that is
-            some other sub-type of <so name="RNA"/></li>
+            some other sub-type of <span class="term"><a href="http://song.sourceforge.net/#RNA">RNA</a></span>
+</li>
         </ul>
       </p>
-        </description>
-  </scenario>
+        </div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: supported</div>
+</div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: supported</div>
+</div>
+</div>
 
-  <scenario id="pseudogene" status="discussion">
-    <summary>A pseudogene is a non-functional relic of a
-      gene</summary>
-    <description>
-      See <so name="pseudogene"/>. A pseudogene may look like an
+  <a name="pseudogene"></a><div class="scenario">
+<div class="id">pseudogene</div>
+<div class="summary">A pseudogene is a non-functional relic of a
+      gene</div>
+<div class="description">
+      See <span class="term"><a href="http://song.sourceforge.net/#pseudogene">pseudogene</a></span>. A pseudogene may look like an
       ordinary gene, and may even have discernable parts such as
       exons. It may sometimes be desirable to annotate the exon
       structure of a pseudogene - this can in principle be done using
-      SO types such as <so name="decayed_exon"/>. In practice no-one
+      SO types such as <span class="term"><a href="http://song.sourceforge.net/#decayed_exon">decayed_exon</a></span>. In practice no-one
       is using Chado to do this. There are currently two practices:
       <ul>
-        <li>pseudogenes are treated analagously to <lookup
-        scenario="noncoding-gene"/>s. That is, there are normal "gene"
+        <li>pseudogenes are treated analagously to <a href="#noncoding-gene">noncoding-gene</a>s. That is, there are normal "gene"
         and "exon" features. However, in place of a subtype of RNA,
         there is a feature of type pseudogene. This practice is
         STRONGLY DISCOURAGED (it is not compliant with the relations
@@ -157,28 +139,30 @@ modules/sequence/doc/sequence-best-practices.html
         FlyBase.
         </li>
         <li>
-          Pseudogenes are normal <lookup
-          scenario="singleton-feature"/>s. There is no annotation of
+          Pseudogenes are normal <a href="#singleton-feature">singleton-feature</a>s. There is no annotation of
           exon structure. This practice is encouraged. If at a later
           date it becomes desirable to annotated the exon structure of
           a pseudogene, it will be compatible with this.
         </li>
       </ul>
-    </description>
-    <support tool="apollo" status="unclear">
+    </div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: unclear</div>
       Apollo by default treats pseudogenes using the first method,
       above. It may also be possible to configure it to the second,
       singleton, method. Annotating the exon structure of pseudogenes
       the correct way has not yet been attempted to our knowledge.
-    </support>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="singleton-feature" status="discussion">
-    <summary>Many types of features are singletons - that is they are
+  <a name="singleton-feature"></a><div class="scenario">
+<div class="id">singleton-feature</div>
+<div class="summary">Many types of features are singletons - that is they are
     not related to other features through
     feature_relationships. Storage of these is basic and as one may
-    expect</summary>
-    <description>
+    expect</div>
+<div class="description">
       Singleton features present no major problems. Unlike genes,
       which typically have parts (with the parts having subparts),
       singletons do not form feature graphs (or rather, they form
@@ -186,20 +170,26 @@ modules/sequence/doc/sequence-best-practices.html
       are located relative to other features (usually the genome, but
       once can have singletons that are located relative to other
       features - this may not be supported by all applications)
-    </description>
-    <support tool="gbrowse" status="suppported"/>
-    <support tool="apollo" status="suppported">
+    </div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: suppported</div>
+</div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: suppported</div>
       Apollo supports singletons provided they are located relative to
       the genome (singletons located relative to other features will
       be ignored). It may be necessary to configure apollo to make the
       feature type "1-level"
-    </support>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="dicistronic-gene" status="discussion">
-    <summary>A dicistronic gene is a gene with a mRNA that codes for
-      two distinct non-overlapping CDSs</summary>
-    <description>
+  <a name="dicistronic-gene"></a><div class="scenario">
+<div class="id">dicistronic-gene</div>
+<div class="summary">A dicistronic gene is a gene with a mRNA that codes for
+      two distinct non-overlapping CDSs</div>
+<div class="description">
       <p>
         Dicistronic genes (see for example, the dmel Adh and Adhr
         genes) have totally distinct gene products deriving from the
@@ -207,7 +197,7 @@ modules/sequence/doc/sequence-best-practices.html
         commonly refered to as being derived from two distinct genes
         (e.g. Adh and Adhr). The entire genomic region comprising the
         transcript (e.g. Adh+Adhr) that includes both CDSs is refered
-        to as the <so name="gene_cassette"/>. In a database such as
+        to as the <span class="term"><a href="http://song.sourceforge.net/#gene_cassette">gene_cassette</a></span>. In a database such as
         FlyBase, there are 3 gene IDs stored in the database - one for
         each of the two non-overlapping genes, and one for the gene
         cassette
@@ -224,70 +214,24 @@ modules/sequence/doc/sequence-best-practices.html
         from a modeling standpoint, but introduces a lot of complexity
         to software
       </p>
-    </description>
-    <proposal id="dicistronic-gene-hack">
-      <summary>This is the standard solution currently used</summary>
-      <description>
-        <p>
-        Typically two distinct gene models are created (e.g. one for
-        Adh, one for Adhr). These gene models would contain mRNA parts
-        that have exact overlaps (e.g. mRNA-1 from gene-1 would
-        exactly match mRNA-2 from gene-2). This means data curators
-        must take care to make sure that the duplicate mRNA feature
-        rows are in sync. The gene would get a featureprop of type
-        <featureprop name="dicistronic"/>='true'. The two duplicate
-        mRNA feature rows would have separate, non-overlapping
-        polypeptides attached to each.
-        </p>
-        <p>
-          In FlyBase, each of the two genes in a dicistronic pair get
-          their own dbxref and name. In addition, there is also a
-          dbxref and name for the gene cassette. The gene cassette
-          feature is not stored explicitly. Each gene has an
-          <featureprop name="encoded_symbol"/> featureprop with the
-          value being the gene cassette symbol. FLYBASE TO COMMENT HERE
-        </p>
-      </description>
-      <support tool="apollo" status="supported">
-        Apollo supports this by default, and is also aware of the
-        dicistornic featureprop
-      </support>
-    </proposal>
-    <proposal id="dicistronic-gene-proposed">
-      <summary>This is a better solution, but involves software being
-        more explicitly aware of dicistronic genes</summary>
-      <description>
-        There are no duplicate mRNA rows. Each mRNA feature in the
-        database represents an actual existing spliceform. A
-        dicistronic mRNA feature can have multiple polypeptide features
-        attached as parts. It would be desirable for modeling purposes
-        to treat the entire dicistronic gene as a single gene, but
-        this may not work well in some cases (e.g. the different
-        dicistronic components may have different genetic data
-        attached). In this case it may be necessary to have two
-        separate gene features, with additional feature_relations from
-        the polypeptides. Each gene feature could link to a
-        gene_cassette feature
-      </description>
-      <support tool="apollo" status="not-supported"/>
-      <support tool="gbrowse" status="not-supported"/>
-    </proposal>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="operon" status="discussion">
-    <summary>Bacterial genes are often transcribed in groups; eg LacZ</summary>
-    <description>
-      There are many similarities with <lookup
-        scenario="dicistronic-gene"/>s here.
-    </description>
-  </scenario>
+  <a name="operon"></a><div class="scenario">
+<div class="id">operon</div>
+<div class="summary">Bacterial genes are often transcribed in groups; eg LacZ</div>
+<div class="description">
+      There are many similarities with <a href="#dicistronic-gene">dicistronic-gene</a>s here.
+    </div>
+</div>
 
-  <scenario id="trans-spliced-gene" status="discussion">
-    <summary>A trans-spliced gene has one or more transcripts in which
+  <a name="trans-spliced-gene"></a><div class="scenario">
+<div class="id">trans-spliced-gene</div>
+<div class="summary">A trans-spliced gene has one or more transcripts in which
     that transcript may be spliced together from different parts of the
       genome
-    </summary>
-    <description>
+    </div>
+<div class="description">
       <p>
       A trans spliced transcript is spliced from exons coming from
       different parts of the genome. The distance between each trans
@@ -297,7 +241,7 @@ modules/sequence/doc/sequence-best-practices.html
       <p>
       Most C elegans genes have a trans spliced
       leader sequence. This is different from the trans splicing
-      involved in dmel <fb name="mod(mdg4)"/>, where we observe what
+      involved in dmel <fb name="mod(mdg4)"></fb>, where we observe what
       appears to be two transcripts on separate strands (both
       containing coding sequence) joining together in a single
       functional transcript
@@ -312,63 +256,63 @@ modules/sequence/doc/sequence-best-practices.html
         example is not proposed (not sure if we even need one?)
       </p>
       <proposal id="trans-spliced-gene-mixed-exons">
-        <summary>
+        <div class="summary">
           We treat this as an ordinary gene model, but relax our rules
           for exon locations in a transcript
-        </summary>
-        <description>
+        </div>
+        <div class="description">
           For example, for the canonical Dmel trans spliced gene, we
           would allow transcripts to have exons on different
-          strands. Note that in Chado, exon ordering comes from <table
-            name="feature_relationship"/>.rank (between exon and
+          strands. Note that in Chado, exon ordering comes from <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature_relationship">feature_relationship</a></span>.rank (between exon and
           transcript), NOT from the featureloc of the exon. Chado has no
           problem with this. However, some software may make assumptions
           that all exons are on the same strand, or may try to order
           exons by their location to get a transcript sequence. This
           software will have unintended consequences with trans spliced
           genes modeled using this proposal
-        </description>
-        <support tool="apollo" status="unclear">
+        </div>
+        <div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: unclear</div>
           apollo may accidentally scramble the order of exons. Need to
           check
-        </support>
-        <support tool="gbrowse" status="unclear">
+        </div>
+        <div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: unclear</div>
           Not sure.
-        </support>
+        </div>
       </proposal>
       <proposal id="trans-spliced-gene-mixed-transcripts">
-        <summary>
+        <div class="summary">
           We would introduce extra transcripts, and have relations
           between the transcripts. Only the mature, spliced,
           transcript would have a relation to the polypeptide
-        </summary>
-        <description>
+        </div>
+        <div class="description">
           This may model the biology better. However, it introduces
-           a major departure from the <lookup
-          scenario="canonical-gene-model"/>. For this reason this
+           a major departure from the <a href="#canonical-gene-model">canonical-gene-model</a>. For this reason this
           proposal is unlikely to be adopted
-        </description>
+        </div>
       </proposal>
-    </description>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="gene-with-regulatory-elements" status="discussion">
-    <summary>regulatory elements may be implicitly or explicitly
-      associated with a gene</summary>
-  </scenario>
+  <a name="gene-with-regulatory-elements"></a><div class="scenario">
+<div class="id">gene-with-regulatory-elements</div>
+<div class="summary">regulatory elements may be implicitly or explicitly
+      associated with a gene</div>
+</div>
 
-  <scenario id="transposons" status="discussion">
-    <summary>transposons can be annotated as <lookup
-        scenario="singleton-feature"/>s or as complex annotations</summary>
-    <description>
+  <a name="transposons"></a><div class="scenario">
+<div class="id">transposons</div>
+<div class="summary">transposons can be annotated as <a href="#singleton-feature">singleton-feature</a>s or as complex annotations</div>
+<div class="description">
       <p>
-        A transposon may consist of various parts such as <so
-          name="long_terminal_repeat"/>s and gene models coding for genes
+        A transposon may consist of various parts such as <span class="term"><a href="http://song.sourceforge.net/#long_terminal_repeat">long_terminal_repeat</a></span>s and gene models coding for genes
         like gag, pol, env. These parts may have all decayed over
         time. Transposon annotation typically ignores these subtleties
-        as all that is usually required is a <lookup
-          scenario="singleton-feature"/> of type <so
-          name="transposable_element_feature"/>. In this case, there is no
+        as all that is usually required is a <a href="#singleton-feature">singleton-feature</a> of type <span class="term"><a href="http://song.sourceforge.net/#transposable_element_feature">transposable_element_feature</a></span>. In this case, there is no
         difficulty
       </p>
       <p>
@@ -380,32 +324,35 @@ modules/sequence/doc/sequence-best-practices.html
         unsatisfactory as one may desire to have the appropriate
         part_of relations between the parts.
       </p>
-    </description>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="P-element-insertions" status="final">
-    <summary></summary>
-  </scenario>
+  <a name="P-element-insertions"></a><div class="scenario">
+<div class="id">P-element-insertions</div>
+<div class="summary"></div>
+</div>
 
-  <scenario id="SNPs" status="final">
-    <summary></summary>
-  </scenario>
+  <a name="SNPs"></a><div class="scenario">
+<div class="id">SNPs</div>
+<div class="summary"></div>
+</div>
 
-  <scenario id="gene-with-implicit-features-manifested" status="discussion">
-    <summary>Some feature types such as introns are not normally
+  <a name="gene-with-implicit-features-manifested"></a><div class="scenario">
+<div class="id">gene-with-implicit-features-manifested</div>
+<div class="summary">Some feature types such as introns are not normally
       manifested as rows in chado. They are normally derived
-      on-the-fly from the gaps between consecutive exons. See <view
-        name="inton_view"/> for an example. Occasionally it may be
+      on-the-fly from the gaps between consecutive exons. See <span class="table"></span> for an example. Occasionally it may be
       desirable to store the introns actual rows in the feature table
-      - for scenario in a report database</summary>
-  </scenario>
+      - for scenario in a report database</div>
+</div>
 
-  <scenario id="feature-localization" status="final">
-    <summary>All features with sequence annotation should be localized
-    using featureloc</summary>
-    <description>
+  <a name="feature-localization"></a><div class="scenario">
+<div class="id">feature-localization</div>
+<div class="summary">All features with sequence annotation should be localized
+    using featureloc</div>
+<div class="description">
       <p>
-        localized features must have a <table name="featureloc"/> with
+        localized features must have a <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#featureloc">featureloc</a></span> with
         rank=0 and locgroup=0. This is the primary location of the
         feature. The location always indicates the boundaries of the
         feature. If the feature is composed of distinct subfeatures
@@ -416,7 +363,7 @@ modules/sequence/doc/sequence-best-practices.html
       </p>
       <p>
         In a feature graph (i.e. a group of features connected via
-        <table name="feature_relationship"/> rows, all features will
+        <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#feature_relationship">feature_relationship</a></span> rows, all features will
         typically be localized relative to the same source feature
         (i.e. they will all have the same value for
         featureloc.srcfeature_id)
@@ -429,24 +376,23 @@ modules/sequence/doc/sequence-best-practices.html
         unusual practices will most likely not be recognized by most
         software
       </p>
-    </description>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="feature-localization-to-contigs-in-assembly" status="final">
-    <summary>In an assembled genome, it is common to locate relative
+  <a name="feature-localization-to-contigs-in-assembly"></a><div class="scenario">
+<div class="id">feature-localization-to-contigs-in-assembly</div>
+<div class="summary">In an assembled genome, it is common to locate relative
       to the top-level assembly units (e.g. chromosomes). However, it
-      is also permissable to locate to smaller units such as <so
-        name="contig"/>s or <so name="golden_path_unit"/>s</summary>
-    <description>
+      is also permissable to locate to smaller units such as <span class="term"><a href="http://song.sourceforge.net/#contig">contig</a></span>s or <span class="term"><a href="http://song.sourceforge.net/#golden_path_unit">golden_path_unit</a></span>s</div>
+<div class="description">
       <p>
         If a genome assembly is not stable, it is common to locate
-        relative to assembly units such as <so name="contig"/>s. These
+        relative to assembly units such as <span class="term"><a href="http://song.sourceforge.net/#contig">contig</a></span>s. These
         contigs may then be localized relative to the top-level assembly
         units. This is known in chado terms as a <b>location
           graph</b>.
       </p>
-      <p>We discuss here location graphs of depth 2. See also <lookup
-          scenario="n-level-assemblies"/>. This scenario is often
+      <p>We discuss here location graphs of depth 2. See also <a href="#n-level-assemblies">n-level-assemblies</a>. This scenario is often
         invisible to software interoperating with Chado. The software
         is free to only look at the main features and the contig-level
         feature and ignore the top-level assembly feature. It may
@@ -454,30 +400,32 @@ modules/sequence/doc/sequence-best-practices.html
         location transformations, mapping features from contigs to
         top-level units and back
       </p>
-    </description>
-    <support tool="apollo" status="unclear">
+    </div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: unclear</div>
       apollo should be happy to treat contigs just as if they were
       top-level units as chromosome arms. However, the user may have
       to explicitly provide contigs if location queries are
       desired. For example, apollo may retrieve nothing if the user
       asks for a certain range on chromosome 4, and the features are
       located relative to contigs which are themselves on chromosome 4.
-    </support>
-    <support tool="gbrowse" status="unclear">
+    </div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: unclear</div>
       Gbrowse may expect features to be located relative to top-level
       units such as chromosomes.
-    </support>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="redundant-localizations-to-different-assembly-levels"
-    status="final" usage="infrequent">
-    <summary>Features can be located relative to both contigs and
-      top-level assembly units</summary>
-    <variant_of scenario="feature-localization-to-contigs-in-assembly"/>
-    <description>
+  <a name="redundant-localizations-to-different-assembly-levels"></a><div class="scenario">
+<div class="id">redundant-localizations-to-different-assembly-levels</div>
+<div class="summary">Features can be located relative to both contigs and
+      top-level assembly units</div>
+<div class="description">
       <p>
-        Chado allows redundant feature localization using <table
-          name="featureloc"/>.locgroup>0. This allows a database to have
+        Chado allows redundant feature localization using <span class="table"><a href="http://gmod.sourceforge.net/schema/doc/default_schema.html#featureloc">featureloc</a></span>.locgroup&gt;0. This allows a database to have
         primary locations for features relative to contigs, and
         secondary locations relative to top-level units such as
         chromosomes. The converse is also allowed.
@@ -490,25 +438,29 @@ modules/sequence/doc/sequence-best-practices.html
         software suite. Nevertheless, this scenario may be useful for
         advanced users in certain circumstances
       </p>
-    </description>
-    <support tool="gbrowse" status="unclear">
+    </div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: unclear</div>
       Not clear if gbrowse uses locgroup in querying. If it constrains
       by locgroup, then this is essentially the same as 
-      <lookup scenario="feature-localization-to-contigs-in-assembly"/>
-    </support>
-    <support tool="gbrowse" status="partial">
+      <a href="#feature-localization-to-contigs-in-assembly">feature-localization-to-contigs-in-assembly</a>
+    </div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: partial</div>
       Not clear if apollo uses locgroup in querying. If it constrains
-      by locgroup, then this is essentially the same as <lookup
-      scenario="feature-localization-to-contigs-in-assembly"/>. Apollo
+      by locgroup, then this is essentially the same as <a href="#feature-localization-to-contigs-in-assembly">feature-localization-to-contigs-in-assembly</a>. Apollo
       will not preserve redundant featurelocs when writing back to
       db. This could lead to db getting out of sync.
-    </support>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="n-level-assemblies" status="final" usage="rare">
-    <summary>In theory it is possible (but rare) to have assemblies with variable
-    depths, or with depths>2</summary>
-    <description>
+  <a name="n-level-assemblies"></a><div class="scenario">
+<div class="id">n-level-assemblies</div>
+<div class="summary">In theory it is possible (but rare) to have assemblies with variable
+    depths, or with depths&gt;2</div>
+<div class="description">
       This scenario is rare. If required, then Chado can deal with
       this - there is no theoretical limit to the depth of a location
       graph. One can have annotated features located relative to
@@ -517,12 +469,13 @@ modules/sequence/doc/sequence-best-practices.html
       interoperates with Chado will not be able to deal with this, so
       this scenario is discouraged except by advanced users who have
       no other option
-    </description>
-  </scenario>
+    </div>
+</div>
 
-  <scenario id="unlocalized-gene" status="final">
-    <summary>A gene without sequence based localization</summary>
-    <description>
+  <a name="unlocalized-gene"></a><div class="scenario">
+<div class="id">unlocalized-gene</div>
+<div class="summary">A gene without sequence based localization</div>
+<div class="description">
       <p>
         Many chado instances are purely concerned with genome annotation
         - in these cases it would be strange to have genes or other
@@ -535,16 +488,20 @@ modules/sequence/doc/sequence-best-practices.html
         create genome annotations for these, we just 'fill out' the gene
         feature by adding transcript and exon features.
       </p>
-    </description>
-    <support tool="gbrowse" status="supported">
+    </div>
+<div class="support">
+<div class="tool">Tool: gbrowse</div>
+<div class="status">Status: supported</div>
       Gbrowse supports this scenario in that unlocalized features will
       be ignored from the genome viewer, which is appropriate
-    </support>
-    <support tool="apollo" status="supported">
+    </div>
+<div class="support">
+<div class="tool">Tool: apollo</div>
+<div class="status">Status: supported</div>
       Apollo supports this scenario in that unlocalized features will
       be ignored, which is appropriate behaviour for a genome
       annotation tool
-    </support>
-  </scenario>
+    </div>
+</div>
   
 </doc>
