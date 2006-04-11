@@ -322,7 +322,7 @@
 
     </module>
 
-    <module id='genetic'>
+    <module id='phenotype'>
       <dependency to='general'/>
       <dependency to='sequence'/>
       <dependency to='cv'/>
@@ -331,7 +331,22 @@
         In use right now in FlyBase
       </status>
       <description>
-        Genetic and phenotypic data
+        Entity-attribute-value phenotypic character descriptions
+      </description>
+      <source type='sql' path='genetic/genetic.sql'/>
+    </module>
+
+    <module id='genetic'>
+      <dependency to='general'/>
+      <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='phenotype'/>
+      <status code='beta'>
+        In use right now in FlyBase
+      </status>
+      <description>
+        Genotypes and mutant alleles
       </description>
       <source type='sql' path='genetic/genetic.sql'/>
     </module>
