@@ -333,7 +333,7 @@
       <description>
         Entity-attribute-value phenotypic character descriptions
       </description>
-      <source type='sql' path='genetic/genetic.sql'/>
+      <source type='sql' path='phenotype/phenotype.sql'/>
     </module>
 
     <module id='genetic'>
