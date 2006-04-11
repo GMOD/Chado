@@ -268,3 +268,5 @@ VERSION 0.04
                         cv and sequence modules only
 
 2005-06-07      - [cjm] added: feature_cvterm.is_not and feature_cvterm_dbxref
+
+2006-04-11      - [cjm] split genetic module into genetic+phenotype modules
