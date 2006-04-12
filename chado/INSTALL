@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.42 2006-02-20 18:31:23 scottcain Exp $
+$Id: INSTALL,v 1.43 2006-04-12 03:19:10 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -114,7 +114,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
           (-microarray 0.1 --required for microarray data)
 
   go-perl
-      Get from http://archive.godatabase.org/latest-full/go_200602-utilities-src.tar.gz.
+      Get from http://archive.godatabase.org/latest-full/*utilities-src.tar.gz
       Be sure to set GO_ROOT as directed in the go-perl INSTALL doc.
 
   Standard Perl modules:
@@ -126,7 +126,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
     * DBD::Pg                  (GBrowse,chado)
-    * SQL::Translator (from cvs) (chado) (optional)
+    * SQL::Translator          (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
     * Module::Build            (chado)

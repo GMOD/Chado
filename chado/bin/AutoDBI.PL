@@ -39,9 +39,26 @@ Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHO
 
 #sub search_ilike { shift->_do_search(ILIKE => \@_ ) }
 
+#
+# NOT PART OF THE API, but useful function which returns a single row
+#  and throws an error if more than one is returned
+#
+sub get_single_row {
+   my ($proto, @args) = @_;
+   my $class = ref $proto || $proto;
+
+   my @rows  = $class->search( @args );
+
+   my $count = @rows;
+   die "only one row expected, @rows returned" if @rows > 1;
+
+   return @rows[0];
+}
+
 !GROK!THIS!
 
 print OUT <<'!NO!SUBS!';
+# -------------------------------------------------------------------
 package Chado::DBI::Chado::Tableinfo;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -1676,6 +1693,128 @@ sub Chado::DBI::Chado::Analysisfeature::analysis {
 }
 
 # -------------------------------------------------------------------
+package Chado::DBI::Chado::Phenotype;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::DBI::Chado::Phenotype->set_up_table('phenotype');
+
+
+Chado::DBI::Chado::Phenotype->has_a(
+    observable_id => 'Chado::DBI::Chado::Cvterm'
+);
+
+sub Chado::DBI::Chado::Phenotype::observable {
+    return shift->observable_id
+}
+
+Chado::DBI::Chado::Phenotype->has_a(
+    attr_id => 'Chado::DBI::Chado::Cvterm'
+);
+
+sub Chado::DBI::Chado::Phenotype::attr {
+    return shift->attr_id
+}
+
+Chado::DBI::Chado::Phenotype->has_a(
+    cvalue_id => 'Chado::DBI::Chado::Cvterm'
+);
+
+sub Chado::DBI::Chado::Phenotype::cvalue {
+    return shift->cvalue_id
+}
+
+Chado::DBI::Chado::Phenotype->has_a(
+    assay_id => 'Chado::DBI::Chado::Cvterm'
+);
+
+sub Chado::DBI::Chado::Phenotype::assay {
+    return shift->assay_id
+}
+
+Chado::DBI::Chado::Phenotype->has_many(
+    'phenstatement_phenotype_id', 'Chado::DBI::Chado::Phenstatement' => 'phenotype_id'
+);
+
+sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+Chado::DBI::Chado::Phenotype->has_many(
+    'phenotype_cvterm_phenotype_id', 'Chado::DBI::Chado::Phenotype_Cvterm' => 'phenotype_id'
+);
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+Chado::DBI::Chado::Phenotype->has_many(
+    'feature_phenotype_phenotype_id', 'Chado::DBI::Chado::Feature_Phenotype' => 'phenotype_id'
+);
+
+sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
+
+sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
+
+Chado::DBI::Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype1_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype1_id'
+);
+
+Chado::DBI::Chado::Phenotype->has_many(
+    'phenotype_comparison_phenotype2_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype2_id'
+);
+
+# -------------------------------------------------------------------
+package Chado::DBI::Chado::Phenotype_Cvterm;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::DBI::Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
+
+
+Chado::DBI::Chado::Phenotype_Cvterm->has_a(
+    phenotype_id => 'Chado::DBI::Chado::Phenotype'
+);
+
+sub Chado::DBI::Chado::Phenotype_Cvterm::phenotype {
+    return shift->phenotype_id
+}
+
+Chado::DBI::Chado::Phenotype_Cvterm->has_a(
+    cvterm_id => 'Chado::DBI::Chado::Cvterm'
+);
+
+sub Chado::DBI::Chado::Phenotype_Cvterm::cvterm {
+    return shift->cvterm_id
+}
+
+# -------------------------------------------------------------------
+package Chado::DBI::Chado::Feature_Phenotype;
+use base 'Chado::DBI';
+use Class::DBI::Pager;
+
+Chado::DBI::Chado::Feature_Phenotype->set_up_table('feature_phenotype');
+
+
+Chado::DBI::Chado::Feature_Phenotype->has_a(
+    feature_id => 'Chado::DBI::Chado::Feature'
+);
+
+sub Chado::DBI::Chado::Feature_Phenotype::feature {
+    return shift->feature_id
+}
+
+Chado::DBI::Chado::Feature_Phenotype->has_a(
+    phenotype_id => 'Chado::DBI::Chado::Phenotype'
+);
+
+sub Chado::DBI::Chado::Feature_Phenotype::phenotype {
+    return shift->phenotype_id
+}
+
+# -------------------------------------------------------------------
 package Chado::DBI::Chado::Genotype;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -1820,104 +1959,6 @@ sub Chado::DBI::Chado::Environment_Cvterm::cvterm {
 }
 
 # -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenotype;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::DBI::Chado::Phenotype->set_up_table('phenotype');
-
-
-Chado::DBI::Chado::Phenotype->has_a(
-    observable_id => 'Chado::DBI::Chado::Cvterm'
-);
-
-sub Chado::DBI::Chado::Phenotype::observable {
-    return shift->observable_id
-}
-
-Chado::DBI::Chado::Phenotype->has_a(
-    attr_id => 'Chado::DBI::Chado::Cvterm'
-);
-
-sub Chado::DBI::Chado::Phenotype::attr {
-    return shift->attr_id
-}
-
-Chado::DBI::Chado::Phenotype->has_a(
-    cvalue_id => 'Chado::DBI::Chado::Cvterm'
-);
-
-sub Chado::DBI::Chado::Phenotype::cvalue {
-    return shift->cvalue_id
-}
-
-Chado::DBI::Chado::Phenotype->has_a(
-    assay_id => 'Chado::DBI::Chado::Cvterm'
-);
-
-sub Chado::DBI::Chado::Phenotype::assay {
-    return shift->assay_id
-}
-
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenstatement_phenotype_id', 'Chado::DBI::Chado::Phenstatement' => 'phenotype_id'
-);
-
-sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
-
-sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
-
-sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
-
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_cvterm_phenotype_id', 'Chado::DBI::Chado::Phenotype_Cvterm' => 'phenotype_id'
-);
-
-sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
-
-sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
-
-Chado::DBI::Chado::Phenotype->has_many(
-    'feature_phenotype_phenotype_id', 'Chado::DBI::Chado::Feature_Phenotype' => 'phenotype_id'
-);
-
-sub phenotype_comparison_phenotype1_ids { my $self = shift; return $self->phenotype_comparison_phenotype1_id(@_) }
-
-sub phenotype_comparison_phenotype2_ids { my $self = shift; return $self->phenotype_comparison_phenotype2_id(@_) }
-
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_comparison_phenotype1_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype1_id'
-);
-
-Chado::DBI::Chado::Phenotype->has_many(
-    'phenotype_comparison_phenotype2_id', 'Chado::DBI::Chado::Phenotype_Comparison' => 'phenotype2_id'
-);
-
-# -------------------------------------------------------------------
-package Chado::DBI::Chado::Phenotype_Cvterm;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::DBI::Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
-
-
-Chado::DBI::Chado::Phenotype_Cvterm->has_a(
-    phenotype_id => 'Chado::DBI::Chado::Phenotype'
-);
-
-sub Chado::DBI::Chado::Phenotype_Cvterm::phenotype {
-    return shift->phenotype_id
-}
-
-Chado::DBI::Chado::Phenotype_Cvterm->has_a(
-    cvterm_id => 'Chado::DBI::Chado::Cvterm'
-);
-
-sub Chado::DBI::Chado::Phenotype_Cvterm::cvterm {
-    return shift->cvterm_id
-}
-
-# -------------------------------------------------------------------
 package Chado::DBI::Chado::Phenstatement;
 use base 'Chado::DBI';
 use Class::DBI::Pager;
@@ -1963,30 +2004,6 @@ Chado::DBI::Chado::Phenstatement->has_a(
 
 sub Chado::DBI::Chado::Phenstatement::pub {
     return shift->pub_id
-}
-
-# -------------------------------------------------------------------
-package Chado::DBI::Chado::Feature_Phenotype;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-
-Chado::DBI::Chado::Feature_Phenotype->set_up_table('feature_phenotype');
-
-
-Chado::DBI::Chado::Feature_Phenotype->has_a(
-    feature_id => 'Chado::DBI::Chado::Feature'
-);
-
-sub Chado::DBI::Chado::Feature_Phenotype::feature {
-    return shift->feature_id
-}
-
-Chado::DBI::Chado::Feature_Phenotype->has_a(
-    phenotype_id => 'Chado::DBI::Chado::Phenotype'
-);
-
-sub Chado::DBI::Chado::Feature_Phenotype::phenotype {
-    return shift->phenotype_id
 }
 
 # -------------------------------------------------------------------

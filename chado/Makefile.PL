@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.95 2006-03-22 20:37:48 scottcain Exp $
+# $Id: Makefile.PL,v 1.96 2006-04-12 03:19:10 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -704,6 +704,7 @@ graphviz :: \
 	make $working_dir/modules/library/library.graphviz.png \
 	make $working_dir/modules/map/map.graphviz.png \
 	make $working_dir/modules/organism/organism.graphviz.png \
+	make $working_dir/modules/phenotype/phenotype.graphviz.png \
 	make $working_dir/modules/phylogeny/phylogeny.graphviz.png \
 	make $working_dir/modules/pub/pub.graphviz.png \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
@@ -721,6 +722,7 @@ graphviz_svg :: \
 	make $working_dir/modules/library/library.graphviz.svg \
 	make $working_dir/modules/map/map.graphviz.svg \
 	make $working_dir/modules/organism/organism.graphviz.svg \
+	make $working_dir/modules/phenotype/phenotype.graphviz.svg \
 	make $working_dir/modules/phylogeny/phylogeny.graphviz.svg \
 	make $working_dir/modules/pub/pub.graphviz.svg \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
@@ -738,6 +740,7 @@ diagram :: \
 	make $working_dir/modules/library/library.diagram.png \
 	make $working_dir/modules/map/map.diagram.png \
 	make $working_dir/modules/organism/organism.diagram.png \
+	make $working_dir/modules/phenotype/phenotype.diagram.png \
 	make $working_dir/modules/phylogeny/phylogeny.diagram.png \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
@@ -756,6 +759,7 @@ html :: \
 	make $working_dir/modules/library/library.html \
 	make $working_dir/modules/map/map.html \
 	make $working_dir/modules/organism/organism.html \
+	make $working_dir/modules/phenotype/phenotype.html \
 	make $working_dir/modules/phylogeny/phylogeny.html \
 	make $working_dir/modules/pub/pub.html \
 	make $working_dir/modules/sequence/sequence.html \

@@ -181,7 +181,6 @@ create index cvterm_idx1 on cvterm (cv_id);
 create index cvterm_idx2 on cvterm (name);
 create index cvterm_idx3 on cvterm (dbxref_id);
 
-
 create table cvterm_relationship (
     cvterm_relationship_id serial not null,
     primary key (cvterm_relationship_id),
@@ -3358,8 +3357,69 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
+
+CREATE TABLE phenotype (
+    phenotype_id SERIAL NOT NULL,
+    primary key (phenotype_id),
+    uniquename TEXT NOT NULL,  
+    observable_id INT,
+    FOREIGN KEY (observable_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+    attr_id INT,
+    FOREIGN KEY (attr_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    value TEXT,
+    cvalue_id INT,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    assay_id INT,
+    FOREIGN KEY (assay_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    CONSTRAINT phenotype_c1 UNIQUE (uniquename)
+);
+CREATE INDEX phenotype_idx1 ON phenotype (cvalue_id);
+CREATE INDEX phenotype_idx2 ON phenotype (observable_id);
+CREATE INDEX phenotype_idx3 ON phenotype (attr_id);
+
+COMMENT ON TABLE phenotype IS 'a phenotypic statement, or a single atomic phenotypic observation a controlled sentence describing observable effect of non-wt function -- e.g. Obs=eye, attribute=color, cvalue=red';
+
+COMMENT ON COLUMN phenotype.observable_id IS 'The entity: e.g. anatomy_part, biological_process';
+COMMENT ON COLUMN phenotype.attr_id IS 'Phenotypic attribute (quality, property, attribute, character) - drawn from PATO';
+COMMENT ON COLUMN phenotype.value IS 'value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate';
+COMMENT ON COLUMN phenotype.cvalue_id IS 'Phenotype attribute value (state)';
+COMMENT ON COLUMN phenotype.assay_id IS 'evidence type';
+
+CREATE TABLE phenotype_cvterm (
+    phenotype_cvterm_id SERIAL NOT NULL,
+    primary key (phenotype_cvterm_id),
+    phenotype_id INT NOT NULL,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
+    cvterm_id INT NOT NULL,
+    FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+    CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id)
+);
+CREATE INDEX phenotype_cvterm_idx1 ON phenotype_cvterm (phenotype_id);
+CREATE INDEX phenotype_cvterm_idx2 ON phenotype_cvterm (cvterm_id);
+
+COMMENT ON TABLE phenotype_cvterm IS NULL;
+
+ 
+CREATE TABLE feature_phenotype (
+    feature_phenotype_id SERIAL NOT NULL,
+    primary key (feature_phenotype_id),
+    feature_id INT NOT NULL,
+    FOREIGN KEY (feature_id) REFERENCES feature (feature_id) ON DELETE CASCADE,
+    phenotype_id INT NOT NULL,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
+    CONSTRAINT feature_phenotype_c1 UNIQUE (feature_id,phenotype_id)       
+);
+CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
+CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
+
+COMMENT ON TABLE feature_phenotype IS NULL;
+
+
 -- ==========================================
 -- Chado genetics module
+--
+-- 2006-04-11
+--   split out phenotype tables into phenotype module
 --
 -- redesigned 2003-10-28
 --
@@ -3373,165 +3433,13 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --   Many, including rename of gcontext to genotype,  split 
 --   phenstatement into phenstatement & phenotype, created environment
 --
--- for modeling simple or complex genetic screens
---
--- most genetic statements are about "alleles", although
--- sometimes the definition of allele is stretched
--- (RNAi, engineered construct). genetic statements can
--- also be about large aberrations that take out
--- multiple genes (in FlyBase the policy here is to create
--- alleles for genes within the end-points only, and to
--- attach phenotypic data and so forth to the aberration)
---
--- in chado, a mutant allele is just another feature of type "gene";
--- it is just another form of the canonical wild-type gene feature.
---
--- it is related via an "allele-of" feature_relationship; eg
--- [id:FBgn001, type:gene] <-- [id:FBal001, type:gene]
---
--- with the genetic module, features can either be attached
--- to features of type sequence_variation, or to features of
--- type 'gene' (in the case of mutant alleles).
---
--- if a sequence_variation is large (eg a deficiency) and
--- knocks out multiple genes, then we want to attach the
--- phenotype directly to the sequence variation.
---
--- if the mutation is simple, and affects a single wild-type
--- gene feature, then we would create the mutant allele
--- (another gene feature) and attach the phenotypic data via
--- that feature
---
--- this allows us the option of doing a full structural
--- annotation of the mutant allele gene feature in the future
---
--- we don't necessarily know the molecular details of the
--- the sequence variation (but if we later discover them,
--- we can simply add a featureloc to the sequence_variation
---
--- we can also have sequence variations (of type haplotype_block)
--- that are collections of smaller variations (i.e. via
--- "part_of" feature_relationships) - we could attach phenotypic
--- stuff via this haplotype_block feature or to the alleles it
--- causes
---
--- if we have a mutation affecting the shared region of a nested
--- gene, and we did not know which of the two mutant gene forms were
--- responsible for the resulting phenotype, we would attach the
--- phenotype directly to sequence_variation feature; if we knew
--- which of the two mutant forms of the gene were responsible for
--- the phenotype, we would attach it to them
---
--- we leave open the opportunity for attaching phenotypes via
--- mutant forms of transcripts/proteins/promoters
---
--- we can represent the relationship between a variation and
--- the mutant gene features via a "causes" feature_relationship
---
--- LINKING ALLELES AND VARIATIONS TO PHENOTYPES
---
--- we link via a "genetic context" table - this is essentially
--- the genotype
---
--- most genetic statements take the form
---
--- "allele x[1] shows phenotype P"
---
--- which we represent as "the genetic context defined by x[1] shows P"
---
--- we also allow
---
--- "allele x[1] shows phenotypes P, Q against a background of sev[3]"
---
--- but we actually represent it as
--- "x[1], sev[3] shows phenotypes P, Q"
---
--- x[1] sev[3] is the geneticcontext - genetic contexts can also
--- include things not part of a genotype - e.g. RNAi introduced into cell
---
--- representing environment:
---
--- "allele x[1] shows phenotype P against a background of sev[TS1] at 38 degrees"
--- "allele x[1] shows NO phenotype P against a background of sev[TS1] at 36 degrees"
---
--- we specify this with an environmental context
---
--- we use the phendesc relation to represent the actual organismal 
--- context under observation
---
--- for the description of the phenotype, we are using the standard
--- Observable/Attribute/Value model from the Phenotype Ontology
---
--- we also allow genetic interactions:
---
--- "dx[24] suppresses the wing vein phenotype of H[2]"
---
--- but we actually represent this as:
---
--- "H[2] -> wing vein phenotype P1"
--- "dx[24] -> wing vein phenotype P2"
--- "P2 < P1"
---
--- from this we can do the necessary inference
---
--- complementation:
---
--- "x[1] complements x[2]"
---
--- is actually
---
--- "x[1] -> P1"
--- "x[2] -> P2"
--- "x[2],x[2] -> P3"
--- P3 < P1, P3 < P2
---
--- complementation can be qualified, (eg due to transvection/transsplicing)
---
--- RNAi can be handled - in this case the "allele" is a RNA construct (another
--- feature type) introduced to the cell (but not the genome??) which has an
--- observable phenotypic effect
---
--- "foo[RNAi.1] shows phenotype P"
---
--- mis-expression screens (eg GAL4/UAS) are handled - here the
--- "alleles" are either the construct features, or the insertion features
--- holding the construct (we may need SO type "gal4_insertion" etc);
--- we actually need two alleles in these cases - for both GAL4 and UAS
--- we then record statements such as:
---
--- "Ras85D[V12.S35], gal4[dpp.blk1]  shows phenotype P"
---
--- we use feature_relationships to represent the relationship between
--- the construct and the original non-Scer gene
---
--- we can also record experiments made with other engineered constructs:
--- for example, rescue constructs made from transcripts with an without
--- introns, and recording the difference in phenotype
---
--- the design here is heavily indebted to Rachel Drysdale's paper
--- "Genetic Data in FlyBase"
---
--- ALLELE CLASS
---
--- alleles are amorphs, hypomorphs, etc
---
--- since alleles are features of type gene, we can just use feature_cvterm
--- for this
---
--- SHOULD WE ALSO MAKE THIS CONTEXTUAL TO PHENOTYPE??
---
--- OPEN QUESTION: homologous recombination events
---
--- STOCKS
---
--- this should be in a sub-module of this one; basically we want some
--- kind of linking table between stock and genotype
---
+-- see doc/genetic-notes.txt
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ============
 -- DEPENDENCIES
 -- ============
 -- :import feature from sequence
+-- :import phenotype from phenotype
 -- :import cvterm from cv
 -- :import pub from pub
 -- :import dbxref from general
@@ -3635,170 +3543,67 @@ create index environment_cvterm_idx2 on environment_cvterm (cvterm_id);
 
 COMMENT ON TABLE environment_cvterm IS NULL;
 
--- ================================================
--- TABLE: phenotype
--- ================================================
--- a phenotypic statement, or a single atomic phenotypic
--- observation
--- 
--- a controlled sentence describing observable effect of non-wt function
--- 
--- e.g. Obs=eye, attribute=color, cvalue=red
--- 
--- see notes from Phenotype Ontology meeting
--- 
--- observable_id       : e.g. anatomy_part, biological_process
--- attr_id             : e.g. process
--- value               : unconstrained free text value
--- cvalue_id           : constrained value from ontology, e.g. "abnormal", "big"
--- assay_id            : e.g. name of specific test
---
-create table phenotype (
-    phenotype_id serial not null,
-    primary key (phenotype_id),
-    uniquename text not null,  
-    observable_id int,
-    foreign key (observable_id) references cvterm (cvterm_id) on delete cascade,
-    attr_id int,
-    foreign key (attr_id) references cvterm (cvterm_id) on delete set null,
-    value text,
-    cvalue_id int,
-    foreign key (cvalue_id) references cvterm (cvterm_id) on delete set null,
-    assay_id int,
-    foreign key (assay_id) references cvterm (cvterm_id) on delete set null,
-    constraint phenotype_c1 unique (uniquename)
-);
-create index phenotype_idx1 on phenotype (cvalue_id);
-create index phenotype_idx2 on phenotype (observable_id);
-create index phenotype_idx3 on phenotype (attr_id);
-
-COMMENT ON TABLE phenotype IS NULL;
-
-
--- ================================================
--- TABLE: phenotype_cvterm
--- ================================================
-create table phenotype_cvterm (
-    phenotype_cvterm_id serial not null,
-    primary key (phenotype_cvterm_id),
-    phenotype_id int not null,
-    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
-    cvterm_id int not null,
-    foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
-    constraint phenotype_cvterm_c1 unique (phenotype_id, cvterm_id)
-);
-create index phenotype_cvterm_idx1 on phenotype_cvterm (phenotype_id);
-create index phenotype_cvterm_idx2 on phenotype_cvterm (cvterm_id);
-
-COMMENT ON TABLE phenotype_cvterm IS NULL;
-
-
--- ================================================
--- TABLE: phenstatement
--- ================================================
--- Phenotypes are things like "larval lethal".  Phenstatements are things
--- like "dpp[1] is recessive larval lethal". So essentially phenstatement
--- is a linking table expressing the relationship between genotype, environment,
--- and phenotype.
--- 
-create table phenstatement (
-    phenstatement_id serial not null,
+CREATE TABLE phenstatement (
+    phenstatement_id SERIAL NOT NULL,
     primary key (phenstatement_id),
-    genotype_id int not null,
-    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
-    environment_id int not null,
-    foreign key (environment_id) references environment (environment_id) on delete cascade,
-    phenotype_id int not null,
-    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade,
-    constraint phenstatement_c1 unique (genotype_id,phenotype_id,environment_id,type_id,pub_id)
+    genotype_id INT NOT NULL,
+    FOREIGN KEY (genotype_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
+    environment_id INT NOT NULL,
+    FOREIGN KEY (environment_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
+    phenotype_id INT NOT NULL,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
+    type_id INT NOT NULL,
+    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+    pub_id INT NOT NULL,
+    FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
+    CONSTRAINT phenstatement_c1 UNIQUE (genotype_id,phenotype_id,environment_id,type_id,pub_id)
 );
-create index phenstatement_idx1 on phenstatement (genotype_id);
-create index phenstatement_idx2 on phenstatement (phenotype_id);
+CREATE INDEX phenstatement_idx1 ON phenstatement (genotype_id);
+CREATE INDEX phenstatement_idx2 ON phenstatement (phenotype_id);
 
-COMMENT ON TABLE phenstatement IS NULL;
+COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp[1] is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.';
 
-
--- ================================================
--- TABLE: feature_phenotype
--- ================================================
-create table feature_phenotype (
-    feature_phenotype_id serial not null,
-    primary key (feature_phenotype_id),
-    feature_id int not null,
-    foreign key (feature_id) references feature (feature_id) on delete cascade,
-    phenotype_id int not null,
-    foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
-    constraint feature_phenotype_c1 unique (feature_id,phenotype_id)       
-);
-create index feature_phenotype_idx1 on feature_phenotype (feature_id);
-create index feature_phenotype_idx2 on feature_phenotype (phenotype_id);
-
-COMMENT ON TABLE feature_phenotype IS NULL;
-
-
--- ================================================
--- TABLE: phendesc
--- ================================================
--- RELATION: phendesc
---
--- a summary of a _set_ of phenotypic statements for any one
--- gcontext made in any one
--- publication
--- 
-create table phendesc (
-    phendesc_id serial not null,
+CREATE TABLE phendesc (
+    phendesc_id SERIAL NOT NULL,
     primary key (phendesc_id),
-    genotype_id int not null,
-    foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
-    environment_id int not null,
-    foreign key (environment_id) references environment ( environment_id) on delete cascade,
-    description text not null,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade,
-    constraint phendesc_c1 unique (genotype_id,environment_id,pub_id)
+    genotype_id INT NOT NULL,
+    FOREIGN KEY (genotype_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
+    environment_id INT NOT NULL,
+    FOREIGN KEY (environment_id) REFERENCES environment ( environment_id) ON DELETE CASCADE,
+    description TEXT NOT NULL,
+    pub_id INT NOT NULL,
+    FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
+    CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,pub_id)
 );
-create index phendesc_idx1 on phendesc (genotype_id);
-create index phendesc_idx2 on phendesc (environment_id);
-create index phendesc_idx3 on phendesc (pub_id);
+CREATE INDEX phendesc_idx1 ON phendesc (genotype_id);
+CREATE INDEX phendesc_idx2 ON phendesc (environment_id);
+CREATE INDEX phendesc_idx3 ON phendesc (pub_id);
 
-COMMENT ON TABLE phendesc IS NULL;
+COMMENT ON TABLE phendesc IS 'a summary of a _set_ of phenotypic statements for any one gcontext made in any one publication';
 
-
--- ================================================
--- TABLE: phenotype_comparison
--- ================================================
--- comparison of phenotypes
--- eg, genotype1/environment1/phenotype1 "non-suppressible" wrt 
--- genotype2/environment2/phenotype2
--- 
-create table phenotype_comparison (
-    phenotype_comparison_id serial not null,
+CREATE TABLE phenotype_comparison (
+    phenotype_comparison_id SERIAL NOT NULL,
     primary key (phenotype_comparison_id),
-    genotype1_id int not null,
-        foreign key (genotype1_id) references genotype (genotype_id) on delete cascade,
-    environment1_id int not null,
-        foreign key (environment1_id) references environment (environment_id) on delete cascade,
-    genotype2_id int not null,
-        foreign key (genotype2_id) references genotype (genotype_id) on delete cascade,
-    environment2_id int not null,
-        foreign key (environment2_id) references environment (environment_id) on delete cascade,
-    phenotype1_id int not null,
-        foreign key (phenotype1_id) references phenotype (phenotype_id) on delete cascade,
-    phenotype2_id int,
-        foreign key (phenotype2_id) references phenotype (phenotype_id) on delete cascade,
-    type_id int not null,
-        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-    pub_id int not null,
-    foreign key (pub_id) references pub (pub_id) on delete cascade,
-    constraint phenotype_comparison_c1 unique (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
+    genotype1_id INT NOT NULL,
+        FOREIGN KEY (genotype1_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
+    environment1_id INT NOT NULL,
+        FOREIGN KEY (environment1_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
+    genotype2_id INT NOT NULL,
+        FOREIGN KEY (genotype2_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
+    environment2_id INT NOT NULL,
+        FOREIGN KEY (environment2_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
+    phenotype1_id INT NOT NULL,
+        FOREIGN KEY (phenotype1_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
+    phenotype2_id INT,
+        FOREIGN KEY (phenotype2_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
+    type_id INT NOT NULL,
+        FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+    pub_id INT NOT NULL,
+    FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
+    CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
 );
 
-COMMENT ON TABLE phenotype_comparison IS NULL;
-
+COMMENT ON TABLE phenotype_comparison IS 'comparison of phenotypes eg, genotype1/environment1/phenotype1 "non-suppressible" wrt  genotype2/environment2/phenotype2';
 -- NOTE: this module is all due for revision...
 
 -- A possibly problematic case is where we want to localize an object
@@ -3907,7 +3712,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_schema.sql,v 1.39 2006-04-05 02:43:22 scottcain Exp $
+-- $Id: default_schema.sql,v 1.40 2006-04-12 03:19:11 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --

@@ -1,0 +1,583 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
+<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
+
+<h1 class="SchemaDescription">
+	Description of Schema
+</h1>
+
+<hr />
+
+<!-- 
+	Table listing (3 tables)
+ -->
+
+<a name="top" />
+
+<table class="LinkTable" width="100%">
+
+<tr>
+	<td class="LinkTableCell"><h2 class="LinkTableTitle">
+	Tables
+</h2></td>
+</tr>
+
+<!-- 
+	Start link to table 'phenotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype-link" href="#phenotype">phenotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype'
+ -->
+
+<!-- 
+	Start link to table 'phenotype_cvterm'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype_cvterm-link" href="#phenotype_cvterm">phenotype_cvterm</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype_cvterm'
+ -->
+
+<!-- 
+	Start link to table 'feature_phenotype'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_phenotype-link" href="#feature_phenotype">feature_phenotype</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_phenotype'
+ -->
+
+</table>
+
+<!-- 
+	Starting table 'phenotype'
+ -->
+
+<a name="phenotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype
+</h3></td>
+		<a name="phenotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	a phenotypic statement, or a single atomic phenotypic observation a controlled sentence describing observable effect of non-wt function -- e.g. Obs=eye, attribute=color, cvalue=red 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype-observable_id">observable_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">The entity: e.g. anatomy_part, biological_process </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype-attr_id">attr_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">Phenotypic attribute (quality, property, attribute, character) - drawn from PATO </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype-cvalue_id">cvalue_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">Phenotype attribute value (state) </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype-assay_id">assay_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">evidence type </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx1</td>
+	<td>cvalue_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx2</td>
+	<td>observable_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_idx3</td>
+	<td>attr_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>observable_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>attr_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvalue_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>assay_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenotype_cvterm'
+ -->
+
+<a name="phenotype_cvterm" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype_cvterm
+</h3></td>
+		<a name="phenotype_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_cvterm-phenotype_cvterm_id">phenotype_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_cvterm-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_cvterm-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_cvterm_idx1</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_cvterm_idx2</td>
+	<td>cvterm_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>phenotype_id, cvterm_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_phenotype'
+ -->
+
+<a name="feature_phenotype" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_phenotype
+</h3></td>
+		<a name="feature_phenotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	NULL
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_phenotype-feature_phenotype_id">feature_phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_phenotype-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_phenotype-phenotype_id">phenotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_phenotype_idx1</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_phenotype_idx2</td>
+	<td>phenotype_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_id, phenotype_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+Created by <a href="http://sqlfairy.sourceforge.net">
+SQL::Translator 0.07</a>
+
+</body>
+</html>
