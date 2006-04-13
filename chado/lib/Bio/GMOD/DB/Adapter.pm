@@ -1791,7 +1791,7 @@ sub uniquename_validation {
       ) { #if this returns non-zero, it is already in the cache and not valid
 
       $uniquename = "$uniquename-$nextfeature";
-      return uniquename_validation($uniquename, $type, $organism, $nextfeature);
+      return $self->uniquename_validation($uniquename, $type, $organism, $nextfeature);
 
   }
   else { #this uniquename is valid; cache it and return
