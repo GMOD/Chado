@@ -37,6 +37,7 @@ use Getopt::Long;
 #use Data::Dumper;
 use URI::Escape;
 use lib '/Users/cain/cvs_stuff/schema/chado/lib';
+use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::GMOD::DB::Adapter;
 
 =head1 NAME
