@@ -78,7 +78,7 @@ CREATE OR REPLACE FUNCTION store_db (VARCHAR)
       INSERT INTO db
        (name)
          VALUES
-       (v_name)
+       (v_name);
        RETURN currval(''db_db_id_seq'');
     END IF;
     RETURN v_db_id;
@@ -104,7 +104,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
       INSERT INTO dbxref
        (db_id,accession)
          VALUES
-       (v_db_id,v_accession)
+       (v_db_id,v_accession);
        RETURN currval(''dbxref_dbxref_id_seq'');
     END IF;
     RETURN v_dbxref_id;
@@ -3712,7 +3712,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_schema.sql,v 1.40 2006-04-12 03:19:11 scottcain Exp $
+-- $Id: default_schema.sql,v 1.41 2006-04-13 15:23:34 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
