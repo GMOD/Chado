@@ -26,7 +26,13 @@ use install;
 my $origdir = cwd;
 my $homedir = "$Bin/..";
 
-my $conf = Bio::GMOD::Config->new();
+my $arg;
+if ($ARGV[0]) {
+    $ARGV[0] =~ /GMOD_ROOT\=(.+)/;
+    $arg = $1;
+}
+
+my $conf = Bio::GMOD::Config->new($arg);
 my $gmod_root = $conf->gmod_root();
 
 $gmod_root ||= '/usr/local/gmod';
