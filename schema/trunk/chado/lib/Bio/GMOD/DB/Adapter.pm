@@ -758,8 +758,11 @@ sub uniquename_cache {
     my @bogus_keys = grep {!/($ALLOWED_UNIQUENAME_CACHE_KEYS)/} keys %argv;
 
     if (@bogus_keys) {
-        die "I don't know what to do with the key(s) ".@bogus_keys.
-          " in the uniquename_cache method; it's probably because of a typo\n";
+        for (@bogus_keys) {
+            warn "I don't know what to do with the key ".$_.
+                 " in the uniquename_cache method; it's probably because of a typo\n";
+        }
+        confess;
     }
 
     if ($argv{validate}) {
@@ -816,7 +819,7 @@ sub uniquename_cache {
 
 =item Function
 
-With a organism common name as an arg, sets the orgainism_id value
+With a organism common name as an arg, sets the organism_id value
 
 =item Returns
 
@@ -824,7 +827,7 @@ value of organism_id (a scalar)
 
 =item Arguments
 
-With a organism common name as an arg, sets the orgainism_id value
+With a organism common name as an arg, sets the organism_id value
 
 =back
 
@@ -1834,6 +1837,7 @@ sub synonyms  {
     my $self = shift;
     my $alias = shift;
     my $feature_id = shift;
+
     unless ($self->cache('synonym',$alias)) {
       unless ($self->cache('type','synonym')) {
         my $sth
@@ -2032,65 +2036,22 @@ sub handle_target {
       my $tstrand   = $target->strand ? $target->strand : '\N';
       my $tsource   = $feature->source->value;
 
-      synonyms($target_id,$self->cache('feature',$uniquename));
+      $self->synonyms($target_id,$self->cache('feature',$uniquename));
 
-      #warn join("\t", (($feature->annotation->get_Annotations('Parent'))[0]->value,$target_id,$tstart,$tend )) if $feature->annotation->get_Annotations('Parent');
+      my $created_target_feature = 0;
 
-      if ($feature->annotation->get_Annotations('Parent')
-         && $self->cache('feature',($feature->annotation->get_Annotations('Parent'))[0]->value) ) {
-
-        #check for an existing feature with the Target's uniquename
-        if ( $self->uniquename_cache(validate=>1,uniquename=>$target_id) ) {
-            $self->print_floc(
-                $self->nextfeatureloc,
-                $self->nextfeature,
-                $self->uniquename_cache(validate=>1,uniquename=>$target_id),
-                $tstart, $tend, $tstrand, '\N',$rank,'0'
+      #check for an existing feature with the Target's uniquename
+      if ( $self->uniquename_cache(validate=>1,uniquename=>$target_id) ) {
+          $self->print_floc(
+                            $self->nextfeatureloc,
+                            $self->nextfeature,
+                            $self->uniquename_cache(validate=>1,uniquename=>$target_id),
+                            $tstart, $tend, $tstrand, '\N',$rank,'0'
             );
-        }
-        else {
-            my $gffline = $feature->write_feature();
-            die << "END_DIE"
-I don't think this should happen; there is a Target with a Parent, but
-no feature maps as the Target Parent for this feature:
-$gffline
-END_DIE
-;
-        }
-      } else { #this Target needs a feature too
-
-        #first, check for an existing feature with the Target's unqiuename
-        if ( $self->uniquename_cache(validate=>1,uniquename=>$target_id) ) {
-          $self->print_floc(
-              $self->nextfeatureloc,
-              $self->nextfeature,
-              $self->uniquename_cache(validate=>1,uniquename=>$target_id),
-              $tstart, $tend, $tstrand, '\N',$rank,'0'
-          );
-        }
-        else { #need to create a 'dummy' feature for the Target
-          $self->nextfeature('++');
-          $name ||= "$featuretype-$uniquename";
-
-          $self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N');
-          $self->print_floc(
-                $self->nextfeatureloc,
-                $self->nextfeature-1,
-                $self->nextfeature,
-                $tstart,
-                $tend,
-                $tstrand,
-                '\N',
-                $rank,
-                '0'
-                );
-          $self->uniquename_cache(
-                                   feature_id   => $self->nextfeature,
-                                   type_id      => $type,
-                                   orgainism_id => $self->organism_id(),
-                                   uniquename   => $target_id
-                                 );
-        }
+      }
+      else {
+          $self->create_target_feature($name,$featuretype,$uniquename,$target_id,$type,$tstart,$tend,$tstrand,$rank);
+          $created_target_feature = 1;
       }
 
       my $score = $feature->score->value ? $feature->score->value : '\N';
@@ -2123,13 +2084,43 @@ END_DIE
         $score_string = "\\N\t\\N\t\\N\t$score";
       }
 
-      $self->print_af($nextanalysisfeature,$self->nextfeature,$self->cache('analysis',$ankey),$score_string);
+      $self->print_af($nextanalysisfeature,
+                      $self->nextfeature-$created_target_feature, #takes care of Allen's nextfeature bug--FINALLY!
+                      $self->cache('analysis',$ankey),
+                      $score_string);
       $nextanalysisfeature++;
       $self->nextfeatureloc('++');
       $rank++;
     }
 }
 
+sub create_target_feature {
+    my $self = shift;
+    my ($name,$featuretype,$uniquename,$target_id,$type,$tstart,$tend,$tstrand,$rank) = @_;
+
+    $self->nextfeature('++');
+    $name ||= "$featuretype-$uniquename";
+
+    $self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N');
+    $self->print_floc(
+           $self->nextfeatureloc,
+           ($self->nextfeature)-1,
+           $self->nextfeature,
+           $tstart,
+           $tend,
+           $tstrand,
+           '\N',
+           $rank,
+           '0'
+          );
+    $self->uniquename_cache(
+                            feature_id   => $self->nextfeature,
+                            type_id      => $type,
+                            organism_id  => $self->organism_id(),
+                            uniquename   => $target_id
+                           );
+    return;
+}
 
 sub handle_nontarget_analysis {
     my $self = shift;

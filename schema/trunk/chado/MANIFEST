@@ -117,7 +117,6 @@ modules/companalysis/examples/basic/index.html
 modules/companalysis/examples/basic/interpro.itxt
 modules/companalysis/examples/basic/interpro.xml
 modules/contact/contact.sql
-modules/cv/bridges/godb-bridge.sql
 modules/cv/cv-dbapi.sqli
 modules/cv/cv-intro.txt
 modules/cv/cv.html
@@ -185,7 +184,6 @@ README.gene_expression
 README.H_sapiens
 soi/cgi/get_xml.pl
 soi/readme
-soi/scripts/dump_generegion_soi.pl
 soi/scripts/dump_segment.pl
 soi/SOI/Adapter.pm
 soi/SOI/Feature.pm

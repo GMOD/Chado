@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.43 2006-04-12 03:19:10 scottcain Exp $
+$Id: INSTALL,v 1.44 2006-04-13 20:39:16 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -37,6 +37,8 @@ Prerequisites:
       in order for this change to take affect):
 
         tcpip_socket = true
+
+      (This option is not available and not needed in PostgreSQL 8.1.)
 
     * create a database user with permission to drop and add databases;
       the database user name should be the same as your unix user name to
@@ -129,10 +131,14 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * SQL::Translator          (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
+    * Graph::Directed          (BioPerl prereq)
+    * Data::Stag               (chado)
+    * XML::Parser::PerlSAX     (chado)
     * Module::Build            (chado)
     * Class::DBI               (chado)
     * Class::DBI::Pg           (chado)
     * Class::DBI::Pager        (chado)
+    * DBIx::DBStag             (chado)
     * XML::Simple              (chado)
     * LWP                      (chado)
     * Template                 (chado)
