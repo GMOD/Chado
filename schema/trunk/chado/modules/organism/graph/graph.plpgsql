@@ -1,0 +1,221 @@
+---
+--- Fill functions
+---
+
+--- example: select * from fill_organismpath(7); where 7 is organism_id
+--- fill path from the node to its children and their children
+CREATE OR REPLACE FUNCTION _fill_organismpath4node(INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    origin alias for $1;
+    child_id alias for $2;
+    typeid alias for $3;
+    depth alias for $4;
+    organism organism_relationship%ROWTYPE;
+    exist_c int;
+
+BEGIN
+
+    --- RAISE NOTICE ''depth=% root=%'', depth,child_id;
+    --- not check type_id as it may be null and not very meaningful in organismpath when pathdistance > 1
+    SELECT INTO exist_c count(*) FROM organismpath WHERE object_id = origin AND subject_id = child_id AND pathdistance = depth;
+
+    IF (exist_c = 0) THEN
+        INSERT INTO organismpath (object_id, subject_id, type_id, pathdistance) VALUES(origin, child_id, typeid, depth);
+    END IF;
+    FOR organism IN SELECT * FROM organism_relationship WHERE object_id = child_id LOOP
+        PERFORM _fill_organismpath4node(origin, organism.subject_id, organism.type_id, depth+1);
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+CREATE OR REPLACE FUNCTION _fill_organismpath4root(INTEGER) RETURNS INTEGER AS
+'
+DECLARE
+    rootid alias for $1;
+    ttype int;
+    cterm organism_relationship%ROWTYPE;
+    child organism_relationship%ROWTYPE;
+
+BEGIN
+
+    SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
+    PERFORM _fill_organismpath4node(rootid, rootid, ttype, 0);
+    FOR cterm IN SELECT * FROM organism_relationship WHERE object_id = rootid LOOP
+        PERFORM _fill_organismpath4root(cterm.subject_id);
+        -- RAISE NOTICE ''DONE for term, %'', cterm.subject_id;
+    END LOOP;
+    RETURN 1;
+END;
+'
+LANGUAGE 'plpgsql';
+
+--
+-- Probably best not to call this, but to fill subtrees with _fill_organismpath4root(INTEGER) instead.
+--
+
+CREATE OR REPLACE FUNCTION fill_organismpath() RETURNS INTEGER AS
+'
+DECLARE
+    root organism%ROWTYPE;
+
+BEGIN
+
+    TRUNCATE organismpath;
+
+    FOR root IN SELECT o.* FROM organism AS o WHERE o.species = ''root'' LOOP
+        PERFORM _fill_organismpath4root(root.organism_id);
+    END LOOP;
+    RETURN 1;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+
+
+
+---
+--- Accessor functions
+---
+
+CREATE OR REPLACE FUNCTION get_organism_below(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm organismpath%ROWTYPE;
+    cterm2 organismpath%ROWTYPE;
+
+BEGIN
+
+    FOR cterm IN SELECT * FROM organism_relationship WHERE object_id = root LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM get_all_organism_subject_ids(cterm.subject_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_organism_above(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm organismpath%ROWTYPE;
+    cterm2 organismpath%ROWTYPE;
+
+BEGIN
+
+    FOR cterm IN SELECT * FROM organism_relationship WHERE subject_id = leaf LOOP
+        RETURN NEXT cterm;
+-- RAISE NOTICE ''FOR cterm2 IN SELECT * FROM get_all_organism_object_ids(%) LOOP'', cterm.object_id;
+        FOR cterm2 IN SELECT * FROM get_all_organism_object_ids(cterm.object_id) LOOP
+-- RAISE NOTICE ''cterm.object_id=% cterm2.object_id=%'', cterm.object_id, cterm2.object_id;
+
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+
+
+
+
+---
+--- Internal accessor functions
+---
+
+CREATE OR REPLACE FUNCTION get_all_organism_subject_ids(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm organismpath%ROWTYPE;
+    exist_c int;
+BEGIN
+
+    SELECT INTO exist_c count(*) FROM organismpath WHERE object_id = root and pathdistance <= 0;
+    IF (exist_c > 0) THEN
+        FOR cterm IN SELECT * FROM organismpath WHERE object_id = root and pathdistance > 0 LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    ELSE
+        FOR cterm IN SELECT * FROM _get_all_organism_subject_ids(root) LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    END IF;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION get_all_organism_object_ids(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm organismpath%ROWTYPE;
+    exist_c int;
+BEGIN
+
+
+    SELECT INTO exist_c count(*) FROM organismpath WHERE subject_id = leaf and pathdistance <= 0;
+    IF (exist_c > 0) THEN
+        FOR cterm IN SELECT * FROM organismpath WHERE subject_id = leaf AND pathdistance > 0 LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    ELSE
+        FOR cterm IN SELECT * FROM _get_all_organism_object_ids(leaf) LOOP
+            RETURN NEXT cterm;
+        END LOOP;
+    END IF;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION _get_all_organism_object_ids(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    leaf alias for $1;
+    cterm organismpath%ROWTYPE;
+    cterm2 organismpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM organism_relationship WHERE subject_id = leaf LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_organism_object_ids(cterm.object_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
+
+
+CREATE OR REPLACE FUNCTION _get_all_organism_subject_ids(integer) RETURNS SETOF organismpath AS
+'
+DECLARE
+    root alias for $1;
+    cterm organismpath%ROWTYPE;
+    cterm2 organismpath%ROWTYPE;
+BEGIN
+
+    FOR cterm IN SELECT * FROM organism_relationship WHERE object_id = root LOOP
+        RETURN NEXT cterm;
+        FOR cterm2 IN SELECT * FROM _get_all_organism_subject_ids(cterm.subject_id) LOOP
+            RETURN NEXT cterm2;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;   
+'
+LANGUAGE 'plpgsql';
+
