@@ -1,0 +1,165 @@
+\section{Chado and advanced ontology features}
+
+This section describes advanced usage of the \cv module for use with
+OWL-DL \cite{OWL}, advanced Obo format 1.2 \cite{OboFormat} features
+or elements from other ontology formalisms.
+
+If you aren't sure what this means, you probably don't need to read
+this section yet.
+
+\subsection{Background}
+
+See the document on \cite{ConvertingOboToOWL}
+
+\subsection{Logical definitions}
+
+In a normal ontology DAG representation in chado, the
+cvterm_relationship rows represent relationships between terms, or
+more formally, {\em necessary conditions}. A logical definition must
+have both {\em necessary and sufficient conditions}. A logical
+definition often consists of a {\em generic term} (aka genus) and one
+or more {\em discriminating characteristics} (aka differentiae). The
+discriminating characteristics are typically relationships 
+
+For example, the logical definition of {\tt larval locomotory
+behaviour} would be a {\tt locomotory behaviour} (genus) which {\em
+hasStage} {\tt larval stage} (where hasStage could be drawn from an
+ontology of relations, and larval stage may come from an insect
+developmental stage ontology). These constitute both necessary and
+sufficient conditions: the conditions are necessary in that all
+instances of larval locomotory behavior are necessarily locomotory
+behaviors and are necessarily manifested at the larval stage. We could
+represent this using a normal DAG. However, because this is a
+definition it also constitutes sufficient conditions, in that any
+instance of locomotory behavior which manifests at the larval stage is
+by definition a larval locomotory behavior.
+
+In an ontology formalism like OWL-DL or Obo-1.2, genus-differentiae
+are represented using set-intersections.
+
+Here is the Obo 1.2 representation:
+
+\begin{verbatim}
+[Term]
+id: GO:0008345
+name: larval locomotory behavior
+namespace: biological_process
+is_a: GO:0007626                      ! locomotory behavior
+is_a: GO:0030537                      ! larval behavior
+intersection_of: GO:0007626           ! locomotory behavior
+intersection_of: during FBdv:00005336 ! larval stage
+\end{verbatim}
+
+Here is the equivalent in OWL (note: RDF-XML syntax is very verbose!):
+
+\begin{verbatim}
+  <owl:Class rdf:ID="GO_0008345">
+    <rdfs:label xml:lang="en">larval locomotory behavior</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#GO_0007626"/>
+    <rdfs:subClassOf rdf:resource="#GO_0030537"/>
+    <owl:equivalentClass>
+      <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#GO_0007626"/>
+          <owl:Restriction>
+            <owl:onProperty>
+              <owl:ObjectProperty rdf:about="#during"/>
+            </owl:onProperty>
+            <owl:someValuesFrom rdf:resource="#FBdv_00005336"/>
+          </owl:Restriction>
+        </owl:intersectionOf>
+      </owl:Class>
+    </owl:equivalentClass>
+  </owl:Class>
+\end{verbatim}
+
+When converting to chado we employ a more economical representation:
+
+\begin{verbatim}
+\end{verbatim}
+
+If you wish to convert Obo-specified logical definitions to chadoxml
+you will need go-perl v0.05 or higher (if you have a lower version,
+the intersection\_of tags will simply be ignored). 
+
+\subsubsection{How logical definitions are stored in Chado}
+
+This involves no schema changes to the cv module. Each intersection\_of
+goes in as a DAG arc of type internal:intersection\_of. The object_id
+in the arc is either a term (for the genus) or an anonymous term
+representing a restriction (the differentium). the restriction has a
+relationship of some type to another term.
+
+For example, for "larval locomotory behavior" we would normally just have:
+
+\begin{verbatim}
+LLB is_a LocomotoryBehavior
+LLB is_a LarvalBehavior
+\begin{verbatim}
+
+If we load a logical definition for this term (see
+go-dev/go-perl/t/data/llm/obo), like this:
+
+\begin{verbatim}
+[Term]
+id: GO:0008345
+name: larval locomotory behavior
+namespace: biological_process
+is_a: GO:0007626                      ! locomotory behavior
+is_a: GO:0030537                      ! larval behavior
+intersection_of: GO:0007626           ! locomotory behavior
+intersection_of: during FBdv:00005336 ! larval stage
+\end{verbatim}
+
+Then the intersection\_ofs get stored using the basic DAG tables as:
+
+
+\begin{table}[htb]
+\center
+{ \small
+\begin{tabular}{l l l}
+Subject & Relation & Object \\ \hline
+LLB & intersection\_of & LocomotoryBehavior
+LLB & intersection\_of & anon:xxx
+anon:xxx & during & FBv:00005336
+
+\label{tab:intersections-in-Chado}
+\end{tabular}
+}
+\caption{Logical definition stored ib cvterm\_relationship table}
+\label{tab:tab-esc-str}
+\end{table}
+
+\subsubsection{Logical Definition Views}
+
+Two views: cvterm\_genus and cvterm\_differentium views are in
+chado/modules/cv/views 
+
+\subsubsection{Example use case: Phenotypes}
+
+The idea here is that queries for composed term "syndactyly" should
+automatically return the same results as a boolean query for
+"fusion"+inheres_in="finger" regardless of whether the annotation is
+to the composed term or is a composed annotation (provided we put the
+logical definition of syndactyly in the database)
+
+\subsubsection{Example use case: feature types}
+
+The Sequence Ontology has some logical definitions - you will need to
+load the file {\tt so-xp.obo}
+
+\subsubsection{Example use case: GO}
+
+See
+http://www.fruitfly.org/~cjm/obol
+
+\subsubsection{Example use case: Drawing DAGs}
+
+Currently the DAGs of many OBO ontologies are highly tangled; see:
+http://www.fruitfly.org/~cjm/obol/doc/go-complexity.html
+
+If all terms have logical definitions, then there is only one 'true'
+(genus) \isa parent. This enables us to disentangle the DAGs and draw
+distinct hierarchies. For example, the GO term {\em cysteine
+biosynthesis} could be drawn as two distinct hierarchies - one process
+and one chemical
