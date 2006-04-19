@@ -227,3 +227,19 @@ If all terms have logical definitions, then there is only one 'true'
 distinct hierarchies. For example, the GO term {\em cysteine
 biosynthesis} could be drawn as two distinct hierarchies - one process
 and one chemical
+
+\subsubsection{Loading OWL into Chado}
+
+Not all OWL-DL features are supported. Only intersectionOfs
+correspondibg to genus-differentiae are loaded.
+
+First you must convert OWL into Obo 1.2 format. There will soon be a
+way to do this in OboEdit. For now you can use blipkit
+(http://www.blipkit.org)
+
+\begin{verbatim}
+blip io-convert my.owl -to obo -o my.obo
+\end{verbatim}
+
+Once you have an obo file you can run go2chadoxml, as above
+
