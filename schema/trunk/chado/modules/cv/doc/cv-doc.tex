@@ -1,0 +1,43 @@
+\chapter{The cv Module: Ontologies}
+
+\section{Introduction}
+
+We have seen how the sequence module makes extensive use of terms
+taken from various ontologies such as SO and the OBO Relations
+Ontology, using the type\_id foreign key column. In addition, features
+can be annotated using ontologies such as GO using the feature\_cvterm
+linking table. These terms are modelled using the cv module, the core
+of which is the cvterm table.
+
+An ontology, terminology or cv (controlled vocabulary) , is a
+collection of terms (here equivalent to what are more typically called
+classes, types, categories or kinds in the ontology literature[REF])
+in a particular domain of interest. Examples include "gene" (from SO),
+"transcription factor activity" (from GO molecular function) and
+"lymphocyte" (from OBO-Cell).  The chado cv module is based on the GO
+Database schema, described here[14].  Terms are stored in the cvterm
+table, and relationships between terms are stored in the
+cvterm\_relationship table. This table follows an analogous structure
+to the feature\_relationship table, in that it has columns subject\_id,
+object\_id and type\_id. Here, all three of these foreign keys refer to
+rows in the cvterm table.
+
+A detailed treatment of relationship types in biological ontologies
+can be found here[13]. Of particular interest to Chado is the is\_a
+relation, which specifies a sub- typing relationship between two terms
+or classes. Recall that tables in the sequence module frequently (such
+as the feature table) defined a type\_id foreign key column to indicate
+the specific type or class of entity for each row in that table. The
+combination of the type\_id column and the is\_a relationship gives
+Chado a data sub- classing system, beyond what is possible with
+traditional SQL database semantics.
+
+This is discussed further in a later section The collection of
+cvterms and cvterm\_relationships can be considered to constitute
+vertices and edges in a graph. This graph is typically acyclic (a
+DAG), though it is not guaranteed to be as certain relationship types
+are allowed to form cycles.
+
+\section{Transitive Closure}
+
+
