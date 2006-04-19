@@ -23,7 +23,7 @@ discriminating characteristics are typically relationships
 
 For example, the logical definition of {\tt larval locomotory
 behaviour} would be a {\tt locomotory behaviour} (genus) which {\em
-hasStage} {\tt larval stage} (where hasStage could be drawn from an
+during} {\tt larval stage} (where {\em during} could be drawn from an
 ontology of relations, and larval stage may come from an insect
 developmental stage ontology). These constitute both necessary and
 sufficient conditions: the conditions are necessary in that all
@@ -46,8 +46,8 @@ name: larval locomotory behavior
 namespace: biological_process
 is_a: GO:0007626                      ! locomotory behavior
 is_a: GO:0030537                      ! larval behavior
-intersection_of: GO:0007626           ! locomotory behavior
-intersection_of: during FBdv:00005336 ! larval stage
+intersection_of: GO:0007626           ! GENUS: locomotory behavior
+intersection_of: during FBdv:00005336 ! DIFFERENTIUM: during larval stage
 \end{verbatim}
 
 Here is the equivalent in OWL (note: RDF-XML syntax is very verbose!):
@@ -73,14 +73,74 @@ Here is the equivalent in OWL (note: RDF-XML syntax is very verbose!):
   </owl:Class>
 \end{verbatim}
 
-When converting to chado we employ a more economical representation:
+When converting to chado we employ a more economical representation,
+in terms of the number of triples we use:
 
 \begin{verbatim}
+  <!-- normal DAG relationships (necessary conditions) -->
+  <cvterm_relationship>
+    <type_id>is_a</type_id>
+    <subject_id>GO:0008345</subject_id>
+    <object_id>GO:0007626</object_id>
+  </cvterm_relationship>
+  <cvterm_relationship>
+    <type_id>is_a</type_id>
+    <subject_id>GO:0008345</subject_id>
+    <object_id>GO:0030537</object_id>
+  </cvterm_relationship>
+
+  <!-- Genus/generic term -->
+  <cvterm_relationship>
+    <type_id>intersection_of</type_id>
+    <subject_id>GO:0008345</subject_id>
+    <object_id>GO:0007626</object_id> <!-- locomotory behavior -->
+  </cvterm_relationship>
+
+  <!-- Discriminating characteristics -->
+  <cvterm_relationship>
+    <type_id>intersection_of</type_id>
+    <subject_id>GO:0008345</subject_id>
+    <object_id>
+
+      <!-- anonymous term representing  during(larval stage) -->
+      <cvterm>
+        <dbxref_id>
+          <dbxref>
+            <db_id>internal</db_id>
+            <accession>restriction--OBOL:during--GO:0008345</accession>
+          </dbxref>
+        </dbxref_id>
+
+        <!-- note: as this is an anon term, the name will never
+             be shown to a user -->
+        <name>restriction--OBOL:during--GO:0008345</name>
+        <cv_id>anonymous_cv</cv_id>
+        <cvtermprop>
+          <type_id>is_anonymous</type_id>
+          <value>1</value>
+          <rank>0</rank>
+        </cvtermprop>
+        <cvterm_relationship>
+          <type_id>OBOL:during</type_id>
+          <object_id>FBdv:00005336</object_id>
+        </cvterm_relationship>
+      </cvterm>
+
+    </object_id>
+  </cvterm_relationship>
+
 \end{verbatim}
+
+(if you are not familiar with how ChadoXML maps to the chado schema,
+see the explanation below)
 
 If you wish to convert Obo-specified logical definitions to chadoxml
 you will need go-perl v0.05 or higher (if you have a lower version,
-the intersection\_of tags will simply be ignored). 
+the intersection\_of tags will simply be ignored).
+
+\begin{verbatim}
+go2chadoxml ont.obo > ont.chado
+\end{verbatim}
 
 \subsubsection{How logical definitions are stored in Chado}
 
@@ -113,7 +173,6 @@ intersection_of: during FBdv:00005336 ! larval stage
 
 Then the intersection\_ofs get stored using the basic DAG tables as:
 
-
 \begin{table}[htb]
 \center
 { \small
@@ -129,6 +188,11 @@ anon:xxx & during & FBv:00005336
 \caption{Logical definition stored ib cvterm\_relationship table}
 \label{tab:tab-esc-str}
 \end{table}
+
+This uses 4 cvterm\_relationships and the creation of a new
+``anonymous'' term that is never shown directly to the user. The
+anonymous term represents the class of things that happen during the
+larval stage
 
 \subsubsection{Logical Definition Views}
 
