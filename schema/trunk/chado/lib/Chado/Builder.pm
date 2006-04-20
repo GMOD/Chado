@@ -12,6 +12,7 @@ use Template;
 use XML::Simple;
 use LWP::Simple qw(mirror is_success status_message);
 use Log::Log4perl;
+use DBI;
 Log::Log4perl::init('load/etc/log.conf');
 no warnings;
 
@@ -390,6 +391,18 @@ sub ACTION_ontologies {
       }
     }
   }
+
+  #fix up DBIx::DBStag stomping on part_of and derives_from
+  $m->log->debug("fix up DBIx::DBStag stomping on part_of and derives_from");
+  my $dbh = DBI->connect("dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port",
+                         $db_user, $db_pass);
+  $dbh->do("UPDATE cvterm SET 
+                     cv_id = (SELECT cv_id FROM cv WHERE name='relationship')
+                     WHERE name='derives_from'"); 
+  $dbh->do("UPDATE cvterm SET
+                     cv_id = (SELECT cv_id FROM cv WHERE name='relationship')
+                     WHERE name='part_of'");
+  $dbh->disconnect;
 
   $m->log->info("leaving ACTION_ontologies");
 }
