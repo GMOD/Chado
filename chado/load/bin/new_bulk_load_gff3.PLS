@@ -515,48 +515,8 @@ if ($ONTOLOGY) {
   }
 }
 
-
-#######################################################
-# Load cache with existing synonym, dbxref, and
-# analysis records.  prevents failure of load if they
-# already existed.
-#
-#
-# I don't want to do this due to overhead issues
-#my %label = (
-#             #add more tables here.  key is tablename,
-#             #value is label to lookup by.
-#             analysis => 'name',
-#             synonym  => 'name',
-#             dbxref   => 'accession',
-#            );
-#
-#my $iterator;
-#
-#foreach my $table (keys %label){
-#  print STDERR "caching $table... ";
-#  my $class = 'Chado::'.ucfirst($table);
-#  $iterator = $class->retrieve_all();
-#  my $label = $label{$table};
-#  while(my $obj = $iterator->next()){
-#    $cache{$table}{$obj->$label} = $obj;
-#  }
-#  print STDERR "done!\n";
-#}
-#
-#
-# End load cache.
-#######################################################
-
-
-
-########################
-
-#######################################################
-#prepare a bunch of sql queries to be used in the loop:
-#
-
-$chado->organism_id($ORGANISM) or die "$ORGANISM organism not found in the database";
+$chado->organism_id($ORGANISM) 
+   or die "$ORGANISM organism not found in the database";
 
 $chado->file_handles();
 
@@ -578,12 +538,20 @@ warn "done\n";
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
 
-while(my $feature = $gffio->next_feature()){
+my $feature_iterator;
+FEATURE:
+while(my $feature = $feature_iterator->next_feature || $gffio->next_feature){
+
+  my $featuretype = $feature->type->name;
+
+  if ($featuretype =~ /CDS/) {
+    #handle_CDS returns a feature iterator if it has a complete set
+    my $feature_iterator = $chado->handle_CDS($feature);
+    next FEATURE; 
+  }
 
   my $nextfeature    = $chado->nextfeature();
   my $nextfeatureloc = $chado->nextfeatureloc();
-
-  my $featuretype = $feature->type->name;
 
   my $type           = $chado->get_type($featuretype);
   my ($src, $seqlen) = $chado->get_src_seqlen($feature);
@@ -633,7 +601,6 @@ while(my $feature = $gffio->next_feature()){
     $locgroup{$uniquename}       = 0;
   }
 
-  #FIXME potential $chado->nextfeature bug
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !$feature->annotation->get_Annotations('Target')) {
