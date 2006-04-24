@@ -39,6 +39,9 @@ Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHO
 
 #sub search_ilike { shift->_do_search(ILIKE => \@_ ) }
 
+!GROK!THIS!
+
+print OUT <<'!NO!SUBS!';
 #
 # NOT PART OF THE API, but useful function which returns a single row
 #  and throws an error if more than one is returned
@@ -55,9 +58,6 @@ sub get_single_row {
    return @rows[0];
 }
 
-!GROK!THIS!
-
-print OUT <<'!NO!SUBS!';
 # -------------------------------------------------------------------
 package Chado::DBI::Chado::Tableinfo;
 use base 'Chado::DBI';
