@@ -34,7 +34,7 @@ print OUT <<'!NO!SUBS!';
 use strict;
 use Bio::FeatureIO;
 use Getopt::Long;
-#use Data::Dumper;
+use Data::Dumper;
 use URI::Escape;
 use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use lib '/home/scott/cvs_stuff/schema/chado/lib';
@@ -540,13 +540,12 @@ warn "(This may take a while ...)\n";
 
 my $feature_iterator;
 FEATURE:
-while(my $feature = $feature_iterator->next_feature || $gffio->next_feature){
+while(my $feature = (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
 
   my $featuretype = $feature->type->name;
 
   if ($featuretype =~ /CDS/) {
-    #handle_CDS returns a feature iterator if it has a complete set
-    my $feature_iterator = $chado->handle_CDS($feature);
+    $feature_iterator = $chado->handle_CDS($feature);
     next FEATURE; 
   }
 
@@ -680,6 +679,8 @@ while(my $feature = $feature_iterator->next_feature || $gffio->next_feature){
   }
   $chado->nextfeature('++');
 }
+
+goto FEATURE if ($feature_iterator = $chado->handle_CDS() );
 
 $chado->end_files();
 

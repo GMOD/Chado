@@ -1,4 +1,4 @@
-package Bio::GMOD::DB::Adaptor::FeatureIterator;
+package Bio::GMOD::DB::Adapter::FeatureIterator;
 
 =pod
 
