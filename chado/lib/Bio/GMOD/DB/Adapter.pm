@@ -6,6 +6,8 @@ use DBI;
 use File::Temp;
 use Data::Dumper;
 use URI::Escape;
+use Bio::SeqFeature::Generic;
+use Bio::GMOD::DB::Adapter::FeatureIterator;
 
 #set lots of package-wide variables:
 my ($nextfeaturerel,$nextfeatureprop,
@@ -675,7 +677,10 @@ sub file_handles {
     else {
         for my $key (keys %files) {
             $self->{file_handles}{$files{$key}} 
-                = new File::Temp(TEMPLATE => $key.'XXXX');
+                = new File::Temp(
+                                 TEMPLATE => $key.'XXXX',
+                                 UNLINK   => 0,  
+                                );
         }
         return;
     }
@@ -2406,6 +2411,85 @@ sub handle_gap {
     }
 }
 
+
+sub handle_CDS {
+    my $self = shift;
+    my $feat = shift;
+
+#    warn Dumper($feat);
+
+    my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value      if $feat;
+    my $feat_parent = ($feat->annotation->get_Annotations('Parent'))[0]->value  if $feat;
+
+    my $iterator;
+    if ( ($feat_id && $self->{cdscache}{id} && $feat_id ne $self->{cdscache}{id})
+          or
+         ($feat_parent && $self->{cdscache}{parent} && $feat_parent ne $self->{cdscache}{parent})
+          or
+         (!$self->{cdscache}{id} && !$self->{cdscache}{parent}) ) {
+
+        #this is a new cds feature so package up the old one to give back
+        if ($self->{cdscache}{polypeptide_obj}) {
+            push @{ $self->{cdscache}{feature_array} }, 
+                 $self->{cdscache}{polypeptide_obj};
+
+            $iterator = Bio::GMOD::DB::Adapter::FeatureIterator->new(
+                   \@{ $self->{cdscache}{feature_array} }
+            );
+        }
+
+        #now empty the caches and set parent/id
+        $self->{cdscache}{feature_array}   = ();
+        $self->{cdscache}{polypeptide_obj} = '';
+        $self->{cdscache}{id}              = $feat_id;
+        $self->{cdscache}{parent}          = $feat_parent;
+    }
+
+    #get the current AnnotationCollection and change
+    if ($feat) {
+        my $ac = $feat->annotation();
+
+        $ac->remove_Annotations('type'); 
+        $ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
+                                -term => Bio::Ontology::Term->new(-name=>'exon')));
+        $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                             'Exon inferred from GFF3 CDS feature line'));
+
+        $feat->annotation($ac); 
+    }
+
+    if ($feat && !$self->{cdscache}{polypeptide_obj}) {
+    #polypeptide doesn't exist yet, so create it
+        my $polyp = Bio::SeqFeature::Annotated->new();
+        $polyp->seq_id(   $feat->seq_id );
+        $polyp->start(    $feat->start  );
+        $polyp->end(      $feat->end    );
+        $polyp->strand(   $feat->strand );
+        $polyp->name(     $feat_parent.' polypeptide');
+
+        my $polyp_ac = Bio::Annotation::Collection->new();
+        $polyp_ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                       'polypeptide feature inferred from GFF3 CDS feature'));
+        $polyp_ac->add_Annotation('Parent',Bio::Annotation::SimpleValue->new(
+                       $feat_parent));
+        $polyp_ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
+                                -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
+        $polyp->annotation($polyp_ac);
+
+        $self->{cdscache}{polypeptide_obj} = $polyp;
+    }
+    #check for bounds change on the existing polypeptide
+    elsif ( $feat && $self->{cdscache}{polypeptide_obj}->start > $feat->start ) {
+        $self->{cdscache}{polypeptide_obj}->start($feat->start);
+    }
+    elsif ( $feat && $self->{cdscache}{polypeptide_obj}->end < $feat->end) {
+        $self->{cdscache}{polypeptide_obj}->end($feat->end);
+    }
+
+    push @{ $self->{cdscache}{feature_array} }, $feat if $feat;
+
+    return $iterator;
+}
 
 sub handle_parent {
     my $self = shift;
