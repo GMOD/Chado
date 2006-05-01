@@ -2452,7 +2452,8 @@ sub handle_CDS {
 
 #    warn Dumper($feat);
 
-    my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value      if $feat;
+    my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value
+                      if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
     my $feat_parent = ($feat->annotation->get_Annotations('Parent'))[0]->value  if $feat;
 
     my $iterator;
@@ -2610,7 +2611,7 @@ sub get_src_seqlen {
     my ($feature) = @_;
 
     my ($src,$seqlen);
-    if ( defined (($feature->annotation->get_Annotations('ID'))[0]->value)
+    if ( defined(($feature->annotation->get_Annotations('ID'))[0])
          && $feature->seq_id->value
             eq ($feature->annotation->get_Annotations('ID'))[0]->value ) {
         #this is a srcfeature (ie, a reference sequence)
