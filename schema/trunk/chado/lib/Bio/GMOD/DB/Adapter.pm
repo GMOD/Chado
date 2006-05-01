@@ -679,7 +679,7 @@ sub file_handles {
             $self->{file_handles}{$files{$key}} 
                 = new File::Temp(
                                  TEMPLATE => $key.'XXXX',
-                                 UNLINK   => 0,  
+                      #           UNLINK   => 0,  
                                 );
         }
         return;
@@ -2411,6 +2411,40 @@ sub handle_gap {
     }
 }
 
+=head2 handle_CDS
+
+=over
+
+=item Usage
+
+  my $feature_iterator = $obj->handle_CDS($feature_obj)
+
+=item Function
+
+This function deals with converting GFF3 lines that constitute
+a single CDS feature into exon features and a polypeptide feature.
+THIS IS VERY IMPORTANT: in order to work, CDS lines for different
+CDS features CANNOT be intermixed.  That is something like this would
+be invalid:
+
+  chrI . CDS  200  300  .  +  .  ID=cds1
+  chrI . CDS  200  305  .  +  .  ID=cds2
+  chrI . CDS  500  605  .  +  .  ID=cds1
+  chrI . CDS  503  650  .  +  .  ID=cds2
+
+=item Returns
+
+When a new CDS feature is started or when no arg is passed in, this method
+returns a L<Bio::GMOD::DB::Adapter::FeatureIterator> object.
+
+=item Arguments
+
+Either a Bio::FeatureIO CDS object, or nothing (to get the last set
+of exon and polypeptide features).
+
+=back
+
+=cut
 
 sub handle_CDS {
     my $self = shift;
@@ -2576,9 +2610,9 @@ sub get_src_seqlen {
     my ($feature) = @_;
 
     my ($src,$seqlen);
-    if ( defined (($feature->annotation->get_Annotations('ID'))[0])
+    if ( defined (($feature->annotation->get_Annotations('ID'))[0]->value)
          && $feature->seq_id->value
-            eq ($feature->annotation->get_Annotations('ID'))[0] ) {
+            eq ($feature->annotation->get_Annotations('ID'))[0]->value ) {
         #this is a srcfeature (ie, a reference sequence)
       $src = $self->nextfeature;
       $self->cache('parent',$feature->seq_id->value,$src);
