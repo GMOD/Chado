@@ -593,7 +593,7 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
     $locgroup{$uniquename}++;
   }
   else {
-    $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$ANALYSIS,$seqlen);
+    $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen);
 
     $chado->cache('feature',$uniquename,$nextfeature);
     $chado->cache('parent',$uniquename,$nextfeature);
