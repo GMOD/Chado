@@ -142,6 +142,7 @@ sub new {
     $self->noload(          $arg{noload}          );
     $self->skip_vacuum(     $arg{skip_vacuum}     );
     $self->drop_indexes_flag($arg{drop_indexes_flag});
+    $self->noexon(          $arg{noexon}          );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
     $self->initialize_ontology();
@@ -1018,6 +1019,38 @@ sub dbh {
     return $self->{'dbh'};
 }
 
+=head2 noexon
+
+=over
+
+=item Usage
+
+  $obj->noexon()        #get existing value
+  $obj->noexon($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of noexon (a scalar)
+
+=item Arguments
+
+new value of noexon (to set)
+
+=back
+
+=cut
+
+sub noexon {
+    my $self = shift;
+
+    my $noexon = shift if defined(@_);
+    return $self->{'noexon'} = $noexon if defined($noexon);
+    return $self->{'noexon'};
+}
+
+
 =head2 dbname
 
 =over
@@ -1821,7 +1854,7 @@ sub dump_ana_contents {
   print STDERR "\n\nCouldn't find $anakey in analysis table\n";
   print STDERR "The current contents of the analysis table is:\n\n";
 
-  confess;
+  #confess;
 
   my $sth
     = $self->dbh->prepare("SELECT analysis_id,name,program FROM analysis");
@@ -2404,7 +2437,7 @@ sub handle_gap {
                               terms=> [ $self->cache('feature',$uniquename),
                                         $self->cache('type','Gap'),
                                         $rank ] ) ) {
-        $self->print_frop($nextfeatureprop,$self->cache('feature',$uniquename),$self->cache('type','Gap') ,uri_unescape($note),$rank);
+        $self->print_fprop($nextfeatureprop,$self->cache('feature',$uniquename),$self->cache('type','Gap') ,uri_unescape($note),$rank);
         $rank++;
         $nextfeatureprop++;
       }
@@ -2453,8 +2486,9 @@ sub handle_CDS {
 #    warn Dumper($feat);
 
     my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value
-                      if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
-    my $feat_parent = ($feat->annotation->get_Annotations('Parent'))[0]->value  if $feat;
+                    if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
+    my $feat_parent = ($feat->annotation->get_Annotations('Parent'))[0]->value
+                    if $feat;
 
     my $iterator;
     if ( ($feat_id && $self->{cdscache}{id} && $feat_id ne $self->{cdscache}{id})
@@ -2464,12 +2498,17 @@ sub handle_CDS {
          (!$self->{cdscache}{id} && !$self->{cdscache}{parent}) ) {
 
         #this is a new cds feature so package up the old one to give back
-        if ($self->{cdscache}{polypeptide_obj}) {
+        if ($self->noexon) {
+            $iterator = Bio::GMOD::DB::Adapter::FeatureIterator->new(
+                $self->{cdscache}{polypeptide_obj} 
+            );
+        }
+        elsif ($self->{cdscache}{polypeptide_obj}) {
             push @{ $self->{cdscache}{feature_array} }, 
-                 $self->{cdscache}{polypeptide_obj};
+                $self->{cdscache}{polypeptide_obj};
 
             $iterator = Bio::GMOD::DB::Adapter::FeatureIterator->new(
-                   \@{ $self->{cdscache}{feature_array} }
+                \@{ $self->{cdscache}{feature_array} }
             );
         }
 
@@ -2504,11 +2543,11 @@ sub handle_CDS {
 
         my $polyp_ac = Bio::Annotation::Collection->new();
         $polyp_ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
-                       'polypeptide feature inferred from GFF3 CDS feature'));
+                      'polypeptide feature inferred from GFF3 CDS feature'));
         $polyp_ac->add_Annotation('Parent',Bio::Annotation::SimpleValue->new(
-                       $feat_parent));
+                      $feat_parent));
         $polyp_ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
-                                -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
+                      -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
         $polyp->annotation($polyp_ac);
 
         $self->{cdscache}{polypeptide_obj} = $polyp;

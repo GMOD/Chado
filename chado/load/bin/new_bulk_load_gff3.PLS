@@ -38,6 +38,7 @@ use Data::Dumper;
 use URI::Escape;
 use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use lib '/home/scott/cvs_stuff/schema/chado/lib';
+use lib '/Users/cain/chado/lib';
 use Bio::GMOD::DB::Adapter;
 
 =head1 NAME
@@ -72,6 +73,8 @@ $0 - Bulk loads gff3 files into a chado database.
  --ontology        Give directions for handling misc Ontology_terms
  --skip_vacuum     Skip vacuuming the tables after the inserts
  --inserts         Print INSERT statements instead of COPY FROM STDIN
+ --noexon          Don't convert CDS features to exons (but still create
+                     polypeptide features) 
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -259,6 +262,21 @@ use the perl script, L<gmod_fasta2gff3.pl>, that comes with this distribution
 to make a GFF3 file suitable for loading into chado before loading your
 analysis results.
 
+=item CDS features
+
+The way CDS features are represented in Chado is as an intersection of
+a transcript's exons and the transcripts polypeptide feature.  To allow
+proper translation of a GFF3 file's CDS features, this loader will 
+convert CDS feature lines to corresponding exon features (and add
+a featureprop note that the exon was inferred from a GFF3 CDS line),
+and create a polypeptide feature that spans the genomic region from
+the start of translation to the stop.
+
+If your GFF3 file contains both exon and CDS features, then you will
+want to suppress the creation of the exon features and instead will
+only want a polypeptide feature to be created.  To do this, use the
+--noexon option.
+
 =back
 
 =back
@@ -405,7 +423,8 @@ it under the same terms as Perl itself.
 
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
-    $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,$DROP_INDEX);
+    $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
+    $DROP_INDEX, $NOEXON);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -426,6 +445,7 @@ GetOptions(
     'skip_vacuum'=> \$SKIP_VACUUM,
     'drop_indexes'=>\$DROP_INDEX,
     'inserts'    => \$INSERTS,
+    'noexon'     => \$NOEXON,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -498,6 +518,7 @@ my %argv;
   $argv{inserts}      = $INSERTS;
   $argv{global_analysis}=$GLOBAL_ANALYSIS;
   $argv{analysis_group}=$ANALYSIS_GROUP;
+  $argv{noexon}       = $NOEXON;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();

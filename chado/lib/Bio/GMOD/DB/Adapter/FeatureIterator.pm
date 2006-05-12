@@ -32,7 +32,7 @@ Email cain@cshl.org
 
 sub new {
   my $package  = shift;
-  my $features = shift;
+  my $features = ref $_[0] eq 'ARRAY' ? shift : [@_];
   return bless $features,$package;
 }
 
