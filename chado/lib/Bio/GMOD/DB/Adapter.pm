@@ -1866,6 +1866,9 @@ sub dump_ana_contents {
     printf STDERR "%10s %25s %10s\n", @$array_ref;
   }
 
+  print STDERR "\n\nCouldn't find $anakey in analysis table\n";
+  print STDERR "The current contents of the analysis table is:\n\n";
+
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
   exit 1;
 }
@@ -2092,8 +2095,8 @@ sub handle_target {
           $created_target_feature = 1;
       }
 
-      my $score = $feature->score->value ? $feature->score->value : '\N';
-      $score    = '.' eq $score          ? '\N'                   : $score;
+      my $score = defined($feature->score->value) ? $feature->score->value : '\N';
+      $score    = '.' eq $score                   ? '\N'                   : $score;
 
       my $featuretype = $feature->type->name;
 
@@ -2106,10 +2109,10 @@ sub handle_target {
       unless($self->cache('analysis',$ankey)) {
         $self->{queries}{search_analysis}->execute($ankey);
         my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
-        dump_ana_contents($ankey) unless $ana;
+        $self->dump_ana_contents($ankey) unless $ana;
         $self->cache('analysis',$ankey,$ana);
       }
-      dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
+      $self->dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
 
       my $score_string;
       if      ($self->score_col =~ /^[Ss]/) {
@@ -2520,7 +2523,7 @@ sub handle_CDS {
     }
 
     #get the current AnnotationCollection and change
-    if ($feat) {
+    if ($feat && !$self->noexon) {
         my $ac = $feat->annotation();
 
         $ac->remove_Annotations('type'); 
@@ -2544,7 +2547,7 @@ sub handle_CDS {
         my $polyp_ac = Bio::Annotation::Collection->new();
         $polyp_ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
                       'polypeptide feature inferred from GFF3 CDS feature'));
-        $polyp_ac->add_Annotation('Parent',Bio::Annotation::SimpleValue->new(
+        $polyp_ac->add_Annotation('Derives_from',Bio::Annotation::SimpleValue->new(
                       $feat_parent));
         $polyp_ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
                       -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
@@ -2587,6 +2590,8 @@ sub handle_derives_from {
     ($pname)   = ($feature->annotation->get_Annotations('Derives_from'))[0]->value;
     my $parent = $self->cache('parent',$pname);
     die "no parent ".$pname unless $parent;
+
+#    confess "parent:$parent, derives_from:$derives_from\n";
 
     $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$derives_from);
     $nextfeaturerel++;
@@ -2665,5 +2670,13 @@ sub get_src_seqlen {
     return ($src,$seqlen);
 }
 
+sub flush_caches {
+    my $self = shift;
+
+    $self->{cache}            = '';
+    $self->{uniquename_cache} = '';
+
+    return;
+}
 
 1;
