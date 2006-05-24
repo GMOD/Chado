@@ -36,9 +36,9 @@ use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
 use URI::Escape;
+use Carp;
 use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use lib '/home/scott/cvs_stuff/schema/chado/lib';
-use lib '/Users/cain/chado/lib';
 use Bio::GMOD::DB::Adapter;
 
 =head1 NAME
@@ -716,6 +716,8 @@ unless ($NOSEQUENCE) {
     $chado->print_seq($name,$string);
   }
 }
+
+$chado->flush_caches();
 
 $chado->load_data() unless $NOLOAD;
 
