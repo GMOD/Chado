@@ -6,6 +6,7 @@ use DBI;
 use File::Temp;
 use Data::Dumper;
 use URI::Escape;
+use DB_File;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
 
@@ -143,6 +144,7 @@ sub new {
     $self->skip_vacuum(     $arg{skip_vacuum}     );
     $self->drop_indexes_flag($arg{drop_indexes_flag});
     $self->noexon(          $arg{noexon}          );
+    $self->nouniquecache(   $arg{nouniquecache}   );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
     $self->initialize_ontology();
@@ -756,6 +758,10 @@ Allowed hash keys:
 
 =back
 
+Need to add an option to allow not initializing the hash with every
+uniquename and instead hitting the database every time for validation
+and using the hash to store uniquenames that it creates
+
 =cut
 
 sub uniquename_cache {
@@ -766,26 +772,73 @@ sub uniquename_cache {
     if (@bogus_keys) {
         for (@bogus_keys) {
             warn "I don't know what to do with the key ".$_.
-                 " in the uniquename_cache method; it's probably because of a typo\n";
+           " in the uniquename_cache method; it's probably because of a typo\n";
         }
         confess;
     }
 
     if ($argv{validate}) {
-        if ($argv{type_id}){  #valididate type & org too
-            if ($self->{uniquename_cache}{$argv{uniquename}}{type_id}
-               && $self->{uniquename_cache}{$argv{uniquename}}{organism_id}) {
+        if (defined $argv{type_id}){  #valididate type & org too
+            if (defined $self->{uniquename_cache}{$argv{uniquename}}{type_id}
+               && defined $self->{uniquename_cache}{$argv{uniquename}}{organism_id}) {
                 return $self->{uniquename_cache}{$argv{uniquename}}{feature_id};
             }
+            elsif ($self->nouniquecache) { #we didn't build a cache at start up,
+                                           #so we have to hit the database now
+                my $sth = $self->dbh->prepare("SELECT feature_id FROM feature WHERE type_id = ? AND organism_id = ? AND uniquename = ?");
+                $sth->execute($argv{type_id},$argv{organism_id},$argv{uniquename});
+
+                my ($f_id) = $sth->fetchrow_array;
+
+                if (defined $f_id) { #cache it now so we don't have to hit the database again
+                    $self->{uniquename_cache}{$argv{uniquename}}{type_id}
+                         = $argv{type_id};
+                    $self->{uniquename_cache}{$argv{uniquename}}{organism_id}
+                         = $argv{organism_id};
+                    $self->{uniquename_cache}{$argv{uniquename}}{feature_id}
+                         = $f_id;
+                    return $f_id; 
+                }
+                else {
+                    return 0; 
+                }
+            }
+            else {
+                return 0;
+            }
         }
-        elsif ($self->{uniquename_cache}{$argv{uniquename}}) {
-            return $self->{uniquename_cache}{$argv{uniquename}}{feature_id};
-        }
-        else {
-            return 0;
+        else { #just validate the uniquename
+            return $self->{uniquename_cache}{$argv{uniquename}}{feature_id}
+                if $self->{uniquename_cache}{$argv{uniquename}}{feature_id};
+
+            if ($self->nouniquecache) { #we didn't build a cache at start up,
+                                        #so we have to hit the database now
+                my $sth = $self->dbh->prepare("SELECT feature_id,type_id,organism_id FROM feature WHERE uniquename = ?");
+                $sth->execute($argv{uniquename});
+
+                my $hashref = $sth->fetchrow_hashref;
+
+                if (defined $$hashref{feature_id}) {
+                    #cache it now so we don't have to get it again
+                    $self->{uniquename_cache}{$argv{uniquename}}{type_id}
+                         = $$hashref{type_id};
+                    $self->{uniquename_cache}{$argv{uniquename}}{organism_id}
+                         = $$hashref{organism_id};
+                    $self->{uniquename_cache}{$argv{uniquename}}{feature_id}
+                         = $$hashref{feature_id};
+                    return $$hashref{feature_id};
+                }
+                else {
+                    return 0;
+                }
+            }
+            else {
+                return 0;
+            }
         }
     }
     elsif ($argv{type_id}) { 
+        #this doesn't change even if nouniquecache is set
         $self->{uniquename_cache}{$argv{uniquename}}{type_id} 
               = $argv{type_id};
         $self->{uniquename_cache}{$argv{uniquename}}{organism_id} 
@@ -795,12 +848,22 @@ sub uniquename_cache {
         return;
     }
     else {
+        return if $self->nouniquecache;
+
+        print STDERR "Creating uniquename cache...";
         my $unique_cache = $self->dbh->prepare(
              "select feature_id,uniquename,type_id,organism_id from feature");
         $unique_cache->execute();
 
+        warn $self->dbname;
+
+        tie %{ $self }, 
+           'DB_File', 
+           $self->dbname.'_adaptor_object_cache';
+
         while (my $un_hash = $unique_cache->fetchrow_hashref() ) {
             my $name = $$un_hash{'uniquename'};
+
             $self->{uniquename_cache}{$name}{'feature_id'}
                       = $$un_hash{'feature_id'};
             $self->{uniquename_cache}{$name}{'type_id'}  
@@ -809,6 +872,7 @@ sub uniquename_cache {
                       = $$un_hash{'organism_id'};
         }
         $unique_cache->finish();
+        print STDERR "Done\n";
         return;
     }
 }
@@ -1019,6 +1083,38 @@ sub dbh {
     return $self->{'dbh'};
 }
 
+=head2 nouniquecache
+
+=over
+
+=item Usage
+
+  $obj->nouniquecache()        #get existing value
+  $obj->nouniquecache($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of nouniquecache (a scalar)
+
+=item Arguments
+
+new value of nouniquecache (to set)
+
+=back
+
+=cut
+
+sub nouniquecache {
+    my $self = shift;
+
+    my $nouniquecache = shift if defined(@_);
+    return $self->{'nouniquecache'} = $nouniquecache if defined($nouniquecache);
+    return $self->{'nouniquecache'};
+}
+
+
 =head2 noexon
 
 =over
@@ -1076,7 +1172,9 @@ new value of dbname (to set)
 
 sub dbname {
     my $self = shift;
-    return $self->{'dbname'} = shift if defined(@_);
+
+    my $dbname = shift if defined(@_);
+    return $self->{'dbname'} = $dbname if defined($dbname);
     return $self->{'dbname'};
 }
 
