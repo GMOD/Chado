@@ -75,6 +75,8 @@ $0 - Bulk loads gff3 files into a chado database.
  --inserts         Print INSERT statements instead of COPY FROM STDIN
  --noexon          Don't convert CDS features to exons (but still create
                      polypeptide features) 
+ --nouniquecache   Don't create a cache of all the uniquenames in the
+                     database on startup
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -325,6 +327,20 @@ As an indication of the speed differences involved, loading
 yeast GFF3 annotations (about 16K rows), it takes about 5 times
 longer using INSERTs versus COPY on my laptop.
 
+=item The uniquename cache
+
+By default, at start up, the loader will create a cache of all
+the uniquenames and their feature_ids in the database to make
+lookups faster.  However, when the database is large, this hash
+can also grow quite large and cause the machine to run out of
+memory and force the OS to kill either perl or the database or
+cause the database to abort the load or, for really poorly
+written OSes, crash the computer.  To stop the building of the
+uniquename cache, supply the --nouniquecache option on the command
+line.  This will force the loader to look up uniquenames on an
+as needed basis, slowing the loader but decreasing its memory
+footprint.
+
 =item Sequence
 
 By default, if there is sequence in the GFF file, it will be loaded
@@ -424,7 +440,7 @@ it under the same terms as Perl itself.
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
-    $DROP_INDEX, $NOEXON);
+    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -446,6 +462,7 @@ GetOptions(
     'drop_indexes'=>\$DROP_INDEX,
     'inserts'    => \$INSERTS,
     'noexon'     => \$NOEXON,
+    'nouniquecache'=> \$NOUNIQUECACHE,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -519,6 +536,7 @@ my %argv;
   $argv{global_analysis}=$GLOBAL_ANALYSIS;
   $argv{analysis_group}=$ANALYSIS_GROUP;
   $argv{noexon}       = $NOEXON;
+  $argv{nouniquecache}= $NOUNIQUECACHE;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
@@ -552,9 +570,7 @@ if ($GFFFILE eq 'stdin') {
                                  -validate_terms => $VALIDATE);
 }
 
-print STDERR "Creating a uniquename cache...";
 $chado->uniquename_cache();
-warn "done\n";
 
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
