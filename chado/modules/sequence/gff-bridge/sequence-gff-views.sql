@@ -91,38 +91,19 @@ FROM feature;
 
 
 CREATE OR REPLACE VIEW gff3view (
-  feature_id,
-  ref,
-  source,
-  type,
-  fstart,
-  fend,
-  score,
-  strand,
-  phase,
-  seqlen,
-  name,
-  organism_id
+  feature_id, ref, source, type, fstart, fend,
+  score, strand, phase, seqlen, name, organism_id
 ) AS
 SELECT
-  f.feature_id   ,
-  sf.name        ,
-  dbx.accession  ,
-  cv.name        ,
-  fl.fmin+1      ,
-  fl.fmax        ,
-  af.significance,
-  fl.strand      ,
-  fl.phase       ,
-  f.seqlen       ,
-  f.name         ,
-  f.organism_id
+  f.feature_id, sf.name, dbx.accession, cv.name,
+  fl.fmin+1, fl.fmax, af.significance, fl.strand,
+  fl.phase, f.seqlen, f.name, f.organism_id
 FROM feature f
      LEFT JOIN featureloc fl     ON (f.feature_id     = fl.feature_id)
      LEFT JOIN feature sf        ON (fl.srcfeature_id = sf.feature_id)
      LEFT JOIN feature_dbxref fd ON (f.feature_id     = fd.feature_id)
-     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id)
+     LEFT JOIN dbxref dbx        ON (dbx.dbxref_id    = fd.dbxref_id 
+         AND dbx.db_id IN (select db_id from db where db.name = 'GFF_source'))
      LEFT JOIN cvterm cv         ON (f.type_id        = cv.cvterm_id)
-     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id)
-WHERE dbx.db_id IN (select db_id from db where db.name = 'GFF_source');
+     LEFT JOIN analysisfeature af ON (f.feature_id    = af.feature_id);
 
