@@ -41,7 +41,7 @@
   <!-- ontologies -->
   <!--            -->
   <ontology name="Relationship Ontology" order="1">
-    <file type="obo"    local="obo/OBO_REL/rel.obo" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/OBO_REL/relationship.obo?rev=HEAD" method="lwp-mirror"/>
+    <file type="obo"    local="obo/OBO_REL/rel.obo" remote="http://obo.cvs.sourceforge.net/obo/obo/ontology/OBO_REL/relationship.obo?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
 
@@ -55,11 +55,11 @@
   </ontology>
 
 <!--  <ontology name="Embryonic Mouse Anatomy Ontology" order="5">
-    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology?rev=HEAD" method="lwp-mirror"/>
+    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology" remote="http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.ontology?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
   <ontology name="Mouse Anatomy Ontology" order="6">
-    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology?rev=HEAD" method="lwp-mirror"/>
+    <file type="ontology" local="obo/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology" remote="http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
   <ontology name="Mammalian Phenotype Ontology" order="7">
@@ -74,7 +74,7 @@
 -->
 
   <ontology name="Cell Ontology" order="4">
-    <file type="obo" local="obo/anatomy/cell_type/cell.obo" remote="http://cvs.sf.net/viewcvs.py/obo/obo/ontology/anatomy/cell_type/cell.obo?rev=HEAD" method="lwp-mirror"/>
+    <file type="obo" local="obo/anatomy/cell_type/cell.obo" remote="http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/cell_type/cell.obo?rev=HEAD" method="lwp-mirror"/>
   </ontology>
 
   <ontology name="Plant Ontology" order="5">
