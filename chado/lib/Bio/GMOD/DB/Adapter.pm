@@ -1965,7 +1965,6 @@ sub dump_ana_contents {
   }
 
   print STDERR "\n\nCouldn't find $anakey in analysis table\n";
-  print STDERR "The current contents of the analysis table is:\n\n";
 
   print STDERR "\nPlease see \`perldoc gmod_bulk_load_gff3.pl\` for more information\n\n";
   exit 1;
