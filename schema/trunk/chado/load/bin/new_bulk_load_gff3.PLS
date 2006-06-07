@@ -75,8 +75,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --inserts         Print INSERT statements instead of COPY FROM STDIN
  --noexon          Don't convert CDS features to exons (but still create
                      polypeptide features) 
- --nouniquecache   Don't create a cache of all the uniquenames in the
-                     database on startup
+ --recreate_cache  Causes the uniquename cache to be recreated
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -329,17 +328,13 @@ longer using INSERTs versus COPY on my laptop.
 
 =item The uniquename cache
 
-By default, at start up, the loader will create a cache of all
-the uniquenames and their feature_ids in the database to make
-lookups faster.  However, when the database is large, this hash
-can also grow quite large and cause the machine to run out of
-memory and force the OS to kill either perl or the database or
-cause the database to abort the load or, for really poorly
-written OSes, crash the computer.  To stop the building of the
-uniquename cache, supply the --nouniquecache option on the command
-line.  This will force the loader to look up uniquenames on an
-as needed basis, slowing the loader but decreasing its memory
-footprint.
+The loader uses the chado database to create a table that caches
+feature_ids, uniquenames, type_ids, and organism_ids of the features
+that exist in the database at the time the load starts and the
+features that will be added when the load is complete.  If it is possilbe
+that new features have been added via some method that is not this
+loader (eg, Apollo edits or loads with XORT), then you should supply
+the --recreate_cache option to make sure the cache is fresh.
 
 =item Sequence
 
@@ -440,7 +435,7 @@ it under the same terms as Perl itself.
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
-    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE);
+    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -463,6 +458,7 @@ GetOptions(
     'inserts'    => \$INSERTS,
     'noexon'     => \$NOEXON,
     'nouniquecache'=> \$NOUNIQUECACHE,
+    'recreate_cache'=> \$RECREATE_CACHE,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -537,6 +533,7 @@ my %argv;
   $argv{analysis_group}=$ANALYSIS_GROUP;
   $argv{noexon}       = $NOEXON;
   $argv{nouniquecache}= $NOUNIQUECACHE;
+  $argv{recreate_cache}=$RECREATE_CACHE;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
@@ -569,8 +566,6 @@ if ($GFFFILE eq 'stdin') {
                                  -format => 'gff', 
                                  -validate_terms => $VALIDATE);
 }
-
-$chado->uniquename_cache();
 
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
