@@ -183,6 +183,7 @@ sub new {
     $self->noexon(          $arg{noexon}          );
     $self->nouniquecache(   $arg{nouniquecache}   );
     $self->recreate_cache(  $arg{recreate_cache}  );
+    $self->save_tmpfiles(   $arg{save_tmpfiles}   );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
     $self->initialize_ontology();
@@ -728,7 +729,7 @@ sub file_handles {
             $self->{file_handles}{$files{$key}} 
                 = new File::Temp(
                                  TEMPLATE => $key.'XXXX',
-                      #           UNLINK   => 0,  
+                                 UNLINK   => $self->save_tmpfiles(),  
                                 );
         }
         return;
@@ -851,7 +852,7 @@ sub uniquename_cache {
             $argv{type_id},
             $argv{organism_id}        
         );
-
+        $self->dbh->commit;
         return;
     }
 }
@@ -882,6 +883,7 @@ new value of recreate_cache (to set)
 sub recreate_cache {
     my $self = shift;
     my $recreate_cache = shift if defined(@_);
+
     return $self->{'recreate_cache'} = $recreate_cache if defined($recreate_cache);
     return $self->{'recreate_cache'};
 }
@@ -963,13 +965,18 @@ sub initialize_uniquename_cache {
         print STDERR "(Re)creating the uniquename cache in the database... ";
         $dbh->do(DROP_CACHE_TABLE) if $self->recreate_cache();
 
+        print STDERR "\nCreating table...\n";
         $dbh->do(CREATE_CACHE_TABLE);
 
+        print STDERR "Populating table...\n";
         $dbh->do(POPULATE_CACHE_TABLE);
 
+        print STDERR "Creating indexes...";
         $dbh->do(CREATE_CACHE_TABLE_INDEX1);
         $dbh->do(CREATE_CACHE_TABLE_INDEX2);
         $dbh->do(CREATE_CACHE_TABLE_INDEX3);
+
+        $dbh->commit;
         print STDERR "Done.\n";
     }
     return;
@@ -1703,6 +1710,36 @@ sub drop_indexes_flag {
     return $self->{'drop_indexes_flag'} = shift if defined(@_);
     return $self->{'drop_indexes_flag'};
 }
+
+=head2 save_tmpfiles
+
+=over
+
+=item Usage
+
+  $obj->save_tmpfiles()        #get existing value
+  $obj->save_tmpfiles($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of save_tmpfiles (a scalar)
+
+=item Arguments
+
+new value of save_tmpfiles (to set)
+
+=back
+
+=cut
+
+sub save_tmpfiles {
+    my $self = shift;
+    my $save_tmpfiles = shift if defined(@_);
+    return $self->{'save_tmpfiles'} = $save_tmpfiles if defined($save_tmpfiles);    return $self->{'save_tmpfiles'};
+}
+
 
 #####################################################################
 #

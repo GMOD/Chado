@@ -37,6 +37,7 @@ use Getopt::Long;
 use Data::Dumper;
 use URI::Escape;
 use Carp;
+use lib '/home/cain/cvs_stuff/schema/chado/lib';
 use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::GMOD::DB::Adapter;
@@ -76,6 +77,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --noexon          Don't convert CDS features to exons (but still create
                      polypeptide features) 
  --recreate_cache  Causes the uniquename cache to be recreated
+ --save_tmpfiles   Save the temp files used for loading the database
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -333,7 +335,8 @@ feature_ids, uniquenames, type_ids, and organism_ids of the features
 that exist in the database at the time the load starts and the
 features that will be added when the load is complete.  If it is possilbe
 that new features have been added via some method that is not this
-loader (eg, Apollo edits or loads with XORT), then you should supply
+loader (eg, Apollo edits or loads with XORT) or if a previous load using
+this loader was aborted, then you should supply
 the --recreate_cache option to make sure the cache is fresh.
 
 =item Sequence
@@ -435,7 +438,7 @@ it under the same terms as Perl itself.
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
-    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE);
+    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -459,6 +462,7 @@ GetOptions(
     'noexon'     => \$NOEXON,
     'nouniquecache'=> \$NOUNIQUECACHE,
     'recreate_cache'=> \$RECREATE_CACHE,
+    'save_tmpfiles'=>\$SAVE_TMPFILES,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -534,6 +538,7 @@ my %argv;
   $argv{noexon}       = $NOEXON;
   $argv{nouniquecache}= $NOUNIQUECACHE;
   $argv{recreate_cache}=$RECREATE_CACHE;
+  $argv{save_tmpfiles}= $SAVE_TMPFILES;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
