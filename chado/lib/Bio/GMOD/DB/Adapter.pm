@@ -6,7 +6,6 @@ use DBI;
 use File::Temp;
 use Data::Dumper;
 use URI::Escape;
-use DB_File;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
 
