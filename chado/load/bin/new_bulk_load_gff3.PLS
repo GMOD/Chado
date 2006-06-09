@@ -513,7 +513,6 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
   $ANALYSIS = 0;
 }
 
-
 my %argv;
   $argv{organism}     = $ORGANISM;
   $argv{gfffile}      = $GFFFILE;

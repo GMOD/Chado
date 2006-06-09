@@ -367,7 +367,6 @@ sub cache {
             " in the cache method; it's probably because of a typo";
     }
 
-
     return $self->{cache}{$top_level}{$key} unless $value;
 
     return $self->{cache}{$top_level}{$key} = $value; 
@@ -821,7 +820,6 @@ sub uniquename_cache {
 
     if ($argv{validate}) {
         if (defined $argv{type_id}){  #valididate type & org too
-
             $self->{'queries'}{'validate_type_id'}->execute(
                 $argv{type_id},
                 $argv{organism_id},
@@ -1147,6 +1145,7 @@ sub dbh {
     return $self->{'dbh'};
 }
 
+
 =head2 nouniquecache
 
 =over
@@ -1267,7 +1266,9 @@ new value of dbport (to set)
 
 sub dbport {
     my $self = shift;
-    return $self->{'dbport'} = shift if defined(@_);
+
+    my $dbport = shift;
+    return $self->{'dbport'} = $dbport if defined($dbport);
     return $self->{'dbport'};
 }
 
@@ -1296,7 +1297,9 @@ new value of dbhost (to set)
 
 sub dbhost {
     my $self = shift;
-    return $self->{'dbhost'} = shift if defined(@_);
+
+    my $dbhost = shift;
+    return $self->{'dbhost'} = $dbhost if defined($dbhost);
     return $self->{'dbhost'};
 }
 
@@ -1325,7 +1328,9 @@ new value of dbuser (to set)
 
 sub dbuser {
     my $self = shift;
-    return $self->{'dbuser'} = shift if defined(@_);
+
+    my $dbuser = shift;
+    return $self->{'dbuser'} = $dbuser if defined($dbuser);
     return $self->{'dbuser'};
 }
 
@@ -1354,7 +1359,9 @@ new value of dbpass (to set)
 
 sub dbpass {
     my $self = shift;
-    return $self->{'dbpass'} = shift if defined(@_);
+
+    my $dbpass = shift;
+    return $self->{'dbpass'} = $dbpass if defined($dbpass);
     return $self->{'dbpass'};
 }
 
@@ -1383,7 +1390,9 @@ new value of notransact (to set)
 
 sub notransact {
     my $self = shift;
-    return $self->{'notransact'} = shift if defined(@_);
+
+    my $notransact = shift;
+    return $self->{'notransact'} = $notransact if defined($notransact);
     return $self->{'notransact'};
 }
 
@@ -1412,7 +1421,9 @@ new value of nosequence (to set)
 
 sub nosequence {
     my $self = shift;
-    return $self->{'nosequence'} = shift if defined(@_);
+
+    my $nosequence = shift;
+    return $self->{'nosequence'} = $nosequence if defined($nosequence);
     return $self->{'nosequence'};
 }
 
@@ -1441,7 +1452,9 @@ new value of inserts (to set)
 
 sub inserts {
     my $self = shift;
-    return $self->{'inserts'} = shift if defined(@_);
+
+    my $inserts = shift if defined(@_);
+    return $self->{'inserts'} = $inserts if defined($inserts);
     return $self->{'inserts'};
 }
 
@@ -1590,7 +1603,9 @@ new value of organism (to set)
 
 sub organism {
     my $self = shift;
-    return $self->{'organism'} = shift if defined(@_); 
+
+    my $organism = shift;
+    return $self->{'organism'} = $organism if defined($organism); 
     return $self->{'organism'};
 }
 
@@ -1619,7 +1634,9 @@ new value of dbprofile (to set)
 
 sub dbprofile {
     my $self = shift;
-    return $self->{'dbprofile'} = shift if defined(@_);
+
+    my $dbprofile = shift;
+    return $self->{'dbprofile'} = $dbprofile if defined($dbprofile);
     return $self->{'dbprofile'};
 }
 
@@ -1648,7 +1665,9 @@ new value of noload (to set)
 
 sub noload {
     my $self = shift;
-    return $self->{'noload'} = shift if defined(@_);
+
+    my $noload = shift;
+    return $self->{'noload'} = $noload if defined($noload);
     return $self->{'noload'};
 }
 
@@ -1677,7 +1696,9 @@ new value of skip_vacuum (to set)
 
 sub skip_vacuum {
     my $self = shift;
-    return $self->{'skip_vacuum'} = shift if defined(@_);
+
+    my $skip_vacuum = shift;
+    return $self->{'skip_vacuum'} = $skip_vacuum if defined($skip_vacuum);
     return $self->{'skip_vacuum'};
 }
 
@@ -1706,7 +1727,9 @@ new value of drop_indexes_flag (to set)
 
 sub drop_indexes_flag {
     my $self = shift;
-    return $self->{'drop_indexes_flag'} = shift if defined(@_);
+
+    my $drop_indexes_flag = shift;
+    return $self->{'drop_indexes_flag'} = $drop_indexes_flag if defined($drop_indexes_flag);
     return $self->{'drop_indexes_flag'};
 }
 
@@ -2729,7 +2752,6 @@ sub handle_CDS {
     if ($feat && !$self->{cdscache}{polypeptide_obj}) {
     #polypeptide doesn't exist yet, so create it
         my $polyp = Bio::SeqFeature::Annotated->new();
-        $polyp->seq_id(   $feat->seq_id );
         $polyp->start(    $feat->start  );
         $polyp->end(      $feat->end    );
         $polyp->strand(   $feat->strand );
@@ -2742,6 +2764,8 @@ sub handle_CDS {
                       $feat_parent));
         $polyp_ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
                       -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
+        $polyp_ac->add_Annotation('seq_id',Bio::Annotation::SimpleValue->new(
+                      $feat->seq_id->value));
         $polyp->annotation($polyp_ac);
 
         $self->{cdscache}{polypeptide_obj} = $polyp;
@@ -2854,6 +2878,7 @@ sub get_src_seqlen {
       $self->cache('parent',$feature->seq_id->value,$src);
       $seqlen = $feature->end - $feature->start +1;
     } else { # normal case
+
       $src = $self->cache('parent',$feature->seq_id->value);
       $seqlen = '\N';
     }
