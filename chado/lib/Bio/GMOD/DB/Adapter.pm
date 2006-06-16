@@ -29,7 +29,7 @@ my %sequences = (
 );
 
 my %copystring = (
-   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen)",
+   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen,dbxref)",
    featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
    feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
    featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
@@ -1931,7 +1931,7 @@ sub print_frel {
 
 sub print_f {
   my $self = shift;
-  my ($nextfeature,$organism,$name,$uniquename,$type,$seqlen) = @_;
+  my ($nextfeature,$organism,$name,$uniquename,$type,$seqlen,$dbxref) = @_;
 
   my $fh = $self->file_handles('F');
   if ($self->inserts()) {
@@ -1939,10 +1939,10 @@ sub print_f {
     my $q_uniquename  = $self->dbh->quote($uniquename);
     my $q_seqlen      = $seqlen eq '\N' ? 'NULL' : $seqlen;
     my $q_analysis    = $self->analysis ? "'true'" : "'false'";
-    print $fh "INSERT INTO feature $copystring{'feature'} VALUES ($nextfeature,$organism,$q_name,$q_uniquename,$type,$q_analysis,$q_seqlen);\n";
+    print $fh "INSERT INTO feature $copystring{'feature'} VALUES ($nextfeature,$organism,$q_name,$q_uniquename,$type,$q_analysis,$q_seqlen,$dbxref);\n";
   }
   else {
-    print $fh join("\t", ($self->nextfeature, $organism, $name, $uniquename, $type, $self->analysis,$seqlen)),"\n";
+    print $fh join("\t", ($self->nextfeature, $organism, $name, $uniquename, $type, $self->analysis,$seqlen,$dbxref)),"\n";
   }
 }
 
@@ -2356,7 +2356,7 @@ sub create_target_feature {
     $self->nextfeature('++');
     $name ||= "$featuretype-$uniquename";
 
-    $self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N');
+    $self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N','\N');
     $self->print_floc(
            $self->nextfeatureloc,
            ($self->nextfeature)-1,
