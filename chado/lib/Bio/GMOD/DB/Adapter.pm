@@ -29,7 +29,7 @@ my %sequences = (
 );
 
 my %copystring = (
-   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen,dbxref)",
+   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen,dbxref_id)",
    featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
    feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
    featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
@@ -727,7 +727,7 @@ sub file_handles {
             $self->{file_handles}{$files{$key}} 
                 = new File::Temp(
                                  TEMPLATE => $key.'XXXX',
-                                 UNLINK   => $self->save_tmpfiles(),  
+                                 UNLINK   => $self->save_tmpfiles() ? 0 : 1,  
                                 );
         }
         return;
