@@ -45,8 +45,8 @@ are allowed to form cycles.
 The cvtermpath is for calculating the reflexive transitive closure of
 a relationship, and any derived relationships
 
-Normal (direct) relationships are stored in the cvterm_relationship
-table. A entry in this table represents a cvterm_relationship S over
+Normal (direct) relationships are stored in the cvterm\_relationship
+table. A entry in this table represents a cvterm\_relationship S over
 some relation R.
 
 \begin{verbatim}
@@ -55,7 +55,7 @@ some relation R.
 
 For example:
 
- {\tt S = "cardioblast" develops_from "mesodermal cell"}
+ {\tt S = "cardioblast" develops\_from "mesodermal cell"}
 
 The relation \isa represents a special kind of relation -
 subsumption, or inheritance.
@@ -126,11 +126,13 @@ certain ontologies (eg flybase anatomy ontology)
 
 What does this mean in practice?
 
-For a typical database, which may only have relations is_a,
-part_of and develops_from, we will end up with 3 sets of paths.
+For a typical database, which may only have relations \isa,
+part\_of and develops\_from, we will end up with 3 sets of paths.
 
-The "is_a" closure, is_a(path) will include paths over
-cvterm_relationships that look like this:
+The \isa closure, \isa (path) will include paths over
+cvterm\_relationships that look like this:
+
+\begin{verbatim}
 
 a is_a b is_a c is_a d is_a e
 
@@ -144,14 +146,16 @@ cvterm_relationships that look like this:
 
 a develops_from b develops_from c is_a d is_a e develops_from f
 
-It may be tempting to mix different non-is_a relationships in the same
+\end{verbatim}
+
+It may be tempting to mix different non \isa relationships in the same
 path, but this should NEVER be done - there will be an unacceptable
 combinatorial explosion in many cases. Besides, there is no use for
 such a cvtermpath; it is meaningless.
 
 Note that for amigolike query behaviour, it is necessary only to query
-cvtermpath ignoring cvtermpath.type_id (these are obtained by querying
-cvterm_relationship)
+cvtermpath ignoring cvtermpath.type\_id (these are obtained by querying
+cvterm\_relationship)
 
 
 

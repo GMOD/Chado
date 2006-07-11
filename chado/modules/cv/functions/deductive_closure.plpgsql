@@ -1,0 +1,119 @@
+CREATE TYPE closure_result AS (cvterm_id INTEGER, pathdistance INTEGER);
+
+-- results may not be distinct
+CREATE OR REPLACE FUNCTION _closure_over_IS_A(INTEGER, INTEGER) RETURNS SETOF INTEGER AS
+'
+DECLARE
+    term        ALIAS FOR $1;
+    is_a_id     ALIAS FOR $2;
+    inner_row               RECORD;
+    outer_row               RECORD;
+BEGIN
+    -- get direct is_a parents
+    FOR inner_row IN SELECT object_id AS cvterm_id 
+                 FROM cvterm_relationship WHERE subject_id = term AND type_id=is_a_id LOOP
+        -- return direct is_a parents
+        RETURN NEXT inner_row.cvterm_id;
+
+        -- recursive, self-call
+        FOR outer_row IN SELECT * FROM _closure_over_IS_A(inner_row.cvterm_id, is_a_id) LOOP
+            RETURN NEXT outer_row._closure_over_IS_A;
+        END LOOP;
+    END LOOP;
+    RETURN;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION closure_over_IS_A(INTEGER) RETURNS SETOF INTEGER AS
+'
+DECLARE
+    is_a_id           INTEGER;
+    r                 RECORD;
+BEGIN
+    SELECT INTO is_a_id get_cvterm_id_for_is_a();
+    FOR r IN SELECT * FROM  _closure_over_IS_A($1, is_a_id) LOOP
+        RETURN NEXT r._closure_over_IS_A;
+    END LOOP;
+    RETURN;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION closure_over_reflexive_IS_A(INTEGER) RETURNS SETOF INTEGER AS
+'
+DECLARE
+    is_a_id           INTEGER;
+    r                 RECORD;
+BEGIN
+    SELECT INTO is_a_id get_cvterm_id_for_is_a();
+    FOR r IN SELECT * FROM  _closure_over_IS_A($1, is_a_id)
+             UNION SELECT $1 
+           LOOP
+        RETURN NEXT r._closure_over_IS_A;
+    END LOOP;
+    RETURN;
+END;
+'
+LANGUAGE 'plpgsql';
+
+-- implements:
+--  X R Z <= X is_a* Y, Y R Z
+-- but not:
+--  X R Z <= X R Y, Y is_a+ Z
+CREATE OR REPLACE FUNCTION _closure_over_relation_with_dist_partial(INTEGER,INTEGER,INTEGER,INTEGER) RETURNS SETOF closure_result AS
+'
+DECLARE
+    term                ALIAS FOR $1; 
+    relation_id         ALIAS FOR $2;
+    is_a_id             ALIAS FOR $3;
+    depth               ALIAS FOR $4;
+    depth2              INTEGER;
+    isa_plus_r          RECORD;
+    direct_link_r       closure_result%ROWTYPE;
+    trans_link_r        closure_result%ROWTYPE;
+BEGIN
+    depth2 := depth+1;
+    -- get ALL is_a* parents
+    FOR isa_plus_r IN SELECT * FROM _closure_over_is_a(term,is_a_id) AS cvterm_id UNION SELECT term AS cvterm_id LOOP
+
+       RAISE NOTICE ''is_a %'', isa_plus_r.cvterm_id;
+       FOR direct_link_r IN SELECT object_id AS cvterm_id, depth2 AS pathdistance
+                     FROM cvterm_relationship WHERE subject_id = isa_plus_r.cvterm_id AND type_id=relation_id LOOP
+           RAISE NOTICE ''obj % dist % / % '', direct_link_r.cvterm_id, depth2, direct_link_r.pathdistance;
+           -- return direct R parents
+           RETURN NEXT direct_link_r;
+           -- recursive, self-call
+           FOR trans_link_r IN SELECT *
+                 FROM _closure_over_relation_with_dist_partial(direct_link_r.cvterm_id, relation_id, is_a_id, depth2) LOOP
+               RETURN NEXT trans_link_r;
+           END LOOP;
+       END LOOP;
+    END LOOP;
+    RETURN;
+END;
+'
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION closure_over_relation_with_dist(INTEGER,INTEGER) RETURNS SETOF closure_result AS
+'
+DECLARE
+    is_a_id           INTEGER;
+    r                 closure_result%ROWTYPE;
+    r_plus_is_a       closure_result%ROWTYPE;
+BEGIN
+    SELECT INTO is_a_id get_cvterm_id_for_is_a();
+    FOR r IN SELECT * FROM  _closure_over_relation_with_dist_partial($1,$2,is_a_id,0) AS cvterm_id LOOP
+       FOR r_plus_is_a IN 
+           SELECT cvterm_id, r.pathdistance FROM  _closure_over_is_a(r.cvterm_id,is_a_id) AS cvterm_id
+           UNION SELECT r.* LOOP
+             RETURN NEXT r_plus_is_a;
+       END LOOP;
+    END LOOP;
+    RETURN;
+END;
+'
+LANGUAGE 'plpgsql';
+
+
+
