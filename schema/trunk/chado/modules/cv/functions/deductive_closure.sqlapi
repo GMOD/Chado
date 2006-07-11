@@ -1,0 +1,56 @@
+CREATE TYPE closure_result AS (cvterm_id INTEGER, pathdistance INTEGER);
+
+DECLARE FUNCTION closure_over_is_a(cvterm_id INTEGER) RETURNS SETOF INTEGER;
+
+COMMENT ON FUNCTION closure_over_is_a(INTEGER) IS 'Performs the
+deductive closure over the is_a relation. Returns every cvterm_id
+which is a direct or indirect is_a parent of the input term.
+
+Implements the rule:
+X is_a Z <= X is_a Y, Y is_a Z   [transitive]
+';
+
+DECLARE FUNCTION closure_over_reflexive_is_a(cvterm_id INTEGER) RETURNS SETOF INTEGER;
+
+COMMENT ON FUNCTION closure_over_reflexive_is_a(INTEGER) IS 'Performs the
+deductive closure over the is_a relation, treating the is_a relation as reflexive. i.e.
+
+X is_a X  [reflexive]
+';
+
+DECLARE FUNCTION closure_over_relation(cvterm_id INTEGER, 
+                                       relation_cvterm_id INTEGER) 
+        RETURNS SETOF INTEGER;
+
+DECLARE FUNCTION closure_over_relation_with_dist(cvterm_id INTEGER, 
+                                                 relation_cvterm_id INTEGER) 
+        RETURNS SETOF closure_result;
+
+COMMENT ON FUNCTION closure_over_relation_with_dist(INTEGER,INTEGER) IS
+'Performs the deductive closure over non-is_a transitive relation (eg
+part_of). Returns every cvterm_id which is a direct or indirect is_a
+parent of the input term.
+
+Implements the rules:
+X R Z <= X R Y, Y R Z     [transitive]
+X R Z <= X is_a[transitive] Y, Y R Z
+X R Z <= X R Y, Y is_a[transitive] Z
+
+For example, if we have
+
+A is_a B, B is_a C, C part_of D, D part_of E, E is_a F, F part_of G, G is_a H
+
+Then A is part_of D, E, F, G, H
+
+In addition, the distance is returned; this is the number of
+connecting links of type R (links of type is_a are not counted here)
+
+Note: this function returns a set, so it should be called like this:
+
+  SELECT * FROM closure_over_relation_with_dist( <cvterm_id>, <relation_cvterm_id> );
+
+Note: this will not check to see if the relation has been explicitly declared transitive
+';
+
+
+
