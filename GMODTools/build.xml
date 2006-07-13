@@ -1,4 +1,4 @@
-<project name="GMODTools" default="all" basedir=".">
+<project name="GMODTools" default="dist" basedir=".">
 
 <description>
 This ant build.xml makes a GMODTools file release.  It excludes
@@ -6,27 +6,69 @@ some old cruft files, and maybe renames/relocates some others for
 handier use. Since the GMODTools is in Perl, ant doesn't do much else.
 </description> 
 
-<!-- ===================== Property Definitions =========================== -->
-
   <property file="build.properties"/>
 	<property environment="env"/>
   <property name="app"       value="GMODTools"/>
   <property name="app.version"   value="1.0"/>
-
-<!-- ==================== File and Directory Names ======================== -->
   
   <property name="dist.home"     value="${basedir}"/>  
   <property name="build.home"    value="${basedir}/build"/>
   <property name="appsrc.jar"    value="${dist.home}/${app}-${app.version}.zip"/>
 
-<!-- ==================== All Target ====================================== -->
+  <target name="checkout" description="Checkout GMODTools from gmod.cvs.sf.net">
+    <cvspass cvsRoot=":pserver:anonymous@gmod.cvs.sourceforge.net:/cvsroot/gmod"
+       password=""
+     /> 
+    <cvs cvsRoot=":pserver:anonymous@gmod.cvs.sourceforge.net:/cvsroot/gmod"
+       command="checkout" compression="true"
+       package="schema/GMODTools"
+       dest="${basedir}"
+      />
+  </target>
+  
+  <target name="cvsupdate" description="Update GMODTools from gmod.cvs.sf.net">
+    <cvs cvsRoot=":pserver:anonymous@gmod.cvs.sourceforge.net:/cvsroot/gmod"
+       command="update -A -d" compression="true"
+       package="schema/GMODTools"
+       dest="${basedir}"
+      />
+  </target>
 
-  <target name="all" depends="prepare,dist" 
-   description="Make all"/>
+  <target name="gmodrel" description="Create gmod release file set">
 
+    <input
+      message="Please enter gmodrelease path [gmodrel]:"
+      addproperty="gmod.dir"
+      defaultvalue="gmodrel"
+    />
+  
+    <copy  todir="${gmod.dir}/lib" verbose="true" >
+      <fileset dir="${basedir}/lib"  
+      excludes="Bio/GMOD/Bulkfiles/To*.pm GMOD/** **/*.old/**"
+      />
+     </copy>
+ 
+     <copy  todir="${gmod.dir}/bin" verbose="true" >
+      <fileset dir="${basedir}/bin"  
+       includes="gff2biomart5.pl bulkfiles.pl"
+      />
+     <mapper type="glob" from="*.pl" to="gmod_*.pl"/>
+    </copy>
 
-<!-- ==================== Dist Target ===================================== -->
-
+    <copy  todir="${gmod.dir}/conf" verbose="true" >
+     <fileset dir="${basedir}/conf"  
+      excludes="**/*.old/** gmod.conf*"
+      />
+    </copy>
+     
+     <copy  todir="${gmod.dir}/doc" verbose="true" >
+     <fileset dir="${basedir}/doc"   
+       excludes="**/*.old/**"
+      />
+    </copy>
+  </target>
+  
+  
 
   <target name="dist"  depends="perldoc" description="Create source file">
     <zip  destfile="${appsrc.jar}" >
@@ -80,23 +122,6 @@ handier use. Since the GMODTools is in Perl, ant doesn't do much else.
   </target>
 
 
-<!-- ==================== Prepare Target ================================== -->
-  <target name="prepare">
-
-<!--
-    <mkdir  dir="${build.home}"/>
-           
-     <copy preservelastmodified="true"  todir="${build.web}/classes">
-      <fileset dir="${src.home}" defaultexcludes="yes"  
-     	excludes="META-INF/** **/*.java **/*.old/** org/eugenes/lusearch/** org/argos/** tlds/** "
-     	/>
-    </copy>
--->
-     
-  </target>
-
-
-<!-- ==================== Javadoc / Perldoc? Target ================================== -->
 
   <target name="chkDocBuild" >
   <uptodate property="doc.isUpToDate"
@@ -113,25 +138,6 @@ handier use. Since the GMODTools is in Perl, ant doesn't do much else.
     </exec>
 
   </target>
-
-  <!-- 
-  <target name="javadoc" depends="compile"
-   description="Create Javadoc API documentation">
-
-    <mkdir  dir="${dist.home}/doc/api"/>
-    <javadoc breakiterator="yes" destdir="${dist.home}/doc/api" packagenames="*">
-
-    <fileset dir="${src.home}" 
-      defaultexcludes="yes" 
-      excludes="org/eugenes/lusearch/** org/argos/**"
-      includes="**/*.java"
-      />
-    	 
-    <classpath refid="compile.classpath"/>
-    </javadoc>
-
-  </target>
-  -->
 
 
 </project>
