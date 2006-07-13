@@ -1,4 +1,4 @@
-<?xml-stylesheet type="text/xsl" href="xsl/scenario-to-html-inline.xsl"?>
+<?xml-stylesheet type="text/xsl" href="xsl/scenario-to-html.xsl"?>
 
   <scenarios version='0.003'>
     <title>Chado usage scenarios</title>
