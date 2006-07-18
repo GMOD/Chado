@@ -132,6 +132,11 @@ use constant INSERT_CACHE_UNIQUENAME =>
                "INSERT INTO tmp_gff_load_cache (feature_id,uniquename)
                   VALUES (?,?)";
 
+use constant INSERT_GFF_SORT_TMP =>
+               "INSERT INTO gff_sort_tmp (refseq,id,parent,gffline)
+                  VALUES (?,?,?,?)";
+
+
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
 my $ALLOWED_CACHE_KEYS =
@@ -151,6 +156,7 @@ sub new {
     my $dbuser = $arg{dbuser};
     my $dbpass = $arg{dbpass};
     my $notrans= $arg{notransact};
+    my $skipinit=$arg{skipinit};
 
     my $dbh = DBI->connect(
         "dbi:Pg:dbname=$dbname;port=$dbport;host=$dbhost",
@@ -185,10 +191,13 @@ sub new {
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
-    $self->initialize_ontology();
+
     $self->prepare_queries();
-    $self->initialize_sequences();
-    $self->initialize_uniquename_cache();
+    unless ($skipinit) {
+        $self->initialize_ontology();
+        $self->initialize_sequences();
+        $self->initialize_uniquename_cache();
+    }
 
     return $self;
 }
@@ -249,6 +258,9 @@ sub prepare_queries {
                                   = $dbh->prepare(INSERT_CACHE_TYPE_ID);
   $self->{'queries'}{'insert_cache_uniquename'}
                                   = $dbh->prepare(INSERT_CACHE_UNIQUENAME);
+
+  $self->{'queries'}{'insert_gff_sort_tmp'}
+                                  = $dbh->prepare(INSERT_GFF_SORT_TMP);
   return;
 }
 
@@ -2894,5 +2906,43 @@ sub flush_caches {
 
     return;
 }
+
+
+#########################################################################
+#
+#  Methods that are to be used with the GFF3 preprocessor.  It makes
+#  use of the chado database to make a temp table that it uses to sort
+#  content of the GFF file
+#
+sub sorter_create_table  {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+   
+    $dbh->do("CREATE TABLE gff_sort_tmp (
+    refseq   varchar(4000),
+    id       varchar(4000),
+    parent   varchar(4000),
+    gffline  varchar(4000)
+    ) "); 
+
+    return;
+}
+
+sub sorter_drop_table {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    $dbh->do("DROP TABLE gff_sort_tmp");
+    return;
+}
+
+sub sorter_insert_line {
+    my $self = shift;
+    my ($refseq, $id, $parent, $line) = @_;
+    $self->{'queries'}{'insert_gff_sort_tmp'}->execute(
+                                               $refseq, $id, $parent, $line);
+    return;
+}
+
 
 1;
