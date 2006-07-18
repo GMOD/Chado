@@ -1,0 +1,237 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Bio::FeatureIO;
+use Getopt::Long;
+use FileHandle;
+use lib '/home/scott/cvs_stuff/schema/chado/lib';
+use Bio::GMOD::DB::Adapter;
+use Bio::GMOD::Config;
+use Bio::GMOD::DB::Config;
+
+=head1 NAME
+
+$0 - Bulk loads gff3 files into a chado database.
+
+=head1 SYNOPSIS
+
+  % gmod_gff_preprocessor [options] --gfffile <filename>
+
+=head1 COMMAND-LINE OPTIONS
+
+ --gfffile        The file containing GFF3 (optional, can read
+                     from stdin)
+ --outfile        The name kernel that will be used for naming result files
+ --splitfiles     Split the files into more managable chunks, providing
+                     an argument to control splitting
+ --onlysplit      Split the files and then quit (ie, don't sort)
+ --nosplit        Don't split the files (ie, only sort)
+ --hasrefseq      Set this if the file contains a reference sequence line
+                     (Only needed if not splitting files)
+ --dbprofile      Specify a gmod.conf profile name (otherwise use default)
+
+=head1 DESCRIPTION
+
+
+splitfiles  -- Just setting this flag will cause the file to be split 
+by reference sequence.  If you provide an optional argument, it will be
+further split according to these rules:
+
+ --source=1     Splits files according to the value in the source column
+ --source=a,b,c Puts lines with sources that match (via regular expression)
+                     'a', 'b', or 'c' in a separate file
+ --type=a,b,c   Puts lines with types that match 'a', 'b', or 'c' in a
+                     separate file
+
+For example, if you wanted all of your analysis results to go in a separate
+file, you could indicate '--type=match', and all cDNA_match, EST_match and
+cross_genome_match features would go into separate files (separate by 
+reference sequence).
+
+=head1 AUTHOR
+
+Scott Cain E<lt>cain@cshl.orgE<gt>
+
+Copyright (c) 2006
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+my ($GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
+
+GetOptions(
+    'gfffile=s'   => \$GFFFILE,
+    'outfile=s'   => \$OUTFILE,
+    'splitfile=s' => \$SPLITFILE,
+    'onlysplit'   => \$ONLYSPLIT,
+    'nosplit'     => \$NOSPLIT,
+    'hasrefseq'   => \$HASREFSEQ,
+    'dbprofile'   => \$DBPROFILE,
+) or ( system( 'pod2text', $0 ), exit -1 );
+
+$DBPROFILE ||='default';
+
+my $split_on_source;
+my $split_on_type;
+if ($SPLITFILE) {
+    my @splits = split /;/, $SPLITFILE;
+    for (@splits) {
+        my ($tag, $value) = split /=/;
+        $value            =~ s/,/|/g;
+        if ($tag eq 'source') {
+            $split_on_source = $value;
+        }
+        elsif ($tag eq 'type') {
+            $split_on_type   = $value;
+        }
+        else {
+            die "unsupported splitfile tag: $tag\n";
+        }
+    }
+}
+
+$GFFFILE  ||='-';
+$OUTFILE  ||="$GFFFILE.out.gff3";
+
+my %has_ref_seq;
+my @gfffiles;
+if ($SPLITFILE && !$NOSPLIT) {
+
+    open GFFIN, "<", $GFFFILE or die "couldn't open $GFFFILE for reading: $!";
+
+    my %files;
+    while ( <GFFIN> ) {
+        next if /^#/;
+        my @la = split /\t/;
+
+        (warn "ignored gff line: $_" && next) if (scalar @la != 9);
+
+        my $has_ref_seq;
+        chomp $la[8];
+        if ( $la[8] =~ /ID=([^;]+);*.*$/ ) {
+            my $id = $1;
+            if ( $id eq $la[0] ) {
+                $has_ref_seq = $id;
+            } 
+        }
+
+        if ( $split_on_source && $split_on_source eq 1 ) {
+            my $source = $la[1];
+            my $filename = "$la[0].$la[1].$OUTFILE";
+            unless ( defined $files{ $filename } ) {
+                $files{ $filename } = new FileHandle $filename, "w";
+                push @gfffiles, $filename;
+            }
+            $files{ $filename }->print( $_ );
+
+            push @{$has_ref_seq{ $filename }}, $has_ref_seq if $has_ref_seq;
+        }
+        elsif ( $split_on_source && $la[1] =~ /$split_on_source/) {
+            my $filename = "$la[0].source.$OUTFILE";
+            unless ( defined $files{ $filename } ) {
+                $files{ $filename } = new FileHandle $filename, "w";
+                push @gfffiles, $filename;
+            }
+            $files{ $filename }->print( $_ );
+
+            push @{$has_ref_seq{ $filename }}, $has_ref_seq if $has_ref_seq;
+        }
+        elsif ( $split_on_type && $la[2] =~ /$split_on_type/) {
+            my $filename = $la[0].'.type.'.$OUTFILE;
+            unless ( defined $files{ $filename } ) {
+                $files{ $filename } = new FileHandle $filename, "w";
+                push @gfffiles, $filename;
+            } 
+            $files{ $filename }->print( $_ );
+ 
+            push @{$has_ref_seq{ $filename }}, $has_ref_seq if $has_ref_seq;
+        }
+        else {
+            my $filename = $la[0].'.'.$OUTFILE;
+            unless ( defined $files{ $filename } ) {
+                $files{ $filename } = new FileHandle $filename, "w";
+                push @gfffiles, $filename;
+            }
+            $files{ $filename }->print( $_ );
+
+            push @{$has_ref_seq{ $filename }}, $has_ref_seq if $has_ref_seq; 
+        }
+    } 
+
+    for my $key (keys %files) {
+        $files{$key}->close;
+    }
+}
+else {
+    push @gfffiles, $GFFFILE;
+    push @{ $has_ref_seq{ $GFFFILE } }, $GFFFILE if $HASREFSEQ;
+}
+
+exit(0) if $ONLYSPLIT;
+
+my $gmod_conf = Bio::GMOD::Config->new();
+my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, 'default');
+my $db        = Bio::GMOD::DB::Adapter->new(
+                    dbuser  => $db_conf->user,
+                    dbpass  => $db_conf->password || '',
+                    dbhost  => $db_conf->host,
+                    dbport  => $db_conf->port,
+                    dbname  => $db_conf->name,
+                    notransact => 1, 
+                    skipinit   => 1,
+                );
+
+
+
+for my $gfffile (@gfffiles) {
+    $db->sorter_create_table;
+
+    my $outfile = $gfffile.'.sorted';
+
+    open IN, "<", $gfffile or die "couldn't open $gfffile for reading: $!\n";
+
+    print STDERR "Sorting the contents off $gfffile ...\n";
+    while( <IN> ) {
+        my $line       = $_;
+        my @line_array = split /\t/, $line;
+
+        if ($line =~ /^#/ or scalar @line_array != 9) {
+            next;
+        }
+
+        my $refseq = $line_array[0];
+
+        my ($id, @parents,@derives_froms);
+        if ( $line_array[8] =~ /ID=([^;]+);*.*$/ ) {
+            $id = $1;
+        }
+        if ( $line_array[8] =~ /Parent=([^;]+);*.*$/ ) {
+            @parents       = split /,/, $1;
+        }
+        if ( $line_array[8] =~ /Derives_from=([^;]+);*.*$/ ) {
+            @derives_froms = split /,/, $1;
+        }
+
+        if (@parents > 0 || @derives_froms > 0) {
+            for my $parent ( (@parents,@derives_froms) ) {
+                $db->sorter_insert_line($refseq, $id, $parent, $line);
+            }
+        }
+        else {
+            $db->sorter_insert_line($refseq, $id, '', $line);
+        }
+    }
+    close IN;
+
+
+    open OUT,">", $outfile or die "couldn't open $outfile for writing: $!\n";
+
+    close OUT;
+
+
+#    $db->sorter_drop_table;
+}
+
+
