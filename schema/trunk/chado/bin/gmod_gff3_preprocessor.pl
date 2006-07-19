@@ -192,7 +192,7 @@ for my $gfffile (@gfffiles) {
 
     open IN, "<", $gfffile or die "couldn't open $gfffile for reading: $!\n";
 
-    print STDERR "Sorting the contents off $gfffile ...\n";
+    print STDERR "Sorting the contents of $gfffile ...\n";
     while( <IN> ) {
         my $line       = $_;
         my @line_array = split /\t/, $line;
@@ -206,6 +206,7 @@ for my $gfffile (@gfffiles) {
         my ($id, @parents,@derives_froms);
         if ( $line_array[8] =~ /ID=([^;]+);*.*$/ ) {
             $id = $1;
+            chomp $id;
         }
         if ( $line_array[8] =~ /Parent=([^;]+);*.*$/ ) {
             @parents       = split /,/, $1;
@@ -216,22 +217,51 @@ for my $gfffile (@gfffiles) {
 
         if (@parents > 0 || @derives_froms > 0) {
             for my $parent ( (@parents,@derives_froms) ) {
+                chomp $parent;
                 $db->sorter_insert_line($refseq, $id, $parent, $line);
             }
         }
+        elsif ($id) {
+            $db->sorter_insert_line($refseq, $id, undef, $line);
+        }
         else {
-            $db->sorter_insert_line($refseq, $id, '', $line);
+            $db->sorter_insert_line($refseq, undef, undef, $line);
         }
     }
     close IN;
 
-
+    print STDERR "Writing sorted contents to $outfile ...\n";
     open OUT,">", $outfile or die "couldn't open $outfile for writing: $!\n";
 
+#to print:
+#   -get ref seqs (refseq == id)
+#   -get things with no parent
+
+    my @refseqs = $db->sorter_get_refseqs();
+    for my $refseq (@refseqs) {
+        print OUT $refseq;      #already has the line feed
+    }
+
+    my @no_parents = $db->sorter_get_no_parents();
+    for my $no_parent (@no_parents) {
+        print OUT $no_parent;
+    }
+    @no_parents = '';
+
+    my @second_tiers = $db->sorter_get_second_tier();
+    for my $second_tier (@second_tiers) {
+        print OUT $second_tier;
+    }
+    @second_tiers = '';
+
+    my @third_tiers = $db->sorter_get_third_tier();
+    for my $third_tier (@third_tiers) {
+        print OUT $third_tier;
+    }
+    @third_tiers = '';
+
+    $db->sorter_drop_table;
     close OUT;
-
-
-#    $db->sorter_drop_table;
 }
 
 

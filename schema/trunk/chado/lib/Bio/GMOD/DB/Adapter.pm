@@ -2925,6 +2925,10 @@ sub sorter_create_table  {
     gffline  varchar(4000)
     ) "); 
 
+    $dbh->do("CREATE INDEX gff_sort_tmp_idx1 ON gff_sort_tmp (refseq)");
+    $dbh->do("CREATE INDEX gff_sort_tmp_idx2 ON gff_sort_tmp (id)");
+    $dbh->do("CREATE INDEX gff_sort_tmp_idx3 ON gff_sort_tmp (parent)");
+
     return;
 }
 
@@ -2932,7 +2936,11 @@ sub sorter_drop_table {
     my $self = shift;
     my $dbh  = $self->dbh;
 
+    $dbh->do("DROP INDEX gff_sort_tmp_idx1");
+    $dbh->do("DROP INDEX gff_sort_tmp_idx2");
+    $dbh->do("DROP INDEX gff_sort_tmp_idx3");
     $dbh->do("DROP TABLE gff_sort_tmp");
+
     return;
 }
 
@@ -2942,6 +2950,69 @@ sub sorter_insert_line {
     $self->{'queries'}{'insert_gff_sort_tmp'}->execute(
                                                $refseq, $id, $parent, $line);
     return;
+}
+
+sub sorter_get_refseqs {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE refseq = id") or die;
+    $sth->execute or die;
+
+    my $result = $sth->fetchall_arrayref or die;
+
+    my @to_return = map { $$_[0] } @$result; 
+   
+    return @to_return; 
+}
+
+sub sorter_get_no_parents {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE id is null and parent is null") or die; 
+    $sth->execute or die;
+    
+    my $result = $sth->fetchall_arrayref or die;
+
+    my @to_return = map { $$_[0] } @$result;
+
+    $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent is null and refseq != id order by id") or die;
+    $sth->execute or die;
+
+    $result = $sth->fetchall_arrayref or die;
+
+    push @to_return, map { $$_[0] } @$result;
+
+    return @to_return;
+}
+
+sub sorter_get_second_tier {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by id") or die;
+    $sth->execute or die;
+
+    my $result = $sth->fetchall_arrayref or die;
+
+    my @to_return = map { $$_[0] } @$result;
+
+    return @to_return;
+}
+
+sub sorter_get_third_tier {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by id") or die;
+    $sth->execute or die;
+
+    my $result = $sth->fetchall_arrayref or die;
+
+    my @to_return = map { $$_[0] } @$result;
+
+    return @to_return;
 }
 
 
