@@ -184,9 +184,9 @@ my $db        = Bio::GMOD::DB::Adapter->new(
                 );
 
 
-
+$db->sorter_create_table;
 for my $gfffile (@gfffiles) {
-    $db->sorter_create_table;
+    $db->sorter_delete_from_table;
 
     my $outfile = $gfffile.'.sorted';
 
@@ -260,8 +260,8 @@ for my $gfffile (@gfffiles) {
     }
     @third_tiers = '';
 
-    $db->sorter_drop_table;
     close OUT;
+
 }
 
 

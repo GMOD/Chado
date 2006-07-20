@@ -2932,15 +2932,19 @@ sub sorter_create_table  {
     return;
 }
 
-sub sorter_drop_table {
+sub sorter_vacuum_table {
     my $self = shift;
     my $dbh  = $self->dbh;
 
-    $dbh->do("DROP INDEX gff_sort_tmp_idx1");
-    $dbh->do("DROP INDEX gff_sort_tmp_idx2");
-    $dbh->do("DROP INDEX gff_sort_tmp_idx3");
-    $dbh->do("DROP TABLE gff_sort_tmp");
+    $dbh->do("vacuum gff_sort_tmp");
+    return;
+}
 
+sub sorter_delete_from_table {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    $dbh->do("DELETE FROM gff_sort_tmp");
     return;
 }
 
