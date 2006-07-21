@@ -2922,7 +2922,9 @@ sub sorter_create_table  {
     refseq   varchar(4000),
     id       varchar(4000),
     parent   varchar(4000),
-    gffline  varchar(4000)
+    gffline  varchar(4000),
+    row_id   serial not null,
+    primary key(row_id)
     ) "); 
 
     $dbh->do("CREATE INDEX gff_sort_tmp_idx1 ON gff_sort_tmp (refseq)");
