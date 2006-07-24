@@ -2917,7 +2917,14 @@ sub flush_caches {
 sub sorter_create_table  {
     my $self = shift;
     my $dbh  = $self->dbh;
-   
+  
+    #determine if the table already exists
+    my $sth = $dbh->prepare("SELECT count(*) FROM pg_tables WHERE tablename='gff_sort_tmp'");
+    $sth->execute;
+    my ($table_exists) = $sth->fetchrow_array;
+    return if $table_exists;
+
+ 
     $dbh->do("CREATE TABLE gff_sort_tmp (
     refseq   varchar(4000),
     id       varchar(4000),
