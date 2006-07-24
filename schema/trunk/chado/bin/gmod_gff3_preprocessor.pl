@@ -59,10 +59,10 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
+my (@GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
 
 GetOptions(
-    'gfffile=s'   => \$GFFFILE,
+    'gfffile=s'   => \@GFFFILE,
     'outfile=s'   => \$OUTFILE,
     'splitfile=s' => \$SPLITFILE,
     'onlysplit'   => \$ONLYSPLIT,
@@ -70,6 +70,8 @@ GetOptions(
     'hasrefseq'   => \$HASREFSEQ,
     'dbprofile'   => \$DBPROFILE,
 ) or ( system( 'pod2text', $0 ), exit -1 );
+
+@GFFFILE = split(/,/,join(',',@GFFFILE));
 
 $DBPROFILE ||='default';
 
@@ -92,12 +94,14 @@ if ($SPLITFILE) {
     }
 }
 
-$GFFFILE  ||='-';
-$OUTFILE  ||="$GFFFILE.out.gff3";
 
 my %has_ref_seq;
 my @gfffiles;
-if ($SPLITFILE && !$NOSPLIT) {
+for my $GFFFILE (@GFFFILE) {
+  $GFFFILE  ||='-';
+  $OUTFILE  ||="$GFFFILE.out.gff3";
+
+  if ($SPLITFILE && !$NOSPLIT) {
 
     open GFFIN, "<", $GFFFILE or die "couldn't open $GFFFILE for reading: $!";
 
@@ -163,12 +167,13 @@ if ($SPLITFILE && !$NOSPLIT) {
     for my $key (keys %files) {
         $files{$key}->close;
     }
-}
-else {
+  }
+  else {
     push @gfffiles, $GFFFILE;
     push @{ $has_ref_seq{ $GFFFILE } }, $GFFFILE if $HASREFSEQ;
-}
+  }
 
+}
 exit(0) if $ONLYSPLIT;
 
 my $gmod_conf = Bio::GMOD::Config->new();
@@ -182,7 +187,6 @@ my $db        = Bio::GMOD::DB::Adapter->new(
                     notransact => 1, 
                     skipinit   => 1,
                 );
-
 
 $db->sorter_create_table;
 for my $gfffile (@gfffiles) {
