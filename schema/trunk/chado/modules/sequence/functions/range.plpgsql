@@ -50,7 +50,7 @@ CREATE OR REPLACE FUNCTION feature_overlaps(int)
  'SELECT feature.*
   FROM feature
    INNER JOIN featureloc AS x ON (x.feature_id=feature.feature_id)
-   INNER JOIN featureloc AS y ON (y.feature_id=$1)
+   INNER JOIN featureloc AS y ON (y.feature_id = $1)
   WHERE
    x.srcfeature_id = y.srcfeature_id            AND
    ( x.fmax >= y.fmin AND x.fmin <= y.fmax ) '
@@ -61,7 +61,7 @@ CREATE OR REPLACE FUNCTION feature_disjoint_from(int)
  'SELECT feature.*
   FROM feature
    INNER JOIN featureloc AS x ON (x.feature_id=feature.feature_id)
-   INNER JOIN featureloc AS y ON (y.feature_id=$1)
+   INNER JOIN featureloc AS y ON (y.feature_id = $1)
   WHERE
    x.srcfeature_id = y.srcfeature_id            AND
    ( x.fmax < y.fmin OR x.fmin > y.fmax ) '

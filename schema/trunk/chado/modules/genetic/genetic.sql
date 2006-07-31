@@ -154,9 +154,11 @@ CREATE TABLE phendesc (
     environment_id INT NOT NULL,
     FOREIGN KEY (environment_id) REFERENCES environment ( environment_id) ON DELETE CASCADE,
     description TEXT NOT NULL,
+    type_id INT NOT NULL,
+        FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     pub_id INT NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
-    CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,pub_id)
+    CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,type_id,pub_id)
 );
 CREATE INDEX phendesc_idx1 ON phendesc (genotype_id);
 CREATE INDEX phendesc_idx2 ON phendesc (environment_id);
