@@ -2799,29 +2799,29 @@ sub handle_parent {
     my $self = shift;
     my ($feature) = @_;
 
-    my $pname  = undef;
-    ($pname)   = ($feature->annotation->get_Annotations('Parent'))[0]->value;
-    my $parent = $self->cache('parent',$pname);
-    die "no parent ".$pname unless $parent;
+    for my $p_anot ( $feature->annotation->get_Annotations('Parent') ) {
+        my $pname  = $p_anot->value;
+        my $parent = $self->cache('parent',$pname);
+        die "no parent ".$pname unless $parent;
 
-    $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$part_of);
+        $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$part_of);
 
-    $nextfeaturerel++;
+        $nextfeaturerel++;
+    }
 }
 
 sub handle_derives_from {
     my $self = shift;
     my ($feature) = @_;
 
-    my $pname  = undef;
-    ($pname)   = ($feature->annotation->get_Annotations('Derives_from'))[0]->value;
-    my $parent = $self->cache('parent',$pname);
-    die "no parent ".$pname unless $parent;
+    for my $p_anot ( $feature->annotation->get_Annotations('Derives_from') ) {
+        my $pname  = $p_anot->value;
+        my $parent = $self->cache('parent',$pname);
+        die "no parent ".$pname unless $parent;
 
-#    confess "parent:$parent, derives_from:$derives_from\n";
-
-    $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$derives_from);
-    $nextfeaturerel++;
+        $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$derives_from);
+        $nextfeaturerel++;
+    }
 }
 
 
