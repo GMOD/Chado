@@ -131,6 +131,12 @@ in terms of the number of triples we use:
 
 \end{verbatim}
 
+Note that in the above, we are creating {\em anonymous} terms. We give
+them fake names and fake dbxrefs. In the bbop-experimental cvs branch
+of chado, names and dbxrefs are nullable, so these can be
+omitted. With the current schema, you must provide fake dbxrefs and
+names that are unique, such as the above.
+
 (if you are not familiar with how ChadoXML maps to the chado schema,
 see the explanation below)
 
@@ -243,3 +249,67 @@ blip io-convert my.owl -to obo -o my.obo
 
 Once you have an obo file you can run go2chadoxml, as above
 
+\subsection{Post-coordinating terms}
+
+Sometimes we want to be able to refer to a term such as {\em plasma
+membrane of spermatocyte}, but no such term exists in the
+ontology. Introducing these as {\em pre-coordinated} cross-product
+terms would make the ontology unwieldy.
+
+Chado allows the {\em post-coordination} or {\em post-composition} of
+terms using the same formalism as described above. Briefly: we would
+create an {\em anonymous}. This anonymous term would be defined using
+the terms {\em plasma membrane} and {\em spermatocyte}, using a
+genus-differentia definition as above.
+
+\begin{verbatim}
+
+  <!-- Genus/generic term -->
+  <cvterm_relationship>
+    <type_id>intersection_of</type_id>
+    <subject_id>anon_1</subject_id>
+    <object_id>GO__plasma_membrane</object_id>
+  </cvterm_relationship>
+
+  <!-- Discriminating characteristics -->
+  <cvterm_relationship>
+    <type_id>intersection_of</type_id>
+    <subject_id>anon_1</subject_id>
+    <object_id>
+
+      <!-- anonymous term representing  part_of(spermatocyte) -->
+      <cvterm>
+        <dbxref_id>
+          <dbxref>
+            <db_id>internal</db_id>
+            <accession>restriction--part_of--spermatocyte</accession>
+          </dbxref>
+        </dbxref_id>
+
+        <!-- note: as this is an anon term, the name will never
+             be shown to a user -->
+        <name>restriction--part_of--spermatocyte</name>
+        <cv_id>anonymous_cv</cv_id>
+        <cvtermprop>
+          <type_id>is_anonymous</type_id>
+          <value>1</value>
+          <rank>0</rank>
+        </cvtermprop>
+        <cvterm_relationship>
+          <type_id>OBO_REL:part_of</type_id>
+          <object_id>CL__spermatocyte</object_id>
+        </cvterm_relationship>
+      </cvterm>
+
+    </object_id>
+  </cvterm_relationship>
+
+\end{verbatim}
+
+The above assumes XORT macro IDs defined for GO__plasma_membrane and
+CL__spermatocyte
+
+
+Allow post-coordinated terms places a greater burden on applications
+that use the cv module. More documentation will be provided here on
+this.
