@@ -252,6 +252,23 @@ create index feature_pub_idx2 on feature_pub (pub_id);
 
 --
 
+create table feature_pubprop (
+    feature_pubprop_id serial not null,
+    primary key (feature_pubprop_id),
+    feature_pub_id int not null,
+    foreign key (feature_pub_id) references feature_pub (feature_pub_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint feature_pubprop_c1 unique (feature_pub_id,type_id,rank)
+);
+COMMENT ON TABLE feature_pubprop IS 'Property or attribute of a feature_pub link';
+
+create index feature_pubprop_idx1 on feature_pubprop (feature_pub_id);
+
+--
+
 create table featureprop (
     featureprop_id serial not null,
     primary key (featureprop_id),
