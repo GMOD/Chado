@@ -76,12 +76,13 @@ CREATE INDEX dbxref_idx5 ON godb.dbxref (xref_desc);
   <relation id="term">
     <sql>
 SELECT
- cvterm_id     AS id,
+ cvterm_id       AS id,
  godb.go_acc.acc AS acc,
- name          AS name,
- is_obsolete   AS is_obsolete,
- 0             AS is_root
-FROM public.cvterm
+ name            AS name,
+ is_obsolete     AS is_obsolete,
+ 0               AS is_root
+FROM 
+ public.cvterm
  INNER JOIN godb.go_acc USING (dbxref_id);
     </sql>
     <index>
@@ -92,7 +93,12 @@ CREATE INDEX term_idx4 ON godb.term (is_obsolete);
 CREATE INDEX term_idx5 ON godb.term (is_root);
     </index>
     <extra>
-UPDATE term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM cvterm WHERE cvterm_id NOT IN (SELECT DISTINCT subject_id FROM cvterm_relationship) AND is_obsolete = 0 AND is_relationshiptype = 0);
+UPDATE term SET is_root = 1
+WHERE id IN (SELECT cvterm_id FROM cvterm
+      WHERE NOT EXISTS (
+       SELECT subject_id FROM
+       cvterm_relationship WHERE subject_id=cvterm_id) 
+      AND is_obsolete = 0 AND is_relationshiptype = 0);
     </extra>
   </relation>
 
@@ -100,7 +106,8 @@ UPDATE term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM cvterm WHERE cvte
     <sql>
 SELECT
  cvterm_id AS term_id,
- definition AS term_definition
+ definition AS term_definition,
+ CAST('' AS VARCHAR) AS term_comment
 FROM public.cvterm
 WHERE definition IS NOT NULL;
     </sql>
@@ -112,7 +119,8 @@ WHERE definition IS NOT NULL;
     <sql>
 SELECT
  cvterm_id AS term_id,
- dbxref_id  AS dbxref_id
+ dbxref_id  AS dbxref_id,
+ is_for_definition
 FROM public.cvterm_dbxref;
     </sql>
   </relation>
@@ -123,7 +131,8 @@ FROM public.cvterm_dbxref;
     <sql>
 SELECT
  cvterm_id AS term_id,
- synonym  AS term_synonym
+ synonym  AS term_synonym,
+ type_id AS synonym_type_id
 FROM public.cvtermsynonym;
     </sql>
   </relation>
