@@ -28,6 +28,13 @@
       </description>
       <source type='sql' path='general/general.sql'/>
 
+      <component id='general-report' type='views' required='true'>
+        <description>
+          Standard Chado SQL Reports for the general module
+        </description>
+        <source type='sql' path='general/views/general-reports.sql'/>
+      </component>
+
       <component id='general-loading-api' type='dbapi'>
         <description>
           A DBMS API for the general module's loading functions
@@ -60,6 +67,13 @@
         <source type='sql' path='cv/views/cv-views.sql'/>
       </component>
 
+      <component id='cv-report' type='views' required='true'>
+        <description>
+          Standard Chado SQL Reports for the cv module
+        </description>
+        <source type='sql' path='cv/views/cv-reports.sql'/>
+      </component>
+
       <component id='cv-dbapi' type='dbapi'>
         <description>
           A DBMS API for the cv module
@@ -88,8 +102,15 @@
         </description>
         <source type='plpgsql' path='cv/functions/detect_cycle.plpgsql'/>
       </component>
+    </module>
 
-
+    <module id='pub' required='true'>
+      <dependency to='general'/>
+      <dependency to='cv'/>
+      <description>
+        Bibliographic data on publications
+      </description>
+      <source type='sql' path='pub/pub.sql'/>
     </module>
 
     <module id='organism' required='true'>
@@ -123,15 +144,6 @@
       </component>
     </module>
 
-    <module id='pub' required='true'>
-      <dependency to='general'/>
-      <dependency to='cv'/>
-      <description>
-        Bibliographic data on publications
-      </description>
-      <source type='sql' path='pub/pub.sql'/>
-    </module>
-
     <module id='sequence' required='true'>
       <dependency to='general'/>
       <dependency to='organism'/>
@@ -141,6 +153,13 @@
         Sequence and sequence features, their localization and properties
       </description>
       <source type='sql' path='sequence/sequence.sql'/>
+
+      <component id='sequence-report' type='views' required='true'>
+        <description>
+          Standard Chado SQL Reports for the sequence module
+        </description>
+        <source type='sql' path='sequence/views/sequence-reports.sql'/>
+      </component>
 
       <component id='gencode' type='sql' required='true'>
         <description>
@@ -231,6 +250,24 @@
         <status code='alpha'/>
         <source type='bridge-xml' path='sequence/bridges/chaos-bridge.sql'/>
       </component>
+
+      <component id='sofa-bridge' type='bridge' required='true'>
+        <description>
+          Provides a view for every type in the SOFA ontology. This
+          means you can do queries such as "SELECT * FROM gene" etc
+        </description>
+        <source type='bridge-xml' path='sequence/bridges/sofa-bridge.sql'/>
+      </component>
+
+      <component id='implicit-feature-views' type='views' required='true'>
+        <description>
+          This enhances the SOFA layer with additional queries for
+          complex feature types, such as those can be inferred from
+          other features.
+        </description>
+        <source type='sql' path='sequence/views/implicit-feature-views.sql'/>
+      </component>
+
 
       <component id='sequence-loading-api' type='dbapi'>
         <description>
