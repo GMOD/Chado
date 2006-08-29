@@ -31,7 +31,7 @@ database configuration files in GMOD_ROOT/conf.
 use DBI;
 use File::Spec::Functions qw/ catdir catfile /;
 use vars '@ISA';
-@ISA = qw/ Bio::GMOD::Config /;
+use base qw/ Bio::GMOD::Config /;
 
 
 =head2 new
