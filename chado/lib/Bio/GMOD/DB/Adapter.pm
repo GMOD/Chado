@@ -2194,6 +2194,11 @@ sub load_data {
 
 
   foreach my $table (@tables) {
+    $self->file_handles($files{$table})->autoflush;
+    if (-s $self->file_handles($files{$table})->filename <= 4) {
+        warn "Skipping $table table since the load file is empty...\n";
+        next;
+    }
     $self->copy_from_stdin($table,
                     $copystring{$table},
                     $files{$table},      #file_handle name
