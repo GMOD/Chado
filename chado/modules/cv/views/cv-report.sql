@@ -6,7 +6,7 @@ CREATE VIEW cv_cvterm_count_with_obs AS
   SELECT cv.name,count(*) AS num_terms_incl_obs FROM cv INNER JOIN cvterm USING (cv_id) GROUP BY cv.name;
 COMMENT ON VIEW cv_cvterm_count_with_obs IS 'per-cv terms counts (includes obsoletes)';
 
-CREATE VIEW cv_distinct_relations AS
+CREATE VIEW cv_link_count AS
  SELECT cv.name AS cv_name,
         relation.name AS relation_name,
         relation_cv.name AS relation_cv_name,
@@ -18,12 +18,12 @@ CREATE VIEW cv_distinct_relations AS
   INNER JOIN cv AS relation_cv ON (relation.cv_id=relation_cv.cv_id) 
  GROUP BY cv.name,relation.name,relation_cv.name;
 
-COMMENT ON VIEW cv_distinct_relations IS 'per-cv summary of number of
+COMMENT ON VIEW cv_link_count IS 'per-cv summary of number of
 links (cvterm_relationships) broken down by
 relationship_type. num_links is the total # of links of the specified
 type in which the subject_id of the link is in the named cv';
 
-CREATE VIEW cv_distinct_paths AS
+CREATE VIEW cv_path_count AS
  SELECT cv.name AS cv_name,
         relation.name AS relation_name,
         relation_cv.name AS relation_cv_name,
@@ -35,8 +35,7 @@ CREATE VIEW cv_distinct_paths AS
   INNER JOIN cv AS relation_cv ON (relation.cv_id=relation_cv.cv_id) 
  GROUP BY cv.name,relation.name,relation_cv.name;
 
-COMMENT ON VIEW cv_distinct_paths IS 'per-cv summary of number of
+COMMENT ON VIEW cv_path_count IS 'per-cv summary of number of
 paths (cvtermpaths) broken down by relationship_type. num_paths is the
 total # of paths of the specified type in which the subject_id of the
 path is in the named cv. See also: cv_distinct_relations';
-

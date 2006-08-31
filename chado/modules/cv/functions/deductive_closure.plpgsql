@@ -2,7 +2,7 @@ CREATE TYPE closure_result AS (cvterm_id INTEGER, pathdistance INTEGER);
 
 -- results may not be distinct
 CREATE OR REPLACE FUNCTION _closure_over_IS_A(INTEGER, INTEGER) RETURNS SETOF INTEGER AS
-'
+$$
 DECLARE
     term        ALIAS FOR $1;
     is_a_id     ALIAS FOR $2;
@@ -22,11 +22,11 @@ BEGIN
     END LOOP;
     RETURN;
 END;
-'
+$$
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION closure_over_IS_A(INTEGER) RETURNS SETOF INTEGER AS
-'
+$$
 DECLARE
     is_a_id           INTEGER;
     r                 RECORD;
@@ -37,11 +37,11 @@ BEGIN
     END LOOP;
     RETURN;
 END;
-'
+$$
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION closure_over_reflexive_IS_A(INTEGER) RETURNS SETOF INTEGER AS
-'
+$$
 DECLARE
     is_a_id           INTEGER;
     r                 RECORD;
@@ -54,7 +54,7 @@ BEGIN
     END LOOP;
     RETURN;
 END;
-'
+$$
 LANGUAGE 'plpgsql';
 
 -- implements:
@@ -62,7 +62,7 @@ LANGUAGE 'plpgsql';
 -- but not:
 --  X R Z <= X R Y, Y is_a+ Z
 CREATE OR REPLACE FUNCTION _closure_over_relation_with_dist_partial(INTEGER,INTEGER,INTEGER,INTEGER) RETURNS SETOF closure_result AS
-'
+$$
 DECLARE
     term                ALIAS FOR $1; 
     relation_id         ALIAS FOR $2;
@@ -92,11 +92,11 @@ BEGIN
     END LOOP;
     RETURN;
 END;
-'
+$$
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION closure_over_relation_with_dist(INTEGER,INTEGER) RETURNS SETOF closure_result AS
-'
+$$
 DECLARE
     is_a_id           INTEGER;
     r                 closure_result%ROWTYPE;
@@ -112,8 +112,151 @@ BEGIN
     END LOOP;
     RETURN;
 END;
-'
+$$
 LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION forward_chain() RETURNS INT AS
+$$
+DECLARE
+  num_assertions        INTEGER;
+  total_assertions      INTEGER;
+BEGIN
+  total_assertions := 0;
 
+  PERFORM seed_cvtermpath();
 
+  -- keep adding new facts until exhausted
+  LOOP
+    SELECT INTO num_assertions forward_chain_iteration();
+    total_assertions := total_assertions + num_assertions;
+
+    RAISE LOG 'Asserted % new facts; current_total=%', num_assertions, total_assertions;
+    EXIT WHEN num_assertions > 0;
+  END LOOP;   
+  RETURN total_assertions;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION seed_cvtermpath() RETURNS INT AS
+$$
+DECLARE
+  num_assertions        INTEGER;
+  is_a_id               INTEGER;
+BEGIN
+  RAISE LOG 'Seeding cvtermpath';
+
+  -- seed cvtermpath with direct asserted links
+  INSERT INTO cvtermpath 
+    (subject_id,type_id,object_id,pathdistance)
+    SELECT DISTINCT
+      link.subject_id,
+      link.type_id,
+      link.object_id,
+      1
+     FROM 
+      cvterm_relationship AS link
+      LEFT JOIN cvtermpath AS p1 USING (subject_id,type_id,object_id) -- exclude pre-populated links
+     WHERE  p1.cvtermpath_id IS NULL; -- this is how we do a SELECT MINUS
+  GET DIAGNOSTICS num_assertions = ROW_COUNT;
+  RAISE LOG 'Seeded cvtermpath with % links', num_assertions;
+
+  SELECT INTO is_a_id get_cvterm_id_for_is_a();
+  -- seed cvtermpath with reflexive is_a
+  INSERT INTO cvtermpath 
+    (subject_id,type_id,object_id,pathdistance)
+    SELECT DISTINCT
+      t.cvterm_id,
+      is_a_id,
+      t.cvterm_id,
+      0
+     FROM 
+      cvterm AS t
+      LEFT JOIN cvtermpath AS p1 ON 
+        (p1.subject_id=t.cvterm_id,p1.type_id=t.is_a_id,p1.object_id=t.cvterm_id) -- exclude pre-populated links
+     WHERE  p1.cvtermpath_id IS NULL; -- this is how we do a SELECT MINUS
+  GET DIAGNOSTICS num_assertions = ROW_COUNT;
+  RAISE LOG 'Seeded cvtermpath with % links', num_assertions;
+
+  RETURN num_assertions;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION forward_chain_iteration() RETURNS INT AS
+$$
+DECLARE
+  num_assertions        INTEGER;
+  total_assertions      INTEGER;
+BEGIN
+  total_assertions := 0;
+
+  -- add your own rules here:
+  SELECT INTO num_assertions forward_chain_iteration_rule_is_a();
+  total_assertions := total_assertions + num_assertions;
+  -- end of rules section
+
+  RETURN total_assertions;
+END;
+$$ LANGUAGE 'plpgsql';
+
+-- IS_A rule
+-- X is_a Y, Y is_a Z => X is_a Z
+CREATE OR REPLACE FUNCTION forward_chain_iteration_rule_is_a() RETURNS INT AS
+$$
+DECLARE
+    is_a_id           INTEGER;
+    num_assertions    INTEGER;
+BEGIN
+    RAISE LOG 'Applying rule: IS_A';
+    SELECT INTO is_a_id get_cvterm_id_for_is_a();
+    INSERT INTO cvtermpath 
+      (subject_id,type_id,object_id,pathdistance)
+      SELECT DISTINCT
+        p.subject_id,
+        is_a_id,
+        link.object_id,
+        p.pathdistance+1
+       FROM 
+        cvtermpath AS p -- extend this
+        INNER JOIN cvterm_relationship AS link ON (p.object_id = link.subject_id) -- using this
+        LEFT JOIN cvtermpath AS p1 ON (p1.subject_id=p.subject_id AND p1.object_id=link.object_id AND p1.type_id=is_a_id) -- excluding this [pathdist??]
+       WHERE  link.type_id=is_a_id 
+         AND  p.type_id=is_a_id 
+         AND  p1.cvtermpath_id IS NULL; -- exclude existing paths
+     
+    GET DIAGNOSTICS num_assertions = ROW_COUNT;
+    RAISE LOG 'RULE:IS_A iteration produced % links', num_assertions;
+    RETURN num_assertions;
+END;
+$$ LANGUAGE 'plpgsql';
+  
+-- TRANSITIVE-OVER-IS_A rule
+-- X is_a+ Y, Y R Z => X R Z
+CREATE OR REPLACE FUNCTION forward_chain_iteration_rule_trans_over_is_a() RETURNS INT AS
+$$
+DECLARE
+    is_a_id           INTEGER;
+    num_assertions    INTEGER;
+BEGIN
+    RAISE LOG 'Applying rule: TRANS_OVER_IS_A';
+    SELECT INTO is_a_id get_cvterm_id_for_is_a();
+    INSERT INTO cvtermpath 
+      (subject_id,type_id,object_id,pathdistance)
+      SELECT DISTINCT
+        p_is_a.subject_id,
+        p_rel.type_id
+        p_rel.object_id,
+        p_rel.pathdistance+1
+       FROM 
+        cvtermpath AS p_is_a  -- extend this
+        INNER JOIN cvtermpath AS p_rel ON (p_is_a.object_id = p_rel.subject_id) -- using this
+        LEFT JOIN cvtermpath AS p1 ON (p1.subject_id=p_is_a.subject_id AND p1.object_id=p_rel.object_id AND p1.type_id=p_rel.type_id) -- excluding this [pathdist??]
+       WHERE  p_is_a.type_id=is_a_id 
+         AND  p1.cvtermpath_id IS NULL; -- exclude existing paths
+     
+    GET DIAGNOSTICS num_assertions = ROW_COUNT;
+    RAISE LOG 'Applied rule:TRANS_OVER_IS_A iteration produced % links', num_assertions;
+    RETURN num_assertions;
+END;
+$$ LANGUAGE 'plpgsql';
+  
+  
