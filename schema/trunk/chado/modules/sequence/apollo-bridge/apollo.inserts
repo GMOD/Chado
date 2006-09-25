@@ -204,7 +204,14 @@ insert into analysis (name,program,programversion,sourcename)
 insert into analysis (name,program,programversion,sourcename)
    values ('Maize_Seq_Panzea_EST_match','blat','1','Maize_Seq_Panzea');
 insert into analysis (name,program,programversion,sourcename)
-   values ('','blat','1','');
+   values ('RiceMinuta_BACend_OMAP_nucleotide_match','blat','1','RiceMinuta_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceGranulata_BACend_OMAP_nucleotide_match','blat','1','RiceGranulata_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceRidleyi_BACend_OMAP_nucleotide_match','blat','1','RiceRidleyi_BACend_OMAP');
+insert into analysis (name,program,programversion,sourcename)
+   values ('RiceOfficinalis_BACend_OMAP_nucleotide_match','blat','1','RiceOfficinalis_BACend_OMAP');
+
 
 insert into db (name) values ('DB:TIGR_EGAD');
 insert into db (name) values ('DB:Maize_Seq_Panzea');
