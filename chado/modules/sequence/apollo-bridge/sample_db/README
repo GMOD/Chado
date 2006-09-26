@@ -1,0 +1,88 @@
+Steps:
+
+perl Makefile.PL with this build.conf and answering yes to both questions:
+
+DEFAULT=y
+DBHOST=localhost
+DBUSER=cain
+PREFIX=
+LOCAL_TMP=./tmp
+DBNAME=apollo
+DBDRIVER=Pg
+DBPORT=5432
+DBORGANISM=rice
+LIB=
+DBPASS=
+
+
+make
+
+sudo make install UNINST=1
+
+make load_schema
+
+make prepdb
+
+rm -rf tmp  # to clear out old ontologies so that this db has freshest
+
+make ontologies    loading 1,2
+
+cd modules/sequence/apollo-bridge/sample_db
+
+psql apollo < ../cv_inserts.sql 
+psql apollo < ../apollo.inserts
+
+pg_dump apollo | bzip2 -c --best > ontologies_only.bz2
+    # to keep a copy of the database at this stage in case something goes wrong loading data
+
+
+bzip2 -d gff_files/10.non.gff.bz2  # this is the non-analysis data (ie, 'knowns')
+
+gmod_bulk_load_gff3.pl --noexon -g gff_files/10.non.gff 
+    # takes about 2-3 minutes to run
+
+bzip2 --best gff_files/10.non.gff  
+
+bzip2 -d gff_files/10.pred.gff.bz2 
+
+gmod_bulk_load_gff3.pl -a FgenesH_Monocot -g gff_files/10.pred.gff
+ 
+bzip2 --best gff_files/10.pred.gff
+
+bzip2 -d gff_files/10.inserts.bz2 
+
+psql apollo < gff_files/10.inserts
+    # puts features with sequence for most of the hits contained in the analsys gff files
+    # this is much better/cleaner than letting the bulk loader create features on the fly
+    # see perldoc gmod_bulk_load_gff3.pl for more information
+
+    # there are no doubt redundant entries in this file, but will be discarded due
+    # to their violating a unique constraint
+
+psql apollo
+  apollo=# vacuum full analyze;
+  apollo=# \q
+
+bzip2 --best gff_files/10.inserts 
+
+bzip2 -d gff_files/*est* gff_files/*match*
+
+gmod_bulk_load_gff3.pl --recreate -a -g gff_files/10.est.gff
+    # the recreate is necessary because features got into the database via a route other than the bulk loader
+
+gmod_bulk_load_gff3.pl -a -g gff_files/10.match.gff
+
+gmod_bulk_load_gff3.pl -a -g gff_files/10.rice_match.gff
+
+bzip2 --best gff_files/*.gff
+
+pg_dump apollo | bzip2 -c --best > pre_trigger_dump.bz2
+
+cat /usr/local/gmod/src/chado/modules/sequence/apollo-bridge/apollo-triggers.plpgsql | psql apollo
+
+pg_dump apollo | bzip2 -c --best > final_dump.bz2
+
+# now connect with apollo using a chado-adaptor.xml like the one in this directory (note that
+# I used the section named 'RiceDB test server at gmod.cshl.edu(Tunneling)'
+
+
