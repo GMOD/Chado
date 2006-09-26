@@ -95,5 +95,5 @@ pg_dump apollo | bzip2 -c --best > final_dump.bz2
 Note that any of the dumps can be restored to a database with the
 command:
 
-  bzip2 -dc <dump_file.bz2> | psql $DBNAME
+  bzip2 -dc dump_file.bz2 | psql $DBNAME
 
