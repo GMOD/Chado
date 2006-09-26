@@ -92,4 +92,8 @@ pg_dump apollo | bzip2 -c --best > final_dump.bz2
 # this directory (note that I used the section named 'RiceDB test
 # server at gmod.cshl.edu(Tunneling)'
 
+Note that any of the dumps can be restored to a database with the
+command:
+
+  bzip2 -dc <dump_file.bz2> | psql $DBNAME
 
