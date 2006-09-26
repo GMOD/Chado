@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is used to config chado database adapter -->
+<chado-adapter>
+
+     <chadoInstance id="referenceInstance" default="true">
+
+        <writebackXmlTemplateFile>transactionXMLTemplate.xml</writebackXmlTemplateFile>
+
+        <featureCV>sequence</featureCV>
+        <polypeptideType>polypeptide</polypeptideType>
+        <relationshipCV>relationship</relationshipCV>
+        <propertyTypeCV>feature_property</propertyTypeCV>
+
+        <!-- default is part_of -->
+        <partOfCvTerm>part_of</partOfCvTerm>
+        <transProtRelationTerm>derives_from</transProtRelationTerm>
+
+        <searchHitsHaveFeatLocs>true</searchHitsHaveFeatLocs>
+
+        <clsName>apollo.dataadapter.chado.jdbc.FlybaseChadoInstance</clsName>
+
+	<oneLevelAnnotTypes>
+	    <type>promoter</type>
+	    <type>insertion site</type>
+	    <type>transposable_element</type>
+	    <type>transposable_element_insertion_site</type>
+	    <type>remark</type>
+	    <type>repeat_region</type>	
+	</oneLevelAnnotTypes>
+
+	<threeLevelAnnotTypes>
+	    <type>gene</type>
+	    <type>pseudogene</type>
+	    <type>tRNA</type>
+	    <type>snRNA</type>
+	    <type>snoRNA</type>
+	    <type>ncRNA</type>
+	    <type>rRNA</type>
+	    <type>miRNA</type>
+	</threeLevelAnnotTypes>        
+
+    </chadoInstance>
+
+    <chadoInstance id="flybaseInstance">
+
+       <inheritsInstance>referenceInstance</inheritsInstance>    
+
+    	<sequenceTypes>
+	    <type>gene</type>
+	    <type>golden_path_region</type>
+	</sequenceTypes>
+
+       <polypeptideType>protein</polypeptideType>
+ 
+       <featureCV>SO</featureCV>
+        <relationshipCV>relationship type</relationshipCV>
+        <!-- default is part_of -->
+        <partOfCvTerm>partof</partOfCvTerm>
+        <!-- default is derives_from -->
+        <producedByCvTerm>producedby</producedByCvTerm>
+        <propertyTypeCV>property type</propertyTypeCV>
+
+        <genePredictionPrograms>
+            <program>genscan</program>
+            <program>piecegenie</program>
+        </genePredictionPrograms>
+
+        <searchHitPrograms>
+           <program>sim4</program>
+           <program>%blastx%</program>
+        </searchHitPrograms>        
+
+        <searchHitsHaveFeatLocs>false</searchHitsHaveFeatLocs>
+
+    </chadoInstance>
+
+    <!-- Indiana public FlyBase server r4.2 -->
+    <!-- user is "apollo" password is "flybase930" for all fly svrs -->
+    <chadodb>
+        <name>FlyBase Chado Indiana public server r4.2</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://flybase.org:5432/dmel_r4.2</url>
+	<dbName>dmel_r4.2</dbName>
+	<dbInstance>flybaseInstance</dbInstance>
+	<style>fly.style</style>
+    </chadodb>    
+
+    <!-- Indiana public FlyBase server r4.1 -->
+    <chadodb>
+        <name>FlyBase Chado Indiana public server r4.1</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://flybase.org:5432/dmel_r4.1</url>
+	<dbName>dmel_r4.1</dbName>
+	<dbInstance>flybaseInstance</dbInstance>
+	<style>fly.style</style>
+    </chadodb> 
+   
+    <!-- Indiana public FlyBase server r3.2 -->
+    <chadodb>
+        <name>FlyBase Chado Indiana public server r3.2</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://flybase.org:5432/dmel_r3.2</url>
+	<dbName>dmel_r3.2</dbName>
+	<dbInstance>flybaseInstance</dbInstance>
+	<style>fly.style</style>
+    </chadodb>    
+
+    <!-- Indiana public FlyBase dpse server 1.0.4 -->
+    <chadodb>
+        <name>FlyBase Chado Indiana Dpse public server 1.0.4</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://flybase.org:5432/dpse_r1.0.4</url>
+	<dbName>dpse_r1.0.4</dbName>
+	<dbInstance>flybaseInstance</dbInstance>
+	<style>fly.style</style>
+    </chadodb>    
+
+    <!-- Indiana public FlyBase het server -->
+    <chadodb>
+        <name>FlyBase Chado Indiana Heterochromatin public server</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://flybase.org:5432/dmelhet_r3.2</url>
+	<dbName>dmelhet_r3.2</dbName>
+	<dbInstance>flybaseInstance</dbInstance>
+	<style>fly.style</style>
+    </chadodb>
+
+
+    <chadoInstance id="riceInstance" default="true">
+
+        <inheritsInstance>referenceInstance</inheritsInstance>
+
+	<sequenceTypes>
+	    <type>gene</type>
+	    <!-- bacs are not in rice yet  <type>BAC</type> -->
+	    <!-- useStartAndEnd specifies this is a range so that different GUI
+	         can be used, queryForValue -> query db for chroms/seqIds -->
+            <type>
+                <name>chromosome</name>
+                <useStartAndEnd>true</useStartAndEnd>
+                <queryForValueList>true</queryForValueList>
+                <isTopLevel>true</isTopLevel>
+            </type>
+	</sequenceTypes>
+
+        <writebackXmlTemplateFile>transactionXMLTemplate_rice.xml</writebackXmlTemplateFile>
+        <featureCV>sequence</featureCV>
+        <relationshipCV>relationship</relationshipCV>
+        <propertyTypeCV>property type</propertyTypeCV>
+
+        <genePredictionPrograms>
+            <program>FgenesH</program>
+        </genePredictionPrograms>
+
+        <searchHitPrograms>
+            <program>blat</program>
+        </searchHitPrograms>        
+
+        <searchHitsHaveFeatLocs>true</searchHitsHaveFeatLocs>
+
+    	<clsName>apollo.dataadapter.chado.jdbc.RiceChadoInstance</clsName>
+
+	<oneLevelAnnotTypes>
+	    <type>promoter</type>
+	    <type>transposable_element</type>
+	    <type>remark</type>
+	    <type>repeat_region</type>	
+	</oneLevelAnnotTypes>
+
+    </chadoInstance>  
+  
+
+    <!-- Test rice database at brebiou.cshl.org -->
+    <chadodb>
+        <name>RiceDB test server at brebiou</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://brebiou.cshl.org:5432/rice</url>
+	<dbName>rice</dbName>
+	<dbUser>wgm</dbUser>
+	<dbInstance>riceInstance</dbInstance>
+	<style>rice.style</style>
+    </chadodb> 
+
+   <!-- Marks Test rice database at brebiou.cshl.org - works with ssh
+   tunnel on local host (need to have csh login & change -l mgibson)
+   ssh -L15432:brebiou.cshl.org:5432 -l mgibson -N brebiou.cshl.org -->
+    <chadodb>
+        <name>RiceDB test server at brebiou(Tunneling)</name>
+	<adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+	<url>jdbc:postgresql://localhost:15432/rice</url>
+	<dbName>rice</dbName>
+	<dbUser>mgibson</dbUser>
+	<dbInstance>riceInstance</dbInstance>
+	<style>rice.style</style>
+        <!-- default database to use for loading and saving from -->
+        <!--  command line if none is specified -->
+        <default-command-line-db>false</default-command-line-db>
+    </chadodb>   
+
+    <chadodb>
+        <name>RiceDB test server at gmod.cshl.edu(Tunneling)</name>
+        <adapter>apollo.dataadapter.chado.jdbc.PostgresChadoAdapter</adapter>
+        <url>jdbc:postgresql://localhost:15432/apollo</url>
+        <dbName>apollo</dbName>
+        <dbUser>cain</dbUser>
+        <dbInstance>riceInstance</dbInstance>
+        <style>rice.style</style>
+        <!-- default database to use for loading and saving from -->
+        <!--  command line if none is specified -->
+        <default-command-line-db>false</default-command-line-db>
+    </chadodb>  
+
+</chado-adapter>
+
