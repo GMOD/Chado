@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.96 2006-04-12 03:19:10 scottcain Exp $
+# $Id: Makefile.PL,v 1.97 2006-09-27 20:28:13 cmungall Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -673,6 +673,7 @@ sub MY::c_o {
   return ".SUFFIXES : .gz ";
 }
 
+# TODO: this should be rewritten to use the metadata xml
 sub MY::postamble {
   my $root = "GMOD_ROOT=$O{GMOD_ROOT}";
   qq{
@@ -701,6 +702,7 @@ graphviz :: \
 	make $working_dir/modules/expression/rad.graphviz.png \
 	make $working_dir/modules/general/general.graphviz.png \
 	make $working_dir/modules/genetic/genetic.graphviz.png \
+	make $working_dir/modules/phenotype/phenotype.graphviz.png \
 	make $working_dir/modules/library/library.graphviz.png \
 	make $working_dir/modules/map/map.graphviz.png \
 	make $working_dir/modules/organism/organism.graphviz.png \
@@ -756,6 +758,7 @@ html :: \
 	make $working_dir/modules/expression/rad.html \
 	make $working_dir/modules/general/general.html \
 	make $working_dir/modules/genetic/genetic.html \
+	make $working_dir/modules/phenotype/phenotype.html \
 	make $working_dir/modules/library/library.html \
 	make $working_dir/modules/map/map.html \
 	make $working_dir/modules/organism/organism.html \
@@ -766,8 +769,30 @@ html :: \
 	make $working_dir/modules/www/www.html \
 	make $working_dir/modules/nofuncs.html
 
+tex :: \
+	make $working_dir/modules/companalysis/companalysis.tex \
+	make $working_dir/modules/contact/contact.tex \
+	make $working_dir/modules/cv/cv.tex \
+	make $working_dir/modules/expression/expression.tex \
+	make $working_dir/modules/expression/rad.tex \
+	make $working_dir/modules/general/general.tex \
+	make $working_dir/modules/genetic/genetic.tex \
+	make $working_dir/modules/phenotype/phenotype.tex \
+	make $working_dir/modules/library/library.tex \
+	make $working_dir/modules/map/map.tex \
+	make $working_dir/modules/organism/organism.tex \
+	make $working_dir/modules/phenotype/phenotype.tex \
+	make $working_dir/modules/phylogeny/phylogeny.tex \
+	make $working_dir/modules/pub/pub.tex \
+	make $working_dir/modules/sequence/sequence.tex \
+	make $working_dir/modules/www/www.tex \
+	make $working_dir/modules/nofuncs.tex
+
 %.html: %.sql
 	$working_dir/bin/pg2html.pl \$< > \$@
+
+%.tex: %.sql
+	sqlt --from PostgreSQL \$< --to Latex > \$@
 
 %.graphviz.png: %.sql
 	$working_dir/bin/pg2graphviz.pl \$< > \$@
