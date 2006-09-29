@@ -67,3 +67,34 @@ CREATE OR REPLACE FUNCTION feature_disjoint_from(int)
    ( x.fmax < y.fmin OR x.fmin > y.fmax ) '
 LANGUAGE 'sql';
 
+
+
+--Evolution of the methods found in range.plpgsql (C. Pommier)
+--Goal : increase performances of segment fetching
+--       Implies to optimise featureloc_slice
+
+--Background : The existing featureloc_slice uses uses a spatial rtree index. The spatial objects used are a boxrange ((0,fmin), (fmax,500000000)) and a boxquery ((fmin,fmax),(fmin,fmax)) . The boxranges are indexed. 
+--             To speed up things (for gbrowse) featureloc_slice has been overiden to filter simultaneously on the boxrange and the srcfeature_id. This gives good results.
+--             The goal here is to push this logic further and to include the srcfeature_id filter directly into the boxrange object. We propose to consider the following boxs : 
+--             boxrange : ((srcfeature_id,fmin),(srcfeature_id,fmax))
+--             boxquery : ((srcfeature_id,fmin),(srcfeature_id,fmax))
+
+
+
+CREATE OR REPLACE FUNCTION boxrange (int, int, int) RETURNS box AS
+ 'SELECT box (create_point($1, $2), create_point($1,$3))'
+LANGUAGE 'sql' IMMUTABLE;
+
+-- create a query box
+CREATE OR REPLACE FUNCTION boxquery (int, int, int) RETURNS box AS
+ 'SELECT box (create_point($1, $2), create_point($1, $3))'
+LANGUAGE 'sql' IMMUTABLE;
+
+CREATE INDEX binloc_boxrange_src ON featureloc USING RTREE (boxrange(srcfeature_id,fmin, fmax));
+
+CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
+  RETURNS setof featureloc AS
+  'SELECT * 
+   FROM featureloc 
+   WHERE boxquery($1, $2, $3) && boxrange(srcfeature_id,fmin,fmax)'   
+LANGUAGE 'sql';
