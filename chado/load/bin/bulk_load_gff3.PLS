@@ -580,8 +580,8 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
 
   my $featuretype = $feature->type->name;
 
-  if ($featuretype =~ /CDS/) {
-    $feature_iterator = $chado->handle_CDS($feature);
+  if ($featuretype =~ /(CDS|UTR)/) {
+    $chado->handle_CDS($feature);
     next FEATURE; 
   }
 
@@ -716,7 +716,7 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
   $chado->nextfeature('++');
 }
 
-goto FEATURE if ($feature_iterator = $chado->handle_CDS() );
+goto FEATURE if ($feature_iterator = $chado->process_CDS() );
 
 $chado->end_files();
 

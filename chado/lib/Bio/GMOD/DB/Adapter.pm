@@ -8,6 +8,7 @@ use Data::Dumper;
 use URI::Escape;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
+use FreezeThaw qw( freeze thaw safeFreeze );
 
 #set lots of package-wide variables:
 my ($nextfeaturerel,$nextfeatureprop,
@@ -198,6 +199,8 @@ sub new {
         $self->initialize_sequences();
         $self->initialize_uniquename_cache();
     }
+
+    $self->cds_db_exists(0);
 
     return $self;
 }
@@ -2684,30 +2687,20 @@ sub handle_gap {
 
 =item Usage
 
-  my $feature_iterator = $obj->handle_CDS($feature_obj)
+  $obj->handle_CDS($feature_obj)
 
 =item Function
 
-This function deals with converting GFF3 lines that constitute
-a single CDS feature into exon features and a polypeptide feature.
-THIS IS VERY IMPORTANT: in order to work, CDS lines for different
-CDS features CANNOT be intermixed.  That is something like this would
-be invalid:
-
-  chrI . CDS  200  300  .  +  .  ID=cds1
-  chrI . CDS  200  305  .  +  .  ID=cds2
-  chrI . CDS  500  605  .  +  .  ID=cds1
-  chrI . CDS  503  650  .  +  .  ID=cds2
+This function stores CDS and UTR features in a temporary database
+table for processing after the entire GFF3 file has be seen.
 
 =item Returns
 
-When a new CDS feature is started or when no arg is passed in, this method
-returns a L<Bio::GMOD::DB::Adapter::FeatureIterator> object.
+Nothing
 
 =item Arguments
 
-Either a Bio::FeatureIO CDS object, or nothing (to get the last set
-of exon and polypeptide features).
+A Bio::FeatureIO CDS or UTR object
 
 =back
 
@@ -2716,20 +2709,276 @@ of exon and polypeptide features).
 sub handle_CDS {
     my $self = shift;
     my $feat = shift;
+    my $dbh  = $self->dbh;
 
 #    warn Dumper($feat);
 
     my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value
-                    if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
-    my $feat_parent = ($feat->annotation->get_Annotations('Parent'))[0]->value
-                    if $feat;
+               if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
+    my @feat_parents= map {$_->value} 
+               $feat->annotation->get_Annotations('Parent')
+               if ($feat && ($feat->annotation->get_Annotations('Parent'))[0]);
+
+    #assume that an exon can have at most one grandparent (gene, operon)
+    my $feat_grandparent = $self->cache('parent',$feat_parents[0]) if $feat_parents[0];
+
+    unless ($self->cds_db_exists()) {
+        $self->create_cds_db;
+    }
+
+    my $fmin = $feat->start;              #check that this is interbase
+    my $fmax = $feat->end;
+    my $object = safeFreeze $feat;
+
+    my $feat_type   = $feat->type->name;
+    my $seq_id = $feat->seq_id;
+
+    my $insert = qq/
+        INSERT INTO tmp_cds_handler (gff_id,seq_id,type,fmin,fmax,object) 
+        VALUES (?,?,?,?,?,?)
+    /;
+    my $sth = $dbh->prepare($insert);
+    $sth->execute($feat_id,$seq_id,$feat_type,$fmin,$fmax,$object);
+
+    #get the value of the row just inserted
+    $sth = $dbh->prepare("SELECT currval('tmp_cds_handler_cds_row_id_seq')");
+    $sth->execute;
+    my ($cds_row_id) = $sth->fetchrow_array;
+
+    $sth = $dbh->prepare("INSERT INTO tmp_cds_handler_relationship (cds_row_id,parent_id,grandparent_id) VALUES (?,?,?)");
+    for my $parent (@feat_parents) {
+        $sth->execute($cds_row_id,$parent,$feat_grandparent);        
+    }
+
+    return;
+}
+
+
+=head2 process_CDS
+
+=over
+
+=item Usage
+
+  my $feature_iterator = $obj->process_CDS()
+
+=item Function
+
+Retrieves CDS and UTR objects from a temporary database table and
+does necessary conversion to exon and polypeptide features and
+returns a feature iterator to let the bulk loader process them
+
+=item Returns
+
+A Bio::GMOD::Adaptor::FeatureIterator object
+
+=item Arguments
+
+None.
+
+=back
+
+=cut
+
+sub process_CDS {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+    #get one of the features from the database(!)
+
+    my $min_feat_query = "SELECT min(fmax) FROM tmp_cds_handler";
+    my $sth = $dbh->prepare($min_feat_query);
+    $sth->execute;
+    my ($min_feat) = $sth->fetchrow_array;
+
+    my $cds_utr_query = qq/
+SELECT cds.object,cds.type,cds.fmin,cds.fmax, rel.parent_id,rel.grandparent_id
+FROM tmp_cds_handler cds, tmp_cds_handler_relationship rel
+WHERE rel.cds_row_id = cds.cds_row_id
+  AND rel.grandparent_id IN
+        (SELECT grandparent_id FROM tmp_cds_handler_relationship
+          WHERE cds_row_id IN
+           (SELECT cds_row_id FROM tmp_cds_handler WHERE fmax = ?))
+ORDER BY cds.fmin,cds.gff_id
+                /;
+    $sth = $dbh->prepare($cds_utr_query);
+    $sth->execute($min_feat);
+
+    my %polypeptide;
+    my @feature_list;
+    my $grandparent;
+#do stuff, create a list of features
+    while (my $feat_row = $sth->fetchrow_hashref) {
+        my $parent_id = $$feat_row{ parent_id };
+        $grandparent  = $$feat_row{ grandparent_id };
+        my ($feat_obj)= thaw $$feat_row{ object };
+        my $type      = $$feat_row{ type };
+        my $fmin      = $$feat_row{ fmin };
+        my $fmax      = $$feat_row{ fmax };
+
+        warn $feat_obj;
+
+        if ($type =~ /CDS/) {
+            #check for a polypeptide with for this parent
+            if ($polypeptide{ $parent_id }) {
+            #add to it if it exists
+                if ( $polypeptide{ $parent_id }->start > $fmin ) {
+                    $polypeptide{ $parent_id }->start($fmin);
+                }
+                if ( $polypeptide{ $parent_id }->end   < $fmax ) {
+                    $polypeptide{ $parent_id }->end($fmax);
+                }
+            }
+            else {
+            #create it if it doesn't
+                my $polyp = Bio::SeqFeature::Annotated->new();
+                $polyp->start(  $fmin  );
+                $polyp->end(    $fmax  );
+                $polyp->strand( $feat_obj->strand );
+                $polyp->name(   $parent_id.' polypeptide');
+
+                my $polyp_ac = Bio::Annotation::Collection->new();
+                $polyp_ac->add_Annotation(
+                    'Note',Bio::Annotation::SimpleValue->new(
+                     'polypeptide feature inferred from GFF3 CDS feature'));
+                $polyp_ac->add_Annotation(
+                    'Derives_from',Bio::Annotation::SimpleValue->new(
+                      $parent_id));
+                $polyp_ac->add_Annotation(
+                    'type',Bio::Annotation::OntologyTerm->new(
+                      -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
+                $polyp_ac->add_Annotation(
+                    'seq_id',Bio::Annotation::SimpleValue->new(
+                      $feat_obj->seq_id->value));
+                $polyp->annotation($polyp_ac);
+
+                $polypeptide{ $parent_id } = $polyp;
+            }
+        }
+
+        #create an exon feature (or add to an existing one)
+        my $merged_exon = 0;
+        for my $exon ( @feature_list ) {
+            if ($exon->start == $fmax ) {
+        #this feature imideately precedes an existing exon, glue them together
+                warn "exon start:".$exon->start.", fmin:$fmin";
+
+                $exon->start($fmin);
+
+                $exon = $self->_merge_annotations($exon, $feat_obj);
+                $merged_exon = 1;
+
+                warn "exon start:".$exon->start.", fmin:$fmin";
+
+            }
+
+            if ($exon->end == $fmin ) {
+        #this feature come right after an existing exon, glue them together
+                warn "exon end:".$exon->end.", fmax:$fmax";
+                $exon->end($fmax);
+
+                $exon = $self->_merge_annotations($exon, $feat_obj);
+                $merged_exon = 1;
+                warn "exon end:".$exon->end.", fmax:$fmax";
+            }
+        }
+
+        unless ($merged_exon) {
+        #convert the existing feature to an exon
+            my $ac = $feat_obj->annotation();
+
+            $ac->remove_Annotations('type');
+            $ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
+                             -term => Bio::Ontology::Term->new(-name=>'exon')));
+            $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                             'Exon inferred from GFF3 ' .
+                             $feat_obj->type->name .
+                             ' feature line'));
+
+            $feat_obj->annotation($ac);
+
+            push @feature_list, $feat_obj;
+        }
+    }
+    #add the polypeptides to the list
+    push @feature_list, values %polypeptide;
+
+#delete the features from the temp tables:
+
+    my $delete_query = qq/DELETE FROM tmp_cds_handler WHERE cds_row_id IN
+  (SELECT cds_row_id FROM tmp_cds_handler_relationship WHERE grandparent_id =?)
+   /;
+    $sth = $dbh->prepare($delete_query);
+    $sth->execute($grandparent);
+    $dbh->commit;
+
+#return an iterator
+    if (@feature_list > 0) {
+        return Bio::GMOD::DB::Adapter::FeatureIterator->new(\@feature_list);
+    }
+    else {
+        return 0;
+    }
+}
+
+=head2 _merge_annotations
+
+=over
+
+=item Usage
+
+  $obj->_merge_annotations()
+
+=item Function
+
+Take two adjecent feature objects and merge their annotations
+
+=item Returns
+
+The merged feature object (which will be an exon feature)
+
+=item Arguments
+
+Two feature objects, with the existing exon first
+
+=back
+
+=cut
+
+sub _merge_annotations {
+    my ($self, $exon, $obj2) = @_;
+
+    my $exon_ac = $exon->annotation;
+    my $obj2_ac = $obj2->annotation;
+
+    for my $key ( $obj2_ac->get_all_annotation_keys() ) {
+        my @values = $obj2_ac->get_Annotations($key);
+        if ($key eq 'type') {
+            $exon_ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                'exon feature the result of two merged features in GFF3, one '.
+                'of which was a '.$obj2->type->value.' feature')); 
+        }
+        else {
+            for my $value ( @values ) {
+                $exon_ac->add_Annotation($key,$value); 
+            }
+        }
+    }
+    $exon->annotation($exon_ac);
+
+    return $exon;
+}
+
+
+=pod
 
     my $iterator;
-    if ( ($feat_id && $self->{cdscache}{id} && $feat_id ne $self->{cdscache}{id})
-          or
-         ($feat_parent && $self->{cdscache}{parent} && $feat_parent ne $self->{cdscache}{parent})
-          or
-         (!$self->{cdscache}{id} && !$self->{cdscache}{parent}) ) {
+  #so its time to process the most recent set of features and return an iterator
+    if (($feat_id && $self->{cdscache}{id} && $feat_id ne $self->{cdscache}{id})
+         or
+       ($feat_parent && $self->{cdscache}{parent} && $feat_parent ne $self->{cdscache}{parent})
+         or
+       (!$self->{cdscache}{id} && !$self->{cdscache}{parent}) ) {
 
         #this is a new cds feature so package up the old one to give back
         if ($self->noexon) {
@@ -2754,16 +3003,61 @@ sub handle_CDS {
     }
 
     #get the current AnnotationCollection and change
+    # that is, convert CDS features to exon features
     if ($feat && !$self->noexon) {
-        my $ac = $feat->annotation();
 
-        $ac->remove_Annotations('type'); 
-        $ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
-                                -term => Bio::Ontology::Term->new(-name=>'exon')));
-        $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
-                             'Exon inferred from GFF3 CDS feature line'));
+        #check for existing created exons that but up against this feature
+        my $start = $feat->start;
+        my $stop  = $feat->end;
 
-        $feat->annotation($ac); 
+        my $appended_feature_flag = 0;
+        for my $cached_feat ( @{ $self->{cdscache}{feature_array} } ) {
+            if ($stop + 1 == $cached_feat->start) {
+                my $cached_ac = $cached_feat->annotation();
+                my $ac        = $feat->annotation();
+
+                $ac->remove_Annotations('type');
+                $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                             'Exon added to from an adjacent feature in GFF3'));
+                
+                my @annot_list = $ac->get_Annotations;
+                for my $annot (@annot_list) {
+                    $cached_ac->add_Annotation($annot);
+                } 
+
+                $cached_feat->start($start);
+                $appended_feature_flag = 1;
+            }
+            elsif ( $start == $cached_feat->end + 1 ) {
+                my $cached_ac = $cached_feat->annotation();
+                my $ac        = $feat->annotation();
+
+                $ac->remove_Annotations('type');
+                $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                             'Exon added to from an adjacent feature in GFF3'));
+                my @annot_list = $ac->get_Annotations;
+                for my $annot (@annot_list) {
+                    $cached_ac->add_Annotation($annot);
+                }
+
+                $cached_feat->end($stop);
+                $appended_feature_flag = 1;
+            } 
+        }
+
+        unless ( $appended_feature_flag ) {
+            my $ac = $feat->annotation();
+
+            $ac->remove_Annotations('type'); 
+            $ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
+                             -term => Bio::Ontology::Term->new(-name=>'exon')));
+            $ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
+                             'Exon inferred from GFF3 ' .
+                             $feat->type->name .
+                             ' feature line'));
+
+            $feat->annotation($ac); 
+        }
     }
 
     if ($feat && !$self->{cdscache}{polypeptide_obj}) {
@@ -2788,10 +3082,14 @@ sub handle_CDS {
         $self->{cdscache}{polypeptide_obj} = $polyp;
     }
     #check for bounds change on the existing polypeptide
-    elsif ( $feat && $self->{cdscache}{polypeptide_obj}->start > $feat->start ) {
+    elsif ( $feat 
+              && $self->{cdscache}{polypeptide_obj}->start > $feat->start
+              && $feat->type->name =~ /CDS/ ) {
         $self->{cdscache}{polypeptide_obj}->start($feat->start);
     }
-    elsif ( $feat && $self->{cdscache}{polypeptide_obj}->end < $feat->end) {
+    elsif ( $feat 
+              && $self->{cdscache}{polypeptide_obj}->end < $feat->end
+              && $feat->type->name =~ /CDS/ ) {
         $self->{cdscache}{polypeptide_obj}->end($feat->end);
     }
 
@@ -2799,6 +3097,7 @@ sub handle_CDS {
 
     return $iterator;
 }
+=cut
 
 sub handle_parent {
     my $self = shift;
@@ -2807,7 +3106,7 @@ sub handle_parent {
     for my $p_anot ( $feature->annotation->get_Annotations('Parent') ) {
         my $pname  = $p_anot->value;
         my $parent = $self->cache('parent',$pname);
-        die "no parent ".$pname unless $parent;
+        die "\nno parent $pname;\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
 
         $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$part_of);
 
@@ -3009,7 +3308,9 @@ sub sorter_get_second_tier {
     my $self = shift;
     my $dbh  = $self->dbh;
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by id") or die;
+#ARGH! need to deal with multiple parents!
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or die;
     $sth->execute or die;
 
     my $result = $sth->fetchall_arrayref or die;
@@ -3023,7 +3324,9 @@ sub sorter_get_third_tier {
     my $self = shift;
     my $dbh  = $self->dbh;
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by id") or die;
+#ARGH! need to deal with multiple parents!
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or die;
     $sth->execute or die;
 
     my $result = $sth->fetchall_arrayref or die;
@@ -3031,6 +3334,123 @@ sub sorter_get_third_tier {
     my @to_return = map { $$_[0] } @$result;
 
     return @to_return;
+}
+
+=head2 cds_db_exists
+
+=over
+
+=item Usage
+
+  $obj->cds_db_exists()        #get existing value
+  $obj->cds_db_exists($newval) #set new value
+
+=item Function
+
+Flag for determining if the cds temp database exists
+
+=item Returns
+
+value of cds_db_exists (a scalar)
+
+=item Arguments
+
+new value of cds_db_exists (to set)
+
+=back
+
+=cut
+
+sub cds_db_exists {
+    my $self = shift;
+    my $cds_db_exists = shift if defined(@_);
+    return $self->{'cds_db_exists'} = $cds_db_exists if defined($cds_db_exists);
+    return $self->{'cds_db_exists'};
+}
+
+=head2 create_cds_db
+
+=over
+
+=item Usage
+
+  $obj->create_cds_db()
+
+=item Function
+
+Create the temp database table for dealing with CDS and UTR features
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+None
+
+=back
+
+=cut
+
+sub create_cds_db {
+    my $self = shift;
+    my $dbh = $self->dbh;
+
+    #determine if the table exists and drop if it does
+
+    my $exists_query = "SELECT tablename FROM pg_tables WHERE tablename = 'tmp_cds_handler'";  
+    my $sth = $dbh->prepare($exists_query);
+    $sth->execute();
+    my ($exists) = $sth->fetchrow_array; 
+
+    if ($exists) {
+        warn "Dropping cds temp tables...\n";
+        $dbh->do("DROP INDEX tmp_cds_handler_seq_id");
+        $dbh->do("DROP INDEX tmp_cds_handler_fmax");
+        $dbh->do("DROP INDEX tmp_cds_handler_relationship_grandparent");
+        $dbh->do("DROP TABLE tmp_cds_handler_relationship");
+        $dbh->do("DROP TABLE tmp_cds_handler");
+        $dbh->commit();
+    }
+ 
+    #create the table
+
+    warn "Creating cds temp tables...\n";
+    my $table_create = qq/
+        CREATE TABLE tmp_cds_handler (
+            cds_row_id   serial not null,
+            seq_id       varchar(1024),
+            gff_id       varchar(1024),
+            type         varchar(1024) not null,
+            fmin         int not null,
+            fmax         int not null,
+            object       text not null,
+            primary key(cds_row_id)
+        )
+    /;
+
+    $dbh->do($table_create);
+    $dbh->do("CREATE INDEX tmp_cds_handler_seq_id ON tmp_cds_handler (seq_id)");
+    $dbh->do("CREATE INDEX tmp_cds_handler_fmax ON tmp_cds_handler (fmax)");
+    $dbh->commit;
+
+    $table_create = qq/
+        CREATE TABLE tmp_cds_handler_relationship (
+            rel_row_id   serial not null,
+            cds_row_id   int,
+            foreign key (cds_row_id) references tmp_cds_handler (cds_row_id) on delete cascade,
+            parent_id    varchar(1024),
+            grandparent_id varchar(1024),
+            primary key(rel_row_id)
+        )
+    /;
+
+    $dbh->do($table_create);
+    $dbh->do("CREATE INDEX tmp_cds_handler_relationship_grandparent ON tmp_cds_handler_relationship(grandparent_id)");
+    $dbh->commit;
+
+    $self->cds_db_exists(1);
+    return;
 }
 
 
