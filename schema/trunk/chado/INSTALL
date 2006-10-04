@@ -1,23 +1,23 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.44 2006-04-13 20:39:16 scottcain Exp $
+$Id: INSTALL,v 1.45 2006-10-04 16:47:29 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
-considered alpha software, so expect there to be bumps in the road.  When
-you experience problems, please email them to the gmod-devel mailing list
-at gmod-devel@lists.sourceforge.net.  This release will work with the
-most recent release of the Generic Genome Browser (gbrowse) version 1.62
+considered beta software, so expect there to be bumps in the road.  When
+you experience problems, please email them to the gmod-schema mailing list
+at gmod-schema@lists.sourceforge.net.  This release will work with the
+most recent release of the Generic Genome Browser (gbrowse) version 1.65
 though there have been bug fixes to gbrowse that will be rolled into
-a new 1.63 release in the near future.  If you experience difficulties
+a new 1.66 release in the near future.  If you experience difficulties
 with gbrowse and chado, you might want to look at getting a cvs
-checkout of the bugfix branch.  The installation instructions for
+checkout of the gbrowse-session branch.  The installation instructions for
 gbrowse are included in that package.  There are plans to make the
 installation of gbrowse and other components more automatic, but for
 the time being, please unpack it and install separately.
 
 This release of chado/gmod also comes with example functions for
-allowing Apollo (http://www.gmod.org/apollo.shtml) to read and
+allowing Apollo (http://www.gmod.org/apollo) to read and
 write directly to the database, allowing creation and editing of
 genome features.  Please see the file README.Apollo for some details
 on setting this up.
@@ -25,12 +25,22 @@ on setting this up.
 Thanks,
 Scott Cain
 cain@cshl.edu
-May 2, 2005
+Sept 12, 2006
 
 Prerequisites:
 
-  PostgreSQL (currently, developers are using 7.4). Items to do with
-  postgres to make it ready to go:
+  PostgreSQL; currently, developers are using 7.4 and 8.1. There are currently
+  two main considerations in choosing what version of PostgreSQL to use:
+
+    1. Version 8.1 is currently incompatible with the triggers that work
+    with Apollo
+
+    2. Version 7.4 is incompatible with the functions for making CMap
+    integration more seamless.
+
+  Neither problem is insurmountable; it is really a matter conconvience.
+
+  Items to do with postgres to make it ready to go:
 
     * make it accept tcp/ip connections by adding this line to postgresql.conf
       (must be done either as user root or postgres; database must be restarted
@@ -112,7 +122,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
 
   Apache (1.3.* or 2.0.*) (for gbrowse, gmod-web requires 2.0)
 
-  BioPerl (bioperl-live or greater than 1.5)
+  BioPerl (bioperl-live or greater than 1.5.1)
           (-microarray 0.1 --required for microarray data)
 
   go-perl
@@ -135,9 +145,9 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * Data::Stag               (chado)
     * XML::Parser::PerlSAX     (chado)
     * Module::Build            (chado)
-    * Class::DBI               (chado)
-    * Class::DBI::Pg           (chado)
-    * Class::DBI::Pager        (chado)
+    * Class::DBI               (GMODWeb)
+    * Class::DBI::Pg           (GMODWeb)
+    * Class::DBI::Pager        (GMODWeb)
     * DBIx::DBStag             (chado)
     * XML::Simple              (chado)
     * LWP                      (chado)
@@ -157,6 +167,10 @@ This document describes how to install the Chado schema:
     If you are using a csh-like shell, it is done like this:
 
        $ setenv VARNAME value
+
+    To make life easier on yourself, you will probably want to put those
+    commands in your .cshrc or .bashrc file so that the envirnment variables
+    are always available when you log in. 
 
    * GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
 
@@ -184,7 +198,6 @@ As indicated, the host, port, and password are optional.
 2.  Next, run the following commands:
 
 *   perl Makefile.PL   
-    Creates AutoDBI.pm.
 
       During this step you are prompted for several configuration values
       used by Chado and its associated tools:
@@ -233,8 +246,15 @@ As indicated, the host, port, and password are optional.
 
         *   What is the default organism (common name, or "none")?
 
+        The organism name should be one what will be in the organism table.
+        When the database is created, several organisms will be there
+        by default; these include: human, fruitfly, mouse, mosquito,
+        rat, mustard weed, worm, zebrafish, rice, and yeast.  (The
+        insert statements that create these default organisms are 
+        contained in load/etc/initialize.sql).
 
-
+        THIS PARAGRAPH IS OUT OF DATE, AS IS THE SECTION AT THE
+        END, AND BOTH SHOULD BE REWRITTEN.
         At this point, if you answered "No" to the "use default schema"
         question, you will be prompted about what database exensions
         to use; generally, you should answer "Yes" to that question.
@@ -247,10 +267,10 @@ As indicated, the host, port, and password are optional.
 
 *   (sudo) make install
     Probably needs to be run as root.  Installs data loading scripts
-    in /usr/local/bin, perl modules, as well as placing various files
-    in $GMOD_ROOT, and creating the infastructure for logging of
-    errors by creating $GMOD_ROOT/logs and creating the
-    file /etc/log4perl.conf if it does not already exist.
+    in perl's path (typically /usr/local/bin or /usr/bin), perl modules,
+    as well as placing various files in $GMOD_ROOT, and creating the
+    infastructure for logging of errors by creating $GMOD_ROOT/logs and
+    creating the file /etc/log4perl.conf if it does not already exist.
 
 
 *   make load_schema
@@ -272,11 +292,11 @@ As indicated, the host, port, and password are optional.
 *   make ontologies
     Gets and installs various ontologies.  Requires a network 
     connection.  Absolutely required are the Relationship Ontology and
-    the Sequence Ontology Feature Annotation (SOFA).  All others are
-    optional.  Note retrieved ontology files are stored in the directory
-    specified when perl Makefile.PL was run (the default is ./tmp).  In
-    order to do a repeat installation, lock files need to be removed to
-    allow reinstallation of ontologies.  Those lock files can be removed
+    the Sequence Ontology (SO).  All others are optional.  Note retrieved
+    ontology files are stored in the directory specified when
+    perl Makefile.PL was run (the default is ./tmp).  In order to do a
+    repeat installation, lock files need to be removed to allow
+    reinstallation of ontologies.  Those lock files can be removed
     by executing `make rm_locks`.  Alternatively, deleting everything in
     the temporary directory will force the re-downloading of the ontology
     data from their respective sources.  Also note that loading a large
@@ -288,11 +308,22 @@ As indicated, the host, port, and password are optional.
     problems.  If you already have desired ontology files locally, you
     can execute a command for each file to load it.  Note again that
     the Relationship Ontology is required before all others, and the
-    the Sequence Ontology Feature Annotation (SOFA) is absolutely required
-    for proper functioning of the database.  The command to load an
-    ontology and its definition file (if it exists) is this:
+    the Sequence Ontology (SO) is absolutely required for proper
+    functioning of the database.  The command to load an ontology is
+    this:
 
-        $ gmod_load_ontology.pl /path/to/onto_file [/path/to/def_file]
+        go2fmt.pl -p obo_text -w xml /path/to/obofile | \
+            go-apply-xslt oboxml_to_chadoxml - > obo_text.xml
+
+    to create a chadoxml file of the obo file, and then execute:
+
+        stag-storenode.pl \
+     -d 'dbi:Pg:dbname=$CHADO_DB_NAME;host=$CHADO_DB_HOST;port=$CHADO_DB_PORT' \
+     --user $CHADO_DB_USERNAME --password $CHADO_DB_PASSWORD obo_text.xml
+
+    If you have other ontology format files, the commands are similar;
+    consult the documentation for go2fmt.pl and go-apply-xslt for your
+    file format.
 
     It is not a bad idea at this point to make a back up of the database,
     particularly if you loaded a large ontology like GO.  To make a complete
@@ -342,13 +373,6 @@ Then execute gmod_bulk_load_gff3.pl:
     Note the redirection of standard out.  Note that this method
     for generating GFF3 files is not completely satisfactory and
     development is ongoing to provide better translation.
-
-DUMPING GFF3
-
-The script gmod_dump_gff3.pl can be used to dump GFF3 from a chado
-database.  If executed with no arguments, dump_gff3.pl will dump all
-features for the default organism in the database.  Alternatively,
-you can provide the organism or reference sequence to dump.
 
 GENERIC GENOME BROWSER
 
