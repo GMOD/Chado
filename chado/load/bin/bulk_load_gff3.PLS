@@ -621,9 +621,9 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
   $name           = $name->value if ref($name);
 
   #my $uniquename = $nextfeature;
-  unless ($chado->cache('parent',$uniquename) ) {
-      $chado->cache('parent',$uniquename,$nextfeature);
-  }
+#  unless ($chado->cache('parent',$uniquename) ) {
+#      $chado->cache('parent',$uniquename,$nextfeature);
+#  }
   if($chado->cache('feature',$uniquename)){
     #seen this feature before
     $locgroup{$uniquename}++;
@@ -632,7 +632,7 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
     $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,'\N');
 
     $chado->cache('feature',$uniquename,$nextfeature);
-    $chado->cache('parent',$uniquename,$nextfeature);
+#    $chado->cache('parent',$uniquename,$nextfeature);
     $locgroup{$uniquename}       = 0;
   }
 

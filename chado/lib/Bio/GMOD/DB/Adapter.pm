@@ -2720,7 +2720,13 @@ sub handle_CDS {
                if ($feat && ($feat->annotation->get_Annotations('Parent'))[0]);
 
     #assume that an exon can have at most one grandparent (gene, operon)
-    my $feat_grandparent = $self->cache('parent',$feat_parents[0]) if $feat_parents[0];
+    my $parent_id = $self->cache('feature',$feat_parents[0]) if $feat_parents[0];
+
+    unless ($parent_id) {
+        warn "\n\nThere is a ".$feat->type->name." feature with no parent.  I think that is wrong!\n\n";
+    }
+
+    my $feat_grandparent = $self->cache('parent',$parent_id);
 
     unless ($self->cds_db_exists()) {
         $self->create_cds_db;
@@ -2786,13 +2792,16 @@ sub process_CDS {
 
     #get one of the features from the database(!)
 
+#    print Dumper($self);
+#    die;
+
     my $min_feat_query = "SELECT min(fmax) FROM tmp_cds_handler";
     my $sth = $dbh->prepare($min_feat_query);
     $sth->execute;
     my ($min_feat) = $sth->fetchrow_array;
 
     my $cds_utr_query = qq/
-SELECT cds.object,cds.type,cds.fmin,cds.fmax, rel.parent_id,rel.grandparent_id
+SELECT distinct cds.gff_id,cds.object,cds.type,cds.fmin,cds.fmax, rel.grandparent_id
 FROM tmp_cds_handler cds, tmp_cds_handler_relationship rel
 WHERE rel.cds_row_id = cds.cds_row_id
   AND rel.grandparent_id IN
@@ -2809,19 +2818,19 @@ ORDER BY cds.fmin,cds.gff_id
     my $grandparent;
 #do stuff, create a list of features
     while (my $feat_row = $sth->fetchrow_hashref) {
-        my $parent_id = $$feat_row{ parent_id };
         $grandparent  = $$feat_row{ grandparent_id };
         my ($feat_obj)= thaw $$feat_row{ object };
         my $type      = $$feat_row{ type };
         my $fmin      = $$feat_row{ fmin };
         my $fmax      = $$feat_row{ fmax };
+        my @parents   = $feat_obj->annotation->get_Annotations('Parent');
 
-        warn $feat_obj;
-
-        if ($type =~ /CDS/) {
+        for my $parent_id (@parents) {
+          if ($type =~ /CDS/) {
             #check for a polypeptide with for this parent
             if ($polypeptide{ $parent_id }) {
             #add to it if it exists
+
                 if ( $polypeptide{ $parent_id }->start > $fmin ) {
                     $polypeptide{ $parent_id }->start($fmin);
                 }
@@ -2854,34 +2863,34 @@ ORDER BY cds.fmin,cds.gff_id
 
                 $polypeptide{ $parent_id } = $polyp;
             }
+          }
         }
 
         #create an exon feature (or add to an existing one)
         my $merged_exon = 0;
         for my $exon ( @feature_list ) {
-            if ($exon->start == $fmax ) {
+            next unless ($exon->type->name eq 'exon');
+            if ($exon->start == $fmax - 1 ) {
         #this feature imideately precedes an existing exon, glue them together
-                warn "exon start:".$exon->start.", fmin:$fmin";
 
                 $exon->start($fmin);
 
                 $exon = $self->_merge_annotations($exon, $feat_obj);
                 $merged_exon = 1;
-
-                warn "exon start:".$exon->start.", fmin:$fmin";
-
             }
 
-            if ($exon->end == $fmin ) {
+            if ($exon->end == $fmin -1 ) {
         #this feature come right after an existing exon, glue them together
-                warn "exon end:".$exon->end.", fmax:$fmax";
                 $exon->end($fmax);
 
                 $exon = $self->_merge_annotations($exon, $feat_obj);
                 $merged_exon = 1;
-                warn "exon end:".$exon->end.", fmax:$fmax";
             }
         }
+
+#        if ($merged_exon) {
+#            print Dumper($_) for @feature_list;
+#        }
 
         unless ($merged_exon) {
         #convert the existing feature to an exon
@@ -2956,7 +2965,14 @@ sub _merge_annotations {
         if ($key eq 'type') {
             $exon_ac->add_Annotation('Note',Bio::Annotation::SimpleValue->new(
                 'exon feature the result of two merged features in GFF3, one '.
-                'of which was a '.$obj2->type->value.' feature')); 
+                'of which was a '.$obj2->type->name.' feature')); 
+        }
+        elsif ( $key eq 'source'
+             or $key eq 'Parent'
+             or $key eq 'seq_id'
+             or $key eq 'phase'
+             or $key eq 'score' ) {
+            next;
         }
         else {
             for my $value ( @values ) {
@@ -3105,8 +3121,10 @@ sub handle_parent {
 
     for my $p_anot ( $feature->annotation->get_Annotations('Parent') ) {
         my $pname  = $p_anot->value;
-        my $parent = $self->cache('parent',$pname);
+        my $parent = $self->cache('feature',$pname);
         die "\nno parent $pname;\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
+
+        $self->cache('parent',$self->nextfeature,$parent);
 
         $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$part_of);
 
@@ -3120,8 +3138,10 @@ sub handle_derives_from {
 
     for my $p_anot ( $feature->annotation->get_Annotations('Derives_from') ) {
         my $pname  = $p_anot->value;
-        my $parent = $self->cache('parent',$pname);
+        my $parent = $self->cache('feature',$pname);
         die "no parent ".$pname unless $parent;
+
+        $self->cache('parent',$self->nextfeature,$parent);
 
         $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$derives_from);
         $nextfeaturerel++;
@@ -3142,7 +3162,7 @@ sub src_second_chance {
                                         validate => 1,
                                         uniquename => $feature->seq_id->value
                                               );
-      $self->cache('parent',$feature->seq_id->value,$temp_f_id);
+      $self->cache('feature',$feature->seq_id->value,$temp_f_id);
 
       unless ($temp_f_id) {
         $self->{queries}{count_name}->execute($feature->seq_id->value);
@@ -3152,14 +3172,14 @@ sub src_second_chance {
         } elsif ( 1==$n_rows) {
           $self->{queries}{search_name}->execute($feature->seq_id->value);
           my ($tmp_source) = $self->{queries}{search_name}->fetchrow_array;
-          $self->cache('parent',$feature->seq_id->value,$tmp_source);
+          $self->cache('feature',$feature->seq_id->value,$tmp_source);
         } else {
           confess "Unable to find srcfeature "
                .$feature->seq_id->value
                ." in the database\n";
         }
       }
-      $src = $self->cache('parent',$feature->seq_id->value);
+      $src = $self->cache('feature',$feature->seq_id->value);
     }
 
     return $src;
@@ -3191,11 +3211,10 @@ sub get_src_seqlen {
             eq ($feature->annotation->get_Annotations('ID'))[0]->value ) {
         #this is a srcfeature (ie, a reference sequence)
       $src = $self->nextfeature;
-      $self->cache('parent',$feature->seq_id->value,$src);
       $seqlen = $feature->end - $feature->start +1;
     } else { # normal case
 
-      $src = $self->cache('parent',$feature->seq_id->value);
+      $src = $self->cache('feature',$feature->seq_id);
       $seqlen = '\N';
     }
 
