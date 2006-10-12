@@ -574,6 +574,8 @@ if ($GFFFILE eq 'stdin') {
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
 
+my $seen_cds = my $seen_exon = 0;
+
 my $feature_iterator;
 FEATURE:
 while(my $feature = (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
@@ -585,6 +587,14 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
     next FEATURE; 
   }
 
+  $seen_cds = 1 if $featuretype =~ /CDS$/;
+  $seen_exon= 1 if $featuretype =~ /exon$/;
+
+  if ( $seen_cds && $seen_exon && !$NOEXON ) {
+    warn "\n\nThere are both CDS and exon features in this file, but\n"
+        ."you did not set the --noexon option, which you probably want.\n"
+        ."Please see `perldoc gmod_bulk_load_gff3.pl for more information.\n\n";
+  }
   my $nextfeature    = $chado->nextfeature();
   my $nextfeatureloc = $chado->nextfeatureloc();
 
