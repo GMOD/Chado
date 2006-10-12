@@ -2910,7 +2910,13 @@ ORDER BY cds.fmin,cds.gff_id
         }
     }
     #add the polypeptides to the list
-    push @feature_list, values %polypeptide;
+    if ($self->noexon) {
+        #only return the polpeptides if noexon is set
+        @feature_list = values %polypeptide;
+    }
+    else {
+        push @feature_list, values %polypeptide;
+    }
 
 #delete the features from the temp tables:
 
@@ -3329,7 +3335,7 @@ sub sorter_get_second_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or die;
     $sth->execute or die;
 
     my $result = $sth->fetchall_arrayref or die;
@@ -3345,7 +3351,7 @@ sub sorter_get_third_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or die;
     $sth->execute or die;
 
     my $result = $sth->fetchall_arrayref or die;
