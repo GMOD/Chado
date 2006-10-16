@@ -2859,6 +2859,8 @@ ORDER BY cds.fmin,cds.gff_id
                 $polyp_ac->add_Annotation(
                     'seq_id',Bio::Annotation::SimpleValue->new(
                       $feat_obj->seq_id->value));
+                $polyp_ac->add_Annotation(
+                    'phase',Bio::Annotation::SimpleValue->new('.'));
                 $polyp->annotation($polyp_ac);
 
                 $polypeptide{ $parent_id } = $polyp;
