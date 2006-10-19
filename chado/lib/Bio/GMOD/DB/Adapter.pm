@@ -3184,7 +3184,7 @@ sub src_second_chance {
         } else {
           confess "Unable to find srcfeature "
                .$feature->seq_id->value
-               ." in the database\n";
+               ." in the database.\nPerhaps you need to rerun your data load with the '--recreate_cache' option.";
         }
       }
       $src = $self->cache('feature',$feature->seq_id->value);
