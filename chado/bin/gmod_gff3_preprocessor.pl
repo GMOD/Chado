@@ -37,16 +37,16 @@ splitfiles  -- Just setting this flag will cause the file to be split
 by reference sequence.  If you provide an optional argument, it will be
 further split according to these rules:
 
- --source=1     Splits files according to the value in the source column
- --source=a,b,c Puts lines with sources that match (via regular expression)
+ source=1     Splits files according to the value in the source column
+ source=a,b,c Puts lines with sources that match (via regular expression)
                      'a', 'b', or 'c' in a separate file
- --type=a,b,c   Puts lines with types that match 'a', 'b', or 'c' in a
+ type=a,b,c   Puts lines with types that match 'a', 'b', or 'c' in a
                      separate file
 
 For example, if you wanted all of your analysis results to go in a separate
-file, you could indicate '--type=match', and all cDNA_match, EST_match and
-cross_genome_match features would go into separate files (separate by 
-reference sequence).
+file, you could indicate '--splitfiles type=match', and all cDNA_match,
+EST_match and cross_genome_match features would go into separate files
+(separate by reference sequence).
 
 =head1 AUTHOR
 
