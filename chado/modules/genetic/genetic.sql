@@ -192,5 +192,8 @@ CREATE TABLE phenotype_comparison (
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
     CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
 );
-
+CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
+CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
+CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
+CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 COMMENT ON TABLE phenotype_comparison IS 'comparison of phenotypes eg, genotype1/environment1/phenotype1 "non-suppressible" wrt  genotype2/environment2/phenotype2';
