@@ -33,21 +33,26 @@
 -- TABLE: genotype
 -- ================================================
 -- genetic context
--- the uniquename should be derived from the features
--- making up the genoptype
---
--- uniquename: a human-readable unique identifier
 --
 create table genotype (
     genotype_id serial not null,
     primary key (genotype_id),
+    name text,
     uniquename text not null,      
     description varchar(255),
     constraint genotype_c1 unique (uniquename)
 );
 create index genotype_idx1 on genotype(uniquename);
+create index genotype_idx2 on genotype(name);
 
 COMMENT ON TABLE genotype IS NULL;
+
+COMMENT ON COLUMN genotype.uniquename IS 'The unique name for a genotype; 
+typically derived from the features making up the genotype';
+
+COMMENT ON COLUMN genotype.name IS 'Optional alternative name for a genotype, 
+for display purposes';
+
 
 
 -- ===============================================
