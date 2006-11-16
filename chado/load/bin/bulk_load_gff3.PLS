@@ -78,6 +78,15 @@ $0 - Bulk loads gff3 files into a chado database.
                      polypeptide features) 
  --recreate_cache  Causes the uniquename cache to be recreated
  --save_tmpfiles   Save the temp files used for loading the database
+ --no_target_syn   By default, the loader adds the targetId in 
+                     the synonyms list of the feature. This flag 
+                     desactivate this.
+ --unique_target   Trust the unicity of the target IDs. IDs are case 
+                     sensitive. By default, the uniquename of a new target 
+                     will be 'TargetId_PrimaryKey'. With this flag, 
+                     it will be 'TargetId'. Furthermore, the Name of the 
+                     created target will be its TargetId, instead of the
+                     feature's Name.
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -438,7 +447,8 @@ it under the same terms as Perl itself.
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
-    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES);
+    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
+    $NO_TARGET_SYN, $UNIQUE_TARGET);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -463,6 +473,8 @@ GetOptions(
     'nouniquecache'=> \$NOUNIQUECACHE,
     'recreate_cache'=> \$RECREATE_CACHE,
     'save_tmpfiles'=>\$SAVE_TMPFILES,
+    'no_target_syn'=> \$NO_TARGET_SYN,
+    'unique_target' => \$UNIQUE_TARGET
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -538,6 +550,8 @@ my %argv;
   $argv{nouniquecache}= $NOUNIQUECACHE;
   $argv{recreate_cache}=$RECREATE_CACHE;
   $argv{save_tmpfiles}= $SAVE_TMPFILES;
+  $argv{no_target_syn}= $NO_TARGET_SYN;
+  $argv{unique_target}= $UNIQUE_TARGET;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
