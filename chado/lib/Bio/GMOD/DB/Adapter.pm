@@ -1779,6 +1779,68 @@ sub save_tmpfiles {
     return $self->{'save_tmpfiles'} = $save_tmpfiles if defined($save_tmpfiles);    return $self->{'save_tmpfiles'};
 }
 
+=head2 no_target_syn
+
+=over
+
+=item Usage
+
+  $obj->no_target_syn()        #get existing value
+  $obj->no_target_syn($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of no_target_syn() (a scalar)
+
+=item Arguments
+
+new value of no_target_syn (to set)
+
+=back
+
+=cut
+
+sub no_target_syn {
+
+    my $self = shift;
+    my $no_target_syn = shift if defined(@_);
+    return $self->{'no_target_syn'} = $no_target_syn if defined($no_target_syn);
+    return $self->{'no_target_syn'};
+}
+
+=head2 unique_target
+
+=over
+
+=item Usage
+
+  $obj->unique_target()        #get existing value
+  $obj->unique_target($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of unique_target() (a scalar)
+
+=item Arguments
+
+new value of unique_target (to set)
+
+=back
+
+=cut
+
+sub unique_target {
+
+    my $self = shift;
+    my $unique_target = shift if defined(@_);
+    return $self->{'unique_target'} = $unique_target if defined($unique_target);
+    return $self->{'unique_target'};
+}
+
 
 #####################################################################
 #
@@ -2386,7 +2448,7 @@ sub create_target_feature {
                                                              #It will unecessrally accelerate the growth of feature_id, and possibly lead to problem with very large and old databases.
     if ($self->unique_target){
       $tuniquename = $target_id;
-      $name=target_id;
+      $name = $target_id;
     }
     $self->print_f($self->nextfeature, $self->organism_id(), $name,$tuniquename , $type, '\N','\N');
  
