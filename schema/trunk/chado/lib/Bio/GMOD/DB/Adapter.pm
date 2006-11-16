@@ -190,6 +190,8 @@ sub new {
     $self->nouniquecache(   $arg{nouniquecache}   );
     $self->recreate_cache(  $arg{recreate_cache}  );
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
+    $self->no_target_syn(   $arg{no_target_syn}  );
+    $self->unique_target(   $arg{unique_target}  );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -2311,7 +2313,7 @@ sub handle_target {
       my $tstrand   = $target->strand ? $target->strand : '\N';
       my $tsource   = $feature->source->value;
 
-      $self->synonyms($target_id,$self->cache('feature',$uniquename));
+      $self->synonyms($target_id,$self->cache('feature',$uniquename)) if (!$self->no_target_syn);
 
       my $created_target_feature = 0;
 
@@ -2326,6 +2328,7 @@ sub handle_target {
       }
       else {
           $self->create_target_feature($name,$featuretype,$uniquename,$target_id,$type,$tstart,$tend,$tstrand,$rank);
+          
           $created_target_feature = 1;
       }
 
@@ -2376,7 +2379,18 @@ sub create_target_feature {
     $self->nextfeature('++');
     $name ||= "$featuretype-$uniquename";
 
-    $self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N','\N');
+    #$self->print_f($self->nextfeature, $self->organism_id(), $name, $target_id.'_'.$self->nextfeature, $type, '\N','\N');
+
+
+    my $tuniquename = $target_id.'_'.$self->nextfeature;     # isn't this double call to nextfeature problematic? 
+                                                             #It will unecessrally accelerate the growth of feature_id, and possibly lead to problem with very large and old databases.
+    if ($self->unique_target){
+      $tuniquename = $target_id;
+      $name=target_id;
+    }
+    $self->print_f($self->nextfeature, $self->organism_id(), $name,$tuniquename , $type, '\N','\N');
+ 
+
     $self->print_floc(
            $self->nextfeatureloc,
            ($self->nextfeature)-1,
