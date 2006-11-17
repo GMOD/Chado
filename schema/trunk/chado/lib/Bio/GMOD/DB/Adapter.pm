@@ -192,6 +192,7 @@ sub new {
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
     $self->no_target_syn(   $arg{no_target_syn}  );
     $self->unique_target(   $arg{unique_target}  );
+    $self->feature_dbxref(  $arg{feature_dbxref}  );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -1841,6 +1842,66 @@ sub unique_target {
     return $self->{'unique_target'};
 }
 
+=head2 feature_dbxref
+
+=over
+
+=item Usage
+
+  $obj->feature_dbxref()        #get existing value
+  $obj->feature_dbxref($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of feature_dbxref (a scalar)
+
+=item Arguments
+
+new value of feature_dbxref (to set)
+
+=back
+
+=cut
+
+sub feature_dbxref {
+    my $self = shift;
+    my $feature_dbxref = shift if defined(@_);
+    return $self->{'feature_dbxref'} = $feature_dbxref if defined($feature_dbxref);
+    return $self->{'feature_dbxref'};
+}
+
+=head2 primary_dbxref
+
+=over
+
+=item Usage
+
+  $obj->primary_dbxref()        #get existing value
+  $obj->primary_dbxref($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of primary_dbxref (a scalar)
+
+=item Arguments
+
+new value of primary_dbxref (to set)
+
+=back
+
+=cut
+
+sub primary_dbxref {
+    my $self = shift;
+    my $primary_dbxref = shift if defined(@_);
+    return $self->{'primary_dbxref'} = $primary_dbxref if defined($primary_dbxref);
+    return $self->{'primary_dbxref'};
+}
+
 
 #####################################################################
 #
@@ -2515,6 +2576,7 @@ sub handle_dbxref {
     my ($feature,$uniquename) = @_;
 
     my @dbxrefs = $feature->annotation->get_Annotations('Dbxref');
+    my $dbxref_id;
     foreach my $dbxref (@dbxrefs) {
       my $database  = $dbxref->database;
       my $accession = $dbxref->primary_id;
@@ -2527,11 +2589,11 @@ sub handle_dbxref {
       my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
 
       #enforcing the unique index on dbxref table
-      if(my $temp_id = $self->cache('dbxref',"$database|$accession|$version")){
+      if(my $dbxref_id = $self->cache('dbxref',"$database|$accession|$version")){
         if($self->constraint( name  => 'feature_dbxref_c1',
                               terms => [ $self->cache('feature',$uniquename) ,
-                                         $temp_id] ) ) {
-          $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$temp_id);
+                                         $dbxref_id] ) ) {
+          $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
           $nextfeaturedbxref++;
         }
       } else {
@@ -2546,28 +2608,30 @@ sub handle_dbxref {
           #check for an existing dbxref--this could slow things down a lot!
           $self->{queries}{search_long_dbxref}->execute($accession,
                                        $version,$self->cache('db',$database));
-          my ($existing_dbxref) = $self->{queries}{search_long_dbxref}->fetchrow_array;
-          if ($existing_dbxref) {
+          ($dbxref_id) = $self->{queries}{search_long_dbxref}->fetchrow_array;
+          if ($dbxref_id) {
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
-                                            $existing_dbxref ] ) ) {
-              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$existing_dbxref);
+                                            $dbxref_id ] ) ) {
+              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
               $nextfeaturedbxref++;
             }
-            $self->cache('dbxref',"$database|$accession|$version",$existing_dbxref);
+            $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
           } else {
+            $dbxref_id = $nextdbxref;
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
-                                            $nextdbxref ] ) ){
-              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$nextdbxref);
+                                            $dbxref_id ] ) ){
+              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
               $nextfeaturedbxref++;
             }
-            $self->print_dbx($nextdbxref,$self->cache('db',$database),$accession,$version,$desc);
-            $self->cache('dbxref',"$database|$accession|$version",$nextdbxref);
+            $self->print_dbx($dbxref_id,$self->cache('db',$database),$accession,$version,$desc);
+            $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
             $nextdbxref++;
           }
       }
     }
+    $self->primary_dbxref($dbxref_id) if ($self->feature_dbxref == 1);
 }
 
 
@@ -2667,6 +2731,17 @@ sub handle_unreserved_tags {
       next if $tag eq 'seq_id';
       next if $tag eq 'type';
       next if $tag eq 'score';
+
+      #allow the user to define an arbitrary tag that will be used as the
+      #primary dbxref
+      if (defined $self->feature_dbxref &&
+                  $self->feature_dbxref ne '1'  &&
+                  $tag eq $self->feature_dbxref) {
+          $self->primary_dbxref(
+                   @{$feature->annotation->get_Annotations($tag)}[0]->value );
+          next;
+      }
+
       next if $tag eq 'dbxref';
 
       unless ($self->{const}{auto_cv_id}){
