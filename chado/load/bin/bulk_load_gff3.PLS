@@ -87,6 +87,10 @@ $0 - Bulk loads gff3 files into a chado database.
                      it will be 'TargetId'. Furthermore, the Name of the 
                      created target will be its TargetId, instead of the
                      feature's Name.
+ --feature_dbxref  Use (a randomly picked) Dbxref annotation as the
+                     primary dbxref (that goes into feature.dbxref_id).
+                     If used with an option argument, indicates what
+                     tag to use for the xref (eg, primary_dbxref).
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -448,7 +452,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
-    $NO_TARGET_SYN, $UNIQUE_TARGET);
+    $NO_TARGET_SYN, $UNIQUE_TARGET, $FEATURE_DBXREF);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -474,7 +478,8 @@ GetOptions(
     'recreate_cache'=> \$RECREATE_CACHE,
     'save_tmpfiles'=>\$SAVE_TMPFILES,
     'no_target_syn'=> \$NO_TARGET_SYN,
-    'unique_target' => \$UNIQUE_TARGET
+    'unique_target' => \$UNIQUE_TARGET,
+    'feature_dbxref:s'=> \$FEATURE_DBXREF,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -552,6 +557,7 @@ my %argv;
   $argv{save_tmpfiles}= $SAVE_TMPFILES;
   $argv{no_target_syn}= $NO_TARGET_SYN;
   $argv{unique_target}= $UNIQUE_TARGET;
+  $argv{feature_dbxref}=$FEATURE_DBXREF;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
@@ -644,28 +650,11 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
                    || "$featuretype-$uniquename";
   $name           = $name->value if ref($name);
 
-  #my $uniquename = $nextfeature;
-#  unless ($chado->cache('parent',$uniquename) ) {
-#      $chado->cache('parent',$uniquename,$nextfeature);
-#  }
-  if($chado->cache('feature',$uniquename)){
-    #seen this feature before
-    $locgroup{$uniquename}++;
-  }
-  else {
-    $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,'\N');
-
-    $chado->cache('feature',$uniquename,$nextfeature);
-#    $chado->cache('parent',$uniquename,$nextfeature);
-    $locgroup{$uniquename}       = 0;
-  }
-
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !$feature->annotation->get_Annotations('Target')) {
     $chado->cache('feature',($feature->annotation->get_Annotations('ID'))[0]->value,$nextfeature);
   }
-
 
 #don't write a featureloc entry for srcfeatures
   unless ($src eq '\N' or $src == $nextfeature) {
@@ -721,6 +710,18 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
 
   foreach my $alias (@ualiases) {
     $chado->synonyms($alias,$chado->cache('feature',$uniquename));
+  }
+
+  if($chado->cache('feature',$uniquename)){
+    #seen this feature before
+    $locgroup{$uniquename}++;
+  }
+  else {
+    $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,$chado->primary_dbxref);
+
+    $chado->cache('feature',$uniquename,$nextfeature);
+#    $chado->cache('parent',$uniquename,$nextfeature);
+    $locgroup{$uniquename}       = 0;
   }
 
   if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
