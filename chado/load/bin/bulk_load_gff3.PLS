@@ -88,8 +88,8 @@ $0 - Bulk loads gff3 files into a chado database.
                      created target will be its TargetId, instead of the
                      feature's Name.
  --dbxref          Use either the first Dbxref annotation as the
-                     primary dbxref (that goes into feature.dbxref_id).
-                     If an optional argument is supplied, the first
+                     primary dbxref (that goes into feature.dbxref_id),
+                     or if an optional argument is supplied, the first
                      dbxref that has a database part (ie, before the ':')
                      that matches the supplied pattern is used. 
 
