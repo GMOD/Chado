@@ -193,7 +193,6 @@ sub new {
     $self->no_target_syn(   $arg{no_target_syn}  );
     $self->unique_target(   $arg{unique_target}  );
     $self->dbxref(          $arg{dbxref}         );
-    warn $arg{dbxref};
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
