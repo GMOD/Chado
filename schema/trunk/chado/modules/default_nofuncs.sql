@@ -72,11 +72,17 @@ create table cv (
    constraint cv_c1 unique (name)
 );
 
-COMMENT ON TABLE cv IS 'A controlled vocabulary or ontology. A cv is composed of cvterms (aka terms, classes, concepts, frames) and the relationships between them';
+COMMENT ON TABLE cv IS 'A controlled vocabulary or ontology. A cv is
+composed of cvterms (aka terms, classes, types, universals - relations
+and properties are also stored in cvterm)) and the relationships
+between them';
 
-COMMENT ON COLUMN cv.name IS 'The name of the ontology. This corresponds to the obo-format -namespace-. cv names are unique';
+COMMENT ON COLUMN cv.name IS 'The name of the ontology. This
+corresponds to the obo-format -namespace-. cv names uniquely identify
+the cv. In obo file format, the cv.name is known as the namespace';
 
-COMMENT ON COLUMN cv.definition IS 'A description of the criteria for membership of this ontology';
+COMMENT ON COLUMN cv.definition IS 'A text description of the criteria for
+membership of this ontology';
 
 
 create table cvterm (
@@ -93,30 +99,36 @@ create table cvterm (
     constraint cvterm_c1 unique (name,cv_id,is_obsolete),
     constraint cvterm_c2 unique (dbxref_id)
 );
-COMMENT ON TABLE cvterm IS
- 'A term, class or concept within an ontology or controlled vocabulary.
-  Also used for relationship types. A cvterm can also be thought of
-  as a node in a graph';
-COMMENT ON COLUMN cvterm.cv_id IS
- 'The cv/ontology/namespace to which this cvterm belongs';
-COMMENT ON COLUMN cvterm.name IS
- 'A concise human-readable name describing the meaning of the cvterm';
-COMMENT ON COLUMN cvterm.definition IS
- 'A human-readable text definition';
-COMMENT ON COLUMN cvterm.dbxref_id IS
- 'Primary dbxref - The unique global OBO identifier for this cvterm.
-  Note that a cvterm may  have multiple secondary dbxrefs - see also
-  table: cvterm_dbxref';
-COMMENT ON COLUMN cvterm.is_obsolete IS
- 'Boolean 0=false,1=true; see GO documentation for details of obsoletion.
-  note that two terms with different primary dbxrefs may exist if one
-  is obsolete';
-COMMENT ON COLUMN cvterm.is_relationshiptype IS
- 'Boolean 0=false,1=true
-  Relationship types (also known as Typedefs in OBO format, or as
-  properties or slots) form a cv/ontology in themselves. We use this
-  flag to indicate whether this cvterm is an actual term/concept or
-  a relationship type';
+
+COMMENT ON TABLE cvterm IS 'A term, class, universal or type within an
+ontology or controlled vocabulary.  This table is also used for
+relations and properties. cvterms constitute nodes in the graph
+defined by the collection of cvterms and cvterm_relationships';
+
+COMMENT ON COLUMN cvterm.cv_id IS 'The cv/ontology/namespace to which
+this cvterm belongs';
+
+COMMENT ON COLUMN cvterm.name IS 'A concise human-readable name or
+label for the cvterm. uniquely identifies a cvterm within a cv';
+
+COMMENT ON COLUMN cvterm.definition IS 'A human-readable text
+definition';
+
+COMMENT ON COLUMN cvterm.dbxref_id IS 'Primary identifier dbxref - The
+unique global OBO identifier for this cvterm.  Note that a cvterm may
+have multiple secondary dbxrefs - see also table: cvterm_dbxref';
+
+COMMENT ON COLUMN cvterm.is_obsolete IS 'Boolean 0=false,1=true; see
+GO documentation for details of obsoletion.  note that two terms with
+different primary dbxrefs may exist if one is obsolete';
+
+COMMENT ON COLUMN cvterm.is_relationshiptype IS 'Boolean
+0=false,1=true relations or relationship types (also known as Typedefs
+in OBO format, or as properties or slots) form a cv/ontology in
+themselves. We use this flag to indicate whether this cvterm is an
+actual term/class/universal or a relation. Relations may be drawn from
+the OBO Relations ontology, but are not exclusively drawn from there';
+
 COMMENT ON INDEX cvterm_c1 IS 'a name can mean different things in
 different contexts; for example "chromosome" in SO and GO. A name
 should be unique within an ontology/cv. A name may exist twice in a
@@ -126,8 +138,8 @@ for more details on obsoletion. Note that occasionally multiple
 obsolete terms with the same name will exist in the same cv. If this
 is a possibility for the ontology under consideration (eg GO) then the
 ID should be appended to the name to ensure uniqueness';
-COMMENT ON INDEX cvterm_c2 IS 
- 'the OBO identifier is globally unique';
+
+COMMENT ON INDEX cvterm_c2 IS 'the OBO identifier is globally unique';
 
 create index cvterm_idx1 on cvterm (cv_id);
 create index cvterm_idx2 on cvterm (name);
@@ -144,20 +156,32 @@ create table cvterm_relationship (
     foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     constraint cvterm_relationship_c1 unique (subject_id,object_id,type_id)
 );
-COMMENT ON TABLE cvterm_relationship IS
- 'A relationship linking two cvterms. A relationship can be thought of
-  as an edge in a graph, or as a natural language statement about
-  two cvterms. The statement is of the form SUBJECT PREDICATE OBJECT;
-  for example "wing part_of body"';
 
-COMMENT ON COLUMN cvterm_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
-COMMENT ON COLUMN cvterm_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
-COMMENT ON COLUMN cvterm_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
+COMMENT ON TABLE cvterm_relationship IS 'A relationship linking two
+cvterms. Each cvterm_relationship constitutes an edge in the graph
+defined by the collection of cvterms and cvterm_relationships. The
+meaning of the cvterm_relationship depends on the definition of the
+cvterm R refered to by type_id. However, in general the definitions
+are such that the statement all SUBJs REL some OBJ is true. The
+cvterm_relationship statement is about the subject, not the
+object. For example "insect wing part_of thorax"';
+
+COMMENT ON COLUMN cvterm_relationship.subject_id IS 'the subject of
+the subj-predicate-obj sentence. The cvterm_relationship is about the
+subject. In a graph, this typically corresponds to the child node';
+
+COMMENT ON COLUMN cvterm_relationship.object_id IS 'the object of the
+subj-predicate-obj sentence. The cvterm_relationship refers to the
+object. In a graph, this typically corresponds to the parent node';
+
+COMMENT ON COLUMN cvterm_relationship.type_id IS 'The nature of the
+relationship between subject and object. Note that relations are also
+housed in the cvterm table, typically from the OBO relationship
+ontology, although other relationship types are allowed';
 
 create index cvterm_relationship_idx1 on cvterm_relationship (type_id);
 create index cvterm_relationship_idx2 on cvterm_relationship (subject_id);
 create index cvterm_relationship_idx3 on cvterm_relationship (object_id);
-
 
 create table cvtermpath (
     cvtermpath_id serial not null,
@@ -174,19 +198,28 @@ create table cvtermpath (
     constraint cvtermpath_c1 unique (subject_id,object_id,type_id,pathdistance)
 );
 
-COMMENT ON TABLE cvtermpath IS 'The reflexive transitive closure of the cvterm_relationship relation. For a full discussion, see the file populating-cvtermpath.txt in this directory';
+COMMENT ON TABLE cvtermpath IS 'The reflexive transitive closure of
+the cvterm_relationship relation. For a full discussion, see the file
+populating-cvtermpath.txt in this directory';
 
-COMMENT ON COLUMN cvtermpath.type_id IS 'The relationship type that this is a closure over. If null, then this is a closure over ALL relationship types. If non-null, then this references a relationship cvterm - note that the closure will apply to both this relationship AND the OBO_REL:is_a (subclass) relationship';
+COMMENT ON COLUMN cvtermpath.type_id IS 'The relationship type that
+this is a closure over. If null, then this is a closure over ALL
+relationship types. If non-null, then this references a relationship
+cvterm - note that the closure will apply to both this relationship
+AND the OBO_REL:is_a (subclass) relationship';
 
-COMMENT ON COLUMN cvtermpath.cv_id IS 'Closures will mostly be within one cv. If the closure of a relationship traverses a cv, then this refers to the cv of the object_id cvterm';
+COMMENT ON COLUMN cvtermpath.cv_id IS 'Closures will mostly be within
+one cv. If the closure of a relationship traverses a cv, then this
+refers to the cv of the object_id cvterm';
 
-COMMENT ON COLUMN cvtermpath.pathdistance IS 'The number of steps required to get from the subject cvterm to the object cvterm, counting from zero (reflexive relationship)';
+COMMENT ON COLUMN cvtermpath.pathdistance IS 'The number of steps
+required to get from the subject cvterm to the object cvterm, counting
+from zero (reflexive relationship)';
 
 create index cvtermpath_idx1 on cvtermpath (type_id);
 create index cvtermpath_idx2 on cvtermpath (subject_id);
 create index cvtermpath_idx3 on cvtermpath (object_id);
 create index cvtermpath_idx4 on cvtermpath (cv_id);
-
 
 create table cvtermsynonym (
     cvtermsynonym_id serial not null,
@@ -199,9 +232,14 @@ create table cvtermsynonym (
     constraint cvtermsynonym_c1 unique (cvterm_id,synonym)
 );
 
-COMMENT ON TABLE cvtermsynonym IS 'A cvterm actually represents a distinct class or concept. A concept can be refered to by different phrases or names. In addition to the primary name (cvterm.name) there can be a number of alternative aliases or synonyms. For example, -T cell- as a synonym for -T lymphocyte-';
+COMMENT ON TABLE cvtermsynonym IS 'A cvterm actually represents a
+distinct class or concept. A concept can be refered to by different
+phrases or names. In addition to the primary name (cvterm.name) there
+can be a number of alternative aliases or synonyms. For example, -T
+cell- as a synonym for -T lymphocyte-';
 
-COMMENT ON COLUMN cvtermsynonym.type_id IS 'A synonym can be exact, narrow or borader than';
+COMMENT ON COLUMN cvtermsynonym.type_id IS 'A synonym can be exact,
+narrow or borader than';
 
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
 
@@ -217,9 +255,26 @@ create table cvterm_dbxref (
     constraint cvterm_dbxref_c1 unique (cvterm_id,dbxref_id)
 );
 
-COMMENT ON TABLE cvterm_dbxref IS 'In addition to the primary identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary identifiers, which may be in external databases';
+COMMENT ON TABLE cvterm_dbxref IS 'In addition to the primary
+identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary
+identifiers/dbxrefs, which may refer to records in external
+databases. The exact semantics of cvterm_dbxref are not fixed. For
+example: the dbxref could be a pubmed ID that is pertinent to the
+cvterm, or it could be an equivalent or similar term in another
+ontology. For example, GO cvterms are typically linked to InterPro
+IDs, even though the nature of the relationship between them is
+largely one of statistical association. The dbxref may be have data
+records attached in the same database instance, or it could be a
+"hanging" dbxref pointing to some external database. NOTE: If the
+desired objective is to link two cvterms together, and the nature of
+the relation is known and holds for all instances of the subject
+cvterm then consider instead using cvterm_relationship together with a
+well-defined relation.';
 
-COMMENT ON COLUMN cvterm_dbxref.is_for_definition IS 'A cvterm.definition should be supported by one or more references. If this column is true, the dbxref is not for a term in an external db - it is a dbxref for provenance information for the definition';
+COMMENT ON COLUMN cvterm_dbxref.is_for_definition IS 'A
+cvterm.definition should be supported by one or more references. If
+this column is true, the dbxref is not for a term in an external db -
+it is a dbxref for provenance information for the definition';
 
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
 create index cvterm_dbxref_idx2 on cvterm_dbxref (dbxref_id);
@@ -270,59 +325,6 @@ COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not d
 
 create index dbxrefprop_idx1 on dbxrefprop (dbxref_id);
 create index dbxrefprop_idx2 on dbxrefprop (type_id);
-
-
-create table organism (
-	organism_id serial not null,
-	primary key (organism_id),
-	abbreviation varchar(255) null,
-	genus varchar(255) not null,
-	species varchar(255) not null,
-	common_name varchar(255) null,
-	comment text null,
-    constraint organism_c1 unique (genus,species)
-);
-
-COMMENT ON TABLE organism IS 'The organismal taxonomic
-classification. Note that phylogenies are represented using the
-phylogeny module, and taxonomies can be represented using the cvterm
-module or the phylogeny module';
-
-COMMENT ON COLUMN organism.species IS 'A type of organism is always
-uniquely identified by genus+species. When mapping from the NCBI
-taxonomy names.dmp file, the unique-name column must be used where it
-is present, as the name column is not always unique (eg environmental
-samples). If a particular strain or subspecies is to be represented,
-this is appended onto the species name. Follows standard NCBI taxonomy
-pattern';
-
-create table organism_dbxref (
-    organism_dbxref_id serial not null,
-    primary key (organism_dbxref_id),
-    organism_id int not null,
-    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
-    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
-    constraint organism_dbxref_c1 unique (organism_id,dbxref_id)
-);
-create index organism_dbxref_idx1 on organism_dbxref (organism_id);
-create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
-
-create table organismprop (
-    organismprop_id serial not null,
-    primary key (organismprop_id),
-    organism_id int not null,
-    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
-    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value text null,
-    rank int not null default 0,
-    constraint organismprop_c1 unique (organism_id,type_id,rank)
-);
-create index organismprop_idx1 on organismprop (organism_id);
-create index organismprop_idx2 on organismprop (type_id);
-
-COMMENT ON TABLE organismprop IS 'tag-value properties - follows standard chado model';
 
 
 create table pub (
@@ -437,6 +439,98 @@ COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard ch
 
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
+
+create table organism (
+	organism_id serial not null,
+	primary key (organism_id),
+	abbreviation varchar(255) null,
+	genus varchar(255) not null,
+	species varchar(255) not null,
+	common_name varchar(255) null,
+	comment text null,
+    constraint organism_c1 unique (genus,species)
+);
+
+COMMENT ON TABLE organism IS 'The organismal taxonomic
+classification. Note that phylogenies are represented using the
+phylogeny module, and taxonomies can be represented using the cvterm
+module or the phylogeny module';
+
+COMMENT ON COLUMN organism.species IS 'A type of organism is always
+uniquely identified by genus+species. When mapping from the NCBI
+taxonomy names.dmp file, the unique-name column must be used where it
+is present, as the name column is not always unique (eg environmental
+samples). If a particular strain or subspecies is to be represented,
+this is appended onto the species name. Follows standard NCBI taxonomy
+pattern';
+
+create table organism_dbxref (
+    organism_dbxref_id serial not null,
+    primary key (organism_dbxref_id),
+    organism_id int not null,
+    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    constraint organism_dbxref_c1 unique (organism_id,dbxref_id)
+);
+create index organism_dbxref_idx1 on organism_dbxref (organism_id);
+create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
+
+create table organismprop (
+    organismprop_id serial not null,
+    primary key (organismprop_id),
+    organism_id int not null,
+    foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint organismprop_c1 unique (organism_id,type_id,rank)
+);
+create index organismprop_idx1 on organismprop (organism_id);
+create index organismprop_idx2 on organismprop (type_id);
+
+COMMENT ON TABLE organismprop IS 'tag-value properties - follows standard chado model';
+
+-- ================================================
+-- TABLE: organism_relationship
+-- ================================================
+
+CREATE TABLE organism_relationship (
+    organism_relationship_id serial not null,
+    PRIMARY KEY (organism_relationship_id),
+    subject_id int not null,
+    FOREIGN KEY (subject_id) REFERENCES organism (organism_id) INITIALLY DEFERRED,
+    object_id int not null,
+    FOREIGN KEY (object_id) REFERENCES organism (organism_id) INITIALLY DEFERRED,
+    type_id int not null,
+    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) INITIALLY DEFERRED,
+    CONSTRAINT organism_relationship_c1 UNIQUE (subject_id, object_id, type_id)
+);
+CREATE INDEX organism_relationship_idx1 ON organism_relationship (subject_id);
+CREATE INDEX organism_relationship_idx2 ON organism_relationship (object_id);
+CREATE INDEX organism_relationship_idx3 ON organism_relationship (type_id);
+
+-- ================================================
+-- TABLE: organismpath
+-- ================================================
+
+CREATE TABLE organismpath (
+    organismpath_id serial not null,
+    PRIMARY KEY (organismpath_id),
+    subject_id int not null,
+    FOREIGN KEY (subject_id) REFERENCES organism (organism_id) INITIALLY DEFERRED,
+    object_id int not null,
+    FOREIGN KEY (object_id) REFERENCES organism (organism_id) INITIALLY DEFERRED,
+    type_id int not null,
+    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) INITIALLY DEFERRED,
+    pathdistance int,
+    CONSTRAINT organismpath_c1 UNIQUE (subject_id,object_id,type_id,pathdistance)
+);
+CREATE INDEX organismpath_idx1 ON organismpath (type_id);
+CREATE INDEX organismpath_idx2 ON organismpath (subject_id);
+CREATE INDEX organismpath_idx3 ON organismpath (object_id);
+
 
 create table feature (
     feature_id serial not null,
@@ -688,6 +782,23 @@ COMMENT ON TABLE feature_pub IS 'Provenance. Linking table between features and 
 
 create index feature_pub_idx1 on feature_pub (feature_id);
 create index feature_pub_idx2 on feature_pub (pub_id);
+
+--
+
+create table feature_pubprop (
+    feature_pubprop_id serial not null,
+    primary key (feature_pubprop_id),
+    feature_pub_id int not null,
+    foreign key (feature_pub_id) references feature_pub (feature_pub_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint feature_pubprop_c1 unique (feature_pub_id,type_id,rank)
+);
+COMMENT ON TABLE feature_pubprop IS 'Property or attribute of a feature_pub link';
+
+create index feature_pubprop_idx1 on feature_pubprop (feature_pub_id);
 
 --
 
@@ -1291,21 +1402,26 @@ COMMENT ON TABLE feature_phenotype IS NULL;
 -- TABLE: genotype
 -- ================================================
 -- genetic context
--- the uniquename should be derived from the features
--- making up the genoptype
---
--- uniquename: a human-readable unique identifier
 --
 create table genotype (
     genotype_id serial not null,
     primary key (genotype_id),
+    name text,
     uniquename text not null,      
     description varchar(255),
     constraint genotype_c1 unique (uniquename)
 );
 create index genotype_idx1 on genotype(uniquename);
+create index genotype_idx2 on genotype(name);
 
 COMMENT ON TABLE genotype IS NULL;
+
+COMMENT ON COLUMN genotype.uniquename IS 'The unique name for a genotype; 
+typically derived from the features making up the genotype';
+
+COMMENT ON COLUMN genotype.name IS 'Optional alternative name for a genotype, 
+for display purposes';
+
 
 
 -- ===============================================
@@ -1412,9 +1528,11 @@ CREATE TABLE phendesc (
     environment_id INT NOT NULL,
     FOREIGN KEY (environment_id) REFERENCES environment ( environment_id) ON DELETE CASCADE,
     description TEXT NOT NULL,
+    type_id INT NOT NULL,
+        FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     pub_id INT NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
-    CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,pub_id)
+    CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,type_id,pub_id)
 );
 CREATE INDEX phendesc_idx1 ON phendesc (genotype_id);
 CREATE INDEX phendesc_idx2 ON phendesc (environment_id);
@@ -1443,7 +1561,10 @@ CREATE TABLE phenotype_comparison (
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
     CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
 );
-
+CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
+CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
+CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
+CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 COMMENT ON TABLE phenotype_comparison IS 'comparison of phenotypes eg, genotype1/environment1/phenotype1 "non-suppressible" wrt  genotype2/environment2/phenotype2';
 -- NOTE: this module is all due for revision...
 
@@ -1553,7 +1674,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_nofuncs.sql,v 1.16 2006-04-12 03:19:11 scottcain Exp $
+-- $Id: default_nofuncs.sql,v 1.17 2006-11-21 16:12:19 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --

@@ -32,7 +32,7 @@
         <description>
           Standard Chado SQL Reports for the general module
         </description>
-        <source type='sql' path='general/views/general-reports.sql'/>
+        <source type='sql' path='general/views/general-report.sql'/>
       </component>
 
       <component id='general-loading-api' type='dbapi'>
@@ -71,7 +71,7 @@
         <description>
           Standard Chado SQL Reports for the cv module
         </description>
-        <source type='sql' path='cv/views/cv-reports.sql'/>
+        <source type='sql' path='cv/views/cv-report.sql'/>
       </component>
 
       <component id='cv-dbapi' type='dbapi'>
@@ -158,7 +158,7 @@
         <description>
           Standard Chado SQL Reports for the sequence module
         </description>
-        <source type='sql' path='sequence/views/sequence-reports.sql'/>
+        <source type='sql' path='sequence/views/sequence-report.sql'/>
       </component>
 
       <component id='gencode' type='sql' required='true'>

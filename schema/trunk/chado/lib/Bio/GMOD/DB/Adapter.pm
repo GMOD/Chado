@@ -192,7 +192,8 @@ sub new {
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
     $self->no_target_syn(   $arg{no_target_syn}  );
     $self->unique_target(   $arg{unique_target}  );
-    $self->feature_dbxref(  $arg{feature_dbxref}  );
+    $self->dbxref(          $arg{dbxref}         );
+    warn $arg{dbxref};
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -1842,34 +1843,34 @@ sub unique_target {
     return $self->{'unique_target'};
 }
 
-=head2 feature_dbxref
+=head2 dbxref
 
 =over
 
 =item Usage
 
-  $obj->feature_dbxref()        #get existing value
-  $obj->feature_dbxref($newval) #set new value
+  $obj->dbxref()        #get existing value
+  $obj->dbxref($newval) #set new value
 
 =item Function
 
 =item Returns
 
-value of feature_dbxref (a scalar)
+value of dbxref (a scalar)
 
 =item Arguments
 
-new value of feature_dbxref (to set)
+new value of dbxref (to set)
 
 =back
 
 =cut
 
-sub feature_dbxref {
+sub dbxref {
     my $self = shift;
-    my $feature_dbxref = shift if defined(@_);
-    return $self->{'feature_dbxref'} = $feature_dbxref if defined($feature_dbxref);
-    return $self->{'feature_dbxref'};
+    my $dbxref = shift if defined(@_);
+    return $self->{'dbxref'} = $dbxref if defined($dbxref);
+    return $self->{'dbxref'};
 }
 
 =head2 primary_dbxref
@@ -2079,9 +2080,11 @@ sub print_f {
     my $q_uniquename  = $self->dbh->quote($uniquename);
     my $q_seqlen      = $seqlen eq '\N' ? 'NULL' : $seqlen;
     my $q_analysis    = $self->analysis ? "'true'" : "'false'";
+    $dbxref      ||= 'NULL';
     print $fh "INSERT INTO feature $copystring{'feature'} VALUES ($nextfeature,$organism,$q_name,$q_uniquename,$type,$q_analysis,$q_seqlen,$dbxref);\n";
   }
   else {
+    $dbxref      ||= '\N';
     print $fh join("\t", ($self->nextfeature, $organism, $name, $uniquename, $type, $self->analysis,$seqlen,$dbxref)),"\n";
   }
 }
@@ -2576,7 +2579,10 @@ sub handle_dbxref {
     my ($feature,$uniquename) = @_;
 
     my @dbxrefs = $feature->annotation->get_Annotations('Dbxref');
-    my $dbxref_id;
+    my ($dbxref_id,$primary_dbxref_id,$primary_pattern);
+    if (defined $self->dbxref and $self->dbxref ne '1') {
+        $primary_pattern = $self->dbxref;
+    }
     foreach my $dbxref (@dbxrefs) {
       my $database  = $dbxref->database;
       my $accession = $dbxref->primary_id;
@@ -2589,11 +2595,19 @@ sub handle_dbxref {
       my $desc      = '\N'; #FeatureIO::gff doesn't support descriptions yet
 
       #enforcing the unique index on dbxref table
-      if(my $dbxref_id = $self->cache('dbxref',"$database|$accession|$version")){
+      if(my $dbxref_id=$self->cache('dbxref',"$database|$accession|$version")){
+        if ($primary_pattern and $database =~/$primary_pattern/) {
+            $primary_dbxref_id ||= $dbxref_id;
+        }
+        elsif ($self->dbxref eq '1') {
+            $primary_dbxref_id ||= $dbxref_id;
+        }
         if($self->constraint( name  => 'feature_dbxref_c1',
                               terms => [ $self->cache('feature',$uniquename) ,
                                          $dbxref_id] ) ) {
-          $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
+          $self->print_fdbx($nextfeaturedbxref,
+                            $self->cache('feature',$uniquename),
+                            $dbxref_id);
           $nextfeaturedbxref++;
         }
       } else {
@@ -2613,7 +2627,9 @@ sub handle_dbxref {
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
                                             $dbxref_id ] ) ) {
-              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
+              $self->print_fdbx($nextfeaturedbxref,
+                                $self->cache('feature',$uniquename),
+                                $dbxref_id);
               $nextfeaturedbxref++;
             }
             $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
@@ -2622,16 +2638,29 @@ sub handle_dbxref {
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
                                             $dbxref_id ] ) ){
-              $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
+              $self->print_fdbx($nextfeaturedbxref,
+                                $self->cache('feature',$uniquename),
+                                $dbxref_id);
               $nextfeaturedbxref++;
             }
-            $self->print_dbx($dbxref_id,$self->cache('db',$database),$accession,$version,$desc);
+            $self->print_dbx($dbxref_id,
+                             $self->cache('db',$database),
+                             $accession,
+                             $version,
+                             $desc);
             $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
             $nextdbxref++;
           }
+          if ($primary_pattern and $database =~/$primary_pattern/) {
+              $primary_dbxref_id ||= $dbxref_id;
+          }
+          elsif ($self->dbxref eq '1') {
+              $primary_dbxref_id ||= $dbxref_id;
+          }
       }
     }
-    $self->primary_dbxref($dbxref_id) if ($self->feature_dbxref == 1);
+    $self->primary_dbxref($primary_dbxref_id) 
+            if ($primary_dbxref_id && $self->dbxref);
 }
 
 
@@ -2731,17 +2760,6 @@ sub handle_unreserved_tags {
       next if $tag eq 'seq_id';
       next if $tag eq 'type';
       next if $tag eq 'score';
-
-      #allow the user to define an arbitrary tag that will be used as the
-      #primary dbxref
-      if (defined $self->feature_dbxref &&
-                  $self->feature_dbxref ne '1'  &&
-                  $tag eq $self->feature_dbxref) {
-          $self->primary_dbxref(
-                   @{$feature->annotation->get_Annotations($tag)}[0]->value );
-          next;
-      }
-
       next if $tag eq 'dbxref';
 
       unless ($self->{const}{auto_cv_id}){

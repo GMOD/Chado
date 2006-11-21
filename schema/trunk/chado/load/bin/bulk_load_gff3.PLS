@@ -87,10 +87,11 @@ $0 - Bulk loads gff3 files into a chado database.
                      it will be 'TargetId'. Furthermore, the Name of the 
                      created target will be its TargetId, instead of the
                      feature's Name.
- --feature_dbxref  Use (a randomly picked) Dbxref annotation as the
+ --dbxref          Use either the first Dbxref annotation as the
                      primary dbxref (that goes into feature.dbxref_id).
-                     If used with an option argument, indicates what
-                     tag to use for the xref (eg, primary_dbxref).
+                     If an optional argument is supplied, the first
+                     dbxref that has a database part (ie, before the ':')
+                     that matches the supplied pattern is used. 
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -452,7 +453,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
-    $NO_TARGET_SYN, $UNIQUE_TARGET, $FEATURE_DBXREF);
+    $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF);
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -479,7 +480,7 @@ GetOptions(
     'save_tmpfiles'=>\$SAVE_TMPFILES,
     'no_target_syn'=> \$NO_TARGET_SYN,
     'unique_target' => \$UNIQUE_TARGET,
-    'feature_dbxref:s'=> \$FEATURE_DBXREF,
+    'dbxref:s'      => \$DBXREF,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -530,6 +531,10 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
   $ANALYSIS = 0;
 }
 
+if ((defined $DBXREF) and ($DBXREF eq '')) {
+  $DBXREF=1; #ie, it was on the command line with no arg
+}
+
 my %argv;
   $argv{organism}     = $ORGANISM;
   $argv{gfffile}      = $GFFFILE;
@@ -557,7 +562,7 @@ my %argv;
   $argv{save_tmpfiles}= $SAVE_TMPFILES;
   $argv{no_target_syn}= $NO_TARGET_SYN;
   $argv{unique_target}= $UNIQUE_TARGET;
-  $argv{feature_dbxref}=$FEATURE_DBXREF;
+  $argv{dbxref}       = $DBXREF;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
@@ -599,6 +604,7 @@ my $seen_cds = my $seen_exon = 0;
 my $feature_iterator;
 FEATURE:
 while(my $feature = (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
+  $chado->primary_dbxref('');
 
   my $featuretype = $feature->type->name;
 
@@ -649,6 +655,18 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
                    ||($feature->annotation->get_Annotations('ID'))[0]
                    || "$featuretype-$uniquename";
   $name           = $name->value if ref($name);
+
+  my $current_feature_id=0;
+  if($chado->cache('feature',$uniquename)){
+    #seen this feature before
+    $locgroup{$uniquename}++;
+  }
+  else {
+    $chado->cache('feature',$uniquename,$nextfeature);
+    $locgroup{$uniquename}       = 0;
+    $current_feature_id=$nextfeature;
+  }
+
 
   if ($ANALYSIS 
       && $featuretype =~ /match/  
@@ -712,16 +730,8 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
     $chado->synonyms($alias,$chado->cache('feature',$uniquename));
   }
 
-  if($chado->cache('feature',$uniquename)){
-    #seen this feature before
-    $locgroup{$uniquename}++;
-  }
-  else {
+  if($current_feature_id) {
     $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,$chado->primary_dbxref);
-
-    $chado->cache('feature',$uniquename,$nextfeature);
-#    $chado->cache('parent',$uniquename,$nextfeature);
-    $locgroup{$uniquename}       = 0;
   }
 
   if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
