@@ -279,20 +279,21 @@ use the perl script, L<gmod_fasta2gff3.pl>, that comes with this distribution
 to make a GFF3 file suitable for loading into chado before loading your
 analysis results.
 
-=item CDS features
+=item CDS and UTR features
 
 The way CDS features are represented in Chado is as an intersection of
 a transcript's exons and the transcripts polypeptide feature.  To allow
 proper translation of a GFF3 file's CDS features, this loader will 
-convert CDS feature lines to corresponding exon features (and add
-a featureprop note that the exon was inferred from a GFF3 CDS line),
+convert CDS and UTR feature lines to corresponding exon features (and add
+a featureprop note that the exon was inferred from a GFF3 CDS and/or UTR line),
 and create a polypeptide feature that spans the genomic region from
 the start of translation to the stop.
 
-If your GFF3 file contains both exon and CDS features, then you will
+If your GFF3 file contains both exon and CDS/UTR features, then you will
 want to suppress the creation of the exon features and instead will
 only want a polypeptide feature to be created.  To do this, use the
---noexon option.
+--noexon option.  In this case, the CDS and UTR features will still 
+be converted to exon features as described above.
 
 =back
 
