@@ -33,6 +33,7 @@ if ($OPTIONS{PREFIX}) {
 
 print OUT <<'!NO!SUBS!';
 use strict;
+use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::Tools::GFF;
 use Bio::SeqIO;
 use Chado::AutoDBI;
@@ -330,7 +331,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         elsif ( $tag =~ /^[A-Z]/ ) {
             die "$0 doesn't handle '$tag' tags yet.  are you sure it's allowed by the GFF3 spec?";
         }
-        elsif ( $tag eq $UNIQUENAME ) {
+        elsif ( defined $UNIQUENAME && $tag eq $UNIQUENAME ) {
            # do nothing--we already used this information to create the feature
         }
         elsif ( $tag =~ /^[a-z]/ ) {
@@ -530,19 +531,14 @@ sub load_Ontology_term {
         my $dbxref;
         my $db_obj_iterator; 
         if ($db) {
-            if ($db eq 'GO') {
-                $db_obj_iterator
-                      = Chado::Db->search_like( name =>"%Gene Ontology%" );
-            } elsif ($db eq 'SO') {
-                $db_obj_iterator 
-                      = Chado::Db->search( name =>"Sequence Ontology" );
+            if ($db eq 'GO' or $db eq 'SO') {
+                $db_obj_iterator = Chado::Db->search( name => $db );
             } else {
                 $progress->message(
                   "I don't know how to deal with OntologyTerms like $db:$d\n")
                   and next;
             }
 
-            my @db_list;
             while (!$dbxref and my $db_obj = $db_obj_iterator->next) {
                 ($dbxref) = Chado::Dbxref->search( 
                                          accession => $d ,
@@ -803,10 +799,25 @@ sub initialize {
       )
       or ( system( 'pod2text', $0 ), exit -1 );
 
-    $ORGANISM   ||= 'Human';
-    $SRC_DB     ||= 'DB:refseq';
+    unless($ORGANISM) {
+        if (eval {require Bio::GMOD::Config;
+              Bio::GMOD::Config->import();
+              require Bio::GMOD::DB::Config;
+              Bio::GMOD::DB::Config->import();
+              1;  } ) {
+            my $gmod_conf = $ENV{'GMOD_ROOT'} || "/var/lib/gmod" ?
+                      Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} 
+                                             || "/var/lib/gmod") 
+                    : Bio::GMOD::Config->new();
+
+            my $profile = 'default';
+            my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,$profile);
+            $ORGANISM   = $db_conf->organism();
+        }
+    }
+    $SRC_DB;
     $CACHE_SIZE ||= 1000;
-    $ONTOLOGY   ||= 'Sequence Ontology Feature Annotation';
+    $ONTOLOGY   ||= 'sequence';
 
     die "\nYou must specify a GFF file\n" unless $GFFFILE;
 
@@ -818,9 +829,9 @@ sub initialize {
     my $linenumber = `grep -n "^>" $GFFFILE`;
     if ( $linenumber =~ /^(\d+)/ ) {
         $linenumber = $1;
-        system("tail +$linenumber $GFFFILE > $TMPFASTA");
+        system("tail -n $linenumber $GFFFILE > $TMPFASTA");
         $linenumber -= 1;
-        system("head -$linenumber $GFFFILE > $TMPGFF");
+        system("head -n $linenumber $GFFFILE > $TMPGFF");
 
         #we don't want to do this, as the filename is used in a pub record
         #$GFFFILE = $TMPGFF;

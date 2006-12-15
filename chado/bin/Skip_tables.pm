@@ -20,7 +20,10 @@ require Exporter;
                 'affymetrixdabg',
                 'affymetrixrma',
                 'affymetrixgcrma',
-                'affymetrixprobesetstat',);
+                'affymetrixprobesetstat',
+                'gencode_codon_aa',
+                'gencode_startcodon',);
+
 
 
 1;

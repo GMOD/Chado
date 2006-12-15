@@ -2650,10 +2650,10 @@ sub handle_dbxref {
             $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
             $nextdbxref++;
           }
-          if ($primary_pattern and $database =~/$primary_pattern/) {
+          if (defined $primary_pattern and defined $database and $database =~/$primary_pattern/) {
               $primary_dbxref_id ||= $dbxref_id;
           }
-          elsif ($self->dbxref eq '1') {
+          elsif (defined $self->dbxref and $self->dbxref eq '1') {
               $primary_dbxref_id ||= $dbxref_id;
           }
       }
