@@ -1,0 +1,191 @@
+[% MACRO printPackage(node) BLOCK %]
+########Chado::[% format_node(node.name) %]########
+
+package Chado::[% format_node(node.name) %];
+use base '[% baseclass %]';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Chado::[% format_node(node.name) %]->set_up_table('[% node.table.name %]');
+[% printPKAccessors(node.primary_key, node.table.name) %]
+[% printHasA(node.edges, node) %]
+[% printHasMany(node.edges, node) %]
+[% printHasCompound(node.compoundedges, node.hyperedges, node.name) %]
+
+1;
+[% END %]
+[% MACRO printPKAccessors(array, name) BLOCK %]
+#
+# Primary key accessors
+#
+[% FOREACH item = array %]
+[% IF item != "id" %]sub id { shift->[% item %] }[% END %]
+[% IF item != name %]sub [% name %] { shift->[% item %] }[% END %]
+[% END %] [% END %] [% MACRO printHasA(edges, name) BLOCK %]
+[% FOREACH edge = edges %]
+[% IF loop.first() %]
+#
+# Has A
+#
+[% END %] [% IF edge.type == 'import' %]
+Chado::[% format_node(node.name) %]->has_a([% edge.thisfield.name %] => 'Chado::[% format_node(edge.thatnode.name) %]');
+    [% IF node.has(edge.thatnode.name) < 2 %]
+sub Chado::[% format_node(node.name) %]::[% edge.thatnode.table.name %] { return shift->[% edge.thisfield.name %] }
+    [% ELSE %]
+sub [% format_fk(edge.thisnode.table.name,edge.thisfield.name) %] { return shift->[% edge.thisfield.name %] }
+    [% END %] [% END %] [% END %] [% END %]
+[%- MACRO printHasMany(edges, node) BLOCK -%]
+[%- FOREACH edge = edges -%]
+[% IF loop.first() %]
+#
+# Has Many
+#
+[% END %] [% IF edge.type == 'export' %]
+Chado::[% format_node(node.name) %]->has_many('[% edge.thatnode.table.name %]_[% edge.thatfield.name %]', 'Chado::[% format_node(edge.thatnode.name) %]' => '[% edge.thatfield.name %]');
+  [% IF node.via(edge.thatnode.name) >= 1 %]
+sub [% edge.thatnode.table.name %]_[% format_fk(edge.thatnode.table.name,edge.thatfield.name) %]s { return shift->[% edge.thatnode.table.name %]_[% edge.thatfield.name %] }
+#sub [% format_refers(edge.thatnode.table.name,edge.thatfield.name) %] {}
+  [% ELSIF edge.thatnode.table.is_data %]
+    [% IF node.edgecount(edge.thatnode.name) > 1 %]
+sub [% edge.thatnode.table.name %]_[% format_fk(edge.thatnode.name,edge.thatfield.name) %]_ids { my $self = shift; return $self->[% edge.thatnode.table.name %]_[% edge.thatfield.name %](@_) }
+    [% ELSE %]
+sub [% edge.thatnode.table.name %]s { return shift->[% edge.thatnode.table.name %]_[% edge.thatfield.name %] }
+    [% END %] [% END %] [%- END -%] [%- END -%] [%- END -%]
+[% MACRO printHasCompound(cedges,hedges,name) BLOCK %]
+[% FOREACH cedge = cedges %]
+[% IF loop.first() %]
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+[% END %] [% FOREACH edge = cedge.edges %]
+  [% NEXT IF edge.thisnode.name != name %]
+sub [% cedge.via.table.name %]_[% format_fk(edge.thatnode.table.name,edge.thatfield.name) %]s { return shift->[% cedge.via.table.name %]_[% edge.thatfield.name %] }
+[% END %] [% END %]
+# one to many to one
+[% seen = 0 %] [% FOREACH h = hedges %]
+  [% NEXT UNLESS h.type == 'one2one' %]
+[% IF seen == 0 ; seen = 1 %]# one2one #[% END %]
+sub [% h.thatnode.table.name %]s { my $self = shift; return map $_->[% h.thatviafield.name %], $self->[% h.vianode.table.name %]_[% h.thisviafield.name %] }
+[% END %]
+# one to many to many
+[% seen = 0 %] [% FOREACH h = hedges %]
+  [% NEXT UNLESS h.type == 'one2many' %]
+[% IF seen == 0 ; seen = 1 %]# one2many #[% END %]
+  [% thisnode = h.thisnode_index(0) %]
+  [% i = 0 %]
+  [% FOREACH thatnode = h.thatnode %]
+    [% NEXT UNLESS h.thisviafield_index(i).name %]
+sub [% h.vianode.table.name %]_[% format_fk(h.vianode,h.thatviafield_index(0).name) %]s { my $self = shift; return map $_->[% h.thatviafield_index(0).name %], $self->[% h.vianode.table.name %]_[% h.thisviafield_index(i).name %] }
+    [% i = i + 1 %]
+  [% END %] [% END %]
+#many to many to one
+[% seen = 0 %] [% FOREACH h = hedges %]
+  [% NEXT UNLESS h.type == 'many2one' %]
+[% IF seen == 0 ; seen = 1 %]# many2one #[% END %]
+  [% i = 0 %]
+  [% FOREACH thisnode = h.thisnode %]
+sub [% h.vianode.table.name %]_[% format_fk(h.vianode,h.thisviafield_index(i).name) %]_[% format_fk(h.vianode,h.thatviafield_index(0).name) %]s { my $self = shift; return map $_->[% h.thatviafield_index(0).name %], $self->[% h.vianode.table.name %]_[% h.thisviafield_index(i).name %] }
+    [% i = i + 1 %]
+  [% END %] [% END %]
+#many to many to many
+[% seen = 0 %]
+[% FOREACH h = hedges %]
+  [% NEXT UNLESS h.type == 'many2many' %]
+[% IF seen == 0 ; seen = 1 %]# many2many #[% END %]
+  [% i = 0 %]
+  [% FOREACH thisnode = h.thisnode %]
+    [% j = 0 %]
+    [% FOREACH thatnode = h.thatnode %]
+sub [% h.vianode.table.name %]_[% format_fk(h.vianode,h.thisviafield_index(i).name) %]_[% format_fk(h.vianode,h.thatviafield_index(j).name) %]s { my $self = shift; return map $_->[% h.vianode.table.name %]_[% format_fk(h.vianode,h.thatviafield_index(j).name) %]s, $self->[% h.vianode.table.name %]_[% format_fk(h.vianode,h.thisviafield_index(i).name) %]s }
+      [% j = j + 1 %]
+    [% END %]
+    [% i = i + 1 %]
+  [% END %] [% END %]
+# close the db connection
+sub close_connection {
+  my $self = shift;
+  my $dbh = $self->db_Main();
+  #$dbh->disconnect();
+}
+# close the db connection
+sub DESTROY {
+  my $self = shift;
+  $self->close_connection();
+}
+[% END %]
+########DBI########
+package [% baseclass %];
+
+# Created by SQL::Translator::Producer::TTSchema
+# Template used: dbi.tt2
+
+use strict;
+use Data::Dumper;
+no warnings 'redefine';
+use base qw(Class::DBI::Pg);
+
+# This is how you normally connect with Class DBI's connection pooling but
+# its very fragile for me on FC2.  I'm replacing it with the db_Main method below
+#[% baseclass %]->set_db('Main', '[% db_dsn  %]', '[% db_user %]', '[% db_pass %]');
+
+my $db_options = { __PACKAGE__->_default_attributes };
+__PACKAGE__->_remember_handle('Main'); # so dbi_commit works
+sub db_Main {
+  my $dbh;
+  $dbh = DBI->connect_cached( '[% db_dsn  %]', '[% db_user %]', '[% db_pass %]', $db_options );
+  # clear the connection cache if can't ping
+  if ($dbh->ping() < 1) {
+    my $CachedKids_hashref = $dbh->{Driver}->{CachedKids};
+    %$CachedKids_hashref = () if $CachedKids_hashref;
+    $dbh = DBI->connect_cached( '[% db_dsn  %]', '[% db_user %]', '[% db_pass %]', $db_options );
+    warn("Database handle reset!: ".$dbh." ping: ".$dbh->ping());
+  }
+  return($dbh);
+}
+
+sub search_ilike { shift->_do_search(ILIKE => [% "\@\_" %] ) }
+sub search_lower {
+   my $c = shift;
+   my %q = @_;
+   my %t;
+   foreach my $k (keys %q){
+     $t{"lower($k)"} = lc($q{$k});
+   }
+   $c->_do_search(LIKE => %t);
+}
+
+
+# debug method
+sub dump {
+  my $self = shift;
+  my %arg  = %{shift @_};
+  $arg{'indent'} ||= 1;
+  $arg{'depth'} ||= 3;
+  $Data::Dumper::Maxdepth = $arg{'depth'} if defined $arg{'depth'};
+  $Data::Dumper::Indent = $arg{'indent'} if defined $arg{'indent'};
+  return(Dumper($arg{'object'}));
+}
+
+#
+#
+# NOT PART OF THE API, but useful function which returns a single row
+#  and throws an error if more than one is returned
+#
+# Added as a utility function for modware
+#
+sub get_single_row {
+   my ($proto, @args) = @_;
+   my $class = ref $proto || $proto;
+
+   my @rows  = $class->search( @args );
+
+   my $count = @rows;
+   die "only one row expected, @rows returned" if @rows > 1;
+
+   return $rows[0];
+}
+
+
+1;
+[% graph = schema.as_graph %]
+[% FOREACH n = graph.node %][% NEXT UNLESS n.isa('UNIVERSAL') %][% printPackage(n) %][% END %]
