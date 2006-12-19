@@ -67,18 +67,25 @@ can be abbreviated to one letter.
                                                     even if it has already
                                                     been loaded before
   --gfffile    (required)                           The name of the GFF3 file
-  --organism   (optional, defaults to 'Human')      Common name of the organism
-  --srcdb      (optional, defaults to 'DB:refseq')  The name of the source
+  --organism   (optional, default from --dbprofile) Common name of the organism
+  --srcdb      (optional)                           The name of the source
                                                     database
   --uniquename (optional)                           The tag to use to provide
                                                     feature.uniquename
-  --ontology   (optional)                           Ontology to use instead
-                                                    of the default.  Note that
-                                                    this should be detected
-                                                    automatically, but isn't
-                                                    yet.
+?  --ontology   (optional)                           Ontology to use instead
+?                                                    of the default.  Note that
+?                                                    this should be detected
+?                                                    automatically, but isn't
+?                                                    yet.
+  --dbprofile  (optional, defaults to 'default')    Name of the database
+                                                    profile used by 
+                                                    Bio::GMOD::Config to get
+                                                    the organism.
 
 =head1 DESCRIPTION
+
+WARNING: this loader doesn't handle cds and exon features the same way
+as the bulk loader (yet!).
 
 The gmod_load_gff3.pl script takes genomic annotations in the GFF3 format
 and loads them into several tables in chado.  (see
@@ -184,7 +191,8 @@ my ( undef, $TMPGFF )   = tempfile( "XXXXXX", ".gff", SUFFIX => '.gff' );
 warn $TMPFASTA if DEBUG;
 warn $TMPGFF if DEBUG;
 
-my ( $ORGANISM,$SRC_DB,$GFFFILE,$UNIQUENAME,$CACHE_SIZE,$FORCE_LOAD,$ONTOLOGY );
+my ( $ORGANISM,$GFFFILE,$UNIQUENAME,$CACHE_SIZE,$FORCE_LOAD,
+     $ONTOLOGY,$DBPROFILE );
 my ( $progress, $next_update, $linecount ) =
   ( undef, undef, undef );    #progressbar;
 my ( $chado_db, $chado_organism, $nullpub ) =
@@ -277,6 +285,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
     }
 
     #is this general, or what should really be done here?
+    #parse the dbxref and get the appropriate db_id
     if ( $id && !$dbxref{$id} ) {
         my ($chado_dbxref) = Chado::Dbxref->find_or_create(
             {
@@ -790,12 +799,12 @@ sub initialize {
 
     GetOptions(
         'organism:s' => \$ORGANISM,
-        'srcdb:s'    => \$SRC_DB,
         'gfffile:s'  => \$GFFFILE,
         'uniquename:s'=>\$UNIQUENAME,
         'cache:s'    => \$CACHE_SIZE,
         'force'      => \$FORCE_LOAD,
         'ontology:s' => \$ONTOLOGY,
+        'dbprofile:s'=> \$DBPROFILE,
       )
       or ( system( 'pod2text', $0 ), exit -1 );
 
@@ -810,12 +819,11 @@ sub initialize {
                                              || "/var/lib/gmod") 
                     : Bio::GMOD::Config->new();
 
-            my $profile = 'default';
+            my $profile = $DBPROFILE || 'default';
             my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,$profile);
             $ORGANISM   = $db_conf->organism();
         }
     }
-    $SRC_DB;
     $CACHE_SIZE ||= 1000;
     $ONTOLOGY   ||= 'sequence';
 
@@ -884,7 +892,7 @@ sub initialize {
     ($chado_organism) = Chado::Organism->search( genus => $ORGANISM  )
         unless($chado_organism);
 
-    ($chado_db)       = Chado::Db->search( name              => $SRC_DB );
+    ($chado_db)       = Chado::Db->search( name              => $SRC_DB ) if $SRC_DB;
     ($nullpub)        = Chado::Pub->search( miniref          => 'null' );
 
     unless ($chado_organism) {
