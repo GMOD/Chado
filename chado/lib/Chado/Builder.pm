@@ -7,6 +7,7 @@ use Carp;
 use Data::Dumper;
 use File::Spec::Functions 'catfile';
 use File::Path;
+use File::Copy;
 use Data::Dumper;
 use Template;
 use XML::Simple;
@@ -265,8 +266,14 @@ sub ACTION_ontologies {
         mkpath( $fullpath, 0, 0711 )
           or print "Couldn't make path '$fullpath': $!\n";
       }
-      print "  +", $file->{remote}, "\n";
-      $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+      if ($file->{method} =~ /mirror/) {
+        print "  +", $file->{remote}, "\n";
+        $load = 1 if $m->_mirror( $file->{remote}, $file->{local} ); 
+      }
+      else { # it is a local file
+        copy( $file->{remote} , $fullpath );
+        $load = 1;
+      }
     }
 
     my ($deffile) =
@@ -286,7 +293,13 @@ sub ACTION_ontologies {
 
       print "  +", $file->{remote}, "\n";
 
-      $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+      if ($file->{method} =~ /mirror/) {
+        $load = 1 if $m->_mirror( $file->{remote}, $file->{local} );
+      }
+      else { #local file
+        copy( $file->{remote}, $fullpath );
+        $load = 1; 
+      }
 
       next unless $load;
 
