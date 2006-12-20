@@ -92,6 +92,8 @@ $0 - Bulk loads gff3 files into a chado database.
                      or if an optional argument is supplied, the first
                      dbxref that has a database part (ie, before the ':')
                      that matches the supplied pattern is used. 
+ --fp_cv           Name of the feature property controlled vocabulary
+                     (defaults to 'feature_property').
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -454,7 +456,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
-    $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF);
+    $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -482,6 +484,7 @@ GetOptions(
     'no_target_syn'=> \$NO_TARGET_SYN,
     'unique_target' => \$UNIQUE_TARGET,
     'dbxref:s'      => \$DBXREF,
+    'fp_cv:s'       => \$FP_CV,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 
@@ -516,6 +519,7 @@ $NOTRANSACT ||=0;
 $NOSEQUENCE ||=0;
 $INSERTS    ||=0;
 $SCORE_COL  ||='significance';
+$FP_CV      ||='feature_property';
 
 die "You must supply a database name" unless $DBNAME;
 
@@ -564,6 +568,7 @@ my %argv;
   $argv{no_target_syn}= $NO_TARGET_SYN;
   $argv{unique_target}= $UNIQUE_TARGET;
   $argv{dbxref}       = $DBXREF;
+  $argv{fp_cv}        = $FP_CV;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
