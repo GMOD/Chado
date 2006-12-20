@@ -81,6 +81,8 @@ can be abbreviated to one letter.
                                                     profile used by 
                                                     Bio::GMOD::Config to get
                                                     the organism.
+  --fp_cv     (optional, defaults to 'feature_property')  Name of the
+                                                   feature property cv
 
 =head1 DESCRIPTION
 
@@ -192,13 +194,13 @@ warn $TMPFASTA if DEBUG;
 warn $TMPGFF if DEBUG;
 
 my ( $ORGANISM,$GFFFILE,$UNIQUENAME,$CACHE_SIZE,$FORCE_LOAD,
-     $ONTOLOGY,$DBPROFILE );
+     $ONTOLOGY,$DBPROFILE, $FP_CV, $SRC_DB );
 my ( $progress, $next_update, $linecount ) =
   ( undef, undef, undef );    #progressbar;
 my ( $chado_db, $chado_organism, $nullpub ) =
   ( undef, undef, undef );
 my $feature_count = 0;        #for cache/flush
-my $cv;
+my ($auto_cv, $fp_cv);
 my $null_db_id;
 my %srcfeature        = ();
 my %feature           = ();
@@ -286,6 +288,7 @@ while ( my $gff_feature = $gffio->next_feature() ) {
 
     #is this general, or what should really be done here?
     #parse the dbxref and get the appropriate db_id
+    #or take commandline arg mapping them out
     if ( $id && !$dbxref{$id} ) {
         my ($chado_dbxref) = Chado::Dbxref->find_or_create(
             {
@@ -442,7 +445,7 @@ sub load_custom_tags {
     }
     else {
         unless ( defined $cvterm{$tag} ) {
-            cache_cvterm($tag);
+            cache_cvterm($tag, $fp_cv ? $fp_cv->id : 0);
             $progress->message("Data with the $tag tag are being placed in the featureprop table");
         }
 
@@ -799,12 +802,14 @@ sub initialize {
 
     GetOptions(
         'organism:s' => \$ORGANISM,
+        'srcdb:s'    => \$SRC_DB,
         'gfffile:s'  => \$GFFFILE,
         'uniquename:s'=>\$UNIQUENAME,
         'cache:s'    => \$CACHE_SIZE,
         'force'      => \$FORCE_LOAD,
         'ontology:s' => \$ONTOLOGY,
         'dbprofile:s'=> \$DBPROFILE,
+        'fp_cv:s'    => \$FP_CV,
       )
       or ( system( 'pod2text', $0 ), exit -1 );
 
@@ -824,8 +829,10 @@ sub initialize {
             $ORGANISM   = $db_conf->organism();
         }
     }
+    $SRC_DB     ||= 'DB:refseq';
     $CACHE_SIZE ||= 1000;
     $ONTOLOGY   ||= 'sequence';
+    $FP_CV      ||= 'feature_property';
 
     die "\nYou must specify a GFF file\n" unless $GFFFILE;
 
@@ -868,12 +875,20 @@ sub initialize {
     $next_update = 0;
 
     Chado::LoadDBI->init();
-    ($cv) = Chado::Cv->search(
+    ($auto_cv) = Chado::Cv->search(
         {
             name       => 'autocreated',
         }
     );
-    die "Unable to find a 'autocreated' cv in the cv table; please add one" unless $cv;
+    ($fp_cv)   = Chado::Cv->search(
+        {
+            name       => $FP_CV,
+        }
+    );
+    
+    die "Unable to find a 'autocreated' cv in the cv table; please add one" unless $auto_cv;
+    warn "No feature property cv found; unknown tags will be put in 'autocreated'" unless $fp_cv; 
+
     ($so) = Chado::Cv->search( { name => $ONTOLOGY } );
     die "Unable to find $ONTOLOGY in cv table; that is a pretty big problem" unless $so;
 
@@ -881,7 +896,7 @@ sub initialize {
     my @needed_cvterms =
       qw(description synonym note develops_from part_of gff_file score protein);
     foreach my $n (@needed_cvterms) {
-        cache_cvterm($n);
+        cache_cvterm($n, $fp_cv ? $fp_cv->id : 0);
     }
     cache_cvterm('region',$so->id); #make sure to get the SO region term
 
@@ -1295,13 +1310,14 @@ sub cache_cvterm {
 
     #we need an ontology source check here.  GO has an obsolete term for 'protein', but we want the
     #one from SO.
-
-    ( $cvterm{$name} ) = Chado::Cvterm->search( {
+    if ($soid && !$cvterm{$name} ) {
+        ( $cvterm{$name} ) = Chado::Cvterm->search( {
                                                   name => $name,
                                                   cv_id=> $soid } ) 
                       || Chado::Cvterm->search( {
                                                   name => ucfirst($name),
                                                   cv_id=> $soid } );
+    }
 
     if (!$cvterm{$name} and !$soid) {
         ( $cvterm{$name} )=Chado::Cvterm->search( { name => $name } )
@@ -1312,7 +1328,7 @@ sub cache_cvterm {
       if defined( $cvterm{$name} )
       and $cvterm{$name}->isa('Class::DBI::Iterator');
 
-    if ( !$cvterm{$name} && !$soid  ) {
+    if ( !$cvterm{$name} && $soid != $so->id ) {
 
         unless ($null_db_id) {
             my ($null_db)  = Chado::Db->search(
@@ -1326,14 +1342,14 @@ sub cache_cvterm {
         my ($dbxref)       = Chado::Dbxref->find_or_create(
             {
                 db_id      => $null_db_id,
-                accession  => $cv->name.":".$name,
+                accession  => $auto_cv->name.":".$name,
             }
         );
 
         ( $cvterm{$name} ) = Chado::Cvterm->find_or_create(
             {
                 name       => $name,
-                cv_id      => $cv->id,
+                cv_id      => $auto_cv->id,
                 definition => 'autocreated by gmod_load_gff3.pl',
                 dbxref_id  => $dbxref->id,
             }
