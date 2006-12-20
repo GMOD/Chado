@@ -193,6 +193,7 @@ sub new {
     $self->no_target_syn(   $arg{no_target_syn}  );
     $self->unique_target(   $arg{unique_target}  );
     $self->dbxref(          $arg{dbxref}         );
+    $self->fp_cv(           $arg{fp_cv}          );
 
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -872,6 +873,39 @@ sub uniquename_cache {
     }
 }
 
+=head2 fp_cv
+
+=over
+
+=item Usage
+
+  $obj->fp_cv()        #get existing value
+  $obj->fp_cv($newval) #set new value
+
+=item Function
+
+Gets/sets the name of the feature property cv
+
+=item Returns
+
+value of fp_cv (a scalar)
+
+=item Arguments
+
+new value of fp_cv (to set)
+
+=back
+
+=cut
+
+sub fp_cv {
+    my $self = shift;
+    my $fp_cv = shift if defined(@_);
+    return $self->{'fp_cv'} = $fp_cv if defined($fp_cv);
+    return $self->{'fp_cv'};
+}
+
+
 =head2 recreate_cache
 
 =over
@@ -978,7 +1012,7 @@ sub initialize_uniquename_cache {
 
     if (!$table_exists || $self->recreate_cache() ) {
         print STDERR "(Re)creating the uniquename cache in the database... ";
-        $dbh->do(DROP_CACHE_TABLE) if $self->recreate_cache();
+        $dbh->do(DROP_CACHE_TABLE) if ($self->recreate_cache() and $table_exists);
 
         print STDERR "\nCreating table...\n";
         $dbh->do(CREATE_CACHE_TABLE);
@@ -2762,14 +2796,33 @@ sub handle_unreserved_tags {
       next if $tag eq 'dbxref';
 
       unless ($self->{const}{auto_cv_id}){
-        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='autocreated'");
+        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='autocreated' or name='". $self->fp_cv  ."'");
         $sth->execute;
         ($self->{const}{auto_cv_id}) = $sth->fetchrow_array;
       }
 
+      if (!$self->{const}{tried_fp_cv} and !$self->{const}{fp_cv_id}) {
+        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='". $self->fp_cv  ."'");
+        $sth->execute;
+        ($self->{const}{fp_cv_id}) = $sth->fetchrow_array;
+        $self->{const}{tried_fp_cv} = 1;
+      }
+
       unless ( $self->cache('type',$tag) ) {
-        $self->{queries}{search_cvterm_id}->execute($tag, $self->{const}{auto_cv_id});
+        #check fp cv first, then autocreated
+        $self->{queries}{search_cvterm_id}->execute(
+                                 $tag, 
+                                 $self->{const}{fp_cv_id})
+                              if $self->{const}{fp_cv_id};
         my ($tag_cvterm) = $self->{queries}{search_cvterm_id}->fetchrow_array;
+
+        unless ($tag_cvterm) {
+            $self->{queries}{search_cvterm_id}->execute(
+                                 $tag, 
+                                 $self->{const}{auto_cv_id});
+            ($tag_cvterm) = $self->{queries}{search_cvterm_id}->fetchrow_array;
+        }
+
         if ($tag_cvterm) { #good, the term is already there
           $self->cache('type',$tag,$tag_cvterm);
         } else { #bad! the term is not there for now we die with a helpful message
