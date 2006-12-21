@@ -89,6 +89,13 @@ can be abbreviated to one letter.
 WARNING: this loader doesn't handle cds and exon features the same way
 as the bulk loader (yet!).
 
+The most important thing to know about this loader is that it is SLOW!
+The bulk loader (gmod_bulk_load_gff3.pl, also in this distribution) is
+many times faster (perhaps 100 times faster).  In addition, the bulk
+loader currently implements a more complete load and is more flexible.
+The only real advantage is the this loader is easier to port to other
+database systems because it runs on Class::DBI middleware.
+
 The gmod_load_gff3.pl script takes genomic annotations in the GFF3 format
 and loads them into several tables in chado.  (see
 L<http://song.sourceforge.net/gff3.shtml> for a description of the format).  
@@ -844,7 +851,7 @@ sub initialize {
     my $linenumber = `grep -n "^>" $GFFFILE`;
     if ( $linenumber =~ /^(\d+)/ ) {
         $linenumber = $1;
-        system("tail -n $linenumber $GFFFILE > $TMPFASTA");
+        system("tail -n +$linenumber $GFFFILE > $TMPFASTA");
         $linenumber -= 1;
         system("head -n $linenumber $GFFFILE > $TMPGFF");
 
