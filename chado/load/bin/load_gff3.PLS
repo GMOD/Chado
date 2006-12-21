@@ -22,7 +22,7 @@ if (open F,"$Bin/../../build.conf") {
 
 
 open OUT,">$file" or die "Can't create $file: $!";
-print OUT "$Config{startperl} -w\n";
+print OUT "$Config{startperl}\n";
 
 if ($OPTIONS{LIB}) {
   print OUT "use lib '$OPTIONS{LIB}';\n";
@@ -33,6 +33,7 @@ if ($OPTIONS{PREFIX}) {
 
 print OUT <<'!NO!SUBS!';
 use strict;
+use warnings;
 use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::Tools::GFF;
 use Bio::SeqIO;
