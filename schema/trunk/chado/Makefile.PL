@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.97 2006-09-27 20:28:13 cmungall Exp $
+# $Id: Makefile.PL,v 1.98 2006-12-28 21:23:30 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
@@ -641,18 +641,18 @@ WriteMakefile(
     clean                 => {
       FILES               => 
         '$(DISTVNAME).tar$(SUFFIX) load/etc/load.conf build.conf ' .
-        '_build Build lib/Chado/AutoDBI.pm lib/Chado/LoadDBI.pm'  
+        '_build Build lib/Chado/AutoDBI.pm lib/Chado/LoadDBI.pm '.$LOCAL_TMP  
     },
 );
 
 print INSTRUCTIONS;
 
-sub MY::clean {
-  package MY;
-  my $inherited = shift->SUPER::clean(@_);
-  $inherited =~ s/clean_subdirs/clean_subdirs rm_locks/;
-  $inherited;
-}
+#sub MY::clean {
+#  package MY;
+#  my $inherited = shift->SUPER::clean(@_);
+#  $inherited =~ s/clean_subdirs/clean_subdirs rm_locks/;
+#  $inherited;
+#}
 
 sub MY::install {
   package MY;
