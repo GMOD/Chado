@@ -1,27 +1,23 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.98 2006-12-28 21:23:30 scottcain Exp $
+# $Id: Makefile.PL,v 1.99 2006-12-28 21:36:42 scottcain Exp $
 
 use constant INSTRUCTIONS => <<HERE
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 Makefile written.  Now you should do the following, in order:
-
   1. make              (creates necessary build files)
   2. sudo make install (creates \$GMOD_ROOT and subdirectories)
-
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
          STEP 3 WILL DELETE ANY DATA IN A DATABASE WITH THE 
             DATABASE NAME YOU PROVIDED!
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
   3. make load_schema (loads SQL schema into database)
   4. make prepdb      (loads basic data)
   5. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
-
   make radviews     (creates views for gene expression data.  this is
                      necessary if you chose expression/rad.sql above)
   make html         (auto-generates html documentation for each module)
@@ -29,11 +25,10 @@ Optional Targets:
   make rm_locks     (removes ontology lock files, allowing installation
                      of ontologies on successive builds of the database
                      without removing the ontology files altogether)
-
+  make clean        (remove build related files and ontology tmp dir)
   make instructions (at any moment display these instructions)
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 HERE
 ;
 
