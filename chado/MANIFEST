@@ -90,7 +90,6 @@ load/bin/bulk_load_gff3.PLS
 load/bin/load_affymetrix.pl
 load/bin/load_affyxls.pl
 load/bin/load_gff3.PLS
-load/bin/load_ontology.PLS
 load/Build.PL
 load/etc/extra.sql
 load/etc/initialize.sql
