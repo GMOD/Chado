@@ -22,7 +22,8 @@ require Exporter;
                 'affymetrixgcrma',
                 'affymetrixprobesetstat',
                 'gencode_codon_aa',
-                'gencode_startcodon',);
+                'gencode_startcodon',
+                'gencode');
 
 
 
