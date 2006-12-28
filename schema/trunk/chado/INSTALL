@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.45 2006-10-04 16:47:29 scottcain Exp $
+$Id: INSTALL,v 1.46 2006-12-28 21:33:10 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -373,6 +373,13 @@ Then execute gmod_bulk_load_gff3.pl:
     Note the redirection of standard out.  Note that this method
     for generating GFF3 files is not completely satisfactory and
     development is ongoing to provide better translation.
+
+Note that gmod_load_gff3.pl is also available, but is limited in how
+much it has been supported and in how flexible it currently is.  It is
+a good example of how to write code using Class::DBI classes that are 
+created at the time of install.  For more information on using these
+classes, see http://sourceforge.net/projects/gmod-ware for a Class::DBI
+based middleware/API.
 
 GENERIC GENOME BROWSER
 

@@ -33,6 +33,19 @@ if ($OPTIONS{PREFIX}) {
 }
 
 print OUT <<'!NO!SUBS!';
+
+print <<END_OF_SCRIPT;
+
+---------------------DEPRECATED-----------------------------
+The script gmod_load_ontologies.pl is no longer supported.
+To load ontologies, either use the `make ontologies` command
+or read the INSTALL document describing the make ontologies
+command and how to do it 'by hand'.
+
+END_OF_SCRIPT
+;
+
+__END__
 use strict;
 use lib 'lib';
 use File::Basename;
