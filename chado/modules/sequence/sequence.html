@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (17 tables)
+	Table listing (18 tables)
  -->
 
 <a name="top" />
@@ -76,6 +76,18 @@
 
 <!-- 
 	End link to table 'feature_pub'
+ -->
+
+<!-- 
+	Start link to table 'feature_pubprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_pubprop-link" href="#feature_pubprop">feature_pubprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_pubprop'
  -->
 
 <!-- 
@@ -1197,6 +1209,178 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>feature_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_pubprop'
+ -->
+
+<a name="feature_pubprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_pubprop
+</h3></td>
+		<a name="feature_pubprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	Property or attribute of a feature_pub link 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-feature_pubprop_id">feature_pubprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_pubprop-feature_pub_id">feature_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature_pub-feature_pub_id">feature_pub.feature_pub_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_pubprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_pubprop_idx1</td>
+	<td>feature_pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_pubprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_pub_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -3481,7 +3665,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
+SQL::Translator 0.08_01</a>
 
 </body>
 </html>

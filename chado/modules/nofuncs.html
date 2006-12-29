@@ -175,42 +175,6 @@
  -->
 
 <!-- 
-	Start link to table 'organism'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="organism-link" href="#organism">organism</a></td>
-</tr>
-
-<!-- 
-	End link to table 'organism'
- -->
-
-<!-- 
-	Start link to table 'organism_dbxref'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="organism_dbxref-link" href="#organism_dbxref">organism_dbxref</a></td>
-</tr>
-
-<!-- 
-	End link to table 'organism_dbxref'
- -->
-
-<!-- 
-	Start link to table 'organismprop'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="organismprop-link" href="#organismprop">organismprop</a></td>
-</tr>
-
-<!-- 
-	End link to table 'organismprop'
- -->
-
-<!-- 
 	Start link to table 'pub'
  -->
 
@@ -271,6 +235,66 @@
  -->
 
 <!-- 
+	Start link to table 'organism'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organism-link" href="#organism">organism</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organism'
+ -->
+
+<!-- 
+	Start link to table 'organism_dbxref'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organism_dbxref-link" href="#organism_dbxref">organism_dbxref</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organism_dbxref'
+ -->
+
+<!-- 
+	Start link to table 'organismprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organismprop-link" href="#organismprop">organismprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organismprop'
+ -->
+
+<!-- 
+	Start link to table 'organism_relationship'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organism_relationship-link" href="#organism_relationship">organism_relationship</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organism_relationship'
+ -->
+
+<!-- 
+	Start link to table 'organismpath'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="organismpath-link" href="#organismpath">organismpath</a></td>
+</tr>
+
+<!-- 
+	End link to table 'organismpath'
+ -->
+
+<!-- 
 	Start link to table 'feature'
  -->
 
@@ -316,6 +340,18 @@
 
 <!-- 
 	End link to table 'feature_pub'
+ -->
+
+<!-- 
+	Start link to table 'feature_pubprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_pubprop-link" href="#feature_pubprop">feature_pubprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_pubprop'
  -->
 
 <!-- 
@@ -472,42 +508,6 @@
 
 <!-- 
 	End link to table 'feature_synonym'
- -->
-
-<!-- 
-	Start link to table 'gencode'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="gencode-link" href="#gencode">gencode</a></td>
-</tr>
-
-<!-- 
-	End link to table 'gencode'
- -->
-
-<!-- 
-	Start link to table 'gencode_codon_aa'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="gencode_codon_aa-link" href="#gencode_codon_aa">gencode_codon_aa</a></td>
-</tr>
-
-<!-- 
-	End link to table 'gencode_codon_aa'
- -->
-
-<!-- 
-	Start link to table 'gencode_startcodon'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="gencode_startcodon-link" href="#gencode_startcodon">gencode_startcodon</a></td>
-</tr>
-
-<!-- 
-	End link to table 'gencode_startcodon'
  -->
 
 <!-- 
@@ -1944,7 +1944,10 @@
 
 <em>
 	<br />
-	A controlled vocabulary or ontology. A cv is composed of cvterms (aka terms, classes, concepts, frames) and the relationships between them 
+	A controlled vocabulary or ontology. A cv is
+	composed of cvterms (aka terms, classes, types, universals - relations
+	and properties are also stored in cvterm)) and the relationships
+	between them 
 </em>
 
 <table border="1">
@@ -1984,7 +1987,9 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This corresponds to the obo-format -namespace-. cv names are unique </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This
+corresponds to the obo-format -namespace-. cv names uniquely identify
+the cv. In obo file format, the cv.name is known as the namespace </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1993,7 +1998,8 @@
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A description of the criteria for membership of this ontology </td>
+	<td class="FieldCellOther">A text description of the criteria for
+membership of this ontology </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2056,9 +2062,10 @@
 
 <em>
 	<br />
-	A term, class or concept within an ontology or controlled vocabulary.
-	  Also used for relationship types. A cvterm can also be thought of
-	  as a node in a graph 
+	A term, class, universal or type within an
+	ontology or controlled vocabulary.  This table is also used for
+	relations and properties. cvterms constitute nodes in the graph
+	defined by the collection of cvterms and cvterm_relationships 
 </em>
 
 <table border="1">
@@ -2098,7 +2105,8 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv/ontology/namespace to which this cvterm belongs </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv/ontology/namespace to which
+this cvterm belongs </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -2107,7 +2115,8 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">1024</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name describing the meaning of the cvterm </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name or
+label for the cvterm. uniquely identifies a cvterm within a cv </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2116,7 +2125,8 @@
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A human-readable text definition </td>
+	<td class="FieldCellOther">A human-readable text
+definition </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2125,9 +2135,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Primary dbxref - The unique global OBO identifier for this cvterm.
-  Note that a cvterm may  have multiple secondary dbxrefs - see also
-  table: cvterm_dbxref </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Primary identifier dbxref - The
+unique global OBO identifier for this cvterm.  Note that a cvterm may
+have multiple secondary dbxrefs - see also table: cvterm_dbxref </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -2136,9 +2146,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see GO documentation for details of obsoletion.
-  note that two terms with different primary dbxrefs may exist if one
-  is obsolete </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see
+GO documentation for details of obsoletion.  note that two terms with
+different primary dbxrefs may exist if one is obsolete </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2147,11 +2157,12 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL, Boolean 0=false,1=true
-  Relationship types (also known as Typedefs in OBO format, or as
-  properties or slots) form a cv/ontology in themselves. We use this
-  flag to indicate whether this cvterm is an actual term/concept or
-  a relationship type </td>
+	<td class="FieldCellOther">NOT NULL, Boolean
+0=false,1=true relations or relationship types (also known as Typedefs
+in OBO format, or as properties or slots) form a cv/ontology in
+themselves. We use this flag to indicate whether this cvterm is an
+actual term/class/universal or a relation. Relations may be drawn from
+the OBO Relations ontology, but are not exclusively drawn from there </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2291,10 +2302,14 @@
 	is a possibility for the ontology under consideration (eg GO) then the
 	ID should be appended to the name to ensure uniqueness  <br />
 	the OBO identifier is globally unique  <br />
-	A relationship linking two cvterms. A relationship can be thought of
-	  as an edge in a graph, or as a natural language statement about
-	  two cvterms. The statement is of the form SUBJECT PREDICATE OBJECT;
-	  for example "wing part_of body" 
+	A relationship linking two
+	cvterms. Each cvterm_relationship constitutes an edge in the graph
+	defined by the collection of cvterms and cvterm_relationships. The
+	meaning of the cvterm_relationship depends on the definition of the
+	cvterm R refered to by type_id. However, in general the definitions
+	are such that the statement all SUBJs REL some OBJ is true. The
+	cvterm_relationship statement is about the subject, not the
+	object. For example "insect wing part_of thorax" 
 </em>
 
 <table border="1">
@@ -2334,7 +2349,10 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The nature of the
+relationship between subject and object. Note that relations are also
+housed in the cvterm table, typically from the OBO relationship
+ontology, although other relationship types are allowed </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2343,7 +2361,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of
+the subj-predicate-obj sentence. The cvterm_relationship is about the
+subject. In a graph, this typically corresponds to the child node </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2352,7 +2372,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the
+subj-predicate-obj sentence. The cvterm_relationship refers to the
+object. In a graph, this typically corresponds to the parent node </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2472,7 +2494,9 @@
 
 <em>
 	<br />
-	The reflexive transitive closure of the cvterm_relationship relation. For a full discussion, see the file populating-cvtermpath.txt in this directory 
+	The reflexive transitive closure of
+	the cvterm_relationship relation. For a full discussion, see the file
+	populating-cvtermpath.txt in this directory 
 </em>
 
 <table border="1">
@@ -2512,7 +2536,11 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, The relationship type that this is a closure over. If null, then this is a closure over ALL relationship types. If non-null, then this references a relationship cvterm - note that the closure will apply to both this relationship AND the OBO_REL:is_a (subclass) relationship </td>
+	<td class="FieldCellOther">UNIQUE, The relationship type that
+this is a closure over. If null, then this is a closure over ALL
+relationship types. If non-null, then this references a relationship
+cvterm - note that the closure will apply to both this relationship
+AND the OBO_REL:is_a (subclass) relationship </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2539,7 +2567,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, Closures will mostly be within one cv. If the closure of a relationship traverses a cv, then this refers to the cv of the object_id cvterm </td>
+	<td class="FieldCellOther">NOT NULL, Closures will mostly be within
+one cv. If the closure of a relationship traverses a cv, then this
+refers to the cv of the object_id cvterm </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -2548,7 +2578,9 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, The number of steps required to get from the subject cvterm to the object cvterm, counting from zero (reflexive relationship) </td>
+	<td class="FieldCellOther">UNIQUE, The number of steps
+required to get from the subject cvterm to the object cvterm, counting
+from zero (reflexive relationship) </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2678,7 +2710,11 @@
 
 <em>
 	<br />
-	A cvterm actually represents a distinct class or concept. A concept can be refered to by different phrases or names. In addition to the primary name (cvterm.name) there can be a number of alternative aliases or synonyms. For example, -T cell- as a synonym for -T lymphocyte- 
+	A cvterm actually represents a
+	distinct class or concept. A concept can be refered to by different
+	phrases or names. In addition to the primary name (cvterm.name) there
+	can be a number of alternative aliases or synonyms. For example, -T
+	cell- as a synonym for -T lymphocyte- 
 </em>
 
 <table border="1">
@@ -2736,7 +2772,8 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A synonym can be exact, narrow or borader than </td>
+	<td class="FieldCellOther">A synonym can be exact,
+narrow or borader than </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2836,7 +2873,21 @@
 
 <em>
 	<br />
-	In addition to the primary identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary identifiers, which may be in external databases 
+	In addition to the primary
+	identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary
+	identifiers/dbxrefs, which may refer to records in external
+	databases. The exact semantics of cvterm_dbxref are not fixed. For
+	example: the dbxref could be a pubmed ID that is pertinent to the
+	cvterm, or it could be an equivalent or similar term in another
+	ontology. For example, GO cvterms are typically linked to InterPro
+	IDs, even though the nature of the relationship between them is
+	largely one of statistical association. The dbxref may be have data
+	records attached in the same database instance, or it could be a
+	"hanging" dbxref pointing to some external database. NOTE: If the
+	desired objective is to link two cvterms together, and the nature of
+	the relation is known and holds for all instances of the subject
+	cvterm then consider instead using cvterm_relationship together with a
+	well-defined relation. 
 </em>
 
 <table border="1">
@@ -2894,7 +2945,10 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL, A cvterm.definition should be supported by one or more references. If this column is true, the dbxref is not for a term in an external db - it is a dbxref for provenance information for the definition </td>
+	<td class="FieldCellOther">NOT NULL, A
+cvterm.definition should be supported by one or more references. If
+this column is true, the dbxref is not for a term in an external db -
+it is a dbxref for provenance information for the definition </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3343,479 +3397,6 @@ default 0 value should be used </td>
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>dbxref_id, type_id, rank</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'organism'
- -->
-
-<a name="organism" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	organism
-</h3></td>
-		<a name="organism"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	The organismal taxonomic
-	classification. Note that phylogenies are represented using the
-	phylogeny module, and taxonomies can be represented using the cvterm
-	module or the phylogeny module 
-</em>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism-abbreviation">abbreviation</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism-genus">genus</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism-species">species</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always
-uniquely identified by genus+species. When mapping from the NCBI
-taxonomy names.dmp file, the unique-name column must be used where it
-is present, as the name column is not always unique (eg environmental
-samples). If a particular strain or subspecies is to be represented,
-this is appended onto the species name. Follows standard NCBI taxonomy
-pattern </td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism-common_name">common_name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism-comment">comment</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genus</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>species</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>genus, species</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'organism_dbxref'
- -->
-
-<a name="organism_dbxref" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	organism_dbxref
-</h3></td>
-		<a name="organism_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism_dbxref-organism_dbxref_id">organism_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism_dbxref-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>organism_dbxref_idx1</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organism_dbxref_idx2</td>
-	<td>dbxref_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_dbxref_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>organism_id, dbxref_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'organismprop'
- -->
-
-<a name="organismprop" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	organismprop
-</h3></td>
-		<a name="organismprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	tag-value properties - follows standard chado model 
-</em>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismprop-organismprop_id">organismprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organismprop-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organismprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>organismprop_idx1</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organismprop_idx2</td>
-	<td>type_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organismprop_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>organism_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>organism_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -4773,6 +4354,848 @@ pattern </td>
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>pub_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organism'
+ -->
+
+<a name="organism" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organism
+</h3></td>
+		<a name="organism"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	The organismal taxonomic
+	classification. Note that phylogenies are represented using the
+	phylogeny module, and taxonomies can be represented using the cvterm
+	module or the phylogeny module 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism-abbreviation">abbreviation</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism-genus">genus</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism-species">species</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always
+uniquely identified by genus+species. When mapping from the NCBI
+taxonomy names.dmp file, the unique-name column must be used where it
+is present, as the name column is not always unique (eg environmental
+samples). If a particular strain or subspecies is to be represented,
+this is appended onto the species name. Follows standard NCBI taxonomy
+pattern </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism-common_name">common_name</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism-comment">comment</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genus</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>species</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genus, species</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organism_dbxref'
+ -->
+
+<a name="organism_dbxref" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organism_dbxref
+</h3></td>
+		<a name="organism_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism_dbxref-organism_dbxref_id">organism_dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism_dbxref-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism_dbxref-dbxref_id">dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_dbxref_idx1</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_dbxref_idx2</td>
+	<td>dbxref_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>organism_id, dbxref_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organismprop'
+ -->
+
+<a name="organismprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organismprop
+</h3></td>
+		<a name="organismprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	tag-value properties - follows standard chado model 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismprop-organismprop_id">organismprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organismprop-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organismprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismprop_idx1</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organismprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>organism_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organism_relationship'
+ -->
+
+<a name="organism_relationship" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organism_relationship
+</h3></td>
+		<a name="organism_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organism_relationship <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism_relationship-organism_relationship_id">organism_relationship_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism_relationship-subject_id">subject_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organism_relationship-object_id">object_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organism_relationship-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_relationship_idx1</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_relationship_idx2</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organism_relationship_idx3</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_relationship_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>subject_id, object_id, type_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'organismpath'
+ -->
+
+<a name="organismpath" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	organismpath
+</h3></td>
+		<a name="organismpath"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organismpath <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismpath-organismpath_id">organismpath_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organismpath-subject_id">subject_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismpath-object_id">object_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="organismpath-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="organismpath-pathdistance">pathdistance</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismpath_idx1</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismpath_idx2</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>organismpath_idx3</td>
+	<td>object_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organismpath_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>subject_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>object_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>subject_id, object_id, type_id, pathdistance</td>
 </tr>
 
 </table>
@@ -5740,6 +6163,178 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>feature_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_pubprop'
+ -->
+
+<a name="feature_pubprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_pubprop
+</h3></td>
+		<a name="feature_pubprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	Property or attribute of a feature_pub link 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-feature_pubprop_id">feature_pubprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_pubprop-feature_pub_id">feature_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature_pub-feature_pub_id">feature_pub.feature_pub_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_pubprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_pubprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_pubprop_idx1</td>
+	<td>feature_pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_pubprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_pub_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -8024,318 +8619,6 @@ synonym is -internal- and should be queryable but should not be listed in report
 <hr />
 
 <!-- 
-	Starting table 'gencode'
- -->
-
-<a name="gencode" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	gencode
-</h3></td>
-		<a name="gencode"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="gencode-gencode_id">gencode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="gencode-organismstr">organismstr</a></td>
-	<td class="FieldCellType">VARCHAR</td>
-	<td class="FieldCellSize">512</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>gencode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organismstr</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'gencode_codon_aa'
- -->
-
-<a name="gencode_codon_aa" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	gencode_codon_aa
-</h3></td>
-		<a name="gencode_codon_aa"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="gencode_codon_aa-gencode_id">gencode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#gencode-gencode_id">gencode.gencode_id</a></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="gencode_codon_aa-codon">codon</a></td>
-	<td class="FieldCellType">char</td>
-	<td class="FieldCellSize">3</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="gencode_codon_aa-aa">aa</a></td>
-	<td class="FieldCellType">char</td>
-	<td class="FieldCellSize">1</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>gencode_codon_aa_i1</td>
-	<td>gencode_id, codon, aa</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>gencode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>gencode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>codon</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>aa</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>gencode_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'gencode_startcodon'
- -->
-
-<a name="gencode_startcodon" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	gencode_startcodon
-</h3></td>
-		<a name="gencode_startcodon"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="gencode_startcodon-gencode_id">gencode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#gencode-gencode_id">gencode.gencode_id</a></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="gencode_startcodon-codon">codon</a></td>
-	<td class="FieldCellType">char</td>
-	<td class="FieldCellSize">3</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>gencode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>gencode_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>gencode_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
 	Starting table 'analysis'
  -->
 
@@ -9513,9 +9796,6 @@ synonym is -internal- and should be queryable but should not be listed in report
 	TABLE: genotype <br />
 	================================================ <br />
 	genetic context <br />
-	the uniquename should be derived from the features <br />
-	making up the genoptype <br />
-	uniquename: a human-readable unique identifier <br />
 	NULL
 </em>
 
@@ -9552,15 +9832,26 @@ synonym is -internal- and should be queryable but should not be listed in report
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
+	<td class="FieldCellName"><a name="genotype-name">name</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">Optional alternative name for a genotype, 
+for display purposes </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a genotype; 
+typically derived from the features making up the genotype </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="genotype-description">description</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -9589,6 +9880,11 @@ synonym is -internal- and should be queryable but should not be listed in report
 <tr class="IndexCell">
 	<td>genotype_idx1</td>
 	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>genotype_idx2</td>
+	<td>name</td>
 </tr>
 
 </table>
@@ -10449,6 +10745,15 @@ synonym is -internal- and should be queryable but should not be listed in report
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="phendesc-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phendesc-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -10538,6 +10843,16 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
 	<td>pub_id</td>
 </tr>
 
@@ -10548,7 +10863,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>genotype_id, environment_id, pub_id</td>
+	<td>genotype_id, environment_id, type_id, pub_id</td>
 </tr>
 
 </table>
@@ -10683,6 +10998,43 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx1</td>
+	<td>genotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx2</td>
+	<td>genotype2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx3</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx4</td>
+	<td>pub_id</td>
 </tr>
 
 </table>
@@ -11543,7 +11895,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.3 2006-04-12 03:19:11 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.4 2006-12-29 16:26:09 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -20454,7 +20806,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
+SQL::Translator 0.08_01</a>
 
 </body>
 </html>

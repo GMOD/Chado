@@ -167,9 +167,6 @@
 	TABLE: genotype <br />
 	================================================ <br />
 	genetic context <br />
-	the uniquename should be derived from the features <br />
-	making up the genoptype <br />
-	uniquename: a human-readable unique identifier <br />
 	NULL
 </em>
 
@@ -206,15 +203,26 @@
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
+	<td class="FieldCellName"><a name="genotype-name">name</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">Optional alternative name for a genotype, 
+for display purposes </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a genotype; 
+typically derived from the features making up the genotype </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="genotype-description">description</a></td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
@@ -243,6 +251,11 @@
 <tr class="IndexCell">
 	<td>genotype_idx1</td>
 	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>genotype_idx2</td>
+	<td>name</td>
 </tr>
 
 </table>
@@ -1103,6 +1116,15 @@
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="phendesc-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phendesc-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -1192,6 +1214,16 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
 	<td>pub_id</td>
 </tr>
 
@@ -1202,7 +1234,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>genotype_id, environment_id, pub_id</td>
+	<td>genotype_id, environment_id, type_id, pub_id</td>
 </tr>
 
 </table>
@@ -1342,6 +1374,43 @@
 </table>
 
 <h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx1</td>
+	<td>genotype1_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx2</td>
+	<td>genotype2_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx3</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_idx4</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
 	Constraints
 </h3>
 
@@ -1446,7 +1515,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
+SQL::Translator 0.08_01</a>
 
 </body>
 </html>
