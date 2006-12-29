@@ -1674,7 +1674,7 @@ create index featuremap_pub_idx2 on featuremap_pub (pub_id);
 
 
 
--- $Id: default_nofuncs.sql,v 1.17 2006-11-21 16:12:19 scottcain Exp $
+-- $Id: default_nofuncs.sql,v 1.18 2006-12-29 16:26:08 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --

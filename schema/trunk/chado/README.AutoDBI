@@ -1,4 +1,20 @@
-Process for makeing AutoDBI.PL:
+Process for making AutoDBI.PL:
+
+run bin/chado-build-schema.pl
+   click select all and Create Pg Schema
+   In order to add custom SQL statements (ie, table create statements),
+   you need to edit chado-module-metadata.xml to define meta data for
+   the file, including location and any dependencies and then run
+   chado-build-schema.pl.
+
+mv chado_schema.sql modules/default_schema.sql
+
+run bin/chado-build-schema.pl
+   check SQL only, Select All and Create Pg Schema
+
+mv chado_schema.sql modules/default_nofuncs.sql
+
+
 
 Run Makefile.PL, answer 'No' to the 'use simple' question and select
    all sql and function extensions (except the Apollo functions).

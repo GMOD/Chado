@@ -42,7 +42,7 @@ WriteMakefile(
 	      'VERSION_FROM' => "lib/Bio/Chaos/Root.pm",
 	      'PREREQ_PM'    => {
 				 'Data::Stag' => '0.07',
-				 'Bio::Seq'         => '1.5',
+				 'Bio::Perl'         => '1_5_2',
                                  'Graph' => 0,
 				},
 	      'EXE_FILES'    => [

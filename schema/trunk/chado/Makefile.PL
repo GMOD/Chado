@@ -1,8 +1,9 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.99 2006-12-28 21:36:42 scottcain Exp $
+# $Id: Makefile.PL,v 1.100 2006-12-29 16:26:07 scottcain Exp $
 
+$| = 1;
 use constant INSTRUCTIONS => <<HERE
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -18,8 +19,6 @@ Makefile written.  Now you should do the following, in order:
   5. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
-  make radviews     (creates views for gene expression data.  this is
-                     necessary if you chose expression/rad.sql above)
   make html         (auto-generates html documentation for each module)
   make images       (generates images of the schema in several formats)
   make rm_locks     (removes ontology lock files, allowing installation
@@ -352,103 +351,13 @@ my @sqlfiles;
 my $external;
 my @funcfiles;
 my $rebuild_complete = 0;
-if ($O{'SIMPLE'} =~ /^[Yy]/) {
-  system('cp', 
-         "$working_dir/modules/default_schema.sql", 
-         "$working_dir/modules/complete.sql");
-    system('cp',
-         "$working_dir/modules/default_nofuncs.sql",
-         "$working_dir/modules/nofuncs.sql");
+copy( 
+     "$working_dir/modules/default_schema.sql", 
+     "$working_dir/modules/complete.sql");
+copy(
+     "$working_dir/modules/default_nofuncs.sql",
+     "$working_dir/modules/nofuncs.sql");
 
-} else{
-
-  open CORE, $O{COREDEF} or die "Unable to read file '$O{COREDEF}': $!\n";
-  while (<CORE>) {
-    next if /^\s*#/; # allow comment lines
-    chomp;
-    my $file = $working_dir . '/modules/' . $_;
-    if (-M "$working_dir/modules/complete.sql" > -M $file) {
-      $rebuild_complete++;
-    }
-    push @sqlfiles, $file;
-  }
-  close CORE;
-
-#
-# Ask about available extensions to core.
-#
-  print "\nAvailable extensions to the core schema:\n";
-  open EXT, $O{EXTDEF} or die "Unable to read file '$O{EXTDEF}': $!\n";
-  my @extfiles = ( 0 );
-  my $i = 0;
-  while (<EXT>) {
-    next if /^\s*#/; # allow comment lines
-    $i++;
-    print "[$i] $_";
-    chomp;
-    my $file = "$working_dir/modules/".$_;
-    if (-M "$working_dir/modules/complete.sql" > -M $file) {
-      $rebuild_complete++;
-    }
-    push @extfiles, $file;
-  }
-  close EXT;
-
-  print "\nWhat extensions to the core schema would you like?\n",
-    "(Note that selecting any of these will force the\n",
-    "rebuilding of Class::DBI classes.)\n";
-  my $extstr = prompt("(Comma-delimited)?","0");
-
-  if ($extstr) {
-    $rebuild_complete++; 
-    my @extindex = split /,/, $extstr;
-    foreach my $index (@extindex) {
-      next unless defined $extfiles[$index];
-      push @sqlfiles, $extfiles[$index];
-    }
-  }
-
-  $external = prompt("Enter the full path of an external DDL file", 'none');
-  unless ($external eq 'none') {
-    if (-e $external) {
-      push @sqlfiles, $external; 
-    } else {
-      die "The file $external couldn't be found.  Quitting...\n";
-    }
-  }
-
-  print "\nAvailable function extensions to the core schema:\n";
-#  open EXT, $O{FUNCDEF} or die "Unable to read file '$O{FUNCDEF}': $!\n";
-  @funcfiles = `find modules/ -name *.plpgsql`;
-  my $i = 0;
-  foreach my $file (@funcfiles) {
-    $i++;
-    print "[$i] $file";
-    chomp $file;
-  }
-#  while (<EXT>) {
-#    next if /^\s*#/; # allow comment lines
-#    $i++;
-#    print "[$i] $_";
-#    chomp;
-#    my $file = "$working_dir/modules/".$_;
-#    push @funcfiles, $file;
-#  }
-#  close EXT;
-                                                                                    
-  print "\nWhat function extensions to the core schema would you like?\n";
-  print "Only load triggers if you know what you are doing!\n";
-  my $funcstr = prompt("(Comma-delimited)?","0");
-
-  my @indexes = split /,\s*/, $funcstr if $funcstr;
-
-  my @temparray = @funcfiles;
-  @funcfiles = ();
-  foreach my $index (@indexes) {
-    push @funcfiles, $temparray[$index-1];
-  }
-
-} #closes the "nonsimple" unless option
 
 #
 # Show the user the options (esp. if using RECONFIGURE or DEFAULTS).
@@ -466,11 +375,7 @@ print join("\n",
   "  LOCAL_TMP=$LOCAL_TMP",
   "  DBORGANISM=$DBORGANISM",
   "  DEFAULT=$DEFAULT",
-  '',
-  $O{'SIMPLE'}!~ /^[Yy]/ ? 'And the following core modules and extensions:' : ''  , 
-  $O{'SIMPLE'}!~ /^[Yy]/ ? ( map { "  $_" } @sqlfiles ) : '', 
-  ''
-);
+),"\n\n";
 
 #warn about GO_ROOT for loading ontologies
 unless ($ENV{GO_ROOT}) {
@@ -537,55 +442,34 @@ my $complete_sql;
 if ($O{'SIMPLE'} =~ /^[Yy]/) {
     system(  $PERL, 'bin/AutoDBI.PL') == 0
         or die "unable to run bin/AutoDBI.PL: $!\n";
-    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
-        or die "unable to create Build from load/Build.PL: $!\n";
 }
 else {
 
-  $complete_sql = "$working_dir/modules/complete.sql";
-  if ($rebuild_complete || !-e $complete_sql ) {
-    open OUT, ">$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
-    print OUT <<END_NOTE
---DO NOT edit this file directly; doing so may break any applications
---that depend on Class::DBI.  If you want a different complete.sql
---modify the appropriate module file and rebuild the database with
--- `perl Makefile.PL
+    print STDERR <<AUTODBI;
 
-END_NOTE
-; 
-    foreach my $file (@sqlfiles) {
-      open IN, $file or die "Couldn't read file '$file': $!\n";
-      while (<IN>) {
-        print OUT;
-      }
-      close IN;
-    }
-    close OUT;
+-------------------------WARNING------------------------------------
+I'm assuming you modified modules/default_schema.sql and
+modules/default_nofuncs.sql or want to rebuild AutoDBI.pm for some
+other reason.  If that is not the case, please read README.AutoDBI
+for more information or, if you do not think this is what you want to
+do, rerun `perl Makefile.PL` and answer 'y' to the question about
+doing a simple install.
+
+AUTODBI
+;
 
     print "Creating Class::DBI classes in '$chado_dir'\n",
       "(This could take a while) ...\n"; 
 
     system(
-      "$working_dir/bin/pg2cdbi.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
-      "$working_dir/modules/complete.sql > $working_dir/lib/Chado/AutoDBI.pm"
-    ) == 0 or die "bin/pg2cdbi.pl failed, is SQL::Translator installed?\n";
+      "$working_dir/bin/pg2cdbi_viaTT.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
+      "$working_dir/modules/nofuncs.sql > $working_dir/lib/Chado/AutoDBI.pm"
+    ) == 0 or die "bin/pg2cdbi_viaTT.pl failed, is SQL::Translator installed?\n";
+}
 
-    system( "$PERL load/Build.PL load_conf=$load_config; ./Build" );
-    copy("$working_dir/modules/complete.sql","$working_dir/modules/nofuncs.sql"); 
-  }
+system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
+    or die "unable to create Build from load/Build.PL: $!\n";
 
-  if (@funcfiles > 0) {
-    open OUT, ">>$complete_sql" or die "Couldn't write file '$complete_sql': $!\n";
-    foreach my $file (@funcfiles) {
-      open IN, $file or die "Couldn't read file '$file': $!\n";
-      while (<IN>) {
-        print OUT;
-      }
-      close IN;
-    }
-    close OUT;
-  }
-} # close "not simple" else to make AutoDBI.pm
 
 WriteMakefile(
 #    'NAME'		            => 'chado',
@@ -813,9 +697,6 @@ prepdb ::
 
 ontologies ::
 	./Build ontologies
-
-radviews ::
-	./Build radviews
 
 rm_locks ::
 	`find $LOCAL_TMP -name "*$DBNAME" -exec rm -f '{}' ';'`
