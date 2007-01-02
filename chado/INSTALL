@@ -1,31 +1,30 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.46 2006-12-28 21:33:10 scottcain Exp $
+$Id: INSTALL,v 1.47 2007-01-02 16:05:28 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
 considered beta software, so expect there to be bumps in the road.  When
 you experience problems, please email them to the gmod-schema mailing list
 at gmod-schema@lists.sourceforge.net.  This release will work with the
-most recent release of the Generic Genome Browser (gbrowse) version 1.65
-though there have been bug fixes to gbrowse that will be rolled into
-a new 1.66 release in the near future.  If you experience difficulties
-with gbrowse and chado, you might want to look at getting a cvs
-checkout of the gbrowse-session branch.  The installation instructions for
-gbrowse are included in that package.  There are plans to make the
-installation of gbrowse and other components more automatic, but for
-the time being, please unpack it and install separately.
+most recent release of the Generic Genome Browser (gbrowse) version 1.66
+If you experience difficulties with gbrowse and chado, you might want to
+look at getting a cvs checkout of the gbrowse-session branch.  The
+installation instructions for gbrowse are included in that package. 
+There are plans to make the installation of gbrowse and other components
+more automatic, but for the time being, please unpack it and install
+separately.
 
 This release of chado/gmod also comes with example functions for
 allowing Apollo (http://www.gmod.org/apollo) to read and
 write directly to the database, allowing creation and editing of
-genome features.  Please see the file README.Apollo for some details
-on setting this up.
+genome features as well as a sample database.  Please see the file
+README.Apollo for some details on setting this up.
 
 Thanks,
 Scott Cain
 cain@cshl.edu
-Sept 12, 2006
+January 2, 2007
 
 Prerequisites:
 
@@ -120,7 +119,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
          max_connections = 32
 
 
-  Apache (1.3.* or 2.0.*) (for gbrowse, gmod-web requires 2.0)
+  Apache (1.3.* or 2.0.*) (gmod-web requires 2.0)
 
   BioPerl (bioperl-live or greater than 1.5.1)
           (-microarray 0.1 --required for microarray data)
@@ -253,13 +252,9 @@ As indicated, the host, port, and password are optional.
         insert statements that create these default organisms are 
         contained in load/etc/initialize.sql).
 
-        THIS PARAGRAPH IS OUT OF DATE, AS IS THE SECTION AT THE
-        END, AND BOTH SHOULD BE REWRITTEN.
-        At this point, if you answered "No" to the "use default schema"
-        question, you will be prompted about what database exensions
-        to use; generally, you should answer "Yes" to that question.
-        To see the documentation for this part of the make procedure,
-        see "CUSTOM DATABASE SCHEMAS" at the end of this document.
+        If you answered 'No' to the simple install question, AutoDBI.pm
+        will now be created by SQL::Translator, see the CUSTOM DATABASE
+        SCHEMAS section below for more information.
 
 *   make
     Creates necessary files for the rest of the build process.
@@ -295,13 +290,12 @@ As indicated, the host, port, and password are optional.
     the Sequence Ontology (SO).  All others are optional.  Note retrieved
     ontology files are stored in the directory specified when
     perl Makefile.PL was run (the default is ./tmp).  In order to do a
-    repeat installation, lock files need to be removed to allow
-    reinstallation of ontologies.  Those lock files can be removed
-    by executing `make rm_locks`.  Alternatively, deleting everything in
-    the temporary directory will force the re-downloading of the ontology
-    data from their respective sources.  Also note that loading a large
-    ontology like the Gene Ontology will take several minutes (perhaps
-    as long as an hour).
+    repeat installation, the directory containing the downloaded
+    ontology must be removed.  In addition to 'rm -rf ./tmp', you can
+    also issue the `make clean` command, which will clear out all
+    of the files and directories created up until this point in the 
+    installation.   Also note that loading a large ontology like the
+    Gene Ontology will take several minutes (perhaps as long as an hour).
 
     Note that since `make ontologies` downloads ontology files from their
     online repositories, this step is prone to failure due to network
@@ -400,53 +394,19 @@ for more information on configuring GBrowse to work with chado.
 
 CUSTOM DATABASE SCHEMAS
 
-        If you answered "No" to the "use default schema" question,
-        you will be prompted about what database exensions
-        to use; generally, you should answer "Yes" to that question.
-        Here are the questions to answer for this section of the 
-        make procedure:
-
-        *   Available extensions to the core schema:
-            [1] sequence/gff-bridge/sequence-gff-views.sql
-            [2] expression/rad.sql
-            [3] expression/expression.sql
-    
-    
-            What extensions to the core schema would you like?
-            (Note that selecting any of these will force the
-            rebuilding of Class::DBI classes.)
-            (Comma-delimited)? [0]
-    
-            Available function extensions to the core schema:
-           [1] sequence/gff-bridge/sequence-gff-funcs.pgsql
-           [2] sequence/functions/feature_subalignments.plpgsql
-    
-        !!!!!IMPORTANT!!!!!
-        This section is where you choose optional extensions to the
-        base Chado schema.
-    
-        If you plan to use Chado in combination with GBrowse, make
-        sure you select (1) from both menus.
-    
-        If you plan to store many alignments with small regions of
-        perfect match, you might want to load the alignment data
-        as an alignment string rather than creating a feature for
-        each aligned block.  Functionality exists for using this
-        method in (2) of the function extentions, and is documented
-        in README.H_sapiens.
-    
-        If you plan to represent gene expression data in a way that
-        is compliant with MIAME standards, make sure you select (2)
-        and (3) from the core schema exentions
-.
-        !!!!!IMPORTANT!!!!!
-    
-        *   Enter the full path of an external DDL file [none]
-    
-        Path to a file containing external SQL commands to execute
-        after the database has been created.  This will typically be
-        extra modules/views/tables not distributed with the core schema,
-        or default data to insert into the database to fulfill the
-        specialized needs of a MOD.
-    
+If you answered 'No' to the question about doing a simple install
+during `perl Makefile.PL`, you must provide the files default_schema.sql
+and default_nofuncs.sql.  The best way to create these files is using
+bin/chado-build-schema.pl, a perl script with a graphical user interface
+for interactively building a Chado schema.  If you are providing table
+definitions of your own, you will also have to edit the file 
+chado-module-metadata.xml to define how your tables relate to other
+tables in the Chado schema.  While there is no documentation of the ddt
+of this file, it is relatively straight forward.  See README.AutoDBI
+for more information on how chado-build-schema.pl relates to the build 
+process.  Once the default_schema.sql and default_nofuncs.sql files 
+are in place and you run `perl Makefile.PL`, the only difference between
+the simple and non-simple installs is that the non-simple install will
+build AutoDBI.pm using SQL::Translator, which will take several minutes
+typically.
 
