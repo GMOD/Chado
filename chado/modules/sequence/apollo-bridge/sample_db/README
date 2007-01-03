@@ -25,7 +25,7 @@ make prepdb
 
 rm -rf tmp  # to clear out old ontologies so that this db has freshest
 
-make ontologies   # loading 1,2
+make ontologies   # loading 1,2,4
 
 cd modules/sequence/apollo-bridge/sample_db
 
@@ -41,7 +41,7 @@ bzip2 -d gff_files/10.non.gff.bz2
     # this is the non-analysis data (ie, 'knowns')
 
 gmod_bulk_load_gff3.pl --noexon -g gff_files/10.non.gff 
-    # takes about 2-3 minutes to run
+    # takes about 10 minutes to run
 
 bzip2 --best gff_files/10.non.gff  
 
@@ -74,7 +74,7 @@ bzip2 -d gff_files/*est* gff_files/*match*
     #loading the follow files can take an hour or more
 gmod_bulk_load_gff3.pl --recreate -a -g gff_files/10.est.gff
     # the recreate is necessary because features got into the database
-    #via a route other than the bulk loader
+    #via a route other than the bulk loader from the 10.inserts file
 
 gmod_bulk_load_gff3.pl -a -g gff_files/10.match.gff
 
