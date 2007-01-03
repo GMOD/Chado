@@ -1060,12 +1060,17 @@ sub initialize_ontology {
     my $self = shift;
 
     my $sth = $self->dbh->prepare(
-       "select cvterm_id from cvterm where name = 'part_of'");
+       "select cvterm_id from cvterm where name = 'part_of' and cv_id in (
+         SELECT cv_id FROM cv WHERE name='relationship'
+        )");
     $sth->execute;
     ($part_of) = $sth->fetchrow_array();
 
     $sth = $self->dbh->prepare(
-      "select cvterm_id from cvterm where name = 'derives_from'");$sth->execute;
+      "select cvterm_id from cvterm where name = 'derives_from' and cv_id in (
+         SELECT cv_id FROM cv WHERE name='relationship' 
+       )");
+    $sth->execute;
     ($derives_from) = $sth->fetchrow_array();
 
     $sth = $self->dbh->prepare("select cv_id from cv where name = 'sequence'");
