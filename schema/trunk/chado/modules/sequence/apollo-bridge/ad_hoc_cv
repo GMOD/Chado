@@ -1,34 +1,11 @@
-[property type]
-aminoacid
-anticodon
-comment
-date
-description
-element
-encoded_symbol
-internal_synonym
-owner
-problem
-protein_id
-qseq_type
-sp_comment
-sp_status
-status
-symbol
-unixdate
-gbunit
-cyto_range
-dicistronic
-validation_flag
-keywords
-organism
-mol_type
-dev_stage
-chromosome
-map
-finished
-missing_start_codon
-missing_stop_codon
+#[property type]
+#protein_id   #missing from feature_property
+#organism     #missing from feature_property
+#mol_type      #missing from feature_property
+#dev_stage     #missing from feature_property
+#chromosome    #missing from feature_property
+#map           #missing from feature_property
+#finished       #missing from feature_property
 
 [pub type]
 computer file
