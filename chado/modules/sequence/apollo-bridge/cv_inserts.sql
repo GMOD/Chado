@@ -1,64 +1,11 @@
-INSERT INTO cv (name) VALUES ('property type');
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:aminoacid');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'aminoacid',(select dbxref_id from dbxref where accession='property type:aminoacid'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:anticodon');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'anticodon',(select dbxref_id from dbxref where accession='property type:anticodon'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:comment');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'comment',(select dbxref_id from dbxref where accession='property type:comment'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:date');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'date',(select dbxref_id from dbxref where accession='property type:date'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:description');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'description',(select dbxref_id from dbxref where accession='property type:description'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:element');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'element',(select dbxref_id from dbxref where accession='property type:element'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:encoded_symbol');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'encoded_symbol',(select dbxref_id from dbxref where accession='property type:encoded_symbol'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:internal_synonym');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'internal_synonym',(select dbxref_id from dbxref where accession='property type:internal_synonym'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:owner');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'owner',(select dbxref_id from dbxref where accession='property type:owner'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:problem');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'problem',(select dbxref_id from dbxref where accession='property type:problem'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:protein_id');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'protein_id',(select dbxref_id from dbxref where accession='property type:protein_id'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:qseq_type');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'qseq_type',(select dbxref_id from dbxref where accession='property type:qseq_type'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:sp_comment');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'sp_comment',(select dbxref_id from dbxref where accession='property type:sp_comment'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:sp_status');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'sp_status',(select dbxref_id from dbxref where accession='property type:sp_status'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:status');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'status',(select dbxref_id from dbxref where accession='property type:status'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:symbol');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'symbol',(select dbxref_id from dbxref where accession='property type:symbol'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:unixdate');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'unixdate',(select dbxref_id from dbxref where accession='property type:unixdate'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:gbunit');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'gbunit',(select dbxref_id from dbxref where accession='property type:gbunit'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:cyto_range');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'cyto_range',(select dbxref_id from dbxref where accession='property type:cyto_range'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:dicistronic');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'dicistronic',(select dbxref_id from dbxref where accession='property type:dicistronic'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:validation_flag');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'validation_flag',(select dbxref_id from dbxref where accession='property type:validation_flag'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:keywords');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'keywords',(select dbxref_id from dbxref where accession='property type:keywords'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:organism');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'organism',(select dbxref_id from dbxref where accession='property type:organism'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:mol_type');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'mol_type',(select dbxref_id from dbxref where accession='property type:mol_type'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:dev_stage');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'dev_stage',(select dbxref_id from dbxref where accession='property type:dev_stage'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:chromosome');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'chromosome',(select dbxref_id from dbxref where accession='property type:chromosome'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:map');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'map',(select dbxref_id from dbxref where accession='property type:map'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:finished');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'finished',(select dbxref_id from dbxref where accession='property type:finished'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:missing_start_codon');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'missing_start_codon',(select dbxref_id from dbxref where accession='property type:missing_start_codon'));
-INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'property type:missing_stop_codon');
-INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='property type'),'missing_stop_codon',(select dbxref_id from dbxref where accession='property type:missing_stop_codon'));
+
+
+
+
+
+
+
+
 INSERT INTO cv (name) VALUES ('pub type');
 INSERT INTO dbxref (db_id,accession) VALUES ((select db_id from db where name='null'), 'pub type:computer file');
 INSERT INTO cvterm (cv_id,name,dbxref_id) VALUES ((select cv_id from cv where name='pub type'),'computer file',(select dbxref_id from dbxref where accession='pub type:computer file'));
