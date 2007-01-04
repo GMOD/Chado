@@ -88,7 +88,8 @@ cat ../apollo-triggers.plpgsql | psql apollo
 
 pg_dump apollo | bzip2 -c --best > final_dump.bz2
 
-# now connect with apollo using a chado-adaptor.xml like the one in
+# now connect with apollo using a chado-adaptor.xml and
+# transactionXMLTemplate_rice.xml like the ones in
 # this directory (note that I used the section named 'RiceDB test
 # server at gmod.cshl.edu(Tunneling)'
 
