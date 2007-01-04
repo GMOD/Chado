@@ -360,3 +360,71 @@ domain: SO:0000110
 range: xsd:string
 range_def: "<dbxref> of a term in some ontology" []
 comment: In chado, this is redundant with the feature_cvterm table
+
+[Typedef]
+id: SOFP:protein_id
+name: protein_id
+namespace: feature_property
+def: "A protein sequence identifier" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+comment: Should really be a dbxref [so:sjc]
+
+[Typedef]
+id: SOFP:organism
+name: organism
+namespace: feature_property
+def: "The name of the organism" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+comment: In chado, this is redundant with the organism table [so:sjc]
+
+[Typedef]
+id: SOFP:mol_type
+name: mol_type
+namespace: feature_property
+def: "The type of molecule" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+comment: Presumably, this could be inferred from the SO type [so:sjc]
+
+[Typedef]
+id: SOFP:dev_stage
+name: dev_stage
+namespace: feature_property
+def: "Stage of development" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+
+[Typedef]
+id: SOFP:chromosome
+name: chromosome
+namespace: feature_property
+def: "Name of chromosome the feature occurs on(?)" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+comment: What is this for? [so:sjc]
+
+[Typedef]
+id: SOFP:map
+name: map
+namespace: feature_property
+def: "A map location" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+
+[Typedef]
+id: SOFP:finished
+name: finished
+namespace: feature_property
+def: "If the annotation of the feature is complete" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:boolean
+
