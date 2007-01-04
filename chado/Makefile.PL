@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.100 2006-12-29 16:26:07 scottcain Exp $
+# $Id: Makefile.PL,v 1.101 2007-01-04 19:48:52 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -485,7 +485,7 @@ WriteMakefile(
       'Term::ProgressBar' => 2.06, #fluff, but make sure you check load/bin/*
                                   #if this prereq is removed
       'DBI'               => 0,
-      'DBD::Pg'           => 0,
+      'DBD::Pg'           => 1.49,
       'XML::Simple'       => 2.09,
       'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.07,
