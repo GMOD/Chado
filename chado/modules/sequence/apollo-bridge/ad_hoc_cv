@@ -1,12 +1,3 @@
-#[property type]
-#protein_id   #missing from feature_property
-#organism     #missing from feature_property
-#mol_type      #missing from feature_property
-#dev_stage     #missing from feature_property
-#chromosome    #missing from feature_property
-#map           #missing from feature_property
-#finished       #missing from feature_property
-
 [pub type]
 computer file
 curator
