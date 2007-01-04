@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.47 2007-01-02 16:05:28 scottcain Exp $
+$Id: INSTALL,v 1.48 2007-01-04 19:48:52 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -136,7 +136,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * CGI                      (GBrowse)
     * GD                       (GBrowse)
     * DBI                      (GBrowse,chado)
-    * DBD::Pg                  (GBrowse,chado)
+    * DBD::Pg (1.49 or better) (GBrowse,chado)
     * SQL::Translator          (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
