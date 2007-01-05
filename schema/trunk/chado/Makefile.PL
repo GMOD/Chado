@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.101 2007-01-04 19:48:52 scottcain Exp $
+# $Id: Makefile.PL,v 1.102 2007-01-05 03:11:29 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -474,7 +474,7 @@ system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
 WriteMakefile(
 #    'NAME'		            => 'chado',
     'NAME'                => 'gmod',
-    'VERSION'             => 0.003,
+    'VERSION'             => 0.5,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       'Class::DBI'        => 0.94,
