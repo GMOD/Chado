@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.49 2007-01-05 16:00:20 scottcain Exp $
+$Id: INSTALL,v 1.50 2007-01-05 18:20:43 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -140,7 +140,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * SQL::Translator          (chado) (optional)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
-    * Graph::Directed          (BioPerl prereq)
+    * Graph                    (Bio-Chaos)
     * Data::Stag               (chado)
     * XML::Parser::PerlSAX     (chado)
     * Module::Build            (chado)
