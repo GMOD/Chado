@@ -60,7 +60,6 @@ chaos-xml/lib/Bio/Chaos/ChaosGraph.pm
 chaos-xml/lib/Bio/Chaos/FeatureUtil.pm
 chaos-xml/lib/Bio/Chaos/Root.pm
 chaos-xml/lib/Bio/Chaos/XSLTHelper.pm
-chaos-xml/Makefile
 chaos-xml/Makefile.PL
 chaos-xml/MANIFEST
 chaos-xml/README
@@ -87,7 +86,6 @@ doc/chado-policy.txt
 doc/chado-scenarios.xml
 doc/Chado_Schema_Documentation.doc
 doc/ChadoCSHMay03Slides.pdf
-doc/cjm-notes.txt
 doc/css/chado.css
 doc/design.txt
 doc/examples/dicistronic-gene-example.chado
@@ -175,7 +173,6 @@ modules/cv/functions/deductive_closure.sqlapi
 modules/cv/functions/detect_cycle.plpgsql
 modules/cv/functions/fill_cvtermpath.plpgsql
 modules/cv/functions/get_subj_obj_ids.plpgsql
-modules/cv/populating-cvtermpath.txt
 modules/cv/views/cv-convenience-views.sql
 modules/cv/views/cv-logical-definitions-views.sql
 modules/cv/views/cv-report.sql
