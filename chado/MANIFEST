@@ -8,7 +8,6 @@ bin/ddltrans
 bin/gencode2sql.pl
 bin/gmod_apollo_triggers.pl
 bin/gmod_bulkfiles.pl
-bin/gmod_dump_gff3.pl
 bin/gmod_fasta2gff3.pl
 bin/gmod_gff2biomart5.pl
 bin/gmod_gff3_preprocessor.pl
