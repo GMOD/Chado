@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.48 2007-01-04 19:48:52 scottcain Exp $
+$Id: INSTALL,v 1.49 2007-01-05 16:00:20 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -296,6 +296,16 @@ As indicated, the host, port, and password are optional.
     of the files and directories created up until this point in the 
     installation.   Also note that loading a large ontology like the
     Gene Ontology will take several minutes (perhaps as long as an hour).
+
+    At the time of this release, DBIx::DBStag is printing an error 
+    when loading some ontologies like this:
+
+DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
+"cvterm_c1"
+DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
+"cvterm_c1"
+
+    It doesn't appear to affect the operation the database though.
 
     Note that since `make ontologies` downloads ontology files from their
     online repositories, this step is prone to failure due to network
