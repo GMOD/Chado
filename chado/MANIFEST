@@ -187,7 +187,6 @@ load/tt2/LoadDBI.tt2
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
 modules/audit/add-audits.tmpl
 modules/audit/audit.doc
 modules/audit/audit_tables.sql
