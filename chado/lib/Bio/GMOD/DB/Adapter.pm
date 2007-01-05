@@ -3014,6 +3014,9 @@ None.
 
 sub process_CDS {
     my $self = shift;
+
+    return unless $self->cds_db_exists;
+
     my $dbh  = $self->dbh;
 
     #get one of the features from the database(!)
