@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.104 2007-01-05 18:18:51 scottcain Exp $
+# $Id: Makefile.PL,v 1.105 2007-01-08 15:40:14 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -505,7 +505,7 @@ WriteMakefile(
            #'load/bin/gmod_load_affyxls.pl',
            'load/bin/gmod_load_gff3.pl',
            'load/bin/gmod_bulk_load_gff3.pl',
-           'bin/gmod_dump_gff3.pl',
+           #'bin/gmod_dump_gff3.pl',
            'bin/gmod_apollo_triggers.pl',
            'bin/gmod_fasta2gff3.pl',
            'bin/gmod_sort_gff3.pl',
