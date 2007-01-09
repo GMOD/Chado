@@ -298,6 +298,11 @@ only want a polypeptide feature to be created.  To do this, use the
 --noexon option.  In this case, the CDS and UTR features will still 
 be converted to exon features as described above.
 
+Note that in the case where your GFF file contains CDS and/or UTR features
+that do not belong to 'central dogma' genes (that is, that have a
+gene, transcript and CDS/exon features), none of the above will happen
+and the features will be stored as is.
+
 =back
 
 =back
