@@ -606,7 +606,7 @@ if ($GFFFILE eq 'stdin') {
 warn "Preparing data for inserting into the $DBNAME database\n";
 warn "(This may take a while ...)\n";
 
-my $seen_cds = my $seen_exon = 0;
+my $seen_cds = my $seen_exon = my $seen_bad_cds = 0;
 
 my $feature_iterator;
 FEATURE:
@@ -616,11 +616,23 @@ while(my $feature = (defined $feature_iterator && $feature_iterator->next_featur
   my $featuretype = $feature->type->name;
 
   if ($featuretype =~ /(CDS|UTR)/) {
-    $chado->handle_CDS($feature);
-    next FEATURE; 
+    my $continue_on = $chado->handle_CDS($feature);
+    $seen_cds = 1 if !$seen_cds && $featuretype =~ /CDS/;
+    next FEATURE unless ($continue_on == 0); 
+
+    if (!$seen_bad_cds ) {
+      warn <<END;
+
+This GFF file has CDS and/or UTR features that do not belong to a 
+'central dogma' gene (ie, gene/transcript/CDS).  The features of 
+this type are being stored in the database as is.
+
+END
+;
+      $seen_bad_cds = 1;
+    }
   }
 
-  $seen_cds = 1 if $featuretype =~ /CDS$/;
   $seen_exon= 1 if $featuretype =~ /exon$/;
 
   if ( $seen_cds && $seen_exon && !$NOEXON ) {

@@ -2919,10 +2919,15 @@ sub handle_gap {
 
 This function stores CDS and UTR features in a temporary database
 table for processing after the entire GFF3 file has be seen.
+If the feature's parents do not correspond to the central dogma
+(that is, gene -> transcript -> cds), then the method will return
+false and the CDS or UTR feature will be inserted as is into
+the database.
 
 =item Returns
 
-Nothing
+False if the feature doesn't belong to a central dogma gene, 
+otherwise nothing.
 
 =item Arguments
 
@@ -2953,6 +2958,8 @@ sub handle_CDS {
     }
 
     my $feat_grandparent = $self->cache('parent',$parent_id);
+
+    return 0 unless $feat_grandparent;
 
     unless ($self->cds_db_exists()) {
         $self->create_cds_db;
