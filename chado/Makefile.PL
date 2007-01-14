@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.105 2007-01-08 15:40:14 scottcain Exp $
+# $Id: Makefile.PL,v 1.106 2007-01-14 18:42:30 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -358,6 +358,16 @@ copy(
      "$working_dir/modules/default_nofuncs.sql",
      "$working_dir/modules/nofuncs.sql");
 
+if (-e "$working_dir/../GMODTools") {
+    print "\nCopying GMODTools from it's directory using its ant build.xml ...\n";
+
+    chdir "$working_dir/../GMODTools";
+
+    system("ant", "gmodrel", "-Dgmod.dir=$working_dir");
+    print "Done with GMODTools\n";
+
+    chdir $working_dir;
+}
 
 #
 # Show the user the options (esp. if using RECONFIGURE or DEFAULTS).
@@ -477,9 +487,9 @@ WriteMakefile(
     'VERSION'             => 0.5,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
-      'Class::DBI'        => 0.94,
-      'Class::DBI::Pager' => 0,
-      'Class::DBI::Pg'    => 0.02,
+      #'Class::DBI'        => 0.94,
+      #'Class::DBI::Pager' => 0,
+      #'Class::DBI::Pg'    => 0.02,
       'Module::Build'     => 0.20,
       'Template'          => 2.10,
       'Term::ProgressBar' => 2.06, #fluff, but make sure you check load/bin/*
