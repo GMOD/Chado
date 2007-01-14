@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.50 2007-01-05 18:20:43 scottcain Exp $
+$Id: INSTALL,v 1.51 2007-01-14 19:07:00 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -144,9 +144,9 @@ host    all         all         127.0.0.1         255.255.255.255   trust
     * Data::Stag               (chado)
     * XML::Parser::PerlSAX     (chado)
     * Module::Build            (chado)
-    * Class::DBI               (GMODWeb)
-    * Class::DBI::Pg           (GMODWeb)
-    * Class::DBI::Pager        (GMODWeb)
+    * Class::DBI               (GMODWeb, or with a custom Chado schema)
+    * Class::DBI::Pg           (GMODWeb, or with a custom Chado schema)
+    * Class::DBI::Pager        (GMODWeb, or with a custom Chado schema)
     * DBIx::DBStag             (chado)
     * XML::Simple              (chado)
     * LWP                      (chado)
