@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.106 2007-01-14 18:42:30 scottcain Exp $
+# $Id: Makefile.PL,v 1.107 2007-01-15 16:25:54 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -584,7 +584,7 @@ instructions ::
 
 graphviz :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.png \
-	make $working_dir/modules/contact/contact.png \
+	make $working_dir/modules/contact/contact.graphviz.png \
 	make $working_dir/modules/cv/cv.graphviz.png \
 	make $working_dir/modules/expression/expression.graphviz.png \
 	make $working_dir/modules/expression/rad.graphviz.png \
@@ -599,6 +599,7 @@ graphviz :: \
 	make $working_dir/modules/pub/pub.graphviz.png \
 	make $working_dir/modules/sequence/sequence.graphviz.png \
 	make $working_dir/modules/www/www.graphviz.png \
+	make $working_dir/modules/stock/stock.graphviz.png \
 	make $working_dir/modules/nofuncs.graphviz.png
 
 graphviz_svg :: \
@@ -617,6 +618,7 @@ graphviz_svg :: \
 	make $working_dir/modules/pub/pub.graphviz.svg \
 	make $working_dir/modules/sequence/sequence.graphviz.svg \
 	make $working_dir/modules/www/www.graphviz.svg \
+	make $working_dir/modules/stock/stock.graphviz.svg \
 	make $working_dir/modules/nofuncs.graphviz.svg
 
 diagram :: \
@@ -635,6 +637,7 @@ diagram :: \
 	make $working_dir/modules/pub/pub.diagram.png \
 	make $working_dir/modules/sequence/sequence.diagram.png \
 	make $working_dir/modules/www/www.diagram.png \
+	make $working_dir/modules/stock/stock.diagram.png \
 	make $working_dir/modules/nofuncs.diagram.png
 
 
@@ -655,6 +658,7 @@ html :: \
 	make $working_dir/modules/pub/pub.html \
 	make $working_dir/modules/sequence/sequence.html \
 	make $working_dir/modules/www/www.html \
+	make $working_dir/modules/stock/stock.html \
 	make $working_dir/modules/nofuncs.html
 
 tex :: \
@@ -674,6 +678,7 @@ tex :: \
 	make $working_dir/modules/pub/pub.tex \
 	make $working_dir/modules/sequence/sequence.tex \
 	make $working_dir/modules/www/www.tex \
+	make $working_dir/modules/stock/stock.tex \
 	make $working_dir/modules/nofuncs.tex
 
 %.html: %.sql
