@@ -7447,3 +7447,767 @@
        EXECUTE PROCEDURE audit_update_delete_studyfactorvalue ();
 
 
+   DROP TABLE audit_stock;
+   CREATE TABLE audit_stock ( 
+       stock_id integer, 
+       dbxref_id integer, 
+       organism_id integer, 
+       name varchar(255), 
+       uniquename text, 
+       description text, 
+       type_id integer, 
+       is_obsolete boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock() RETURNS trigger AS
+   '
+   DECLARE
+       stock_id_var integer; 
+       dbxref_id_var integer; 
+       organism_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var text; 
+       description_var text; 
+       type_id_var integer; 
+       is_obsolete_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_id_var = OLD.stock_id;
+       dbxref_id_var = OLD.dbxref_id;
+       organism_id_var = OLD.organism_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       description_var = OLD.description;
+       type_id_var = OLD.type_id;
+       is_obsolete_var = OLD.is_obsolete;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock ( 
+             stock_id, 
+             dbxref_id, 
+             organism_id, 
+             name, 
+             uniquename, 
+             description, 
+             type_id, 
+             is_obsolete, 
+             transaction_type
+       ) VALUES ( 
+             stock_id_var, 
+             dbxref_id_var, 
+             organism_id_var, 
+             name_var, 
+             uniquename_var, 
+             description_var, 
+             type_id_var, 
+             is_obsolete_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_audit_ud ON stock;
+   CREATE TRIGGER stock_audit_ud
+       BEFORE UPDATE OR DELETE ON stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock ();
+
+
+   DROP TABLE audit_stock_pub;
+   CREATE TABLE audit_stock_pub ( 
+       stock_pub_id integer, 
+       stock_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stock_pub_id_var integer; 
+       stock_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_pub_id_var = OLD.stock_pub_id;
+       stock_id_var = OLD.stock_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_pub ( 
+             stock_pub_id, 
+             stock_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_pub_id_var, 
+             stock_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_pub_audit_ud ON stock_pub;
+   CREATE TRIGGER stock_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_pub ();
+
+
+   DROP TABLE audit_stockprop;
+   CREATE TABLE audit_stockprop ( 
+       stockprop_id integer, 
+       stock_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop() RETURNS trigger AS
+   '
+   DECLARE
+       stockprop_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockprop_id_var = OLD.stockprop_id;
+       stock_id_var = OLD.stock_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockprop ( 
+             stockprop_id, 
+             stock_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stockprop_id_var, 
+             stock_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockprop_audit_ud ON stockprop;
+   CREATE TRIGGER stockprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stockprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockprop ();
+
+
+   DROP TABLE audit_stockprop_pub;
+   CREATE TABLE audit_stockprop_pub ( 
+       stockprop_pub_id integer, 
+       stockprop_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stockprop_pub_id_var integer; 
+       stockprop_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockprop_pub_id_var = OLD.stockprop_pub_id;
+       stockprop_id_var = OLD.stockprop_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockprop_pub ( 
+             stockprop_pub_id, 
+             stockprop_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stockprop_pub_id_var, 
+             stockprop_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockprop_pub_audit_ud ON stockprop_pub;
+   CREATE TRIGGER stockprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stockprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockprop_pub ();
+
+
+   DROP TABLE audit_stock_relationship;
+   CREATE TABLE audit_stock_relationship ( 
+       stock_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_id_var = OLD.stock_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship ( 
+             stock_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_audit_ud ON stock_relationship;
+   CREATE TRIGGER stock_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship ();
+
+
+   DROP TABLE audit_stock_relationship_pub;
+   CREATE TABLE audit_stock_relationship_pub ( 
+       stock_relationship_pub_id integer, 
+       stock_relationship_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_pub_id_var integer; 
+       stock_relationship_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_pub_id_var = OLD.stock_relationship_pub_id;
+       stock_relationship_id_var = OLD.stock_relationship_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship_pub ( 
+             stock_relationship_pub_id, 
+             stock_relationship_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_pub_id_var, 
+             stock_relationship_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_pub_audit_ud ON stock_relationship_pub;
+   CREATE TRIGGER stock_relationship_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship_pub ();
+
+
+   DROP TABLE audit_stock_dbxref;
+   CREATE TABLE audit_stock_dbxref ( 
+       stock_dbxref_id integer, 
+       stock_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       stock_dbxref_id_var integer; 
+       stock_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_dbxref_id_var = OLD.stock_dbxref_id;
+       stock_id_var = OLD.stock_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_dbxref ( 
+             stock_dbxref_id, 
+             stock_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             stock_dbxref_id_var, 
+             stock_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_dbxref_audit_ud ON stock_dbxref;
+   CREATE TRIGGER stock_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_dbxref ();
+
+
+   DROP TABLE audit_stock_cvterm;
+   CREATE TABLE audit_stock_cvterm ( 
+       stock_cvterm_id integer, 
+       stock_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       stock_cvterm_id_var integer; 
+       stock_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_cvterm_id_var = OLD.stock_cvterm_id;
+       stock_id_var = OLD.stock_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_cvterm ( 
+             stock_cvterm_id, 
+             stock_id, 
+             cvterm_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_cvterm_id_var, 
+             stock_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_cvterm_audit_ud ON stock_cvterm;
+   CREATE TRIGGER stock_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_cvterm ();
+
+
+   DROP TABLE audit_stock_genotype;
+   CREATE TABLE audit_stock_genotype ( 
+       stock_genotype_id integer, 
+       stock_id integer, 
+       genotype_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_genotype to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_genotype() RETURNS trigger AS
+   '
+   DECLARE
+       stock_genotype_id_var integer; 
+       stock_id_var integer; 
+       genotype_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_genotype_id_var = OLD.stock_genotype_id;
+       stock_id_var = OLD.stock_id;
+       genotype_id_var = OLD.genotype_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_genotype ( 
+             stock_genotype_id, 
+             stock_id, 
+             genotype_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_genotype_id_var, 
+             stock_id_var, 
+             genotype_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_genotype_audit_ud ON stock_genotype;
+   CREATE TRIGGER stock_genotype_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_genotype
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_genotype ();
+
+
+   DROP TABLE audit_stockcollection;
+   CREATE TABLE audit_stockcollection ( 
+       stockcollection_id integer, 
+       type_id integer, 
+       contact_id integer, 
+       name varchar(255), 
+       uniquename text, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollection to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollection_id_var integer; 
+       type_id_var integer; 
+       contact_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var text; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollection_id_var = OLD.stockcollection_id;
+       type_id_var = OLD.type_id;
+       contact_id_var = OLD.contact_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollection ( 
+             stockcollection_id, 
+             type_id, 
+             contact_id, 
+             name, 
+             uniquename, 
+             transaction_type
+       ) VALUES ( 
+             stockcollection_id_var, 
+             type_id_var, 
+             contact_id_var, 
+             name_var, 
+             uniquename_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollection_audit_ud ON stockcollection;
+   CREATE TRIGGER stockcollection_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollection
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollection ();
+
+
+   DROP TABLE audit_stockcollectionprop;
+   CREATE TABLE audit_stockcollectionprop ( 
+       stockcollectionprop_id integer, 
+       stockcollection_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollectionprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollectionprop() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollectionprop_id_var integer; 
+       stockcollection_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollectionprop_id_var = OLD.stockcollectionprop_id;
+       stockcollection_id_var = OLD.stockcollection_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollectionprop ( 
+             stockcollectionprop_id, 
+             stockcollection_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stockcollectionprop_id_var, 
+             stockcollection_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollectionprop_audit_ud ON stockcollectionprop;
+   CREATE TRIGGER stockcollectionprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollectionprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollectionprop ();
+
+
+   DROP TABLE audit_stockcollection_stock;
+   CREATE TABLE audit_stockcollection_stock ( 
+       stockcollection_stock_id integer, 
+       stockcollection_id integer, 
+       stock_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollection_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection_stock() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollection_stock_id_var integer; 
+       stockcollection_id_var integer; 
+       stock_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollection_stock_id_var = OLD.stockcollection_stock_id;
+       stockcollection_id_var = OLD.stockcollection_id;
+       stock_id_var = OLD.stock_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollection_stock ( 
+             stockcollection_stock_id, 
+             stockcollection_id, 
+             stock_id, 
+             transaction_type
+       ) VALUES ( 
+             stockcollection_stock_id_var, 
+             stockcollection_id_var, 
+             stock_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollection_stock_audit_ud ON stockcollection_stock;
+   CREATE TRIGGER stockcollection_stock_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollection_stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollection_stock ();
+
+

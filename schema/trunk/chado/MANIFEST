@@ -328,6 +328,9 @@ modules/sequence/views/implicit-feature-views.sql
 modules/sequence/views/range-views.sql
 modules/sequence/views/sequence-cv-views.sql
 modules/sequence/views/sequence-report.sql
+modules/stock/stock.diagram.png
+modules/stock/stock.html
+modules/stock/stock.sql
 README
 README.Apollo
 README.Apollo.pod

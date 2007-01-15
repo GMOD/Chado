@@ -502,6 +502,20 @@
 
     </module>
 
+    <module id='stock'>
+      <dependency to='genetic'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='general'/>
+      <status code='beta'>
+        In use at ParameciumDB
+      </status>
+      <description>
+        For tracking stock collections
+      </description>
+      <source type='sql' path='stock/stock.sql'/>
+    </module>
+
     <module id='composite'>
       <status code='beta'>
       </status>
