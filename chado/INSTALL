@@ -1,6 +1,6 @@
                             CHADO INSTALLATION
  
-$Id: INSTALL,v 1.51 2007-01-14 19:07:00 scottcain Exp $
+$Id: INSTALL,v 1.52 2007-01-16 22:50:32 scottcain Exp $
 
 This document describes the procedure for installing the chado 
 schema and loading data from GFF3 data records.  This is currently
@@ -127,6 +127,12 @@ host    all         all         127.0.0.1         255.255.255.255   trust
   go-perl
       Get from http://archive.godatabase.org/latest-full/*utilities-src.tar.gz
       Be sure to set GO_ROOT as directed in the go-perl INSTALL doc.
+
+  Ant
+      When installing from cvs, ant is needed to move GMODTools files
+      from schema/GMODTools into schema/chado.  When installing from
+      a distribution, this is not necessary, as the files will have
+      already been moved as part of the build process.
 
   Standard Perl modules:
       The perl modules can be installed via the cpan shell and by issuing 
