@@ -100,19 +100,7 @@ sub [% h.vianode.table.name %]_[% format_fk(h.vianode,h.thisviafield_index(i).na
       [% j = j + 1 %]
     [% END %]
     [% i = i + 1 %]
-  [% END %] [% END %]
-# close the db connection
-sub close_connection {
-  my $self = shift;
-  my $dbh = $self->db_Main();
-  #$dbh->disconnect();
-}
-# close the db connection
-sub DESTROY {
-  my $self = shift;
-  $self->close_connection();
-}
-[% END %]
+  [% END %] [% END %] [% END %]
 ########DBI########
 package [% baseclass %];
 
