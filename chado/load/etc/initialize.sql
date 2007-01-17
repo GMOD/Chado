@@ -19,6 +19,8 @@ insert into organism (abbreviation, genus, species, common_name)
        values ('O.sativa', 'Oryza','sativa','rice');
 insert into organism (abbreviation, genus, species, common_name)
        values ('S.cerevisiae', 'Saccharomyces','cerevisiae','yeast');
+insert into organism (abbreviation, genus, species, common_name)
+       values ('X.laevis', 'Xenopus','laevis','frog');
 insert into contact (name) values ('Affymetrix');
 insert into contact (name,description) values ('null','null');
 insert into cv (name) values ('null');
