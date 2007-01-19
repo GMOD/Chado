@@ -1,3 +1,17 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import feature from sequence
+-- :import cvterm from cv
+-- :import pub from pub
+-- :import phenotype from phenotype
+-- :import organism from organism
+-- :import genotype from genetic
+-- :import expression from expression
+-- :import project from general
+-- WARNING: unresolvable dependency 'author'! 
+-- =================================================================
+
 -- ================================================
 -- TABLE: wwwuser
 -- ================================================

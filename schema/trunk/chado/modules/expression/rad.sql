@@ -1,3 +1,17 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import feature from sequence
+-- :import cvterm from cv
+-- :import pub from pub
+-- :import organism from organism
+-- :import contact from contact
+-- :import dbxref from general
+-- :import tableinfo from general
+-- :import project from general
+-- :import analysis from companalysis
+-- =================================================================
+
 create table mageml (
     mageml_id serial not null,
     primary key (mageml_id),

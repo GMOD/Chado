@@ -8,6 +8,14 @@
 -- (which is stored in the curaton.doc under GAT6 btw)), they'd have to give
 -- us the cv terms, which we could load into the cv module
 
+-- =================================================================
+-- Dependencies:
+--
+-- :import feature from sequence
+-- :import cvterm from cv
+-- :import pub from pub
+-- =================================================================
+
 -- ================================================
 -- TABLE: expression
 -- ================================================
