@@ -1,6 +1,6 @@
-#!/usr/local/bin/perl
+#!/usr/local/bin/perl -w
 #
-# Hilmar Lapp, hlapp at gmx.net, 2007.
+# (c) Hilmar Lapp, hlapp at gmx.net, 2007.
 #
 # You may use, modify, and distribute this script under the same terms
 # as Perl itself. Consult the Perl Artistic License.
@@ -36,7 +36,6 @@ if ($mod_names) {
 die "no module(s) provided on the command line\n" unless @modules;
 
 my $module_name_map = {};
-my @schema_mods = ();
 foreach my $mod_name (@modules) {
     my $module = get_dep_tree($mod_name,$module_name_map);
     $module_name_map->{$mod_name} = $module;
