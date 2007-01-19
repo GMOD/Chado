@@ -1,3 +1,9 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import cvterm from cv
+-- :import feature from sequence
+-- =================================================================
 
 CREATE TABLE phenotype (
     phenotype_id SERIAL NOT NULL,

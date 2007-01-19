@@ -1,3 +1,9 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import cvterm from cv
+-- :import dbxref from general
+-- =================================================================
 
 create table pub (
     pub_id serial not null,

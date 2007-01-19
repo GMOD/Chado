@@ -1,3 +1,11 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import cvterm from cv
+-- :import pub from pub
+-- :import organism from organism
+-- :import dbxref from general
+-- =================================================================
 
 create table feature (
     feature_id serial not null,
