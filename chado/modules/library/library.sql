@@ -1,3 +1,13 @@
+-- =================================================================
+-- Dependencies:
+--
+-- :import feature from sequence
+-- :import synonym from sequence
+-- :import cvterm from cv
+-- :import pub from pub
+-- :import organism from organism
+-- =================================================================
+
 -- ================================================
 -- TABLE: library
 -- ================================================

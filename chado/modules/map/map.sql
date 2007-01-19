@@ -11,6 +11,14 @@
 
 -- TODO:  Get a comprehensive set of mapping use-cases 
 
+-- =================================================================
+-- Dependencies:
+--
+-- :import feature from sequence
+-- :import cvterm from cv
+-- :import pub from pub
+-- =================================================================
+
 -- one set of use-cases is aberrations (which will all be involved with this 
 -- module).   Simple aberrations should be do-able, but what about cases where
 -- a breakpoint interrupts a gene?  This would be an example of the problematic
