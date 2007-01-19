@@ -12,22 +12,32 @@ use Getopt::Long;
 # global variables
 #################################################################
 
-my @modules = ();
-my $mod_names = "";
+my $mod_names;
+my $help;
 
 #################################################################
 # main
 #################################################################
 
-my $ok = GetOptions("modules=s",\$mod_names);
+my $ok = GetOptions("modules=s",\$mod_names,
+                    "h|help", \$help);
 
-@modules = split(/[, ]+/,$mod_names);
-die "no module(s) provided - use --modules to specify\n" unless @modules;
+if ($help) {
+    usage();
+    exit(0);
+}
+
+my @modules = ();
+if ($mod_names) {
+    @modules = split(/[, ]+/,$mod_names);
+} else {
+    @modules = @ARGV;
+}
+die "no module(s) provided on the command line\n" unless @modules;
 
 my $module_name_map = {};
 my @schema_mods = ();
 foreach my $mod_name (@modules) {
-    print STDERR "module $mod_name\n";
     my $module = get_dep_tree($mod_name,$module_name_map);
     $module_name_map->{$mod_name} = $module;
 }
@@ -100,4 +110,23 @@ sub get_module_sqlfile {
     my $mod_name = shift;
     return $mod_name if (-e $mod_name) && (! -d $mod_name);
     return $mod_name."/".$mod_name.".sql";
+}
+
+sub usage {
+    print <<_USAGE;
+Usage: makedep.pl <module1> [<module2> ...] > chado.ddl
+Options:
+    -h|--help    prints this message and exits
+    --modules    a string of comma or space-delimited module names
+
+Accepts a series of one or more Chado modules, either by name (such as cv) or
+as actual SQL file names (for example, when using custom written modules), and
+extracts from each one the dependencies (currently by using the :import
+comments) in a recursive manner. It then prints to stdout the schema DDL
+scripts of the desired modules and all their dependencies in the proper order,
+such that all dependencies have been created when a particular module is
+instantiated.
+The desired module(s) may be given using the --modules parameter, or simply
+by enumerating them on the command line. 
+_USAGE
 }
