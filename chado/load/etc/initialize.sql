@@ -90,15 +90,15 @@ insert into db (name) values ('DB:TSC');
 
 insert into db (name, description) values ('DB:GR','Gramene');
 insert into db (name, description, urlprefix) values ('DB:uniprot','UniProt/TrEMBL','http://us.expasy.org/cgi-bin/niceprot.pl?');
-insert into db (name, description, urlprefix) values ('DB:refseq:mrna','RefSeq mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
-insert into db (name, description, urlprefix) values ('DB:refseq:protein','RefSeq Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
-insert into db (name, description, urlprefix) values ('DB:unigene','Unigene','http://http://www.ncbi.nih.gov/entrez/query.fcgi?db=unigene&cmd=search&term=');
-insert into db (name, description, urlprefix) values ('DB:omim','OMIM','http://http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=');
-insert into db (name, description, urlprefix) values ('DB:locuslink','LocusLink','http://http://www.ncbi.nlm.nih.gov/LocusLink/LocRpt.cgi?l=');
-insert into db (name, description, urlprefix) values ('DB:genbank:mrna','GenBank mRNA','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
-insert into db (name, description, urlprefix) values ('DB:genbank:protein','GenBank Protein','http://http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
-insert into db (name, description, urlprefix) values ('DB:swissprot:display','SwissProt','http://http://us.expasy.org/cgi-bin/niceprot.pl?');
-insert into db (name, description, urlprefix) values ('DB:pfam','Pfam','http://http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
+insert into db (name, description, urlprefix) values ('DB:refseq:mrna','RefSeq mRNA','http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:refseq:protein','RefSeq Protein','http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:unigene','Unigene','http://www.ncbi.nih.gov/entrez/query.fcgi?db=unigene&cmd=search&term=');
+insert into db (name, description, urlprefix) values ('DB:omim','OMIM','http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=');
+insert into db (name, description, urlprefix) values ('DB:locuslink','LocusLink','http://www.ncbi.nlm.nih.gov/LocusLink/LocRpt.cgi?l=');
+insert into db (name, description, urlprefix) values ('DB:genbank:mrna','GenBank mRNA','http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=nucleotide&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:genbank:protein','GenBank Protein','http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&db=protein&dopt=GenBank&term=');
+insert into db (name, description, urlprefix) values ('DB:swissprot:display','SwissProt','http://us.expasy.org/cgi-bin/niceprot.pl?');
+insert into db (name, description, urlprefix) values ('DB:pfam','Pfam','http://www.sanger.ac.uk/cgi-bin/Pfam/dql.pl?query=');
 
 insert into analysis (name,program,programversion) values ('dabg' ,'dabg' ,'dabg' );
 insert into analysis (name,program,programversion) values ('dchip','dchip','dchip');
