@@ -1,0 +1,58 @@
+Perl Tools for Chado
+
+Note
+
+These tools are unsupported - I really just wrote them for my own use,
+feel free to download and play with them, just don't base any critical
+code on them, because they are liable to change at any time. 
+
+Modules Required
+
+In addition to some standard CPAN modules, you will need the following:
+XML::NestArray
+
+This is a module I wrote for dealing with nested array / tree
+datastructures that uses XML. It also has a native indented text
+format, that I find preferable for viewing/editing in emacs. 
+This will eventually be uploaded to CPAN, but for now you can get it
+from the BDGP CVS Repository, check out the project
+scratch/xml-nestarray. 
+
+Bio::XML
+
+This is a module for dealing with biological data (such as features)
+as nested arrays/xml. This may eventually go into bioperl, but it is
+different from the bioperl approach, as it is emphatically not object
+oriented. The core of the code is just a series of transforms in
+Bio::XML::Sequence::Transform; for instance, inferring UTR from exons;
+inferring splice sites; inferring coordinates of composite features
+(eg transcripts) from the coordinates of leaf features (eg exons);
+coordinate transformations.
+
+In addition to being a relational database, Chado will also need a
+Domain Logic Layer. This is one example of how that layer may
+look. Other alternatives include SQL (views and procedures), XSLT and
+an Object Oriented layer. My personal views are fairly anti-OO these
+days, but that's just me. 
+
+Bio::XML is checked into the chado repository, right here, see
+chado/src/test/perl. 
+
+Tools
+
+After all that, there's really just one tool so far:
+
+fgraph
+
+This draws a network graph diagram showing Chado data. Right now it
+works if you feed it XML::NestArray style indented text or XML. The
+XML it expects will probably differ from official Chado XML, it uses a
+schema transformation I find useful. Eventually it should all be in
+sync.
+ 
+For an example of the graph images produced, see Sequence Module examples 
+or Comp Analysis Module examples
+
+This tool requires GraphViz from CPAN.
+
+Chris Mungall Last modified: Tue Nov 12 18:15:31 PST 2002
