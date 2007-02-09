@@ -2954,7 +2954,7 @@ sub handle_CDS {
     my $parent_id = $self->cache('feature',$feat_parents[0]) if $feat_parents[0];
 
     unless ($parent_id) {
-        warn "\n\nThere is a ".$feat->type->name." feature with no parent.  I think that is wrong!\n\n";
+        warn "\n\nThere is a ".$feat->type->name." feature with no parent (ID:$feat_id)  I think that is wrong!\n\n";
     }
 
     my $feat_grandparent = $self->cache('parent',$parent_id);
