@@ -1,8 +1,8 @@
-                            CHADO INSTALLATION
- 
-$Id: INSTALL,v 1.52 2007-01-16 22:50:32 scottcain Exp $
+$Id: INSTALL,v 1.53 2007-02-13 22:11:27 briano Exp $
 
-This document describes the procedure for installing the chado 
+CHADO INSTALLATION
+
+This document describes the procedure for installing the Chado 
 schema and loading data from GFF3 data records.  This is currently
 considered beta software, so expect there to be bumps in the road.  When
 you experience problems, please email them to the gmod-schema mailing list
