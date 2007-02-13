@@ -44,6 +44,7 @@ if (! (-e $confdir)) {
 
 if (! (-e $tmpdir)) {
     mkdir($tmpdir, 0777) or die "unable to make $tmpdir directory";
+    chmod 0777, $tmpdir;
 }
 
 my $localconf = 'build.conf';
