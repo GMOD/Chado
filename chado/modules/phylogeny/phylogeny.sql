@@ -1,41 +1,40 @@
--- $Id: phylogeny.sql,v 1.6 2005-09-15 01:07:18 cmungall Exp $
+-- $Id: phylogeny.sql,v 1.7 2007-02-18 03:36:53 briano Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
 -- Richard Bruskiewich
 -- Chris Mungall
 --
--- nested set tree implementation by way of Joe Celko;
--- see the excellent intro by Aaron Mackey here
+-- Nested set tree implementation by way of Joe Celko;
+-- see the excellent intro by Aaron Mackey here:
 -- http://www.oreillynet.com/pub/a/network/2002/11/27/bioconf.html
 -- 
 -- Initial design: 2004-05-27
 --
 -- For representing phylogenetic trees; the trees represent the
 -- phylogeny of some some kind of sequence feature (mainly proteins)
--- or actual organism taxonomy trees
+-- or actual organism taxonomy trees.
 --
 -- This module relies heavily on the sequence module
 -- in particular, all the leaf nodes in a tree correspond to features;
 -- these will usually be features of type SO:protein or SO:polypeptide
--- (but other trees are possible - eg intron trees)
+-- (but other trees are possible - e.g. intron trees).
 --
--- if it is desirable to store multiple alignments for each non-leaf node,
--- then each node can be mapped to a feature of type SO:match
--- refer to the sequence module docs for details on storing multiple alignments 
+-- If it is desirable to store multiple alignments for each non-leaf node,
+-- then each node can be mapped to a feature of type SO:match.
+-- Refer to the sequence module docs for details on storing multiple alignments.
 --
 -- Annotating nodes:
 -- Each node can have a feature attached; this 'feature' is the multiple
 -- alignment for non-leaf nodes. It is these features that are annotated
 -- rather than annotating the nodes themselves. This has lots of advantages -
--- we can piggyback off of the sequence module and reuse the tables there
+-- we can piggyback off of the sequence module and reuse the tables there.
 --
--- the leaf nodes may have annotations already attached - for example, GO
--- associations
---
+-- The leaf nodes may have annotations already attached - for example, GO
+-- associations.
 -- In fact, it is even possible to annotate ranges along an alignment -
 -- this would entail creating a new feature which has a featureloc on
--- the alignment feature
+-- the alignment feature.
 --
 -- ==========================================
 --
@@ -66,15 +65,10 @@ create table phylotree (
         foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 	name varchar(255) null,
 
--- type: protein, nucleotide, taxonomy, ???
--- the type should be any SO type, or "taxonomy"
+-- Type: protein, nucleotide, taxonomy, for example.
+-- The type should be any SO type, or "taxonomy".
 	type_id int,
 	foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
-
--- REMOVED BY cjm; this is implicit from indexing - see phylonode
--- (and besides, we get into problems with cyclical foreign keys)
---	root_phylonode_id int not null,
---	foreign key (root_phylonode_id) references phylonode (phylonode_id) on delete cascade,
 
 	comment text null,
 
@@ -86,7 +80,7 @@ create index phylotree_idx1 on phylotree (phylotree_id);
 -- TABLE: phylotree_pub
 --        Tracks citations global to the tree
 --        e.g. multiple sequence alignment
---        supporting tree construction
+--        supporting tree construction.
 -- ================================================
 
 create table phylotree_pub (
@@ -108,7 +102,7 @@ create index phylotree_pub_idx2 on phylotree_pub (pub_id);
 --        This is the most pervasive element in the
 --        phylogeny module, cataloging the 'phylonodes'
 --        of tree graphs. Edges are implied
---        by the parent_phylonode_id reflexive closure
+--        by the parent_phylonode_id reflexive closure.
 -- ================================================
 
 create table phylonode (
@@ -118,34 +112,33 @@ create table phylonode (
        phylotree_id int not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
 
--- root phylonode can have null parent_phylonode_id value
+-- Root phylonode can have null parent_phylonode_id value.
        parent_phylonode_id int null,
        foreign key (parent_phylonode_id) references phylonode (phylonode_id) on delete cascade,
 
--- nested set implementation
+-- Nested set implementation
 -- for all nodes, the left and right index will be *between* the parents
--- left and right indexes
+-- left and right indexes.
        left_idx int not null,
        right_idx int not null,
 
--- type: root, interior, leaf
+-- Type: root, interior, leaf.
        type_id int,
        foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
 
---     phylonodes can have optional features attached to them
+--     Phylonodes can have optional features attached to them
 --        e.g. a protein or nucleotide sequence
 --        usually attached to a leaf of the phylotree
 --        for non-leaf nodes, the feature may be
 --        a feature that is an instance of SO:match;
 --        this feature is the alignment of all leaf
---        features beneath it
+--        features beneath it.
        feature_id int,
        foreign key (feature_id) references feature (feature_id) on delete cascade,
 
        label varchar(255) null,
        distance float  null,
---       bootstrap float null,
-
+--       Bootstrap float null.
        unique(phylotree_id, left_idx),
        unique(phylotree_id, right_idx)
 );
@@ -155,7 +148,7 @@ create table phylonode (
 --        e.g. for orthology, paralogy group identifiers;
 --        could also be used for NCBI taxonomy;
 --        for sequences, refer to 'phylonode_feature' 
---        feature associated dbxrefs
+--        feature associated dbxrefs.
 -- ================================================
 
 create table phylonode_dbxref (
@@ -192,15 +185,14 @@ create index phylonode_pub_idx2 on phylonode_pub (pub_id);
 
 -- ================================================
 -- TABLE: phylonode_organism
---        this linking table should only be used
+--        This linking table should only be used
 --        for nodes in taxonomy trees; it provides
---        a mapping between the node and an organism
+--        a mapping between the node and an organism.
 --
---        one node can have zero or one organisms
+--        >ne node can have zero or one organisms,
 --        one organism can have zero or more nodes
 --        (although typically it should only have one,
---         in the standard NCBI taxonomy tree. should we
---         enforce one only, or allow competing taxonomy trees?)
+--         in the standard NCBI taxonomy tree).
 -- ================================================
 
 create table phylonode_organism (
@@ -213,17 +205,17 @@ create table phylonode_organism (
        foreign key (organism_id) references organism (organism_id) on delete cascade,
 
        unique(phylonode_id)
--- one phylonode cannot refer to >1 organism
+-- One phylonode cannot refer to >1 organism.
 );
 create index phylonode_organism_idx1 on phylonode_organism (phylonode_id);
 create index phylonode_organism_idx2 on phylonode_organism (organism_id);
 
 -- ================================================
 -- TABLE: phylonodeprop
--- e.g. "type_id" could designate phylonode hierarchy
---       relationships, for example: species taxonomy 
---       (kingdom, order, family, genus, species),
---      "ortholog/paralog", "fold/superfold", etc.
+-- "type_id" could designate phylonode hierarchy
+-- relationships, for example: species taxonomy 
+-- (kingdom, order, family, genus, species),
+-- "ortholog/paralog", "fold/superfold", etc.
 -- ================================================
 
 create table phylonodeprop (
@@ -236,7 +228,7 @@ create table phylonodeprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
        value text not null default '',
--- not sure how useful the rank concept is here, but I'll leave it in for now
+-- It is not clear how useful the rank concept is here, leave it in for now.
        rank int not null default 0,
 
        unique(phylonode_id, type_id, value, rank)
@@ -246,14 +238,14 @@ create index phylonodeprop_idx2 on phylonodeprop (type_id);
 
 -- ================================================
 -- TABLE: phylonode_relationship
---        this is for exotic relationships that are
+--        This is for exotic relationships that are
 --        not strictly hierarchical; for example,
---        horizontal gene transfer
+--        horizontal gene transfer.
 --
---        use of this table would be highly unusual;
+--        Use of this table would be highly unusual;
 --        most phylogenetic trees are strictly
 --        hierarchical.
---        nevertheless, it is here for completion
+--        Nevertheless, it is here for completeness.
 -- ================================================
 
 create table phylonode_relationship (
