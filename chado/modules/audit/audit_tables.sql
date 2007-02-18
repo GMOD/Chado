@@ -1,5 +1,6 @@
 --audit tables generated from 
--- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl nofuncs.sql>audit_tables.sql
+-- % sqlt -f PostgreSQL -t TTSchema --template add-audits.tmpl 
+-- nofuncs.sql > audit_tables.sql
 
 
    DROP TABLE audit_tableinfo;
@@ -8209,5 +8210,3 @@
        BEFORE UPDATE OR DELETE ON stockcollection_stock
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_stockcollection_stock ();
-
-
