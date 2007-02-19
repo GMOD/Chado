@@ -187,7 +187,6 @@ modules/cv/bridges/bin/create-bridge-sql.pl
 modules/cv/bridges/godb-bridge.plpgsql
 modules/cv/bridges/godb-bridge.sql.xml
 modules/cv/cv-dbapi.sqli
-modules/cv/cv-intro.txt
 modules/cv/cv.html
 modules/cv/cv.sql
 modules/cv/doc/deductive_closure.txt
