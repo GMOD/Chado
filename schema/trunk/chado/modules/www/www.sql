@@ -1,3 +1,7 @@
+-- $Id: www.sql,v 1.7 2007-02-19 21:34:11 briano Exp $
+-- ==========================================
+-- Chado www module
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -9,14 +13,13 @@
 -- :import genotype from genetic
 -- :import expression from expression
 -- :import project from general
+--
 -- WARNING: unresolvable dependency 'author'! 
 -- =================================================================
 
 -- ================================================
 -- TABLE: wwwuser
 -- ================================================
--- keep track of www users.  this may also be useful
--- in an audit module at some point (?).
 
 create table wwwuser (
 	wwwuser_id serial not null,
@@ -29,10 +32,11 @@ create table wwwuser (
 );
 create index wwwuser_idx1 on wwwuser (username);
 
+COMMENT ON TABLE WWWUSER IS 'Keep track of WWW users. This may also be useful in an audit module at some point.';
+
 -- ================================================
--- TABLE: wwwuser
+-- TABLE: wwwuser_project
 -- ================================================
--- link wwwuser accounts to projects
 
 create table wwwuser_project (
 	wwwuser_project_id serial not null,
@@ -47,10 +51,11 @@ create table wwwuser_project (
 create index wwwuser_project_idx1 on wwwuser_project(wwwuser_id);
 create index wwwuser_project_idx2 on wwwuser_project(project_id);
 
+COMMENT ON TABLE WWWUSER_PROJECT IS 'Link wwwuser accounts to projects';
+
 -- ================================================
 -- TABLE: wwwuser_author
 -- ================================================
--- track wwwuser interest in authors
 
 create table wwwuser_author (
 	wwwuser_author_id serial not null,
@@ -65,10 +70,11 @@ create table wwwuser_author (
 create index wwwuser_author_idx1 on wwwuser_author(wwwuser_id);
 create index wwwuser_author_idx2 on wwwuser_author(author_id);
 
+COMMENT ON TABLE WWWUSER_AUTHOR IS 'Track wwwuser interest in authors.';
+
 -- ================================================
 -- TABLE: wwwuser_cvterm
 -- ================================================
--- track wwwuser interest in cvterms
 
 create table wwwuser_cvterm (
 	wwwuser_cvterm_id serial not null,
@@ -83,10 +89,11 @@ create table wwwuser_cvterm (
 create index wwwuser_cvterm_idx1 on wwwuser_cvterm(wwwuser_id);
 create index wwwuser_cvterm_idx2 on wwwuser_cvterm(cvterm_id);
 
+COMMENT ON TABLE WWWUSER_CVTERM IS 'Track wwwuser interest in cvterms.';
+
 -- ================================================
 -- TABLE: wwwuser_expression
 -- ================================================
--- track wwwuser interest in expressions
 
 create table wwwuser_expression (
 	wwwuser_expression_id serial not null,
@@ -101,10 +108,11 @@ create table wwwuser_expression (
 create index wwwuser_expression_idx1 on wwwuser_expression(wwwuser_id);
 create index wwwuser_expression_idx2 on wwwuser_expression(expression_id);
 
+COMMENT ON TABLE WWWUSER_EXPRESSION IS 'Track wwwuser interest in expressions.';
+
 -- ================================================
 -- TABLE: wwwuser_feature
 -- ================================================
--- track wwwuser interest in features
 
 create table wwwuser_feature (
 	wwwuser_feature_id serial not null,
@@ -119,10 +127,11 @@ create table wwwuser_feature (
 create index wwwuser_feature_idx1 on wwwuser_feature(wwwuser_id);
 create index wwwuser_feature_idx2 on wwwuser_feature(feature_id);
 
+COMMENT ON TABLE WWWUSER_FEATURE IS 'Track wwwuser interest in features.';
+
 -- ================================================
 -- TABLE: wwwuser_genotype
 -- ================================================
--- track wwwuser interest in genotypes
 
 create table wwwuser_genotype (
 	wwwuser_genotype_id serial not null,
@@ -137,10 +146,11 @@ create table wwwuser_genotype (
 create index wwwuser_genotype_idx1 on wwwuser_genotype(wwwuser_id);
 create index wwwuser_genotype_idx2 on wwwuser_genotype(genotype_id);
 
+COMMENT ON TABLE WWWUSER_GENOTYPE IS 'Track wwwuser interest in genotypes.';
+
 -- ================================================
 -- TABLE: wwwuser_interaction
 -- ================================================
--- track wwwuser interest in interactions
 
 create table wwwuser_interaction (
 	wwwuser_interaction_id serial not null,
@@ -155,10 +165,11 @@ create table wwwuser_interaction (
 create index wwwuser_interaction_idx1 on wwwuser_interaction(wwwuser_id);
 create index wwwuser_interaction_idx2 on wwwuser_interaction(interaction_id);
 
+COMMENT ON TABLE WWWUSER_INTERACTION IS 'Track wwwuser interest in interactions.';
+
 -- ================================================
 -- TABLE: wwwuser_organism
 -- ================================================
--- track wwwuser interest in organisms
 
 create table wwwuser_organism (
 	wwwuser_organism_id serial not null,
@@ -173,10 +184,12 @@ create table wwwuser_organism (
 create index wwwuser_organism_idx1 on wwwuser_organism(wwwuser_id);
 create index wwwuser_organism_idx2 on wwwuser_organism(organism_id);
 
+COMMENT ON TABLE WWWUSER_ORGANISM IS 'Track wwwuser interest in
+organisms.';
+
 -- ================================================
 -- TABLE: wwwuser_phenotype
 -- ================================================
--- track wwwuser interest in phenotypes
 
 create table wwwuser_phenotype (
 	wwwuser_phenotype_id serial not null,
@@ -191,10 +204,11 @@ create table wwwuser_phenotype (
 create index wwwuser_phenotype_idx1 on wwwuser_phenotype(wwwuser_id);
 create index wwwuser_phenotype_idx2 on wwwuser_phenotype(phenotype_id);
 
+COMMENT ON TABLE WWWUSER_PHENOTYPE IS 'Track wwwuser interest in phenotypes.';
+
 -- ================================================
 -- TABLE: wwwuser_pub
 -- ================================================
--- track wwwuser interest in publications
 
 create table wwwuser_pub (
 	wwwuser_pub_id serial not null,
@@ -209,10 +223,11 @@ create table wwwuser_pub (
 create index wwwuser_pub_idx1 on wwwuser_pub(wwwuser_id);
 create index wwwuser_pub_idx2 on wwwuser_pub(pub_id);
 
+COMMENT ON TABLE WWWUSER_PUB IS 'Track wwwuser interest in publications.';
+
 -- ================================================
 -- TABLE: wwwuserrelationship
 -- ================================================
--- track wwwuser interest in other wwwusers
 
 create table wwwuserrelationship (
 	wwwuserrelationship_id serial not null,
@@ -226,3 +241,5 @@ create table wwwuserrelationship (
 );
 create index wwwuserrelationship_idx1 on wwwuserrelationship(subjwwwuser_id);
 create index wwwuserrelationship_idx2 on wwwuserrelationship(objwwwuser_id);
+
+COMMENT ON TABLE WWWUSERRELATIONSHIP IS 'Track wwwuser interest in other wwwusers.';
