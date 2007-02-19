@@ -1,9 +1,17 @@
+-- $Id: pub.sql,v 1.27 2007-02-19 20:50:44 briano Exp $
+-- ==========================================
+-- Chado pub module
+--
 -- =================================================================
 -- Dependencies:
 --
 -- :import cvterm from cv
 -- :import dbxref from general
 -- =================================================================
+
+-- ================================================
+-- TABLE: pub
+-- ================================================
 
 create table pub (
     pub_id serial not null,
@@ -24,16 +32,19 @@ create table pub (
     pubplace varchar(255),
     constraint pub_c1 unique (uniquename)
 );
+CREATE INDEX pub_idx1 ON pub (type_id);
 
 COMMENT ON TABLE pub IS 'A documented provenance artefact - publications,
-documents, personal communication';
+documents, personal communication.';
+COMMENT ON COLUMN pub.title IS 'Descriptive general heading.';
+COMMENT ON COLUMN pub.volumetitle IS 'Title of part if one of a series.';
+COMMENT ON COLUMN pub.series_name IS 'Full name of (journal) series.';
+COMMENT ON COLUMN pub.pages IS 'Page number range[s], e.g. 457--459, viii + 664pp, lv--lvii.';
+COMMENT ON COLUMN pub.type_id IS  'The type of the publication (book, journal, poem, graffiti, etc). Uses pub cv.';
 
-COMMENT ON COLUMN pub.title IS 'descriptive general heading';
-COMMENT ON COLUMN pub.volumetitle IS 'title of part if one of a series';
-COMMENT ON COLUMN pub.series_name IS 'full name of (journal) series';
-COMMENT ON COLUMN pub.pages IS 'page number range[s], eg, 457--459, viii + 664pp, lv--lvii';
-COMMENT ON COLUMN pub.type_id IS  'the type of the publication (book, journal, poem, graffiti, etc). Uses pub cv';
-CREATE INDEX pub_idx1 ON pub (type_id);
+-- ================================================
+-- TABLE: pub_relationship
+-- ================================================
 
 create table pub_relationship (
     pub_relationship_id serial not null,
@@ -47,16 +58,18 @@ create table pub_relationship (
 
     constraint pub_relationship_c1 unique (subject_id,object_id,type_id)
 );
-COMMENT ON TABLE pub_relationship IS 'Handle relationships between
-publications, eg, when one publication makes others obsolete, when one
-publication contains errata with respect to other publication(s), or
-when one publication also appears in another pub (I think these three
-are it - at least for fb)';
-
-
 create index pub_relationship_idx1 on pub_relationship (subject_id);
 create index pub_relationship_idx2 on pub_relationship (object_id);
 create index pub_relationship_idx3 on pub_relationship (type_id);
+
+COMMENT ON TABLE pub_relationship IS 'Handle relationships between
+publications, e.g. when one publication makes others obsolete, when one
+publication contains errata with respect to other publication(s), or
+when one publication also appears in another pub.';
+
+-- ================================================
+-- TABLE: pub_dbxref
+-- ================================================
 
 create table pub_dbxref (
     pub_dbxref_id serial not null,
@@ -71,10 +84,13 @@ create table pub_dbxref (
 create index pub_dbxref_idx1 on pub_dbxref (pub_id);
 create index pub_dbxref_idx2 on pub_dbxref (dbxref_id);
 
-COMMENT ON TABLE pub_dbxref IS 'Handle links to eg, pubmed, biosis,
-zoorec, OCLC, mdeline, ISSN, coden...';
+COMMENT ON TABLE pub_dbxref IS 'Handle links to repositories,
+e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden...';
 
 
+-- ================================================
+-- TABLE: pubauthor
+-- ================================================
 
 create table pubauthor (
     pubauthor_id serial not null,
@@ -89,16 +105,18 @@ create table pubauthor (
 
     constraint pubauthor_c1 unique (pub_id, rank)
 );
-
-COMMENT ON TABLE pubauthor IS 'an author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors.';
-
-COMMENT ON COLUMN pubauthor.givennames IS 'first name, initials';
-COMMENT ON COLUMN pubauthor.suffix IS 'Jr., Sr., etc';
-COMMENT ON COLUMN pubauthor.rank IS 'order of author in author list for this pub - order is important';
-
-COMMENT ON COLUMN pubauthor.editor IS 'indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans';
-
 create index pubauthor_idx2 on pubauthor (pub_id);
+
+COMMENT ON TABLE pubauthor IS 'An author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors.';
+COMMENT ON COLUMN pubauthor.givennames IS 'First name, initials';
+COMMENT ON COLUMN pubauthor.suffix IS 'Jr., Sr., etc';
+COMMENT ON COLUMN pubauthor.rank IS 'Order of author in author list for this pub - order is important.';
+COMMENT ON COLUMN pubauthor.editor IS 'Indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans.';
+
+
+-- ================================================
+-- TABLE: pubprop
+-- ================================================
 
 create table pubprop (
     pubprop_id serial not null,
@@ -112,8 +130,7 @@ create table pubprop (
 
     constraint pubprop_c1 unique (pub_id,type_id,rank)
 );
-
-COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern - see sequence module for details';
-
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
+
+COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
