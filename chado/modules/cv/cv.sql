@@ -1,3 +1,4 @@
+-- $Id: cv.sql,v 1.36 2007-02-19 18:25:05 briano Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -14,12 +15,12 @@ create table cv (
 
 COMMENT ON TABLE cv IS 'A controlled vocabulary or ontology. A cv is
 composed of cvterms (aka terms, classes, types, universals - relations
-and properties are also stored in cvterm)) and the relationships
+and properties are also stored in cvterm) and the relationships
 between them';
 
 COMMENT ON COLUMN cv.name IS 'The name of the ontology. This
 corresponds to the obo-format -namespace-. cv names uniquely identify
-the cv. In obo file format, the cv.name is known as the namespace';
+the cv. In OBO file format, the cv.name is known as the namespace';
 
 COMMENT ON COLUMN cv.definition IS 'A text description of the criteria for
 membership of this ontology';
@@ -45,11 +46,11 @@ ontology or controlled vocabulary.  This table is also used for
 relations and properties. cvterms constitute nodes in the graph
 defined by the collection of cvterms and cvterm_relationships';
 
-COMMENT ON COLUMN cvterm.cv_id IS 'The cv/ontology/namespace to which
+COMMENT ON COLUMN cvterm.cv_id IS 'The cv or ontology or namespace to which
 this cvterm belongs';
 
 COMMENT ON COLUMN cvterm.name IS 'A concise human-readable name or
-label for the cvterm. uniquely identifies a cvterm within a cv';
+label for the cvterm. Uniquely identifies a cvterm within a cv';
 
 COMMENT ON COLUMN cvterm.definition IS 'A human-readable text
 definition';
@@ -59,7 +60,7 @@ unique global OBO identifier for this cvterm.  Note that a cvterm may
 have multiple secondary dbxrefs - see also table: cvterm_dbxref';
 
 COMMENT ON COLUMN cvterm.is_obsolete IS 'Boolean 0=false,1=true; see
-GO documentation for details of obsoletion.  note that two terms with
+GO documentation for details of obsoletion. Note that two terms with
 different primary dbxrefs may exist if one is obsolete';
 
 COMMENT ON COLUMN cvterm.is_relationshiptype IS 'Boolean
@@ -69,17 +70,17 @@ themselves. We use this flag to indicate whether this cvterm is an
 actual term/class/universal or a relation. Relations may be drawn from
 the OBO Relations ontology, but are not exclusively drawn from there';
 
-COMMENT ON INDEX cvterm_c1 IS 'a name can mean different things in
+COMMENT ON INDEX cvterm_c1 IS 'A name can mean different things in
 different contexts; for example "chromosome" in SO and GO. A name
 should be unique within an ontology/cv. A name may exist twice in a
 cv, in both obsolete and non-obsolete forms - these will be for
 different cvterms with different OBO identifiers; so GO documentation
 for more details on obsoletion. Note that occasionally multiple
 obsolete terms with the same name will exist in the same cv. If this
-is a possibility for the ontology under consideration (eg GO) then the
+is a possibility for the ontology under consideration (e.g. GO) then the
 ID should be appended to the name to ensure uniqueness';
 
-COMMENT ON INDEX cvterm_c2 IS 'the OBO identifier is globally unique';
+COMMENT ON INDEX cvterm_c2 IS 'The OBO identifier is globally unique';
 
 create index cvterm_idx1 on cvterm (cv_id);
 create index cvterm_idx2 on cvterm (name);
@@ -102,15 +103,15 @@ cvterms. Each cvterm_relationship constitutes an edge in the graph
 defined by the collection of cvterms and cvterm_relationships. The
 meaning of the cvterm_relationship depends on the definition of the
 cvterm R refered to by type_id. However, in general the definitions
-are such that the statement all SUBJs REL some OBJ is true. The
+are such that the statement "all SUBJs REL some OBJ" is true. The
 cvterm_relationship statement is about the subject, not the
 object. For example "insect wing part_of thorax"';
 
-COMMENT ON COLUMN cvterm_relationship.subject_id IS 'the subject of
+COMMENT ON COLUMN cvterm_relationship.subject_id IS 'The subject of
 the subj-predicate-obj sentence. The cvterm_relationship is about the
 subject. In a graph, this typically corresponds to the child node';
 
-COMMENT ON COLUMN cvterm_relationship.object_id IS 'the object of the
+COMMENT ON COLUMN cvterm_relationship.object_id IS 'The object of the
 subj-predicate-obj sentence. The cvterm_relationship refers to the
 object. In a graph, this typically corresponds to the parent node';
 
@@ -139,8 +140,7 @@ create table cvtermpath (
 );
 
 COMMENT ON TABLE cvtermpath IS 'The reflexive transitive closure of
-the cvterm_relationship relation. For a full discussion, see the file
-populating-cvtermpath.txt in this directory';
+the cvterm_relationship relation.';
 
 COMMENT ON COLUMN cvtermpath.type_id IS 'The relationship type that
 this is a closure over. If null, then this is a closure over ALL
@@ -175,11 +175,11 @@ create table cvtermsynonym (
 COMMENT ON TABLE cvtermsynonym IS 'A cvterm actually represents a
 distinct class or concept. A concept can be refered to by different
 phrases or names. In addition to the primary name (cvterm.name) there
-can be a number of alternative aliases or synonyms. For example, -T
-cell- as a synonym for -T lymphocyte-';
+can be a number of alternative aliases or synonyms. For example, "T
+cell" as a synonym for "T lymphocyte".';
 
 COMMENT ON COLUMN cvtermsynonym.type_id IS 'A synonym can be exact,
-narrow or borader than';
+narrow or broader than.';
 
 create index cvtermsynonym_idx1 on cvtermsynonym (cvterm_id);
 
@@ -213,7 +213,7 @@ well-defined relation.';
 
 COMMENT ON COLUMN cvterm_dbxref.is_for_definition IS 'A
 cvterm.definition should be supported by one or more references. If
-this column is true, the dbxref is not for a term in an external db -
+this column is true, the dbxref is not for a term in an external database -
 it is a dbxref for provenance information for the definition';
 
 create index cvterm_dbxref_idx1 on cvterm_dbxref (cvterm_id);
@@ -235,7 +235,7 @@ create table cvtermprop (
 
 COMMENT ON TABLE cvtermprop IS 'Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format';
 
-COMMENT ON COLUMN cvtermprop.type_id IS 'The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm';
+COMMENT ON COLUMN cvtermprop.type_id IS 'The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm';
 
 COMMENT ON COLUMN cvtermprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation';
 
