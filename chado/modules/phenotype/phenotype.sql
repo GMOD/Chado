@@ -1,3 +1,8 @@
+-- $Id: phenotype.sql,v 1.3 2007-02-19 20:19:22 briano Exp $
+-- ==========================================
+-- Chado phenotype module
+--
+
 -- =================================================================
 -- Dependencies:
 --
@@ -24,13 +29,12 @@ CREATE INDEX phenotype_idx1 ON phenotype (cvalue_id);
 CREATE INDEX phenotype_idx2 ON phenotype (observable_id);
 CREATE INDEX phenotype_idx3 ON phenotype (attr_id);
 
-COMMENT ON TABLE phenotype IS 'a phenotypic statement, or a single atomic phenotypic observation a controlled sentence describing observable effect of non-wt function -- e.g. Obs=eye, attribute=color, cvalue=red';
-
-COMMENT ON COLUMN phenotype.observable_id IS 'The entity: e.g. anatomy_part, biological_process';
-COMMENT ON COLUMN phenotype.attr_id IS 'Phenotypic attribute (quality, property, attribute, character) - drawn from PATO';
-COMMENT ON COLUMN phenotype.value IS 'value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate';
-COMMENT ON COLUMN phenotype.cvalue_id IS 'Phenotype attribute value (state)';
-COMMENT ON COLUMN phenotype.assay_id IS 'evidence type';
+COMMENT ON TABLE phenotype IS 'A phenotypic statement, or a single atomic phenotypic observation a controlled sentence describing observable effect of non-wt function E.g. Obs=eye, attribute=color, cvalue=red';
+COMMENT ON COLUMN phenotype.observable_id IS 'The entity: e.g. anatomy_part, biological_process.';
+COMMENT ON COLUMN phenotype.attr_id IS 'Phenotypic attribute (quality, property, attribute, character) - drawn from PATO.';
+COMMENT ON COLUMN phenotype.value IS 'Value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate.';
+COMMENT ON COLUMN phenotype.cvalue_id IS 'Phenotype attribute value (state).';
+COMMENT ON COLUMN phenotype.assay_id IS 'Evidence type';
 
 CREATE TABLE phenotype_cvterm (
     phenotype_cvterm_id SERIAL NOT NULL,
@@ -60,5 +64,3 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
-
-
