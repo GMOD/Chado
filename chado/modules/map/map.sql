@@ -1,15 +1,4 @@
--- NOTE: this module is all due for revision...
-
--- A possibly problematic case is where we want to localize an object
--- to the left or right of a feature (but not within it):
---
---                     |---------|  feature-to-map
---        ------------------------------------------------- map
---                |------|         |----------|   features to map wrt
---
--- How do we map the 3' end of the feature-to-map?
-
--- TODO:  Get a comprehensive set of mapping use-cases 
+-- $Id: map.sql,v 1.12 2007-02-19 19:59:19 briano Exp $
 
 -- =================================================================
 -- Dependencies:
@@ -18,11 +7,6 @@
 -- :import cvterm from cv
 -- :import pub from pub
 -- =================================================================
-
--- one set of use-cases is aberrations (which will all be involved with this 
--- module).   Simple aberrations should be do-able, but what about cases where
--- a breakpoint interrupts a gene?  This would be an example of the problematic
--- case above...  (or?)
 
 -- ================================================
 -- TABLE: featuremap
@@ -41,13 +25,6 @@ create table featuremap (
 -- ================================================
 -- TABLE: featurerange
 -- ================================================
-
--- In cases where the start and end of a mapped feature is a range, leftendf
--- and rightstartf are populated.  
--- featuremap_id is the id of the feature being mapped
--- leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of
--- features with respect to with the feature is being mapped.  These may
--- be cytological bands.
 
 create table featurerange (
     featurerange_id serial not null,
@@ -73,6 +50,10 @@ create index featurerange_idx4 on featurerange (leftendf_id);
 create index featurerange_idx5 on featurerange (rightstartf_id);
 create index featurerange_idx6 on featurerange (rightendf_id);
 
+COMMENT ON TABLE FEATURERANGE IS 'In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands.';
+COMMENT ON COLUMN FEATURERANGE.FEATUREMAP_ID IS 'featuremap_id is the id of the feature being mapped.';
+
+
 -- ================================================
 -- TABLE: featurepos
 -- ================================================
@@ -88,11 +69,12 @@ create table featurepos (
     foreign key (map_feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
     mappos float not null
 );
--- map_feature_id links to the feature (map) upon which the feature is
--- being localized
 create index featurepos_idx1 on featurepos (featuremap_id);
 create index featurepos_idx2 on featurepos (feature_id);
 create index featurepos_idx3 on featurepos (map_feature_id);
+
+COMMENT ON COLUMN FEATUREPOS.MAP_FEATURE_ID IS 'map_feature_id
+links to the feature (map) upon which the feature is being localized';
 
 
 -- ================================================
@@ -109,8 +91,3 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
-
-
-
-
-
