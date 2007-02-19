@@ -1,4 +1,4 @@
--- $Id: stock.sql,v 1.2 2007-02-19 22:02:47 briano Exp $
+-- $Id: stock.sql,v 1.3 2007-02-19 23:50:36 briano Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -260,7 +260,9 @@ create table stockcollectionprop (
 create index stockcollectionprop_idx1 on stockcollectionprop (stockcollection_id);
 create index stockcollectionprop_idx2 on stockcollectionprop (type_id);
 
-COMMENT ON TABLE STOCKCOLLECTIONPROP IS 'The table stockcollectionprop contains the value of the stockcollection such as website/email URLs; the value of the stockcollection order URLs.';
+COMMENT ON TABLE STOCKCOLLECTIONPROP IS 'The table stockcollectionprop
+contains the value of the stock collection such as website/email URLs;
+the value of the stock collection order URLs.';
 -- COMMENT ON COLUMN STOCKCOLLECTIONPROP.TYPE_ID IS 'The cv for the type_id is "stockcollection property type".';
 
 
@@ -280,4 +282,5 @@ create table stockcollection_stock (
 create index stockcollection_stock_idx1 on stockcollection_stock (stockcollection_id);
 create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
-COMMENT ON TABLE STOCKCOLLECTION_STOCK IS 'stockcollection_stock links a stockcollection to the stocks which are contained in the collection.';
+COMMENT ON TABLE STOCKCOLLECTION_STOCK IS 'stockcollection_stock links
+a stock collection to the stocks which are contained in the collection.';
