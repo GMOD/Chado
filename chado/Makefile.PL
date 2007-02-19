@@ -1,7 +1,7 @@
-use ExtUtils::MakeMaker;
+extenstionsuse ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.108 2007-02-18 15:46:54 briano Exp $
+# $Id: Makefile.PL,v 1.109 2007-02-19 14:55:13 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -237,7 +237,7 @@ my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
   $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO, $DEFAULT);
 
 $O{'SIMPLE'} = prompt(
-   "Use the simple install (uses default database schema, which contains\nall of the extenstions to the schema and all of the non-trigger functions.\nThis is probably what you want)", 'Y'
+   "Use the simple install (uses default database schema, which contains\nall of the modules and extensions to the schema and all of the non-trigger functions.\nThis is probably what you want)", 'Y'
   );
 
 if ( ! @argv && %conf ) {
