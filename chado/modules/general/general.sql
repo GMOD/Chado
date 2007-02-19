@@ -1,3 +1,9 @@
+-- $Id: general.sql,v 1.29 2007-02-19 19:21:52 briano Exp $
+
+-- ================================================
+-- TABLE: tableinfo
+-- ================================================
+
 create table tableinfo (
     tableinfo_id serial not null,
     primary key (tableinfo_id),
@@ -13,6 +19,10 @@ create table tableinfo (
 
 COMMENT ON TABLE tableinfo IS NULL;
 
+-- ================================================
+-- TABLE: db
+-- ================================================
+
 create table db (
     db_id serial not null,
     primary key (db_id),
@@ -25,13 +35,17 @@ create table db (
     constraint db_c1 unique (name)
 );
 
-COMMENT ON TABLE db IS 'A database authority. Typical dbs in
+COMMENT ON TABLE db IS 'A database authority. Typical databases in
 bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority
 is generally known by this sortened form, which is unique within the
 bioinformatics and biomedical realm.  **TODO** - add support for URIs,
-URNs (eg LSIDs). We can do this by treating the url as a uri -
+URNs (e.g. LSIDs). We can do this by treating the url as a uri -
 however, some applications may expect this to be resolvable - to be
-decided';
+decided.';
+
+-- ================================================
+-- TABLE: dbxref
+-- ================================================
 
 create table dbxref (
     dbxref_id serial not null,
@@ -47,13 +61,14 @@ create index dbxref_idx1 on dbxref (db_id);
 create index dbxref_idx2 on dbxref (accession);
 create index dbxref_idx3 on dbxref (version);
 
-COMMENT ON TABLE dbxref IS 'A unique, global, public, stable identifier. Not necessarily an eXternal reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>. ';
+COMMENT ON TABLE dbxref IS 'A unique, global, public, stable identifier. Not necessarily an eXternal reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>.';
 
-COMMENT ON COLUMN dbxref.accession IS 'The local part of the identifier. Guaranteed by the db authority to be unique for that db';
+COMMENT ON COLUMN dbxref.accession IS 'The local part of the identifier. Guaranteed by the db authority to be unique for that db.';
 
 -- ================================================
 -- TABLE: project
 -- ================================================
+
 create table project (
     project_id serial not null,  
     primary key (project_id),
