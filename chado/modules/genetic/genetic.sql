@@ -1,3 +1,4 @@
+-- $Id: genetic.sql,v 1.26 2007-02-19 19:35:54 briano Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -16,7 +17,6 @@
 --   Many, including rename of gcontext to genotype,  split 
 --   phenstatement into phenstatement & phenotype, created environment
 --
--- see doc/genetic-notes.txt
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ============
 -- DEPENDENCIES
@@ -28,12 +28,9 @@
 -- :import dbxref from general
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 -- ================================================
 -- TABLE: genotype
 -- ================================================
--- genetic context
---
 create table genotype (
     genotype_id serial not null,
     primary key (genotype_id),
@@ -45,37 +42,17 @@ create table genotype (
 create index genotype_idx1 on genotype(uniquename);
 create index genotype_idx2 on genotype(name);
 
-COMMENT ON TABLE genotype IS NULL;
+COMMENT ON TABLE genotype IS 'Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs';
 
 COMMENT ON COLUMN genotype.uniquename IS 'The unique name for a genotype; 
-typically derived from the features making up the genotype';
+typically derived from the features making up the genotype.';
 
 COMMENT ON COLUMN genotype.name IS 'Optional alternative name for a genotype, 
-for display purposes';
-
-
+for display purposes.';
 
 -- ===============================================
 -- TABLE: feature_genotype
 -- ================================================
--- A genotype is defined by a collection of features
--- mutations, balancers, deficiencies, haplotype blocks, engineered
--- constructs
--- 
--- rank can be used for n-ploid organisms
--- 
--- group can be used for distinguishing the chromosomal groups
--- 
--- (RNAi products and so on can be treated as different groups, as
--- they do not fall on a particular chromosome)
--- 
--- OPEN QUESTION: for multicopy transgenes, should we include a 'n_copies'
--- column as well?
--- 
--- chromosome_id       : a feature of SO type 'chromosome'
--- rank                : preserves order
--- group               : spatially distinguishable group
---
 create table feature_genotype (
     feature_genotype_id serial not null,
     primary key (feature_genotype_id),
@@ -95,13 +72,17 @@ create index feature_genotype_idx1 on feature_genotype (feature_id);
 create index feature_genotype_idx2 on feature_genotype (genotype_id);
 
 COMMENT ON TABLE feature_genotype IS NULL;
-
-
+COMMENT ON COLUMN feature_genotype.rank IS 'rank can be used for
+n-ploid organisms or to preserve order.';
+COMMENT ON COLUMN feature_genotype.group IS 'Spatially distinguishable
+group. group can be used for distinguishing the chromosomal groups,
+for example (RNAi products and so on can be treated as different
+groups, as they do not fall on a particular chromosome).';
+COMMENT ON COLUMN feature_genotype.chromosome_id IS 'A feature of SO type "chromosome".';
 
 -- ================================================
 -- TABLE: environment
 -- ================================================
--- The environmental component of a phenotype description
 create table environment (
     environment_id serial not NULL,
     primary key  (environment_id),
@@ -111,7 +92,7 @@ create table environment (
 );
 create index environment_idx1 on environment(uniquename);
 
-COMMENT ON TABLE environment IS NULL;
+COMMENT ON TABLE environment IS 'The environmental component of a phenotype description';
 
 
 -- ================================================
@@ -149,7 +130,7 @@ CREATE TABLE phenstatement (
 CREATE INDEX phenstatement_idx1 ON phenstatement (genotype_id);
 CREATE INDEX phenstatement_idx2 ON phenstatement (phenotype_id);
 
-COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp[1] is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.';
+COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.';
 
 CREATE TABLE phendesc (
     phendesc_id SERIAL NOT NULL,
@@ -169,7 +150,7 @@ CREATE INDEX phendesc_idx1 ON phendesc (genotype_id);
 CREATE INDEX phendesc_idx2 ON phendesc (environment_id);
 CREATE INDEX phendesc_idx3 ON phendesc (pub_id);
 
-COMMENT ON TABLE phendesc IS 'a summary of a _set_ of phenotypic statements for any one gcontext made in any one publication';
+COMMENT ON TABLE phendesc IS 'A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication.';
 
 CREATE TABLE phenotype_comparison (
     phenotype_comparison_id SERIAL NOT NULL,
@@ -196,4 +177,7 @@ CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
 CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
 CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
 CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
-COMMENT ON TABLE phenotype_comparison IS 'comparison of phenotypes eg, genotype1/environment1/phenotype1 "non-suppressible" wrt  genotype2/environment2/phenotype2';
+
+COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes
+    e.g., genotype1/environment1/phenotype1 "non-suppressible" with
+    respect to genotype2/environment2/phenotype2';
