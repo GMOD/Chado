@@ -1,30 +1,5 @@
--- This module is for how curated expression data is stored in chado. 
--- This module is totally dependant on the sequence module.  Objects in the
--- genetic module cannot connect to expression data except by going via the
--- sequence module
--- We assume that we'll *always* have a controlled vocabulary for expression 
--- data.   
-
--- An example of a simple case of the sort of data that FlyBase curates. 
--- The dpp transcript is expressed in embryonic stage 13-15 in the cephalic
--- segment as reported in a paper by Blackman et al. in 1991.
--- This would be implemented in the expression module by linking the dpp
--- transcript feature to expression via feature_expression (we would add a
--- pub_id column to feature_expression to link to the publication in the
--- pub table).
--- We would then link the following cvterms to the expression using
--- expression_cvterm
--- 'embryonic stage 13' where the cvterm_type would be stage and the rank=0
--- 'embryonic stage 14' where the cvterm_type would be stage and the rank=1
--- 'embryonic stage 15' where the cvterm_type would be stage and the rank=1
--- 'cephalic segment' where the cvterm_type would be anatomy and the rank=0
--- 'in situ hybridization' where the cvterm_type would be assat and the
--- rank=0
--- Note that we would change the cvterm_type column to cvterm_type_id and
--- use a cvterm_id for a particular expression slot (i.e. stage, anatomy,
--- assay, 'subcellular location' and that cvterms from different obo
--- ontologies can share the same cvterm_type 
-
+-- $Id: expression.sql,v 1.11 2007-02-19 18:53:13 briano Exp $
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -38,8 +13,6 @@
 -- TABLE: expression
 -- ================================================
 
--- expression essentially a bridge table
-
 create table expression (
        expression_id serial not null,
        primary key (expression_id),
@@ -49,29 +22,12 @@ create table expression (
        expression_c1 unique(uniquename)       
 );
 
+COMMENT ON TABLE EXPRESSION IS 'The expression table is essentially a bridge table';
 
 -- ================================================
 -- TABLE: expression_cvterm
 -- ================================================
 
--- What are the possibities of combination when more than one cvterm is used
--- in a field?   
---
--- For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal
--- If the two terms used in a particular field are co-equal (both from the
--- same CV, is the relation always "&"?   May we find "or"?
---
--- Obviously another case is when a bodypart term and a bodypart qualifier
--- term are used in a specific field, eg:
---   <t> L | third instar <a> larval antennal segment sensilla | subset <p  
---
--- WRT the three-part <t><a><p> statements, are the values in the different 
--- parts *always* from different vocabularies in proforma.CV?   If not,
--- we'll need to have some kind of type qualifier telling us whether the
--- cvterm used is <t>, <a>, or <p>
--- yes we should have a type qualifier as a cv term can be from diff vocab
--- e.g. blastoderm can be body part and stage terms in dros anatomy
--- but cvterm_type_id needs to be a cv instead of a free text type
 
 create table expression_cvterm (
        expression_cvterm_id serial not null,
@@ -114,7 +70,7 @@ expression to cvterm associations. Examples: qualifiers';
 
 COMMENT ON COLUMN expression_cvtermprop.type_id IS 'The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. cvterms may come from the FlyBase miscellaneous cv';
+that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv';
 
 COMMENT ON COLUMN expression_cvtermprop.value IS 'The value of the
 property, represented as text. Numeric values are converted to their
@@ -204,8 +160,7 @@ create table feature_expressionprop (
 create index feature_expressionprop_idx1 on feature_expressionprop (feature_expression_id);
 create index expression_cvtermprop_idx2 on feature_expressionprop (type_id);
 
-COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for
-	feature_expression text. Examples: comments';
+COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for feature_expression text. Examples: comments';
 
 
 -- ================================================
@@ -219,8 +174,9 @@ create table eimage (
        eimage_type varchar(255) not null,
        image_uri varchar(255)
 );
--- we expect images in eimage_data (eg jpegs) to be uuencoded
--- describes the type of data in eimage_data
+
+COMMENT ON TABLE EIMAGE IS 'We expect images in eimage_data (e.g. jpegs)
+to be uuencoded. Describes the type of data in eimage_data.'
 
 
 -- ================================================
