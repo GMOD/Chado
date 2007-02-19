@@ -1,3 +1,4 @@
+# $Id: contact.sql,v 1.3 2007-02-19 16:29:46 briano Exp $
 -- ================================================
 -- TABLE: contact
 -- ================================================
@@ -10,8 +11,9 @@ create table contact (
     description varchar(255) null,
     constraint contact_c1 unique (name)
 );
-COMMENT ON TABLE contact IS 'model persons, institutes, groups, organizations, etc';
-COMMENT ON COLUMN contact.type_id IS 'what type of contact is this?  e.g. "person", "lab", etc.';
+
+COMMENT ON TABLE contact IS 'Model persons, institutes, groups, organizations, etc.';
+COMMENT ON COLUMN contact.type_id IS 'What type of contact is this?  e.g. "person", "lab", etc.';
 
 -- ================================================
 -- TABLE: contact_relationship
@@ -31,8 +33,7 @@ create index contact_relationship_idx1 on contact_relationship (type_id);
 create index contact_relationship_idx2 on contact_relationship (subject_id);
 create index contact_relationship_idx3 on contact_relationship (object_id);
 
-COMMENT ON TABLE contact_relationship IS 'model relationships between contacts';
-COMMENT ON COLUMN contact_relationship.subject_id IS 'the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node';
-COMMENT ON COLUMN contact_relationship.object_id IS 'the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node';
-COMMENT ON COLUMN contact_relationship.type_id IS 'relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed';
-
+COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
+COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
+COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
+COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
