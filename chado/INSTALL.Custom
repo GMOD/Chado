@@ -1,4 +1,4 @@
-$Id: INSTALL.Custom,v 1.1 2007-02-20 03:34:27 briano Exp $
+$Id: INSTALL.Custom,v 1.2 2007-02-20 17:32:35 briano Exp $
 
 The Chado schema is organized as a set of modules where each module 
 has its own directory in chado/modules/. This structure is designed to allow
@@ -11,6 +11,9 @@ The following steps will create a complete schema, including schema
 and functions, and diagrams.
  
 1. Run chado-build-schema.pl
+
+This script launches an application with a graphical interface. The
+Tk language and Perl's Tk module are required.
 
   >bin/chado-build-schema.pl
  
@@ -35,7 +38,7 @@ Check SQL Only, Select All and Create Pg Schema.
 
   >perl Makefile.PL
 
-Answer 'No' to the 'use simple' question.
+Answer 'No' to the 'Use the simple install' question.
 
 6. Make diagrams
 
@@ -46,11 +49,17 @@ Answer 'No' to the 'use simple' question.
   >make graphviz_svg
   >find . -name "*.graphviz.svg" -path "*modules*" -exec cp '{}' doc/diagrams/ ';'
 
-7. Create audit tables
+7. Make schema diagrams
+
+  >make html
+
+8. Create audit tables
+
+This is optional. The file audit
 
   >sqlt -f PostgreSQL -t TTSchema --template modules/audit/add-audits.tmpl modules/nofuncs.sql > modules/audit/audit_tables.sql
 
-8. edit bin/AutoDBI.PL
+9. edit bin/AutoDBI.PL
 
 Delete everything in the non-substituting HEREDOC, insert the
 corresponding section from the corresponding blib/lib/Chado/AutoDBI.pm
@@ -75,4 +84,24 @@ Do "modules/bin/makedep.pl --help" for more documentation.
 
   >perl Makefile.PL
 
-Answer 'Yes' to the 'use simple' question.
+Answer 'Yes' to the 'Use the simple install' question.
+
+
+ABOUT THE Chado DDL FILES
+
+Different DDL files, or SQL scripts, are created dynamically during
+the typical installation.
+
+* modules/default_schema.sql
+
+default_schema.sql is used to actually instantiate the database.
+
+* modules/default_nofuncs.sql
+
+default_nofuncs.sql is a SQL or DDL file that does not contain
+Postgresql functions.  The reason for this is at least two fold: the
+minor one is to create SQL that is relatively RDBMS-independent. In
+addition SQL::Translator frequently chokes on Postgresql functions, so there
+needs to be a file that represents the schema for SQLFairy to operate on
+for creating the audit tables and AutoDBI.  This file is only used
+when SQLFairy is needed (that is, when creating a new build or custom schema).
