@@ -33,7 +33,7 @@ if ($mod_names) {
 } else {
     @modules = @ARGV;
 }
-die "no module(s) provided on the command line\n" unless @modules;
+die "No module(s) provided on the command line\n" unless @modules;
 
 my $module_name_map = {};
 foreach my $mod_name (@modules) {

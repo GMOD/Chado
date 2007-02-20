@@ -1,0 +1,78 @@
+$Id: INSTALL.Custom,v 1.1 2007-02-20 03:34:27 briano Exp $
+
+The Chado schema is organized as a set of modules where each module 
+has its own directory in chado/modules/. This structure is designed to allow
+the addition of custom modules to the Chado schema or to customize the 
+installation of Chado by module.
+
+CUSTOMIZATION USING AutoDBI.pl
+
+The following steps will create a complete schema, including schema
+and functions, and diagrams.
+ 
+1. Run chado-build-schema.pl
+
+  >bin/chado-build-schema.pl
+ 
+Click Select all and Create Pg Schema.  In order to add custom SQL
+statements (i.e. table create statements)  you need to edit 
+chado-module-metadata.xml to define meta data for the file, including 
+location and any dependencies and then run chado-build-schema.pl.
+
+2. Replace default_schema.sql with your SQL script
+
+  >mv chado_schema.sql modules/default_schema.sql
+
+3. Run bin/chado-build-schema.pl again
+
+Check SQL Only, Select All and Create Pg Schema.
+
+4. Replace default_nofuncs.sql
+
+  >mv chado_schema.sql modules/default_nofuncs.sql
+
+5. Run Makefile.PL
+
+  >perl Makefile.PL
+
+Answer 'No' to the 'use simple' question.
+
+6. Make diagrams
+
+  >make diagram
+  >find . -name "*.diagram.png" -path "*modules*" -exec cp '{}' doc/diagrams/ ';'
+  >make graphviz
+  >find . -name "*.graphviz.png" -path "*modules*" -exec cp '{}' doc/diagrams/ ';'
+  >make graphviz_svg
+  >find . -name "*.graphviz.svg" -path "*modules*" -exec cp '{}' doc/diagrams/ ';'
+
+7. Create audit tables
+
+  >sqlt -f PostgreSQL -t TTSchema --template modules/audit/add-audits.tmpl modules/nofuncs.sql > modules/audit/audit_tables.sql
+
+8. edit bin/AutoDBI.PL
+
+Delete everything in the non-substituting HEREDOC, insert the
+corresponding section from the corresponding blib/lib/Chado/AutoDBI.pm
+
+
+CUSTOMIZATION USING makedep.pl
+
+The following approach creates a DDL, or SQL script, that will install
+the tables for the selected modules.
+
+1. Run makedep.pl
+
+  >chado/modules/bin/makedep.pl --modules <module1>,<module2> > my.sql
+
+Do "modules/bin/makedep.pl --help" for more documentation.
+
+2. Replace default_schema.sql with your SQL script
+
+  >mv my.sql modules/default_schema.sql
+
+3. Run Makefile.PL
+
+  >perl Makefile.PL
+
+Answer 'Yes' to the 'use simple' question.
