@@ -1,3 +1,12 @@
+-- This file is contributed by Allen Day and is specific to his own work.
+-- It is included for illustrative purposes, these tables and views
+-- are not part of the rad module.  It gives an example of how the
+-- generic element and elementresult tables in the rad module can be 
+-- used to represent different types of data.  Another way to do this is
+-- with PostgreSQL table subclasses. There is a performance gain for
+-- typical usage in splitting data into subclass tables rather than
+-- using views to filter.
+
 CREATE TABLE affymetrixprobeset (
   element_id serial not null,
   primary key (element_id),
