@@ -1,7 +1,7 @@
-extenstionsuse ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.109 2007-02-19 14:55:13 briano Exp $
+# $Id: Makefile.PL,v 1.110 2007-02-20 15:31:14 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
