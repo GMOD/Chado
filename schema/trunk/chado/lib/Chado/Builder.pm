@@ -1,3 +1,4 @@
+# $Id: Builder.pm,v 1.34 2007-02-20 16:23:53 briano Exp $
 package Chado::Builder;
 # vim: set ft=perl ts=2 expandtab:
 
@@ -18,18 +19,6 @@ Log::Log4perl::init('load/etc/log.conf');
 no warnings;
 
 =head1 ACTIONS
-
-=item foo()
-
-this is an example target
-
-=item radviews()
-
-Calls the psql command and pipes in the contents of the
-modules/expression/rad.views file.  This creates several views
-on the elementresult table for representing different types of
-gene expression data.  This is a prerequisite for loading
-gene expression data.
 
 = item prepdb()
 
@@ -58,41 +47,6 @@ platform-specific variable values
 =item _last
 
 =cut
-
-=head2 ACTION_radviews
-
- Title   : ACTION_radviews
- Usage   :
- Function: Executes any SQL statements in the modules/expression/rad.views file.
- Example :
- Returns : 
- Args    :
-
-=cut
-
-sub ACTION_radviews {
-  # the build object $m
-  my $m = shift;
-  # the XML config object
-  my $conf = $m->conf;
-
-  $m->log->info("entering ACTION_radviews");
-
-  my $db_name   = $conf->{'database'}{'db_name'}  || '';
-  my $db_host   = $conf->{'database'}{'db_host'}  || '';
-  my $db_port   = $conf->{'database'}{'db_port'}  || '';
-  my $db_user   = $conf->{'database'}{'db_username'}  || '';
-  my $db_pass   = $conf->{'database'}{'db_password'}  || '';
-  my $build_dir = $conf->{'build'}{'working_dir'} || '';
-  my $init_sql  = catfile( $build_dir, 'modules', 'expression', 'rad.views' );
-  my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
-
-  $m->log->debug("system call: $sys_call");
-
-  system( $sys_call ) == 0 or croak "Error executing '$sys_call': $?";
-
-  $m->log->info("leaving ACTION_radviews");
-}
 
 =head2 ACTION_prepdb
 

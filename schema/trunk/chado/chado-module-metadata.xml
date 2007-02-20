@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: chado-module-metadata.xml,v 1.21 2007-02-20 16:23:53 briano Exp $ -->
 <schema_metadata id='chado'>
 
   <title>Chado: A generic model organism database schema</title>
@@ -470,7 +471,7 @@
       <dependency to='pub'/>
       <dependency to='general'/>
       <status code='alpha'>
-        In use at UCLA/Allen Day
+        In use at FlyBase
       </status>
       <description>
         transcript or protein expression data
@@ -490,16 +491,6 @@
         Alternative expression module, based on MAGE model
       </description>
       <source type='sql' path='expression/rad.sql'/>
-
-      <component id='rad-views' type='views'>
-        <description>
-          A set of table descriptions for the rad module that
-          includes several tables that use Postgres' INHERIT function.
-        </description>
-        <source type='sql' path='expression/rad.views'/>
-      </component>
-
-
     </module>
 
     <module id='stock'>
@@ -557,7 +548,6 @@
 
     </module>
 
-
 <!--
     Since this is dynamically generated from a given schema, this should
     either be done at a later step, or if requested, dynamically generated
@@ -587,5 +577,6 @@
       <source type='sql' path='audit/audit_tables.sql'/>
     </module>
 -->
+
   </modules>
 </schema_metadata>
