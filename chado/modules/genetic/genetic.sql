@@ -1,4 +1,4 @@
--- $Id: genetic.sql,v 1.26 2007-02-19 19:35:54 briano Exp $
+-- $Id: genetic.sql,v 1.27 2007-02-20 18:23:56 briano Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -74,7 +74,7 @@ create index feature_genotype_idx2 on feature_genotype (genotype_id);
 COMMENT ON TABLE feature_genotype IS NULL;
 COMMENT ON COLUMN feature_genotype.rank IS 'rank can be used for
 n-ploid organisms or to preserve order.';
-COMMENT ON COLUMN feature_genotype.group IS 'Spatially distinguishable
+COMMENT ON COLUMN feature_genotype.cgroup IS 'Spatially distinguishable
 group. group can be used for distinguishing the chromosomal groups,
 for example (RNAi products and so on can be treated as different
 groups, as they do not fall on a particular chromosome).';
