@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.110 2007-02-20 15:31:14 briano Exp $
+# $Id: Makefile.PL,v 1.111 2007-02-20 15:48:31 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -460,7 +460,7 @@ else {
 -------------------------WARNING------------------------------------
 I'm assuming you modified modules/default_schema.sql and
 modules/default_nofuncs.sql or want to rebuild AutoDBI.pm for some
-other reason.  If that is not the case, please read INSTALL.AutoDBI
+other reason.  If that is not the case, please read INSTALL.Custom
 for more information or, if you do not think this is what you want to
 do, rerun `perl Makefile.PL` and answer 'y' to the question about
 doing a simple install.
