@@ -1,4 +1,6 @@
--- $Id: expression.sql,v 1.11 2007-02-19 18:53:13 briano Exp $
+-- $Id: expression.sql,v 1.12 2007-02-20 17:31:36 briano Exp $
+-- ==========================================
+-- Chado expression module
 --
 -- =================================================================
 -- Dependencies:
@@ -22,12 +24,11 @@ create table expression (
        expression_c1 unique(uniquename)       
 );
 
-COMMENT ON TABLE EXPRESSION IS 'The expression table is essentially a bridge table';
+COMMENT ON TABLE EXPRESSION IS 'The expression table is essentially a bridge table.';
 
 -- ================================================
 -- TABLE: expression_cvterm
 -- ================================================
-
 
 create table expression_cvterm (
        expression_cvterm_id serial not null,
@@ -60,17 +61,15 @@ create table expression_cvtermprop (
     rank int not null default 0,
     unique (expression_cvterm_id,type_id,rank)
 );
-
-
 create index expression_cvtermprop_idx1 on expression_cvtermprop (expression_cvterm_id);
 create index expression_cvtermprop_idx2 on expression_cvtermprop (type_id);
 
 COMMENT ON TABLE expression_cvtermprop IS 'Extensible properties for
-expression to cvterm associations. Examples: qualifiers';
+expression to cvterm associations. Examples: qualifiers.';
 
 COMMENT ON COLUMN expression_cvtermprop.type_id IS 'The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv';
+that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv.';
 
 COMMENT ON COLUMN expression_cvtermprop.value IS 'The value of the
 property, represented as text. Numeric values are converted to their
@@ -81,7 +80,7 @@ COMMENT ON COLUMN expression_cvtermprop.rank IS 'Property-Value
 ordering. Any expression_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used';
+the default 0 value should be used.';
 
 -- ================================================
 -- TABLE: expressionprop
@@ -142,7 +141,6 @@ create index feature_expression_idx2 on feature_expression (pub_id);
 -- ================================================
 -- TABLE: feature_expressionprop
 -- ================================================
--- modeled on feature_cvtermprop
 
 create table feature_expressionprop (
        feature_expressionprop_id serial not null,
@@ -155,12 +153,11 @@ create table feature_expressionprop (
        rank int not null default 0,
        unique (feature_expression_id,type_id,rank)
 );
-
-
 create index feature_expressionprop_idx1 on feature_expressionprop (feature_expression_id);
 create index expression_cvtermprop_idx2 on feature_expressionprop (type_id);
 
-COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for feature_expression text. Examples: comments';
+COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for
+feature_expression (comments, for example). Modeled on feature_cvtermprop.';
 
 
 -- ================================================
@@ -175,8 +172,8 @@ create table eimage (
        image_uri varchar(255)
 );
 
-COMMENT ON TABLE EIMAGE IS 'We expect images in eimage_data (e.g. jpegs)
-to be uuencoded. Describes the type of data in eimage_data.'
+COMMENT ON COLUMN EIMAGE.EIMAGE_DATA IS 'We expect images in eimage_data (e.g. JPEGs) to be uuencoded.';
+COMMENT ON COLUMN EIMAGE.EIMAGE_TYPE IS 'Describes the type of data in eimage_data.';
 
 
 -- ================================================
