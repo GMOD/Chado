@@ -1,4 +1,4 @@
-$Id: INSTALL,v 1.54 2007-02-18 15:46:54 briano Exp $
+$Id: INSTALL,v 1.55 2007-02-20 15:44:12 briano Exp $
 
 CHADO INSTALLATION
 
@@ -418,7 +418,7 @@ for interactively building a Chado schema.  If you are providing table
 definitions of your own, you will also have to edit the file 
 chado-module-metadata.xml to define how your tables relate to other
 tables in the Chado schema.  While there is no documentation of the ddt
-of this file, it is relatively straight forward.  See INSTALL.AutoDBI
+of this file, it is relatively straight forward.  See INSTALL.Custom
 for more information on how chado-build-schema.pl relates to the build 
 process.  Once the default_schema.sql and default_nofuncs.sql files 
 are in place and you run `perl Makefile.PL`, the only difference between
