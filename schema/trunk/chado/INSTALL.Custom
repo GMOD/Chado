@@ -1,4 +1,4 @@
-$Id: INSTALL.Custom,v 1.2 2007-02-20 17:32:35 briano Exp $
+$Id: INSTALL.Custom,v 1.3 2007-02-20 17:37:08 briano Exp $
 
 The Chado schema is organized as a set of modules where each module 
 has its own directory in chado/modules/. This structure is designed to allow
@@ -105,3 +105,4 @@ addition SQL::Translator frequently chokes on Postgresql functions, so there
 needs to be a file that represents the schema for SQLFairy to operate on
 for creating the audit tables and AutoDBI.  This file is only used
 when SQLFairy is needed (that is, when creating a new build or custom schema).
+It is also useful to those who want to use Mysql or Oracle.
