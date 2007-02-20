@@ -209,7 +209,7 @@ modules/expression/expression.sql
 modules/expression/rad.html
 modules/expression/rad.sql
 modules/expression/rad.views
-modules/expression/readme
+modules/expression/README
 modules/extension.modules
 modules/function.modules
 modules/general/functions/general-loading.plpgsql
