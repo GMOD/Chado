@@ -1,4 +1,4 @@
--- $Id: stock.sql,v 1.3 2007-02-19 23:50:36 briano Exp $
+-- $Id: stock.sql,v 1.4 2007-02-20 18:17:21 briano Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -81,8 +81,11 @@ create table stockprop (
 create index stockprop_idx1 on stockprop (stock_id);
 create index stockprop_idx2 on stockprop (type_id);
 
-COMMENT ON TABLE STOCKPROP IS 'A stock can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.';
-COMMENT ON COLUMN STOCKPROP.STOCKPROP_C1 IS 'Unique index stockprop_c1 for any one stock, multivalued property-value pairs must be differentiated by rank.';
+COMMENT ON TABLE STOCKPROP IS 'A stock can have any number of
+slot-value property tags attached to it. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, stockprop_c1, for
+the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
 
 
 -- ================================================
