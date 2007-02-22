@@ -1,4 +1,4 @@
--- $Id: rad.sql,v 1.35 2007-02-19 19:13:48 briano Exp $
+-- $Id: rad.sql,v 1.36 2007-02-22 21:54:15 allenday Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -115,7 +115,7 @@ create table arraydesign (
     num_grid_rows int null,
     num_sub_columns int null,
     num_sub_rows int null,
-    constraint arraydesign_c1 unique (name)
+    constraint arraydesign_c1 unique (name,version)
 );
 create index arraydesign_idx1 on arraydesign (manufacturer_id);
 create index arraydesign_idx2 on arraydesign (platformtype_id);
