@@ -1,4 +1,4 @@
--- $Id: rad.sql,v 1.36 2007-02-22 21:54:15 allenday Exp $
+-- $Id: rad.sql,v 1.37 2007-02-22 22:01:26 allenday Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -471,7 +471,19 @@ create index element_idx2 on element (arraydesign_id);
 create index element_idx3 on element (type_id);
 create index element_idx4 on element (dbxref_id);
 
-COMMENT ON TABLE element IS 'Represents a feature of the array. This is typically a region of the array coated or bound to DNA.';
+COMMENT ON TABLE element IS 'Represents a subcomponent of an assay platform that performs a measurement. For a microarray this is typically a region of the array coated or bound to DNA.  For another assay platform such as an in-situ hybridization of two probes, the two probes would be represented here.  The nullable foreign key constraint back to feature allows mapping of these measuring components back to the genome features they represent.';
+
+create table arraydesign_element (
+    arraydesign_element_id serial not null,
+    primary key (arraydesign_element_id),
+    arraydesign_id int not null,
+    foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
+    element_id int not null,
+    foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
+    constraint arraydesign_element_c1 unique (arraydesign_id,element_id)
+);
+create index arraydesign_element_idx1 on arraydesign_element (arraydesign_id);
+create index arraydesign_element_idx2 on arraydesign_element (element_id);
 
 create table elementresult (
     elementresult_id serial not null,
