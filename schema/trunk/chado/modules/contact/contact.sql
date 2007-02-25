@@ -1,7 +1,17 @@
--- $Id: contact.sql,v 1.4 2007-02-19 16:32:32 briano Exp $
+-- $Id: contact.sql,v 1.5 2007-02-25 17:00:17 briano Exp $
+-- ==========================================
+-- Chado contact module
+--
+-- =================================================================
+-- Dependencies:
+--
+-- :import cvterm from cv
+-- =================================================================
+
 -- ================================================
 -- TABLE: contact
 -- ================================================
+
 create table contact (
     contact_id serial not null,
     primary key (contact_id),
@@ -13,11 +23,12 @@ create table contact (
 );
 
 COMMENT ON TABLE contact IS 'Model persons, institutes, groups, organizations, etc.';
-COMMENT ON COLUMN contact.type_id IS 'What type of contact is this?  e.g. "person", "lab", etc.';
+COMMENT ON COLUMN contact.type_id IS 'What type of contact is this?  E.g. "person", "lab".';
 
 -- ================================================
 -- TABLE: contact_relationship
 -- ================================================
+
 create table contact_relationship (
     contact_relationship_id serial not null,
     primary key (contact_relationship_id),
