@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.63 2007-02-19 21:23:57 briano Exp $
+-- $Id: sequence.sql,v 1.64 2007-02-26 04:09:30 briano Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -52,7 +52,7 @@ on; see the Sequence Ontology for more.';
 
 COMMENT ON COLUMN feature.dbxref_id IS 'An optional primary public stable
 identifier for this feature. Secondary identifiers and external
-dbxrefs go in table:feature_dbxref.';
+dbxrefs go in the table feature_dbxref.';
 
 COMMENT ON COLUMN feature.organism_id IS 'The organism to which this feature
 belongs. This column is mandatory.';
@@ -62,7 +62,7 @@ a feature, for display purposes.';
 
 COMMENT ON COLUMN feature.uniquename IS 'The unique name for a feature; may
 not be necessarily be particularly human-readable, although this is
-prefered. This name must be unique for this type of feature within
+preferred. This name must be unique for this type of feature within
 this organism.';
 
 COMMENT ON COLUMN feature.residues IS 'A sequence of alphabetic characters
@@ -70,7 +70,7 @@ representing biological residues (nucleic acids, amino acids). This
 column does not need to be manifested for all features; it is optional
 for features such as exons where the residues can be derived from the
 featureloc. It is recommended that the value for this column be
-manifested for features which may may non-contiguous sublocations (eg
+manifested for features which may may non-contiguous sublocations (e.g.
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
 RNA sequence.';
@@ -95,7 +95,7 @@ identifier. This column is thus used to subclass the feature table.';
 COMMENT ON COLUMN feature.is_analysis IS 'Boolean indicating whether this
 feature is annotated or the result of an automated analysis. Analysis
 results also use the companalysis module. Note that the dividing line
-between analysis/annotation may be fuzzy, this should be determined on
+between analysis and annotation may be fuzzy, this should be determined on
 a per-project basis in a consistent manner. One requirement is that
 there should only be one non-analysis version of each wild-type gene
 feature in a genome, whereas the same gene feature can be predicted
@@ -107,12 +107,12 @@ remove the feature altogether, others may choose to keep an obsolete
 row in the table.';
 
 COMMENT ON COLUMN feature.timeaccessioned IS 'For handling object
-accession/modification timestamps (as opposed to db auditing info,
+accession or modification timestamps (as opposed to database auditing data,
 handled elsewhere). The expectation is that these fields would be
 available to software interacting with chado.';
 
 COMMENT ON COLUMN feature.timelastmodified IS 'For handling object
-accession/modification timestamps (as opposed to db auditing info,
+accession or modification timestamps (as opposed to database auditing data,
 handled elsewhere). The expectation is that these fields would be
 available to software interacting with chado.';
 
@@ -147,13 +147,13 @@ create index featureloc_idx2 on featureloc (srcfeature_id);
 create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
 
 COMMENT ON TABLE featureloc IS 'The location of a feature relative to
-another feature.  IMPORTANT: INTERBASE COORDINATES ARE USED. This is
+another feature. Important: interbase coordinates are used. This is
 vital as it allows us to represent zero-length features e.g. splice
 sites, insertion points without an awkward fuzzy system. Features
 typically have exactly ONE location, but this need not be the
 case. Some features may not be localized (e.g. a gene that has been
-characterized genetically but no sequence/molecular info is
-available). NOTE ON MULTIPLE LOCATIONS: Each feature can have 0 or
+characterized genetically but no sequence or molecular information is
+available). Note on multiple locations: Each feature can have 0 or
 more locations. Multiple locations do NOT indicate non-contiguous
 locations (if a feature such as a transcript has a non-contiguous
 location, then the subfeatures such as exons should always be
@@ -164,16 +164,15 @@ query feature, one on the subject feature. Features representing
 sequence variation could have alternate locations instantiated on a
 feature on the mutant strain. The column:rank is used to
 differentiate these different locations. Reflexive locations should
-never be stored - this is for -proper- (i.e. non-self) locations only;
-i.e. nothing should be located relative to itself.';
+never be stored - this is for -proper- (i.e. non-self) locations only; nothing should be located relative to itself.';
 
 COMMENT ON COLUMN featureloc.feature_id IS 'The feature that is being located. Any feature can have zero or more featurelocs.';
 
 COMMENT ON COLUMN featureloc.srcfeature_id IS 'The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph.';
 
-COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin.';
+COMMENT ON COLUMN featureloc.fmin IS 'The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin.';
 
-COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl).';
+COMMENT ON COLUMN featureloc.fmax IS 'The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl).';
 
 COMMENT ON COLUMN featureloc.strand IS 'The orientation/directionality of the
 location. Should be 0, -1 or +1.';
@@ -189,12 +188,12 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 COMMENT ON COLUMN featureloc.locgroup IS 'This is used to manifest redundant,
 derivable extra locations for a feature. The default locgroup=0 is
-used for the DIRECT location of a feature. !! MOST CHADO USERS MAY
-NEVER USE featurelocs WITH logroup>0 !! Transitively derived locations
-are indicated with locgroup>0. For example, the position of an exon on
+used for the DIRECT location of a feature. Important: most Chado users may
+never use featurelocs WITH logroup > 0. Transitively derived locations
+are indicated with locgroup > 0. For example, the position of an exon on
 a BAC and in global chromosome coordinates. This column is used to
 differentiate these groupings of locations. The default locgroup 0
-is used for the main/primary location, from which the others can be
+is used for the main or primary location, from which the others can be
 derived via coordinate transformations. Another example of redundant
 locations is storing ORF coordinates relative to both transcript and
 genome. Redundant locations open the possibility of the database
@@ -397,7 +396,7 @@ create index feature_relationship_idx3 on feature_relationship (type_id);
 COMMENT ON TABLE feature_relationship IS 'Features can be arranged in
 graphs, e.g. "exon part_of transcript part_of gene"; If type is
 thought of as a verb, the each arc or edge makes a statement
-[SUBJECT VERB OBJECT]. The object can also be thought of as parent
+[Subject Verb Object]. The object can also be thought of as parent
 (containing feature), and subject as child (contained feature or
 subfeature). We include the relationship rank/order, because even
 though most of the time we can order things implicitly by sequence
@@ -652,5 +651,4 @@ COMMENT ON COLUMN feature_synonym.pub_id IS 'The pub_id link is for relating the
 
 COMMENT ON COLUMN feature_synonym.is_current IS 'The is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature.';
 
-COMMENT ON COLUMN feature_synonym.is_internal IS 'Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym.   If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym.';
-
+COMMENT ON COLUMN feature_synonym.is_internal IS 'Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym. If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym.';

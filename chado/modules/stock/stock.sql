@@ -1,4 +1,4 @@
--- $Id: stock.sql,v 1.5 2007-02-26 03:43:24 briano Exp $
+-- $Id: stock.sql,v 1.6 2007-02-26 04:12:23 briano Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -241,7 +241,7 @@ COMMENT ON TABLE STOCKCOLLECTION IS 'The lab or stock center distributing the st
 COMMENT ON COLUMN STOCKCOLLECTION.UNIQUENAME IS 'uniqename is the value of the collection cv.';
 COMMENT ON COLUMN STOCKCOLLECTION.TYPE_ID IS 'type_id is the collection type cv.';
 COMMENT ON COLUMN STOCKCOLLECTION.NAME IS 'name is the collection.';
-COMMENT ON COLUMN STOCKCOLLECTION.CONTACT_ID IS 'contact_id links to the contact info for the collection.';
+COMMENT ON COLUMN STOCKCOLLECTION.CONTACT_ID IS 'contact_id links to the contact information for the collection.';
 
 
 -- ================================================
