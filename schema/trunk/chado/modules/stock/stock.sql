@@ -1,4 +1,4 @@
--- $Id: stock.sql,v 1.4 2007-02-20 18:17:21 briano Exp $
+-- $Id: stock.sql,v 1.5 2007-02-26 03:43:24 briano Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -132,8 +132,7 @@ COMMENT ON STOCK_RELATIONSHIP.SUBJECT_ID IS 'stock_relationship.subject_id is th
 COMMENT ON STOCK_RELATIONSHIP.OBJECT_ID IS 'stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock.';
 COMMENT ON STOCK_RELATIONSHIP.TYPE_ID IS 'stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
 COMMENT ON STOCK_RELATIONSHIP.RANK IS 'stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero.';
-COMMENT ON STOCK_RELATIONSHIP.VALUE IS 'stock_relationship.value is
-for additional notes/comments.';
+COMMENT ON STOCK_RELATIONSHIP.VALUE IS 'stock_relationship.value is for additional notes or comments.';
 
 
 -- ================================================
