@@ -1,5 +1,7 @@
--- $Id: general.sql,v 1.29 2007-02-19 19:21:52 briano Exp $
-
+-- $Id: general.sql,v 1.30 2007-02-27 16:17:07 briano Exp $
+-- ==========================================
+-- Chado general module
+--
 -- ================================================
 -- TABLE: tableinfo
 -- ================================================
@@ -37,9 +39,9 @@ create table db (
 
 COMMENT ON TABLE db IS 'A database authority. Typical databases in
 bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority
-is generally known by this sortened form, which is unique within the
-bioinformatics and biomedical realm.  **TODO** - add support for URIs,
-URNs (e.g. LSIDs). We can do this by treating the url as a uri -
+is generally known by this shortened form, which is unique within the
+bioinformatics and biomedical realm.  To Do - add support for URIs,
+URNs (e.g. LSIDs). We can do this by treating the URL as a URI -
 however, some applications may expect this to be resolvable - to be
 decided.';
 
