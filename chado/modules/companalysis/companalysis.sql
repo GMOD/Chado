@@ -1,4 +1,4 @@
--- $Id: companalysis.sql,v 1.35 2007-02-26 03:40:49 briano Exp $
+-- $Id: companalysis.sql,v 1.36 2007-02-28 20:10:34 briano Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -39,7 +39,7 @@ COMMENT ON COLUMN ANALYSIS.PROGRAM IS 'Program name, e.g. blastx, blastp, sim4, 
 COMMENT ON COLUMN ANALYSIS.PROGRAMVERSION IS 'Version description, e.g. TBLASTX 2.0MP-WashU [09-Nov-2000].';
 COMMENT ON COLUMN ANALYSIS.ALGORITHM IS 'Algorithm name, e.g. blast.';
 COMMENT ON COLUMN ANALYSIS.SOURCENAME IS 'Source name, e.g. cDNA, SwissProt.';
-COMMENT ON COLUMN ANALYSIS.SOURCEURI 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
+COMMENT ON COLUMN ANALYSIS.SOURCEURI IS 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
 
 -- ================================================
 -- TABLE: analysisprop
