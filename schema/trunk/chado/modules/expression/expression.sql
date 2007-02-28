@@ -1,4 +1,4 @@
--- $Id: expression.sql,v 1.12 2007-02-20 17:31:36 briano Exp $
+-- $Id: expression.sql,v 1.13 2007-02-28 20:51:22 briano Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -21,7 +21,7 @@ create table expression (
        uniquename text not null,
        md5checksum character(32),
        description text,
-       expression_c1 unique(uniquename)       
+       constraint expression_c1 unique(uniquename)       
 );
 
 COMMENT ON TABLE EXPRESSION IS 'The expression table is essentially a bridge table.';
@@ -40,7 +40,7 @@ create table expression_cvterm (
        rank int not null default 0,
        cvterm_type_id int not null,
        foreign key (cvterm_type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-       unique(expression_id,cvterm_id,cvterm_type_id)
+       constraint expression_cvterm_c1 unique(expression_id,cvterm_id,cvterm_type_id)
 );
 create index expression_cvterm_idx1 on expression_cvterm (expression_id);
 create index expression_cvterm_idx2 on expression_cvterm (cvterm_id);
@@ -59,7 +59,7 @@ create table expression_cvtermprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
-    unique (expression_cvterm_id,type_id,rank)
+    constraint expression_cvtermprop_c1 unique (expression_cvterm_id,type_id,rank)
 );
 create index expression_cvtermprop_idx1 on expression_cvtermprop (expression_cvterm_id);
 create index expression_cvtermprop_idx2 on expression_cvtermprop (type_id);
@@ -95,7 +95,7 @@ create table expressionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
-    unique (expression_id,type_id,rank)
+    constraint expressionprop_c1 unique (expression_id,type_id,rank)
 );
 create index expressionprop_idx1 on expressionprop (expression_id);
 create index expressionprop_idx2 on expressionprop (type_id);
@@ -112,7 +112,7 @@ create table expression_pub (
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-       unique(expression_id,pub_id)       
+       constraint expression_pub_c1 unique(expression_id,pub_id)       
 );
 create index expression_pub_idx1 on expression_pub (expression_id);
 create index expression_pub_idx2 on expression_pub (pub_id);
@@ -131,7 +131,7 @@ create table feature_expression (
        foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-       unique(expression_id,feature_id,pub_id)       
+       constraint feature_expression_c1 unique(expression_id,feature_id,pub_id)       
 );
 create index feature_expression_idx1 on feature_expression (expression_id);
 create index feature_expression_idx2 on feature_expression (feature_id);
@@ -151,7 +151,7 @@ create table feature_expressionprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
-       unique (feature_expression_id,type_id,rank)
+       constraint feature_expressionprop_c1 unique (feature_expression_id,type_id,rank)
 );
 create index feature_expressionprop_idx1 on feature_expressionprop (feature_expression_id);
 create index expression_cvtermprop_idx2 on feature_expressionprop (type_id);
@@ -165,11 +165,11 @@ feature_expression (comments, for example). Modeled on feature_cvtermprop.';
 -- ================================================
 
 create table eimage (
-       eimage_id serial not null,
-       primary key (eimage_id),
-       eimage_data text,
-       eimage_type varchar(255) not null,
-       image_uri varchar(255)
+		eimage_id serial not null,
+      primary key (eimage_id),
+      eimage_data text,
+      eimage_type varchar(255) not null,
+      image_uri varchar(255)
 );
 
 COMMENT ON COLUMN EIMAGE.EIMAGE_DATA IS 'We expect images in eimage_data (e.g. JPEGs) to be uuencoded.';
@@ -187,7 +187,7 @@ create table expression_image (
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        eimage_id int not null,
        foreign key (eimage_id) references eimage (eimage_id) on delete cascade INITIALLY DEFERRED,
-       unique(expression_id,eimage_id)
+       constraint expression_image_c1 unique(expression_id,eimage_id)
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
