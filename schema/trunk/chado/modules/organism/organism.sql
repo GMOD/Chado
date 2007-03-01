@@ -1,4 +1,4 @@
--- $Id: organism.sql,v 1.17 2007-02-19 20:15:44 briano Exp $
+-- $Id: organism.sql,v 1.18 2007-03-01 03:57:56 briano Exp $
 -- ==========================================
 -- Chado organism module
 
@@ -27,15 +27,15 @@ create table organism (
 COMMENT ON TABLE organism IS 'The organismal taxonomic
 classification. Note that phylogenies are represented using the
 phylogeny module, and taxonomies can be represented using the cvterm
-module or the phylogeny module';
+module or the phylogeny module.';
 
 COMMENT ON COLUMN organism.species IS 'A type of organism is always
 uniquely identified by genus and species. When mapping from the NCBI
-taxonomy names.dmp file, the unique-name column must be used where it
-is present, as the name column is not always unique (eg environmental
+taxonomy names.dmp file, this column must be used where it
+is present, as the common_name column is not always unique (e.g. environmental
 samples). If a particular strain or subspecies is to be represented,
 this is appended onto the species name. Follows standard NCBI taxonomy
-pattern';
+pattern.';
 
 -- ================================================
 -- TABLE: organism_dbxref
