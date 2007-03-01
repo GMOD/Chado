@@ -1,4 +1,4 @@
--- $Id: genetic.sql,v 1.27 2007-02-20 18:23:56 briano Exp $
+-- $Id: genetic.sql,v 1.28 2007-03-01 03:17:19 briano Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -42,7 +42,7 @@ create table genotype (
 create index genotype_idx1 on genotype(uniquename);
 create index genotype_idx2 on genotype(name);
 
-COMMENT ON TABLE genotype IS 'Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs';
+COMMENT ON TABLE genotype IS 'Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs.';
 
 COMMENT ON COLUMN genotype.uniquename IS 'The unique name for a genotype; 
 typically derived from the features making up the genotype.';
@@ -92,7 +92,7 @@ create table environment (
 );
 create index environment_idx1 on environment(uniquename);
 
-COMMENT ON TABLE environment IS 'The environmental component of a phenotype description';
+COMMENT ON TABLE environment IS 'The environmental component of a phenotype description.';
 
 
 -- ================================================
@@ -178,6 +178,4 @@ CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
 CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
 CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 
-COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes
-    e.g., genotype1/environment1/phenotype1 "non-suppressible" with
-    respect to genotype2/environment2/phenotype2';
+COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2.';
