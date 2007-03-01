@@ -1,5 +1,7 @@
--- $Id: map.sql,v 1.12 2007-02-19 19:59:19 briano Exp $
-
+-- $Id: map.sql,v 1.13 2007-03-01 03:42:17 briano Exp $
+-- ==========================================
+-- Chado map module
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -74,7 +76,7 @@ create index featurepos_idx2 on featurepos (feature_id);
 create index featurepos_idx3 on featurepos (map_feature_id);
 
 COMMENT ON COLUMN FEATUREPOS.MAP_FEATURE_ID IS 'map_feature_id
-links to the feature (map) upon which the feature is being localized';
+links to the feature (map) upon which the feature is being localized.';
 
 
 -- ================================================
