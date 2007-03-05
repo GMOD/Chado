@@ -3,13 +3,11 @@ README
 Makefile.PL
 MANIFEST
 create-manifest.sh
-index.html
 bin/cx-enscore2chaos.pl
 bin/cx-genbank2chaos.pl
 bin/cx-chadoxml2chaos.pl
 bin/cx-chaos-report.pl
 bin/cx-download-enscore.pl
-doc/css/stylesheet.css
 dtd/chaos.dtd
 lib/Bio/Chaos/XSLTHelper.pm
 lib/Bio/Chaos/ChaosGraph.pm
