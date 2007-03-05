@@ -1,7 +1,195 @@
 chaos-xml/README
-# $Id: README,v 1.2 2004-07-08 23:49:13 cmungall Exp $
+# $Id: README,v 1.3 2007-03-05 16:34:14 briano Exp $
 
 Refer to the INSTALL file for installation instructions
 
 Please read the file index.html using a web browser for a description
 of this software
+
+                               Chaos-XML Library
+
+Intro
+
+   The Chaos-XML Library contains software and specifications for the
+   Chaos XML format. Chaos XML is for representing sequences and sequence
+   features.
+
+   Chaos is a mapping of the chado relational schema into a hierarchical
+   (ie XML) model. Chaos XML can be used in conjunction with a Chado
+   database, or it can be used entirely independently of Chado or any
+   database. Of course, the Chado database may be used entirely
+   independently of Chaos XML.
+
+   This directory contains perl scripts, modules and XSL transforms for
+   extracting chaos from various datasources, and for manipulating and
+   transforming chaos documents.
+
+   Chaos-XML is the annotation format for [1]CGL.
+
+Status
+
+   This software and data format will be officially released on Jun 1
+   2005. Until then that time it is to be considered alpha software.
+
+Downloading and Installation
+
+   You can either download the latest stable release, or fetch the
+   bleeding-edge latest version from CVS
+
+  Download stable release
+
+   This is recommended for most users
+
+   The current latest release is [2]Bio-Chaos-0.01. Download this and
+   follow the instructions in the [3]INSTALL file
+
+  Obtain from CVS
+
+   See [4]GMOD CVS for details. Chaos-XML is part of the gmod-schema
+   project, see [5]gmod/schema/chado/chaos-xml
+
+Motivation
+
+   The chaos format arose out of a need for an annotation data exchange
+   format within the BDGP. We needed an XML format that would be
+   compatible with the richness of annotation data that could be
+   represented in a Chado database. We also need a format that we (BDGP)
+   had direct control over, so that we could make minor modifications as
+   required.
+
+   We created chaos-xml as an almost direct mapping of a pre-1.0 Chado
+   database. The idea was that there would be no *semantic* mapping
+   required between chado and chaos, purely a *syntactic* XML to
+   relational mapping. A summary of the differences between Chado and
+   Chaos are listed further on in this document.
+
+   At around the same time the main chado software development team at
+   FlyBase devised the official Chado XML format. Chado XML and Chaos XML
+   are semantically very similar, but they are different in how the XML
+   to relational database mapping is performed. Chado XML is also
+   considerably more verbose than Chaos XML. This is because Chaos uses
+   some denormalisations of the Chado model, explained below. In our view
+   these two formats are complementary. Conversions between the formats
+   should be trivial [TODO: XSL mapping].
+
+The Chaos Model
+
+   For full documentation on the Chaos XML datamodel see the dtd
+   directory. Elements in Chaos XML will generally have an equivalent
+   table or column in the Chado relational schema. Thus the Chado
+   documentation should also serve as documentation for the Chaos XML
+   format.
+
+   Briefly, Chaos (and Chado) are generic ontology-typed feature graph
+   formats. This is similar to, but richer than, the [6]GFF3 format
+
+   The central concept in Chaos/Chado is a "feature". A feature can
+   represent any genomic or sequence entity that is typed by the
+   [7]Sequence Ontology (SO)
+
+   Features are interconnected in a feature graph using the
+   feature_relationship element. This is to indicate which exons and
+   proteins belong to which transcript, which transcripts belong to which
+   gene.
+
+   The location of a feature, relative to another feature, is described
+   by the featureloc element. All locations are interbase (ie counting
+   from 0, not 1. It is the gaps between bases that are counted, not the
+   bases themselves). In contrast to chado, which uses fmin/fmax to
+   indicate the left and right coordinates, chaos use nbeg/nend to
+   indicate the five prime (natural start) and three prime (natural end)
+   coordinates.
+
+   For more details, see the [8]dtd/ directory
+
+Differences between Chaos XML and the Chado Relational Database Schema
+
+   Chaos-XML is based on the Chado relational model. For a full
+   explanation of the meaning of the elements in Chaos-XML, please refer
+   to the Chado documentation
+
+   For a full explanation of the differences, see [9]Chaos and Chado
+
+Library Contents
+
+   The Chaos-XML Library consists of specifications and software for
+   dealing with Chaos-XML files.
+
+  DTD
+
+   The DTD specification can be found in [10]dtd/chaos.dtd
+
+   Soon there will also be specifications as XML Schema and/or Relax-NG
+
+  XSL Stylesheets
+
+   XSL transformations can be found in the [11]xsl/ directory.
+
+  Example Chaos XML
+
+   Example Chaos-XML can be found in the [12]sample-data/ directory.
+
+  Scripts
+
+   The scripts are in the [13]bin/ directory. You need to install the
+   perl chaos library before running these scripts.
+
+  Chaos Perl Module
+
+   You can browse the perl modules in the [14]lib/ directory. To install,
+   download the chaos-xml library and follow the instructions in the
+   [15]INSTALL file.
+
+Converting between Chaos-XML and Chado-XML
+
+   There are XSLT stylesheets defined for mapping between these two
+   similar formats, see the [16]xsl/ directory.
+
+   If you are not familiar with XSLT, you can use these scripts, part of
+   this distribution (see the [17]bin/ directory
+     * cx-chaos2chadoxml.pl
+     * cx-chadoxml2chaos.pl
+
+Future Extensions
+
+   As new modules are added to chado (for example, the genetics module
+   and the phylogeny module), corresponding chaos-xml [18]DTDs will be
+   generated.
+
+Questions and Further info
+
+   For general info on the chado schema, see
+   [19]http://www.gmod.org/schema/index.shtml
+
+   Send questions/comments to this mail list:
+   [20]http://lists.sourceforge.net/lists/listinfo/gmod-schema
+     _________________________________________________________________
+
+
+    [21]Chris Mungall
+
+   Last modified: Tue May 10 11:11:15 PDT 2005
+
+References
+
+   1. http://www.yandell-lab.org/
+   2. file://localhost/Users/bosborne/schema/chado/chaos-xml/Bio-Chaos-0.01.tar.gz
+   3. file://localhost/Users/bosborne/schema/chado/chaos-xml/INSTALL
+   4. http://www.gmod.org/cvs.shtml
+   5. http://cvs.sourceforge.net/viewcvs.py/gmod/schema/chado/chaos-xml/
+   6. http://song.sourceforge.net/gff3-jan04.shtml
+   7. http://song.sourceforge.net/
+   8. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd
+   9. file://localhost/Users/bosborne/schema/chado/chaos-xml/doc/chaos-and-chado.html
+  10. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd/chaos.dtd
+  11. file://localhost/Users/bosborne/schema/chado/chaos-xml/xsl/
+  12. file://localhost/Users/bosborne/schema/chado/chaos-xml/sample-data/
+  13. file://localhost/Users/bosborne/schema/chado/chaos-xml/bin/
+  14. file://localhost/Users/bosborne/schema/chado/chaos-xml/lib/
+  15. file://localhost/Users/bosborne/schema/chado/chaos-xml/INSTALL
+  16. file://localhost/Users/bosborne/schema/chado/chaos-xml/xsl
+  17. file://localhost/Users/bosborne/schema/chado/chaos-xml/bin/
+  18. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd/chaos.dtd
+  19. http://www.gmod.org/schema/index.shtml
+  20. http://lists.sourceforge.net/lists/listinfo/gmod-schema
+  21. mailto:cjm@fruitfly.org
