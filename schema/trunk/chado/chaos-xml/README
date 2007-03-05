@@ -1,14 +1,12 @@
+# $Id: README,v 1.4 2007-03-05 16:58:54 briano Exp $
+
 chaos-xml/README
-# $Id: README,v 1.3 2007-03-05 16:34:14 briano Exp $
 
-Refer to the INSTALL file for installation instructions
-
-Please read the file index.html using a web browser for a description
-of this software
+Refer to the INSTALL file for installation instructions.
 
                                Chaos-XML Library
 
-Intro
+Introduction
 
    The Chaos-XML Library contains software and specifications for the
    Chaos XML format. Chaos XML is for representing sequences and sequence
@@ -24,7 +22,7 @@ Intro
    extracting chaos from various datasources, and for manipulating and
    transforming chaos documents.
 
-   Chaos-XML is the annotation format for [1]CGL.
+   Chaos-XML is the annotation format for CGL.
 
 Status
 
@@ -34,19 +32,19 @@ Status
 Downloading and Installation
 
    You can either download the latest stable release, or fetch the
-   bleeding-edge latest version from CVS
+   bleeding-edge latest version from CVS.
 
-  Download stable release
+Download stable release
 
-   This is recommended for most users
+   This is recommended for most users.
 
-   The current latest release is [2]Bio-Chaos-0.01. Download this and
-   follow the instructions in the [3]INSTALL file
+   The current latest release is Bio-Chaos-0.01. Download this and
+   follow the instructions in the INSTALL file.
 
-  Obtain from CVS
+Obtain from CVS
 
-   See [4]GMOD CVS for details. Chaos-XML is part of the gmod-schema
-   project, see [5]gmod/schema/chado/chaos-xml
+   See http://wiki.gmod.org/index.php/Chaos_XML for details. Chaos-XML
+	is part of the gmod-schema project, see gmod/schema/chado/chaos-xml
 
 Motivation
 
@@ -81,11 +79,11 @@ The Chaos Model
    format.
 
    Briefly, Chaos (and Chado) are generic ontology-typed feature graph
-   formats. This is similar to, but richer than, the [6]GFF3 format
+   formats. This is similar to, but richer than, the GFF3 format.
 
    The central concept in Chaos/Chado is a "feature". A feature can
    represent any genomic or sequence entity that is typed by the
-   [7]Sequence Ontology (SO)
+   Sequence Ontology (SO).
 
    Features are interconnected in a feature graph using the
    feature_relationship element. This is to indicate which exons and
@@ -100,96 +98,73 @@ The Chaos Model
    indicate the five prime (natural start) and three prime (natural end)
    coordinates.
 
-   For more details, see the [8]dtd/ directory
+   For more details, see the dtd/ directory
 
 Differences between Chaos XML and the Chado Relational Database Schema
 
    Chaos-XML is based on the Chado relational model. For a full
    explanation of the meaning of the elements in Chaos-XML, please refer
-   to the Chado documentation
+   to the Chado documentation at wiki.gmod.org.
 
-   For a full explanation of the differences, see [9]Chaos and Chado
+   For a full explanation of the differences, see http://wiki.gmod.org/index.php/Chaos_XML
 
 Library Contents
 
    The Chaos-XML Library consists of specifications and software for
    dealing with Chaos-XML files.
 
-  DTD
+DTD
 
-   The DTD specification can be found in [10]dtd/chaos.dtd
+   The DTD specification can be found in dtd/chaos.dtd
 
-   Soon there will also be specifications as XML Schema and/or Relax-NG
+   Soon there will also be specifications as XML Schema and/or Relax-NG.
 
-  XSL Stylesheets
+XSL Stylesheets
 
-   XSL transformations can be found in the [11]xsl/ directory.
+   XSL transformations can be found in the xsl/ directory.
 
-  Example Chaos XML
+Example Chaos XML
 
-   Example Chaos-XML can be found in the [12]sample-data/ directory.
+   Example Chaos-XML can be found in the sample-data/ directory.
 
-  Scripts
+ Scripts
 
-   The scripts are in the [13]bin/ directory. You need to install the
+   The scripts are in the bin/ directory. You need to install the
    perl chaos library before running these scripts.
 
-  Chaos Perl Module
+ Chaos Perl Module
 
-   You can browse the perl modules in the [14]lib/ directory. To install,
+   You can browse the perl modules in the lib/ directory. To install,
    download the chaos-xml library and follow the instructions in the
-   [15]INSTALL file.
+   INSTALL file.
 
 Converting between Chaos-XML and Chado-XML
 
    There are XSLT stylesheets defined for mapping between these two
-   similar formats, see the [16]xsl/ directory.
+   similar formats, see the xsl/ directory.
 
    If you are not familiar with XSLT, you can use these scripts, part of
-   this distribution (see the [17]bin/ directory
+   this distribution (see the bin/ directory):
+
      * cx-chaos2chadoxml.pl
      * cx-chadoxml2chaos.pl
 
 Future Extensions
 
    As new modules are added to chado (for example, the genetics module
-   and the phylogeny module), corresponding chaos-xml [18]DTDs will be
+   and the phylogeny module), corresponding chaos-xml DTDs will be
    generated.
 
 Questions and Further info
 
-   For general info on the chado schema, see
-   [19]http://www.gmod.org/schema/index.shtml
+   For general info on the chado schema, see http://wiki.gmod.org
 
    Send questions/comments to this mail list:
-   [20]http://lists.sourceforge.net/lists/listinfo/gmod-schema
-     _________________________________________________________________
+   
+   http://lists.sourceforge.net/lists/listinfo/gmod-schema
+    _________________________________________________________________
 
 
-    [21]Chris Mungall
+   Chris Mungall
 
    Last modified: Tue May 10 11:11:15 PDT 2005
-
-References
-
-   1. http://www.yandell-lab.org/
-   2. file://localhost/Users/bosborne/schema/chado/chaos-xml/Bio-Chaos-0.01.tar.gz
-   3. file://localhost/Users/bosborne/schema/chado/chaos-xml/INSTALL
-   4. http://www.gmod.org/cvs.shtml
-   5. http://cvs.sourceforge.net/viewcvs.py/gmod/schema/chado/chaos-xml/
-   6. http://song.sourceforge.net/gff3-jan04.shtml
-   7. http://song.sourceforge.net/
-   8. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd
-   9. file://localhost/Users/bosborne/schema/chado/chaos-xml/doc/chaos-and-chado.html
-  10. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd/chaos.dtd
-  11. file://localhost/Users/bosborne/schema/chado/chaos-xml/xsl/
-  12. file://localhost/Users/bosborne/schema/chado/chaos-xml/sample-data/
-  13. file://localhost/Users/bosborne/schema/chado/chaos-xml/bin/
-  14. file://localhost/Users/bosborne/schema/chado/chaos-xml/lib/
-  15. file://localhost/Users/bosborne/schema/chado/chaos-xml/INSTALL
-  16. file://localhost/Users/bosborne/schema/chado/chaos-xml/xsl
-  17. file://localhost/Users/bosborne/schema/chado/chaos-xml/bin/
-  18. file://localhost/Users/bosborne/schema/chado/chaos-xml/dtd/chaos.dtd
-  19. http://www.gmod.org/schema/index.shtml
-  20. http://lists.sourceforge.net/lists/listinfo/gmod-schema
-  21. mailto:cjm@fruitfly.org
