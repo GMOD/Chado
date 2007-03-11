@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.111 2007-02-20 15:48:31 briano Exp $
+# $Id: Makefile.PL,v 1.112 2007-03-11 17:40:57 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -359,7 +359,7 @@ copy(
      "$working_dir/modules/nofuncs.sql");
 
 if (-e "$working_dir/../GMODTools") {
-    print "\nCopying GMODTools from it's directory using its ant build.xml ...\n";
+    print "\nCopying GMODTools from its directory using its ant build.xml ...\n";
 
     chdir "$working_dir/../GMODTools";
 
