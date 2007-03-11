@@ -44,7 +44,7 @@ use base qw(Class::DBI::Pg);
 
 my \$db_options = { __PACKAGE__->_default_attributes };
 __PACKAGE__->_remember_handle('Main'); # so dbi_commit works
-\$db_options{AutoCommit} = 0;
+\$db_options->{AutoCommit} = 0;
 
 sub db_Main {
   my \$dbh;
