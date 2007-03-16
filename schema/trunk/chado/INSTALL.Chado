@@ -1,4 +1,4 @@
-$Id: INSTALL.Chado,v 1.2 2007-03-16 17:19:17 briano Exp $
+$Id: INSTALL.Chado,v 1.3 2007-03-16 17:30:28 briano Exp $
 
 CHADO INSTALLATION
 
@@ -345,51 +345,13 @@ DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
 
         $ psql <database name>     <   <ontologies only sql filename>
 
-With that, the installation of the schema is complete.  The easiest way
-to load data into the database is to use a GFF3 file and the script
-gmod_bulk_load_gff3.pl.  A nice set of sample data is the GFF3 file prepared
-by the nice folks at the Saccharomyces Genome Database, at
 
-    ftp://ftp.yeastgenome.org/pub/yeast/data_download/chromosomal_feature/saccharomyces_cerevisiae.gff
+LOADING DATA
 
-This file contains gene ontology (GO) anotations, so if you didn't load
-GO when you executed `make ontologies`, you will get many warning messages
-about being unable to find entries in the dbxref table.  If you want to
-load GO now, you can execute `make ontologies` and select 'Gene Ontology'
-for installation.
+With that, the installation of the schema is complete. Please see the HOWTOs
+at http://wiki.gmod.org for information on loading the Chado schema
+with data.
 
-Then execute gmod_bulk_load_gff3.pl: 
-
-    gmod_bulk_load_gff3.pl --organism yeast \
-                           --gfffile saccharomyces_cerevisiae.gff
-
-    (note that the '\' is included to allow cutting and pasting to a unix
-    command line.)
-    This loads the GFF3 file.  The loading script requires GFF3 as it has
-    tighter control of the syntax and requires the use of a controlled
-    vocabulary (from Sequence Ontology Feature Annotation (SOFA)), allowing
-    mapping to the relational schema.  In addition to supplying the location
-    of the file with the --gfffile flag, the --organism tag uses the common
-    name (common_name field) from the organism table.  Do 
-    "perldoc gmod_bulk_load_gff.pl" for
-    more information on adding other organisms and databases, as well as
-    other available commandline flags.
-
-    GFF3 can also be generated via a script provided with Bioperl,
-    bp_genbank2gff.pl:
-
-        $ bp_genbank2gff.pl --stdout --file <genbank file> > <gff file>
-
-    Note the redirection of standard out.  Note that this method
-    for generating GFF3 files is not completely satisfactory and
-    development is ongoing to provide better translation.
-
-Note that gmod_load_gff3.pl is also available, but is limited in how
-much it has been supported and in how flexible it currently is.  It is
-a good example of how to write code using Class::DBI classes that are 
-created at the time of install.  For more information on using these
-classes, see http://sourceforge.net/projects/gmod-ware for a Class::DBI
-based middleware/API.
 
 GENERIC GENOME BROWSER
 
