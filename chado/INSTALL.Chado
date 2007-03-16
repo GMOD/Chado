@@ -1,30 +1,25 @@
-$Id: INSTALL,v 1.55 2007-02-20 15:44:12 briano Exp $
+$Id: INSTALL.Chado,v 1.1 2007-03-16 01:28:36 briano Exp $
 
 CHADO INSTALLATION
 
 This document describes the procedure for installing the Chado 
 schema and loading data from GFF3 data records.  This is currently
-considered beta software, so expect there to be bumps in the road.  When
-you experience problems, please email them to the gmod-schema mailing list
-at gmod-schema@lists.sourceforge.net.  This release will work with the
-most recent release of the Generic Genome Browser (gbrowse) version 1.66
-If you experience difficulties with gbrowse and chado, you might want to
-look at getting a cvs checkout of the gbrowse-session branch.  The
-installation instructions for gbrowse are included in that package. 
-There are plans to make the installation of gbrowse and other components
-more automatic, but for the time being, please unpack it and install
-separately.
+considered beta software - when you experience problems, please email
+them to the gmod-schema mailing list
+at gmod-schema@lists.sourceforge.net.  
 
-This release of chado/gmod also comes with example functions for
+This release will work with the most recent release of the Generic 
+Genome Browser (Gbrowse) version 1.66. If you experience difficulties 
+with Gbrowse and Chado, you might want to look at getting a CVS
+checkout of the gbrowse-session branch.  The installation instructions
+for Gbrowse are included in that package. 
+
+This release of Chado and GMOD also comes with example functions for
 allowing Apollo (http://www.gmod.org/apollo) to read and
 write directly to the database, allowing creation and editing of
 genome features as well as a sample database.  Please see the file
 README.Apollo for some details on setting this up.
 
-Thanks,
-Scott Cain
-cain@cshl.edu
-January 2, 2007
 
 Prerequisites:
 
@@ -37,11 +32,11 @@ Prerequisites:
     2. Version 7.4 is incompatible with the functions for making CMap
     integration more seamless.
 
-  Neither problem is insurmountable; it is really a matter conconvience.
+  Neither problem is insurmountable; it is really a matter of convenience.
 
   Items to do with postgres to make it ready to go:
 
-    * make it accept tcp/ip connections by adding this line to postgresql.conf
+    * Make it accept TCP/IP connections by adding this line to postgresql.conf
       (must be done either as user root or postgres; database must be restarted
       in order for this change to take affect):
 
@@ -49,21 +44,21 @@ Prerequisites:
 
       (This option is not available and not needed in PostgreSQL 8.1.)
 
-    * create a database user with permission to drop and add databases;
-      the database user name should be the same as your unix user name to
+    * Create a database user with permission to drop and add databases;
+      the database user name should be the same as your Unix user name to
       allow the software build to progress smoothly (must be done as user
       postgres; createuser is a commandline program that comes with the
       PostgreSQL package):
         
         # createuser --createdb <your username> 
 
-    * tell postgres that it can use the plpgsql language (as user
+    * Tell postgres that it can use the plpgsql language (as user
       postgres; createlang is a commandline program that comes with
       the PostgreSQL package):
 
         # createlang plpgsql template1
 
-    * edit the pg_hba.conf (either as the user 'root' or 'postgres') to give
+    * Edit the pg_hba.conf (either as the user 'root' or 'postgres') to give
       the user created above permission to access the database.  Read
       the comments in pg_hba.conf regarding permissions.  My pg_hba.conf looks
       like this (which is very loose permissions):
@@ -73,12 +68,11 @@ Prerequisites:
 local   all         all                                             trust
 host    all         all         127.0.0.1         255.255.255.255   trust
 
-
-    * for information on tuning postgres for performance, see
+    * For information on tuning postgres for performance, see
 
          http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
 
-      the two most critical parameters to tune are shared_buffers and
+      The two most critical parameters to tune are shared_buffers and
       effective_cache size.  Adjusting these parameters may require
       modification of memory settings in /etc/sysctl.conf, see the sysctl
       manpage for details.  Also critical for continued performance of
@@ -105,9 +99,9 @@ host    all         all         127.0.0.1         255.255.255.255   trust
           sysctl -w kern.sysv.shmseg=8
           sysctl -w kern.sysv.shmall=25600 # 4k pages: 100 megs
 
-      (these are the values I use for my Mac that has 1.2 G RAM) and reboot.
+      (these are the values used on a Mac that has 1.2 G RAM) and reboot.
 
-      For my linux box with 512M RAM, I use these values in /etc/sysctl.conf:
+      For a Linux box with 512M RAM, use these values in /etc/sysctl.conf:
 
          kernel.shmall = 134217728
          kernel.shmmax = 134217728
@@ -119,10 +113,11 @@ host    all         all         127.0.0.1         255.255.255.255   trust
          max_connections = 32
 
 
-  Apache (1.3.* or 2.0.*) (gmod-web requires 2.0)
+  Apache
+		Version 1.3* or 2.0*, GMODWeb requires 2.0.
 
-  BioPerl (bioperl-live or greater than 1.5.1)
-          (-microarray 0.1 --required for microarray data)
+  BioPerl
+		bioperl-live or a version greater than 1.5.1.
 
   go-perl
       Get from http://archive.godatabase.org/latest-full/*utilities-src.tar.gz
@@ -134,7 +129,7 @@ host    all         all         127.0.0.1         255.255.255.255   trust
       a distribution, this is not necessary, as the files will have
       already been moved as part of the build process.
 
-  Standard Perl modules:
+  Standard Perl modules
       The perl modules can be installed via the cpan shell and by issuing 
       the command 'install Bundle::GMOD' which will install all of the 
       modules below except for SQL::Translator, which is optional.
@@ -212,7 +207,7 @@ As indicated, the host, port, and password are optional.
         Answering yes skips questions about what exensions to use, and
         eliminates the need to have SQL::Translator installed.  This
         is recomended, and that is all that is necessary in order to use
-        the full schema and run GBrowse and gmod-web on top of it.
+        the full schema and run GBrowse and GMODWeb on top of it.
 
         *   Use values in '/home/scott/gmod/build.conf'? [Y]
 
@@ -263,10 +258,12 @@ As indicated, the host, port, and password are optional.
         SCHEMAS section below for more information.
 
 *   make
+
     Creates necessary files for the rest of the build process.
 
 
 *   (sudo) make install
+
     Probably needs to be run as root.  Installs data loading scripts
     in perl's path (typically /usr/local/bin or /usr/bin), perl modules,
     as well as placing various files in $GMOD_ROOT, and creating the
@@ -275,14 +272,16 @@ As indicated, the host, port, and password are optional.
 
 
 *   make load_schema
+
     Creates database, installs schema.  Note that it will wipe out
     any database with the same name in the process!
 
 
 *   make prepdb
+
     Inserts a few useful items into fundamental Chado tables. It 
     uses load/etc/initialize.sql.  It contains information for several
-    common organisms and source databases (eg, genbank). This file
+    common organisms and source databases (e.g. Genbank). This file
     can be edited to add any organism or source database, using the
     INSERT statements for the examples as a template.  Note also that
     the prepdb target needs to be executed before the ontologies target,
@@ -291,6 +290,7 @@ As indicated, the host, port, and password are optional.
 
 
 *   make ontologies
+
     Gets and installs various ontologies.  Requires a network 
     connection.  Absolutely required are the Relationship Ontology and
     the Sequence Ontology (SO).  All others are optional.  Note retrieved
@@ -345,11 +345,10 @@ DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
 
         $ psql <database name>     <   <ontologies only sql filename>
 
-
 With that, the installation of the schema is complete.  The easiest way
 to load data into the database is to use a GFF3 file and the script
 gmod_bulk_load_gff3.pl.  A nice set of sample data is the GFF3 file prepared
-by the nice folks at the Saccraromyces Genome Database, at
+by the nice folks at the Saccharomyces Genome Database, at
 
     ftp://ftp.yeastgenome.org/pub/yeast/data_download/chromosomal_feature/saccharomyces_cerevisiae.gff
 
@@ -370,12 +369,13 @@ Then execute gmod_bulk_load_gff3.pl:
     tighter control of the syntax and requires the use of a controlled
     vocabulary (from Sequence Ontology Feature Annotation (SOFA)), allowing
     mapping to the relational schema.  In addition to supplying the location
-    of the file with the --gfffile flag, the --orgainism tag uses the common
-    name from the organism table.  See `perldoc gmod_bulk_load_gff.pl` for
+    of the file with the --gfffile flag, the --organism tag uses the common
+    name (common_name field) from the organism table.  Do 
+    "perldoc gmod_bulk_load_gff.pl" for
     more information on adding other organisms and databases, as well as
     other available commandline flags.
 
-    GFF3 can also be generated via a script provided with bioperl,
+    GFF3 can also be generated via a script provided with Bioperl,
     bp_genbank2gff.pl:
 
         $ bp_genbank2gff.pl --stdout --file <genbank file> > <gff file>
@@ -393,19 +393,20 @@ based middleware/API.
 
 GENERIC GENOME BROWSER
 
-Finally, to browse the data in chado, install the Generic Genome Browser,
+Finally, to browse the data in Chado, install the Generic Genome Browser,
 GBrowse.  To do this execute the following commands (substituting the
 version number for the 'x's):
 
     $ tar -zxvf Generic-Genome-Browser-x.xx.tar.gz
     $ cd Generic-Genome-Browser-x.xx
-    and follow the instruction in the INSTALL documentation.
+  
+And follow the instruction in the INSTALL documentation.
 
 After installing GBrowse, go to 
 
   http://localhost/gbrowse/docs/pod/README-chado.html
 
-for more information on configuring GBrowse to work with chado.
+for more information on configuring GBrowse to work with Chado.
 
 
 CUSTOM DATABASE SCHEMAS
@@ -425,4 +426,3 @@ are in place and you run `perl Makefile.PL`, the only difference between
 the simple and non-simple installs is that the non-simple install will
 build AutoDBI.pm using SQL::Translator, which will take several minutes
 typically.
-

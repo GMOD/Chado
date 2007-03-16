@@ -115,8 +115,19 @@
 
 <em>
 	<br />
+	$Id: pub.html,v 1.3 2007-03-16 01:28:38 briano Exp $ <br />
+	========================================== <br />
+	Chado pub module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	:import dbxref from general <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: pub <br />
+	================================================ <br />
 	A documented provenance artefact - publications,
-	documents, personal communication 
+	documents, personal communication. 
 </em>
 
 <table border="1">
@@ -156,7 +167,7 @@
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">descriptive general heading </td>
+	<td class="FieldCellOther">Descriptive general heading. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -165,7 +176,7 @@
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">title of part if one of a series </td>
+	<td class="FieldCellOther">Title of part if one of a series. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -183,7 +194,7 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">full name of (journal) series </td>
+	<td class="FieldCellOther">Full name of (journal) series. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -210,7 +221,7 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">page number range[s], eg, 457--459, viii + 664pp, lv--lvii </td>
+	<td class="FieldCellOther">Page number range[s], e.g. 457--459, viii + 664pp, lv--lvii. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -237,7 +248,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, the type of the publication (book, journal, poem, graffiti, etc). Uses pub cv </td>
+	<td class="FieldCellOther">NOT NULL, The type of the publication (book, journal, poem, graffiti, etc). Uses pub cv. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -359,11 +370,13 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: pub_relationship <br />
+	================================================ <br />
 	Handle relationships between
-	publications, eg, when one publication makes others obsolete, when one
+	publications, e.g. when one publication makes others obsolete, when one
 	publication contains errata with respect to other publication(s), or
-	when one publication also appears in another pub (I think these three
-	are it - at least for fb) 
+	when one publication also appears in another pub. 
 </em>
 
 <table border="1">
@@ -541,8 +554,11 @@
 
 <em>
 	<br />
-	Handle links to eg, pubmed, biosis,
-	zoorec, OCLC, mdeline, ISSN, coden... 
+	================================================ <br />
+	TABLE: pub_dbxref <br />
+	================================================ <br />
+	Handle links to repositories,
+	e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden... 
 </em>
 
 <table border="1">
@@ -710,7 +726,10 @@
 
 <em>
 	<br />
-	an author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors. 
+	================================================ <br />
+	TABLE: pubauthor <br />
+	================================================ <br />
+	An author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors. 
 </em>
 
 <table border="1">
@@ -759,7 +778,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, order of author in author list for this pub - order is important </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Order of author in author list for this pub - order is important. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -768,7 +787,7 @@
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans </td>
+	<td class="FieldCellOther">Indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -786,7 +805,7 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">100</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">first name, initials </td>
+	<td class="FieldCellOther">First name, initials </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -895,7 +914,10 @@
 
 <em>
 	<br />
-	Property-value pairs for a pub. Follows standard chado pattern - see sequence module for details 
+	================================================ <br />
+	TABLE: pubprop <br />
+	================================================ <br />
+	Property-value pairs for a pub. Follows standard chado pattern. 
 </em>
 
 <table border="1">
@@ -1050,7 +1072,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
+SQL::Translator 0.08</a>
 
 </body>
 </html>

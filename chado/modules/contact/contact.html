@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
 <meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
-</head><body>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -75,10 +79,11 @@
 
 <em>
 	<br />
+	$Id: contact.html,v 1.2 2007-03-16 01:28:37 briano Exp $ <br />
 	================================================ <br />
 	TABLE: contact <br />
 	================================================ <br />
-	model persons, institutes, groups, organizations, etc 
+	Model persons, institutes, groups, organizations, etc. 
 </em>
 
 <table border="1">
@@ -118,7 +123,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">what type of contact is this?  e.g. "person", "lab", etc. </td>
+	<td class="FieldCellOther">What type of contact is this?  e.g. "person", "lab", etc. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -207,7 +212,7 @@
 	================================================ <br />
 	TABLE: contact_relationship <br />
 	================================================ <br />
-	model relationships between contacts 
+	Model relationships between contacts 
 </em>
 
 <table border="1">
@@ -247,7 +252,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -256,7 +261,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node. </td>
 	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
@@ -265,7 +270,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node. </td>
 	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
@@ -363,5 +368,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
-</body></html>
+SQL::Translator 0.08</a>
+
+</body>
+</html>
