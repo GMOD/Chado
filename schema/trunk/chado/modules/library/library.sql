@@ -1,4 +1,4 @@
--- $Id: library.sql,v 1.6 2007-02-19 19:47:22 briano Exp $
+-- $Id: library.sql,v 1.7 2007-03-16 01:28:38 briano Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -62,6 +62,7 @@ exists so that somebody querying the database with an obsolete name
 can find the object they are looking for under its current name.  If
 the synonym has been used publicly and deliberately (e.g. in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (e.g., there was a typo which went public), then the is_internal bit may be set to "true" so that it is known that the synonym is "internal" and should be queryable but should not be listed in reports as a valid synonym.';
 
+
 -- ================================================
 -- TABLE: library_pub
 -- ================================================
@@ -117,8 +118,7 @@ create index library_cvterm_idx1 on library_cvterm (library_id);
 create index library_cvterm_idx2 on library_cvterm (cvterm_id);
 create index library_cvterm_idx3 on library_cvterm (pub_id);
 
-COMMENT ON TABLE LIBRARY_CVTERM IS 'The table library_cvterm links
-a library to controlled vocabularies which describe the library.  For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library.';
+COMMENT ON TABLE LIBRARY_CVTERM IS 'The table library_cvterm links a library to controlled vocabularies which describe the library.  For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library.';
 
 
 -- ================================================

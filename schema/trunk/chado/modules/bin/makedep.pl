@@ -114,6 +114,7 @@ sub get_module_sqlfile {
 sub usage {
     print <<_USAGE;
 Usage: makedep.pl <module1> [<module2> ...] > chado.ddl
+Example: makedep.pl --modules companalysis,contact,cv,expression,general,genetic,library,map,organism,phenotype,phylogeny,pub,sequence,www,stock > chado.ddl
 Options:
     -h|--help    prints this message and exits
     --modules    a string of comma or space-delimited module names

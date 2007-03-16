@@ -115,6 +115,18 @@
 
 <em>
 	<br />
+	$Id: organism.html,v 1.4 2007-03-16 01:28:38 briano Exp $ <br />
+	========================================== <br />
+	Chado organism module <br />
+	============ <br />
+	DEPENDENCIES <br />
+	============ <br />
+	:import cvterm from cv <br />
+	:import dbxref from general <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	================================================ <br />
+	TABLE: organism <br />
+	================================================ <br />
 	The organismal taxonomic
 	classification. Note that phylogenies are represented using the
 	phylogeny module, and taxonomies can be represented using the cvterm
@@ -177,7 +189,7 @@
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always
-uniquely identified by genus+species. When mapping from the NCBI
+uniquely identified by genus and species. When mapping from the NCBI
 taxonomy names.dmp file, the unique-name column must be used where it
 is present, as the name column is not always unique (eg environmental
 samples). If a particular strain or subspecies is to be represented,
@@ -259,6 +271,19 @@ pattern </td>
 		<a name="organism_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organism_dbxref <br />
+	================================================
+</em>
 
 <table border="1">
 
@@ -411,7 +436,10 @@ pattern </td>
 
 <em>
 	<br />
-	tag-value properties - follows standard chado model 
+	================================================ <br />
+	TABLE: organismprop <br />
+	================================================ <br />
+	Tag-value properties - follows standard chado model. 
 </em>
 
 <table border="1">
@@ -935,7 +963,7 @@ pattern </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08_01</a>
+SQL::Translator 0.08</a>
 
 </body>
 </html>

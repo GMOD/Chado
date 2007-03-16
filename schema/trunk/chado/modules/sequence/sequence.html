@@ -271,12 +271,25 @@
 
 <em>
 	<br />
+	$Id: sequence.html,v 1.4 2007-03-16 01:28:38 briano Exp $ <br />
+	========================================== <br />
+	Chado sequence module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	:import dbxref from general <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: feature <br />
+	================================================ <br />
 	A feature is a biological sequence or a
 	section of a biological sequence, or a collection of such
 	sections. Examples include genes, exons, transcripts, regulatory
 	regions, polypeptides, protein domains, chromosome sequences, sequence
 	variations, cross-genome match regions such as hits and HSPs and so
-	on; see the Sequence Ontology for more 
+	on; see the Sequence Ontology for more. 
 </em>
 
 <table border="1">
@@ -318,7 +331,7 @@
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">An optional primary public stable
 identifier for this feature. Secondary identifiers and external
-dbxrefs go in table:feature_dbxref </td>
+dbxrefs go in table:feature_dbxref. </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -328,7 +341,7 @@ dbxrefs go in table:feature_dbxref </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The organism to which this feature
-belongs. This column is mandatory </td>
+belongs. This column is mandatory. </td>
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
@@ -338,7 +351,7 @@ belongs. This column is mandatory </td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">The optional human-readable common name for
-a feature, for display purposes </td>
+a feature, for display purposes. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -350,7 +363,7 @@ a feature, for display purposes </td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a feature; may
 not be necessarily be particularly human-readable, although this is
 prefered. This name must be unique for this type of feature within
-this organism </td>
+this organism. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -367,7 +380,7 @@ featureloc. It is recommended that the value for this column be
 manifested for features which may may non-contiguous sublocations (eg
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
-RNA sequence </td>
+RNA sequence. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -382,7 +395,7 @@ column, and also with featureloc. This column is required because the
 location may be unknown and the residue sequence may not be
 manifested, yet it may be desirable to store and query the length of
 the feature. The seqlen should always be manifested where the length
-of the sequence is known </td>
+of the sequence is known. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -394,7 +407,7 @@ of the sequence is known </td>
 	<td class="FieldCellOther">The 32-character checksum of the sequence,
 calculated using the MD5 algorithm. This is practically guaranteed to
 be unique for any feature. This column thus acts as a unique
-identifier on the mathematical sequence </td>
+identifier on the mathematical sequence. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -405,7 +418,7 @@ identifier on the mathematical sequence </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A required reference to a table:cvterm
 giving the feature type. This will typically be a Sequence Ontology
-identifier. This column is thus used to subclass the feature table </td>
+identifier. This column is thus used to subclass the feature table. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -421,7 +434,7 @@ between analysis/annotation may be fuzzy, this should be determined on
 a per-project basis in a consistent manner. One requirement is that
 there should only be one non-analysis version of each wild-type gene
 feature in a genome, whereas the same gene feature can be predicted
-multiple times in different analyses </td>
+multiple times in different analyses. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -433,7 +446,7 @@ multiple times in different analyses </td>
 	<td class="FieldCellOther">NOT NULL, Boolean indicating whether this
 feature has been obsoleted. Some chado instances may choose to simply
 remove the feature altogether, others may choose to keep an obsolete
-row in the table </td>
+row in the table. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -442,10 +455,10 @@ row in the table </td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther">NOT NULL, for handling object
+	<td class="FieldCellOther">NOT NULL, For handling object
 accession/modification timestamps (as opposed to db auditing info,
 handled elsewhere). The expectation is that these fields would be
-available to software interacting with chado </td>
+available to software interacting with chado. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -454,10 +467,10 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther">NOT NULL, for handling object
+	<td class="FieldCellOther">NOT NULL, For handling object
 accession/modification timestamps (as opposed to db auditing info,
 handled elsewhere). The expectation is that these fields would be
-available to software interacting with chado </td>
+available to software interacting with chado. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -607,12 +620,17 @@ available to software interacting with chado </td>
 
 <em>
 	<br />
+	COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified <br />
+	by the combination of organism, uniquename and feature type'; <br />
+	================================================ <br />
+	TABLE: featureloc <br />
+	================================================ <br />
 	The location of a feature relative to
-	another feature.  IMPORTANT: INTERBASE COORDINATES ARE USED.(This is
-	vital as it allows us to represent zero-length features eg splice
-	sites, insertion points without an awkward fuzzy system). Features
+	another feature.  IMPORTANT: INTERBASE COORDINATES ARE USED. This is
+	vital as it allows us to represent zero-length features e.g. splice
+	sites, insertion points without an awkward fuzzy system. Features
 	typically have exactly ONE location, but this need not be the
-	case. Some features may not be localized (eg a gene that has been
+	case. Some features may not be localized (e.g. a gene that has been
 	characterized genetically but no sequence/molecular info is
 	available). NOTE ON MULTIPLE LOCATIONS: Each feature can have 0 or
 	more locations. Multiple locations do NOT indicate non-contiguous
@@ -621,12 +639,12 @@ available to software interacting with chado </td>
 	manifested). Instead, multiple featurelocs for a feature designate
 	alternate locations or grouped locations; for instance, a feature
 	designating a blast hit or hsp will have two locations, one on the
-	query feature, one on the subject feature.  features representing
+	query feature, one on the subject feature. Features representing
 	sequence variation could have alternate locations instantiated on a
-	feature on the mutant strain.  the column:rank is used to
+	feature on the mutant strain. The column:rank is used to
 	differentiate these different locations. Reflexive locations should
-	never be stored - this is for -proper- (ie non-self) locations only;
-	i.e. nothing should be located relative to itself 
+	never be stored - this is for -proper- (i.e. non-self) locations only;
+	i.e. nothing should be located relative to itself. 
 </em>
 
 <table border="1">
@@ -666,7 +684,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The feature that is being located. Any feature can have zero or more featurelocs </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The feature that is being located. Any feature can have zero or more featurelocs. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -675,7 +693,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph </td>
+	<td class="FieldCellOther">The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -684,7 +702,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin </td>
+	<td class="FieldCellOther">The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -695,7 +713,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellDefault">false</td>
 	<td class="FieldCellOther">NOT NULL, This is typically
 false, but may be true if the value for column:fmin is inaccurate or
-the leftmost part of the range is unknown/unbounded </td>
+the leftmost part of the range is unknown/unbounded. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -704,7 +722,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (eg GFF, bioperl) </td>
+	<td class="FieldCellOther">The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -715,7 +733,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellDefault">false</td>
 	<td class="FieldCellOther">NOT NULL, This is typically
 false, but may be true if the value for column:fmax is inaccurate or
-the rightmost part of the range is unknown/unbounded </td>
+the rightmost part of the range is unknown/unbounded. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -725,7 +743,7 @@ the rightmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellSize">5</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">The orientation/directionality of the
-location. Should be 0,-1 or +1 </td>
+location. Should be 0, -1 or +1. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -734,10 +752,11 @@ location. Should be 0,-1 or +1 </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">phase of translation wrt srcfeature_id.
-Values are 0,1,2. It may not be possible to manifest this column for
+	<td class="FieldCellOther">Phase of translation with
+respect to srcfeature_id.
+Values are 0, 1, 2. It may not be possible to manifest this column for
 some features such as exons, because the phase is dependant on the
-spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs </td>
+spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -747,14 +766,14 @@ spliceform (the same exon can appear in multiple spliceforms). This column is mo
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">Alternative residues,
-when these differ from feature.residues. for instance, a SNP feature
-located on a wild and mutant protein would have different alresidues.
-for alignment/similarity features, the altresidues is used to
+when these differ from feature.residues. For instance, a SNP feature
+located on a wild and mutant protein would have different alternative residues.
+for alignment/similarity features, the alternative residues is used to
 represent the alignment string (CIGAR format). Note on variation
-features; even if we dont want to instantiate a mutant
+features; even if we do not want to instantiate a mutant
 chromosome/contig feature, we can still represent a SNP etc with 2
 locations, one (rank 0) on the genome, the other (rank 1) would have
-most fields null, except for altresidues </td>
+most fields null, except for alternative residues. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -769,20 +788,20 @@ used for the DIRECT location of a feature. !! MOST CHADO USERS MAY
 NEVER USE featurelocs WITH logroup>0 !! Transitively derived locations
 are indicated with locgroup>0. For example, the position of an exon on
 a BAC and in global chromosome coordinates. This column is used to
-differentiate these groupings of locations. the default locgroup 0
+differentiate these groupings of locations. The default locgroup 0
 is used for the main/primary location, from which the others can be
-derived via coordinate transformations. another example of redundant
+derived via coordinate transformations. Another example of redundant
 locations is storing ORF coordinates relative to both transcript and
-genome. redundant locations open the possibility of the database
+genome. Redundant locations open the possibility of the database
 getting into inconsistent states; this schema gives us the flexibility
 of both warehouse instantiations with redundant locations (easier for
 querying) and management instantiations with no redundant
 locations. An example of using both locgroup and rank: imagine a
 feature indicating a conserved region between the chromosomes of two
-different species. we may want to keep redundant locations on both
-contigs and chromosomes. we would thus have 4 locations for the single
+different species. We may want to keep redundant locations on both
+contigs and chromosomes. We would thus have 4 locations for the single
 conserved region feature - two distinct locgroups (contig level and
-chromosome level) and two distinct ranks (for the two species) </td>
+chromosome level) and two distinct ranks (for the two species). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -792,13 +811,13 @@ chromosome level) and two distinct ranks (for the two species) </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Used when a feature has >1
-location, otherwise the default rank 0 is used. Some features (eg
+location, otherwise the default rank 0 is used. Some features (e.g.
 blast hits and HSPs) have two locations - one on the query and one on
 the subject. Rank is used to differentiate these. Rank=0 is always
 used for the query, Rank=1 for the subject. For multiple alignments,
 assignment of rank is arbitrary. Rank is also used for
 sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
-(or baseline) feature, Rank=1 indicates the mutant (or compared) feature </td>
+(or baseline) feature, Rank=1 indicates the mutant (or compared) feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -930,7 +949,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<br />
 	COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely <br />
 	partition locations for any one feature'; <br />
-	Provenance of featureloc. Linking table between featurelocs and publications that mention them 
+	================================================ <br />
+	TABLE: featureloc_pub <br />
+	================================================ <br />
+	Provenance of featureloc. Linking table between featurelocs and publications that mention them. 
 </em>
 
 <table border="1">
@@ -1084,7 +1106,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	Provenance. Linking table between features and publications that mention them 
+	================================================ <br />
+	TABLE: feature_pub <br />
+	================================================ <br />
+	Provenance. Linking table between features and publications that mention them. 
 </em>
 
 <table border="1">
@@ -1238,7 +1263,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	Property or attribute of a feature_pub link 
+	================================================ <br />
+	TABLE: feature_pubprop <br />
+	================================================ <br />
+	Property or attribute of a feature_pub link. 
 </em>
 
 <table border="1">
@@ -1410,7 +1438,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible 
+	================================================ <br />
+	TABLE: featureprop <br />
+	================================================ <br />
+	A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. 
 </em>
 
 <table border="1">
@@ -1463,7 +1494,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 property/slot is a cvterm. The meaning of the property is defined in
 that cvterm. Certain property types will only apply to certain feature
 types (e.g. the anticodon property will only apply to tRNA features) ;
-the types here come from the sequence feature property ontology </td>
+the types here come from the sequence feature property ontology. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -1595,9 +1626,12 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	for any one feature, multivalued
-	property-value pairs must be differentiated by rank  <br />
-	Provenance. Any featureprop assignment can optionally be supported by a publication 
+	For any one feature, multivalued
+	property-value pairs must be differentiated by rank.  <br />
+	================================================ <br />
+	TABLE: featureprop_pub <br />
+	================================================ <br />
+	Provenance. Any featureprop assignment can optionally be supported by a publication. 
 </em>
 
 <table border="1">
@@ -1751,7 +1785,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id 
+	================================================ <br />
+	TABLE: feature_dbxref <br />
+	================================================ <br />
+	Links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id. 
 </em>
 
 <table border="1">
@@ -1809,7 +1846,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature </td>
+	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1919,15 +1956,18 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	features can be arranged in
-	graphs, eg exon part_of transcript part_of gene; translation madeby
-	transcript if type is thought of as a verb, each arc makes a statement
-	[SUBJECT VERB OBJECT] object can also be thought of as parent
+	================================================ <br />
+	TABLE: feature_relationship <br />
+	================================================ <br />
+	Features can be arranged in
+	graphs, e.g. "exon part_of transcript part_of gene"; If type is
+	thought of as a verb, the each arc or edge makes a statement
+	[SUBJECT VERB OBJECT]. The object can also be thought of as parent
 	(containing feature), and subject as child (contained feature or
-	subfeature) -- we include the relationship rank/order, because even
+	subfeature). We include the relationship rank/order, because even
 	though most of the time we can order things implicitly by sequence
-	coordinates, we cant always do this - eg transpliced genes.  its also
-	useful for quickly getting implicit introns 
+	coordinates, we can not always do this - e.g. transpliced genes. It is also
+	useful for quickly getting implicit introns. 
 </em>
 
 <table border="1">
@@ -1967,7 +2007,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of the subj-predicate-obj sentence. This is typically the subfeature </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of the subj-predicate-obj sentence. This is typically the subfeature. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -1976,7 +2016,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the subj-predicate-obj sentence. This is typically the container feature </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the subj-predicate-obj sentence. This is typically the container feature. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -1985,7 +2025,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. The most common relationship type is OBO_REL:part_of. Valid relationship types are constrained by the Sequence Ontology </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. The most common relationship type is OBO_REL:part_of. Valid relationship types are constrained by the Sequence Ontology. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -1994,7 +2034,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">Additional notes/comments </td>
+	<td class="FieldCellOther">Additional notes or comments. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2003,7 +2043,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The ordering of subject features with respect to the object feature may be important (for example, exon ordering on a transcript - not always derivable if you take trans spliced genes into consideration). rank is used to order these; starts from zero </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The ordering of subject features with respect to the object feature may be important (for example, exon ordering on a transcript - not always derivable if you take trans spliced genes into consideration). Rank is used to order these; starts from zero. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2128,7 +2168,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Provenance. Attach optional evidence to a feature_relationship in the form of a publication 
+	================================================ <br />
+	TABLE: feature_relationship_pub <br />
+	================================================ <br />
+	Provenance. Attach optional evidence to a feature_relationship in the form of a publication. 
 </em>
 
 <table border="1">
@@ -2282,12 +2325,15 @@ default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_relationshipprop <br />
+	================================================ <br />
 	Extensible properties
 	for feature_relationships. Analagous structure to featureprop. This
 	table is largely optional and not used with a high frequency. Typical
 	scenarios may be if one wishes to attach additional data to a
 	feature_relationship - for example to say that the
-	feature_relationship is only true in certain contexts 
+	feature_relationship is only true in certain contexts. 
 </em>
 
 <table border="1">
@@ -2339,7 +2385,7 @@ default 0 value should be used </td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
 that cvterm. Currently there is no standard ontology for
-feature_relationship property types </td>
+feature_relationship property types. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2364,7 +2410,7 @@ types, but is easier to query. </td>
 ordering. Any feature_relationship can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used </td>
+the default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2474,7 +2520,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Provenance for feature_relationshipprop 
+	================================================ <br />
+	TABLE: feature_relationshipprop_pub <br />
+	================================================ <br />
+	Provenance for feature_relationshipprop. 
 </em>
 
 <table border="1">
@@ -2628,7 +2677,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Associate a term from a cv with a feature, for example, GO annotation 
+	================================================ <br />
+	TABLE: feature_cvterm <br />
+	================================================ <br />
+	Associate a term from a cv with a feature, for example, GO annotation. 
 </em>
 
 <table border="1">
@@ -2686,7 +2738,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref. </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
@@ -2695,7 +2747,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL, if this is set to true, then this annotation is interpreted as a NEGATIVE annotation - ie the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details </td>
+	<td class="FieldCellOther">NOT NULL, If this is set to true, then this annotation is interpreted as a NEGATIVE annotation - i.e. the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2820,11 +2872,14 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_cvtermprop <br />
+	================================================ <br />
 	Extensible properties for
 	feature to cvterm associations. Examples: GO evidence codes;
 	qualifiers; metadata such as the date on which the entry was curated
 	and the source of the association. See the featureprop table for
-	meanings of type_id, value and rank 
+	meanings of type_id, value and rank. 
 </em>
 
 <table border="1">
@@ -2875,7 +2930,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. cvterms may come from the OBO evidence code cv </td>
+that cvterm. cvterms may come from the OBO evidence code cv. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2900,7 +2955,7 @@ types, but is easier to query. </td>
 ordering. Any feature_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used </td>
+the default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3010,7 +3065,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details 
+	================================================ <br />
+	TABLE: feature_cvterm_dbxref <br />
+	================================================ <br />
+	Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details. 
 </em>
 
 <table border="1">
@@ -3164,11 +3222,14 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_cvterm_pub <br />
+	================================================ <br />
 	Secondary pubs for an
 	association. Each feature_cvterm association is supported by a single
 	primary publication. Additional secondary pubs can be added using this
 	linking table (in a GO gene association file, these corresponding to
-	any IDs after the pipe symbol in the publications column 
+	any IDs after the pipe symbol in the publications column. 
 </em>
 
 <table border="1">
@@ -3322,7 +3383,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	A synonym for a feature. One feature can have multiple synonyms, and the same synonym can apply to multiple features 
+	================================================ <br />
+	TABLE: synonym <br />
+	================================================ <br />
+	A synonym for a feature. One feature can have multiple synonyms, and the same synonym can apply to multiple features. 
 </em>
 
 <table border="1">
@@ -3362,7 +3426,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The synonym itself. Should be human-readable machine-searchable ascii text </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The synonym itself. Should be human-readable machine-searchable ascii text. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3371,7 +3435,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, types would be symbol and fullname for now </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Types would be symbol and fullname for now. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -3380,7 +3444,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The fully specified synonym, with any non-ascii characters encoded in SGML </td>
+	<td class="FieldCellOther">NOT NULL, The fully specified synonym, with any non-ascii characters encoded in SGML. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3480,7 +3544,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Linking table between feature and synonym 
+	================================================ <br />
+	TABLE: feature_synonym <br />
+	================================================ <br />
+	Linking table between feature and synonym. 
 </em>
 
 <table border="1">
@@ -3538,7 +3605,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the pub_id link is for relating the usage of a given synonym to the publication in which it was used </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The pub_id link is for relating the usage of a given synonym to the publication in which it was used. </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
@@ -3547,7 +3614,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature </td>
+	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3556,8 +3623,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL, typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the 
-synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym </td>
+	<td class="FieldCellOther">NOT NULL, Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym.   If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3665,7 +3731,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08_01</a>
+SQL::Translator 0.08</a>
 
 </body>
 </html>
