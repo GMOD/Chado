@@ -1951,7 +1951,7 @@ sub dbxref_error_message {
   my $tag = shift;
   warn <<END
 Your GFF3 file uses a tag called '$tag', but this term is not
-already in the cvterm table so that it's value can be inserted
+already in the cvterm and dbxref tables so that its value can be inserted
 into the featureprop table.  The easiest way to rectify this is
 to execute the following SQL commands in the psql shell:
 
