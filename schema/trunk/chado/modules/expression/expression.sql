@@ -1,4 +1,4 @@
--- $Id: expression.sql,v 1.13 2007-02-28 20:51:22 briano Exp $
+-- $Id: expression.sql,v 1.14 2007-03-23 15:18:02 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -24,7 +24,7 @@ create table expression (
        constraint expression_c1 unique(uniquename)       
 );
 
-COMMENT ON TABLE EXPRESSION IS 'The expression table is essentially a bridge table.';
+COMMENT ON TABLE expression IS 'The expression table is essentially a bridge table.';
 
 -- ================================================
 -- TABLE: expression_cvterm
@@ -135,7 +135,7 @@ create table feature_expression (
 );
 create index feature_expression_idx1 on feature_expression (expression_id);
 create index feature_expression_idx2 on feature_expression (feature_id);
-create index feature_expression_idx2 on feature_expression (pub_id);
+create index feature_expression_idx3 on feature_expression (pub_id);
 
 
 -- ================================================
@@ -154,7 +154,7 @@ create table feature_expressionprop (
        constraint feature_expressionprop_c1 unique (feature_expression_id,type_id,rank)
 );
 create index feature_expressionprop_idx1 on feature_expressionprop (feature_expression_id);
-create index expression_cvtermprop_idx2 on feature_expressionprop (type_id);
+create index feature_expressionprop_idx2 on feature_expressionprop (type_id);
 
 COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for
 feature_expression (comments, for example). Modeled on feature_cvtermprop.';
@@ -172,8 +172,8 @@ create table eimage (
       image_uri varchar(255)
 );
 
-COMMENT ON COLUMN EIMAGE.EIMAGE_DATA IS 'We expect images in eimage_data (e.g. JPEGs) to be uuencoded.';
-COMMENT ON COLUMN EIMAGE.EIMAGE_TYPE IS 'Describes the type of data in eimage_data.';
+COMMENT ON COLUMN eimage.eimage_data IS 'We expect images in eimage_data (e.g. JPEGs) to be uuencoded.';
+COMMENT ON COLUMN eimage.eimage_type IS 'Describes the type of data in eimage_data.';
 
 
 -- ================================================

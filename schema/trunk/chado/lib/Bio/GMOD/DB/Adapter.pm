@@ -2277,7 +2277,12 @@ sub synonyms  {
     unless ($self->cache('synonym',$alias)) {
       unless ($self->cache('type','synonym')) {
         my $sth
-          = $self->dbh->prepare("SELECT cvterm_id FROM cvterm WHERE name='synonym'");
+          = $self->dbh->prepare("SELECT cvterm_id FROM cvterm WHERE 
+              (name='synonym' and cv_id in 
+                 (SELECT cv_id FROM cv WHERE name='null' OR name='local')) OR
+              (name='exact' and cv_id in 
+                 (SELECT cv_id FROM cv WHERE name='synonym_type') )
+              ORDER BY name");
         $sth->execute;
         my ($syn_type) = $sth->fetchrow_array;
 
@@ -2617,6 +2622,7 @@ sub handle_dbxref {
     my ($feature,$uniquename) = @_;
 
     my @dbxrefs = $feature->annotation->get_Annotations('Dbxref');
+    push @dbxrefs, $feature->annotation->get_Annotations('dbxref');
     my ($dbxref_id,$primary_dbxref_id,$primary_pattern);
     if (defined $self->dbxref and $self->dbxref ne '1') {
         $primary_pattern = $self->dbxref;
@@ -2859,7 +2865,8 @@ sub handle_note {
                            "SELECT cvterm_id FROM cvterm WHERE name='Note'
                             AND cv_id in
                               (SELECT cv_id FROM cv WHERE name='null' OR
-                                                          name='local')");
+                                                    name='local' OR
+                                                    name='feature_property')");
           $sth->execute();
           my ($note_type) = $sth->fetchrow_array;
           $self->cache('type','Note',$note_type);
@@ -2890,7 +2897,8 @@ sub handle_gap {
                      "SELECT cvterm_id FROM cvterm WHERE name='Gap'
                             AND cv_id in
                               (SELECT cv_id FROM cv WHERE name='null' OR
-                                                          name='local')");
+                                                    name='local' OR
+                                                    name='feature_property')");
           $sth->execute();
           my ($gap_type) = $sth->fetchrow_array; 
           $self->cache('type','Gap',$gap_type);
@@ -2989,7 +2997,7 @@ sub handle_CDS {
         $sth->execute($cds_row_id,$parent,$feat_grandparent);        
     }
 
-    return;
+    return 1;
 }
 
 

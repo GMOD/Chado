@@ -1,4 +1,4 @@
--- $Id: stock.sql,v 1.6 2007-02-26 04:12:23 briano Exp $
+-- $Id: stock.sql,v 1.7 2007-03-23 15:18:03 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -35,13 +35,13 @@ create index stock_idx2 on stock (organism_id);
 create index stock_idx3 on stock (type_id);
 create index stock_idx4 on stock (uniquename);
 
-COMMENT ON TABLE STOCK IS 'Any stock can be globally identified by the
+COMMENT ON TABLE stock IS 'Any stock can be globally identified by the
 combination of organism, uniquename and stock type. A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype.';
-COMMENT ON COLUMN STOCK.DBXREF_ID IS 'The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref.';
-COMMENT ON COLUMN STOCK.ORGANISM_ID IS 'The organism_id is the organism to which the stock belongs. This column is mandatory.';
-COMMENT ON COLUMN STOCK.TYPE_ID IS 'The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm.';
-COMMENT ON COLUMN STOCK.DESCRIPTION IS 'The description is the genetic description provided in the stock list.';
-COMMENT ON COLUMN STOCK.NAME IS 'The name is a human-readable local name for a stock.';
+COMMENT ON COLUMN stock.dbxref_id IS 'The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref.';
+COMMENT ON COLUMN stock.organism_id IS 'The organism_id is the organism to which the stock belongs. This column is mandatory.';
+COMMENT ON COLUMN stock.type_id IS 'The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm.';
+COMMENT ON COLUMN stock.description IS 'The description is the genetic description provided in the stock list.';
+COMMENT ON COLUMN stock.name IS 'The name is a human-readable local name for a stock.';
 
 
 -- ================================================
@@ -60,7 +60,7 @@ create table stock_pub (
 create index stock_pub_idx1 on stock_pub (stock_id);
 create index stock_pub_idx2 on stock_pub (pub_id);
 
-COMMENT ON TABLE STOCK_PUB IS 'Provenance. Linking table between stocks and, for example, a stocklist computer file.';
+COMMENT ON TABLE stock_pub IS 'Provenance. Linking table between stocks and, for example, a stocklist computer file.';
 
 
 -- ================================================
@@ -81,7 +81,7 @@ create table stockprop (
 create index stockprop_idx1 on stockprop (stock_id);
 create index stockprop_idx2 on stockprop (type_id);
 
-COMMENT ON TABLE STOCKPROP IS 'A stock can have any number of
+COMMENT ON TABLE stockprop IS 'A stock can have any number of
 slot-value property tags attached to it. This is an alternative to
 hardcoding a list of columns in the relational schema, and is
 completely extensible. There is a unique constraint, stockprop_c1, for
@@ -104,7 +104,7 @@ create table stockprop_pub (
 create index stockprop_pub_idx1 on stockprop_pub (stockprop_id);
 create index stockprop_pub_idx2 on stockprop_pub (pub_id); 
 
-COMMENT ON TABLE STOCKPROP_PUB IS 'Provenance. Any stockprop assignment can optionally be supported by a publication.';
+COMMENT ON TABLE stockprop_pub IS 'Provenance. Any stockprop assignment can optionally be supported by a publication.';
 
 
 -- ================================================
@@ -128,11 +128,11 @@ create index stock_relationship_idx1 on stock_relationship (subject_id);
 create index stock_relationship_idx2 on stock_relationship (object_id);
 create index stock_relationship_idx3 on stock_relationship (type_id);
 
-COMMENT ON STOCK_RELATIONSHIP.SUBJECT_ID IS 'stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock.';
-COMMENT ON STOCK_RELATIONSHIP.OBJECT_ID IS 'stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock.';
-COMMENT ON STOCK_RELATIONSHIP.TYPE_ID IS 'stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
-COMMENT ON STOCK_RELATIONSHIP.RANK IS 'stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero.';
-COMMENT ON STOCK_RELATIONSHIP.VALUE IS 'stock_relationship.value is for additional notes or comments.';
+COMMENT ON COLUMN stock_relationship.subject_id IS 'stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock.';
+COMMENT ON COLUMN stock_relationship.object_id IS 'stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock.';
+COMMENT ON COLUMN stock_relationship.type_id IS 'stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
+COMMENT ON COLUMN stock_relationship.rank IS 'stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero.';
+COMMENT ON COLUMN stock_relationship.value IS 'stock_relationship.value is for additional notes or comments.';
 
 
 -- ================================================
@@ -151,7 +151,7 @@ create table stock_relationship_pub (
 create index stock_relationship_pub_idx1 on stock_relationship_pub (stock_relationship_id);
 create index stock_relationship_pub_idx2 on stock_relationship_pub (pub_id);
 
-COMMENT ON TABLE STOCK_RELATIONSHIP_PUB IS 'Provenance. Attach optional evidence to a stock_relationship in the form of a publication.';
+COMMENT ON TABLE stock_relationship_pub IS 'Provenance. Attach optional evidence to a stock_relationship in the form of a publication.';
 
 
 -- ================================================
@@ -171,8 +171,8 @@ create table stock_dbxref (
 create index stock_dbxref_idx1 on stock_dbxref (stock_id);
 create index stock_dbxref_idx2 on stock_dbxref (dbxref_id);
 
-COMMENT ON TABLE STOCK_DBXREF IS 'stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id.';
-COMMENT ON COLUMN STOCK_DBXREF.IS_CURRENT IS 'The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock.';
+COMMENT ON TABLE stock_dbxref IS 'stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id.';
+COMMENT ON COLUMN stock_dbxref.is_current IS 'The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock.';
 
 
 -- ================================================
@@ -194,7 +194,7 @@ create index stock_cvterm_idx1 on stock_cvterm (stock_id);
 create index stock_cvterm_idx2 on stock_cvterm (cvterm_id);
 create index stock_cvterm_idx3 on stock_cvterm (pub_id);
 
-COMMENT ON TABLE STOCK_CVTERM IS 'stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id.';
+COMMENT ON TABLE stock_cvterm IS 'stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id.';
 
 
 -- ================================================
@@ -213,7 +213,7 @@ create table stock_genotype (
 create index stock_genotype_idx1 on stock_genotype (stock_id);
 create index stock_genotype_idx2 on stock_genotype (genotype_id);
 
-COMMENT ON TABLE STOCK_GENOTYPE IS 'Simple table linking a stock to
+COMMENT ON TABLE stock_genotype IS 'Simple table linking a stock to
 a genotype. Features with genotypes can be linked to stocks thru feature_genotype -> genotype -> stock_genotype -> stock.';
 
 
@@ -237,11 +237,11 @@ create index stockcollection_idx1 on stockcollection (contact_id);
 create index stockcollection_idx2 on stockcollection (type_id);
 create index stockcollection_idx3 on stockcollection (uniquename);
 
-COMMENT ON TABLE STOCKCOLLECTION IS 'The lab or stock center distributing the stocks in their collection.';
-COMMENT ON COLUMN STOCKCOLLECTION.UNIQUENAME IS 'uniqename is the value of the collection cv.';
-COMMENT ON COLUMN STOCKCOLLECTION.TYPE_ID IS 'type_id is the collection type cv.';
-COMMENT ON COLUMN STOCKCOLLECTION.NAME IS 'name is the collection.';
-COMMENT ON COLUMN STOCKCOLLECTION.CONTACT_ID IS 'contact_id links to the contact information for the collection.';
+COMMENT ON TABLE stockcollection IS 'The lab or stock center distributing the stocks in their collection.';
+COMMENT ON COLUMN stockcollection.uniquename IS 'uniqename is the value of the collection cv.';
+COMMENT ON COLUMN stockcollection.type_id IS 'type_id is the collection type cv.';
+COMMENT ON COLUMN stockcollection.name IS 'name is the collection.';
+COMMENT ON COLUMN stockcollection.contact_id IS 'contact_id links to the contact information for the collection.';
 
 
 -- ================================================
@@ -262,10 +262,10 @@ create table stockcollectionprop (
 create index stockcollectionprop_idx1 on stockcollectionprop (stockcollection_id);
 create index stockcollectionprop_idx2 on stockcollectionprop (type_id);
 
-COMMENT ON TABLE STOCKCOLLECTIONPROP IS 'The table stockcollectionprop
+COMMENT ON TABLE stockcollectionprop IS 'The table stockcollectionprop
 contains the value of the stock collection such as website/email URLs;
 the value of the stock collection order URLs.';
--- COMMENT ON COLUMN STOCKCOLLECTIONPROP.TYPE_ID IS 'The cv for the type_id is "stockcollection property type".';
+COMMENT ON COLUMN stockcollectionprop.type_id IS 'The cv for the type_id is "stockcollection property type".';
 
 
 -- ================================================
@@ -284,5 +284,5 @@ create table stockcollection_stock (
 create index stockcollection_stock_idx1 on stockcollection_stock (stockcollection_id);
 create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
-COMMENT ON TABLE STOCKCOLLECTION_STOCK IS 'stockcollection_stock links
+COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';

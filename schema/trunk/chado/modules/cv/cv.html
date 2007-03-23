@@ -151,15 +151,20 @@
 
 <em>
 	<br />
-	$Id: cv.html,v 1.4 2007-03-16 01:28:37 briano Exp $ <br />
+	$Id: cv.html,v 1.5 2007-03-23 15:18:02 scottcain Exp $ <br />
+	========================================== <br />
+	Chado cv module <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import dbxref from general <br />
 	================================================================= <br />
+	================================================ <br />
+	TABLE: cv <br />
+	================================================ <br />
 	A controlled vocabulary or ontology. A cv is
-	composed of cvterms (aka terms, classes, types, universals - relations
+	composed of cvterms (AKA terms, classes, types, universals - relations
 	and properties are also stored in cvterm) and the relationships
-	between them 
+	between them. 
 </em>
 
 <table border="1">
@@ -201,7 +206,7 @@
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This
 corresponds to the obo-format -namespace-. cv names uniquely identify
-the cv. In OBO file format, the cv.name is known as the namespace </td>
+the cv. In OBO file format, the cv.name is known as the namespace. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -211,7 +216,7 @@ the cv. In OBO file format, the cv.name is known as the namespace </td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A text description of the criteria for
-membership of this ontology </td>
+membership of this ontology. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -274,10 +279,13 @@ membership of this ontology </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvterm <br />
+	================================================ <br />
 	A term, class, universal or type within an
 	ontology or controlled vocabulary.  This table is also used for
 	relations and properties. cvterms constitute nodes in the graph
-	defined by the collection of cvterms and cvterm_relationships 
+	defined by the collection of cvterms and cvterm_relationships. 
 </em>
 
 <table border="1">
@@ -318,7 +326,7 @@ membership of this ontology </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv or ontology or namespace to which
-this cvterm belongs </td>
+this cvterm belongs. </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -328,7 +336,7 @@ this cvterm belongs </td>
 	<td class="FieldCellSize">1024</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name or
-label for the cvterm. Uniquely identifies a cvterm within a cv </td>
+label for the cvterm. Uniquely identifies a cvterm within a cv. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -338,7 +346,7 @@ label for the cvterm. Uniquely identifies a cvterm within a cv </td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A human-readable text
-definition </td>
+definition. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -349,7 +357,7 @@ definition </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Primary identifier dbxref - The
 unique global OBO identifier for this cvterm.  Note that a cvterm may
-have multiple secondary dbxrefs - see also table: cvterm_dbxref </td>
+have multiple secondary dbxrefs - see also table: cvterm_dbxref. </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -360,7 +368,7 @@ have multiple secondary dbxrefs - see also table: cvterm_dbxref </td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see
 GO documentation for details of obsoletion. Note that two terms with
-different primary dbxrefs may exist if one is obsolete </td>
+different primary dbxrefs may exist if one is obsolete. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -374,7 +382,7 @@ different primary dbxrefs may exist if one is obsolete </td>
 in OBO format, or as properties or slots) form a cv/ontology in
 themselves. We use this flag to indicate whether this cvterm is an
 actual term/class/universal or a relation. Relations may be drawn from
-the OBO Relations ontology, but are not exclusively drawn from there </td>
+the OBO Relations ontology, but are not exclusively drawn from there. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -506,14 +514,17 @@ the OBO Relations ontology, but are not exclusively drawn from there </td>
 	<br />
 	A name can mean different things in
 	different contexts; for example "chromosome" in SO and GO. A name
-	should be unique within an ontology/cv. A name may exist twice in a
+	should be unique within an ontology or cv. A name may exist twice in a
 	cv, in both obsolete and non-obsolete forms - these will be for
 	different cvterms with different OBO identifiers; so GO documentation
 	for more details on obsoletion. Note that occasionally multiple
 	obsolete terms with the same name will exist in the same cv. If this
 	is a possibility for the ontology under consideration (e.g. GO) then the
-	ID should be appended to the name to ensure uniqueness  <br />
-	The OBO identifier is globally unique  <br />
+	ID should be appended to the name to ensure uniqueness.  <br />
+	The OBO identifier is globally unique.  <br />
+	================================================ <br />
+	TABLE: cvterm_relationship <br />
+	================================================ <br />
 	A relationship linking two
 	cvterms. Each cvterm_relationship constitutes an edge in the graph
 	defined by the collection of cvterms and cvterm_relationships. The
@@ -521,7 +532,7 @@ the OBO Relations ontology, but are not exclusively drawn from there </td>
 	cvterm R refered to by type_id. However, in general the definitions
 	are such that the statement "all SUBJs REL some OBJ" is true. The
 	cvterm_relationship statement is about the subject, not the
-	object. For example "insect wing part_of thorax" 
+	object. For example "insect wing part_of thorax". 
 </em>
 
 <table border="1">
@@ -564,7 +575,7 @@ the OBO Relations ontology, but are not exclusively drawn from there </td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The nature of the
 relationship between subject and object. Note that relations are also
 housed in the cvterm table, typically from the OBO relationship
-ontology, although other relationship types are allowed </td>
+ontology, although other relationship types are allowed. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -575,7 +586,7 @@ ontology, although other relationship types are allowed </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of
 the subj-predicate-obj sentence. The cvterm_relationship is about the
-subject. In a graph, this typically corresponds to the child node </td>
+subject. In a graph, this typically corresponds to the child node. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -586,7 +597,7 @@ subject. In a graph, this typically corresponds to the child node </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the
 subj-predicate-obj sentence. The cvterm_relationship refers to the
-object. In a graph, this typically corresponds to the parent node </td>
+object. In a graph, this typically corresponds to the parent node. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -706,6 +717,9 @@ object. In a graph, this typically corresponds to the parent node </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvtermpath <br />
+	================================================ <br />
 	The reflexive transitive closure of
 	the cvterm_relationship relation. 
 </em>
@@ -751,7 +765,7 @@ object. In a graph, this typically corresponds to the parent node </td>
 this is a closure over. If null, then this is a closure over ALL
 relationship types. If non-null, then this references a relationship
 cvterm - note that the closure will apply to both this relationship
-AND the OBO_REL:is_a (subclass) relationship </td>
+AND the OBO_REL:is_a (subclass) relationship. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -780,7 +794,7 @@ AND the OBO_REL:is_a (subclass) relationship </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">NOT NULL, Closures will mostly be within
 one cv. If the closure of a relationship traverses a cv, then this
-refers to the cv of the object_id cvterm </td>
+refers to the cv of the object_id cvterm. </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -791,7 +805,7 @@ refers to the cv of the object_id cvterm </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, The number of steps
 required to get from the subject cvterm to the object cvterm, counting
-from zero (reflexive relationship) </td>
+from zero (reflexive relationship). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -921,6 +935,9 @@ from zero (reflexive relationship) </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvtermsynonym <br />
+	================================================ <br />
 	A cvterm actually represents a
 	distinct class or concept. A concept can be refered to by different
 	phrases or names. In addition to the primary name (cvterm.name) there
@@ -984,7 +1001,7 @@ from zero (reflexive relationship) </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A synonym can be exact,
-narrow or broader than. </td>
+narrower, or broader than. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -1084,6 +1101,9 @@ narrow or broader than. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvterm_dbxref <br />
+	================================================ <br />
 	In addition to the primary
 	identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary
 	identifiers/dbxrefs, which may refer to records in external
@@ -1159,7 +1179,7 @@ narrow or broader than. </td>
 	<td class="FieldCellOther">NOT NULL, A
 cvterm.definition should be supported by one or more references. If
 this column is true, the dbxref is not for a term in an external database -
-it is a dbxref for provenance information for the definition </td>
+it is a dbxref for provenance information for the definition. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1269,7 +1289,10 @@ it is a dbxref for provenance information for the definition </td>
 
 <em>
 	<br />
-	Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format 
+	================================================ <br />
+	TABLE: cvtermprop <br />
+	================================================ <br />
+	Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format. 
 </em>
 
 <table border="1">
@@ -1318,7 +1341,7 @@ it is a dbxref for provenance information for the definition </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -1327,7 +1350,7 @@ it is a dbxref for provenance information for the definition </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1340,7 +1363,7 @@ it is a dbxref for provenance information for the definition </td>
 cvterm can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
-default 0 value should be used </td>
+default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1455,7 +1478,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop 
+	================================================ <br />
+	TABLE: dbxrefprop <br />
+	================================================ <br />
+	Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop. 
 </em>
 
 <table border="1">
@@ -1615,7 +1641,7 @@ default 0 value should be used </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08</a>
+SQL::Translator 0.08_01</a>
 
 </body>
 </html>

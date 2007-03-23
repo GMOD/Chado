@@ -1,4 +1,4 @@
--- $Id: map.sql,v 1.13 2007-03-01 03:42:17 briano Exp $
+-- $Id: map.sql,v 1.14 2007-03-23 15:18:02 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -52,8 +52,8 @@ create index featurerange_idx4 on featurerange (leftendf_id);
 create index featurerange_idx5 on featurerange (rightstartf_id);
 create index featurerange_idx6 on featurerange (rightendf_id);
 
-COMMENT ON TABLE FEATURERANGE IS 'In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands.';
-COMMENT ON COLUMN FEATURERANGE.FEATUREMAP_ID IS 'featuremap_id is the id of the feature being mapped.';
+COMMENT ON TABLE featurerange IS 'In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands.';
+COMMENT ON COLUMN featurerange.featuremap_id IS 'featuremap_id is the id of the feature being mapped.';
 
 
 -- ================================================
@@ -75,7 +75,7 @@ create index featurepos_idx1 on featurepos (featuremap_id);
 create index featurepos_idx2 on featurepos (feature_id);
 create index featurepos_idx3 on featurepos (map_feature_id);
 
-COMMENT ON COLUMN FEATUREPOS.MAP_FEATURE_ID IS 'map_feature_id
+COMMENT ON COLUMN featurepos.map_feature_id IS 'map_feature_id
 links to the feature (map) upon which the feature is being localized.';
 
 
