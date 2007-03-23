@@ -733,7 +733,8 @@ END
     $chado->handle_ontology_term($feature,$uniquename);
   }
 
-  if ($feature->annotation->get_Annotations('Dbxref')) {
+  if ($feature->annotation->get_Annotations('Dbxref')
+       or $feature->annotation->get_Annotations('dbxref')) {
     $chado->handle_dbxref($feature,$uniquename);
   }
 

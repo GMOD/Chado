@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Description of Schema</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Description of Schema</title>
 <meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
-</head><body>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
 
 <h1 class="SchemaDescription">
 	Description of Schema
@@ -13,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (34 tables)
+	Table listing (35 tables)
  -->
 
 <a name="top" />
@@ -327,6 +331,18 @@
  -->
 
 <!-- 
+	Start link to table 'arraydesign_element'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="arraydesign_element-link" href="#arraydesign_element">arraydesign_element</a></td>
+</tr>
+
+<!-- 
+	End link to table 'arraydesign_element'
+ -->
+
+<!-- 
 	Start link to table 'elementresult'
  -->
 
@@ -459,7 +475,20 @@
 
 <em>
 	<br />
-	this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables 
+	$Id: rad.html,v 1.2 2007-03-23 15:18:02 scottcain Exp $ <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	:import contact from contact <br />
+	:import dbxref from general <br />
+	:import tableinfo from general <br />
+	:import project from general <br />
+	:import analysis from companalysis <br />
+	================================================================= <br />
+	This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables. 
 </em>
 
 <table border="1">
@@ -753,7 +782,7 @@
 
 <em>
 	<br />
-	procedural notes on how data was prepared and processed 
+	Procedural notes on how data was prepared and processed. 
 </em>
 
 <table border="1">
@@ -971,7 +1000,8 @@
 
 <em>
 	<br />
-	parameters related to a protocol.  if the protocol is a soak, this might include attributes of bath temperature and duration 
+	Parameters related to a
+	protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration. 
 </em>
 
 <table border="1">
@@ -1171,7 +1201,7 @@
 
 <em>
 	<br />
-	different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but affy uses only one) 
+	Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one). 
 </em>
 
 <table border="1">
@@ -1288,7 +1318,10 @@
 
 <em>
 	<br />
-	general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns). 
+	General properties about an array.
+	An array is a template used to generate physical slides, etc.  It
+	contains layout information, as well as global array properties, such
+	as material (glass, nylon) and spot dimensions (in rows/columns). 
 </em>
 
 <table border="1">
@@ -1382,7 +1415,7 @@
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">UNIQUE</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1582,7 +1615,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>name</td>
+	<td>name, version</td>
 </tr>
 
 </table>
@@ -1612,7 +1645,7 @@
 
 <em>
 	<br />
-	extra arraydesign properties that are not accounted for in arraydesign 
+	Extra array design properties that are not accounted for in arraydesign 
 </em>
 
 <table border="1">
@@ -1789,7 +1822,9 @@
 
 <em>
 	<br />
-	an assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician info).  the assay can be thought of as a hybridization 
+	An assay consists of a physical instance of
+	an array, combined with the conditions used to create the array
+	(protocols, technician information). The assay can be thought of as a hybridization. 
 </em>
 
 <table border="1">
@@ -2026,7 +2061,7 @@
 
 <em>
 	<br />
-	extra assay properties that are not accounted for in assay 
+	Extra assay properties that are not accounted for in assay. 
 </em>
 
 <table border="1">
@@ -2203,7 +2238,7 @@
 
 <em>
 	<br />
-	link assays to projects 
+	Link assays to projects. 
 </em>
 
 <table border="1">
@@ -2357,7 +2392,7 @@
 
 <em>
 	<br />
-	a biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract.  it is essentially some biological material (tissue, cells, serum) that may have been processed.  processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table. 
+	A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table. 
 </em>
 
 <table border="1">
@@ -2538,7 +2573,7 @@
 
 <em>
 	<br />
-	relate biomaterials to one another.  this is a way to track a series of treatments or material splits/merges, for instance 
+	Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance. 
 </em>
 
 <table border="1">
@@ -2716,7 +2751,7 @@
 
 <em>
 	<br />
-	extra biomaterial properties that are not accounted for in biomaterial 
+	Extra biomaterial properties that are not accounted for in biomaterial. 
 </em>
 
 <table border="1">
@@ -3036,7 +3071,7 @@
 
 <em>
 	<br />
-	a biomaterial may undergo multiple treatments.  this can range from apoxia to fluorophore and biotin labeling 
+	A biomaterial may undergo multiple treatments. This can range from apoxia to fluorophore and biotin labeling. 
 </em>
 
 <table border="1">
@@ -3227,7 +3262,7 @@
 
 <em>
 	<br />
-	link biomaterials to treatments.  treatments have an order of operations (rank), and associated measurements (unittype_id, value) 
+	Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value). 
 </em>
 
 <table border="1">
@@ -3423,7 +3458,7 @@
 
 <em>
 	<br />
-	a biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays) 
+	A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays). 
 </em>
 
 <table border="1">
@@ -3610,7 +3645,7 @@
 
 <em>
 	<br />
-	this represents the scanning of hybridized material.  the output of this process is typically a digital image of an array 
+	This represents the scanning of hybridized material. The output of this process is typically a digital image of an array. 
 </em>
 
 <table border="1">
@@ -3805,7 +3840,7 @@
 
 <em>
 	<br />
-	parameters associated with image acquisition 
+	Parameters associated with image acquisition. 
 </em>
 
 <table border="1">
@@ -3982,7 +4017,7 @@
 
 <em>
 	<br />
-	multiple monochrome images may be merged to form a multi-color image.  red-green images of 2-channel hybridizations are an example of this 
+	Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this. 
 </em>
 
 <table border="1">
@@ -4183,7 +4218,7 @@
 
 <em>
 	<br />
-	quantification is the transformation of an image acquisition to numeric data.  this typically involves statistical procedures. 
+	Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures. 
 </em>
 
 <table border="1">
@@ -4402,7 +4437,7 @@
 
 <em>
 	<br />
-	extra quantification properties that are not accounted for in quantification 
+	Extra quantification properties that are not accounted for in quantification. 
 </em>
 
 <table border="1">
@@ -4579,7 +4614,7 @@
 
 <em>
 	<br />
-	there may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where 
+	There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where. 
 </em>
 
 <table border="1">
@@ -4981,7 +5016,7 @@
 
 <em>
 	<br />
-	represents a feature of the array.  this is typically a region of the array coated or bound to DNA 
+	Represents a subcomponent of an assay platform that performs a measurement. For a microarray this is typically a region of the array coated or bound to DNA.  For another assay platform such as an in-situ hybridization of two probes, the two probes would be represented here.  The nullable foreign key constraint back to feature allows mapping of these measuring components back to the genome features they represent. 
 </em>
 
 <table border="1">
@@ -5146,6 +5181,149 @@
 <hr />
 
 <!-- 
+	Starting table 'arraydesign_element'
+ -->
+
+<a name="arraydesign_element" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	arraydesign_element
+</h3></td>
+		<a name="arraydesign_element"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_element_id">arraydesign_element_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_id">arraydesign_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="arraydesign_element-element_id">element_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>arraydesign_element_idx1</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>arraydesign_element_idx2</td>
+	<td>element_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>arraydesign_element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>arraydesign_id, element_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
 	Starting table 'elementresult'
  -->
 
@@ -5168,7 +5346,7 @@
 
 <em>
 	<br />
-	an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit 
+	An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit. 
 </em>
 
 <table border="1">
@@ -5341,7 +5519,7 @@
 
 <em>
 	<br />
-	sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance 
+	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
 <table border="1">
@@ -5547,7 +5725,7 @@
 
 <em>
 	<br />
-	sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance 
+	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
 <table border="1">
@@ -6735,5 +6913,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.07</a>
-</body></html>
+SQL::Translator 0.08_01</a>
+
+</body>
+</html>

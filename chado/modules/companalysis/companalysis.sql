@@ -1,4 +1,4 @@
--- $Id: companalysis.sql,v 1.36 2007-02-28 20:10:34 briano Exp $
+-- $Id: companalysis.sql,v 1.37 2007-03-23 15:18:02 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -27,19 +27,19 @@ create table analysis (
     timeexecuted timestamp not null default current_timestamp,
     constraint analysis_c1 unique (program,programversion,sourcename)
 );
-COMMENT ON TABLE ANALYSIS IS 'An analysis is a particular type of a
+COMMENT ON TABLE analysis IS 'An analysis is a particular type of a
     computational analysis; it may be a blast of one sequence against
     another, or an all by all blast, or a different kind of analysis
     altogether. It is a single unit of computation.';
-COMMENT ON COLUMN ANALYSIS.NAME IS 'A way of grouping analyses. This
+COMMENT ON COLUMN analysis.name IS 'A way of grouping analyses. This
     should be a handy short identifier that can help people find an
     analysis they want. For instance "tRNAscan", "cDNA", "FlyPep",
     "SwissProt", and it should not be assumed to be unique. For instance, there may be lots of separate analyses done against a cDNA database.';
-COMMENT ON COLUMN ANALYSIS.PROGRAM IS 'Program name, e.g. blastx, blastp, sim4, genscan.';
-COMMENT ON COLUMN ANALYSIS.PROGRAMVERSION IS 'Version description, e.g. TBLASTX 2.0MP-WashU [09-Nov-2000].';
-COMMENT ON COLUMN ANALYSIS.ALGORITHM IS 'Algorithm name, e.g. blast.';
-COMMENT ON COLUMN ANALYSIS.SOURCENAME IS 'Source name, e.g. cDNA, SwissProt.';
-COMMENT ON COLUMN ANALYSIS.SOURCEURI IS 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
+COMMENT ON COLUMN analysis.program IS 'Program name, e.g. blastx, blastp, sim4, genscan.';
+COMMENT ON COLUMN analysis.programversion IS 'Version description, e.g. TBLASTX 2.0MP-WashU [09-Nov-2000].';
+COMMENT ON COLUMN analysis.algorithm IS 'Algorithm name, e.g. blast.';
+COMMENT ON COLUMN analysis.sourcename IS 'Source name, e.g. cDNA, SwissProt.';
+COMMENT ON COLUMN analysis.sourceuri IS 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
 
 -- ================================================
 -- TABLE: analysisprop
@@ -78,16 +78,16 @@ create table analysisfeature (
 create index analysisfeature_idx1 on analysisfeature (feature_id);
 create index analysisfeature_idx2 on analysisfeature (analysis_id);
 
-COMMENT ON TABLE ANALYSISFEATURE IS 'Computational analyses generate features (e.g. Genscan generates transcripts and exons; sim4 alignments generate similarity/match features). analysisfeatures are stored using the feature table from the sequence module. The analysisfeature table is used to decorate these features, with analysis specific attributes. A feature is an analysisfeature if and only if there is a corresponding entry in the analysisfeature table. analysisfeatures will have two or more featureloc entries,
+COMMENT ON TABLE analysisfeature IS 'Computational analyses generate features (e.g. Genscan generates transcripts and exons; sim4 alignments generate similarity/match features). analysisfeatures are stored using the feature table from the sequence module. The analysisfeature table is used to decorate these features, with analysis specific attributes. A feature is an analysisfeature if and only if there is a corresponding entry in the analysisfeature table. analysisfeatures will have two or more featureloc entries,
  with rank indicating query/subject';
-COMMENT ON COLUMN ANALYSISFEATURE.IDENTITY IS 'Percent identity between the locations compared.  Note that these 4 metrics do not cover the full range of scores possible; it would be undesirable to list every score possible, as this should be kept extensible. instead, for non-standard scores, use the analysisprop table.';
-COMMENT ON COLUMN ANALYSISFEATURE.SIGNIFICANCE IS 'This is some kind of expectation or probability metric, representing the probability that the analysis would appear randomly given the model. As such, any program or person querying this table can assume the following semantics:
+COMMENT ON COLUMN analysisfeature.identity IS 'Percent identity between the locations compared.  Note that these 4 metrics do not cover the full range of scores possible; it would be undesirable to list every score possible, as this should be kept extensible. instead, for non-standard scores, use the analysisprop table.';
+COMMENT ON COLUMN analysisfeature.significance IS 'This is some kind of expectation or probability metric, representing the probability that the analysis would appear randomly given the model. As such, any program or person querying this table can assume the following semantics:
    * 0 <= significance <= n, where n is a positive number, theoretically unbounded but unlikely to be more than 10
   * low numbers are better than high numbers.';
-COMMENT ON COLUMN ANALYSISFEATURE.NORMSCORE IS 'This is the rawscore but
+COMMENT ON COLUMN analysisfeature.normscore IS 'This is the rawscore but
     semi-normalized. Complete normalization to allow comparison of
     features generated by different programs would be nice but too
     difficult. Instead the normalization should strive to enforce the
     following semantics: * normscores are floating point numbers >= 0,
     * high normscores are better than low one. For most programs, it would be sufficient to make the normscore the same as this rawscore, providing these semantics are satisfied.';
-COMMENT ON COLUMN ANALYSISFEATURE.RAWSCORE IS 'This is the native score generated by the program; for example, the bitscore generated by blast, sim4 or genscan scores. One should not assume that high is necessarily better than low.';
+COMMENT ON COLUMN analysisfeature.rawscore IS 'This is the native score generated by the program; for example, the bitscore generated by blast, sim4 or genscan scores. One should not assume that high is necessarily better than low.';

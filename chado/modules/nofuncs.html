@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (119 tables)
+	Table listing (123 tables)
  -->
 
 <a name="top" />
@@ -847,18 +847,6 @@
  -->
 
 <!-- 
-	Start link to table 'feature_expression'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="feature_expression-link" href="#feature_expression">feature_expression</a></td>
-</tr>
-
-<!-- 
-	End link to table 'feature_expression'
- -->
-
-<!-- 
 	Start link to table 'expression_cvterm'
  -->
 
@@ -871,6 +859,30 @@
  -->
 
 <!-- 
+	Start link to table 'expression_cvtermprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="expression_cvtermprop-link" href="#expression_cvtermprop">expression_cvtermprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'expression_cvtermprop'
+ -->
+
+<!-- 
+	Start link to table 'expressionprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="expressionprop-link" href="#expressionprop">expressionprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'expressionprop'
+ -->
+
+<!-- 
 	Start link to table 'expression_pub'
  -->
 
@@ -880,6 +892,30 @@
 
 <!-- 
 	End link to table 'expression_pub'
+ -->
+
+<!-- 
+	Start link to table 'feature_expression'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_expression-link" href="#feature_expression">feature_expression</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_expression'
+ -->
+
+<!-- 
+	Start link to table 'feature_expressionprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="feature_expressionprop-link" href="#feature_expressionprop">feature_expressionprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'feature_expressionprop'
  -->
 
 <!-- 
@@ -1207,6 +1243,18 @@
  -->
 
 <!-- 
+	Start link to table 'arraydesign_element'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="arraydesign_element-link" href="#arraydesign_element">arraydesign_element</a></td>
+</tr>
+
+<!-- 
+	End link to table 'arraydesign_element'
+ -->
+
+<!-- 
 	Start link to table 'elementresult'
  -->
 
@@ -1483,6 +1531,12 @@
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado general module <br />
+	================================================ <br />
+	TABLE: tableinfo <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -1655,13 +1709,16 @@
 
 <em>
 	<br />
-	A database authority. Typical dbs in
+	================================================ <br />
+	TABLE: db <br />
+	================================================ <br />
+	A database authority. Typical databases in
 	bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority
-	is generally known by this sortened form, which is unique within the
-	bioinformatics and biomedical realm.  **TODO** - add support for URIs,
-	URNs (eg LSIDs). We can do this by treating the url as a uri -
+	is generally known by this shortened form, which is unique within the
+	bioinformatics and biomedical realm.  To Do - add support for URIs,
+	URNs (e.g. LSIDs). We can do this by treating the URL as a URI -
 	however, some applications may expect this to be resolvable - to be
-	decided 
+	decided. 
 </em>
 
 <table border="1">
@@ -1791,7 +1848,10 @@
 
 <em>
 	<br />
-	A unique, global, public, stable identifier. Not necessarily an eXternal reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>.  
+	================================================ <br />
+	TABLE: dbxref <br />
+	================================================ <br />
+	A unique, global, public, stable identifier. Not necessarily an external reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>. 
 </em>
 
 <table border="1">
@@ -1840,7 +1900,7 @@
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The local part of the identifier. Guaranteed by the db authority to be unique for that db </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The local part of the identifier. Guaranteed by the db authority to be unique for that db. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2088,10 +2148,20 @@
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado cv module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import dbxref from general <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: cv <br />
+	================================================ <br />
 	A controlled vocabulary or ontology. A cv is
-	composed of cvterms (aka terms, classes, types, universals - relations
-	and properties are also stored in cvterm)) and the relationships
-	between them 
+	composed of cvterms (AKA terms, classes, types, universals - relations
+	and properties are also stored in cvterm) and the relationships
+	between them. 
 </em>
 
 <table border="1">
@@ -2133,7 +2203,7 @@
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This
 corresponds to the obo-format -namespace-. cv names uniquely identify
-the cv. In obo file format, the cv.name is known as the namespace </td>
+the cv. In OBO file format, the cv.name is known as the namespace. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2143,7 +2213,7 @@ the cv. In obo file format, the cv.name is known as the namespace </td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A text description of the criteria for
-membership of this ontology </td>
+membership of this ontology. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2206,10 +2276,13 @@ membership of this ontology </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvterm <br />
+	================================================ <br />
 	A term, class, universal or type within an
 	ontology or controlled vocabulary.  This table is also used for
 	relations and properties. cvterms constitute nodes in the graph
-	defined by the collection of cvterms and cvterm_relationships 
+	defined by the collection of cvterms and cvterm_relationships. 
 </em>
 
 <table border="1">
@@ -2249,8 +2322,8 @@ membership of this ontology </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv/ontology/namespace to which
-this cvterm belongs </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv or ontology or namespace to which
+this cvterm belongs. </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -2260,7 +2333,7 @@ this cvterm belongs </td>
 	<td class="FieldCellSize">1024</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name or
-label for the cvterm. uniquely identifies a cvterm within a cv </td>
+label for the cvterm. Uniquely identifies a cvterm within a cv. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2270,7 +2343,7 @@ label for the cvterm. uniquely identifies a cvterm within a cv </td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A human-readable text
-definition </td>
+definition. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2281,7 +2354,7 @@ definition </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Primary identifier dbxref - The
 unique global OBO identifier for this cvterm.  Note that a cvterm may
-have multiple secondary dbxrefs - see also table: cvterm_dbxref </td>
+have multiple secondary dbxrefs - see also table: cvterm_dbxref. </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -2291,8 +2364,8 @@ have multiple secondary dbxrefs - see also table: cvterm_dbxref </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see
-GO documentation for details of obsoletion.  note that two terms with
-different primary dbxrefs may exist if one is obsolete </td>
+GO documentation for details of obsoletion. Note that two terms with
+different primary dbxrefs may exist if one is obsolete. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2306,7 +2379,7 @@ different primary dbxrefs may exist if one is obsolete </td>
 in OBO format, or as properties or slots) form a cv/ontology in
 themselves. We use this flag to indicate whether this cvterm is an
 actual term/class/universal or a relation. Relations may be drawn from
-the OBO Relations ontology, but are not exclusively drawn from there </td>
+the OBO Relations ontology, but are not exclusively drawn from there. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2436,24 +2509,27 @@ the OBO Relations ontology, but are not exclusively drawn from there </td>
 
 <em>
 	<br />
-	a name can mean different things in
+	A name can mean different things in
 	different contexts; for example "chromosome" in SO and GO. A name
-	should be unique within an ontology/cv. A name may exist twice in a
+	should be unique within an ontology or cv. A name may exist twice in a
 	cv, in both obsolete and non-obsolete forms - these will be for
 	different cvterms with different OBO identifiers; so GO documentation
 	for more details on obsoletion. Note that occasionally multiple
 	obsolete terms with the same name will exist in the same cv. If this
-	is a possibility for the ontology under consideration (eg GO) then the
-	ID should be appended to the name to ensure uniqueness  <br />
-	the OBO identifier is globally unique  <br />
+	is a possibility for the ontology under consideration (e.g. GO) then the
+	ID should be appended to the name to ensure uniqueness.  <br />
+	The OBO identifier is globally unique.  <br />
+	================================================ <br />
+	TABLE: cvterm_relationship <br />
+	================================================ <br />
 	A relationship linking two
 	cvterms. Each cvterm_relationship constitutes an edge in the graph
 	defined by the collection of cvterms and cvterm_relationships. The
 	meaning of the cvterm_relationship depends on the definition of the
 	cvterm R refered to by type_id. However, in general the definitions
-	are such that the statement all SUBJs REL some OBJ is true. The
+	are such that the statement "all SUBJs REL some OBJ" is true. The
 	cvterm_relationship statement is about the subject, not the
-	object. For example "insect wing part_of thorax" 
+	object. For example "insect wing part_of thorax". 
 </em>
 
 <table border="1">
@@ -2496,7 +2572,7 @@ the OBO Relations ontology, but are not exclusively drawn from there </td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The nature of the
 relationship between subject and object. Note that relations are also
 housed in the cvterm table, typically from the OBO relationship
-ontology, although other relationship types are allowed </td>
+ontology, although other relationship types are allowed. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2505,9 +2581,9 @@ ontology, although other relationship types are allowed </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of
 the subj-predicate-obj sentence. The cvterm_relationship is about the
-subject. In a graph, this typically corresponds to the child node </td>
+subject. In a graph, this typically corresponds to the child node. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2516,9 +2592,9 @@ subject. In a graph, this typically corresponds to the child node </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the
 subj-predicate-obj sentence. The cvterm_relationship refers to the
-object. In a graph, this typically corresponds to the parent node </td>
+object. In a graph, this typically corresponds to the parent node. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2638,9 +2714,11 @@ object. In a graph, this typically corresponds to the parent node </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvtermpath <br />
+	================================================ <br />
 	The reflexive transitive closure of
-	the cvterm_relationship relation. For a full discussion, see the file
-	populating-cvtermpath.txt in this directory 
+	the cvterm_relationship relation. 
 </em>
 
 <table border="1">
@@ -2684,7 +2762,7 @@ object. In a graph, this typically corresponds to the parent node </td>
 this is a closure over. If null, then this is a closure over ALL
 relationship types. If non-null, then this references a relationship
 cvterm - note that the closure will apply to both this relationship
-AND the OBO_REL:is_a (subclass) relationship </td>
+AND the OBO_REL:is_a (subclass) relationship. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -2713,7 +2791,7 @@ AND the OBO_REL:is_a (subclass) relationship </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">NOT NULL, Closures will mostly be within
 one cv. If the closure of a relationship traverses a cv, then this
-refers to the cv of the object_id cvterm </td>
+refers to the cv of the object_id cvterm. </td>
 	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
@@ -2724,7 +2802,7 @@ refers to the cv of the object_id cvterm </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, The number of steps
 required to get from the subject cvterm to the object cvterm, counting
-from zero (reflexive relationship) </td>
+from zero (reflexive relationship). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -2854,11 +2932,14 @@ from zero (reflexive relationship) </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvtermsynonym <br />
+	================================================ <br />
 	A cvterm actually represents a
 	distinct class or concept. A concept can be refered to by different
 	phrases or names. In addition to the primary name (cvterm.name) there
-	can be a number of alternative aliases or synonyms. For example, -T
-	cell- as a synonym for -T lymphocyte- 
+	can be a number of alternative aliases or synonyms. For example, "T
+	cell" as a synonym for "T lymphocyte". 
 </em>
 
 <table border="1">
@@ -2917,7 +2998,7 @@ from zero (reflexive relationship) </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">A synonym can be exact,
-narrow or borader than </td>
+narrower, or broader than. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -3017,6 +3098,9 @@ narrow or borader than </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: cvterm_dbxref <br />
+	================================================ <br />
 	In addition to the primary
 	identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary
 	identifiers/dbxrefs, which may refer to records in external
@@ -3091,8 +3175,8 @@ narrow or borader than </td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">NOT NULL, A
 cvterm.definition should be supported by one or more references. If
-this column is true, the dbxref is not for a term in an external db -
-it is a dbxref for provenance information for the definition </td>
+this column is true, the dbxref is not for a term in an external database -
+it is a dbxref for provenance information for the definition. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3202,7 +3286,10 @@ it is a dbxref for provenance information for the definition </td>
 
 <em>
 	<br />
-	Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format 
+	================================================ <br />
+	TABLE: cvtermprop <br />
+	================================================ <br />
+	Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format. 
 </em>
 
 <table border="1">
@@ -3251,7 +3338,7 @@ it is a dbxref for provenance information for the definition </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -3260,7 +3347,7 @@ it is a dbxref for provenance information for the definition </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3273,7 +3360,7 @@ it is a dbxref for provenance information for the definition </td>
 cvterm can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
-default 0 value should be used </td>
+default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3388,7 +3475,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop 
+	================================================ <br />
+	TABLE: dbxrefprop <br />
+	================================================ <br />
+	Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop. 
 </em>
 
 <table border="1">
@@ -3570,8 +3660,19 @@ default 0 value should be used </td>
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado pub module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	:import dbxref from general <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: pub <br />
+	================================================ <br />
 	A documented provenance artefact - publications,
-	documents, personal communication 
+	documents, personal communication. 
 </em>
 
 <table border="1">
@@ -3611,7 +3712,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">descriptive general heading </td>
+	<td class="FieldCellOther">Descriptive general heading. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3620,7 +3721,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">title of part if one of a series </td>
+	<td class="FieldCellOther">Title of part if one of a series. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3638,7 +3739,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">full name of (journal) series </td>
+	<td class="FieldCellOther">Full name of (journal) series. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3665,7 +3766,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">page number range[s], eg, 457--459, viii + 664pp, lv--lvii </td>
+	<td class="FieldCellOther">Page number range[s], e.g. 457--459, viii + 664pp, lv--lvii. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3692,7 +3793,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, the type of the publication (book, journal, poem, graffiti, etc). Uses pub cv </td>
+	<td class="FieldCellOther">NOT NULL, The type of the publication (book, journal, poem, graffiti, etc). Uses pub cv. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -3814,11 +3915,13 @@ default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: pub_relationship <br />
+	================================================ <br />
 	Handle relationships between
-	publications, eg, when one publication makes others obsolete, when one
+	publications, e.g. when one publication makes others obsolete, when one
 	publication contains errata with respect to other publication(s), or
-	when one publication also appears in another pub (I think these three
-	are it - at least for fb) 
+	when one publication also appears in another pub. 
 </em>
 
 <table border="1">
@@ -3996,8 +4099,11 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Handle links to eg, pubmed, biosis,
-	zoorec, OCLC, mdeline, ISSN, coden... 
+	================================================ <br />
+	TABLE: pub_dbxref <br />
+	================================================ <br />
+	Handle links to repositories,
+	e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden... 
 </em>
 
 <table border="1">
@@ -4165,7 +4271,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	an author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors. 
+	================================================ <br />
+	TABLE: pubauthor <br />
+	================================================ <br />
+	An author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors. 
 </em>
 
 <table border="1">
@@ -4214,7 +4323,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, order of author in author list for this pub - order is important </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Order of author in author list for this pub - order is important. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -4223,7 +4332,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans </td>
+	<td class="FieldCellOther">Indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -4241,7 +4350,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">100</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">first name, initials </td>
+	<td class="FieldCellOther">First name, initials </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -4350,7 +4459,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Property-value pairs for a pub. Follows standard chado pattern - see sequence module for details 
+	================================================ <br />
+	TABLE: pubprop <br />
+	================================================ <br />
+	Property-value pairs for a pub. Follows standard chado pattern. 
 </em>
 
 <table border="1">
@@ -4527,10 +4639,22 @@ default 0 value should be used </td>
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado organism module <br />
+	============ <br />
+	DEPENDENCIES <br />
+	============ <br />
+	:import cvterm from cv <br />
+	:import dbxref from general <br />
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
+	================================================ <br />
+	TABLE: organism <br />
+	================================================ <br />
 	The organismal taxonomic
 	classification. Note that phylogenies are represented using the
 	phylogeny module, and taxonomies can be represented using the cvterm
-	module or the phylogeny module 
+	module or the phylogeny module. 
 </em>
 
 <table border="1">
@@ -4589,12 +4713,12 @@ default 0 value should be used </td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A type of organism is always
-uniquely identified by genus+species. When mapping from the NCBI
-taxonomy names.dmp file, the unique-name column must be used where it
-is present, as the name column is not always unique (eg environmental
+uniquely identified by genus and species. When mapping from the NCBI
+taxonomy names.dmp file, this column must be used where it
+is present, as the common_name column is not always unique (e.g. environmental
 samples). If a particular strain or subspecies is to be represented,
 this is appended onto the species name. Follows standard NCBI taxonomy
-pattern </td>
+pattern. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -4671,6 +4795,19 @@ pattern </td>
 		<a name="organism_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: organism_dbxref <br />
+	================================================
+</em>
 
 <table border="1">
 
@@ -4823,7 +4960,10 @@ pattern </td>
 
 <em>
 	<br />
-	tag-value properties - follows standard chado model 
+	================================================ <br />
+	TABLE: organismprop <br />
+	================================================ <br />
+	Tag-value properties - follows standard chado model. 
 </em>
 
 <table border="1">
@@ -5369,12 +5509,25 @@ pattern </td>
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado sequence module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	:import dbxref from general <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: feature <br />
+	================================================ <br />
 	A feature is a biological sequence or a
 	section of a biological sequence, or a collection of such
 	sections. Examples include genes, exons, transcripts, regulatory
 	regions, polypeptides, protein domains, chromosome sequences, sequence
 	variations, cross-genome match regions such as hits and HSPs and so
-	on; see the Sequence Ontology for more 
+	on; see the Sequence Ontology for more. 
 </em>
 
 <table border="1">
@@ -5416,7 +5569,7 @@ pattern </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">An optional primary public stable
 identifier for this feature. Secondary identifiers and external
-dbxrefs go in table:feature_dbxref </td>
+dbxrefs go in the table feature_dbxref. </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -5426,7 +5579,7 @@ dbxrefs go in table:feature_dbxref </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The organism to which this feature
-belongs. This column is mandatory </td>
+belongs. This column is mandatory. </td>
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
@@ -5436,7 +5589,7 @@ belongs. This column is mandatory </td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">The optional human-readable common name for
-a feature, for display purposes </td>
+a feature, for display purposes. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5447,8 +5600,8 @@ a feature, for display purposes </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a feature; may
 not be necessarily be particularly human-readable, although this is
-prefered. This name must be unique for this type of feature within
-this organism </td>
+preferred. This name must be unique for this type of feature within
+this organism. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5462,10 +5615,10 @@ representing biological residues (nucleic acids, amino acids). This
 column does not need to be manifested for all features; it is optional
 for features such as exons where the residues can be derived from the
 featureloc. It is recommended that the value for this column be
-manifested for features which may may non-contiguous sublocations (eg
+manifested for features which may may non-contiguous sublocations (e.g.
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
-RNA sequence </td>
+RNA sequence. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5480,7 +5633,7 @@ column, and also with featureloc. This column is required because the
 location may be unknown and the residue sequence may not be
 manifested, yet it may be desirable to store and query the length of
 the feature. The seqlen should always be manifested where the length
-of the sequence is known </td>
+of the sequence is known. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5492,7 +5645,7 @@ of the sequence is known </td>
 	<td class="FieldCellOther">The 32-character checksum of the sequence,
 calculated using the MD5 algorithm. This is practically guaranteed to
 be unique for any feature. This column thus acts as a unique
-identifier on the mathematical sequence </td>
+identifier on the mathematical sequence. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5503,7 +5656,7 @@ identifier on the mathematical sequence </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, A required reference to a table:cvterm
 giving the feature type. This will typically be a Sequence Ontology
-identifier. This column is thus used to subclass the feature table </td>
+identifier. This column is thus used to subclass the feature table. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -5515,11 +5668,11 @@ identifier. This column is thus used to subclass the feature table </td>
 	<td class="FieldCellOther">NOT NULL, Boolean indicating whether this
 feature is annotated or the result of an automated analysis. Analysis
 results also use the companalysis module. Note that the dividing line
-between analysis/annotation may be fuzzy, this should be determined on
+between analysis and annotation may be fuzzy, this should be determined on
 a per-project basis in a consistent manner. One requirement is that
 there should only be one non-analysis version of each wild-type gene
 feature in a genome, whereas the same gene feature can be predicted
-multiple times in different analyses </td>
+multiple times in different analyses. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5531,7 +5684,7 @@ multiple times in different analyses </td>
 	<td class="FieldCellOther">NOT NULL, Boolean indicating whether this
 feature has been obsoleted. Some chado instances may choose to simply
 remove the feature altogether, others may choose to keep an obsolete
-row in the table </td>
+row in the table. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5540,10 +5693,10 @@ row in the table </td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther">NOT NULL, for handling object
-accession/modification timestamps (as opposed to db auditing info,
+	<td class="FieldCellOther">NOT NULL, For handling object
+accession or modification timestamps (as opposed to database auditing data,
 handled elsewhere). The expectation is that these fields would be
-available to software interacting with chado </td>
+available to software interacting with chado. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5552,10 +5705,10 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">timestamp</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther">NOT NULL, for handling object
-accession/modification timestamps (as opposed to db auditing info,
+	<td class="FieldCellOther">NOT NULL, For handling object
+accession or modification timestamps (as opposed to database auditing data,
 handled elsewhere). The expectation is that these fields would be
-available to software interacting with chado </td>
+available to software interacting with chado. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5705,26 +5858,30 @@ available to software interacting with chado </td>
 
 <em>
 	<br />
+	COMMENT ON INDEX feature_c1 IS 'Any feature can be globally identified <br />
+	by the combination of organism, uniquename and feature type'; <br />
+	================================================ <br />
+	TABLE: featureloc <br />
+	================================================ <br />
 	The location of a feature relative to
-	another feature.  IMPORTANT: INTERBASE COORDINATES ARE USED.(This is
-	vital as it allows us to represent zero-length features eg splice
-	sites, insertion points without an awkward fuzzy system). Features
+	another feature. Important: interbase coordinates are used. This is
+	vital as it allows us to represent zero-length features e.g. splice
+	sites, insertion points without an awkward fuzzy system. Features
 	typically have exactly ONE location, but this need not be the
-	case. Some features may not be localized (eg a gene that has been
-	characterized genetically but no sequence/molecular info is
-	available). NOTE ON MULTIPLE LOCATIONS: Each feature can have 0 or
+	case. Some features may not be localized (e.g. a gene that has been
+	characterized genetically but no sequence or molecular information is
+	available). Note on multiple locations: Each feature can have 0 or
 	more locations. Multiple locations do NOT indicate non-contiguous
 	locations (if a feature such as a transcript has a non-contiguous
 	location, then the subfeatures such as exons should always be
 	manifested). Instead, multiple featurelocs for a feature designate
 	alternate locations or grouped locations; for instance, a feature
 	designating a blast hit or hsp will have two locations, one on the
-	query feature, one on the subject feature.  features representing
+	query feature, one on the subject feature. Features representing
 	sequence variation could have alternate locations instantiated on a
-	feature on the mutant strain.  the column:rank is used to
+	feature on the mutant strain. The column:rank is used to
 	differentiate these different locations. Reflexive locations should
-	never be stored - this is for -proper- (ie non-self) locations only;
-	i.e. nothing should be located relative to itself 
+	never be stored - this is for -proper- (i.e. non-self) locations only; nothing should be located relative to itself. 
 </em>
 
 <table border="1">
@@ -5764,7 +5921,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The feature that is being located. Any feature can have zero or more featurelocs </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The feature that is being located. Any feature can have zero or more featurelocs. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -5773,7 +5930,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph </td>
+	<td class="FieldCellOther">The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -5782,7 +5939,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, bioperl), add 1 to fmin </td>
+	<td class="FieldCellOther">The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5793,7 +5950,7 @@ available to software interacting with chado </td>
 	<td class="FieldCellDefault">false</td>
 	<td class="FieldCellOther">NOT NULL, This is typically
 false, but may be true if the value for column:fmin is inaccurate or
-the leftmost part of the range is unknown/unbounded </td>
+the leftmost part of the range is unknown/unbounded. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5802,7 +5959,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (eg in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. IMPORTANT: This is space-based (INTERBASE) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (eg GFF, bioperl) </td>
+	<td class="FieldCellOther">The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5813,7 +5970,7 @@ the leftmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellDefault">false</td>
 	<td class="FieldCellOther">NOT NULL, This is typically
 false, but may be true if the value for column:fmax is inaccurate or
-the rightmost part of the range is unknown/unbounded </td>
+the rightmost part of the range is unknown/unbounded. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5823,7 +5980,7 @@ the rightmost part of the range is unknown/unbounded </td>
 	<td class="FieldCellSize">5</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">The orientation/directionality of the
-location. Should be 0,-1 or +1 </td>
+location. Should be 0, -1 or +1. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5832,10 +5989,11 @@ location. Should be 0,-1 or +1 </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">phase of translation wrt srcfeature_id.
-Values are 0,1,2. It may not be possible to manifest this column for
+	<td class="FieldCellOther">Phase of translation with
+respect to srcfeature_id.
+Values are 0, 1, 2. It may not be possible to manifest this column for
 some features such as exons, because the phase is dependant on the
-spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs </td>
+spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5845,14 +6003,14 @@ spliceform (the same exon can appear in multiple spliceforms). This column is mo
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">Alternative residues,
-when these differ from feature.residues. for instance, a SNP feature
-located on a wild and mutant protein would have different alresidues.
-for alignment/similarity features, the altresidues is used to
+when these differ from feature.residues. For instance, a SNP feature
+located on a wild and mutant protein would have different alternative residues.
+for alignment/similarity features, the alternative residues is used to
 represent the alignment string (CIGAR format). Note on variation
-features; even if we dont want to instantiate a mutant
+features; even if we do not want to instantiate a mutant
 chromosome/contig feature, we can still represent a SNP etc with 2
 locations, one (rank 0) on the genome, the other (rank 1) would have
-most fields null, except for altresidues </td>
+most fields null, except for alternative residues. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5863,24 +6021,24 @@ most fields null, except for altresidues </td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, This is used to manifest redundant,
 derivable extra locations for a feature. The default locgroup=0 is
-used for the DIRECT location of a feature. !! MOST CHADO USERS MAY
-NEVER USE featurelocs WITH logroup>0 !! Transitively derived locations
-are indicated with locgroup>0. For example, the position of an exon on
+used for the DIRECT location of a feature. Important: most Chado users may
+never use featurelocs WITH logroup > 0. Transitively derived locations
+are indicated with locgroup > 0. For example, the position of an exon on
 a BAC and in global chromosome coordinates. This column is used to
-differentiate these groupings of locations. the default locgroup 0
-is used for the main/primary location, from which the others can be
-derived via coordinate transformations. another example of redundant
+differentiate these groupings of locations. The default locgroup 0
+is used for the main or primary location, from which the others can be
+derived via coordinate transformations. Another example of redundant
 locations is storing ORF coordinates relative to both transcript and
-genome. redundant locations open the possibility of the database
+genome. Redundant locations open the possibility of the database
 getting into inconsistent states; this schema gives us the flexibility
 of both warehouse instantiations with redundant locations (easier for
 querying) and management instantiations with no redundant
 locations. An example of using both locgroup and rank: imagine a
 feature indicating a conserved region between the chromosomes of two
-different species. we may want to keep redundant locations on both
-contigs and chromosomes. we would thus have 4 locations for the single
+different species. We may want to keep redundant locations on both
+contigs and chromosomes. We would thus have 4 locations for the single
 conserved region feature - two distinct locgroups (contig level and
-chromosome level) and two distinct ranks (for the two species) </td>
+chromosome level) and two distinct ranks (for the two species). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -5890,13 +6048,13 @@ chromosome level) and two distinct ranks (for the two species) </td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, Used when a feature has >1
-location, otherwise the default rank 0 is used. Some features (eg
+location, otherwise the default rank 0 is used. Some features (e.g.
 blast hits and HSPs) have two locations - one on the query and one on
 the subject. Rank is used to differentiate these. Rank=0 is always
 used for the query, Rank=1 for the subject. For multiple alignments,
 assignment of rank is arbitrary. Rank is also used for
 sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
-(or baseline) feature, Rank=1 indicates the mutant (or compared) feature </td>
+(or baseline) feature, Rank=1 indicates the mutant (or compared) feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -6028,7 +6186,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 	<br />
 	COMMENT ON INDEX featureloc_c1 IS 'locgroup and rank serve to uniquely <br />
 	partition locations for any one feature'; <br />
-	Provenance of featureloc. Linking table between featurelocs and publications that mention them 
+	================================================ <br />
+	TABLE: featureloc_pub <br />
+	================================================ <br />
+	Provenance of featureloc. Linking table between featurelocs and publications that mention them. 
 </em>
 
 <table border="1">
@@ -6182,7 +6343,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	Provenance. Linking table between features and publications that mention them 
+	================================================ <br />
+	TABLE: feature_pub <br />
+	================================================ <br />
+	Provenance. Linking table between features and publications that mention them. 
 </em>
 
 <table border="1">
@@ -6336,7 +6500,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	Property or attribute of a feature_pub link 
+	================================================ <br />
+	TABLE: feature_pubprop <br />
+	================================================ <br />
+	Property or attribute of a feature_pub link. 
 </em>
 
 <table border="1">
@@ -6508,7 +6675,10 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 
 <em>
 	<br />
-	A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible 
+	================================================ <br />
+	TABLE: featureprop <br />
+	================================================ <br />
+	A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. 
 </em>
 
 <table border="1">
@@ -6561,7 +6731,7 @@ sequence_variant features, such as SNPs. Rank=0 indicates the wildtype
 property/slot is a cvterm. The meaning of the property is defined in
 that cvterm. Certain property types will only apply to certain feature
 types (e.g. the anticodon property will only apply to tRNA features) ;
-the types here come from the sequence feature property ontology </td>
+the types here come from the sequence feature property ontology. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -6693,9 +6863,12 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	for any one feature, multivalued
-	property-value pairs must be differentiated by rank  <br />
-	Provenance. Any featureprop assignment can optionally be supported by a publication 
+	For any one feature, multivalued
+	property-value pairs must be differentiated by rank.  <br />
+	================================================ <br />
+	TABLE: featureprop_pub <br />
+	================================================ <br />
+	Provenance. Any featureprop assignment can optionally be supported by a publication. 
 </em>
 
 <table border="1">
@@ -6849,7 +7022,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id 
+	================================================ <br />
+	TABLE: feature_dbxref <br />
+	================================================ <br />
+	Links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id. 
 </em>
 
 <table border="1">
@@ -6907,7 +7083,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature </td>
+	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -7017,15 +7193,18 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	features can be arranged in
-	graphs, eg exon part_of transcript part_of gene; translation madeby
-	transcript if type is thought of as a verb, each arc makes a statement
-	[SUBJECT VERB OBJECT] object can also be thought of as parent
+	================================================ <br />
+	TABLE: feature_relationship <br />
+	================================================ <br />
+	Features can be arranged in
+	graphs, e.g. "exon part_of transcript part_of gene"; If type is
+	thought of as a verb, the each arc or edge makes a statement
+	[Subject Verb Object]. The object can also be thought of as parent
 	(containing feature), and subject as child (contained feature or
-	subfeature) -- we include the relationship rank/order, because even
+	subfeature). We include the relationship rank/order, because even
 	though most of the time we can order things implicitly by sequence
-	coordinates, we cant always do this - eg transpliced genes.  its also
-	useful for quickly getting implicit introns 
+	coordinates, we can not always do this - e.g. transpliced genes. It is also
+	useful for quickly getting implicit introns. 
 </em>
 
 <table border="1">
@@ -7065,7 +7244,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of the subj-predicate-obj sentence. This is typically the subfeature </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of the subj-predicate-obj sentence. This is typically the subfeature. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -7074,7 +7253,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the subj-predicate-obj sentence. This is typically the container feature </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the subj-predicate-obj sentence. This is typically the container feature. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -7083,7 +7262,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. The most common relationship type is OBO_REL:part_of. Valid relationship types are constrained by the Sequence Ontology </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. The most common relationship type is OBO_REL:part_of. Valid relationship types are constrained by the Sequence Ontology. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -7092,7 +7271,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">Additional notes/comments </td>
+	<td class="FieldCellOther">Additional notes or comments. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -7101,7 +7280,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The ordering of subject features with respect to the object feature may be important (for example, exon ordering on a transcript - not always derivable if you take trans spliced genes into consideration). rank is used to order these; starts from zero </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The ordering of subject features with respect to the object feature may be important (for example, exon ordering on a transcript - not always derivable if you take trans spliced genes into consideration). Rank is used to order these; starts from zero. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -7226,7 +7405,10 @@ default 0 value should be used </td>
 
 <em>
 	<br />
-	Provenance. Attach optional evidence to a feature_relationship in the form of a publication 
+	================================================ <br />
+	TABLE: feature_relationship_pub <br />
+	================================================ <br />
+	Provenance. Attach optional evidence to a feature_relationship in the form of a publication. 
 </em>
 
 <table border="1">
@@ -7380,12 +7562,15 @@ default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_relationshipprop <br />
+	================================================ <br />
 	Extensible properties
 	for feature_relationships. Analagous structure to featureprop. This
 	table is largely optional and not used with a high frequency. Typical
 	scenarios may be if one wishes to attach additional data to a
 	feature_relationship - for example to say that the
-	feature_relationship is only true in certain contexts 
+	feature_relationship is only true in certain contexts. 
 </em>
 
 <table border="1">
@@ -7437,7 +7622,7 @@ default 0 value should be used </td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
 that cvterm. Currently there is no standard ontology for
-feature_relationship property types </td>
+feature_relationship property types. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -7462,7 +7647,7 @@ types, but is easier to query. </td>
 ordering. Any feature_relationship can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used </td>
+the default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -7572,7 +7757,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Provenance for feature_relationshipprop 
+	================================================ <br />
+	TABLE: feature_relationshipprop_pub <br />
+	================================================ <br />
+	Provenance for feature_relationshipprop. 
 </em>
 
 <table border="1">
@@ -7726,7 +7914,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Associate a term from a cv with a feature, for example, GO annotation 
+	================================================ <br />
+	TABLE: feature_cvterm <br />
+	================================================ <br />
+	Associate a term from a cv with a feature, for example, GO annotation. 
 </em>
 
 <table border="1">
@@ -7784,7 +7975,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref. </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
@@ -7793,7 +7984,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL, if this is set to true, then this annotation is interpreted as a NEGATIVE annotation - ie the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details </td>
+	<td class="FieldCellOther">NOT NULL, If this is set to true, then this annotation is interpreted as a NEGATIVE annotation - i.e. the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -7918,11 +8109,14 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_cvtermprop <br />
+	================================================ <br />
 	Extensible properties for
 	feature to cvterm associations. Examples: GO evidence codes;
 	qualifiers; metadata such as the date on which the entry was curated
 	and the source of the association. See the featureprop table for
-	meanings of type_id, value and rank 
+	meanings of type_id, value and rank. 
 </em>
 
 <table border="1">
@@ -7973,7 +8167,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. cvterms may come from the OBO evidence code cv </td>
+that cvterm. cvterms may come from the OBO evidence code cv. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -7998,7 +8192,7 @@ types, but is easier to query. </td>
 ordering. Any feature_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used </td>
+the default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8108,7 +8302,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details 
+	================================================ <br />
+	TABLE: feature_cvterm_dbxref <br />
+	================================================ <br />
+	Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details. 
 </em>
 
 <table border="1">
@@ -8262,11 +8459,14 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_cvterm_pub <br />
+	================================================ <br />
 	Secondary pubs for an
 	association. Each feature_cvterm association is supported by a single
 	primary publication. Additional secondary pubs can be added using this
 	linking table (in a GO gene association file, these corresponding to
-	any IDs after the pipe symbol in the publications column 
+	any IDs after the pipe symbol in the publications column. 
 </em>
 
 <table border="1">
@@ -8420,7 +8620,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	A synonym for a feature. One feature can have multiple synonyms, and the same synonym can apply to multiple features 
+	================================================ <br />
+	TABLE: synonym <br />
+	================================================ <br />
+	A synonym for a feature. One feature can have multiple synonyms, and the same synonym can apply to multiple features. 
 </em>
 
 <table border="1">
@@ -8460,7 +8663,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The synonym itself. Should be human-readable machine-searchable ascii text </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The synonym itself. Should be human-readable machine-searchable ascii text. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8469,7 +8672,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, types would be symbol and fullname for now </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Types would be symbol and fullname for now. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -8478,7 +8681,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The fully specified synonym, with any non-ascii characters encoded in SGML </td>
+	<td class="FieldCellOther">NOT NULL, The fully specified synonym, with any non-ascii characters encoded in SGML. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8578,7 +8781,10 @@ the default 0 value should be used </td>
 
 <em>
 	<br />
-	Linking table between feature and synonym 
+	================================================ <br />
+	TABLE: feature_synonym <br />
+	================================================ <br />
+	Linking table between feature and synonym. 
 </em>
 
 <table border="1">
@@ -8636,7 +8842,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the pub_id link is for relating the usage of a given synonym to the publication in which it was used </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The pub_id link is for relating the usage of a given synonym to the publication in which it was used. </td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
@@ -8645,7 +8851,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, the is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature </td>
+	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8654,8 +8860,7 @@ the default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL, typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly & deliberately (eg in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (eg, there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the 
-synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym </td>
+	<td class="FieldCellOther">NOT NULL, Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym. If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8785,43 +8990,21 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado companalysis module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	================================================================= <br />
 	================================================ <br />
 	TABLE: analysis <br />
 	================================================ <br />
-	an analysis is a particular type of a computational analysis; <br />
-	it may be a blast of one sequence against another, or an all by all <br />
-	blast, or a different kind of analysis altogether. <br />
-	it is a single unit of computation <br />
-	name: <br />
-	a way of grouping analyses. this should be a handy <br />
-	short identifier that can help people find an analysis they <br />
-	want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt" <br />
-	it should not be assumed to be unique. for instance, there may <br />
-	be lots of seperate analyses done against a cDNA database. <br />
-	program: <br />
-	e.g. blastx, blastp, sim4, genscan <br />
-	programversion: <br />
-	e.g. TBLASTX 2.0MP-WashU [09-Nov-2000] <br />
-	algorithm: <br />
-	e.g. blast <br />
-	sourcename: <br />
-	e.g. cDNA, SwissProt <br />
-	queryfeature_id: <br />
-	the sequence that was used as the query sequence can be <br />
-	optionally included via queryfeature_id - even though this <br />
-	is redundant with the tables below. this can still <br />
-	be useful - for instance, we may have an analysis that blasts <br />
-	contigs against a database. we may then transform those hits <br />
-	into global coordinates; it may be useful to keep a record <br />
-	of which contig was blasted as the query. <br />
-	MAPPING (bioperl): maps to Bio::Search::Result::ResultI <br />
-	** not anymore, b/c we are using analysis in a more general sense <br />
-	** to represent microarray analysis <br />
-	sourceuri: <br />
-	This is an optional permanent URL/URI for the source of the <br />
-	analysis. The idea is that someone could recreate the analysis <br />
-	directly by going to this URI and fetching the source data <br />
-	(eg the blast database, or the training model).
+	An analysis is a particular type of a
+	    computational analysis; it may be a blast of one sequence against
+	    another, or an all by all blast, or a different kind of analysis
+	    altogether. It is a single unit of computation. 
 </em>
 
 <table border="1">
@@ -8861,7 +9044,10 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">A way of grouping analyses. This
+    should be a handy short identifier that can help people find an
+    analysis they want. For instance "tRNAscan", "cDNA", "FlyPep",
+    "SwissProt", and it should not be assumed to be unique. For instance, there may be lots of separate analyses done against a cDNA database. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8879,7 +9065,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Program name, e.g. blastx, blastp, sim4, genscan. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8888,7 +9074,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Version description, e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8897,7 +9083,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">Algorithm name, e.g. blast. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8906,7 +9092,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE</td>
+	<td class="FieldCellOther">UNIQUE, Source name, e.g. cDNA, SwissProt. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8924,7 +9110,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9174,47 +9360,8 @@ synonym is -internal- and should be queryable but should not be listed in report
 	================================================ <br />
 	TABLE: analysisfeature <br />
 	================================================ <br />
-	computational analyses generate features (eg genscan generates <br />
-	transcripts and exons; sim4 alignments generate similarity/match <br />
-	features) <br />
-	analysisfeatures are stored using the feature table from <br />
-	the sequence module. the analysisfeature table is used to <br />
-	decorate these features, with analysis specific attributes. <br />
-	a feature is an analysisfeature if and only if there is <br />
-	a corresponding entry in the analysisfeature table <br />
-	analysisfeatures will have two or more featureloc entries, <br />
-	with rank indicating query/subject <br />
-	analysis_id: <br />
-	scoredsets are grouped into analyses <br />
-	rawscore: <br />
-	this is the native score generated by the program; for example, <br />
-	the bitscore generated by blast, sim4 or genscan scores. <br />
-	one should not assume that high is necessarily better than low. <br />
-	normscore: <br />
-	this is the rawscore but semi-normalized. complete normalization <br />
-	to allow comparison of features generated by different programs <br />
-	would be nice but too difficult. instead the normalization should <br />
-	strive to enforce the following semantics: <br />
-	* normscores are floating point numbers >= 0 <br />
-	* high normscores are better than low one. <br />
-	for most programs, it would be sufficient to make the normscore <br />
-	the same as this rawscore, providing these semantics are <br />
-	satisfied. <br />
-	significance: <br />
-	this is some kind of expectation or probability metric, <br />
-	representing the probability that the scoredset would appear <br />
-	randomly given the model. <br />
-	as such, any program or person querying this table can assume <br />
-	the following semantics: <br />
-	* 0 <= significance <= n, where n is a positive number, theoretically <br />
-	unbounded but unlikely to be more than 10 <br />
-	* low numbers are better than high numbers. <br />
-	identity: <br />
-	percent identity between the locations compared <br />
-	note that these 4 metrics do not cover the full range of scores <br />
-	possible; it would be undesirable to list every score possible, as <br />
-	this should be kept extensible. instead, for non-standard scores, use <br />
-	the scoredsetprop table.
+	Computational analyses generate features (e.g. Genscan generates transcripts and exons; sim4 alignments generate similarity/match features). analysisfeatures are stored using the feature table from the sequence module. The analysisfeature table is used to decorate these features, with analysis specific attributes. A feature is an analysisfeature if and only if there is a corresponding entry in the analysisfeature table. analysisfeatures will have two or more featureloc entries,
+	 with rank indicating query/subject 
 </em>
 
 <table border="1">
@@ -9272,7 +9419,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">float</td>
 	<td class="FieldCellSize">20</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">This is the native score generated by the program; for example, the bitscore generated by blast, sim4 or genscan scores. One should not assume that high is necessarily better than low. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9281,7 +9428,12 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">float</td>
 	<td class="FieldCellSize">20</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">This is the rawscore but
+    semi-normalized. Complete normalization to allow comparison of
+    features generated by different programs would be nice but too
+    difficult. Instead the normalization should strive to enforce the
+    following semantics: * normscores are floating point numbers >= 0,
+    * high normscores are better than low one. For most programs, it would be sufficient to make the normscore the same as this rawscore, providing these semantics are satisfied. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9290,7 +9442,9 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">float</td>
 	<td class="FieldCellSize">20</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">This is some kind of expectation or probability metric, representing the probability that the analysis would appear randomly given the model. As such, any program or person querying this table can assume the following semantics:
+   * 0 <= significance <= n, where n is a positive number, theoretically unbounded but unlikely to be more than 10
+  * low numbers are better than high numbers. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9299,7 +9453,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">float</td>
 	<td class="FieldCellSize">20</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">Percent identity between the locations compared.  Note that these 4 metrics do not cover the full range of scores possible; it would be undesirable to list every score possible, as this should be kept extensible. instead, for non-standard scores, use the analysisprop table. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9404,7 +9558,20 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
-	a phenotypic statement, or a single atomic phenotypic observation a controlled sentence describing observable effect of non-wt function -- e.g. Obs=eye, attribute=color, cvalue=red 
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado phenotype module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	:import feature from sequence <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: phenotype <br />
+	================================================ <br />
+	A phenotypic statement, or a single
+	atomic phenotypic observation, is a controlled sentence describing
+	observable effects of non-wild type function. E.g. Obs=eye, attribute=color, cvalue=red. 
 </em>
 
 <table border="1">
@@ -9453,7 +9620,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The entity: e.g. anatomy_part, biological_process </td>
+	<td class="FieldCellOther">The entity: e.g. anatomy_part, biological_process. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -9462,7 +9629,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Phenotypic attribute (quality, property, attribute, character) - drawn from PATO </td>
+	<td class="FieldCellOther">Phenotypic attribute (quality, property, attribute, character) - drawn from PATO. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -9471,7 +9638,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate </td>
+	<td class="FieldCellOther">Value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9480,7 +9647,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Phenotype attribute value (state) </td>
+	<td class="FieldCellOther">Phenotype attribute value (state). </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -9489,7 +9656,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">evidence type </td>
+	<td class="FieldCellOther">Evidence type. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -9604,6 +9771,9 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: phenotype_cvterm <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -9758,6 +9928,9 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: feature_phenotype <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -9912,6 +10085,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
 	2006-04-11 <br />
@@ -9925,7 +10099,6 @@ synonym is -internal- and should be queryable but should not be listed in report
 	changes 2004-06 (Documented by DE: 10-MAR-2005): <br />
 	Many, including rename of gcontext to genotype,  split <br />
 	phenstatement into phenstatement & phenotype, created environment <br />
-	see doc/genetic-notes.txt <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	============ <br />
 	DEPENDENCIES <br />
@@ -9939,8 +10112,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	================================================ <br />
 	TABLE: genotype <br />
 	================================================ <br />
-	genetic context <br />
-	NULL
+	Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs. 
 </em>
 
 <table border="1">
@@ -9981,7 +10153,7 @@ synonym is -internal- and should be queryable but should not be listed in report
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">Optional alternative name for a genotype, 
-for display purposes </td>
+for display purposes. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -9991,7 +10163,7 @@ for display purposes </td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a genotype; 
-typically derived from the features making up the genotype </td>
+typically derived from the features making up the genotype. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -10093,18 +10265,6 @@ typically derived from the features making up the genotype </td>
 	=============================================== <br />
 	TABLE: feature_genotype <br />
 	================================================ <br />
-	A genotype is defined by a collection of features <br />
-	mutations, balancers, deficiencies, haplotype blocks, engineered <br />
-	constructs <br />
-	rank can be used for n-ploid organisms <br />
-	group can be used for distinguishing the chromosomal groups <br />
-	(RNAi products and so on can be treated as different groups, as <br />
-	they do not fall on a particular chromosome) <br />
-	OPEN QUESTION: for multicopy transgenes, should we include a 'n_copies' <br />
-	column as well? <br />
-	chromosome_id       : a feature of SO type 'chromosome' <br />
-	rank                : preserves order <br />
-	group               : spatially distinguishable group <br />
 	NULL
 </em>
 
@@ -10163,7 +10323,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE</td>
+	<td class="FieldCellOther">UNIQUE, A feature of SO type "chromosome". </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -10172,7 +10332,8 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, rank can be used for
+n-ploid organisms or to preserve order. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -10181,7 +10342,10 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Spatially distinguishable
+group. group can be used for distinguishing the chromosomal groups,
+for example (RNAi products and so on can be treated as different
+groups, as they do not fall on a particular chromosome). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -10323,8 +10487,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: environment <br />
 	================================================ <br />
-	The environmental component of a phenotype description <br />
-	NULL
+	The environmental component of a phenotype description. 
 </em>
 
 <table border="1">
@@ -10615,7 +10778,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp[1] is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype. 
+	Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype. 
 </em>
 
 <table border="1">
@@ -10826,7 +10989,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	a summary of a _set_ of phenotypic statements for any one gcontext made in any one publication 
+	A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication. 
 </em>
 
 <table border="1">
@@ -11037,7 +11200,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	comparison of phenotypes eg, genotype1/environment1/phenotype1 "non-suppressible" wrt  genotype2/environment2/phenotype2 
+	Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2. 
 </em>
 
 <table border="1">
@@ -11310,18 +11473,15 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	NOTE: this module is all due for revision... <br />
-	A possibly problematic case is where we want to localize an object <br />
-	to the left or right of a feature (but not within it): <br />
-	|---------|  feature-to-map <br />
-	------------------------------------------------- map <br />
-	|------|         |----------|   features to map wrt <br />
-	How do we map the 3' end of the feature-to-map? <br />
-	TODO:  Get a comprehensive set of mapping use-cases <br />
-	one set of use-cases is aberrations (which will all be involved with this <br />
-	module).   Simple aberrations should be do-able, but what about cases where <br />
-	a breakpoint interrupts a gene?  This would be an example of the problematic <br />
-	case above...  (or?) <br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado map module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	================================================================= <br />
 	================================================ <br />
 	TABLE: featuremap <br />
 	================================================
@@ -11448,12 +11608,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: featurerange <br />
 	================================================ <br />
-	In cases where the start and end of a mapped feature is a range, leftendf <br />
-	and rightstartf are populated. <br />
-	featuremap_id is the id of the feature being mapped <br />
-	leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of <br />
-	features with respect to with the feature is being mapped.  These may <br />
-	be cytological bands.
+	In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands. 
 </em>
 
 <table border="1">
@@ -11493,7 +11648,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, featuremap_id is the id of the feature being mapped. </td>
 	<td class="FieldCellFK"><a href="#featuremap-featuremap_id">featuremap.featuremap_id</a></td>
 </tr>
 
@@ -11757,7 +11912,8 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, map_feature_id
+links to the feature (map) upon which the feature is being localized. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -11886,8 +12042,6 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	map_feature_id links to the feature (map) upon which the feature is <br />
-	being localized <br />
 	================================================ <br />
 	TABLE: featuremap_pub <br />
 	================================================
@@ -12039,37 +12193,12 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.5 2007-01-15 16:25:58 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
 	Chris Mungall <br />
-	nested set tree implementation by way of Joe Celko; <br />
-	see the excellent intro by Aaron Mackey here <br />
-	http://www.oreillynet.com/pub/a/network/2002/11/27/bioconf.html <br />
 	Initial design: 2004-05-27 <br />
-	For representing phylogenetic trees; the trees represent the <br />
-	phylogeny of some some kind of sequence feature (mainly proteins) <br />
-	or actual organism taxonomy trees <br />
-	This module relies heavily on the sequence module <br />
-	in particular, all the leaf nodes in a tree correspond to features; <br />
-	these will usually be features of type SO:protein or SO:polypeptide <br />
-	(but other trees are possible - eg intron trees) <br />
-	if it is desirable to store multiple alignments for each non-leaf node, <br />
-	then each node can be mapped to a feature of type SO:match <br />
-	refer to the sequence module docs for details on storing multiple alignments <br />
-	Annotating nodes: <br />
-	Each node can have a feature attached; this 'feature' is the multiple <br />
-	alignment for non-leaf nodes. It is these features that are annotated <br />
-	rather than annotating the nodes themselves. This has lots of advantages - <br />
-	we can piggyback off of the sequence module and reuse the tables there <br />
-	the leaf nodes may have annotations already attached - for example, GO <br />
-	associations <br />
-	In fact, it is even possible to annotate ranges along an alignment - <br />
-	this would entail creating a new feature which has a featureloc on <br />
-	the alignment feature <br />
-	========================================== <br />
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	============ <br />
 	DEPENDENCIES <br />
 	============ <br />
@@ -12079,13 +12208,10 @@ typically derived from the features making up the genotype </td>
 	:import organism from organism <br />
 	:import dbxref from general <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
-	============ <br />
-	RELATIONS <br />
-	============ <br />
 	================================================ <br />
 	TABLE: phylotree <br />
-	Global anchor for phylogenetic tree <br />
-	================================================
+	================================================ <br />
+	Global anchor for phylogenetic tree. 
 </em>
 
 <table border="1">
@@ -12143,7 +12269,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">type: protein, nucleotide, taxonomy, ???</td>
+	<td class="FieldCellOther">Type: protein, nucleotide, taxonomy, for example. The type should be any SO type, or "taxonomy". </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -12152,7 +12278,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">REMOVED BY cjm; this is implicit from indexing - see phylonode</td>
+	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -12249,10 +12375,8 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylotree_pub <br />
-	Tracks citations global to the tree <br />
-	e.g. multiple sequence alignment <br />
-	supporting tree construction <br />
-	================================================
+	================================================ <br />
+	Tracks citations global to the tree e.g. multiple sequence alignment supporting tree construction. 
 </em>
 
 <table border="1">
@@ -12408,12 +12532,12 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylonode <br />
-	This is the most pervasive element in the <br />
-	phylogeny module, cataloging the 'phylonodes' <br />
-	of tree graphs. Edges are implied <br />
-	by the parent_phylonode_id reflexive closure <br />
 	================================================ <br />
-	bootstrap float null,
+	Bootstrap float null. <br />
+	This is the most pervasive
+	       element in the phylogeny module, cataloging the "phylonodes" of
+	       tree graphs. Edges are implied by the parent_phylonode_id
+	       reflexive closure. For all nodes in a nested set implementation the left and right index will be *between* the parents left and right indexes. 
 </em>
 
 <table border="1">
@@ -12462,7 +12586,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">root phylonode can have null parent_phylonode_id value</td>
+	<td class="FieldCellOther">Root phylonode can have null parent_phylonode_id value. </td>
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
@@ -12471,7 +12595,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, nested set implementation</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -12489,7 +12613,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">type: root, interior, leaf</td>
+	<td class="FieldCellOther">Type: e.g. root, interior, leaf. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -12498,7 +12622,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">phylonodes can have optional features attached to them</td>
+	<td class="FieldCellOther">Phylonodes can have optional features attached to them e.g. a protein or nucleotide sequence usually attached to a leaf of the phylotree for non-leaf nodes, the feature may be a feature that is an instance of SO:match; this feature is the alignment of all leaf features beneath it. </td>
 	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
@@ -12616,11 +12740,8 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylonode_dbxref <br />
-	e.g. for orthology, paralogy group identifiers; <br />
-	could also be used for NCBI taxonomy; <br />
-	for sequences, refer to 'phylonode_feature' <br />
-	feature associated dbxrefs <br />
-	================================================
+	================================================ <br />
+	For example, for orthology, paralogy group identifiers; could also be used for NCBI taxonomy; for sequences, refer to phylonode_feature, feature associated dbxrefs. 
 </em>
 
 <table border="1">
@@ -12932,16 +13053,8 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylonode_organism <br />
-	this linking table should only be used <br />
-	for nodes in taxonomy trees; it provides <br />
-	a mapping between the node and an organism <br />
-	one node can have zero or one organisms <br />
-	one organism can have zero or more nodes <br />
-	(although typically it should only have one, <br />
-	in the standard NCBI taxonomy tree. should we <br />
-	enforce one only, or allow competing taxonomy trees?) <br />
 	================================================ <br />
-	one phylonode cannot refer to >1 organism
+	This linking table should only be used for nodes in taxonomy trees; it provides a mapping between the node and an organism. One node can have zero or one organisms, one organism can have zero or more nodes (although typically it should only have one in the standard NCBI taxonomy tree). 
 </em>
 
 <table border="1">
@@ -12981,7 +13094,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, One phylonode cannot refer to >1 organism. </td>
 	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
@@ -13097,10 +13210,6 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylonodeprop <br />
-	e.g. "type_id" could designate phylonode hierarchy <br />
-	relationships, for example: species taxonomy <br />
-	(kingdom, order, family, genus, species), <br />
-	"ortholog/paralog", "fold/superfold", etc. <br />
 	================================================
 </em>
 
@@ -13150,7 +13259,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, type_id could designate phylonode hierarchy relationships, for example: species taxonomy (kingdom, order, family, genus, species), "ortholog/paralog", "fold/superfold", etc. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -13168,7 +13277,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, not sure how useful the rank concept is here, but I'll leave it in for now</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, It is not clear how useful the rank concept is here, leave it in for now.</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -13285,14 +13394,8 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: phylonode_relationship <br />
-	this is for exotic relationships that are <br />
-	not strictly hierarchical; for example, <br />
-	horizontal gene transfer <br />
-	use of this table would be highly unusual; <br />
-	most phylogenetic trees are strictly <br />
-	hierarchical. <br />
-	nevertheless, it is here for completion <br />
-	================================================
+	================================================ <br />
+	This is for exotic relationships that are not strictly hierarchical; for example, horizontal gene transfer. Use of this table would be highly unusual; most phylogenetic trees are strictly hierarchical. Nevertheless, it is here for completeness. 
 </em>
 
 <table border="1">
@@ -13479,10 +13582,17 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado contact module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import cvterm from cv <br />
+	================================================================= <br />
 	================================================ <br />
 	TABLE: contact <br />
 	================================================ <br />
-	model persons, institutes, groups, organizations, etc 
+	Model persons, institutes, groups, organizations, etc. 
 </em>
 
 <table border="1">
@@ -13522,7 +13632,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">what type of contact is this?  e.g. "person", "lab", etc. </td>
+	<td class="FieldCellOther">What type of contact is this?  E.g. "person", "lab". </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -13611,7 +13721,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: contact_relationship <br />
 	================================================ <br />
-	model relationships between contacts 
+	Model relationships between contacts 
 </em>
 
 <table border="1">
@@ -13651,7 +13761,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -13660,7 +13770,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node. </td>
 	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
@@ -13669,7 +13779,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, the object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node </td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node. </td>
 	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
@@ -13789,17 +13899,19 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	This module is totally dependant on the sequence module.  Objects in the <br />
-	genetic module cannot connect to expression data except by going via the <br />
-	sequence module <br />
-	We assume that we'll *always* have a controlled vocabulary for expression <br />
-	data.   If an experiment used a set of cv terms different from the ones <br />
-	FlyBase uses (bodypart cv, bodypart qualifier cv, and the temporal cv <br />
-	(which is stored in the curaton.doc under GAT6 btw)), they'd have to give <br />
-	us the cv terms, which we could load into the cv module <br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado expression module <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	================================================================= <br />
 	================================================ <br />
 	TABLE: expression <br />
-	================================================
+	================================================ <br />
+	The expression table is essentially a bridge table. 
 </em>
 
 <table border="1">
@@ -13835,6 +13947,24 @@ typically derived from the features making up the genotype </td>
 </tr>
 
 <tr class="tr-even">
+	<td class="FieldCellName"><a name="expression-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expression-md5checksum">md5checksum</a></td>
+	<td class="FieldCellType">char</td>
+	<td class="FieldCellSize">32</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="expression-description">description</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -13865,160 +13995,14 @@ typically derived from the features making up the genotype </td>
 	<td>expression_id</td>
 </tr>
 
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'feature_expression'
- -->
-
-<a name="feature_expression" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	feature_expression
-</h3></td>
-		<a name="feature_expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	================================================ <br />
-	TABLE: feature_expression <br />
-	================================================
-</em>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expression-feature_expression_id">feature_expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_expression-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expression-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>feature_expression_idx1</td>
-	<td>expression_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>feature_expression_idx2</td>
-	<td>feature_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>feature_expression_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>expression_id, feature_id</td>
+	<td>uniquename</td>
 </tr>
 
 </table>
@@ -14050,22 +14034,7 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: expression_cvterm <br />
-	================================================ <br />
-	What are the possibities of combination when more than one cvterm is used <br />
-	in a field? <br />
-	For eg (in <p> here):   <t> E | early <a> <p> anterior & dorsal <br />
-	If the two terms used in a particular field are co-equal (both from the <br />
-	same CV, is the relation always "&"?   May we find "or"? <br />
-	Obviously another case is when a bodypart term and a bodypart qualifier <br />
-	term are used in a specific field, eg: <br />
-	<t> L | third instar <a> larval antennal segment sensilla | subset <p <br />
-	WRT the three-part <t><a><p> statements, are the values in the different <br />
-	parts *always* from different vocabularies in proforma.CV?   If not, <br />
-	we'll need to have some kind of type qualifier telling us whether the <br />
-	cvterm used is <t>, <a>, or <p> <br />
-	yes we should have a type qualifier as a cv term can be from diff vocab <br />
-	e.g. blastoderm can be body part and stage terms in dros anatomy <br />
-	but cvterm_type needs to be a cv instead of a free text type here?
+	================================================
 </em>
 
 <table border="1">
@@ -14122,18 +14091,18 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellName"><a name="expression_cvterm-rank">rank</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
+	<td class="FieldCellDefault">0</td>
 	<td class="FieldCellOther">NOT NULL</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvterm-cvterm_type">cvterm_type</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
+	<td class="FieldCellName"><a name="expression_cvterm-cvterm_type_id">cvterm_type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -14161,6 +14130,11 @@ typically derived from the features making up the genotype </td>
 <tr class="IndexCell">
 	<td>expression_cvterm_idx2</td>
 	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>expression_cvterm_idx3</td>
+	<td>cvterm_type_id</td>
 </tr>
 
 </table>
@@ -14211,8 +14185,387 @@ typically derived from the features making up the genotype </td>
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_type_id</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>expression_id, cvterm_id</td>
+	<td>expression_id, cvterm_id, cvterm_type_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'expression_cvtermprop'
+ -->
+
+<a name="expression_cvtermprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	expression_cvtermprop
+</h3></td>
+		<a name="expression_cvtermprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: expression_cvtermprop <br />
+	================================================ <br />
+	Extensible properties for
+	expression to cvterm associations. Examples: qualifiers. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvtermprop_id">expression_cvtermprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvterm_id">expression_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#expression_cvterm-expression_cvterm_id">expression_cvterm.expression_cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expression_cvtermprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv. </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="expression_cvtermprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther">The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expression_cvtermprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
+ordering. Any expression_cvterm can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>expression_cvtermprop_idx1</td>
+	<td>expression_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>expression_cvtermprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>expression_cvtermprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>expression_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>expression_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>expression_cvterm_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'expressionprop'
+ -->
+
+<a name="expressionprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	expressionprop
+</h3></td>
+		<a name="expressionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: expressionprop <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expressionprop-expressionprop_id">expressionprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="expressionprop-expression_id">expression_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expressionprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="expressionprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="expressionprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>expressionprop_idx1</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>expressionprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>expressionprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>expression_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -14376,6 +14729,367 @@ typically derived from the features making up the genotype </td>
 <hr />
 
 <!-- 
+	Starting table 'feature_expression'
+ -->
+
+<a name="feature_expression" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_expression
+</h3></td>
+		<a name="feature_expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: feature_expression <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_expression-feature_expression_id">feature_expression_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_expression-expression_id">expression_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_expression-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_expression-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_expression_idx1</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_expression_idx2</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_expression_idx3</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>expression_id, feature_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'feature_expressionprop'
+ -->
+
+<a name="feature_expressionprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	feature_expressionprop
+</h3></td>
+		<a name="feature_expressionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: feature_expressionprop <br />
+	================================================ <br />
+	Extensible properties for
+	feature_expression (comments, for example). Modeled on feature_cvtermprop. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_expressionprop-feature_expressionprop_id">feature_expressionprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_expressionprop-feature_expression_id">feature_expression_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature_expression-feature_expression_id">feature_expression.feature_expression_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_expressionprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_expressionprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="feature_expressionprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_expressionprop_idx1</td>
+	<td>feature_expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>feature_expressionprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_expressionprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_expression_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>feature_expression_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
 	Starting table 'eimage'
  -->
 
@@ -14440,7 +15154,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">We expect images in eimage_data (e.g. JPEGs) to be uuencoded. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -14449,7 +15163,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, Describes the type of data in eimage_data. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -14516,8 +15230,6 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	we expect images in eimage_data (eg jpegs) to be uuencoded <br />
-	describes the type of data in eimage_data <br />
 	================================================ <br />
 	TABLE: expression_image <br />
 	================================================
@@ -14674,7 +15386,20 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	this table is for storing extra bits of mageml in a denormalized form.  more normalization would require many more tables 
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	:import contact from contact <br />
+	:import dbxref from general <br />
+	:import tableinfo from general <br />
+	:import project from general <br />
+	:import analysis from companalysis <br />
+	================================================================= <br />
+	This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables. 
 </em>
 
 <table border="1">
@@ -14968,7 +15693,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	procedural notes on how data was prepared and processed 
+	Procedural notes on how data was prepared and processed. 
 </em>
 
 <table border="1">
@@ -15186,7 +15911,8 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	parameters related to a protocol.  if the protocol is a soak, this might include attributes of bath temperature and duration 
+	Parameters related to a
+	protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration. 
 </em>
 
 <table border="1">
@@ -15386,7 +16112,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but affy uses only one) 
+	Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one). 
 </em>
 
 <table border="1">
@@ -15503,7 +16229,10 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	general properties about an array.  and array is a template used to generate physical slides, etc.  it contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions(in rows/columns). 
+	General properties about an array.
+	An array is a template used to generate physical slides, etc.  It
+	contains layout information, as well as global array properties, such
+	as material (glass, nylon) and spot dimensions (in rows/columns). 
 </em>
 
 <table border="1">
@@ -15597,7 +16326,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">UNIQUE</td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -15797,7 +16526,7 @@ typically derived from the features making up the genotype </td>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>name</td>
+	<td>name, version</td>
 </tr>
 
 </table>
@@ -15827,7 +16556,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	extra arraydesign properties that are not accounted for in arraydesign 
+	Extra array design properties that are not accounted for in arraydesign 
 </em>
 
 <table border="1">
@@ -16004,7 +16733,9 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	an assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician info).  the assay can be thought of as a hybridization 
+	An assay consists of a physical instance of
+	an array, combined with the conditions used to create the array
+	(protocols, technician information). The assay can be thought of as a hybridization. 
 </em>
 
 <table border="1">
@@ -16241,7 +16972,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	extra assay properties that are not accounted for in assay 
+	Extra assay properties that are not accounted for in assay. 
 </em>
 
 <table border="1">
@@ -16418,7 +17149,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	link assays to projects 
+	Link assays to projects. 
 </em>
 
 <table border="1">
@@ -16572,7 +17303,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	a biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract.  it is essentially some biological material (tissue, cells, serum) that may have been processed.  processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table. 
+	A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table. 
 </em>
 
 <table border="1">
@@ -16753,7 +17484,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	relate biomaterials to one another.  this is a way to track a series of treatments or material splits/merges, for instance 
+	Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance. 
 </em>
 
 <table border="1">
@@ -16931,7 +17662,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	extra biomaterial properties that are not accounted for in biomaterial 
+	Extra biomaterial properties that are not accounted for in biomaterial. 
 </em>
 
 <table border="1">
@@ -17251,7 +17982,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	a biomaterial may undergo multiple treatments.  this can range from apoxia to fluorophore and biotin labeling 
+	A biomaterial may undergo multiple treatments. This can range from apoxia to fluorophore and biotin labeling. 
 </em>
 
 <table border="1">
@@ -17442,7 +18173,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	link biomaterials to treatments.  treatments have an order of operations (rank), and associated measurements (unittype_id, value) 
+	Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value). 
 </em>
 
 <table border="1">
@@ -17638,7 +18369,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	a biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays) 
+	A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays). 
 </em>
 
 <table border="1">
@@ -17825,7 +18556,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	this represents the scanning of hybridized material.  the output of this process is typically a digital image of an array 
+	This represents the scanning of hybridized material. The output of this process is typically a digital image of an array. 
 </em>
 
 <table border="1">
@@ -18020,7 +18751,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	parameters associated with image acquisition 
+	Parameters associated with image acquisition. 
 </em>
 
 <table border="1">
@@ -18197,7 +18928,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	multiple monochrome images may be merged to form a multi-color image.  red-green images of 2-channel hybridizations are an example of this 
+	Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this. 
 </em>
 
 <table border="1">
@@ -18398,7 +19129,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	quantification is the transformation of an image acquisition to numeric data.  this typically involves statistical procedures. 
+	Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures. 
 </em>
 
 <table border="1">
@@ -18617,7 +19348,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	extra quantification properties that are not accounted for in quantification 
+	Extra quantification properties that are not accounted for in quantification. 
 </em>
 
 <table border="1">
@@ -18794,7 +19525,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	there may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where 
+	There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where. 
 </em>
 
 <table border="1">
@@ -19196,7 +19927,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	represents a feature of the array.  this is typically a region of the array coated or bound to DNA 
+	Represents a subcomponent of an assay platform that performs a measurement. For a microarray this is typically a region of the array coated or bound to DNA.  For another assay platform such as an in-situ hybridization of two probes, the two probes would be represented here.  The nullable foreign key constraint back to feature allows mapping of these measuring components back to the genome features they represent. 
 </em>
 
 <table border="1">
@@ -19361,6 +20092,149 @@ typically derived from the features making up the genotype </td>
 <hr />
 
 <!-- 
+	Starting table 'arraydesign_element'
+ -->
+
+<a name="arraydesign_element" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	arraydesign_element
+</h3></td>
+		<a name="arraydesign_element"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_element_id">arraydesign_element_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_id">arraydesign_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="arraydesign_element-element_id">element_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>arraydesign_element_idx1</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>arraydesign_element_idx2</td>
+	<td>element_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>arraydesign_element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>arraydesign_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>element_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>arraydesign_id, element_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
 	Starting table 'elementresult'
  -->
 
@@ -19383,7 +20257,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	an element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id).  this is the base data from which tables that actually contain data inherit 
+	An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit. 
 </em>
 
 <table border="1">
@@ -19556,7 +20430,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance 
+	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
 <table border="1">
@@ -19762,7 +20636,7 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	sometimes we want to combine measurements from multiple elements to get a composite value.  affy combines many probes to form a probeset measurement, for instance 
+	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
 <table border="1">
@@ -20972,8 +21846,9 @@ typically derived from the features making up the genotype </td>
 
 <em>
 	<br />
-	============ <br />
-	Stock Module <br />
+	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	========================================== <br />
+	Chado stock module <br />
 	DEPENDENCIES <br />
 	============ <br />
 	:import cvterm from cv <br />
@@ -20984,13 +21859,8 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock <br />
 	================================================ <br />
-	Any stock can be globally identified by the combination of organism, uniquename and stock type. <br />
-	A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype. <br />
-	The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref. <br />
-	The organism_id is the organism to which the stock belongs. This column is mandatory. <br />
-	The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Decondary cvterms for stocks would go in stock_cvterm. <br />
-	The description is the genetic description provided in the stock list. <br />
-	The name is a human-readable local name for a stock.
+	Any stock can be globally identified by the
+	combination of organism, uniquename and stock type. A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype. 
 </em>
 
 <table border="1">
@@ -21030,7 +21900,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref. </td>
 	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
@@ -21039,7 +21909,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The organism_id is the organism to which the stock belongs. This column is mandatory. </td>
 	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
@@ -21048,7 +21918,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">The name is a human-readable local name for a stock. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -21066,7 +21936,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">The description is the genetic description provided in the stock list. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -21075,7 +21945,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -21222,7 +22092,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock_pub <br />
 	================================================ <br />
-	Provenance. Linking table between stocks and for example a stocklist computer file.
+	Provenance. Linking table between stocks and, for example, a stocklist computer file. 
 </em>
 
 <table border="1">
@@ -21379,8 +22249,11 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stockprop <br />
 	================================================ <br />
-	A stock can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. <br />
-	Unique index stockprop_c1 for any one stock, multivalued property-value pairs must be differentiated by rank.
+	A stock can have any number of
+	slot-value property tags attached to it. This is an alternative to
+	hardcoding a list of columns in the relational schema, and is
+	completely extensible. There is a unique constraint, stockprop_c1, for
+	the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank. 
 </em>
 
 <table border="1">
@@ -21560,7 +22433,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stockprop_pub <br />
 	================================================ <br />
-	Provenance. Any stockprop assignment can optionally be supported by a publication.
+	Provenance. Any stockprop assignment can optionally be supported by a publication. 
 </em>
 
 <table border="1">
@@ -21716,12 +22589,7 @@ typically derived from the features making up the genotype </td>
 	<br />
 	================================================ <br />
 	TABLE: stock_relationship <br />
-	================================================ <br />
-	stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock. <br />
-	stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock. <br />
-	stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. <br />
-	stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero. <br />
-	stock_relationship.value is Additional notes/comments.
+	================================================
 </em>
 
 <table border="1">
@@ -21761,7 +22629,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock. </td>
 	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
@@ -21770,7 +22638,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock. </td>
 	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
@@ -21779,7 +22647,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -21788,7 +22656,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">stock_relationship.value is for additional notes or comments. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -21797,7 +22665,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -21925,7 +22793,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock_relationship_pub <br />
 	================================================ <br />
-	stock_relationship_pub Provenance. Attach optional evidence to a stock_relationship in the form of a publication.
+	Provenance. Attach optional evidence to a stock_relationship in the form of a publication. 
 </em>
 
 <table border="1">
@@ -22082,8 +22950,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock_dbxref <br />
 	================================================ <br />
-	stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id. <br />
-	stock_dbxref.is_current the is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock.
+	stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id. 
 </em>
 
 <table border="1">
@@ -22141,7 +23008,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -22254,7 +23121,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock_cvterm <br />
 	================================================ <br />
-	stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id.
+	stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id. 
 </em>
 
 <table border="1">
@@ -22435,8 +23302,8 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stock_genotype <br />
 	================================================ <br />
-	simple table linking a stock to a genotype <br />
-	features can with genotypes can be linked to stocks thru feature_genotype -> genotype -> stock_genotype -> stock
+	Simple table linking a stock to
+	a genotype. Features with genotypes can be linked to stocks thru feature_genotype -> genotype -> stock_genotype -> stock. 
 </em>
 
 <table border="1">
@@ -22593,11 +23460,7 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stockcollection <br />
 	================================================ <br />
-	stockcollection The lab or stock center distributing the stocks in their collection. <br />
-	uniqename is the value of the collection_FBcv <br />
-	type_id is the collection_type_FBcv <br />
-	name is the collection <br />
-	contact_id links to the contact info for the collection.
+	The lab or stock center distributing the stocks in their collection. 
 </em>
 
 <table border="1">
@@ -22637,7 +23500,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, type_id is the collection type cv. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -22646,7 +23509,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">contact_id links to the contact information for the collection. </td>
 	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
@@ -22655,7 +23518,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">varchar</td>
 	<td class="FieldCellSize">255</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
+	<td class="FieldCellOther">name is the collection. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -22664,7 +23527,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, uniqename is the value of the collection cv. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -22782,8 +23645,9 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stockcollectionprop <br />
 	================================================ <br />
-	The table stockcollectionprop contains the value of the stockcollection such as website/email URLs; the value of the stockcollection order URLs. <br />
-	The cv for the type_id is 'stockcollection property type'
+	The table stockcollectionprop
+	contains the value of the stock collection such as website/email URLs;
+	the value of the stock collection order URLs. 
 </em>
 
 <table border="1">
@@ -22832,7 +23696,7 @@ typically derived from the features making up the genotype </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv for the type_id is "stockcollection property type". </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -22963,7 +23827,8 @@ typically derived from the features making up the genotype </td>
 	================================================ <br />
 	TABLE: stockcollection_stock <br />
 	================================================ <br />
-	stockcollection_stock links a stockcollection to the stocks which are contained in the collection.
+	stockcollection_stock links
+	a stock collection to the stocks which are contained in the collection. 
 </em>
 
 <table border="1">
