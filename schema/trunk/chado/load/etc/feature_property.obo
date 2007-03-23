@@ -428,3 +428,30 @@ is_a: SOFP:feature_property
 domain: SO:0000110
 range: xsd:boolean
 
+[Typedef]
+id: SOFP:Note
+name: Note
+namespace: feature_property
+def: "A GFF3 Note attribute" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+
+[Typedef]
+id: SOFP:Gap
+name: Gap
+namespace: feature_property
+def: "A GFF3 Gap cigar string" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+
+[Typedef]
+id: SOFP:score
+name: score
+namespace: feature_property
+def: "A GFF3 score" [so:sjc]
+is_a: SOFP:feature_property
+domain: SO:0000110
+range: xsd:string
+
