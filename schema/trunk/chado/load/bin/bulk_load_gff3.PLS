@@ -31,16 +31,15 @@ if ($OPTIONS{PREFIX}) {
 }
 
 print OUT <<'!NO!SUBS!';
+
 use strict;
 use warnings;
 use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
+use Pod::Usage;
 use URI::Escape;
 use Carp;
-use lib '/home/cain/cvs_stuff/schema/chado/lib';
-use lib '/Users/cain/cvs_stuff/schema/chado/lib';
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::GMOD::DB::Adapter;
 
 =head1 NAME
@@ -52,11 +51,12 @@ $0 - Bulk loads gff3 files into a chado database.
   % $0 [options]
   % cat <gff-file> | $0 [options]
 
-=head1 COMMAND-LINE OPTIONS
+=head1 OPTIONS
 
  --gfffile         The file containing GFF3 (optional, can read 
                      from stdin)
- --organism        The organism for the data
+ --organism        The organism for the data 
+                    (use the value 'fromdata' to read from GFF organism=xxx)
  --dbprofile       Database config profile name
  --dbname          Database name
  --dbuser          Database user name
@@ -95,6 +95,13 @@ $0 - Bulk loads gff3 files into a chado database.
                      that matches the supplied pattern is used. 
  --fp_cv           Name of the feature property controlled vocabulary
                      (defaults to 'feature_property').
+ --noaddfpcv       By default, the loader adds GFF attribute types as
+                     new feature_property cv terms when missing.  This flag
+                     deactivates it.
+   ** dgg note: should rename this flag: --[no]autoupdate 
+            for Chado tables cvterm, cv, db, organism, analysis ...
+   
+ --manual          Detailed manual pages
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -462,7 +469,8 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
-    $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV );
+    $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
+    $MANPAGE, $DEBUG );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -491,8 +499,13 @@ GetOptions(
     'unique_target' => \$UNIQUE_TARGET,
     'dbxref:s'      => \$DBXREF,
     'fp_cv:s'       => \$FP_CV,
-) or ( system( 'pod2text', $0 ), exit -1 );
-
+    'noaddfpcv'     => \$NO_ADDFP_CV,
+    'manual'   => \$MANPAGE,
+    'debug'   => \$DEBUG,
+) 
+# or ( system( 'pod2text', $0 ), exit -1 );
+or pod2usage(-verbose => 1, -exitval => 1);
+pod2usage(-verbose => 2, -exitval => 1) if $MANPAGE;
 
 unless ($DBNAME) {
     if (eval {require Bio::GMOD::Config;
@@ -526,6 +539,7 @@ $NOSEQUENCE ||=0;
 $INSERTS    ||=0;
 $SCORE_COL  ||='significance';
 $FP_CV      ||='feature_property';
+$NO_ADDFP_CV ||=0;
 
 die "You must supply a database name" unless $DBNAME;
 
@@ -555,7 +569,7 @@ my %argv;
   $argv{dbpass}       = $DBPASS;
   $argv{dbhost}       = $DBHOST;
   $argv{dbport}       = $DBPORT;
-  $argv{analysis}     = $ANALYSIS;
+  $argv{is_analysis}  = $ANALYSIS;
   $argv{noload}       = $NOLOAD;
   $argv{validate}     = $VALIDATE;
   $argv{notransact}   = $NOTRANSACT;
@@ -575,6 +589,7 @@ my %argv;
   $argv{unique_target}= $UNIQUE_TARGET;
   $argv{dbxref}       = $DBXREF;
   $argv{fp_cv}        = $FP_CV;
+  $argv{addpropertycv}= ! $NO_ADDFP_CV; #dgg
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();
@@ -592,8 +607,14 @@ if ($ONTOLOGY) {
   }
 }
 
+my $ORGANISM_FROMDATA= ($ORGANISM =~ /fromdata/);
+if($ORGANISM_FROMDATA) {
+  $ORGANISM= "null"; # is this useful?
+} else {
+$chado->organism($ORGANISM);
 $chado->organism_id($ORGANISM) 
    or die "$ORGANISM organism not found in the database";
+}
 
 $chado->file_handles();
 
@@ -613,12 +634,31 @@ warn "(This may take a while ...)\n";
 
 my $seen_cds = my $seen_exon = my $seen_bad_cds = 0;
 
-my $feature_iterator;
-FEATURE:
-while(my $feature = (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
-  $chado->primary_dbxref('');
 
+my $feature_iterator; my $itern=0; my %seen_organism;
+FEATURE:
+while(my $feature = 
+  (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
+  $chado->primary_dbxref('');
+  
   my $featuretype = $feature->type->name;
+
+  # dgg: pull organism from 1st feature??
+  # * may be many per gff-file; e.g. uniprot input
+  if($ORGANISM_FROMDATA) {
+    my($gff_organism) = ($feature->annotation->get_Annotations('organism'))[0];
+    if($gff_organism && $gff_organism ne $chado->organism()) {
+      $ORGANISM = "$gff_organism";# is it pesky bperl object?
+      warn "Organism $ORGANISM from data\n" unless($seen_organism{$ORGANISM}++);
+      $chado->organism($ORGANISM);
+      $chado->organism_id($ORGANISM) #? dont die if many orgs? auto-add *
+        or die "$ORGANISM organism not found in the database";
+      }
+  }
+  
+  
+  $itern++;
+  warn(join(",","f".$itern,$featuretype,$feature->seq_id->value),"\n") if $DEBUG;
 
   if ($featuretype =~ /(CDS|UTR)/) {
     my $continue_on = $chado->handle_CDS($feature);
@@ -680,6 +720,11 @@ END
                    || "$featuretype-$uniquename";
   $name           = $name->value if ref($name);
 
+  ## dgg: fixme: not always wanted?
+  if ($uniquename eq $feature->seq_id->value) { 
+    $chado->reftype_property($featuretype,$type); #  a reference sequence?? not always 
+    } 
+  
   my $current_feature_id=0;
   if($chado->cache('feature',$uniquename)){
     #seen this feature before
@@ -802,5 +847,4 @@ exit(0);
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 chdir $origdir;
-
 
