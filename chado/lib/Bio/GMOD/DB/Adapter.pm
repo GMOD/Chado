@@ -8,53 +8,22 @@ use Data::Dumper;
 use URI::Escape;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
-use FreezeThaw qw( freeze thaw safeFreeze );
+## dgg## use FreezeThaw qw( freeze thaw safeFreeze ); ## see below; Data::Dumper is better
 
-#set lots of package-wide variables:
-my ($nextfeaturerel,$nextfeatureprop,
-    $nextfeaturecvterm,$nextsynonym,$nextfeaturesynonym,
-    $nextfeaturedbxref,$nextdbxref,$nextanalysisfeature,
-    $part_of,$derives_from,$sofa_id);
+#set lots of package-wide variables: # dgg; drop these for $self->{nextoid}{$table}  
+my ( $part_of,$derives_from,$sofa_id);
+  # $nextfeaturerel,
+  # $nextfeatureprop,
+  #  $nextfeaturecvterm,
+  # $nextsynonym,
+  # $nextfeaturesynonym,
+  #  $nextfeaturedbxref,
+  #  $nextdbxref,
+  # $nextanalysisfeature,
+   
 
-my %sequences = (
-   feature              => "feature_feature_id_seq",
-   featureloc           => "featureloc_featureloc_id_seq",
-   feature_relationship => "feature_relationship_feature_relationship_id_seq",
-   featureprop          => "featureprop_featureprop_id_seq",
-   feature_cvterm       => "feature_cvterm_feature_cvterm_id_seq",
-   synonym              => "synonym_synonym_id_seq",
-   feature_synonym      => "feature_synonym_feature_synonym_id_seq",
-   dbxref               => "dbxref_dbxref_id_seq",
-   feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
-   analysisfeature      => "analysisfeature_analysisfeature_id_seq"
-);
-
-my %copystring = (
-   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen,dbxref_id)",
-   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
-   feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
-   featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
-   feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
-   synonym              => "(synonym_id,name,type_id,synonym_sgml)",
-   feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
-   dbxref               => "(dbxref_id,db_id,accession,version,description)",
-   feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
-   analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance,rawscore,normscore,identity)",
-);
-
-my %files = (
-   feature              => 'F', 
-   featureloc           => 'FLOC',
-   feature_relationship => 'FREL',
-   featureprop          => 'FPROP',
-   feature_cvterm       => 'FCV',
-   synonym              => 'SYN',
-   feature_synonym      => 'FS',
-   dbxref               => 'DBX',
-   feature_dbxref       => 'FDBX',
-   analysisfeature      => 'AF',
-   sequence             => 'SEQ',
-);
+#------------ START Table Entries ------------------------------
+#  any new table to populate needs entries here (and a print_tablename)
 
 # @tables array sets the order for which things will be inserted into
 # the database
@@ -69,7 +38,70 @@ my @tables = (
    "dbxref",
    "feature_dbxref",
    "analysisfeature",
+   "cvterm", ## dgg
+   "db", ## dgg
+   "cv", ## dgg
+   "analysis", #dgg
+   "organism", #dgg
 );
+
+
+my %sequences = (
+   feature              => "feature_feature_id_seq",
+   featureloc           => "featureloc_featureloc_id_seq",
+   feature_relationship => "feature_relationship_feature_relationship_id_seq",
+   featureprop          => "featureprop_featureprop_id_seq",
+   feature_cvterm       => "feature_cvterm_feature_cvterm_id_seq",
+   synonym              => "synonym_synonym_id_seq",
+   feature_synonym      => "feature_synonym_feature_synonym_id_seq",
+   dbxref               => "dbxref_dbxref_id_seq",
+   feature_dbxref       => "feature_dbxref_feature_dbxref_id_seq",
+   analysisfeature      => "analysisfeature_analysisfeature_id_seq",
+   cvterm               => "cvterm_cvterm_id_seq", # dgg
+   db                   => "db_db_id_seq", # dgg
+   cv                   => "cv_cv_id_seq", # dgg
+   analysis             => "analysis_analysis_id_seq", # dgg
+   organism             => "organism_organism_id_seq", # dgg
+);
+
+my %copystring = (
+   feature              => "(feature_id,organism_id,name,uniquename,type_id,is_analysis,seqlen,dbxref_id)",
+   featureloc           => "(featureloc_id,feature_id,srcfeature_id,fmin,fmax,strand,phase,rank,locgroup)",
+   feature_relationship => "(feature_relationship_id,subject_id,object_id,type_id)",
+   featureprop          => "(featureprop_id,feature_id,type_id,value,rank)",
+   feature_cvterm       => "(feature_cvterm_id,feature_id,cvterm_id,pub_id)",
+   synonym              => "(synonym_id,name,type_id,synonym_sgml)",
+   feature_synonym      => "(feature_synonym_id,synonym_id,feature_id,pub_id)",
+   dbxref               => "(dbxref_id,db_id,accession,version,description)",
+   feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)",
+   analysisfeature      => "(analysisfeature_id,feature_id,analysis_id,significance,rawscore,normscore,identity)",
+   cvterm               => "(cvterm_id,cv_id,name,dbxref_id,definition)", # is_obsolete, is_relationshiptype ## dgg
+   db                   => "(db_id,name,description)", # ,urlprefix,url ## dgg
+   cv                   => "(cv_id,name,definition)",  ## dgg
+   analysis             => "(analysis_id,name,program,programversion,sourcename)",  ## dgg
+   organism             => "(organism_id,genus,species,common_name,abbreviation)",  ## dgg
+);
+
+#------------ END Table Entries ------------------------------
+
+## dgg; see sub file_handles
+my %files = map { $_ => 'FH'.$_; } @tables,'sequence'; # SEQ special case in feature table 
+# (
+#    feature              => 'F', 
+#    featureloc           => 'FLOC',
+#    feature_relationship => 'FREL',
+#    featureprop          => 'FPROP',
+#    feature_cvterm       => 'FCV',
+#    synonym              => 'SYN',
+#    feature_synonym      => 'FS',
+#    dbxref               => 'DBX',
+#    feature_dbxref       => 'FDBX',
+#    analysisfeature      => 'AF',
+#    sequence             => 'SEQ',
+#    cvterm               => 'CVTERM', # dgg
+#    db               => 'DB', # dgg
+#    cv               => 'CV', # dgg
+# );
 
 
 use constant SEARCH_NAME =>
@@ -91,8 +123,12 @@ use constant SEARCH_LONG_DBXREF =>
                "SELECT dbxref_id FROM dbxref WHERE accession =?
                                                   AND version =?
                                                   AND db_id =?";
+## dgg patch see note below
+# use constant SEARCH_ANALYSIS =>
+#                "SELECT analysis_id FROM analysis WHERE name=?";
 use constant SEARCH_ANALYSIS =>
-               "SELECT analysis_id FROM analysis WHERE name=?";
+               "SELECT analysis_id FROM analysis 
+                WHERE (name = ?) OR (program=? and (sourcename=? OR sourcename is NULL))";
 use constant SEARCH_SYNONYM =>
                "SELECT synonym_id FROM synonym WHERE name=? AND type_id=?";
 
@@ -141,7 +177,7 @@ use constant INSERT_GFF_SORT_TMP =>
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
 my $ALLOWED_CACHE_KEYS =
-               "analysis|db|dbxref|feature|parent|source|synonym|type|ontology|const";
+               "analysis|db|dbxref|feature|parent|source|synonym|type|ontology|property|const";
 
 
 sub new {
@@ -180,7 +216,7 @@ sub new {
     $self->score_col(       $arg{score_col}       );
     $self->global_analysis( $arg{global_analysis} );
     $self->analysis_group(  $arg{analysis_group}  );
-    $self->analysis(        $arg{analysis}        );
+    $self->is_analysis(     $arg{is_analysis}     );
     $self->organism(        $arg{organism}        );
     $self->dbprofile(       $arg{dbprofile}       );
     $self->noload(          $arg{noload}          );
@@ -193,8 +229,9 @@ sub new {
     $self->no_target_syn(   $arg{no_target_syn}  );
     $self->unique_target(   $arg{unique_target}  );
     $self->dbxref(          $arg{dbxref}         );
-    $self->fp_cv(           $arg{fp_cv}          );
-
+    $self->fp_cv(           $arg{fp_cv} || 'autocreated' );
+    $self->{'addpropertycv'}= $arg{addpropertycv}; # dgg
+    
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
     $self->prepare_queries();
@@ -391,6 +428,68 @@ sub cache {
     return $self->{cache}{$top_level}{$key} = $value; 
 }
 
+=head2 nextoid
+
+=over
+
+=item Usage
+
+  $obj->nextoid($table)        #get existing value
+  $obj->nextoid($table,$newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of next table id (a scalar)
+
+=item Arguments
+
+new value of next table id (to set)
+
+=back
+
+=cut
+
+sub nextoid {  
+  my $self = shift;
+  my $table= shift;
+  my $arg  = shift if defined(@_);
+  if (defined($arg) && $arg eq '++') {
+      return $self->{'nextoid'}{$table}++;
+  }
+  elsif (defined($arg)) {
+      return $self->{'nextoid'}{$table} = $arg;
+  }
+  return $self->{'nextoid'}{$table} if ($table);
+  # return nextvalueHash(); #??
+}
+
+sub nextvalueHash {  
+  my $self= shift;
+  my %nextval=();
+  for my $t (@tables) {
+    $nextval{$t} = $self->{'nextoid'}{$t};
+    }
+  return %nextval;
+}
+#   return (
+#    "feature"              => $self->nextfeature,
+#    "featureloc"           => $self->nextfeatureloc,
+#    "feature_relationship" => $nextfeaturerel,
+#    "featureprop"          => $nextfeatureprop,
+#    "feature_cvterm"       => $nextfeaturecvterm,
+#    "synonym"              => $nextsynonym,
+#    "feature_synonym"      => $nextfeaturesynonym,
+#    "feature_dbxref"       => $nextfeaturedbxref,
+#    "dbxref"               => $nextdbxref,
+#    "analysisfeature"      => $nextanalysisfeature,
+#    "cvterm"               => $nextcvterm, #dgg
+#    "db"               => $nextdbname, #dgg
+#    "cv"               => $nextcvname, #dgg
+#    );
+
+
 =head2 nextfeature
 
 =over
@@ -414,17 +513,18 @@ new value of nextfeature (to set)
 
 =cut
 
+## dgg; keep - this is public; 
 sub nextfeature {
     my $self = shift;
-
-    my $arg = shift if defined(@_);
-    if (defined($arg) && $arg eq '++') {
-        return $self->{'nextfeature'}++;
-    }
-    elsif (defined($arg)) {
-        return $self->{'nextfeature'} = $arg;
-    }
-    return $self->{'nextfeature'};
+    return $self->nextoid('feature',@_);
+#     my $arg = shift if defined(@_);
+#     if (defined($arg) && $arg eq '++') {
+#         return $self->{'nextfeature'}++;
+#     }
+#     elsif (defined($arg)) {
+#         return $self->{'nextfeature'} = $arg;
+#     }
+#     return $self->{'nextfeature'};
 }
 
 =head2 nextfeatureloc
@@ -450,250 +550,260 @@ new value of nextfeatureloc (to set)
 
 =cut
 
+## dgg; keep - this is public; 
 sub nextfeatureloc {
     my $self = shift;
-
-    my $arg = shift if defined(@_);
-    if (defined($arg) && $arg eq '++') {
-        return $self->{nextfeatureloc}++;
-    }
-    elsif (defined($arg)) {
-        return $self->{nextfeatureloc} = $arg;
-    }
-    return $self->{nextfeatureloc};
+    return $self->nextoid('featureloc',@_);
+# 
+#     my $arg = shift if defined(@_);
+#     if (defined($arg) && $arg eq '++') {
+#         return $self->{nextfeatureloc}++;
+#     }
+#     elsif (defined($arg)) {
+#         return $self->{nextfeatureloc} = $arg;
+#     }
+#     return $self->{nextfeatureloc};
 }
 
-=head2 nextfeaturerel
-
-=over
-
-=item Usage
-
-  $obj->nextfeaturerel()        #get existing value
-  $obj->nextfeaturerel($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextfeaturerel (a scalar)
-
-=item Arguments
-
-new value of nextfeaturerel (to set)
-
-=back
-
-=cut
-
-sub nextfeaturerel {
-    my $self = shift;
-    return $nextfeaturerel = shift if defined(@_);
-    return $nextfeaturerel;
-}
-
-=head2 nextfeatureprop
-
-=over
-
-=item Usage
-
-  $obj->nextfeatureprop()        #get existing value
-  $obj->nextfeatureprop($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextfeatureprop (a scalar)
-
-=item Arguments
-
-new value of nextfeatureprop (to set)
-
-=back
-
-=cut
-
-sub nextfeatureprop {
-    my $self = shift;
-    return $nextfeatureprop = shift if defined(@_);
-    return $nextfeatureprop;
-}
-
-=head2 nextfeaturecvterm
-
-=over
-
-=item Usage
-
-  $obj->nextfeaturecvterm()        #get existing value
-  $obj->nextfeaturecvterm($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextfeaturecvterm (a scalar)
-
-=item Arguments
-
-new value of nextfeaturecvterm (to set)
-
-=back
-
-=cut
-
-sub nextfeaturecvterm {
-    my $self = shift;
-    return $nextfeaturecvterm = shift if defined(@_);
-    return $nextfeaturecvterm;
-}
-
-=head2 nextsynonym
-
-=over
-
-=item Usage
-
-  $obj->nextsynonym()        #get existing value
-  $obj->nextsynonym($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextsynonym (a scalar)
-
-=item Arguments
-
-new value of nextsynonym (to set)
-
-=back
-
-=cut
-
-sub nextsynonym {
-    my $self = shift;
-    return $nextsynonym = shift if defined(@_);
-    return $nextsynonym;
-}
-
-=head2 nextfeaturesynonym
-
-=over
-
-=item Usage
-
-  $obj->nextfeaturesynonym()        #get existing value
-  $obj->nextfeaturesynonym($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextfeaturesynonym (a scalar)
-
-=item Arguments
-
-new value of nextfeaturesynonym (to set)
-
-=back
-
-=cut
-
-sub nextfeaturesynonym {
-    my $self = shift;
-    return $nextfeaturesynonym = shift if defined(@_);
-    return $nextfeaturesynonym;
-}
-
-=head2 nextfeaturedbxref
-
-=over
-
-=item Usage
-
-  $obj->nextfeaturedbxref()        #get existing value
-  $obj->nextfeaturedbxref($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextfeaturedbxref (a scalar)
-
-=item Arguments
-
-new value of nextfeaturedbxref (to set)
-
-=back
-
-=cut
-
-sub nextfeaturedbxref {
-    my $self = shift;
-    return $nextfeaturedbxref = shift if defined(@_);
-    return $nextfeaturedbxref;
-}
-
-=head2 nextdbxref
-
-=over
-
-=item Usage
-
-  $obj->nextdbxref()        #get existing value
-  $obj->nextdbxref($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextdbxref (a scalar)
-
-=item Arguments
-
-new value of nextdbxref (to set)
-
-=back
-
-=cut
-
-sub nextdbxref {
-    my $self = shift;
-    return $nextdbxref = shift if defined(@_);
-    return $nextdbxref;
-}
-
-=head2 nextanalysisfeature
-
-=over
-
-=item Usage
-
-  $obj->nextanalysisfeature()        #get existing value
-  $obj->nextanalysisfeature($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of nextanalysisfeature (a scalar)
-
-=item Arguments
-
-new value of nextanalysisfeature (to set)
-
-=back
-
-=cut
-
-sub nextanalysisfeature {
-    my $self = shift;
-    return $nextanalysisfeature = shift if defined(@_);
-    return $nextanalysisfeature;
-}
+# =head2 nextfeaturerel
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextfeaturerel()        #get existing value
+#   $obj->nextfeaturerel($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextfeaturerel (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextfeaturerel (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextfeaturerel {
+#     my $self = shift;
+#     return $self->nextoid('feature_relationship',@_);
+# #     return $nextfeaturerel = shift if defined(@_);
+# #     return $nextfeaturerel;
+# }
+
+# =head2 nextfeatureprop
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextfeatureprop()        #get existing value
+#   $obj->nextfeatureprop($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextfeatureprop (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextfeatureprop (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextfeatureprop {
+#     my $self = shift;
+#     return $self->nextoid('featureprop',@_);
+# #     return $nextfeatureprop = shift if defined(@_);
+# #     return $nextfeatureprop;
+# }
+
+# =head2 nextfeaturecvterm
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextfeaturecvterm()        #get existing value
+#   $obj->nextfeaturecvterm($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextfeaturecvterm (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextfeaturecvterm (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextfeaturecvterm {
+#     my $self = shift;
+#     return $self->nextoid('feature_cvterm',@_);
+# #     return $nextfeaturecvterm = shift if defined(@_);
+# #     return $nextfeaturecvterm;
+# }
+
+# =head2 nextsynonym
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextsynonym()        #get existing value
+#   $obj->nextsynonym($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextsynonym (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextsynonym (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextsynonym {
+#     my $self = shift;
+#     return $self->nextoid('synonym',@_);
+# #     return $nextsynonym = shift if defined(@_);
+# #     return $nextsynonym;
+# }
+
+# =head2 nextfeaturesynonym
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextfeaturesynonym()        #get existing value
+#   $obj->nextfeaturesynonym($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextfeaturesynonym (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextfeaturesynonym (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextfeaturesynonym {
+#     my $self = shift;
+#     return $self->nextoid('feature_synonym',@_);
+# #     return $nextfeaturesynonym = shift if defined(@_);
+# #     return $nextfeaturesynonym;
+# }
+
+# =head2 nextfeaturedbxref
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextfeaturedbxref()        #get existing value
+#   $obj->nextfeaturedbxref($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextfeaturedbxref (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextfeaturedbxref (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextfeaturedbxref {
+#     my $self = shift;
+#     return $self->nextoid('feature_dbxref',@_);
+# #     return $nextfeaturedbxref = shift if defined(@_);
+# #     return $nextfeaturedbxref;
+# }
+
+# =head2 nextdbxref
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextdbxref()        #get existing value
+#   $obj->nextdbxref($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextdbxref (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextdbxref (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextdbxref {
+#     my $self = shift;
+#     return $self->nextoid('dbxref',@_);
+# #     return $nextdbxref = shift if defined(@_);
+# #     return $nextdbxref;
+# }
+
+# =head2 nextanalysisfeature
+# 
+# =over
+# 
+# =item Usage
+# 
+#   $obj->nextanalysisfeature()        #get existing value
+#   $obj->nextanalysisfeature($newval) #set new value
+# 
+# =item Function
+# 
+# =item Returns
+# 
+# value of nextanalysisfeature (a scalar)
+# 
+# =item Arguments
+# 
+# new value of nextanalysisfeature (to set)
+# 
+# =back
+# 
+# =cut
+# 
+# sub nextanalysisfeature {
+#     my $self = shift;
+#     return $self->nextoid('analysisfeature',@_);
+# #     return $nextanalysisfeature = shift if defined(@_);
+# #     return $nextanalysisfeature;
+# }
 
 
 
@@ -718,6 +828,7 @@ On create, void.  With an arguement, returns the requested file handle
 If the 'short hand' name of a file handle is given, returns the requested
 file handle.  The short hand file names are:
 
+** dgg; revised this so FH = 'FH'.$tablename
   F       feature
   FLOC    featureloc
   FREL    feature_relationship
@@ -739,14 +850,16 @@ sub file_handles {
     my ($self, $argv) = @_;
 
     if ($argv && $argv ne 'close') {
-        return $self->{file_handles}{$argv};
+        my $fhhame= ($argv =~ /^FH/) ? $argv : 'FH'.$argv; #dgg
+        return $self->{file_handles}{$fhhame};
     }
     else {
         for my $key (keys %files) {
             $self->{file_handles}{$files{$key}} 
                 = new File::Temp(
-                                 TEMPLATE => $key.'XXXX',
-                                 UNLINK   => $self->save_tmpfiles() ? 0 : 1,  
+                                 TEMPLATE => "chado-$key-XXXX", #dgg; was $keyXXXX
+                                 SUFFIX => '.dat',
+                                 UNLINK   => $self->save_tmpfiles() ? 0 : 1, 
                                 );
         }
         return;
@@ -968,11 +1081,44 @@ sub organism_id {
 
     return $self->{'organism_id'} unless $organism_name;
 
-    my $sth = $self->dbh->prepare(
-           "SELECT organism_id FROM organism WHERE common_name = ?");
-    $sth->execute($organism_name);
-    ($self->{'organism_id'}) = $sth->fetchrow_array; 
+    ## dgg; handle also 'Saccharomyces cerevisiae'
+    ## dgg; now may have new organism on each gff line (e.g. uniprot data)
+    ## start using $self->cache('organism',...);
+    
+    my ($genus,$species)= split(" ",$organism_name,2);
+    my ($sth,$orgid);
+    
+    if($species && $genus =~ /^[A-Z]/) {
+      $sth = $self->dbh->prepare("SELECT organism_id FROM organism WHERE genus = ? AND species = ?");
+      $sth->execute($genus,$species);
+    } else { # 2nd way
+      $sth = $self->dbh->prepare("SELECT organism_id FROM organism WHERE common_name = ? OR abbreviation = ?");
+      $sth->execute($organism_name, $organism_name);
+    }
+    ($orgid) = $sth->fetchrow_array; 
 
+    unless($orgid) { # try other way
+      if($species && $genus =~ /^[A-Z]/) {
+        $sth = $self->dbh->prepare("SELECT organism_id FROM organism WHERE common_name = ? OR abbreviation = ?");
+        $sth->execute($organism_name, $organism_name);
+      } elsif($species) { # 2nd way
+        $sth = $self->dbh->prepare("SELECT organism_id FROM organism WHERE genus = ? AND species = ?");
+        $sth->execute($genus,$species);
+      }
+      ($orgid) = $sth->fetchrow_array; 
+    }
+    
+    # auto-add here
+    if(!$orgid && $self->{'addpropertycv'} && $species && $genus =~ /^[A-Z]/) {
+      # create analysis entry
+      $orgid= $self->nextoid('organism');
+      $self->print_organism( $orgid, $genus, $species);
+      $self->nextoid('organism','++'); 
+      ## $self->cache('organism',$organism_name,$orgid);
+    }
+    
+    $self->{'organism_id'}= $orgid;
+    
     return $self->{'organism_id'};
 }
 
@@ -1125,50 +1271,63 @@ none
 sub initialize_sequences {
     my $self = shift;
 
-    my $sth = $self->dbh->prepare("select nextval('$sequences{feature}')");
-    $sth->execute;
-    my ($nextfeature) = $sth->fetchrow_array();
-    $self->nextfeature($nextfeature);
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{featureloc}')");
-    $sth->execute;
-    my ($nextfeatureloc) = $sth->fetchrow_array();
-    $self->nextfeatureloc($nextfeatureloc);
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{feature_relationship}')");
-    $sth->execute;
-    ($nextfeaturerel) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{featureprop}')");
-    $sth->execute;
-    ($nextfeatureprop) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{feature_cvterm}')");
-    $sth->execute;
-    ($nextfeaturecvterm) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{synonym}')");
-    $sth->execute;
-    ($nextsynonym) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{feature_synonym}')");
-    $sth->execute;
-    ($nextfeaturesynonym) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{feature_dbxref}')");
-    $sth->execute;
-    ($nextfeaturedbxref) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{dbxref}')");
-    $sth->execute;
-    ($nextdbxref) = $sth->fetchrow_array();
-
-    $sth = $self->dbh->prepare("select nextval('$sequences{analysisfeature}')");
-    $sth->execute;
-    ($nextanalysisfeature) = $sth->fetchrow_array();
-
+    foreach my $table (@tables) {
+      my $sth = $self->dbh->prepare("select nextval('$sequences{$table}')");
+      $sth->execute;
+      my ($nextoid) = $sth->fetchrow_array();
+      $self->nextoid($table, $nextoid);
+    }
     return;
 }
+#     my $sth = $self->dbh->prepare("select nextval('$sequences{feature}')");
+#     $sth->execute;
+#     my ($nextfeature) = $sth->fetchrow_array();
+#     $self->nextfeature($nextfeature);
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{featureloc}')");
+#     $sth->execute;
+#     my ($nextfeatureloc) = $sth->fetchrow_array();
+#     $self->nextfeatureloc($nextfeatureloc);
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_relationship}')");
+#     $sth->execute;
+#     ($nextfeaturerel) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{featureprop}')");
+#     $sth->execute;
+#     ($nextfeatureprop) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_cvterm}')");
+#     $sth->execute;
+#     ($nextfeaturecvterm) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{synonym}')");
+#     $sth->execute;
+#     ($nextsynonym) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_synonym}')");
+#     $sth->execute;
+#     ($nextfeaturesynonym) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_dbxref}')");
+#     $sth->execute;
+#     ($nextfeaturedbxref) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{dbxref}')");
+#     $sth->execute;
+#     ($nextdbxref) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{cvterm}')");
+#     $sth->execute;
+#     ($nextcvterm) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{db}')");
+#     $sth->execute;
+#     ($nextdbname) = $sth->fetchrow_array();
+# 
+#     $sth = $self->dbh->prepare("select nextval('$sequences{analysisfeature}')");
+#     $sth->execute;
+#     ($nextanalysisfeature) = $sth->fetchrow_array();
 
 
 =head2 dbh
@@ -1605,34 +1764,36 @@ sub global_analysis {
     return $self->{'global_analysis'};
 }
 
-=head2 analysis
+=head2 is_analysis
 
 =over
 
 =item Usage
 
-  $obj->analysis()        #get existing value
-  $obj->analysis($newval) #set new value
+  $obj->is_analysis()        #get existing value
+  $obj->is_analysis($newval) #set new value
 
+  dgg: renamed to flag field name to avoid confusion with analysis table
+  
 =item Function
 
 =item Returns
 
-value of analysis (a scalar)
+value of is_analysis (a scalar)
 
 =item Arguments
 
-new value of analysis (to set)
+new value of is_analysis (to set)
 
 =back
 
 =cut
 
-sub analysis {
+sub is_analysis {
     my $self = shift;
-    my $analysis = shift if defined(@_);
-    return $self->{'analysis'} = $analysis if defined($analysis);
-    return $self->{'analysis'};
+    my $is_analysis = shift if defined(@_);
+    return $self->{'is_analysis'} = $is_analysis if defined($is_analysis);
+    return $self->{'is_analysis'};
 }
 
 =head2 organism
@@ -1973,7 +2134,7 @@ sub print_seq {
   my $self = shift;
   my ($name,$string) = @_;
 
-  my $fh = $self->file_handles('SEQ');
+  my $fh = $self->file_handles('sequence');
   print $fh "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
   print $fh "UPDATE feature set seqlen=length(residues) WHERE uniquename='$name';\n";
 
@@ -1984,7 +2145,7 @@ sub print_af {
   my $self = shift;
   my ($af_id,$f_id,$a_id,$score) = @_;
 
-  my $fh = $self->file_handles('AF');
+  my $fh = $self->file_handles('analysisfeature');
   if ($self->inserts()) {
     $score       =~ s/\\N/NULL/g;
     my @scores   = split "\t", $score;
@@ -2001,7 +2162,7 @@ sub print_dbx {
   my $self = shift;
   my ($dbx_id,$db_id,$acc,$vers,$desc) = @_;
 
-  my $fh = $self->file_handles('DBX');
+  my $fh = $self->file_handles('dbxref');
   if ($self->inserts()) {
     my $q_acc  = $self->dbh->quote($acc);
     my $q_vers = $self->dbh->quote($vers);
@@ -2013,11 +2174,96 @@ sub print_dbx {
   }
 }
 
+
+sub print_analysis {  # dgg
+  my $self = shift;
+  my ($an_id,$name,$program,$source) = @_;
+  
+  unless($name) { $name = ($source) ? "$program.$source" : $program; }   
+  $source ||= '\N';
+  my $progvers= 'null'; # not NULL, but no idea here? dup program? or 'null' ?
+  my $fh = $self->file_handles('analysis');
+  if ($self->inserts()) {
+    my $q_name     = $self->dbh->quote($name);
+    my $q_program  = $self->dbh->quote($program);
+    my $q_progvers = $self->dbh->quote($progvers);
+    my $q_source   = $source eq '\N' ? 'NULL' : $self->dbh->quote($source);
+    print $fh "INSERT INTO analysis $copystring{'analysis'} VALUES ($an_id,$q_name,$q_program,$q_progvers,$q_source);\n";
+  } else {
+    print $fh join("\t",($an_id,$name,$program,$progvers,$source) ),"\n";
+  }
+}
+
+sub print_organism {  # dgg
+  my $self = shift;
+  my ($orgid,$genus,$species,$common) = @_;
+  
+  $common ||= '\N';
+  my $abbrev= substr($genus,0,1).'.'.$species;
+  my $fh = $self->file_handles('organism');
+  if ($self->inserts()) {
+    my $q_genus    = $self->dbh->quote($genus);
+    my $q_species  = $self->dbh->quote($species);
+    my $q_abbrev   = $self->dbh->quote($abbrev);
+    my $q_common   = $common eq '\N' ? 'NULL' : $self->dbh->quote($common);
+    print $fh "INSERT INTO organism $copystring{'organism'} VALUES ($orgid,$q_genus,$q_species,$q_common,$q_abbrev);\n";
+  } else {
+    print $fh join("\t",($orgid,$genus,$species,$common,$abbrev) ),"\n";
+  }
+}
+
+
+sub print_cvterm {  # dgg
+  my $self = shift;
+  my ($cvterm_id,$cv_id,$name,$dbxref_id,$definition) = @_;
+  
+  $definition ||= '\N';
+  my $fh = $self->file_handles('cvterm');
+  if ($self->inserts()) {
+    my $q_acc  = $self->dbh->quote($name);
+    my $q_desc = $definition eq '\N' ? 'NULL' : $self->dbh->quote($definition);
+    print $fh "INSERT INTO cvterm $copystring{'cvterm'} VALUES ($cvterm_id,$cv_id,$q_acc,$dbxref_id,$q_desc);\n";
+  } else {
+    print $fh join("\t",($cvterm_id,$cv_id,$name,$dbxref_id,$definition)),"\n";
+  }
+}
+
+
+sub print_cv {  # dgg
+  my $self = shift;
+  my ($cv_id,$name,$definition) = @_;
+  
+  $definition ||= '\N';
+  my $fh = $self->file_handles('cv');
+  if ($self->inserts()) {
+    my $q_acc  = $self->dbh->quote($name);
+    my $q_desc = $definition eq '\N' ? 'NULL' : $self->dbh->quote($definition);
+    print $fh "INSERT INTO cv $copystring{'cv'} VALUES ($cv_id,$q_acc,$q_desc);\n";
+  } else {
+    print $fh join("\t",($cv_id,$name,$definition)),"\n";
+  }
+}
+
+sub print_dbname {  # dgg
+  my $self = shift;
+  my ($db_id,$name,$description) = @_;
+  
+  $description ||= '\N';
+  my $fh = $self->file_handles('db');
+  if ($self->inserts()) {
+    my $q_acc  = $self->dbh->quote($name);
+    my $q_desc = $description eq '\N' ? 'NULL' : $self->dbh->quote($description);
+    print $fh "INSERT INTO db $copystring{'db'} VALUES ($db_id,$q_acc,$q_desc);\n";
+  } else {
+    print $fh join("\t",($db_id,$name,$description)),"\n";
+  }
+}
+
 sub print_fs {
   my $self = shift;
   my ($fs_id,$s_id,$f_id,$p_id) = @_;
 
-  my $fh = $self->file_handles('FS');
+  my $fh = $self->file_handles('feature_synonym');
   if ($self->inserts()) {
     print $fh "INSERT INTO feature_synonym $copystring{'feature_synonym'} VALUES ($fs_id,$s_id,$f_id,$p_id);\n";
   }
@@ -2030,7 +2276,7 @@ sub print_fdbx {
   my $self = shift;
   my ($fd_id,$f_id,$dx_id) = @_;
 
-  my $fh = $self->file_handles('FDBX');
+  my $fh = $self->file_handles('feature_dbxref');
   if ($self->inserts()) {
     print $fh "INSERT INTO feature_dbxref $copystring{'feature_dbxref'} VALUES ($fd_id,$f_id,$dx_id);\n";
   }
@@ -2043,7 +2289,7 @@ sub print_fcv {
   my $self = shift;
   my ($fcv_id,$f_id,$cvterm_id,$p_id) = @_;
 
-  my $fh = $self->file_handles('FCV');
+  my $fh = $self->file_handles('feature_cvterm');
   if ($self->inserts()) {
     print $fh "INSERT INTO feature_cvterm $copystring{'feature_cvterm'} VALUES ($fcv_id,$f_id,$cvterm_id,$p_id);\n";
   }
@@ -2056,7 +2302,7 @@ sub print_syn {
   my $self = shift;
   my ($s_id,$syn,$type_id) = @_;
 
-  my $fh = $self->file_handles('SYN');
+  my $fh = $self->file_handles('synonym');
   if ($self->inserts()) {
     my $q_syn = $self->dbh->quote($syn);
     print $fh "INSERT INTO synonym $copystring{'synonym'} VALUES ($s_id,$q_syn,$type_id,$q_syn);\n";
@@ -2070,7 +2316,7 @@ sub print_floc {
   my $self = shift;
   my ($featureloc_id,$feature_id,$src_id,$start,$end,$strand,$phase,$rank,$locgroup) = @_;
 
-  my $fh = $self->file_handles('FLOC');
+  my $fh = $self->file_handles('featureloc');
   if ($self->inserts()) {
     my $q_strand= $strand eq '\N'? 'NULL' : $strand;
     my $q_phase = $phase eq '\N' ? 'NULL' : $phase;
@@ -2085,7 +2331,7 @@ sub print_fprop {
   my $self = shift;
   my ($fp_id,$f_id,$cvterm_id,$value,$rank) = @_;
 
-  my $fh = $self->file_handles('FPROP');
+  my $fh = $self->file_handles('featureprop');
   if ($self->inserts()) {
     my $q_value = $self->dbh->quote($value);
     print $fh "INSERT INTO featureprop $copystring{'featureprop'} VALUES ($fp_id,$f_id,$cvterm_id,$q_value,$rank);\n";
@@ -2099,7 +2345,7 @@ sub print_frel {
   my $self = shift;
   my ($nextfeaturerel,$nextfeature,$parent,$part_of) = @_;
 
-  my $fh = $self->file_handles('FREL');
+  my $fh = $self->file_handles('feature_relationship');
   if ($self->inserts()) {
     print $fh "INSERT INTO feature_relationship $copystring{'feature_relationship'} VALUES ($nextfeaturerel,$nextfeature,$parent,$part_of);\n";
   }
@@ -2112,18 +2358,18 @@ sub print_f {
   my $self = shift;
   my ($nextfeature,$organism,$name,$uniquename,$type,$seqlen,$dbxref) = @_;
 
-  my $fh = $self->file_handles('F');
+  my $fh = $self->file_handles('feature');
   if ($self->inserts()) {
     my $q_name        = $self->dbh->quote($name);
     my $q_uniquename  = $self->dbh->quote($uniquename);
     my $q_seqlen      = $seqlen eq '\N' ? 'NULL' : $seqlen;
-    my $q_analysis    = $self->analysis ? "'true'" : "'false'";
+    my $q_analysis    = $self->is_analysis ? "'true'" : "'false'";
     $dbxref      ||= 'NULL';
     print $fh "INSERT INTO feature $copystring{'feature'} VALUES ($nextfeature,$organism,$q_name,$q_uniquename,$type,$q_analysis,$q_seqlen,$dbxref);\n";
   }
   else {
     $dbxref      ||= '\N';
-    print $fh join("\t", ($self->nextfeature, $organism, $name, $uniquename, $type, $self->analysis,$seqlen,$dbxref)),"\n";
+    print $fh join("\t", ($self->nextfeature, $organism, $name, $uniquename, $type, $self->is_analysis,$seqlen,$dbxref)),"\n";
   }
 }
 
@@ -2253,13 +2499,13 @@ sub dump_ana_contents {
   #confess;
 
   my $sth
-    = $self->dbh->prepare("SELECT analysis_id,name,program FROM analysis");
-  printf STDERR "%10s %25s %10s\n\n",
-    ('analysis_id','name','program');
+    = $self->dbh->prepare("SELECT analysis_id,name,program,sourcename FROM analysis");
+  printf STDERR "%10s %25s %10s %10s\n\n",
+    ('analysis_id','name','program','sourcename');
 
   $sth->execute;
   while (my $array_ref = $sth->fetchrow_arrayref) {
-    printf STDERR "%10s %25s %10s\n", @$array_ref;
+    printf STDERR "%10s %25s %10s %10s\n", @$array_ref;
   }
 
   print STDERR "\n\nCouldn't find $anakey in analysis table\n";
@@ -2309,14 +2555,14 @@ sub synonyms  {
 
         if ( $self->constraint( name => 'feature_synonym_c1',
                                 terms=> [ $feature_id , $synonym ] ) ) {
-          $self->print_fs($nextfeaturesynonym,$synonym,$feature_id,$self->{const}{pub});
+          $self->print_fs($self->nextoid('feature_synonym'),$synonym,$feature_id,$self->{const}{pub});
 
-          $nextfeaturesynonym++;
+          $self->nextoid('feature_synonym','++'); #$nextfeaturesynonym++;
           $self->cache('synonym',$alias,$synonym);
         }
 
       } else {
-        $self->print_syn($nextsynonym,$alias,$self->cache('type','synonym'));
+        $self->print_syn($self->nextoid('synonym'),$alias,$self->cache('type','synonym'));
 
         unless ($self->{const}{pub}) {
           my $sth=$self->dbh->prepare("SELECT pub_id FROM pub WHERE miniref = 'null'");
@@ -2326,11 +2572,11 @@ sub synonyms  {
         }
 
         if( $self->constraint( name  => 'feature_synonym_c1',
-                               terms => [ $feature_id , $nextsynonym ] ) ) {
-          $self->print_fs($nextfeaturesynonym,$nextsynonym,$feature_id,$self->{const}{pub});
-          $nextfeaturesynonym++;
-          $self->cache('synonym',$alias,$nextsynonym);
-          $nextsynonym++;
+                               terms => [ $feature_id , $self->nextoid('synonym') ] ) ) {
+          $self->print_fs($self->nextoid('feature_synonym'),$self->nextoid('synonym'),$feature_id,$self->{const}{pub});
+          $self->nextoid('feature_synonym','++'); #$nextfeaturesynonym++;
+          $self->cache('synonym',$alias,$self->nextoid('synonym'));
+          $self->nextoid('synonym','++'); #$nextsynonym++;
         }
       }
 
@@ -2338,8 +2584,8 @@ sub synonyms  {
       if ( $self->constraint( name => 'feature_synonym_c1',
                               terms=>  [ $feature_id ,
                                          $self->cache('synonym',$alias) ] ) ) {
-        $self->print_fs($nextfeaturesynonym,$self->cache('synonym',$alias),$feature_id,$self->{const}{pub});
-        $nextfeaturesynonym++;
+        $self->print_fs($self->nextoid('feature_synonym'),$self->cache('synonym',$alias),$feature_id,$self->{const}{pub});
+        $self->nextoid('feature_synonym','++'); #$nextfeaturesynonym++;
       }
     }
 }
@@ -2353,18 +2599,22 @@ sub load_data {
     $self->drop_indexes();
   }
 
-  my %nextvalue = (
-   "feature"              => $self->nextfeature,
-   "featureloc"           => $self->nextfeatureloc,
-   "feature_relationship" => $nextfeaturerel,
-   "featureprop"          => $nextfeatureprop,
-   "feature_cvterm"       => $nextfeaturecvterm,
-   "synonym"              => $nextsynonym,
-   "feature_synonym"      => $nextfeaturesynonym,
-   "feature_dbxref"       => $nextfeaturedbxref,
-   "dbxref"               => $nextdbxref,
-   "analysisfeature"      => $nextanalysisfeature,
-  );
+  my %nextvalue = $self->nextvalueHash();
+#   (
+#    "feature"              => $self->nextfeature,
+#    "featureloc"           => $self->nextfeatureloc,
+#    "feature_relationship" => $nextfeaturerel,
+#    "featureprop"          => $nextfeatureprop,
+#    "feature_cvterm"       => $nextfeaturecvterm,
+#    "synonym"              => $nextsynonym,
+#    "feature_synonym"      => $nextfeaturesynonym,
+#    "feature_dbxref"       => $nextfeaturedbxref,
+#    "dbxref"               => $nextdbxref,
+#    "analysisfeature"      => $nextanalysisfeature,
+#    "cvterm"               => $nextcvterm, #dgg
+#    "db"               => $nextdbname, #dgg
+#    "cv"               => $nextcvname, #dgg
+#   );
 
 
   foreach my $table (@tables) {
@@ -2383,6 +2633,8 @@ sub load_data {
   ($self->dbh->commit() 
       || die "commit failed: ".$self->dbh->errstr()) unless $self->notransact;
   $self->dbh->{AutoCommit}=1;
+
+  $self->load_reftype_property(); # dgg
 
   #load sequence
   unless ($self->nosequence) {
@@ -2454,20 +2706,71 @@ sub copy_from_stdin {
 
   }
   #update the sequence so that later inserts will work
-  $dbh->do("SELECT setval('$sequence', $nextval) FROM $table");
+  $dbh->do("SELECT setval('$sequence', $nextval) FROM $table")
+    or die "Error when executing:  setval('$sequence', $nextval) FROM $table: $!\n"; 
 }
 
 sub load_sequence {
     my $self = shift;
     my $dbh  = $self->dbh();
     warn "Loading sequences (if any) ...\n";
-    my $fh = $self->file_handles('SEQ');
+    my $fh = $self->file_handles('sequence'); # 'SEQ'
     seek($fh,0,0);
     while (<$fh>) {
         chomp;
         $dbh->do($_);
     }
 }
+
+=item add this to chado db for gbrowse reference class:
+
+ insert into cvtermprop (cvterm_id,type_id,value) 
+   values(ref_cvtermid,ref_cvtermid,'MapReferenceType');
+  where ref_cvtermid = cvterm_id for reference type (e.g. chromosome,region,contig,...)
+  my $query = "select cvterm_id from cvtermprop where value = ?";
+
+  $value= Bio::DB::Das::Chado->MAP_REFERENCE_TYPE();
+  
+=cut
+
+sub reftype_property {
+    my $self = shift;
+    my $reftype_property = shift;
+    my $reftype_cvtermid = shift;
+    # warn "Adding reftype_property=$reftype_property,$reftype_cvtermid\n"  if($reftype_property);
+    $self->{'reftype_property'}= $reftype_property if($reftype_property);
+    $self->{'reftype_cvtermid'}= $reftype_cvtermid if($reftype_cvtermid);
+    return $self->{'reftype_property'};
+}
+
+
+sub load_reftype_property {
+    my $self = shift;
+
+    my $reftype = $self->reftype_property();  return unless($reftype);  
+    warn "Adding cvtermprop=MapReferenceType for '$reftype' ...\n";
+    my $ref_cvtermid = $self->{'reftype_cvtermid'};
+    $ref_cvtermid = $self->get_type($reftype) unless($ref_cvtermid);  
+    return unless($ref_cvtermid);
+    my $maprefkey=""; 
+    ##?? eval { "$maprefkey= Bio::DB::Das::Chado::MAP_REFERENCE_TYPE;" }; warn @$ if($@);
+    $maprefkey ||= 'MapReferenceType';
+    
+    my $dbh = $self->dbh();
+    my $sth = $dbh->prepare("SELECT value FROM cvtermprop where cvterm_id = ? and type_id = ?");
+    $sth->execute($ref_cvtermid,$ref_cvtermid);
+    my $data = $sth->fetchrow_hashref(); 
+    return if $$data{'value'}; #??
+    
+    #? check we haven't already added this ...
+    warn "Adding cvtermprop=$maprefkey to $reftype ...\n";
+    $sth = $dbh->prepare("INSERT INTO cvtermprop (cvterm_id,type_id,value) VALUES (?,?,?)");
+    $sth->execute($ref_cvtermid,$ref_cvtermid,$maprefkey) 
+      or warn "Error when executing: INSERT INTO cvtermprop: $!\n";
+}
+
+
+
 
 sub handle_target {
     my $self = shift;
@@ -2508,16 +2811,18 @@ sub handle_target {
 
       my $type = $self->cache('type',$featuretype);
 
-      my $ankey = $self->global_analysis ?
-                  $self->analysis_group :
-                  $tsource .'_'. $featuretype;
+#       my $ankey = $self->global_analysis ?
+#                   $self->analysis_group :
+#                   $tsource .'_'. $featuretype;
+# 
+#       unless($self->cache('analysis',$ankey)) {
+#         $self->{queries}{search_analysis}->execute($ankey);
+#         my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
+#         $self->dump_ana_contents($ankey) unless $ana;
+#         $self->cache('analysis',$ankey,$ana);
+#       }
 
-      unless($self->cache('analysis',$ankey)) {
-        $self->{queries}{search_analysis}->execute($ankey);
-        my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
-        $self->dump_ana_contents($ankey) unless $ana;
-        $self->cache('analysis',$ankey,$ana);
-      }
+      my $ankey = $self->find_analysis($tsource,$featuretype); ## dgg patch, see note below
       $self->dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
 
       my $score_string;
@@ -2531,11 +2836,11 @@ sub handle_target {
         $score_string = "\\N\t\\N\t\\N\t$score";
       }
 
-      $self->print_af($nextanalysisfeature,
+      $self->print_af($self->nextoid('analysisfeature'),
                       $self->nextfeature-$created_target_feature, #takes care of Allen's nextfeature bug--FINALLY!
                       $self->cache('analysis',$ankey),
                       $score_string);
-      $nextanalysisfeature++;
+      $self->nextoid('analysisfeature','++'); #$nextanalysisfeature++;
       $self->nextfeatureloc('++');
       $rank++;
     }
@@ -2580,6 +2885,97 @@ sub create_target_feature {
     return;
 }
 
+
+
+=item  analysis  comment
+
+ d.gilbert, 07mar: data sourcename is important also for analysis use,
+ see the table index: (program, programversion, sourcename)
+ The 'name' field is not a unique value; see schema comments:
+ Note only program and programversion are NOT NULL fields.
+ 
+-- TABLE: analysis
+-- name: can be NULL
+--   a way of grouping analyses. this should be a handy
+--   short identifier that can help people find an analysis they
+--   want. for instance "tRNAscan", "cDNA", "FlyPep", "SwissProt"
+--   it should not be assumed to be unique. for instance, there may
+--   be lots of seperate analyses done against a cDNA database.
+--
+-- program: not NULL   (and programversion is NOT NULL...)
+--   e.g. blastx, blastp, sim4, genscan
+--
+-- sourcename: can be NULL
+--   e.g. cDNA, SwissProt
+
+when analysis_group is not given, here are options for
+finding from GFF source.  Using GFF.method is problematic
+as any analysis can produce several method/type values (gene,CDS,exon; match, match_part, ...)
+
+  1.  gff.source == an.program[:.-]an.sourcename -- this is flybase example an. usage
+    e.g.   gff: chr4, BLASTx.insectEST, est_match, ...
+                chrX, tBLASTn.yeastProtein, protein_match, ...
+           chado.an:  program=tBLASTN, sourcename=yeastgenes
+           
+  2.  gff.source == an.program
+            gff:  chr2, genscan, gene, ...
+                  chr2, genscan, CDS, ...
+        chado.an: program=genscan  programversion=2.0  or genscan 2.0, sourcename=NULL
+  
+Proposed changes: 
+  ... original ...
+   use constant SEARCH_ANALYSIS =>
+               "SELECT analysis_id FROM analysis WHERE name=?";
+    my $ankey = $self->global_analysis ?
+                $self->analysis_group :
+                $source .'_'. $featuretype; ## problem
+
+    unless ($self->cache('analysis',$ankey)) {
+      $self->{queries}{search_analysis}->execute($ankey);
+      
+  ... new , with option to auto-add analysis names to database
+
+   use constant SEARCH_ANALYSIS =>
+               "SELECT analysis_id FROM analysis 
+                WHERE (name = ?) OR (program=? AND (sourcename=? OR sourcename is NULL))";
+
+    my $ankey = $self->global_analysis ? $self->analysis_group : $source; 
+    my ($anprog,$ansource)= split(/[:\.]/,$ankey,2);
+    unless ($self->cache('analysis',$ankey)) {
+      $self->{queries}{search_analysis}->execute($ankey,$anprog,$ansource);
+
+=cut
+
+sub find_analysis {
+    my $self = shift;
+    my ($source,$featuretype) = @_;
+
+    my $ankey = $self->global_analysis ? $self->analysis_group : $source; 
+    unless ($self->cache('analysis',$ankey)) {
+      my ($anprog,$ansource)= split(/[:\.]/,$ankey,2); 
+        # what is best split pattern? '_' is useful as name part
+        ## GBrowse.conf problem using 'feature = type:prog:source'; 
+        ## this affects also gff.source > ch.dbxref
+        ## use/expect convention of 'program.dbsource' in gff.source line?
+        
+      $self->{queries}{search_analysis}->execute($ankey,$anprog,$ansource);
+      my ($an_id) = $self->{queries}{search_analysis}->fetchrow_array;
+
+      if($an_id) {
+        $self->cache('analysis',$ankey,$an_id);
+        
+      } elsif ($self->{'addpropertycv'}) {   
+        # create analysis entry
+        $an_id= $self->nextoid('analysis');
+        $self->print_analysis( $an_id, $ankey, $anprog, $ansource);
+        $self->nextoid('analysis','++'); 
+        $self->cache('analysis',$ankey,$an_id);
+      }
+    }
+    return $ankey;
+}
+
+
 sub handle_nontarget_analysis {
     my $self = shift;
     my ($feature,$uniquename) = @_;
@@ -2589,16 +2985,18 @@ sub handle_nontarget_analysis {
 
     my $featuretype = $feature->type->name;
 
-    my $ankey = $self->global_analysis ?
-                $self->analysis_group :
-                $source .'_'. $featuretype;
+#     my $ankey = $self->global_analysis ?
+#                 $self->analysis_group :
+#                 $source .'_'. $featuretype;
+# 
+#     unless ($self->cache('analysis',$ankey)) {
+#       $self->{queries}{search_analysis}->execute($ankey);
+#       my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
+#       $self->dump_ana_contents($ankey) unless $ana;
+#       $self->cache('analysis',$ankey,$ana);
+#     }
 
-    unless ($self->cache('analysis',$ankey)) {
-      $self->{queries}{search_analysis}->execute($ankey);
-      my ($ana) = $self->{queries}{search_analysis}->fetchrow_array;
-      $self->dump_ana_contents($ankey) unless $ana;
-      $self->cache('analysis',$ankey,$ana);
-    }
+    my $ankey = $self->find_analysis($source,$featuretype); ## dgg patch, see note 
     $self->dump_ana_contents($ankey) unless $self->cache('analysis',$ankey);
 
     my $score_string;
@@ -2612,8 +3010,8 @@ sub handle_nontarget_analysis {
         $score_string = "\\N\t\\N\t\\N\t$score";
     }
 
-    $self->print_af($nextanalysisfeature,$self->cache('feature',$uniquename),$self->cache('analysis',$ankey),$score_string);
-    $nextanalysisfeature++;
+    $self->print_af($self->nextoid('analysisfeature'),$self->cache('feature',$uniquename),$self->cache('analysis',$ankey),$score_string);
+    $self->nextoid('analysisfeature','++'); #$nextanalysisfeature++;
 }
 
 
@@ -2649,16 +3047,26 @@ sub handle_dbxref {
         if($self->constraint( name  => 'feature_dbxref_c1',
                               terms => [ $self->cache('feature',$uniquename) ,
                                          $dbxref_id] ) ) {
-          $self->print_fdbx($nextfeaturedbxref,
+          $self->print_fdbx($self->nextoid('feature_dbxref'),
                             $self->cache('feature',$uniquename),
                             $dbxref_id);
-          $nextfeaturedbxref++;
+          $self->nextoid('feature_dbxref','++'); #$nextfeaturedbxref++;
         }
       } else {
           unless ($self->cache('db',$database)) {
-              $self->{queries}{search_db}->execute("DB:$database");
+              $self->{queries}{search_db}->execute("$database");
               my($db_id) = $self->{queries}{search_db}->fetchrow_array;
-              warn "couldn't find database 'DB:$database' in db table"
+              unless($db_id) { 
+                ## dgg: this 'DB:' prefix on db names in chado is not desired
+                $self->{queries}{search_db}->execute("DB:$database");
+                ($db_id) = $self->{queries}{search_db}->fetchrow_array;
+                }
+              if(!$db_id && $self->{'addpropertycv'}) { # dgg: use same flag for add db names
+                $db_id= $self->nextoid('db');# $nextdbname++;
+                $self->print_dbname($db_id,$database,"autocreated:$database");
+                $self->nextoid('db','++');
+                }
+              warn "couldn't find database '$database' in db table"
                  and next unless $db_id;
               $self->cache('db',$database,$db_id);
           }
@@ -2671,21 +3079,21 @@ sub handle_dbxref {
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
                                             $dbxref_id ] ) ) {
-              $self->print_fdbx($nextfeaturedbxref,
+              $self->print_fdbx($self->nextoid('feature_dbxref'),  
                                 $self->cache('feature',$uniquename),
                                 $dbxref_id);
-              $nextfeaturedbxref++;
+              $self->nextoid('feature_dbxref','++'); #$nextfeaturedbxref++;
             }
             $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
           } else {
-            $dbxref_id = $nextdbxref;
+            $dbxref_id = $self->nextoid('dbxref'); # $nextdbxref;
             if($self->constraint( name => 'feature_dbxref_c1',
                                   terms=> [ $self->cache('feature',$uniquename),
                                             $dbxref_id ] ) ){
-              $self->print_fdbx($nextfeaturedbxref,
+              $self->print_fdbx($self->nextoid('feature_dbxref'),
                                 $self->cache('feature',$uniquename),
                                 $dbxref_id);
-              $nextfeaturedbxref++;
+              $self->nextoid('feature_dbxref','++'); #$nextfeaturedbxref++;
             }
             $self->print_dbx($dbxref_id,
                              $self->cache('db',$database),
@@ -2693,7 +3101,7 @@ sub handle_dbxref {
                              $version,
                              $desc);
             $self->cache('dbxref',"$database|$accession|$version",$dbxref_id);
-            $nextdbxref++;
+            $self->nextoid('dbxref','++'); ##$nextdbxref++;
           }
           if (defined $primary_pattern and defined $database and $database =~/$primary_pattern/) {
               $primary_dbxref_id ||= $dbxref_id;
@@ -2717,7 +3125,7 @@ sub handle_ontology_term {
     my @ucvterms = grep {++$count{$_} < 2} @cvterms;
     foreach my $term (@ucvterms) {
       next unless $term;
-      unless ($self->cache('type',$term)) {
+      unless ($self->cache('type',$term)) { ## shouldnt this be cache('ontology',$term) ?? dgg
         my($d,$a) = $term =~ /^(.+?):(.+?)$/;
 
         my $db_name;
@@ -2749,8 +3157,8 @@ sub handle_ontology_term {
       if($self->constraint( name  => 'feature_cvterm_c1',
                             terms => [ $self->cache('feature',$uniquename), 
                                        $self->cache('type',$term) ] ) ){
-        $self->print_fcv($nextfeaturecvterm,$self->cache('feature',$uniquename),$self->cache('type',$term),$self->{const}{pub});
-        $nextfeaturecvterm++;
+        $self->print_fcv($self->nextoid('feature_cvterm'),$self->cache('feature',$uniquename),$self->cache('type',$term),$self->{const}{pub});
+        $self->nextoid('feature_cvterm','++'); # $nextfeaturecvterm++;
       }
     }
 }
@@ -2776,17 +3184,17 @@ sub handle_source {
         if ($chado_source) {
           $self->cache('dbxref',$source,$chado_source);
         } else {
-          $self->cache('dbxref',$source,$nextdbxref);
-          $self->print_dbx($nextdbxref,$self->{const}{gff_source_db},$source,1,'\N');
-          $nextdbxref++;
+          $self->cache('dbxref',$source,$self->nextoid('dbxref'));
+          $self->print_dbx($self->nextoid('dbxref'),$self->{const}{gff_source_db},$source,1,'\N');
+          $self->nextoid('dbxref','++'); #$nextdbxref++;
         }
       }
       my $dbxref_id = $self->cache('dbxref',$source);
       if($self->constraint( name => 'feature_dbxref_c1',
                             terms=> [ $self->cache('feature',$uniquename),
                                       $dbxref_id ] ) ){
-        $self->print_fdbx($nextfeaturedbxref,$self->cache('feature',$uniquename),$dbxref_id);
-        $nextfeaturedbxref++;
+        $self->print_fdbx($self->nextoid('feature_dbxref'),$self->cache('feature',$uniquename),$dbxref_id);
+        $self->nextoid('feature_dbxref','++'); # $nextfeaturedbxref++;
       }
     } else {
       $self->{const}{source_success} = 0; #geting GFF_source failed, so don't try anymore
@@ -2806,47 +3214,87 @@ sub handle_unreserved_tags {
       next if $tag eq 'score';
       next if $tag eq 'dbxref';
 
-      unless ($self->{const}{auto_cv_id}){
-        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='autocreated' or name='". $self->fp_cv  ."'");
-        $sth->execute;
-        ($self->{const}{auto_cv_id}) = $sth->fetchrow_array;
-      }
-
-      if (!$self->{const}{tried_fp_cv} and !$self->{const}{fp_cv_id}) {
-        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='". $self->fp_cv  ."'");
+      unless ($self->{const}{fp_cv_id} || $self->{const}{tried_fp_cv}){
+      
+        $self->fp_cv("autocreated") unless($self->fp_cv());
+      
+        my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='". $self->fp_cv()  ."'");
+          # dgg: dropped  'autocreated' due to SO/auto conflicts for things like 'gene', 'chromosome'
+          #      where SO and autocreated cvs are used primarily for type names in Bio/DB/Das/Chado
         $sth->execute;
         ($self->{const}{fp_cv_id}) = $sth->fetchrow_array;
+        if(!$self->{const}{fp_cv_id} && $self->{'addpropertycv'}) {
+          # create cv entry
+          $self->{const}{fp_cv_id}= $self->nextoid('cv');
+          $self->print_cv( $self->{const}{fp_cv_id}, $self->fp_cv());
+          $self->nextoid('cv','++'); 
+        }
+        
         $self->{const}{tried_fp_cv} = 1;
       }
 
-      unless ( $self->cache('type',$tag) ) {
-        #check fp cv first, then autocreated
-        $self->{queries}{search_cvterm_id}->execute(
-                                 $tag, 
-                                 $self->{const}{fp_cv_id})
-                              if $self->{const}{fp_cv_id};
-        my ($tag_cvterm) = $self->{queries}{search_cvterm_id}->fetchrow_array;
+#       if (!$self->{const}{tried_fp_cv} and !$self->{const}{fp_cv_id}) {
+#         my $sth = $self->dbh->prepare("SELECT cv_id FROM cv WHERE name='". $self->fp_cv  ."'");
+#         $sth->execute;
+#         ($self->{const}{fp_cv_id}) = $sth->fetchrow_array;
+#         $self->{const}{tried_fp_cv} = 1;
+#       }
 
-        unless ($tag_cvterm) {
-            $self->{queries}{search_cvterm_id}->execute(
-                                 $tag, 
-                                 $self->{const}{auto_cv_id});
-            ($tag_cvterm) = $self->{queries}{search_cvterm_id}->fetchrow_array;
-        }
+      ## problems here with auto-added properties that clash with SO/other cvterms; cache-type?
+      my $property_cvterm_id = $self->cache('property',$tag);
+      # $property_cvterm_id = $self->cache('type',$tag) unless($property_cvterm_id); ## dgg; drop this?
+      unless ( $property_cvterm_id ) {
+        #check fp cv first; ## dgg drop this due to conflicts with SO type:  autocreated
+        ## my ($tag_cvterm); # ==  $property_cvterm_id
+        if ($self->{const}{fp_cv_id}) {
+          $self->{queries}{search_cvterm_id}->execute( 
+                                $tag, 
+                                $self->{const}{fp_cv_id}) ;
+         ($property_cvterm_id) = $self->{queries}{search_cvterm_id}->fetchrow_array;
+         }
 
-        if ($tag_cvterm) { #good, the term is already there
-          $self->cache('type',$tag,$tag_cvterm);
+        if ($property_cvterm_id) { #good, the term is already there
+          $self->cache('property',$tag,$property_cvterm_id); 
         } else { #bad! the term is not there for now we die with a helpful message
+
+## dgg patch
+          if($self->{'addpropertycv'} && $self->{const}{fp_cv_id}) {
+            $property_cvterm_id= $self->nextoid('cvterm'); # $nextcvterm++;
+            my $dbxid= $self->nextoid('dbxref'); #$nextdbxref++;
+            my $cvid = $self->{const}{fp_cv_id};
+            my $dbxacc= "autocreated:$tag";
+
+            ## bad to use  gff_source_db id; use 'null' db
+            unless ($self->{const}{null_db}) {
+              my $sth = $self->dbh->prepare("SELECT db_id FROM db WHERE name='null'");
+              $sth->execute;
+              ($self->{const}{null_db}) = $sth->fetchrow_array;
+            }
+        
+            $self->print_dbx($dbxid,$self->{const}{null_db},$dbxacc,1,'\N');
+            $self->nextoid('dbxref','++'); 
+            $self->cache('dbxref',$dbxacc,$dbxid);
+            $self->print_cvterm($property_cvterm_id, $cvid, $tag, $dbxid);
+            $self->nextoid('cvterm','++'); 
+            $self->cache('property',$tag,$property_cvterm_id);  
+          
+          } else {
           dbxref_error_message($tag) && die;
+          }
         }
       }
       #moving on, add this to the featureprop table
       my @values = map {$_->value} $feature->annotation->get_Annotations($tag);
       my $rank=0;
       foreach my $value (@values) {
-        $self->print_fprop($nextfeatureprop,$self->cache('feature',$uniquename),$self->cache('type',$tag),$value,$rank);
+        if ( $self->constraint( name => 'featureprop_c1',
+                              terms=> [ $self->cache('feature',$uniquename),
+                                        $self->cache('property',$tag), 
+                                        $rank ] ) ) {
+        $self->print_fprop($self->nextoid('featureprop'),$self->cache('feature',$uniquename),$property_cvterm_id,$value,$rank);
         $rank++;
-        $nextfeatureprop++;
+        $self->nextoid('featureprop','++'); # $nextfeatureprop++;
+        }
       }
     }
 }
@@ -2876,9 +3324,9 @@ sub handle_note {
                               terms=> [ $self->cache('feature',$uniquename),
                                         $self->cache('type','Note'), 
                                         $rank ] ) ) {
-        $self->print_fprop($nextfeatureprop,$self->cache('feature',$uniquename),$self->cache('type','Note'),uri_unescape($note),$rank);
+        $self->print_fprop($self->nextoid('featureprop'),$self->cache('feature',$uniquename),$self->cache('type','Note'),uri_unescape($note),$rank);
         $rank++;
-        $nextfeatureprop++;
+        $self->nextoid('featureprop','++'); #$nextfeatureprop++;
       }
     }
 }
@@ -2908,9 +3356,9 @@ sub handle_gap {
                               terms=> [ $self->cache('feature',$uniquename),
                                         $self->cache('type','Gap'),
                                         $rank ] ) ) {
-        $self->print_fprop($nextfeatureprop,$self->cache('feature',$uniquename),$self->cache('type','Gap') ,uri_unescape($note),$rank);
+        $self->print_fprop($self->nextoid('featureprop'),$self->cache('feature',$uniquename),$self->cache('type','Gap') ,uri_unescape($note),$rank);
         $rank++;
-        $nextfeatureprop++;
+        $self->nextoid('featureprop','++'); #$nextfeatureprop++;
       }
     }
 }
@@ -2975,17 +3423,22 @@ sub handle_CDS {
 
     my $fmin = $feat->start;              #check that this is interbase
     my $fmax = $feat->end;
-    my $object = safeFreeze $feat;
-
-    my $feat_type   = $feat->type->name;
-    my $seq_id = $feat->seq_id;
+    # my $object = safeFreeze $feat;  ## original; dgg;  was bad for argos perl lib; had real old FreezeThaw
+    ## dgg this works, and doesnt need a new 3rd party perl module: 
+    my $dumper = Data::Dumper->new ([[$feat]]);
+    $dumper->Indent(0)->Terse(1)->Purity(1);
+    my $object = $dumper->Dump;
+    
+    my $feat_type   = $feat->type->name; 
+    ##$feat_type= $feat_type->value if(ref $feat_type);
+    my $seq_id = $feat->seq_id;  ## this is a ref->value !!
 
     my $insert = qq/
         INSERT INTO tmp_cds_handler (gff_id,seq_id,type,fmin,fmax,object) 
         VALUES (?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($insert);
-    $sth->execute($feat_id,$seq_id,$feat_type,$fmin,$fmax,$object);
+    $sth->execute($feat_id,"$seq_id","$feat_type",$fmin,$fmax,$object);
 
     #get the value of the row just inserted
     $sth = $dbh->prepare("SELECT currval('tmp_cds_handler_cds_row_id_seq')");
@@ -3063,7 +3516,12 @@ ORDER BY cds.fmin,cds.gff_id
 #do stuff, create a list of features
     while (my $feat_row = $sth->fetchrow_hashref) {
         $grandparent  = $$feat_row{ grandparent_id };
-        my ($feat_obj)= thaw $$feat_row{ object };
+
+## dgg: Data::Dumper works and is easier on user (Data::Dumper part of sys perl lib) ##          
+        ##my ($feat_obj)= thaw $$feat_row{ object }; # original
+        my $objs = eval $$feat_row{ object }; if($@) { warn @$; }
+        my $feat_obj = $$objs[0];
+
         my $type      = $$feat_row{ type };
         my $fmin      = $$feat_row{ fmin };
         my $fmax      = $$feat_row{ fmax };
@@ -3378,9 +3836,9 @@ sub handle_parent {
 
         $self->cache('parent',$self->nextfeature,$parent);
 
-        $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$part_of);
+        $self->print_frel($self->nextoid('feature_relationship'),$self->nextfeature,$parent,$part_of);
 
-        $nextfeaturerel++;
+        $self->nextoid('feature_relationship','++'); # $nextfeaturerel++;
     }
 }
 
@@ -3395,8 +3853,8 @@ sub handle_derives_from {
 
         $self->cache('parent',$self->nextfeature,$parent);
 
-        $self->print_frel($nextfeaturerel,$self->nextfeature,$parent,$derives_from);
-        $nextfeaturerel++;
+        $self->print_frel($self->nextoid('feature_relationship'),$self->nextfeature,$parent,$derives_from);
+        $self->nextoid('feature_relationship','++'); #$nextfeaturerel++;
     }
 }
 
