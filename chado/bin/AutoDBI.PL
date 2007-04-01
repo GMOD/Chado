@@ -3931,15 +3931,6 @@ sub organism { shift->organism_id }
 # Has A
 #
   
-  
-  
-  
-  
-  
-  
-  
-  
-   
 
 #
 # Has Many
@@ -3953,11 +3944,7 @@ Chado::Organism->has_many('organismprop_organism_id', 'Chado::Organismprop' => '
   
     
 sub organismprops { return shift->organismprop_organism_id }
-      
-Chado::Organism->has_many('organism_relationship_subject_id', 'Chado::Organism_Relationship' => 'subject_id');
-   
-Chado::Organism->has_many('organism_relationship_object_id', 'Chado::Organism_Relationship' => 'object_id');
-   
+         
 Chado::Organism->has_many('feature_organism_id', 'Chado::Feature' => 'organism_id');
   
     
@@ -3967,43 +3954,18 @@ Chado::Organism->has_many('stock_organism_id', 'Chado::Stock' => 'organism_id');
   
     
 sub stocks { return shift->stock_organism_id }
-      
-Chado::Organism->has_many('organismpath_subject_id', 'Chado::Organismpath' => 'subject_id');
-  
-    
-sub organismpath_subject_ids { my $self = shift; return $self->organismpath_subject_id(@_) }
-      
-Chado::Organism->has_many('organismpath_object_id', 'Chado::Organismpath' => 'object_id');
-  
-    
-sub organismpath_object_ids { my $self = shift; return $self->organismpath_object_id(@_) }
-      
+            
 Chado::Organism->has_many('biomaterial_taxon_id', 'Chado::Biomaterial' => 'taxon_id');
   
     
 sub biomaterials { return shift->biomaterial_taxon_id }
-     
-
 
 
 #
 # Has Compound Many (many to many relationships in all their flavors)
 #
  
-  
-sub organism_relationship_subjects { return shift->organism_relationship_subject_id }
-
-  
-sub organism_relationship_objects { return shift->organism_relationship_object_id }
-
-   
- 
-  
 sub organism_dbxref_organisms { return shift->organism_dbxref_organism_id }
-
-   
- 
-  
   
 sub phylonode_organism_organisms { return shift->phylonode_organism_organism_id }
  
@@ -4028,21 +3990,8 @@ sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode
   
 # many2one #
   
-  
-sub organism_relationship_subject_types { my $self = shift; return map $_->type_id, $self->organism_relationship_subject_id }
     
-  
-sub organism_relationship_object_types { my $self = shift; return map $_->type_id, $self->organism_relationship_object_id }
-    
-   
-  
-  
-#many to many to many
-
-
-  
-  
-   
+#many to many to many 
 
 1;
 
@@ -4641,61 +4590,6 @@ sub map_feature { return shift->map_feature_id }
 
 1;
 
-########Chado::Organism_Relationship########
-
-package Chado::Organism_Relationship;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-no warnings qw(redefine);
-
-Chado::Organism_Relationship->set_up_table('organism_relationship');
-
-#
-# Primary key accessors
-#
-
-sub id { shift->organism_relationship_id }
-sub organism_relationship { shift->organism_relationship_id }
- 
-
-
-
-#
-# Has A
-#
- 
-Chado::Organism_Relationship->has_a(subject_id => 'Chado::Organism');
-    
-sub subject { return shift->subject_id }
-      
- 
-Chado::Organism_Relationship->has_a(object_id => 'Chado::Organism');
-    
-sub object { return shift->object_id }
-      
- 
-Chado::Organism_Relationship->has_a(type_id => 'Chado::Cvterm');
-    
-sub Chado::Organism_Relationship::cvterm { return shift->type_id }
-       
-
-#
-# Has Many
-#
-   
-
-
-# one to many to one
- 
-# one to many to many
- 
-#many to many to one
- 
-#many to many to many
-
- 
-
-1;
 
 ########Chado::Phenotype_Comparison########
 
@@ -7630,61 +7524,6 @@ sub Chado::Control::tableinfo { return shift->tableinfo_id }
 
 1;
 
-########Chado::Organismpath########
-
-package Chado::Organismpath;
-use base 'Chado::DBI';
-use Class::DBI::Pager;
-no warnings qw(redefine);
-
-Chado::Organismpath->set_up_table('organismpath');
-
-#
-# Primary key accessors
-#
-
-sub id { shift->organismpath_id }
-sub organismpath { shift->organismpath_id }
- 
-
-
-
-#
-# Has A
-#
- 
-Chado::Organismpath->has_a(subject_id => 'Chado::Organism');
-    
-sub subject { return shift->subject_id }
-      
- 
-Chado::Organismpath->has_a(object_id => 'Chado::Organism');
-    
-sub object { return shift->object_id }
-      
- 
-Chado::Organismpath->has_a(type_id => 'Chado::Cvterm');
-    
-sub Chado::Organismpath::cvterm { return shift->type_id }
-       
-
-#
-# Has Many
-#
-   
-
-
-# one to many to one
- 
-# one to many to many
- 
-#many to many to one
- 
-#many to many to many
-
- 
-
-1;
 
 ########Chado::Phenotype_Cvterm########
 
@@ -7701,8 +7540,6 @@ Chado::Phenotype_Cvterm->set_up_table('phenotype_cvterm');
 
 sub id { shift->phenotype_cvterm_id }
 sub phenotype_cvterm { shift->phenotype_cvterm_id }
- 
-
 
 
 #
@@ -8159,9 +7996,7 @@ Chado::Cvterm->has_many('acquisition_relationship_type_id', 'Chado::Acquisition_
   
     
 sub acquisition_relationships { return shift->acquisition_relationship_type_id }
-      
-Chado::Cvterm->has_many('organism_relationship_type_id', 'Chado::Organism_Relationship' => 'type_id');
-   
+         
 Chado::Cvterm->has_many('phenotype_comparison_type_id', 'Chado::Phenotype_Comparison' => 'type_id');
    
 Chado::Cvterm->has_many('feature_cvtermprop_type_id', 'Chado::Feature_Cvtermprop' => 'type_id');
@@ -8308,12 +8143,7 @@ Chado::Cvterm->has_many('control_type_id', 'Chado::Control' => 'type_id');
   
     
 sub controls { return shift->control_type_id }
-      
-Chado::Cvterm->has_many('organismpath_type_id', 'Chado::Organismpath' => 'type_id');
-  
-    
-sub organismpaths { return shift->organismpath_type_id }
-      
+            
 Chado::Cvterm->has_many('phenotype_cvterm_cvterm_id', 'Chado::Phenotype_Cvterm' => 'cvterm_id');
    
 Chado::Cvterm->has_many('stockprop_type_id', 'Chado::Stockprop' => 'type_id');
@@ -8428,19 +8258,7 @@ sub element_types { return shift->element_type_id }
 sub element_types { return shift->element_type_id }
  
  
-  
-  
-  
-sub organism_relationship_types { return shift->organism_relationship_type_id }
- 
- 
-  
 sub contact_relationship_types { return shift->contact_relationship_type_id }
-
-  
-   
- 
-  
   
 sub quantification_relationship_types { return shift->quantification_relationship_type_id }
 
@@ -8579,13 +8397,6 @@ sub biomaterial_relationship_subjects { my $self = shift; return map $_->subject
   
   
     
-sub organism_relationship_subjects { my $self = shift; return map $_->subject_id, $self->organism_relationship_type_id }
-    
-  
-     
-  
-
-  
   
   
     
