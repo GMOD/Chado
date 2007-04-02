@@ -507,6 +507,8 @@ GetOptions(
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $MANPAGE;
 
+my $ORGANISM_FROM_CMDLINE = $ORGANISM;
+
 unless ($DBNAME) {
     if (eval {require Bio::GMOD::Config;
           Bio::GMOD::Config->import();
@@ -543,7 +545,7 @@ $NO_ADDFP_CV ||=0;
 
 die "You must supply a database name" unless $DBNAME;
 
-die "You must supply an organism" unless $ORGANISM;
+#die "You must supply an organism" unless $ORGANISM;
 
 $GLOBAL_ANALYSIS=0;
 if ((defined $ANALYSIS) and ($ANALYSIS eq '')) { 
@@ -607,15 +609,6 @@ if ($ONTOLOGY) {
   }
 }
 
-my $ORGANISM_FROMDATA= ($ORGANISM =~ /fromdata/);
-if($ORGANISM_FROMDATA) {
-  $ORGANISM= "null"; # is this useful?
-} else {
-$chado->organism($ORGANISM);
-$chado->organism_id($ORGANISM) 
-   or die "$ORGANISM organism not found in the database";
-}
-
 $chado->file_handles();
 
 my $gffio;
@@ -634,6 +627,28 @@ warn "(This may take a while ...)\n";
 
 my $seen_cds = my $seen_exon = my $seen_bad_cds = 0;
 
+my $ORGANISM_FROMDATA= ($ORGANISM =~ /fromdata/);
+if($ORGANISM_FROMDATA) {
+    $ORGANISM= "null"; # is this useful?
+} 
+elsif ($ORGANISM_FROM_CMDLINE) {
+    $ORGANISM = $ORGANISM_FROM_CMDLINE;
+    $chado->organism($ORGANISM);
+    $chado->organism_id($ORGANISM)
+       or die "$ORGANISM organism not found in the database";
+}
+elsif ($gffio->organism) {
+    $ORGANISM = $gffio->organism;
+    $chado->organism($ORGANISM);
+    $chado->organism_id($ORGANISM)
+       or die "$ORGANISM organism not found in the database";
+
+}
+else {
+    $chado->organism($ORGANISM);
+    $chado->organism_id($ORGANISM)
+       or die "$ORGANISM organism not found in the database";
+}
 
 my $feature_iterator; my $itern=0; my %seen_organism;
 FEATURE:
