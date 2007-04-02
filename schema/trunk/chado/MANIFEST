@@ -29,10 +29,6 @@ bin/test_load.sh
 bin/ucsc_genes2gff.pl
 bin/ucsc_snp2gff.pl
 chado-module-metadata.xml
-chado-xml/doc/Chado-XML-overview.asc
-chado-xml/doc/Chado-XML-overview.html
-chado-xml/doc/Chado-XML-overview.pdf
-chado-xml/doc/makefile
 chado-xml/examples/CG10833.expanded.chado-xml
 chado-xml/examples/CG10833.with-macros.chado-xml
 chado-xml/examples/CG10833.with-macros.defaults-stripped.chado-xml
@@ -52,10 +48,7 @@ chaos-xml/bin/cx-download-enscore.pl
 chaos-xml/bin/cx-enscore2chaos.pl
 chaos-xml/bin/cx-genbank2chaos.pl
 chaos-xml/create-manifest.sh
-chaos-xml/doc/chaos-and-chado.html
-chaos-xml/doc/css/stylesheet.css
 chaos-xml/dtd/chaos.dtd
-chaos-xml/index.html
 chaos-xml/INSTALL
 chaos-xml/lib/Bio/Chaos/ChaosGraph.pm
 chaos-xml/lib/Bio/Chaos/FeatureUtil.pm
@@ -126,7 +119,8 @@ doc/gmod-tools-readme.pod
 doc/index.html
 doc/xsl/scenario-to-html-inline.xsl
 doc/xsl/scenario-to-html.xsl
-INSTALL
+INSTALL.Chado
+INSTALL.Custom
 install_util/conf_install.PLS
 install_util/install.pm
 install_util/log4perl.conf.PLS
@@ -189,7 +183,6 @@ modules/cv/bridges/godb-bridge.sql.xml
 modules/cv/cv-dbapi.sqli
 modules/cv/cv.html
 modules/cv/cv.sql
-modules/cv/doc/deductive_closure.txt
 modules/cv/functions/cv-helper.plpgsql
 modules/cv/functions/cv-helper.sqlapi
 modules/cv/functions/deductive_closure.plpgsql
@@ -206,10 +199,6 @@ modules/default_nofuncs.sql
 modules/default_schema.sql
 modules/expression/expression.html
 modules/expression/expression.sql
-modules/expression/rad.html
-modules/expression/rad.sql
-modules/expression/rad.views
-modules/expression/README
 modules/extension.modules
 modules/function.modules
 modules/general/functions/general-loading.plpgsql
@@ -230,7 +219,6 @@ modules/organism/examples/examples-orgs.chado-xml
 modules/organism/functions/organism-loading.plpgsql
 modules/organism/functions/organism.plpgsql
 modules/organism/functions/organism.sqlapi
-modules/organism/graph/graph.plpgsql
 modules/organism/organism.html
 modules/organism/organism.sql
 modules/phenotype/phenotype.html
@@ -286,7 +274,6 @@ modules/sequence/gencode/gencode.sql
 modules/sequence/gencode/gencode_data.sql
 modules/sequence/gff-bridge/sequence-gff-funcs.plpgsql
 modules/sequence/gff-bridge/sequence-gff-views.sql
-modules/sequence/seq_triggers.sql~
 modules/sequence/sequence-dbapi.sqli
 modules/sequence/sequence.html
 modules/sequence/sequence.pgfunc
