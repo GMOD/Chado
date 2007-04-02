@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.9 2007-03-23 15:18:02 scottcain Exp $
+-- $Id: phylogeny.sql,v 1.10 2007-04-02 01:57:06 briano Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -15,6 +15,7 @@
 -- :import pub from pub
 -- :import organism from organism
 -- :import dbxref from general
+-- :import analysis from analysis
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -- ================================================
@@ -28,7 +29,9 @@ create table phylotree (
    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 	name varchar(255) null,
 	type_id int,
-	foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+	analysis_id int null,
+   foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
 	comment text null,
 	unique(phylotree_id)
 );
@@ -45,12 +48,10 @@ COMMENT ON COLUMN phylotree.type_id IS 'Type: protein, nucleotide, taxonomy, for
 create table phylotree_pub (
        phylotree_pub_id serial not null,
        primary key (phylotree_pub_id),
-
        phylotree_id int not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade,
-
        unique(phylotree_id, pub_id)
 );
 create index phylotree_pub_idx1 on phylotree_pub (phylotree_id);
@@ -182,7 +183,6 @@ COMMENT ON COLUMN phylonodeprop.type_id IS 'type_id could designate phylonode hi
 create table phylonode_relationship (
        phylonode_relationship_id serial not null,
        primary key (phylonode_relationship_id),
-
        subject_id int not null,
        foreign key (subject_id) references phylonode (phylonode_id) on delete cascade,
        object_id int not null,
@@ -190,11 +190,15 @@ create table phylonode_relationship (
        type_id int not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        rank int,
-
+       phylotree_id int not null,
+       foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
        unique(subject_id, object_id, type_id)
 );
 create index phylonode_relationship_idx1 on phylonode_relationship (subject_id);
 create index phylonode_relationship_idx2 on phylonode_relationship (object_id);
 create index phylonode_relationship_idx3 on phylonode_relationship (type_id);
 
-COMMENT ON TABLE phylonode_relationship IS 'This is for exotic relationships that are not strictly hierarchical; for example, horizontal gene transfer. Use of this table would be highly unusual; most phylogenetic trees are strictly hierarchical. Nevertheless, it is here for completeness.';
+COMMENT ON TABLE phylonode_relationship IS 'This is for 
+relationships that are not strictly hierarchical; for example,
+horizontal gene transfer. Most phylogenetic trees are strictly
+hierarchical, nevertheless it is here for completeness.';
