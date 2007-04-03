@@ -1,4 +1,7 @@
--- $Id: mage.sql,v 1.1 2007-04-03 13:59:05 briano Exp $
+-- $Id: mage.sql,v 1.2 2007-04-03 21:40:21 briano Exp $
+-- ==========================================
+-- Chado mage module
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -13,6 +16,10 @@
 -- :import analysis from companalysis
 -- =================================================================
 
+-- ================================================
+-- TABLE: mageml
+-- ================================================
+
 create table mageml (
     mageml_id serial not null,
     primary key (mageml_id),
@@ -21,6 +28,10 @@ create table mageml (
 );
 
 COMMENT ON TABLE mageml IS 'This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables.';
+
+-- ================================================
+-- TABLE: magedocumentation
+-- ================================================
 
 create table magedocumentation (
     magedocumentation_id serial not null,
@@ -37,6 +48,10 @@ create index magedocumentation_idx2 on magedocumentation (tableinfo_id);
 create index magedocumentation_idx3 on magedocumentation (row_id);
 
 COMMENT ON TABLE magedocumentation IS NULL;
+
+-- ================================================
+-- TABLE: protocol
+-- ================================================
 
 create table protocol (
     protocol_id serial not null,
@@ -60,6 +75,10 @@ create index protocol_idx3 on protocol (dbxref_id);
 
 COMMENT ON TABLE protocol IS 'Procedural notes on how data was prepared and processed.';
 
+-- ================================================
+-- TABLE: protocolparam
+-- ================================================
+
 create table protocolparam (
     protocolparam_id serial not null,
     primary key (protocolparam_id),
@@ -80,6 +99,10 @@ create index protocolparam_idx3 on protocolparam (unittype_id);
 COMMENT ON TABLE protocolparam IS 'Parameters related to a
 protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration.';
 
+-- ================================================
+-- TABLE: channel
+-- ================================================
+
 create table channel (
     channel_id serial not null,
     primary key (channel_id),
@@ -89,6 +112,10 @@ create table channel (
 );
 
 COMMENT ON TABLE channel IS 'Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one).';
+
+-- ================================================
+-- TABLE: arraydesign
+-- ================================================
 
 create table arraydesign (
     arraydesign_id serial not null,
@@ -128,6 +155,10 @@ An array is a template used to generate physical slides, etc.  It
 contains layout information, as well as global array properties, such
 as material (glass, nylon) and spot dimensions (in rows/columns).';
 
+-- ================================================
+-- TABLE: arraydesignprop
+-- ================================================
+
 create table arraydesignprop (
     arraydesignprop_id serial not null,
     primary key (arraydesignprop_id),
@@ -143,6 +174,10 @@ create index arraydesignprop_idx1 on arraydesignprop (arraydesign_id);
 create index arraydesignprop_idx2 on arraydesignprop (type_id);
 
 COMMENT ON TABLE arraydesignprop IS 'Extra array design properties that are not accounted for in arraydesign.';
+
+-- ================================================
+-- TABLE: assay
+-- ================================================
 
 create table assay (
     assay_id serial not null,
@@ -171,6 +206,10 @@ COMMENT ON TABLE assay IS 'An assay consists of a physical instance of
 an array, combined with the conditions used to create the array
 (protocols, technician information). The assay can be thought of as a hybridization.';
 
+-- ================================================
+-- TABLE: assayprop
+-- ================================================
+
 create table assayprop (
     assayprop_id serial not null,
     primary key (assayprop_id),
@@ -187,6 +226,10 @@ create index assayprop_idx2 on assayprop (type_id);
 
 COMMENT ON TABLE assayprop IS 'Extra assay properties that are not accounted for in assay.';
 
+-- ================================================
+-- TABLE: assay_project
+-- ================================================
+
 create table assay_project (
     assay_project_id serial not null,
     primary key (assay_project_id),
@@ -200,6 +243,10 @@ create index assay_project_idx1 on assay_project (assay_id);
 create index assay_project_idx2 on assay_project (project_id);
 
 COMMENT ON TABLE assay_project IS 'Link assays to projects.';
+
+-- ================================================
+-- TABLE: biomaterial
+-- ================================================
 
 create table biomaterial (
     biomaterial_id serial not null,
@@ -220,6 +267,10 @@ create index biomaterial_idx3 on biomaterial (dbxref_id);
 
 COMMENT ON TABLE biomaterial IS 'A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table.';
 
+-- ================================================
+-- TABLE: biomaterial_relationship
+-- ================================================
+
 create table biomaterial_relationship (
     biomaterial_relationship_id serial not null,
     primary key (biomaterial_relationship_id),
@@ -237,6 +288,10 @@ create index biomaterial_relationship_idx3 on biomaterial_relationship (type_id)
 
 COMMENT ON TABLE biomaterial_relationship IS 'Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance.';
 
+-- ================================================
+-- TABLE: biomaterialprop
+-- ================================================
+
 create table biomaterialprop (
     biomaterialprop_id serial not null,
     primary key (biomaterialprop_id),
@@ -253,6 +308,10 @@ create index biomaterialprop_idx2 on biomaterialprop (type_id);
 
 COMMENT ON TABLE biomaterialprop IS 'Extra biomaterial properties that are not accounted for in biomaterial.';
 
+-- ================================================
+-- TABLE: biomaterial_dbxref
+-- ================================================
+
 create table biomaterial_dbxref (
     biomaterial_dbxref_id serial not null,
     primary key (biomaterial_dbxref_id),
@@ -265,6 +324,9 @@ create table biomaterial_dbxref (
 create index biomaterial_dbxref_idx1 on biomaterial_dbxref (biomaterial_id);
 create index biomaterial_dbxref_idx2 on biomaterial_dbxref (dbxref_id);
 
+-- ================================================
+-- TABLE: treatment
+-- ================================================
 
 create table treatment (
     treatment_id serial not null,
@@ -285,6 +347,10 @@ create index treatment_idx3 on treatment (protocol_id);
 COMMENT ON TABLE treatment IS 'A biomaterial may undergo multiple
 treatments. Examples of treatments: apoxia, fluorophore and biotin labeling.';
 
+-- ================================================
+-- TABLE: biomaterial_treatment
+-- ================================================
+
 create table biomaterial_treatment (
     biomaterial_treatment_id serial not null,
     primary key (biomaterial_treatment_id),
@@ -304,6 +370,10 @@ create index biomaterial_treatment_idx3 on biomaterial_treatment (unittype_id);
 
 COMMENT ON TABLE biomaterial_treatment IS 'Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value).';
 
+-- ================================================
+-- TABLE: assay_biomaterial
+-- ================================================
+
 create table assay_biomaterial (
     assay_biomaterial_id serial not null,
     primary key (assay_biomaterial_id),
@@ -321,6 +391,10 @@ create index assay_biomaterial_idx2 on assay_biomaterial (biomaterial_id);
 create index assay_biomaterial_idx3 on assay_biomaterial (channel_id);
 
 COMMENT ON TABLE assay_biomaterial IS 'A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays).';
+
+-- ================================================
+-- TABLE: acquisition
+-- ================================================
 
 create table acquisition (
     acquisition_id serial not null,
@@ -342,6 +416,10 @@ create index acquisition_idx3 on acquisition (channel_id);
 
 COMMENT ON TABLE acquisition IS 'This represents the scanning of hybridized material. The output of this process is typically a digital image of an array.';
 
+-- ================================================
+-- TABLE: acquisitionprop
+-- ================================================
+
 create table acquisitionprop (
     acquisitionprop_id serial not null,
     primary key (acquisitionprop_id),
@@ -357,6 +435,10 @@ create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
 create index acquisitionprop_idx2 on acquisitionprop (type_id);
 
 COMMENT ON TABLE acquisitionprop IS 'Parameters associated with image acquisition.';
+
+-- ================================================
+-- TABLE: acquisition_relationship
+-- ================================================
 
 create table acquisition_relationship (
     acquisition_relationship_id serial not null,
@@ -376,6 +458,10 @@ create index acquisition_relationship_idx2 on acquisition_relationship (type_id)
 create index acquisition_relationship_idx3 on acquisition_relationship (object_id);
 
 COMMENT ON TABLE acquisition_relationship IS 'Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this.';
+
+-- ================================================
+-- TABLE: quantification
+-- ================================================
 
 create table quantification (
     quantification_id serial not null,
@@ -400,6 +486,10 @@ create index quantification_idx4 on quantification (analysis_id);
 
 COMMENT ON TABLE quantification IS 'Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures.';
 
+-- ================================================
+-- TABLE: quantificationprop
+-- ================================================
+
 create table quantificationprop (
     quantificationprop_id serial not null,
     primary key (quantificationprop_id),
@@ -415,6 +505,10 @@ create index quantificationprop_idx1 on quantificationprop (quantification_id);
 create index quantificationprop_idx2 on quantificationprop (type_id);
 
 COMMENT ON TABLE quantificationprop IS 'Extra quantification properties that are not accounted for in quantification.';
+
+-- ================================================
+-- TABLE: quantification_relationship
+-- ================================================
 
 create table quantification_relationship (
     quantification_relationship_id serial not null,
@@ -432,6 +526,10 @@ create index quantification_relationship_idx2 on quantification_relationship (ty
 create index quantification_relationship_idx3 on quantification_relationship (object_id);
 
 COMMENT ON TABLE quantification_relationship IS 'There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where.';
+
+-- ================================================
+-- TABLE: control
+-- ================================================
 
 create table control (
     control_id serial not null,
@@ -454,6 +552,10 @@ create index control_idx4 on control (row_id);
 
 COMMENT ON TABLE control IS NULL;
 
+-- ================================================
+-- TABLE: element
+-- ================================================
+
 create table element (
     element_id serial not null,
     primary key (element_id),
@@ -474,6 +576,10 @@ create index element_idx4 on element (dbxref_id);
 
 COMMENT ON TABLE element IS 'Represents a feature of the array. This is typically a region of the array coated or bound to DNA.';
 
+-- ================================================
+-- TABLE: element_result
+-- ================================================
+
 create table elementresult (
     elementresult_id serial not null,
     primary key (elementresult_id),
@@ -489,6 +595,10 @@ create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (signal);
 
 COMMENT ON TABLE elementresult IS 'An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit.';
+
+-- ================================================
+-- TABLE: element_relationship
+-- ================================================
 
 create table element_relationship (
     element_relationship_id serial not null,
@@ -510,6 +620,10 @@ create index element_relationship_idx4 on element_relationship (value);
 
 COMMENT ON TABLE element_relationship IS 'Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.';
 
+-- ================================================
+-- TABLE: elementresult_relationship
+-- ================================================
+
 create table elementresult_relationship (
     elementresult_relationship_id serial not null,
     primary key (elementresult_relationship_id),
@@ -530,6 +644,10 @@ create index elementresult_relationship_idx4 on elementresult_relationship (valu
 
 COMMENT ON TABLE elementresult_relationship IS 'Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.';
 
+-- ================================================
+-- TABLE: study
+-- ================================================
+
 create table study (
     study_id serial not null,
     primary key (study_id),
@@ -549,6 +667,10 @@ create index study_idx3 on study (dbxref_id);
 
 COMMENT ON TABLE study IS NULL;
 
+-- ================================================
+-- TABLE: study_assay
+-- ================================================
+
 create table study_assay (
     study_assay_id serial not null,
     primary key (study_assay_id),
@@ -563,6 +685,10 @@ create index study_assay_idx2 on study_assay (assay_id);
 
 COMMENT ON TABLE study_assay IS NULL;
 
+-- ================================================
+-- TABLE: studydesign
+-- ================================================
+
 create table studydesign (
     studydesign_id serial not null,
     primary key (studydesign_id),
@@ -573,6 +699,10 @@ create table studydesign (
 create index studydesign_idx1 on studydesign (study_id);
 
 COMMENT ON TABLE studydesign IS NULL;
+
+-- ================================================
+-- TABLE: studydesignprop
+-- ================================================
 
 create table studydesignprop (
     studydesignprop_id serial not null,
@@ -590,6 +720,10 @@ create index studydesignprop_idx2 on studydesignprop (type_id);
 
 COMMENT ON TABLE studydesignprop IS NULL;
 
+-- ================================================
+-- TABLE: studyfactor
+-- ================================================
+
 create table studyfactor (
     studyfactor_id serial not null,
     primary key (studyfactor_id),
@@ -604,6 +738,10 @@ create index studyfactor_idx1 on studyfactor (studydesign_id);
 create index studyfactor_idx2 on studyfactor (type_id);
 
 COMMENT ON TABLE studyfactor IS NULL;
+
+-- ================================================
+-- TABLE: studyfactorvalue
+-- ================================================
 
 create table studyfactorvalue (
     studyfactorvalue_id serial not null,
