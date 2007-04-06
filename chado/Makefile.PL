@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.112 2007-03-11 17:40:57 briano Exp $
+# $Id: Makefile.PL,v 1.113 2007-04-06 19:18:29 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -363,7 +363,8 @@ if (-e "$working_dir/../GMODTools") {
 
     chdir "$working_dir/../GMODTools";
 
-    system("ant", "gmodrel", "-Dgmod.dir=$working_dir");
+    system("ant", "gmodrel", "-Dgmod.dir=$working_dir") == 0 or
+        die "\n\n****************\nMoving tools from GMODTools directory faild; do you have ant intalled?\n****************\n\n";
     print "Done with GMODTools\n";
 
     chdir $working_dir;
