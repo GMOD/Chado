@@ -10,7 +10,7 @@ insert into organism (abbreviation, genus, species, common_name)
 insert into organism (abbreviation, genus, species, common_name)
        values ('R.norvegicus', 'Rattus','norvegicus','rat');
 insert into organism (abbreviation, genus, species, common_name)
-       values ('A.thaliana', 'Arabidopsis','thaliana','mustard weed');
+       values ('A.thaliana', 'Arabidopsis','thaliana','mouse-ear cress');
 insert into organism (abbreviation, genus, species, common_name)
        values ('C.elegans', 'Caenorhabditis','elegans','worm');
 insert into organism (abbreviation, genus, species, common_name)
