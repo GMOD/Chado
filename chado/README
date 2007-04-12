@@ -1,4 +1,4 @@
-$Id: README,v 1.13 2007-04-12 18:30:26 briano Exp $
+$Id: README,v 1.14 2007-04-12 19:01:50 briano Exp $
 
 INTRODUCTION
 ------------
@@ -98,12 +98,6 @@ You can send questions to the Chado mailing list:
 You can browse the schema CVS repository here:
 
     http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
-
-
-COPYRIGHT
----------
-This software is free.  You can use it under the terms of the
-Perl Artistic License.
 
 
 AUTHORS
