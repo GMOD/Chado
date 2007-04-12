@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.114 2007-04-06 19:22:03 scottcain Exp $
+# $Id: Makefile.PL,v 1.115 2007-04-12 17:00:30 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -499,7 +499,7 @@ WriteMakefile(
       'DBD::Pg'           => 1.49,
       'XML::Simple'       => 2.09,
       'Log::Log4perl'     => 0.39,
-      'DBIx::DBStag'      => 0.07,
+#     'DBIx::DBStag'      => 0.0001,
       'GO::Parser'        => 0,
     }, 
     'PL_FILES'            => {
