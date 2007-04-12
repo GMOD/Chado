@@ -1,9 +1,21 @@
-$Id: INSTALL.Custom,v 1.3 2007-02-20 17:37:08 briano Exp $
+$Id: INSTALL.Custom,v 1.4 2007-04-12 18:19:29 briano Exp $
 
 The Chado schema is organized as a set of modules where each module 
 has its own directory in chado/modules/. This structure is designed to allow
 the addition of custom modules to the Chado schema or to customize the 
 installation of Chado by module.
+
+You can interactively build a schema using chado-build-schema.pl and
+then install from source.  To do this, Makefile.PL will change and
+no longer ask 'do you want to use the default schema', instead, it 
+will assume that whatever schema is currently in the modules 
+directory is the one that will be used.  (It should no doubt
+issue a warning indicating that is what it is doing.)  In this 
+scenario, the schema building step takes place before `perl Makefile.PL`
+though we will probably want a command line flag to let Makefile.PL
+know that the default schema is not being used so that the Class::DBI 
+objects get rebuilt.
+
 
 CUSTOMIZATION USING AutoDBI.pl
 
