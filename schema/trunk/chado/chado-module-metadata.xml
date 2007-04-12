@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- $Id: chado-module-metadata.xml,v 1.21 2007-02-20 16:23:53 briano Exp $ -->
+<!-- $Id: chado-module-metadata.xml,v 1.22 2007-04-12 18:45:14 briano Exp $ -->
 <schema_metadata id='chado'>
 
   <title>Chado: A generic model organism database schema</title>
@@ -50,8 +50,6 @@
         <implements to='general-loading-api'/>
         <source type='plpgsql' path='general/functions/general-loading.plpgsql'/>
       </component>
-
-
     </module>
 
     <module id='cv' required='true'>
@@ -424,6 +422,7 @@
       <dependency to='pub'/>
       <dependency to='general'/>
       <dependency to='organism'/>
+      <dependency to='companalysis'/>	
       <status code='beta'>
         In use at IRRI
       </status>
@@ -448,8 +447,6 @@
         <implements to='phylogeny-dbapi'/>
         <source type='plpgsql' path='phylogeny/functions/phylo.plpgsql'/>
       </component>
-
-
     </module>
 
     <module id='contact'>
@@ -479,18 +476,21 @@
       <source type='sql' path='expression/expression.sql'/>
     </module>
 
-    <module id='rad'>
-      <dependency to='sequence'/>
-      <dependency to='cv'/>
-      <dependency to='pub'/>
-      <dependency to='general'/>
+    <module id='mage'>
+	      <dependency to='sequence'/>
+   	   <dependency to='cv'/>
+      	<dependency to='pub'/>
+      	<dependency to='general'/>
+ 			<dependency to='organism'/>
+ 			<dependency to='contact'/>
+ 			<dependency to='companalysis'/>
       <status code='beta'>
         In use at UCLA/Allen Day
       </status>
       <description>
         Alternative expression module, based on MAGE model
       </description>
-      <source type='sql' path='expression/rad.sql'/>
+      <source type='sql' path='mage/mage.sql'/>
     </module>
 
     <module id='stock'>
@@ -505,6 +505,19 @@
         For tracking stock collections
       </description>
       <source type='sql' path='stock/stock.sql'/>
+    </module>
+
+    <module id='library'>
+      <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='organism'/>
+      <status code='beta'>
+      </status>
+      <description>
+        For describing molecular libraries
+      </description>
+      <source type='sql' path='library/library.sql'/>
     </module>
 
     <module id='composite'>
@@ -544,8 +557,6 @@
           <source type='sql' path='sequence/views/range-views.sql'/>
         </component>
       </component>
-
-
     </module>
 
 <!--
