@@ -1,4 +1,4 @@
-The triggers contained in the apollo-triggers.sql file assign names according
+The triggers contained in the apollo-triggers.plpgsql file assign names according
 to the following rules:
 
 1. If the feature has 'prefix:temp' in the uniquename, it gets renamed using a
