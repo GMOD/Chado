@@ -1,4 +1,4 @@
--- $Id: phylogeny.sql,v 1.10 2007-04-02 01:57:06 briano Exp $
+-- $Id: phylogeny.sql,v 1.11 2007-04-12 17:00:30 briano Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -15,7 +15,7 @@
 -- :import pub from pub
 -- :import organism from organism
 -- :import dbxref from general
--- :import analysis from analysis
+-- :import analysis from companalysis
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -- ================================================
