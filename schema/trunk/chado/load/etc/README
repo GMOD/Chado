@@ -1,6 +1,7 @@
 
+Ontologies of feature props to use for chado. These may move to the SO
+CVS repository:
+
 feature_property.obo
 genbank_feature_property.obo
 
-Ontologies of feature props to use for chado. These may move to the SO
-CVS repository

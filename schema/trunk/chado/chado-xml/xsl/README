@@ -1,36 +1,25 @@
 chado-xml/xsl
-=============
+------------
 
 XSLT programs for transforming Chado-XML - either into other formats,
-or other Chado-XML forms (eg with or without macros)
+or other Chado-XML forms (eg with or without macros).
 
-See:
-http://www.w3.org/Style/XSL
+See: http://www.w3.org/Style/XSL
+
 
 Running an XSLT transformation
-------------------------------
+-------------------------
 
 You can use any xslt processor you like with these; both Xalan and
 xsltproc can be run from the command line. For integrating with an
 application, you can use Xalan (java) or Lib::XSLT (perl).
 
-Xalan can be downloaded from ...[TODO INSTRUCTIONS]
+Xalan can be downloaded from http://xml.apache.org/xalan-j
 
 xsltproc is part of libxslt, available from http://xmlsoft.org/XSLT/
 
 To run on the command line with xsltproc:
 
-----------
-cd gmod/schema/chado/chado-xml
-xsltproc xsl/chado-insert-macros.xsl examples/CG10833.expanded.chado-xml
-----------
-
-To run on the command line using Xalan:
-[TO BE WRITTEN]
-
-From a perl application:
-[TO BE WRITTEN]
-
-From a java application:
-[TO BE WRITTEN]
+ $ cd gmod/schema/chado/chado-xml
+ $ xsltproc xsl/chado-insert-macros.xsl examples/CG10833.expanded.chado-xml
 

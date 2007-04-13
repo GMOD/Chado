@@ -1,5 +1,3 @@
-chado/modules/sequence/bdgp
-===========================
 
 This directory is for BDGP extensions to Chado
 
@@ -17,5 +15,4 @@ The BDGP extensions currently comprise of
 
   so-views.sql                  -- portable SO view layer
 
-  [DOCUMENTATION FORTHCOMING]
 
