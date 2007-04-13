@@ -15,7 +15,7 @@ chado-xml/
         dtd/                    -- DTDs/XSDs defining the xml model
         examples/          -- example XML files
 
-The current documentation can be found at wiki.gmod.org.
+The current documentation can be found at gmod.org.
 
 See:
 
@@ -35,4 +35,4 @@ XML IDs that are valid within a particular document.
 See also
 --------
 
-gmod/XML-XORT
+gmod.org/XORT

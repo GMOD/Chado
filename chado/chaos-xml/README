@@ -1,4 +1,4 @@
-# $Id: README,v 1.4 2007-03-05 16:58:54 briano Exp $
+# $Id: README,v 1.5 2007-04-13 02:13:42 briano Exp $
 
 chaos-xml/README
 
@@ -106,7 +106,7 @@ Differences between Chaos XML and the Chado Relational Database Schema
    explanation of the meaning of the elements in Chaos-XML, please refer
    to the Chado documentation at wiki.gmod.org.
 
-   For a full explanation of the differences, see http://wiki.gmod.org/index.php/Chaos_XML
+   For a full explanation of the differences, see http://gmod.org//Chaos_XML
 
 Library Contents
 
@@ -157,14 +157,12 @@ Future Extensions
 
 Questions and Further info
 
-   For general info on the chado schema, see http://wiki.gmod.org
+   For general info on the chado schema, see http://gmod.org/Chado
 
    Send questions/comments to this mail list:
    
    http://lists.sourceforge.net/lists/listinfo/gmod-schema
-    _________________________________________________________________
 
 
    Chris Mungall
 
-   Last modified: Tue May 10 11:11:15 PDT 2005
