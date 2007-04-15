@@ -287,10 +287,8 @@ modules/sequence/views/sequence-report.sql
 modules/stock/stock.sql
 README
 README.Apollo
-README.gene_expression
-README.H_sapiens
+soi/README
 soi/cgi/get_xml.pl
-soi/readme
 soi/scripts/dump_fasta.pl
 soi/scripts/dump_segment.pl
 soi/scripts/generegion.pl
