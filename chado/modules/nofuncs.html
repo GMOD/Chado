@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (123 tables)
+	Table listing (126 tables)
  -->
 
 <a name="top" />
@@ -268,30 +268,6 @@
 
 <!-- 
 	End link to table 'organismprop'
- -->
-
-<!-- 
-	Start link to table 'organism_relationship'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="organism_relationship-link" href="#organism_relationship">organism_relationship</a></td>
-</tr>
-
-<!-- 
-	End link to table 'organism_relationship'
- -->
-
-<!-- 
-	Start link to table 'organismpath'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="organismpath-link" href="#organismpath">organismpath</a></td>
-</tr>
-
-<!-- 
-	End link to table 'organismpath'
  -->
 
 <!-- 
@@ -1243,18 +1219,6 @@
  -->
 
 <!-- 
-	Start link to table 'arraydesign_element'
- -->
-
-<tr class="LinkTableRow">
-	<td class="LinkTableCell"><a id="arraydesign_element-link" href="#arraydesign_element">arraydesign_element</a></td>
-</tr>
-
-<!-- 
-	End link to table 'arraydesign_element'
- -->
-
-<!-- 
 	Start link to table 'elementresult'
  -->
 
@@ -1506,6 +1470,78 @@
 	End link to table 'stockcollection_stock'
  -->
 
+<!-- 
+	Start link to table 'library'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="library-link" href="#library">library</a></td>
+</tr>
+
+<!-- 
+	End link to table 'library'
+ -->
+
+<!-- 
+	Start link to table 'library_synonym'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="library_synonym-link" href="#library_synonym">library_synonym</a></td>
+</tr>
+
+<!-- 
+	End link to table 'library_synonym'
+ -->
+
+<!-- 
+	Start link to table 'library_pub'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="library_pub-link" href="#library_pub">library_pub</a></td>
+</tr>
+
+<!-- 
+	End link to table 'library_pub'
+ -->
+
+<!-- 
+	Start link to table 'libraryprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="libraryprop-link" href="#libraryprop">libraryprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'libraryprop'
+ -->
+
+<!-- 
+	Start link to table 'library_cvterm'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="library_cvterm-link" href="#library_cvterm">library_cvterm</a></td>
+</tr>
+
+<!-- 
+	End link to table 'library_cvterm'
+ -->
+
+<!-- 
+	Start link to table 'library_feature'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="library_feature-link" href="#library_feature">library_feature</a></td>
+</tr>
+
+<!-- 
+	End link to table 'library_feature'
+ -->
+
 </table>
 
 <!-- 
@@ -1531,7 +1567,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado general module <br />
 	================================================ <br />
@@ -2148,7 +2184,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado cv module <br />
 	================================================================= <br />
@@ -3660,7 +3696,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado pub module <br />
 	================================================================= <br />
@@ -4639,7 +4675,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado organism module <br />
 	============ <br />
@@ -5118,375 +5154,6 @@ pattern. </td>
 <hr />
 
 <!-- 
-	Starting table 'organism_relationship'
- -->
-
-<a name="organism_relationship" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	organism_relationship
-</h3></td>
-		<a name="organism_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	================================================ <br />
-	TABLE: organism_relationship <br />
-	================================================
-</em>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism_relationship-organism_relationship_id">organism_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organism_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organism_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>organism_relationship_idx1</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organism_relationship_idx2</td>
-	<td>object_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organism_relationship_idx3</td>
-	<td>type_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_relationship_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'organismpath'
- -->
-
-<a name="organismpath" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	organismpath
-</h3></td>
-		<a name="organismpath"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<b>
-	Comments:
-</b>
-
-<br />
-
-<em>
-	<br />
-	================================================ <br />
-	TABLE: organismpath <br />
-	================================================
-</em>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismpath-organismpath_id">organismpath_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organismpath-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismpath-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="organismpath-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="organismpath-pathdistance">pathdistance</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>organismpath_idx1</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organismpath_idx2</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>organismpath_idx3</td>
-	<td>object_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organismpath_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, pathdistance</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
 	Starting table 'feature'
  -->
 
@@ -5509,7 +5176,7 @@ pattern. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -8990,7 +8657,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado companalysis module <br />
 	================================================================= <br />
@@ -9558,7 +9225,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
 	================================================================= <br />
@@ -10085,7 +9752,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
 	2006-04-11 <br />
@@ -11473,7 +11140,7 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado map module <br />
 	================================================================= <br />
@@ -12193,7 +11860,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -12207,6 +11874,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 	:import pub from pub <br />
 	:import organism from organism <br />
 	:import dbxref from general <br />
+	:import analysis from companalysis <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	================================================ <br />
 	TABLE: phylotree <br />
@@ -12274,6 +11942,15 @@ links to the feature (map) upon which the feature is being localized. </td>
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="phylotree-analysis_id">analysis_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -12339,6 +12016,11 @@ links to the feature (map) upon which the feature is being localized. </td>
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>analysis_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -13395,7 +13077,10 @@ links to the feature (map) upon which the feature is being localized. </td>
 	================================================ <br />
 	TABLE: phylonode_relationship <br />
 	================================================ <br />
-	This is for exotic relationships that are not strictly hierarchical; for example, horizontal gene transfer. Use of this table would be highly unusual; most phylogenetic trees are strictly hierarchical. Nevertheless, it is here for completeness. 
+	This is for 
+	relationships that are not strictly hierarchical; for example,
+	horizontal gene transfer. Most phylogenetic trees are strictly
+	hierarchical, nevertheless it is here for completeness. 
 </em>
 
 <table border="1">
@@ -13464,6 +13149,15 @@ links to the feature (map) upon which the feature is being localized. </td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phylonode_relationship-phylotree_id">phylotree_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
 </table>
@@ -13551,6 +13245,16 @@ links to the feature (map) upon which the feature is being localized. </td>
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>subject_id, object_id, type_id</td>
 </tr>
@@ -13582,7 +13286,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado contact module <br />
 	================================================================= <br />
@@ -13899,7 +13603,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado expression module <br />
 	================================================================= <br />
@@ -15386,7 +15090,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
+	========================================== <br />
+	Chado mage module <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import feature from sequence <br />
@@ -15399,6 +15105,9 @@ the default 0 value should be used. </td>
 	:import project from general <br />
 	:import analysis from companalysis <br />
 	================================================================= <br />
+	================================================ <br />
+	TABLE: mageml <br />
+	================================================ <br />
 	This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables. 
 </em>
 
@@ -15511,6 +15220,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: magedocumentation <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -15693,6 +15405,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: protocol <br />
+	================================================ <br />
 	Procedural notes on how data was prepared and processed. 
 </em>
 
@@ -15911,6 +15626,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: protocolparam <br />
+	================================================ <br />
 	Parameters related to a
 	protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration. 
 </em>
@@ -16112,6 +15830,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: channel <br />
+	================================================ <br />
 	Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one). 
 </em>
 
@@ -16229,6 +15950,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: arraydesign <br />
+	================================================ <br />
 	General properties about an array.
 	An array is a template used to generate physical slides, etc.  It
 	contains layout information, as well as global array properties, such
@@ -16326,7 +16050,7 @@ the default 0 value should be used. </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
+	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -16526,7 +16250,7 @@ the default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>name, version</td>
+	<td>name</td>
 </tr>
 
 </table>
@@ -16556,7 +16280,10 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	Extra array design properties that are not accounted for in arraydesign 
+	================================================ <br />
+	TABLE: arraydesignprop <br />
+	================================================ <br />
+	Extra array design properties that are not accounted for in arraydesign. 
 </em>
 
 <table border="1">
@@ -16733,6 +16460,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: assay <br />
+	================================================ <br />
 	An assay consists of a physical instance of
 	an array, combined with the conditions used to create the array
 	(protocols, technician information). The assay can be thought of as a hybridization. 
@@ -16972,6 +16702,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: assayprop <br />
+	================================================ <br />
 	Extra assay properties that are not accounted for in assay. 
 </em>
 
@@ -17149,6 +16882,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: assay_project <br />
+	================================================ <br />
 	Link assays to projects. 
 </em>
 
@@ -17303,6 +17039,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: biomaterial <br />
+	================================================ <br />
 	A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table. 
 </em>
 
@@ -17484,6 +17223,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: biomaterial_relationship <br />
+	================================================ <br />
 	Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance. 
 </em>
 
@@ -17662,6 +17404,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: biomaterialprop <br />
+	================================================ <br />
 	Extra biomaterial properties that are not accounted for in biomaterial. 
 </em>
 
@@ -17831,6 +17576,19 @@ the default 0 value should be used. </td>
 	</tr>
 </table>
 
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: biomaterial_dbxref <br />
+	================================================
+</em>
+
 <table border="1">
 
 <tr>
@@ -17982,7 +17740,11 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	A biomaterial may undergo multiple treatments. This can range from apoxia to fluorophore and biotin labeling. 
+	================================================ <br />
+	TABLE: treatment <br />
+	================================================ <br />
+	A biomaterial may undergo multiple
+	treatments. Examples of treatments: apoxia, fluorophore and biotin labeling. 
 </em>
 
 <table border="1">
@@ -18173,6 +17935,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: biomaterial_treatment <br />
+	================================================ <br />
 	Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value). 
 </em>
 
@@ -18369,6 +18134,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: assay_biomaterial <br />
+	================================================ <br />
 	A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays). 
 </em>
 
@@ -18556,6 +18324,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: acquisition <br />
+	================================================ <br />
 	This represents the scanning of hybridized material. The output of this process is typically a digital image of an array. 
 </em>
 
@@ -18751,6 +18522,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: acquisitionprop <br />
+	================================================ <br />
 	Parameters associated with image acquisition. 
 </em>
 
@@ -18928,6 +18702,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: acquisition_relationship <br />
+	================================================ <br />
 	Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this. 
 </em>
 
@@ -19129,6 +18906,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: quantification <br />
+	================================================ <br />
 	Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures. 
 </em>
 
@@ -19348,6 +19128,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: quantificationprop <br />
+	================================================ <br />
 	Extra quantification properties that are not accounted for in quantification. 
 </em>
 
@@ -19525,6 +19308,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: quantification_relationship <br />
+	================================================ <br />
 	There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where. 
 </em>
 
@@ -19703,6 +19489,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: control <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -19927,7 +19716,10 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	Represents a subcomponent of an assay platform that performs a measurement. For a microarray this is typically a region of the array coated or bound to DNA.  For another assay platform such as an in-situ hybridization of two probes, the two probes would be represented here.  The nullable foreign key constraint back to feature allows mapping of these measuring components back to the genome features they represent. 
+	================================================ <br />
+	TABLE: element <br />
+	================================================ <br />
+	Represents a feature of the array. This is typically a region of the array coated or bound to DNA. 
 </em>
 
 <table border="1">
@@ -20092,149 +19884,6 @@ the default 0 value should be used. </td>
 <hr />
 
 <!-- 
-	Starting table 'arraydesign_element'
- -->
-
-<a name="arraydesign_element" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	arraydesign_element
-</h3></td>
-		<a name="arraydesign_element"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_element_id">arraydesign_element_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign_element-arraydesign_id">arraydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign_element-element_id">element_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
-</tr>
-
-</table>
-
-<h3>
-	Indices
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Name
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>arraydesign_element_idx1</td>
-	<td>arraydesign_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>arraydesign_element_idx2</td>
-	<td>element_id</td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_element_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>arraydesign_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>element_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>element_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>arraydesign_id, element_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
 	Starting table 'elementresult'
  -->
 
@@ -20257,6 +19906,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: element_result <br />
+	================================================ <br />
 	An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit. 
 </em>
 
@@ -20430,6 +20082,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: element_relationship <br />
+	================================================ <br />
 	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
@@ -20636,6 +20291,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: elementresult_relationship <br />
+	================================================ <br />
 	Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance. 
 </em>
 
@@ -20842,6 +20500,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: study <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21033,6 +20694,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: study_assay <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21187,6 +20851,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: studydesign <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21321,6 +20988,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: studydesignprop <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21498,6 +21168,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: studyfactor <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21665,6 +21338,9 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: studyfactorvalue <br />
+	================================================ <br />
 	NULL
 </em>
 
@@ -21846,7 +21522,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.6 2007-03-23 15:18:01 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado stock module <br />
 	DEPENDENCIES <br />
@@ -23953,6 +23629,1090 @@ the default 0 value should be used. </td>
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>stockcollection_id, stock_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'library'
+ -->
+
+<a name="library" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	library
+</h3></td>
+		<a name="library"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	$Id: nofuncs.html,v 1.7 2007-04-16 16:24:11 scottcain Exp $ <br />
+	================================================================= <br />
+	Dependencies: <br />
+	:import feature from sequence <br />
+	:import synonym from sequence <br />
+	:import cvterm from cv <br />
+	:import pub from pub <br />
+	:import organism from organism <br />
+	================================================================= <br />
+	================================================ <br />
+	TABLE: library <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library-name">name</a></td>
+	<td class="FieldCellType">varchar</td>
+	<td class="FieldCellSize">255</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library-uniquename">uniquename</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The type_id foreign key links
+to a controlled vocabulary of library types. Examples of this would be: "cDNA_library" or "genomic_library" </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_name_ind1</td>
+	<td>name</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_idx1</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_idx2</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_idx3</td>
+	<td>uniquename</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>organism_id, uniquename, type_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'library_synonym'
+ -->
+
+<a name="library_synonym" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	library_synonym
+</h3></td>
+		<a name="library_synonym"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: library_synonym <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_synonym-library_synonym_id">library_synonym_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_synonym-synonym_id">synonym_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#synonym-synonym_id">synonym.synonym_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_synonym-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_synonym-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The pub_id link is for
+relating the usage of a given synonym to the publication in which it was used. </td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_synonym-is_current">is_current</a></td>
+	<td class="FieldCellType">boolean</td>
+	<td class="FieldCellSize">0</td>
+	<td class="FieldCellDefault">true</td>
+	<td class="FieldCellOther">NOT NULL, The is_current bit indicates whether the linked synonym is the current -official- symbol for the linked library. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_synonym-is_internal">is_internal</a></td>
+	<td class="FieldCellType">boolean</td>
+	<td class="FieldCellSize">0</td>
+	<td class="FieldCellDefault">false</td>
+	<td class="FieldCellOther">NOT NULL, Typically a synonym
+exists so that somebody querying the database with an obsolete name
+can find the object they are looking for under its current name.  If
+the synonym has been used publicly and deliberately (e.g. in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (e.g., there was a typo which went public), then the is_internal bit may be set to "true" so that it is known that the synonym is "internal" and should be queryable but should not be listed in reports as a valid synonym. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_synonym_idx1</td>
+	<td>synonym_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_synonym_idx2</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_synonym_idx3</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_synonym_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>synonym_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>synonym_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>is_current</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>is_internal</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>synonym_id, library_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'library_pub'
+ -->
+
+<a name="library_pub" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	library_pub
+</h3></td>
+		<a name="library_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: library_pub <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_pub-library_pub_id">library_pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_pub-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_pub-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_pub_idx1</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_pub_idx2</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>library_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'libraryprop'
+ -->
+
+<a name="libraryprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	libraryprop
+</h3></td>
+		<a name="libraryprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: libraryprop <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="libraryprop-libraryprop_id">libraryprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="libraryprop-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="libraryprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="libraryprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="libraryprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>libraryprop_idx1</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>libraryprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>libraryprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>library_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'library_cvterm'
+ -->
+
+<a name="library_cvterm" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	library_cvterm
+</h3></td>
+		<a name="library_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: library_cvterm <br />
+	================================================ <br />
+	The table library_cvterm links a library to controlled vocabularies which describe the library.  For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_cvterm-library_cvterm_id">library_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_cvterm-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_cvterm-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_cvterm-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_cvterm_idx1</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_cvterm_idx2</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_cvterm_idx3</td>
+	<td>pub_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>library_id, cvterm_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'library_feature'
+ -->
+
+<a name="library_feature" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	library_feature
+</h3></td>
+		<a name="library_feature"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: library_feature <br />
+	================================================ <br />
+	library_feature links a library to the clones which are contained in the library.  Examples of such linked features might be "cDNA_clone" or  "genomic_clone". 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_feature-library_feature_id">library_feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="library_feature-library_id">library_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="library_feature-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_feature_idx1</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>library_feature_idx2</td>
+	<td>feature_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>library_id, feature_id</td>
 </tr>
 
 </table>
