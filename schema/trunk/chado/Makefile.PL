@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
 
-# $Id: Makefile.PL,v 1.115 2007-04-12 17:00:30 briano Exp $
+# $Id: Makefile.PL,v 1.116 2007-04-16 16:24:10 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -647,7 +647,6 @@ html :: \
 	make $working_dir/modules/contact/contact.html \
 	make $working_dir/modules/cv/cv.html \
 	make $working_dir/modules/expression/expression.html \
-	make $working_dir/modules/expression/rad.html \
 	make $working_dir/modules/general/general.html \
 	make $working_dir/modules/genetic/genetic.html \
 	make $working_dir/modules/phenotype/phenotype.html \

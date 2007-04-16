@@ -1,4 +1,4 @@
--- $Id: library.sql,v 1.7 2007-03-16 01:28:38 briano Exp $
+-- $Id: library.sql,v 1.8 2007-04-16 16:24:12 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -29,7 +29,7 @@ create index library_idx1 on library (organism_id);
 create index library_idx2 on library (type_id);
 create index library_idx3 on library (uniquename);
 
-COMMENT ON COLUMN LIBRARY.TYPE_ID IS 'The type_id foreign key links
+COMMENT ON COLUMN library.type_id IS 'The type_id foreign key links
 to a controlled vocabulary of library types. Examples of this would be: "cDNA_library" or "genomic_library"';
 
 
@@ -54,10 +54,10 @@ create index library_synonym_idx1 on library_synonym (synonym_id);
 create index library_synonym_idx2 on library_synonym (library_id);
 create index library_synonym_idx3 on library_synonym (pub_id);
 
-COMMENT ON COLUMN LIBRARY_SYNONYM.IS_CURRENT IS 'The is_current bit indicates whether the linked synonym is the current -official- symbol for the linked library.';
-COMMENT ON COLUMN LIBRARY_SYNONYM.PUB_ID IS 'The pub_id link is for
+COMMENT ON COLUMN library_synonym.is_current IS 'The is_current bit indicates whether the linked synonym is the current -official- symbol for the linked library.';
+COMMENT ON COLUMN library_synonym.pub_id IS 'The pub_id link is for
 relating the usage of a given synonym to the publication in which it was used.';
-COMMENT ON COLUMN LIBRARY_SYNONYM.IS_INTERNAL IS 'Typically a synonym
+COMMENT ON COLUMN library_synonym.is_internal IS 'Typically a synonym
 exists so that somebody querying the database with an obsolete name
 can find the object they are looking for under its current name.  If
 the synonym has been used publicly and deliberately (e.g. in a paper), it my also be listed in reports as a synonym.   If the synonym was not used deliberately (e.g., there was a typo which went public), then the is_internal bit may be set to "true" so that it is known that the synonym is "internal" and should be queryable but should not be listed in reports as a valid synonym.';
@@ -118,7 +118,7 @@ create index library_cvterm_idx1 on library_cvterm (library_id);
 create index library_cvterm_idx2 on library_cvterm (cvterm_id);
 create index library_cvterm_idx3 on library_cvterm (pub_id);
 
-COMMENT ON TABLE LIBRARY_CVTERM IS 'The table library_cvterm links a library to controlled vocabularies which describe the library.  For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library.';
+COMMENT ON TABLE library_cvterm IS 'The table library_cvterm links a library to controlled vocabularies which describe the library.  For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library.';
 
 
 -- ================================================
@@ -137,4 +137,4 @@ create table library_feature (
 create index library_feature_idx1 on library_feature (library_id);
 create index library_feature_idx2 on library_feature (feature_id);
 
-COMMENT ON TABLE LIBRARY_FEATURE IS 'library_feature links a library to the clones which are contained in the library.  Examples of such linked features might be "cDNA_clone" or  "genomic_clone".';
+COMMENT ON TABLE library_feature IS 'library_feature links a library to the clones which are contained in the library.  Examples of such linked features might be "cDNA_clone" or  "genomic_clone".';

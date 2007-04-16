@@ -1,4 +1,4 @@
-$Id: INSTALL.Custom,v 1.4 2007-04-12 18:19:29 briano Exp $
+$Id: INSTALL.Custom,v 1.5 2007-04-16 16:24:07 scottcain Exp $
 
 The Chado schema is organized as a set of modules where each module 
 has its own directory in chado/modules/. This structure is designed to allow
@@ -61,7 +61,7 @@ Answer 'No' to the 'Use the simple install' question.
   >make graphviz_svg
   >find . -name "*.graphviz.svg" -path "*modules*" -exec cp '{}' doc/diagrams/ ';'
 
-7. Make schema diagrams
+7. Make schema html-based documentation
 
   >make html
 

@@ -151,7 +151,7 @@
 
 <em>
 	<br />
-	$Id: phylogeny.html,v 1.4 2007-03-23 15:18:02 scottcain Exp $ <br />
+	$Id: phylogeny.html,v 1.5 2007-04-16 16:24:12 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -165,6 +165,7 @@
 	:import pub from pub <br />
 	:import organism from organism <br />
 	:import dbxref from general <br />
+	:import analysis from companalysis <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	================================================ <br />
 	TABLE: phylotree <br />
@@ -232,6 +233,15 @@
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="phylotree-analysis_id">analysis_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -297,6 +307,11 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>analysis_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1353,7 +1368,10 @@
 	================================================ <br />
 	TABLE: phylonode_relationship <br />
 	================================================ <br />
-	This is for exotic relationships that are not strictly hierarchical; for example, horizontal gene transfer. Use of this table would be highly unusual; most phylogenetic trees are strictly hierarchical. Nevertheless, it is here for completeness. 
+	This is for 
+	relationships that are not strictly hierarchical; for example,
+	horizontal gene transfer. Most phylogenetic trees are strictly
+	hierarchical, nevertheless it is here for completeness. 
 </em>
 
 <table border="1">
@@ -1422,6 +1440,15 @@
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phylonode_relationship-phylotree_id">phylotree_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
 </table>
@@ -1506,6 +1533,16 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
