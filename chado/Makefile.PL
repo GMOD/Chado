@@ -1,7 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-
-# $Id: Makefile.PL,v 1.116 2007-04-16 16:24:10 scottcain Exp $
+# $Id: Makefile.PL,v 1.117 2007-04-19 21:21:09 briano Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -588,11 +587,11 @@ graphviz :: \
 	make $working_dir/modules/contact/contact.graphviz.png \
 	make $working_dir/modules/cv/cv.graphviz.png \
 	make $working_dir/modules/expression/expression.graphviz.png \
-	make $working_dir/modules/expression/rad.graphviz.png \
 	make $working_dir/modules/general/general.graphviz.png \
 	make $working_dir/modules/genetic/genetic.graphviz.png \
 	make $working_dir/modules/phenotype/phenotype.graphviz.png \
 	make $working_dir/modules/library/library.graphviz.png \
+	make $working_dir/modules/mage/mage.graphviz.png \
 	make $working_dir/modules/map/map.graphviz.png \
 	make $working_dir/modules/organism/organism.graphviz.png \
 	make $working_dir/modules/phenotype/phenotype.graphviz.png \
@@ -608,10 +607,10 @@ graphviz_svg :: \
 	make $working_dir/modules/contact/contact.graphviz.svg \
 	make $working_dir/modules/cv/cv.graphviz.svg \
 	make $working_dir/modules/expression/expression.graphviz.svg \
-	make $working_dir/modules/expression/rad.graphviz.svg \
 	make $working_dir/modules/general/general.graphviz.svg \
 	make $working_dir/modules/genetic/genetic.graphviz.svg \
 	make $working_dir/modules/library/library.graphviz.svg \
+	make $working_dir/modules/mage/mage.graphviz.svg \
 	make $working_dir/modules/map/map.graphviz.svg \
 	make $working_dir/modules/organism/organism.graphviz.svg \
 	make $working_dir/modules/phenotype/phenotype.graphviz.svg \
@@ -627,10 +626,10 @@ diagram :: \
 	make $working_dir/modules/contact/contact.diagram.png \
 	make $working_dir/modules/cv/cv.diagram.png \
 	make $working_dir/modules/expression/expression.diagram.png \
-	make $working_dir/modules/expression/rad.diagram.png \
 	make $working_dir/modules/general/general.diagram.png \
 	make $working_dir/modules/genetic/genetic.diagram.png \
 	make $working_dir/modules/library/library.diagram.png \
+	make $working_dir/modules/mage/mage.diagram.png \
 	make $working_dir/modules/map/map.diagram.png \
 	make $working_dir/modules/organism/organism.diagram.png \
 	make $working_dir/modules/phenotype/phenotype.diagram.png \
@@ -651,6 +650,7 @@ html :: \
 	make $working_dir/modules/genetic/genetic.html \
 	make $working_dir/modules/phenotype/phenotype.html \
 	make $working_dir/modules/library/library.html \
+	make $working_dir/modules/mage/mage.html \
 	make $working_dir/modules/map/map.html \
 	make $working_dir/modules/organism/organism.html \
 	make $working_dir/modules/phenotype/phenotype.html \
@@ -666,11 +666,11 @@ tex :: \
 	make $working_dir/modules/contact/contact.tex \
 	make $working_dir/modules/cv/cv.tex \
 	make $working_dir/modules/expression/expression.tex \
-	make $working_dir/modules/expression/rad.tex \
 	make $working_dir/modules/general/general.tex \
 	make $working_dir/modules/genetic/genetic.tex \
 	make $working_dir/modules/phenotype/phenotype.tex \
 	make $working_dir/modules/library/library.tex \
+	make $working_dir/modules/mage/mage.tex \
 	make $working_dir/modules/map/map.tex \
 	make $working_dir/modules/organism/organism.tex \
 	make $working_dir/modules/phenotype/phenotype.tex \
