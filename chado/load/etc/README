@@ -1,6 +1,10 @@
 
-Ontologies of feature props to use for chado. These may move to the SO
-CVS repository:
+Ontologies of feature properties to use for chado. The point of these
+controlled vocabularies is to try to capture the terms you would
+typically find as tags in a GFF file or GenBank entry. As such these
+are not as coherent or uniform as the known OBO ontologies.
+
+These may move to the SO CVS repository:
 
 feature_property.obo
 genbank_feature_property.obo
