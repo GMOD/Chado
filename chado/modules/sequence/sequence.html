@@ -271,7 +271,7 @@
 
 <em>
 	<br />
-	$Id: sequence.html,v 1.4 2007-03-16 01:28:38 briano Exp $ <br />
+	$Id: sequence.html,v 1.5 2007-04-20 13:31:37 briano Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -1846,7 +1846,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature. </td>
+	<td class="FieldCellOther">True if this secondary dbxref is the most up to date accession in the corresponding db. Retired accessions should set this field to false.</td>
 	<td class="FieldCellFK"></td>
 </tr>
 

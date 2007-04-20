@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.64 2007-02-26 04:09:30 briano Exp $
+-- $Id: sequence.sql,v 1.65 2007-04-20 13:31:37 briano Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -369,7 +369,7 @@ create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
 
 COMMENT ON TABLE feature_dbxref IS 'Links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id.';
 
-COMMENT ON COLUMN feature_dbxref.is_current IS 'The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature.';
+COMMENT ON COLUMN feature_dbxref.is_current IS 'True if this secondary dbxref is the most up to date accession in the corresponding db. Retired accessions should set this field to false';
 
 
 -- ================================================
