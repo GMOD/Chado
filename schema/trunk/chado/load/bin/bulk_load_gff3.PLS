@@ -34,6 +34,7 @@ print OUT <<'!NO!SUBS!';
 
 use strict;
 use warnings;
+use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
@@ -650,6 +651,7 @@ else {
        or die "$ORGANISM organism not found in the database";
 }
 
+my $processing_CDS = 0;
 my $feature_iterator; my $itern=0; my %seen_organism;
 FEATURE:
 while(my $feature = 
@@ -675,6 +677,7 @@ while(my $feature =
   $itern++;
   warn(join(",","f".$itern,$featuretype,$feature->seq_id->value),"\n") if $DEBUG;
 
+  $seen_exon= 1 if $featuretype =~ /exon$/ and !$processing_CDS;
   if ($featuretype =~ /(CDS|UTR)/) {
     my $continue_on = $chado->handle_CDS($feature);
     $seen_cds = 1 if !$seen_cds && $featuretype =~ /CDS/;
@@ -693,9 +696,7 @@ END
     }
   }
 
-  $seen_exon= 1 if $featuretype =~ /exon$/;
-
-  if ( $seen_cds && $seen_exon && !$NOEXON ) {
+  if ( $seen_cds && $seen_exon && !$NOEXON && !$processing_CDS) {
     warn "\n\nThere are both CDS and exon features in this file, but\n"
         ."you did not set the --noexon option, which you probably want.\n"
         ."Please see `perldoc gmod_bulk_load_gff3.pl for more information.\n\n";
@@ -836,7 +837,10 @@ END
   $chado->nextfeature('++');
 }
 
-goto FEATURE if ($feature_iterator = $chado->process_CDS() );
+if ($feature_iterator = $chado->process_CDS() ) {
+    $processing_CDS=1;
+    goto FEATURE;
+}
 
 $chado->end_files();
 
