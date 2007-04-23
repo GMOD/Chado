@@ -3483,6 +3483,7 @@ None.
 sub process_CDS {
     my $self = shift;
 
+#    $self->dbh->commit && die;
     return unless $self->cds_db_exists;
 
     my $dbh  = $self->dbh;
