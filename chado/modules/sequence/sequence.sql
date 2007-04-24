@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.65 2007-04-20 13:31:37 briano Exp $
+-- $Id: sequence.sql,v 1.66 2007-04-24 15:16:13 briano Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -48,7 +48,8 @@ section of a biological sequence, or a collection of such
 sections. Examples include genes, exons, transcripts, regulatory
 regions, polypeptides, protein domains, chromosome sequences, sequence
 variations, cross-genome match regions such as hits and HSPs and so
-on; see the Sequence Ontology for more.';
+on; see the Sequence Ontology for more. The combination of
+organism_id, uniquename and type_id should be unique.';
 
 COMMENT ON COLUMN feature.dbxref_id IS 'An optional primary public stable
 identifier for this feature. Secondary identifiers and external
