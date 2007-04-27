@@ -1,4 +1,4 @@
--- $Id: phenotype.sql,v 1.5 2007-03-01 04:15:26 briano Exp $
+-- $Id: phenotype.sql,v 1.6 2007-04-27 16:09:46 emmert Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -53,7 +53,8 @@ CREATE TABLE phenotype_cvterm (
     FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
     cvterm_id INT NOT NULL,
     FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
-    CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id)
+    rank int not null default 0,
+    CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id, rank)
 );
 CREATE INDEX phenotype_cvterm_idx1 ON phenotype_cvterm (phenotype_id);
 CREATE INDEX phenotype_cvterm_idx2 ON phenotype_cvterm (cvterm_id);

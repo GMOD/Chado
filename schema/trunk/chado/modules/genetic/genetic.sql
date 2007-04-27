@@ -1,4 +1,4 @@
--- $Id: genetic.sql,v 1.28 2007-03-01 03:17:19 briano Exp $
+-- $Id: genetic.sql,v 1.29 2007-04-27 16:09:46 emmert Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -112,6 +112,9 @@ create index environment_cvterm_idx2 on environment_cvterm (cvterm_id);
 
 COMMENT ON TABLE environment_cvterm IS NULL;
 
+-- ================================================
+-- TABLE: phenstatement
+-- ================================================
 CREATE TABLE phenstatement (
     phenstatement_id SERIAL NOT NULL,
     primary key (phenstatement_id),
@@ -132,6 +135,9 @@ CREATE INDEX phenstatement_idx2 ON phenstatement (phenotype_id);
 
 COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.';
 
+-- ================================================
+-- TABLE: phendesc
+-- ================================================
 CREATE TABLE phendesc (
     phendesc_id SERIAL NOT NULL,
     primary key (phendesc_id),
@@ -152,6 +158,9 @@ CREATE INDEX phendesc_idx3 ON phendesc (pub_id);
 
 COMMENT ON TABLE phendesc IS 'A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication.';
 
+-- ================================================
+-- TABLE: phenotype_comparison
+-- ================================================
 CREATE TABLE phenotype_comparison (
     phenotype_comparison_id SERIAL NOT NULL,
     primary key (phenotype_comparison_id),
@@ -167,11 +176,11 @@ CREATE TABLE phenotype_comparison (
         FOREIGN KEY (phenotype1_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
     phenotype2_id INT,
         FOREIGN KEY (phenotype2_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    type_id INT NOT NULL,
-        FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     pub_id INT NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
-    CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
+    organism_id INT NOT NULL,
+    FOREIGN KEY (organism_id) REFERENCES organism (organism_id) ON DELETE CASCADE,
+    CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,pub_id)
 );
 CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
 CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
@@ -179,3 +188,20 @@ CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
 CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 
 COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2.';
+
+-- ================================================
+-- TABLE: phenotype_comparison_cvterm
+-- ================================================
+CREATE TABLE phenotype_comparison_cvterm (
+    pub_id INT NOT NULL,
+    phenotype_comparison_cvterm_id serial not null,
+    primary key (phenotype_comparison_cvterm_id),
+    phenotype_comparison_id int not null,
+    FOREIGN KEY (phenotype_comparison_id) references phenotype_comparison (phenotype_comparison_id) on delete cascade,
+    cvterm_id int not null,
+    FOREIGN KEY (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    rank int not null default 0,
+    CONSTRAINT phenotype_comparison_cvterm_c1 unique (phenotype_comparison_id, cvterm_id)
+);
+CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
+CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
