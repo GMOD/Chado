@@ -8,6 +8,9 @@ use Data::Dumper;
 use URI::Escape;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
+
+use base 'Bio::Root::Root';
+
 ## dgg## use FreezeThaw qw( freeze thaw safeFreeze ); ## see below; Data::Dumper is better
 
 #set lots of package-wide variables: # dgg; drop these for $self->{nextoid}{$table}  
@@ -85,7 +88,7 @@ my %copystring = (
 #------------ END Table Entries ------------------------------
 
 ## dgg; see sub file_handles
-my %files = map { $_ => 'FH'.$_; } @tables,'sequence'; # SEQ special case in feature table 
+my %files = map { $_ => 'FH'.$_; } @tables,'sequence','delete'; # SEQ special case in feature table 
 # (
 #    feature              => 'F', 
 #    featureloc           => 'FLOC',
@@ -201,7 +204,7 @@ sub new {
         $dbpass,
         {AutoCommit => $notrans,
          TraceLevel => 0}
-    ) or die;
+    ) or $self->throw("couldn't connect to the database");
 
     $self->dbh($dbh);
 
@@ -352,7 +355,7 @@ sub constraint {
     if ($constraint eq 'feature_synonym_c1' ||
         $constraint eq 'feature_dbxref_c1'  ||
         $constraint eq 'feature_cvterm_c1') {
-        die "wrong number of constraint terms" if (@terms != 2);
+        $self->throw( "wrong number of constraint terms") if (@terms != 2);
         if ($self->{$constraint}{$terms[0]}{$terms[1]}) {
             return 0; #this combo is already in the constraint
         }
@@ -362,7 +365,7 @@ sub constraint {
         }
     }
     elsif ($constraint eq 'featureprop_c1') {
-        die "wrong number of constraint terms" if (@terms != 3);
+        $self->throw("wrong number of constraint terms") if (@terms != 3);
         if ($self->{$constraint}{$terms[0]}{$terms[1]}{$terms[2]}) {
             return 0; #this combo is already in the constraint
         }
@@ -372,7 +375,7 @@ sub constraint {
         }
     }
     else {
-        die "I don't know how to deal with the constraint $constraint: typo?";
+        $self->throw("I don't know how to deal with the constraint $constraint: typo?");
     }
 }
 
@@ -2130,6 +2133,15 @@ END
 ;
 }
 
+sub print_delete {
+  my $self = shift;
+  my $feature_id = shift;
+
+  my $fh = $self->file_handles('delete');
+  print $fh "DELETE FROM feature WHERE feature_id = $feature_id;\n";
+  return;
+}
+
 sub print_seq {
   my $self = shift;
   my ($name,$string) = @_;
@@ -2616,6 +2628,11 @@ sub load_data {
 #    "cv"               => $nextcvname, #dgg
 #   );
 
+  $self->file_handles('delete')->autoflush;
+  if (-s $self->file_handles('delete')->filename > 0) {
+      warn "Processing deletes ...\n";
+      $self->load_deletes();
+  }
 
   foreach my $table (@tables) {
     $self->file_handles($files{$table})->autoflush;
@@ -2685,13 +2702,13 @@ sub copy_from_stdin {
                    "-p " . $self->dbport() . " " .
                    "-U " . $self->dbuser() . " " .
                    "-d " . $self->dbname()   )
-      && die "FAILED: loading $file failed (error:$!); I can't go on\n";
+      && $self->throw("FAILED: loading $file failed (error:$!); I can't go on");
   }
   else {
 
     my $query = "COPY $table $fields FROM STDIN;";
     #warn "\t".$query;
-    $dbh->do($query) or die "Error when executing: $query: $!\n";
+    $dbh->do($query) or $self->throw("Error when executing: $query: $!");
 
     while (<$fh>) {
       if ( ! ($dbh->pg_putline($_)) ) {
@@ -2699,15 +2716,15 @@ sub copy_from_stdin {
         $dbh->pg_endcopy;
         $dbh->rollback;
         $dbh->disconnect;
-        die "error while copying data's of file $file, line $.\n";
+        $self->throw("error while copying data's of file $file, line $.");
       } #putline returns 1 if succesful
     }
-    $dbh->pg_endcopy or die "calling endcopy for $table failed: $!\n";
+    $dbh->pg_endcopy or $self->throw("calling endcopy for $table failed: $!");
 
   }
   #update the sequence so that later inserts will work
   $dbh->do("SELECT setval('$sequence', $nextval) FROM $table")
-    or die "Error when executing:  setval('$sequence', $nextval) FROM $table: $!\n"; 
+    or $self->throw("Error when executing:  setval('$sequence', $nextval) FROM $table: $!"); 
 }
 
 sub load_sequence {
@@ -2715,6 +2732,17 @@ sub load_sequence {
     my $dbh  = $self->dbh();
     warn "Loading sequences (if any) ...\n";
     my $fh = $self->file_handles('sequence'); # 'SEQ'
+    seek($fh,0,0);
+    while (<$fh>) {
+        chomp;
+        $dbh->do($_);
+    }
+}
+
+sub load_deletes {
+    my $self = shift;
+    my $dbh  = $self->dbh();
+    my $fh = $self->file_handles('delete');
     seek($fh,0,0);
     while (<$fh>) {
         chomp;
@@ -3859,6 +3887,82 @@ sub handle_derives_from {
     }
 }
 
+sub handle_crud {
+    my $self = shift;
+    my $feature = shift;
+
+    my ($op) = $feature->annotation->get_Annotations('CRUD');
+    $op = $op->value;
+
+    my ($name) = $feature->annotation->get_Annotations('Name');
+    $name = $name->value;
+    my $type   = $feature->type->name;
+    
+    if ($op =~ /delete/) {
+        #determine if a single feature corresponds to what is in the gff line
+        #it is considered to be the same if the type, name (or synonym)
+        #and organism are the same
+
+        #this sql should be moved to the prepared sql hash after debugging is done
+        my $sql = "SELECT feature_id FROM feature
+                   WHERE name = ? and type_id = ? and organism_id = ?";
+        my $delete_query_handle = $self->dbh->prepare($sql);
+        $delete_query_handle->execute($name,
+                                      $self->get_type($type),
+                                      $self->organism_id);
+        my $feature_id_arrayref = $delete_query_handle->fetchall_arrayref;
+        my $feature_id;
+        if (scalar @{$feature_id_arrayref} > 1 and $op != 'delete-all') {
+            $self->throw("I can't figure out which feature to delete that corresponds to a feature with a name of $name, a type of $type and organism of ".$self->organism.".  More than one feature match these criteria");
+        }
+        elsif (scalar @{$feature_id_arrayref} > 1) {
+            warn "Deleting all features with name $name, type $type and organism ".$self->organism."\n";
+            for my $id_row (@{$feature_id_arrayref}) {
+                my $feature_id = $$id_row[0];
+                $self->print_delete($$id_row[0]) if $feature_id;
+            }
+            return 1;
+        }
+        elsif (scalar @{$feature_id_arrayref} == 0) {
+            warn("Searching for a feature with the name $name to delete yielded nothing; checking synonyms...");
+            $sql = "SELECT f.feature_id 
+                    FROM feature f, feature_synonym fs, synonym s
+                    WHERE s.name = ? and 
+                          s.synonym_id = fs.synonym_id and
+                          fs.feature_id = f.feature_id and
+                          f.type_id = ? and f.organism_id = ?"; 
+            my $delete_by_syn_query_handle = $self->dbh->prepare($sql);
+            $delete_by_syn_query_handle->execute($name,
+                                                 $self->get_type($type),
+                                                 $self->organism_id);
+            $feature_id_arrayref = $delete_by_syn_query_handle->fetchall_arrayref;
+            if (scalar @{$feature_id_arrayref} > 1) {
+                $self->throw("I couldn't figure out which feature to delete when searching by synonym $name; I found more than one matching feature");
+            } 
+            elsif (scalar @{$feature_id_arrayref} == 0) {
+                $self->throw("I couldn't find a matching feature using either feature.name or synonym.name of $name and a type of $type and organism of ".$self->organism.".  I can't go on... Bye.");
+            }
+            else { 
+                ($feature_id) = $$feature_id_arrayref[0];
+            }
+        }
+        else {
+            ($feature_id) = $$feature_id_arrayref[0];
+        }
+
+        $self->print_delete($feature_id);
+        return 1;
+    }
+    elsif ($op eq 'replace' or $op eq 'update') {
+        $self->throw("The CRUD operation $op is not supported yet");
+    }
+    elsif ($op eq 'create') {
+        return 0;  #nothing to do--create is the default
+    }
+    else {
+        $self->throw("I don't know what to do for the CRUD operation $op");
+    } 
+}
 
 sub src_second_chance {
     my $self = shift;
@@ -3879,7 +3983,7 @@ sub src_second_chance {
         $self->{queries}{count_name}->execute($feature->seq_id->value);
         my ($n_rows) = $self->{queries}{count_name}->fetchrow_array;
         if (1 < $n_rows) {
-          die "more that one source for ".$feature->seq_id->value;
+          $self->throw( "more that one source for ".$feature->seq_id->value );
         } elsif ( 1==$n_rows) {
           $self->{queries}{search_name}->execute($feature->seq_id->value);
           my ($tmp_source) = $self->{queries}{search_name}->fetchrow_array;
@@ -3909,7 +4013,7 @@ sub get_type {
 
     return $tmp_type if defined $tmp_type;
 
-    die "no cvterm for ".$featuretype;
+    $self->throw( "no cvterm for ".$featuretype );
 }
 
 sub get_src_seqlen {
@@ -4003,10 +4107,10 @@ sub sorter_get_refseqs {
     my $self = shift;
     my $dbh  = $self->dbh;
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE refseq = id") or die;
-    $sth->execute or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE refseq = id") or $self->throw();
+    $sth->execute or $self->throw();
 
-    my $result = $sth->fetchall_arrayref or die;
+    my $result = $sth->fetchall_arrayref or $self->throw();
 
     my @to_return = map { $$_[0] } @$result; 
    
@@ -4017,17 +4121,17 @@ sub sorter_get_no_parents {
     my $self = shift;
     my $dbh  = $self->dbh;
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE id is null and parent is null") or die; 
-    $sth->execute or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline FROM gff_sort_tmp WHERE id is null and parent is null") or $self->throw(); 
+    $sth->execute or $self->throw();
     
-    my $result = $sth->fetchall_arrayref or die;
+    my $result = $sth->fetchall_arrayref or $self->throw();
 
     my @to_return = map { $$_[0] } @$result;
 
-    $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent is null and refseq != id order by id") or die;
-    $sth->execute or die;
+    $sth  = $dbh->prepare("SELECT distinct gffline,id FROM gff_sort_tmp WHERE parent is null and refseq != id order by id") or $self->throw();
+    $sth->execute or $self->throw();
 
-    $result = $sth->fetchall_arrayref or die;
+    $result = $sth->fetchall_arrayref or $self->throw();
 
     push @to_return, map { $$_[0] } @$result;
 
@@ -4040,10 +4144,10 @@ sub sorter_get_second_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or die;
-    $sth->execute or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or $self->throw();
+    $sth->execute or $self->throw();
 
-    my $result = $sth->fetchall_arrayref or die;
+    my $result = $sth->fetchall_arrayref or $self->throw();
 
     my @to_return = map { $$_[0] } @$result;
 
@@ -4056,10 +4160,10 @@ sub sorter_get_third_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or die;
-    $sth->execute or die;
+    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or $self->throw();
+    $sth->execute or $self->throw();
 
-    my $result = $sth->fetchall_arrayref or die;
+    my $result = $sth->fetchall_arrayref or $self->throw();
 
     my @to_return = map { $$_[0] } @$result;
 
