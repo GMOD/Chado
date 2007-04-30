@@ -672,7 +672,12 @@ while(my $feature =
         or die "$ORGANISM organism not found in the database";
       }
   }
-  
+
+  if($feature->annotation->get_Annotations('CRUD')) {
+    my $continue = $chado->handle_crud($feature);
+    next if $continue == 1;  #that is, this was a delete or update operation
+                             #and it is done
+  }
   
   $itern++;
   warn(join(",","f".$itern,$featuretype,$feature->seq_id->value),"\n") if $DEBUG;
