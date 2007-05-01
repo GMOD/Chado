@@ -3911,8 +3911,9 @@ sub handle_crud {
                                       $self->get_type($type),
                                       $self->organism_id);
         my $feature_id_arrayref = $delete_query_handle->fetchall_arrayref;
+
         my $feature_id;
-        if (scalar @{$feature_id_arrayref} > 1 and $op != 'delete-all') {
+        if (scalar @{$feature_id_arrayref} > 1 and $op ne 'delete-all') {
             $self->throw("I can't figure out which feature to delete that corresponds to a feature with a name of $name, a type of $type and organism of ".$self->organism.".  More than one feature match these criteria");
         }
         elsif (scalar @{$feature_id_arrayref} > 1) {
@@ -3924,32 +3925,33 @@ sub handle_crud {
             return 1;
         }
         elsif (scalar @{$feature_id_arrayref} == 0) {
-            warn("Searching for a feature with the name $name to delete yielded nothing; checking synonyms...");
-            $sql = "SELECT f.feature_id 
-                    FROM feature f, feature_synonym fs, synonym s
-                    WHERE s.name = ? and 
-                          s.synonym_id = fs.synonym_id and
-                          fs.feature_id = f.feature_id and
-                          f.type_id = ? and f.organism_id = ?"; 
-            my $delete_by_syn_query_handle = $self->dbh->prepare($sql);
-            $delete_by_syn_query_handle->execute($name,
-                                                 $self->get_type($type),
-                                                 $self->organism_id);
-            $feature_id_arrayref = $delete_by_syn_query_handle->fetchall_arrayref;
-            if (scalar @{$feature_id_arrayref} > 1) {
-                $self->throw("I couldn't figure out which feature to delete when searching by synonym $name; I found more than one matching feature");
-            } 
-            elsif (scalar @{$feature_id_arrayref} == 0) {
-                $self->throw("I couldn't find a matching feature using either feature.name or synonym.name of $name and a type of $type and organism of ".$self->organism.".  I can't go on... Bye.");
-            }
-            else { 
-                ($feature_id) = $$feature_id_arrayref[0];
-            }
+            warn "Couldn't fined a matching feature with name $name, type $type and organism ".$self->organism."\n";
+            return 1;
+#            warn("Searching for a feature with the name $name to delete yielded nothing; checking synonyms...");
+#            $sql = "SELECT f.feature_id 
+#                    FROM feature f, feature_synonym fs, synonym s
+#                    WHERE s.name = ? and 
+#                          s.synonym_id = fs.synonym_id and
+#                          fs.feature_id = f.feature_id and
+#                          f.type_id = ? and f.organism_id = ?"; 
+#            my $delete_by_syn_query_handle = $self->dbh->prepare($sql);
+#            $delete_by_syn_query_handle->execute($name,
+#                                                 $self->get_type($type),
+#                                                 $self->organism_id);
+#            $feature_id_arrayref = $delete_by_syn_query_handle->fetchall_arrayref;
+#            if (scalar @{$feature_id_arrayref} > 1) {
+#                $self->throw("I couldn't figure out which feature to delete when searching by synonym $name; I found more than one matching feature");
+#            } 
+#            elsif (scalar @{$feature_id_arrayref} == 0) {
+#                $self->throw("I couldn't find a matching feature using either feature.name or synonym.name of $name and a type of $type and organism of ".$self->organism.".  I can't go on... Bye.");
+#            }
+#            else { 
+#                ($feature_id) = $$feature_id_arrayref[0];
+#            }
         }
         else {
-            ($feature_id) = $$feature_id_arrayref[0];
+            $feature_id = $$feature_id_arrayref[0][0];
         }
-
         $self->print_delete($feature_id);
         return 1;
     }

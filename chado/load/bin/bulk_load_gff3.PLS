@@ -359,6 +359,42 @@ As an indication of the speed differences involved, loading
 yeast GFF3 annotations (about 16K rows), it takes about 5 times
 longer using INSERTs versus COPY on my laptop.
 
+=item Deletes and updates via GFF
+
+There is rudimentary support for modifying the features in an
+existing database via GFF.  Currently, there is only support for
+deleting.  In order to delete, the GFF line must have a custom
+tag in the ninth column, 'CRUD' (for Create, Replace, Update and
+Delete) and have a recognized value.  Currently the two recognized
+values are CRUD=delete and CRUD=delete-all.  IMPORTANT NOTE: Using the
+delete operations have the potential of creating orphan features (eg,
+exons whose gene has been deleted).  You should be careful to make
+sure that doesn't happen.  
+
+=over
+
+=item delete
+
+The delete option will delete one and only one feature for which the 
+name, type and organism match what is in the GFF line with what is 
+in the database.  Note that feature.uniquename are not considered, nor
+are the coordinates presented in the GFF file.  This is so that 
+updates via GFF can be done on the coordinants.  If there is more than 
+one feature for which the name, type and organism match, the loader will
+print an error message and stop.  If there are no features that match
+the name, type and organism, the loader will print a warning message
+and continue.
+
+=item delete-all
+
+The delete-all option works similarly to the delete option, except that 
+it will delete all features that match the name, type and organism in the
+GFF line (as opposed to allowing only one feature to be deleted).  If there
+are no features that match, the loader will print a warning message and
+continue.
+
+=back
+
 =item The uniquename cache
 
 The loader uses the chado database to create a table that caches
