@@ -42,6 +42,7 @@ use Pod::Usage;
 use URI::Escape;
 use Carp;
 use Bio::GMOD::DB::Adapter;
+use ExtUtils::MakeMaker;  #to get prompt
 
 =head1 NAME
 
@@ -94,6 +95,14 @@ $0 - Bulk loads gff3 files into a chado database.
                      or if an optional argument is supplied, the first
                      dbxref that has a database part (ie, before the ':')
                      that matches the supplied pattern is used. 
+ --delete          Instead of inserting features into the database,
+                     use the GFF lines to delete features as though
+                     the CRUD=delete-all option were set on all lines
+                     (see 'Deletes and updates via GFF below'). The
+                     loader will ask for confirmation before continuing.
+ --delete_i_really_mean_it
+                   Works like --delete except that it does not ask
+                     for confirmation.
  --fp_cv           Name of the feature property controlled vocabulary
                      (defaults to 'feature_property').
  --noaddfpcv       By default, the loader adds GFF attribute types as
@@ -507,7 +516,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
-    $MANPAGE, $DEBUG );
+    $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -539,6 +548,8 @@ GetOptions(
     'noaddfpcv'     => \$NO_ADDFP_CV,
     'manual'   => \$MANPAGE,
     'debug'   => \$DEBUG,
+    'delete'  => \$DELETE,
+    'delete_i_really_mean_it' => \$DELETE_CONFIRM,
 ) 
 # or ( system( 'pod2text', $0 ), exit -1 );
 or pod2usage(-verbose => 1, -exitval => 1);
@@ -687,6 +698,18 @@ else {
        or die "$ORGANISM organism not found in the database";
 }
 
+if ($DELETE && !$DELETE_CONFIRM) {
+    my $really_delete 
+   = prompt("Do you really want me to delete features using this GFF file",'N');
+    if (lc $really_delete eq 'y') {
+        $DELETE_CONFIRM = $DELETE;
+    }
+    else {
+        warn "OK, I'm stopping instead.\n\n";
+        exit(0);
+    }
+}
+
 my $processing_CDS = 0;
 my $feature_iterator; my $itern=0; my %seen_organism;
 FEATURE:
@@ -709,9 +732,10 @@ while(my $feature =
       }
   }
 
-  if($feature->annotation->get_Annotations('CRUD')) {
-    my $continue = $chado->handle_crud($feature);
-    next if $continue == 1;  #that is, this was a delete or update operation
+  if($feature->annotation->get_Annotations('CRUD') || $DELETE_CONFIRM ) {
+    my $continue = $chado->handle_crud($feature, $DELETE_CONFIRM);
+    next if ($continue == 1 || $DELETE_CONFIRM);  
+                             #that is, this was a delete or update operation
                              #and it is done
   }
   
