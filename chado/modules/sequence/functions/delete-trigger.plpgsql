@@ -1,3 +1,14 @@
+--This is a fairly simple trigger to delete child features of features that
+--are being deleted as long as the child features dont have other parents
+--(that is, they are orphan features).  Items to consider/improve:
+--
+--  * the relationship type isnt considered; you may want to only delete
+--    part_of, or only delete part_of and derives_from but not other
+--    relationships.
+--  * as written, it will infintely recurse, that is, it doesnt care how
+--    many levels of relationships you have (typically you will have
+--    three: gene, transcript, and exon); maybe you dont want that
+
 
 DROP TRIGGER tr_feature_del  ON feature;
 CREATE OR REPLACE function fn_feature_del() RETURNS TRIGGER AS '
