@@ -375,10 +375,16 @@ existing database via GFF.  Currently, there is only support for
 deleting.  In order to delete, the GFF line must have a custom
 tag in the ninth column, 'CRUD' (for Create, Replace, Update and
 Delete) and have a recognized value.  Currently the two recognized
-values are CRUD=delete and CRUD=delete-all.  IMPORTANT NOTE: Using the
-delete operations have the potential of creating orphan features (eg,
-exons whose gene has been deleted).  You should be careful to make
-sure that doesn't happen.  
+values are CRUD=delete and CRUD=delete-all.  
+
+IMPORTANT NOTE: Using the delete operations have the potential of creating
+orphan features (eg, exons whose gene has been deleted).  You should be
+careful to make sure that doesn't happen. Included in this distribution is a
+PostgreSQL trigger (written in plpgsql) that will delete all orphan children
+recursively, so if a gene is deleted, all transcripts, exons and 
+polypeptides that belong to that gene will be deleted too.  See
+the file modules/sequence/functions/delete-trigger.plpgsql for
+more information.
 
 =over
 

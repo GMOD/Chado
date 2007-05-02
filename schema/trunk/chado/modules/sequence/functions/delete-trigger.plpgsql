@@ -8,6 +8,12 @@
 --  * as written, it will infintely recurse, that is, it doesnt care how
 --    many levels of relationships you have (typically you will have
 --    three: gene, transcript, and exon); maybe you dont want that
+--
+--To install this trigger in your database, execute this on the command line:
+--
+--    psql DATABASENAME < delete-trigger.plpgsql
+--
+--replacing DATABASENAME with the name of your database.
 
 
 DROP TRIGGER tr_feature_del  ON feature;
