@@ -3901,8 +3901,12 @@ sub handle_crud {
     my ($name) = $feature->annotation->get_Annotations('Name');
 
     if (!$name) {
+        #try to get the name from the ID
+        ($name) = $feature->annotation->get_Annotations('ID');
+        if (!$name) {
         #if it doesn't have a name, don't do anything
         return 1;
+        }
     }
 
     $name = $name->value;
