@@ -3890,11 +3890,21 @@ sub handle_derives_from {
 sub handle_crud {
     my $self = shift;
     my $feature = shift;
+    my $force_delete = shift;
 
     my ($op) = $feature->annotation->get_Annotations('CRUD');
-    $op = $op->value;
+    $op = $op->value if $op;
+    if ($force_delete) {
+        $op = 'delete-all';
+    }
 
     my ($name) = $feature->annotation->get_Annotations('Name');
+
+    if (!$name) {
+        #if it doesn't have a name, don't do anything
+        return 1;
+    }
+
     $name = $name->value;
     my $type   = $feature->type->name;
     
