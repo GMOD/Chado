@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.117 2007-04-19 21:21:09 briano Exp $
+# $Id: Makefile.PL,v 1.118 2007-05-03 20:31:03 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -357,13 +357,14 @@ copy(
      "$working_dir/modules/default_nofuncs.sql",
      "$working_dir/modules/nofuncs.sql");
 
+my $ant = 1;
 if (-e "$working_dir/../GMODTools") {
     print "\nCopying GMODTools from its directory using its ant build.xml ...\n";
 
     chdir "$working_dir/../GMODTools";
 
     system("ant", "gmodrel", "-Dgmod.dir=$working_dir") == 0 or
-        die "\n\n****************\nMoving tools from GMODTools directory faild; do you have ant installed?\n****************\n\n";
+        (warn "\n\n****************\nMoving tools from GMODTools directory faild; do you have ant installed?\n****************\n\n" && $ant = 0);
     print "Done with GMODTools\n";
 
     chdir $working_dir;
@@ -480,6 +481,22 @@ AUTODBI
 system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
     or die "unable to create Build from load/Build.PL: $!\n";
 
+my @exe_files = (
+           #'load/bin/gmod_load_affymetrix.pl',
+           #'load/bin/gmod_load_affyxls.pl',
+           'load/bin/gmod_load_gff3.pl',
+           'load/bin/gmod_bulk_load_gff3.pl',
+           #'bin/gmod_dump_gff3.pl',
+           'bin/gmod_apollo_triggers.pl',
+           'bin/gmod_fasta2gff3.pl',
+           'bin/gmod_sort_gff3.pl',
+#           'bin/gmod_bulkfiles.pl',
+#           'bin/gmod_gff2biomart5.pl',
+);
+
+if ($ant) {
+    push @exe_files, 'bin/gmod_bulkfiles.pl', 'bin/gmod_gff2biomart5.pl';
+}
 
 WriteMakefile(
 #    'NAME'		            => 'chado',
@@ -510,18 +527,7 @@ WriteMakefile(
           'install_util/src_install.PLS'     => 'install_util/src_install.pl',
           'install_util/log4perl.conf.PLS'   => 'install_util/log4perl.conf.pl',
     },
-    EXE_FILES             => [
-           #'load/bin/gmod_load_affymetrix.pl',
-           #'load/bin/gmod_load_affyxls.pl',
-           'load/bin/gmod_load_gff3.pl',
-           'load/bin/gmod_bulk_load_gff3.pl',
-           #'bin/gmod_dump_gff3.pl',
-           'bin/gmod_apollo_triggers.pl',
-           'bin/gmod_fasta2gff3.pl',
-           'bin/gmod_sort_gff3.pl',
-           'bin/gmod_bulkfiles.pl',
-           'bin/gmod_gff2biomart5.pl',
-    ],
+    EXE_FILES             => \@exe_files,
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
        AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()
