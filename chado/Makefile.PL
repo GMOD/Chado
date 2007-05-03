@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.118 2007-05-03 20:31:03 scottcain Exp $
+# $Id: Makefile.PL,v 1.119 2007-05-03 20:33:19 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -494,7 +494,7 @@ my @exe_files = (
 #           'bin/gmod_gff2biomart5.pl',
 );
 
-if ($ant) {
+if ($ant or !-e "$working_dir/../GMODTools") {
     push @exe_files, 'bin/gmod_bulkfiles.pl', 'bin/gmod_gff2biomart5.pl';
 }
 
