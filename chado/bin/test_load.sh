@@ -4,9 +4,6 @@ DBPORT=$2
 DBUSER=$3
 DBNAME=$4;
 
-echo "*******";
-echo "Note that messages of the type \"ERROR: type something does not exist\" are OK";
-echo "*******";
 dropdb -h $DBHOST -p $DBPORT -U $DBUSER $DBNAME;
 createdb -h $DBHOST -p $DBPORT -U $DBUSER $DBNAME;
 createlang -h $DBHOST -p $DBPORT -U $DBUSER plpgsql $DBNAME;
