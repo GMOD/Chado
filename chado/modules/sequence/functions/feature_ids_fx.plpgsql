@@ -4,7 +4,7 @@
 --DROP TYPE feature_by_cvt_type CASCADE;
 --DROP TYPE fxgsfids_type CASCADE;
 
-DROP TYPE feature_by_fx_type CASCADE;
+--DROP TYPE feature_by_fx_type CASCADE;
 CREATE TYPE feature_by_fx_type AS (
     feature_id INTEGER,
     depth INT
