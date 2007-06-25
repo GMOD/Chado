@@ -1,4 +1,4 @@
--- $Id: genetic.sql,v 1.29 2007-04-27 16:09:46 emmert Exp $
+-- $Id: genetic.sql,v 1.30 2007-06-25 19:52:34 emmert Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -184,7 +184,6 @@ CREATE TABLE phenotype_comparison (
 );
 CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
 CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
-CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
 CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 
 COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2.';
