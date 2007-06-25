@@ -8,7 +8,7 @@
 
 --NOTE: private, don't call directly as relying on having temp table tmpcvtr
 
-DROP TYPE soi_type CASCADE;
+--DROP TYPE soi_type CASCADE;
 CREATE TYPE soi_type AS (
     type_id INT,
     subject_id INT,
