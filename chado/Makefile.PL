@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.119 2007-05-03 20:33:19 scottcain Exp $
+# $Id: Makefile.PL,v 1.120 2007-07-12 17:55:07 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -18,8 +18,6 @@ Makefile written.  Now you should do the following, in order:
   5. make ontologies  (loads data for various ontologies)
 
 Optional Targets:
-  make html         (auto-generates html documentation for each module)
-  make images       (generates images of the schema in several formats)
   make rm_locks     (removes ontology lock files, allowing installation
                      of ontologies on successive builds of the database
                      without removing the ontology files altogether)
@@ -499,6 +497,7 @@ if ($ant or !-e "$working_dir/../GMODTools") {
 }
 
 WriteMakefile(
+#      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
 #    'NAME'		            => 'chado',
     'NAME'                => 'gmod',
     'VERSION'             => 0.5,

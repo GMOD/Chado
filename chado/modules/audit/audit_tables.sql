@@ -3062,6 +3062,7 @@
        phenotype_cvterm_id integer, 
        phenotype_id integer, 
        cvterm_id integer, 
+       rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3073,12 +3074,14 @@
        phenotype_cvterm_id_var integer; 
        phenotype_id_var integer; 
        cvterm_id_var integer; 
+       rank_var integer; 
        
        transaction_type_var char;
    BEGIN
        phenotype_cvterm_id_var = OLD.phenotype_cvterm_id;
        phenotype_id_var = OLD.phenotype_id;
        cvterm_id_var = OLD.cvterm_id;
+       rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -3090,11 +3093,13 @@
              phenotype_cvterm_id, 
              phenotype_id, 
              cvterm_id, 
+             rank, 
              transaction_type
        ) VALUES ( 
              phenotype_cvterm_id_var, 
              phenotype_id_var, 
              cvterm_id_var, 
+             rank_var, 
              transaction_type_var
        );
 
@@ -3577,8 +3582,8 @@
        environment2_id integer, 
        phenotype1_id integer, 
        phenotype2_id integer, 
-       type_id integer, 
        pub_id integer, 
+       organism_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3594,8 +3599,8 @@
        environment2_id_var integer; 
        phenotype1_id_var integer; 
        phenotype2_id_var integer; 
-       type_id_var integer; 
        pub_id_var integer; 
+       organism_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3606,8 +3611,8 @@
        environment2_id_var = OLD.environment2_id;
        phenotype1_id_var = OLD.phenotype1_id;
        phenotype2_id_var = OLD.phenotype2_id;
-       type_id_var = OLD.type_id;
        pub_id_var = OLD.pub_id;
+       organism_id_var = OLD.organism_id;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -3623,8 +3628,8 @@
              environment2_id, 
              phenotype1_id, 
              phenotype2_id, 
-             type_id, 
              pub_id, 
+             organism_id, 
              transaction_type
        ) VALUES ( 
              phenotype_comparison_id_var, 
@@ -3634,8 +3639,8 @@
              environment2_id_var, 
              phenotype1_id_var, 
              phenotype2_id_var, 
-             type_id_var, 
              pub_id_var, 
+             organism_id_var, 
              transaction_type_var
        );
 
@@ -3653,6 +3658,73 @@
        BEFORE UPDATE OR DELETE ON phenotype_comparison
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_phenotype_comparison ();
+
+
+   DROP TABLE audit_phenotype_comparison_cvterm;
+   CREATE TABLE audit_phenotype_comparison_cvterm ( 
+       pub_id integer, 
+       phenotype_comparison_cvterm_id integer, 
+       phenotype_comparison_id integer, 
+       cvterm_id integer, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_phenotype_comparison_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_phenotype_comparison_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       pub_id_var integer; 
+       phenotype_comparison_cvterm_id_var integer; 
+       phenotype_comparison_id_var integer; 
+       cvterm_id_var integer; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       pub_id_var = OLD.pub_id;
+       phenotype_comparison_cvterm_id_var = OLD.phenotype_comparison_cvterm_id;
+       phenotype_comparison_id_var = OLD.phenotype_comparison_id;
+       cvterm_id_var = OLD.cvterm_id;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_phenotype_comparison_cvterm ( 
+             pub_id, 
+             phenotype_comparison_cvterm_id, 
+             phenotype_comparison_id, 
+             cvterm_id, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             pub_id_var, 
+             phenotype_comparison_cvterm_id_var, 
+             phenotype_comparison_id_var, 
+             cvterm_id_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER phenotype_comparison_cvterm_audit_ud ON phenotype_comparison_cvterm;
+   CREATE TRIGGER phenotype_comparison_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON phenotype_comparison_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_phenotype_comparison_cvterm ();
 
 
    DROP TABLE audit_featuremap;

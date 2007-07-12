@@ -91,7 +91,7 @@
 
 <em>
 	<br />
-	$Id: phenotype.html,v 1.3 2007-03-23 15:18:02 scottcain Exp $ <br />
+	$Id: phenotype.html,v 1.4 2007-07-12 17:55:11 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
 	================================================================= <br />
@@ -360,6 +360,15 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_cvterm-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
 </table>
 
 <h3>
@@ -430,8 +439,13 @@
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>phenotype_id, cvterm_id</td>
+	<td>phenotype_id, cvterm_id, rank</td>
 </tr>
 
 </table>

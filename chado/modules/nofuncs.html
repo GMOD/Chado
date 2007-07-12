@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (126 tables)
+	Table listing (127 tables)
  -->
 
 <a name="top" />
@@ -640,6 +640,18 @@
 
 <!-- 
 	End link to table 'phenotype_comparison'
+ -->
+
+<!-- 
+	Start link to table 'phenotype_comparison_cvterm'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phenotype_comparison_cvterm-link" href="#phenotype_comparison_cvterm">phenotype_comparison_cvterm</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phenotype_comparison_cvterm'
  -->
 
 <!-- 
@@ -1567,7 +1579,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado general module <br />
 	================================================ <br />
@@ -2184,7 +2196,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado cv module <br />
 	================================================================= <br />
@@ -3696,7 +3708,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado pub module <br />
 	================================================================= <br />
@@ -4675,7 +4687,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado organism module <br />
 	============ <br />
@@ -5176,7 +5188,7 @@ pattern. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -5194,7 +5206,8 @@ pattern. </td>
 	sections. Examples include genes, exons, transcripts, regulatory
 	regions, polypeptides, protein domains, chromosome sequences, sequence
 	variations, cross-genome match regions such as hits and HSPs and so
-	on; see the Sequence Ontology for more. 
+	on; see the Sequence Ontology for more. The combination of
+	organism_id, uniquename and type_id should be unique. 
 </em>
 
 <table border="1">
@@ -6750,7 +6763,7 @@ default 0 value should be used </td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
 	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature. </td>
+	<td class="FieldCellOther">NOT NULL, True if this secondary dbxref is the most up to date accession in the corresponding db. Retired accessions should set this field to false </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8657,7 +8670,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado companalysis module <br />
 	================================================================= <br />
@@ -9225,7 +9238,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
 	================================================================= <br />
@@ -9494,6 +9507,15 @@ the default 0 value should be used. </td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_cvterm-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
 </table>
 
 <h3>
@@ -9564,8 +9586,13 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>phenotype_id, cvterm_id</td>
+	<td>phenotype_id, cvterm_id, rank</td>
 </tr>
 
 </table>
@@ -9752,7 +9779,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
 	2006-04-11 <br />
@@ -10445,6 +10472,9 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: phenstatement <br />
+	================================================ <br />
 	Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype. 
 </em>
 
@@ -10656,6 +10686,9 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: phendesc <br />
+	================================================ <br />
 	A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication. 
 </em>
 
@@ -10867,6 +10900,9 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: phenotype_comparison <br />
+	================================================ <br />
 	Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2. 
 </em>
 
@@ -10957,21 +10993,21 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
-</tr>
-
-<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phenotype_comparison-pub_id">pub_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_comparison-organism_id">organism_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
 </table>
@@ -10999,11 +11035,6 @@ groups, as they do not fall on a particular chromosome). </td>
 <tr class="IndexCell">
 	<td>phenotype_comparison_idx2</td>
 	<td>genotype2_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>phenotype_comparison_idx3</td>
-	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -11090,12 +11121,171 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>organism_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genotype1_id, environment1_id, genotype2_id, environment2_id, phenotype1_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phenotype_comparison_cvterm'
+ -->
+
+<a name="phenotype_comparison_cvterm" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phenotype_comparison_cvterm
+</h3></td>
+		<a name="phenotype_comparison_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phenotype_comparison_cvterm <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_cvterm_id">phenotype_comparison_cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_id">phenotype_comparison_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#phenotype_comparison-phenotype_comparison_id">phenotype_comparison.phenotype_comparison_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_cvterm_idx1</td>
+	<td>phenotype_comparison_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phenotype_comparison_cvterm_idx2</td>
+	<td>cvterm_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
 </tr>
 
 <tr class="IndexCell">
@@ -11104,13 +11294,38 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_comparison_cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>phenotype_comparison_id</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>phenotype_comparison_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>genotype1_id, environment1_id, genotype2_id, environment2_id, phenotype1_id, type_id, pub_id</td>
+	<td>phenotype_comparison_id, cvterm_id</td>
 </tr>
 
 </table>
@@ -11140,7 +11355,7 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado map module <br />
 	================================================================= <br />
@@ -11860,7 +12075,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -13286,7 +13501,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado contact module <br />
 	================================================================= <br />
@@ -13603,7 +13818,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado expression module <br />
 	================================================================= <br />
@@ -15090,7 +15305,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado mage module <br />
 	================================================================= <br />
@@ -21522,7 +21737,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	========================================== <br />
 	Chado stock module <br />
 	DEPENDENCIES <br />
@@ -23658,7 +23873,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.8 2007-04-20 13:19:42 briano Exp $ <br />
+	$Id: nofuncs.html,v 1.9 2007-07-12 17:55:10 scottcain Exp $ <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import feature from sequence <br />
@@ -24720,7 +24935,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08</a>
+SQL::Translator 0.08_04</a>
 
 </body>
 </html>
