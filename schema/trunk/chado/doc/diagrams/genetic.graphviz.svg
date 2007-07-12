@@ -14,116 +14,131 @@
 <polygon style="fill:white;stroke:white;" points="-2,586 -2,-2 730,-2 730,586 -2,586"/>
 <!-- genotype -->
 <g id="node1" class="node"><title>genotype</title>
-<polygon style="fill:white;stroke:black;" points="330,502 439,502 439,441 330,441 330,502"/>
-<text text-anchor="start" x="335" y="453" style="font-size:9.75pt;">{genotype|&#45; genotype_id </text>
-<text text-anchor="start" x="335" y="464" style="font-size:9.75pt;">&#45; name </text>
-<text text-anchor="start" x="335" y="475" style="font-size:9.75pt;">&#45; uniquename </text>
-<text text-anchor="start" x="335" y="486" style="font-size:9.75pt;">&#45; description </text>
-<text text-anchor="middle" x="384" y="497" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="418,209 529,209 529,147 418,147 418,209"/>
+<text text-anchor="start" x="424" y="159" style="font-size:9.83pt;">{genotype|&#45; genotype_id </text>
+<text text-anchor="start" x="424" y="170" style="font-size:9.83pt;">&#45; name </text>
+<text text-anchor="start" x="424" y="182" style="font-size:9.83pt;">&#45; uniquename </text>
+<text text-anchor="start" x="424" y="193" style="font-size:9.83pt;">&#45; description </text>
+<text text-anchor="middle" x="473" y="204" style="font-size:9.83pt;">}</text>
 </g>
 <!-- feature_genotype -->
 <g id="node2" class="node"><title>feature_genotype</title>
-<polygon style="fill:white;stroke:black;" points="536,513 709,513 709,418 536,418 536,513"/>
-<text text-anchor="start" x="542" y="430" style="font-size:9.75pt;">{feature_genotype|&#45; feature_genotype_id </text>
-<text text-anchor="start" x="542" y="441" style="font-size:9.75pt;">&#45; feature_id </text>
-<text text-anchor="start" x="542" y="453" style="font-size:9.75pt;">&#45; genotype_id </text>
-<text text-anchor="start" x="542" y="464" style="font-size:9.75pt;">&#45; chromosome_id </text>
-<text text-anchor="start" x="542" y="475" style="font-size:9.75pt;">&#45; rank </text>
-<text text-anchor="start" x="542" y="486" style="font-size:9.75pt;">&#45; cgroup </text>
-<text text-anchor="start" x="542" y="497" style="font-size:9.75pt;">&#45; cvterm_id </text>
-<text text-anchor="middle" x="622" y="508" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="549,496 723,496 723,400 549,400 549,496"/>
+<text text-anchor="start" x="555" y="412" style="font-size:9.83pt;">{feature_genotype|&#45; feature_genotype_id </text>
+<text text-anchor="start" x="555" y="423" style="font-size:9.83pt;">&#45; feature_id </text>
+<text text-anchor="start" x="555" y="435" style="font-size:9.83pt;">&#45; genotype_id </text>
+<text text-anchor="start" x="555" y="446" style="font-size:9.83pt;">&#45; chromosome_id </text>
+<text text-anchor="start" x="555" y="457" style="font-size:9.83pt;">&#45; rank </text>
+<text text-anchor="start" x="555" y="468" style="font-size:9.83pt;">&#45; cgroup </text>
+<text text-anchor="start" x="555" y="480" style="font-size:9.83pt;">&#45; cvterm_id </text>
+<text text-anchor="middle" x="636" y="491" style="font-size:9.83pt;">}</text>
 </g>
 <!-- genotype&#45;&gt;feature_genotype -->
 <g id="edge10" class="edge"><title>genotype&#45;&gt;feature_genotype</title>
-<path style="fill:none;stroke:black;" d="M439,470C466,469 498,469 529,468"/>
-<polygon style="fill:black;stroke:black;" points="529,465 536,468 529,470 529,465"/>
+<path style="fill:none;stroke:black;" d="M492,209C520,255 570,338 604,394"/>
+<polygon style="fill:black;stroke:black;" points="606,393 607,400 602,395 606,393"/>
 </g>
 <!-- phenstatement -->
 <g id="node5" class="node"><title>phenstatement</title>
-<polygon style="fill:white;stroke:black;" points="573,124 724,124 724,40 573,40 573,124"/>
-<text text-anchor="start" x="578" y="52" style="font-size:9.75pt;">{phenstatement|&#45; phenstatement_id </text>
-<text text-anchor="start" x="578" y="63" style="font-size:9.75pt;">&#45; genotype_id </text>
-<text text-anchor="start" x="578" y="74" style="font-size:9.75pt;">&#45; environment_id </text>
-<text text-anchor="start" x="578" y="86" style="font-size:9.75pt;">&#45; phenotype_id </text>
-<text text-anchor="start" x="578" y="97" style="font-size:9.75pt;">&#45; type_id </text>
-<text text-anchor="start" x="578" y="108" style="font-size:9.75pt;">&#45; pub_id </text>
-<text text-anchor="middle" x="648" y="119" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="572,151 724,151 724,67 572,67 572,151"/>
+<text text-anchor="start" x="577" y="78" style="font-size:9.83pt;">{phenstatement|&#45; phenstatement_id </text>
+<text text-anchor="start" x="577" y="90" style="font-size:9.83pt;">&#45; genotype_id </text>
+<text text-anchor="start" x="577" y="101" style="font-size:9.83pt;">&#45; environment_id </text>
+<text text-anchor="start" x="577" y="112" style="font-size:9.83pt;">&#45; phenotype_id </text>
+<text text-anchor="start" x="577" y="123" style="font-size:9.83pt;">&#45; type_id </text>
+<text text-anchor="start" x="577" y="135" style="font-size:9.83pt;">&#45; pub_id </text>
+<text text-anchor="middle" x="647" y="146" style="font-size:9.83pt;">}</text>
 </g>
 <!-- genotype&#45;&gt;phenstatement -->
 <g id="edge16" class="edge"><title>genotype&#45;&gt;phenstatement</title>
-<path style="fill:none;stroke:black;" d="M405,441C451,372 560,212 615,130"/>
-<polygon style="fill:black;stroke:black;" points="614,128 620,124 617,131 614,128"/>
+<path style="fill:none;stroke:black;" d="M529,156C540,151 553,146 565,142"/>
+<polygon style="fill:black;stroke:black;" points="564,140 572,139 566,144 564,140"/>
 </g>
 <!-- phendesc -->
 <g id="node6" class="node"><title>phendesc</title>
-<polygon style="fill:white;stroke:black;" points="402,128 513,128 513,44 402,44 402,128"/>
-<text text-anchor="start" x="407" y="56" style="font-size:9.75pt;">{phendesc|&#45; phendesc_id </text>
-<text text-anchor="start" x="407" y="67" style="font-size:9.75pt;">&#45; genotype_id </text>
-<text text-anchor="start" x="407" y="79" style="font-size:9.75pt;">&#45; environment_id </text>
-<text text-anchor="start" x="407" y="90" style="font-size:9.75pt;">&#45; description </text>
-<text text-anchor="start" x="407" y="101" style="font-size:9.75pt;">&#45; type_id </text>
-<text text-anchor="start" x="407" y="112" style="font-size:9.75pt;">&#45; pub_id </text>
-<text text-anchor="middle" x="457" y="123" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="267,111 380,111 380,26 267,26 267,111"/>
+<text text-anchor="start" x="273" y="38" style="font-size:9.83pt;">{phendesc|&#45; phendesc_id </text>
+<text text-anchor="start" x="273" y="50" style="font-size:9.83pt;">&#45; genotype_id </text>
+<text text-anchor="start" x="273" y="61" style="font-size:9.83pt;">&#45; environment_id </text>
+<text text-anchor="start" x="273" y="72" style="font-size:9.83pt;">&#45; description </text>
+<text text-anchor="start" x="273" y="83" style="font-size:9.83pt;">&#45; type_id </text>
+<text text-anchor="start" x="273" y="95" style="font-size:9.83pt;">&#45; pub_id </text>
+<text text-anchor="middle" x="324" y="106" style="font-size:9.83pt;">}</text>
 </g>
 <!-- genotype&#45;&gt;phendesc -->
 <g id="edge12" class="edge"><title>genotype&#45;&gt;phendesc</title>
-<path style="fill:none;stroke:black;" d="M390,441C402,374 432,216 448,135"/>
-<polygon style="fill:black;stroke:black;" points="446,134 450,128 450,135 446,134"/>
+<path style="fill:none;stroke:black;" d="M431,147C417,137 401,125 385,114"/>
+<polygon style="fill:black;stroke:black;" points="384,116 380,110 387,112 384,116"/>
 </g>
 <!-- phenotype_comparison -->
 <g id="node7" class="node"><title>phenotype_comparison</title>
-<polygon style="fill:white;stroke:black;" points="29,530 249,530 249,413 29,413 29,530"/>
-<text text-anchor="start" x="35" y="425" style="font-size:9.75pt;">{phenotype_comparison|&#45; phenotype_comparison_id </text>
-<text text-anchor="start" x="35" y="436" style="font-size:9.75pt;">&#45; genotype1_id </text>
-<text text-anchor="start" x="35" y="447" style="font-size:9.75pt;">&#45; environment1_id </text>
-<text text-anchor="start" x="35" y="458" style="font-size:9.75pt;">&#45; genotype2_id </text>
-<text text-anchor="start" x="35" y="469" style="font-size:9.75pt;">&#45; environment2_id </text>
-<text text-anchor="start" x="35" y="480" style="font-size:9.75pt;">&#45; phenotype1_id </text>
-<text text-anchor="start" x="35" y="491" style="font-size:9.75pt;">&#45; phenotype2_id </text>
-<text text-anchor="start" x="35" y="503" style="font-size:9.75pt;">&#45; type_id </text>
-<text text-anchor="start" x="35" y="514" style="font-size:9.75pt;">&#45; pub_id </text>
-<text text-anchor="middle" x="139" y="525" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="296,550 518,550 518,432 296,432 296,550"/>
+<text text-anchor="start" x="302" y="444" style="font-size:9.83pt;">{phenotype_comparison|&#45; phenotype_comparison_id </text>
+<text text-anchor="start" x="302" y="455" style="font-size:9.83pt;">&#45; genotype1_id </text>
+<text text-anchor="start" x="302" y="466" style="font-size:9.83pt;">&#45; environment1_id </text>
+<text text-anchor="start" x="302" y="477" style="font-size:9.83pt;">&#45; genotype2_id </text>
+<text text-anchor="start" x="302" y="489" style="font-size:9.83pt;">&#45; environment2_id </text>
+<text text-anchor="start" x="302" y="500" style="font-size:9.83pt;">&#45; phenotype1_id </text>
+<text text-anchor="start" x="302" y="511" style="font-size:9.83pt;">&#45; phenotype2_id </text>
+<text text-anchor="start" x="302" y="522" style="font-size:9.83pt;">&#45; pub_id </text>
+<text text-anchor="start" x="302" y="534" style="font-size:9.83pt;">&#45; organism_id </text>
+<text text-anchor="middle" x="407" y="545" style="font-size:9.83pt;">}</text>
 </g>
 <!-- genotype&#45;&gt;phenotype_comparison -->
 <g id="edge14" class="edge"><title>genotype&#45;&gt;phenotype_comparison</title>
-<path style="fill:none;stroke:black;" d="M330,471C308,471 282,471 256,471"/>
-<polygon style="fill:black;stroke:black;" points="256,473 249,471 256,469 256,473"/>
+<path style="fill:none;stroke:black;" d="M467,209C456,259 435,359 421,425"/>
+<polygon style="fill:black;stroke:black;" points="423,425 420,432 419,425 423,425"/>
 </g>
 <!-- environment -->
 <g id="node3" class="node"><title>environment</title>
-<polygon style="fill:white;stroke:black;" points="224,121 361,121 361,71 224,71 224,121"/>
-<text text-anchor="start" x="230" y="83" style="font-size:9.75pt;">{environment|&#45; environment_id </text>
-<text text-anchor="start" x="230" y="94" style="font-size:9.75pt;">&#45; uniquename </text>
-<text text-anchor="start" x="230" y="105" style="font-size:9.75pt;">&#45; description </text>
-<text text-anchor="middle" x="292" y="116" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="209,361 347,361 347,310 209,310 209,361"/>
+<text text-anchor="start" x="215" y="322" style="font-size:9.83pt;">{environment|&#45; environment_id </text>
+<text text-anchor="start" x="215" y="333" style="font-size:9.83pt;">&#45; uniquename </text>
+<text text-anchor="start" x="215" y="345" style="font-size:9.83pt;">&#45; description </text>
+<text text-anchor="middle" x="278" y="356" style="font-size:9.83pt;">}</text>
 </g>
 <!-- environment_cvterm -->
 <g id="node4" class="node"><title>environment_cvterm</title>
-<polygon style="fill:white;stroke:black;" points="5,112 205,112 205,62 5,62 5,112"/>
-<text text-anchor="start" x="10" y="74" style="font-size:9.75pt;">{environment_cvterm|&#45; environment_cvterm_id </text>
-<text text-anchor="start" x="10" y="85" style="font-size:9.75pt;">&#45; environment_id </text>
-<text text-anchor="start" x="10" y="96" style="font-size:9.75pt;">&#45; cvterm_id </text>
-<text text-anchor="middle" x="105" y="107" style="font-size:9.75pt;">}</text>
+<polygon style="fill:white;stroke:black;" points="5,146 207,146 207,95 5,95 5,146"/>
+<text text-anchor="start" x="10" y="107" style="font-size:9.83pt;">{environment_cvterm|&#45; environment_cvterm_id </text>
+<text text-anchor="start" x="10" y="118" style="font-size:9.83pt;">&#45; environment_id </text>
+<text text-anchor="start" x="10" y="130" style="font-size:9.83pt;">&#45; cvterm_id </text>
+<text text-anchor="middle" x="106" y="141" style="font-size:9.83pt;">}</text>
 </g>
 <!-- environment&#45;&gt;environment_cvterm -->
 <g id="edge2" class="edge"><title>environment&#45;&gt;environment_cvterm</title>
-<path style="fill:none;stroke:black;" d="M224,93C220,93 216,93 212,92"/>
-<polygon style="fill:black;stroke:black;" points="212,94 205,92 212,89 212,94"/>
+<path style="fill:none;stroke:black;" d="M258,310C226,271 165,194 130,152"/>
+<polygon style="fill:black;stroke:black;" points="128,153 126,146 133,150 128,153"/>
 </g>
 <!-- environment&#45;&gt;phenstatement -->
 <g id="edge8" class="edge"><title>environment&#45;&gt;phenstatement</title>
-<path style="fill:none;stroke:black;" d="M361,93C419,90 504,88 566,85"/>
-<polygon style="fill:black;stroke:black;" points="566,82 573,85 566,87 566,82"/>
+<path style="fill:none;stroke:black;" d="M319,310C381,272 496,202 572,154"/>
+<polygon style="fill:black;stroke:black;" points="572,152 579,151 574,156 572,152"/>
 </g>
 <!-- environment&#45;&gt;phendesc -->
 <g id="edge4" class="edge"><title>environment&#45;&gt;phendesc</title>
-<path style="fill:none;stroke:black;" d="M361,92C372,91 383,90 395,90"/>
-<polygon style="fill:black;stroke:black;" points="395,88 402,89 395,92 395,88"/>
+<path style="fill:none;stroke:black;" d="M282,310C290,267 305,175 315,118"/>
+<polygon style="fill:black;stroke:black;" points="313,117 317,111 317,118 313,117"/>
 </g>
 <!-- environment&#45;&gt;phenotype_comparison -->
 <g id="edge6" class="edge"><title>environment&#45;&gt;phenotype_comparison</title>
-<path style="fill:none;stroke:black;" d="M282,121C259,179 200,322 166,407"/>
-<polygon style="fill:black;stroke:black;" points="168,407 163,413 163,405 168,407"/>
+<path style="fill:none;stroke:black;" d="M299,361C314,378 334,403 353,426"/>
+<polygon style="fill:black;stroke:black;" points="355,425 358,432 352,428 355,425"/>
+</g>
+<!-- phenotype_comparison_cvterm -->
+<g id="node8" class="node"><title>phenotype_comparison_cvterm</title>
+<polygon style="fill:white;stroke:black;" points="26,501 203,501 203,428 26,428 26,501"/>
+<text text-anchor="start" x="31" y="440" style="font-size:9.83pt;">{phenotype_comparison_cvterm|&#45; pub_id </text>
+<text text-anchor="start" x="31" y="451" style="font-size:9.83pt;">&#45; phenotype_comparison_cvterm_id </text>
+<text text-anchor="start" x="31" y="462" style="font-size:9.83pt;">&#45; phenotype_comparison_id </text>
+<text text-anchor="start" x="31" y="473" style="font-size:9.83pt;">&#45; cvterm_id </text>
+<text text-anchor="start" x="31" y="484" style="font-size:9.83pt;">&#45; rank </text>
+<text text-anchor="middle" x="114" y="496" style="font-size:9.83pt;">}</text>
+</g>
+<!-- phenotype_comparison&#45;&gt;phenotype_comparison_cvterm -->
+<g id="edge18" class="edge"><title>phenotype_comparison&#45;&gt;phenotype_comparison_cvterm</title>
+<path style="fill:none;stroke:black;" d="M296,481C268,478 239,476 211,473"/>
+<polygon style="fill:black;stroke:black;" points="211,475 203,473 211,471 211,475"/>
 </g>
 </g>
 </svg>

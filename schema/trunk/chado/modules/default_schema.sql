@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -1261,7 +1261,8 @@ section of a biological sequence, or a collection of such
 sections. Examples include genes, exons, transcripts, regulatory
 regions, polypeptides, protein domains, chromosome sequences, sequence
 variations, cross-genome match regions such as hits and HSPs and so
-on; see the Sequence Ontology for more.';
+on; see the Sequence Ontology for more. The combination of
+organism_id, uniquename and type_id should be unique.';
 
 COMMENT ON COLUMN feature.dbxref_id IS 'An optional primary public stable
 identifier for this feature. Secondary identifiers and external
@@ -1582,7 +1583,7 @@ create index feature_dbxref_idx2 on feature_dbxref (dbxref_id);
 
 COMMENT ON TABLE feature_dbxref IS 'Links a feature to dbxrefs. This is for secondary identifiers; primary identifiers should use feature.dbxref_id.';
 
-COMMENT ON COLUMN feature_dbxref.is_current IS 'The is_current boolean indicates whether the linked dbxref is the  current -official- dbxref for the linked feature.';
+COMMENT ON COLUMN feature_dbxref.is_current IS 'True if this secondary dbxref is the most up to date accession in the corresponding db. Retired accessions should set this field to false';
 
 
 -- ================================================
@@ -2934,7 +2935,7 @@ SET search_path = public;
 
 --NOTE: private, don't call directly as relying on having temp table tmpcvtr
 
-DROP TYPE soi_type CASCADE;
+--DROP TYPE soi_type CASCADE;
 CREATE TYPE soi_type AS (
     type_id INT,
     subject_id INT,
@@ -3087,7 +3088,7 @@ LANGUAGE 'plpgsql';
 --DROP TYPE feature_by_cvt_type CASCADE;
 --DROP TYPE fxgsfids_type CASCADE;
 
-DROP TYPE feature_by_fx_type CASCADE;
+--DROP TYPE feature_by_fx_type CASCADE;
 CREATE TYPE feature_by_fx_type AS (
     feature_id INTEGER,
     depth INT
@@ -3510,7 +3511,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -3634,7 +3635,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -3689,7 +3690,8 @@ CREATE TABLE phenotype_cvterm (
     FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
     cvterm_id INT NOT NULL,
     FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
-    CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id)
+    rank int not null default 0,
+    CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id, rank)
 );
 CREATE INDEX phenotype_cvterm_idx1 ON phenotype_cvterm (phenotype_id);
 CREATE INDEX phenotype_cvterm_idx2 ON phenotype_cvterm (cvterm_id);
@@ -3713,7 +3715,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -3827,6 +3829,9 @@ create index environment_cvterm_idx2 on environment_cvterm (cvterm_id);
 
 COMMENT ON TABLE environment_cvterm IS NULL;
 
+-- ================================================
+-- TABLE: phenstatement
+-- ================================================
 CREATE TABLE phenstatement (
     phenstatement_id SERIAL NOT NULL,
     primary key (phenstatement_id),
@@ -3847,6 +3852,9 @@ CREATE INDEX phenstatement_idx2 ON phenstatement (phenotype_id);
 
 COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.';
 
+-- ================================================
+-- TABLE: phendesc
+-- ================================================
 CREATE TABLE phendesc (
     phendesc_id SERIAL NOT NULL,
     primary key (phendesc_id),
@@ -3867,6 +3875,9 @@ CREATE INDEX phendesc_idx3 ON phendesc (pub_id);
 
 COMMENT ON TABLE phendesc IS 'A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication.';
 
+-- ================================================
+-- TABLE: phenotype_comparison
+-- ================================================
 CREATE TABLE phenotype_comparison (
     phenotype_comparison_id SERIAL NOT NULL,
     primary key (phenotype_comparison_id),
@@ -3882,19 +3893,35 @@ CREATE TABLE phenotype_comparison (
         FOREIGN KEY (phenotype1_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
     phenotype2_id INT,
         FOREIGN KEY (phenotype2_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    type_id INT NOT NULL,
-        FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     pub_id INT NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
-    CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,type_id,pub_id)
+    organism_id INT NOT NULL,
+    FOREIGN KEY (organism_id) REFERENCES organism (organism_id) ON DELETE CASCADE,
+    CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,pub_id)
 );
 CREATE INDEX phenotype_comparison_idx1 on phenotype_comparison (genotype1_id);
 CREATE INDEX phenotype_comparison_idx2 on phenotype_comparison (genotype2_id);
-CREATE INDEX phenotype_comparison_idx3 on phenotype_comparison (type_id);
 CREATE INDEX phenotype_comparison_idx4 on phenotype_comparison (pub_id);
 
 COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2.';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+
+-- ================================================
+-- TABLE: phenotype_comparison_cvterm
+-- ================================================
+CREATE TABLE phenotype_comparison_cvterm (
+    pub_id INT NOT NULL,
+    phenotype_comparison_cvterm_id serial not null,
+    primary key (phenotype_comparison_cvterm_id),
+    phenotype_comparison_id int not null,
+    FOREIGN KEY (phenotype_comparison_id) references phenotype_comparison (phenotype_comparison_id) on delete cascade,
+    cvterm_id int not null,
+    FOREIGN KEY (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    rank int not null default 0,
+    CONSTRAINT phenotype_comparison_cvterm_c1 unique (phenotype_comparison_id, cvterm_id)
+);
+CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
+CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -3989,7 +4016,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -4221,7 +4248,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -4271,7 +4298,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -4464,7 +4491,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -5224,7 +5251,7 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -5512,7 +5539,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.47 2007-04-16 16:24:10 scottcain Exp $
+-- $Id: default_schema.sql,v 1.48 2007-07-12 17:55:09 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
