@@ -23,7 +23,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --gfffile        The file containing GFF3 (optional, can read
                      from stdin)
  --outfile        The name kernel that will be used for naming result files
- --splitfiles     Split the files into more managable chunks, providing
+ --splitfile      Split the files into more managable chunks, providing
                      an argument to control splitting
  --onlysplit      Split the files and then quit (ie, don't sort)
  --nosplit        Don't split the files (ie, only sort)
@@ -34,7 +34,7 @@ $0 - Bulk loads gff3 files into a chado database.
 =head1 DESCRIPTION
 
 
-splitfiles  -- Just setting this flag will cause the file to be split 
+splitfile  -- Just setting this flag will cause the file to be split 
 by reference sequence.  If you provide an optional argument, it will be
 further split according to these rules:
 
@@ -45,7 +45,7 @@ further split according to these rules:
                      separate file
 
 For example, if you wanted all of your analysis results to go in a separate
-file, you could indicate '--splitfiles type=match', and all cDNA_match,
+file, you could indicate '--splitfile type=match', and all cDNA_match,
 EST_match and cross_genome_match features would go into separate files
 (separate by reference sequence).
 
