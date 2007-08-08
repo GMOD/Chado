@@ -1,0 +1,6 @@
+Java Tools
+
+A set of tools and API to manipulate data stored in chado.
+
+The src folder contains the code generation pipeline to generate the hibernate mapping and the upcomming buisness layer.
+The dist folder contains hibernate mapings for the versions 0.003 and 0.5 of the chado schema. 

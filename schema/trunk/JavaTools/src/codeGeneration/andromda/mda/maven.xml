@@ -1,0 +1,135 @@
+<project xmlns:ant="jelly:ant" xmlns:j="jelly:core"
+	xmlns:maven="jelly:maven" xmlns:i="jelly:interaction" 
+	default="pom:install">
+	
+    <preGoal name="pom:install">
+        <attainGoal name="andromda:run"/>
+    </preGoal>
+    
+    	<goal name="chado:schema2xmi"
+		description="generate chado xmi from a database">
+		<j:set var="schemaUser"
+			value="${maven.andromda.schema2xmi.user}" />
+		<j:while test="${empty(schemaUser)}">
+			<i:ask question="Please enter the schema user name:"
+				answer="schemaUser" />
+		</j:while>
+		<j:set var="schemaPassword"
+			value="${maven.andromda.schema2xmi.password}" />
+		<!-- <j:while test="${empty(schemaPassword)}">
+			<i:ask question="Please enter the schema user password:"
+				answer="schemaPassword" />
+		</j:while>-->
+		<j:set var="connectionUrl"
+			value="${maven.andromda.schema2xmi.connectionUrl}" />
+		<j:while test="${empty(connectionUrl)}">
+			<i:ask question="Please enter the connection URL:"
+				answer="connectionUrl" />
+		</j:while>
+		<j:set var="driverClass"
+			value="${maven.andromda.schema2xmi.driverClass}" />
+		<j:while test="${empty(driverClass)}">
+			<i:ask question="Please enter the driver class:"
+				answer="driverClass" />
+		</j:while>
+		<j:set var="mappingsUri"
+			value="${maven.andromda.schema2xmi.mappingsUri}" />
+		<j:while test="${empty(mappingsUri)}">
+			<i:ask
+				question="Please enter the URI to your mappings file:"
+				answer="mappingsUri" />
+		</j:while>
+
+		<attainGoal name="andromda:init" />
+		<!-- add any model dependencies -->
+		<attainGoal name="andromda:add-model-dependencies" />
+
+		<ant:java classname="fr.inra.mdatools.ChadoSchema2XMI"
+			fork="true">
+			<ant:classpath>
+				<ant:path refid="maven.andromda.classpath" />
+			</ant:classpath>
+			<ant:arg value="-x" />
+			<ant:arg value="${maven.andromda.schema2xmi.xmiVersion}" />
+			<j:set var="inputModel"
+				value="${maven.andromda.schema2xmi.inputModel}" />
+			<j:if test="${inputModel != null and inputModel != ''}">
+				<ant:arg value="-i" />
+				<ant:arg value="${inputModel}" />
+			</j:if>
+			<ant:arg value="-u" />
+			<ant:arg value="${schemaUser}" />
+			<ant:arg value="-p" />
+			<ant:arg value="${schemaPassword}" />
+			<ant:arg value="-c" />
+			<ant:arg value="${connectionUrl}" />
+			<ant:arg value="-d" />
+			<ant:arg value="${driverClass}" />
+			<ant:arg value="-m" />
+			<ant:arg value="${mappingsUri}" />
+			<ant:arg value="-o" />
+			<ant:arg value="${maven.andromda.schema2xmi.outputModel}" />
+			<j:set var="schema"
+				value="${maven.andromda.schema2xmi.schema}" />
+			<j:if test="${schema != null and schema != ''}">
+				<ant:arg value="-s" />
+				<ant:arg value="${schema}" />
+			</j:if>
+			<j:set var="tablePattern"
+				value="${maven.andromda.schema2xmi.tablePattern}" />
+			<j:if
+				test="${tablePattern != null and tablePattern != ''}">
+				<ant:arg value="-t" />
+				<ant:arg value="${tablePattern}" />
+			</j:if>
+			<j:set var="tableExclusionPattern"
+				value="${maven.andromda.schema2xmi.tableExclusionPattern}" />
+			<j:if
+				test="${tableExclusionPattern != null and tableExclusionPattern != ''}">
+				<ant:arg value="-T" />
+				<ant:arg value="${tableExclusionPattern}" />
+			</j:if>
+			<j:set var="columnPattern"
+				value="${maven.andromda.schema2xmi.columnPattern}" />
+			<j:if
+				test="${columnPattern != null and columnPattern != ''}">
+				<ant:arg value="-a" />
+				<ant:arg value="${columnPattern}" />
+			</j:if>
+			<j:set var="package"
+				value="${maven.andromda.schema2xmi.package}" />
+			<j:if test="${package != null and package != ''}">
+				<ant:arg value="-P" />
+				<ant:arg value="${package}" />
+			</j:if>
+			<j:set var="classStereotype"
+				value="${maven.andromda.schema2xmi.classStereotype}" />
+			<j:if
+				test="${classStereotype != null and classStereotype != ''}">
+				<ant:arg value="-C" />
+				<ant:arg value="${classStereotype}" />
+			</j:if>
+			<j:set var="identifierStereotype"
+				value="${maven.andromda.schema2xmi.identifierStereotype}" />
+			<j:if
+				test="${identifierStereotype != null and identifierStereotype != ''}">
+				<ant:arg value="-I" />
+				<ant:arg value="${identifierStereotype}" />
+			</j:if>
+			<j:set var="tableTaggedValue"
+				value="${maven.andromda.schema2xmi.tableTaggedValue}" />
+			<j:if
+				test="${tableTaggedValue != null and tableTaggedValue != ''}">
+				<ant:arg value="-V" />
+				<ant:arg value="${tableTaggedValue}" />
+			</j:if>
+			<j:set var="columnTaggedValue"
+				value="${maven.andromda.schema2xmi.columnTaggedValue}" />
+			<j:if
+				test="${columnTaggedValue != null and columnTaggedValue != ''}">
+				<ant:arg value="-v" />
+				<ant:arg value="${columnTaggedValue}" />
+			</j:if>
+		</ant:java>
+	</goal>
+</project>

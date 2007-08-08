@@ -1,0 +1,220 @@
+<project default="install"
+         xmlns:ant="jelly:ant"
+         xmlns:maven="jelly:maven"
+         xmlns:j="jelly:core"
+         xmlns:util="jelly:util"
+         xmlns:i="jelly:interaction">
+
+    <ant:property environment="env"/>
+
+    <!-- ==================================================================
+           Builds everything and installs it into the local Maven repository
+         ================================================================== -->
+    <goal name="install">
+        <attainGoal name="multiproject:install"/>
+    </goal>
+
+    <!-- ==================================================================
+           Cleans Everything
+         ================================================================== -->
+    <goal name="clean">
+        <attainGoal name="multiproject:clean"/>
+        <!-- get rid of all the log files -->
+        <ant:delete>
+            <ant:fileset dir=".">
+                <ant:include name="**/*.log*"/>
+                <ant:exclude name="maven.log"/>
+                <ant:exclude name="**/*andromda*.log"/>
+            </ant:fileset>
+        </ant:delete>
+    </goal>
+
+    <!-- ==================================================================
+           Cleans Everything and deletes all implementation classes
+         ================================================================== -->
+    <goal name="nuke">
+        <i:ask question="This will also clean out all implementation classes, are you sure (y/n) ?"
+               answer="nukeit"/>
+        <j:choose>
+            <j:when test="${nukeit eq 'y'}">
+                <ant:echo>Nuking source code...</ant:echo>
+                <attainGoal name="clean"/>
+                <ant:delete>
+                    <fileset dir="common/src/java">
+                        <include name="**/*Impl.java"/>
+                    </fileset>
+                    <fileset dir="core/src/java">
+                        <include name="**/*Impl.java"/>
+                    </fileset>
+                    <fileset dir="web/src/java">
+                        <include name="**/*Impl.java"/>
+                    </fileset>
+                </ant:delete>
+                <ant:echo>Finished nuke.</ant:echo>
+            </j:when>
+            <j:otherwise>
+                <ant:echo>Nuke was canceled by user.</ant:echo>
+            </j:otherwise>
+        </j:choose>
+    </goal>
+
+    <!-- ==================================================================
+            Deploy the Application
+         ================================================================== -->
+    <goal name="deploy">
+        <maven:maven
+            descriptor="web/project.xml"
+            goals="deploy"/>
+    </goal>
+
+    <!-- ==================================================================
+           Undeploy the Application
+         ================================================================== -->
+    <goal name="undeploy">
+        <maven:maven
+            descriptor="web/project.xml"
+            goals="undeploy"/>
+    </goal>
+
+    <!-- ==================================================================
+           Builds the Web component
+         ================================================================== -->
+    <goal name="web">
+        <maven:maven
+            descriptor="web/project.xml"
+            goals="war:install"/>
+    </goal>
+
+    <!-- ==================================================================
+            Builds the Core component
+         ================================================================== -->
+    <goal name="core">
+        <maven:maven
+            descriptor="core/project.xml"
+            goals="ejb:install"/>
+    </goal>
+
+    <!-- ==================================================================
+            Builds the Common component
+         ================================================================== -->
+    <goal name="common">
+        <maven:maven
+        descriptor="common/project.xml"
+        goals="jar:install"/>
+    </goal>
+
+    <!-- ==================================================================
+            Runs the MDA component
+         ================================================================== -->
+    <goal name="mda">
+        <maven:maven
+            descriptor="mda/project.xml"
+            goals="pom:install"/>
+    </goal>
+
+    <!-- ==================================================================
+            Starts the AndroMDA server
+         ================================================================== -->
+    <goal name="start-andromda-server">
+        <maven:maven
+            descriptor="mda/project.xml"
+            goals="andromda:start-server"/>
+    </goal>
+
+    <!-- ==================================================================
+            Stops the AndroMDA server
+         ================================================================== -->
+    <goal name="stop-andromda-server">
+        <maven:maven
+            descriptor="mda/project.xml"
+            goals="andromda:stop-server"/>
+    </goal>
+
+    <!-- ============================================================
+             Initializes the database schema for this application
+         ============================================================ -->
+    <goal name="create-schema">
+        <j:set var="script" value="${dataSource.sql.init}"/>
+        <attainGoal name="execute-script"/>
+    </goal>
+
+    <!-- ============================================================
+             Drops the database schema for this application
+         ============================================================ -->
+    <goal name="drop-schema">
+        <j:set var="script" value="${dataSource.sql.drop}"/>
+        <attainGoal name="execute-script"/>
+    </goal>
+
+    <goal name="load-dummy-data">
+        <j:set var="script" value="${dataSource.sql.load}"/>
+        <attainGoal name="execute-script"/>
+    </goal>
+
+    <j:set var="generatedSourceDir" value="${maven.build.dir}"/>
+    <ant:available
+        file="${maven.build.src}"
+        type="dir"
+        property="generatedSrcAvailable"/>
+
+     <!-- ============================================================
+            Adds the generated source to the compile path for
+            each subproject (if any exists)
+          ============================================================ -->
+    <preGoal name="java:compile">
+    <!-- only attempt to add the generated source to the classpath
+             if we have a source directory -->
+        <j:set var="sourceDirectory" value="${pom.build.sourceDirectory}"/>
+        <j:if test="${!empty sourceDirectory}">
+            <j:if test="${generatedSrcAvailable}">
+                <ant:available
+                    file="${sourceDirectory}"
+                    type="dir"
+                    property="srcAvailable"/>
+                <j:choose>
+                    <j:when test="${srcAvailable}">
+                        <!-- add the paths of the generated source to the
+                             maven compile path -->
+                        <ant:path
+                            id="andromda.java.gen.src"
+                            location="${generatedSourceDir}"/>
+                        <maven:addPath
+                            id="maven.compile.src.set"
+                            refid="andromda.java.gen.src"/>
+                    </j:when>
+                    <j:otherwise>
+                        <ant:path id="maven.compile.src.set">
+                            <!-- need to set sources present to true since
+                                 maven thinks no source exist if the directory
+                                 specified by pom.build.sourceDirectory doesn't exist -->
+                            <j:set var="sourcesPresent" value="true"/>
+                            <ant:pathelement location="${generatedSourceDir}"/>
+                        </ant:path>
+                    </j:otherwise>
+                </j:choose>
+            </j:if>
+        </j:if>
+    </preGoal>
+
+    <!-- ============================================================
+             Executes the given DDL script
+         ============================================================ -->
+    <goal name="execute-script">
+        <j:if test="${script != null}">
+            <util:file var="scriptFile" name="${script}"/>
+            <j:if test="${scriptFile.exists()}">
+                <ant:sql driver="${dataSource.driver.class}"
+                         src="${scriptFile}"
+                         url="${dataSource.url}"
+                         userid="${dataSource.user}"
+                         password="${dataSource.password}"
+                         onerror="${dataSource.sql.onError}">
+                    <ant:classpath>
+                        <ant:pathelement location="${dataSource.driver.jar}"/>
+                    </ant:classpath>
+                </ant:sql>
+            </j:if>
+        </j:if>
+    </goal>
+
+</project>
