@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+This is used to map SQL Types to
+model datatypes for Schema2XMI
+got this from http://galaxy.andromda.org/forum/viewtopic.php?p=458&sid=d1370602fbaad97bc4a93aeb9dce8806
+-->
+<mappings name="DatatypeMappings">
+
+<mapping>
+<from>DECIMAL</from>
+<to>datatype::Decimal</to>
+</mapping>
+
+<mapping>
+<from>BIGINT</from>
+<to>datatype::Integer</to>
+</mapping>
+
+<mapping>
+<from>INTEGER</from>
+<to>datatype::Integer</to>
+</mapping>
+
+<mapping>
+<from>REAL</from>
+<to>datatype::Float</to>
+</mapping>
+
+<mapping>
+<from>BOOLEAN</from>
+<to>datatype::Boolean</to>
+</mapping>
+
+<mapping>
+<from>DATE</from>
+<to>datatype::Date</to>
+</mapping>
+
+<mapping>
+<from>VARCHAR</from>
+<to>datatype::String</to>
+</mapping>
+
+<mapping>
+<from>CHAR</from>
+<to>datatype::String</to>
+</mapping>
+
+<mapping>
+<from>TIMESTAMP</from>
+<to>datatype::Timestamp</to>
+</mapping>
+
+<mapping>
+<from>BLOB</from>
+<to>datatype::Blob</to>
+</mapping>
+
+<mapping>
+<from>BYTEA</from>
+<to>datatype::Blob</to>
+</mapping>
+     <mapping>
+        <from>DOUBLE</from>
+        <to>datatype::Double</to>
+    </mapping>
+
+    <mapping>
+        <from>BIT</from>
+        <to>datatype::Boolean</to>
+    </mapping>
+    <mapping>
+        <from>SMALLINT</from>
+        <to>datatype::Short</to>
+    </mapping>
+</mappings> 
+
+
+

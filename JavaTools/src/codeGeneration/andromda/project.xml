@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <artifactId>${application.id}</artifactId>
+    <groupId>${application.id}</groupId>
+    <name>The ${application.name}</name>
+    <currentVersion>${application.version}</currentVersion>
+    <shortDescription>The Chado</shortDescription>
+    <description>
+        Contains the Chado Project.
+    </description>
+    <package>${application.package}</package>
+    <developers>
+        <developer>
+              <name>Cyril Pommier</name>
+              <id></id>
+              <email>cpommier@versailles.inra.fr</email>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>commons-jelly</groupId>
+            <artifactId>commons-jelly-tags-interaction</artifactId>
+            <version>${commons.jelly.version}</version>
+        </dependency>
+    </dependencies>
+</project>

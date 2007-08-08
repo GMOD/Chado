@@ -1,0 +1,60 @@
+  _______________________________________________________________
+  |                                                             |
+  |                   AndroMDA for Chado                        |
+  |_____________________________________________________________|
+
+
+Author : Cyril Pommier INRA URGI 
+         cyril.pommier@versailles.inra.fr
+         
+
+1/ Description
+
+   This maven project allows to generate an UML model (xmi)  from a chado database, and then an hibernate mapping from that model.
+ Future version will hopefully allow to generate also a DAO/Service (buisness) layer for Chado. 
+ See readme.AndroMDA.txt for more details o this technology.
+
+
+2/ Prerequiste
+
+  Maven 1.0.2 (NOT 1.1) : this will take care of all the other dependencies.
+              create a build.properties file in your home directory and insert the following in this file : 
+
+
+maven.repo.remote = file:${user.home}/.maven/repository, \
+                    http://repo1.maven.org/maven, \
+                    http://team.andromda.org/maven
+
+
+3/ Use
+
+  3.1/UML Model generation
+
+   If you are using another RDBMS than postgreSQL, you must edit hibernate.db.dialect and sql.mappings in the file project.properties.
+
+   Cd to mda. Edit the file project.properties and modify the following properties : 
+      dbname=
+      maven.andromda.schema2xmi.user=cpommier
+      maven.andromda.schema2xmi.password=
+      maven.andromda.schema2xmi.driverClass=org.postgresql.Driver
+      maven.andromda.schema2xmi.connectionUrl=
+      #Modify this parameter if you are using something else than PostgreSQL
+      maven.andromda.schema2xmi.mappingsUri=file:./PgMapping.xml
+
+    To launch the model generation simply type : 
+      maven chado:schema2xmi
+
+
+    If you want to have a look at the model, you can use Magic Draw Community Edition version 9.5 
+    (IMPORTANT, this has been only tested with UML 1.4, don't try to use this with outputs from a newer version of Magic Draw).
+
+
+   3.2/ Hibernate Layer generation
+  Cd to the project home and issue the following command : 
+     maven  mda  -Dfilter=hibernate 
+   If you want to check, the sources have been generated in core/target/src
+
+   3.3/Package a jar archive.
+  Type maven common core. 
+  The jar archive should have been generated in core/target/ as chado-core-0.003.jar. 
+  If you want to change the version number, edit application.version in ${basedir}/build.properties
