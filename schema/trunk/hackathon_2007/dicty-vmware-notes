@@ -1,0 +1,26 @@
+installed:
+  sudo apt-get install mediawiki apache2-doc lynx php4-gd2 mysql-server mysql-client  libgd-tools
+
+  appended "Include /etc/mediawiki/apache.conf" to /etc/apache2/apache2.conf
+  restart apache results in this error, but I can't figure out why:
+    [warn] The Alias directive in /etc/mediawiki/apache.conf at line 1 will probably never match because it overlaps an earlier Alias.
+
+browse to (from another machine) http://192.168.0.100/mediawiki/
+
+  do simple set up of mediawiki  Oy! this is version 1.4 so it's pretty old
+
+uncomment 'multiverse' lines in /etc/apt/sources.conf
+
+apt-get install mediawiki1.7
+
+  which removed php4 and installed php5
+
+apt-get remove mediawiki1.7
+
+install mediawiki 1.10.1 by hand
+
+  WikiSysop password: gmod
+  wikiuser (wikidb) password: wikiuser
+
+Installed Cite and ProcessCite extensions
+
