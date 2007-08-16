@@ -1,0 +1,18 @@
+sudo /sbin/fdisk /dev/sdb
+  n   #add a new partition
+  p   #primary partition
+  1   #partition number 1
+  1   #first cylinder
+  <return>  #use the whole disk
+  w   #write out new partition table and quit
+sudo /sbin/mkfs.ext3 -j -L "/var/lib/postgresql" /dev/sdb1
+sudo mount -t ext3 /dev/sdb1 /media/tmp
+sudo /etc/init.d/postgresql stop
+sudo cp -a /var/lib/postresql/ /media/tmp
+sudo umount /media/tmp
+sudo rm -rf /var/lib/postgresql/*
+sudo mount -t ext3 /dev/sdb1 /var/lib/postgresql
+sudo /etc/init.d/postgresql start
+
+repeat for /var/lib/mysql
+

@@ -24,3 +24,7 @@ install mediawiki 1.10.1 by hand
 
 Installed Cite and ProcessCite extensions
 
+Installed TableEdit extension (0.75) and tested a little in the sandbox
+
+added 100GB drives for each mysql (mounted at /var/lib/mysql) and postgres
+(mounted at /var/lib/postresql).
