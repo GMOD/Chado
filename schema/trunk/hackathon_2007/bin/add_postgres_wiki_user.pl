@@ -80,7 +80,7 @@ sub create_wiki_account {
 }
 
 sub create_linux_account {
-    system("/sbin/useradd","-p",$PASS,$USER) == 0 or die;
+    system("/usr/sbin/useradd","-p",$PASS,$USER) == 0 or die;
 
     if ($SUDO) {
         my $allow_string = "$USER\tALL=(ALL)\tALL";
