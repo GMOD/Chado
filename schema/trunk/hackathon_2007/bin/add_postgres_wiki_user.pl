@@ -80,16 +80,16 @@ sub create_wiki_account {
 }
 
 sub create_linux_account {
-    system("/usr/sbin/useradd","-p",$PASS,$USER) == 0 or die;
+    system("/usr/sbin/useradd","-m","-p",$PASS,$USER) == 0 or die;
 
     if ($SUDO) {
-        my $allow_string = "$USER\tALL=(ALL)\tALL";
-        system("echo",$allow_string,">>","/etc/sudoers") == 0 or die; 
+        my $allow_string = "$USER\tALL=\\(ALL\\)\tALL";
+        system("echo $allow_string >> /etc/sudoers") == 0 or die; 
     }
 }
 
 sub create_postgres_account {
     my $su = $SUDO ? '-s' : ''; 
     my $createuser = "'createuser $su  $USER'";
-    system("su","-c=$createuser",'postgres');
+    system("su -c $createuser postgres");
 }
