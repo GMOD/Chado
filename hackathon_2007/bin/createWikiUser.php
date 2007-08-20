@@ -28,8 +28,8 @@ if( !is_object( $user ) ) {
 	echo( "invalid username.\n" );
 	die( 1 );
 } elseif( 0 != $user->idForName() ) {
-	echo( "account exists.\n" );
-	die( 1 );
+	echo( "Wiki account exists.\n" );
+	die( 0 );
 }
 
 # Insert the account into the database
