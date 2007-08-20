@@ -3,12 +3,13 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use Pod::Usage;
 
 =pod
 
 =head1 SYNOPSYS
 
-  create_postgres_wiki_user.pl [options] -u username -p password
+  sudo create_postgres_wiki_user.pl [options] -u username -p password
 
 =head1 OPTIONS
 
@@ -88,6 +89,7 @@ sub create_linux_account {
 }
 
 sub create_postgres_account {
-    my $createuser = "createuser $USER";
+    my $su = $SUDO ? '-s' : ''; 
+    my $createuser = "'createuser $su  $USER'";
     system("su","-c=$createuser",'postgres');
 }
