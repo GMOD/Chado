@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.120 2007-07-12 17:55:07 scottcain Exp $
+# $Id: Makefile.PL,v 1.121 2007-08-21 14:32:15 mwz444 Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -153,7 +153,7 @@ my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #C
 my $all_envs = join( '|', keys %env_required );
 
 my %O;
-$O{GMOD_ROOT}    = $ENV{GMOD_ROOT} || catdir qw[usr local gmod];
+$O{GMOD_ROOT}    = $ENV{GMOD_ROOT} || catdir ( '', 'usr', 'local', 'gmod', );
 $O{PACKAGE_HOME} = catfile $O{GMOD_ROOT}, 'lib', 'schema';
 $O{COREDEF}      = catfile $working_dir, 'modules', 'idb-full.modules';
 $O{EXTDEF}       = catfile $working_dir, 'modules', 'extension.modules';
