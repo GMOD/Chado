@@ -33,6 +33,13 @@ are --wiki_only, to skip creation of the shell and postgres accounts, and
 --sudo, to give sudo (ie root access) permission to the created shell and
 postgres accounts.
 
+=head2 About Passwords
+
+You will need to reenter the password for the linux command 'passwd'.  Also
+there will be no password set for the PostgreSQL user account.  If you want
+a password for the database, please see the PostgreSQL user manual for
+information on setting it.
+
 =head1 AUTHOR
 
 Scott Cain, cain@cshl.edu
@@ -80,7 +87,8 @@ sub create_wiki_account {
 }
 
 sub create_linux_account {
-    system("/usr/sbin/useradd","-m","-p",$PASS,$USER) == 0 or die;
+    system("/usr/sbin/useradd","-m",$USER) == 0 or die;
+    system("passwd",$USER);
 
     if ($SUDO) {
         my $allow_string = "$USER\tALL=\\(ALL\\)\tALL";
