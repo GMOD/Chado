@@ -87,16 +87,19 @@ sub create_wiki_account {
 }
 
 sub create_linux_account {
+    warn "Creating linux shell account...\n";
     system("/usr/sbin/useradd","-m",$USER) == 0 or die;
     system("passwd",$USER);
 
     if ($SUDO) {
+        warn "Giving shell acount sudo...\n";
         my $allow_string = "$USER\tALL=\\(ALL\\)\tALL";
         system("echo $allow_string >> /etc/sudoers") == 0 or die; 
     }
 }
 
 sub create_postgres_account {
+    warn "Creating PostgreSQL account...\n";
     my $su = $SUDO ? '-s' : ''; 
     my $createuser = "'createuser $su  $USER'";
     system("su -c $createuser postgres");
