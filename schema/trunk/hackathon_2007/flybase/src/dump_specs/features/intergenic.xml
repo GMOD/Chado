@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chado SYSTEM "/users/zhou/work/flybase/xml/chado_stan.dtd">
+
+
+<chado dumpspec="proteins.xml" date="Fri Dec 16 2005">
+   <feature dump="cols">
+      <_appdata name="genus">$1</_appdata>
+      <_appdata name="species">$2</_appdata>
+      
+      <is_analysis test="yes">false</is_analysis>
+      <is_obsolete test="yes">false</is_obsolete>
+      
+      <type_id test="yes">
+          <cvterm>
+              <name>intergenic_region</name>
+          </cvterm>
+      </type_id>
+
+      <organism_id test="yes">
+        <organism>
+            <genus>$1</genus>
+            <species>$2</species>
+        </organism>
+      </organism_id>
+
+      <organism_id>
+         <organism dump="cols" />
+      </organism_id>
+
+      <featureloc dump="cols" />
+   </feature>
+</chado>

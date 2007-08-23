@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    This dumpspec dumps out all the chromsome information and sequence for a single species.
+-->
+<chado dumpspec="chromosomes_all.xml" date="Fri Dec 16 2005">
+   <feature dump="cols">
+      <_appdata name="genus">$1</_appdata>
+      <_appdata name="species">$2</_appdata>
+      <_sql>
+         select feature_0.timeaccessioned, feature_0.name,
+                feature_0.timelastmodified, feature_0.residues,
+                feature_0.dbxref_id, feature_0.is_obsolete,
+                feature_0.feature_id, feature_0.uniquename, feature_0.seqlen,
+                feature_0.md5checksum, feature_0.organism_id,
+                feature_0.type_id, feature_0.is_analysis
+            from feature feature_0, cvterm cvterm_0, organism organism_0
+            where cvterm_0.name in ('chromosome_arm','chromosome','ultra_scaffold','golden_path_region')
+                  and organism_0.genus='$1' and organism_0.species='$2'
+                  and feature_0.residues is not null
+                  and feature_0.is_analysis=false and feature_0.is_obsolete=false
+                  and feature_0.organism_id=organism_0.organism_id
+                  and feature_0.type_id=cvterm_0.cvterm_id
+      </_sql>
+      
+      <organism_id>
+         <organism dump="cols" />
+      </organism_id>
+      
+   </feature>
+</chado>

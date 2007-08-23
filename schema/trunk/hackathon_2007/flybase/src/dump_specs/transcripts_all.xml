@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chado dumpspec="transcripts_all.xml" date="May 5th 2006">
+    <feature dump="cols">
+        <uniquename test="ms">^FBtr[0-9]+$</uniquename>
+        <name test="ms">^\\S+-R[A-Z]+$</name>
+        <is_obsolete test="yes">false</is_obsolete>
+        <is_analysis test="yes">false</is_analysis>
+        <type_id test="yes">
+            <cvterm>
+                <name test="in">
+                    ('pseudogene','tRNA','snRNA','ncRNA','mRNA','rRNA','snoRNA','miRNA')
+                </name>
+            </cvterm>
+        </type_id>
+
+        <!-- Get organism info -->
+        <organism_id>
+            <organism dump="cols" />
+        </organism_id>
+
+        <!-- Get type information -->
+        <type_id dump="cols">
+            <cvterm />
+        </type_id>
+
+        <!-- Get feature properties -->
+        <featureprop dump="cols">
+            <featureprop_pub>
+                <pub_id>
+                    <pub dump="select">
+                        <uniquename />
+                        <title />
+                        <miniref />
+                        <is_obsolete />
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </pub>
+                </pub_id>
+            </featureprop_pub>
+        </featureprop>
+
+        <!-- Get the related publications -->
+        <feature_pub>
+            <pub_id>
+                <pub dump="select">
+                    <uniquename />
+                    <title />
+                    <miniref />
+                    <is_obsolete />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                </pub>
+            </pub_id>
+        </feature_pub>
+
+        <!-- Get synonyms -->
+        <feature_synonym dump="cols">
+            <pub_id>
+                <pub dump="select">
+                    <uniquename />
+                    <title />
+                    <miniref />
+                    <is_obsolete />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                </pub>
+            </pub_id>
+            <synonym_id>
+                <synonym dump="select">
+                    <name />
+                    <synonym_sgml />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                </synonym>
+            </synonym_id>
+        </feature_synonym>
+
+        <!-- Get dbxrefs -->
+        <feature_dbxref dump="cols">
+            <dbxref_id>
+                <dbxref dump="cols">
+                    <dbxrefprop dump="cols" />
+                </dbxref>
+            </dbxref_id>
+        </feature_dbxref>
+
+        <!-- Get supporting cDNAs -->
+        <feature_relationship>
+            <type_id test="yes">
+                <cvterm>
+                    <name>supports</name>
+                </cvterm>
+            </type_id>
+            <subject_id test="yes">
+                <feature>
+                    <type_id>
+                        <cvterm>
+                            <name test="in">('cDNA','EST')</name>
+                        </cvterm>
+                    </type_id>
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </subject_id>
+            <type_id>
+                <cvterm dump="select">
+                    <name />
+                </cvterm>
+            </type_id>
+            <subject_id>
+                <feature dump="select">
+                    <uniquename />
+                    <is_analysis />
+                    <is_obsolete />
+                    
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <feature_relationship>
+                        <object_id test="yes">
+                            <feature>
+                                <type_id>
+                                   <cvterm>
+                                        <name>cDNA_clone</name>
+                                    </cvterm>
+                                </type_id>
+                                <is_obsolete>false</is_obsolete>
+                            </feature>
+                        </object_id>
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                        <object_id>
+                            <feature dump="select">
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+                                <uniquename />
+                                <name />
+                                <is_analysis />
+                                <is_obsolete />
+                            </feature>
+                        </object_id>
+                        
+                        <feature_relationship_pub>
+                            <pub_id>
+                                <pub dump="select">
+                                    <uniquename />
+                                    <title />
+                                    <miniref />
+                                    <is_obsolete />
+                                    <type_id>
+                                        <cvterm dump="select">
+                                            <name />
+                                        </cvterm>
+                                    </type_id>
+                                </pub>
+                            </pub_id>
+                        </feature_relationship_pub>
+                    </feature_relationship>
+                </feature>
+            </subject_id>
+            
+            <feature_relationshipprop dump="select">
+                <rank />
+                <value />
+                <type_id>
+                    <cvterm dump="select">
+                        <name />
+                    </cvterm>
+                </type_id>
+            </feature_relationshipprop>
+            
+            <feature_relationship_pub>
+                <pub_id>
+                    <pub dump="select">
+                        <uniquename />
+                        <title />
+                        <miniref />
+                        <is_obsolete />
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </pub>
+                </pub_id>
+            </feature_relationship_pub>
+        </feature_relationship>
+        
+        <!-- Get the parent gene of this transcript. -->
+        <feature_relationship dump="select">
+            <type_id test="yes">
+                <cvterm>
+                    <name>partof</name>
+                </cvterm>
+            </type_id>
+            <object_id test="yes">
+                <feature>
+                    <type_id test="yes">
+                        <cvterm>
+                            <name>gene</name>
+                        </cvterm>
+                    </type_id>
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </object_id>
+            <object_id>
+                <feature dump="select">
+                    <name />
+                    <uniquename />
+                    <is_analysis />
+                    <is_obsolete />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <feature_synonym dump="select" limit="1">
+                        <is_current test="yes">true</is_current>
+                        <is_internal test="yes">false</is_internal>
+
+                        <is_current />
+                        <is_internal />
+
+                        <synonym_id test="yes">
+                            <synonym>
+                                <type_id>
+                                    <cvterm>
+                                        <name>symbol</name>
+                                    </cvterm>
+                                </type_id>
+                            </synonym>
+                        </synonym_id>
+                        <synonym_id>
+                            <synonym dump="select">
+                                <name />
+                                <synonym_sgml />
+                            </synonym>
+                        </synonym_id>
+                    </feature_synonym>
+
+                    <!--
+                        Get all the transcripts produced by this gene.
+                        This will include the transcript from above so it will have
+                        to be ignored during reporting.  Would be nice if XORT
+                        could ignore it.
+                    -->
+                    <feature_relationship>
+                        <type_id test="yes">
+                            <cvterm>
+                                <name>partof</name>
+                            </cvterm>
+                        </type_id>
+                        <subject_id test="yes">
+                            <feature>
+                                <uniquename test="ms">^FBtr[0-9]+$</uniquename>
+                                <name test="ms">^\\S+-R[A-Z]+$</name>
+                                <is_obsolete>false</is_obsolete>
+                                <is_analysis>false</is_analysis>
+                            </feature>
+                        </subject_id>
+                        <subject_id>
+                            <feature dump="select">
+                                <uniquename />
+                                <name />
+                                <seqlen />
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+                                <is_analysis />
+                                <is_obsolete />
+
+                                <feature_synonym dump="select" limit="1">
+                                    <is_current test="yes">true</is_current>
+                                    <is_internal test="yes">false</is_internal>
+
+                                    <is_current />
+                                    <is_internal />
+
+                                    <synonym_id test="yes">
+                                        <synonym>
+                                            <type_id>
+                                                <cvterm>
+                                                    <name>symbol</name>
+                                                </cvterm>
+                                            </type_id>
+                                        </synonym>
+                                    </synonym_id>
+                                    <synonym_id>
+                                        <synonym dump="select">
+                                            <name />
+                                            <synonym_sgml />
+                                        </synonym>
+                                    </synonym_id>
+                                </feature_synonym>
+
+                                <!--
+                                    Get all the proteins produced by these transcripts.
+                                -->
+                                <feature_relationship>
+                                    <type_id test="yes">
+                                        <cvterm>
+                                            <name>producedby</name>
+                                        </cvterm>
+                                    </type_id>
+                                    <subject_id test="yes">
+                                        <feature>
+                                            <uniquename test="ms">^FBpp[0-9]+$</uniquename>
+                                            <name test="ms">^\\S+-P[A-Z]+$</name>
+                                            <is_obsolete>false</is_obsolete>
+                                            <is_analysis>false</is_analysis>
+                                        </feature>
+                                    </subject_id>
+                                    <subject_id>
+                                        <feature dump="select">
+                                            <uniquename />
+                                            <name />
+                                            <seqlen />
+                                            <is_obsolete />
+                                            <is_analysis />
+                                            <type_id>
+                                                <cvterm dump="select">
+                                                    <name />
+                                                </cvterm>
+                                            </type_id>
+
+                                            <feature_synonym dump="select" limit="1">
+                                                <is_current test="yes">true</is_current>
+                                                <is_internal test="yes">false</is_internal>
+
+                                                <is_current />
+                                                <is_internal />
+
+                                                <synonym_id test="yes">
+                                                    <synonym>
+                                                        <type_id>
+                                                            <cvterm>
+                                                                <name>symbol</name>
+                                                            </cvterm>
+                                                        </type_id>
+                                                    </synonym>
+                                                </synonym_id>
+                                                <synonym_id>
+                                                    <synonym dump="select">
+                                                        <name />
+                                                        <synonym_sgml />
+                                                    </synonym>
+                                                </synonym_id>
+                                            </feature_synonym>
+                                        </feature>
+                                    </subject_id>
+                                    <feature_relationship_pub>
+                                        <pub_id>
+                                            <pub dump="select">
+                                                <uniquename />
+                                                <title />
+                                                <miniref />
+                                                <is_obsolete />
+                                                <type_id>
+                                                    <cvterm dump="select">
+                                                        <name />
+                                                    </cvterm>
+                                                </type_id>
+                                            </pub>
+                                        </pub_id>
+                                    </feature_relationship_pub>
+                                </feature_relationship>
+                            </feature>
+                        </subject_id>
+                        <feature_relationship_pub>
+                            <pub_id>
+                                <pub dump="select">
+                                    <uniquename />
+                                    <title />
+                                    <miniref />
+                                    <is_obsolete />
+                                    <type_id>
+                                        <cvterm dump="select">
+                                            <name />
+                                        </cvterm>
+                                    </type_id>
+                                </pub>
+                            </pub_id>
+                        </feature_relationship_pub>
+                    </feature_relationship>
+                </feature>
+            </object_id>
+            <feature_relationship_pub>
+                <pub_id>
+                    <pub dump="select">
+                        <uniquename />
+                        <title />
+                        <miniref />
+                        <is_obsolete />
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </pub>
+                </pub_id>
+            </feature_relationship_pub>
+        </feature_relationship>
+
+    </feature>
+</chado>

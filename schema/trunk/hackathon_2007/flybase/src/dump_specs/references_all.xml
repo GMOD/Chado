@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This will dump all pub records in chadoXML -->
+<chado dumpspec="dumpspec_pub_all.xml" date="July 27 2005">
+    <pub dump="cols">
+        <uniquename test="ms">^FBrf[0-9]+$</uniquename>
+        <is_obsolete test="yes">false</is_obsolete>
+
+        <pubauthor dump="all" />
+
+        <pubprop dump="cols">
+            <type_id>
+                <cvterm dump="select">
+                    <name />
+                </cvterm>
+            </type_id>
+        </pubprop>
+
+        <pub_dbxref dump="all" />
+
+        <pub_relationship dump="all">
+            <object_id test="yes">
+                <pub>
+                    <is_obsolete>false</is_obsolete>
+                </pub>
+            </object_id>
+            <object_id>
+                <pub dump="cols">
+
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <pubauthor dump="all" />
+
+                    <pubprop dump="cols">
+                        <type_id test="yes">
+                            <cvterm>
+                                <name test="nti">('pubmed_abstract','pubmed_fulltext_url')</name>
+                            </cvterm>
+                        </type_id>
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </pubprop>
+
+                    <pub_dbxref dump="all" />
+                </pub>
+            </object_id>
+        </pub_relationship>
+
+        <pub_relationship dump="all">
+            <subject_id test="yes">
+                <pub>
+                    <is_obsolete>false</is_obsolete>
+                </pub>
+            </subject_id>
+            <subject_id>
+                <pub dump="cols">
+
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <pubauthor dump="all" />
+
+                    <pubprop dump="cols">
+                        <type_id test="yes">
+                            <cvterm>
+                                <name test="nti">('pubmed_abstract','pubmed_fulltext_url')</name>
+                            </cvterm>
+                        </type_id>
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </pubprop>
+
+                    <pub_dbxref dump="all" />
+                </pub>
+            </subject_id>
+        </pub_relationship>
+
+        <feature_pub>
+            <feature_id test="yes">
+                <feature>
+                    
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </feature_id>
+            <feature_id>
+                <feature dump="select">
+                    <uniquename />
+                    <is_obsolete />
+                    <is_analysis />
+
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <!--  Get organism info -->
+                    <organism_id>
+                        <organism dump="cols" />
+                    </organism_id>
+
+
+                    <feature_synonym dump="select" limit="1">
+                        <is_current test="yes">true</is_current>
+                        <is_internal test="yes">false</is_internal>
+
+                        <is_current />
+                        <is_internal />
+
+                        <synonym_id test="yes">
+                            <synonym>
+                                <type_id>
+                                    <cvterm>
+                                        <name>symbol</name>
+                                    </cvterm>
+                                </type_id>
+                            </synonym>
+                        </synonym_id>
+                        <synonym_id>
+                            <synonym dump="select">
+                                <name />
+                                <synonym_sgml />
+                            </synonym>
+                        </synonym_id>
+                    </feature_synonym>
+                </feature>
+            </feature_id>
+        </feature_pub>
+    </pub>
+</chado>
