@@ -6,4 +6,10 @@ dir/file                 description
 ==========================================================================
 src/perl                 Perl modules used by FlyBase for writing ChadoXML
 
+src/dump_specs           XORT dumpspecs that are used for generating FlyBase
+                         web reports.
+
+src/dump_specs/features  XORT dumpspecs for dumping ChadoXML that is used for
+                         generating GFF and FASTA files.
+
 loading_ontologies.txt   Standard operating procedure for loading *.obo files.

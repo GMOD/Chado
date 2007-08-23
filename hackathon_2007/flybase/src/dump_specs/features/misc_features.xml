@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    This dumpspec dumps all features that are essentially stand alone
+    objects in Chado.  These are features that aren't analysis features,
+    predicted features, gene or gene product objects, etc...  These features
+    are also directly localized to the chromosome via featurelocs.
+-->
+<chado dumpspec="misc_features.xml" date="Fri Dec 16 2005">
+    <feature dump="cols">
+        <_appdata name="genus">$1</_appdata>
+        <_appdata name="species">$2</_appdata>
+
+        <is_obsolete test="yes">false</is_obsolete>
+        <is_analysis test="yes">false</is_analysis>
+        <type_id test="yes">
+            <cvterm>
+                <name test="in">
+                    ('polyA_site','point_mutation','protein_binding_site','rescue_fragment',
+                    'mature_peptide','enhancer','aberration_junction','regulatory_region',
+                    'sequence_variant','DNA_motif','RNA_motif','chromosome_band',
+                    'oligonucleotide','pcr_product','BAC_cloned_genomic_insert',
+                    'complex_subtitution','deletion','insertion_site', 'transposable_element_target_site_duplication',
+                    'uncharacterized_change_in_nucleotide_sequence')
+                </name>
+            </cvterm>
+        </type_id>
+        
+        <featureloc test="yes">
+            <srcfeature_id>
+                <feature>
+                    <organism_id>
+                        <organism>
+                            <genus>$1</genus>
+                            <species>$2</species>
+                        </organism>
+                    </organism_id>
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+        
+        <type_id>
+            <cvterm dump="select">
+                <name />
+            </cvterm>
+        </type_id>
+
+        <library_feature>
+            <library_id>
+                <library dump="select">
+                    <uniquename />
+                </library>
+            </library_id>
+        </library_feature>
+
+        <dbxref_id>
+            <dbxref dump="cols" />
+        </dbxref_id>
+
+        <organism_id>
+            <organism dump="cols" />
+        </organism_id>
+
+        <featureloc dump="cols">
+            <srcfeature_id>
+                <feature dump="select">
+                    <organism_id>
+                        <organism />
+                    </organism_id>
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                    <seqlen />
+                    <uniquename />
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+
+        <featureprop dump="select">
+            <type_id>
+                <cvterm dump="select">
+                    <name />
+                </cvterm>
+            </type_id>
+            <value />
+        </featureprop>
+
+        <!-- Get synonyms -->
+        <feature_synonym dump="select">
+            <is_current />
+            <is_internal />
+            <synonym_id>
+                <synonym dump="select">
+                    <name />
+                    <synonym_sgml />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                </synonym>
+            </synonym_id>
+        </feature_synonym>
+
+        <feature_dbxref dump="cols">
+            <dbxref_id>
+                <dbxref dump="cols" />
+            </dbxref_id>
+        </feature_dbxref>
+
+        <!-- Get related transcripts, protein, genes, etc... -->
+        <feature_relationship dump="all">
+            <type_id test="yes">
+                <cvterm>
+                    <name>partof</name>
+                </cvterm>
+            </type_id>
+            <object_id test="yes">
+                <feature>
+                    <is_obsolete>false</is_obsolete>
+                    <featureloc>
+                        <srcfeature_id />
+                    </featureloc>
+                </feature>
+            </object_id>
+            <object_id>
+                <feature dump="select">
+                    <uniquename />
+                    <name />
+                    <featureloc dump="select">
+                        <fmin />
+                        <fmax />
+                        <strand />
+                    </featureloc>
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                </feature>
+            </object_id>
+            <type_id>
+                <cvterm dump="select">
+                    <name />
+                </cvterm>
+            </type_id>
+        </feature_relationship>
+    </feature>
+    
+    <!-- Dump the repeat region features -->
+    <feature dump="cols">
+        <_appdata name="genus">$1</_appdata>
+        <_appdata name="species">$2</_appdata>
+
+        <is_obsolete test="yes">false</is_obsolete>
+        <is_analysis test="yes">false</is_analysis>
+        <uniquename test="ms">RR[0-9]{5}</uniquename>
+        
+        <type_id test="yes">
+            <cvterm>
+                <name test="in">
+                    ('repeat_region','tandem_repeat','transposable_element')
+                </name>
+            </cvterm>
+        </type_id>
+        
+        <featureloc test="yes">
+            <srcfeature_id>
+                <feature>
+                    <organism_id>
+                        <organism>
+                            <genus>$1</genus>
+                            <species>$2</species>
+                        </organism>
+                    </organism_id>
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+        
+        <type_id>
+            <cvterm dump="select">
+                <name />
+            </cvterm>
+        </type_id>
+
+        <organism_id>
+            <organism dump="cols" />
+        </organism_id>
+
+        <featureloc dump="cols">
+            <srcfeature_id>
+                <feature dump="select">
+                    <organism_id>
+                        <organism />
+                    </organism_id>
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                    <seqlen />
+                    <uniquename />
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+
+        <featureprop dump="select">
+            <type_id>
+                <cvterm dump="select">
+                    <name />
+                </cvterm>
+            </type_id>
+            <value />
+        </featureprop>
+
+        <feature_dbxref dump="cols">
+            <dbxref_id>
+                <dbxref dump="cols" />
+            </dbxref_id>
+        </feature_dbxref>
+    </feature>
+</chado>

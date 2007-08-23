@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chado dumpspec="genes.xml" date="Fri Dec 16 2005">
+    <feature dump="cols">
+        <_appdata name="genus">$1</_appdata>
+        <_appdata name="species">$2</_appdata>
+        
+        <uniquename test="ms">^FBgn[0-9]+$</uniquename>
+        <is_analysis test="yes">false</is_analysis>
+        <is_obsolete test="yes">false</is_obsolete>
+        <organism_id test="yes">
+            <organism>
+                <genus>$1</genus>
+                <species>$2</species>
+            </organism>
+        </organism_id>
+        
+        <!-- Exclude features that are localized to obsoleted chromosomes/scaffolds. -->
+        <featureloc test="yes">
+            <srcfeature_id>
+                <feature>
+                    <is_obsolete>false</is_obsolete>
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+
+        <type_id>
+            <cvterm dump="select">
+                <name />
+            </cvterm>
+        </type_id>
+
+        <!-- Get the feature cvterms -->
+        <feature_cvterm dump="select">
+            <cvterm_id>
+                <cvterm dump="cols" />
+            </cvterm_id>
+            <!-- Only need to check for negated terms for GFF files. -->
+            <feature_cvtermprop dump="cols">
+                <type_id test="yes">
+                    <cvterm>
+                        <name>NOT</name>
+                    </cvterm>
+                </type_id>
+                <type_id>
+                    <cvterm dump="select">
+                        <name />
+                    </cvterm>
+                </type_id>
+            </feature_cvtermprop>
+        </feature_cvterm>
+
+        <organism_id>
+            <organism dump="cols" />
+        </organism_id>
+
+        <featureloc dump="cols">
+            <srcfeature_id>
+                <feature dump="select">
+                    <organism_id>
+                        <organism />
+                    </organism_id>
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                    <seqlen />
+                    <uniquename />
+                </feature>
+            </srcfeature_id>
+        </featureloc>
+
+        <featureprop dump="cols">
+            <type_id test="yes">
+                <cvterm>
+                    <name>
+                        <or>gbunit</or>
+                        <or>cyto_range</or>
+                    </name>
+                </cvterm>
+            </type_id>
+        </featureprop>
+
+        <feature_dbxref dump="cols">
+            <dbxref_id>
+                <dbxref dump="cols" />
+            </dbxref_id>
+        </feature_dbxref>
+
+        <!-- Get all RNAs. -->
+        <feature_relationship dump="all">
+            <type_id test="yes">
+                <cvterm>
+                    <name>partof</name>
+                </cvterm>
+            </type_id>
+            <subject_id test="yes">
+                <feature>
+                    <is_obsolete>false</is_obsolete>
+                    <is_analysis>false</is_analysis>
+                    <type_id>
+                        <cvterm>
+                            <name test="in">
+                                ('mRNA','snoRNA','ncRNA',
+                                'snRNA','tRNA','rRNA','miRNA',
+                                'pseudogene')
+                            </name>
+                        </cvterm>
+                    </type_id>
+                    <featureloc>
+                        <srcfeature_id />
+                    </featureloc>
+                </feature>
+            </subject_id>
+            <subject_id>
+                <feature dump="select">
+                    <uniquename />
+                    <name />
+                    <residues />
+                    <md5checksum />
+                    <seqlen />
+                    
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <featureloc dump="cols">
+                        <srcfeature_id>
+                            <feature dump="select">
+                                <organism_id>
+                                    <organism />
+                                </organism_id>
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+                                <seqlen />
+                                <uniquename />
+                            </feature>
+                        </srcfeature_id>
+                    </featureloc>
+
+                    <feature_dbxref dump="cols">
+                        <dbxref_id>
+                            <dbxref />
+                        </dbxref_id>
+                    </feature_dbxref>
+                    
+                    <featureprop dump="select">
+                        <type_id test="yes">
+                            <cvterm>
+                                <name test="in">('score','score_text')</name>
+                            </cvterm>
+                        </type_id>
+                        
+                        <value />
+                        <type_id>
+                            <cvterm dump="select">
+                                <name />
+                            </cvterm>
+                        </type_id>
+                    </featureprop>
+
+                    <!-- Get all introns, exons, UTRs, CDS, and proteins. -->
+                    <feature_relationship dump="all">
+                        <type_id test="yes">
+                            <cvterm>
+                                <name test="in">('partof','producedby')</name>
+                            </cvterm>
+                        </type_id>
+                        <subject_id test="yes">
+                            <feature>
+                                <is_obsolete>false</is_obsolete>
+                                <featureloc>
+                                    <srcfeature_id />
+                                </featureloc>
+                            </feature>
+                        </subject_id>
+                        <subject_id>
+                            <feature dump="select">
+                                <uniquename />
+                                <name />
+                                <residues />
+                                <md5checksum />
+                                <seqlen />
+                                
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+
+                                <featureprop dump="select">
+                                    <type_id test="yes">
+                                        <cvterm>
+                                            <name test="in">('derived_isoelectric_point','derived_molecular_weight')</name>
+                                        </cvterm>
+                                    </type_id>
+
+                                    <value />
+                                    <type_id>
+                                        <cvterm dump="select">
+                                            <name />
+                                        </cvterm>
+                                    </type_id>
+                                </featureprop>
+
+                                <featureloc dump="cols">
+                                    <srcfeature_id>
+                                        <feature dump="select">
+                                            <organism_id>
+                                                <organism />
+                                            </organism_id>
+                                            <type_id>
+                                                <cvterm dump="select">
+                                                    <name />
+                                                </cvterm>
+                                            </type_id>
+                                            <seqlen />
+                                            <uniquename />
+                                        </feature>
+                                    </srcfeature_id>
+                                </featureloc>
+
+                                <feature_dbxref dump="cols">
+                                    <dbxref_id>
+                                        <dbxref />
+                                    </dbxref_id>
+                                </feature_dbxref>
+                            </feature>
+                        </subject_id>
+                    </feature_relationship>
+                </feature>
+            </subject_id>
+        </feature_relationship>
+        
+        <!-- Get all orthologs in the subject_id direction. -->
+        <feature_relationship dump="all">
+            <type_id test="yes">
+                <cvterm>
+                    <name>putative_ortholog_of</name>
+                </cvterm>
+            </type_id>
+            <subject_id test="yes">
+                <feature>
+                    <is_obsolete>false</is_obsolete>
+                    
+                </feature>
+            </subject_id>
+            <subject_id>
+                <feature dump="select">
+                    <uniquename />
+                    <name />
+                    <organism />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+                    
+                    <featureloc dump="cols">
+                        <srcfeature_id>
+                            <feature dump="select">
+                                <organism_id>
+                                    <organism />
+                                </organism_id>
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+                                <seqlen />
+                                <uniquename />
+                            </feature>
+                        </srcfeature_id>
+                    </featureloc>
+
+                    <feature_dbxref dump="cols">
+                        <is_current test="yes">true</is_current>
+                        <dbxref_id test="yes">
+                            <dbxref>
+                                <db_id>
+                                    <db>
+                                        <name test="in">
+                                            ('FlyBase','FlyBase Annotation IDs')
+                                        </name>
+                                    </db>
+                                </db_id>
+                            </dbxref>
+                        </dbxref_id>
+                        <dbxref_id>
+                            <dbxref />
+                        </dbxref_id>
+                    </feature_dbxref>
+                </feature>
+            </subject_id>
+        </feature_relationship>
+        
+        <!-- Get all orthologs in the object_id direction. -->
+        <feature_relationship dump="all">
+            <type_id test="yes">
+                <cvterm>
+                    <name>putative_ortholog_of</name>
+                </cvterm>
+            </type_id>
+            <object_id test="yes">
+                <feature>
+                    <is_obsolete>false</is_obsolete>
+                    
+                </feature>
+            </object_id>
+            <object_id>
+                <feature dump="select">
+                    <uniquename />
+                    <name />
+                    <organism />
+                    <type_id>
+                        <cvterm dump="select">
+                            <name />
+                        </cvterm>
+                    </type_id>
+
+                    <featureloc dump="cols">
+                        <srcfeature_id>
+                            <feature dump="select">
+                                <organism_id>
+                                    <organism />
+                                </organism_id>
+                                <type_id>
+                                    <cvterm dump="select">
+                                        <name />
+                                    </cvterm>
+                                </type_id>
+                                <seqlen />
+                                <uniquename />
+                            </feature>
+                        </srcfeature_id>
+                    </featureloc>
+
+                    <feature_dbxref dump="cols">
+                        <is_current test="yes">true</is_current>
+                        <dbxref_id test="yes">
+                            <dbxref>
+                                <db_id>
+                                    <db>
+                                        <name test="in">
+                                            ('FlyBase','FlyBase Annotation IDs')
+                                        </name>
+                                    </db>
+                                </db_id>
+                            </dbxref>
+                        </dbxref_id>
+                        <dbxref_id>
+                            <dbxref />
+                        </dbxref_id>
+                    </feature_dbxref>
+                </feature>
+            </object_id>
+        </feature_relationship>
+        
+    </feature>
+</chado>

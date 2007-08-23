@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chado SYSTEM "/users/zhou/work/flybase/xml/chado_stan.dtd">
+
+
+<chado dumpspec="genes.xml" date="Fri Dec 16 2005">
+   <feature dump="cols">
+      <_appdata name="species">$1</_appdata>
+      <_sql>
+         select feature_0.feature_id,feature_0.name, feature_0.uniquename
+               from feature feature_0, cvterm cvterm_0, organism organism_0
+            where cvterm_0.name = 'golden_path_region' and organism_0.abbreviation ~* '$1'
+               and feature_0.is_obsolete='f' and feature_0.is_analysis='f'
+               and feature_0.type_id=cvterm_0.cvterm_id
+               and feature_0.organism_id=organism_0.organism_id
+      </_sql>
+
+      <name />
+      <uniquename />
+
+      <organism_id>
+         <organism dump="cols" />
+      </organism_id>
+
+      <featureloc dump="cols" />
+   </feature>
+</chado>
