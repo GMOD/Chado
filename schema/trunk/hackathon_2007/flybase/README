@@ -1,0 +1,9 @@
+This directory contains hackathon related items from FlyBase
+
+Directory layout-
+
+dir/file                 description
+==========================================================================
+src/perl                 Perl modules used by FlyBase for writing ChadoXML
+
+loading_ontologies.txt   Standard operating procedure for loading *.obo files.
