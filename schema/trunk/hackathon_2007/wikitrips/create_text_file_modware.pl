@@ -1,8 +1,8 @@
 #!/usr/bin/perl
+use strict;
+my ( $gene_name_input, $page_template, $table_template ) = @ARGV;
 
-my ( $gene_name_input, $template ) = @ARGV;
-
-die "please pass gene_name and template_name as arguments\n" if ( !$gene_name_input || !$template);
+die "please pass gene_name, page_template, table_template as arguments\n" if ( !$gene_name_input || !$page_template || !$table_template );
 
 use Modware::Search::Gene;
 
@@ -12,4 +12,4 @@ my $gene_name   = $gene->name();
 my $description = $gene->description();
 my @synonyms    = @{$gene->synonyms()};
 my $syn_string  = join ", ", @synonyms;
-print $gene_name."\t".$template."\t".$gene_name.'||'.$description.'||'.$syn_string."\n";
+print $gene_name."\t".$page_template."\t".$table_template."\t".$gene_name.'||'.$description.'||'.$syn_string."\n";
