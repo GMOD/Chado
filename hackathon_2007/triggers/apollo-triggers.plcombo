@@ -367,176 +367,327 @@ GRANT ALL ON FUNCTION fn_feature_del() TO PUBLIC;
 CREATE TRIGGER tr_feature_del BEFORE DELETE ON feature for EACH ROW EXECUTE PROCEDURE fn_feature_del();
 
 DROP TRIGGER feature_assignname_tr_i ON feature;
-CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS '
-DECLARE
-  maxid      int;
-  pos        int;
-  id         varchar(255);
-  max_id     int;
-  is_anal    feature.is_analysis%TYPE;
-  prefix     cvtermprop.value%TYPE;
-  suffix     cvtermprop.value%TYPE;
-  f_row_g    feature%ROWTYPE;
-  f_row_e    feature%ROWTYPE;
-  f_row_t    feature%ROWTYPE;
-  f_row_p    feature%ROWTYPE;
-  f_type     cvterm.name%TYPE;
-  f_type_id  cvterm.cvterm_id%TYPE;
-  letter_t   varchar;
-  letter_p   varchar;
-  f_uniquename_temp    feature.uniquename%TYPE;
-  f_uniquename         feature.uniquename%TYPE;
-  f_uniquename_tr      feature.uniquename%TYPE;
-  f_uniquename_exon    feature.uniquename%TYPE;
-  f_uniquename_protein feature.uniquename%TYPE;
-  f_name               feature.name%TYPE;
-  s_type_id            synonym.type_id%TYPE;
-  s_id                 synonym.synonym_id%TYPE;
-  c_cv_id              cv.cv_id%TYPE;
-  f_s_id               feature_synonym.feature_synonym_id%TYPE;
-  fr_row feature_relationship%ROWTYPE;
-  f_type_gene CONSTANT varchar :=''gene'';
-  f_type_exon CONSTANT varchar :=''exon'';
-  f_type_transcript CONSTANT varchar :=''mRNA'';
-  f_type_snoRNA CONSTANT varchar :=''snoRNA'';
-  f_type_ncRNA CONSTANT varchar :=''ncRNA'';
-  f_type_snRNA CONSTANT varchar :=''snRNA'';
-  f_type_tRNA CONSTANT varchar :=''tRNA'';
-  f_type_rRNA CONSTANT varchar :=''rRNA'';
-  f_type_promoter CONSTANT varchar :=''promoter'';
-  f_type_repeat_region CONSTANT varchar :=''repeat_region'';
-  f_type_miRNA CONSTANT varchar :=''miRNA'';
-  f_type_transposable_element CONSTANT varchar :=''transposable_element'';
-  f_type_pseudo CONSTANT varchar :=''pseudogene'';
-  f_type_protein CONSTANT varchar :=''polypeptide'';
-  f_type_allele CONSTANT varchar :=''alleleof'';
-  f_type_remark CONSTANT varchar :=''remark'';
-  f_dbname_gadfly CONSTANT varchar :=''DB:GR'';
-  f_dbname_FB CONSTANT varchar :=''null'';
-  o_genus  CONSTANT varchar :=''Oryza'';
-  o_species  CONSTANT varchar:=''sativa'';
-  c_name_synonym CONSTANT varchar:=''synonym'';
-  cv_cvname_synonym CONSTANT varchar:=''null'';
-  p_miniref         CONSTANT varchar:=''none'';
-  p_id  pub.pub_id%TYPE;
-BEGIN
-  SELECT INTO is_anal is_analysis FROM feature WHERE uniquename = NEW.uniquename and 
-                                                     type_id = NEW.type_id and 
-                                                     organism_id = NEW.organism_id;
-  IF (is_anal) THEN
-      RETURN NEW;
-  END IF;
 
-  SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv
-                             WHERE cvterm.name = ''prefix'' and
-                                   cp.cvterm_id = cvterm.cvterm_id and
-                                   cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''apollo'';
-  SELECT INTO suffix cp.value FROM cvtermprop cp, cvterm, cv
-                             WHERE cvterm.name = ''suffix'' and
-                                   cp.cvterm_id = cvterm.cvterm_id and
-                                   cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''apollo'';
-  SELECT INTO f_type c.name
-         from feature f, cvterm c
-         where f.type_id=c.cvterm_id and
-               f.uniquename=NEW.uniquename and
-               f.organism_id =NEW.organism_id;
-  SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
-  SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS $$
 
-  RAISE NOTICE ''assigning names, prefix:%, suffix:%, type:%, current uniquename:%'',prefix,suffix,f_type,NEW.uniquename;
+    my $f_type_gene                 = 'gene';
+    my $f_type_exon                 = 'exon';
+    my $f_type_transcript           = 'mRNA';
+    my $f_type_snoRNA               = 'snoRNA';
+    my $f_type_ncrna                = 'ncrna';
+    my $f_type_snrna                = 'snrna';
+    my $f_type_trna                 = 'trna';
+    my $f_type_rrna                 = 'rrna';
+    my $f_type_promoter             = 'promoter';
+    my $f_type_repeat_region        = 'repeat_region';
+    my $f_type_mirna                = 'mirna';
+    my $f_type_transposable_element = 'transposable_element';
+    my $f_type_pseudo               = 'pseudogene';
+    my $f_type_protein              = 'polypeptide';
+    my $f_type_allele               = 'alleleof';
+    my $f_type_remark               = 'remark';
+    my $c_name_synonym              = 'synonym';
+    my $cv_cvname_synonym           = 'null';
+    my $p_miniref                   = 'none';
 
-  IF (NEW.uniquename like prefix||''%:temp%''||suffix OR NEW.uniquename like prefix||''%-temp%'') THEN
+    my $f_name;
 
-      SELECT INTO f_type c.name
-         from feature f, cvterm c
-         where f.type_id=c.cvterm_id and
-               f.uniquename=NEW.uniquename and
-               f.organism_id =NEW.organism_id;
-      --SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
-      --SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
+    my $get_single_value = sub {
+        my $sql_str     = shift;
+        my $column_name = shift;
 
-      SELECT INTO f_uniquename * FROM next_uniquename();
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0]{$column_name};
+    };
 
-      SELECT INTO f_row_g * from feature where uniquename=NEW.uniquename and organism_id=NEW.organism_id;
+    my $get_single_row = sub {
+        my $sql_str = shift;
 
-      IF f_type = f_type_gene THEN
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0];
+    };
 
-          IF NEW.name like ''%temp%'' or NEW.name IS NULL THEN
-               f_name = f_uniquename;
-               UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=f_row_g.feature_id;
-          ELSE
-               f_name = f_row_g.name;
-               UPDATE feature set uniquename=f_uniquename where feature_id=f_row_g.feature_id;
-          END IF;
+    my $is_anal = $get_single_value->(
+        q[SELECT is_analysis FROM feature WHERE uniquename =']
+            . $_TD->{new}{'uniquename'}
+            . q[' and type_id =]
+            . $_TD->{new}{'type_id'}
+            . q[ and organism_id =]
+            . $_TD->{new}{'organism_id'} . q[],
+        'is_analysis'
+    );
+    if ($is_anal) {
+        return;
+    }
 
-      ELSIF (f_type=f_type_transcript or 
-             f_type=f_type_ncRNA or 
-             f_type=f_type_snoRNA or 
-             f_type=f_type_snRNA or 
-             f_type=f_type_tRNA or 
-             f_type=f_type_rRNA or 
-             f_type=f_type_pseudo or 
-             f_type=f_type_miRNA or
-             f_type=f_type_protein or
-             f_type=f_type_exon) THEN
+    my $prefix = $get_single_value->(
+        q[
+    SELECT cp.value 
+    FROM cvtermprop cp, cvterm, cv 
+    WHERE cvterm.name = 'prefix' and cp.cvterm_id = cvterm.cvterm_id 
+        and cvterm.cv_id = cv.cv_id and cv.name = 'apollo'
+    ],
+        'value'
+    );
+    my $suffix = $get_single_value->(
+        q[
+    SELECT cp.value 
+    FROM cvtermprop cp, cvterm, cv 
+    WHERE cvterm.name = 'suffix' and cp.cvterm_id = cvterm.cvterm_id 
+        and cvterm.cv_id = cv.cv_id and cv.name = 'apollo'
+    ], 'value'
+    );
+    my $f_type = $get_single_value->(
+        q[
+        SELECT c.name 
+        from feature f, cvterm c 
+        where f.type_id=c.cvterm_id and f.uniquename=']
+            . $_TD->{new}{'uniquename'}
+            . q[' and f.organism_id =]
+            . $_TD->{new}{'organism_id'} . q[],
+        'name'
+    );
+    my $p_id = $get_single_value->(
+        qq[SELECT pub_id from pub where uniquename = '$p_miniref'], 'pub_id'
+    );
+    my $s_type_id = $get_single_value->(
+        qq[
+        SELECT cvterm_id 
+        from cvterm c1, cv c2 
+        where c1.name='$c_name_synonym' 
+        and c2.name='$cv_cvname_synonym' 
+        and c1.cv_id=c2.cv_id],
+        'cvterm_id'
+    );
 
-          IF NEW.name like ''%temp%'' or NEW.name IS NULL THEN
-               f_name = null;
-          ELSE
-               f_name = f_row_g.name;
-          END IF;
-          UPDATE feature set uniquename=f_uniquename,name=f_name where feature_id=f_row_g.feature_id;
+    # RAISE NOTICE ''assigning names, prefix:%, suffix:%, type:%,
+    # current uniquename:%'',prefix,suffix,f_type,$_TD->{new}{'uniquename'};
 
-      ELSIF ( f_type=f_type_transposable_element or 
-              f_type=f_type_promoter or 
-              f_type=f_type_repeat_region or 
-              f_type=f_type_remark )  THEN
+    if (   $_TD->{new}{'uniquename'} =~ /$prefix.*temp.*$suffix/
+        or $_TD->{new}{'uniquename'} =~ /$prefix.*-temp/ )
+    {
 
-          IF NEW.name like ''%temp%'' or NEW.name IS NULL THEN
-               f_name := CAST(f_uniquename||''-''||f_type  AS TEXT);
-               UPDATE feature set uniquename=f_uniquename, name=f_uniquename where feature_id=f_row_g.feature_id;
-          ELSE
-               f_name = f_row_g.name;
-               UPDATE feature set uniquename=f_uniquename, name=f_name where feature_id=f_row_g.feature_id;
-          END IF;
+        $f_type = $get_single_value->(
+            q[
+            SELECT c.name 
+            from feature f, cvterm c 
+            where f.type_id=c.cvterm_id and f.uniquename=']
+                . $_TD->{new}{'uniquename'}
+                . q[' and f.organism_id =]
+                . $_TD->{new}{'organism_id'} . q[],
+            'name'
+        );
 
-      END IF;
+        # my $p_id = $get_single_value->( q[SELECT pub_id from pub
+        # where uniquename = $p_miniref],'pub_id');#LOOK AT
+        # my $s_type_id = $get_single_value->( q[
+        #   SELECT cvterm_id
+        #   from cvterm c1, cv c2
+        #   where c1.name=$c_name_synonym and c2.name=$cv_cvname_synonym
+        #   and c1.cv_id=c2.cv_id],'cvterm_id');#LOOK AT
 
-      RAISE NOTICE ''new uniquename of this feature is:%'', f_uniquename;
+        my $f_uniquename = $get_single_value->(
+            q[SELECT next_uniquename FROM next_uniquename()],
+            'next_uniquename'
+        );
 
-      --insert into synonym, feature_synonym
-      SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
-      IF s_id IS NULL THEN
-          INSERT INTO synonym(name, synonym_sgml, type_id) values(f_uniquename, f_uniquename, s_type_id);
-          SELECT INTO s_id synonym_id from synonym where name=f_uniquename and type_id=s_type_id;
-      END IF;
-      SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_g.feature_id and synonym_id=s_id and pub_id=p_id;
-      IF f_s_id IS NULL THEN
-          INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_g.feature_id, s_id, p_id, ''true'');
-      END IF;
-      RAISE NOTICE ''feature_id:%, synonym_id:% for uniquename'', f_row_g.feature_id, s_id;
+        my $f_row_g = $get_single_row->(
+                  q[SELECT * from feature where uniquename=']
+                . $_TD->{new}{'uniquename'}
+                . q[' and organism_id=]
+                . $_TD->{new}{'organism_id'} . q[],
+        );
 
-      IF f_name IS NOT NULL THEN
+        if ( $f_type = $f_type_gene ) {
 
-          SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
-          IF s_id IS NULL THEN
-              INSERT INTO synonym(name, synonym_sgml, type_id) values(f_name, f_name, s_type_id);
-              SELECT INTO s_id synonym_id from synonym where name=f_name and type_id=s_type_id;
-          END IF;
-          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row_g.feature_id and synonym_id=s_id and pub_id=p_id;
-          IF f_s_id IS NULL THEN
-              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row_g.feature_id, s_id, p_id, ''true'');
-          END IF;
-          RAISE NOTICE ''feature_id:%, synonym_id:% for name'', f_row_g.feature_id, s_id;
+            if ( $_TD->{new}{'name'} =~ /temp/
+                or not defined( $_TD->{new}{'name'} ) )
+            {
+                $f_name = $f_uniquename;
+                spi_exec_query(
+                    qq[
+                    UPDATE feature 
+                    set uniquename='$f_uniquename', name='$f_uniquename' ]
+                        . qq[where feature_id=] . $f_row_g->{'feature_id'}
+                );
+            }
+            else {
+                $f_name = $f_row_g->{'name'};
+                spi_exec_query(
+                    qq[
+                    UPDATE feature 
+                    set uniquename='$f_uniquename' where feature_id=]
+                        . $f_row_g->{'feature_id'}
+                );
+            }
+        }
+        elsif ($f_type = $f_type_transcript
+            or $f_type = $f_type_ncRNA
+            or $f_type = $f_type_snoRNA
+            or $f_type = $f_type_snRNA
+            or $f_type = $f_type_tRNA
+            or $f_type = $f_type_rRNA
+            or $f_type = $f_type_pseudo
+            or $f_type = $f_type_miRNA
+            or $f_type = $f_type_protein
+            or $f_type = $f_type_exon )
+        {
 
-      END IF;
-  END IF;     --ends if uniquename like temp
+            if (not defined(
+                           $_TD->{new}{'name'}
+                        or $_TD->{new}{'name'} =~ /temp/
+                )
+                )
+            {
+                spi_exec_query(
+                          qq[UPDATE feature set uniquename='$f_uniquename',]
+                        . qq[name=NULL where feature_id=]
+                        . $f_row_g->{'feature_id'} );
+            }
+            else {
+                $f_name = $f_row_g->{'name'};
+                spi_exec_query(
+                          qq[UPDATE feature set uniquename='$f_uniquename',]
+                        . qq[name='$f_name' where feature_id=]
+                        . $f_row_g->{'feature_id'} );
+            }
+        }
+        elsif ($f_type = $f_type_transposable_element
+            or $f_type = $f_type_promoter
+            or $f_type = $f_type_repeat_region
+            or $f_type = $f_type_remark )
+        {
 
-  return NEW;    
+            if ( $_TD->{new}{'name'} =~ /temp/
+                or not defined( $_TD->{new}{'name'} ) )
+            {
+                $f_name = $f_uniquename . '-' . $f_type;
+                spi_exec_query(
+                    qq[
+                    UPDATE feature 
+                    set uniquename='$f_uniquename', name='$f_uniquename' 
+                    where feature_id=]
+                        . $f_row_g->{'feature_id'}
+                );
+            }
+            else {
+                $f_name = $f_row_g->{'name'};
+                spi_exec_query(
+                    qq[
+                    UPDATE feature 
+                    set uniquename='$f_uniquename', name='$f_name' 
+                    where feature_id=]
+                        . $f_row_g->{'feature_id'}
+                );
+            }
+
+        }
+
+        # RAISE NOTICE''new uniquename of this feature is:%'', $f_uniquename;
+
+        # insert into synonym, feature_synonym
+        my $s_id = $get_single_value->(
+            qq[
+            SELECT synonym_id 
+            from synonym 
+            where name='$f_uniquename' and type_id=$s_type_id],
+            'synonym_id'
+        );
+        if ( not defined($s_id) ) {
+            spi_exec_query(
+                qq[
+            INSERT INTO synonym(name, synonym_sgml, type_id) 
+            values('$f_uniquename', '$f_uniquename', $s_type_id)]
+            );
+            $s_id = $get_single_value->(
+                qq[
+                SELECT synonym_id 
+                from synonym 
+                where name='$f_uniquename' and type_id=$s_type_id],
+                'synonym_id'
+            );
+        }
+        my $f_s_id = $get_single_value->(
+            qq[
+            SELECT feature_synonym_id 
+            from feature_synonym 
+            where feature_id=]
+                . $f_row_g->{'feature_id'}
+                . qq[ and synonym_id=$s_id and pub_id=$p_id],
+            'feature_synonym_id'
+        );
+        if ( not_defined($f_s_id) ) {
+            spi_exec_query(
+                qq[
+            INSERT INTO feature_synonym
+            (feature_id, synonym_id, pub_id, is_current) 
+            values (]
+                    . $f_row_g->{'feature_id'} . qq[, $s_id, $p_id, 'true')]
+            );
+        }
+
+        # RAISE NOTICE''feature_id:%, synonym_id:%
+        # for uniquename'', $f_row_g->{'feature_id'}, $s_id;
+
+        if ( not defined($f_name) ) {
+
+            $s_id = $get_single_value->(
+                qq[
+                SELECT synonym_id 
+                from synonym 
+                where name='$f_name' and type_id=$s_type_id],
+                'synonym_id'
+            );    #LOOK AT
+            if ( not defined($s_id) ) {
+                spi_exec_query(
+                    qq[
+                    INSERT INTO synonym(name, synonym_sgml, type_id) 
+                    values('$f_name', '$f_name', $s_type_id)]
+                );
+                $s_id = $get_single_value->(
+                    qq[
+                    SELECT synonym_id 
+                    from synonym 
+                    where name='$f_name' and type_id=$s_type_id],
+                    'synonym_id'
+                );    #LOOK AT
+            }
+            $f_s_id = $get_single_value->(
+                qq[
+                SELECT feature_synonym_id 
+                from feature_synonym 
+                where feature_id=]
+                    . $f_row_g->{'feature_id'}
+                    . qq[ and synonym_id=$s_id and pub_id=$p_id],
+                'feature_synonym_id'
+            );        #LOOK AT
+            if ( not defined $f_s_id ) {
+                spi_exec_query(
+                    qq[
+                    INSERT INTO feature_synonym
+                    (feature_id, synonym_id, pub_id, is_current) 
+                    values (]
+                        . $f_row_g->{'feature_id'}
+                        . qq[, $s_id, $p_id, 'true')]
+                );
+            }
+
+            # RAISE NOTICE''feature_id:%, synonym_id:% for name'',
+            # $f_row_g->{'feature_id'}, $s_id;
+        }
+    }    # ends if uniquename like temp
+
+    return 'MODIFY';
 END;
-'LANGUAGE plpgsql;
+$$ LANGUAGE plperl;
 
 GRANT ALL ON FUNCTION feature_assignname_fn_i() TO PUBLIC;
 
