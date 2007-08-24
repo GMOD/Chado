@@ -1,0 +1,2508 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="en">
+<!-- 
+   export from http://ecoliwiki.net/colipedia/index.php/ of these gene templates
+Template:Complex
+Template:Complex_placeholder
+Template:Complex_talk_placeholder
+Template:Database
+Template:Database_table
+Template:Database_table_help
+Template:Disambiguation
+Template:EXPRESSION_ACCESSIONS_NOTES
+Template:EcoliHub_NavBar1
+Template:Evolution
+Template:Evolution_best_hits_table
+Template:Evolution_families_table
+Template:Evolution_families_table_help
+Template:Evolution_homologs_table
+Template:Evolution_homologs_table_help
+Template:Evolution_links_default
+Template:Evolution_talk_placeholder
+Template:Expression
+Template:Expression_accessions_table_help
+Template:Expression_allele_table
+Template:Expression_allele_table_help
+Template:Expression_operons_table
+Template:Expression_overview_placeholder
+Template:Expression_resource_table
+Template:Expression_resource_table_help
+Template:Expression_studies_table
+Template:Expression_studies_table_help
+Template:Expression_talk_placeholder
+Template:Expression_transcription_placeholder
+Template:Expression_translation_help
+Template:Expression_translation_placeholder
+Template:Expression_turnover_placeholder
+Template:GBrowseFigureByCoord
+Template:GO_table_product
+Template:GO_table_reference
+Template:Gbrowse_link
+Template:Gene
+Template:Gene_Product(s)_talk_placeholder
+Template:Gene_accessions_help
+Template:Gene_accessions_table
+Template:Gene_allele_table
+Template:Gene_alleles_help
+Template:Gene_location_help
+Template:Gene_location_table
+Template:Gene_nomenclature_help
+Template:Gene_nomenclature_table
+Template:Gene_resource_table
+Template:Gene_resources_help
+Template:Gene_sequence_features_help
+Template:Gene_sequence_features_table
+Template:Gene_talk_placeholder
+Template:GeneralSuggestion
+Template:LeftTOC
+Template:Links_help
+Template:Links_table
+Template:LitLinks
+Template:LitMaterials
+Template:LitSignificance
+Template:Location_placeholder
+Template:Nomenclature_table
+Template:Nterm_closeup
+Template:On_One_Page
+Template:PMID_page
+Template:Pagetop
+Template:Plasmid
+Template:PlasmidHistory
+Template:PlasmidImage
+Template:PlasmidSeq
+Template:PlasmidSources
+Template:PlasmidTable
+Template:Prettytable
+Template:Problems
+Template:Processes_Page
+Template:Product
+Template:Product_GO_help
+Template:Product_accessions_help
+Template:Product_domains_motifs_help
+Template:Product_interactions_help
+Template:Product_interactions_table
+Template:Product_localization_help
+Template:Product_localization_table
+Template:Product_motif_table
+Template:Product_nomenclature_help
+Template:Product_nomenclature_table
+Template:Product_phys_prop_table
+Template:Product_physical_properties_help
+Template:Product_resource_table
+Template:Product_resources_help
+Template:Product_structure_help
+Template:Product_structure_table
+Template:Products_with_structures_in_PDB_placeholder
+Template:Quickview
+Template:Quickview_table
+Template:Quickview_table_help
+Template:Quickview_talk_placeholder
+Template:RefHelp
+Template:SidebarCustom
+Template:Strain
+Template:Sub
+Template:Tab
+Template:Tab_On
+Template:TableHeadingColor
+Template:TableHelpHorizontal
+Template:TableHelpVertical
+Template:TabsBottom
+Template:TabsTop
+Template:TemplateSuggestion
+Template:Test_template
+Template:Txn_factor_GO_poll
+Template:Txn_unit
+Template:Txn_unit_talk_placeholder
+Template:expression_transcription_help
+Template:prettytable
+Template:table_heading_style
+Template:Bioinformatics_Tools
+-->
+
+  <siteinfo>
+    <sitename>EcoliWiki</sitename>
+    <base>http://ecoliwiki.net/colipedia/index.php/Welcome_to_EcoliWiki</base>
+    <generator>MediaWiki 1.9.3</generator>
+    <case>case-sensitive</case>
+      <namespaces>
+      <namespace key="-2">Media</namespace>
+      <namespace key="-1">Special</namespace>
+      <namespace key="0" />
+      <namespace key="1">Talk</namespace>
+      <namespace key="2">User</namespace>
+      <namespace key="3">User talk</namespace>
+      <namespace key="4">EcoliWiki</namespace>
+      <namespace key="5">EcoliWiki talk</namespace>
+      <namespace key="6">Image</namespace>
+      <namespace key="7">Image talk</namespace>
+      <namespace key="8">MediaWiki</namespace>
+      <namespace key="9">MediaWiki talk</namespace>
+      <namespace key="10">Template</namespace>
+      <namespace key="11">Template talk</namespace>
+      <namespace key="12">Help</namespace>
+      <namespace key="13">Help talk</namespace>
+      <namespace key="14">Category</namespace>
+      <namespace key="15">Category talk</namespace>
+    </namespaces>
+  </siteinfo>
+  <page>
+    <title>Template:Complex</title>
+    <id>1539</id>
+    <revision>
+      <id>254354</id>
+      <timestamp>2007-08-02T07:50:29Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">==About==
+{{{ABOUT}}}
+==References==
+&lt;references/&gt;
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Complex placeholder</title>
+    <id>111687</id>
+    <revision>
+      <id>307742</id>
+      <timestamp>2007-08-05T05:56:00Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">Add information about this complex.</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Complex talk placeholder</title>
+    <id>110211</id>
+    <revision>
+      <id>246216</id>
+      <timestamp>2007-08-01T22:18:48Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <comment>New page: Leave comments or suggestions here about the overall layout and design of the '''Complex''' pages. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; at...</comment>
+      <text xml:space="preserve">Leave comments or suggestions here about the overall layout and design of the '''Complex''' pages. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; at the start of a line to indent. You may also email us at {{Email}}.</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Database</title>
+    <id>1746</id>
+    <revision>
+      <id>246140</id>
+      <timestamp>2007-08-01T20:05:04Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <text xml:space="preserve">{{Pagetop}}
+[[Category:Databases]]
+
+&lt;newTableEdit&gt;Template:Database_table&lt;/newTableEdit&gt;
+{{Database_table_help}}
+=About {{PAGENAME}} {{HelpIcon|Help:Databases}}=
+''Add general information here'' 
+[{{{1|link}}} {{PAGENAME}}] is...
+=Content {{HelpIcon|Help:Databases}}=
+
+=Using {{PAGENAME}} {{HelpIcon|Help:Databases}}=
+==Browsing==
+==Searching==
+==Usage examples==
+''Add links to additional pages describing success stories here.''
+
+=Other sites with related content {{HelpIcon|Help:Databases}}=
+
+=Technology {{HelpIcon|Help:Databases}}=
+==Web Services/API==
+
+=Discussion {{HelpIcon|Help:Databases}}=
+
+=References {{HelpIcon|Help:Databases}}=
+&lt;references /&gt;
+
+=External Links=
+[{{{1|link}}} {{PAGENAME}}] URL:{{{1|link}}}
+==Discussion of {{PAGENAME}} on other websites==</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Database table</title>
+    <id>109967</id>
+    <revision>
+      <id>257402</id>
+      <timestamp>2007-08-02T17:25:58Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Link/URL:
+What:
+Who:
+Updates:
+Upcoming events:
+Web Services:
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;
+&lt;table_style&gt;{{Prettytable}} width='30%' align=right&lt;/table_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Database table help</title>
+    <id>109968</id>
+    <revision>
+      <id>245768</id>
+      <timestamp>2007-07-31T19:23:12Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Database_table]] for how to add or edit information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Disambiguation</title>
+    <id>1540</id>
+    <revision>
+      <id>1593</id>
+      <timestamp>2007-06-27T16:35:52Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">{{PAGENAME}} may refer to more than one item in EcoliWiki.  Possible meanings
+&lt;!--disambiguation list--&gt;
+{{{DISAMBIGUATION}}}
+==Notes==
+{{{DISAMBIGUATION_NOTES}}}
+==References==
+&lt;references/&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:EXPRESSION ACCESSIONS NOTES</title>
+    <id>104590</id>
+    <revision>
+      <id>152037</id>
+      <timestamp>2007-07-18T22:58:13Z</timestamp>
+      <contributor>
+        <ip>NoPower</ip>
+      </contributor>
+      <comment>New page: &lt;small&gt;This is a placeholder for a summary statement about the accessions of the expression of this gene product. You can help EcoliWiki by becoming a user and writing/editing this stateme...</comment>
+      <text xml:space="preserve">&lt;small&gt;This is a placeholder for a summary statement about the accessions of the expression of this gene product. You can help EcoliWiki by becoming a user and writing/editing this statement.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:EcoliHub NavBar1</title>
+    <id>1541</id>
+    <revision>
+      <id>1595</id>
+      <timestamp>2006-03-03T23:33:17Z</timestamp>
+      <contributor>
+        <ip>Jimhu</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;div style=&quot;border-style:solid;border-width:1px;padding:5px;&quot;&gt;
+&lt;center&gt;Quick Clix: | [[EcoliHub|EcoliHub Home]] | [[EcoliHub_EcoliWiki|EcoliWiki]] | [[EcoliHub_Schema|Schema]] | [[EcoliHub_Integration|Integration]] | [[EcoliDB_Display|Displays]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution</title>
+    <id>1542</id>
+    <revision>
+      <id>246036</id>
+      <timestamp>2007-07-31T22:58:42Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>/* Categories */</comment>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE,
+*                             YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;
+&lt;noinclude&gt;{{TabsTop}}
+{{Tab|Quickview|{{{1}}}}}{{Tab|Gene|{{{1}}}}}{{Tab|Gene Product(s)|{{{1}}}}}{{Tab|Expression|{{{1}}}}}{{Tab On|Evolution|{{{1}}}}}{{Tab|On One Page|{{{1}}}}}{{TabsBottom}}
+{|
+|- 
+|{{Sub}}[[#Homologs in Other Organisms|Homologs]] 
+|{{Sub}}[[#Families|Families]]
+|{{Sub}}[[#Links| Links]]
+|{{Sub}}[[#References| References]]
+|{{Sub}}[[Talk:{{PAGENAMEE}}| Suggestions]]
+|}
+&lt;/noinclude&gt;
+==Homologs in Other Organisms==
+{{BacktoTop}}
+{{{EVOLUTION_HOMOLOGS_TABLE}}}
+{{Evolution_homologs_table_help}}
+
+===Do-It-Yourself Web Tools===
+*[http://130.14.29.110/BLAST/ BLAST]
+*[http://130.14.29.110/BLAST/Blast.cgi?CMD=Web&amp;LAYOUT=TwoWindows&amp;AUTO_FORMAT=Semiauto&amp;ALIGNMENTS=250&amp;ALIGNMENT_VIEW=Pairwise&amp;CLIENT=web&amp;COMPOSITION_BASED_STATISTICS=on&amp;DATABASE=nr&amp;CDD_SEARCH=on&amp;DESCRIPTIONS=500&amp;ENTREZ_QUERY=%28none%29&amp;EXPECT=10&amp;FORMAT_OBJECT=Alignment&amp;FORMAT_TYPE=HTML&amp;I_THRESH=0.005&amp;MATRIX_NAME=BLOSUM62&amp;NCBI_GI=on&amp;PAGE=Proteins&amp;PROGRAM=blastp&amp;RUN_PSIBLAST=on&amp;SERVICE=plain&amp;SET_DEFAULTS.x=36&amp;SET_DEFAULTS.y=5&amp;SHOW_OVERVIEW=on&amp;END_OF_HTTPGET=Yes&amp;SHOW_LINKOUT=yes&amp;GET_SEQUENCE=yes&amp;SEARCH_NAME=psi_bp/ CDD]
+*[http://inparanoid.sbc.su.se/cgi-bin/eid_search.pl?id={{{REFSEQ}}}&amp;idtype=all&amp;start=on&amp;species=All&amp;conf=0.05 InParanoid]
+*[http://www.sanger.ac.uk/PostGenomics/S_pombe/YOGY/ YOGY]
+
+&lt;protect&gt;&lt;!--Homology_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{HOMOLOGY_NOTES}}}
+
+==Families==
+{{BacktoTop}}
+{{{EVOLUTION_FAMILIES_TABLE}}}
+{{Evolution_families_table_help}}
+&lt;protect&gt;&lt;!--Families_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{FAMILIES_NOTES}}}
+
+==Links==
+{{BacktoTop}}
+{{{LINKS}}}
+{{Links_help}}
+
+==References==
+{{BacktoTop}}
+{{RefHelp}}
+&lt;references/&gt;
+&lt;noinclude&gt;
+__NOTOC__
+&lt;/noinclude&gt;
+===Categories===
+{{BacktoTop}}
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution best hits table</title>
+    <id>1543</id>
+    <revision>
+      <id>1623</id>
+      <timestamp>2007-07-15T00:45:55Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+From
+[http://www.arabidopsis.org/ ''Arabidopsis thaliana'']||arabidopsis
+[http://www.wormbase.org/ ''Caenorhabditis elegans'']||celegans
+[http://zfin.org/cgi-bin/webdriver?MIval=aa-ZDB_home.apg ''Danio rerio'']||zebrafish
+[http://dictybase.org/ ''Dictyostelium discoideum'']||dicty
+[http://www.flybase.org/ ''Drosophila melanogaster'']||drosophila
+[http://dec2005.archive.ensembl.org/Homo_sapiens/index.html ''Homo sapien'']||human
+[http://www.informatics.jax.org/ ''Mus musculus'']||mouse
+[http://www.yeastgenome.org/ ''Saccharomyces cerevisiae'']||yeast
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution families table</title>
+    <id>1544</id>
+    <revision>
+      <id>1624</id>
+      <timestamp>2007-07-10T00:04:46Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+COG
+GTOP
+Interpro
+Pfam
+SCOP Domain
+SMART
+SuperFamily
+TIGRFAMs
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution families table help</title>
+    <id>104592</id>
+    <revision>
+      <id>152040</id>
+      <timestamp>2007-07-19T19:22:53Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Evolution_families]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution homologs table</title>
+    <id>1545</id>
+    <revision>
+      <id>1626</id>
+      <timestamp>2007-07-15T04:05:30Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Organism
+Homologs (Statistics)
+Comments
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution homologs table help</title>
+    <id>104593</id>
+    <revision>
+      <id>152041</id>
+      <timestamp>2007-07-19T19:23:44Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Evolution_homologs]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution links default</title>
+    <id>104594</id>
+    <revision>
+      <id>152042</id>
+      <timestamp>2007-07-19T18:13:39Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;This is a placeholder statement. In this section, links about the evolution of this gene product can be added. You can help Ecoliwiki do this by becoming a member.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;This is a placeholder statement. In this section, links about the evolution of this gene product can be added. You can help Ecoliwiki do this by becoming a member.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Evolution talk placeholder</title>
+    <id>104595</id>
+    <revision>
+      <id>152043</id>
+      <timestamp>2007-07-24T20:39:31Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">{{GeneralSuggestion|Evolution}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression</title>
+    <id>1546</id>
+    <revision>
+      <id>246034</id>
+      <timestamp>2007-07-31T22:57:31Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE,
+*                             YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;
+&lt;noinclude&gt;{{TabsTop}}
+{{Tab|Quickview|{{{1}}}}}{{Tab|Gene|{{{1}}}}}{{Tab|Gene Product(s)|{{{1}}}}}{{Tab On|Expression|{{{1}}}}}{{Tab|Evolution|{{{1}}}}}{{Tab|On One Page|{{{1}}}}}{{TabsBottom}}
+{|
+|- 
+|{{Sub}}[[#Overview|Overview]] 
+|{{Sub}}[[#Transcription and Transcriptional Regulation|Transcription]]
+|{{Sub}}[[#Translation and Regulation of Translation|Translation]]
+|{{Sub}}[[#Turnover and Regulation of Turnover|Turnover]]
+|{{Sub}}[[#Experimental|Experimental]]
+|{{Sub}}[[#Links| Links]]
+|{{Sub}}[[#References| References]]
+|{{Sub}}[[Talk:{{PAGENAMEE}}| Suggestions]]
+|}
+&lt;/noinclude&gt;
+==Overview==
+{{{OVERVIEW}}}
+==Transcription and Transcriptional Regulation==
+{{BacktoTop}}
+&lt;protect&gt;
+{|{{Prettytable}}
+|-
+|{{{OPERONS_TABLE}}}||{{{RegulonDB_figure}}}
+|}
+{{expression_transcription_help}}
+&lt;!--Transcription_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{TRANSCRIPTION_NOTES}}}
+
+==Translation and Regulation of Translation==
+{{BacktoTop}}
+&lt;protect&gt;{{{GBrowse_Nterm_figure}}}
+&lt;!--Translation_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{TRANSLATION_NOTES}}}
+
+==Turnover and Regulation of Turnover==
+&lt;!--Turnover_notes--&gt;&lt;/protect&gt;
+
+===Notes===
+{{{TURNOVER_NOTES}}}
+
+==Experimental==
+{{BacktoTop}}
+&lt;protect&gt;
+&lt;big&gt;'''Mutations Affecting Expression'''&lt;/big&gt;
+{{{EXPRESSION_ALLELE_TABLE}}}
+{{Expression_allele_table_help}}
+
+&lt;big&gt;'''Expression Studies'''&lt;/big&gt;
+{{{EXPRESSION_STUDIES_TABLE}}}
+{{Expression_studies_table_help}}
+
+&lt;big&gt;'''Expression Resources'''&lt;/big&gt;
+{{{EXPRESSION_RESOURCE_TABLE}}}
+{{Expression_resource_table_help}}
+&lt;protect&gt;&lt;!--Expression_experimental_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{EXPRESSION_EXPERIMENTAL_NOTES}}}
+
+==Accessions Related to ''{{{GENE_NAME}}}'' Expression==
+{{BacktoTop}}
+{{{GENE_ACCESSIONS_TABLE}}}
+{{Expression_accessions_table_help}}
+&lt;protect&gt;&lt;!--Accessions_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{EXPRESSION_ACCESSIONS_NOTES}}}
+
+==Links==
+{{BacktoTop}}
+{{{LINKS}}}
+{{Links_help}}
+&lt;noinclude&gt;
+==References==
+{{BacktoTop}}
+{{RefHelp}}
+&lt;references/&gt;
+__NOTOC__
+&lt;/noinclude&gt;
+===Categories===
+{{BacktoTop}}
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression accessions table help</title>
+    <id>1547</id>
+    <revision>
+      <id>1679</id>
+      <timestamp>2007-07-15T18:03:09Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_accessions]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression allele table</title>
+    <id>1548</id>
+    <revision>
+      <id>1680</id>
+      <timestamp>2007-07-10T17:58:10Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Allele Name
+Mutation
+Phenotype
+Reference
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression allele table help</title>
+    <id>1549</id>
+    <revision>
+      <id>1681</id>
+      <timestamp>2007-07-15T17:59:34Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_mutations]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression operons table</title>
+    <id>1550</id>
+    <revision>
+      <id>1683</id>
+      <timestamp>2007-07-13T15:40:50Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Transcription unit(s)
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression overview placeholder</title>
+    <id>1551</id>
+    <revision>
+      <id>1684</id>
+      <timestamp>2007-07-15T18:21:00Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;This is a placeholder for a summary statement on how expression of this gene product is regulated.  You can help EcoliWiki by becoming a user and writing/editing this statement.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression resource table</title>
+    <id>1552</id>
+    <revision>
+      <id>1685</id>
+      <timestamp>2007-07-09T23:59:01Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Resource Name
+Resource Type
+Description
+Source
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression resource table help</title>
+    <id>1553</id>
+    <revision>
+      <id>152045</id>
+      <timestamp>2007-07-23T03:42:20Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_resources]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression studies table</title>
+    <id>1554</id>
+    <revision>
+      <id>307840</id>
+      <timestamp>2007-08-06T03:34:09Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;Type||Type|select| |microarray|reporter genes|RNA level (not microarray)|RNA stability|protein level|protein synthesis|protein stability|other
+Reference
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression studies table help</title>
+    <id>1555</id>
+    <revision>
+      <id>1688</id>
+      <timestamp>2007-07-15T18:01:10Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_studies]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression talk placeholder</title>
+    <id>104596</id>
+    <revision>
+      <id>152046</id>
+      <timestamp>2007-07-24T20:39:16Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">{{GeneralSuggestion|Expression}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression transcription placeholder</title>
+    <id>1556</id>
+    <revision>
+      <id>1689</id>
+      <timestamp>2007-07-15T17:44:20Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;This is a placeholder for a summary statement about how transcription of this gene is regulated.  You can help EcoliWiki by becoming a user and writing/editing this statement. &lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression translation help</title>
+    <id>1557</id>
+    <revision>
+      <id>1690</id>
+      <timestamp>2007-07-15T18:04:26Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_translation]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression translation placeholder</title>
+    <id>1558</id>
+    <revision>
+      <id>1691</id>
+      <timestamp>2007-07-15T17:50:12Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;This is a placeholder for a summary statement about how translation of this gene product is regulated.  You can help EcoliWiki by becoming a user and writing/editing this statement.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Expression turnover placeholder</title>
+    <id>1559</id>
+    <revision>
+      <id>1692</id>
+      <timestamp>2007-07-15T18:24:05Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt; This is a placeholder for a summary statement about turnover of this gene product.  You can help EcoliWiki by becoming a user and writing/editing this statement.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:GBrowseFigureByCoord</title>
+    <id>1560</id>
+    <revision>
+      <id>95918</id>
+      <timestamp>2007-07-24T02:59:56Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;noinclude&gt;
+Usage
+&lt;nowiki&gt;
+{{GBrowseFigureByCoord|start|end|genome(optional)|trackset(optional)}}
+&lt;/nowiki&gt;
+
+start: starting DNA sequence coordinate
+
+end: ending DNA sequence coordinate
+
+genome: which genome to show.  
+name, where genome is a viewable genome and name is the name of a named segment.  For example, for bacteriophage lambda, use
+ genomeL bacteriophage_lambda
+ name:NC_001416
+
+Defaults to ''E. coli'' MG1655 if not specified.  Available genomes can be viewed in [http://dimer.tamu.edu/cgi-bin/gb/gbrowse/ GBrowse].  See also the discussion for this template.
+
+trackset: a specific set of tracks to display.  See discussion.
+
+width: width of the figure in pixels.  Defaults to 300
+[[Category:Template]]
+&lt;/noinclude&gt;
+http://dimer.tamu.edu/colimod/gbrowse_img.php?coord={{{1}}}..{{{2}}}&amp;genome={{{3|ecoli}}}&amp;name={{{4|MG1655}}}&amp;trackset={{{5|0}}}&amp;width={{{6|300}}}&amp;.png
+&lt;br /&gt;&lt;small&gt;{{{7| }}}&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:GO table product</title>
+    <id>1561</id>
+    <revision>
+      <id>152048</id>
+      <timestamp>2007-07-18T15:23:06Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Qualifier||qualifier|select| |NOT
+GO ID||go_id|text
+GO term name||go_term|lookupcalc|SELECT page_title FROM GO_archive.term WHERE go_id = '{{{go_id}}}' ORDER BY term_update DESC LIMIT 1|page_title|split|_!_|1
+Reference(s)||refs
+Evidence Code||evidence|select| |IC: Inferred by Curator|IDA: Inferred from Direct Assay|IEA: Inferred from Electronic Annotation|IEP: Inferred from Expression Pattern|IGC: Inferred from Genomic Context|IGI: Inferred from Genetic Interaction|IMP: Inferred from Mutant Phenotype|IPI: Inferred from Physical Interaction|ISS: Inferred from Sequence or Structural Similarity|NAS: Non-traceable Author Statement|ND: No biological Data available|RCA: inferred from Reviewed Computational Analysis|TAS: Traceable Author Statement|NR: Not Recorded
+with/from||with|text
+Aspect||aspect|lookup|SELECT namespace from GO_archive.term WHERE go_id = '{{{go_id}}}' ORDER BY term_update DESC LIMIT 1|namespace
+Notes||Notes
+Status||status|calc|reqcomplete|go_id|refs|go_term|evidence
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:GO table reference</title>
+    <id>1562</id>
+    <revision>
+      <id>152049</id>
+      <timestamp>2007-07-18T15:10:12Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Gene product||product
+Qualifier||qualifier|select| |NOT
+GO ID||go_id|text
+GO term name||go_term|lookupcalc|SELECT page_title from GO_archive.term WHERE go_id = '{{{go_id}}}' ORDER BY term_update DESC LIMIT 1|page_title|split|_!_|1
+Evidence Code||evidence|select| |IC: Inferred by Curator|IDA: Inferred from Direct Assay|IEA: Inferred from Electronic Annotation|IEP: Inferred from Expression Pattern|IGC: Inferred from Genomic Context|IGI: Inferred from Genetic Interaction|IMP: Inferred from Mutant Phenotype|IPI: Inferred from Physical Interaction|ISS: Inferred from Sequence or Structural Similarity|NAS: Non-traceable Author Statement|ND: No biological Data available|RCA: inferred from Reviewed Computational Analysis|TAS: Traceable Author Statement|NR: Not Recorded
+with/from||with|text
+Aspect||aspect|lookup|SELECT namespace from GO_archive.term WHERE go_id = '{{{go_id}}}' ORDER BY term_update DESC LIMIT 1|namespace
+Notes
+Status||status|calc|reqcomplete|go_id|product|go_term|evidence
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gbrowse link</title>
+    <id>111851</id>
+    <revision>
+      <id>307821</id>
+      <timestamp>2007-08-05T15:31:44Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">[http://dimer.tamu.edu/cgi-bin/gb/gbrowse/{{{1|ecoli}}} Gbrowse]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene</title>
+    <id>1563</id>
+    <revision>
+      <id>246031</id>
+      <timestamp>2007-07-31T22:55:45Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE,
+*                             YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;
+&lt;noinclude&gt;{{TabsTop}} 
+{{Tab|Quickview|{{{1}}}}}{{Tab On|Gene|{{{1}}}}}{{Tab|Gene Product(s)|{{{1}}}}}{{Tab|Expression|{{{1}}}}}{{Tab|Evolution|{{{1}}}}}{{Tab|On One Page|{{{1}}}}}{{TabsBottom}}
+{|
+|- style=&quot;background-color:white; border:solid 2px #CCFFFF; text-align:center; white-space: nowrap;&quot; 
+|{{Sub}}[[#Nomenclature |Nomenclature]]
+|{{Sub}}[[#Location(s) and DNA Sequence|Location(s) and DNA Sequence]]
+|{{Sub}}[[#Alleles and Phenotypes |Alleles and Phenotypes]]
+|{{Sub}}[[#Genetic Resources  |Genetic Resources]]
+|{{Sub}}[[#Accessions in Other Databases |Accessions]]
+|{{Sub}}[[#Links |Links]]
+|{{Sub}}[[#References |References]]
+|{{Sub}}[[Talk:{{PAGENAMEE}}| Suggestions]]
+|}
+&lt;/noinclude&gt;&lt;protect&gt;
+==Nomenclature==
+{{BacktoTop}}
+{{{NOMENCLATURE_TABLE}}}
+{{Gene_nomenclature_help}}
+&lt;!--Nomenclature_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{NOMENCLATURE_NOTES}}}
+
+==Location(s) and DNA Sequence==
+{{BacktoTop}}
+&lt;protect&gt;
+{{{LOCATION_TABLE}}}
+{{Gene_location_help}}
+&lt;!--Location_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{LOCATION_NOTES}}}
+
+==Sequence Features==
+{{BacktoTop}}
+{{{SEQUENCE_TABLE}}}
+{{Gene_sequence_features_help}}
+&lt;protect&gt;&lt;!--Sequence_notes--&gt;&lt;/protect&gt;
+====Notes====
+{{{SEQUENCE_NOTES}}}
+
+==Alleles and Phenotypes==
+{{BacktoTop}}
+{{{ALLELES_TABLE}}}
+{{Gene_alleles_help}}
+&lt;protect&gt;&lt;!--Alleles_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{ALLELES_NOTES}}}
+
+==Genetic Resources==
+{{BacktoTop}}
+{{{GENE_RESOURCES_TABLE}}}
+{{Gene_resources_help}}
+&lt;protect&gt;&lt;!--Gene_resources_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{GENE_RESOURCES_NOTES}}}
+
+==Accessions in Other Databases==
+{{BacktoTop}}
+{{{GENE_ACCESSIONS_TABLE}}}
+{{Gene_accessions_help}}
+&lt;protect&gt;&lt;!--Gene_accessions_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{GENE_ACCESSIONS_NOTES}}}
+
+==Links==
+{{BacktoTop}}
+{{{LINKS}}}
+{{Links_help}}
+
+&lt;noinclude&gt;&lt;protect&gt;
+==References==
+{{BacktoTop}}
+{{RefHelp}}
+&lt;references/&gt;
+__NOTOC__
+&lt;/protect&gt;&lt;/noinclude&gt;
+===Categories===
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene Product(s) talk placeholder</title>
+    <id>104597</id>
+    <revision>
+      <id>246066</id>
+      <timestamp>2007-08-01T00:54:00Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">{{GeneralSuggestion|Product}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene accessions help</title>
+    <id>1565</id>
+    <revision>
+      <id>1774</id>
+      <timestamp>2007-07-09T16:24:38Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_accessions]] for help with entering information into the Gene Accessions table.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene accessions table</title>
+    <id>1566</id>
+    <revision>
+      <id>1775</id>
+      <timestamp>2007-07-06T18:02:50Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;Database
+Accession
+Notes
+&lt;/headings&gt;
+&lt;type&gt;0&lt;/type&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene allele table</title>
+    <id>1567</id>
+    <revision>
+      <id>172489</id>
+      <timestamp>2007-07-28T16:50:31Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Allele||allele
+Nt change(s)||nt_change
+AA change(s)||aa_change
+Phenotype: Type||type|select| |Growth Phenotype|Cell Shape|Colony Morphology|Auxotrophies|Resistant to|Sensitivity to|Other
+Phenotype: Description||description
+Reference||reference
+Availability||availability
+Comments||comments
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene alleles help</title>
+    <id>1568</id>
+    <revision>
+      <id>152053</id>
+      <timestamp>2007-07-23T03:43:57Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_alleles]] for how to enter or edit alleles and phenotypes in EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene location help</title>
+    <id>1569</id>
+    <revision>
+      <id>1787</id>
+      <timestamp>2007-07-12T20:30:13Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_location]] for help entering information in the Gene Location and DNA sequence table.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene location table</title>
+    <id>1570</id>
+    <revision>
+      <id>1792</id>
+      <timestamp>2007-07-08T18:42:16Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <minor/>
+      <comment>[[Template:Location table]] moved to [[Template:Gene location table]]</comment>
+      <text xml:space="preserve">&lt;headings&gt;Strain
+Map location
+Genome coordinates
+Genome browsers
+Sequence links
+&lt;/headings&gt;
+&lt;type&gt;0&lt;/type&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene nomenclature help</title>
+    <id>1571</id>
+    <revision>
+      <id>1795</id>
+      <timestamp>2007-07-09T19:55:13Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_nomenclature]] for help with entering information in the Gene Nomenclature table.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene nomenclature table</title>
+    <id>1572</id>
+    <revision>
+      <id>1798</id>
+      <timestamp>2007-07-08T18:40:44Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <minor/>
+      <comment>[[Template:Nomenclature table]] moved to [[Template:Gene nomenclature table]]</comment>
+      <text xml:space="preserve">&lt;headings&gt;Standard name
+Mnemonic
+Synonyms&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene resource table</title>
+    <id>1573</id>
+    <revision>
+      <id>152054</id>
+      <timestamp>2007-07-24T03:49:43Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;Resource||resource
+Resource Type||resource_type|select| |Strain|Plasmid Clone|F'|Kohara Phage
+Source||source
+Notes/Reference||notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene resources help</title>
+    <id>1574</id>
+    <revision>
+      <id>1802</id>
+      <timestamp>2007-07-12T20:32:03Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_resources]] for help entering information into the Genetic Resources table.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene sequence features help</title>
+    <id>1575</id>
+    <revision>
+      <id>1805</id>
+      <timestamp>2007-07-10T22:58:26Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_sequence_features]] for help in entering sequence features in EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene sequence features table</title>
+    <id>1576</id>
+    <revision>
+      <id>1810</id>
+      <timestamp>2007-07-08T18:47:18Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <minor/>
+      <comment>[[Template:Sequence table]] moved to [[Template:Gene sequence features table]]</comment>
+      <text xml:space="preserve">&lt;headings&gt;Feature type
+Location
+Description&lt;/headings&gt;
+&lt;type&gt;0&lt;/type&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Gene talk placeholder</title>
+    <id>1577</id>
+    <revision>
+      <id>152055</id>
+      <timestamp>2007-07-24T20:37:50Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">{{GeneralSuggestion|Gene}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:GeneralSuggestion</title>
+    <id>104598</id>
+    <revision>
+      <id>307550</id>
+      <timestamp>2007-08-04T18:59:58Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">Leave comments or suggestions here about the overall layout and design of the [[{{SUBJECTPAGENAME}}]] page. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; at the start of a line to indent.
+To discuss the general layout of {{{1}}} pages, go [[Template_talk:{{{1}}}|here]].  
+You may also email us at {{Email}}.</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:LeftTOC</title>
+    <id>110087</id>
+    <revision>
+      <id>245905</id>
+      <timestamp>2007-07-31T21:45:35Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;div style=&quot;float:left; margin: 1em;&quot;&gt; __TOC__&lt;/div&gt;</comment>
+      <text xml:space="preserve">&lt;div style=&quot;float:left; margin: 1em;&quot;&gt; __TOC__&lt;/div&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Links help</title>
+    <id>104599</id>
+    <revision>
+      <id>152057</id>
+      <timestamp>2007-07-24T00:09:46Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <comment>New page: &lt;small&gt;See [[Help:Links_table]] for how to enter or edit information in this section of EcoliWiki.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Links_table]] for how to enter or edit information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Links table</title>
+    <id>104600</id>
+    <revision>
+      <id>152058</id>
+      <timestamp>2007-07-20T22:43:45Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Name
+URL
+Comments
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;
+&lt;type&gt;0&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:LitLinks</title>
+    <id>1579</id>
+    <revision>
+      <id>1816</id>
+      <timestamp>2007-02-19T20:00:12Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;Add links to pages that link here (e.g. gene, product, method pages)&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:LitMaterials</title>
+    <id>1580</id>
+    <revision>
+      <id>1817</id>
+      <timestamp>2007-02-19T19:43:49Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;You can help Ecoliwiki by describing the useful materials (strains, plasmids, antibodies, etc) described in this paper.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:LitSignificance</title>
+    <id>1581</id>
+    <revision>
+      <id>1818</id>
+      <timestamp>2007-02-19T19:42:34Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by summarizing why this paper is useful&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Location placeholder</title>
+    <id>111688</id>
+    <revision>
+      <id>307548</id>
+      <timestamp>2007-08-04T18:53:58Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <comment>New page: {{TemplateSuggestion}}</comment>
+      <text xml:space="preserve">{{TemplateSuggestion}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Nomenclature table</title>
+    <id>1582</id>
+    <revision>
+      <id>1819</id>
+      <timestamp>2007-07-08T18:40:44Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <comment>[[Template:Nomenclature table]] moved to [[Template:Gene nomenclature table]]</comment>
+      <text xml:space="preserve">#REDIRECT [[Template:Gene nomenclature table]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Nterm closeup</title>
+    <id>110180</id>
+    <revision>
+      <id>246028</id>
+      <timestamp>2007-07-31T22:35:39Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;This picture shows the sequence around the N-terminus.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;This picture shows the sequence around the N-terminus.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:On One Page</title>
+    <id>1583</id>
+    <revision>
+      <id>152059</id>
+      <timestamp>2007-07-24T02:45:36Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE, YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;&lt;noinclude&gt;{{TabsTop}} 
+{{Tab|Quickview|{{{1}}}}}{{Tab|Gene|{{{1}}}}}{{Tab|Gene Product(s)|{{{1}}}}}{{Tab|Expression|{{{1}}}}}{{Tab|Evolution|{{{1}}}}}{{Tab On|On One Page|{{{1}}}}}{{TabsBottom}}
+{| style=\&quot;font-size:130%;\&quot;
+|-
+|[[#Quickview |Quickview]] |
+|[[#Gene |Gene]] |
+|[[#Product(s)  |Product(s)]] |
+|[[#Expression |Expression]]|
+|[[#Evolution |Evolution]] |
+|[[#References | References]] |
+|}
+&lt;/noinclude&gt;
+=Quickview=
+{{BacktoTop}}
+{{:{{{1}}}:Quickview}}
+=Gene=
+{{BacktoTop}}
+{{:{{{1}}}:Gene}}
+=Product(s)=
+{{BacktoTop}}
+{{:{{{1}}}:Gene Product(s)}}
+=Expression=
+{{BacktoTop}}
+{{:{{{1}}}:Expression}}
+=Evolution=
+{{BacktoTop}}
+{{:{{{1}}}:Evolution}}
+__NOTOC__</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PMID page</title>
+    <id>1584</id>
+    <revision>
+      <id>307903</id>
+      <timestamp>2007-08-06T19:52:05Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;protect&gt;
+{{RightTOC}}
+
+&lt;span style = 'font-size: large'&gt; {{{REFERENCE}}}&lt;/span&gt;
+
+{|{{Prettytable}} align = 'center' width= '70%'
+|-
+|{{TableHeadingColor}} |'''Abstract''' || {{{ABSTRACT}}}
+&lt;/noinclude&gt;
+|-
+|{{TableHeadingColor}} nowrap |'''Links''' || {{{LINKS}}}
+|}
+&lt;/protect&gt;
+==Significance {{HelpIcon|Help:Literature}} ==
+{{LitSignificance}}
+
+== Useful Materials and Methods {{HelpIcon|Help:Literature}}==
+{{LitMaterials}}
+
+==Annotations {{HelpIcon|Help:Literature}}==
+&lt;newTableEdit&gt; Template:GO table reference &lt;/newTableEdit&gt;
+
+==EcoliWiki Links {{HelpIcon|Help:Literature}} ==
+{{LitLinks}}
+
+==References==
+{{RefHelp}}
+&lt;references/&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Pagetop</title>
+    <id>109947</id>
+    <revision>
+      <id>245679</id>
+      <timestamp>2007-07-30T21:20:33Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;You can help EcoliWiki by editing the content of this page.  For information about becoming a registered user and obtaining editing privileges, see [[Help:Accounts]].&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by editing the content of this page.  For information about becoming a registered user and obtaining editing privileges, see [[Help:Accounts]].&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Plasmid</title>
+    <id>1585</id>
+    <revision>
+      <id>307746</id>
+      <timestamp>2007-08-05T06:04:52Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">==At a Glance {{HelpIcon|Help:Plasmid}}==
+&lt;newTableEdit&gt;PlasmidTable&lt;/newTableEdit&gt;
+
+==History {{HelpIcon|Help:Plasmid}}==
+{{PlasmidHistory}}
+
+==Sources {{HelpIcon|Help:Plasmid}}==
+{{PlasmidSources}}
+
+==Sequence {{HelpIcon|Help:Plasmid}}==
+{{PlasmidSeq}}
+
+==Images {{HelpIcon|Help:Plasmid}}==
+{{PlasmidImage}}
+
+==References==
+{{RefHelp}}
+&lt;references/&gt;
+
+__NOTOC__
+
+
+&lt;includeonly&gt;[[Category:Plasmids]]&lt;/includeonly&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PlasmidHistory</title>
+    <id>104601</id>
+    <revision>
+      <id>152061</id>
+      <timestamp>2007-07-19T23:20:10Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;You can help EcoliWiki by writing about the history of this plasmid.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by writing about the history of this plasmid.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PlasmidImage</title>
+    <id>104602</id>
+    <revision>
+      <id>152062</id>
+      <timestamp>2007-07-19T23:21:39Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;You can help EcoliWiki by providing images of this plasmid.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by providing images of this plasmid.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PlasmidSeq</title>
+    <id>104603</id>
+    <revision>
+      <id>152063</id>
+      <timestamp>2007-07-21T00:30:19Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by providing database accessions or, if none are available, the sequence of this plasmid.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PlasmidSources</title>
+    <id>104604</id>
+    <revision>
+      <id>152064</id>
+      <timestamp>2007-07-19T23:20:40Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <comment>New page: &lt;small&gt;You can help EcoliWiki by writing about the available sources of this plasmid.&lt;/small&gt;</comment>
+      <text xml:space="preserve">&lt;small&gt;You can help EcoliWiki by writing about the available sources of this plasmid.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:PlasmidTable</title>
+    <id>109933</id>
+    <revision>
+      <id>313440</id>
+      <timestamp>2007-08-20T20:31:35Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Type
+Origin
+Copy #
+Markers
+Comments
+References
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Prettytable</title>
+    <id>1586</id>
+    <revision>
+      <id>1834</id>
+      <timestamp>2005-07-03T01:47:42Z</timestamp>
+      <contributor>
+        <ip>Jimhu</ip>
+      </contributor>
+      <text xml:space="preserve">border=&quot;2&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;margin: 1em 1em 1em 0; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse;&quot;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Problems</title>
+    <id>112310</id>
+    <revision>
+      <id>313554</id>
+      <timestamp>2007-08-23T14:58:16Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <comment>New page: {|border=&quot;2&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;margin: 1em 1em 1em 0; background: #ffaaaa; border: 2px #aaa solid; border-collapse: collapse; &quot; align=right width=200px |- |&lt;small&gt;'''P...</comment>
+      <text xml:space="preserve">{|border=&quot;2&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;margin: 1em 1em 1em 0; background: #ffaaaa; border: 2px #aaa solid; border-collapse: collapse; &quot; align=right width=200px
+|-
+|&lt;small&gt;'''Problem/Question'''&lt;/small&gt;:&lt;br&gt;
+{{{1|Sample problem text}}}[[Category:Pages with problems or questions]]
+|}
+&lt;noinclude&gt;To use this template, put &lt;nowiki&gt;{{Problems|your text}}&lt;/nowiki&gt; on the page where you want to leave a note.  It will put in a pink box like the one on the right with your text and add the page to the category [[:Category:Pages with problems or questions]]&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Processes Page</title>
+    <id>109935</id>
+    <revision>
+      <id>245700</id>
+      <timestamp>2007-07-30T22:03:29Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">==General Description {{HelpIcon|Help:Processes}}==
+
+==Components {{HelpIcon|Help:Processes}}==
+
+==Function {{HelpIcon|Help:Processes}}==
+
+==Regulation {{HelpIcon|Help:Processes}}==
+
+==Cell Biology {{HelpIcon|Help:Processes}}==
+
+==Experimental Resources {{HelpIcon|Help:Processes}}==
+
+==Comparison with other organisms {{HelpIcon|Help:Processes}}==
+
+==Notes {{HelpIcon|Help:Processes}}==
+{{UserContentHelp}}
+
+==References==
+{{RefHelp}}
+&lt;references/&gt;
+
+__NOTOC__
+&lt;noinclude&gt;&lt;!--categories--&gt;&lt;!--/categories--&gt;&lt;/noinclude&gt;
+
+[[Category:Processes:{{PAGENAME}}]]
+[[Category:Processes]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product</title>
+    <id>1587</id>
+    <revision>
+      <id>307999</id>
+      <timestamp>2007-08-08T21:19:27Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE,
+*                             YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;
+&lt;noinclude&gt;{{TabsTop}}
+{{Tab|Quickview|{{{1}}}}}{{Tab|Gene|{{{1}}}}}{{Tab On|Gene Product(s)|{{{1}}}}}{{Tab|Expression|{{{1}}}}}{{Tab|Evolution|{{{1}}}}}{{Tab|On One Page|{{{1}}}}}{{TabsBottom}}
+{|
+|- 
+|{{Sub}}[[#Nomenclature |Nomenclature]] 
+|{{Sub}}[[#Function |Function]]
+|{{Sub}}[[#Interactions |Interactions]]
+|{{Sub}}[[#Localization |Localization]]
+|{{Sub}}[[#Sequence|Sequence]]
+|{{Sub}}[[#Structure and Physical Properties|Structure]]
+|{{Sub}}[[#Gene Product Resources|Resources]]
+|{{Sub}}[[#Accessions in Other Databases |Accessions]]
+|{{Sub}}[[#Links |Links]]
+|{{Sub}}[[#References| References]]
+|{{Sub}}[[Talk:{{PAGENAMEE}}| Suggestions]]
+|}
+&lt;/noinclude&gt;
+==Nomenclature==
+{{{NOMENCLATURE_TABLE}}}
+{{Product_nomenclature_help}}
+&lt;protect&gt;&lt;!--Nomenclature_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{NOMENCLATURE_NOTES}}}
+
+==Function==
+{{BacktoTop}}
+&lt;protect&gt;
+&lt;big&gt;'''Gene Ontology'''&lt;/big&gt;
+{{{GO_TABLE}}}
+{{Product_GO_help}}
+
+&lt;span id=&quot;Interactions&quot;&gt;&lt;/span&gt;&lt;big&gt;'''Interactions'''&lt;/big&gt;
+{{{INTERACTIONS_TABLE}}}
+{{Product_interactions_help}}
+&lt;!--Function_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{FUNCTION_NOTES}}}
+
+==Localization==
+{{{LOCALIZATION_TABLE}}}
+{{Product_localization_help}}
+&lt;protect&gt;&lt;!--Localization_notes--&gt;&lt;/protect&gt;
+
+===Notes===
+{{{LOCALIZATION_NOTES}}}
+
+==Structure and Physical Properties==
+{{BacktoTop}}
+&lt;protect&gt;
+&lt;span id=&quot;Sequence&quot;&gt;&lt;/span&gt;&lt;big&gt;'''Physical Properties'''&lt;/big&gt;
+{{{PHYSICAL_PROPERTIES_TABLE}}}
+{{Product_physical_properties_help}}
+
+&lt;big&gt;'''Domains/Motifs/Modification Sites'''&lt;/big&gt;
+{{{DOMAINS_TABLE}}}
+{{Product_domains_motifs_help}}
+
+&lt;span id=&quot;Structure&quot;&gt;&lt;/span&gt;&lt;big&gt;'''Structure'''&lt;/big&gt;
+{{{STRUCTURE_TABLE}}}
+{{Product_structure_help}}
+&lt;!--Structure_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{STRUCTURE_NOTES}}}
+
+==Gene Product Resources==
+{{BacktoTop}}
+{{{PRODUCT_RESOURCES_TABLE}}}
+{{Product_resources_help}}
+&lt;protect&gt;&lt;!--Resources_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{PRODUCT_RESOURCES_NOTES}}}
+
+==Accessions in Other Databases==
+{{BacktoTop}}
+{{{ACCESSIONS_TABLE}}}
+{{Product_accessions_help}}
+&lt;protect&gt;&lt;!--Accessions_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{{ACCESSIONS_NOTES}}}
+
+==Links==
+{{BacktoTop}}
+{{{LINKS}}}
+{{Links_help}}
+
+
+
+&lt;noinclude&gt;
+==References==
+{{BacktoTop}}
+{{RefHelp}}
+&lt;references/&gt;
+__NOTOC__
+&lt;/noinclude&gt;
+===Categories===
+{{BacktoTop}}
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product GO help</title>
+    <id>1588</id>
+    <revision>
+      <id>1906</id>
+      <timestamp>2007-07-12T20:44:07Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Gene_ontology]] for help entering or editing GO terms and GO annotations in EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product accessions help</title>
+    <id>1589</id>
+    <revision>
+      <id>1908</id>
+      <timestamp>2007-07-12T20:45:40Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_accessions]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product domains motifs help</title>
+    <id>1590</id>
+    <revision>
+      <id>1909</id>
+      <timestamp>2007-07-12T20:42:35Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_domains_motifs]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product interactions help</title>
+    <id>1591</id>
+    <revision>
+      <id>1911</id>
+      <timestamp>2007-07-12T20:48:03Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_interactions]] for help entering or editing information about gene product interactions in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product interactions table</title>
+    <id>1592</id>
+    <revision>
+      <id>1912</id>
+      <timestamp>2007-07-09T23:57:45Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Partner Type||Type|select| |Protein|DNA|RNA|Small Molecule
+Partner
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product localization help</title>
+    <id>109915</id>
+    <revision>
+      <id>245623</id>
+      <timestamp>2007-07-30T19:44:19Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_localization]] for how to add or edit information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product localization table</title>
+    <id>1593</id>
+    <revision>
+      <id>1914</id>
+      <timestamp>2007-07-14T16:54:14Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Compartment||Type|select| |Cytosol|Nucleoid|Pole|Septum|Periplasm|Inner membrane|Outer membrane|Extracellular|Other
+Description
+Evidence
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product motif table</title>
+    <id>1594</id>
+    <revision>
+      <id>1915</id>
+      <timestamp>2007-07-10T00:00:10Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Type||Type|select| |Domain|Motif|Modification Site
+Residues
+Description
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product nomenclature help</title>
+    <id>1595</id>
+    <revision>
+      <id>1917</id>
+      <timestamp>2007-07-12T20:48:53Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_nomenclature]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product nomenclature table</title>
+    <id>1596</id>
+    <revision>
+      <id>1919</id>
+      <timestamp>2007-07-08T21:01:09Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Standard name
+Synonyms
+Product description
+EC number (for enzymes)
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product phys prop table</title>
+    <id>1597</id>
+    <revision>
+      <id>1921</id>
+      <timestamp>2007-07-11T03:31:58Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Sequence
+Mol. Wt
+pI
+Extinction coefficient
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;
+&lt;type&gt;1&lt;/type&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product physical properties help</title>
+    <id>1598</id>
+    <revision>
+      <id>1923</id>
+      <timestamp>2007-07-12T20:49:40Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_physical_properties]] for help entering or editing information about the physical properties of this gene product.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product resource table</title>
+    <id>1599</id>
+    <revision>
+      <id>1924</id>
+      <timestamp>2007-07-10T00:02:53Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Resource type||Type|select| |Purification protocol|Antibody|Assay
+Source
+Notes/Reference
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product resources help</title>
+    <id>1600</id>
+    <revision>
+      <id>1926</id>
+      <timestamp>2007-07-12T20:50:13Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt; See [[Help:Product_resources]] for help with entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product structure help</title>
+    <id>1601</id>
+    <revision>
+      <id>1928</id>
+      <timestamp>2007-07-12T20:51:12Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Product_structure]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Product structure table</title>
+    <id>1602</id>
+    <revision>
+      <id>7357</id>
+      <timestamp>2007-07-19T16:51:17Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;
+Structure Type||Type|select| |X-ray|NMR|EM|Transmembrane Segment|Predicted|Neutron diffraction|Other
+Organism
+Accession
+Residues covered
+Notes
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table heading style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Products with structures in PDB placeholder</title>
+    <id>111731</id>
+    <revision>
+      <id>307653</id>
+      <timestamp>2007-08-04T22:25:36Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <comment>New page: This page contains links to the EcoliWiki Gene Product(s) pages for products with structures in the Protein Databank (PDB).</comment>
+      <text xml:space="preserve">This page contains links to the EcoliWiki Gene Product(s) pages for products with structures in the Protein Databank (PDB).</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Quickview</title>
+    <id>1603</id>
+    <revision>
+      <id>153374</id>
+      <timestamp>2007-07-26T23:50:09Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;!--
+***************************************************************************************************************************************************
+*
+*
+*               PLEASE EDIT FROM THE SECTION OR TABLE EDIT LINKS...IF YOU SEE THIS MESSAGE,
+*                             YOU'RE PROBABLY IN THE WRONG PLACE
+*
+*
+***************************************************************************************************************************************************
+--&gt;{{#css:Suppresslinks.css}}&lt;css&gt;{{:Suppresslinks.css}}&lt;/css&gt;
+&lt;noinclude&gt;{{TabsTop}}  
+{{Tab On|Quickview|{{{1}}}}}{{Tab|Gene|{{{1}}}}}{{Tab|Gene Product(s)|{{{1}}}}}{{Tab|Expression|{{{1}}}}}{{Tab|Evolution|{{{1}}}}}{{Tab|On One Page|{{{1}}}}}{{TabsBottom}}
+{|
+|- style=&quot;background-color:white; border:solid 2px #CCFFFF; text-align:center; white-space: nowrap;&quot; 
+|{{Sub}}[[#References| References]]
+|{{Sub}}[[Talk:{{PAGENAMEE}}| Suggestions]]
+|}
+&lt;/noinclude&gt;
+{{{QUICKVIEW_TABLE}}}
+{{Quickview_table_help}}
+&lt;protect&gt;&lt;!--Quickview_notes--&gt;&lt;/protect&gt;
+===Notes===
+{{BacktoTop}}
+{{{NOTES}}}
+
+&lt;noinclude&gt;
+==References==
+{{BacktoTop}}
+{{RefHelp}}
+&lt;references/&gt;
+&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Quickview table</title>
+    <id>1604</id>
+    <revision>
+      <id>1957</id>
+      <timestamp>2007-06-27T18:56:42Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;headings&gt;Gene Name
+Product(s) 
+Description	
+Knock-Out Phenotype	
+Regulation/Expression	
+Regulation/Activity
+&lt;/headings&gt;
+&lt;type&gt;1&lt;/type&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Quickview table help</title>
+    <id>104791</id>
+    <revision>
+      <id>154374</id>
+      <timestamp>2007-07-27T05:45:04Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Quickview]] for help with entering information in the Quickview table.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Quickview talk placeholder</title>
+    <id>109913</id>
+    <revision>
+      <id>244902</id>
+      <timestamp>2007-07-30T18:08:19Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <comment>New page: {{GeneralSuggestion|Quickview}}</comment>
+      <text xml:space="preserve">{{GeneralSuggestion|Quickview}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:RefHelp</title>
+    <id>1605</id>
+    <revision>
+      <id>1958</id>
+      <timestamp>2007-02-19T20:04:29Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:References]] for how to manage references in EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:SidebarCustom</title>
+    <id>1608</id>
+    <revision>
+      <id>1970</id>
+      <timestamp>2007-01-24T22:32:07Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">**Talk:{{PAGENAME}}|talk page
+**Test2|Test2
+**{{If|{{{1}}}|then=a|else=b}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Strain</title>
+    <id>105013</id>
+    <revision>
+      <id>245705</id>
+      <timestamp>2007-07-30T22:18:14Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">==Alternate Names {{HelpIcon|Help:Strains}}==
+
+==Chromosomal Genotype {{HelpIcon|Help:Strains}}==
+
+==Plasmids {{HelpIcon|Help:Strains}}==
+
+==Phage {{HelpIcon|Help:Strains}}==
+
+==Phenotypes {{HelpIcon|Help:Strains}}==
+
+==Construction {{HelpIcon|Help:Strains}}==
+
+==Notes==
+
+==References==
+{{RefHelp}}
+&lt;references/&gt;
+
+__NOTOC__
+[[Category:Strains]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Sub</title>
+    <id>1609</id>
+    <revision>
+      <id>1975</id>
+      <timestamp>2006-11-02T19:21:14Z</timestamp>
+      <contributor>
+        <username>Lili</username>
+        <id>3</id>
+      </contributor>
+      <text xml:space="preserve">style=&quot;padding:0 .3em; background-color:white; border:solid 2px #A3B1BF; border-bottom: 0; border-left: 0; border-top: 0; text-align:center; font-weight:bold; white-space: wrap;&quot;|</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Tab</title>
+    <id>1610</id>
+    <revision>
+      <id>307549</id>
+      <timestamp>2007-08-04T18:56:02Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;includeonly&gt;| style=&quot;padding:0 .3em; background-color:#CEE0F2; border:solid 2px #A3B1BF; text-align:center; font-size:130%;white-space: nowrap;&quot;| [[{{{2}}}:{{{1}}}|{{{1}}}]] 
+| style=&quot;border-bottom:2px solid #A3B1BF&quot; width=&quot;3&quot; |&amp;nbsp;&lt;/includeonly&gt;
+
+&lt;noinclude&gt;
+&lt;br clear=&quot;all&quot;&gt;
+==Usage==
+To create a set of tabs, use these four elements. Keep the page tabs in the same order on all pages and use &quot;Tab On&quot; for the current page.
+
+{{[[Template: Tab On|Tab On]]|Current page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:Tab|Tab]]|Other page name(s)|Gene name}}&lt;br&gt;
+&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Tab On</title>
+    <id>1611</id>
+    <revision>
+      <id>307583</id>
+      <timestamp>2007-08-04T21:09:05Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">&lt;includeonly&gt;| style=&quot;padding:0 .3em; background-color:white;border:solid 2px #A3B1BF; border-bottom: 0; text-align:center; font-weight:bold; font-size:130%; white-space: nowrap;&quot;| {{{1}}}
+| style=&quot;border-bottom:2px solid #A3B1BF&quot; width=&quot;3&quot; |&amp;nbsp;&lt;/includeonly&gt;
+
+&lt;noinclude&gt;
+&lt;br clear=&quot;all&quot;&gt;
+==Usage==
+To create a set of tabs, use these four elements. Keep the page tabs in the same order on all pages and use &quot;Tab On&quot; for the current page.
+
+{{[[Template: Tab On|Tab On]]|Current page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:Tab|Tab]]|Other page name(s)|Gene name}}&lt;br&gt;
+&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TableHeadingColor</title>
+    <id>1612</id>
+    <revision>
+      <id>2014</id>
+      <timestamp>2007-02-19T20:03:03Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">bgcolor='#CCCCFF'</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TableHelpHorizontal</title>
+    <id>104972</id>
+    <revision>
+      <id>245657</id>
+      <timestamp>2007-07-30T21:01:33Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">==Editing and Entering Information==
+Editing and Entering Information into the tables is relatively simple. Below, we walk you through adding new data or editing data already there. 
+
+
+[[Image:HorizonAdd.jpg|thumb|left|600px]] After clicking on the '''Edit Table''' link, an editable version of the table will appear, such as the one on the left.
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+[[Image:HorizonBlanks.jpg|thumb|left|600px]] Adding data is done by clicking the '''Add Data''' button at the bottom of the table. This will generate editable boxes for adding information. Please note that the titles of the boxes in the pictures may be different from the table you are editing. 
+
+You can choose to protect the data entered if you don't wish anyone else (except the EcoliWiki Team) to modify it. Use the pull-down menu to select either public or private. 
+
+After entering the information, click on the '''Save''' button at the bottom of the table. 
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+[[image:HorizonEdit.jpg|thumb|left|600px]] There may be information already in the table that you wish to change. 
+
+Please note that data marked protected has been added by Wiki scripts and cannot be edited, such as the information in the row titled Protein in our example on the left. However, if you consider something to be wrong or needing to be changed, we encourage you to make your voice heard by editing the table or writing in the section marked Notes below the table.
+
+Content that has been added by the community can be edited. In the image to the left, the row entitled DNA can be edited. To do this, click on the '''Edit''' button at the end of the row that you wish to edit. You can choose to protect the data entered if you don't wish anyone else (except the EcoliWiki Team) to modify it. Use the pull-down menu to select either public or private. 
+
+After entering the information, click on the '''Save''' button at the table.
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+Whether you've entered data or edited data, it will need to be saved. In the above examples, the data has been saved so that the user can see an updated version of the table.  To save the data to the actual Wiki page, click on the '''Save Table to Wiki Page''' button at the bottom of the updated table to save the table to the original page.
+
+The EcoliWiki Team thanks you for your contribution!
+[[Category:Help]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TableHelpVertical</title>
+    <id>104971</id>
+    <revision>
+      <id>245666</id>
+      <timestamp>2007-07-30T21:04:27Z</timestamp>
+      <contributor>
+        <username>Gwen</username>
+        <id>5</id>
+      </contributor>
+      <text xml:space="preserve">==Editing and Entering Information==
+Editing and Entering Information into the tables is relatively simple. Below, we walk you through adding new data or editing data already there. 
+
+[[Image:Verttable.jpg|thumb|left|500px]] To get started, click the '''Edit Table''' link on the bottom, left-hand side of the table. An editable version of the table will appear. An example is shown in the next image.
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+[[Image:Vertedit.jpg|thumb|left|500px]]  
+
+For adding new data, click on the '''Add Data''' button at the bottom of the table to create a new row with text boxes where you can enter information.  What should appear is in the image on the left.
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+[[Image:Vertadd.jpg|thumb|left|500px]] Adding data is done by clicking the '''Add Data''' button at the bottom of the table. This will generate editable boxes for adding information. Please note that the titles of the boxes in the pictures may be different from the table you are editing. 
+
+You can chose to protect the data entered if you don't wish anyone else (except the EcoliWiki Team) to modify it. Use the pull-down menu to select either public or private. 
+
+After entering the information, click on the '''Save''' button at the bottom of the table. 
+&lt;BR&gt;
+&lt;br clear='all'&gt;
+
+
+[[Image:Verteditcol.jpg|thumb|left|500px]]There may be information already in the table that you wish to change. 
+
+Please note that data marked protected has been added by Wiki scripts and can not be edited, such as the information in the row titled Protein in our example on the left. However, if you consider something to be wrong or needing to be changed, we encourage you to make your voice heard by editing the table or writing in the section marked Notes below the table.
+
+Content that has been added by the community can be edited. In the image to the left, the column entitled new standard name can be edited. To do this, click on the '''Edit''' button at the bottom of the column that you wish to edit. You can choose to protect the data entered if you don't wish anyone else (except the EcoliWiki Team) to modify it. Use the pull-down menu to select either public or private. 
+
+After entering the information, click on the '''Save''' button at the table. &lt;BR&gt;
+&lt;br clear='all'&gt;
+
+Whether you've entered data or edited data, it will need to be saved. In the above examples, the data has been saved so that the user can see an updated version of the table.  To save the data to the actual Wiki page, click on '''Save Table to Wiki Page''' button at the bottom of the updated table to save the table to the original page.
+
+The EcoliWiki Team thanks you for your contribution!
+[[Category:Help]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TabsBottom</title>
+    <id>1613</id>
+    <revision>
+      <id>2017</id>
+      <timestamp>2006-10-06T20:31:58Z</timestamp>
+      <contributor>
+        <username>Lili</username>
+        <id>3</id>
+      </contributor>
+      <text xml:space="preserve">&lt;includeonly&gt;| style=&quot;border-bottom:2px solid #A3B1BF&quot; width=&quot;3000&quot; | &amp;nbsp;
+|}&lt;/includeonly&gt;
+&lt;noinclude&gt;
+&lt;br clear=&quot;all&quot;&gt;
+==Usage==
+To create a set of tabs, use these four elements. Keep the page tabs in the same order on all pages and use &quot;Tab On&quot; for the current page.
+
+{{[[Template:TabsTop]]}}&lt;br&gt;
+{{[[Template: Tab On|Tab On]]|Current page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:Tab|Tab]]|Other page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:TabsBottom]]}}
+&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TabsTop</title>
+    <id>1614</id>
+    <revision>
+      <id>2023</id>
+      <timestamp>2006-10-05T21:32:14Z</timestamp>
+      <contributor>
+        <username>Lili</username>
+        <id>3</id>
+      </contributor>
+      <text xml:space="preserve">{| width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot; valign=&quot;top&quot; border=&quot;0&quot; valign=center|
+&lt;noinclude&gt;
+&lt;br clear=&quot;all&quot;&gt;
+==Usage==
+To create a set of tabs, use these four elements. Keep the page tabs in the same order on all pages and use &quot;Tab On&quot; for the current page.
+
+{{[[Template:TabsTop|TabsTop]]}}&lt;br&gt;
+{{[[Template: Tab On|Tab On]]|Current page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:Tab|Tab]]|Other page name(s)|Gene name}}&lt;br&gt;
+{{[[Template:TabsBottom|TabsBottom]]}}
+&lt;/noinclude&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:TemplateSuggestion</title>
+    <id>111685</id>
+    <revision>
+      <id>307539</id>
+      <timestamp>2007-08-04T18:48:36Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">Leave comments or suggestions here about the overall layout and design of all pages using this template. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; at the start of a line to indent. You may also email us at {{Email}}.&lt;br/&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Test template</title>
+    <id>1615</id>
+    <revision>
+      <id>2024</id>
+      <timestamp>2005-07-03T00:25:52Z</timestamp>
+      <contributor>
+        <ip>WikiSysop</ip>
+      </contributor>
+      <text xml:space="preserve">This is a test template.  &lt;nowiki&gt;{{&lt;/nowiki&gt;subst:''Test template''&lt;nowiki&gt;}}&lt;/nowiki&gt; should include this text</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Txn factor GO poll</title>
+    <id>111890</id>
+    <revision>
+      <id>307981</id>
+      <timestamp>2007-08-08T16:16:48Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <comment>New page: &lt;headings&gt; Gene name (bnum)||gene Is this a regulator||regulator Pos. regulator?||positive Neg. regulator?||negative Comments||comments Evidence||evidence &lt;/headings&gt; &lt;heading_style&gt;{{tabl...</comment>
+      <text xml:space="preserve">&lt;headings&gt;
+Gene name (bnum)||gene
+Is this a regulator||regulator
+Pos. regulator?||positive
+Neg. regulator?||negative
+Comments||comments
+Evidence||evidence
+&lt;/headings&gt;
+&lt;heading_style&gt;{{table_heading_style}}&lt;/heading_style&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Txn unit</title>
+    <id>10582</id>
+    <revision>
+      <id>13993</id>
+      <timestamp>2007-07-19T18:04:22Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <comment>New page: ==About== {{{ABOUT}}} ==References== &lt;references/&gt; {{{CATEGORIES}}}</comment>
+      <text xml:space="preserve">==About==
+{{{ABOUT}}}
+==References==
+&lt;references/&gt;
+{{{CATEGORIES}}}</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Txn unit talk placeholder</title>
+    <id>110210</id>
+    <revision>
+      <id>246215</id>
+      <timestamp>2007-08-01T22:18:01Z</timestamp>
+      <contributor>
+        <username>Siegele</username>
+        <id>6</id>
+      </contributor>
+      <comment>New page: Leave comments or suggestions here about the overall layout and design of the '''Txn unit''' pages. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; a...</comment>
+      <text xml:space="preserve">Leave comments or suggestions here about the overall layout and design of the '''Txn unit''' pages. Click on the &quot;+&quot; above to add a new topic or on &quot;edit&quot; to edit the discussion. Use &quot;:&quot; at the start of a line to indent. You may also email us at {{Email}}.</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:expression transcription help</title>
+    <id>1616</id>
+    <revision>
+      <id>2025</id>
+      <timestamp>2007-07-15T17:48:28Z</timestamp>
+      <contributor>
+        <ip>DSiegele</ip>
+      </contributor>
+      <text xml:space="preserve">&lt;small&gt;See [[Help:Expression_transcription]] for help entering or editing information in this section of EcoliWiki.&lt;/small&gt;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:prettytable</title>
+    <id>1617</id>
+    <revision>
+      <id>2026</id>
+      <timestamp>2005-11-16T07:36:41Z</timestamp>
+      <contributor>
+        <ip>Jimhu</ip>
+      </contributor>
+      <text xml:space="preserve">border=&quot;2&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;margin: 1em 1em 1em 0; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse;&quot;</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:table heading style</title>
+    <id>1618</id>
+    <revision>
+      <id>2027</id>
+      <timestamp>2007-06-27T18:57:18Z</timestamp>
+      <contributor>
+        <username>JimHu</username>
+        <id>1</id>
+      </contributor>
+      <text xml:space="preserve">align='left' bgcolor='#CCCCFF'</text>
+    </revision>
+  </page>
+  <page>
+    <title>Template:Bioinformatics Tools</title>
+    <id>104588</id>
+    <revision>
+      <id>152034</id>
+      <timestamp>2007-07-20T20:00:18Z</timestamp>
+      <contributor>
+        <ip>NoPower</ip>
+      </contributor>
+      <comment>/* References */</comment>
+      <text xml:space="preserve">{{Pagetop}}
+== Short Description ==
+{{UserContentHelp}}
+== Links ==
+Links to sites that run the software or where it can be obtained
+== Requirements ==
+Hardware/Software requirements, if applicable
+
+== User notes ==
+
+== See Also ==
+
+== References ==
+{{RefHelp}}
+&lt;references/&gt;
+&lt;includeonly&gt;[[Category:Bioinformatics Tools]]&lt;/includeonly&gt;</text>
+    </revision>
+  </page>
+</mediawiki>

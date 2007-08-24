@@ -1,0 +1,11 @@
+feature_id|field|value
+65467|Name|sadA
+65467|uniquename|sadA
+65467|seqlen|seqlen
+65467|type|gene
+65467|organism|D.discoideum
+65467|synonym|sadA
+65467|name description|sad = <b>S</b>ubstrate <b>AD</b>hesion
+65467|description|EGF repeat-containing 9 transmembrane molecule involved in substrate adhesion.
+65467|location|DDB0232432:1638800..1641837 [+]
+(9 rows)
