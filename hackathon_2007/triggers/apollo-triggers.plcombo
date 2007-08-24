@@ -11,33 +11,53 @@
 
 --gets the next available uniquename; note that it is
 --destructive because it calls nextval on a sequence 
-CREATE OR REPLACE FUNCTION next_uniquename() RETURNS varchar AS '
-DECLARE
-  prename      varchar;
-  f_uniquename varchar;
-  prefix       varchar;
-  suffix       varchar;
-  id           varchar;
-  maxid        int;
-BEGIN
-  SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv
-                             WHERE cvterm.name = ''prefix'' and
-                                   cp.cvterm_id = cvterm.cvterm_id and
-                                   cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''apollo'';
-  SELECT INTO suffix cp.value FROM cvtermprop cp, cvterm, cv
-                             WHERE cvterm.name = ''suffix'' and
-                                   cp.cvterm_id = cvterm.cvterm_id and
-                                   cvterm.cv_id = cv.cv_id and
-                                   cv.name = ''apollo'';
+CREATE OR REPLACE FUNCTION next_uniquename() RETURNS varchar AS $$
 
-  SELECT INTO maxid nextval(''uniquename_id_generator'');
-  RAISE NOTICE ''maxid is:%'', maxid;
-  id:=lpad(maxid, 6, ''000000'');
-  f_uniquename:=CAST(prefix||id||suffix as VARCHAR);
-  RETURN f_uniquename;
+    my $get_single_value = sub {
+        my $sql_str     = shift;
+        my $column_name = shift;
+
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0]{$column_name};
+    };
+
+    # Prefix of the name
+    my $prefix = $get_single_value->(
+        q[
+        SELECT cp.value FROM cvtermprop cp, cvterm, cv
+        WHERE cvterm.name = 'prefix' and
+            cp.cvterm_id = cvterm.cvterm_id and
+            cvterm.cv_id = cv.cv_id and
+            cv.name = 'apollo';
+    ],
+        'value'
+    );
+
+    # Suffix of the name
+    my $suffix = $get_single_value->(
+        q[
+        SELECT cp.value FROM cvtermprop cp, cvterm, cv
+        WHERE cvterm.name = 'suffix' and
+            cp.cvterm_id = cvterm.cvterm_id and
+            cvterm.cv_id = cv.cv_id and
+            cv.name = 'apollo';
+    ],
+        'value'
+    );
+
+    my $max_id = $get_single_value->(
+        q[ SELECT nextval('uniquename_id_generator') as nextval ], 'nextval',
+    );
+    $max_id = sprintf( "%06d", $max_id );
+
+    return $prefix . $max_id . $suffix;
+
 END;
-'LANGUAGE plpgsql;
+$$ LANGUAGE plperl;
 
 DROP TRIGGER tr_feature_del  ON feature;
 
@@ -1227,4 +1247,5 @@ BEGIN
   RETURN 1;
 END;
 'LANGUAGE plpgsql;
+
 
