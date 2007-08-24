@@ -529,16 +529,16 @@ CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS $$
                 );
             }
         }
-        elsif ($f_type = $f_type_transcript
-            or $f_type = $f_type_ncRNA
-            or $f_type = $f_type_snoRNA
-            or $f_type = $f_type_snRNA
-            or $f_type = $f_type_tRNA
-            or $f_type = $f_type_rRNA
-            or $f_type = $f_type_pseudo
-            or $f_type = $f_type_miRNA
-            or $f_type = $f_type_protein
-            or $f_type = $f_type_exon )
+        elsif ($f_type eq $f_type_transcript
+            or $f_type eq $f_type_ncRNA
+            or $f_type eq $f_type_snoRNA
+            or $f_type eq $f_type_snRNA
+            or $f_type eq $f_type_tRNA
+            or $f_type eq $f_type_rRNA
+            or $f_type eq $f_type_pseudo
+            or $f_type eq $f_type_miRNA
+            or $f_type eq $f_type_protein
+            or $f_type eq $f_type_exon )
         {
 
             if (not defined(
@@ -560,10 +560,10 @@ CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS $$
                         . $f_row_g->{'feature_id'} );
             }
         }
-        elsif ($f_type = $f_type_transposable_element
-            or $f_type = $f_type_promoter
-            or $f_type = $f_type_repeat_region
-            or $f_type = $f_type_remark )
+        elsif ($f_type eq $f_type_transposable_element
+            or $f_type eq $f_type_promoter
+            or $f_type eq $f_type_repeat_region
+            or $f_type eq $f_type_remark )
         {
 
             if ( $_TD->{new}{'name'} =~ /temp/
