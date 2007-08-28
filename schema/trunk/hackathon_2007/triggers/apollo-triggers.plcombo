@@ -1327,240 +1327,465 @@ CREATE TRIGGER feature_relationship_propagatename_tr_i AFTER INSERT ON feature_r
 
 DROP TRIGGER feature_update_name_tr_u ON feature;
 
-CREATE OR REPLACE FUNCTION feature_fn_u() RETURNS TRIGGER AS
-'
-DECLARE
-  f_type          cvterm.name%TYPE;
-  f_type_gene     CONSTANT varchar :=''gene'';
-  f_row           feature%ROWTYPE;
-  s_type_id       synonym.type_id%TYPE;
-  s_id            synonym.synonym_id%TYPE;
-  f_s_id          feature_synonym.feature_synonym_id%TYPE;
-  p_id            pub.pub_id%TYPE;
-  p_miniref       CONSTANT varchar:=''none'';
-  c_name_synonym  CONSTANT varchar:=''synonym'';
-  cv_cvname_synonym CONSTANT varchar:=''null'';
-  name_suffix     varchar;
-  child_name      varchar;
-BEGIN
-  IF OLD.uniquename <> NEW.uniquename AND OLD.uniquename NOT LIKE ''%temp%'' THEN
-      RAISE NOTICE ''You may not change the uniquename of a feature'';
-      RAISE NOTICE ''if you feel you must, contact your database admin'';
-      RETURN OLD;
-  END IF;
-  IF OLD.name = NEW.name THEN
-      --not updating name, so go ahead 
-      RETURN NEW;
-  END IF;
+CREATE OR REPLACE FUNCTION feature_fn_u() RETURNS TRIGGER AS $$
+    my $f_type_gene       = 'gene';
+    my $p_miniref         = 'none';
+    my $c_name_synonym    = 'synonym';
+    my $cv_cvname_synonym = 'null';
 
+    my $get_single_value = sub {
+        my $sql_str     = shift;
+        my $column_name = shift;
 
---fetch a few useful things
-  SELECT INTO s_type_id cvterm_id from cvterm c1, cv c2 where c1.name=c_name_synonym and c2.name=cv_cvname_synonym and c1.cv_id=c2.cv_id;
-  SELECT INTO f_type cv.name FROM feature f, cvterm cv WHERE f.feature_id = OLD.feature_id and f.type_id = cv.cvterm_id; 
-  SELECT INTO p_id pub_id from pub where uniquename = p_miniref;
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0]{$column_name};
+    };
 
+    my $get_single_row = sub {
+        my $sql_str = shift;
 
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0];
+    };
 
---  IF f_type <> f_type_gene THEN
---      --its not a gene, so go ahead
---      --but insert the new name into the synonym table
+    if (    $_TD->{old}{'uniquename'} ne $_TD->{new}{'uniquename'}
+        and $_TD->{old}{'uniquename'} !~ /temp/ )
+    {
 
+        # RAISE NOTICE'You may not change the uniquename of a feature';
+        # RAISE NOTICE'if you feel you must, contact your database admin';
+        return 'SKIP';
+    }
+    if ( $_TD->{old}{'name'} eq $_TD->{new}{'name'} ) {
 
-  --On gene name update, we also update the gene inner synonym (ie himself)
-  --so for all features, the inner synonym gets updated
-      IF NEW.name IS NOT NULL THEN
-          SELECT INTO s_id synonym_id from synonym where name=NEW.name and type_id=s_type_id;
-          IF s_id IS NULL THEN
-              INSERT INTO synonym(name, synonym_sgml, type_id) values(NEW.name, NEW.name, s_type_id);
-              SELECT INTO s_id synonym_id from synonym where name=NEW.name and type_id=s_type_id;
-          END IF;
-          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=NEW.feature_id and synonym_id=s_id and pub_id=p_id;
-          IF f_s_id IS NULL THEN
-              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (NEW.feature_id, s_id, p_id, ''true'');
-          END IF;
-      END IF;
- 
-  IF f_type <> f_type_gene THEN
-      --its not a gene, so go ahead   
-      RETURN NEW;
-  END IF;
+        # Not updating name, so go ahead
+        return;
+    }
 
-  --OK, so its a gene, and were changing the name...
+    # Fetch a few useful things
+    my $s_type_id = $get_single_value->(
+        qq[
+        SELECT cvterm_id 
+        from cvterm c1, cv c2 
+        where c1.name='$c_name_synonym' and c2.name='$cv_cvname_synonym' 
+        and c1.cv_id=c2.cv_id],
+        'cvterm_id'
+    );
 
+    my $f_type = $get_single_value->(
+        qq[
+        SELECT cv.name 
+        FROM feature f, cvterm cv 
+        WHERE f.feature_id =]
+            . $_TD->{old}{'feature_id'} 
+            . q[ and f.type_id = cv.cvterm_id], 'name'
+    );
+    my $p_id = $get_single_value->(
+        qq[
+        SELECT pub_id 
+        from pub 
+        where uniquename = '$p_miniref'], 'pub_id'
+    );
 
+    #  IF $f_type <> $f_type_gene THEN
+    #      #its not a gene, so go ahead
+    #      #but insert the new name into the synonym table
 
+    #On gene name update, we also update the gene inner synonym (ie himself)
+    #so for all features, the inner synonym gets updated
+    if ( defined( $_TD->{new}{'name'} ) ) {
+        my $s_id = $get_single_value->(
+            qq[
+            SELECT synonym_id 
+            from synonym 
+            where name=']
+                . $_TD->{new}{'name'} 
+                . qq[' and type_id=$s_type_id], 'synonym_id'
+        );
+        if ( not defined($s_id) ) {
+            spi_exec_query(
+                qq[
+                INSERT INTO synonym(name, synonym_sgml, type_id) 
+                values(']
+                    . $_TD->{new}{'name'} . qq[',']
+                    . $_TD->{new}{'name'}
+                    . qq[', $s_type_id);]
+            );
+            $s_id = $get_single_value->(
+                qq[
+                SELECT synonym_id 
+                from synonym 
+                where name=']
+                    . $_TD->{new}{'name'} 
+                    . qq[' and type_id=$s_type_id], 'synonym_id'
+            );
+        }
+        my $f_s_id = $get_single_value->(
+            qq[
+            SELECT feature_synonym_id 
+            from feature_synonym 
+            where feature_id=]
+                . $_TD->{new}{'feature_id'}
+                . qq[ and synonym_id=$s_id and pub_id=$p_id],
+            'feature_synonym_id'
+        );
+        if ( not defined($f_s_id) ) {
+            spi_exec_query(
+                qq[
+                INSERT INTO feature_synonym
+                (feature_id, synonym_id, pub_id, is_current) 
+                values ($_TD->{new}{'feature_id'}, $s_id, $p_id, 'true');]
+            );
+        }
+    }
 
-  --For corectly handling alternate transcript of a gene, we must add a distinct in order not to process the same exon multiple times (exons are shared in chado)
-  FOR f_row IN SELECT DISTINCT f.* FROM feature f, get_sub_feature_ids(OLD.feature_id) ch WHERE f.feature_id = ch.feature_id LOOP
-      --This one process the transcripts and the proteins
---      IF f_row.name LIKE OLD.name||''-%'' THEN
---          SELECT INTO name_suffix  substring(name from OLD.name||''(-.+)'') FROM feature where feature_id = f_row.feature_id;
---          child_name = NEW.name||name_suffix;
---          UPDATE feature SET name = child_name WHERE feature_id = f_row.feature_id;
+    if ( $f_type ne $f_type_gene ) {
 
---          SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
---          IF s_id IS NULL THEN
---              INSERT INTO synonym(name, synonym_sgml, type_id) values(child_name, child_name, s_type_id);
---              SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
---          END IF;
---          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row.feature_id and synonym_id=s_id and pub_id=p_id;
---          IF f_s_id IS NULL THEN
---              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row.feature_id, s_id, p_id, ''true'');
---          END IF;
---      END IF;
+        #its not a gene, so go ahead
+        return 'MODIFY';
+    }
 
-      --And this one process the exons (of form gene_name:something)
-      --Be careful, this could lead to problems with some autogenerated split names which for flybase are also of the form gene_name:#) TODO : move this regexp to something like /gene_name:\d-\d/
-      IF  f_row.name LIKE OLD.name||'':%'' THEN
-          SELECT INTO name_suffix  substring(name from OLD.name||''(:.+)'') FROM feature where feature_id = f_row.feature_id;
-          child_name = NEW.name||name_suffix;
-          RAISE NOTICE ''feature_id:%, name:% , new name : %, namesuffix:%, geneName:%'', f_row.feature_id, f_row.name, child_name,name_suffix, NEW.name ;
-          UPDATE feature SET name = child_name WHERE feature_id = f_row.feature_id;
+    #OK, so its a gene, and were changing the name...
 
-          SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
-          IF s_id IS NULL THEN
-              INSERT INTO synonym(name, synonym_sgml, type_id) values(child_name, child_name, s_type_id);
-              SELECT INTO s_id synonym_id from synonym where name=child_name and type_id=s_type_id;
-          END IF;
-          SELECT INTO f_s_id feature_synonym_id from feature_synonym where feature_id=f_row.feature_id and synonym_id=s_id and pub_id=p_id;
-          IF f_s_id IS NULL THEN
-              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row.feature_id, s_id, p_id, ''true'');          END IF;
+    # For corectly handling alternate transcript of a gene,
+    # we must add a distinct in order not to process the same
+    # exon multiple times (exons are shared in chado)
+    my $rv = spi_exec_query(
+        qq[ 
+        SELECT DISTINCT f.* 
+        FROM feature f, get_sub_feature_ids(]
+            . $_TD->{old}{'feature_id'} . qq[) ch 
+        WHERE f.feature_id = ch.feature_id]
+    );
+    foreach my $f_row ( @{ $rv->{q[rows]} || [] } ) {
 
-      END IF; 
+#This one process the transcripts and the proteins
+#      IF f_row.name LIKE $_TD->{old}{'name'}||'-%' THEN
+#          my $name_suffix = $get_single_value->(
+#qq[
+#SELECT substring(name from $_TD->{old}{'name'}||'(-.+)')
+#FROM feature where feature_id = f_row.feature_id],'substring(name');#LOOK AT
+#          $child_name = $_TD->{new}{'name'}||name_suffix;
+#          UPDATE feature SET name = $child_name WHERE feature_id = f_row.feature_id;
 
-  END LOOP;  
-  
-  RETURN NEW; 
-END;
-'LANGUAGE plpgsql;
+#          #my $s_id = $get_single_value->( qq[
+#          #SELECT synonym_id from synonym where name=$child_name and type_id=$s_type_id],'synonym_id');#LOOK AT
+#          if (not defined($s_id)){
+#              INSERT INTO synonym(name, synonym_sgml, type_id) values($child_name, $child_name, $s_type_id);
+#              my $s_id = $get_single_value->(
+#qq[SELECT synonym_id from synonym where name=$child_name and type_id=$s_type_id],'synonym_id');#LOOK AT
+#          }
+#          my $f_s_id = $get_single_value->(
+#qq[SELECT feature_synonym_id from feature_synonym where feature_id=f_row.feature_id and synonym_id=s_id and pub_id=$p_id],'feature_synonym_id');#LOOK AT
+#          if (not defined($f_s_id)){
+#              INSERT INTO feature_synonym(feature_id, synonym_id, pub_id, is_current) values (f_row.feature_id, $s_id, $p_id, 'true');
+#          }
+#      END IF
+
+        #And this one process the exons (of form gene_name:something)
+        #Be careful, this could lead to problems with some autogenerated
+        #split names which for flybase are also of the form gene_name:#)
+        #TODO : move this regexp to something like /gene_name:\d-\d/
+        if ( $f_row->{'name'} =~ $_TD->{old}{'name'} . ':' ) {
+            my $name_suffix = '';
+            my $old_name    = $_TD->{old}{'name'};
+            if ( $f_row->{'name'} =~ /$old_name(:.+)/ ) {
+                $name_suffix = $1;
+            }
+
+            my $child_name = $_TD->{new}{'name'} . $name_suffix;
+
+# RAISE NOTICE'feature_id:%, name:% , new name : %, namesuffix:%, geneName:%', f_row.feature_id, f_row.name, $child_name,name_suffix, $_TD->{new}{'name'} ;
+            spi_exec_query(
+                qq[ 
+                UPDATE feature SET name = '$child_name' 
+                WHERE feature_id = ] . $f_row->{'feature_id'}
+            );
+
+            my $s_id = $get_single_value->(
+                qq[
+            SELECT synonym_id 
+            from synonym 
+            where name='$child_name' and type_id=$s_type_id], 'synonym_id'
+            );
+            if ( not defined($s_id) ) {
+                spi_exec_query(
+                    qq[
+                INSERT INTO synonym(name, synonym_sgml, type_id) 
+                values('$child_name', '$child_name', $s_type_id);]
+                );
+                $s_id = $get_single_value->(
+                    qq[
+                SELECT synonym_id 
+                from synonym 
+                where name='$child_name' and type_id=$s_type_id], 'synonym_id'
+                );
+            }
+            my $f_s_id = $get_single_value->(
+                qq[SELECT feature_synonym_id from feature_synonym where feature_id=]
+                    . $f_row->{'feature_id'}
+                    . qq[ and synonym_id=$s_id and pub_id=$p_id],
+                'feature_synonym_id'
+            );    #LOOK AT
+            if ( not defined($f_s_id) ) {
+                spi_exec_query(
+                    qq[
+                INSERT INTO feature_synonym
+                (feature_id, synonym_id, pub_id, is_current) 
+                values (]
+                        . $f_row->{'feature_id'} . qq[, $s_id, $p_id, 'true')]
+                );
+            }
+
+        }
+
+    }
+
+    return 'MODIFY';
+$$ LANGUAGE plperl;
 
 CREATE TRIGGER feature_update_name_tr_u BEFORE UPDATE ON feature FOR EACH ROW EXECUTE PROCEDURE feature_fn_u();
 
 -- function to fascilitate gene merges
 -- returns the uniquename of the merged gene
 --WARNING: COMPLETELY UNTESTED
-CREATE OR REPLACE FUNCTION apollo_merge(varchar, varchar) RETURNS varchar AS
-'
-DECLARE
-  f1_uniquename		ALIAS FOR $1;
-  f2_uniquename		ALIAS FOR $2;
-  f_uniquename		feature.uniquename%TYPE;
-  f1_fid		feature.feature_id%TYPE;
-  f2_fid		feature.feature_id%TYPE;
-  f_id			feature.feature_id%TYPE;
-  f1_type		cvterm.name%TYPE;
-  f2_type		cvterm.name%TYPE;
-  f1_organism_id	feature.organism_id%TYPE;
-  f2_organism_id        feature.organism_id%TYPE;	
-  f_type_gene		CONSTANT varchar :=''gene'';
-  c_cvterm_id		cvterm.cvterm_id%TYPE;
-  s_id			synonym.synonym_id%TYPE;
-  dbxref_id		dbxref.dbxref_id%TYPE;
-  fd_row                feature_dbxref%ROWTYPE;
-  p_id			pub.pub_id%TYPE;
-  fpub_row		feature_pub%ROWTYPE;
-  fp_row		featureprop%ROWTYPE;
-  fc_row		feature_cvterm%ROWTYPE;
-  fs_row		feature_synonym%ROWTYPE;
-BEGIN
---check that they are both genes
-  SELECT INTO f1_type c.name FROM feature f, cvterm c
-                            WHERE f.uniquename = f1_uniquename AND
-                                  f.type_id    = c.cvterm_id;
-  SELECT INTO f2_type c.name FROM feature f, cvterm c
-                            WHERE f.uniquename = f1_uniquename AND
-                                  f.type_id    = c.cvterm_id;
+CREATE OR REPLACE FUNCTION apollo_merge(varchar, varchar) RETURNS varchar AS $$
+{
 
-  IF f1_type <> f_type_gene OR f2_type <> f_type_gene THEN
-      RAISE NOTICE ''The uniquenames for the features provided must be those of genes'';
-      RETURN OLD;
-  END IF;
+    my $f1_uniquename = shift;
+    my $f2_uniquename = shift;
+    my $f_type_gene   = 'gene';
 
---check that they come from the same organism
-  SELECT INTO f1_organism_id FROM feature WHERE uniquename=f1_uniquename;
-  SELECT INTO f2_organism_id FROM feature WHERE uniquename=f2_uniquename;
+    my $get_single_value = sub {
+        my $sql_str     = shift;
+        my $column_name = shift;
 
-  IF f1_organism_id <> f2_organism_id THEN
-      RAISE NOTICE ''The merged genes must come from the same organism'';
-      RETURN OLD;
-  END IF;
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0]{$column_name};
+    };
 
-  SELECT INTO c_cvterm_id type_id FROM feature
-                                 WHERE uniquename = f1_uniquename;
+    my $get_single_row = sub {
+        my $sql_str = shift;
 
-  SELECT INTO f_uniquename next_uniquename();
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0];
+    };
 
---create the new gene
-  INSERT INTO feature (organism_id, uniquename, type_id)
-              VALUES  (f1_organism_id, f_uniquename, c_cvterm_id);
+    #Check that they are both genes
+    my $f1_type = $get_single_value->(
+        qq[
+        SELECT c.name 
+        FROM feature f, cvterm c 
+        WHERE f.uniquename = '$f1_uniquename' and f.type_id    = c.cvterm_id],
+        'name'
+    );
+    my $f2_type = $get_single_value->(
+        qq[
+        SELECT c.name 
+        FROM feature f, cvterm c 
+        WHERE f.uniquename = '$f2_uniquename' and f.type_id    = c.cvterm_id],
+        'name'
+    );
 
-  SELECT INTO f_id feature_id FROM feature
-                             WHERE uniquename  = f_uniquename AND
-                                   organism_id = f_organism_id AND
-                                   type_id     = c_cvterm_id;
+    if ( $f1_type ne $f_type_gene or $f2_type ne $f_type_gene ) {
 
-  SELECT INTO f1_id feature_id FROM feature
-                             WHERE uniquename  = f1_uniquename AND
-                                   organism_id = f1_organism_id AND
-                                   type_id     = c_cvterm_id;
+        # RAISE NOTICE'The uniquenames for the features 
+        # provided must be those of genes';
+        return;
+    }
 
-  SELECT INTO f2_id feature_id FROM feature
-                             WHERE uniquename  = f2_uniquename AND
-                                   organism_id = f2_organism_id AND
-                                   type_id     = c_cvterm_id;
+    # check that they come from the same organism
+    my $f1_organism_id = $get_single_value->(
+        qq[
+        SELECT 
+        FROM feature 
+        WHERE uniquename='$f1_uniquename'], 'organism_id'
+    );
+    my $f2_organism_id = $get_single_value->(
+        qq[
+        SELECT 
+        FROM feature 
+        WHERE uniquename='$f2_uniquename'], 'organism_id'
+    );
 
---add synonyms to new feature for all of the synonyms of the old feature
-  FOR fs_row IN SELECT * FROM feature_synonym
-                               WHERE feature_id = f1_id OR
-                                     feature_id = f2_id LOOP
+    if ( $f1_organism_id <=> $f2_organism_id ) {
+
+        # RAISE NOTICE'The merged genes must come from the same organism';
+        return;
+    }
+
+    my $c_cvterm_id = $get_single_value->(
+        qq[
+        SELECT type_id 
+        FROM feature 
+        WHERE uniquename = '$f1_uniquename'], 'type_id'
+    );
+
+    my $f_uniquename = $get_single_value->(
+        q[SELECT next_uniquename FROM next_uniquename()],
+        'next_uniquename'
+    );
+
+    # create the new gene
+    spi_exec_query(
+        qq[
+        INSERT INTO feature (organism_id, uniquename, type_id)
+        VALUES  ($f1_organism_id, '$f_uniquename', $c_cvterm_id);]
+    );
+
+    my $f_id = $get_single_value->(
+        qq[
+        SELECT feature_id 
+        FROM feature 
+        WHERE uniquename  = '$f_uniquename' 
+        and organism_id = f_organism_id 
+        and type_id = $c_cvterm_id], 'feature_id'
+    );
+
+    my $f1_id = $get_single_value->(
+        qq[
+        SELECT feature_id 
+        FROM feature 
+        WHERE uniquename  = '$f1_uniquename' 
+        and organism_id = $f1_organism_id 
+        and type_id = $c_cvterm_id], 'feature_id'
+    );
+
+    my $f2_id = $get_single_value->(
+        qq[
+        SELECT feature_id 
+        FROM feature 
+        WHERE uniquename  = '$f2_uniquename' 
+        and organism_id = $f1_organism_id 
+        and type_id = $c_cvterm_id], 'feature_id'
+    );
+
+    # add synonyms to new feature for all of the synonyms of the old feature
+
+    my $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_synonym
+        WHERE feature_id = $f1_id or
+              feature_id = $f2_id 
+        ]
+    );
+    foreach my $fs_row ( @{ $rv->{q[rows]} || [] } ) {
+
+        spi_exec_query(
+            qq[
       INSERT INTO feature_synonym (feature_id, synonym_id)
-            VALUES (f_id, fs_row.synonym_id);
-  END LOOP;
+            VALUES ($f_id, ] . $fs_row->{'synonym_id'} . qq[);]
+        );
+    }
 
---copy dbxref, featureprop, cvterms, pubs to the new gene
-  FOR fd_row IN SELECT * FROM feature_dbxref 
-                                   WHERE feature_id = f1_id OR
-                                         feature_id = f2_id LOOP
+    # copy dbxref, featureprop, cvterms, pubs to the new gene
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_dbxref 
+        WHERE feature_id = $f1_id or
+              feature_id = $f2_id 
+        ]
+    );
+    foreach my $fd_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
-            VALUES (f_id, fd_row.dbxref_id, 0);
-  END LOOP;
+            VALUES ($f_id, ] . $fd_row->{'dbxref_id'} . qq[, 0);]
+        );
+    }
 
-  FOR fp_row IN SELECT * FROM featureprop
-                        WHERE feature_id = f1_id OR
-                              feature_id = f2_id LOOP
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM featureprop 
+        WHERE feature_id = $f1_id or
+              feature_id = $f2_id 
+        ]
+    );
+    foreach my $fp_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO featureprop (feature_id,type_id,value,rank)
-            VALUES (f_id,fp_row.type_id,fp_row.value,fp_row.rank);
-  END LOOP;
+            VALUES ($f_id,]
+                . $fp_row->{'type_id'} . qq[,]
+                . $fp_row->{'value'} . qq[,]
+                . $fp_row->{'rank'} . qq[);]
+        );
+    }
 
-  FOR fc_row IN SELECT * FROM feature_cvterm
-                        WHERE feature_id = f1_id OR
-                              feature_id = f2_id LOOP
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_cvterm 
+        WHERE feature_id = $f1_id or
+              feature_id = $f2_id 
+        ]
+    );
+    foreach my $fc_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
-            VALUES (f_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
-  END LOOP; 
+            VALUES ($f_id,]
+                . $fc_row->{'cvterm_id'} . qq[,]
+                . $fc_row->{'pub_id'} . qq[,]
+                . $fc_row->{'is_not'} . qq[);]
+        );
+    }
 
-  FOR fpub_row IN SELECT * FROM feature_pub
-                           WHERE feature_id = f1_id OR
-                                 feature_id = f2_id LOOP
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_pub 
+        WHERE feature_id = $f1_id or
+              feature_id = $f2_id 
+        ]
+    );
+    foreach my $fpub_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO feature_pub (feature_id,pub_id)
-            VALUES (f_id,fpub_row.pub_id);
-  END LOOP;
+            VALUES ($f_id,] . $fpub_row->{'pub_id'} . qq[);]
+        );
+    }
 
---delete featureloc entries for old genes
-  DELETE FROM featureloc WHERE feature_id=f1_id;
-  DELETE FROM featureloc WHERE feature_id=f2_id;
+    # delete featureloc entries for old genes
+    spi_exec_query(
+        qq[
+        DELETE FROM featureloc WHERE feature_id=$f1_id; ]
+    );
+    spi_exec_query(
+        qq[
+        DELETE FROM featureloc WHERE feature_id=$f2_id; ]
+    );
 
---mark old gene features as obsolete
-  UPDATE feature SET is_obsolete=true WHERE feature_id=f1_id;
-  UPDATE feature SET is_obsolete=true WHERE feature_id=f2_id;
+    # mark old gene features as obsolete
+    spi_exec_query(
+        qq[
+        UPDATE feature SET is_obsolete=true WHERE feature_id=$f1_id; ]
+    );
+    spi_exec_query(
+        qq[
+        UPDATE feature SET is_obsolete=true WHERE feature_id=$f2_id; ]
+    );
 
---note in either feature_relationship or featureprop the origin of this gene
+  # note in either feature_relationship or featureprop the origin of this gene
 
-
-
-  RETURN f_uniquename;
-END;
-'LANGUAGE plpgsql; 
+    return $f_uniquename;
+}
+$$ LANGUAGE plperl; 
 
 
 -- function to fascilitate gene splits
@@ -1568,127 +1793,199 @@ END;
 --   -the feature_id of the old gene that was split
 --   -the feature_id of the new genes
 --WARNING: COMPLETELY UNTESTED
-CREATE OR REPLACE FUNCTION apollo_split(int,int,int) RETURNS int AS
-'
-DECLARE
-  f_id                  ALIAS FOR $1;
-  f1_id                ALIAS FOR $2;
-  f2_id                ALIAS FOR $3;
-  f_type                cvterm.name%TYPE;
-  f_organism_id		feature.organism_id%TYPE;
-  f1_organism_id        feature.organism_id%TYPE;
-  f2_organism_id        feature.organism_id%TYPE;
-  f_type_gene           CONSTANT varchar :=''gene'';
-  c_cvterm_id           cvterm.cvterm_id%TYPE;
-  fs_row                feature_synonym%ROWTYPE;
-  fd_row		feature_dbxref%ROWTYPE;
-  fpub_row              pub%ROWTYPE;
-  fp_row                featureprop%ROWTYPE;
-  fc_row                feature_cvterm%ROWTYPE;
-BEGIN
 
---do some error checking; first, make sure they are all genes
-  SELECT INTO f_type c.name FROM feature f, cvterm c
-                            WHERE f.feature_id = f_id AND
-                                  f.type_id    = c.cvterm_id;
+CREATE or REPLACE FUNCTION apollo_split(int,int,int) RETURNS int AS $$
+{
+    my $f_id        = shift;
+    my $f1_id       = shift;
+    my $f2_id       = shift;
+    my $f_type_gene = 'gene';
 
-  IF f_type <> f_type_gene THEN
-      RAISE NOTICE ''The uniquename for the feature provided must be that of a gene'';
-      RETURN OLD;
-  END IF;
+    my $get_single_value = sub {
+        my $sql_str     = shift;
+        my $column_name = shift;
 
-  SELECT INTO f_type c.name FROM feature f, cvterm c
-                            WHERE f.feature_id = f1_id AND
-                                  f.type_id    = c.cvterm_id;
+        my $rv          = spi_exec_query($sql_str);
+        my $num_of_rows = $rv->{processed};
+        unless ($num_of_rows) {
+            return undef;
+        }
+        return $rv->{q[rows]}[0]{$column_name};
+    };
 
-  IF f_type <> f_type_gene THEN
-      RAISE NOTICE ''The uniquename for the feature provided must be that of a gene'';
-      RETURN OLD;
-  END IF;
+    # do some error checking; first, make sure they are all genes
+    my $f_type = $get_single_value->(
+        qq[
+        SELECT c.name 
+        FROM feature f, cvterm c 
+        WHERE f.feature_id = $f_id 
+        and f.type_id    = c.cvterm_id], 'name'
+    );    #LOOK AT
 
-  SELECT INTO f_type c.name FROM feature f, cvterm c
-                            WHERE f.feature_id = f2_id AND
-                                  f.type_id    = c.cvterm_id;
+    if ( $f_type ne $f_type_gene ) {
 
-  IF f_type <> f_type_gene THEN
-      RAISE NOTICE ''The uniquename for the feature provided must be that of a gene'';
-      RETURN OLD;
-  END IF;
+        # RAISE NOTICE'The uniquename for the feature
+        # provided must be that of a gene';
+        return;
+    }
 
---more error checking: are they all from the same organism?
-  SELECT INTO f_organism_id organism_id FROM feature
-                                        WHERE feature_id = f_id;
+    # more error checking: are they all from the same organism?
+    my $f_organism_id = $get_single_value->(
+        qq[
+        SELECT organism_id 
+        FROM feature 
+        WHERE feature_id = $f_id], 'organism_id'
+    );    #LOOK AT
+    my $f1_organism_id = $get_single_value->(
+        qq[
+        SELECT organism_id 
+        FROM feature 
+        WHERE feature_id = $f1_id], 'organism_id'
+    );
+    my $f2_organism_id = $get_single_value->(
+        qq[
+        SELECT organism_id 
+        FROM feature 
+        WHERE feature_id = $f2_id], 'organism_id'
+    );
 
-  SELECT INTO f1_organism_id organism_id FROM feature
-                                        WHERE feature_id = f1_id;
+    if (   $f_organism_id <=> $f1_organism_id
+        or $f_organism_id <=> $f2_organism_id )
+    {
 
-  SELECT INTO f2_organism_id organism_id FROM feature
-                                        WHERE feature_id = f2_id;
+        # RAISE NOTICE'The new gene and the old genes
+        # need to come from the same organism';
+        return;
+    }
 
-  IF f_organism_id <> f1_organism_id OR f_organism_id <> f2_organism_id THEN
-      RAISE NOTICE ''The new gene and the old genes need to come from the same organism'';
-      RETURN OLD;
-  END IF;
-
-  SELECT INTO c_cvterm_id type_id FROM feature
-                                 WHERE feature_id = f_id;
-
---add synonyms to new feature for all of the synonyms of the old feature
-  FOR fs_row IN SELECT * FROM feature_synonym
-                        WHERE feature_id = f_id LOOP
+    # add synonyms to new feature for all of the synonyms of the old feature
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_synonym
+        WHERE feature_id = $f_id 
+        ]
+    );
+    foreach my $fs_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO feature_synonym (feature_id, synonym_id, pub_id)
-            VALUES (f1_id, fs_row.synonym_id, fs_row.pub_id);
+            VALUES ($f1_id, ]
+                . $fs_row->{'synonym_id'} . qq[, ]
+                . $fs_row->{'pub_id'} . qq[);]
+        );
+        spi_exec_query(
+            qq[
       INSERT INTO feature_synonym (feature_id, synonym_id, pub_id)
-            VALUES (f2_id, fs_row.synonym_id, fs_row.pub_id);
-  END LOOP;
+            VALUES ($f2_id, ]
+                . $fs_row->{'synonym_id'} . qq[, ]
+                . $fs_row->{'pub_id'} . qq[);]
+        );
+    }
 
---copy dbxref, featureprop, cvterms, pubs to the new gene
-  FOR fd_row IN SELECT * FROM feature_dbxref
-                        WHERE feature_id = f_id LOOP
+    # copy dbxref, featureprop, cvterms, pubs to the new gene
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_dbxref
+        WHERE feature_id = $f_id 
+        ]
+    );
+    foreach my $fd_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
       INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
-            VALUES (f1_id, fd_row.dbxref_id, 0);
+            VALUES ($f1_id, ] . $fd_row->{'dbxref_id'} . qq[, 0);]
+        );
+        spi_exec_query(
+            qq[
       INSERT INTO feature_dbxref (feature_id,dbxref_id,is_current)
-            VALUES (f2_id, fd_row.dbxref_id, 0);
-  END LOOP;
+            VALUES ($f2_id, ] . $fd_row->{'dbxref_id'} . qq[, 0);]
+        );
+    }
 
-  FOR fp_row IN SELECT * FROM featureprop
-                        WHERE feature_id = f_id LOOP
-      INSERT INTO featureprop (feature_id,type_id,value,rank)
-            VALUES (f1_id,fp_row.type_id,fp_row.value,fp_row.rank);
-      INSERT INTO featureprop (feature_id,type_id,value,rank)
-            VALUES (f2_id,fp_row.type_id,fp_row.value,fp_row.rank);
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM featureprop
+        WHERE feature_id = $f_id 
+        ]
+    );
+    foreach my $fp_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
+            INSERT INTO featureprop (feature_id,type_id,value,rank)
+            VALUES ($f1_id,]
+                . $fp_row->{'type_id'} . qq[,]
+                . $fp_row->{'value'} . qq[,]
+                . $fp_row->{'rank'} . qq[);]
+        );
+        spi_exec_query(
+            qq[
+            INSERT INTO featureprop (feature_id,type_id,value,rank)
+            VALUES ($f2_id,]
+                . $fp_row->{'type_id'} . qq[,]
+                . $fp_row->{'value'} . qq[,]
+                . $fp_row->{'rank)'} . qq[;]
+        );
+    }
 
-  END LOOP;
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_cvterm
+        WHERE feature_id = $f_id 
+        ]
+    );
+    foreach my $fc_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
+            INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
+            VALUES ($f1_id,]
+                . $fc_row->{'cvterm_id'} . qq[,]
+                . $fc_row->{'pub_id'} . qq[,]
+                . $fc_row->{'is_not'} . qq[);]
+        );
+        spi_exec_query(
+            qq[
+            INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
+            VALUES ($f2_id,]
+                . $fc_row->{'cvterm_id'} . qq[,]
+                . $fc_row->{'pub_id'} . qq[,]
+                . $fc_row->{'is_not'} . qq[);]
+        );
+    }
 
-  FOR fc_row IN SELECT * FROM feature_cvterm
-                        WHERE feature_id = f_id LOOP
-      INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
-            VALUES (f1_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
-      INSERT INTO feature_cvterm (feature_id,cvterm_id,pub_id,is_not)
-            VALUES (f2_id,fc_row.cvterm_id,fc_row.pub_id,fc_row.is_not);
-  END LOOP;
+    $rv = spi_exec_query(
+        qq[
+        SELECT * FROM feature_pub
+        WHERE feature_id = $f_id 
+        ]
+    );
+    foreach my $fpub_row ( @{ $rv->{q[rows]} || [] } ) {
+        spi_exec_query(
+            qq[
+            INSERT INTO feature_pub (feature_id,pub_id)
+            VALUES ($f1_id,] . $fpub_row->{'pub_id'} . qq[);]
+        );
+        spi_exec_query(
+            qq[
+            INSERT INTO feature_pub (feature_id,pub_id)
+            VALUES ($f2_id,] . $fpub_row->{'pub_id'} . qq[);]
+        );
+    }
 
-  FOR fpub_row IN SELECT * FROM feature_pub
-                       WHERE feature_id = f_id LOOP
-      INSERT INTO feature_pub (feature_id,pub_id)
-            VALUES (f1_id,p_row.pub_id);
-      INSERT INTO feature_pub (feature_id,pub_id)
-            VALUES (f2_id,p_row.pub_id);
-  END LOOP;
+    # delete featureloc entries for old genes
+    spi_exec_query(
+        qq[
+        DELETE FROM featureloc WHERE feature_id=$f_id;]
+    );
 
+    # mark old gene features as obsolete
+    spi_exec_query(
+        qq[
+            UPDATE feature SET is_obsolete=true WHERE feature_id=$f_id;]
+    );
 
---delete featureloc entries for old genes
-  DELETE FROM featureloc WHERE feature_id=f_id;
+  # note in either feature_relationship or featureprop the origin of this gene
 
---mark old gene features as obsolete
-  UPDATE feature SET is_obsolete=true WHERE feature_id=f_id;
-
---note in either feature_relationship or featureprop the origin of this gene
-
-
-
-  RETURN 1;
-END;
-'LANGUAGE plpgsql;
-
+    return 1;
+}
+$$ LANGUAGE plperl;
 
