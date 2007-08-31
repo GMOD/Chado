@@ -180,7 +180,7 @@ use constant INSERT_GFF_SORT_TMP =>
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
 my $ALLOWED_CACHE_KEYS =
-               "analysis|db|dbxref|feature|parent|source|synonym|type|ontology|property|const";
+               "analysis|db|dbxref|feature|parent|source|synonym|type|ontology|property|const|srcfeature";
 
 
 sub new {
@@ -409,6 +409,7 @@ The name of one of several top level cache keys:
              synonym
              type            #cvterm.cvterm_id cache
              ontology
+             srcfeature      #feature_id is a srcfeature
 
 and a tag and optional value that gets stored in the cache.
 If no value is passed, it is returned, otherwise void is returned.
@@ -426,7 +427,7 @@ sub cache {
             " in the cache method; it's probably because of a typo";
     }
 
-    return $self->{cache}{$top_level}{$key} unless $value;
+    return $self->{cache}{$top_level}{$key} unless defined($value);
 
     return $self->{cache}{$top_level}{$key} = $value; 
 }
@@ -2832,7 +2833,8 @@ sub handle_target {
           $created_target_feature = 1;
       }
 
-      my $score = defined($feature->score->value) ? $feature->score->value : '\N';
+      #print Dumper($feature);
+      my $score = defined($feature->score) ? $feature->score : '\N';
       $score    = '.' eq $score                   ? '\N'                   : $score;
 
       my $featuretype = $feature->type->name;
@@ -3008,7 +3010,7 @@ sub handle_nontarget_analysis {
     my $self = shift;
     my ($feature,$uniquename) = @_;
     my $source = $feature->source->value;
-    my $score = $feature->score->value ? $feature->score->value : '\N';
+    my $score = $feature->score ? $feature->score : '\N';
     $score    = '.' eq $score   ? '\N'            : $score;
 
     my $featuretype = $feature->type->name;
@@ -3429,10 +3431,10 @@ sub handle_CDS {
 #    warn Dumper($feat);
 
     my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value
-               if ($feat && ($feat->annotation->get_Annotations('ID'))[0]);
+               if ($feat && defined(($feat->annotation->get_Annotations('ID'))[0]));
     my @feat_parents= map {$_->value} 
                $feat->annotation->get_Annotations('Parent')
-               if ($feat && ($feat->annotation->get_Annotations('Parent'))[0]);
+               if ($feat && defined(($feat->annotation->get_Annotations('Parent'))[0]));
 
     #assume that an exon can have at most one grandparent (gene, operon)
     my $parent_id = $self->cache('feature',$feat_parents[0]) if $feat_parents[0];
@@ -3466,7 +3468,7 @@ sub handle_CDS {
         VALUES (?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($insert);
-    $sth->execute($feat_id,"$seq_id","$feat_type",$fmin,$fmax,$object);
+    $sth->execute($feat_id,$seq_id->value,$feat_type,$fmin,$fmax,$object);
 
     #get the value of the row just inserted
     $sth = $dbh->prepare("SELECT currval('tmp_cds_handler_cds_row_id_seq')");
@@ -3554,7 +3556,8 @@ ORDER BY cds.fmin,cds.gff_id
         my $type      = $$feat_row{ type };
         my $fmin      = $$feat_row{ fmin };
         my $fmax      = $$feat_row{ fmax };
-        my @parents   = $feat_obj->annotation->get_Annotations('Parent');
+        my @parents   = map {$_->value}
+                              $feat_obj->annotation->get_Annotations('Parent');
 
         for my $parent_id (@parents) {
           if ($type =~ /CDS/) {
@@ -3576,8 +3579,12 @@ ORDER BY cds.fmin,cds.gff_id
                 $polyp->end(    $fmax  );
                 $polyp->strand( $feat_obj->strand );
                 $polyp->name(   $parent_id.' polypeptide');
+                $polyp->source( $feat_obj->source->value);
 
                 my $polyp_ac = Bio::Annotation::Collection->new();
+                $polyp_ac->add_Annotation(
+                    'source',Bio::Annotation::SimpleValue->new(
+                     $feat_obj->source->value));
                 $polyp_ac->add_Annotation(
                     'Note',Bio::Annotation::SimpleValue->new(
                      'polypeptide feature inferred from GFF3 CDS feature'));
@@ -3893,17 +3900,17 @@ sub handle_crud {
     my $force_delete = shift;
 
     my ($op) = $feature->annotation->get_Annotations('CRUD');
-    $op = $op->value if $op;
+    $op = $op->value if defined($op);
     if ($force_delete) {
         $op = 'delete-all';
     }
 
     my ($name) = $feature->annotation->get_Annotations('Name');
 
-    if (!$name) {
+    if (!defined($name)) {
         #try to get the name from the ID
         ($name) = $feature->annotation->get_Annotations('ID');
-        if (!$name) {
+        if (!defined($name)) {
         #if it doesn't have a name, don't do anything
         return 1;
         }
@@ -4043,9 +4050,12 @@ sub get_src_seqlen {
         #this is a srcfeature (ie, a reference sequence)
       $src = $self->nextfeature;
       $seqlen = $feature->end - $feature->start +1;
-    } else { # normal case
 
-      $src = $self->cache('feature',$feature->seq_id);
+      $self->cache('feature',$feature->seq_id->value,$src);
+      $self->cache('srcfeature',$src,1);
+
+    } else { # normal case
+      $src = $self->cache('feature',$feature->seq_id->value);
       $seqlen = '\N';
     }
 

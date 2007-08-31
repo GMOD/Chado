@@ -728,7 +728,10 @@ while(my $feature =
   # dgg: pull organism from 1st feature??
   # * may be many per gff-file; e.g. uniprot input
   if($ORGANISM_FROMDATA) {
-    my($gff_organism) = ($feature->annotation->get_Annotations('organism'))[0];
+    my($gff_organism) = 
+               defined($feature->annotation->get_Annotations('organism'))
+              ? ($feature->annotation->get_Annotations('organism'))[0]
+              : '';
     if($gff_organism && $gff_organism ne $chado->organism()) {
       $ORGANISM = "$gff_organism";# is it pesky bperl object?
       warn "Organism $ORGANISM from data\n" unless($seen_organism{$ORGANISM}++);
@@ -738,7 +741,7 @@ while(my $feature =
       }
   }
 
-  if($feature->annotation->get_Annotations('CRUD') || $DELETE_CONFIRM ) {
+  if($feature->annotation->get_Annotations('CRUD')||$DELETE_CONFIRM ) {
     my $continue = $chado->handle_crud($feature, $DELETE_CONFIRM);
     next if ($continue == 1 || $DELETE_CONFIRM);  
                              #that is, this was a delete or update operation
@@ -791,10 +794,13 @@ END
     $chado->handle_derives_from($feature);
   }
 
-  my $source      = $feature->source->value;
+  my $source      = defined ($feature->source) ?
+                       $feature->source->value
+                       : '.';
 
-  my($uniquename) = ($feature->annotation->get_Annotations('ID'))[0]
-                   || "auto".$nextfeature;
+  my($uniquename) = defined(($feature->annotation->get_Annotations('ID'))[0]) ?
+                ($feature->annotation->get_Annotations('ID'))[0]->value
+                : "auto".$nextfeature;
   $uniquename     = $uniquename->value if ref($uniquename);
 
   $uniquename     = $chado->uniquename_validation( $uniquename,
@@ -802,14 +808,16 @@ END
                                        $chado->organism_id,
                                        $nextfeature);
 
-  my($name)       = ($feature->annotation->get_Annotations('Name'))[0]
-                   ||($feature->annotation->get_Annotations('ID'))[0]
-                   || "$featuretype-$uniquename";
+  my($name)    = defined(($feature->annotation->get_Annotations('Name'))[0]) ?
+                   ($feature->annotation->get_Annotations('Name'))[0]->value :
+                 defined(($feature->annotation->get_Annotations('ID'))[0])   ?
+                   ($feature->annotation->get_Annotations('ID'))[0]->value   :
+                 "$featuretype-$uniquename";
+
   $name           = $name->value if ref($name);
 
-  ## dgg: fixme: not always wanted?
   if ($uniquename eq $feature->seq_id->value) { 
-    $chado->reftype_property($featuretype,$type); #  a reference sequence?? not always 
+    $chado->reftype_property($featuretype,$type); #  a reference sequence?? yes 
     } 
   
   my $current_feature_id=0;
@@ -826,7 +834,7 @@ END
 
   if ($ANALYSIS 
       && $featuretype =~ /match/  
-      && !$feature->annotation->get_Annotations('Target')) {
+      && !defined($feature->annotation->get_Annotations('Target'))) {
     $chado->cache('feature',($feature->annotation->get_Annotations('ID'))[0]->value,$nextfeature);
   }
 
@@ -887,22 +895,22 @@ END
     $chado->synonyms($alias,$chado->cache('feature',$uniquename));
   }
 
-  if($current_feature_id) {
+  if($current_feature_id or $chado->cache('srcfeature',$nextfeature)) {
     $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,$chado->primary_dbxref);
   }
 
-  if ($ANALYSIS && !$feature->annotation->get_Annotations('Target')) {
+  if ($ANALYSIS && !defined($feature->annotation->get_Annotations('Target'))) {
     $chado->handle_nontarget_analysis($feature,$uniquename);
   }
 
   $chado->nextfeatureloc('++');
   #now deal with creating another feature for targets
 
-  if (!$ANALYSIS && $feature->annotation->get_Annotations('Target')) {
+  if (!$ANALYSIS && defined($feature->annotation->get_Annotations('Target'))) {
     die "Features in this GFF file have Target tags, but you did not indicate\n"
     ."--analysis on the command line";
   }
-  elsif ($feature->annotation->get_Annotations('Target')) {
+  elsif (defined($feature->annotation->get_Annotations('Target'))) {
       $chado->handle_target($feature, $uniquename,$name,$featuretype,$type);
   }
   $chado->nextfeature('++');
