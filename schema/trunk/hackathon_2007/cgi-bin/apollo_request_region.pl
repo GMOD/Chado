@@ -12,7 +12,7 @@ $ENV{PATH}      = '/usr/local/java/bin:/usr/bin:/bin';
 unless(param()) { #print the starting page
 
     print header,
-          start_html('Script for generating game on the fly from apollo'),
+          start_html(-title=>'Script for generating game on the fly from apollo'),
           h1('Request a GAME-XML file from the database'),
           start_form(-method=>'GET'),
           'Chromosome:',
@@ -50,14 +50,19 @@ if (param()) {
     my $filename = "$chromosome:$start\-$end";
 
     print header,
-          start_html,
+          start_html(-title=>"Download $filename",
+                     -style=>{src=>'/gbrowse/gbrowse.css'},
+                     -script=>{-language=>'JAVASCRIPT',
+                               -src=>'/gbrowse/js/yahoo-dom-event.js'},),
+,
           h1("Getting a game file for $filename"),
           p('This may take a while...');
 
     my $javacmd = "$apollo -w $working_dir$filename.xml -o game -l $filename -i chadoDB";
-    warn $javacmd;
 
+    print a({-href=>'',-onClick=>togDisplay('apollo_out')},"Show Apollo output"),start_div(-id=>'apollo_out');
     system($javacmd) == 0 or die;
+    print end_div;
 
     print p("The file $filename.xml has been created");
 
