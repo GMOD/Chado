@@ -4,10 +4,10 @@ use strict;
 
 use CGI qw/:standard/;
 
-my $working_dir = "/var/www/html/apollo/tmp/";
-my $apollo      = "/home/scott/cvs_stuff/apollo/bin/apollo";
-my $hostname    = "localhost";
-$ENV{PATH}      = '/opt/j2sdk1.4.2_11/bin/java:/usr/bin:/bin';
+my $working_dir = "/var/www/apollo/tmp/";
+my $apollo      = "/home/ubuntu/apollo/bin/apollo.headless";
+my $hostname    = "gmod.genetics.northwestern.edu";
+$ENV{PATH}      = '/usr/local/java/bin:/usr/bin:/bin';
 
 unless(param()) { #print the starting page
 
@@ -54,16 +54,17 @@ if (param()) {
           h1("Getting a game file for $filename"),
           p('This may take a while...');
 
-    system("$apollo -w $working_dir$filename.xml -o game -l $filename -i chadoDB") == 0 or die;
+    my $javacmd = "$apollo -w $working_dir$filename.xml -o game -l $filename -i chadoDB";
+    warn $javacmd;
+
+    system($javacmd) == 0 or die;
 
     print p("The file $filename.xml has been created");
 
     open OUT, ">$working_dir$filename.jnlp" 
        or die "couldn't open file $working_dir$filename.jnlp for writing: $!\n";
 
-    while (<DATA>) {
-        print OUT "$_";
-    }
+    print OUT write_jnlp($hostname, $filename);
 
     close OUT;
 
@@ -76,12 +77,16 @@ if (param()) {
 }
 
 
-__DATA__
+sub write_jnlp {
+    my $hostname = shift;
+    my $filename = shift;
+
+    return <<END;
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp
 spec="1.0+"
 codebase="http://$hostname/apollo"
-href="$filename.jnlp">
+href="tmp/$filename.jnlp">
 <information>
 <title>Apollo</title>
 <vendor>Stein Lab</vendor>
@@ -139,3 +144,6 @@ in -->
 <argument>http://$hostname/apollo/tmp/$filename.xml</argument>
 </application-desc>
 </jnlp>
+END
+;
+}
