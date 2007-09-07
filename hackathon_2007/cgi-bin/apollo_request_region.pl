@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use CGI qw/:standard/;
+use CGI qw/:standard start_div start_span start_pre/;
 
 my $working_dir = "/var/www/apollo/tmp/";
 my $apollo      = "/home/ubuntu/apollo/bin/apollo.headless";
@@ -12,7 +12,8 @@ $ENV{PATH}      = '/usr/local/java/bin:/usr/bin:/bin';
 unless(param()) { #print the starting page
 
     print header,
-          start_html(-title=>'Script for generating game on the fly from apollo'),
+          start_html(-title=>'Script for generating game on the fly from apollo',
+                     -style=>{src=>'/gbrowse/gbrowse.css'},),
           h1('Request a GAME-XML file from the database'),
           start_form(-method=>'GET'),
           'Chromosome:',
@@ -49,22 +50,52 @@ if (param()) {
 
     my $filename = "$chromosome:$start\-$end";
 
+    my $jscript = <<END;
+function visibility(id1,id2) {
+  var visible = YAHOO.util.Dom.getStyle (id1,'display') == 'none' ? ['inline','none'] : ['none','inline'];
+  YAHOO.util.Dom.setStyle(id1,'display',visible[0]);
+  YAHOO.util.Dom.setStyle(id2,'display',visible[1]); 
+}
+END
+
+    my $style = <<END;
+.showhide { position:relative; top:0px;}
+.output { border:1px solid blue; width:85%; overflow:auto; }
+.control { cursor:pointer }
+END
+
     print header,
           start_html(-title=>"Download $filename",
-                     -style=>{src=>'/gbrowse/gbrowse.css'},
-                     -script=>{-language=>'JAVASCRIPT',
-                               -src=>'/gbrowse/js/yahoo-dom-event.js'},),
+                     -style=>[{src=>'/gbrowse/gbrowse.css'},
+                              {code=>$style}],
+                     -script=>[{-language=>'JAVASCRIPT',
+                                -src=>"/gbrowse/js/yahoo-dom-event.js"},
+                               {-code=>$jscript }] 
+          ),
 ,
           h1("Getting a game file for $filename"),
-          p('This may take a while...');
+          p('This may take a while...'),
+          start_div(-class=>"output");
 
     my $javacmd = "$apollo -w $working_dir$filename.xml -o game -l $filename -i chadoDB";
 
-    print a({-href=>'',-onClick=>togDisplay('apollo_out')},"Show Apollo output"),start_div(-id=>'apollo_out');
+    print start_div({-id=>'invisible',
+                     -class=>'showhide',
+                     -style=>"display:none"}),
+          start_span({-onclick=>"visibility('visible','invisible')"}),
+          "[-] Hide Apollo output<br>",
+          end_span,
+          start_pre;
     system($javacmd) == 0 or die;
-    print end_div;
+    print end_pre,end_div();
+    print start_div({-id=>'visible',
+                     -class=>'showhide',}),
+          start_span({-onclick=>"visibility('visible','invisible')"}),
+          "[+] Show Apollo output<br>",
+          end_span(),end_div(),end_div(),"<br clear=all>";
 
-    print p("The file $filename.xml has been created");
+    print start_span(-class=>'position:relative'),
+          p("The file $filename.xml has been created");
 
     open OUT, ">$working_dir$filename.jnlp" 
        or die "couldn't open file $working_dir$filename.jnlp for writing: $!\n";
@@ -78,6 +109,7 @@ if (param()) {
           . a({href=>"http://$hostname/apollo/tmp/$filename.jnlp"},
               "$filename.jnlp")
           ." to start Apollo and download the file"),
+          end_span,
           end_html; 
 }
 
