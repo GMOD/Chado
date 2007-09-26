@@ -12,7 +12,7 @@ use Bio::GMOD::DB::Config;
 
 =head1 NAME
 
-$0 - Bulk loads gff3 files into a chado database.
+$0 - Prepares a GFF3 file for bulk loading into a chado database.
 
 =head1 SYNOPSIS
 
