@@ -4161,7 +4161,13 @@ sub sorter_get_no_parents {
 
     push @to_return, map { $$_[0] } @$result;
 
-    return @to_return;
+    my %seen = ();
+    my @uniq;
+    for my $item (@to_return) {
+        push(@uniq, $item) unless $seen{$item}++;
+    }
+
+    return @uniq;
 }
 
 sub sorter_get_second_tier {
@@ -4177,7 +4183,13 @@ sub sorter_get_second_tier {
 
     my @to_return = map { $$_[0] } @$result;
 
-    return @to_return;
+    my %seen = ();
+    my @uniq;
+    for my $item (@to_return) {
+        push(@uniq, $item) unless $seen{$item}++;
+    }
+
+    return @uniq;
 }
 
 sub sorter_get_third_tier {
@@ -4193,7 +4205,13 @@ sub sorter_get_third_tier {
 
     my @to_return = map { $$_[0] } @$result;
 
-    return @to_return;
+    my %seen = ();
+    my @uniq;
+    for my $item (@to_return) {
+        push(@uniq, $item) unless $seen{$item}++;
+    }
+
+    return @uniq;
 }
 
 =head2 cds_db_exists
