@@ -899,18 +899,18 @@ END
     $chado->print_f($nextfeature,$chado->organism_id,$name,$uniquename,$type,$seqlen,$chado->primary_dbxref);
   }
 
-  if ($ANALYSIS && !defined($feature->annotation->get_Annotations('Target'))) {
+  if ($ANALYSIS && !defined(($feature->annotation->get_Annotations('Target'))[0])) {
     $chado->handle_nontarget_analysis($feature,$uniquename);
   }
 
   $chado->nextfeatureloc('++');
   #now deal with creating another feature for targets
 
-  if (!$ANALYSIS && defined($feature->annotation->get_Annotations('Target'))) {
+  if (!$ANALYSIS && defined(($feature->annotation->get_Annotations('Target'))[0])) {
     die "Features in this GFF file have Target tags, but you did not indicate\n"
     ."--analysis on the command line";
   }
-  elsif (defined($feature->annotation->get_Annotations('Target'))) {
+  elsif (defined(($feature->annotation->get_Annotations('Target'))[0])) {
       $chado->handle_target($feature, $uniquename,$name,$featuretype,$type);
   }
   $chado->nextfeature('++');
