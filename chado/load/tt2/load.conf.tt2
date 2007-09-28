@@ -46,7 +46,8 @@
 
 
   <ontology name="Sequence Ontology" order="2">
-    <file type="obo"    local="song/so.obo"   remote="http://easynews.dl.sourceforge.net/sourceforge/song/so.obo"   method="lwp-mirror"/>
+    <file type="obo"    local="song/so.obo"   remote="http://song.cvs.sourceforge.net/*checkout*/song/ontology/so.obo"   method="lwp-mirror"/>
+  <!--  <file type="obo"    local="song/so.obo"   remote="http://easynews.dl.sourceforge.net/sourceforge/song/so.obo"   method="lwp-mirror"/> -->
   <!--  <file type="obo"    local="song/so.obo"   remote="http://www.gmod.org/files/so.obo"   method="lwp-mirror"/> -->
   </ontology>
 
