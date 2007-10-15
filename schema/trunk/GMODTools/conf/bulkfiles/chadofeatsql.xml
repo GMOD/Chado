@@ -1,32 +1,12 @@
 <opt
   name="chadofeatsql" 
-  date="20051129"
+  date="20071014"
   >
 
   <title>Chado DB SQL</title>
   
-<!-- ENV_default:
-  Variables below of form '$ {xxx}' for XML::Simple are handy, 
-  however things fail if (a) they are not defined by caller
-  or (b) defined badly. Need default config vars (XML::Simple doesn't do )
-  
-  seq_ontology is name in CV table (SO, Sequence Ontology, etc.)
-  golden_path value is set of quoted names for chromosome/.. type
-  'chromosome', 'chromosome_arm', 'ultra_scaffold' ..
-  feature.type.name IN ($ {golden_path})
--->
-  <ENV_default
-    seq_ontology="Sequence Ontology Feature Annotation"
-    golden_path="'chromosome', 'chromosome_arm', 'ultra_scaffold'"
-    featureprops="'Note','cyto_range','gbunit'"
-    species="Unknown_species"
-    unknown_chr="U"
-    analysis_where_clause=""
-    est_where_clause=""
-  />
+  <about id="chadofeatsql"><![CDATA[
 
-
-  <about>
     This is a collection of Chado DB SQL calls to extract
     all basic genome features, into intermediate feature_table form
     
@@ -40,14 +20,65 @@
     features needing separate SQL: chromosome/super-contigs,
     gene_models, matches, analyses, syntenic features ..
     
+    There are three critical ENV_default configurations defined here, 
+    that can be overridden in your site_defaults.xml or main bulkfiles.xml 
+    configuration:
+    
+       golden_path="'chromosome','chromosome_arm','ultra_scaffold'"
+         .. the top level source feature(s) for your genome data
+
+       seq_ontology="sequence"
+         .. the name in Chado cv table that refers to cvterm table sequence terms
+         .. "Sequence Ontology Feature Annotation",
+             SOFA, SO, Sequence Ontology, sequence, and other values have been used.
+         
+       species="Unknown_species"
+
+    Find worked examples from this configuration file now at
+    http://www.gmod.org/Sample_Chado_SQL
+       
     Logic in Bulkfiles::FeatureWriter then merges, selects/reformats
     these feature_tables and writes bulk files per chromosome.  One can
     also attach post-processing scripts (see matches below).
     
     Written originally for the FlyBase  project, it attempts to work
     for a range of Chado databases.
-  </about>
+  ]]></about>
+
   
+  <ENV_default
+    seq_ontology="sequence"
+    seq_ontology_old="Sequence Ontology Feature Annotation"
+    golden_path="'chromosome', 'chromosome_arm', 'ultra_scaffold', 'supercontig'"
+    species="Unknown_species"
+    featureprops="'Note','cyto_range','gbunit'"
+    unknown_chr="U"
+    analysis_where_clause=""
+    est_where_clause=""
+  />
+  <about id="ENV_default"><![CDATA[
+
+  Variables above of form '$ {xxx}' for XML::Simple are handy, 
+  however things fail if (a) they are not defined by caller
+  or (b) defined badly. Need default config vars (XML::Simple doesn't do )
+  
+  seq_ontology is name in CV table (SO, Sequence Ontology, etc.)
+  golden_path value is set of quoted names for chromosome/.. type
+  'chromosome', 'chromosome_arm', 'ultra_scaffold' ..
+  feature.type.name IN ($ {golden_path})
+  
+  2007oct
+    : change default seq_ontology="sequence" to match change in GMOD onto. loading
+    : add 'supercontig', synonym of scaffold, to default golden_path
+           
+    : example clauses on how to segregate analysis types        
+    analysis_where_clause="AND NOT (an.program = 'sim4' AND an.sourcename IN ('na_dbEST'))"
+    est_where_clause="AND (an.program = 'sim4' AND an.sourcename IN ('na_dbEST'))"
+
+  ]]></about>
+
+
+
   <feature_sql id="organism_summary" type="summary" output="organisms-overview.txt">
   <sql><![CDATA[
     SELECT o.organism_id,o.abbreviation,o.genus,o.species,o.common_name, 
@@ -58,6 +89,7 @@
     ;
   ]]></sql>
   
+  <!-- // drop, header fixed from above
   <script name="orgsum" type="postprocess" shell="perl -ni" language="perl">
   <![CDATA[
   unless($header++){ print join("\t",
@@ -65,6 +97,7 @@
   @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
   print join("\t",@v),"\n";
   ]]></script>
+  -->
   
   </feature_sql>
 
@@ -72,7 +105,7 @@
   <feature_sql id="analysis_summary" type="summary" output="analyses-overview.txt">
   <sql><![CDATA[
   SELECT 
-    an.analysis_id,
+    an.analysis_id as Analysis_id,
     CASE WHEN (an.sourcename IS NULL OR an.sourcename = 'dummy') THEN 'match:' || an.program
       ELSE 'match:' || an.program || ':' || an.sourcename
     END AS Analysis_type, 
@@ -87,6 +120,7 @@
   ;
   ]]></sql>  
 
+  <!-- // drop, headers added from sql
   <script name="anasum" type="postprocess" shell="perl -ni" language="perl">
   <![CDATA[
   unless($header++){ print join("\t",
@@ -94,6 +128,7 @@
   @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
   print join("\t",@v),"\n";
   ]]></script>
+  -->
   </feature_sql>
 
   <feature_sql id="property_summary" type="summary" output="properties-overview.txt">
@@ -112,6 +147,7 @@
   ;
   ]]></sql>  
 
+  <!-- // drop, headers from sql now
   <script name="propsum" type="postprocess" shell="perl -ni" language="perl">
   <![CDATA[
   unless($header++){ print join("\t",
@@ -119,6 +155,7 @@
   @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
   print join("\t",@v),"\n";
   ]]></script>
+  -->
   </feature_sql>
 
 
@@ -136,13 +173,12 @@
     (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
   FROM feature f, cvterm t
   WHERE f.type_id = t.cvterm_id
-      AND NOT (t.name like 'sim4:wrap%') -- ignore flybase misuse of SO feat types
   GROUP BY f.organism_id, f.type_id, t.name
   ORDER BY species, feature_type
   ;
-
   ]]></sql>  
 
+  <!-- // drop, headers from sql now
   <script name="featsum" type="postprocess" shell="perl -ni" language="perl">
   <![CDATA[
   unless($header++){ print join("\t",
@@ -150,39 +186,95 @@
   @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
   print join("\t",@v),"\n";
   ]]></script>
+  -->
   </feature_sql>
+
 
   <feature_sql id="chromosome_summary" type="NOTYET_summary" output="chromosomes-overview.txt">
-  <sql><![CDATA[
-  -- this is slow for an overview table; see instead tmp/featdump/chromosomes.tsv 
-  -- from below chromosomes feature_table
-  SELECT 
-    f.type_id,
-    t.name as Feature_type,
-    count(f.feature_id) as N_features,
-    sum(length(f.residues)) as N_residues,
-    sum(f.seqlen) as Tot_len,
-    sum(CASE WHEN fl.srcfeature_id = f.feature_id THEN 1 ELSE 0 END) as N_issource,
-    sum(CASE WHEN fl.feature_id = f.feature_id THEN 1 ELSE 0 END) as N_istarget,
-    (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
-  FROM cvterm t, feature f 
-    left join featureloc fl on (fl.srcfeature_id = f.feature_id or fl.feature_id = f.feature_id)
-  WHERE f.type_id = t.cvterm_id
-      AND NOT (t.name like 'sim4:wrap%') -- ignore flybase misuse of SO feat types
-  GROUP BY f.organism_id, f.type_id, t.name
-  ORDER BY species, feature_type
-  ;
-  ]]></sql>  
-
-  <script name="csum" type="postprocess" shell="perl -i" language="perl">
-  <![CDATA[
-  unless($header++){ print join("\t",
-   qw(Type_id Feature_type Name Seqlen Feature_id Species)),"\n"; } 
-  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
-  print join("\t",@v),"\n";
-  ]]></script>
+  <about>
+  This chromosome_summary needs more testing: 
+  works well enough on some dbs, but hung up on a largish one
+  </about>
+  <sql>
+    SELECT DISTINCT
+      f.type_id as Type_id,  
+      t.name as Golden_path_type, 
+      count(DISTINCT f.feature_id) as N_features, 
+      sum(f.seqlen) as Tot_len, 
+      sum(length(f.residues)) as N_residues,
+      (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
+    FROM  cvterm t, 
+          feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
+    WHERE f.type_id = t.cvterm_id 
+    GROUP BY  f.organism_id, f.type_id, t.name
+    ORDER BY Species, Golden_path_type
+    ;
+  </sql>
   </feature_sql>
  
+ 
+  <!-- // want something like this to show tables with >0 rows ...
+  <feature_sql id="db_summary" type="summary" output="database-overview.txt">
+  <sql><![CDATA[
+  SELECT s.tablename, count(s.tablename.*) as row_count
+  from pg_tables s
+  where s.schemaname = 'public'
+  ;
+  ]]></sql>  
+  -->
+
+
+  <!-- 0710: add SO/SOFA CV table identity check -->
+  
+  <feature_sql id="0_seq_ontology_check" type="validate" >
+  <warning>
+Failed to validate configuration variable 
+    seq_ontology='${seq_ontology}'
+in database tables cv, cvterm and feature. Please check your configuration.
+  </warning>
+  
+  <sql><![CDATA[
+    SELECT feat.feature_id
+    FROM   feature feat, cvterm featcv, cv socv
+    WHERE  socv.name = '${seq_ontology}'
+       and featcv.cv_id = socv.cv_id 
+       and featcv.cvterm_id = feat.type_id
+    LIMIT 1;  
+  ]]></sql>
+  
+  <sql_inspect><![CDATA[
+    SELECT name as seq_ontology_name, cv_id FROM cv 
+    WHERE cv_id IN (SELECT cv_id FROM cvterm WHERE name = 'exon');
+  ]]></sql_inspect>
+  </feature_sql>
+
+  <feature_sql id="1_golden_path_check" type="validate">
+  <warning>
+Failed to validate configuration variable 
+    golden_path='${golden_path}'
+in database tables cv, cvterm and feature. Please check your configuration.
+  </warning>
+
+  <sql><![CDATA[
+    SELECT feat.feature_id -- ? or uniquename
+    FROM   feature feat, cvterm featcv, cv socv
+    WHERE  featcv.name in ( ${golden_path} )    
+       and featcv.cv_id = socv.cv_id 
+       and socv.name = '${seq_ontology}'
+       and featcv.cvterm_id = feat.type_id
+    LIMIT 1; 
+  ]]></sql>
+
+  <sql_inspect><![CDATA[
+    SELECT DISTINCT
+      t.name as golden_path_type, f.type_id,  
+      count(DISTINCT f.feature_id) as N_features, 
+      sum(f.seqlen) as Tot_len, sum(length(f.residues)) as N_residues
+    FROM  cvterm t, feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
+    WHERE f.type_id = t.cvterm_id 
+    GROUP BY  f.type_id, t.name ;
+  ]]></sql_inspect>
+  </feature_sql>
 
 
   <feature_sql id="fbids" type="SKIP" output="fbid_table1.txt">
@@ -266,9 +358,6 @@ $l_oid= $oid;
 
   <feature_sql id="chromosomes_dpse" type="feature_table" output="chromosomes.tsv">
 
-<!-- need also
-  <script name="remapUandMISC" type="postprocess" shell="perl -i.old" language="perl">
--->
   <sql><![CDATA[
 -- get chromosome/arm/supercontig/ ; mess needed for dpse with mixture of
 -- assembly-ness
@@ -405,8 +494,9 @@ sub mapparts {
   
   </feature_sql>
   
-<!-- dmel r4 note: uniquename == chromosome name; name == genbank accession  -->
-
+  
+  
+  
   <feature_sql id="chromosomes" type="feature_table" output="chromosomes.tsv">
   <sql><![CDATA[
 -- get chromosome/arm/supercontig/... lengths/names

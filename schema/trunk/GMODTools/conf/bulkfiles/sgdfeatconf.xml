@@ -5,11 +5,11 @@
  
   <title>Chado DB Feature info for SGDLite db</title>
   <about>
-    Edited for SGDLite feature usage (diff. from FlyBase)
+    Configured for SGDLite feature usage  
     
     These are configurations for converting chado feature table dumps to
     standard feature/sequence files. Much of below specifies how to
-    process different features (tied to methods in ChadoFeatDump.pm
+    process different features  
     
     These configs should be data-set independent.
     This works with, but is independent of SeqUtil2 configs.
@@ -25,16 +25,16 @@
     but db-release config can override @featset, %featmap -->
 
   <!-- feature sets to make fasta bulk files -->
+  <!--
   <featset>chromosome</featset>
   <featset>gene</featset>
-  <featset>CDS</featset>
   <featset>CDS_translation</featset>
-<!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
   <featset>ncRNA</featset>
   <featset>transposon</featset>
   <featset>gene_extended2000</featset>
   <featset>intergenic</featset>
-
+  -->
+  
   <!-- see featuresets.xml -->
   
   <featmap id="gene" get_id="1" />
@@ -52,47 +52,43 @@
   <featmap id="CDS" add_id="gene" />
 
   <!-- sgdlite doesnt have translation/transcript residues in sgdlite chado -->
-  <featmap
-    id="translation"
+  <featmap id="translation"
     types="protein"
     typelabel="protein"
     fromdb="1"
     />
-  <featmap
-    id="CDS_translation"
-    types="CDS"
-    typelabel="protein"
+    
+  <featmap id="CDS_translation"
+    types="CDS gene"
+    typelabel="protein protein"
     dotranslate="1"
-    fromdb="0"
-    />
-  <featmap
-    id="transcript"
-    types="mRNA"
-    typelabel="transcript"
     fromdb="1"
     />
-  <featmap
-    id="transposon"
+    
+  <featmap id="chromosome"
+    types="${golden_path}"
+    fromdb="1"
+    onlydb="1"
+    />
+  <featmap id="EST"
+    types="EST"
+    fromdb="1"
+    onlydb="1"
+    />
+    
+  <featmap id="transposon"
     types="transposable_element"
     typelabel="transposable_element"
     />
-    <!-- note this variant includes all non-prot-coding rnas -->
-  <featmap
-    name="ncRNA"
+  <featmap name="ncRNA"
     types="ncRNA snRNA snoRNA rRNA tRNA"
     />
-  <featmap
-    id="miscRNA"
-    types="ncRNA snRNA snoRNA rRNA" 
-    />
-  <featmap
-    id="gene_extended2000"
+  <featmap id="gene_extended2000"
     types="gene"
     typelabel="gene_ex2000"
     subrange="-2000..2000"
     />
-  <featmap
-    id="intergenic"
+  <featmap id="intergenic"
     types="gene"
     typelabel="intergenic"
     method="between"

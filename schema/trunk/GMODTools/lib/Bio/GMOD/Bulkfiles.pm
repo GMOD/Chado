@@ -262,7 +262,50 @@ MORE CONFIG FILES:
   cd GMODTools
   env GMOD_ROOT=$PWD perl -I./lib/ bin/bulkfiles.pl sgdbulk1
   
+=head1 no_csomesplit update 
 
+  this change is needed to handle partially assembled genomes (the common
+  first draft) with many scaffolds (10,000s of < 1MB  to  100,000s of
+    < 100Kb segments)
+
+  The old state assumes a handful of full or nearly full chromosomes implicitly
+  by producing 1 file/golden_path segment, at least as temporary working
+  files. This is a problem for any file system, where > 1,000 files/folder
+  is problematic and > 100,000 can be serious.  THis isnt needful design,
+  just how the program grew (for drosophila genome data with 5 golden_path
+  segments).
+
+  First try: use "sum" as special chromosome name, "all" is already used
+    specially for final output of  public files with all csomes in one file.
+    
+  Main changes are to these subs here:
+    See filesets.xml configuration with flags no_csomesplit, perchr and makeall
+
+   Features:
+    sortNSplitByChromosome : produce temporary per-csome feature files (tmp/chadofeat-org-csome)
+
+    getFeatTableFiles : collect temp per-csome feat. files for further processing
+      -- this hands data to downstream BulkWriter packages for final file (GFF,..)
+        creation. Then the filesets perchr and makeall flags control final file set.
+
+    >> need to revise downstream packs (FeatureWriter, ...) to  not split into
+       per-csome files (done before 'makeall' option)
+    
+    Dna:
+    -- possibly revise here to use chado sql calls instead of temp dna files?
+    dumpChromosomeBases: create dna string files from chado feature.residues
+      see ##  for making Unknown 'bag' chromosomes from parts
+          ## $csomeset->{$chr}->{parts}
+
+    getBasesFromFiles: return data from dna string files
+     Note use of Bio::GMOD::Bulkfiles::MyLargePrimarySeq for dna files.
+    
+    >> first try using only chadodb get residues
+    failed to create chromosome.fasta (no dna/ files). other fasta looked ok.
+    See FastaWriter:processFasta : has special raw2Fasta for csomes.,
+
+    
+  
 =head1 SEE ALSO
 
   GMOD::Chado::SeqUtils  -- older sequence in/out/check methods for Chado DB
@@ -340,8 +383,9 @@ sub intergeneFromFFF2
 
 
 
-# debug
-##use lib("/bio/biodb/common/perl/lib", "/bio/biodb/common/system-local/perl/lib");
+#debug# 
+use lib("/bio/argos/common/perl/lib", "/bio/argos/common/system-local/perl/lib");
+use lib("/Users/gilbertd/bio/dev/gmod/schema/GMODTools/lib/");
 
 use POSIX;
 use FileHandle;
@@ -354,27 +398,26 @@ use FindBin qw( $RealBin); #? eval
 use DBI; 
 
 use Bio::Location::Simple;
+use Bio::PrimarySeq; # see MyLargePrimarySeq use
 
 use Bio::GMOD::Bulkfiles::BulkWriter;
-# see instead getWriter() - base class BulkWriter
-# use Bio::GMOD::Bulkfiles::FeatureWriter; ## was ChadoFeatDump;
-# use Bio::GMOD::Bulkfiles::BlastWriter;  
-# use Bio::GMOD::Bulkfiles::FastaWriter;  
-# use Bio::GMOD::Bulkfiles::GnomapWriter;  
+# see getWriter() - base class BulkWriter, loads any other subclasses
 
 use Bio::GMOD::Bulkfiles::MyLargePrimarySeq;
 use Bio::GMOD::Bulkfiles::MySplitLocation;
-
-#?? should this package become subclass of Bulkfiles::BulkWriter? too many back-calls here?
+# see below require Bio::GMOD::Config2; dont use
 
 our $DEBUG = 0;
-my $VERSION = "1.0";
+my $VERSION = "1.1"; # no_csomesplit update
 
-## should be $self instead of package global?
 use vars qw/ @ENV_KEYS @featset @allfeats %mapchr_pattern $fndel /;
 
 # special config keys to put in ENV for Config2 reader
-BEGIN{@ENV_KEYS= qw( species org date title rel relfull relid datadir release_url ftp_url );}
+# 0710: add more: ENV_default set : golden_path seq_ontology
+# too many rel.variables: relid , release_id == rel ??
+BEGIN{@ENV_KEYS=  qw( species org date title datadir 
+    rel relfull relid release_url release_id release_date 
+    ftp_url golden_path seq_ontology );}
 
 my $defaultconfigfile="bulkfiles"; # was 'sequtil'  
 my %dnaseqs=(); #? package global - read only BioseqFile
@@ -417,15 +460,16 @@ sub init
   $self->{skiponerror}= 1 unless defined $self->{skiponerror};
   $self->{ignoredbresidues}= 0 unless defined $self->{ignoredbresidues};
   $self->{addids}= 0 unless defined $self->{addids};
-  # $self->{date}= POSIX::strftime("%d-%B-%Y", localtime( $^T ));
   $self->{date}= POSIX::strftime("%F %T", localtime( $^T ));
   $self->{config}={} unless defined $self->{config};
   $self->{configfile}= $defaultconfigfile unless defined $self->{configfile};
   $self->{verbose}=0 unless defined $self->{verbose};
-
+  # no_csomesplit is now a call option, but respect only if >0, replacing config value
+  
   $self->readConfig($self->{configfile});
   # calls initData()
 }
+
 
 =item readConfig($configfile)
 
@@ -448,6 +492,8 @@ sub callReadConfig
 	my $self= shift;
 	my ($configfile)= @_;
   my $returnConfig= {};
+  my $replacevariables= $DEBUG; #?? make default, then drop rereadConfig
+  
   eval {  
     my $config2= $self->{config2}; # Config2 object, not hash
     unless(ref $config2) { 
@@ -467,12 +513,35 @@ sub callReadConfig
 
     ## added processing of include="include.conf"  
     unless ($config2->readConfigOk()) {
-      my $msg= "** Error with configuration files\n";
-      ($self->{failonerror} || $self->{automake}) ? die $msg : warn $msg;
+      warn "** Error with configuration files\n";
+      die if($self->{failonerror} || $self->{automake});
       }
 
+    if($replacevariables) { # 0710 update      
+      my @keys= @ENV_KEYS;
+      # also inspect config for simple keys
+      foreach my $k (keys %$returnConfig) {
+        my $v= $$returnConfig{$k};
+        push(@keys, $k) unless(ref($v));
+        }
+      foreach my $k (@keys) { 
+        my $v= $$returnConfig{$k};
+        $ENV{$k}= $v if(defined $v and not defined $ENV{$k}); 
+        } 
+      print STDERR "readConfig:pass2 for variables=@keys\n" if $DEBUG;
+
+      # readConfig replace=>1 is bad, replaces 1st/primary values with backup values :(
+      # new updateVariables will touch only ${variable} set
+      # recurses thru all of config  hash to find '${variable}' matching %ENV keys
+      
+      $returnConfig= $self->{config2}->updateVariables( 
+        $returnConfig,  { Variables => \%ENV, replace =>1 },
+        ); 
+    
+      }
+    
     print STDERR $config2->showConfig( $returnConfig, { debug => $DEBUG }) 
-      if ($self->{showconfig}); ##if $DEBUG;
+      if ($self->{showconfig});  
     }; 
     
   if ($@) { 
@@ -489,39 +558,49 @@ sub rereadConfig
 {
 	my $self= shift;
   print STDERR "rereadConfig\n" if $DEBUG;
-  #update $docs= $self->config->{doc} unless ref $docs;
 	
-  ## add these to %ENV before reading  so ${vars} get replaced ..
-  my $sconfig= $self->config;
-  @ENV{@ENV_KEYS} = @{%$sconfig}{@ENV_KEYS};
+  my $config= $self->config;
+  foreach my $k (@ENV_KEYS) { defined $$config{$k} and $ENV{$k}= $$config{$k}; }
+
   my $newconfig= {};
-  
   eval {  
-    ##$self->readConfig($self->{configfile});
-    $newconfig= $self->{config2}->readConfig( $self->{configfile}, 
-      { Variables => \%ENV },
-      $newconfig, # $self->config, << this is bad; old not overwritten 
-      ); 
-    
-    #fixme: want to update any/all replace vals from newconfig
-    # can we replace {config} - but see initData() changes.
-    $self->config->{doc} = $newconfig->{doc} if $newconfig->{doc};
+  
+    ## need to replace ${variables} with config values
+    ## so need to change $self->{config} hash, not newconfig
+    ## still need rereadConfig after  above updateVariables, as init() changes config
+    ## but could use a 2nd updateVariables here instead ??
+
+    $self->{config2}->updateVariables( $config,  
+                { Variables => \%ENV, replace =>1 },  ); 
+
+#     $newconfig= $self->{config2}->readConfig( $self->{configfile}, 
+#                 { Variables => \%ENV }, $newconfig, ); 
+#     $self->config->{doc} = $newconfig->{doc} if $newconfig->{doc};
+
     }; 
   if ($@) { 
     my $cf= $self->{config2}->{filename}; 
     warn "Config2: file=$cf; err: $@"; 
-    ##die if $self->{failonerror};
     }
-  print STDERR "new.doc.content=",$newconfig->{doc}->{content},"\n" if $DEBUG;
+  # print STDERR "new.doc.content=",$newconfig->{doc}->{content},"\n" if $DEBUG;
 }
+
+sub updateConfigVars
+{
+	my $self= shift;
+  my $config= $self->config;
+  foreach my $k (@ENV_KEYS) { defined $$config{$k} and $ENV{$k}= $$config{$k}; }
+  eval { $self->{config2}->updateVariables( $config, { Variables => \%ENV, replace =>1 },  ); }; 
+  if ($@) {  warn "Config2: file=",$self->{config2}->{filename},"; err: $@";  }
+}
+
 
 sub config  { return shift->{config}; }
 
 sub getconfig 
 {
 	my $self= shift;
-  my $cf= $self->{config2}; # if missing ??
-  # if ($cf && @_) { my %vals= $cf->get(@_); return %vals; } #?? or single val
+  my $cf= $self->{config2}; 
   if ($cf && @_) { return $cf->get(@_); } 
 }
 
@@ -651,8 +730,6 @@ sub remapArm
 {
   my ($self,$arm,$fmin,$fmax,$strand,$csomeset)= @_;
   my $savearm= $arm;
-#  my $armfile= $arm;
-  ##my $csomeset= $self->getChromosomeTable(); ## pass value
   $csomeset= {} unless($csomeset);
   
   if ($csomeset->{'_part2chr'}->{$arm}) {
@@ -717,6 +794,8 @@ sub remapArm
   ** See FeatureWriter remapArm and precursor work w/ Dpse; need to create
   ordered Uknown chr, joining contigs end-to-end.
   
+  oct07 -- need no_csomesplit / no dna files option (for 100,000s of scaffolds cases)
+  
 =cut
 
 sub dumpChromosomeBases 
@@ -727,6 +806,17 @@ sub dumpChromosomeBases
   my $csomeset= $self->getChromosomeTable();
   $chromosomes= $self->getChromosomes() unless (ref $chromosomes);
   
+  my $no_csomesplit= $self->config->{no_csomesplit} || 0; # FIXME: 0710
+  
+  #? $chromosomes=["sum"] if($no_csomesplit); # 2007oct; not "all", other special csome name !
+  # ^^ can we use one dna.raw file with simple csome byte index instead of many files?
+  #    or chado db feature.residues fetch as csome 'file'
+  if($no_csomesplit) {
+    my $chr="sum"; #? "sum" or "all"
+    my $dnafile= $self->dnafile($chr);  #? add $org option
+    return [ { path => $dnafile, type => 'dna/raw', name => $chr, chr => $chr, } ];
+    }
+    
   ##? change naming of dnafile() to same as other files?
   ## using get_filename
   my $saveorg= $self->config->{org};
@@ -773,7 +863,7 @@ sub dumpChromosomeBases
         }
       else { 
         warn "dumpChromosomeBases: no bases for $dnafile\n"; 
-        die if $self->{failonerror}; ##? || $self->{automake};
+        die if $self->{failonerror};
         }
       }
       
@@ -785,7 +875,6 @@ sub dumpChromosomeBases
 =item getChromosomeFiles()
 
 return fileset of dna/raw chromosomes 
-## rename this getChromosomeDnaFiles ?
 
 =cut
 
@@ -794,6 +883,9 @@ sub getChromosomeFiles
   my ($self, $chromosomes)= @_;
   $chromosomes= $self->getChromosomes() unless (ref $chromosomes);
   my @files=();
+  
+  ## FIXME: no_csomesplit
+  my $no_csomesplit= $self->config->{no_csomesplit} || 0; # FIXME: 0710
   
   foreach my $chr (@$chromosomes) {
     next if $chr eq 'all';
@@ -839,7 +931,9 @@ sub getDumpFiles
     my $type= $fs->{type};
     my $sql = $fs->{sql};
     my $outn= $fs->{output} || $tgname.".tsv";
-    unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
+    unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) {
+      warn "getDumpFiles skip: $tgname/$type<>$sqltype\n";
+      next; } #??
 
     my $outf= catfile($outpath,$outn);
     if(! -e $outf && -e "$outf.gz") { $outf .=".gz";}
@@ -926,14 +1020,17 @@ sub getFeatTableFiles
   my $fdump= $self->config->{featdump};
   my $outpath= $self->getReleaseSubdir( $fdump->{'path'} || "tmp/") ;
   my $outname= catfile( $outpath, $fdump->{splitname} || "chadofeat");
+  
+  my $no_csomesplit= $self->config->{no_csomesplit} || 0; # FIXME: 0710
 
   $chromosomes= $self->getChromosomes() unless (ref $chromosomes); 
 
   ##my $spp= $csomeset->{$chr}->{species};  ## FIX $dnafile name for this !
   my $spp= $self->config->{species} || $self->config->{org};
-  my $orgabbr= $self->speciesAbbrev($spp);
-  #?? $orgabbr == '3'
+  my $orgabbr= $self->speciesAbbrev($spp, "org4");
   print STDERR "# feature_table org=$orgabbr species=$spp path=$outpath \n" if $DEBUG;
+  
+  $chromosomes=["sum"] if($no_csomesplit); # 2007oct; not "all", other special csome name !
   
   foreach my $chr (@$chromosomes) {
     next if $chr eq 'all';
@@ -1088,6 +1185,8 @@ sub sortNSplitByChromosome
   my $outname= catfile( $outpath, $fdump->{splitname} || "chadofeat");
   my $intype = $fdump->{type};
 
+  my $no_csomesplit= $self->config->{no_csomesplit} || 0; # FIXME: 0710
+
   my $tfset  = $self->getFilesetInfo('tables');
   my $tabdir = $self->getReleaseSubdir( $tfset->{path} || 'tables/');
   my $sumfile= catfile( $tabdir, "feature_table-summary.txt");
@@ -1096,7 +1195,11 @@ sub sortNSplitByChromosome
   ## if newer than input fileset, leave as is, return file names ?
   my $chromosomes= $self->getChromosomes(); ## $self->config->{chromosomes};
   my $chr= $$chromosomes[0];
-  my $testout= "$outname-$chr.tsv";
+
+  ##FIXME:    my $testout= $outname-$orgabbr.$chr; ## dmel2R, 
+  my $orgabbr= $self->config->{org} || $self->speciesAbbrev("","org4"); 
+
+  my $testout= "$outname-$orgabbr$chr.tsv";
   if(! -e $testout && -e "$testout.gz") { $testout .=".gz"; }
   my $uptodate= (-e $testout) ? 1 : 0;
   
@@ -1113,7 +1216,7 @@ sub sortNSplitByChromosome
   if($uptodate) {
     my @files=();
     foreach my $chr (@$chromosomes) {
-      my $fn= "$outname-$chr.tsv";
+      my $fn= "$outname-$orgabbr$chr.tsv"; ## dmel2R, 
       push(@files, { path => $fn, type => 'feature_table', name => $chr, chr => $chr,  });
       }
     return \@files;
@@ -1127,7 +1230,7 @@ sub sortNSplitByChromosome
   print STDERR "sortNSplitByChromosome:\n $scmd\n" if $DEBUG;
   print STDERR "  to csomeSplit($outname)\n" if $DEBUG;
   open(FS,$scmd) || die $scmd;
-  my $files= $self->csomeSplit(*FS, $outname, $sumfile);
+  my $files= $self->csomeSplit(*FS, $outname, $sumfile, $no_csomesplit);
   close(FS);
   
     ## with remapArm, need to resort each output file
@@ -1148,11 +1251,17 @@ sub sortNSplitByChromosome
  split sorted input feature_table files into per-chromosome (and now per-organism)
  feature fileset
 
+  2007Oct: add this flag ENV_default: output_by_golden_path=1 instead use: csome_split=1
+    to separate output by chromosome/scaffold/..., otherwise lump output by feature types,
+    for all csomes.
+    -- how much work to implement this? as all downstream outputs are csome-split now.
+    
+    
 =cut
 
 sub csomeSplit 
 {
-  my($self, $inh, $outname, $sumfile)= @_;
+  my($self, $inh, $outname, $sumfile, $no_csomesplit)= @_;
   $outname ||= "chadofeats";
   my @files=();
   my $fh= undef;
@@ -1171,8 +1280,10 @@ sub csomeSplit
     my $oldarm;
     my $oldfmax= $fmax;
     
-    my $orgabbr= $organisms->{$orgid}->{abbreviation};
-    # unless($orgabbr) { } # what?
+    # bug 0710: getting 's.cerevisiae' instead of 'scer'; from chado db ??
+    my $orgabbr= 
+      $organisms->{$orgid}->{org4} ||
+      $organisms->{$orgid}->{abbreviation};
     $orgabbr = "org$orgid" unless($orgabbr); #?? skip null orgabbr : not wanted ?
     
     ($arm,$fmin,$fmax,$strand,$oldarm)= $self->remapArm($arm,$fmin,$fmax,$strand,$csomeset); # for Unknown.. and other fragments ? need to do before sorter call
@@ -1181,17 +1292,21 @@ sub csomeSplit
     next unless($arm && $arm ne 'skip'); #?
     
     if ($attr_type eq 'to_species') {
-      my $toorg= $self->speciesAbbrev($attribute);
+      my $toorg= $self->speciesAbbrev($attribute); ## , "org4"
       ## my $toorg= $organisms->{$attribute}->{abbreviation};
       $attribute= $toorg if $toorg;
       }
       
     my $dosort= ($arm ne $oldarm || $fmax ne $oldfmax);
-    my $fhname= $orgabbr.$arm; ## dmel2R, 
+    
+    my $armfile= ($no_csomesplit) ? "sum" : $arm;
+    my $fhname= $orgabbr.$armfile; ## dmel2R, 
+    
     unless($fhs{$fhname}) {
       my $fn= "$outname-$fhname.tsv";
       $fh= $fhs{$fhname}= new FileHandle(">$fn");
-      push(@files, { path => $fn, name => $arm,  chr => $arm, org => $orgabbr, 
+      die "Failed to create csome feature file '$fn'" unless($fh);
+      push(@files, { path => $fn, name => $armfile,  chr => $arm, org => $orgabbr, 
         type => 'feature_table', # should be   $fs->{type} == feature_table
         dosort => $dosort,
         });
@@ -1262,13 +1377,6 @@ sub preMake
     $ok= 1 if(@$dnafiles);
     }
     
-#   if ($what =~ /fff/) { ## ?? not preMake?
-#     warn "Automaking fff files\n"; 
-#     $chrfeats = $self->getFiles('feature_table', $chromosomes);
-#     my $featwriter= $self->getWriter('fff');
-#     $ok = $featwriter->makeFiles( %args, infiles => $chrfeats );   
-#     }
-
   return $ok;
 }
 
@@ -1302,6 +1410,7 @@ sub missingData
   infiles => \@fileset,   # required
   formats => [ 'gff', 'fasta', 'fff', 'blast' ] # optional
 
+
 =cut
 
 
@@ -1313,7 +1422,7 @@ sub makeFiles
 
   print STDERR "makeFiles\n" if $DEBUG; # debug
 
-  $self->rereadConfig(); # replace doc ${values}
+  $self->rereadConfig(); # == updateConfigVars; replace doc ${values}
   
   $self->writeDocs( $self->config->{doc} ); #? unless already wrote ? move this to Writer module
  
@@ -1333,17 +1442,23 @@ sub makeFiles
   if (delete $outformats{'overview'}) {
     my $overviewset  = $self->getFilesetInfo('overview');
     if($overviewset) {
-    # my $overviewfiles= ($overviewset) ? $self->dumpFeatures($overviewset) : [];
-    # my $ovlist= join(" ",map {$_->{name}} @$overviewfiles);
-    ## check for already done overview files ..
-    my ($ovfiles,$ovmissing)= $self->getDumpFiles(['overview'], $overviewset);
-    if(scalar(@$ovmissing)) { $ovfiles =  $self->dumpFeatures($overviewset);  }
-    my $ovlist= join(" ",map {$_->{name}} @$ovfiles);
-    push @results, "overviews:$ovlist";
-    warn "** Please review overview tables for validity **\noverviews:$ovlist\n" if($automake||$DEBUG); # && return ??
-    $self->getOrganismTable() if($ovlist =~ /organism/);
+      ## check for already done overview files ..
+      my ($ovfiles,$ovmissing)= $self->getDumpFiles(['overview'], $overviewset);
+      ## FIXME: bug in above x config? 'overview' files are tagged 'summary' in chadofeatsql ??
+      if(1 or scalar(@$ovmissing)) { 
+        $ovfiles =  $self->dumpFeatures($overviewset, undef, "colnames");  
+        }
+  
+      my $ovlist= join(" ",map {$_->{name}} @$ovfiles);
+      push @results, "overviews:$ovlist";
+      warn "** Please review overview tables for validity **\noverviews:$ovlist\n" if($automake||$DEBUG); # && return ??
+      $self->getOrganismTable() if($ovlist =~ /organism/);
+      }
     }
-    }
+    
+  ## 0710: insert here optional validateVariables: seq_ontology, golden_path at least
+  ## valid=0 default flag handles this for newuser: $self->config->{newuser}
+  $self->validateVariables() unless( $self->config->{valid} );
     
     ## getChromosomes needs chromosomes.tsv .. essential it exist here
   my $fileset= $self->getDumpFiles(['chromosomes']);
@@ -1473,7 +1588,7 @@ sub writeDocs
       $docs= \%dd;
       }
     foreach my $dname (sort keys %$docs) {
-      next if ($docs->{$dname}->{hidden} == 1);
+      next if ($docs->{$dname}->{hidden}); ##  == 1
       my $data = $docs->{$dname}->{content} || '';
       my $dpath= $docs->{$dname}->{path} || $dname;
       
@@ -1493,111 +1608,11 @@ sub writeDocs
 
 
 
-=item
+=item getWriter
   
   Replaced getXxxWriter with generic getWriter('type')
   
 =cut
-
-# =item getFeatureWriter()
-# 
-#  return handler to write bulk files, with this primary method
-#   $featwriter->makeFiles( 
-#     infiles => [ @$seqfiles, @$chrfeats ], # required
-#     formats => [ qw(fff gff fasta) ] , # optional
-#     );
-#     
-# =cut
-# 
-# sub getFeatureWriter
-# {
-#   my ($self)= @_;
-# 
-#   my $fileinfo= $self->config->{fileset}->{fff}; # FIXME
-#   my $writer= Bio::GMOD::Bulkfiles::FeatureWriter->new( 
-#     configfile => $fileinfo->{config}, fileinfo => $fileinfo,
-#     handler => $self, 
-#     debug => $DEBUG, showconfig => $self->{showconfig},
-#     );
-#     
-#   return $writer;
-# }
-
-
-# =item getBlastWriter()
-# 
-#   return handler to write blast index files, with this primary method
-# 
-#   $blastwriter->makeFiles( 
-#     infiles => [ @$fastafiles ], # required
-#     );
-# 
-# #  my $blastwriter= $self->getBlastWriter();
-# #  $result= $blastwriter->makeFiles(%args);
-#     
-# =cut
-# 
-# sub getBlastWriter
-# {
-#   my ($self)= @_;
-#   
-#   my $fileinfo= $self->config->{fileset}->{blast};  
-#   ##$fileinfo= $self->config->{blastfiles} unless($fileinfo); 
-#   my $writer= Bio::GMOD::Bulkfiles::BlastWriter->new( 
-#     configfile => $fileinfo->{config}, fileinfo => $fileinfo,
-#     handler => $self, 
-#     debug => $DEBUG, showconfig => $self->{showconfig},
-#     );
-#   return $writer;
-# }
-
-
-# =item getFastaWriter()
-# 
-#   return handler to write fasta feature set sequence files, with this primary method
-# 
-#   $fawriter->makeFiles( 
-#     infiles => [ @$fastafiles ], # required? or optional
-#     );
-# 
-# =cut
-# 
-# sub getFastaWriter
-# {
-#   my ($self)= @_;
-#   my $fileinfo= $self->config->{fileset}->{fasta}; # FIXME
-#   ##$fileinfo= $self->config->{fastafiles} unless($fileinfo); 
-#   my $writer= Bio::GMOD::Bulkfiles::FastaWriter->new( 
-#     configfile => $fileinfo->{config}, fileinfo => $fileinfo,
-#     handler => $self, 
-#     debug => $DEBUG, showconfig => $self->{showconfig},
-#     );
-#   return $writer;
-# }
-
-# =item getGnomapWriter()
-# 
-#   return handler to write gnomap feature files, with this primary method
-# 
-#   $fawriter->makeFiles( 
-#     infiles => [ @$fastafiles ], # required? or optional
-#     );
-# 
-# =cut
-# 
-# sub getGnomapWriter
-# {
-#   my ($self)= @_;
-#   my $fileinfo= $self->config->{fileset}->{gnomap}; # FIXME
-#   ##$fileinfo= $self->config->{gnomapfiles} unless($fileinfo); 
-#   my $writer= Bio::GMOD::Bulkfiles::GnomapWriter->new( 
-#     configfile => $fileinfo->{config}, fileinfo => $fileinfo,
-#     handler => $self, 
-#     debug => $DEBUG, showconfig => $self->{showconfig},
-#     );
-#   return $writer;
-# }
-
 
 
 sub getWriter
@@ -1618,7 +1633,7 @@ sub getWriter
         );";
     ##print STDERR "getWriter: eval $eval\n" if $DEBUG;
     my $writer= eval $eval; 
-    if ($@) { ($self->{failonerror}) ? die $@ : warn $@; }
+    if ($@) { warn $@; die if($self->{failonerror}); }
     return $writer if ref $writer; 
     }
  
@@ -1700,7 +1715,7 @@ sub getChromosomeTable
     
     #? allow only one species per make run ?
   my $myspp= $config->{species};  $myspp =~ s/ /_/g;
-  my $myorg= $config->{org} || self->speciesAbbrev($myspp); 
+  my $myorg= $config->{org} || $self->speciesAbbrev($myspp); 
   
   my $fileset= $self->getDumpFiles(['chromosomes']);
   my $path= (ref $fileset) ? $fileset->[0]->{path} : undef;
@@ -1732,6 +1747,7 @@ sub getChromosomeTable
     $org= "null" unless($org); 
     next unless($myorg eq $org || $myspp eq $species); #?? dec05; for dpse+dmel db
     next if ($nozombiechromosomes && $fmax <= $fmin);
+    my $org4= $self->speciesAbbrev($orgid, "org4");
     
     my $chrvals= {
       arm => $arm,
@@ -1752,6 +1768,7 @@ sub getChromosomeTable
     $orgset{$orgid}= { 
       organism_id => $orgid, 
       abbreviation => lc($org), 
+      org4 => $org4,
       genus => $genus, 
       species => $spp,
       fullspecies => $species,
@@ -1770,7 +1787,7 @@ sub getChromosomeTable
   close(CF);
   }
   
-  $chromosome->{'_part2chr'}= $part2chr;
+  $chromosome->{'_part2chr'}= $part2chr if( %$part2chr );
   foreach my $arm (keys %$chrparts) {
     unless($chromosome->{$arm}) {  ## make pseudochr from parts?
       $chromosome->{$arm}= { 
@@ -1782,30 +1799,12 @@ sub getChromosomeTable
         }; 
       } 
     $chromosome->{$arm}->{parts}= $chrparts->{$arm}; 
-    }
+  }
 
   my $organisms = $self->getOrganismTable(\%orgset);
-
-#   $self->config->{organism}={}  unless(ref $self->config->{organism});
-#   my $organisms= $self->config->{organism};
-#   foreach my $orgid (keys %orgset) {
-#     my $org= $orgset{$orgid}->{abbreviation};
-#     $organisms->{$org}={} unless(ref $organisms->{$org});
-#     
-#     $organisms->{$org}->{organism_id}= $orgid; # need this from db
-#     $organisms->{$org}->{abbreviation}= $org; 
-#     $organisms->{$org}->{species}= $orgset{$orgid}->{fullspecies};
-#     $organisms->{$orgid}= $organisms->{$org}; # copy for orgid lookup
-#     warn "Organism oid=$orgid abbr=$org species=",$organisms->{$org}->{species},"\n" if $DEBUG;
-#     }
     
   $config->{chromosome}= $chromosome;
   $self->getChromosomes();
-#   unless(ref $config->{chromosomes}) {
-#     my @csomes= sort keys %$chromosome;
-#     $config->{chromosomes}= \@csomes;
-#     }
-
   warn "N chromosomes=",scalar(keys %{$chromosome}),"\n" if $DEBUG;
   return $chromosome;
 }
@@ -1815,7 +1814,7 @@ sub getOrganismTable
 {
 	my $self= shift;
 	my($orgset)= @_;
-
+  
  ## add read from overview tables/organisms-overview.txt
  ## flds: qw(Organism_id Abbreviation Genus Species Common_name N_features Comment)
   unless($self->{did_organism}) {
@@ -1834,9 +1833,11 @@ sub getOrganismTable
           my($orgid,$abbreviation,$genus,$species,$common,@xtra)= @col;
           my $fullspecies= $genus."_".$species;
           unless($abbreviation) { $abbreviation= $self->speciesAbbrev($fullspecies); }
-          
+          my $org4= $self->species4letter($fullspecies);
+
           $orgset->{$orgid}= { 
             organism_id => $orgid, 
+            org4 => $org4,
             abbreviation => lc($abbreviation), 
             genus => $genus, 
             species => $species,
@@ -1849,9 +1850,10 @@ sub getOrganismTable
     }
   }
 
+
   my $organisms= $self->config->{organism};
   $organisms= {} unless(ref $organisms);
-  my $norgs;
+  my $norgs=0;
   if(ref $orgset) {
   foreach my $orgid (keys %$orgset) {
     my $orgref= $orgset->{$orgid};
@@ -1859,15 +1861,17 @@ sub getOrganismTable
     next if( $organisms->{$orgid}->{from_db} && ! $orgref->{from_db});
 
     $organisms->{$orgid}->{organism_id}= $orgid;  
-    my $fullspecies= $orgref->{fullspecies};
-    unless ($fullspecies) { $fullspecies= $orgref->{genus}."_".$orgref->{species}; }
-    $organisms->{$orgid}->{species}= $fullspecies;
+    my $fullspecies= $orgref->{fullspecies} || $orgref->{genus}."_".$orgref->{species}; 
+    $organisms->{$orgid}->{fullspecies}= $fullspecies;
+    $organisms->{$orgid}->{species}= $fullspecies; #?? need this same as fullspecies??
     $organisms->{$orgid}->{from_db}= $orgref->{from_db} || 0;
-    my $abbrev= $orgref->{abbreviation};
-    unless($abbrev) { $abbrev= $self->speciesAbbrev( $fullspecies ); }
+    $organisms->{$orgid}->{org4}= $self->species4letter($fullspecies); 
+    
+    my $abbrev= $orgref->{abbreviation} || $self->speciesAbbrev( $fullspecies );
     $organisms->{$orgid}->{abbreviation}= $abbrev; 
+    
     $organisms->{$abbrev}= $organisms->{$orgid}; # copy for orgid lookup
-    $norgs++; #warn "Organism oid=$orgid abbr=$abbrev species=",$organisms->{$orgid}->{species},"\n" if $DEBUG;
+    $norgs++;
     }
   warn "Organisms n_entries=$norgs\n" if $DEBUG;
   } 
@@ -1889,33 +1893,58 @@ sub getChromosomes
 }
 
 
-sub speciesAbbrev
+# this needs to be a configuration choice (how many genus,species letters)
+# and combine with chado table abbreviation, locase or not, ... have too many
+# abbreviations now, used in file names.  Need simpler common abbrev.
+
+sub species4letter
 {
 	my $self= shift;
 	my ($spp)= @_;
-  $spp= $spp || $self->config->{species} || $self->config->{org};
+  $spp ||= $self->config->{species} || $self->config->{org};
+	$spp =~ s/ /_/g;
+	
+	my $spattern= $self->config->{species_short_pattern}
+	      || '^(\w)[^_]*_(\w{1,3})';
+	  
+	my( $ga, $sa) = $spp =~ /$spattern/;
+	return lc($ga.$sa) if($ga and $sa); #? should lc() be a _pattern option?
+  return lc( substr($spp,0,4) ); #??
+}
+
+sub speciesAbbrev
+{
+	my $self= shift;
+	my ($spp, $org4letter)= @_;
+  $spp = $spp || $self->config->{species} || $self->config->{org} || "";
 	$spp =~ s/ /_/g;
   my $organisms= $self->config->{organism};
   if (ref $organisms) {
+
+  local $^W=0; # kill warnings of undef orgset values
     foreach my $org (reverse sort keys %{$organisms}) {
+      my $orgset= $organisms->{$org};
       if ($spp eq $org 
-        || $spp eq $organisms->{$org}->{fullspecies}
-        || $spp eq $organisms->{$org}->{species}
-        || $spp eq $organisms->{$org}->{organism_id}
+        || $spp eq $orgset->{fullspecies}
+        || $spp eq $orgset->{species}
+        || $spp eq $orgset->{organism_id}
         ) {
-        if ($org =~ /\d+/) { # watchout for org == orgid here
-          my $abbr= $organisms->{$org}->{abbreviation};
+        
+        if($org4letter) {
+          my $org4= $orgset->{org4} || $self->species4letter($spp);
+          return $org4;
+          }
+        elsif ($org =~ /\d+/) { # watchout for org == orgid here
+          my $abbr= $orgset->{abbreviation};
           return $abbr if $abbr;
           }
         else { return $org; }
         }
       }
     }
-  if ($spp =~ /^(\w)[^_]*_(\w{1,3})/) {
-    return "$1$2"; # Gspp 4 letter abbrev.
-    }
-  return $spp; #?
+  return $self->species4letter($spp);
 }
+
 
 sub speciesFull
 {
@@ -2002,6 +2031,19 @@ sub intergeneFromFFF2
   return $newfff;
 }
 
+## no_csomesplit: replace dna/ files w/ chado db calls for all?? see dumpChromosomeBases
+sub getDnaSeqFromDb
+{
+  my($self,$chr)= @_;
+  my $csomeset= $self->getChromosomeTable();  
+  my $id= $csomeset->{$chr}->{id} || $chr;
+  my $bases= $self->getBasesFromDb($id,1); 
+  unless ($bases) { 
+    warn "getDnaSeqFromDb: no bases for segment:$chr\n"; 
+    die if $self->{failonerror};  
+    }
+  return $bases;
+}
 
 
 sub getDnaSeq 
@@ -2009,10 +2051,19 @@ sub getDnaSeq
   my ($self, $chr)= @_;
   my $seq= $dnaseqs{$chr};
   unless($seq) {
-    my $dnafile= $self->dnafile($chr); #"$dnadir/dna-$chr.raw";
-    $seq= Bio::GMOD::Bulkfiles::MyLargePrimarySeq->new( -file => $dnafile);
+    
+    my $no_csomesplit= $self->config->{no_csomesplit} || 0; # 2007oct: old default, change for many small scaffolds
+    if($no_csomesplit) {
+      my $dna= $self->getDnaSeqFromDb($chr);
+      $seq= Bio::PrimarySeq->new( -id=>$chr, -seq => $dna);
+      print STDERR "getDnaSeqFromDb $chr, length=",$seq->length(),"\n" if $DEBUG;
+      
+    } else {
+      my $dnafile= $self->dnafile($chr); #"$dnadir/dna-$chr.raw";
+      $seq= Bio::GMOD::Bulkfiles::MyLargePrimarySeq->new( -id=>$chr, -file => $dnafile);
+      print STDERR "open dnafile $dnafile, length=",$seq->length(),"\n" if $DEBUG;
+      }
     $dnaseqs{$chr}= $seq;
-    print STDERR "open dnafile $dnafile, length=",$seq->length(),"\n" if $DEBUG;
     }
   return $seq;
 }
@@ -2040,16 +2091,13 @@ sub dbiDSN
   my $config= $self->config;
   my ($dbuser,$dbpass)=("","");
   if ($dsn && $dsn =~ /^dbi:/) { $self->{dsn}= $dsn; }
-  ## if ($self->{dsn}) { $dsn= $self->{dsn}; }
   if (ref $config->{db}) { 
     my $dbname= $config->{db}->{name};
-    my $relid= $config->{relid};
+    my $relid= $config->{relid}; #? or now use promoted {release_dbname}
     my $reldb= ($relid && defined $config->{release}->{$relid}) 
       ? $config->{release}->{$relid}->{dbname} :'';
     $dbname= $reldb if ($reldb);
-    unless($dbname) {
-      $self->{failonerror} ? die "missing dbname" : warn "missing dbname";
-      }
+    unless($dbname) { warn "missing dbname"; die if $self->{failonerror}; }
     
     ## ? handle   dbi:mysql:database=dmel_r41_20050207;host=localhost;port=3306;mysql_socket=/tmp/fbmysql.sock
     if($config->{db}->{dsn}){
@@ -2094,7 +2142,6 @@ sub getSeqSql
 {
   my ($self, $sqlconf, $sqlenv)= @_;
   $sqlconf = 'chadofeatsql' unless($sqlconf);
-  #$sqlenv= \%ENV unless (ref $sqlenv);
   $sqlenv= $self->config unless (ref $sqlenv);
 
   print STDERR "sqlenv: ",join("\n ", map{ $_."=".$sqlenv->{$_}} keys %$sqlenv ),"\n"
@@ -2115,15 +2162,85 @@ sub getSeqSql
     foreach my $k (keys %env) { $env{$k}= $sqlenv->{$k} if($sqlenv->{$k}); }
     $seqsql= $config2->readConfig( $sqlconf, {Variables => \%env}, {} ); 
     
-    if ($DEBUG) {
-      my @undefs=  $sqxml =~ m/\$\{([^}]+)\}/g;
-      print STDERR "Added default vars\n"; 
-      foreach my $un (@undefs) { print STDERR "$un => ",$seqsql->{ENV_default}{$un},"\n"; }
-      }
+#     if ($DEBUG) {
+#       my @undefs=  $sqxml =~ m/\$\{([^}]+)\}/g;
+#       print STDERR "Added default vars\n"; 
+#       foreach my $un (@undefs) { print STDERR "$un => ",$seqsql->{ENV_default}{$un},"\n"; }
+#       }
     }
+
   $self->{$sqlconf}= $seqsql;
-    
   return $seqsql;
+}
+
+=item validateVariables
+
+  validate config values for seq_ontology, golden_path, species??
+  to exist in database
+  
+=cut
+
+sub validateVariables
+{
+  my ($self)= @_;
+  return if $self->{didvalidatevars};
+  $self->{didvalidatevars}= 1;
+  warn "Validating...\n" if($DEBUG||$self->{automake});
+  my $note="";
+  my $doinspect= ($DEBUG or $self->{verbose} or $self->config->{newuser}) ? 1 : 0;
+      ## ? newuser, verbose, DEBUG, ...
+  
+  my $fdump   = $self->config->{featdump};
+  my $seqsql  = $self->getSeqSql($fdump->{config},$fdump->{ENV});
+  my $sqltag  = $fdump->{tag} || "feature_sql";
+  my $sqltype = 'validate';  # other types? 
+  my @sqlparam=();
+  
+  ## tag names here are now seq_ontology_check, golden_path_check
+
+  my $dbh= $self->dbiConnect();
+  my @targets= sort keys %{$seqsql->{$sqltag}}; 
+  foreach my $tgname (@targets)  {
+    my $fs  = $seqsql->{$sqltag}->{$tgname};
+    my $type= $fs->{type};
+    my $sql = $fs->{sql};
+    next unless($sql && ( $type =~ m/\b$sqltype\b/) );
+    
+    $note.= "$tgname = ";
+    print STDERR "$type:$tgname\n" if $DEBUG; # sql=$sql 
+    
+    # local $^W=0; # kill warnings of undef values
+    my $nrow= 0;
+    my $err="";
+    my $sth = $dbh->prepare($sql) or $err= "Failed to prepare $sql";  
+    unless($err) { $sth->execute() or $err= "Failed to execute sql";  }
+    unless($err) { while (my @row = $sth->fetchrow_array) {  $nrow++; } }
+    $sth->finish(); 
+      
+    my $sql_inspect = $fs->{sql_inspect}; # optionally show this inspect even if no err
+    if($err or $nrow == 0) {
+      $err .= "*** Failed validation check for $tgname\n";
+      $err .= $fs->{warning}."\n" if($fs->{warning});
+      $err .= "$tgname sql=$sql\n";
+      warn $err; $err= "Invalid $tgname\n";
+      $doinspect= 1;
+      }
+        
+    if($doinspect and $sql_inspect) {
+      warn "\nInspecting database for $tgname values...\n";
+      print STDERR ("-") x 60, "\n";
+      my $result= $self->getFeaturesFromDb( *STDERR, $sql_inspect, undef, "colnames"); 
+      print STDERR ("-") x 60, "\n";
+    }
+      
+    if ($err) {
+      warn $err; die if($self->{failonerror}); #?? ||$self->{automake}
+      $note.="Invalid ";
+      }
+    else { $note.="Ok "; }
+    }
+    
+  warn "Variable checks: $note\n" if($DEBUG||$self->{automake});
 }
 
 
@@ -2172,8 +2289,9 @@ sub updateSqlViews
 
 sub dumpFeatures 
 {
-  my ($self, $fdump, $sqlconf)= @_;
+  my ($self, $fdump, $sqlconf, $dumpflags)= @_;
   my @files=();
+  $dumpflags ||=""; ## add colnames for overview.txt
   
   $fdump   = $self->config->{featdump}  unless($fdump);
   $sqlconf = $fdump->{config} unless($sqlconf);
@@ -2197,12 +2315,14 @@ sub dumpFeatures
     my $type= $fs->{type};
     my $sql = $fs->{sql};
     my $outn= $fs->{output} || $tgname.".tsv";
-    unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) { next; } #??
+    unless($sql && (!$sqltype || $type =~ m/\b$sqltype\b/)) { 
+      warn "dumpFeatures skip: $tgname/$type<>$sqltype\n";
+      next; } #??
 
     my $outf= catfile($outpath,$outn);
     my $outh= new FileHandle(">$outf");
-    print STDERR "sql dump $tgname $type $outf\n" if $DEBUG; # debug
-    my $nout= $self->getFeaturesFromDb( $outh, $sql);# @sqlparam ?
+    print STDERR "sql dump $tgname $type $outf\n" if $DEBUG; 
+    my $nout= $self->getFeaturesFromDb( $outh, $sql, undef, $dumpflags);# \@sqlparam ?
     print STDERR "sql dump $tgname n rows=$nout\n" if $DEBUG;  
     close($outh);
     
@@ -2211,9 +2331,6 @@ sub dumpFeatures
       my $shell=  $fixme->{shell} || $fixme->{language};  
       my $spath=  catfile( $self->config->{TMP}, $fixme->{name});
       my $fixinput= $outf;
-      # if ($fixme->{input}) {
-      # $fixinput= catfile($self->getReleaseDir(),$fixme->{input});
-      # }
       
       print STDERR "postprocess $shell $spath $fixinput\n" if $DEBUG;
       open(SH,">$spath"); print SH $fixme->{content}; close(SH);
@@ -2224,7 +2341,6 @@ sub dumpFeatures
       
       ## changed keys: name=> target; file=> name
     push(@files, { path => $outf, type => $type, target => $tgname, name => $outn, });
-    # push(@files, { path => $outf, type => $type, name => $tgname, file => $outn, });
   }
   return \@files;
 }
@@ -2232,35 +2348,37 @@ sub dumpFeatures
 
 =item getFeaturesFromDb
   
-  $n= getFeaturesFromDb( $outh, $sql, @sqlparam)
+  $nrows = self->getFeaturesFromDb( $outh, $sql, \@sqlparam, $flags)
+  $table = self->getFeaturesFromDb( undef, $sql, \@sqlparam, $flags)
 
 =cut
 
 sub getFeaturesFromDb 
 {
-  my ($self, $outh, $sql, @sqlparam)= @_;
-  my $dbh= $self->dbiConnect();
-
+  my ($self, $outh, $sql, $sqlparam, $flags)= @_;
   my $err="";
+  my $dbh = $self->dbiConnect();
   my $sth = $dbh->prepare($sql) or $err= "failed to prepare $sql";  
-  if (@sqlparam) { $sth->execute(@sqlparam) or $err= "failed to execute sql" ; }
+  if (ref $sqlparam) { $sth->execute(@$sqlparam) or $err= "failed to execute sql" ; }
   else { $sth->execute() or $err= "failed to execute sql"; }
-  if ($err) { ($self->{failonerror}) ? die $err : warn $err;  return -1; }
+  if ($err) { warn $err; die if($self->{failonerror}); return -1; }
  
-# sql dump analysis feature_table /bio/biodb/flybase/data2/fban/sgdlite_20040519/tmp/featdump/ana
-# lysis.tsv
-# DBD::Pg::st execute failed: ERROR:  No such attribute armft.name at /bio/biodb/common/perl/lib/
-# Bio/GMOD/Bulkfiles.pm line 1013.
-   
-   ## analysis sql gets lots of: Use of uninitialized value in join  
+  ## analysis sql gets lots of: Use of uninitialized value in join  
   local $^W=0; # kill warnings of undef values
-  my $n= 0;
-  while (my @row = $sth->fetchrow_array) { 
-    print $outh join("\t",@row),"\n"; $n++;
-    }
-  $sth->finish;
-  
-  return $n;
+  my $result= 0;
+  if($outh) {  
+    print $outh join("\t",@{$sth->{NAME}})."\n" if($flags=~/colname/i);
+    while (my @row = $sth->fetchrow_array) { 
+      print $outh join("\t",@row),"\n"; $result++;
+      }
+  } else {  
+    $result = join("\t",@{$sth->{NAME}})."\n" if($flags=~/colname/i); # is this ok?
+    while (my @row = $sth->fetchrow_array) { 
+      $result .= join("\t",@row)."\n";  
+      }
+  }
+  $sth->finish();
+  return $result;
 }
 
 =item $bases= getBasesFromDb( $uniquename)
@@ -2275,26 +2393,20 @@ sub getBasesFromDb
   $sql= $self->config->{dnadump}->{sql_csome} if ($iscsome);
   $sql ||= $self->config->{dnadump}->{sql};
   $sql ||= "select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?";
-  #$sql ||= "select feature_id, residues from feature where uniquename = ?";
   my $err="";    
   my $sth = $dbh->prepare($sql) or $err="unable to prepare feature_id";
-  $sth->execute($uniquename) or $err="failed to execute feature_id"; 
-  if ($err) { ($self->{failonerror}) ? die $err : warn $err; return undef;  }
+  unless($err) { $sth->execute($uniquename) or $err="failed to execute feature_id"; }
+  if ($err) { warn $err; die if ($self->{failonerror}); return undef;  }
 
-#   my $hashref = $sth->fetchrow_hashref;
-#   my $feature_id = $$hashref{'feature_id'};
-#   my $bases= $$hashref{'residues'};
-  # check for >1 row? e.g. flybase dpse has 2+ csome entries, 1 w/o bases, for same ID
-  my($hashref,$feature_id,$bases);
+  ## check for >1 row! e.g. flybase dpse has 2+ csome entries, 1 w/o bases, for same ID
+  my($hashref,$feature_id,$bases)=(undef,undef,"");
   while (my $nextrow = $sth->fetchrow_hashref) {
     $hashref = $nextrow;
     $feature_id = $$hashref{'feature_id'};
-    $bases= $$hashref{'residues'};
+    $bases= $$hashref{'residues'} || "";
     last if $bases;
-    }  
-  ## return md5checksum, seqlen fields if desired?
-  ## maybe stick all other fields into self? 
-  $self->{gotbases}= $hashref;
+    }    
+  $self->{gotbases}= $hashref; ## return md5checksum, seqlen fields ;stick all other fields into self
   $sth->finish();
   print STDERR "getBasesFromDb $uniquename -> $feature_id ;  n bases=",length($bases),"\n" 
     if (!$bases || $DEBUG > 1);
@@ -2339,6 +2451,8 @@ sub dna2protein
     }
   return $aa;
 }
+
+
 
 sub getBasesFromFiles
 {
@@ -2480,7 +2594,8 @@ sub makePath
   if ($@) { 
     $failonerr= ($self->{failonerror}||$self->{automake})  unless(defined $failonerr);
     warn "ERROR: Couldn't create path $dir: $@\n$errmsg\n"; 
-    ($failonerr) ? die  : return 0;   
+    die if ($failonerr);
+    return 0;   
     }
   else { return 1; }
 }
@@ -2504,7 +2619,6 @@ sub getReleaseDir
   $config->{releasedir} = $releasedir;
   if( ! -d $datadir) { warn " missing data dir $datadir\n";  }
   else { $self->makePath($releasedir, "Release path $subdir needed"); }
-  #elsif(!-d $releasedir) { mkpath($releasedir,$DEBUG); }
   return $releasedir;
 }
 
@@ -2528,6 +2642,38 @@ sub getReleaseSubdir
 }
 
 
+#  ## promote all <release id=relid> to top of config ..
+#   <release id="3" dbname="chado_r3_2_27" date="20040804" ... />
+sub promoteRelease
+{
+  my($self, $config)= @_;
+  
+  my $relid= $config->{relid} ||  $self->{date};
+  unless($relid) { $relid= $config->{relid}= $self->{date}; }
+  unless( ref $config->{release}->{$relid} ) {
+    $config->{release}->{$relid}= {
+      date => $self->{date},
+      };
+  }
+  
+  if($relid && ref $config->{release}->{$relid}) 
+  {
+    my %relh= %{$config->{release}->{$relid}};
+    foreach my $k (keys %relh) {
+      $config->{'release_'.$k}= $config->{$k}= $relh{$k} ;
+      # double-store: too many 'date' keys in conf files; use '${release_key}' by preference
+      }
+  }
+  
+  unless($config->{rel}) {  # used much, relid ~= rel
+    my $org= $config->{org} || "rel";
+    $config->{rel}= $org.$relid; 
+    }
+  $config->{'release_id'}= $config->{rel} unless($config->{'release_id'}); ## alias of config variables ??
+  $self->updateConfigVars(); # install ${release_} variables
+}
+
+
 sub initData 
 {
   my($self, $config, $oroot)= @_;
@@ -2535,13 +2681,17 @@ sub initData
   # check $self for params
   unless(ref $config) { $config= $self->config || {};  }
   $self->{config}= $config;
-  $self->{verbose}= $config->{verbose};
+  $self->{verbose}= $self->{verbose} || $config->{verbose};
+  ## added $self->config->{newuser} ; turn on verbose, valid checks with this
+  $config->{no_csomesplit}= $self->{no_csomesplit} if($self->{no_csomesplit});
   
   if (ref $config->{ENV}) {
     foreach my $key (%{$config->{ENV}}) {
       $ENV{$key}= $config->{ENV}->{$key} unless($ENV{$key});
       }
     }
+
+  $self->promoteRelease($config);
 
   unless(defined $oroot && -d $oroot) {
     if (defined $config->{ROOT}) { $oroot= $config->{ROOT}; }
@@ -2561,7 +2711,6 @@ sub initData
   print STDERR "Using rootpath=$oroot\n" if $DEBUG; # is this bad?
   $self->{rootpath} = $config->{rootpath} =  $oroot; # gmod_root ??
 
-  ## rewrite this to use $config->{vals} ...
   my $datadir= $config->{datadir} || "genomes";  
   $datadir= "$oroot/$datadir" unless(-d $datadir);
   if (!-d $datadir && -d $oroot) { 
@@ -2569,42 +2718,7 @@ sub initData
       "** Need writeable data dir=$datadir\nChange configuration datadir\n", 1);  #mkpath($datadir,$DEBUG);
     }
   $config->{datadir} = $datadir;
-
-  ## my $tmpdir= $config->{TMP} .. moved after release configs
-  ## calling getReleaseSubdir creates invalid 'release' dir; not using config (below)
-
-#   should use these gmod.conf Chado defaults:
-#   CHADO_DB_NAME CHADO_DB_HOST CHADO_DB_PORT CHADO_DB_USERNAME CHADO_DB_PASSWORD
-#  # $config->{db}->{driver} || "Pg";
-#   $config->{db}->{name} = $ENV{'CHADO_DB_HOST'};
-#   $config->{db}->{host} = $ENV{'CHADO_DB_NAME'};
-#   $config->{db}->{port} = $ENV{'CHADO_DB_PORT'};
-#   $config->{db}->{user} = $ENV{'CHADO_DB_USERNAME'};
-#   $config->{db}->{password} = $ENV{'CHADO_DB_PASSWORD'};
-
-
-#  ## promote all <release id=relid> to top of config ..
-#   <release id="3" 
-#     rel="r3.2.1" 
-#     relfull="dmel_r3.2.1_07212004"
-#     dbname="chado_r3_2_27" 
-#     date="20040804" 
-#     release_url="/annot/release3.2.1.html"
-#     />
-  my $relid= $config->{relid};
-  if($relid && ref $config->{release}->{$relid}) {
-    my %relh= %{$config->{release}->{$relid}};
-    foreach my $k (keys %relh) {
-      ## need release date !
-      $config->{$k}= $relh{$k} ;
-        #??NO?# unless($config->{$k});
-      }
-    }
-  if ($relid && !$config->{rel}) { 
-    $config->{rel}= $relid; # used much, relid ~= rel
-    }
   
-  ## my $tmpdir= $config->{TMP} || "$oroot/tmp"; ##?use this instead:  
   my $tmpdir= $config->{TMP} || $self->getReleaseSubdir( "tmp/"); # will make dirs inside datadir
   unless( $tmpdir && $self->makePath($tmpdir,"** Need writeable TMP folder\nTrying other..\n",0) )
   {
@@ -2615,7 +2729,7 @@ sub initData
   }
   $config->{TMP} = $tmpdir;
   
-  $self->{idpattern}= $config->{idpattern} || '(FBgn|FBti)\d+';
+  $self->{idpattern}= $config->{idpattern} || '[A-Za-z]+\d+';
   
   $fndel= $config->{filepart_delimiter} || '-';
   
@@ -2639,7 +2753,6 @@ sub initData
     so source tRNA tRNA_trnascan three_prime_UTR transcription_start_site
     transposable_element transposable_element_insertion transposable_element_insertion_site transposable_element_pred
     );
-  #$config->{allfeats}= \@allfeats;
 
   %mapchr_pattern= %{ $config->{'mapchr_pattern'} } if ref $config->{'mapchr_pattern'};
   
@@ -2670,7 +2783,8 @@ sub initData
   $config->{fastafeatok}= \@fastafeatok;
 
   ## add these to %ENV before more configs so they get replaced ..
-  @ENV{@ENV_KEYS} = @{%$config}{@ENV_KEYS};
+  foreach my $k (@ENV_KEYS) { defined $$config{$k} and $ENV{$k}= $$config{$k}; }
+
 }
 
 

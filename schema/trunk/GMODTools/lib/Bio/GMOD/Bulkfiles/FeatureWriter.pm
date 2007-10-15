@@ -68,7 +68,7 @@ my %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
 my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
 
 my $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
-my $append=0; # $self->{append}
+my $append=0; # $self->{append} #?? is this used?
 
 my %gffForwards=();
 my @gffForwards=();
@@ -130,7 +130,7 @@ sub initData
   my($self)= @_;
   $self->SUPER::initData();
   my $config = $self->{config};
-  my $sconfig= $self->handler()->{config};
+  my $sconfig= $self->handler_config;
   
   ## SUPER does now
   #$config->{idpattern}   =  $self->getconfig('idpattern') || '';
@@ -247,6 +247,13 @@ sub makeFiles
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes};
   my $intype= $self->config->{informat} || 'feature_table'; #? maybe array
+
+  # 0710: no_csomesplit : no perchr files, only makeall
+  my $no_csomesplit= $self->handler_config->{no_csomesplit} || 0; # FIXME: 0710
+  my $makeall= !$no_csomesplit && !$args{noall} && ($self->config->{makeall} || $self->{gff_config}->{makeall});
+
+  $self->{append}=1 if($no_csomesplit); #?????? TEST ME
+  
   unless(@$fileset) { 
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
     unless(@$fileset) { 
@@ -277,7 +284,6 @@ sub makeFiles
       }
     }
     
-  my $makeall= !$args{noall} && ($self->config->{makeall} || $self->{gff_config}->{makeall});
   if ($makeall && $status > 0) {
     foreach my $fmt (@outformats) { 
       $self->makeall( $chromosomes, "", $fmt) unless ($fmt eq 'fff'); 
@@ -388,8 +394,15 @@ sub openCloseOutput
 {
 	my $self= shift;
   my($outh,$chr,$flags)=  @_;
-  my $app= defined $self->{append} ? $self->{append} : $append;
   
+  my $app= defined $self->{append} ? $self->{append} : $append;
+  # 0710: no_csomesplit : no perchr files, only makeall
+  my $no_csomesplit= $self->handler_config->{no_csomesplit} || 0; # FIXME: 0710
+  if( $no_csomesplit ) {
+    $app= 1;
+    $chr="all"; # or "sum" ??
+    }
+    
   if ($outh && $flags =~ /open|close/) {
     foreach my $fmt (@outformats) {
       close($outh->{$fmt}) if ($outh->{$fmt});
@@ -954,8 +967,8 @@ sub processChadoTable
     $self->handleAttrib(\@addattr,$attr_type,$attribute,\%addfob) if ($attribute);
 
     ## inner read loop problem? need to process parent_oid attrib only once below  
-    my $nextin= $self->peekline(0);
-    my $joid= index($nextin,"$id\t$oid\t");
+    my $nextin= $self->peekline(0) || "";
+    my $joid=  index($nextin,"$id\t$oid\t");
     $sameoid= ($joid>0);
     if ($sameoid) {
       my $ioid= index($fin,"$id\t$oid\t");
@@ -2078,9 +2091,9 @@ sub clearFinishedObs
       foreach my $parid (@{$parids}) {
         my $pob = $oidobs->{$parid};
         my $done= ($pob && $pob->{$flag}); #? this is bad?
-        unless($done) {
-          my $ptype= $pob->{fob}->{type};
-          if ($pob && $pob->{fob} && $simplefeat{$ptype}) { $done=1; }
+        if(!$done && $pob && $pob->{fob}) {
+          my $ptype= $pob->{fob}->{type} || "";
+          if ($simplefeat{$ptype}) { $done=1; }
           }
         unless($done) { $isfree=0; last; }
         }
