@@ -34,7 +34,17 @@
     no_orgchr="1" -- files have no organism,chromosome naming
 
   </about>
+  
+  <!--
+  2007oct
+    : add no_csomesplit=1 / output_by_golden_path=1 flag (default, old behavior),
+        need option for no golden_path splitting (e.g. lots of scaffolds/contigs)
+        SEE ALSO flag config->{perchr} : same? but after tmp/chadofeat.arm tables
+        and flag config->{makeall}
+    no_csomesplit flag needs to be in main org/release config?    
 
+  -->
+  
   <!-- change these dump tags to fileset tags ?? 
     Bulkfiles is current handler for dnadump, featdump ; change? -->
   <dnadump
@@ -43,6 +53,7 @@
     sql="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
     sql_csome="select feature_id, residues, md5checksum, seqlen, name from feature where uniquename = ?"
     />
+    
   <!-- rewrite of dnadump; handler is Bulkfiles.pm -->
   <fileset
     id="dna"

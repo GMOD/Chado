@@ -723,18 +723,12 @@ sub attrib4drospege
   # also Dbxref ?
 }
 
-sub gff4drospege
-{
-  # no change but to attribs ?
-}
-
 sub gffcols
 {
   # my ($c,$s,$t,$b,$e,$p,$o,$r,$a)
   my @v= split "\t",$_[0],9; #gff cols
   foreach (@v) { $_=undef if($_ eq '.'); }
   unless($v[6]=~/\d/) { $v[6]= ($v[6] eq '+') ? 1 : ($v[6] eq '-') ? -1 : 0; }
-  # gff4drospege(\@v) if(DROSPEGE);
   return @v;
 }
 
