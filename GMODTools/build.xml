@@ -42,26 +42,26 @@ handier use. Since the GMODTools is in Perl, ant doesn't do much else.
       defaultvalue="gmodrel"
     />
   
-    <copy  todir="${gmod.dir}/lib" verbose="true" >
+    <copy  todir="${gmod.dir}/lib" verbose="true" preservelastmodified="true" >
       <fileset dir="${basedir}/lib"  
       excludes="Bio/GMOD/Bulkfiles/To*.pm GMOD/** **/*.old/**"
       />
      </copy>
  
-     <copy  todir="${gmod.dir}/bin" verbose="true" >
+     <copy  todir="${gmod.dir}/bin" verbose="true" preservelastmodified="true" >
       <fileset dir="${basedir}/bin"  
        includes="gff2biomart5.pl bulkfiles.pl"
       />
      <mapper type="glob" from="*.pl" to="gmod_*.pl"/>
     </copy>
 
-    <copy  todir="${gmod.dir}/conf" verbose="true" >
+    <copy  todir="${gmod.dir}/conf" verbose="true" preservelastmodified="true" >
      <fileset dir="${basedir}/conf"  
       excludes="**/*.old/** gmod.conf*"
       />
     </copy>
      
-     <copy  todir="${gmod.dir}/doc" verbose="true" >
+     <copy  todir="${gmod.dir}/doc" verbose="true" preservelastmodified="true" >
      <fileset dir="${basedir}/doc"   
        excludes="**/*.old/**"
       />
