@@ -4,6 +4,11 @@
   title="Species abbreviations"
   >
 
+  <!-- perl regex for making file-name abbreviation from genus_species -->
+  <species_short_pattern>^(\w)[^_]*_(\w{1,3})</species_short_pattern>
+  <!-- alternate .. -->
+  <species_short_pattern6>^(\w{1,3})[^_]*_(\w{1,3})</species_short_pattern6>
+
   <about>
   Table of organism species, abbreviation-id values.
   Cannot assume chado organism table has values we need.
@@ -12,9 +17,6 @@
   Note that species == Genus_species; all spaces are underscored.
   </about>
   
-  <organism id="dpse" species="Drosophila_pseudoobscura"  />
-  <organism id="dmel" species="Drosophila_melanogaster" />
-
   <organism id="agam" species="Anopheles_gambiae" />
   <organism id="amel" species="Apis_mellifera" />
   <organism id="atha" species="Arabidopsis_thaliana" />
@@ -26,8 +28,10 @@
   <organism id="dere" species="Drosophila_erecta" />
   <organism id="dgri" species="Drosophila_grimshawi" />
   <organism id="dmag" species="Daphnia_magna" />
+  <organism id="dmel" species="Drosophila_melanogaster" />
   <organism id="dmoj" species="Drosophila_mojavensis" />
   <organism id="dper" species="Drosophila_persimilis" />
+  <organism id="dpse" species="Drosophila_pseudoobscura"  />
   <organism id="dpul" species="Daphnia_pulex" />
   <organism id="drer" species="Danio_rerio" />
   <organism id="dsec" species="Drosophila_sechellia" />

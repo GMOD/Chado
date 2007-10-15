@@ -1,9 +1,11 @@
 <opt
   name="bulkfiles"
   relid="1"
-  date="20060102"
-  make_current="0"
+  date="20071014"
+  make_current="1"
   >
+  
+  <title>Chado DB Data Release</title>
   
   <about id="bulkfiles_template"><![CDATA[
     This is an example main configuration file for GMODTools bulkfiles
@@ -56,35 +58,11 @@
   </about>
   
 
-  <title>Chado DB Data Release</title>
-  
-  <doc id="Release.txt"><![CDATA[
-  Bulk output for Chado genome databases
-  Database: ${title}
-  Species:  ${species}
-  Release:  ${rel}, dated ${date} as ${relfull}
-  
-  See release notes at <a href="${release_url}"> ${release_url}</a>
-  ]]></doc>
-  
-  <about id="doc">
-    doc tags are generally printed to files
-    id= name, file name unless path given
-    path= path to output file.
-    A few common tags can be used as inserted ${variables}
-  </about>
-  
-  <release id="1" 
-    rel="rel1"  
-    dbname="chado_spp_2" 
-    date="20040519"
-    relfull="myspecies_release1"
-    release_url="/genome/${species}/myspecies_release1.html"
-    />
-  <release id="2" rel="rel2"  dbname="chado_spp_1" date="20051020"
-    relfull="myspecies_release2"
-    release_url="/genome/${species}/myspecies_release2.html"
-    />
+  <release id="1" dbname="chado1"  date="20040519" />
+  <release id="2" dbname="chado2"  date="20051020" />
+  <relfull>${org}_${release_date}</relfull> <!-- or ${org}_release${release_id} -->
+  <release_url>/genome/${species}/release${release_id}.html</release_url>
+
   <about id="release"><![CDATA[
     release tags (an ARRAY) will specify release info:
       id= number matching 'relid' above
@@ -96,23 +74,44 @@
   ]]></about>
   
 
+  <valid>0</valid> 
+  <about id="valid">Set valid=1 to skip seq_ontology, other variable validation</valid>
+  
+  <seq_ontology>sequence</seq_ontology>
+  
+  <about id="seq_ontology">
+    seq_ontology is the name in CV table for the
+    sequence feature cvterm set, including gene, exon,
+    chromosome.  It varies depending on choices used to
+    install sequence CV terms in your Chado database.
+    'seq_ontology' and 'golden_path' are critical parameters
+    that must match cvterm values used for feature entries. 
+    See chadofeatsql.xml for more details.
+    Common alternate values are 'sequence', 
+    'Sequence Ontology Feature Annotation', 'SO', 'SOFA'.
+  </about>
+
   <!-- see organisms.xml; add your species there -->
   <org>scer</org>
   <species>Saccharomyces_cerevisiae</species>
+  
   <!-- see chadofeatsql ENV_default -->
-  <golden_path>'chromosome'</golden_path>
+  <golden_path>'chromosome','supercontig'</golden_path>
+
   <featureprops>'Note','orf_classification'</featureprops>
-  <seq_ontology>Sequence Ontology Feature Annotation</seq_ontology>
   
   <about id="species-genome">
-    These values of org, species,golden_path,featureprops are some
-    common species-genome specific options.
+    These values of org, species,golden_path,featureprops 
+    are example species-genome specific options.
     org = short species id.
     golden_path = what highest level of genome feature is (a SO term), 
     chromosome, chromosome_arm, golden_path are some common ones.
     featureprops = chado featureprops to include with feature dump.
   </about>
 
+  <!-- 0710: this removes per-chromosome/scaffold/. files, not desired but for
+        well assembled genomes -->
+  <no_csomesplit>1</no_csomesplit>
 
   <featdump
     path="tmp/featdump/\w+.tsv"

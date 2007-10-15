@@ -1,9 +1,11 @@
 <opt
   name="sgdbulk"
-  relid="5"
-  date="20051129"
+  relid="7"
   make_current="1"
   >
+  
+  <!-- 07oct: test bulkfiles v1.1  with no_csomesplit -->
+  <no_csomesplit>1</no_csomesplit>
   
   <about id="sgdbulk"><![CDATA[
    See bulkfiles_template.xml for further documentation. 
@@ -18,7 +20,9 @@
   Bulk output for Chado genome databases
   Database: ${title} 
   Species:  ${species}
-  Release:  ${rel}, dated ${date} as ${relfull}
+  Release:  ${release_id}, dated ${release_date} as ${relfull}
+  
+  See release notes at <a href="${release_url}"> ${release_url}</a>
   ]]></doc>
   
   <doc id="Example.txt"><![CDATA[
@@ -40,17 +44,18 @@
   perl -Ilib bin/bulkfiles.pl -conf sgdbulk -make -debug \
     |& mail -s gmodtools-debug gilbertd@indiana.edu 
 
+  Find worked examples from Bulkfiles SQL use now at
+    http://www.gmod.org/Sample_Chado_SQL
+
   ]]></doc>
   
   
-  <release id="5" rel="sgdr5"  dbname="sgdlite" date="20050823"
-    relfull="sgdlite_2005_08_23"
-    release_url="/genome/Saccharomyces_cerevisiae/sgdlite-release5.html"
-    />
-  <release id="1" rel="sgdr1"  dbname="sgdlite_20040519" date="20040519"
-    relfull="sgdlite_20040519"
-    release_url="/genome/Saccharomyces_cerevisiae/sgdlite-release1.html"
-    />
+  <release id="7" dbname="sgdlite" date="20070531"/>
+  <release id="5" dbname="sgdlite_2005" date="20050823"/>
+  <release id="1" dbname="sgdlite_2004" date="20040519"/>
+
+  <relfull>${org}_${release_date}</relfull> 
+  <release_url>/genome/${species}/release${release_id}.html</release_url>
 
   <org>scer</org>
   <species>Saccharomyces_cerevisiae</species>
@@ -58,6 +63,16 @@
   <golden_path>'chromosome'</golden_path>
   <featureprops>'Note','orf_classification'</featureprops>
   <GFF_source>SGD</GFF_source>
+
+  <!-- default seq_ontology now is sequence -->
+  <seq_ontology>Sequence Ontology Feature Annotation</seq_ontology>
+
+  <about id="species_variables">
+  The  golden_path, seq_ontology and species variables are critical.
+  See bulkfiles_template.xml for further documentation.
+  </about>
+  
+  <valid>0</valid> <!-- set 1 to skip db checks of above variables -->
   
   <fileset_override
     name="fff"
@@ -83,16 +98,46 @@
     <target>analysis</target> <!--  //none in sgdlite1//  -->
   </featdump>
   
-  <!-- feature sets to make fasta bulk files -->
+  <!-- feature sets to make fasta bulk files ; see sgdfeatconf -->
   <featset>chromosome</featset>
   <featset>gene</featset>
-  <!-- <featset>CDS</featset> -->
   <featset>CDS_translation</featset>
   <featset>ncRNA</featset>
   <featset>transposon</featset>
   <featset>gene_extended2000</featset>
   <featset>intergenic</featset>
-<!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
+
+  <featmap id="CDS_translation"
+    types="CDS gene"
+    typelabel="protein protein"
+    dotranslate="1"
+    fromdb="0"
+    />
+  <featmap id="gene"
+    types="gene"
+    />
+  <featmap id="chromosome"
+    types="${golden_path}"
+    fromdb="1"
+    onlydb="1"
+    />
+  <featmap id="transposon"
+    types="transposable_element"
+    typelabel="transposable_element"
+    />
+  <featmap name="ncRNA"
+    types="ncRNA snRNA snoRNA rRNA tRNA"
+    />
+  <featmap id="gene_extended2000"
+    types="gene"
+    typelabel="gene_ex2000"
+    subrange="-2000..2000"
+    />
+  <featmap id="intergenic"
+    types="gene"
+    typelabel="intergenic"
+    method="between"
+    />
 
   <!-- feature sets to make blast indices -->
   <blastset>chromosome</blastset>

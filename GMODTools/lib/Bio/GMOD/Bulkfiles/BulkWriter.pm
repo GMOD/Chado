@@ -91,7 +91,7 @@ sub _init_base
     }
     
   ## add these to %ENV before reading blastfiles.xml so ${vars} get replaced ..
-  my $sconfig= $self->handler()->{config};
+  my $sconfig= $self->handler_config;
   my @keys = qw( species org date title rel relfull relid release_url );
   @ENV{@keys} = @{%$sconfig}{@keys};
 
@@ -116,8 +116,12 @@ sub init
 }
 
 sub handler { return shift->{handler}; }  
-sub sequtil { return shift->{handler}; }  # old method; drop
-sub bulkfiles { return shift->{handler}; }   # old method; drop
+# sub sequtil { return shift->{handler}; }  # old method; drop
+# sub bulkfiles { return shift->{handler}; }   # old method; drop
+
+sub config { return shift->{config}; }
+sub handler_config { return shift->{handler}->{config}; }
+
 
 sub outputpath 
 {
@@ -170,7 +174,7 @@ sub initData
 {
   my($self)= @_;
   my $config = $self->{config};
-  my $sconfig= $self->handler()->{config};
+  my $sconfig= $self->handler_config();
   my $oroot= $sconfig->{rootpath};
   
   $self->{failonerror}= $sconfig->{failonerror}||0 unless defined $self->{failonerror};
@@ -215,7 +219,7 @@ sub promoteconfigs
     }
   
   my $fileinfo = $self->{fileinfo} || {};  
-  my $mainconf = $self->handler()->{config} || {}; 
+  my $mainconf = $self->handler_config() || {}; 
 
   # copy any release-specific additions/changes to config from mainconf
   foreach my $key ( @mykeys ) {
@@ -252,9 +256,6 @@ sub _mergevars {
   return $v;
 }  
 
-sub config { return shift->{config}; }
-#?? sub config { my $self = shift; return (@_) ? $self->{config}->{$_[0]} : $self->{config}; }
-
 =item getconfig(@keys)
 
   return config value(s) for key(s); 
@@ -271,7 +272,7 @@ sub getconfig {
   
   ## need option to choose among fileinfo, handler, default
   my $fileinfo = $self->{fileinfo} || {}; # 1st priority or drop???
-  my $mainconf = $self->handler()->{config} || {}; # 2nd priority; e.g. main release config
+  my $mainconf = $self->handler_config() || {}; # 2nd priority; e.g. main release config
   my $deconfig = $self->{config} || {}; # 3rd priority; default settings
 
   if (wantarray) {
@@ -365,6 +366,8 @@ sub makeall
     close($allfh);
     }
 }
+
+
 =item openInput( $fileset )
 
   handle input files

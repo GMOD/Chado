@@ -1,0 +1,65 @@
+=head1 NAME  
+
+gff2biomart.pl -- create tables for BioMart from genome GFF annotations
+
+=head1 EXAMPLE BioMart : DroSpeGe
+
+  BioMart : DroSpeGe  provides a tool for mining homologies and
+annotations  of [twelve] Drosophila species genomes.
+You can select genome regions with the available annotations, and
+exclude others, and download tables or sequences of the  selection
+set. For instance, select the regions with Mosquito gene homologs,
+but no D. melanogaster gene homologs. Or select regions  with
+gene predictions but no known homolog.
+  DroSpeGe's BioMart is built with the GMOD Tool gff2biomart.pl
+It converts most genome GFF annotations into a BioMart datamine.
+Example data sets from this tool are at
+  http://insects.eugenes.org/BioMart/martview
+
+=head1 OUTPUTS 
+
+  The script generates table .sql, .txt and .xml suited to BioMart 
+(MySQL, BioMart version 0.3 tested).  It is a simple script without
+special requirements, basically a data transformer that writes new
+files formatted for a BioMart database.  Components created
+
+1. chromosome region__main tables for biomart
+   with chromosomes broken into Kb bins/regions (5Kb default)
+   Features that overlap each region are tabulated.
+   
+2. per-feature feature__dm link tables
+    store feature attributes (id,dbxref,match stats,..)
+    add __main column feature_bool to indicate
+    where features lie.
+
+3. __chromosome__dm    
+  with dna residues for fasta output 
+
+4. main_biomart.xml and sequence_biomart.xml
+   configurations for biomart usage.
+   
+
+=head1 IN BIOMART
+
+-- filter (include,exclude) features that exist in regions,
+including joint filters (has homology to human
+but not to fly or worm genes; has predicted gene but 
+not homology; any such feature type comparison).
+
+-- output 4 kinds of attributes: a feature table, per-feature
+sequence, region table, per-region sequence.
+  
+Please have installed and used BioMart before trying
+to load the outputs of this.
+
+=head1 VERSION
+
+This is a alpha-level, not yet fully tested.  
+
+=head1 WHERE
+
+This will be part of a GMODTools release. Find the pre-release
+script at http://eugenes.org/gmod/GMODTools/
+
+
+=cut

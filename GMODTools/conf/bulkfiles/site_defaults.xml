@@ -46,11 +46,34 @@
   change above db settings.
   </about>
   
+  <doc id="Release.txt"><![CDATA[
+  Bulk output for Chado genome databases
+  Database: ${title}
+  Species:  ${species}
+  Release:  ${release_id}, dated ${release_date} as ${relfull}
+  
+  See release notes at <a href="${release_url}"> ${release_url}</a>
+  ]]></doc>
+  
+  <about id="doc">
+    doc tags are generally printed to files
+    id= name, file name unless path given
+    path= path to output file.
+    A few common tags can be used as inserted ${variables}
+  </about>
+
+  <relfull>${org}_${release_date}</relfull> <!-- or ${org}_release${release_id} -->
+  <release_url>/genome/${species}/release${release_id}.html</release_url>
+
+  <newuser>1</newuser>
+  <about id="newuser">
+    This flag turns on extra help and checks.  Set 0 if you are tired
+    of seeing them, or the time they take.
+  </about>
   
   <include>organisms</include>
   <about id="organisms" >
-  list of species and their abbreviations. Include your
-  species .
+  List of species and their abbreviations. Include your species.
   </about>
   
   <!-- how to make bulk files -->

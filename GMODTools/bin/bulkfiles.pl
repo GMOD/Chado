@@ -170,6 +170,7 @@ use Getopt::Long;
 my ($dnadump,$featdump,$makeout,$failonerror,$debug,$verbose,$showconfig)
   = (0) x 10;
 my $splitfeat=-1;  
+my $no_csomesplit=0;
 my $automake=1;  # make this easier for general user
 my $config= undef;   
 my @formats= ();
@@ -196,7 +197,10 @@ my $ok= Getopt::Long::GetOptions(
 'showconfig!' => \$showconfig,
 );
 
-if ($splitfeat == -1) { $splitfeat= $featdump; }
+# 0710 update: change nosplitfeat to mean same as new no_csomesplit flag
+#  meaning no per golden_path files (e.g. for genomes with 1000s - 100,000s of scaffolds)
+if($splitfeat == 0) { $no_csomesplit=1; }
+elsif ($splitfeat == -1) { $splitfeat= $featdump; }
 
 @chr = split(/,/,join(',',@chr));
 @formats = split(/,/,join(',',@formats));
@@ -245,6 +249,7 @@ my $sequtil= Bio::GMOD::Bulkfiles->new( configfile => $config,
   failonerror => $failonerror,
   verbose => $verbose,
   automake => $automake,
+  no_csomesplit => $no_csomesplit,
   );
 
 # automake will do these now if need be.

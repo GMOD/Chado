@@ -1,0 +1,346 @@
+<opt
+  name="chadogenepagesql" 
+  date="20060723"
+  >
+
+  <title>Chado GenePage SQL</title>
+  
+  <ENV_default
+    seq_ontology="Sequence Ontology Feature Annotation"
+    golden_path="'chromosome', 'chromosome_arm', 'ultra_scaffold'"
+    featureprops="'Note','cyto_range','gbunit'"
+    species="Unknown_species"
+    unknown_chr="U"
+    analysis_where_clause=""
+    est_where_clause=""
+  />
+
+
+  <about>
+    This is GMOD Chado SQL for gene-page output tables; i.e.,
+    all the fields relevant to a gene feature needed to create useful
+    gene page web and xml reports.  May need several variants
+    (brief, full, tuned to each project's use of chado tables to
+    store data relevant to individual genes.  
+    
+    Also want other main non-gene feature output SQL (e.g. transposons)
+    
+    See  GMODTools/conf/bulkfiles/chadofeatsql.xml
+    Use with GMOD genepages. Should be part of chadofeatsql.sql or not?  
+    
+  </about>
+  
+  
+  
+  <feature_sql id="v_genepage1" type="view">
+
+-- add dbxrefprop output of all dbxref  (type_id, value, rank?)
+-- add all *prop outputs ? (have featureprop)
+-- analysisprop.sql                   feature_cvtermprop.sql             featureprop.sql
+-- cvtermprop.sql                     feature_relationshipprop.sql       featureprop_pub.sql
+-- dbxrefprop.sql                     feature_relationshipprop_pub.sql   organismprop.sql
+<!--
+select v.*
+from feature f join v_genepage1 as v using(feature_id)
+where f.organism_id = 10 and f.type_id = 778 
+order by f.feature_id,v.field
+
+// how do we get overlapped analysisfeats included with main feat?
+select f.name, feature_overlaps(f.feature_id)
+from feature f
+where  f.feature_id = 146;
+ SWE1 | (146,,10,SWE1,SWE1,,,,778,f,f,"2007-03-22 00:07:50.978518","2007-03-22 00:07:50.978518")
+ SWE1 | (147,,10,SWE1.t01,SWE1.t01,,,,308,f,f,"2007-03-22 00:07:50.978518","2007-03-22 00:07:50.978518")
+ SWE1 | (149,,10,exon-auto149,auto149,,,,221,f,f,"2007-03-22 00:07:50.978518","2007-03-22 00:07:50.978518")
+
+-->
+
+  <sql><![CDATA[
+CREATE OR REPLACE VIEW v_genepage1 
+  (feature_id, field, value)
+AS
+    SELECT feature_id AS feature_id, 'Name' as field, name as value FROM feature
+  UNION ALL
+    SELECT feature_id AS feature_id, 'uniquename' as field, uniquename as value FROM feature 
+  UNION ALL
+    SELECT feature_id AS feature_id, 'seqlen' as field, text('seqlen') as value FROM feature  
+  UNION ALL
+    SELECT f.feature_id AS feature_id, 'type' as field, c.name as value 
+  FROM feature f, cvterm c  WHERE f.type_id = c.cvterm_id 
+UNION ALL
+    SELECT f.feature_id AS feature_id, 'organism' as field, o.abbreviation as value  
+  FROM feature f, organism o WHERE  f.organism_id = o.organism_id 
+  
+  UNION ALL
+    SELECT fs.feature_id AS feature_id,  
+      CASE WHEN fs.is_current IS FALSE THEN 'Synonym_2nd' ELSE 'Synonym' END AS field,
+    s.name as value 
+  FROM  feature_synonym fs, synonym s 
+  WHERE fs.synonym_id = s.synonym_id  
+  
+  UNION ALL
+    SELECT f.feature_id AS feature_id, 'Dbxref' as field, gd.name||':'||gx.accession as value
+  FROM   feature f, db gd, dbxref gx
+  WHERE  f.dbxref_id = gx.dbxref_id and gx.db_id = gd.db_id  
+  
+  UNION ALL
+    SELECT fs.feature_id AS feature_id,  
+      CASE WHEN fs.is_current IS FALSE THEN 'Dbxref obsolete' ELSE 'Dbxref 2' END AS field, 
+      (d.name || ':' || s.accession)::text AS value
+    FROM  feature_dbxref fs, dbxref s, db d
+    WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+  
+  UNION ALL
+    SELECT fc.feature_id AS feature_id, c.name AS field, 
+          substr(cv.name,1,40) || '; '|| dx.accession AS value
+  FROM  feature_cvterm fc, cvterm cv, cv c, dbxref dx
+  WHERE fc.cvterm_id = cv.cvterm_id and cv.cv_id = c.cv_id  
+     and cv.dbxref_id = dx.dbxref_id
+  
+  UNION ALL
+    SELECT fp.feature_id AS feature_id, cv.name AS field, fp.value AS value
+    FROM  featureprop fp, cvterm cv
+    WHERE fp.type_id = cv.cvterm_id  
+  
+  UNION ALL
+    SELECT fl.feature_id AS feature_id, 'location' as field, 
+        chr.uniquename ||':'|| cast( fl.fmin+1 as text) ||'..'|| cast( fl.fmax as text)
+        || CASE 
+          WHEN fl.strand IS NULL THEN ' '
+          WHEN fl.strand < 0 THEN ' [-]'
+          ELSE ' [+]'
+          END AS value
+    FROM   featureloc fl, feature chr
+    WHERE  fl.srcfeature_id = chr.feature_id 
+  
+  -- here if we select on main features (genes) need added join thru  location OVERLAP *
+  UNION ALL
+    SELECT af.feature_id AS feature_id,   
+     'an:' ||  
+     CASE 
+        WHEN a.name IS NOT NULL THEN a.name
+        WHEN a.sourcename IS NOT NULL THEN (a.program || '.' || a.sourcename)::text
+        ELSE a.program
+      END  AS field,
+      CASE  
+        WHEN af.rawscore IS NOT NULL THEN cast(af.rawscore as text)
+        WHEN af.normscore  IS NOT NULL  THEN cast(af.normscore  as text)
+        WHEN af.significance  IS NOT NULL THEN cast(af.significance as text)
+        ELSE cast(af.identity  as text)
+      END  AS value 
+    FROM   analysisfeature af, analysis a
+    WHERE  af.analysis_id = a.analysis_id 
+
+;
+GRANT SELECT ON v_genepage1 TO PUBLIC;
+
+  
+  ]]></sql>
+  </feature_sql>
+
+
+  <feature_sql id="v_analysis_cogs" type="view">
+  <sql><![CDATA[
+  -- special case analysis views
+  -- replace these special analysis cases with general analysisfeature dump !??
+CREATE OR REPLACE VIEW v_analysis_cogs
+    (feature_id, field, value)
+  AS
+  SELECT af.feature_id, 'COG' as field, ('euCOG:'||af.normscore) as value
+  FROM   analysisfeature af, analysis a
+  WHERE  af.analysis_id = a.analysis_id and a.program = 'orthomcl' 
+  
+UNION ALL
+  SELECT af.feature_id, ('euCOG:'||af.normscore) as field, 
+         ((select name from db where db_id = (select db_id from dbxref where dbxref_id = fo.dbxref_id))
+           ||':'||fo.uniquename) 
+         as value
+  FROM   analysisfeature af, analysisfeature afo, feature fo, analysis a
+  WHERE  af.analysis_id = a.analysis_id and a.program = 'orthomcl' 
+         and afo.normscore = af.normscore and afo.analysis_id = a.analysis_id
+         and fo.feature_id = afo.feature_id and fo.feature_id <> af.feature_id
+
+UNION ALL
+  SELECT fd.feature_id, 'COG' AS field, (gd.name||':'||gx.accession) as value
+  FROM   feature_dbxref fd, db gd, dbxref gx
+  WHERE  fd.dbxref_id = gx.dbxref_id and gx.db_id = gd.db_id  -- fd.feature_id = t.id 
+         and gd.name = 'IPC'
+         
+UNION ALL
+  SELECT fd.feature_id, (gd.name||':'||gx.accession) AS field,  
+         ((select name from db where db_id = (select db_id from dbxref where dbxref_id = fo.dbxref_id))
+           ||':'||fo.uniquename) 
+         as value
+  FROM   feature_dbxref fd, feature_dbxref fdo, feature fo, db gd, dbxref gx
+  WHERE  fd.dbxref_id = gx.dbxref_id and gx.db_id = gd.db_id  -- fd.feature_id = t.id
+         and gd.name = 'IPC'
+         and fdo.dbxref_id = gx.dbxref_id 
+         and fdo.feature_id = fo.feature_id and fdo.feature_id <> fd.feature_id  
+
+UNION ALL
+  SELECT fd.feature_id, 
+    CASE WHEN fd.is_current IS FALSE THEN 'dbxref_2nd' ELSE 'dbxref' END AS field, 
+    (gd.name||':'||gx.accession) as value
+  FROM   feature_dbxref fd, db gd, dbxref gx
+  WHERE  fd.dbxref_id = gx.dbxref_id and gx.db_id = gd.db_id  -- fd.feature_id = t.id
+         and gd.name <> 'IPC'
+
+;
+GRANT SELECT ON v_analysis_cogs TO PUBLIC;
+
+
+  ]]></sql>
+  </feature_sql>
+
+
+  <feature_sql id="otherviews" type="view">
+  <sql><![CDATA[
+-- attr view for regular features which may have parent features (exons)
+CREATE OR REPLACE VIEW gffattr_gmodel (
+    feature_id, type, attribute
+) AS
+  SELECT feature_id,  
+    CASE WHEN fs.is_current IS FALSE THEN 'dbxref_2nd' ELSE 'dbxref' END AS type, 
+    d.name || ':' || s.accession AS attribute
+  FROM dbxref s, feature_dbxref fs, db d
+  WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+
+UNION ALL
+  SELECT feature_id, cv.name AS type, fp.value AS attribute
+  FROM featureprop fp, cvterm cv
+  WHERE fp.type_id = cv.cvterm_id
+    and (cv.name in ( ${featureprops} ))
+    -- keep this restriction - other props not useful here: comments, sp_comment, owner ...
+    -- mar05: add 'putative_ortholog_of' cv for dpse/..; this is in feature_relationship
+
+UNION ALL
+  SELECT feature_id,
+    CASE WHEN fs.is_current IS FALSE THEN 'synonym_2nd' ELSE 'synonym' END AS type, 
+    s.synonym_sgml AS attribute
+  FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id and fs.is_internal IS FALSE
+
+UNION ALL
+  -- add parent feat ids for exons, etc.
+  -- putative_ortholog_of=dmel/gene:CG31648
+  SELECT pk.subject_id AS feature_id, cv.name AS type, 
+    'FlyBase:' || fo.uniquename  AS attribute
+  FROM feature_relationship pk, feature fo, cvterm cv
+  WHERE 
+    cv.name = 'putative_ortholog_of' and pk.type_id = cv.cvterm_id 
+    and pk.object_id = fo.feature_id
+    
+UNION ALL
+  -- add parent feat ids for exons, etc.
+  SELECT pk.subject_id AS feature_id, 'parent_oid' AS type, 
+    CASE  
+      WHEN pk.rank IS NULL THEN text(pk.object_id)
+      ELSE pk.object_id || ':' || pk.rank
+    END 
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffattr_gmodel TO PUBLIC;
+
+
+-- seqlen/featloc-length view
+-- CREATE OR REPLACE VIEW feature_length ( feature_id, flength ) AS
+--   SELECT feature_id,  
+--     CASE WHEN seqlen IS NULL THEN (fl.fmax - fl.fmin) ELSE  fs.seqlen END AS flength, 
+--   FROM featureloc fl
+--   WHERE fl.feature_id = feature_id 
+-- ;
+
+-- attr view for match features
+CREATE OR REPLACE VIEW gffattr_match (
+    feature_id,  type,  attribute
+) AS
+  SELECT feature_id,  
+    CASE WHEN fs.is_current IS FALSE THEN 'dbxref_2nd' ELSE 'dbxref' END AS type, 
+    d.name || ':' || s.accession AS attribute
+  FROM dbxref s, feature_dbxref fs, db d
+  WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
+
+UNION ALL
+  SELECT feature_id, cv.name AS type, fp.value AS attribute
+  FROM featureprop fp, cvterm cv
+  WHERE fp.type_id = cv.cvterm_id
+    and (cv.name in ( ${featureprops} )) 
+
+UNION ALL
+  SELECT feature_id,
+    CASE WHEN fs.is_current IS FALSE THEN 'synonym_2nd' ELSE 'synonym' END AS type, 
+    s.synonym_sgml AS attribute
+  FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id and fs.is_internal IS FALSE
+;
+GRANT SELECT ON gffattr_match TO PUBLIC;
+
+-- attrib view for cross-species feats (syntenic_region, orthology)
+CREATE OR REPLACE VIEW gffattr_synteny (
+    feature_id, type,  attribute
+) AS
+  --  parent feat ids for source supercontigs, etc.
+  SELECT pk.subject_id, text('parent_oid') as type, 
+    CASE  
+      WHEN pk.rank IS NULL THEN text(pk.object_id)
+      ELSE pk.object_id || ':' || pk.rank
+    END 
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffattr_synteny TO PUBLIC;
+
+-- use this one instead of above
+CREATE OR REPLACE VIEW gffattr_synt2 (
+    feature_id,  type,  attribute
+) AS
+  SELECT feature_id, text('to_species') AS type, text(targ.organism_id) AS attribute
+  FROM feature targ
+
+-- see above orthofix.pl: add case when this select is missing, use ortho featloc
+-- to find equal gene feature and putative_ortholog_of 
+UNION ALL
+  SELECT feature_id, text('to_name') AS type, 
+    CASE WHEN targ.uniquename = targ.name THEN targ.name 
+    ELSE targ.name || ',' || targ.uniquename 
+    END AS attribute 
+  FROM feature targ
+  WHERE NOT( targ.type_id IN (
+    select cvterm_id from cvterm 
+    where name in ( ${golden_path} )   
+    ) )
+;
+GRANT SELECT ON gffattr_synt2 TO PUBLIC;
+
+
+-- for analysis features
+-- problem where w/ some analysis features - promotor, transposon
+-- ? need to restrict armcv to cv_id = SO id - e.g. find chromosome in 4 cv's
+CREATE OR REPLACE VIEW gffatts_anfloc (
+    feature_id, arm, fmin, fmax, strand, organism_id
+  ) AS
+  SELECT 
+    armloc.feature_id,  
+    armft.uniquename as arm,
+    armloc.fmin, armloc.fmax, armloc.strand, armft.organism_id
+  FROM  feature armft, featureloc armloc, cvterm armcv, cv socv
+  WHERE 
+    armft.type_id = armcv.cvterm_id
+    and armcv.name in ( ${golden_path} ) 
+    and armcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
+    and armft.feature_id = armloc.srcfeature_id
+;
+GRANT SELECT ON gffatts_anfloc TO PUBLIC;
+
+-- for analysis features
+CREATE OR REPLACE VIEW gffatts_evid (
+    feature_id, type, attribute
+) AS
+  SELECT pk.subject_id, text('parent_oid'), text(pk.object_id)
+  FROM feature_relationship pk
+;
+GRANT SELECT ON gffatts_evid TO PUBLIC;
+
+  ]]></sql>
+  </feature_sql>
+  
+</opt>
