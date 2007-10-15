@@ -168,7 +168,9 @@ sub openInput
     my ($featn,$format)= split /[\/]/, $type;
     next if( @featset && ! grep({$_ eq $featn} @featset) );
     
-    my $ok= ( $type =~ /$intype/ && -e $fp) ;
+    my $ok= ( $type =~ /$intype/ && -s $fp) ;  # -e $fp
+    ## need -s $fp here : files must have data (should delete 0 fasta)
+    
     print STDERR "openInput: name=$name $featn, type=$type, ok=$ok\n" if $DEBUG;
     next unless $ok;  
     push(@files, $fp); # return full $fs struct w/ $featn ?
@@ -300,7 +302,8 @@ sub getDbInfo
     $db= { name => $blname, title => $tt, content => "", };  
     }
 
-  my $ftime= $^T - 24*60*60*(-M $blastfile);
+  my $ftime= -M $blastfile || 0;
+  $ftime= $^T - 24*60*60*$ftime;
   $db->{date}= POSIX::strftime("%d-%b-%Y", localtime( $ftime ));
 
   $db->{blname}= $blname;

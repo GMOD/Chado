@@ -438,6 +438,7 @@ sub readConfig
   $confhash = {} unless(ref $confhash);
 
   $DEBUG= delete $opts->{debug} if (defined $opts->{debug});
+  my $replacekeys= delete $opts->{replace} || 0;
   
   ##print STDERR "Config2::readConfig in=$file\n" if $DEBUG;
   
@@ -446,7 +447,7 @@ sub readConfig
     }  
 
   my $conf1 = $self->readConfigFile($file, $opts, 0);
-  $self->appendHash($confhash, $conf1, 0) if ($conf1);
+  $self->appendHash($confhash, $conf1, $replacekeys) if ($conf1);
      
   ## $self->{filename}= $file;
   
@@ -466,7 +467,7 @@ sub readConfig
       if ($conf1) {
         my $inc1= delete $$conf1{include};
         if($inc1) { push(@inc, (ref($inc1) =~ /ARRAY/) ? @$inc1 : ($inc1)); }
-        $self->appendHash($confhash, $conf1, 0);
+        $self->appendHash($confhash, $conf1, $replacekeys);
         }
       $saveConfigOk=0 unless($readConfigOk);
       }
@@ -474,6 +475,47 @@ sub readConfig
     }
     
   return $confhash;
+}
+
+
+sub updateVariables
+{
+  my $self = shift;
+  my( $confhash, $opts)= @_;
+  $DEBUG= delete $opts->{debug} if (defined $opts->{debug});
+  $confhash = $self->{'conf'} unless(ref $confhash); # always exists ?
+  $confhash = {} unless(ref $confhash);
+  my $env= (ref $opts and ref $opts->{Variables}) ? $opts->{Variables} : $Variables;
+  _update1Value( $confhash, $env);
+  return $confhash;
+}
+
+
+sub _update1Value
+{
+  my($val,$env)= @_;
+
+  if( ref($val) eq 'HASH') {  
+    foreach my $tag (sort keys %$val) { 
+      $$val{$tag} = _update1Value( $$val{$tag}, $env);
+      }
+    
+  } elsif( ref($val) eq 'ARRAY') {
+     foreach (@$val){  $_= _update1Value( $_, $env); }
+     
+  } else {
+    while ( $val =~ m/\$\{(\w+)\}/g) {
+      my $var=$1;
+      my $enval= $env->{$var}; #only if defined, leave otherwise
+      if (defined $enval) { 
+        if($enval =~ m/\$\{(\w+)\}/) { $enval= _update1Value( $enval, $env); }
+        print STDERR "UPVAL1: \$\{$var\} => $enval\n" if $DEBUG;
+        $val =~ s/\$\{$var\}/$enval/;
+        } 
+    }
+  }
+  
+  return $val;
 }
 
 

@@ -20,12 +20,11 @@ use base qw(Bio::Seq::LargePrimarySeq);
 
 sub new {
   my ($class, %params) = @_;
-  my $dnafile = $params{'-file'} ;
-  if( $dnafile ) { delete $params{'-file'};  }
+  my $dnafile = delete $params{'-file'} ;
   my $self = $class->SUPER::new(%params);
   $self->dnafile($dnafile);
   if( $dnafile && -e $dnafile ) {  
-    ## $self->_filename($dnafile); # don't change to our name in case stupid wants to unlink it   
+    ## $self->_filename($dnafile); # don't change to our name in case StUPER wants to unlink it   
     my $fh= new FileHandle($dnafile);
     $fh->seek(0,2);
     my $flen= $fh->tell();

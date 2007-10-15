@@ -278,8 +278,7 @@ sub writeTargetDocs
 	my $self= shift;
   my( $targetid, $filesetinfo, $csomefeats )= @_; 
   
-  my $configfile= $filesetinfo->{config};
-
+  my $configfile= $filesetinfo->{config} || "";
   warn "TableWriter: target=$targetid, config=$configfile\n" if $DEBUG;
   return unless($configfile);
   
