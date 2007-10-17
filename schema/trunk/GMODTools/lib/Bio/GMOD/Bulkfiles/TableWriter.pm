@@ -113,6 +113,9 @@ sub makeFiles
   ## may want to use this: 
   ##   my $seqsql = handler()->getSeqSql($fdump->{config},$fdump->{ENV});
 
+  # 0710: no_csomesplit : no perchr files, only makeall
+  my $no_csomesplit= $self->handler_config->{no_csomesplit} || 0; # FIXME: 0710
+
   print STDERR "TableWriter::makeFiles\n" if $DEBUG; # debug
   my $fileset = $args{infiles};
   my $chromosomes = $args{chromosomes}; #??
@@ -129,10 +132,17 @@ sub makeFiles
   #js needs: var csomes= ["X","2L","2R","3L","3R","4"];
   my $chrlist="";
   $chromosomes= $self->handler->getChromosomes(); # want all, not subset ??
-  foreach my $chr (@$chromosomes) { $chrlist .= "'$chr', "; }
+  if($no_csomesplit) {
+    $chrlist= "'sum', "; #?? only this, or none?
+  } else {
+    foreach my $chr (@$chromosomes) { $chrlist .= "'$chr', "; }
+  }
   $ENV{'chromosomes'}= $chrlist;
  
+ 
+  ## FIXME: need option here or elsewhere for other input, e.g. SQL query, GFF, ...
   $self->readFFF($fileset); # collate feature info
+  
   
   ## chromosome_summary ; do this before in Bulkfiles with others?
   ## this file is named in chadosql entry - fixme
@@ -160,9 +170,6 @@ sub makeFiles
     if($targets{$trg}) {
       my $fset= $self->handler->getFilesetInfo($trg);
       unless($fset) { warn "TableWriter: No handler for target=$trg\n"; next; }
-      # $fset->{path};
-      # $fset->{config}; << look for docs to write
-      # $fset->{handler}; << see handler()->getWriter($fset->{handler})
       $self->writeTargetDocs($trg,$fset);
       }
     }
@@ -227,8 +234,8 @@ sub table2html {
       }
   }
 
-
 }
+
 
 sub readFFF
 {
@@ -283,7 +290,8 @@ sub writeTargetDocs
   return unless($configfile);
   
   my $tconfig= $self->handler->callReadConfig( $configfile); 
-
+  
+  ## should have 
   ## need some fix to writeDocs for doc->path at top level or not-releasedir
   my $docs  = $tconfig->{doc};
   $self->handler()->writeDocs( $docs ) if ($docs);
@@ -338,11 +346,8 @@ sub featureSummary
   if ( $sumfile && $csomefeats ) {
     my $fh= new FileHandle(">$sumfile");
     my $title = $self->config->{title};
-    my $date  = $self->{reldate}; 
-    # $date= $self->handler()->config->{relfull} || $self->handler()->{date};
-    # $date= $ENV{date} || $self->handler()->{date};
+    my $date  = $self->{reldate}; # || $self->handler()->{date};
 
-    ##my $org   = $self->{config}->{species} || $self->{config}->{org};
     my $org= $self->{org} || $self->handler()->{config}->{org};
     print $fh "# Genome feature summary of $org from $title [$date]\n";
     my @fl= grep { 'all' ne $_ } sort keys %$csomefeats;
@@ -439,38 +444,6 @@ sub makeGbrowseConf
 }
 
 
-# =item openInput( $fileset )
-# 
-#   handle input files
-#   
-# =cut
-# 
-# sub openInput
-# {
-# 	my $self= shift;
-#   my( $fileset )= @_; # do per-csome/name
-#   my @files= ();
-#   my $inh= undef;
-#   return undef unless(ref $fileset);
-# 
-#   my $intype = $self->config->{informat} || 'fff'; #? maybe array
-#   my $featset= $self->config->{featset} || [];
-#     
-#   print STDERR "openInput: type=$intype \n" if $DEBUG; 
-#   
-#   foreach my $fs (@$fileset) {
-#     my $fp= $fs->{path};
-#     my $name= $fs->{name};
-#     my $type= $fs->{type}; # want also/instead featset type here ? gene,mrna,cds,...
-#     next unless( $fs->{type} =~ /$intype/); # could it be 'dna/fasta', 'amino/fasta' ?
-#     unless(-e $fp) { warn "missing intype file $fp"; next; }
-# 
-#     push(@files, $fp);
-#     }
-#     
-#   return @files;  
-# }
-
 
 
 =item processToOutput
@@ -485,8 +458,6 @@ sub processToOutput
   
 
 }
-
-
 
 
 

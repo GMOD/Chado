@@ -45,16 +45,23 @@
     for a range of Chado databases.
   ]]></about>
 
-  
+
+
+
   <ENV_default
     seq_ontology="sequence"
     seq_ontology_old="Sequence Ontology Feature Annotation"
     golden_path="'chromosome', 'chromosome_arm', 'ultra_scaffold', 'supercontig'"
     species="Unknown_species"
+    org="unk"
     featureprops="'Note','cyto_range','gbunit'"
     unknown_chr="U"
     analysis_where_clause=""
     est_where_clause=""
+    release_id="0"
+    release_date="0"
+    GFF_source="MOD" 
+    taxon="0"
   />
   <about id="ENV_default"><![CDATA[
 
@@ -120,42 +127,23 @@
   ;
   ]]></sql>  
 
-  <!-- // drop, headers added from sql
-  <script name="anasum" type="postprocess" shell="perl -ni" language="perl">
-  <![CDATA[
-  unless($header++){ print join("\t",
-   qw(Analysis_id Analysis_type N_features Ave_score Ave_sig Species)),"\n"; } 
-  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
-  print join("\t",@v),"\n";
-  ]]></script>
-  -->
   </feature_sql>
 
   <feature_sql id="property_summary" type="summary" output="properties-overview.txt">
   <sql><![CDATA[
   SELECT 
     fp.type_id,
-    t.name as Property_type,
+    (select name from cvterm where cvterm_id = fp.type_id) as Property_type,
     count(fp.featureprop_id) as N_properties,
     count(distinct f.feature_id) as N_features,
     count(distinct fp.value) as N_values,
     (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
-  FROM feature f, featureprop fp, cvterm t
-  WHERE fp.type_id = t.cvterm_id and fp.feature_id = f.feature_id
-  GROUP BY f.organism_id, fp.type_id, t.name
+  FROM feature f join featureprop fp on (fp.feature_id = f.feature_id)
+  GROUP BY f.organism_id, fp.type_id
   ORDER BY Species, Property_type
   ;
   ]]></sql>  
 
-  <!-- // drop, headers from sql now
-  <script name="propsum" type="postprocess" shell="perl -ni" language="perl">
-  <![CDATA[
-  unless($header++){ print join("\t",
-   qw(Type_id Property_type N_properties N_features N_values Species)),"\n"; } 
-  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
-  print join("\t",@v),"\n";
-  ]]></script>
-  -->
   </feature_sql>
 
 
@@ -163,7 +151,7 @@
   <sql><![CDATA[
   SELECT 
     f.type_id,
-    t.name as Feature_type,
+    (select name from cvterm where cvterm_id = f.type_id) as Feature_type,
     count(f.feature_id) as N_features,
     sum(length(f.residues)) as N_residues,
     sum(f.seqlen) as Tot_len,
@@ -171,42 +159,31 @@
     MIN(f.seqlen) as Min_len,
     MAX(f.seqlen) as Max_len,
     (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
-  FROM feature f, cvterm t
-  WHERE f.type_id = t.cvterm_id
-  GROUP BY f.organism_id, f.type_id, t.name
-  ORDER BY species, feature_type
+  FROM feature f  
+  GROUP BY f.organism_id, f.type_id 
+  ORDER BY Species, Feature_type
   ;
   ]]></sql>  
 
-  <!-- // drop, headers from sql now
-  <script name="featsum" type="postprocess" shell="perl -ni" language="perl">
-  <![CDATA[
-  unless($header++){ print join("\t",
-   qw(Type_id Feature_type N_features N_residues Tot_len Ave_len Min_len Max_len Species)),"\n"; } 
-  @v=split"\t"; foreach (@v) { $_="\\N" unless(/\S/); } chomp($v[-1]);
-  print join("\t",@v),"\n";
-  ]]></script>
-  -->
   </feature_sql>
 
 
   <feature_sql id="chromosome_summary" type="NOTYET_summary" output="chromosomes-overview.txt">
   <about>
   This chromosome_summary needs more testing: 
-  works well enough on some dbs, but hung up on a largish one
+  works well enough on some dbs, but hung up on a largish one.
+  Moved cvterm.name from where clause to subselect after reducing features.. 5x cut in grouping cost 
   </about>
   <sql>
-    SELECT DISTINCT
+    SELECT  
       f.type_id as Type_id,  
-      t.name as Golden_path_type, 
+      (select name from cvterm where cvterm_id = f.type_id) as Golden_path_type,
       count(DISTINCT f.feature_id) as N_features, 
       sum(f.seqlen) as Tot_len, 
       sum(length(f.residues)) as N_residues,
       (select genus || '_' || species from organism where organism_id = f.organism_id) as Species
-    FROM  cvterm t, 
-          feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
-    WHERE f.type_id = t.cvterm_id 
-    GROUP BY  f.organism_id, f.type_id, t.name
+    FROM  feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
+    GROUP BY  f.organism_id, f.type_id
     ORDER BY Species, Golden_path_type
     ;
   </sql>
@@ -266,14 +243,79 @@ in database tables cv, cvterm and feature. Please check your configuration.
   ]]></sql>
 
   <sql_inspect><![CDATA[
-    SELECT DISTINCT
-      t.name as golden_path_type, f.type_id,  
+    SELECT
+      f.type_id,  
+      (select name from cvterm where cvterm_id = f.type_id) as golden_path_type,
       count(DISTINCT f.feature_id) as N_features, 
       sum(f.seqlen) as Tot_len, sum(length(f.residues)) as N_residues
-    FROM  cvterm t, feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
-    WHERE f.type_id = t.cvterm_id 
-    GROUP BY  f.type_id, t.name ;
+    FROM  feature f join featureloc fl on (fl.srcfeature_id = f.feature_id)
+    GROUP BY f.type_id
+    ;
   ]]></sql_inspect>
+  </feature_sql>
+
+
+
+  <feature_sql id="go_association" type="list" 
+               output="gene_association.${GFF_source}_${org}.txt">
+  <about>
+  0710: preliminary to produce gene ontology association tables
+  .. need variables for GO CV tables // ok: see awkward sql below
+  .. need taxon code in organism.table and/or main config
+  .. want filename with ${GFF_source}_${org} suffix ?
+  .. add header for GO submission ..
+  </about>
+
+  <script name="goa_header" type="postprocess" shell="perl -pi" language="perl">
+  <![CDATA[
+unless($header++){ print "
+!Version:  ${release_id}
+!Organism: ${species}
+!date: ${release_date}
+!From: ${GFF_source}
+";}
+  ]]></script>
+
+  <sql><![CDATA[
+ SELECT
+    '${GFF_source}' as DB,
+    f.uniquename as ID, 
+    f.name as Symbol, -- from synonyms table instead?
+    '' as Qualifier,
+    'GO:'||(select accession from dbxref where dbxref_id = c.dbxref_id) as GO_ID,
+      -- sometimes chado dbxref has 'GO:' prefix, sometimes not. GO spec says 'GO:' is part
+      -- of accession and *should* be stored as dbxref.accession
+    '${GFF_source}:'||pubx.uniquename as Reference,
+    'IEA' as EV_code, -- fixme, where in chado? 
+    '' as With, 
+    CASE   WHEN c.cv_id = (select cv_id from cv where name ilike '%biological%process%')
+           THEN 'P'
+           WHEN c.cv_id = (select cv_id from cv where name ilike '%molecular%function%')
+           THEN 'F'
+           WHEN c.cv_id = (select cv_id from cv where name ilike '%cellular%component%')
+           THEN 'C'
+           ELSE 'X'
+    END as Aspect,
+    '' as Name, -- fixme
+    '' as Synonyms, -- fixme
+    (select name from cvterm where cvterm_id = f.type_id) as Type,
+    'taxon:${taxon}' as Taxon,  
+    replace(substr(f.timelastmodified,1,10),'-','') as Date,  
+    '${GFF_source}' as Assigned
+    
+  FROM cv socv, feature_cvterm fc 
+    join cvterm c on (c.cvterm_id = fc.cvterm_id)
+    join feature f on (f.feature_id = fc.feature_id)
+    join pub pubx on (pubx.pub_id = fc.pub_id)  
+  WHERE 
+  (    c.cv_id = (select cv_id from cv where name ilike '%biological%process%')
+    or c.cv_id = (select cv_id from cv where name ilike '%molecular%function%')
+    or c.cv_id = (select cv_id from cv where name ilike '%cellular%component%')
+  ) and  f.type_id = (select cvterm_id from cvterm where name = 'gene' 
+          and cv_id = socv.cv_id and socv.name = '${seq_ontology}')
+    -- limit it to gene features
+  ;
+  ]]></sql>
   </feature_sql>
 
 
@@ -289,10 +331,11 @@ in database tables cv, cvterm and feature. Please check your configuration.
   <feature_sql id="fbid_table" type="SKIP" output="fbid_table.txt">
   <sql>;</sql>
   
-  <script name="idtab" input="-" type="postprocess"  language="perl"
+  <script name="fbidtab" input="-" type="postprocess"  language="perl"
     shell="cat fff/*.fff |  egrep '\b(gene|transposable_element)\b' | grep '\bFB' | perl " notshell="perl ">
 <![CDATA[
-# idtab2.pl ; cat fff/*.fff | egrep '\b(gene|transposable_element)\b' | grep '\bFB' | perl -n idtab.pl | sort > id_table.txt
+# fbidtab.pl
+# use: cat fff/*.fff | egrep '\b(gene|transposable_element)\b' | grep '\bFB' | perl -n fbidtab.pl | sort > fbid_table.txt
   BEGIN{
   print qq{#   Database ID table for primary gene model features
 #  gene,ncRNA,pseudogene,rRNA,snRNA,snoRNA,tRNA,transposable_element,
@@ -586,8 +629,7 @@ sub mapunk {
   <feature_sql id="features" type="feature_table" output="features.tsv">
   <sql><![CDATA[
 -- standard features (excluding matches, analyses)
-SELECT  distinct
-  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
+SELECT DISTINCT
   armft.uniquename as arm,
   armloc.fmin, armloc.fmax, armloc.strand,
   armft.organism_id,
@@ -611,7 +653,9 @@ WHERE
   and targft.feature_id = armloc.feature_id  
   
 -- dont need ORDER clause? but see below
-ORDER BY arm, armloc.fmin --, targcv.name
+-- 0710: memory error here w/ one chado: parameciumdb, including simple psql -f sql call
+--       drop this order-by and do with perl?
+-- ORDER BY arm, armloc.fmin  
 ;
 
   ]]></sql>
@@ -720,7 +764,7 @@ ORDER BY arm, armloc.fmin --, matchcv.name
   <feature_sql id="matches" type="feature_table"  output="matches.tsv">
 
   <!-- see below ests target; better than this -->
-  <script name="matchfilt" type="postprocess" shell="perl -ni.old" language="perl">
+  <script name="matchfilt" type="SKIP_postprocess" shell="perl -ni.old" language="perl">
 <![CDATA[
   #filter matches that exist in analysis set; keep EST/cDNAs matches; RE60666.5prime, LD02891.5prime and like
   print if (/([.:])(5prime|3prime|contig)/ && !/sim4:wrap/);
@@ -736,7 +780,6 @@ ORDER BY arm, armloc.fmin --, matchcv.name
 -- change 'targft left outer join gffattr_match ' to 'matchft ..' ?
 
 SELECT distinct
-  -- CASE WHEN armft.name IS NULL THEN armft.uniquename ELSE armft.name END AS arm, 
   armft.uniquename as arm,
   armloc.fmin, armloc.fmax, armloc.strand,
   armft.organism_id,
@@ -1040,7 +1083,7 @@ UNION ALL
   -- add parent feat ids for exons, etc.
   -- putative_ortholog_of=dmel/gene:CG31648
   SELECT pk.subject_id AS feature_id, cv.name AS type, 
-    'FlyBase:' || fo.uniquename  AS attribute
+    '${GFF_source}:' || fo.uniquename  AS attribute
   FROM feature_relationship pk, feature fo, cvterm cv
   WHERE 
     cv.name = 'putative_ortholog_of' and pk.type_id = cv.cvterm_id 

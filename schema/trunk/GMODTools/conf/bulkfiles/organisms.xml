@@ -17,39 +17,40 @@
   Note that species == Genus_species; all spaces are underscored.
   </about>
   
-  <organism id="agam" species="Anopheles_gambiae" />
-  <organism id="amel" species="Apis_mellifera" />
-  <organism id="atha" species="Arabidopsis_thaliana" />
-  <organism id="cbri" species="Caenorhabditis_briggsae" />
-  <organism id="cele" species="Caenorhabditis_elegans" />
-  <organism id="cfam" species="Canis_familiaris" />
-  <organism id="dana" species="Drosophila_ananassae" />
-  <organism id="ddis" species="Dictyostelium_discoideum" />
-  <organism id="dere" species="Drosophila_erecta" />
-  <organism id="dgri" species="Drosophila_grimshawi" />
-  <organism id="dmag" species="Daphnia_magna" />
-  <organism id="dmel" species="Drosophila_melanogaster" />
-  <organism id="dmoj" species="Drosophila_mojavensis" />
-  <organism id="dper" species="Drosophila_persimilis" />
-  <organism id="dpse" species="Drosophila_pseudoobscura"  />
-  <organism id="dpul" species="Daphnia_pulex" />
-  <organism id="drer" species="Danio_rerio" />
-  <organism id="dsec" species="Drosophila_sechellia" />
-  <organism id="dsim" species="Drosophila_simulans" />
-  <organism id="dvir" species="Drosophila_virilis" />
-  <organism id="dwil" species="Drosophila_willistoni" />
-  <organism id="dyak" species="Drosophila_yakuba" />
-  <organism id="ecol" species="Escherichia_coli" />
-  <organism id="frub" species="Fugu_rubripes" />
-  <organism id="ggal" species="Gallus_gallus" />
-  <organism id="hsap" species="Homo_sapiens" />
-  <organism id="mmus" species="Mus_musculus" />
-  <organism id="osat" species="Oryza_sativa" />
-  <organism id="pfal" species="Plasmodium_falciparum" />
-  <organism id="ptro" species="Pan_troglodytes" />
-  <organism id="rnor" species="Rattus_norvegicus" />
-  <organism id="scer" species="Saccharomyces_cerevisiae" />
-  <organism id="spom" species="Schizosaccharomyces_pombe" />
-  <organism id="tnig" species="Tetraodon_nigroviridi" />
+  <!-- 0710: add taxon code for go_association table -->
+  <organism id="agam" taxon="0" species="Anopheles_gambiae" />
+  <organism id="amel" taxon="0" species="Apis_mellifera" />
+  <organism id="atha" taxon="0" species="Arabidopsis_thaliana" />
+  <organism id="cbri" taxon="0" species="Caenorhabditis_briggsae" />
+  <organism id="cele" taxon="0" species="Caenorhabditis_elegans" />
+  <organism id="cfam" taxon="0" species="Canis_familiaris" />
+  <organism id="dana" taxon="0" species="Drosophila_ananassae" />
+  <organism id="ddis" taxon="0" species="Dictyostelium_discoideum" />
+  <organism id="dere" taxon="0" species="Drosophila_erecta" />
+  <organism id="dgri" taxon="0" species="Drosophila_grimshawi" />
+  <organism id="dmag" taxon="0" species="Daphnia_magna" />
+  <organism id="dmel" taxon="0" species="Drosophila_melanogaster" />
+  <organism id="dmoj" taxon="0" species="Drosophila_mojavensis" />
+  <organism id="dper" taxon="0" species="Drosophila_persimilis" />
+  <organism id="dpse" taxon="0" species="Drosophila_pseudoobscura"  />
+  <organism id="dpul" taxon="0" species="Daphnia_pulex" />
+  <organism id="drer" taxon="0" species="Danio_rerio" />
+  <organism id="dsec" taxon="0" species="Drosophila_sechellia" />
+  <organism id="dsim" taxon="0" species="Drosophila_simulans" />
+  <organism id="dvir" taxon="0" species="Drosophila_virilis" />
+  <organism id="dwil" taxon="0" species="Drosophila_willistoni" />
+  <organism id="dyak" taxon="0" species="Drosophila_yakuba" />
+  <organism id="ecol" taxon="0" species="Escherichia_coli" />
+  <organism id="frub" taxon="0" species="Fugu_rubripes" />
+  <organism id="ggal" taxon="0" species="Gallus_gallus" />
+  <organism id="hsap" taxon="0" species="Homo_sapiens" />
+  <organism id="mmus" taxon="0" species="Mus_musculus" />
+  <organism id="osat" taxon="0" species="Oryza_sativa" />
+  <organism id="pfal" taxon="0" species="Plasmodium_falciparum" />
+  <organism id="ptro" taxon="0" species="Pan_troglodytes" />
+  <organism id="rnor" taxon="0" species="Rattus_norvegicus" />
+  <organism id="scer" taxon="4932" species="Saccharomyces_cerevisiae" />
+  <organism id="spom" taxon="0" species="Schizosaccharomyces_pombe" />
+  <organism id="tnig" taxon="0" species="Tetraodon_nigroviridi" />
 
 </opt>

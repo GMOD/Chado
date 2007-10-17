@@ -175,11 +175,12 @@ my $automake=1;  # make this easier for general user
 my $config= undef;   
 my @formats= ();
 
-#? let release.xml formats replace this?
-my @defformats= qw(overview fff gff fasta tables blast ); #gnomap
-my @chr=();
+#? let release.xml formats replace this? yes! but want for display?
+## want $sequtil->config->{outformats} but dont want to call before help
+my @defformats= (); #was# qw(overview fff gff fasta tables blast ); 
 
-#? add makeclean/overwrite option ??
+my @chr=();
+my $help=0;
 
 my $ok= Getopt::Long::GetOptions( 
 'config=s' => \$config,
@@ -193,55 +194,70 @@ my $ok= Getopt::Long::GetOptions(
 'makeout!' => \$makeout,
 'debug!' => \$debug,
 'verbose!' => \$verbose,
+'help!' => \$help,
 'bugger=s' => \$debug, # more debug levels
 'showconfig!' => \$showconfig,
 );
+
+my $usage=<<"USAGE";
+Generate genome bulk files from Chado database.
+Usage: $0  -conf sgdbulk -make [ -format gff,fasta ... ]
+Options:
+  -help            : show helpful documents
+  -config=bulkfile-config    
+    Configuration file for genome data release  [required, no default]
+  -format=gff,fasta,blast,tables,overview,go_association
+    output formats [default from your config.xml or site_defaults.xml ]
+  -chromosome=2L      
+    chromosome(s) to work with: -chr=3,4,5 [default: all chromosomes]
+  -[no]make        : make output bulk files [default $makeout]
+  -[no]failonerror : die if error is encountered (otherwise read log to see it)
+  -[no]verbose     : turn on verbose output info [$verbose]
+  -[no]debug       : turn on debug output for progress info [$debug]
+
+MORE INFO:
+  perldoc $0
+  perldoc Bio::GMOD::Bulkfiles
+
+USAGE
+
+=item more usage
+
+  -[no]automake  
+    auto-make required preliminary data [default $automake]
+  -[no]dnadump  
+    extract chromosome dna from database [intermediate step; default $dnadump]
+  -[no]featdump  
+    extract features from database [intermediate step; default $featdump]
+     -splitfeat = collate primary table files, sortin and splitting  by chromosome 
+     -nosplitfeat = do not create any intermediate per-chromosome/scaffold files
+  -[no]showconfig
+    print the parsed configuration file(s); pay attention
+      to ROOT= for location of output (set by \$GMOD_ROOT)
+  
+=cut
 
 # 0710 update: change nosplitfeat to mean same as new no_csomesplit flag
 #  meaning no per golden_path files (e.g. for genomes with 1000s - 100,000s of scaffolds)
 if($splitfeat == 0) { $no_csomesplit=1; }
 elsif ($splitfeat == -1) { $splitfeat= $featdump; }
 
-@chr = split(/,/,join(',',@chr));
-@formats = split(/,/,join(',',@formats));
+@chr = split(/[,;:\s]/,join(',',@chr));
+@formats = split(/[,;:\s]/,join(',',@formats));
 @formats= @defformats unless(@formats);
 
-warn "** Please specify -config=config-name\n" unless($config);
-die <<"USAGE" unless ($ok && $config);
-Generate genome bulk files from Chado database.
-Usage: $0  -conf sgdbulk -make [ -format gff,fasta ... ]
-Options:
-  -config=bulkfile-config    
-    Configuration file for genome data release  [required, no default]
-  -format=gff,fasta    
-    output formats [default: @defformats]
-  -chromosome=2L      
-    chromosome(s) to work with: -chr=3,4,5 [default: all chromosomes]
-  -[no]dnadump  
-    extract chromosome dna from database [intermediate step; default $dnadump]
-  -[no]featdump  
-    extract features from database [intermediate step; default $featdump]
-    ( -[no]splitfeat = collate primary table files, sortin and splitting  by chromosome 
-      [default with -featdump] )
-  -[no]failonerror  
-    die if error is encountered (otherwise read log to see it)
-  -[no]make  
-    make output bulk files [default $makeout]
-  -[no]automake  
-    auto-make required preliminary data [default $automake]
-  -[no]verbose  
-    turn on verbose output info [$verbose]
-  -[no]showconfig
-    print the parsed configuration file(s); pay attention
-      to ROOT= for location of output (set by \$GMOD_ROOT)
-  -[no]debug  
-    turn on debug output for progress info [$debug]
+if($help) {
+  warn $usage;
+  $config= "bulkfiles_template";#? unless($config);
+  $verbose=1;
+  $makeout= $automake= 0;
+  $dnadump= $featdump= $splitfeat=0;
+  @formats=();
+}
 
-MORE INFO:
-  perldoc $0
-  perldoc Bio::GMOD::Bulkfiles
-USAGE
-  
+warn "** Please specify -config=config-name\n" unless($config);
+die $usage unless ($ok && $config);
+
 my $result= 'none';
 
 my $sequtil= Bio::GMOD::Bulkfiles->new( configfile => $config, 

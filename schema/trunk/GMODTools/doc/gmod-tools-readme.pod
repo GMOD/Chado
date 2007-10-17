@@ -77,6 +77,24 @@
     chadofeatsql.xml  --  chado db sql calls to dump features
     chadofeatconv.xml --  feature conversion options
 
+=head1 UPDATES  2007-Oct, version 1.1
+
+  - No chromosome/scaffold/golden_path files.  This change is needed to handle 
+    partially assembled genomes with many (1000s to 100,000s) of scaffolds.
+    Flag no_csomesplit=1 to use this (should become default).
+  
+  - Gene Ontology association file, see go_association tags in configurations
+    formatted as http://geneontology.org/GO.format.annotation.shtml
+
+  - Validate main variables in chado database: ${golden_path}, ${seq_ontology}
+    This step, on now by default, checks that database contains values set in
+    configuration for chromosome type, sequence ontology CV name, and any other
+    critical variables. If failed, db is inspected for real values.
+    
+  - miscellany bugs cured and configuration updates.  tables/overview now again
+    active.
+
+
 =head1 OUTPUTS
   
   DNA files (full chromosomes) in raw and fasta formats

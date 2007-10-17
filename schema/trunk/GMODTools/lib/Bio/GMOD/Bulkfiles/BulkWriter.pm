@@ -127,7 +127,8 @@ sub outputpath
 {
   my $self = shift;
   unless($self->{outputpath}) {
-    my $outputpath= $self->handler()->getReleaseSubdir( $self->getconfig('path') || $self->BULK_TYPE);
+    my $outputpath= $self->handler()->getReleaseSubdir( 
+      $self->getconfig('path') || $self->BULK_TYPE);
     $self->{outputpath} = $outputpath;
     }
   return $self->{outputpath};
@@ -318,12 +319,26 @@ sub makeFiles
 	my $self= shift;
   my %args= @_;  
   print STDERR "makeFiles\n" if $DEBUG; # debug
-  my $fileset = $args{infiles};
-  my $status= 0;
-  unless(ref $fileset) { warn "makeFiles: needs infiles => \@filesets "; return; }
   
-#   my @seqfiles= $self->openInput( $fileset );
+  my $status= 0;
+  my $name  = $args{name} || $self->{bulktype};  
+  my $filesetinfo = $args{filesetinfo}; # hash of <fileset xxxx=yyy> configs
+  my $infiles = $args{infiles};  # array ref of file specs
+  unless(ref $filesetinfo or ref $infiles) { 
+    warn "makeFiles $name: needs infiles => \@infiles "; return; 
+    }
+  
+#   my @seqfiles= $self->openInput( $infiles );
 #   my $res= $self->processBlastInput( \@seqfiles);
+  
+    ## no input files here, input from sql query; should be new module, SQLWriter ??
+  my $dumpfiles= undef;
+  if( $filesetinfo->{input} eq "sql_query" ) {
+    #?? $filesetinfo->{ENV}= \%ENV; # dang, need this for ${variable} replacement in sql?
+    $dumpfiles = $self->handler->dumpFeatures($filesetinfo, undef, "colnames"); 
+    $status= scalar(@$dumpfiles); # 
+    print STDERR "$name: sql_query status = $status\n" if $DEBUG;
+  }
 
   if ($self->config->{makeall} && $status > 0) {
     my $chromosomes= "";
@@ -333,6 +348,7 @@ sub makeFiles
 
   return  $self->status($status); #?? check files made
 }
+
 
 sub makeall 
 {

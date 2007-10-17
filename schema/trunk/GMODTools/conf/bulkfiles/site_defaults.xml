@@ -45,6 +45,22 @@
   will be used. If you dont use thse CHADO_ from gmod.conf,
   change above db settings.
   </about>
+
+
+    <!-- or use bulkfiles defaults/user choice -->
+  <outformats>overview</outformats>
+  <outformats>fff</outformats>
+  <outformats>gff</outformats>
+  <outformats>fasta</outformats>
+  <outformats>tables</outformats>
+  <outformats>go_association</outformats>
+  <outformats>blast</outformats>
+  <about id="outformats" >
+  ARRAY of default output files. Generally each of
+  these has a Bulkfiles::BulkWriter perl subclass,
+  and xml configuration.   fileset details these, including
+  the Perl handler.
+  </about>
   
   <doc id="Release.txt"><![CDATA[
   Bulk output for Chado genome databases
@@ -87,20 +103,6 @@
   <about id="featuresets" >
   What feature sets for bulk files (esp. fasta sequence)
   and how they are grouped from primary features.
-  </about>
-
-    <!-- or use bulkfiles defaults/user choice -->
-  <outformats>overview</outformats>
-  <outformats>fff</outformats>
-  <outformats>gff</outformats>
-  <outformats>fasta</outformats>
-  <outformats>tables</outformats>
-  <outformats>blast</outformats>
-  <about id="outformats" >
-  ARRAY of default output files. Generally each of
-  these has a Bulkfiles::BulkWriter perl subclass,
-  and xml configuration.   fileset details these, including
-  the Perl handler.
   </about>
 
 </opt>

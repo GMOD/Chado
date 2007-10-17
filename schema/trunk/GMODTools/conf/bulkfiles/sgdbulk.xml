@@ -55,10 +55,12 @@
   <release id="1" dbname="sgdlite_2004" date="20040519"/>
 
   <relfull>${org}_${release_date}</relfull> 
-  <release_url>/genome/${species}/release${release_id}.html</release_url>
+  <release_url>/genome/${species}/release-${release_id}.html</release_url>
 
   <org>scer</org>
   <species>Saccharomyces_cerevisiae</species>
+  <taxon>4932</taxon> <!-- 0710: for go_association table ; add to org.table -->
+
   <!-- see chadofeatsql ENV_default -->
   <golden_path>'chromosome'</golden_path>
   <featureprops>'Note','orf_classification'</featureprops>
@@ -84,6 +86,13 @@
     dogzip="0"
     />
   <fileset_override id="dummy" title="placeholder for xmlsimple"/>
+
+    <!--  
+    0710: add go_association option
+      need to add new outformat, see site_defaults
+      need handler to recognize go_association target/format
+      fileset go_association now in filesets.xml
+    -->
 
   <featdump
     path="tmp/featdump/\w+.tsv"

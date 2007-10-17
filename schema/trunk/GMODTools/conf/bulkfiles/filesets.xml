@@ -37,12 +37,8 @@
   
   <!--
   2007oct
-    : add no_csomesplit=1 / output_by_golden_path=1 flag (default, old behavior),
-        need option for no golden_path splitting (e.g. lots of scaffolds/contigs)
-        SEE ALSO flag config->{perchr} : same? but after tmp/chadofeat.arm tables
-        and flag config->{makeall}
-    no_csomesplit flag needs to be in main org/release config?    
-
+    : add no_csomesplit=1 : see main config
+    : added go_association fileset
   -->
   
   <!-- change these dump tags to fileset tags ?? 
@@ -167,6 +163,7 @@
     <target>overviewhtml</target>
   </fileset>
 
+    <!-- see gbrowseconf.xml for db_adaptor options -->
   <fileset
     id="gbrowse_conf"
     path="gff/gbrowse.conf"
@@ -175,9 +172,9 @@
     withvars="1"
     
     db_adaptor_class = "Bio::DB::GFF"
-    db_adaptor = "lucene"
-    db_dsn  = "${outputpath}/lucene/"
-    db_user = "flybase"
+    db_adaptor = "dbi::mysql"
+    db_dsn  = "${relfull}"
+    db_user = "www"
     />
 
   <fileset
@@ -188,6 +185,23 @@
     other_path="tables/.+\.txt"
     no_orgchr="1"
     />
+
+
+    <!-- 0710: add go_association fileset:
+     add as desired to outformats>go_association</outformats 
+     -->
+  <fileset
+    id="go_association"
+    path="tables/"
+    handler="BulkWriter"
+    input="sql_query"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="list"
+    >
+    <target>go_association</target>
+  </fileset>
+
 
   <fileset
     id="gbrowse_fb"
