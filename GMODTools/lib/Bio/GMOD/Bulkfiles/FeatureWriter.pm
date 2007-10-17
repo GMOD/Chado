@@ -263,6 +263,8 @@ sub makeFiles
     }
  
   my @saveformats= @outformats;
+  ## this may be a mistake: config formats are what we need to make(?)
+  ## args{formats} are what caller/customer wants as result
   if ($args{formats}) {
     my $formats= $args{formats};
     if(ref $formats) { @outformats= @$formats; } 

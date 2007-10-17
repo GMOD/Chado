@@ -147,18 +147,25 @@ Also, repeat_family has nucleotide_match child parts  (named? curated?)
   <!-- dont warn if these types have Parent oid not in data; e.g  chromosome parent -->
   <maptype_ignore_missingparent>^(gene|match_part|match)</maptype_ignore_missingparent>
   
+  <!-- 0710: 
+      add/replace ${golden_path} everywhere we find chromosome, EXCEPT
+      golden_path is list of "csome","arm","scaffold" so we need to change
+      perl processing of these fields to handle list
+   -->   
+      
   <!-- move these odd groupings into featmap structures ?? -->
-  
   <!-- chado has these with fmin == 1-origin, others are 0-origin; why?? -->
   <origin_one
     chromosome_arm="1"
     chromosome_band="1"
     chromosome="1"
+    supercontig="1"
     />
 
   <topsort
     chromosome_arm="1"
     chromosome="1"
+    supercontig="1"
     />
     
   <segmentfeats 
@@ -166,6 +173,7 @@ Also, repeat_family has nucleotide_match child parts  (named? curated?)
     chromosome_arm="1"
     chromosome_band="1"
     chromosome="1"
+    supercontig="1"
     golden_path_region="1"
     golden_path="1"
     source="1"

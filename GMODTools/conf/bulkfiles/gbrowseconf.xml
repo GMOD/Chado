@@ -51,6 +51,9 @@ passwd     = ${db_password}
 ## option dbi::mysql adaptor 
 # adaptor     = dbi::mysql
 # database    = ${db_dsn}
+## option lucene adaptor
+#    db_adaptor = lucene
+#    db_dsn  = "${outputpath}/lucene/"
 
 default_name = ${default_location} 
 default_range = 1-500000
@@ -72,7 +75,7 @@ footer = <hr>
 	</TR>
 	</table>
 	<hr>
-	<pre>$Id: gbrowseconf.xml,v 1.4 2006-04-07 21:01:58 dongilbert Exp $</pre>
+	<pre>$Id: gbrowseconf.xml,v 1.5 2007-10-17 01:01:29 dongilbert Exp $</pre>
 
 plugins = BatchDumper TextMapDumper FeatureFastaDumper FastaDumper GFFDumper 
 

@@ -75,7 +75,9 @@
   
 
   <valid>0</valid> 
-  <about id="valid">Set valid=1 to skip seq_ontology, other variable validation</valid>
+  <about id="valid">
+  Set valid=1 to skip seq_ontology, other variable validation
+  </about>
   
   <seq_ontology>sequence</seq_ontology>
   
@@ -94,6 +96,7 @@
   <!-- see organisms.xml; add your species there -->
   <org>scer</org>
   <species>Saccharomyces_cerevisiae</species>
+  <taxon>0000</taxon> <!-- 0710: for go_association table ; add to org.table -->
   
   <!-- see chadofeatsql ENV_default -->
   <golden_path>'chromosome','supercontig'</golden_path>

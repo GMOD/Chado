@@ -261,8 +261,25 @@ MORE CONFIG FILES:
   # set GMOD_ROOT  to here and run default config 
   cd GMODTools
   env GMOD_ROOT=$PWD perl -I./lib/ bin/bulkfiles.pl sgdbulk1
+
+=head1 UPDATES  2007-Oct, version 1.1
+
+  - No chromosome/scaffold/golden_path files.  This change is needed to handle 
+    partially assembled genomes with many (1000s to 100,000s) of scaffolds.
+    Flag no_csomesplit=1 to use this (should become default).
   
-=head1 no_csomesplit update 
+  - Gene Ontology association file output, see go_association tags in configurations
+    formatted as per http://geneontology.org/GO.format.annotation.shtml
+
+  - Validate main variables in chado database: ${golden_path}, ${seq_ontology}
+    This step, on now by default, checks that database contains values set in
+    configuration for chromosome type, sequence ontology CV name, and any other
+    critical variables. If failed, db is inspected for real values.
+    
+  - miscellany bugs cured and configuration updates.  tables/overview now again
+    active.
+  
+=head2 no_csomesplit update 
 
   this change is needed to handle partially assembled genomes (the common
   first draft) with many scaffolds (10,000s of < 1MB  to  100,000s of
@@ -305,6 +322,54 @@ MORE CONFIG FILES:
     See FastaWriter:processFasta : has special raw2Fasta for csomes.,
 
     
+
+=head2 Gene Ontology association table 
+  
+  * this is in essense done.  See filesets.xml: go_association,
+    and SQL code in chadofeatsqll.xml,
+    to use, add to site_defaults, <outformat>go_association
+    
+  - this should be a relatively simple subclass for producing
+  GO association files.  Need 
+  (1) Chado SQL to produce basic table, per gene feature, of
+      linked GO terms via what link table(s)?
+      -- curated GO terms via feature_cvterm : 52929 in _dmel_r4_3_16?
+      -- also find IEA GO terms via analysisfeature to alt-species proteins
+
+   select fc.cvterm_id, count(distinct fc.feature_id) as n_feature, 
+   (select name from cvterm where cvterm_id = fc.cvterm_id) as term 
+   from feature_cvterm fc  group by fc.cvterm_id;
+   -- add restriction to GO CV tables ...
+   
+   * something weird here, parameciumDB queries slower than _dmel_r4_3_16,
+   a larger chado db; maybe we loaded it wrong, with char encoding (UTF-8)
+   instead of SQL_ASCII
+   
+  (2) perl code to reformat to GO spec.
+  
+=head1 TODO
+
+=head2 Gene Pages XML
+
+  - see wfleabase.org/search/ with resultant gene page reports
+  using simple GeneSummary XML
+  - output from chado using genepage SQL for all properties/gene feature
+  
+=head2 New project configurations
+
+  - should add user interface software to prompt for the
+  few basic required variables (chado db name, golden_path, 
+  choices for output, ...) and
+  create project configuration.xml from template.xml
+
+=head2 Other useful output files?
+
+  - BulkWriter.pm now does basic SQL query to table file,
+  add some other useful table file outputs?  gene IDs x synonyms?
+
+=head2 Remove FFF intermediate for GFF only
+  - drop the now awkward FFF format for GFF as primary
+  feature format, use to create Fasta from it.
   
 =head1 SEE ALSO
 
@@ -313,67 +378,6 @@ MORE CONFIG FILES:
 =head1 AUTHOR
 
 D.G. Gilbert, 2004, gilbertd@indiana.edu
-
-=head1 package methods
-
-# -- initialize
-sub new 
-sub closeit
-sub DESTROY 
-sub init 
-sub initData 
-
-sub readConfig
-sub config 
-sub getconfig 
-
-# -- extract data from chado db - move to new package ?
-sub dnafile 
-sub dumpChromosomeBases 
-sub dumpFeatures 
-sub sortNSplitByChromosome
-sub csomeSplit 
-
-sub getDnaSeq 
-sub getBases
-sub getFeaturesFromDb 
-sub getBasesFromDb 
-sub getBasesFromFiles
-
-sub dbiDSN
-sub dbiConnect
-sub getSeqSql
-sub updateSqlViews
-
-sub getChromosomeTable
-sub getChromosomes
-
-# -- file/folder management
-
-sub getReleaseDir 
-sub getReleaseSubdir 
-
-sub getDumpFiles 
-sub getChromosomeFiles
-sub getFastaFiles
-sub getFeatFiles
-sub getFeatTableFiles
-
-sub get_filename
-sub split_filename
-sub maxrange 
-sub _isold  
-
-# -- write files
-
-sub makeFiles
-sub writeDocs
-sub getWriter('type')
-
-sub splitFFF
-sub intergeneFromFFF2
-
-=cut
 
 =head1 METHODS
 
@@ -416,7 +420,8 @@ use vars qw/ @ENV_KEYS @featset @allfeats %mapchr_pattern $fndel /;
 # 0710: add more: ENV_default set : golden_path seq_ontology
 # too many rel.variables: relid , release_id == rel ??
 BEGIN{@ENV_KEYS=  qw( species org date title datadir 
-    rel relfull relid release_url release_id release_date 
+    rel relfull relid release_url release_id release_date  
+    GFF_source taxon
     ftp_url golden_path seq_ontology );}
 
 my $defaultconfigfile="bulkfiles"; # was 'sequtil'  
@@ -456,11 +461,14 @@ sub init
 	
 	$DEBUG= $self->{debug} if defined $self->{debug};
 
+  my $cdate= POSIX::strftime("%F %T", localtime( $^T ));
+  $cdate =~ s/[^\w-]/_/g; ## make sure no space in date !
+  $self->{date}= $cdate;
+
   $self->{failonerror}= 0 unless defined $self->{failonerror};
   $self->{skiponerror}= 1 unless defined $self->{skiponerror};
   $self->{ignoredbresidues}= 0 unless defined $self->{ignoredbresidues};
   $self->{addids}= 0 unless defined $self->{addids};
-  $self->{date}= POSIX::strftime("%F %T", localtime( $^T ));
   $self->{config}={} unless defined $self->{config};
   $self->{configfile}= $defaultconfigfile unless defined $self->{configfile};
   $self->{verbose}=0 unless defined $self->{verbose};
@@ -1428,14 +1436,23 @@ sub makeFiles
  
   my $automake= $args{automake} || $self->{automake} ;
   
+  ## dang change in caller bulkfiles.pl; dropped @outformats, now find
+  ## downstream writers look at this input %args for that: should it (a) ignore $args{outformats}
+  ## or (b) should this method add \@outformats to args?
+  
   my @outformats=(); # check config
   if ($args{formats}) {
     my $formats= $args{formats};
     @outformats= (ref $formats) ? @$formats : ($formats);
     }
-  else {
+  unless(@outformats>0) {
     @outformats=  @{ $self->config->{outformats} || \@defaultformats } ; 
     }
+  # automake, etc, add outformat fff if need be
+  push(@outformats,"fff") # still a dependency, but intermediate format
+    if ($automake && !grep(/fff/, @outformats) && grep(/fasta/, @outformats));
+  $args{formats}= \@outformats; #??? want this
+  
   my %outformats= map{ $_,1; } @outformats;
   print STDERR "makeFiles: outformats= @outformats\n" if $DEBUG; 
   
@@ -1507,7 +1524,9 @@ sub makeFiles
     }
     
   if ($DEBUG) {
-    my @cn= @$chromosomes; print STDERR "make chromosomes= @cn\n";
+    my @cn= @$chromosomes; # FIXME too long to list for some, no_csomesplit
+    @cn= (@cn[0..20],".. more ..") if(@cn>30);
+    print STDERR "make chromosomes= @cn\n";
     my @fn= map {$_->{name}} @$featfiles; print STDERR "with featfiles= @fn\n";
     my @dn= map {$_->{name}} @$dnafiles; print STDERR "with dnafiles= @dn\n";
     }
@@ -1539,12 +1558,32 @@ sub makeFiles
   my @moreformats= grep { $outformats{$_} } @outformats; # preserve call-order
   foreach my $fmt (@moreformats) {
     my $writer= $self->getWriter($fmt);
+    my $fset  = $self->getFilesetInfo($fmt);
     if (!$writer) { warn "no writer for $fmt\n"; }
     else { push @results, $writer->makeFiles( %args, 
-            infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes); 
+            name => $fmt,
+            filesetinfo => $fset,
+            infiles => [ @$featfiles, @$dnafiles ], 
+            chromosomes => $chromosomes); 
       }
     }
-    
+
+=item more formats using SQL queries
+
+  -- need a Writer to handle dumpFeatures : see BulkWriter now
+
+  if (delete $outformats{'go_association'}) {
+    my $fset  = $self->getFilesetInfo('go_association');
+    if($fset) {
+      # my ($ovfiles,$ovmissing)= $self->getDumpFiles(['go_association'], $fset);
+      my $ovfiles =  $self->dumpFeatures($fset, undef, "colnames");    
+      my $ovlist= join(" ",map {$_->{name}} @$ovfiles);
+      push @results, "output:$ovlist";
+      }
+    }
+
+=cut
+
   $self->gzipFiles( \@outformats, $chromosomes );
   
   my $lok= $self->makeCurrentLink() 
@@ -2144,8 +2183,8 @@ sub getSeqSql
   $sqlconf = 'chadofeatsql' unless($sqlconf);
   $sqlenv= $self->config unless (ref $sqlenv);
 
-  print STDERR "sqlenv: ",join("\n ", map{ $_."=".$sqlenv->{$_}} keys %$sqlenv ),"\n"
-    if ($DEBUG>1);     
+#   print STDERR "sqlenv.$sqlconf: ",join("\n ", map{ $_."=".$sqlenv->{$_}} keys %$sqlenv ),"\n"
+#     if ($DEBUG>1);     
 
   my $config2= $self->{config2}; #?? Config2 object, not hash
   my $seqsql = $self->{$sqlconf} || '';
@@ -2155,19 +2194,20 @@ sub getSeqSql
        if ($self->{showconfig} && $DEBUG>1);      
     }
     
+    # has undefined Variables? try to define
   my $sqxml= $config2->showConfig( $seqsql, { debug => 0 });  
-    # has undefined Variables -- try to define
+  if ( $sqxml =~ m/\$\{/ ) {
+    eval { $seqsql= $self->{config2}->updateVariables( $seqsql, { Variables => \%ENV, replace =>1 },  ); }; 
+    if ($@) {  warn "Config2: getSeqSql=$sqlconf; err: $@";  }
+    }
   if ( $sqxml =~ m/\$\{/ && ref($seqsql->{ENV_default}) ) {
     my %env= %{$seqsql->{ENV_default}};
     foreach my $k (keys %env) { $env{$k}= $sqlenv->{$k} if($sqlenv->{$k}); }
     $seqsql= $config2->readConfig( $sqlconf, {Variables => \%env}, {} ); 
-    
-#     if ($DEBUG) {
-#       my @undefs=  $sqxml =~ m/\$\{([^}]+)\}/g;
-#       print STDERR "Added default vars\n"; 
-#       foreach my $un (@undefs) { print STDERR "$un => ",$seqsql->{ENV_default}{$un},"\n"; }
-#       }
     }
+
+#   print STDERR "seqsql.$sqlconf xml: ", $config2->showConfig( $seqsql, { debug => 0 }),"\n"
+#     if ($DEBUG>1);     
 
   $self->{$sqlconf}= $seqsql;
   return $seqsql;
@@ -2214,7 +2254,7 @@ sub validateVariables
     my $err="";
     my $sth = $dbh->prepare($sql) or $err= "Failed to prepare $sql";  
     unless($err) { $sth->execute() or $err= "Failed to execute sql";  }
-    unless($err) { while (my @row = $sth->fetchrow_array) {  $nrow++; } }
+    unless($err) { while (my $row = $sth->fetchrow_arrayref) {  $nrow++; } }
     $sth->finish(); 
       
     my $sql_inspect = $fs->{sql_inspect}; # optionally show this inspect even if no err
@@ -2227,6 +2267,11 @@ sub validateVariables
       }
         
     if($doinspect and $sql_inspect) {
+      ##??? problems with this for chromosome checks (using a join) very long for parameciumDB
+      ## why? is it bug in sql/postgres/database tuning? using some scan instead of index search?
+      ## explain high cost in chado pg is with Sort for Group
+      ## Sort  (cost=178872.73..179239.36 rows=146652 width=560); Sort Key: f.type_id, t.name
+
       warn "\nInspecting database for $tgname values...\n";
       print STDERR ("-") x 60, "\n";
       my $result= $self->getFeaturesFromDb( *STDERR, $sql_inspect, undef, "colnames"); 
@@ -2291,10 +2336,10 @@ sub dumpFeatures
 {
   my ($self, $fdump, $sqlconf, $dumpflags)= @_;
   my @files=();
-  $dumpflags ||=""; ## add colnames for overview.txt
+  $dumpflags ||=""; ## add colnames for overview.txt; look in $fdump->{dumpflags} ??
   
-  $fdump   = $self->config->{featdump}  unless($fdump);
-  $sqlconf = $fdump->{config} unless($sqlconf);
+  $fdump   ||= $self->config->{featdump};
+  $sqlconf ||= $fdump->{config_sql} || $fdump->{config};
   my $seqsql = $self->getSeqSql($sqlconf,$fdump->{ENV});
   
   $self->updateSqlViews($seqsql, $fdump->{tag});
@@ -2364,22 +2409,28 @@ sub getFeaturesFromDb
   if ($err) { warn $err; die if($self->{failonerror}); return -1; }
  
   ## analysis sql gets lots of: Use of uninitialized value in join  
+  ## OUT OF MEM error here with ParameciumDB during fetchrow to tmp/featdump file
+  ## get same memerr when run psql -f features.sql, so it isn't Bulkfiles problem !
+  ## *** malloc: vm_allocate(size=67108864) failed (error code=3); could be gffattr_gmodel
+
   local $^W=0; # kill warnings of undef values
   my $result= 0;
   if($outh) {  
     print $outh join("\t",@{$sth->{NAME}})."\n" if($flags=~/colname/i);
-    while (my @row = $sth->fetchrow_array) { 
-      print $outh join("\t",@row),"\n"; $result++;
+    while (my $row = $sth->fetchrow_arrayref) { 
+      print $outh join("\t",@$row),"\n"; $result++;
       }
   } else {  
     $result = join("\t",@{$sth->{NAME}})."\n" if($flags=~/colname/i); # is this ok?
-    while (my @row = $sth->fetchrow_array) { 
-      $result .= join("\t",@row)."\n";  
+    while (my $row = $sth->fetchrow_arrayref) { 
+      $result .= join("\t",@$row)."\n";  
       }
   }
   $sth->finish();
   return $result;
 }
+
+
 
 =item $bases= getBasesFromDb( $uniquename)
 
@@ -2648,11 +2699,12 @@ sub promoteRelease
 {
   my($self, $config)= @_;
   
-  my $relid= $config->{relid} ||  $self->{date};
-  unless($relid) { $relid= $config->{relid}= $self->{date}; }
+  my $cdate= $self->{date}; $cdate =~ s/[^\w-]/_/g; ## make sure no space in date !
+  my $relid= $config->{relid};
+  unless($relid) { $relid= $config->{relid}= $cdate; }
   unless( ref $config->{release}->{$relid} ) {
     $config->{release}->{$relid}= {
-      date => $self->{date},
+      date =>  $cdate,
       };
   }
   
