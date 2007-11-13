@@ -69,7 +69,7 @@ GetOptions(
     'onlysplit'   => \$ONLYSPLIT,
     'nosplit'     => \$NOSPLIT,
     'hasrefseq'   => \$HASREFSEQ,
-    'dbprofile'   => \$DBPROFILE,
+    'dbprofile=s' => \$DBPROFILE,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 @GFFFILE = split(/,/,join(',',@GFFFILE));
@@ -178,7 +178,7 @@ for my $GFFFILE (@GFFFILE) {
 exit(0) if $ONLYSPLIT;
 
 my $gmod_conf = Bio::GMOD::Config->new();
-my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, 'default');
+my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $DBPROFILE);
 my $db        = Bio::GMOD::DB::Adapter->new(
                     dbuser  => $db_conf->user,
                     dbpass  => $db_conf->password || '',
