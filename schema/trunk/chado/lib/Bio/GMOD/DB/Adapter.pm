@@ -3468,7 +3468,7 @@ sub handle_CDS {
         VALUES (?,?,?,?,?,?)
     /;
     my $sth = $dbh->prepare($insert);
-    $sth->execute($feat_id,$seq_id->value,$feat_type,$fmin,$fmax,$object);
+    $sth->execute($feat_id,$seq_id,$feat_type,$fmin,$fmax,$object);
 
     #get the value of the row just inserted
     $sth = $dbh->prepare("SELECT currval('tmp_cds_handler_cds_row_id_seq')");
@@ -3596,7 +3596,7 @@ ORDER BY cds.fmin,cds.gff_id
                       -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
                 $polyp_ac->add_Annotation(
                     'seq_id',Bio::Annotation::SimpleValue->new(
-                      $feat_obj->seq_id->value));
+                      $feat_obj->seq_id));
                 $polyp_ac->add_Annotation(
                     'phase',Bio::Annotation::SimpleValue->new('.'));
                 $polyp->annotation($polyp_ac);
@@ -3838,7 +3838,7 @@ sub _merge_annotations {
         $polyp_ac->add_Annotation('type',Bio::Annotation::OntologyTerm->new(
                       -term => Bio::Ontology::Term->new(-name=>'polypeptide')));
         $polyp_ac->add_Annotation('seq_id',Bio::Annotation::SimpleValue->new(
-                      $feat->seq_id->value));
+                      $feat->seq_id));
         $polyp->annotation($polyp_ac);
 
         $self->{cdscache}{polypeptide_obj} = $polyp;
@@ -3992,32 +3992,32 @@ sub src_second_chance {
     my ($feature) = @_;
 
     my $src;
-    if($feature->seq_id->value eq '.'){
+    if($feature->seq_id eq '.'){
       $src = '\N';
     } else {
 
       my ($temp_f_id)= $self->uniquename_cache(
                                         validate => 1,
-                                        uniquename => $feature->seq_id->value
+                                        uniquename => $feature->seq_id
                                               );
-      $self->cache('feature',$feature->seq_id->value,$temp_f_id);
+      $self->cache('feature',$feature->seq_id,$temp_f_id);
 
       unless ($temp_f_id) {
-        $self->{queries}{count_name}->execute($feature->seq_id->value);
+        $self->{queries}{count_name}->execute($feature->seq_id);
         my ($n_rows) = $self->{queries}{count_name}->fetchrow_array;
         if (1 < $n_rows) {
-          $self->throw( "more that one source for ".$feature->seq_id->value );
+          $self->throw( "more that one source for ".$feature->seq_id );
         } elsif ( 1==$n_rows) {
-          $self->{queries}{search_name}->execute($feature->seq_id->value);
+          $self->{queries}{search_name}->execute($feature->seq_id);
           my ($tmp_source) = $self->{queries}{search_name}->fetchrow_array;
-          $self->cache('feature',$feature->seq_id->value,$tmp_source);
+          $self->cache('feature',$feature->seq_id,$tmp_source);
         } else {
           confess "Unable to find srcfeature "
-               .$feature->seq_id->value
+               .$feature->seq_id
                ." in the database.\nPerhaps you need to rerun your data load with the '--recreate_cache' option.";
         }
       }
-      $src = $self->cache('feature',$feature->seq_id->value);
+      $src = $self->cache('feature',$feature->seq_id);
     }
 
     return $src;
@@ -4045,17 +4045,17 @@ sub get_src_seqlen {
 
     my ($src,$seqlen);
     if ( defined(($feature->annotation->get_Annotations('ID'))[0])
-         && $feature->seq_id->value
+         && $feature->seq_id
             eq ($feature->annotation->get_Annotations('ID'))[0]->value ) {
         #this is a srcfeature (ie, a reference sequence)
       $src = $self->nextfeature;
       $seqlen = $feature->end - $feature->start +1;
 
-      $self->cache('feature',$feature->seq_id->value,$src);
+      $self->cache('feature',$feature->seq_id,$src);
       $self->cache('srcfeature',$src,1);
 
     } else { # normal case
-      $src = $self->cache('feature',$feature->seq_id->value);
+      $src = $self->cache('feature',$feature->seq_id);
       $seqlen = '\N';
     }
 

@@ -749,7 +749,7 @@ while(my $feature =
   }
   
   $itern++;
-  warn(join(",","f".$itern,$featuretype,$feature->seq_id->value),"\n") if $DEBUG;
+  warn(join(",","f".$itern,$featuretype,$feature->seq_id),"\n") if $DEBUG;
 
   $seen_exon= 1 if $featuretype =~ /exon$/ and !$processing_CDS;
   if ($featuretype =~ /(CDS|UTR)/) {
@@ -784,7 +784,7 @@ END
   if(!$src){
     $src = $chado->src_second_chance($feature);
   }
-  die "no feature for ".$feature->seq_id->value unless $src;
+  die "no feature for ".$feature->seq_id unless $src;
 
   if($feature->annotation->get_Annotations('Parent')){
     $chado->handle_parent($feature);
@@ -816,7 +816,7 @@ END
 
   $name           = $name->value if ref($name);
 
-  if ($uniquename eq $feature->seq_id->value) { 
+  if ($uniquename eq $feature->seq_id) { 
     $chado->reftype_property($featuretype,$type); #  a reference sequence?? yes 
     } 
   
@@ -843,7 +843,7 @@ END
 #need to convert from base to interbase coords
     my $start = $feature->start eq '.' ? '\N' : ($feature->start - 1);
     my $end   = $feature->end   eq '.' ? '\N' : defined($feature->end) ? $feature->end : '\N';
-    my $phase = ($feature->phase->value eq '.' or $feature->phase->value eq '') ? '\N' : $feature->phase->value;
+    my $phase = ($feature->phase eq '.' or $feature->phase eq '') ? '\N' : $feature->phase;
 
     $chado->print_floc($nextfeatureloc, $chado->cache('feature',$uniquename), $src, $start, $end, $feature->strand, $phase,'0',$locgroup{$uniquename});
   }
