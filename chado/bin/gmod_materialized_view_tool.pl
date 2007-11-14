@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
+use lib '/home/cain/cvs_stuff/schema/chado/lib';
+use lib '/home/scott/cvs_stuff/schema/chado/lib';
+
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 #use CXGN::DB::InsertDBH;
@@ -19,7 +22,7 @@ use Getopt::Long;
 our $TABLE = "materialized_view";
 our $SCHEMA = "public";
 
-my ($DBPROFILE, $STATUS, $LIST,
+my ($DBPROFILE, $STATUS, $LIST, $NAME,
     $CREATE_VIEW, $UPDATE_VIEW, $AUTOMATIC);
 
 GetOptions(
@@ -29,6 +32,7 @@ GetOptions(
     'create_view' => \$CREATE_VIEW,
     'update_view=s' => \$UPDATE_VIEW, 
     'automatic'   => \$AUTOMATIC,
+    'name=s'      => \$NAME,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 $DBPROFILE ||='default';
@@ -37,11 +41,12 @@ my $gmod_conf = Bio::GMOD::Config->new();
 my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $DBPROFILE);
 
 my $dbh = $db_conf->dbh;
+$dbh->{AutoCommit} = 0;
 #usage() unless($longarg =~ /^(status)|(list)$/ || $arg->{c} || $arg->{n} || $arg->{a});
 
 #our $view_dbh = CXGN::DB::Connection->new({dbhost => $arg->{h}, dbname => $arg->{d}});
 
-my $db_message = "Viewing '" . $db_conf->name . "' database on host " . $db_conf->_host;
+my $db_message = "Viewing '" . $db_conf->name . "' database on host " . $db_conf->host;
 print "=" x length($db_message) . "\n";
 print $db_message . "\n";
 print "=" x length($db_message) . "\n\n";
@@ -117,7 +122,7 @@ sub view_info {
 	my @list_cols = qw/ name mv_schema mv_table refresh_time last_update /;
 	$query = "SELECT " . join(", ", @list_cols) . " FROM $SCHEMA.$TABLE" if $longarg eq "list";
 	$query = "SELECT name, EXTRACT(epoch FROM NOW() - last_update) AS time_passed, refresh_time FROM $SCHEMA.$TABLE" if $longarg eq "status";
-	my $sth = $view_dbh->prepare($query);
+	my $sth = $dbh->prepare($query);
 	print "Status of materialized views:\n" if $longarg eq "status";
 	print "List of materialized views:\n" if $longarg eq "list";
 	$sth->execute() or exit 0;
@@ -311,7 +316,7 @@ sub prompt_create_mv {
 	if($confirm){
 		$insert_q->execute($refresh_time, $name, $mv_schema, $mv_table, $mv_specs, $query)
 			or die "MV insert error: " . $dbh->errstr . "\n";
-		$arg->{n} = $name;
+		$NAME = $name;
 	}
 	}
 	$dbh->commit();
@@ -350,7 +355,7 @@ sub update_mv {
 		print $create_q . "\n";
 		$dbh->do($create_q)
 			or die "Couldn't create materialized view\n";
-		$dbh->do("GRANT SELECT ON $mv_schema.$mv_table TO web_usr");
+		$dbh->do("GRANT SELECT ON $mv_schema.$mv_table TO public");
 		print "MV table created.\n";
 		$dbh->do("SET SEARCH_PATH=$mv_schema");
 		foreach(@indexed){
