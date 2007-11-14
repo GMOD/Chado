@@ -49,6 +49,15 @@ file, you could indicate '--splitfile type=match', and all cDNA_match,
 EST_match and cross_genome_match features would go into separate files
 (separate by reference sequence).
 
+=head2 FASTA sequence
+
+If the GFF3 file contains FASTA sequence at the end, the sequence
+will be placed in a separate file with the extention '.fasta'.  This
+fasta file can be loaded separately after the split and/or sorted
+GFF3 files are loaded, using the command:
+
+  gmod_bulk_load_gff3.pl -g <fasta file name>
+
 =head1 AUTHOR
 
 Scott Cain E<lt>cain@cshl.orgE<gt>
@@ -101,13 +110,24 @@ my @gfffiles;
 for my $GFFFILE (@GFFFILE) {
   $GFFFILE  ||='-';
   $OUTFILE  ||="$GFFFILE.out.gff3";
+  my $FASTA = "$OUTFILE.fasta";
 
   if ($SPLITFILE && !$NOSPLIT) {
 
     open GFFIN, "<", $GFFFILE or die "couldn't open $GFFFILE for reading: $!";
+    open FASTA, ">", $FASTA or die " couldn't open $FASTA for writing: $!";
 
+    my $fasta_flag = 0;
     my %files;
     while ( <GFFIN> ) {
+        if (/^##FASTA/) {
+            $fasta_flag = 1;
+            print FASTA;
+            next;
+        } elsif ($fasta_flag) {
+            print FASTA;
+            next;
+        }
         next if /^#/;
         my @la = split /\t/;
 
@@ -194,11 +214,23 @@ for my $gfffile (@gfffiles) {
     $db->sorter_delete_from_table;
 
     my $outfile = $gfffile.'.sorted';
+    my $fasta   = "$outfile.fasta";
 
     open IN, "<", $gfffile or die "couldn't open $gfffile for reading: $!\n";
+    open FASTA, ">", $fasta or die "couldn't open $fasta for writing: $!\n";
 
+    my $fasta_flag = 0;
     print STDERR "Sorting the contents of $gfffile ...\n";
     while( <IN> ) {
+        if (/^##FASTA/) {
+            $fasta_flag = 1;
+            print FASTA;
+            next;
+        }
+        elsif ($fasta_flag) {
+            print FASTA;
+            next;
+        }
         my $line       = $_;
         my @line_array = split /\t/, $line;
 
