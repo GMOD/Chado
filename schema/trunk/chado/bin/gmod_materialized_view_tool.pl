@@ -6,20 +6,8 @@ use lib '/home/scott/cvs_stuff/schema/chado/lib';
 
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
-
-#use CXGN::DB::InsertDBH;
-#use CXGN::DB::Connection; #for read-only
-#CXGN::DB::Connection->verbose(0);
-
 use Bio::GMOD::DB::Tools::ETA;
-
-#use Getopt::Std qw/getopts/;
 use Getopt::Long;
-
-#our $arg = {};
-#getopts('cah:d:n:', $arg);
-
-#my $longarg = $ARGV[0];
 
 our $TABLE  = "materialized_view";
 our $SCHEMA = "public";
@@ -45,10 +33,6 @@ my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
 
 my $dbh = $db_conf->dbh;
 $dbh->{AutoCommit} = 0;
-
-#usage() unless($longarg =~ /^(status)|(list)$/ || $arg->{c} || $arg->{n} || $arg->{a});
-
-#our $view_dbh = CXGN::DB::Connection->new({dbhost => $arg->{h}, dbname => $arg->{d}});
 
 my $db_message =
   "Viewing '" . $db_conf->name . "' database on host " . $db_conf->host;
@@ -267,15 +251,16 @@ sub prompt_create_mv {
                 $remove_view = validate(
                     {
                         prompt =>
-                          "A view with this name already exists; do you want to replace it with a materialized view? [y|n]",
+                          "A view with this name already exists; do you want"
+                          ." to replace it\nwith a materialized view? [y|n] ",
                         regexp => '^y|n$'
                     }
                 );
             }
         }
         if ( $remove_view and $remove_view ne 'y' ) {
-            print
-"This (non-materialized) view already exists, and you won't let me remove it.  Bye!\n";
+            print "This (non-materialized) view already exists, and you won't"
+                  ."let me remove it.\nBye!\n";
             exit(0);
         }
 
@@ -283,7 +268,8 @@ sub prompt_create_mv {
         my $refresh_time = validate(
             {
                 prompt =>
-"How often, in seconds, should the MV be refreshed?\nYou can also type 'daily', 'weekly', 'monthly' (30 days), or 'yearly' (365 days): ",
+                     "How often, in seconds, should the MV be refreshed?\n"
+                    ."You can also type 'daily', 'weekly', 'monthly' (30 days), or 'yearly' (365 days): ",
                 regexp => '^(?i:(\d+)|(daily)|(weekly)|(monthly)|(yearly))$'
             }
         );
@@ -306,7 +292,8 @@ sub prompt_create_mv {
         my $mv_specs = validate(
             {
                 prompt =>
-"Enter specifications for the MV, OR provide a file in which the specs are written ('? for help): ",
+"Enter specifications for the materialized view, OR provide a file in which\n"
+."the specs are written ('? for help): ",
                 test => sub {
                     my $t = $_[0];
                     if ( -f $t ) {
@@ -335,12 +322,13 @@ sub prompt_create_mv {
         my $query = validate(
             {
                 prompt =>
-"Enter the SQL query for the materialized view, or a file containing only the query: ",
+                        "Enter the SQL query for the materialized view,\n"
+                       ."or a file containing only the query: ",
                 test => sub {
                     my $t = @_[0];
                     if ( -f $t ) {
                         print
-"'$t' is a valid file, reading into query variable...\n";
+                   "'$t' is a valid file, reading into query variable...\n";
                         print "File '$t' contents: ";
                         $t = slurp_file($t);
                         print "$t\n";
@@ -432,7 +420,6 @@ sub slurp_file {
 sub update_mv {
     my $name = shift;
 
-    #        my $force = shift;
     my $sth = $dbh->prepare("SELECT * FROM $SCHEMA.$TABLE WHERE name=?");
     $sth->execute($name);
     my $row = $sth->fetchrow_hashref();
@@ -491,21 +478,8 @@ sub update_mv {
     $dbh->do("SET SEARCH_PATH=$mv_schema");
 
     #find any indexes that belong to this table
-    my $index_query = $dbh->prepare(
-        'SELECT indexname FROM pg_indexes WHERE tablename=? AND schemaname=?');
-    $index_query->execute( $mv_table, $mv_schema );
+    drop_indexes($mv_schema,$mv_table);
 
-    while ( my $hashref = $index_query->fetchrow_hashref ) {
-        print "Dropping index $mv_schema.$$hashref{indexname}\n";
-        my $query = "DROP INDEX $mv_schema.$$hashref{indexname}";
-        $dbh->do($query);
-    }
-
-    #foreach(@indexed){
-    #	next unless /\w/;
-    #	my $query = "DROP INDEX ${mv_table}_$_";
-    #	$dbh->do($query);
-    #}
     print "Inserting new values into MV '$name'...\n";
     while ( my $entry = $sth->fetchrow_hashref() ) {
         my @valid_cols = extract_cols_from_specs($mv_specs);
@@ -542,7 +516,8 @@ sub dematerialize_view {
     my $view   = shift;
     my $really = validate(
         {
-            prompt => "Enter 'y' to confirm, 'n' to re-enter data: ",
+            prompt => 
+"Really remove the materialized view? Enter 'y' to confirm, 'n' to exit: ",
             regexp => '^y|n$'
         }
     );
@@ -551,12 +526,82 @@ sub dematerialize_view {
         exit(0);
     }
 
-    #determine if the table already exists, if not, exit
-    #
-    #drop indexes and table
-    #
-    #create index from mv_table, mv_specs, query
+    #get table and schema name from view name
+    my $get_the_pieces_query = $dbh->prepare("
+            SELECT mv_schema,mv_table,mv_specs,query
+            FROM materialized_view
+            WHERE name = ?
+        ");
+    $get_the_pieces_query->execute($view)
+        or die "problem with query ". $dbh->errstr;
 
+    my ($schema,$table,$columns,$query) = $get_the_pieces_query->fetchrow_array;
+
+    
+
+    #determine if the table already exists, if not, exit
+    my $exists_query = $dbh->prepare("SELECT count(*) FROM pg_tables
+                                      WHERE schemaname=? AND
+                                            tablename=?");
+    $exists_query->execute($schema,$table); 
+    my ($exists) = $exists_query->fetchrow_array;
+    unless ($exists) {
+        print "The table $schema.$table doesn't exist, so there is nothing to dematerialize.\n";
+        exit(0);
+    } 
+
+    #drop indexes and table
+    drop_indexes_and_table($schema,$table);
+
+    #create index from mv_table, mv_specs, query
+    #fix column spec
+    my @cols = split /,/, $columns;
+    my @columns;
+    for my $col (@cols) {
+        $col =~ /^\s*(\w+)\s+/;
+        push @columns, $1; 
+    }
+    $columns = join(',', @columns);
+
+    my $create_view_query = "CREATE VIEW $schema.$table ($columns) AS $query";
+    $dbh->do($create_view_query) or die "problem creating view: ".$dbh->errstr;
+
+    #change refresh_time to make it near infinite
+    #that is, about 20 years
+    my $update_query = $dbh->prepare(
+         "UPDATE materialized_view SET refresh_time=630720000 where name = ?");
+    $update_query->execute($view) 
+         or die "problem changing refresh_time ".$dbh->errstr;
+    $dbh->commit();
+    return;
+}
+
+sub drop_indexes_and_table {
+    my $schema = shift;
+    my $table  = shift;
+
+    drop_indexes($schema,$table);
+
+    $dbh->do("DROP TABLE $schema.$table")
+           or die "problem dropping table ".$dbh->errstr;
+
+    return;
+}
+
+sub drop_indexes {
+    my $schema = shift;
+    my $table  = shift;
+
+    my $index_query = $dbh->prepare(
+        'SELECT indexname FROM pg_indexes WHERE tablename=? AND schemaname=?');
+    $index_query->execute( $table, $schema );
+
+    while ( my $hashref = $index_query->fetchrow_hashref ) {
+        print "Dropping index $schema.$$hashref{indexname}\n";
+        my $query = "DROP INDEX $schema.$$hashref{indexname}";
+        $dbh->do($query);
+    }
+    return;
 }
 
 sub extract_cols_from_specs {
