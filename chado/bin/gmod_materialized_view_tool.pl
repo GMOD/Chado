@@ -9,11 +9,122 @@ use Bio::GMOD::DB::Config;
 use Bio::GMOD::DB::Tools::ETA;
 use Getopt::Long;
 
+=head1 NAME
+
+gmod_materialized_view_tool.pl - a tool for creating and mangaing
+materialized views for Chado.
+
+=head1 SYNOPSYS
+
+ % gmod_materialized_view_tool.pl [options]
+
+=head1 COMMAND-LINE OPTIONS
+
+ --create_view                    Guides user through creating a MV
+ --update_view viewname           Refreshes data in named MV
+ --automatic                      Refreshes data in all MV that are out of date
+ --dematerialize viewname         Creates a true view, removing the MV
+ --dbprofile profilename          DB profile options to use (default is 'default')
+ --list                           Gives a list of MV
+ --status                         Gives the status of all MV
+ --help                           Prints this documentation and quits
+
+Note that the options can be shortened.  For example, '--de' is
+an acceptable shortening of --dematerialize.  For options that have a
+unique first letter, the short (single hyphened) version of the option
+may be used, like '-c' for --create_view.
+
+=head1 DESCRIPTION
+
+WARNING: This script creates a rather large security hole that could 
+result in data loss.  Users could easily enter SQL queries through this
+interface that could damage your database.
+
+This tool provides several useful functions for creating and maintaining
+materialized views (MV) in a Chado schema.  A materialized view is simple
+a (real) database table that has been created and contains data from
+a collection of other tables.  It is like a view, only because it
+materialized, it can be indexed and searches on it will go much faster
+than on database views.  There are at least two down sides to MVs:
+
+=over
+
+=item 1 Data syncronisity
+
+When normal tables are updated with values that are reflected in a MV,
+there will be a delay (usually a very noticable one) between when 
+the normal table is updated and when the MV is updated.  This tool
+provides the means of updating the MVs; see --automatic below.
+
+=item 2 Disk space
+
+Since MVs are actual tables, they will take up actual disk space.  It
+is possible, depending on how the MV is created, it may take up an
+enormous amount of disk space.
+
+=back
+
+=head2 --create_view
+
+Guides the user through a series of prompts to create a new materialized view.
+
+=head2 --update_view viewname
+
+Updates the data in a materialized view by first deleting the data in 
+the table and then running the query that defines the data to repopulate it. 
+
+=head2 --automatic
+
+Automatically updates all of the MVs that are currently marked out of 
+date according to the update frequency that was specified when the MV
+was created.  This option is very useful in a cron job to update MVs
+on a regular basis.
+
+=head2 --dematerialize viewname
+
+Takes a MV and turns into a standard view.  This might be done if
+the database administrator desides that the downsides of the MV scheme
+is not working for a given view, if for example, the data in the underlying
+tables is changing to frequently or the MV is taking up too much disk space.
+
+=head2 --dbprofile
+
+The name of the DB profile to use for database connectivity.  These
+profiles are kept in $GMOD_ROOT/conf (typically /usr/local/gmod/conf)
+and contain information like the database name, user name and password.
+The default value is 'default' which was created when the Chado
+database was created.
+
+=head2 --list
+
+Gives a list of current MVs.
+
+=head2 --status
+
+Gives the status of all MVs, including whether they are considered
+current or out of date.
+
+=head2 --help
+
+Prints this documetation and quits.
+
+=head1 AUTHORS
+
+ and Scott Cain E<lt>cain@cshl.eduE<gt>
+
+Copyright (c) 2007
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+
 our $TABLE  = "materialized_view";
 our $SCHEMA = "public";
 
 my ( $DBPROFILE, $STATUS, $LIST, $NAME, $DEMATERIALIZE, $CREATE_VIEW,
-    $UPDATE_VIEW, $AUTOMATIC );
+    $UPDATE_VIEW, $AUTOMATIC, $HELP );
 
 GetOptions(
     'dbprofile=s'     => \$DBPROFILE,
@@ -22,9 +133,11 @@ GetOptions(
     'create_view'     => \$CREATE_VIEW,
     'update_view=s'   => \$UPDATE_VIEW,
     'automatic'       => \$AUTOMATIC,
-    'name=s'          => \$NAME,
     'dematerialize=s' => \$DEMATERIALIZE,
+    'help'            => \$HELP,
 ) or ( system( 'pod2text', $0 ), exit -1 );
+
+( system( 'pod2text', $0 ), exit -1 ) if $HELP;
 
 $DBPROFILE ||= 'default';
 
@@ -671,29 +784,6 @@ sub validate {
         }
     }
     return $resp;
-}
-
-sub usage {
-    print "\nUSAGE:\n";
-    print "$0 <options> [status|list]?\n";
-    print "Update materialized view(s) or create one\n";
-    print <<HERE;
-View Info
-	status - show which MV's are out-of-date and how current the others are
-	list - more info about all MV's
-
-Options with Arguments:
-	-h  <hostname>
-	-d  <database>
-	-n  <MV name>  provided MV will be force-updated
-
-Boolean Options:
-	-c  MV creation mode (overwrites -n)
-	-a  automatic update of all MV's that need to be refreshed
-
-HERE
-
-    exit 0;
 }
 
 sub format_secs {
