@@ -103,7 +103,8 @@ sub create_mv_table {
 				mv_table VARCHAR(128),
 				mv_specs TEXT,
 				indexed TEXT,
-				query TEXT
+				query TEXT,
+                                special_index TEXT
 				)" )
       or die "Can't create table\n";
     $dbh->do("GRANT SELECT ON $SCHEMA.$TABLE TO public");
@@ -364,9 +365,36 @@ sub prompt_create_mv {
             }
         );
 
+        my $special_indexes = validate(
+            {
+                prompt =>
+                        "Enter the SQL queries for the indexes,\n"
+                       ."or a file containing only the query: ",
+                test => sub {
+                    my $t = @_[0];
+                    if ( -f $t ) {
+                        print
+                   "'$t' is a valid file, reading into query variable...\n";
+                        print "File '$t' contents: ";
+                        $t = slurp_file($t);
+                        print "$t\n";
+                    }
+                    if ( $t =~ /^\s*CREATE.*INDEX[^?]+$/i ) {
+                        $_[0] = $t;
+                        return 1;
+                    }
+                    else {
+                        print
+"'$t' is not a valid file, or it is not valid SQL.  You can't use placeholders, by the way.\n";
+                    }
+                    return 0;
+                  }
+            } 
+        );
+
         my $insert_q =
           $dbh->prepare(
-"INSERT INTO $SCHEMA.$TABLE (last_update, refresh_time, name, mv_schema, mv_table, mv_specs, query, indexed ) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?)"
+"INSERT INTO $SCHEMA.$TABLE (last_update, refresh_time, name, mv_schema, mv_table, mv_specs, query, indexed, special_index ) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)"
           );
 
         print "\n\nConfirm that the following is correct:\n";
@@ -376,6 +404,7 @@ sub prompt_create_mv {
 "MV creation query: CREATE TABLE $mv_schema.$mv_table ( $mv_specs )\n";
         print "Query: $query\n";
         print "Indexes on: $indexes\n";
+        print "Special index query: $special_indexes\n";
         my $resp = validate(
             {
                 prompt => "Enter 'y' to confirm, 'n' to re-enter data: ",
@@ -386,7 +415,7 @@ sub prompt_create_mv {
 
         if ($confirm) {
             $insert_q->execute( $refresh_time, $name, $mv_schema, $mv_table,
-                $mv_specs, $query, $indexes )
+                $mv_specs, $query, $indexes, $special_indexes )
               or die "MV insert error: " . $dbh->errstr . "\n";
             $NAME = $name;
         }
@@ -434,6 +463,7 @@ sub update_mv {
       ( $row->{mv_schema}, $row->{mv_table}, $row->{mv_specs} );
     $table_exist_q->execute( $mv_schema, $mv_table );
     my $exists         = $table_exist_q->fetchrow_hashref;
+    my $special_indexes = $row->{special_index};
     my $indexed_string = $row->{indexed};
     my @indexed        = split /\s*,\s*/, $indexed_string;
     unless ($exists) {
@@ -450,6 +480,9 @@ sub update_mv {
             next unless /\w/;
             $dbh->do("CREATE INDEX ${mv_table}_$_ ON $mv_table($_)");
         }
+        $dbh->do($special_indexes)
+            or die "CREATE index query failed:\n"
+                   .$special_indexes. "\n".$dbh->errstr;
         $dbh->commit();
     }
 
@@ -503,6 +536,9 @@ sub update_mv {
         next unless /\w/;
         $dbh->do("CREATE INDEX ${mv_table}_$_ ON $mv_table($_)");
     }
+    $dbh->do($special_indexes)
+        or die "CREATE index query failed:\n"
+               .$special_indexes. "\n".$dbh->errstr;
 
     my $timeupq =
       $dbh->prepare("UPDATE $SCHEMA.$TABLE SET last_update=NOW() WHERE name=?");
