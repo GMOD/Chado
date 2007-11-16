@@ -2812,7 +2812,8 @@ sub handle_target {
       my $tstart    = $target->start -1; #convert to interbase
       my $tend      = $target->end;
       my $tstrand   = $target->strand ? $target->strand : '\N';
-      my $tsource   = $feature->source->value;
+      my $tsource   = ref($feature->source) 
+                        ? $feature->source->value : $feature->source;
 
       $self->synonyms($target_id,$self->cache('feature',$uniquename)) if (!$self->no_target_syn);
 
@@ -3009,7 +3010,8 @@ sub find_analysis {
 sub handle_nontarget_analysis {
     my $self = shift;
     my ($feature,$uniquename) = @_;
-    my $source = $feature->source->value;
+    my $source = ref($feature->source) 
+                  ? $feature->source->value : $feature->source;
     my $score = $feature->score ? $feature->score : '\N';
     $score    = '.' eq $score   ? '\N'            : $score;
 
@@ -3579,12 +3581,14 @@ ORDER BY cds.fmin,cds.gff_id
                 $polyp->end(    $fmax  );
                 $polyp->strand( $feat_obj->strand );
                 $polyp->name(   $parent_id.' polypeptide');
-                $polyp->source( $feat_obj->source->value);
+                $polyp->source( ref($feat_obj->source) 
+                               ? $feat_obj->source->value : $feat_obj->source );
 
                 my $polyp_ac = Bio::Annotation::Collection->new();
                 $polyp_ac->add_Annotation(
                     'source',Bio::Annotation::SimpleValue->new(
-                     $feat_obj->source->value));
+                     ref($feat_obj->source) 
+                         ? $feat_obj->source->value : $feat_obj->source));
                 $polyp_ac->add_Annotation(
                     'Note',Bio::Annotation::SimpleValue->new(
                      'polypeptide feature inferred from GFF3 CDS feature'));
@@ -3916,8 +3920,8 @@ sub handle_crud {
         }
     }
 
-    $name = $name->value;
-    my $type   = $feature->type->name;
+    $name = $name->value if ref($name);
+    my $type   = ref($feature->type) ? $feature->type->name : $feature->type;
     
     if ($op =~ /delete/) {
         #determine if a single feature corresponds to what is in the gff line
