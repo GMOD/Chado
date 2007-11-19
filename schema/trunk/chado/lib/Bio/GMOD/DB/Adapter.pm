@@ -3581,14 +3581,16 @@ ORDER BY cds.fmin,cds.gff_id
                 $polyp->end(    $fmax  );
                 $polyp->strand( $feat_obj->strand );
                 $polyp->name(   $parent_id.' polypeptide');
-                $polyp->source( ref($feat_obj->source) 
-                               ? $feat_obj->source->value : $feat_obj->source );
+
+                my $srcval= Bio::Annotation::SimpleValue->new(
+                     ref($feat_obj->source) 
+                         ? $feat_obj->source->value : $feat_obj->source);
+                         
+                $polyp->source( $srcval );
 
                 my $polyp_ac = Bio::Annotation::Collection->new();
-                $polyp_ac->add_Annotation(
-                    'source',Bio::Annotation::SimpleValue->new(
-                     ref($feat_obj->source) 
-                         ? $feat_obj->source->value : $feat_obj->source));
+                $polyp_ac->add_Annotation( 'source', $srcval);
+
                 $polyp_ac->add_Annotation(
                     'Note',Bio::Annotation::SimpleValue->new(
                      'polypeptide feature inferred from GFF3 CDS feature'));
