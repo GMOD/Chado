@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.121 2007-08-21 14:32:15 mwz444 Exp $
+# $Id: Makefile.PL,v 1.122 2007-11-19 15:34:27 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -488,6 +488,7 @@ my @exe_files = (
            'bin/gmod_apollo_triggers.pl',
            'bin/gmod_fasta2gff3.pl',
            'bin/gmod_sort_gff3.pl',
+           'bin/gmod_materialized_view_tool.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );

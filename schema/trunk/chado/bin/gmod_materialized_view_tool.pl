@@ -110,7 +110,8 @@ Prints this documetation and quits.
 
 =head1 AUTHORS
 
- and Scott Cain E<lt>cain@cshl.eduE<gt>
+Chris Carptia <ccarptia at gmail dot com>, with some minor additions and
+GMOD specific alterations from Scott Cain E<lt>cain@cshl.eduE<gt>.
 
 Copyright (c) 2007
 
