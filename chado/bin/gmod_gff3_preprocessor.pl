@@ -44,8 +44,8 @@ further split according to these rules:
  type=a,b,c   Puts lines with types that match 'a', 'b', or 'c' in a
                      separate file
 
-For example, if you wanted all of your analysis results to go in a separate
-file, you could indicate '--splitfile type=match', and all cDNA_match,
+		     For example, if you wanted all of your analysis results to go in a separate
+		     file, you could indicate '--splitfile type=match', and all cDNA_match,
 EST_match and cross_genome_match features would go into separate files
 (separate by reference sequence).
 
@@ -62,7 +62,7 @@ GFF3 files are loaded, using the command:
 
 Scott Cain E<lt>cain@cshl.orgE<gt>
 
-Copyright (c) 2006
+Copyright (c) 2006-2007
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
