@@ -1,4 +1,20 @@
-
+--------------------------------
+---- all_feature_names ---------
+--------------------------------
+-- This is a view to replace the denormaliziation of the synonym
+-- table.  It contains names and uniquenames from feature and
+-- synonym.names from the synonym table, so that GBrowse has one
+-- place to search for names.
+CREATE OR REPLACE VIEW all_feature_names (
+  feature_id,
+  name
+) AS
+SELECT feature_id,uniquename FROM feature
+UNION
+SELECT feature_id, name FROM feature
+UNION
+SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id;
 
 --------------------------------
 ---- dfeatureloc ---------------
