@@ -110,7 +110,7 @@ Prints this documetation and quits.
 
 =head1 AUTHORS
 
-Chris Carptia <ccarptia at gmail dot com>, with some minor additions and
+Chris Carpita <ccarpita at gmail dot com>, with some minor additions and
 GMOD specific alterations from Scott Cain E<lt>cain@cshl.eduE<gt>.
 
 Copyright (c) 2007
@@ -202,7 +202,7 @@ elsif ($DEMATERIALIZE) {
     dematerialize_view($DEMATERIALIZE);
 }
 else {
-    usage();
+    system( 'pod2text', $0 ), exit -1;
 }
 
 sub create_mv_table {
@@ -482,10 +482,14 @@ sub prompt_create_mv {
         my $special_indexes = validate(
             {
                 prompt =>
-                        "Enter the SQL queries for the indexes,\n"
-                       ."or a file containing only the query: ",
+                   "Enter the SQL queries for special indexes,\n"
+                   ."or a file containing only the query (or return for none): ",
                 test => sub {
                     my $t = @_[0];
+                    if ( $t eq "") {
+                        $_[0] = '';
+                        return 1;
+                    }
                     if ( -f $t ) {
                         print
                    "'$t' is a valid file, reading into query variable...\n";
@@ -594,9 +598,11 @@ sub update_mv {
             next unless /\w/;
             $dbh->do("CREATE INDEX ${mv_table}_$_ ON $mv_table($_)");
         }
-        $dbh->do($special_indexes)
-            or die "CREATE index query failed:\n"
-                   .$special_indexes. "\n".$dbh->errstr;
+        if ($special_indexes) {
+            $dbh->do($special_indexes)
+                or die "CREATE index query failed:\n"
+                .$special_indexes. "\n".$dbh->errstr;
+        }
         $dbh->commit();
     }
 
@@ -650,9 +656,11 @@ sub update_mv {
         next unless /\w/;
         $dbh->do("CREATE INDEX ${mv_table}_$_ ON $mv_table($_)");
     }
-    $dbh->do($special_indexes)
-        or die "CREATE index query failed:\n"
-               .$special_indexes. "\n".$dbh->errstr;
+    if ($special_indexes) {
+        $dbh->do($special_indexes)
+            or die "CREATE index query failed:\n"
+            .$special_indexes. "\n".$dbh->errstr;
+    }
 
     my $timeupq =
       $dbh->prepare("UPDATE $SCHEMA.$TABLE SET last_update=NOW() WHERE name=?");
