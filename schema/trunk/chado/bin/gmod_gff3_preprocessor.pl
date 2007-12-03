@@ -224,6 +224,7 @@ for my $gfffile (@gfffiles) {
     while( <IN> ) {
         if (/^##FASTA/) {
             $fasta_flag = 1;
+            print FASTA "##FASTA\n";
             print FASTA;
             next;
         }
