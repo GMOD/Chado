@@ -224,3 +224,20 @@ insert into dbxref (db_id,accession) values ((select db_id from db where name='n
 insert into cvterm (name,definition,cv_id,dbxref_id) values ('histogram','sensu statistica',  (select cv_id from cv where name = 'Statistical Terms'),(select dbxref_id from dbxref where accession='Statistical Terms:histogram'));
 
 insert into cv (name,definition) values ('autocreated','Terms that are automatically inserted by loading software');
+
+
+--this table will probably end up in general.sql
+ CREATE TABLE public.materialized_view   (       
+                                materialized_view_id SERIAL,
+                                last_update TIMESTAMP,
+                                refresh_time INT,
+                                name VARCHAR(64) UNIQUE,
+                                mv_schema VARCHAR(64),
+                                mv_table VARCHAR(128),
+                                mv_specs TEXT,
+                                indexed TEXT,
+                                query TEXT,
+                                special_index TEXT
+                                );
+
+

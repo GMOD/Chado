@@ -5,6 +5,28 @@
 -- table.  It contains names and uniquenames from feature and
 -- synonym.names from the synonym table, so that GBrowse has one
 -- place to search for names.
+--
+-- To materialize this view, run gmod_materialized_view_tool.pl -c and
+-- answer the questions with these responses:
+--
+--   all_feature_names
+--
+--   public.all_feature_names
+--
+--   y   (yes, replace the existing view)
+--
+--   (some update frequency, I chose daily)
+--
+--   feature_id integer,name varchar(255)
+--
+--   (the select part of the view below, all on one line)
+--
+--   feature_id,name
+--
+--   create index all_feature_names_lower_name on all_feature_names (lower(name))
+--
+--   y
+--
 CREATE OR REPLACE VIEW all_feature_names (
   feature_id,
   name

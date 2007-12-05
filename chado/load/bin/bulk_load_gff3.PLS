@@ -882,10 +882,11 @@ END
   if ($feature->annotation->get_Annotations('Alias')) {
     @aliases = map {$_->value} $feature->annotation->get_Annotations('Alias');
   }
-  if ($name ne '\N') {
-    push @aliases, $name;
-  }
-  push @aliases, $uniquename;
+  #Un-denormalizing the synonym table
+  #if ($name ne '\N') {
+  #  push @aliases, $name;
+  #}
+  #push @aliases, $uniquename;
 
   #need to unique-ify the list
   my %count;
