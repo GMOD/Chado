@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -3511,7 +3511,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -3635,7 +3635,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -3715,7 +3715,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -3921,7 +3921,7 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -4016,7 +4016,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -4248,7 +4248,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -4298,7 +4298,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -4491,7 +4491,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -5251,7 +5251,7 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -5539,7 +5539,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.49 2007-12-05 16:00:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.50 2007-12-12 04:03:29 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -5921,12 +5921,13 @@ CREATE OR REPLACE VIEW all_feature_names (
   feature_id,
   name
 ) AS
-SELECT feature_id,uniquename FROM feature
+SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name FROM feature
 UNION
-SELECT feature_id, name FROM feature
+SELECT feature_id, name FROM feature where name is not null
 UNION
 SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
-  WHERE fs.synonym_id = s.synonym_id;
+  WHERE fs.synonym_id = s.synonym_id ;
+
 
 --------------------------------
 ---- dfeatureloc ---------------
