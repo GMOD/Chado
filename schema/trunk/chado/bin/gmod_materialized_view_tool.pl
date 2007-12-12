@@ -64,6 +64,21 @@ enormous amount of disk space.
 
 =back
 
+=head2 A Note about SQL for populating the table
+
+When constructing the SELECT clause, the names of the columns selected
+must match the names of the columns in the materalized view.  For example,
+if the names of the columns are feature_id and name, but the columns
+being selected are feature_id and uniquename, you must use the "AS" option
+to rename the resulting column, like:
+
+  SELECT feature_id, uniquename AS name ...
+
+If you don't do this, the affected column in the resulting table will
+be empty.
+
+=head1 OPTIONS
+
 =head2 --create_view
 
 Guides the user through a series of prompts to create a new materialized view.

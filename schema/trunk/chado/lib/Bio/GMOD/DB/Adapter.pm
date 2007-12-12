@@ -4182,12 +4182,14 @@ sub sorter_get_second_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or $self->throw();
+    my $sth  = $dbh->prepare("SELECT distinct gffline,parent,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null) order by parent,id") or $self->throw();
     $sth->execute or $self->throw();
 
     my $result = $sth->fetchall_arrayref or $self->throw();
 
-    my @to_return = map { $$_[0] } @$result;
+    my %seen;
+    my @to_return = grep { ! $seen{$_}++ }  
+          map { $$_[0] } @$result;
 
     my %seen = ();
     my @uniq;
@@ -4204,12 +4206,14 @@ sub sorter_get_third_tier {
 
 #ARGH! need to deal with multiple parents!
 
-    my $sth  = $dbh->prepare("SELECT distinct gffline,id,parent FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id") or $self->throw();
+    my $sth  = $dbh->prepare("SELECT distinct gffline,parent,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null)) order by parent,id ") or $self->throw();
     $sth->execute or $self->throw();
 
     my $result = $sth->fetchall_arrayref or $self->throw();
 
-    my @to_return = map { $$_[0] } @$result;
+    my %seen;
+    my @to_return = grep { ! $seen{$_}++ } 
+          map { $$_[0] } @$result;
 
     my %seen = ();
     my @uniq;

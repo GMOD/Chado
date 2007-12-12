@@ -31,12 +31,12 @@ CREATE OR REPLACE VIEW all_feature_names (
   feature_id,
   name
 ) AS
-SELECT feature_id,uniquename FROM feature
+SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name FROM feature  
 UNION
-SELECT feature_id, name FROM feature
+SELECT feature_id, name FROM feature where name is not null 
 UNION
 SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
-  WHERE fs.synonym_id = s.synonym_id;
+  WHERE fs.synonym_id = s.synonym_id ;
 
 --------------------------------
 ---- dfeatureloc ---------------
