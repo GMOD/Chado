@@ -26,7 +26,7 @@ my $startperl = $Config{startperl} ne '#!perl'
   ? $Config{startperl}
   : "#!$Config{perlpath}";
                        
-print OUT <<"!GROK!THIS!";
+print OUT <<'!NO!SUBS!';
 ########DBI########
 package Chado::DBI;
 
@@ -35,6 +35,8 @@ package Chado::DBI;
 
 use strict;
 use Data::Dumper;
+use Bio::GMOD::Config;
+use Bio::GMOD::DB::Config;
 no warnings 'redefine';
 use base qw(Class::DBI::Pg);
 
@@ -42,25 +44,33 @@ use base qw(Class::DBI::Pg);
 # its very fragile for me on FC2.  I'm replacing it with the db_Main method below
 #Chado::DBI->set_db('Main', 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHOST'};port=$OPTIONS{'DBPORT'}', '$OPTIONS{'DBUSER'}', '$OPTIONS{'DBPASS'}');
 
-my \$db_options = { __PACKAGE__->_default_attributes };
+my $db_options = { __PACKAGE__->_default_attributes };
 __PACKAGE__->_remember_handle('Main'); # so dbi_commit works
-\$db_options->{AutoCommit} = 0;
+$db_options->{AutoCommit} = 0;
 
 sub db_Main {
-  my \$dbh;
-  \$dbh = DBI->connect_cached( 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHOST'};port=$OPTIONS{'DBPORT'}', '$OPTIONS{'DBUSER'}', '$OPTIONS{'DBPASS'}', \$db_options );
-  # clear the connection cache if can't ping
-  if (\$dbh->ping() < 1) {
-    my \$CachedKids_hashref = \$dbh->{Driver}->{CachedKids};
-    \%\$CachedKids_hashref = () if \$CachedKids_hashref;
-    \$dbh = DBI->connect_cached( 'dbi:Pg:dbname=$OPTIONS{'DBNAME'};host=$OPTIONS{'DBHOST'};port=$OPTIONS{'DBPORT'}', '$OPTIONS{'DBUSER'}', '$OPTIONS{'DBPASS'}', \$db_options );
-    warn("Database handle reset!: ".\$dbh." ping: ".\$dbh->ping());
-  }
-  return(\$dbh);
-}
-!GROK!THIS!
+ 
+  my $DBPROFILE ||= 'default';   #might want to allow passing this in somehow
+  my $gmod_conf = Bio::GMOD::Config->new();
+  my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
 
-print OUT <<'!NO!SUBS!';
+  my $dbname = $db_conf->name;
+  my $dbhost = $db_conf->host;
+  my $dbport = $db_conf->port;
+  my $dbuser = $db_conf->user;
+  my $dbpass = $db_conf->password;
+ 
+  my $dbh;
+  $dbh = DBI->connect_cached( "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport", $dbuser, $dbpass, $db_options );
+  # clear the connection cache if can't ping
+  if ($dbh->ping() < 1) {
+    my $CachedKids_hashref = $dbh->{Driver}->{CachedKids};
+    %$CachedKids_hashref = () if $CachedKids_hashref;
+    $dbh = DBI->connect_cached( "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport" $dbuser, $dbpass, $db_options );
+    warn("Database handle reset!: ".$dbh." ping: ".$dbh->ping());
+  }
+  return($dbh);
+}
 
 sub search_ilike { shift->_do_search(ILIKE => @_ ) }
 sub search_lower {
