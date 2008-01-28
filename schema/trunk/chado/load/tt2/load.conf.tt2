@@ -22,9 +22,10 @@
   <!--                 -->
   <!-- setup templates -->
   <!--                 -->
-  <template>
+<!-- Not creating LoadDBI.pm at make time anymore (now it depends on Bio::GMOD::DB::Config)  <template>
     <file name="LoadDBI" type="tt2" in="load/tt2/LoadDBI.tt2" out="lib/Chado/LoadDBI.pm"/>
   </template>
+-->
 
   <!--            -->
   <!-- NCBI       -->
