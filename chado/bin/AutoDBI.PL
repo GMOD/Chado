@@ -61,12 +61,20 @@ sub db_Main {
   my $dbpass = $db_conf->password;
  
   my $dbh;
-  $dbh = DBI->connect_cached( "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport", $dbuser, $dbpass, $db_options );
+  $dbh = DBI->connect_cached( 
+      "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport", 
+      $dbuser, 
+      $dbpass, 
+      $db_options );
   # clear the connection cache if can't ping
   if ($dbh->ping() < 1) {
     my $CachedKids_hashref = $dbh->{Driver}->{CachedKids};
     %$CachedKids_hashref = () if $CachedKids_hashref;
-    $dbh = DBI->connect_cached( "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport" $dbuser, $dbpass, $db_options );
+    $dbh = DBI->connect_cached(
+       "dbi:Pg:dbname=$dbname;host=$dbhost;port=$dbport",
+       $dbuser, 
+       $dbpass, 
+       $db_options );
     warn("Database handle reset!: ".$dbh." ping: ".$dbh->ping());
   }
   return($dbh);
