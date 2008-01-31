@@ -271,7 +271,7 @@
 
 <em>
 	<br />
-	$Id: sequence.html,v 1.6 2007-06-25 15:47:39 scottcain Exp $ <br />
+	$Id: sequence.html,v 1.7 2008-01-31 04:52:01 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -2751,6 +2751,15 @@ the default 0 value should be used. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="feature_cvterm-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
 </table>
 
 <h3>
@@ -2841,8 +2850,13 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>feature_id, cvterm_id, pub_id</td>
+	<td>feature_id, cvterm_id, pub_id, rank</td>
 </tr>
 
 </table>
@@ -3731,7 +3745,7 @@ the default 0 value should be used. </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08_01</a>
+SQL::Translator 0.08001</a>
 
 </body>
 </html>

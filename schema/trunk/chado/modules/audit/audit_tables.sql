@@ -2213,6 +2213,7 @@
        cvterm_id integer, 
        pub_id integer, 
        is_not boolean, 
+       rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2226,6 +2227,7 @@
        cvterm_id_var integer; 
        pub_id_var integer; 
        is_not_var boolean; 
+       rank_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2234,6 +2236,7 @@
        cvterm_id_var = OLD.cvterm_id;
        pub_id_var = OLD.pub_id;
        is_not_var = OLD.is_not;
+       rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -2247,6 +2250,7 @@
              cvterm_id, 
              pub_id, 
              is_not, 
+             rank, 
              transaction_type
        ) VALUES ( 
              feature_cvterm_id_var, 
@@ -2254,6 +2258,7 @@
              cvterm_id_var, 
              pub_id_var, 
              is_not_var, 
+             rank_var, 
              transaction_type_var
        );
 

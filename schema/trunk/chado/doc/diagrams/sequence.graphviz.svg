@@ -8,292 +8,293 @@
 <!-- Title: test Pages: 1 -->
 <svg width="9.97in" height="7.99in"
  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(0.815287 0.815287) rotate(0) translate(4 938)">
+<g id="graph0" class="graph" transform="scale(0.762661 0.762661) rotate(0) translate(4 1003)">
 <title>test</title>
-<polygon style="fill:white;stroke:white;" points="-4,4 -4,-938 1171,-938 1171,4 -4,4"/>
+<polygon style="fill:white;stroke:white;" points="-4,4 -4,-1003 1252,-1003 1252,4 -4,4"/>
 <!-- feature -->
 <g id="node1" class="node"><title>feature</title>
-<polygon style="fill:white;stroke:black;" points="512,-389 512,-685 636,-685 636,-389 512,-389"/>
-<text text-anchor="middle" x="574" y="-667" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature</text>
-<polyline style="fill:none;stroke:black;" points="512,-657 636,-657 "/>
-<text text-anchor="start" x="520" y="-639" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="520" y="-619" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
-<text text-anchor="start" x="520" y="-599" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; organism_id </text>
-<text text-anchor="start" x="520" y="-579" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; name </text>
-<text text-anchor="start" x="520" y="-559" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; uniquename </text>
-<text text-anchor="start" x="520" y="-539" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; residues </text>
-<text text-anchor="start" x="520" y="-519" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; seqlen </text>
-<text text-anchor="start" x="520" y="-499" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; md5checksum </text>
-<text text-anchor="start" x="520" y="-479" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="520" y="-459" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_analysis </text>
-<text text-anchor="start" x="520" y="-439" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_obsolete </text>
-<text text-anchor="start" x="520" y="-419" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; timeaccessioned </text>
-<text text-anchor="start" x="520" y="-399" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; timelastmodified </text>
+<polygon style="fill:white;stroke:black;" points="546,-362 546,-658 670,-658 670,-362 546,-362"/>
+<text text-anchor="middle" x="608" y="-640" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature</text>
+<polyline style="fill:none;stroke:black;" points="546,-630 670,-630 "/>
+<text text-anchor="start" x="554" y="-612" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="554" y="-592" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
+<text text-anchor="start" x="554" y="-572" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; organism_id </text>
+<text text-anchor="start" x="554" y="-552" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; name </text>
+<text text-anchor="start" x="554" y="-532" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; uniquename </text>
+<text text-anchor="start" x="554" y="-512" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; residues </text>
+<text text-anchor="start" x="554" y="-492" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; seqlen </text>
+<text text-anchor="start" x="554" y="-472" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; md5checksum </text>
+<text text-anchor="start" x="554" y="-452" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="554" y="-432" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_analysis </text>
+<text text-anchor="start" x="554" y="-412" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_obsolete </text>
+<text text-anchor="start" x="554" y="-392" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; timeaccessioned </text>
+<text text-anchor="start" x="554" y="-372" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; timelastmodified </text>
 </g>
 <!-- featureloc -->
 <g id="node2" class="node"><title>featureloc</title>
-<polygon style="fill:white;stroke:black;" points="534,-1 534,-277 651,-277 651,-1 534,-1"/>
-<text text-anchor="middle" x="592" y="-259" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureloc</text>
-<polyline style="fill:none;stroke:black;" points="534,-249 651,-249 "/>
-<text text-anchor="start" x="542" y="-231" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_id </text>
-<text text-anchor="start" x="542" y="-211" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="542" y="-191" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; srcfeature_id </text>
-<text text-anchor="start" x="542" y="-171" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; fmin </text>
-<text text-anchor="start" x="542" y="-151" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_fmin_partial </text>
-<text text-anchor="start" x="542" y="-131" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; fmax </text>
-<text text-anchor="start" x="542" y="-111" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_fmax_partial </text>
-<text text-anchor="start" x="542" y="-91" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; strand </text>
-<text text-anchor="start" x="542" y="-71" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; phase </text>
-<text text-anchor="start" x="542" y="-51" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; residue_info </text>
-<text text-anchor="start" x="542" y="-31" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; locgroup </text>
-<text text-anchor="start" x="542" y="-11" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="572,-1 572,-277 689,-277 689,-1 572,-1"/>
+<text text-anchor="middle" x="630" y="-259" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureloc</text>
+<polyline style="fill:none;stroke:black;" points="572,-249 689,-249 "/>
+<text text-anchor="start" x="580" y="-231" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_id </text>
+<text text-anchor="start" x="580" y="-211" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="580" y="-191" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; srcfeature_id </text>
+<text text-anchor="start" x="580" y="-171" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; fmin </text>
+<text text-anchor="start" x="580" y="-151" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_fmin_partial </text>
+<text text-anchor="start" x="580" y="-131" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; fmax </text>
+<text text-anchor="start" x="580" y="-111" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_fmax_partial </text>
+<text text-anchor="start" x="580" y="-91" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; strand </text>
+<text text-anchor="start" x="580" y="-71" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; phase </text>
+<text text-anchor="start" x="580" y="-51" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; residue_info </text>
+<text text-anchor="start" x="580" y="-31" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; locgroup </text>
+<text text-anchor="start" x="580" y="-11" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature&#45;&gt;featureloc -->
 <g id="edge12" class="edge"><title>feature&#45;&gt;featureloc</title>
-<path style="fill:none;stroke:black;" d="M581,-389C583,-355 584,-320 585,-287"/>
-<polygon style="fill:black;stroke:black;" points="588.488,-287.299 586,-277 581.522,-286.602 588.488,-287.299"/>
+<path style="fill:none;stroke:black;" d="M617,-362C619,-337 620,-312 621,-287"/>
+<polygon style="fill:black;stroke:black;" points="624.488,-287.299 622,-277 617.522,-286.602 624.488,-287.299"/>
 </g>
 <!-- feature_pub -->
 <g id="node4" class="node"><title>feature_pub</title>
-<polygon style="fill:white;stroke:black;" points="524,-754 524,-850 638,-850 638,-754 524,-754"/>
-<text text-anchor="middle" x="581" y="-832" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_pub</text>
-<polyline style="fill:none;stroke:black;" points="524,-822 638,-822 "/>
-<text text-anchor="start" x="532" y="-804" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pub_id </text>
-<text text-anchor="start" x="532" y="-784" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="532" y="-764" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="561,-686 561,-782 675,-782 675,-686 561,-686"/>
+<text text-anchor="middle" x="618" y="-764" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_pub</text>
+<polyline style="fill:none;stroke:black;" points="561,-754 675,-754 "/>
+<text text-anchor="start" x="569" y="-736" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pub_id </text>
+<text text-anchor="start" x="569" y="-716" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="569" y="-696" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- feature&#45;&gt;feature_pub -->
 <g id="edge6" class="edge"><title>feature&#45;&gt;feature_pub</title>
-<path style="fill:none;stroke:black;" d="M578,-685C579,-706 579,-726 580,-744"/>
-<polygon style="fill:black;stroke:black;" points="576.5,-744 580,-754 583.5,-744 576.5,-744"/>
+<path style="fill:none;stroke:black;" d="M615,-658C615,-664 615,-670 616,-676"/>
+<polygon style="fill:black;stroke:black;" points="612.5,-676 616,-686 619.5,-676 612.5,-676"/>
 </g>
 <!-- featureprop -->
 <g id="node6" class="node"><title>featureprop</title>
-<polygon style="fill:white;stroke:black;" points="289,-540 289,-676 401,-676 401,-540 289,-540"/>
-<text text-anchor="middle" x="345" y="-658" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureprop</text>
-<polyline style="fill:none;stroke:black;" points="289,-648 401,-648 "/>
-<text text-anchor="start" x="297" y="-630" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_id </text>
-<text text-anchor="start" x="297" y="-610" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="297" y="-590" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="297" y="-570" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
-<text text-anchor="start" x="297" y="-550" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="308,-575 308,-711 420,-711 420,-575 308,-575"/>
+<text text-anchor="middle" x="364" y="-693" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureprop</text>
+<polyline style="fill:none;stroke:black;" points="308,-683 420,-683 "/>
+<text text-anchor="start" x="316" y="-665" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_id </text>
+<text text-anchor="start" x="316" y="-645" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="316" y="-625" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="316" y="-605" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
+<text text-anchor="start" x="316" y="-585" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature&#45;&gt;featureprop -->
 <g id="edge14" class="edge"><title>feature&#45;&gt;featureprop</title>
-<path style="fill:none;stroke:black;" d="M512,-556C480,-566 443,-578 411,-587"/>
-<polygon style="fill:black;stroke:black;" points="409.573,-583.774 401,-590 411.584,-590.479 409.573,-583.774"/>
+<path style="fill:none;stroke:black;" d="M546,-544C510,-563 466,-588 429,-607"/>
+<polygon style="fill:black;stroke:black;" points="427.042,-604.084 420,-612 430.441,-610.203 427.042,-604.084"/>
 </g>
 <!-- feature_dbxref -->
 <g id="node8" class="node"><title>feature_dbxref</title>
-<polygon style="fill:white;stroke:black;" points="661,-308 661,-424 791,-424 791,-308 661,-308"/>
-<text text-anchor="middle" x="726" y="-406" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_dbxref</text>
-<polyline style="fill:none;stroke:black;" points="661,-396 791,-396 "/>
-<text text-anchor="start" x="669" y="-378" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_dbxref_id </text>
-<text text-anchor="start" x="669" y="-358" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="669" y="-338" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
-<text text-anchor="start" x="669" y="-318" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_current </text>
+<polygon style="fill:white;stroke:black;" points="725,-323 725,-439 855,-439 855,-323 725,-323"/>
+<text text-anchor="middle" x="790" y="-421" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_dbxref</text>
+<polyline style="fill:none;stroke:black;" points="725,-411 855,-411 "/>
+<text text-anchor="start" x="733" y="-393" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_dbxref_id </text>
+<text text-anchor="start" x="733" y="-373" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="733" y="-353" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
+<text text-anchor="start" x="733" y="-333" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_current </text>
 </g>
 <!-- feature&#45;&gt;feature_dbxref -->
 <g id="edge4" class="edge"><title>feature&#45;&gt;feature_dbxref</title>
-<path style="fill:none;stroke:black;" d="M636,-467C647,-456 657,-443 667,-432"/>
-<polygon style="fill:black;stroke:black;" points="670.049,-433.831 674,-424 664.781,-429.221 670.049,-433.831"/>
+<path style="fill:none;stroke:black;" d="M670,-466C685,-456 701,-444 716,-433"/>
+<polygon style="fill:black;stroke:black;" points="718.621,-435.459 725,-427 714.738,-429.635 718.621,-435.459"/>
 </g>
 <!-- feature_relationship -->
 <g id="node9" class="node"><title>feature_relationship</title>
-<polygon style="fill:white;stroke:black;" points="321,-283 321,-439 480,-439 480,-283 321,-283"/>
-<text text-anchor="middle" x="400" y="-421" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationship</text>
-<polyline style="fill:none;stroke:black;" points="321,-411 480,-411 "/>
-<text text-anchor="start" x="329" y="-393" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
-<text text-anchor="start" x="329" y="-373" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; subject_id </text>
-<text text-anchor="start" x="329" y="-353" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; object_id </text>
-<text text-anchor="start" x="329" y="-333" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="329" y="-313" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
-<text text-anchor="start" x="329" y="-293" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="331,-295 331,-451 490,-451 490,-295 331,-295"/>
+<text text-anchor="middle" x="410" y="-433" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationship</text>
+<polyline style="fill:none;stroke:black;" points="331,-423 490,-423 "/>
+<text text-anchor="start" x="339" y="-405" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
+<text text-anchor="start" x="339" y="-385" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; subject_id </text>
+<text text-anchor="start" x="339" y="-365" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; object_id </text>
+<text text-anchor="start" x="339" y="-345" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="339" y="-325" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
+<text text-anchor="start" x="339" y="-305" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature&#45;&gt;feature_relationship -->
 <g id="edge8" class="edge"><title>feature&#45;&gt;feature_relationship</title>
-<path style="fill:none;stroke:black;" d="M512,-474C503,-465 494,-456 485,-447"/>
-<polygon style="fill:black;stroke:black;" points="487.219,-444.221 478,-439 481.951,-448.831 487.219,-444.221"/>
+<path style="fill:none;stroke:black;" d="M546,-467C531,-457 515,-445 498,-434"/>
+<polygon style="fill:black;stroke:black;" points="500.1,-431.2 490,-428 495.9,-436.8 500.1,-431.2"/>
 </g>
 <!-- feature_cvterm -->
 <g id="node13" class="node"><title>feature_cvterm</title>
-<polygon style="fill:white;stroke:black;" points="748,-529 748,-665 880,-665 880,-529 748,-529"/>
-<text text-anchor="middle" x="814" y="-647" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm</text>
-<polyline style="fill:none;stroke:black;" points="748,-637 880,-637 "/>
-<text text-anchor="start" x="756" y="-619" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
-<text text-anchor="start" x="756" y="-599" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="756" y="-579" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; cvterm_id </text>
-<text text-anchor="start" x="756" y="-559" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
-<text text-anchor="start" x="756" y="-539" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_not </text>
+<polygon style="fill:white;stroke:black;" points="804,-560 804,-716 936,-716 936,-560 804,-560"/>
+<text text-anchor="middle" x="870" y="-698" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm</text>
+<polyline style="fill:none;stroke:black;" points="804,-688 936,-688 "/>
+<text text-anchor="start" x="812" y="-670" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
+<text text-anchor="start" x="812" y="-650" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="812" y="-630" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; cvterm_id </text>
+<text text-anchor="start" x="812" y="-610" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<text text-anchor="start" x="812" y="-590" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_not </text>
+<text text-anchor="start" x="812" y="-570" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature&#45;&gt;feature_cvterm -->
 <g id="edge2" class="edge"><title>feature&#45;&gt;feature_cvterm</title>
-<path style="fill:none;stroke:black;" d="M636,-553C667,-560 705,-570 738,-578"/>
-<polygon style="fill:black;stroke:black;" points="737.508,-581.471 748,-580 738.881,-574.607 737.508,-581.471"/>
+<path style="fill:none;stroke:black;" d="M670,-540C708,-559 755,-581 795,-601"/>
+<polygon style="fill:black;stroke:black;" points="793.559,-604.203 804,-606 796.958,-598.084 793.559,-604.203"/>
 </g>
 <!-- feature_synonym -->
 <g id="node18" class="node"><title>feature_synonym</title>
-<polygon style="fill:white;stroke:black;" points="960,-295 960,-451 1104,-451 1104,-295 960,-295"/>
-<text text-anchor="middle" x="1032" y="-433" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_synonym</text>
-<polyline style="fill:none;stroke:black;" points="960,-423 1104,-423 "/>
-<text text-anchor="start" x="968" y="-405" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_synonym_id </text>
-<text text-anchor="start" x="968" y="-385" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_id </text>
-<text text-anchor="start" x="968" y="-365" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
-<text text-anchor="start" x="968" y="-345" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
-<text text-anchor="start" x="968" y="-325" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_current </text>
-<text text-anchor="start" x="968" y="-305" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_internal </text>
+<polygon style="fill:white;stroke:black;" points="1030,-314 1030,-470 1174,-470 1174,-314 1030,-314"/>
+<text text-anchor="middle" x="1102" y="-452" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_synonym</text>
+<polyline style="fill:none;stroke:black;" points="1030,-442 1174,-442 "/>
+<text text-anchor="start" x="1038" y="-424" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_synonym_id </text>
+<text text-anchor="start" x="1038" y="-404" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_id </text>
+<text text-anchor="start" x="1038" y="-384" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_id </text>
+<text text-anchor="start" x="1038" y="-364" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<text text-anchor="start" x="1038" y="-344" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_current </text>
+<text text-anchor="start" x="1038" y="-324" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; is_internal </text>
 </g>
 <!-- feature&#45;&gt;feature_synonym -->
 <g id="edge10" class="edge"><title>feature&#45;&gt;feature_synonym</title>
-<path style="fill:none;stroke:black;" d="M636,-515C717,-486 860,-435 950,-402"/>
-<polygon style="fill:black;stroke:black;" points="951.427,-405.226 960,-399 949.416,-398.521 951.427,-405.226"/>
+<path style="fill:none;stroke:black;" d="M670,-495C759,-474 922,-435 1020,-411"/>
+<polygon style="fill:black;stroke:black;" points="1020.88,-414.393 1030,-409 1019.51,-407.529 1020.88,-414.393"/>
 </g>
 <!-- featureloc_pub -->
 <g id="node3" class="node"><title>featureloc_pub</title>
-<polygon style="fill:white;stroke:black;" points="757,-79 757,-175 888,-175 888,-79 757,-79"/>
-<text text-anchor="middle" x="822" y="-157" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureloc_pub</text>
-<polyline style="fill:none;stroke:black;" points="757,-147 888,-147 "/>
-<text text-anchor="start" x="765" y="-129" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_pub_id </text>
-<text text-anchor="start" x="765" y="-109" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_id </text>
-<text text-anchor="start" x="765" y="-89" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="806,-68 806,-164 937,-164 937,-68 806,-68"/>
+<text text-anchor="middle" x="871" y="-146" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureloc_pub</text>
+<polyline style="fill:none;stroke:black;" points="806,-136 937,-136 "/>
+<text text-anchor="start" x="814" y="-118" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_pub_id </text>
+<text text-anchor="start" x="814" y="-98" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureloc_id </text>
+<text text-anchor="start" x="814" y="-78" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- featureloc&#45;&gt;featureloc_pub -->
 <g id="edge30" class="edge"><title>featureloc&#45;&gt;featureloc_pub</title>
-<path style="fill:none;stroke:black;" d="M651,-136C680,-134 715,-132 747,-131"/>
-<polygon style="fill:black;stroke:black;" points="747.398,-134.478 757,-130 746.701,-127.512 747.398,-134.478"/>
+<path style="fill:none;stroke:black;" d="M689,-133C722,-130 761,-127 796,-123"/>
+<polygon style="fill:black;stroke:black;" points="796.398,-126.478 806,-122 795.701,-119.512 796.398,-126.478"/>
 </g>
 <!-- feature_pubprop -->
 <g id="node5" class="node"><title>feature_pubprop</title>
-<polygon style="fill:white;stroke:black;" points="300,-797 300,-933 440,-933 440,-797 300,-797"/>
-<text text-anchor="middle" x="370" y="-915" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_pubprop</text>
-<polyline style="fill:none;stroke:black;" points="300,-905 440,-905 "/>
-<text text-anchor="start" x="308" y="-887" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pubprop_id </text>
-<text text-anchor="start" x="308" y="-867" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pub_id </text>
-<text text-anchor="start" x="308" y="-847" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="308" y="-827" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
-<text text-anchor="start" x="308" y="-807" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="374,-862 374,-998 514,-998 514,-862 374,-862"/>
+<text text-anchor="middle" x="444" y="-980" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_pubprop</text>
+<polyline style="fill:none;stroke:black;" points="374,-970 514,-970 "/>
+<text text-anchor="start" x="382" y="-952" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pubprop_id </text>
+<text text-anchor="start" x="382" y="-932" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_pub_id </text>
+<text text-anchor="start" x="382" y="-912" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="382" y="-892" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
+<text text-anchor="start" x="382" y="-872" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature_pub&#45;&gt;feature_pubprop -->
 <g id="edge22" class="edge"><title>feature_pub&#45;&gt;feature_pubprop</title>
-<path style="fill:none;stroke:black;" d="M524,-819C501,-826 474,-834 450,-841"/>
-<polygon style="fill:black;stroke:black;" points="448.573,-837.774 440,-844 450.584,-844.479 448.573,-837.774"/>
+<path style="fill:none;stroke:black;" d="M575,-782C556,-804 533,-830 511,-855"/>
+<polygon style="fill:black;stroke:black;" points="508.596,-852.454 504,-862 513.546,-857.404 508.596,-852.454"/>
 </g>
 <!-- featureprop_pub -->
 <g id="node7" class="node"><title>featureprop_pub</title>
-<polygon style="fill:white;stroke:black;" points="36,-757 36,-853 176,-853 176,-757 36,-757"/>
-<text text-anchor="middle" x="106" y="-835" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureprop_pub</text>
-<polyline style="fill:none;stroke:black;" points="36,-825 176,-825 "/>
-<text text-anchor="start" x="44" y="-807" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_pub_id </text>
-<text text-anchor="start" x="44" y="-787" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_id </text>
-<text text-anchor="start" x="44" y="-767" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="46,-823 46,-919 186,-919 186,-823 46,-823"/>
+<text text-anchor="middle" x="116" y="-901" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">featureprop_pub</text>
+<polyline style="fill:none;stroke:black;" points="46,-891 186,-891 "/>
+<text text-anchor="start" x="54" y="-873" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_pub_id </text>
+<text text-anchor="start" x="54" y="-853" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; featureprop_id </text>
+<text text-anchor="start" x="54" y="-833" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- featureprop&#45;&gt;featureprop_pub -->
 <g id="edge32" class="edge"><title>featureprop&#45;&gt;featureprop_pub</title>
-<path style="fill:none;stroke:black;" d="M289,-654C254,-683 209,-720 172,-750"/>
-<polygon style="fill:black;stroke:black;" points="169.221,-747.781 164,-757 173.831,-753.049 169.221,-747.781"/>
+<path style="fill:none;stroke:black;" d="M308,-695C268,-731 216,-779 175,-816"/>
+<polygon style="fill:black;stroke:black;" points="172.596,-813.454 168,-823 177.546,-818.404 172.596,-813.454"/>
 </g>
 <!-- feature_relationship_pub -->
 <g id="node10" class="node"><title>feature_relationship_pub</title>
-<polygon style="fill:white;stroke:black;" points="271,-64 271,-160 458,-160 458,-64 271,-64"/>
-<text text-anchor="middle" x="364" y="-142" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationship_pub</text>
-<polyline style="fill:none;stroke:black;" points="271,-132 458,-132 "/>
-<text text-anchor="start" x="279" y="-114" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_pub_id </text>
-<text text-anchor="start" x="279" y="-94" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
-<text text-anchor="start" x="279" y="-74" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="299,-53 299,-149 486,-149 486,-53 299,-53"/>
+<text text-anchor="middle" x="392" y="-131" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationship_pub</text>
+<polyline style="fill:none;stroke:black;" points="299,-121 486,-121 "/>
+<text text-anchor="start" x="307" y="-103" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_pub_id </text>
+<text text-anchor="start" x="307" y="-83" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
+<text text-anchor="start" x="307" y="-63" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- feature_relationship&#45;&gt;feature_relationship_pub -->
 <g id="edge24" class="edge"><title>feature_relationship&#45;&gt;feature_relationship_pub</title>
-<path style="fill:none;stroke:black;" d="M389,-283C384,-247 377,-204 372,-170"/>
-<polygon style="fill:black;stroke:black;" points="375.478,-169.602 371,-160 368.512,-170.299 375.478,-169.602"/>
+<path style="fill:none;stroke:black;" d="M405,-295C402,-252 399,-199 396,-159"/>
+<polygon style="fill:black;stroke:black;" points="399.478,-158.602 395,-149 392.512,-159.299 399.478,-158.602"/>
 </g>
 <!-- feature_relationshipprop -->
 <g id="node11" class="node"><title>feature_relationshipprop</title>
-<polygon style="fill:white;stroke:black;" points="20,-406 20,-542 205,-542 205,-406 20,-406"/>
-<text text-anchor="middle" x="112" y="-524" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationshipprop</text>
-<polyline style="fill:none;stroke:black;" points="20,-514 205,-514 "/>
-<text text-anchor="start" x="28" y="-496" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_id </text>
-<text text-anchor="start" x="28" y="-476" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
-<text text-anchor="start" x="28" y="-456" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="28" y="-436" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
-<text text-anchor="start" x="28" y="-416" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="13,-437 13,-573 198,-573 198,-437 13,-437"/>
+<text text-anchor="middle" x="105" y="-555" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationshipprop</text>
+<polyline style="fill:none;stroke:black;" points="13,-545 198,-545 "/>
+<text text-anchor="start" x="21" y="-527" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_id </text>
+<text text-anchor="start" x="21" y="-507" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationship_id </text>
+<text text-anchor="start" x="21" y="-487" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="21" y="-467" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
+<text text-anchor="start" x="21" y="-447" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature_relationship&#45;&gt;feature_relationshipprop -->
 <g id="edge26" class="edge"><title>feature_relationship&#45;&gt;feature_relationshipprop</title>
-<path style="fill:none;stroke:black;" d="M321,-392C288,-405 250,-420 214,-433"/>
-<polygon style="fill:black;stroke:black;" points="212.717,-429.74 205,-437 215.56,-436.137 212.717,-429.74"/>
+<path style="fill:none;stroke:black;" d="M331,-407C293,-423 248,-443 207,-460"/>
+<polygon style="fill:black;stroke:black;" points="205.717,-456.74 198,-464 208.56,-463.137 205.717,-456.74"/>
 </g>
 <!-- feature_relationshipprop_pub -->
 <g id="node12" class="node"><title>feature_relationshipprop_pub</title>
-<polygon style="fill:white;stroke:black;" points="4,-115 4,-211 217,-211 217,-115 4,-115"/>
-<text text-anchor="middle" x="110" y="-193" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationshipprop_pub</text>
-<polyline style="fill:none;stroke:black;" points="4,-183 217,-183 "/>
-<text text-anchor="start" x="12" y="-165" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_pub_id </text>
-<text text-anchor="start" x="12" y="-145" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_id </text>
-<text text-anchor="start" x="12" y="-125" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="2,-109 2,-205 215,-205 215,-109 2,-109"/>
+<text text-anchor="middle" x="108" y="-187" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_relationshipprop_pub</text>
+<polyline style="fill:none;stroke:black;" points="2,-177 215,-177 "/>
+<text text-anchor="start" x="10" y="-159" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_pub_id </text>
+<text text-anchor="start" x="10" y="-139" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_relationshipprop_id </text>
+<text text-anchor="start" x="10" y="-119" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- feature_relationshipprop&#45;&gt;feature_relationshipprop_pub -->
 <g id="edge28" class="edge"><title>feature_relationshipprop&#45;&gt;feature_relationshipprop_pub</title>
-<path style="fill:none;stroke:black;" d="M112,-406C111,-351 111,-273 110,-221"/>
-<polygon style="fill:black;stroke:black;" points="113.5,-221 110,-211 106.5,-221 113.5,-221"/>
+<path style="fill:none;stroke:black;" d="M106,-437C106,-372 107,-276 107,-215"/>
+<polygon style="fill:black;stroke:black;" points="110.5,-215 107,-205 103.5,-215 110.5,-215"/>
 </g>
 <!-- feature_cvtermprop -->
 <g id="node14" class="node"><title>feature_cvtermprop</title>
-<polygon style="fill:white;stroke:black;" points="986,-776 986,-912 1144,-912 1144,-776 986,-776"/>
-<text text-anchor="middle" x="1065" y="-894" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvtermprop</text>
-<polyline style="fill:none;stroke:black;" points="986,-884 1144,-884 "/>
-<text text-anchor="start" x="994" y="-866" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvtermprop_id </text>
-<text text-anchor="start" x="994" y="-846" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
-<text text-anchor="start" x="994" y="-826" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="994" y="-806" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
-<text text-anchor="start" x="994" y="-786" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
+<polygon style="fill:white;stroke:black;" points="1043,-840 1043,-976 1201,-976 1201,-840 1043,-840"/>
+<text text-anchor="middle" x="1122" y="-958" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvtermprop</text>
+<polyline style="fill:none;stroke:black;" points="1043,-948 1201,-948 "/>
+<text text-anchor="start" x="1051" y="-930" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvtermprop_id </text>
+<text text-anchor="start" x="1051" y="-910" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
+<text text-anchor="start" x="1051" y="-890" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="1051" y="-870" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; value </text>
+<text text-anchor="start" x="1051" y="-850" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; rank </text>
 </g>
 <!-- feature_cvterm&#45;&gt;feature_cvtermprop -->
 <g id="edge20" class="edge"><title>feature_cvterm&#45;&gt;feature_cvtermprop</title>
-<path style="fill:none;stroke:black;" d="M880,-662C914,-695 954,-734 989,-769"/>
-<polygon style="fill:black;stroke:black;" points="986.454,-771.404 996,-776 991.404,-766.454 986.454,-771.404"/>
+<path style="fill:none;stroke:black;" d="M936,-709C972,-747 1015,-794 1051,-832"/>
+<polygon style="fill:black;stroke:black;" points="1048.78,-834.779 1058,-840 1054.05,-830.169 1048.78,-834.779"/>
 </g>
 <!-- feature_cvterm_dbxref -->
 <g id="node15" class="node"><title>feature_cvterm_dbxref</title>
-<polygon style="fill:white;stroke:black;" points="703,-809 703,-905 879,-905 879,-809 703,-809"/>
-<text text-anchor="middle" x="791" y="-887" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm_dbxref</text>
-<polyline style="fill:none;stroke:black;" points="703,-877 879,-877 "/>
-<text text-anchor="start" x="711" y="-859" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_dbxref_id </text>
-<text text-anchor="start" x="711" y="-839" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
-<text text-anchor="start" x="711" y="-819" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
+<polygon style="fill:white;stroke:black;" points="697,-879 697,-975 873,-975 873,-879 697,-879"/>
+<text text-anchor="middle" x="785" y="-957" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm_dbxref</text>
+<polyline style="fill:none;stroke:black;" points="697,-947 873,-947 "/>
+<text text-anchor="start" x="705" y="-929" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_dbxref_id </text>
+<text text-anchor="start" x="705" y="-909" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
+<text text-anchor="start" x="705" y="-889" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; dbxref_id </text>
 </g>
 <!-- feature_cvterm&#45;&gt;feature_cvterm_dbxref -->
 <g id="edge16" class="edge"><title>feature_cvterm&#45;&gt;feature_cvterm_dbxref</title>
-<path style="fill:none;stroke:black;" d="M808,-665C804,-706 800,-759 796,-799"/>
-<polygon style="fill:black;stroke:black;" points="792.512,-798.701 795,-809 799.478,-799.398 792.512,-798.701"/>
+<path style="fill:none;stroke:black;" d="M847,-716C833,-764 815,-825 802,-869"/>
+<polygon style="fill:black;stroke:black;" points="798.521,-868.416 799,-879 805.226,-870.427 798.521,-868.416"/>
 </g>
 <!-- feature_cvterm_pub -->
 <g id="node16" class="node"><title>feature_cvterm_pub</title>
-<polygon style="fill:white;stroke:black;" points="1005,-540 1005,-636 1165,-636 1165,-540 1005,-540"/>
-<text text-anchor="middle" x="1085" y="-618" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm_pub</text>
-<polyline style="fill:none;stroke:black;" points="1005,-608 1165,-608 "/>
-<text text-anchor="start" x="1013" y="-590" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_pub_id </text>
-<text text-anchor="start" x="1013" y="-570" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
-<text text-anchor="start" x="1013" y="-550" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
+<polygon style="fill:white;stroke:black;" points="1087,-578 1087,-674 1247,-674 1247,-578 1087,-578"/>
+<text text-anchor="middle" x="1167" y="-656" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">feature_cvterm_pub</text>
+<polyline style="fill:none;stroke:black;" points="1087,-646 1247,-646 "/>
+<text text-anchor="start" x="1095" y="-628" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_pub_id </text>
+<text text-anchor="start" x="1095" y="-608" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; feature_cvterm_id </text>
+<text text-anchor="start" x="1095" y="-588" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; pub_id </text>
 </g>
 <!-- feature_cvterm&#45;&gt;feature_cvterm_pub -->
 <g id="edge18" class="edge"><title>feature_cvterm&#45;&gt;feature_cvterm_pub</title>
-<path style="fill:none;stroke:black;" d="M880,-595C915,-594 957,-592 995,-591"/>
-<polygon style="fill:black;stroke:black;" points="995,-594.5 1005,-591 995,-587.5 995,-594.5"/>
+<path style="fill:none;stroke:black;" d="M936,-635C978,-633 1032,-631 1077,-629"/>
+<polygon style="fill:black;stroke:black;" points="1077,-632.5 1087,-629 1077,-625.5 1077,-632.5"/>
 </g>
 <!-- synonym -->
 <g id="node17" class="node"><title>synonym</title>
-<polygon style="fill:white;stroke:black;" points="1026,-73 1026,-189 1140,-189 1140,-73 1026,-73"/>
-<text text-anchor="middle" x="1083" y="-171" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">synonym</text>
-<polyline style="fill:none;stroke:black;" points="1026,-161 1140,-161 "/>
-<text text-anchor="start" x="1034" y="-143" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_id </text>
-<text text-anchor="start" x="1034" y="-123" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; name </text>
-<text text-anchor="start" x="1034" y="-103" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
-<text text-anchor="start" x="1034" y="-83" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_sgml </text>
+<polygon style="fill:white;stroke:black;" points="1102,-69 1102,-185 1216,-185 1216,-69 1102,-69"/>
+<text text-anchor="middle" x="1159" y="-167" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">synonym</text>
+<polyline style="fill:none;stroke:black;" points="1102,-157 1216,-157 "/>
+<text text-anchor="start" x="1110" y="-139" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_id </text>
+<text text-anchor="start" x="1110" y="-119" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; name </text>
+<text text-anchor="start" x="1110" y="-99" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; type_id </text>
+<text text-anchor="start" x="1110" y="-79" style="font-family:Nimbus Roman No9 L;font-weight:regular;font-size:11.34pt;">&#45; synonym_sgml </text>
 </g>
 <!-- synonym&#45;&gt;feature_synonym -->
 <g id="edge34" class="edge"><title>synonym&#45;&gt;feature_synonym</title>
-<path style="fill:none;stroke:black;" d="M1071,-189C1065,-218 1057,-253 1051,-285"/>
-<polygon style="fill:black;stroke:black;" points="1047.53,-284.508 1049,-295 1054.39,-285.881 1047.53,-284.508"/>
+<path style="fill:none;stroke:black;" d="M1146,-185C1139,-220 1130,-265 1121,-304"/>
+<polygon style="fill:black;stroke:black;" points="1117.53,-303.508 1119,-314 1124.39,-304.881 1117.53,-303.508"/>
 </g>
 </g>
 </svg>
