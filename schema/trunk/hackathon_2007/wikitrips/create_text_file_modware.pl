@@ -28,9 +28,13 @@ my $fh = File::Temp->new(UNLINK=>0);
 
 while ( my $gene = $genes->next ) {
     my $gene_name   = $gene->name();
-    my $description = $gene->description() || ''; #$gene->note() || '';
-    my @synonyms    = @{$gene->synonyms()};
-    my $syn_string  = join ", ", @synonyms || '';
+    my $description = $gene->description() || 
+                      $gene->_get_featureprops_of_type('Note') || '';
+    if (ref $description eq 'ARRAY') {
+        $description = join(", ",@{$description});
+    }
+    my $synonyms    = $gene->synonyms();
+    my $syn_string  = join (", ", @{$synonyms}) || '';
     my $row_data    = join ("||", $gene_name, $description, $syn_string);
     my $print_string
        = join("\t",$gene_name,$page_template,$table_template,$row_data)."\n";
