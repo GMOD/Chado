@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.66 2007-04-24 15:16:13 briano Exp $
+-- $Id: sequence.sql,v 1.67 2008-01-31 04:21:18 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -507,7 +507,8 @@ create table feature_cvterm (
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     is_not boolean not null default false,
-    constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id)
+    rank integer not null default 0,
+    constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id,rank)
 );
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
 create index feature_cvterm_idx2 on feature_cvterm (cvterm_id);
