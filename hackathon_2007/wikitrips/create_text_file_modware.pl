@@ -29,12 +29,10 @@ my $fh = File::Temp->new(UNLINK=>0);
 while ( my $gene = $genes->next ) {
     my $gene_name   = $gene->name();
     my $description = $gene->description() || 
-                      $gene->_get_featureprops_of_type('Note') || '';
-    if (ref $description eq 'ARRAY') {
-        $description = join(", ",@{$description});
-    }
+                      $gene->_get_featureprop('Note') ||
+                      '';
     my $synonyms    = $gene->synonyms();
-    my $syn_string  = join (", ", @{$synonyms}) || '';
+    my $syn_string  = join (", ", @$synonyms) || '';
     my $row_data    = join ("||", $gene_name, $description, $syn_string);
     my $print_string
        = join("\t",$gene_name,$page_template,$table_template,$row_data)."\n";
@@ -45,9 +43,14 @@ while ( my $gene = $genes->next ) {
 print $cgi->p('loading gene info via loadwiki.php...');
 
 my $tmpfile = $fh->filename;
-system("php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/cvs_stuff/schema/hackathon_2007/wikitrips/empty.con");
+system("/usr/bin/php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/schema/hackathon_2007/wikitrips/empty.conf") == 0 
+   or die "a problem happened loading the data into the wiki database";
 
 print $cgi->p('done');
+
+my $link_text = $cgi->a({-href=>"/wiki/index.php/$gene_name_input"},
+                        "Edit $gene_name_input");
+print $cgi->p("Now click this link to go to the wiki: $link_text".".");
 
 exit(0);
 
