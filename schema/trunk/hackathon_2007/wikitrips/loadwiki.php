@@ -24,6 +24,7 @@ if (is_file("$config_file")) {
 if (!isset($wiki_dir)) die ("can't get $wiki_dir from config file\n\n");
 
 if (is_file("$wiki_dir/AdminSettings.php")) {
+        unset($_SERVER['REQUEST_METHOD']);
 	require_once ("$wiki_dir/AdminSettings.php");
 	require_once ("$wiki_dir/maintenance/commandLine.inc");
 }else{
