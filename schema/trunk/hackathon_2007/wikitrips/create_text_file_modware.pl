@@ -7,24 +7,26 @@ use CGI::Untaint;
 use Modware::Search::Gene;
 
 my $cgi = CGI->new();
-print $cgi->header;
 
 my %params = $cgi->Vars;
 
-validate_parameters(%params);
+my $failure = validate_parameters(%params);
+handle_error($failure) if $failure;
 
 my $handler = CGI::Untaint->new( {INCLUDE_PATH => 'My::Untaint'}, %params );
 my $gene_name_input = $handler->extract(-as_text => 'gene_name');
 my $page_template   = $handler->extract(-as_text => 'page_template');
 my $table_template  = $handler->extract(-as_text => 'table_template');
 
-untaint_parameters($gene_name_input,$page_template,$table_template,%params);
+$failure = untaint_parameters($gene_name_input,
+                              $page_template,
+                              $table_template,%params);
+handle_error($failure) if $failure;
 
 my $genes = Modware::Search::Gene->Search_by_name( $gene_name_input );
 
-print $cgi->start_html;
-
-my $fh = File::Temp->new(UNLINK=>0);
+my $fh = File::Temp->new(UNLINK=>0) or $failure = "Opening the temp file failed: $!";
+handle_error($failure) if $failure;
 
 while ( my $gene = $genes->next ) {
     my $gene_name   = $gene->name();
@@ -36,23 +38,37 @@ while ( my $gene = $genes->next ) {
     my $row_data    = join ("||", $gene_name, $description, $syn_string);
     my $print_string
        = join("\t",$gene_name,$page_template,$table_template,$row_data)."\n";
-    print $cgi->p($print_string);
-    $fh->print($print_string);
+    $fh->print($print_string) or $failure = "Writing to temp file failed: $!";
+    handle_error($failure) if $failure;
 }
 
-print $cgi->p('loading gene info via loadwiki.php...');
-
 my $tmpfile = $fh->filename;
-system("/usr/bin/php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/schema/hackathon_2007/wikitrips/empty.conf") == 0 
-   or die "a problem happened loading the data into the wiki database";
 
-print $cgi->p('done');
+my $output = `/usr/bin/php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/schema/hackathon_2007/wikitrips/empty.conf`;
 
-my $link_text = $cgi->a({-href=>"/wiki/index.php/$gene_name_input"},
-                        "Edit $gene_name_input");
-print $cgi->p("Now click this link to go to the wiki: $link_text".".");
+$failure = "There was an error running the php loading script.  Here is the output from the script: $output" if $output;
 
-exit(0);
+if (!$failure) {
+    my $base = $cgi->url(-base=>1);
+    print $cgi->redirect($base . "/wiki/index.php/$gene_name_input");
+    exit(0);
+}
+else {
+    handle_error($failure);
+}
+
+
+sub handle_error {
+    my $error_string = shift;
+    print $cgi->header,
+      $cgi->start_html("Error"),
+      $cgi->h1("Sorry, there was a problem");
+      $cgi->p("This is probably not your fault; an error occurred while "
+             ."trying to get data out of the Chado database and copy it "
+             ."into the wiki database.");
+      $cgi->p("Here's what I know about the problem: $failure");
+    exit(0);
+}
 
 sub validate_parameters {
     my %params = @_;
@@ -70,25 +86,21 @@ sub validate_parameters {
         $error_msg .= 'The wiki table template name was not set.'
             unless ($params{table_template});
 
-        print $cgi->p($error_msg),
-              $cgi->p('Please go back to the offending page to try to figure out what went wrong or contact the administrator of this website.');
-        exit(0);
+        return $error_msg;
     }
 }
 
 sub untaint_parameters {
     my ($gene_name_input,$page_template,$table_template,%params) = @_;
     unless ($gene_name_input && $page_template && $table_template) {
-        print $cgi->start_html('Error'),
-              $cgi->h1('This cgi is unable to continue'),
-              $cgi->p('This script was given malformed paramters; only alphanumeric and the underscore character are allowed.  This is what was given:'),
-              $cgi->start_ul,
-                  $cgi->li("gene_name: $params{gene_name}"),
-                  $cgi->li("page_template: $params{page_template}"),
-                  $cgi->li("table_template: $params{table_template}"),
-              $cgi->end_ul,
+        my $err_str = 'This script was given malformed paramters; only alphanumeric and the underscore character are allowed.  This is what was given:'.
+              $cgi->start_ul.
+                  $cgi->li("gene_name: $params{gene_name}").
+                  $cgi->li("page_template: $params{page_template}").
+                  $cgi->li("table_template: $params{table_template}").
+              $cgi->end_ul.
               $cgi->p('Please go back to the offending page to try to figure out what went wrong or contact the administrator of this website.');
-        exit(0);
+        return $err_str;
     }
 }
 
