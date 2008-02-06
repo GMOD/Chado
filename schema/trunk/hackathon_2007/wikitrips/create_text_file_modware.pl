@@ -44,29 +44,26 @@ while ( my $gene = $genes->next ) {
 
 my $tmpfile = $fh->filename;
 
-my $output = `/usr/bin/php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/schema/hackathon_2007/wikitrips/empty.conf`;
+my @output = `/usr/bin/php /home/ubuntu/schema/hackathon_2007/wikitrips/loadwiki.php -f $tmpfile -c /home/ubuntu/schema/hackathon_2007/wikitrips/empty.conf`;
 
-$failure = "There was an error running the php loading script.  Here is the output from the script: $output" if $output;
+$failure = "There was an error running the php loading script.  Here is the output from the script: ".join(", ",@output) if $?;
+handle_error($failure) if $failure;
 
-if (!$failure) {
-    my $base = $cgi->url(-base=>1);
-    print $cgi->redirect($base . "/wiki/index.php/$gene_name_input");
-    exit(0);
-}
-else {
-    handle_error($failure);
-}
+my $base = $cgi->url(-base=>1);
+print $cgi->redirect($base . "/wiki/index.php/$gene_name_input");
+exit(0);
 
 
 sub handle_error {
     my $error_string = shift;
     print $cgi->header,
-      $cgi->start_html("Error"),
-      $cgi->h1("Sorry, there was a problem");
+      $cgi->start_html({-style=>"/gbrowse/gbrowse.css"},"Error"),
+      $cgi->h1("Sorry, there was a problem"),
       $cgi->p("This is probably not your fault; an error occurred while "
              ."trying to get data out of the Chado database and copy it "
-             ."into the wiki database.");
-      $cgi->p("Here's what I know about the problem: $failure");
+             ."into the wiki database."),
+      $cgi->p("Here's what I know about the problem: $error_string"),
+      $cgi->end_html;
     exit(0);
 }
 
@@ -78,7 +75,7 @@ sub validate_parameters {
         print $cgi->start_html('Error'),
               $cgi->h1('This cgi is unable to continue');
 
-        my $error_msg = 'This script was missing required input paramters. ';
+        my $error_msg;
         $error_msg .= 'The gene name was not set. '
             unless ($params{gene_name});
         $error_msg .= 'The wiki page template name was not set. '
@@ -88,6 +85,7 @@ sub validate_parameters {
 
         return $error_msg;
     }
+    return;
 }
 
 sub untaint_parameters {
@@ -102,6 +100,7 @@ sub untaint_parameters {
               $cgi->p('Please go back to the offending page to try to figure out what went wrong or contact the administrator of this website.');
         return $err_str;
     }
+    return;
 }
 
 

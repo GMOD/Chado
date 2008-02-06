@@ -11,6 +11,8 @@ arguments from command line
 
 $options = getopt('c:f:'); print_r($options);
 
+
+
 if (isset($options['f'])) $file = $options['f'];
 if (isset($options['c'])) $config_file = $options['c'];
 if (!isset($file) || !isset($config_file)) die ("USAGE:       php loadwiki.php -f input_filename -c config_filename\n\n");
@@ -32,7 +34,8 @@ if (is_file("$wiki_dir/AdminSettings.php")) {
 }
 
 #load misc. needed functions
-require_once "wiki.php";
+#require_once "wiki.php";
+require_once "common/wiki.php";
 
 $wgUser = User::newFromName('Wikientrybot');
 $wgUser->load();
@@ -50,7 +53,7 @@ $change_count = 0;
 while (!feof($infile)){
 	$line = fgets($infile, 4096);
 	if (trim($line) == '') continue;
-	$line_count++; #echo "working on line $line_count\n";
+	$line_count++; echo "working on line $line_count\n";
 	$data = parse_line($line);# print_r($data);
     if (!isset($data['page_name']) || $data['page_name']=='') continue;
 
@@ -64,13 +67,13 @@ while (!feof($infile)){
 		echo $err_msg;
 		continue;
 	}
-	
+
 	# look for the page by name
 	# need to check behavior on alternate namespaces
 	$title = Title::newFromText($data['page_name']);
  	if ( !$title->exists() || get_wiki_text($data['page_name']) == '' ) {
  		# page doesn't exist yet; add a temporary page to create a page_uid
-		#echo "adding a page for ".$data['page_name']."\n";
+		echo "adding a page for ".$data['page_name']."\n";
 		$article = new Article($title);
 		if ( !$title->exists()){
 			$article->doEdit( 'placeholder', 'Added by wikibot to create page id', EDIT_NEW | EDIT_FORCE_BOT );
@@ -82,10 +85,10 @@ while (!feof($infile)){
 
 		$article->doEdit( $new_page, 'Added by wikibot', EDIT_UPDATE | EDIT_FORCE_BOT );
        	$change_count++;
-		#echo "$line_count lines processed: ".$data['page_name']." is item $change_count\n";
+		echo "$line_count lines processed: ".$data['page_name']." is item $change_count\n";
     }else{
     	# page already exists.  Find the desired box
-		#echo $data['page_name']." already exists\n";
+		echo $data['page_name']." already exists\n";
 		$box_id = get_wikibox_id($data['page_name'], $data['table_template']);
 		$box_uid = get_wikibox_uid($box_id);
 		$box = new wikiBox();
@@ -95,7 +98,7 @@ while (!feof($infile)){
 		$rows = get_wikibox_rows($box, $uid, $data['metadata']);
  		if (count($rows) == 0){
 			$row = $box->insert_row('',$uid);
-			$rows[] = $row->row_index; #echo "adding new row row_index = ".$row->row_index."\n";
+			$rows[] = $row->row_index; echo "adding new row row_index = ".$row->row_index."\n";
 			$row->db_save_row();
 		}
 		#print_r($rows);
@@ -116,7 +119,7 @@ while (!feof($infile)){
  	} # end else - page already exists
 } # end while loop reading infile
 
-#echo "done!\n";
+echo "done!\n";
 
 # ============ functions =========================
 function parse_line($line){
