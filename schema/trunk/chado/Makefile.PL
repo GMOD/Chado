@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.122 2007-11-19 15:34:27 scottcain Exp $
+# $Id: Makefile.PL,v 1.123 2008-02-11 17:01:14 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -482,7 +482,7 @@ system( "$PERL load/Build.PL load_conf=$load_config; ./Build" ) == 0
 my @exe_files = (
            #'load/bin/gmod_load_affymetrix.pl',
            #'load/bin/gmod_load_affyxls.pl',
-           'load/bin/gmod_load_gff3.pl',
+           #'load/bin/gmod_load_gff3.pl',
            'load/bin/gmod_bulk_load_gff3.pl',
            #'bin/gmod_dump_gff3.pl',
            'bin/gmod_apollo_triggers.pl',
