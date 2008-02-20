@@ -1,56 +1,81 @@
-#!/usr/bin/perl -T
+#!/usr/bin/perl
 use warnings;
 use strict;
 
-use CGI qw/:standard start_div start_span start_pre/;
+use CGI qw/:standard start_div start_span start_pre start_ul/;
 
 my $working_dir = "/var/www/apollo/tmp/";
 my $apollo      = "/home/ubuntu/apollo/bin/apollo.headless";
-my $hostname    = "gmod.genetics.northwestern.edu";
+my $hostname    = url(-base=>1);
 $ENV{PATH}      = '/usr/local/java/bin:/usr/bin:/bin';
 
 unless(param()) { #print the starting page
 
     print header,
-          start_html(-title=>'Script for generating game on the fly from apollo',
-                     -style=>{src=>'/gbrowse/gbrowse.css'},),
-          h1('Request a GAME-XML file from the database'),
-          start_form(-method=>'GET'),
-          'Chromosome:',
-          popup_menu(-name=>'chromosome',
-                     -values=>[3]),p,
-          'start:',
-          textfield('start'),p,
-          'end:',
-          textfield('end'),p,
-          submit,
-          end_form,
-          end_html;
-
+         start_html(-title=>'Script for generating game on the fly from apollo',
+                    -style=>{src=>'/gbrowse/gbrowse.css'},),
+         h1('Request a GAME-XML file from the database'),
+         start_form(-method=>'GET'),
+         'Chromosome:',
+         popup_menu(-name=>'chromosome',
+                    -values=>[3]),p,
+         'start:',
+         textfield('start'),p,
+         'end:',
+         textfield('end'),p,
+         radio_group(
+             -name=>'xml_type',
+             -values=>['game','chado'],
+             -default=>'game',
+             -labels=>{'GAME-XML','chadoxml'}
+         ),p,
+         submit,
+         end_form,
+         end_html;
+         exit(0);
 }
 
-if (param()) {
 
-    my ($chromosome,$start,$end);
-    my $t_chromosome = param('chromosome');
-    my $t_start      = param('start');
-    my $t_end        = param('end');
+my ($chromosome,$start,$end,$failure,$xmltype);
+my $t_chromosome = param('chromosome');
+my $t_start      = param('start');
+my $t_end        = param('end');
+my $t_selection  = param('selection');
+my $t_xmltype    = param('xml_type');
 
-    if ($t_chromosome =~ /^(\d+)$/) {
-        $chromosome = $1; 
-    }
-    if ($t_start      =~ /^(\d+)$/) {
-        $start      = $1;
-    }
-    if ($t_end        =~ /^(\d+)$/) {
-        $end        = $1;
-    }
+if ($t_chromosome and $t_chromosome =~ /^(\d+)$/) {
+    $chromosome = $1; 
+}
+if ($t_start      and $t_start      =~ /^(\d+)$/) {
+    $start      = $1;
+}
+if ($t_end        and $t_end        =~ /^(\d+)$/) {
+    $end        = $1;
+}
+if ($t_selection  and $t_selection  =~ /^(\w+):(\d+)\.\.(\d+)$/) {
+    $chromosome = $1;
+    $start      = $2;
+    $end        = $3;
+}
+if ($t_xmltype =~ /^chado$/ or $t_xmltype =~ /^game$/) {
+    $xmltype = $t_xmltype;
+}
+else {
+    $xmltype = 'game';
+}
     
-    die unless ($chromosome && $start && $end);
+unless ($chromosome && $start && $end) {
+    $failure = p("The parameters used for this script weren't understood; here's what I got:")
+              .start_ul  . li("chromosome = $chromosome")
+                         . li("start = $start")
+                         . li("end = $end")
+              .end_ul;
+    handle_error($failure);
+}
 
-    my $filename = "$chromosome:$start\-$end";
+my $filename = "$chromosome:$start\-$end";
 
-    my $jscript = <<END;
+my $jscript = <<END;
 function visibility(id1,id2) {
   var visible = YAHOO.util.Dom.getStyle (id1,'display') == 'none' ? ['inline','none'] : ['none','inline'];
   YAHOO.util.Dom.setStyle(id1,'display',visible[0]);
@@ -58,61 +83,84 @@ function visibility(id1,id2) {
 }
 END
 
-    my $style = <<END;
+my $style = <<END;
 .showhide { position:relative; top:0px;}
 .output { border:1px solid blue; width:85%; overflow:auto; }
 .control { cursor:pointer }
 END
 
-    print header,
-          start_html(-title=>"Download $filename",
-                     -style=>[{src=>'/gbrowse/gbrowse.css'},
-                              {code=>$style}],
-                     -script=>[{-language=>'JAVASCRIPT',
-                                -src=>"/gbrowse/js/yahoo-dom-event.js"},
-                               {-code=>$jscript }] 
-          ),
-,
-          h1("Getting a game file for $filename"),
-          p('This may take a while...'),
-          start_div(-class=>"output");
+print header,
+      start_html(-title=>"Download $filename",
+                 -style=>[{src=>'/gbrowse/gbrowse.css'},
+                          {code=>$style}],
+                 -script=>[{-language=>'JAVASCRIPT',
+                            -src=>"/gbrowse/js/yahoo-dom-event.js"},
+                           {-code=>$jscript }] 
+      ),
+      h1("Getting a game file for $filename"),
+      p('This may take a while...'),
+      start_div(-class=>"output");
 
-    my $javacmd = "$apollo -w $working_dir$filename.xml -o game -l $filename -i chadoDB";
+my $javacmd = "$apollo -w $working_dir$filename.xml -o $xmltype -l $filename -i chadoDB";
 
-    print start_div({-id=>'invisible',
-                     -class=>'showhide',
-                     -style=>"display:none"}),
-          start_span({-onclick=>"visibility('visible','invisible')"}),
-          "[-] Hide Apollo output<br>",
-          end_span,
-          start_pre;
-    system($javacmd) == 0 or die;
-    print end_pre,end_div();
-    print start_div({-id=>'visible',
-                     -class=>'showhide',}),
-          start_span({-onclick=>"visibility('visible','invisible')"}),
-          "[+] Show Apollo output<br>",
-          end_span(),end_div(),end_div(),"<br clear=all>";
+print start_div({-id=>'invisible',
+                 -class=>'showhide',
+                 -style=>"display:none"}),
+      start_span({-onclick=>"visibility('visible','invisible')"}),
+      "[-] Hide Apollo output<br>",
+      end_span,
+      start_pre;
+system($javacmd);
+print end_pre,end_div();
+print start_div({-id=>'visible',
+                 -class=>'showhide',}),
+      start_span({-onclick=>"visibility('visible','invisible')"}),
+      "[+] Show Apollo output<br>",
+      end_span(),end_div(),end_div(),"<br clear=all>";
 
-    print start_span(-class=>'position:relative'),
-          p("The file $filename.xml has been created");
+print start_span(-class=>'position:relative');
 
-    open OUT, ">$working_dir$filename.jnlp" 
-       or die "couldn't open file $working_dir$filename.jnlp for writing: $!\n";
-
-    print OUT write_jnlp($hostname, $filename);
-
-    close OUT;
-
-    print p("Created the file $filename.jnlp."),
-          p("Click on this link: "
-          . a({href=>"http://$hostname/apollo/tmp/$filename.jnlp"},
-              "$filename.jnlp")
-          ." to start Apollo and download the file"),
-          end_span,
-          end_html; 
+my $error_flag;
+if (-e "$working_dir$filename.xml") {
+    print p("The file $filename.xml has been created");
+}
+else {
+    print h3("The file $filename.xml was not created; check the Apollo output for errors");
+    $error_flag = 1;
 }
 
+open OUT, ">$working_dir$filename.jnlp" 
+   or handle_error(
+        p("I couldn't open file $working_dir$filename.jnlp for writing: $!"));
+
+print OUT write_jnlp($hostname, $filename);
+
+close OUT;
+
+if (-e "$working_dir$filename.jnlp") {
+    print p("Created the file $filename.jnlp.");
+}
+else {
+    print h3("The file $filename.jnlp was not created; I don't know why");
+    $error_flag = 1;
+}
+   
+if (!$error_flag) { 
+    print  p("Click on this link: "
+      . a({href=>"$hostname/apollo/tmp/$filename.jnlp"},
+          "$filename.jnlp")
+      ." to start Apollo and download the file"),
+}
+
+print  end_span, end_html; 
+
+exit(0);
+
+sub handle_error {
+    my $failure = shift;
+    print h1("There was a problem"),$failure,end_html;
+    exit(0);
+}
 
 sub write_jnlp {
     my $hostname = shift;
@@ -122,8 +170,8 @@ sub write_jnlp {
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp
 spec="1.0+"
-codebase="http://$hostname/apollo"
-href="tmp/$filename.jnlp">
+codebase="$hostname/apollo"
+href="$hostname/apollo/tmp/$filename.jnlp">
 <information>
 <title>Apollo</title>
 <vendor>Stein Lab</vendor>
@@ -178,7 +226,7 @@ in -->
 <argument>-i</argument>
 <argument>game</argument>
 <argument>-f</argument>
-<argument>http://$hostname/apollo/tmp/$filename.xml</argument>
+<argument>$hostname/apollo/tmp/$filename.xml</argument>
 </application-desc>
 </jnlp>
 END
