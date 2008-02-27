@@ -716,6 +716,7 @@ if ($DELETE && !$DELETE_CONFIRM) {
     }
 }
 
+my ($analysis_err_str,$cds_err_str);
 my $processing_CDS = 0;
 my $feature_iterator; my $itern=0; my %seen_organism;
 FEATURE:
@@ -770,10 +771,12 @@ END
     }
   }
 
-  if ( $seen_cds && $seen_exon && !$NOEXON && !$processing_CDS) {
-    warn "\n\nThere are both CDS and exon features in this file, but\n"
+  if ( !$cds_err_str && $seen_cds && $seen_exon && !$NOEXON && !$processing_CDS) {
+    $cds_err_str = 
+         "\n\nThere are both CDS and exon features in this file, but\n"
         ."you did not set the --noexon option, which you probably want.\n"
         ."Please see `perldoc gmod_bulk_load_gff3.pl for more information.\n\n";
+    warn $cds_err_str;
   }
   my $nextfeature    = $chado->nextfeature();
   my $nextfeatureloc = $chado->nextfeatureloc();
@@ -829,6 +832,28 @@ END
     $chado->cache('feature',$uniquename,$nextfeature);
     $locgroup{$uniquename}       = 0;
     $current_feature_id=$nextfeature;
+  }
+
+  #if there are Targets, match types or scores and this is not ANALYSIS,
+  #there is a problem.
+  #
+  if (!$analysis_err_str && !$ANALYSIS && (
+      ((scalar($feature->annotation->get_Annotations('Target'))>0) and
+        ($feature->annotation->get_Annotations('Target'))[0]->value) or
+      (defined($feature->score) and $feature->score ne '.') or
+      $featuretype =~ /match/ 
+      ) ) {
+      my @errs;
+      push @errs, '* Has Target attributes'
+           if (defined($feature->annotation->get_Annotations('Target')) and
+              ($feature->annotation->get_Annotations('Target'))[0]->value);
+      push @errs, '* Has scores'
+           if (defined($feature->score) and $feature->score ne '.');
+      push @errs, '* Has a match feature type'
+           if ($featuretype =~ /match/);
+
+      $analysis_err_str = join("\n", @errs);
+      warn "\nThis file was not declared as analysis results (with the --analysis flag,\nbut this file contains attributes that imply that it is:\n$analysis_err_str\n\n";
   }
 
 
