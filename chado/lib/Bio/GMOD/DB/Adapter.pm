@@ -3349,7 +3349,12 @@ sub handle_note {
                                                     name='feature_property')");
           $sth->execute();
           my ($note_type) = $sth->fetchrow_array;
-          $self->cache('type','Note',$note_type);
+          if ($note_type) {
+              $self->cache('type','Note',$note_type);
+          }
+          else {
+              $self->throw("I couldn't find the 'Note' cvterm in the database;\nDid you load the feature property controlled vocabulary?");
+          }
       }
 
       if ( $self->constraint( name => 'featureprop_c1',
