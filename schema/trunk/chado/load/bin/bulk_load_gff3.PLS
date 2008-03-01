@@ -845,7 +845,7 @@ END
       ) ) {
       my @errs;
       push @errs, '* Has Target attributes'
-           if (defined($feature->annotation->get_Annotations('Target')) and
+           if (scalar($feature->annotation->get_Annotations('Target'))>0 and
               ($feature->annotation->get_Annotations('Target'))[0]->value);
       push @errs, '* Has scores'
            if (defined($feature->score) and $feature->score ne '.');
@@ -853,7 +853,7 @@ END
            if ($featuretype =~ /match/);
 
       $analysis_err_str = join("\n", @errs);
-      warn "\nThis file was not declared as analysis results (with the --analysis flag,\nbut this file contains attributes that imply that it is:\n$analysis_err_str\n\n";
+      warn "\nThis file was not declared as analysis results (with the --analysis flag,\nbut this file contains attributes that imply that it is:\n$analysis_err_str\nYou can safely ignore this message if you don't need to access scores\nassociated with these features.\n\n";
   }
 
 
