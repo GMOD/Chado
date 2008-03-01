@@ -1,4 +1,4 @@
-$Id: INSTALL.Chado,v 1.6 2007-11-07 04:30:23 scottcain Exp $
+$Id: INSTALL.Chado,v 1.7 2008-03-01 04:36:55 scottcain Exp $
 
 * COMMAND-LINE INSTALL
 
@@ -308,15 +308,18 @@ added (for instance to add a new organism or database).
 
 Gets and installs various ontologies.  Requires a network 
 connection.  Absolutely required are the Relationship Ontology and
-the Sequence Ontology (SO).  All others are optional.  Note retrieved
-ontology files are stored in the directory specified when
-'perl Makefile.PL' was run (the default is ./tmp).  In order to do a
-repeat installation, the directory containing the downloaded
-ontology must be removed.  In addition to 'rm -rf ./tmp', you can
-also issue the `make clean` command, which will clear out all
-of the files and directories created up until this point in the 
-installation.   Also note that loading a large ontology like the
-Gene Ontology will take several minutes (perhaps as long as an hour).
+the Sequence Ontology (SO).  All others are optional, though the Feature
+Property controlled vocabulary will typically be useful for loading GFF
+Files, and the Gene Ontology is generally useful for a wide variety of
+gene feature annotations.  Note retrieved ontology files are stored in
+the directory specified when 'perl Makefile.PL' was run (the default
+is ./tmp).  In order to do a repeat installation, the directory
+containing the downloaded ontology must be removed.  In addition
+to 'rm -rf ./tmp', you can also issue the `make clean` command,
+which will clear out all of the files and directories created
+up until this point in the installation.   Also note that loading
+a large ontology like the Gene Ontology will take several minutes
+(perhaps as long as an hour).
 
 At the time of this release, DBIx::DBStag is printing an error 
 when loading some ontologies like this:
