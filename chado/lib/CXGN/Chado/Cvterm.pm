@@ -11,6 +11,7 @@ CXGN::Chado::Cvterm - a class to handle controlled vocabulary terms.
 
  Naama Menda <nm249@cornell.edu>
  Lukas Mueller <lam87@cornell.edu> (added implementation of Bio::Ontology::TermI)
+                                   (added map_to_slim function [March 3, 2008])
 
 =cut
 
@@ -576,7 +577,9 @@ sub get_parents {
     
     my $self=shift;
     
-    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
+    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ?  and cvterm.is_obsolete = 0 order by cvterm.name asc");
+
+#SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
     $parents_sth->execute($self->get_cvterm_id());
     my @parents = ();
     while (my ($parent_term_id, $type_id) = $parents_sth->fetchrow_array()) { 
@@ -606,8 +609,10 @@ sub get_children {
     
     my $self=shift;
     
-    my $children_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.subject_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.subject_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.object_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
-    $children_sth->execute($self-> get_cvterm_id() );
+    my $children_sth = $self->get_dbh()->prepare("SELECT distinct(cvterm_relationship.subject_id), cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON (cvterm.cvterm_id=cvterm_relationship.subject_id) join dbxref on(cvterm.dbxref_id=dbxref.dbxref_id) join db using(db_id) WHERE cvterm_relationship.object_id= ?  and cvterm.is_obsolete = 0 and db_id=? order by cvterm.name asc");
+#SELECT cvterm_relationship.subject_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.subject_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.object_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
+    $children_sth->execute($self-> get_cvterm_id(), $self->get_dbxref()->get_db_id() );
+    print STDERR "Parent cvterm id = ".$self->get_cvterm_id()."\n";
     my @children = ();
     while (my ($child_term_id, $type_id) = $children_sth->fetchrow_array()) { 
 	print STDERR "retrieved child $child_term_id, $type_id\n";
@@ -1133,6 +1138,63 @@ sub get_alt_id {
     my $alt_id= $sth->fetchrow_array();
     return $alt_id || undef ;
 }
+
+=head2 map_to_slim
+
+ Usage:        my @match_list = $cvterm->map_to_slim(@term_list)
+ Desc:         returns a list of terms in the @term_list that 
+               are parents of the term object. This function is 
+               useful for mapping terms to a slim vocabulary.
+ Ret:          a list of term identifiers
+ Args:         a list of term identifiers that are in the slim vocabulary
+ Side Effects: accesses the database
+ Note:         the db name is stripped off if provided (GO:0003832 is 
+               given as 0003832)
+ Example:
+
+=cut
+
+sub map_to_slim {
+    my $self = shift;
+    my @slim = @_;
+    
+    my %slim_counts = ();
+    for (my $i=0; $i<@slim; $i++) { 
+	$slim[$i]=~s/.*?(\d+).*/$1/;
+	print STDERR "SLIM TERM: $slim[$i]\n";
+	$slim_counts{$slim[$i]}=0;
+    }
+
+    $slim_counts_ref = $self->get_slim_counts(\%slim_counts);
+
+    my @matches = ();
+    foreach my $k (keys %$slim_counts_ref) { 
+	if ($slim_counts_ref->{$k}>0) { push @matches, $k; }
+    }
+    return @matches;
+}
+
+sub get_slim_counts { 
+    my $self = shift;
+    my $slim_counts = shift;
+
+    foreach my $p ($self->get_parents()) { 
+	my $id = $p->[0]->identifier();
+	print STDERR "Checking $id\n";
+	if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
+	    $slim_counts->{$id}++; 
+	    next(); # don't go any more down this branch.
+	}
+	my $sub_counts = $p->[0]->get_slim_counts($slim_counts);
+	foreach my $k (keys(%$sub_counts)) { 
+	    if ($sub_counts->{$k}>0) { $slim_counts->{$k}=1; }
+	}
+    }
+    return $slim_counts;
+    
+}
+
+
 
 
 
