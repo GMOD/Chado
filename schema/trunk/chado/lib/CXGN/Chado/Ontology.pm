@@ -8,7 +8,7 @@ CXGN::Chado::Ontology - a class that implements the Bio::Ontology::OntologyI int
 
 This class implements the interface given in L<Bio::Ontology::OntologyI>. Refer to its documentation for most of the functions given below. 
 
-In addition, this class adds some utility functions:
+In addition, this class adds some utility functions and accessors that are more in-line with SGN usage.
 
 =head1 AUTHOR
 
@@ -33,11 +33,10 @@ use base qw | CXGN::DB::Object |;
 
 =head2 new
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage:        my $ont = CXGN::Chado::Ontology->new($dbh, $id)
+ Desc:         Constructor for an ontology object
+ Args:         a $dbh handle and an ontology id.
+ Side Effects: accesses the database if an $id is provided.
  Example:
 
 =cut
@@ -57,11 +56,11 @@ sub new {
 
 =head2 new_with_name
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage:        my $ont = CXGN::Chado::Ontology->new($dbh, $name)
+ Desc:         alternate constructor that generates an ontology
+               object from its name $name.
+ Args:         a database handle and a name.
+ Side Effects: accesses the database
  Example:
 
 =cut
@@ -81,11 +80,9 @@ sub new_with_name {
 
 =head2 fetch
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage:        $ont->fetch()
+ Desc:         fetches the object contents from the database.
+ Side Effects: accesses the database.
  Example:
 
 =cut
@@ -104,11 +101,14 @@ sub fetch {
 
 =head2 store
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage:        my $id = $ont->store()
+ Desc:         stores the object contents to the database.
+               if the object already has an id, an update is 
+               performed, otherwise an insert is performed.
+ Ret:          the id of the primary key is returned.
+ Args:         none
+ Side Effects: accesses the database. May set the ontology_id
+               property if the row did not exist in the database.
  Example:
 
 =cut
@@ -136,9 +136,9 @@ sub store {
 
 =head2 accessors get_cv_id, set_cv_id
 
- Usage:
- Desc:
- Property
+ Usage:        $ont->get_cv_id()
+ Desc:         the primary key of the ontology object.
+               the setter should not be used mindlessly.
  Side Effects:
  Example:
 
@@ -157,11 +157,12 @@ sub set_cv_id {
 
 =head2 name
 
- Usage:
- Desc:
+ Usage:        my $name = $ont->name()
+ Desc:         getter/setter of the ontology name.
  Ret:
  Args:
- Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -175,11 +176,13 @@ sub name {
 
 =head2 identifier
 
- Usage:
- Desc:
+ Usage:        my $id = $ont->identifier()
+ Desc:         getter/setter of the ontology id.
+               this is a synonym for get_cv_id.
  Ret:
  Args:
- Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -193,11 +196,11 @@ sub identifier {
 
 =head2 definition
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage:        my $def = $ont->definition()
+ Desc:         getter/setter of the definition property
+ Property:     [string]
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -216,11 +219,13 @@ sub definition {
 
 =head2 get_root_terms
 
- Usage:
+ Usage:        my @terms = $ont->get_root_terms()
  Desc:
  Ret:
  Args:
  Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -244,6 +249,8 @@ sub get_root_terms {
  Ret:
  Args:
  Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -268,6 +275,8 @@ my $sth = $self->get_dbh()->prepare($query);
  Ret:
  Args:
  Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -291,6 +300,8 @@ sub get_all_terms {
  Ret:
  Args:
  Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -301,11 +312,15 @@ sub get_ancestor_terms {
 
 =head2 get_parent_terms
 
- Usage:
+ Usage:        my @parents = $ont->get_parent_terms($term, $rel_type)
  Desc:
  Ret:
- Args:
+ Args:         a CXGN::Chado::Cvterm object, and a 
+               CXGN::Chado::Cvterm specifying the relation-
+               ship type.
  Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
  Example:
 
 =cut
@@ -390,7 +405,7 @@ sub get_descendant_terms {
 =head2 add_relationship
 
  Usage:
- Desc:
+ Desc:         [NOT YET IMPLEMENTED]
  Ret:
  Args:
  Side Effects:
@@ -405,10 +420,11 @@ sub add_relationship {
 =head2 get_relationships
 
  Usage:        @terms = $ont->get_relationships($term)
- Desc:         gets all the relationships of $term
- Ret:
- Args:
- Side Effects:
+ Desc:         gets all the relationships of term $term
+ Ret:          a list of CXGN::Chado::Relationship objects
+ Args:         a CXGN::Chado::Cvterm object.
+ Side Effects: accesses the database.
+ 
  Example:
 
 =cut
@@ -429,7 +445,7 @@ sub get_relationships {
 =head2 get_predicate_terms
 
  Usage:
- Desc:
+ Desc:         [NOT YET IMPLEMENTED]
  Ret:
  Args:
  Side Effects:
@@ -443,8 +459,8 @@ sub get_predicate_terms {
 
 =head2 add_term
 
- Usage:
- Desc:
+ Usage:        
+ Desc:         [NOT YET IMPLEMENTED]
  Ret:
  Args:
  Side Effects:
@@ -459,7 +475,7 @@ sub add_term {
 =head2 find_terms
 
  Usage:
- Desc:
+ Desc:         [NOT YET IMPLEMENTED]
  Ret:
  Args:
  Side Effects:
