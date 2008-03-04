@@ -577,10 +577,10 @@ sub get_parents {
     
     my $self=shift;
     
-    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ?  and cvterm.is_obsolete = 0 order by cvterm.name asc");
+    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id join dbxref on (cvterm.dbxref_id=dbxref.dbxref_id) join db using(db_id) WHERE cvterm_relationship.subject_id= ?  and cvterm.is_obsolete = 0 and db_id=? order by cvterm.name asc");
 
 #SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
-    $parents_sth->execute($self->get_cvterm_id());
+    $parents_sth->execute($self->get_cvterm_id(), $self->get_dbxref()->get_db_id());
     my @parents = ();
     while (my ($parent_term_id, $type_id) = $parents_sth->fetchrow_array()) { 
 	my $parent_term = CXGN::Chado::Cvterm->new($self->get_dbh(), $parent_term_id);
@@ -1161,7 +1161,7 @@ sub map_to_slim {
     my %slim_counts = ();
     for (my $i=0; $i<@slim; $i++) { 
 	$slim[$i]=~s/.*?(\d+).*/$1/;
-	print STDERR "SLIM TERM: $slim[$i]\n";
+	#print STDERR "SLIM TERM: $slim[$i]\n";
 	$slim_counts{$slim[$i]}=0;
     }
 
@@ -1180,7 +1180,7 @@ sub get_slim_counts {
 
     foreach my $p ($self->get_parents()) { 
 	my $id = $p->[0]->identifier();
-	print STDERR "Checking $id\n";
+	#print STDERR "Checking $id\n";
 	if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
 	    $slim_counts->{$id}++; 
 	    next(); # don't go any more down this branch.
