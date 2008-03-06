@@ -37,8 +37,6 @@ Provide the same arguments you would give to CXGN::DB::Connection.
 However, providing dbuser or dbpass is useless, since those will 
 be overwritten. 
 
-=back
-
 =item commit_prompt($prompt_message, $yes_regexp, $no_regexp, $stern_message)
 
 Print $prompt_message to STDOUT, then read one line of response from the
@@ -81,6 +79,30 @@ sub connect {
   # a username and password.
   my ($dbargs) = @_;
 
+  if ($$dbargs{'dbprofile'}) {
+    if (eval {require Bio::GMOD::Config;
+          Bio::GMOD::Config->import();
+          require Bio::GMOD::DB::Config;
+          Bio::GMOD::DB::Config->import();
+          1;  } ) {
+      my $gmod_conf = $ENV{'GMOD_ROOT'} || "/var/lib/gmod" ?
+                  Bio::GMOD::Config->new($ENV{'GMOD_ROOT'} || "/var/lib/gmod") :
+                  Bio::GMOD::Config->new();
+
+      my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf,
+                                               $$dbargs{'dbprofile'});
+      my $dbh = $db_conf->dbh;
+      if ($dbh) {
+        return $dbh;
+      } 
+      else {
+        die "You provided the dbprofile option, but I couldn't use it to connect\n";
+      }
+    }
+    else {
+      die "You provided the dbprofile option, but I couldn't load Bio::GMOD::Config\n";
+    }
+  }
 
   ######################################################
   # we will prompt the user for a username and password.

@@ -54,7 +54,7 @@ sub new {
     
     if ($dbh) { 
 	if (!$dbh->isa("CXGN::DB::Connection")) { 
-	    die "I need a database handle, folks! Byebye!\n";
+	    warn "Usually, this is a CXGN::DB::Connection, but it might have been provided by Bio::GMOD::Config\n";
 	}
     }
     else { 
