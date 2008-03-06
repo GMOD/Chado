@@ -19,6 +19,10 @@ hostname for database [required]
 
 database name [required]
 
+=item -p
+
+GMOD database profile name (can provide host and database name)
+
 =item -v
 
 verbose output
@@ -129,18 +133,29 @@ use CXGN::Chado::CV;
 use CXGN::Chado::Cvterm;
 use CXGN::Chado::Ontology;
 use CXGN::Chado::Relationship;
+use Bio::GMOD::Config;
+use Bio::GMOD::DB::Config;
 
-our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, $opt_u, $opt_o);
+our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
+     $opt_u, $opt_o, $opt_p);
 
-getopts('F:d:H:o:n:vD:tu');
+getopts('F:d:H:o:n:vD:tup:');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 
+my $DBPROFILE = $opt_p;
+$DBPROFILE ||= 'default';
+my $gmod_conf = Bio::GMOD::Config->new();
+my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
+
+$dbhost ||= $db_conf->host();
+$dbname ||= $db_conf->name();
+
 if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
 
 my $error = 0; # keep track of input errors (in command line switches).
-if (!$opt_D) { 
+if (!$opt_D and !$dbname) { 
     print STDERR "Option -D required. Must be a valid database name.\n";
     $error=1;
 }
@@ -170,7 +185,8 @@ if ($opt_o) { open (OUT, ">$opt_o") ||die "can't open error file $file for writt
 
 
 my $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				     dbname=>$dbname,  
+				      dbname=>$dbname,  
+                                      dbprofile=>$DBPROFILE,
 				   } );
 
 

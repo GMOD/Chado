@@ -12,7 +12,7 @@ Naama Menda (nm249@cornell.edu)
 
 =cut
 use CXGN::DB::Connection;
-use CXGN::Phenome::Locus; 
+#use CXGN::Phenome::Locus; 
 
 
 package CXGN::Chado::CV;
