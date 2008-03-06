@@ -13,15 +13,15 @@ parameters
 
 =item -H
 
-hostname for database [required]
+hostname for database [required if -p isn't used]
 
 =item -D
 
-database name [required]
+database name [required if -p isn't used]
 
 =item -p
 
-GMOD database profile name (can provide host and database name)
+GMOD database profile name (can provide host and DB name) Default: 'default'
 
 =item -v
 
