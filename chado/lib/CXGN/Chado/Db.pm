@@ -71,6 +71,8 @@ sub new {
 
  Usage:        my $db = CXGN::Chado::Db->new_with_name($dbh, "GO");
  Desc:         an alternate constructor that takes a db name as parameter
+               db name is case insensitive, but if more than one is found 
+               only one db_id is returned + a warning.
  Side Effects: accesses the database.
  Example:
 
@@ -81,10 +83,15 @@ sub new_with_name {
     my $dbh = shift;
     my $name = shift;
 
-    my $query = "SELECT db_id FROM db WHERE name = ?";
+    my $query = "SELECT db_id FROM db WHERE name ilike ?";
     my $sth = $dbh->prepare($query);
     $sth->execute($name);
-    my ($db_id) = $sth->fetchrow_array();
+    my @ids=();
+    while (my $id = $sth->fetchrow_array()) {
+	push @ids, $id;	
+    }
+    if (scalar(@ids) > 1 ) { warn "Db.pm: new with name found more than one db with iname $name! Please check your databse."; }
+    my $db_id= $ids[0] || undef; #return only the 1st id
     my $self = CXGN::Chado::Db->new($dbh, $db_id);
     return $self;
 }

@@ -142,8 +142,9 @@ sub comment {
     my $self = shift;
     my $comment = shift;
     my $type_id=CXGN::Chado::Cvterm::get_cvterm_by_name($self->get_dbh(), "comment")->get_cvterm_id();
-    if (!$self->get_cvterm_id()) { 
+    if (!$type_id) { 
 	print STDERR "WARNING. Cvterm has not yet been stored. Skipping the comment update.\n";
+	return undef;
     }
     if ($comment) { 
 	# check if there is already a comment associated with this term.
@@ -407,10 +408,13 @@ sub store {
 	}
 	
 	my $query = "INSERT INTO cvterm (cv_id, name, dbxref_id, definition, is_obsolete, is_relationshiptype) VALUES (?, ?, ?, ?,?,?)";
+		
 	my $sth = $self->get_dbh()->prepare($query);
 	$sth->execute($self->get_cv_id(), $self->get_cvterm_name(), $self->get_dbxref_id(), $self->get_definition(), $self->get_obsolete(), $self->get_is_relationshiptype());
 	
 	$cvterm_id =  $self->get_dbh()->last_insert_id("cvterm", "public");
+	#print STDERR "cvterm_id= $cvterm_id\n";
+
 	$self->set_cvterm_id($cvterm_id);
     }
     return $cvterm_id;
@@ -432,7 +436,7 @@ The following class properties have accessors (get_cvterm_id, set_cvterm_id...):
     accession
     db_name
     obsolete
-    is_relationship_type
+    is_relationshiptype
 
 =cut
 
@@ -859,13 +863,19 @@ sub add_secondary_dbxref {
     my $self=shift;
     my $accession=shift;
     my ($db_name, $acc) = split (/:/, $accession);
-    
-    my $dbxref_id= CXGN::Chado::Dbxref::get_dbxref_id_by_accession($self->get_dbh(), $acc,$db_name);
+    my $db=CXGN::Chado::Db->new_with_name($self->get_dbh(), $db_name);
+    if ( !($db->get_db_id()) ) {
+	$db->set_db_name($db_name);
+	print STDERR "Cvterm.pm: Storing a new DB: $dbname\n";
+	$db->store();
+    }
+    #check is $accession exists:
+    my $dbxref_id= CXGN::Chado::Dbxref::get_dbxref_id_by_db_id($self->get_dbh(), $acc, $db->get_db_id());
     if (!$dbxref_id) { 
 	print STDERR "No dbxref_id found for db_name '$db_name' accession '$acc' adding new dbxref...\n";
 	my $dbxref=CXGN::Chado::Dbxref->new($self->get_dbh());
 	$dbxref->set_accession($acc);
-	$dbxref->set_db_name($db_name);
+	$dbxref->set_db_name($db->get_db_name());
 	$dbxref->store();
 	$dbxref_id=$dbxref->get_dbxref_id();
     }
@@ -975,10 +985,10 @@ sub add_def_dbxref {
 	$db->store();
     }
     #check is $accession exists:
-    my $dbxref_id= CXGN::Chado::Dbxref::get_dbxref_id_by_accession($self->get_dbh(), $accession, $dbname);
+    my $dbxref_id= CXGN::Chado::Dbxref::get_dbxref_id_by_db_id($self->get_dbh(), $accession, $db->get_db_id());
     if (!$dbxref_id) {
 	my $dbxref=CXGN::Chado::Dbxref->new($self->get_dbh());
-	$dbxref->set_db_name($dbname);
+	$dbxref->set_db_name($db->get_db_name());
 	$dbxref->set_accession($accession);
 	print STDERR "Cvterm.pm: Storing a new Dbxref for db $dbname: $accession\n";
 

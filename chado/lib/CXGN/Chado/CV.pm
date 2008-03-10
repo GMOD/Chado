@@ -12,11 +12,10 @@ Naama Menda (nm249@cornell.edu)
 
 =cut
 use CXGN::DB::Connection;
-#use CXGN::Phenome::Locus; 
 
 
 package CXGN::Chado::CV;
-use base qw /CXGN::Chado::Main / ;
+use base qw /CXGN::Chado::Main CXGN::DB::Object / ;
 
 =head2 new
 
@@ -94,6 +93,19 @@ sub fetch {
 }
 
 
+sub store {
+    my $self=shift;
+    my $cv_id=$self->get_cv_id();
+    if (!$cv_id) {
+	my $query = "INSERT INTO cv (name, definition) VALUES (?,?)";
+	my $sth=$self->get_dbh->prepare($query);
+	$sth->execute($self->get_cv_name(), $self->get_definition() );
+	$cv_id =  $self->get_currval("cv_cv_id_seq");
+	$self->set_cv_id($cv_id);
+    }
+    return $cv_id;
+}
+    
 =head2 Class properties
 
 The following class properties have accessors:
