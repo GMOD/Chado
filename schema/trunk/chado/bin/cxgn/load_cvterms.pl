@@ -230,15 +230,48 @@ foreach my $new_ont(@onts) {
     eval { 
 	print STDERR "Getting all the terms of the new ontology...\n";
 	my (@all_file_terms) = $new_ont->get_all_terms();
+	my (@all_file_predicate_terms) = $new_ont->get_predicate_terms();
+	print STDERR "***found ".(scalar(@all_file_predicate_terms))." predicate terms!.\n";
 	
 	print STDERR "Retrieved ".(scalar(@all_file_terms))." terms.\n";
 	print OUT "Retrieved ".(scalar(@all_file_terms))." terms.\n" if $opt_o;
-
 	
+	#look at all predecate terms (Typedefs)
+	my @all_db_predicate_terms = $db_ont->get_predicate_terms();
+	foreach my $t(@all_file_predicate_terms) {           #look at predicate terms in file
+	    if (!grep (/^$t$/, @all_db_predicate_terms ) ) { #didn't find predicate term in this cv in the database
+		my $p_term= CXGN::Chado::Cvterm::get_cvterm_by_name($dbh, $t->name());
+		if ( ($p_term->get_cv_id()) ) {    #maybe it's stored with another cv_id?
+		    print STDERR "predicate term '" .$t->name() . "' already exists with cv_id " . $p_term->get_cv_id() . "\n";
+		    print OUT "predicate term already exists with cv_id " . $p_term->get_cv_id() . "\n" if $opt_o;
+		}else { 
+		    my $cv = CXGN::Chado::CV->new_with_name($dbh, $new_ont_name);
+		    my $cv_id= $cv->get_cv_id();
+		    if (!$cv_id) { 
+			$cv->set_cv_name("relationship");
+			$cv_id= $cv->store();
+		    }
+		    if (($cv->get_cv_name()) eq 'relationship' ) { $p_term->set_db_name('OBO_REL'); }
+		    else { $p_term->set_db_name($opt_d); }
+ 
+		    $p_term->name($t->name() );
+		    $p_term->identifier($t->identifier()) || $p_term->identifier($t->name() );
+		    $p_term->definition( $t->definition() );
+		    my $ontology= $t->ontology()->name();
+		    $p_term->set_obsolete($t->is_obsolete() );
+		    $p_term->set_is_relationshiptype(1);
+		    $p_term->set_cv_id($cv_id);
+		    $p_term->store();
+		    print STDERR "Stored new relationshiptype '" .  $t->name() . "'\n";
+		    print OUT "Stored new relationshiptype '" .  $t->name() . "'\n" if $opt_o;
+		}
+	    }
+	}
+
 	print STDERR "Getting all the terms of the current ontology...\n";
 	
 	my @all_db_terms = $db_ont->get_all_terms();
-	
+
 	print STDERR "Indexing terms and relationships...\n";
 	my %file_index = ();  # index of term objects in the db with accession as key
 	my %db_index = ();
@@ -431,6 +464,7 @@ foreach my $new_ont(@onts) {
 		$new_term->comment($novel_terms{$k}->comment()); #store comment in cvterm_prop
 		
 		foreach my $s ($novel_terms{$k}->get_synonyms()) { #store synonyms in cvtermsynonym
+		    $s=~ s/\s+$//; 
 		    $s =~ s/\\//g;
 		    message("...adding synonym  '$s'  to the database...\n");
 		    print OUT "...adding synonym  '$s'  to the database...\n" if $opt_o;
@@ -536,12 +570,14 @@ foreach my $new_ont(@onts) {
 		
 		my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
 		my $cv_id= CXGN::Chado::CV->new_with_name($dbh, "relationship")->get_cv_id();
+		if (!$cv_id) { $cv_id= CXGN::Chado::CV->new_with_name($dbh, $db_ont->name)->get_cv_id(); }
+		
 		my $predicate_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $cv_id);
 		if (!$predicate_term->get_cvterm_id()) { 
 		    die "The predicate term $predicate_term_name does not exist in the database\n"; 
 		}
 		$new_rel->predicate_term($predicate_term);
-		if ($opt_v) { print STDERR "Storing relationship $r.\n"; }
+		if ($opt_v) { print STDERR "Storing relationship $r. type cv_id=$cv_id\n"; }
 		if (!$opt_t) { 
 		    $new_rel->store();
 		}

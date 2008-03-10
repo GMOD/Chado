@@ -283,15 +283,42 @@ my $sth = $self->get_dbh()->prepare($query);
 
 sub get_all_terms {
     my $self = shift;
-    my $query = "SELECT cvterm_id FROM cvterm  WHERE  cv_id=?";
+    my $query = "SELECT cvterm_id FROM cvterm  WHERE  cv_id=? AND is_relationshiptype=?";
     my $sth = $self->get_dbh()->prepare($query);
-    $sth->execute($self->identifier());
+    $sth->execute($self->identifier(), 0);
     my @terms = ();
     while (my ($cvterm_id) = $sth->fetchrow_array()) { 
 	push @terms, CXGN::Chado::Cvterm->new($self->get_dbh(), $cvterm_id);
     }
     return @terms;
 }
+
+
+=head2 get_predicate_terms
+
+ Usage:
+ Desc:
+ Ret:
+ Args:
+ Side Effects:
+ Note:         this function is specified in the 
+               L<Bio::Ontology::OntologyI> interface
+ Example:
+
+=cut
+
+sub get_predicate_terms {
+    my $self = shift;
+    my $query = "SELECT cvterm_id FROM cvterm  WHERE  cv_id=? AND is_relationshiptype=?";
+    my $sth = $self->get_dbh()->prepare($query);
+    $sth->execute($self->identifier(), 1);
+    my @terms = ();
+    while (my ($cvterm_id) = $sth->fetchrow_array()) { 
+	push @terms, CXGN::Chado::Cvterm->new($self->get_dbh(), $cvterm_id);
+    }
+    return @terms;
+}
+
 
 =head2 get_ancestor_terms
 

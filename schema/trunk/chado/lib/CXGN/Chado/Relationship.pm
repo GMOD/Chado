@@ -178,8 +178,13 @@ sub fetch {
 
 sub store {
     my $self = shift;
+    if (!$self->identifier) {
+	my $identifier = $self->exists();
+	$self->identifier($identifier);
+    }
     if ($self->identifier()) {
-	#print STDERR "Updating relationship ".$self->identifier().".\n";
+	print STDERR "Relationship.pm: identifier exists!\n";
+	print STDERR "Updating relationship ".$self->identifier().".\n";
 	my $query = "UPDATE cvterm_relationship SET 
                        subject_id = ?,
                        object_id = ?,
@@ -195,7 +200,7 @@ sub store {
 	return $self->identifier();
     }
     else { 
-	#print STDERR "Inserting new relationship...\n";
+	print STDERR "Inserting new relationship...\n";
 	my $query = "INSERT INTO cvterm_relationship (subject_id, object_id, type_id ) VALUES (?, ?, ?)";
 	my $sth = $self->get_dbh()->prepare($query);
 	$sth->execute($self->subject_term()->get_cvterm_id(),

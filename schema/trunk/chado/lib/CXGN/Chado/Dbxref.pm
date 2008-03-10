@@ -399,6 +399,33 @@ sub get_dbxref_id_by_accession {
 
     return $dbxref_id;
 }
+=head2 get_dbxref_id_by_accession
+
+ Usage: CXGN::Chado::Dbxref::get_dbxref_id_by_db_id($dbh,$accession, $db_id)
+ Desc:  find the database id of an accession and a db_id
+ Ret:   dbxref_id
+ Args:  accession and a database db_id (from db table)
+ Side Effects: none
+ Example:
+
+=cut
+   
+
+sub get_dbxref_id_by_db_id {
+    my $dbh=shift;
+    my $accession = shift;
+    my $db_id=shift;
+
+    my $query = "SELECT dbxref_id
+                  FROM dbxref
+                  WHERE accession=? AND db_id = ?" ;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($accession, $db_id );
+    my $dbxref_id = $sth->fetchrow_array();
+
+    return $dbxref_id;
+}
+
 
 =head2 get_publication
 
