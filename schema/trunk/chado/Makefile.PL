@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.123 2008-02-11 17:01:14 scottcain Exp $
+# $Id: Makefile.PL,v 1.124 2008-03-13 19:31:12 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -501,7 +501,7 @@ WriteMakefile(
 #      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
 #    'NAME'		            => 'chado',
     'NAME'                => 'gmod',
-    'VERSION'             => 0.5,
+    'VERSION'             => 1.0,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       #'Class::DBI'        => 0.94,
@@ -509,19 +509,19 @@ WriteMakefile(
       #'Class::DBI::Pg'    => 0.02,
       'Module::Build'     => 0.20,
       'Template'          => 2.10,
-      'Term::ProgressBar' => 2.06, #fluff, but make sure you check load/bin/*
+      #'Term::ProgressBar' => 2.06, #fluff, but make sure you check load/bin/*
                                   #if this prereq is removed
       'DBI'               => 0,
       'DBD::Pg'           => 1.49,
       'XML::Simple'       => 2.09,
       'Log::Log4perl'     => 0.39,
-#     'DBIx::DBStag'      => 0.0001,
+      'DBIx::DBStag'      => 0.09,
       'GO::Parser'        => 0,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
 #          'load/bin/load_affyxls.PLS'    => 'load/bin/gmod_load_affyxls.pl',
-          'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
+#          'load/bin/load_gff3.PLS'       => 'load/bin/gmod_load_gff3.pl',
           'load/bin/bulk_load_gff3.PLS'       => 'load/bin/gmod_bulk_load_gff3.pl',
           'install_util/conf_install.PLS'    => 'install_util/conf_install.pl',
           'install_util/src_install.PLS'     => 'install_util/src_install.pl',
@@ -530,7 +530,7 @@ WriteMakefile(
     EXE_FILES             => \@exe_files,
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       ( # retrieve abstract from module
-       AUTHOR     => 'Scott Cain <cain@cshl.org>') : ()
+       AUTHOR     => 'Scott Cain <cain@cshl.edu>') : ()
     ),
     clean                 => {
       FILES               => 
