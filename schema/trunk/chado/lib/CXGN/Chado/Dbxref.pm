@@ -496,6 +496,32 @@ sub db_exists {
     else { return undef ; }
 }
 
+=head2 get_cvterm_dbxrefs
+
+ Usage: $self->get_cvterm_dbxrefs
+ Desc:  find the dbxrefs associated with a cvterm 
+ Ret:   list of dbxref objects
+ Args:   none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_cvterm_dbxrefs {
+    my $self=shift;
+    my $query = "SELECT dbxref_id FROM cvterm_dbxref
+                 WHERE cvterm_id=?";
+    my $sth=$self->get_dbh()->prepare($query);
+    $sth->execute($self->get_cvterm_id());
+    
+    my @dbxrefs;
+    while (my $id = $sth->fetchrow_array() ){
+	my $d=CXGN::Chado::Dbxref->new($self->get_dbh(),$id); 
+	push @dbxrefs, $d;
+    }
+    return @dbxrefs ;
+}
+
 
 
 return 1;
