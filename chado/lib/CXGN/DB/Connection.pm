@@ -362,7 +362,7 @@ sub init_connect {
     }
     $self->do("SET SEARCH_PATH = ".join(',',@searchpath));
   }
-  if ( (ref $self)->verbose ) {
+  if( (ref $self)->verbose ) {
     warn map {"$_\n"}
       (
        "=== DB::Connection parameters ===",
@@ -821,7 +821,8 @@ sub disconnect {
   Example:
 
 =cut
-__PACKAGE__->mk_classdata( verbose => 0 );
+
+__PACKAGE__->mk_classdata( verbose => ($ENV{MOD_PERL} ? 0 : 1) );
 
 sub is_valid_dbh
 {

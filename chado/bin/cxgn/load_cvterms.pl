@@ -5,7 +5,7 @@ load_cvterms.pl
 
 =head1 DESCRIPTION
 
-Usage: perl load_cvterms.pl -H dbhost -D dbname [-vDnFo] file
+Usage: perl load_cvterms.pl -H dbhost -D dbname [-vdntuFo] file
 
 parameters
 
@@ -116,7 +116,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 0.12, February 2007.
+Version 0.12, February 2008.
 
 =cut
 
@@ -145,7 +145,7 @@ my $dbhost = $opt_H;
 my $dbname = $opt_D;
 
 my $DBPROFILE = $opt_p;
-$DBPROFILE ||= 'default';
+$DBPROFILE ||= undef;
 my $gmod_conf = Bio::GMOD::Config->new();
 my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
 
@@ -186,7 +186,7 @@ if ($opt_o) { open (OUT, ">$opt_o") ||die "can't open error file $file for writt
 
 my $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
 				      dbname=>$dbname,  
-                                      dbprofile=>$DBPROFILE,
+                                      #dbprofile=>$DBPROFILE,
 				   } );
 
 
@@ -203,7 +203,7 @@ my @onts = ();
 while( my $ont = $parser->next_ontology() ) {
     push @onts, $ont;
 }
-#$new_ont = $onts[-1];
+
 
 foreach my $new_ont(@onts) {
     my $new_ont_name=$new_ont->name();
@@ -211,7 +211,22 @@ foreach my $new_ont(@onts) {
     
     if ($opt_n && ( $opt_n ne $new_ont_name) ) { print STDERR "$opt_n: skipping to next ontology..\n"; next (); } 
     
+    #check if relationship ontology is already loaded:
+    if ($new_ont_name ne 'relationship') {
+	my $rel_cv= CXGN::Chado::Ontology->new_with_name($dbh, 'relationship');
+	my @rel=$rel_cv->get_predicate_terms();
+	if (!@rel) {
+	    warn "Relationship ontology must be loaded first!!\n" ;
+	    exit(0);
+	}
+    }
+    
     my $cv = CXGN::Chado::Ontology->new_with_name($dbh, $new_ont->name()); # also get a CXGN::Chado::Ontology object for the cv_id (see later).
+    #store a new cv if the ontology namespace does not exist
+    if (!$cv->get_cv_id() ) { 
+	$cv->name($new_ont_name);
+	$cv->store();
+    }
     print STDERR "cv_id = ".($cv->get_cv_id())."\n";
     
     my $db_ont;
@@ -234,8 +249,9 @@ foreach my $new_ont(@onts) {
 	print STDERR "***found ".(scalar(@all_file_predicate_terms))." predicate terms!.\n";
 	
 	print STDERR "Retrieved ".(scalar(@all_file_terms))." terms.\n";
-	print OUT "Retrieved ".(scalar(@all_file_terms))." terms.\n" if $opt_o;
+	print OUT "Retrieved ".(scalar(@all_file_terms))." terms.\n" if $opt_o;	
 	
+        
 	#look at all predecate terms (Typedefs)
 	my @all_db_predicate_terms = $db_ont->get_predicate_terms();
 	foreach my $t(@all_file_predicate_terms) {           #look at predicate terms in file
@@ -298,7 +314,7 @@ foreach my $new_ont(@onts) {
 	
 	
 	print STDERR "Determining which terms are new...\n";
-	
+	#exit();
 	
 	foreach my $k (keys(%file_index)) { 
 	    #print STDERR "Checking $k...\n";
@@ -569,15 +585,18 @@ foreach my $new_ont(@onts) {
 		$new_rel->object_term($object_term);
 		
 		my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
-		my $cv_id= CXGN::Chado::CV->new_with_name($dbh, "relationship")->get_cv_id();
-		if (!$cv_id) { $cv_id= CXGN::Chado::CV->new_with_name($dbh, $db_ont->name)->get_cv_id(); }
+		my $rel_cv_id= CXGN::Chado::Ontology->new_with_name($dbh, "relationship")->identifier();
+		my $cv_id= $db_ont->identifier();
 		
-		my $predicate_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $cv_id);
-		if (!$predicate_term->get_cvterm_id()) { 
-		    die "The predicate term $predicate_term_name does not exist in the database\n"; 
+		my $predicate_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $rel_cv_id);
+		if (!$predicate_term->get_cvterm_id()) {
+		    $predicate_term=CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $cv_id);
+		    if (!$predicate_term->get_cvterm_id()) { 
+			die "The predicate term $predicate_term_name does not exist in the database\n";  
+		    }
 		}
 		$new_rel->predicate_term($predicate_term);
-		if ($opt_v) { print STDERR "Storing relationship $r. type cv_id=$cv_id\n"; }
+		if ($opt_v) { print STDERR "Storing relationship $r. type cv_id=" . $predicate_term->get_cv_id() ."\n"; }
 		if (!$opt_t) { 
 		    $new_rel->store();
 		}

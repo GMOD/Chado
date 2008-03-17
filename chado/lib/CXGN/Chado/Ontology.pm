@@ -73,7 +73,6 @@ sub new_with_name {
     my $sth = $dbh->prepare($query);
     $sth->execute($name);
     my ($id) = $sth->fetchrow_array();
-    print STDERR "Instantiating a new object with id $id !\n";
     my $self = CXGN::Chado::Ontology->new($dbh, $id);
     return $self;
 }
@@ -469,20 +468,6 @@ sub get_relationships {
     return @relationships;
 }
 
-=head2 get_predicate_terms
-
- Usage:
- Desc:         [NOT YET IMPLEMENTED]
- Ret:
- Args:
- Side Effects:
- Example:
-
-=cut
-
-sub get_predicate_terms {
-
-}
 
 =head2 add_term
 
