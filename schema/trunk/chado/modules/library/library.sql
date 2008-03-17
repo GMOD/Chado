@@ -1,4 +1,4 @@
--- $Id: library.sql,v 1.8 2007-04-16 16:24:12 scottcain Exp $
+-- $Id: library.sql,v 1.9 2008-03-17 20:16:41 emmert Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -22,6 +22,7 @@ create table library (
     uniquename text not null,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id),
+    is_obsolete int not null default 0,
     constraint library_c1 unique (organism_id,uniquename,type_id)
 );
 create index library_name_ind1 on library(name);
@@ -97,6 +98,23 @@ create table libraryprop (
 );
 create index libraryprop_idx1 on libraryprop (library_id);
 create index libraryprop_idx2 on libraryprop (type_id);
+
+
+-- ================================================
+-- TABLE: libraryprop_pub
+-- ================================================
+
+create table libraryprop_pub (
+    libraryprop_pub_id serial not null,
+    primary key (libraryprop_pub_id),
+    libraryprop_id int not null,
+    foreign key (libraryprop_id) references libraryprop (libraryprop_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint libraryprop_pub_c1 unique (libraryprop_id,pub_id)
+);
+create index libraryprop_pub_idx1 on libraryprop_pub (libraryprop_id);
+create index libraryprop_pub_idx2 on libraryprop_pub (pub_id);
 
 
 -- ================================================
