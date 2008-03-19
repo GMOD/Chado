@@ -1,4 +1,4 @@
--- $Id: mage.sql,v 1.2 2007-04-03 21:40:21 briano Exp $
+-- $Id: mage.sql,v 1.3 2008-03-19 18:32:51 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -758,3 +758,68 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
+
+--
+-- studyprop and studyprop_feature added for Kara Dolinski's group
+-- 
+-- Here is her description of it:
+--Both of the tables are used for our YFGdb project 
+--(http://yfgdb.princeton.edu/), which uses chado. 
+--
+--Here is how we use those tables, using the following example:
+--
+--http://yfgdb.princeton.edu/cgi-bin/display.cgi?db=pmid&amp;id=15575969
+--
+--The above data set is represented as a row in the STUDY table.  We have
+--lots of attributes that we want to store about each STUDY (status, etc)
+--and in the official schema, the only prop table we could use was the
+--STUDYDESIGN_PROP table.  This forced us to go through the STUDYDESIGN 
+--table when we often have no real data to store in that table (small 
+--percent of our collection use MAGE-ML unfortunately, and even fewer 
+--provide all the data in the MAGE model, of which STUDYDESIGN is a vestige). 
+--So, we created a STUDYPROP table.  I'd think this table would be 
+--generally useful to people storing various types of data sets via the 
+--STUDY table.
+--
+--The other new table is STUDYPROP_FEATURE.  This basically allows us to
+--group features together per study.  For example, we can store microarray
+--clustering results by saying that the STUDYPROP type is 'cluster'  (via 
+--type_id -> CVTERM of course), the value is 'cluster id 123', and then
+--that cluster would be associated with all the features that are in that
+--cluster via STUDYPROP_FEATURE.  Adding type_id to STUDYPROP_FEATURE is
+-- fine by us!
+--
+--studyprop
+create table studyprop (
+    studyprop_id serial not null,
+        primary key (studyprop_id),
+    study_id int not null,
+        foreign key (study_id) references study (study_id) on delete cascade,
+    type_id int not null,
+        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,  
+    value text null,
+    rank int not null default 0,
+    unique (study_id,type_id,rank)
+);
+
+create index studyprop_idx1 on studyprop (study_id);
+create index studyprop_idx2 on studyprop (type_id);
+
+
+--studyprop_feature
+CREATE TABLE studyprop_feature (
+    studyprop_feature_id serial NOT NULL,
+    primary key (studyprop_feature_id),
+    studyprop_id integer NOT NULL,
+    foreign key (studyprop_id) references studyprop(studyprop_id) on delete cascade,
+    feature_id integer NOT NULL,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    type_id integer,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    unique (studyprop_id, feature_id)
+    );
+ 
+
+create index studyprop_feature_idx1 on studyprop_feature (studyprop_id);
+create index studyprop_feature_idx2 on studyprop_feature (feature_id);
+

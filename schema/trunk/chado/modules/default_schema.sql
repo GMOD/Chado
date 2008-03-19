@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -3512,7 +3512,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -3636,7 +3636,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -3716,7 +3716,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -3922,7 +3922,7 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -4017,7 +4017,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -4249,7 +4249,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -4299,7 +4299,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -4492,7 +4492,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -5252,7 +5252,72 @@ create index studyfactorvalue_idx1 on studyfactorvalue (studyfactor_id);
 create index studyfactorvalue_idx2 on studyfactorvalue (assay_id);
 
 COMMENT ON TABLE studyfactorvalue IS NULL;
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+
+--
+-- studyprop and studyprop_feature added for Kara Dolinski's group
+-- 
+-- Here is her description of it:
+--Both of the tables are used for our YFGdb project 
+--(http://yfgdb.princeton.edu/), which uses chado. 
+--
+--Here is how we use those tables, using the following example:
+--
+--http://yfgdb.princeton.edu/cgi-bin/display.cgi?db=pmid&amp;id=15575969
+--
+--The above data set is represented as a row in the STUDY table.  We have
+--lots of attributes that we want to store about each STUDY (status, etc)
+--and in the official schema, the only prop table we could use was the
+--STUDYDESIGN_PROP table.  This forced us to go through the STUDYDESIGN 
+--table when we often have no real data to store in that table (small 
+--percent of our collection use MAGE-ML unfortunately, and even fewer 
+--provide all the data in the MAGE model, of which STUDYDESIGN is a vestige). 
+--So, we created a STUDYPROP table.  I'd think this table would be 
+--generally useful to people storing various types of data sets via the 
+--STUDY table.
+--
+--The other new table is STUDYPROP_FEATURE.  This basically allows us to
+--group features together per study.  For example, we can store microarray
+--clustering results by saying that the STUDYPROP type is 'cluster'  (via 
+--type_id -> CVTERM of course), the value is 'cluster id 123', and then
+--that cluster would be associated with all the features that are in that
+--cluster via STUDYPROP_FEATURE.  Adding type_id to STUDYPROP_FEATURE is
+-- fine by us!
+--
+--studyprop
+create table studyprop (
+    studyprop_id serial not null,
+        primary key (studyprop_id),
+    study_id int not null,
+        foreign key (study_id) references study (study_id) on delete cascade,
+    type_id int not null,
+        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,  
+    value text null,
+    rank int not null default 0,
+    unique (study_id,type_id,rank)
+);
+
+create index studyprop_idx1 on studyprop (study_id);
+create index studyprop_idx2 on studyprop (type_id);
+
+
+--studyprop_feature
+CREATE TABLE studyprop_feature (
+    studyprop_feature_id serial NOT NULL,
+    primary key (studyprop_feature_id),
+    studyprop_id integer NOT NULL,
+    foreign key (studyprop_id) references studyprop(studyprop_id) on delete cascade,
+    feature_id integer NOT NULL,
+    foreign key (feature_id) references feature (feature_id) on delete cascade,
+    type_id integer,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
+    unique (studyprop_id, feature_id)
+    );
+ 
+
+create index studyprop_feature_idx1 on studyprop_feature (studyprop_id);
+create index studyprop_feature_idx2 on studyprop_feature (feature_id);
+
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -5540,7 +5605,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.51 2008-01-31 04:51:53 scottcain Exp $
+-- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
