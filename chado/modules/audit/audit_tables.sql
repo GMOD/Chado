@@ -7621,6 +7621,135 @@
        EXECUTE PROCEDURE audit_update_delete_studyfactorvalue ();
 
 
+   DROP TABLE audit_studyprop;
+   CREATE TABLE audit_studyprop ( 
+       studyprop_id integer, 
+       study_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_studyprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_studyprop() RETURNS trigger AS
+   '
+   DECLARE
+       studyprop_id_var integer; 
+       study_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       studyprop_id_var = OLD.studyprop_id;
+       study_id_var = OLD.study_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_studyprop ( 
+             studyprop_id, 
+             study_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             studyprop_id_var, 
+             study_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER studyprop_audit_ud ON studyprop;
+   CREATE TRIGGER studyprop_audit_ud
+       BEFORE UPDATE OR DELETE ON studyprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_studyprop ();
+
+
+   DROP TABLE audit_studyprop_feature;
+   CREATE TABLE audit_studyprop_feature ( 
+       studyprop_feature_id integer, 
+       studyprop_id integer, 
+       feature_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_studyprop_feature to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_studyprop_feature() RETURNS trigger AS
+   '
+   DECLARE
+       studyprop_feature_id_var integer; 
+       studyprop_id_var integer; 
+       feature_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       studyprop_feature_id_var = OLD.studyprop_feature_id;
+       studyprop_id_var = OLD.studyprop_id;
+       feature_id_var = OLD.feature_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_studyprop_feature ( 
+             studyprop_feature_id, 
+             studyprop_id, 
+             feature_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             studyprop_feature_id_var, 
+             studyprop_id_var, 
+             feature_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER studyprop_feature_audit_ud ON studyprop_feature;
+   CREATE TRIGGER studyprop_feature_audit_ud
+       BEFORE UPDATE OR DELETE ON studyprop_feature
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_studyprop_feature ();
+
+
    DROP TABLE audit_stock;
    CREATE TABLE audit_stock ( 
        stock_id integer, 

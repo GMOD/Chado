@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (34 tables)
+	Table listing (36 tables)
  -->
 
 <a name="top" />
@@ -438,6 +438,30 @@
 	End link to table 'studyfactorvalue'
  -->
 
+<!-- 
+	Start link to table 'studyprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="studyprop-link" href="#studyprop">studyprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'studyprop'
+ -->
+
+<!-- 
+	Start link to table 'studyprop_feature'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="studyprop_feature-link" href="#studyprop_feature">studyprop_feature</a></td>
+</tr>
+
+<!-- 
+	End link to table 'studyprop_feature'
+ -->
+
 </table>
 
 <!-- 
@@ -463,7 +487,7 @@
 
 <em>
 	<br />
-	$Id: mage.html,v 1.1 2007-04-20 13:18:48 briano Exp $ <br />
+	$Id: mage.html,v 1.2 2008-03-19 18:32:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado mage module <br />
 	================================================================= <br />
@@ -6872,8 +6896,376 @@
 
 <hr />
 
+<!-- 
+	Starting table 'studyprop'
+ -->
+
+<a name="studyprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	studyprop
+</h3></td>
+		<a name="studyprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	studyprop and studyprop_feature added for Kara Dolinski's group <br />
+	Here is her description of it: <br />
+	Both of the tables are used for our YFGdb project <br />
+	(http://yfgdb.princeton.edu/), which uses chado. <br />
+	Here is how we use those tables, using the following example: <br />
+	http://yfgdb.princeton.edu/cgi-bin/display.cgi?db=pmid&amp;id=15575969 <br />
+	The above data set is represented as a row in the STUDY table.  We have <br />
+	lots of attributes that we want to store about each STUDY (status, etc) <br />
+	and in the official schema, the only prop table we could use was the <br />
+	STUDYDESIGN_PROP table.  This forced us to go through the STUDYDESIGN <br />
+	table when we often have no real data to store in that table (small <br />
+	percent of our collection use MAGE-ML unfortunately, and even fewer <br />
+	provide all the data in the MAGE model, of which STUDYDESIGN is a vestige). <br />
+	So, we created a STUDYPROP table.  I'd think this table would be <br />
+	generally useful to people storing various types of data sets via the <br />
+	STUDY table. <br />
+	The other new table is STUDYPROP_FEATURE.  This basically allows us to <br />
+	group features together per study.  For example, we can store microarray <br />
+	clustering results by saying that the STUDYPROP type is 'cluster'  (via <br />
+	type_id -> CVTERM of course), the value is 'cluster id 123', and then <br />
+	that cluster would be associated with all the features that are in that <br />
+	cluster via STUDYPROP_FEATURE.  Adding type_id to STUDYPROP_FEATURE is <br />
+	fine by us! <br />
+	studyprop
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="studyprop-studyprop_id">studyprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="studyprop-study_id">study_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="studyprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="studyprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="studyprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>studyprop_idx1</td>
+	<td>study_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>studyprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>studyprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>study_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>study_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>study_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'studyprop_feature'
+ -->
+
+<a name="studyprop_feature" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	studyprop_feature
+</h3></td>
+		<a name="studyprop_feature"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	studyprop_feature
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="studyprop_feature-studyprop_feature_id">studyprop_feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="studyprop_feature-studyprop_id">studyprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#studyprop-studyprop_id">studyprop.studyprop_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="studyprop_feature-feature_id">feature_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="studyprop_feature-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>studyprop_feature_idx1</td>
+	<td>studyprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>studyprop_feature_idx2</td>
+	<td>feature_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>studyprop_feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>studyprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>studyprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>studyprop_id, feature_id</td>
+</tr>
+
+</table>
+
+<hr />
+
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08</a>
+SQL::Translator 0.08001</a>
 
 </body>
 </html>
