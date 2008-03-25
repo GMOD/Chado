@@ -1,4 +1,4 @@
--- $Id: library.sql,v 1.9 2008-03-17 20:16:41 emmert Exp $
+-- $Id: library.sql,v 1.10 2008-03-25 16:00:43 emmert Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -23,6 +23,8 @@ create table library (
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id),
     is_obsolete int not null default 0,
+    timeaccessioned timestamp not null default current_timestamp,
+    timelastmodified timestamp not null default current_timestamp,
     constraint library_c1 unique (organism_id,uniquename,type_id)
 );
 create index library_name_ind1 on library(name);
@@ -156,3 +158,26 @@ create index library_feature_idx1 on library_feature (library_id);
 create index library_feature_idx2 on library_feature (feature_id);
 
 COMMENT ON TABLE library_feature IS 'library_feature links a library to the clones which are contained in the library.  Examples of such linked features might be "cDNA_clone" or  "genomic_clone".';
+
+
+-- ================================================
+-- TABLE: library_dbxref
+-- ================================================
+
+create table library_dbxref (
+    library_dbxref_id serial not null,
+    primary key (library_dbxref_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    is_current boolean not null default 'true',
+    constraint library_dbxref_c1 unique (library_id,dbxref_id)
+);
+create index library_dbxref_idx1 on library_dbxref (library_id);
+create index library_dbxref_idx2 on library_dbxref (dbxref_id);
+
+
+
+
+
