@@ -47,7 +47,6 @@ chado-xml/xsl/chado-remove-default-elements.xsl
 chado-xml/xsl/chado-remove-feature-nesting.xsl
 chado-xml/xsl/README
 Changes
-Changes.GMOD
 chaos-xml/bin/cx-chadoxml2chaos.pl
 chaos-xml/bin/cx-chaos-report.pl
 chaos-xml/bin/cx-download-enscore.pl
