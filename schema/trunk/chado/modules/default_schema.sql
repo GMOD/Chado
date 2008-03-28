@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -3512,7 +3512,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -3636,7 +3636,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -3716,7 +3716,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -3922,7 +3922,7 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -4017,7 +4017,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -4249,7 +4249,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -4299,7 +4299,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -4492,7 +4492,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -5317,7 +5317,7 @@ CREATE TABLE studyprop_feature (
 create index studyprop_feature_idx1 on studyprop_feature (studyprop_id);
 create index studyprop_feature_idx2 on studyprop_feature (feature_id);
 
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -5605,7 +5605,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.52 2008-03-19 18:32:46 scottcain Exp $
+-- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -5629,6 +5629,9 @@ create table library (
     uniquename text not null,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id),
+    is_obsolete int not null default 0,
+    timeaccessioned timestamp not null default current_timestamp,
+    timelastmodified timestamp not null default current_timestamp,
     constraint library_c1 unique (organism_id,uniquename,type_id)
 );
 create index library_name_ind1 on library(name);
@@ -5707,6 +5710,23 @@ create index libraryprop_idx2 on libraryprop (type_id);
 
 
 -- ================================================
+-- TABLE: libraryprop_pub
+-- ================================================
+
+create table libraryprop_pub (
+    libraryprop_pub_id serial not null,
+    primary key (libraryprop_pub_id),
+    libraryprop_id int not null,
+    foreign key (libraryprop_id) references libraryprop (libraryprop_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint libraryprop_pub_c1 unique (libraryprop_id,pub_id)
+);
+create index libraryprop_pub_idx1 on libraryprop_pub (libraryprop_id);
+create index libraryprop_pub_idx2 on libraryprop_pub (pub_id);
+
+
+-- ================================================
 -- TABLE: library_cvterm
 -- ================================================
 
@@ -5745,6 +5765,29 @@ create index library_feature_idx1 on library_feature (library_id);
 create index library_feature_idx2 on library_feature (feature_id);
 
 COMMENT ON TABLE library_feature IS 'library_feature links a library to the clones which are contained in the library.  Examples of such linked features might be "cDNA_clone" or  "genomic_clone".';
+
+
+-- ================================================
+-- TABLE: library_dbxref
+-- ================================================
+
+create table library_dbxref (
+    library_dbxref_id serial not null,
+    primary key (library_dbxref_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id int not null,
+    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
+    is_current boolean not null default 'true',
+    constraint library_dbxref_c1 unique (library_id,dbxref_id)
+);
+create index library_dbxref_idx1 on library_dbxref (library_id);
+create index library_dbxref_idx2 on library_dbxref (dbxref_id);
+
+
+
+
+
 -- VIEW gffatts: a view to get feature attributes in a format that
 -- will make it easy to convert them to GFF attributes
 

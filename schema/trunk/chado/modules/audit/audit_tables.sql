@@ -8521,6 +8521,9 @@
        name varchar(255), 
        uniquename text, 
        type_id integer, 
+       is_obsolete integer, 
+       timeaccessioned timestamp, 
+       timelastmodified timestamp, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -8534,6 +8537,9 @@
        name_var varchar(255); 
        uniquename_var text; 
        type_id_var integer; 
+       is_obsolete_var integer; 
+       timeaccessioned_var timestamp; 
+       timelastmodified_var timestamp; 
        
        transaction_type_var char;
    BEGIN
@@ -8542,6 +8548,9 @@
        name_var = OLD.name;
        uniquename_var = OLD.uniquename;
        type_id_var = OLD.type_id;
+       is_obsolete_var = OLD.is_obsolete;
+       timeaccessioned_var = OLD.timeaccessioned;
+       timelastmodified_var = OLD.timelastmodified;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -8555,6 +8564,9 @@
              name, 
              uniquename, 
              type_id, 
+             is_obsolete, 
+             timeaccessioned, 
+             timelastmodified, 
              transaction_type
        ) VALUES ( 
              library_id_var, 
@@ -8562,6 +8574,9 @@
              name_var, 
              uniquename_var, 
              type_id_var, 
+             is_obsolete_var, 
+             timeaccessioned_var, 
+             timelastmodified_var, 
              transaction_type_var
        );
 
@@ -8777,6 +8792,63 @@
        EXECUTE PROCEDURE audit_update_delete_libraryprop ();
 
 
+   DROP TABLE audit_libraryprop_pub;
+   CREATE TABLE audit_libraryprop_pub ( 
+       libraryprop_pub_id integer, 
+       libraryprop_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_libraryprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_libraryprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       libraryprop_pub_id_var integer; 
+       libraryprop_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       libraryprop_pub_id_var = OLD.libraryprop_pub_id;
+       libraryprop_id_var = OLD.libraryprop_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_libraryprop_pub ( 
+             libraryprop_pub_id, 
+             libraryprop_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             libraryprop_pub_id_var, 
+             libraryprop_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER libraryprop_pub_audit_ud ON libraryprop_pub;
+   CREATE TRIGGER libraryprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON libraryprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_libraryprop_pub ();
+
+
    DROP TABLE audit_library_cvterm;
    CREATE TABLE audit_library_cvterm ( 
        library_cvterm_id integer, 
@@ -8894,5 +8966,67 @@
        BEFORE UPDATE OR DELETE ON library_feature
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_library_feature ();
+
+
+   DROP TABLE audit_library_dbxref;
+   CREATE TABLE audit_library_dbxref ( 
+       library_dbxref_id integer, 
+       library_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       library_dbxref_id_var integer; 
+       library_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_dbxref_id_var = OLD.library_dbxref_id;
+       library_id_var = OLD.library_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_dbxref ( 
+             library_dbxref_id, 
+             library_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             library_dbxref_id_var, 
+             library_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return null;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_dbxref_audit_ud ON library_dbxref;
+   CREATE TRIGGER library_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON library_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_dbxref ();
 
 
