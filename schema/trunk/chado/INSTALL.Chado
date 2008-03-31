@@ -1,4 +1,4 @@
-$Id: INSTALL.Chado,v 1.7 2008-03-01 04:36:55 scottcain Exp $
+$Id: INSTALL.Chado,v 1.8 2008-03-31 15:40:05 scottcain Exp $
 
 * COMMAND-LINE INSTALL
 
@@ -22,9 +22,11 @@ PREREQUISITES
 
 - PostgreSQL
 
-Currently GMOD developers are using 7.4 and 8.1. The only considerations
-in choosing what version of PostgreSQL to use is that version 7.4 is
-incompatible with the functions for making CMap integration more seamless.
+Currently GMOD developers are using 7.4 and 8.1-2 (PostgreSQL 8.3 may not
+work with some tools written for Chado; this is being investigated
+currently). The only considerations in choosing what version of PostgreSQL
+to use is that version 7.4 is incompatible with the functions for making
+CMap integration more seamless.
 
 Items to do with Postgres to make it ready to go:
 
@@ -60,7 +62,16 @@ Items to do with Postgres to make it ready to go:
       local   all         all                                             trust
       host    all         all         127.0.0.1         255.255.255.255   trust
 
+    * For Pg 8.1+, if you want to allow remote connections, the
+      listen_addresses option will need to be modified to allow other
+      IP addresses to connect; it does allow a wildcard: '*' allows
+      any IP address to connect.
+
 For information on tuning postgres for performance, see
+
+    http://www.gmod.org/wiki/index.php/PostgreSQL_Performance_Tips
+
+and
 
     http://www.varlena.com/varlena/GeneralBits/Tidbits/perf.html
 
@@ -139,7 +150,7 @@ modules below except for SQL::Translator, which is optional.
     * GD                       (GBrowse)
     * DBI                      (GBrowse, Chado)
     * DBD::Pg (1.49 or better) (GBrowse, Chado)
-    * SQL::Translator          (chado) (optional)
+    * SQL::Translator          (chado) (only for a custom Chado schema)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
     * Graph                    (Bio-Chaos)
@@ -154,7 +165,6 @@ modules below except for SQL::Translator, which is optional.
     * LWP                      (Chado)
     * Template                 (Chado)
     * Log::Log4perl            (Chado)
-    * Term::ProgressBar (2.06 or better)  (Chado)
   
 
 INSTALL THE CHADO SCHEMA
@@ -186,6 +196,8 @@ are always available when you log in.
    * CHADO_DB_HOST: The host on which the database runs (e.g. "localhost") [opt]
 
    * CHADO_DB_PORT: The port on which the database is listening [opt]
+
+   * GO_ROOT: As defined by the go-perl INSTALL document
 
 As indicated, the host, port, and password are optional.
 
@@ -329,7 +341,8 @@ when loading some ontologies like this:
   DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
     "cvterm_c1"
 
-It doesn't appear to affect the operation of the database though.
+The cause of these errors is known and does not indicate a problem
+with the database or the install procedure.
 
 Note that since `make ontologies` downloads ontology files from their
 online repositories, this step is prone to failure due to network
@@ -347,8 +360,8 @@ functioning of the database.  The commands to load an ontology are:
 This creates a chadoxml file of the obo file - then execute:
 
      $ stag-storenode.pl \
-       -d 'dbi:Pg:dbname=$CHADO_DB_NAME;host=$CHADO_DB_HOST;port=$CHADO_DB_PORT' \
-       --user $CHADO_DB_USERNAME --password $CHADO_DB_PASSWORD obo_text.xml
+     -d 'dbi:Pg:dbname=$CHADO_DB_NAME;host=$CHADO_DB_HOST;port=$CHADO_DB_PORT' \
+     --user $CHADO_DB_USERNAME --password $CHADO_DB_PASSWORD obo_text.xml
 
 If you have other ontology format files, the commands are similar;
 consult the documentation for go2fmt.pl and go-apply-xslt for your
