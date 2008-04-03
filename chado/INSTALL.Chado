@@ -1,4 +1,4 @@
-$Id: INSTALL.Chado,v 1.8 2008-03-31 15:40:05 scottcain Exp $
+$Id: INSTALL.Chado,v 1.9 2008-04-03 21:20:06 scottcain Exp $
 
 * COMMAND-LINE INSTALL
 
@@ -63,9 +63,10 @@ Items to do with Postgres to make it ready to go:
       host    all         all         127.0.0.1         255.255.255.255   trust
 
     * For Pg 8.1+, if you want to allow remote connections, the
-      listen_addresses option will need to be modified to allow other
-      IP addresses to connect; it does allow a wildcard: '*' allows
-      any IP address to connect.
+      listen_addresses option may need to be modified; it does
+      allow a wildcard '*', which corresponds to all available
+      IP interfaces (it does *not* specify the IP addresses that
+      are allowed to connect).
 
 For information on tuning postgres for performance, see
 
