@@ -7,8 +7,8 @@ SYNOPSIS
       This program generates bulk genome annotation files from a Chado genome
       database, including Fasta, GFF, DNA, Blast indices,
       a standard genome webpage, and Chado database overview tables. 
-  
-        gff2biomart.pl creates tables for BioMart from genome GFF annotations.
+      
+    gff2biomart.pl creates tables for BioMart from genome GFF annotations.
       It generates table .sql, .txt and .xml suited to BioMart. With such
       a BioMart dataset you can select genome regions with the available
       annotations, and exclude others, and download feature tables or
@@ -19,18 +19,18 @@ SYNOPSIS
       Other sequence functions are in library module
       GMOD::Chado::SeqUtils -- common methods for these chado seq scripts
       with main programs in bin/ folder as summarized below.
-  
-      ======================================================================  
-  
+      
+  ======================================================================
+
 NAME
       bulkfiles.pl -- command-line program for Bio::GMOD::Bulkfiles
-  
+
 SYNOPSIS
       This program generates bulk genome annotation files from a Chado genome
       database, including Fasta, GFF, DNA, Blast indices,
       a standard genome webpage, Chado database overview tables. 
-  
-      # get bulkfiles software
+      
+  # get bulkfiles software
       curl -O http://eugenes.org/gmod/GMODTools/GMODTools-1.0.zip
       unzip GMODTools-1.0.zip
       -- OR from CVS repository --
@@ -48,10 +48,10 @@ SYNOPSIS
 
       To create a new genome database release configuration see
       conf/bulkfiles/bulkfiles_template.xml
-  
-      For example output, see http://insects.eugenes.org/genome/
+      
+  For example output, see http://insects.eugenes.org/genome/
 
-      ======================================================================  
+      ======================================================================
 
 NAME
       Bio::GMOD::Bulkfiles -- produce bulk sequence and feature files
@@ -71,20 +71,31 @@ ABOUT Bulkfiles
         chadofeatsql.xml  --  chado db sql calls to dump features
         chadofeatconv.xml --  feature conversion options
 
+UPDATES  2008-May, version 1.2a
+      - adding (in progress) Genbank Submission table writer, 
+        'bulkfiles -format=genbanktbl', with output suited
+        to submit to NCBI as per these specifications
+        http://www.ncbi.nlm.nih.gov/Genbank/eukaryotic_genome_submission.html
+         
+     -- adding Genbank2Chado database xml configs for testing (anogam,...)
+         
+  - improvements (in progress) in chado sql efficiency (table joins mostly
+        can be a problem w/ large dbs).
+
 UPDATES  2007-Oct, version 1.1
       - No chromosome/scaffold/golden_path files.  This change is needed to handle 
         partially assembled genomes with many (1000s to 100,000s) of scaffolds.
         Flag no_csomesplit=1 to use this (should become default).
-  
-      - Gene Ontology association file, see go_association tags in configurations
+      
+  - Gene Ontology association file, see go_association tags in configurations
         formatted as http://geneontology.org/GO.format.annotation.shtml
 
       - Validate main variables in chado database: ${golden_path}, ${seq_ontology}
         This step, on now by default, checks that database contains values set in
         configuration for chromosome type, sequence ontology CV name, and any other
         critical variables. If failed, db is inspected for real values.
-    
-      - miscellany bugs cured and configuration updates.  tables/overview now again
+        
+  - miscellany bugs cured and configuration updates.  tables/overview now again
         active.
 
 OUTPUTS
@@ -100,67 +111,69 @@ OUTPUTS
 
 USAGE
       use Bio::GMOD::Bulkfiles;    
-  
-      my $bulkfiles= Bio::GMOD::Bulkfiles->new( 
+      
+  my $bulkfiles= Bio::GMOD::Bulkfiles->new( 
         configfile => 'fbbulk-r4',   # data-release config file, required param
         debug => 1, showconfig => 0,
         failonerror => 1,
         );
-  
-      $bulkfiles->dumpFeatures(); # extract feature tables from chado sql db
+      
+  $bulkfiles->dumpFeatures(); # extract feature tables from chado sql db
       $bulkfiles->sortNSplitByChromosome(); # collate and separate by chromosome
       $bulkfiles->dumpChromosomeBases();    # extract chromosome dna files
-  
-         # produce various output format bulk files from above
+      
+     # produce various output format bulk files from above
       my $result= $bulkfiles->makeFiles(
             formats => [qw(fff gff fasta blast gnomap)], 
             chromosomes => [qw(all)] );
-  
+
 WHY Bulkfiles?
       (rather than using other middleware layers to chado db - chadoxml,
        chadodbi, bioperl, ...)
-   
-      The general logic is
-  
-        1. dump all chado db features using simple (and quick) sql,
+       
+  The general logic is
+      
+    1. dump all chado db features using simple (and quick) sql,
            to common intermediate table files, and chromosome dna to raw files.
            The feature info is simple: type, location, name/id, and a few
            attributes (db_xrefs,..)
-       
-        2. postprocess these table files to create the various public use
+           
+    2. postprocess these table files to create the various public use
            formats (the time-consuming and configurable part), organized
            into per-chromosome files.
-    
-      Here are some reasons we take this approach:
-  
-        a. using simple sql to dump all db features to intermediate table
+        
+  Here are some reasons we take this approach:
+      
+    a. using simple sql to dump all db features to intermediate table
            allows easy checks that all features get to bulk files
-       
-        b. simple sql dump is fast (30 - 60 min for full fly genome), 
+           
+    b. simple sql dump is fast (30 - 60 min for full fly genome), 
            reliable in getting all mapped features by keeping logic simple
-       
-        c. process table output in stages - better debugging of steps in
+           
+    c. process table output in stages - better debugging of steps in
             process, and can split processing among computers
            c1. the stages are loosely coupled - one can go back, tweek
             configurations and get a new output w/o redoing the complete
             extraction process.
-        
-        d. convert one common feature table + dna to several output formats
+            
+    d. convert one common feature table + dna to several output formats
            in one step, or repeatedly as needed.
-    
-        e. combine features from several chado dbs (flybase now has 3 chado dbs
+        
+    e. combine features from several chado dbs (flybase now has 3 chado dbs
            for d.mel genome features), and add other sources like
            flybase cytology features.
-       
-        f. need fairly complex and data specific configurations - moving
+           
+    f. need fairly complex and data specific configurations - moving
           that to config files keeps code reusable.
-      
-        g. each genome chado database has different policy and choices with
+          
+    g. each genome chado database has different policy and choices with
           respect to feature, vocabulary and other data.  A highly configurable
           tool, with data extraction and correction methods that are separate
           and tunable is needed to adapt to such variation in genome databases.
+          
       
-     ==========================================================================  
+      
+ ==========================================================================
 
 NAME
     gff2biomart.pl -- create tables for BioMart from genome GFF annotations
@@ -211,7 +224,7 @@ IN BIOMART
 VERSION
     This is a alpha-level, not yet fully tested.
 
-     ==========================================================================  
+     ==========================================================================
 
 NAME
     cgi-bin/genomepathmap.pl
@@ -229,12 +242,12 @@ GMOD::SeqUtils
       this package, requirements to run include the perl modules
       installed with GMOD release, esp. Chado::LoadDBI/AutoDBI and
       its ancestor classes from CPAN - Class::DBI, Ima::DBI, etc.
-  
-      Chado::SeqUtils was written for use with the nascent Daphnia genome database,
+      
+  Chado::SeqUtils was written for use with the nascent Daphnia genome database,
       wFleaBase, at http://eugenes.org/daphnia/ See also further information
       at http://eugenes.org/daphnia/database
-    
-      ======================================================================  
+        
+  ======================================================================
 
 NAME
     gmod_init_db.pl
@@ -253,7 +266,7 @@ SYNOPSIS
     generating public IDs. Sequences are assumed to be non-genomic, not
     located.
 
-      ======================================================================  
+      ======================================================================
 
 NAME
     gmod_dump_seq.pl - Print sequences from ChadoDB
@@ -265,7 +278,7 @@ SYNOPSIS
     dbxrefs xSelect by organism, by 'pub' = input file, seq type, feat props
     Need for nascent daphnia wFleaBase to use sequence public IDs
 
-      ======================================================================  
+      ======================================================================
 
 NAME
       gmod_list_db.pl
@@ -279,3 +292,4 @@ SYNOPSIS
 
 AUTHORS
       Don Gilbert, Feb 2004
+

@@ -208,12 +208,12 @@
      -->
   <fileset
     id="genbanktbl"
-    path="genbanksubmit/.+\.tbl"
+    path="genbanksubmit/"
     handler="GenbankSubmitWriter"
     title="Genbank genome submit table"
     input="feature_table"
-    config="chadofeatsql"
-    tag="feature_sql"
+    config="genbanksubmit"
+    tag="gbtbl_sql"
     MAYBE_makeall="1"
     MAYBE_perchr="1"
     dogzip="0"

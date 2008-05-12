@@ -1553,11 +1553,12 @@ sub makeFiles
       infiles =>  $fafiles, chromosomes => $chromosomes );  
     }
     
-  if (delete $outformats{'gnomap'}) {
+  if (delete $outformats{'gnomap'}) { # move to generic handler below
     $self->missingData( $featfiles, "fff","fff files; make with -format fff");
     my $writer= $self->getWriter('gnomap');
     push @results, $writer->makeFiles(%args, 
-      infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes); # needs $featfiles
+      infiles => [ @$featfiles, @$dnafiles ], chromosomes => $chromosomes); 
+        # needs $featfiles
     }
   
   # my @moreformats= grep !/(fff|gff|dna|fasta|blast|gnomap)/,@outformats;
@@ -1565,11 +1566,23 @@ sub makeFiles
   foreach my $fmt (@moreformats) {
     my $writer= $self->getWriter($fmt);
     my $fset  = $self->getFilesetInfo($fmt);
+    
+    my $infiles;
+    if($fset->{input} =~ /feature_table/) {
+      $infiles = $self->getFiles('feature_table', $chromosomes);
+      $self->missingData( $infiles, 'feature_table', "feature_table files; make with -featdump");
+    } else {
+      # ($fset->{input} =~ /fff/)
+      $infiles= [ @$featfiles, @$dnafiles ]; #?? always
+      # $self->missingData( $featfiles, "fff", "fff files; make with -format fff");
+      # $self->missingData( $dnafiles, "dna", "dna files; make with -dnadump");
+    }
+    
     if (!$writer) { warn "no writer for $fmt\n"; }
     else { push @results, $writer->makeFiles( %args, 
             name => $fmt,
             filesetinfo => $fset,
-            infiles => [ @$featfiles, @$dnafiles ], 
+            infiles => $infiles, 
             chromosomes => $chromosomes); 
       }
     }
