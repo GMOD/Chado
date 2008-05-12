@@ -1,0 +1,58 @@
+<opt 
+  name="genbanksubmit"
+  date="20080511"
+  
+  >
+  
+  <title>GenBank Submission table writer</title>
+  <about>
+    These are configurations for converting chado feature table dumps to
+    Genbank submission table files. Most of these configs specify how to
+    process and convert various features extracted from chado db.
+    These are tied to methods in Bulkfiles::FeatureWriter.pm)
+    See chadofeatconv.xml for similar methods.
+
+  Valid options include
+
+    recodekey id={one of feature keys} value=output-key  
+    
+  </about>
+  
+  <!-- 
+    chadofeatconv.xml is where that complex, messy
+    set of rewrite patterns and logic lives that gbsub also
+    needs; should separate out good from old there into two files.
+    
+    need some of these: mapattr_pattern**; maptype_pattern; mapname_pattern; 
+      ** feat_model
+  -->
+
+  <include>chadofeatconv</include>
+  
+  <informat>feature_table</informat>  
+  
+  <outformats>genbanktbl</outformats>
+
+  <!-- genbank tags from internal tags 
+   dicistronic > ??
+   all ncRNA SO types become this
+   type ncRNA ; attr 'ncRNA_class	snRNA'
+  -->
+  <mapattr_key id="Dbxref">db_xref</mapattr_key>
+  <mapattr_key id="Note">note</mapattr_key>
+  <mapattr_key id="synonym">gene_syn</mapattr_key>
+  <mapattr_key id="cyto_range">cyt_map</mapattr_key>
+    
+  <!-- Name is special case depending on feature type -->
+  <mapattr_key id="Name">gene</mapattr_key>
+  <mapattr_key id="ID">locus_tag</mapattr_key>
+  <!-- ditto for ID : locus_tag; transcript_id ; protein_id ... -->
+
+  <!-- see maptype_gff; all the type recodes here .. ncRNA ?? -->
+  <maptype_gb>
+    <protein>CDS</protein>
+    <polypeptide>CDS</polypeptide>
+    <transposable_element_pred>transposable_element:predicted</transposable_element_pred>
+  </maptype_gb>
+
+</opt>

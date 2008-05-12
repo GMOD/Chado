@@ -90,6 +90,9 @@
   perl -Ilib bin/bulkfiles.pl -config=anogam -debug -auto -make  \
     -format='overview,fff,gff,fasta,tables,genbanktbl' \
     >& log.anogam2 &
+
+  perl -Ilib bin/bulkfiles.pl -config=anogam -format=genbanktbl -debug -noauto -make  
+
  
  problems:
   transcript : no db residues; reconfig to get froms eq

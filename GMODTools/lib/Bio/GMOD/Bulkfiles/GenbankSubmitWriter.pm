@@ -2,6 +2,8 @@ package Bio::GMOD::Bulkfiles::GenbankSubmitWriter;
 
 use strict;
 
+use constant FIXME => 1;
+
 =head1 NAME
 
   Bio::GMOD::Bulkfiles::GenbankSubmitWriter  
@@ -55,7 +57,7 @@ use base qw(Bio::GMOD::Bulkfiles::FeatureWriter);
 our $DEBUG = 1;
 my $VERSION = "1.2";
 use constant BULK_TYPE => 'genbanktbl';#??
-use constant CONFIG_FILE => 'chadofeatdump'; #?? or other
+use constant CONFIG_FILE => 'genbanksubmit'; #?? or other
 
 #........... super vars; move some out
 our $maxout = 0;
@@ -108,6 +110,8 @@ use vars qw/
   %GModelParents
   $CDS_spanType
   $CDS_exonType
+  
+  %maptype_gb
   /;
   ## $duptype_pattern
 
@@ -142,6 +146,9 @@ sub initData
   $config->{outformats}= \@outformats; #?? need this before super init; fixme
   
   $self->SUPER::initData();
+
+  %maptype_gb  = %{ $config->{'maptype_gb'} } if ref $config->{'maptype_gb'};
+
 
 #   ## should get this from  $sconfig->{fileset}->{gff}->{noforwards}
 #   my $gffinfo= $self->handler()->getFilesetInfo('gff');
@@ -2389,7 +2396,80 @@ sub writeGenbankHeader
  
 }
 
-# =item writeGFF  
+
+  ## see also SUPER::remapType ; handleAttrib ***; remapId ; remapName ; 
+
+sub handleAttribOut 
+{
+	my $self= shift;
+  my($addattr, $attr_type, $attribute, $feattype)=  @_;
+  my $savetype= $attr_type;
+  
+  # special handling?
+  # for types gene, mRNA, CDS:  Name => Gene; (gene)ID => locus_tag
+  #  mRNA ID => transcript_id ; protein ID => protein_id
+  # Note => note
+  # type polypeptide/protein => CDS type
+  
+  if($savetype eq "ID") {
+       if($feattype =~ /gene/) { $attr_type="locus_tag"; }
+    elsif($feattype =~ /RNA/) { $attr_type="transcript_id"; }
+    elsif($feattype =~ /CDS/) { $attr_type="protein_id"; }
+  }
+  
+  if($self->config->{mapattr_key}->{$attr_type}) {
+    $attr_type= $self->config->{mapattr_key}->{$attr_type}->{content}; 
+    }
+
+  ## see above handleAttrib
+#   foreach my $mp (sort keys %mapattr_pattern) {
+#     next if ($mp eq 'null'); # dummy 
+#     my $mtype= $mapattr_pattern{$mp}->{type};
+#     next if ($mtype && $attr_type !~ m/$mtype/);
+#     my $from= $mapattr_pattern{$mp}->{from}; next unless($from);
+#     my $to  = $mapattr_pattern{$mp}->{to};
+#     if ($to =~ /\$/) { $attribute =~ s/$from/eval($to)/e; }
+#     else { $attribute =~ s/$from/$to/g; }
+#     }
+    
+  push( @$addattr, "$attr_type\t$attribute") if $attribute;  
+
+}
+
+sub splitGbType
+{
+	my $self= shift;
+  my($gffsource,$type,$fulltype)= @_;
+  my($newgffs)=('');
+  
+    #? use fulltype instead of type? as 'match:sim4:na_EST_complete_dros'
+    # convert mRNA_genscan,mRNA_piecegenie to gffsource,mRNA ?
+  if ($maptype_gb{$type}) {
+    ($type,$newgffs)= split(/[\.:]/,$maptype_gb{$type},2);
+    }
+  elsif ($fulltype =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
+    ($type,$newgffs)=($1,$2);
+    }
+  elsif ($type =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
+    ($type,$newgffs)=($1,$2);
+    }
+  else { $type= $fulltype; } #?? feb05; want snRNA not mRNA .. leave in fulltype ?
+  $gffsource= $newgffs if($newgffs && $newgffs ne '.'); 
+  
+  return($gffsource,$type);
+}
+
+sub _gffEscape
+{
+  my $v= shift;
+#?? not for genbank
+#   $v =~ tr/ /+/;
+#   $v =~ s/([\t\n\=&;,])/sprintf("%%%X",ord($1))/ge; # Bio::Tools::GFF _gff3_string escaper
+  return $v;
+}
+
+
+# =item writeGenbankTbl  
 #    
 #    write  one feature in gff3
 #    feature may have sub location parts (multi line)
@@ -2418,50 +2498,61 @@ sub writeGenbankTbl  # from writeGFF
   my %at= ();
 
   my $v;
-  push @at, "ID="._gffEscape($id) if ($id); # use this for gff internal id instead of public id?
-  push @at, "Name="._gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
-
+  #push @at, "ID\t"._gffEscape($id) if ($id); # use this for gff internal id instead of public id?
+  #push @at, "name\t"._gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
+  $at{"ID"}= _gffEscape($id) if ($id);
+  $at{"Name"}= _gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
+    
   foreach (@attr) {
     my ($k,$v)= split "\t";
     if (!$v) { next; }
     elsif ($k eq "object_oid") { next; }
     elsif ($k eq "parent_oid") {
-      if ($gff_keepoids) { $at{$k} .= ',' if $at{$k}; $at{$k} .= $v; }
-      next if $segmentfeats{$type}; # dont do parent for these ... ?
+      next; #??
+unless(FIXME) { 
+      ## for each gene model part; should add locus_tag == gene ID
       
-      $v =~ s/:.*$//; #$v= $oidmap{$v} || $v;
-      $k= 'Parent'; #push @at, "Parent=$v";
+#       if ($gff_keepoids) { $at{$k} .= ',' if $at{$k}; $at{$k} .= $v; }
+#       next if $segmentfeats{$type}; # dont do parent for these ... ?
+#       
+#       $v =~ s/:.*$//;  
+#       $k= 'Parent'; 
+# 
+#       my $parob= $oidobs->{$v}->{fob};
+#       if ($parob && $parob->{id}) {
+#         $v= $parob->{id};
+#         if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
+#         
+#         if ($v eq $id) {  
+#           my $i= 1;
+#           my $paroid= $parob->{oid};
+#           my $kids = $oidobs->{$paroid}->{child};
+#           if ($kids) { 
+#           foreach my $kidob (@{$kids}) {
+#             last if ($kidob->{oid} eq $oid);
+#             $i++;
+#             }
+#            }
+#           $id= "$id.$i";
+#           $at[0]= "ID="._gffEscape($id);
+#           }
+#         }
+#       else {
+#         unless($fulltype =~ /$ignore_missingparent/) { 
+#           print STDERR "GFF: MISSING parent ob for i/o/t:",$id,"/",$oid,"/",$fulltype,
+#           " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
+#           }
+#         next; # always skip writing bogus Parent= to gff
+#         }
+}
 
-      my $parob= $oidobs->{$v}->{fob};
-      if ($parob && $parob->{id}) {
-        $v= $parob->{id};
-        if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
-        
-        if ($v eq $id) {  
-          my $i= 1;
-          my $paroid= $parob->{oid};
-          my $kids = $oidobs->{$paroid}->{child};
-          if ($kids) { 
-          foreach my $kidob (@{$kids}) {
-            last if ($kidob->{oid} eq $oid);
-            $i++;
-            }
-           }
-          $id= "$id.$i";
-          $at[0]= "ID="._gffEscape($id);
-          }
-        }
-      else {
-        unless($fulltype =~ /$ignore_missingparent/) { ## || $id =~ /GA\d/
-          # dpse GA genes; odd parent = csome; ignore parent here? FIXME
-          print STDERR "GFF: MISSING parent ob for i/o/t:",$id,"/",$oid,"/",$fulltype,
-          " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
-          }
-        next; # always skip writing bogus Parent= to gff
-        }
       }
-    elsif ($k eq "dbxref" || $k eq "db_xref") { # dbxref_2nd - leave as separate 
-      $k= 'Dbxref'; 
+      
+        # dbxref_2nd - leave as separate ?
+    #elsif ($k eq "dbxref" || $k eq "Dbxref" || $k eq "db_xref") 
+    elsif ($k =~ /^dbxref|db_xref/i ) 
+      { 
+      $k= 'db_xref'; 
       }
     elsif ($k eq "synonym") { # check dupl ID
       next if ($v eq $id || $v eq $fob->{name});
@@ -2472,16 +2563,22 @@ sub writeGenbankTbl  # from writeGFF
       $at{$k} .= _gffEscape($v);  # should be urlencode($v) - at least any [=,;\s]
       }
     }
-  
-  ($gffsource,$type)= $self->splitGffType($gffsource,$type,$fulltype);
-  
+
   ## drop ID if Parent ; sometimes ?
   my $parent= delete $at{'Parent'};
-  if( $parent && $dropid{$type} ) { $at[0]=  "Parent=$parent"; }
-  elsif ($parent){ push(@at, "Parent=$parent");  }
+unless(FIXME) { 
+  if( $parent && $dropid{$type} ) { $at[0]=  "Parent\t$parent"; }
+  elsif ($parent){ push(@at, "Parent\t$parent");  }
+}  
+
+  ## this should set attrib 'ncRNA_class	snoRNA' for (snoRNA, scRNA, snRNA, miRNA, ncRNA, rRNA) > ncRNA
+  ($gffsource,$type)= $self->splitGbType($gffsource,$type,$fulltype);
   
-  foreach my $k (sort keys %at) { push(@at, "$k=$at{$k}"); }
-  $at = join(";",@at);
+
+  foreach my $k (sort keys %at) { 
+    $self->handleAttribOut(\@at, $k, $at{$k}, $type);
+    # push(@at, "$k\t$at{$k}"); 
+  }
   
   # Genbank Tbl format here:  loc \t loc \t FT-type \n \t ftfield \t ftval ...
   foreach my $i ( 0..$#loc ) { 
@@ -2491,9 +2588,10 @@ sub writeGenbankTbl  # from writeGFF
     print $fh join("\t",@v),"\n";
   }
   foreach my $at (@at) {
-    my ($k,$v)= split "=",$at,2;
+    my ($k,$v)= split "\t",$at,2;
     print $fh join("\t","",$k,$v),"\n";
   }
+  print $fh "\n";
 
 }
 
@@ -2752,15 +2850,6 @@ sub writeGenbankTbl  # from writeGFF
 #   return($gffsource,$type);
 # }
 
-sub _gffEscape
-{
-  my $v= shift;
-#?? not for genbank
-#   $v =~ tr/ /+/;
-#   $v =~ s/([\t\n\=&;,])/sprintf("%%%X",ord($1))/ge; # Bio::Tools::GFF _gff3_string escaper
-  return $v;
-}
- 
 # =item writeGFF  
 #    
 #    write  one feature in gff3
