@@ -1,0 +1,138 @@
+<opt
+  name="spbase"
+  relid="1"
+  date="20071228"
+  make_current="1"
+  >
+
+  <no_csomesplit>1</no_csomesplit>
+  <valid>1</valid> <!-- set 1 to skip db checks of above variables -->
+  
+  <about id="spbase"><![CDATA[
+   See bulkfiles_template.xml for further documentation. 
+   See site_defaults for included configurations.
+  ]]></about>
+  
+  <include>site_defaults</include>
+  
+  <title>SpBase</title>
+  
+  <doc id="Release.txt"><![CDATA[
+  Bulk output for Chado genome databases
+  Database: ${title} 
+  Species:  ${species}
+  Release:  ${rel}, dated ${date} as ${relfull}
+  ]]></doc>
+    
+  <release id="1" rel="spbase1"  dbname="SpBase" date="20071005"
+    relfull="spbase_20071005"
+    release_url="/genome/spbase/spbase-release1.html"
+    />
+  <release id="dummy" title="placeholder for xmlsimple"/>
+
+  <GFF_source>SpBase</GFF_source>
+  <org>spur</org>
+  <species>Strongylocentrotus_purpuratus</species>
+  <seq_ontology>sequence</seq_ontology> 
+  <!-- see chadofeatsql ENV_default -->
+  <golden_path>'supercontig'</golden_path>
+  <featureprops>'Note','orf_classification'</featureprops>
+  
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>matches</target> <!--  //none in sgdlite1//  -->
+    <target>analysis</target> <!--  //none in sgdlite1//  -->
+  </featdump>
+
+  <fileset_override
+    name="fff"
+    path="fff/.+\.fff"
+    input="feature_table"
+    title="Genome features"
+    config="spbasefeatconf"
+    handler="FeatureWriter"
+    dogzip="0"
+    />
+  <fileset_override id="dummy" title="placeholder for xmlsimple"/>
+
+
+  
+  <!-- feature sets to make fasta bulk files -->
+  <featset>chromosome</featset>
+  <featset>gene</featset>
+  <!-- <featset>CDS</featset> -->
+  <featset>CDS_translation</featset>
+  <featset>ncRNA</featset>
+  <featset>transposon</featset>
+  <featset>gene_extended2000</featset>
+  <featset>intergenic</featset>
+<!--   <featset>translation</featset> // none in sgdlite; make from CDS ? -->
+
+  <!-- feature sets to make blast indices -->
+  <blastset>chromosome</blastset>
+  <blastset>gene</blastset>
+  <blastset>CDS_translation</blastset>
+  <blastset>ncRNA</blastset>
+  <blastset>intergenic</blastset>
+
+<!-- 
+dgg: 0712: is there bug in chr dna dump requiring organism entry in organisms.xml
+when found in main conf.xml and also in chado organism table?
+
+12      S.purpuratus    Strongylocentrotus      purpuratus      sea urchin      1525779 
+
+log:
+
+Automaking dna files
+make chromosomes= all scaffold1 scaffold10 scaffold100 scaffold1000 scaffold10000 scaffold100000 scaffol
+d100001 scaffold100002 scaffold100003 scaffold100004 scaffold100005 scaffold100006 scaffold100007 scaffo
+ld100008 scaffold100009 scaffold10001 scaffold100010 scaffold100011 scaffold100012 scaffold100013 .. mor
+e ..
+with featfiles= spur-all-spbase1.fff
+with dnafiles= 
+Missing dna files; make with -dnadump
+
+Config2: read: conf/bulkfiles/fastawriter.xml ok=1
+Config: title = Fasta file writer; date = 20051217;  from conf/bulkfiles/fastawriter.xml
+readConfig:pass2 for variables=species org date title datadir rel relfull relid release_url release_id r
+elease_date GFF_source taxon ftp_url golden_path seq_ontology addids title addmd5sum writeemptyrecords a
+ddcrc64 perchr about makeall outformats date allowanyfeat informat dropnotes dogzip name
+
+FastaWriter::makeFiles
+openInput[0]: name=spur-all-spbase1.fff, type=feature/fff, /usr/local/bio/argos/gmod/gmtmp/GMODTools/dat
+a/genomes/Strongylocentrotus_purpuratus/spbase_20071005/fff/spur-all-spbase1.fff
+procFasta featset=chromosome,gene,CDS_translation,ncRNA,transposon,gene_extended2000,intergenic
+
+procFasta chromosome outh=/usr/local/bio/argos/gmod/gmtmp/GMODTools/data/genomes/Strongylocentrotus_purp
+uratus/spbase_20071005/fasta/spur-all-chromosome-spbase1.fasta
+     ^^ empty file
+procFasta gene outh=/usr/local/bio/argos/gmod/gmtmp/GMODTools/data/genomes/Strongylocentrotus_purpuratus
+/spbase_20071005/fasta/spur-all-gene-spbase1.fasta
+
+...
+fastaFromFFFloop: ft=gene,CDS_translation,ncRNA,transposon,gene_extended2000,intergenic
+fastaFromDb featn=chromosome ?
+fastaFromDb sql= 
+select f.feature_id, t.name as type, f.residues, f.md5checksum, f.seqlen, f.name, f.uniquename
+from feature f, organism o, cvterm t
+where t.name in ('supercontig') and t.cvterm_id = f.type_id
+and o.genus = '' and o.species = '' and o.organism_id = f.organism_id
+            ^^^^^              ^^^^^^   
+in FastaWriter:fastaFromDb:
+  my $org= $self->{org};  
+  my $rel= $self->{rel};  
+  my($species,$genus) = ($self->handler->speciesFull($org),'');
+  ($genus,$species)= split(/[_ ]/,$species,2);  
+
+
+-->
+
+
+</opt>

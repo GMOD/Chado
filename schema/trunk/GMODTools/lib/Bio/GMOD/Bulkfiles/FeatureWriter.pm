@@ -54,24 +54,24 @@ my $VERSION = "1.1";
 use constant BULK_TYPE => 'fff+gff';#??
 use constant CONFIG_FILE => 'chadofeatdump';
 
-my $maxout = 0;
-my $ntotalout= 0;
+our $maxout = 0;
+our $ntotalout= 0;
 
-my $chromosome= {};  ## read info from chado dump chromosomes.tsv 
+our $chromosome= {};  ## read info from chado dump chromosomes.tsv 
 
-my $fff_mergecols=1; # $self->{fff_mergecols} add chr,start cols for merge
-my $gff_keepoids= 0; # $self->{gff_keepoids}
-my @outformats= (); 
-my @defaultformats= qw(fff gff); # cmap ?? fasta - no
-my %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
+our $fff_mergecols=1; # $self->{fff_mergecols} add chr,start cols for merge
+our $gff_keepoids= 0; # $self->{gff_keepoids}
+our @outformats= (); 
+our @defaultformats= qw(fff gff); # cmap ?? fasta - no
+our %formatOk= ( fff => 1, gff => 1 ); # only these handled here ?
 
-my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
+our @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
 
-my $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
-my $append=0; # $self->{append} #?? is this used?
+our $outfile= undef; # "chadofeat"; ## replace w/ get_filename !
+our $append=0; # $self->{append} #?? is this used?
 
-my %gffForwards=();
-my @gffForwards=();
+our %gffForwards=();
+our @gffForwards=();
 
 use constant TOP_SORT => -9999999;
 use constant MAX_FORWARD_RANGE => 990000; # at 500000 lost a handful of oidobs refs; maximum base length allowed for collecting forward refs
@@ -396,13 +396,14 @@ sub openCloseOutput
 {
 	my $self= shift;
   my($outh,$chr,$flags)=  @_;
-  
+
+  my $chrfile= $chr;
   my $app= defined $self->{append} ? $self->{append} : $append;
   # 0710: no_csomesplit : no perchr files, only makeall
   my $no_csomesplit= $self->handler_config->{no_csomesplit} || 0; # FIXME: 0710
   if( $no_csomesplit ) {
     $app= 1;
-    $chr="all"; # or "sum" ??
+    $chrfile="all"; # or "sum" ??
     }
     
   if ($outh && $flags =~ /open|close/) {
@@ -413,14 +414,14 @@ sub openCloseOutput
     
   $outh= {};  
   if ($flags =~ /open/) {
-    $chr='undef' unless($chr);
+    $chrfile='undef' unless($chrfile);
     #?? for unsorted input need to change $append to true after first open?
     foreach my $fmt (@outformats) {
       ## need option to append or create !?
       my $ap=($app) ? ">>" : ">";
       my $fn;
-      if ($outfile) { $fn="$outfile-$chr.$fmt"; }
-      else { $fn= $self->get_filename( $self->{org}, $chr, '', $self->{rel}, $fmt); }
+      if ($outfile) { $fn="$outfile-$chrfile.$fmt"; }
+      else { $fn= $self->get_filename( $self->{org}, $chrfile, '', $self->{rel}, $fmt); }
 
       ##? check for $self->handler()
       my $subdir= $fmt; ##($fmt eq 'fff') ? 'gnomap' : $fmt; #? fixme 
@@ -430,7 +431,7 @@ sub openCloseOutput
       my $exists= ($app && -e $fpath) ? 1 : 0;
       print STDERR "# output $fpath (append=$exists)\n" if $DEBUG;
       $outh->{$fmt}= new FileHandle("$ap$fpath");
-      $self->writeHeader($outh,$fmt,$chr) unless($exists);
+      $self->writeHeader($outh,$fmt,$chr,$exists); # unless($exists);
       }
     }
   return $outh;
@@ -709,18 +710,18 @@ sub hasObForwards {
     my $hasfor= $self->grepline("parent_oid\t".$oid);  
     my $isfor= 0;
 
-    if ($DEBUG && $hasfor) {
-      # my @val= grep /parent_oid\t$oid/, @{$self->{linebuf}};
-      print STDERR "hasForward: $ftype, ",$fob->{name},", $oid\n>","\n"; #join("\n>",@val),"\n"; 
-      }
+#     if ($DEBUG && $hasfor) {
+#       # my @val= grep /parent_oid\t$oid/, @{$self->{linebuf}};
+#       print STDERR "hasForward: $ftype, ",$fob->{name},", $oid\n>","\n"; #join("\n>",@val),"\n"; 
+#       }
 
     ## ? need reverse: if fob has parent_oid, grep for its object_oid ?
     unless($hasfor) {
     $isfor= ($paroid && $self->grepline("\b$paroid\b"));  
-    if ($DEBUG && $isfor) {
-      # my @val= grep /\b$paroid\b/, @{$self->{linebuf}};
-      print STDERR "isForward: $ftype, ",$fob->{name},", par=$paroid\n>", "\n"; # ,join("\n>",@val),"\n"; 
-      }
+#     if ($DEBUG && $isfor) {
+#       # my @val= grep /\b$paroid\b/, @{$self->{linebuf}};
+#       print STDERR "isForward: $ftype, ",$fob->{name},", par=$paroid\n>", "\n"; # ,join("\n>",@val),"\n"; 
+#       }
     }
     
     return 1 if ($hasfor || $isfor);
@@ -2308,12 +2309,12 @@ sub putFeats
 sub writeHeader
 {
 	my $self= shift;
-  my($outh,$fmt,$chr)= @_;
+  my($outh,$fmt,$chr,$appending)= @_;
   my $chrlen= defined $chromosome->{$chr} && $chromosome->{$chr}->{length} || 0;
 
   ## foreach $fmt (@formats) { $self->{$fmt}->writeheader($outh->{$fmt},$chr,$chrlen); }
-  $self->writeFFF1header($outh->{$fmt},$chr,$chrlen) if ($fmt eq 'fff');
-  $self->writeGFF3header($outh->{$fmt},$chr,$chrlen) if ($fmt eq 'gff');
+  $self->writeFFF1header($outh->{$fmt},$chr,$chrlen) if ($fmt eq 'fff' && !$appending);
+  $self->writeGFF3header($outh->{$fmt},$chr,$chrlen) if ($fmt eq 'gff' && !$appending);
   
   ## add fasta output - no header ?
 }

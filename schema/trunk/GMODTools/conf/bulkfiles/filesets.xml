@@ -202,6 +202,24 @@
     <target>go_association</target>
   </fileset>
 
+    <!-- 0805: add genbanktbl / genbanksubmit fileset:
+     add as desired to outformats>genbanktbl</outformats 
+     Bio::GMOD::Bulkfiles::GenbankSubmitWriter
+     -->
+  <fileset
+    id="genbanktbl"
+    path="genbanksubmit/.+\.tbl"
+    handler="GenbankSubmitWriter"
+    title="Genbank genome submit table"
+    input="feature_table"
+    config="chadofeatsql"
+    tag="feature_sql"
+    MAYBE_makeall="1"
+    MAYBE_perchr="1"
+    dogzip="0"
+    >
+  </fileset>
+
 
   <fileset
     id="gbrowse_fb"
