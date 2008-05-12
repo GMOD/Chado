@@ -264,7 +264,7 @@ sub processFasta
   my $outdir= $self->outputpath();
   ## my @features= @$featset;
   my @fffeatures= @$featset;
-  print STDERR "procFasta featset=",join(",",@fffeatures),"\n" if $DEBUG;
+  print STDERR "processFasta featset=",join(",",@fffeatures),"\n" if $DEBUG;
 
   $self->{diddbfa}= {} unless($self->{diddbfa});
   my $featmap = $self->handler_config->{featmap}; # NOT local config ; for main config's featmap
@@ -280,7 +280,7 @@ sub processFasta
   foreach my $featn (@ffflist) {
     my $fn= $self->get_filename ( $self->{org}, $chrout, $featn, $self->{rel}, $self->BULK_TYPE);
     $fn= catfile( $outdir, $fn);
-    print STDERR "procFasta $featn outh=$fn\n" if $DEBUG;
+    print STDERR "processFasta $featn outh=$fn\n" if $DEBUG;
   
     ## special case for feat == chromosome/dna -> raw2Fasta 
     if(!$no_csomesplit and $featn eq "chromosome") {
@@ -301,10 +301,13 @@ sub processFasta
       }
     }
     
-  $ndone += $self->fastaFromFFFloop( $inh, $outh, $chr, \@fffeatures) if (@fffeatures);
-  
   ## dang do this only once; this method called inside chromosome loop;
   $ndone += $self->fastaFromDb( $outh, \@dbfeatures) if (@dbfeatures);
+
+  $ndone += $self->fastaFromFFFloop( $inh, $outh, $chr, \@fffeatures) if (@fffeatures);
+  
+##  ## dang do this only once; this method called inside chromosome loop;
+##  $ndone += $self->fastaFromDb( $outh, \@dbfeatures) if (@dbfeatures);
 
   foreach my $featn (keys %$outh) { 
     my $fh= $outh->{$featn}; 
@@ -674,6 +677,11 @@ sub fastaFromDb
   ($genus,$species)= split(/[_ ]/,$species,2);  
   my $dbh= $self->handler->dbiConnect();
   my $nout= 0;
+
+  unless($genus and $species) { # this is bug area, from above
+    my $err= "ERROR: fastaFromDb: missing genus:$genus, species:$species for org=$org\n";
+    if ($err) { ($self->{failonerror}) ? die $err : warn $err; return undef;  }
+  }
   
   foreach my $featn (@features) {
     print STDERR "fastaFromDb featn=$featn ?\n" if $DEBUG;

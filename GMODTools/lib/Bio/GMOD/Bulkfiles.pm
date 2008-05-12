@@ -1448,9 +1448,11 @@ sub makeFiles
   unless(@outformats>0) {
     @outformats=  @{ $self->config->{outformats} || \@defaultformats } ; 
     }
+    
   # automake, etc, add outformat fff if need be
-  push(@outformats,"fff") # still a dependency, but intermediate format
-    if ($automake && !grep(/fff/, @outformats) && grep(/fasta/, @outformats));
+#   push(@outformats,"fff") # still a dependency, but intermediate format
+#     if ($automake && !grep(/fff/, @outformats) && grep(/fasta/, @outformats));
+    # bug^ recreates fff already made;
   $args{formats}= \@outformats; #??? want this
   
   my %outformats= map{ $_,1; } @outformats;
@@ -1497,7 +1499,11 @@ sub makeFiles
   
     # FIXME trick - getFeatureWriter loads common config for featmap/featset needed by others
   my $featwriter= $self->getWriter('fff');
-  
+  my $featfiles = $self->getFiles('fff', $chromosomes);
+  if ($automake && !@$featfiles && ($outformats{'fasta'} || $outformats{'gnomap'})) { #(grep /fasta|gnomap/, @outformats))
+     $outformats{'fff'}=1;
+     }
+     
     ## this one takes a while; split chromosomes among processors
   if ($outformats{'fff'} || $outformats{'gff'}) { ## grep /fff|gff/, @outformats) 
     delete $outformats{'fff'}; delete $outformats{'gff'};
@@ -1518,10 +1524,10 @@ sub makeFiles
     $self->preMake('dna');
     $dnafiles  = $self->getFiles('dna', $chromosomes);
     }
-  if ($automake && !@$featfiles && ($outformats{'fasta'} || $outformats{'gnomap'})) { #(grep /fasta|gnomap/, @outformats))
-    $self->preMake('fff'); # not active?
-    $dnafiles  = $self->getFiles('fff', $chromosomes);
-    }
+#   if ($automake && !@$featfiles && ($outformats{'fasta'} || $outformats{'gnomap'})) { #(grep /fasta|gnomap/, @outformats))
+#     $self->preMake('fff'); # not active?
+#     $featfiles  = $self->getFiles('fff', $chromosomes);
+#     }
     
   if ($DEBUG) {
     my @cn= @$chromosomes; # FIXME too long to list for some, no_csomesplit
@@ -1946,7 +1952,7 @@ sub species4letter
 	my $spattern= $self->config->{species_short_pattern}
 	      || '^(\w)[^_]*_(\w{1,3})';
 	  
-	my( $ga, $sa) = $spp =~ /$spattern/;
+	my( $ga, $sa) = $spp =~ m/$spattern/;
 	return lc($ga.$sa) if($ga and $sa); #? should lc() be a _pattern option?
   return lc( substr($spp,0,4) ); #??
 }
@@ -1984,8 +1990,29 @@ sub speciesAbbrev
   return $self->species4letter($spp);
 }
 
-
+## fix this; should always prefer  $self->config->{species}; ?
+## $organisms->{$orgid}->{fullspecies} second choice?
 sub speciesFull
+{
+	my $self= shift;
+	my ($org)= @_;
+	my $species= '';
+  $species= $self->config->{species};
+  $species =~ s/ /_/g;
+  return $species if($species =~ m/_/);
+
+  $org= $org || $species || $self->config->{org};
+  $org= $self->speciesAbbrev($org);
+  my $organisms= $self->config->{organism};
+  if(ref $organisms && $organisms->{$org}->{species}) {
+    $species= $organisms->{$org}->{species};
+    $self->config->{species}= $species if ($species =~ m/_/);
+    }
+  return $species;
+}
+
+
+sub speciesFull_OLD
 {
 	my $self= shift;
 	my ($org)= @_;
@@ -1996,6 +2023,7 @@ sub speciesFull
     $species =~ s/ /_/g;
     return $species if($species =~ m/_/);
     }
+    
   $org= $org || $species || $self->config->{org};
   $org= $self->speciesAbbrev($org);
   my $organisms= $self->config->{organism};

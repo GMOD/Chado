@@ -191,6 +191,11 @@
  
  
   <!-- // want something like this to show tables with >0 rows ...
+  
+  try this for row counts == reltuples:
+  select relname,reltype,relpages,reltuples,relkind from pg_class 
+    where relkind = 'r' and relnamespace = 2200 order by reltuples DESC ;
+
   <feature_sql id="db_summary" type="summary" output="database-overview.txt">
   <sql><![CDATA[
   SELECT s.tablename, count(s.tablename.*) as row_count
@@ -300,7 +305,7 @@ unless($header++){ print "
     '' as Synonyms, -- fixme
     (select name from cvterm where cvterm_id = f.type_id) as Type,
     'taxon:${taxon}' as Taxon,  
-    replace(substr(f.timelastmodified,1,10),'-','') as Date,  
+    replace(substr(text(f.timelastmodified),1,10),'-','') as Date,  
     '${GFF_source}' as Assigned
     
   FROM cv socv, feature_cvterm fc 

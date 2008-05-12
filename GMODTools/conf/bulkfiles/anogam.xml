@@ -1,0 +1,99 @@
+<opt
+  name="anogam"
+  relid="1"
+  make_current="1"
+  >
+
+  <no_csomesplit>1</no_csomesplit>
+  <valid>0</valid> <!-- set 1 to skip db checks of above variables -->
+  
+  <about id="anogam"><![CDATA[
+   See bulkfiles_template.xml for further documentation. 
+   See site_defaults for included configurations.
+  ]]></about>
+  
+  <include>site_defaults</include>
+  
+  <title>AnoGambia</title>
+  
+  <doc id="Release.txt"><![CDATA[
+  Bulk output for Chado genome databases
+  Database: ${title} 
+  Species:  ${species}
+  Release:  ${rel}, dated ${date} as ${relfull}
+  ]]></doc>
+    
+  <release id="1" rel="anogam1"  dbname="anogam_x" date="20080511" />
+  <release id="dummy" title="placeholder for xmlsimple"/>
+
+  <relfull>${org}_${release_date}</relfull> 
+  <release_url>/genome/${species}/release-${release_id}.html</release_url>
+
+  <org>anogam</org>
+  <species>Anopheles gambiae</species>
+
+  <GFF_source>Genbank</GFF_source>
+  <seq_ontology>sequence</seq_ontology> 
+  <golden_path>'chromosome'</golden_path>
+  
+  <!-- some useful Genbank feature properties -->
+  <featureprops>'Note','gene','locus_tag','inference',
+      'product','standard_name'</featureprops>
+  
+  <featdump
+    path="tmp/featdump/\w+.tsv"
+    config="chadofeatsql"
+    tag="feature_sql"
+    type="feature_table"
+    splitname="chadofeat"
+    >
+    <target>chromosomes</target>
+    <target>features</target>
+    <target>matches</target>
+    <target>analysis</target>
+  </featdump>
+  
+  <!-- feature sets to make fasta bulk files -->
+  <featset>chromosome</featset>
+  <featset>gene</featset>
+  <featset>transcript</featset>
+  <featset>CDS</featset>  <!-- dna of protein coding sequence -->
+  <featset>translation</featset> <!-- protein aminos -->
+  <featset>ncRNA</featset>
+  <featset>pseudogene</featset>
+  <featset>transposon</featset>
+  <!-- featset>gene_extended2000</featset -->
+  <!-- featset>intergenic</featset -->
+
+
+<!-- test case for genbank table 
+
+  # get AnoGam chrX and load to chado db
+  curl -OR ftp://bio-mirror.net/biomirror/ncbigenomes/Anopheles_gambiae/CHR_X/NC_004818.gbk.gz
+
+  set dbname=anogam_x
+  $pg/bin/createdb -T chado_01_template $dbname
+  
+  # fix Genbank FT to SO type map
+  vi  lib/Bio/SeqFeature/Tools/TypeMapper.pm : add pseudogenic tRNA
+ 
+  # load chromosome X to chado
+  gunzip -c NC_004818.gbk.gz |\
+   perl bin/bp_genbank2gff3.pl -noCDS -in stdin -out stdout |\
+   perl bin/gmod_bulk_load_gff3.pl -dbname $dbname -organism fromdata -dbport 7302
+  
+  # create GMOD Bulkfiles conf/anogam.xml from template.xml : dbname, etc. edits
+  
+  # create Bulkfiles outputs for anogam_x
+  perl -Ilib bin/bulkfiles.pl -config=anogam -debug -make >& log.anogam1 &
+
+  perl -Ilib bin/bulkfiles.pl -config=anogam -debug -auto -make  \
+    -format='overview,fff,gff,fasta,tables,genbanktbl' \
+    >& log.anogam2 &
+ 
+ problems:
+  transcript : no db residues; reconfig to get froms eq
+  
+-->
+
+</opt>
