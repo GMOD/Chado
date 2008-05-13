@@ -49,11 +49,13 @@ use File::Basename;
 use Bio::GMOD::Bulkfiles::BulkWriter;       
 use base qw(Bio::GMOD::Bulkfiles::BulkWriter);
 
+
 our $DEBUG = 0;
 my $VERSION = "1.1";
 use constant BULK_TYPE => 'fff+gff';#??
 use constant CONFIG_FILE => 'chadofeatdump';
 
+## !! change these from our to use vars() for package scope
 our $maxout = 0;
 our $ntotalout= 0;
 

@@ -61,7 +61,8 @@
   <featmap id="CDS" add_id="gene" />
 
   <featmap id="translation"
-    types="CDS"
+    types="CDS protein"
+    ALSO_types="polypeptide"
     typelabel="protein"
     fromdb="1"
     />

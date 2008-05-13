@@ -77,6 +77,18 @@
     chadofeatsql.xml  --  chado db sql calls to dump features
     chadofeatconv.xml --  feature conversion options
 
+=head1 UPDATES  2008-May, version 1.2a
+
+  - adding (in progress) Genbank Submission table writer, 
+    'bulkfiles -format=genbanktbl', with output suited
+    to submit to NCBI as per these specifications
+    http://www.ncbi.nlm.nih.gov/Genbank/eukaryotic_genome_submission.html
+     
+     -- adding Genbank2Chado database xml configs for testing (anogam,...)
+     
+  - improvements (in progress) in chado sql efficiency (table joins mostly
+    can be a problem w/ large dbs).
+  
 =head1 UPDATES  2007-Oct, version 1.1
 
   - No chromosome/scaffold/golden_path files.  This change is needed to handle 

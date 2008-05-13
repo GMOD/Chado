@@ -388,8 +388,8 @@ D.G. Gilbert, 2004, gilbertd@indiana.edu
 
 
 #debug# 
-use lib("/bio/argos/common/perl/lib", "/bio/argos/common/system-local/perl/lib");
-use lib("/Users/gilbertd/bio/dev/gmod/schema/GMODTools/lib/");
+#use lib("/bio/argos/common/perl/lib", "/bio/argos/common/system-local/perl/lib");
+#use lib("/Users/gilbertd/bio/dev/gmod/schema/GMODTools/lib/");
 
 use POSIX;
 use FileHandle;
