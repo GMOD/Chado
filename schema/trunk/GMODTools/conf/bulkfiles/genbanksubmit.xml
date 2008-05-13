@@ -32,9 +32,9 @@
   <informat>feature_table</informat>  
   
   <outformats>genbanktbl</outformats>
+  <outformats>dummy</outformats>
 
   <!-- genbank tags from internal tags 
-   dicistronic > ??
    all ncRNA SO types become this
    type ncRNA ; attr 'ncRNA_class	snRNA'
   -->
@@ -42,17 +42,127 @@
   <mapattr_key id="Note">note</mapattr_key>
   <mapattr_key id="synonym">gene_syn</mapattr_key>
   <mapattr_key id="cyto_range">cyt_map</mapattr_key>
+  <mapattr_key id="map">cyt_map</mapattr_key>
+  <mapattr_key id="eC_number">EC_number</mapattr_key> <!-- fix a GFFism -->
+    
     
   <!-- Name is special case depending on feature type -->
   <mapattr_key id="Name">gene</mapattr_key>
-  <mapattr_key id="ID">locus_tag</mapattr_key>
-  <!-- ditto for ID : locus_tag; transcript_id ; protein_id ... -->
+  <!-- mapattr_key id="ID">locus_tag</mapattr_key -->
+  <!-- ditto for ID : can become locus_tag; transcript_id ; protein_id ... -->
 
-  <!-- see maptype_gff; all the type recodes here .. ncRNA ?? -->
+  <!-- see maptype_gff; all the type recodes here .. ncRNA ??
+      but see below feat_model -->
   <maptype_gb>
     <protein>CDS</protein>
-    <polypeptide>CDS</polypeptide>
     <transposable_element_pred>transposable_element:predicted</transposable_element_pred>
+    <dummy_maptype>dummy_maptype</dummy_maptype>
   </maptype_gb>
+ 
+  <!-- these feat_models override those of chadofeatconv ; suited to genbank needs -->
+  
+    <about id="feat_model"><![CDATA[
+    feat_model: construct feature hierarchies for gene/mRNA/exon,UTR,.. models
+  
+    feat_model keys:
+    id = ? type of feature, cant do with multiples
+    simple = 1; not structure for this, write just span 
+      (gene may be span or structured); replaces "simplefeat" list
+    types   = list of types (replaces id?)
+    submodels = list of features in kid array that become new structured features
+    parent  = feature holding all kid objects (e.g. exons) (for submodel)
+        ? is this valid, use featob->parent instead
+    typelabel = what to write in place of id type (protein -> CDS)
+    hasspan = this feature has start,stop (e.g. gene, mRNA, protein)
+        discard/cut parts that fall outside
+    part(s) = array of kid types (e.g. exons, UTRs) making structure
+    makepartsfrom = list? of parts to make parts from if not given
+      (e.g. exons => cds)
+  ]]></about>
+  
+
+  <feat_model id="gene" simple="1" >
+    <submodels>trnatype</submodels> 
+    <submodels>ncrnatype</submodels> 
+    <!-- submodels>mRNA</submodels --> 
+      <!-- data may or may not have gene parent for other rnas ; pseudogene ? -->
+  </feat_model>
+  
+  <feat_model id="mRNA">
+    <parts>exon</parts> 
+    <submodels>protein</submodels> 
+    <!-- submodels>five_prime_UTR</submodels --> 
+    <!-- submodels>three_prime_UTR</submodels --> 
+    <!-- submodels>intron</submodels --> 
+  </feat_model>
+  
+  <!-- chado is ambiguous: uses both protein, polypeptide types -->
+  <feat_model id="protein" 
+    typelabel="CDS" 
+    parent="mRNA" 
+    hasspan="1" 
+    NOT_makemethod="getCDSexons" 
+    makepartsfrom="exon" 
+    >
+    <parts>CDS</parts>  
+  </feat_model>
+
+  <!-- drop create UTR, intron from mRNA>exon,protein model -->
+  <feat_model id="five_prime_UTR" 
+    NOT_makemethod="makeUtr5" 
+    NOT_makepartsfrom="exon|protein" 
+    >
+    <parts>five_prime_UTR</parts>  
+  </feat_model>
+  <feat_model id="three_prime_UTR" 
+    NOT_makemethod="makeUtr3" 
+    NOT_makepartsfrom="exon|protein" 
+    >
+    <parts>three_prime_UTR</parts>  
+  </feat_model>
+  <feat_model id="intron" 
+    NOT_makemethod="makeIntrons" 
+    NOT_makepartsfrom="exon" 
+    >
+    <parts>intron</parts>  
+  </feat_model>
+  
+  <!-- default structure for non-simple 'mRNA' types -->
+  <!-- tRNA , rRNA are separate in Genbank ; equal to mRNA
+  (snoRNA, scRNA, snRNA, miRNA, ncRNA, rRNA)
+  -->
+  <feat_model id="trnatype" types="tRNA rRNA">
+    <parts>exon</parts> 
+  </feat_model>
+
+  <feat_model id="ncrnatype" typelabel="ncRNA" 
+    types="snRNA snoRNA miRNA ncRNA">
+    <parts>exon</parts> 
+    <attr id="ncRNA_class">type</attr>
+  </feat_model>
+
+  <feat_model id="pseudogene" typelabel="gene">
+    <attr id="pseudo">1</attr>
+    <!-- submodels>pseudogenic_transcript</submodels --> 
+    <!-- submodels>pseudogenic_tRNA</submodels --> 
+    <!-- submodels>pseudogenic_rRNA</submodels -->
+    <!-- parts>exon</parts --> 
+  </feat_model>
+
+  <feat_model id="pseudogenic_transcript" typelabel="mRNA">
+    <parts>exon</parts> 
+    <attr id="pseudo">1</attr>
+  </feat_model>
+
+  <feat_model id="pseudogenic_tRNA" typelabel="tRNA">
+    <parts>exon</parts> 
+    <attr id="pseudo">1</attr>
+  </feat_model>
+
+  <feat_model id="pseudogenic_rRNA" typelabel="rRNA">
+    <parts>exon</parts> 
+    <attr id="pseudo">1</attr>
+  </feat_model>
+
 
 </opt>

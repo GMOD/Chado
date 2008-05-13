@@ -118,6 +118,9 @@ assembly:path-AE002603.4
   <maptype_pattern name="3masked" from="_masked" to=""/>
   <!-- <maptype_pattern name="3match" from=":Dmel r3.1" to="dmel_r31"/> -->
 
+  <!-- CDS_spanType is ambiguous in chado: both polypeptide and  protein used -->
+  <maptype_pattern name="4polypep" from="polypeptide" to="protein"/>
+
   <maptype_pattern name="simwrap" from="sim4:wrap.*" to="sim4:wrap"/>
   <maptype_pattern name="null" typename="noname" from="null" to="null"/>  
 
@@ -230,6 +233,7 @@ golden_path_region, not SO term is now used in flybase chadodb as databank_scaff
     <submodels>intron</submodels> 
   </feat_model>
   
+   <!-- chado ambiguity: protein and polypeptide both used for this; recode one? -->
   <feat_model id="protein" 
     typelabel="CDS" 
     parent="mRNA" 
