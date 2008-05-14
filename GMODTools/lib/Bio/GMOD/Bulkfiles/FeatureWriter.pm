@@ -419,21 +419,27 @@ sub openCloseOutput
     $chrfile='undef' unless($chrfile);
     #?? for unsorted input need to change $append to true after first open?
     foreach my $fmt (@outformats) {
+      my $suffix= $fmt; 
+      my $subdir= $fmt; 
+      my $outset= $self->{fileset}{$fmt}; #= $self->handler->getFilesetInfo($fmt);
+      if($outset) {
+        $subdir= $outset->{path} || $subdir;
+        $suffix= $outset->{suffix} || $suffix;
+      }
+      
       ## need option to append or create !?
       my $ap=($app) ? ">>" : ">";
       my $fn;
-      if ($outfile) { $fn="$outfile-$chrfile.$fmt"; }
-      else { $fn= $self->get_filename( $self->{org}, $chrfile, '', $self->{rel}, $fmt); }
+      if ($outfile) { $fn="$outfile-$chrfile.$suffix"; }
+      else { $fn= $self->get_filename( $self->{org}, $chrfile, '', $self->{rel}, $suffix); }
 
-      ##? check for $self->handler()
-      my $subdir= $fmt; ##($fmt eq 'fff') ? 'gnomap' : $fmt; #? fixme 
       my $featdir= $self->handler()->getReleaseSubdir( $subdir);   
       my $fpath = catfile( $featdir, $fn);
       
       my $exists= ($app && -e $fpath) ? 1 : 0;
       print STDERR "# output $fpath (append=$exists)\n" if $DEBUG;
       $outh->{$fmt}= new FileHandle("$ap$fpath");
-      $self->writeHeader($outh,$fmt,$chr,$exists); # unless($exists);
+      $self->writeHeader($outh,$fmt,$chr,$exists); 
       }
     }
   return $outh;

@@ -394,7 +394,9 @@ sub readConfigFile
       if( ref($val) eq 'HASH') { # hash of hash :(
         my @keys = sort keys %$val;
         foreach my $k (@keys) {
-          $showval .= "\n $k = ". $$val{$k}->{content};
+          my $vv= $$val{$k};
+          if(ref($vv) eq 'HASH') { $vv= $vv->{content}; }
+          $showval .= "\n $k = ". $vv;
           } 
         ##$showval .= join("\n", @{$val}{@keys});
       } elsif( ref($val) eq 'ARRAY') {

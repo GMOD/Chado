@@ -209,6 +209,7 @@
   <fileset
     id="genbanktbl"
     path="genbanksubmit/"
+    suffix="tbl"
     handler="GenbankSubmitWriter"
     title="Genbank genome submit table"
     input="feature_table"

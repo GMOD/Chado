@@ -29,7 +29,7 @@
   <relfull>${org}_${release_date}</relfull> 
   <release_url>/genome/${species}/release-${release_id}.html</release_url>
 
-  <org>drosmelgb</org>
+  <org>dromel</org>
   <species>Drosophila_melanogaster</species>
 
   <GFF_source>Genbank</GFF_source>
