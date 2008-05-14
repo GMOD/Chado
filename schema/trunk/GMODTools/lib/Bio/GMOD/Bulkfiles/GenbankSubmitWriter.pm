@@ -148,6 +148,8 @@ initialize data from config
 
 =cut
 
+our $tbl2asn;
+
 sub initData
 {
   my($self)= @_;
@@ -165,10 +167,53 @@ sub initData
   
   $self->SUPER::initData();
 
+
+  my $blasthome= $config->{blasthome} ; # try $ENV{BLAST_HOME} or other??  
+  $tbl2asn= $config->{tbl2asn} || "$blasthome/tbl2asn";
+  unless(-e $tbl2asn) { 
+    warn "Missing tbl2asn: $tbl2asn"; 
+    $self->status(-1,"missing tbl2asn"); 
+    }
+    
+  my $tbl2asnopts= $config->{tbl2asnopts} || '-V v ';   
+  $config->{tbl2asnopts}= $tbl2asnopts;
+
 }
 
 
 #-------------- subs -------------
+
+sub tbl2asn 
+{
+	my $self= shift;
+	my( $seqlist, $subdir, $blastname)= @_;
+	warn "tbl2asn( $blastname )\n" if $DEBUG;
+	my $opts= $self->getconfig('tbl2asnopts');  
+
+# this works: $nb/tbl2asn -t template.sbt -V vb -p ./  
+# with inputs:
+# drosmelgb-all-drosmelgb4.tbl
+# drosmelgb-all-drosmelgb4.fsa == ../fasta/drosmelgb-all-chromosome-drosmelgb4.fasta
+# drosmelgb-all-drosmelgb4.pep == ../fasta/drosmelgb-all-translation-drosmelgb4.fasta
+# template.sbt
+
+  warn("#$blastname:  $tbl2asn $opts \n") if $DEBUG;
+	my $olddir= $ENV{'PWD'};  #?? not safe?
+  chdir($subdir);  
+  
+#   foreach (@$seqlist) {
+#     $_ = catfile($olddir,$_) unless($_ =~ m,^/,);
+#     }
+#   my $seqlib = join(" ",@$seqlist);
+#   my $cat= ($seqlib =~ /\.(gz|Z)/) ? 'gunzip -c' : 'cat';
+    
+  my $ok= system("$tbl2asn $opts ");
+  
+  ##opendir(D,"."); my @f= grep(/stdin/,readdir(D)); closedir(D);
+  ##foreach my $f (@f) { (my $t= $f) =~ s/stdin/$blastname/; rename($f,$t); }
+
+  chdir($olddir);
+}
 
 
 =item  makeFiles( %args )
@@ -197,7 +242,7 @@ sub makeFiles
   my $makeall= !$no_csomesplit && !$args{noall} && ($self->config->{makeall} || $self->{gff_config}->{makeall});
 
   $self->{append}=1 if($no_csomesplit); #?????? TEST ME
-  
+
   unless(@$fileset) { 
     $fileset = $self->handler->getFiles($intype, $chromosomes);  
     unless(@$fileset) { 
@@ -212,9 +257,18 @@ sub makeFiles
     @outformats= (ref $formats) ? @$formats : ($formats);
     }
   @outformats= grep { $formatOk{$_} > 0 }  @outformats;
-  # @SUPER::outformats= @outformats; #?? BUG here ??
+  
+  ## messy; but see  $args{filesetinfo} $args{name}
+  if($args{name} && $args{filesetinfo}) {
+    $self->{fileset}{ $args{name} }= $args{filesetinfo};
+  }
+  foreach my $fmt (@outformats) {
+    my $outset = $self->handler->getFilesetInfo( $fmt ); # genbanktbl
+    $self->{fileset}{$fmt}= $outset if($outset);
+    }
   
   print STDERR "GenbankSubmitWriter::makeFiles outformats= @outformats\n" if $DEBUG; 
+
   
   my $status= 0;
   my $ok= 1;
@@ -231,14 +285,22 @@ sub makeFiles
     
   if ($makeall && $status > 0) {
     foreach my $fmt (@outformats) { 
-      $self->makeall( $chromosomes, "", $fmt); # unless ($fmt eq 'fff'); 
+      $self->makeall( $chromosomes, "", $fmt); 
       }
     }
+
+
+  ## need also symlink fasta/chrom.fa and fasta/translate.fa to genbanksubmit/.fsa,.pep
+  
+  $self->handler->writeDocs( $self->config->{doc} );   # submit template.sbt
+
 
   @outformats = @saveformats;
   print STDERR "GenbankSubmitWriter::makeFiles: done n=$status\n" if $DEBUG; 
   return  $self->status($status); #?? check files made
 }
+
+
 
 ## just now can do only for gff; leave fff split by chr
 # sub makeall 
@@ -585,6 +647,7 @@ sub handleAttrib
   push( @$addattr, "$attr_type\t$attribute") if $attribute;  
 }
 
+
 #s subclass: this main sub needs revisions
 
 sub processChadoTable
@@ -802,9 +865,7 @@ sub processChadoTable
         
         my $clearflag= 'writefff';
         my $nclear= 0;
-#unless(FIXME) {
         $nclear= $self->clearFinishedObs( $clearflag, \%oidobs, $fmin - MAX_FORWARD_RANGE);
-#}        
         if ($DEBUG>1) {
           while( each %oidobs ){ $nleft++; } 
           print STDERR " printed n=$nobs; oidobs: pre-clear=$nstart, cleared=$nclear, left=$nleft\n";
@@ -823,8 +884,7 @@ sub processChadoTable
         $oidobs{$oid}->{fob}= $newob; 
         }
 
-# my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
-
+      # my @fclone_fields = qw(chr type fulltype name id oid fmin fmax offloc attr writefff writegff);
       $fob->{chr} = $arm;
       $fob->{type}= $type;  
       $fob->{fulltype}= $fulltype;  # colon-delimited complex type 'match:program:source' 
@@ -882,22 +942,6 @@ sub processChadoTable
 }
 
 
-# sub keepfeat_fff
-# {
-# 	my $self= shift;
-#   my ($ftype)= @_;
-#   my $dropfeat= ($dropfeat_fff{$ftype} || $ftype =~ /^match_part/);
-#   return(!$dropfeat);
-# }
-
-sub _debugObj
-{
-  my ($name,$obj)= @_;
-  require Data::Dumper;
-  my $dd = Data::Dumper->new([$obj]); $dd->Terse(1);
-  print STDERR "DEBUG obj: $name=",  $dd->Dump(),"\n";
-}
-
 
 ## jan06: makeFlatFeats -> makeFlatFeatsNew
 ## change to config->{feat_model}->{$type}: @parts, $parent, $typelabel, $types
@@ -936,7 +980,7 @@ sub  makeFlatFeatsNew
     warn ">gmm1 $ftype $id ispar=$ispar iskid=$iskid\n" if $GMM;
 
 
-## FIXME: handle feat_model changes to $fob; not just submodels: typelabel, attr
+    ## handle feat_model changes to $fob; not just submodels: typelabel, attr
     if($feat_model) {
       my $typelabel=  $feat_model->{typelabel};
       $fob->{fulltype}= $fob->{type}= $typelabel if($typelabel); #?? need fulltype
@@ -1030,15 +1074,14 @@ sub  makeFlatFeatsNew
           ## CDS/protein w/o CDS_exon parts ... recreate from cds start/stop + mrna location 
         if ($subob && !@$kidobs && $hasspan && @$mrnaexons) {
           warn ">gmmC getCDSexons $sub_model $kidparts $subob, ne=",scalar(@$mrnaexons),"\n" if $GMM;
+  
+          # this doesnt adjust exons for CDS span: see getLocation; reuse here 
           $kidobs= $self->getCDSexons($subob, $mrnaexons); 
-          #($subob,$kidobs)= eval "\$self->$makemethod(\$subob, \$mrnaexons);";
           }
           
          ## for making UTRs, introns: mar06 # makemethod == makeUtr5,makeIntrons,...
-        
         elsif( !@$kidobs && @$mrnaexons && $makemethod) {
           $subob= $parob unless($subob); #??
-          # warn ">gmmU $makemethod $sub_model $kidparts $subob, ne=",scalar(@$mrnaexons),"\n" if $GMM;
           ($subob,$kidobs)= eval "\$self->$makemethod(\$subob, \$mrnaexons);";
           if($@ && $DEBUG){ warn "$makemethod err: $@"; } #? die if ($self->{failonerror}) ?
           warn ">gmmU $makemethod $sub_model np=",scalar(@$kidobs),"\n" if $GMM;
@@ -1077,7 +1120,6 @@ sub  makeFlatFeatsNew
           ## CDS_exon, exon  end up as compound types same as mRNA, CDS/protein
           
           my $cob= $self->makeCompound( $subob, $kidobs, $subtype); 
-          # $self->listkids($cob,$kidobs) if($DEBUG);  ## was loosing kids to bad $oidobs
           $cob->{fulltype}= $cob->{type}= $typelabel;
           warn ">gmmCOB $typelabel $cob np=",scalar(@$kidobs),"\n" if $GMM;
           
@@ -1121,49 +1163,6 @@ sub  makeFlatFeatsNew
 # }
 
 
-# sub listkids { ## DEBUG only
-# 	my $self= shift;
-#   my ($cob,$kidobs)= @_;
-# 
-#   my $name=$cob->{name};
-#   my $ftype=$cob->{type};
-#   my @locs= @ { $cob->{loc} };
-#   print STDERR "COB $ftype:$name";
-#   print STDERR " locs=",join(",",@locs);
-# 
-#   print STDERR " kids=";
-#   foreach my $kid (@$kidobs) {  
-#     print STDERR  $kid->{type},":",$kid->{name}," ";
-#     print STDERR join(",", @{$kid->{loc}})," ";
-#     }
-#   print STDERR "\n";
-# }
-
-
-# sub cloneBase ## shallow clone 
-# {
-# 	my $self= shift;
-#   my ($fob)= @_;
-#   
-#   my $cob= {};  # are these all constant per oid ?
-#   @{%$cob}{@fclone_fields}= @{%$fob}{@fclone_fields}; #? what is vodoo
-# 
-# #   $cob->{chr} = $fob->{chr};
-# #   $cob->{type}= $fob->{type};
-# #   $cob->{fulltype}= $fob->{fulltype};
-# #   $cob->{name}= $fob->{name};
-# #   $cob->{id}  = $fob->{id};
-# #   $cob->{oid} = $fob->{oid};
-# #  $cob->{'writefff'}= $fob->{'writefff'}; # if ($fob->{'writefff'}<0); # in case flagged in utr checker
-# #  $cob->{'writegff'}= $fob->{'writegff'}; # if ($fob->{'writegff'}<0); # in case flagged in utr checker
-# 
-# # ## need locs ...
-#   $cob->{loc} = [];  push( @{$cob->{loc}}, $_) foreach (@{$fob->{loc}});
-#   $cob->{attr}= [];  push( @{$cob->{attr}}, $_) foreach (@{$fob->{attr}});
-#   # foreach my $attr (@{$fob->{attr}}) { push( @{$cob->{attr}}, $attr); }
-#   return $cob;  
-# }
-
 
 =item  makeCompound($fob,$kidobs,$ftype)
 
@@ -1179,76 +1178,71 @@ sub makeCompound
   my $cob= $self->cloneBase($fob);
   $fob->{'writefff'}=1; # need here also !? this is messy...
    
-  ##FIXME - parent loc may need drop for kids locs (mRNA)
-  ## bad also to pick all kids - only exon type for mRNA, others?
-  ## FIXME - for protein && CDS types which are only child of mRNA, need to merge into
-  ## compound feat.
   ## FIXME - for dang transspliced mod(mdg4) - if strands in locs differ -> getLocation
   
   my @locs= ();
-  #my @kidlist=(); ## debug only?
+  my $hasspan= ($self->config->{'feat_model'}->{$ftype}->{hasspan}) or ($ftype eq $CDS_spanType);
   
   ## need to skip kids for 'gene', others ?
   foreach my $kid (@$kidobs) {
-  
-    ##next if ($fob->{type} eq 'mRNA' && $kid->{type} ne 'exon');
-    #if ($DEBUG && $fob->{type} =~ m/^(mRNA|gene)$/) {
-    #  push(@kidlist, $kid->{name}, $kid->{type});
-    #  }
-      
     next if ($fob->{type} =~ m/^(mRNA|gene)$/ && $kid->{type} ne 'exon');  
-    if ($ftype eq $CDS_spanType && $kid->{type} eq 'mature_peptide')
+    if ($hasspan && $kid->{type} eq 'mature_peptide')
     {
       $ftype= $cob->{type}= 'mature_peptide';
     }
-    # next if ($fob->{type} eq 'CDS' && $kid->{type} ne 'CDS_exon');
     $kid->{'writefff'}=1; # need here also !?
     foreach my $loc (@{$kid->{loc}}) { push( @locs, $loc);  }
     }
 
-  if ($ftype eq $CDS_spanType) { 
-    my $offsetloc = $fob->{loc}->[0]; # only 1 we hope
-    $cob->{offloc}= $offsetloc;
-    # $ftype= $cob->{type}= 'CDS' if(1); ## FIXME another flag to rename CDS spantype?
-    }
-  
   unless(@locs) {
-    #? never keep main loc if have kid loc?
     foreach my $loc (@{$fob->{loc}}) { push( @locs, $loc);  }
     }
-  $cob->{loc}= \@locs;
-  # $cob->{kidlist}= \@kidlist if ($DEBUG); ## debug only?
-    
+
+  if ($hasspan) { #  && !defined $cob->{offloc}
+    my $offsetloc = $fob->{loc}->[0]; # only 1 we hope
+    $cob->{offloc}= $offsetloc;
+    }
+ 
+    # FIXME: do getLocation adjustment for CDS_span > CDS_exons here?
+  if (defined $cob->{offloc}) {
+    @locs= $self->offsetLocation($cob, @locs);
+  }
+  
+  $cob->{loc}= \@locs;    
   return $cob;
 }
 
 
 
-=item getLocation($fob,@loc)
+=item offsetLocation($fob,@loc)
   
+  derived from getLocation
   get feature genbank/embl/ddbj location string (FTstring)
   including transplice complexity
-  
   return ($location, $start, $strand);
 
-## feb05: need to preserve strand==0/undefined for some features which have mixture
-## fixed - for dang transspliced mod(mdg4) - if strands in locs differ 
-### looks like chado pg reporting instance with CDS_exons is bad for transspliced mod(mdg4)
+ feb05: need to preserve strand==0/undefined for some features which have mixture
+ fixed - for dang transspliced mod(mdg4) - if strands in locs differ 
+ looks like chado pg reporting instance with CDS_exons is bad for transspliced mod(mdg4)
 
+ 08may: change behavior for GenbankSubmit to offsetLocation: 
+    dont return Genbank style string location, but
+    adjust @loc to CDS_exons by CDS span offset;
+ See also getCDSexons and makeCompound
+ 
 =cut  
 
-sub getLocation
+sub offsetLocation # was getLocation
 {
 	my $self= shift;
   my($fob,@loc)= @_;
   my $srange='';
   my $bstart= -999;
   my($l_strand,$istrans)=(0,0);
-
+  my @newloc=();
+  
   my ($offstart,$offstop,$offstrand)= (0,0,0);
-  ## if $fob is CDS check offset strand, flip compl.
   if (defined $fob->{offloc}) {
-    # now: DID NOT adjusted @loc by off start/stop
     ($offstart,$offstop,$offstrand) = split("\t",$fob->{offloc});
     }
     
@@ -1260,17 +1254,19 @@ sub getLocation
       next if ($stop < $offstart || $start > $offstop);
       $start= $offstart if ($start<$offstart);
       $stop = $offstop if ($stop>$offstop);
-      ## $strand= -$strand if ($offstrand < 0); #? is this bad for CDS ??
       }
       
     if ($bstart == -999 || $start<$bstart) { $bstart= $start; }
-    $srange .= "$start..$stop,";
+    # $srange .= "$start..$stop,";
+    push( @newloc, "$start\t$stop\t$strand");
+    
     if ($l_strand ne 0 && $strand ne $l_strand) { $istrans= 1; last; }
     $l_strand= $strand;
-    }
-    
+  }
+
   if ($istrans) {
-    $srange='';
+    @newloc=(); $srange='';
+   
     $l_strand= 0; 
     $l_strand= $offstrand if ($offstrand < 0);
 
@@ -1287,28 +1283,29 @@ sub getLocation
       if ($offstop != 0) {
         next if ($stop < $offstart || $start > $offstop);
         ## revcomp tricks here
-        if ( $l_strand < 0 && $strand >= 0 ) { #&& $strand >= 0
+        if ( $l_strand < 0 && $strand >= 0 ) { 
           print STDERR "transplice ",$fob->{name}," rev ex=$start,$stop,$strand ; off=$offstart,$offstop\n" if $DEBUG;
-          $stop = $offstart if ($start < $offstart); #($stop>$offstart); ##
+          $stop = $offstart if ($start < $offstart);  
           }
         else {
-          # next if ($stop < $offstart || $start > $offstop);
           $start= $offstart if ($start<$offstart);
           $stop = $offstop if ($stop>$offstop);
           }
         }
 
       $strand= -$strand if ($l_strand < 0);
-      if ($strand < 0) { $srange .= "complement($start..$stop),"; }
-      else { $srange .= "$start..$stop,"; }
+      # if ($strand < 0) { $srange .= "complement($start..$stop),"; }
+      # else { $srange .= "$start..$stop,"; }
+      push( @newloc, "$start\t$stop\t$strand");
       }
     }
-    
-  $srange =~ s/,$//;
-  if ($l_strand < 0) { $srange= "complement($srange)"; }
-  elsif($srange =~ m/,/) { $srange= "join($srange)"; }
   
-  return ($srange, $bstart, $l_strand);
+  return @newloc;
+  # $srange =~ s/,$//;
+  # if ($l_strand < 0) { $srange= "complement($srange)"; }
+  # elsif($srange =~ m/,/) { $srange= "join($srange)"; }
+  # return ($srange, $bstart, $l_strand);
+  
 }
 
 
@@ -1343,10 +1340,10 @@ sub putFeats
   $self->updateParentKidLinks($fobs, $oidobs); #05feb: logic change ; was in processChadoTable
 
 
-#s subclass convert here for genbanktab output ?   
+#s subclass convert here for genbanktab output    
   if ($outh->{genbanktbl}) {  
     my $ffh= $outh->{genbanktbl};
-    $self->{curformat}=  $self->{bulktype}; # $self->BULK_TYPE; # 'genbanktbl';  
+    $self->{curformat}=  $self->{bulktype}; #  'genbanktbl';  
     
     #? need this for genbank ? probably yes, otherwise get exons as features
     my $cobs= $self->makeFlatFeatsNew($fobs,$oidobs);
@@ -1361,58 +1358,6 @@ sub putFeats
     $ffh->flush();
     $ntotalout += $nout;
   }
-
-#   if ($outh->{fff}) {  
-#     my $ffh= $outh->{fff};
-#     # my $fah= $outh->{fasta};
-#     $self->{curformat}= 'fff';  
-#     my $cobs= $self->makeFlatFeatsNew($fobs,$oidobs);
-#     # need to undef @$cobs when done !
-#     
-#     my $nout= 0;
-#     foreach my $fob (@$cobs) {  
-#       ##$self->writeFFF( $outh->{fff}, $fob, $oidobs);
-#       my $fffline= $self->getFFF( $fob, $oidobs );
-#       if($fffline) {
-#         print $ffh $fffline;
-#         $nout++;
-#         }
-#       undef $fob;
-#       }
-#     
-#     undef $cobs;
-#     $ffh->flush();
-#     $ntotalout += $nout;
-#   }
-  
-#   if ($outh->{gff}) {
-#     $self->{curformat}= 'gff';  
-#     my $gffh= $outh->{gff};
-#     my $noforw= $self->config->{noforwards};
-#     # print $gffh "# fwd oid=".$self->getForwards()."\n"; # is this a section break?
-#     my $gffend= 0;
-#     $l_hasforward= ($noforw) ? 0 : $self->checkForward('writegff');
-#     foreach my $fob (@$fobs) { 
-#       $hasforward= ($noforw) ? 0 : $self->checkForward('writegff',$fob,$oidobs);
-#       if ($hasforward && !$l_hasforward && !$gffend) { $self->writeGFFendfeat($gffh); $gffend++; }
-#       $l_hasforward= $hasforward; #?
-#       if ($hasforward) {
-#         $fob->{'writegff'}=1; # flag we have it for checkForward
-#         push(@gffForwards, $fob);
-#         }
-#       else {
-#         while (@gffForwards) { $self->writeGFF( $gffh, shift @gffForwards,$oidobs) ;  }
-#         ## if we drop use of ID=oid, need to resolve all forwards before writeGFF
-#         $self->writeGFF( $gffh,$fob,$oidobs) ; 
-#         $gffend=0;
-#         }
-#       }
-#       
-#     if ($flag =~ /final/) {
-#       while (@gffForwards) { $self->writeGFF( $gffh,shift @gffForwards,$oidobs) ; }
-#       }
-#     $gffh->flush();
-#     }
 
   $self->{curformat}= '';  
 }
@@ -1469,45 +1414,52 @@ use constant ATTR_LISTCHAR => "\t";
 sub handleAttribOut 
 {
 	my $self= shift;
-  my($addattr, $attr_type, $attribute, $feattype)=  @_;
-  my $savetype= $attr_type;
+  my($attr_array, $attr_key, $attribute, $feattype)=  @_;
+  my $savekey= $attr_key;
   
   # special handling?
   # for types gene, mRNA, CDS:  Name => Gene; (gene)ID => locus_tag
   #  mRNA ID => transcript_id ; protein ID => protein_id
+
+  # Map all ID tags depending on feature type
+  # gene Name,ID => /gene= and /locus_tag=
+  # mRNA Name,ID => /product= and /transcript_id= (but keep Parent /gene= and /locus_tag=
+  # CDS Name,ID => /product= and /protein_id= (but keep (Grand)Parent /gene= and /locus_tag=
+  # ncRNA ID,Name like mRNA ?
+  #  transposon ID => /transposon=
+  #  other  
+  
   # Note => note
   # type polypeptide/protein => CDS type
   
   # FIXME here: also have fromGenbank attributes of these same tr/pr_id
   # keep both? rename other to old_ ? ID here is chado uniquename, should be valid
   # Also, GBSubmit wants original tr/pr_id for updates, in their special format (see docs)
-  
-  if($savetype eq "ID") {
-       if($feattype =~ /gene/) { $attr_type="locus_tag"; }
-    elsif($feattype =~ /RNA/) { $attr_type="transcript_id"; }
-    elsif($feattype =~ /CDS/) { $attr_type="protein_id"; }
-  }
-  
-  if($self->config->{mapattr_key}->{$attr_type}) {
-    $attr_type= $self->config->{mapattr_key}->{$attr_type}->{content}; 
-    }
 
-  ## see above handleAttrib
-#   foreach my $mp (sort keys %mapattr_pattern) {
-#     next if ($mp eq 'null'); # dummy 
-#     my $mtype= $mapattr_pattern{$mp}->{type};
-#     next if ($mtype && $attr_type !~ m/$mtype/);
-#     my $from= $mapattr_pattern{$mp}->{from}; next unless($from);
-#     my $to  = $mapattr_pattern{$mp}->{to};
-#     if ($to =~ /\$/) { $attribute =~ s/$from/eval($to)/e; }
-#     else { $attribute =~ s/$from/$to/g; }
-#     }
+  my $ftkey= "mapattr_key_".$feattype;
+  my $fthash= $self->config->{$ftkey};
+  
+  my $newkey; 
+  if(ref $fthash) { # FIXME allow [mrt*]RNA match
+    ##warn "$ftkey keys=",keys(%$fthash),"\n"; # content,id,key
+    $newkey= $fthash->{$attr_key};
+    }
+    
+  if(!$newkey && exists $self->config->{mapattr_key}->{$attr_key}) {
+    $newkey = $self->config->{mapattr_key}->{$attr_key}->{content}; 
+    }
+  $attr_key= $newkey if($newkey);
+  return if ($newkey eq "skip");
+
+  $attribute =~ s/_/ /g if($attr_key eq "organism"); # was species
+
+  ## see also above handleAttrib
     
     # some/all value lists should be split to separate lines;
     # but some notes have ',': see below change to '\t' ?
   my @avals= split( ATTR_LISTCHAR, $attribute);
   foreach my $aval (@avals) {  
-    push( @$addattr, "$attr_type\t$aval");
+    push( @$attr_array, "$attr_key\t$aval");
   }
 
 }
@@ -1518,9 +1470,15 @@ sub splitGbType
   my($gffsource,$type,$fulltype)= @_;
   my($newgffs)=('');
   
+  # FIXME: ${golden_path} becomes 'source' type. in code or in config?
+  my $golden_path= $self->config->{golden_path} || $ENV{'golden_path'};
+  
+  if($golden_path =~ m/$type/) {
+    $type= "source";
+    }
     #? use fulltype instead of type? as 'match:sim4:na_EST_complete_dros'
     # convert mRNA_genscan,mRNA_piecegenie to gffsource,mRNA ?
-  if ($maptype_gb{$type}) {
+  elsif ($maptype_gb{$type}) {
     ($type,$newgffs)= split(/[\.:]/,$maptype_gb{$type},2);
     }
   elsif ($fulltype =~ m/^([\w\_]+)[\.:]([\w\_\.:]+)$/) {
@@ -1538,19 +1496,19 @@ sub splitGbType
 sub _gffEscape
 {
   my $v= shift;
-#?? not for genbank
+### not for genbank
 #   $v =~ tr/ /+/;
 #   $v =~ s/([\t\n\=&;,])/sprintf("%%%X",ord($1))/ge; # Bio::Tools::GFF _gff3_string escaper
   return $v;
 }
 
 
-# =item writeGenbankTbl  
-#    
-#    write  one feature in gff3
-#    feature may have sub location parts (multi line)
-#    
-# =cut
+=item writeGenbankTbl  
+   
+   write  one feature in Genbank submit table format
+   feature may have sub location parts (multi line)
+   
+=cut
 
 sub writeGenbankTbl  # from writeGFF
 {
@@ -1574,62 +1532,71 @@ sub writeGenbankTbl  # from writeGFF
   my %at= ();
 
   my $v;
-  #push @at, "ID\t"._gffEscape($id) if ($id); # use this for gff internal id instead of public id?
-  #push @at, "name\t"._gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
   $at{"ID"}= _gffEscape($id) if ($id);
-  $at{"Name"}= _gffEscape($v) if (($v= $fob->{name}) && $v ne $id);
+  $at{"Name"}= _gffEscape($v) if (($v= $fob->{name})); # keep dupl for GBsub  ! && $v ne $id
     
   foreach (@attr) {
     my ($k,$v)= split "\t";
     ## NO; keep empty vals# if (!$v) { next; }
     if ($k eq "object_oid") { next; }
     elsif ($k eq "parent_oid") {
-      next; #??
-unless(FIXME) { 
       ## for each gene model part; should add locus_tag == gene ID
       
 #       if ($gff_keepoids) { $at{$k} .= ATTR_LISTCHAR if $at{$k}; $at{$k} .= $v; }
-#       next if $segmentfeats{$type}; # dont do parent for these ... ?
-#       
-#       $v =~ s/:.*$//;  
-#       $k= 'Parent'; 
-# 
-#       my $parob= $oidobs->{$v}->{fob};
-#       if ($parob && $parob->{id}) {
-#         $v= $parob->{id};
-#         if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
-#         
-#         if ($v eq $id) {  
-#           my $i= 1;
-#           my $paroid= $parob->{oid};
-#           my $kids = $oidobs->{$paroid}->{child};
-#           if ($kids) { 
-#           foreach my $kidob (@{$kids}) {
-#             last if ($kidob->{oid} eq $oid);
-#             $i++;
-#             }
-#            }
-#           $id= "$id.$i";
-#           $at[0]= "ID="._gffEscape($id);
-#           }
-#         }
-#       else {
-#         unless($fulltype =~ /$ignore_missingparent/) { 
-#           print STDERR "GFF: MISSING parent ob for i/o/t:",$id,"/",$oid,"/",$fulltype,
-#           " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
-#           }
-#         next; # always skip writing bogus Parent= to gff
-#         }
-}
+      next if $segmentfeats{$type}; # dont do parent for these ... ?
+      
+      $v =~ s/:.*$//;  
+      $k= 'Parent'; 
+
+      my $parob= $oidobs->{$v}->{fob};
+      if ($parob && $parob->{id}) {
+        $v= $parob->{id};
+        if ($oidisid_gff{$type}) { $v= $parob->{oid}; } 
+
+        # FIXME: GBsub wants gene name,id in CDS; not mRNA parent
+        my $vname= $parob->{name};  # special case
+        $at{'ParentName'} = _gffEscape($vname) if($vname);  
+
+        if($type =~ /protein|CDS/) { # FIXME
+          my $paroid= $parob->{oid};
+          my($gparoid)= @{ $oidobs->{$paroid}->{parent} };
+          my $gparob= $oidobs->{ $gparoid }->{fob};
+          my $gparid= $gparob->{id};
+          $at{'GrandParent'} = _gffEscape($gparid);  
+          my $vname= $gparob->{name};  # special case
+          $at{'GrandParentName'} = _gffEscape($vname) if($vname);  
+        }
+        
+        if ($v eq $id) {  
+          my $i= 1;
+          my $paroid= $parob->{oid};
+          my $kids = $oidobs->{$paroid}->{child};
+          if ($kids) { 
+          foreach my $kidob (@{$kids}) {
+            last if ($kidob->{oid} eq $oid);
+            $i++;
+            }
+           }
+          $id= "$id.$i";
+          $at{"ID"} = _gffEscape($id);
+          }
+        }
+      else {
+        unless($fulltype =~ /$ignore_missingparent/) { 
+          print STDERR "GB: MISSING parent ob for i/o/t:",$id,"/",$oid,"/",$fulltype,
+          " parob=",$parob," k/v=",$k,"/",$v, " \n" if $DEBUG;
+          }
+        next; # always skip writing bogus Parent= to gff
+        }
 
       }
       
-        # dbxref_2nd - leave as separate ?
-    #elsif ($k eq "dbxref" || $k eq "Dbxref" || $k eq "db_xref") 
     elsif ($k =~ /^dbxref|db_xref/i ) 
       { 
       $k= 'db_xref'; 
+      next if ($v =~ /^GI:/); # drop NCBI GI: from submit db_xref
       }
+      
     elsif ($k eq "synonym") { # check dupl ID
       next if ($v eq $id || $v eq $fob->{name});
       }
@@ -1641,11 +1608,11 @@ unless(FIXME) {
     }
 
   ## drop ID if Parent ; sometimes ?
-  my $parent= delete $at{'Parent'};
-unless(FIXME) { 
-  if( $parent && $dropid{$type} ) { $at[0]=  "Parent\t$parent"; }
-  elsif ($parent){ push(@at, "Parent\t$parent");  }
-}  
+# unless(0) { 
+#   my $parent= delete $at{'Parent'};
+#   if( $parent && $dropid{$type} ) { $at[0]=  "Parent\t$parent"; }
+#   elsif ($parent){ push(@at, "Parent\t$parent");  }
+# }  
 
   ## this should set attrib 'ncRNA_class	snoRNA' for (snoRNA, scRNA, snRNA, miRNA, ncRNA, rRNA) > ncRNA
   ($gffsource,$type)= $self->splitGbType($gffsource,$type,$fulltype);
@@ -1656,11 +1623,17 @@ unless(FIXME) {
   }
   
   # Genbank Tbl format here:  loc \t loc \t FT-type \n \t ftfield \t ftval ...
-  foreach my $i ( 0..$#loc ) { 
+  # FIXME: revcomp needs $#loc .. 0
+  my(undef,undef,$gstrand)= split("\t",$loc[0]);
+  my @iter= ( 0 .. $#loc );
+  @iter= reverse @iter if ($gstrand < 0);
+  my $first=1;
+  
+  foreach my $i ( @iter ) { 
     my($start,$stop,$strand)= split("\t",$loc[$i]);
     ($start,$stop) = ($stop,$start) if ($strand < 0);
-    my @v= ($i==0) ? ($start,$stop,$type) : ($start,$stop);
-    print $fh join("\t",@v),"\n";
+    my @v= ($first) ? ($start,$stop,$type) : ($start,$stop);
+    print $fh join("\t",@v),"\n"; $first=0;
   }
   foreach my $at (@at) {
     my ($k,$v)= split "\t",$at,2;
