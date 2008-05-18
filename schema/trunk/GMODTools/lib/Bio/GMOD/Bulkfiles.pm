@@ -2005,6 +2005,8 @@ sub speciesAbbrev
 
 ## fix this; should always prefer  $self->config->{species}; ?
 ## $organisms->{$orgid}->{fullspecies} second choice?
+## problems with ' ',_ in species such as
+##    genus=Anopheles  species='gambiae str. PEST'
 sub speciesFull
 {
 	my $self= shift;
@@ -2012,7 +2014,7 @@ sub speciesFull
 	my $species= '';
   $species= $self->config->{species};
   $species =~ s/ /_/g;
-  return $species if($species =~ m/_/);
+  return $species if($species =~ m/_/); # problems
 
   $org= $org || $species || $self->config->{org};
   $org= $self->speciesAbbrev($org);
