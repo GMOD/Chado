@@ -151,7 +151,8 @@ sub initData
   
   
   @outformats=  @{ $config->{outformats} || \@defaultformats } ; 
-
+  $self->{outputlist}= []; 
+  
   $fff_mergecols= (defined $config->{fff_mergecols} && $config->{fff_mergecols}) || 1; ## add chr,start cols for merge
   $gff_keepoids = (defined $config->{gff_keepoids} && $config->{gff_keepoids}) || 0;  
 
@@ -419,6 +420,7 @@ sub openCloseOutput
     $chrfile='undef' unless($chrfile);
     #?? for unsorted input need to change $append to true after first open?
     foreach my $fmt (@outformats) {
+      next if ($fmt eq "dummy"); # dang bug w/ config xml
       my $suffix= $fmt; 
       my $subdir= $fmt; 
       my $outset= $self->{fileset}{$fmt}; #= $self->handler->getFilesetInfo($fmt);
@@ -435,6 +437,8 @@ sub openCloseOutput
 
       my $featdir= $self->handler()->getReleaseSubdir( $subdir);   
       my $fpath = catfile( $featdir, $fn);
+      
+      push( @{$self->{outputlist}}, $fpath); #? or save as hash w/ $fmt;...
       
       my $exists= ($app && -e $fpath) ? 1 : 0;
       print STDERR "# output $fpath (append=$exists)\n" if $DEBUG;

@@ -21,6 +21,9 @@
   Database: ${title} 
   Species:  ${species}
   Release:  ${rel}, dated ${date} as ${relfull}
+
+  This is a test case for <a href="http://gmod.org/GMODTools">GMOD Bulkfiles</a>; 
+  loaded from a NCBI GenBank chromosome record
   ]]></doc>
     
   <release id="1" rel="anogam1"  dbname="anogam_x" date="20080511" />
@@ -30,8 +33,15 @@
   <release_url>/genome/${species}/release-${release_id}.html</release_url>
 
   <org>anogam</org>
-  <species>Anopheles gambiae</species>
-
+  <species>Anopheles gambiae str. PEST</species>
+  <!-- NOTE the Strain PEST tag on NCBI Genbank organism/species is needed
+  Anopheles gambiae str. PEST
+  need code correction for '_'/' ' in species part to fix:
+  fastaFromDb featn=chromosome ? sql= ...
+  and o.genus = 'Anopheles' and o.species = 'gambiae_str._PEST' and o.organism_id = f.organism_id
+       chado db has  genus=Anopheles    species='gambiae str. PEST'
+  -->
+  
   <GFF_source>Genbank</GFF_source>
   <seq_ontology>sequence</seq_ontology> 
   <golden_path>'chromosome'</golden_path>
@@ -87,7 +97,7 @@
   # load chromosome X to chado
   gunzip -c NC_004818.gbk.gz |\
    perl bin/bp_genbank2gff3.pl -noCDS -in stdin -out stdout |\
-   perl bin/gmod_bulk_load_gff3.pl -dbname $dbname -organism fromdata -dbport 7302
+   perl bin/gmod_bulk_load_gff3.pl -dbname $dbname -organism fromdata 
   
   # create GMOD Bulkfiles conf/anogam.xml from template.xml : dbname, etc. edits
   

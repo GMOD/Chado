@@ -675,6 +675,10 @@ sub fastaFromDb
   my $rel= $self->{rel};  
   my($species,$genus) = ($self->handler->speciesFull($org),'');
   ($genus,$species)= split(/[_ ]/,$species,2);  
+  
+  ## fixme for genus=Anopheles  species='gambiae str. PEST'
+  $species =~ s/_/ /g; # is this always right?
+  
   my $dbh= $self->handler->dbiConnect();
   my $nout= 0;
 

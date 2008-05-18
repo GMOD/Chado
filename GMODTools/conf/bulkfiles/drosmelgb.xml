@@ -21,6 +21,9 @@
   Database: ${title} 
   Species:  ${species}
   Release:  ${rel}, dated ${date} as ${relfull}
+  
+  This is a test case for <a href="http://gmod.org/GMODTools">GMOD Bulkfiles</a>; 
+  loaded from a NCBI GenBank chromosome record
   ]]></doc>
     
   <release id="1" rel="drosmelgb4"  dbname="drosmel4" date="20080512" />

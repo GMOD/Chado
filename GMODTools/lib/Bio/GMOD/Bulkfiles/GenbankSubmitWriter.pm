@@ -167,7 +167,6 @@ sub initData
   
   $self->SUPER::initData();
 
-
   my $blasthome= $config->{blasthome} ; # try $ENV{BLAST_HOME} or other??  
   $tbl2asn= $config->{tbl2asn} || "$blasthome/tbl2asn";
   unless(-e $tbl2asn) { 
@@ -183,11 +182,22 @@ sub initData
 
 #-------------- subs -------------
 
+=item tbl2asn
+
+  in makeFiles:
+  
+  @tblouts= @ { $self->{outputlist} }; # full path to output
+  
+  foreach tblouts/chrs do  tbl2asn( $tblname);
+  
+=cut
+
 sub tbl2asn 
 {
 	my $self= shift;
-	my( $seqlist, $subdir, $blastname)= @_;
-	warn "tbl2asn( $blastname )\n" if $DEBUG;
+	my( $tblpath)= @_;
+	warn "tbl2asn( $tblpath )\n" if $DEBUG;
+  my ($tblname, $subdir) = File::Basename::fileparse($tblpath);
 	my $opts= $self->getconfig('tbl2asnopts');  
 
 # this works: $nb/tbl2asn -t template.sbt -V vb -p ./  
@@ -197,22 +207,36 @@ sub tbl2asn
 # drosmelgb-all-drosmelgb4.pep == ../fasta/drosmelgb-all-translation-drosmelgb4.fasta
 # template.sbt
 
-  warn("#$blastname:  $tbl2asn $opts \n") if $DEBUG;
+  my($fastachr,$fastapep,$gbsubfsa,$gbsubpep);
+  my $chrfile="all"; # fixme !
+  my $fadir= "../fasta/"; # fixme !
+
+  $fastachr= $tblname; 
+  $fastachr =~ s/\-(\w+)\.\w+$/-chromosome-$1.fasta/;
+  $fastapep= $tblname; 
+  $fastapep =~ s/\-(\w+)\.\w+$/-translation-$1.fasta/;
+#   $fastachr= $self->get_filename( $self->{org}, $chrfile, 'chromosome', $self->{rel}, "fasta");
+#   $fastapep= $self->get_filename( $self->{org}, $chrfile, 'translation', $self->{rel}, "fasta");
+
+  $fastachr = catfile( $fadir, $fastachr);
+  $fastapep = catfile( $fadir, $fastapep);
+  
+  $gbsubfsa= $tblname; $gbsubfsa =~ s/\.\w+$/.fsa/;
+  $gbsubpep= $tblname; $gbsubpep =~ s/\.\w+$/.pep/;
+
+  warn("# $tbl2asn $opts \n",
+       "# using files: $tblname, $gbsubfsa, $gbsubpep \n") if $DEBUG;
+  
 	my $olddir= $ENV{'PWD'};  #?? not safe?
   chdir($subdir);  
-  
-#   foreach (@$seqlist) {
-#     $_ = catfile($olddir,$_) unless($_ =~ m,^/,);
-#     }
-#   my $seqlib = join(" ",@$seqlist);
-#   my $cat= ($seqlib =~ /\.(gz|Z)/) ? 'gunzip -c' : 'cat';
-    
+
+  symlink( $fastachr, $gbsubfsa);
+  symlink( $fastapep, $gbsubpep);
+
   my $ok= system("$tbl2asn $opts ");
   
-  ##opendir(D,"."); my @f= grep(/stdin/,readdir(D)); closedir(D);
-  ##foreach my $f (@f) { (my $t= $f) =~ s/stdin/$blastname/; rename($f,$t); }
-
   chdir($olddir);
+  return $ok;
 }
 
 
@@ -294,7 +318,13 @@ sub makeFiles
   
   $self->handler->writeDocs( $self->config->{doc} );   # submit template.sbt
 
-
+  if( $status>0 ) {
+    my @tblouts= @ { $self->{outputlist} }; # full path to output
+    my $ok= 0;
+    foreach my $tblname (@tblouts) {  $ok = $self->tbl2asn( $tblname); }
+  }
+  
+  
   @outformats = @saveformats;
   print STDERR "GenbankSubmitWriter::makeFiles: done n=$status\n" if $DEBUG; 
   return  $self->status($status); #?? check files made
