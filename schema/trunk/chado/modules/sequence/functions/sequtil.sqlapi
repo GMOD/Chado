@@ -30,3 +30,10 @@ Translates a DNA sequence to AA sequence based on NCBI genetic code ID (1=standa
  ';
 
 
+DECLARE FUNCTION order_exons(
+    parent_type_id INT)
+  RETURNS void;
+COMMENT ON FUNCTION order_exons(INT) IS 
+ '
+This is a function to seek out exons of transcripts and orders them, using feature_relationship.rank, in "transcript order" numbering from 0, taking strand into account. It will not touch transcripts that already have their exons ordered (in case they have a non-obvious ordering due to trans splicing). It takes as an argument the feature.type_id of the parent transcript type (typically, mRNA, although non coding transcript types should work too).
+ ';
