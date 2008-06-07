@@ -75,6 +75,116 @@ initcond = ''
 );
 
 
+--function to 'unshare' exons.  It looks for exons that have the same fmin
+--and fmax and belong to the same gene and only keeps one.  The other,
+--redundant exons are marked obsolete in the feature table.  Nothing
+--is done with those features' entries in the featureprop, feature_dbxref,
+--feature_pub, or feature_cvterm tables.  For the moment, I'm assuming
+--that any annotations that they have when this script is run are
+--identical to their non-obsoleted doppelgangers.  If that's not the case, 
+--they could be merged via query.
+--
+--The bulk of this code was contributed by Robin Houston at
+--GeneDB/Sanger Centre.
+
+CREATE OR REPLACE FUNCTION share_exons () RETURNS void AS '    
+  DECLARE    
+  BEGIN
+    /* Generate a table of shared exons */
+    CREATE temporary TABLE shared_exons AS
+      SELECT gene.feature_id as gene_feature_id
+           , gene.uniquename as gene_uniquename
+           , transcript1.uniquename as transcript1
+           , exon1.feature_id as exon1_feature_id
+           , exon1.uniquename as exon1_uniquename
+           , transcript2.uniquename as transcript2
+           , exon2.feature_id as exon2_feature_id
+           , exon2.uniquename as exon2_uniquename
+           , exon1_loc.fmin /* = exon2_loc.fmin */
+           , exon1_loc.fmax /* = exon2_loc.fmax */
+      FROM feature gene
+        JOIN cvterm gene_type ON gene.type_id = gene_type.cvterm_id
+        JOIN cv gene_type_cv USING (cv_id)
+        JOIN feature_relationship gene_transcript1 ON gene.feature_id = gene_transcript1.object_id
+        JOIN feature transcript1 ON gene_transcript1.subject_id = transcript1.feature_id
+        JOIN cvterm transcript1_type ON transcript1.type_id = transcript1_type.cvterm_id
+        JOIN cv transcript1_type_cv ON transcript1_type.cv_id = transcript1_type_cv.cv_id
+        JOIN feature_relationship transcript1_exon1 ON transcript1_exon1.object_id = transcript1.feature_id
+        JOIN feature exon1 ON transcript1_exon1.subject_id = exon1.feature_id
+        JOIN cvterm exon1_type ON exon1.type_id = exon1_type.cvterm_id
+        JOIN cv exon1_type_cv ON exon1_type.cv_id = exon1_type_cv.cv_id
+        JOIN featureloc exon1_loc ON exon1_loc.feature_id = exon1.feature_id
+        JOIN feature_relationship gene_transcript2 ON gene.feature_id = gene_transcript2.object_id
+        JOIN feature transcript2 ON gene_transcript2.subject_id = transcript2.feature_id
+        JOIN cvterm transcript2_type ON transcript2.type_id = transcript2_type.cvterm_id
+        JOIN cv transcript2_type_cv ON transcript2_type.cv_id = transcript2_type_cv.cv_id
+        JOIN feature_relationship transcript2_exon2 ON transcript2_exon2.object_id = transcript2.feature_id
+        JOIN feature exon2 ON transcript2_exon2.subject_id = exon2.feature_id
+        JOIN cvterm exon2_type ON exon2.type_id = exon2_type.cvterm_id
+        JOIN cv exon2_type_cv ON exon2_type.cv_id = exon2_type_cv.cv_id
+        JOIN featureloc exon2_loc ON exon2_loc.feature_id = exon2.feature_id
+      WHERE gene_type_cv.name = ''sequence''
+        AND gene_type.name = ''gene''
+        AND transcript1_type_cv.name = ''sequence''
+        AND transcript1_type.name = ''mRNA''
+        AND transcript2_type_cv.name = ''sequence''
+        AND transcript2_type.name = ''mRNA''
+        AND exon1_type_cv.name = ''sequence''
+        AND exon1_type.name = ''exon''
+        AND exon2_type_cv.name = ''sequence''
+        AND exon2_type.name = ''exon''
+        AND exon1.feature_id < exon2.feature_id
+        AND exon1_loc.rank = 0
+        AND exon2_loc.rank = 0
+        AND exon1_loc.fmin = exon2_loc.fmin
+        AND exon1_loc.fmax = exon2_loc.fmax
+    ;
+    
+    /* Choose one of the shared exons to be the canonical representative.
+       We pick the one with the smallest feature_id.
+     */
+    CREATE temporary TABLE canonical_exon_representatives AS
+      SELECT gene_feature_id, min(exon1_feature_id) AS canonical_feature_id, fmin
+      FROM shared_exons
+      GROUP BY gene_feature_id,fmin
+    ;
+    
+    CREATE temporary TABLE exon_replacements AS
+      SELECT DISTINCT shared_exons.exon2_feature_id AS actual_feature_id
+                    , canonical_exon_representatives.canonical_feature_id
+                    , canonical_exon_representatives.fmin
+      FROM shared_exons
+        JOIN canonical_exon_representatives USING (gene_feature_id)
+      WHERE shared_exons.exon2_feature_id <> canonical_exon_representatives.canonical_feature_id
+        AND shared_exons.fmin = canonical_exon_representatives.fmin
+    ;
+    
+    UPDATE feature_relationship 
+      SET subject_id = (
+            SELECT canonical_feature_id
+            FROM exon_replacements
+            WHERE feature_relationship.subject_id = exon_replacements.actual_feature_id)
+      WHERE subject_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+    
+    UPDATE feature_relationship
+      SET object_id = (
+            SELECT canonical_feature_id
+            FROM exon_replacements
+            WHERE feature_relationship.subject_id = exon_replacements.actual_feature_id)
+      WHERE object_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+    
+    UPDATE feature
+      SET is_obsolete = true
+      WHERE feature_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+  END;    
+' LANGUAGE 'plpgsql';
+
 --This is a function to seek out exons of transcripts and orders them,
 --using feature_relationship.rank, in "transcript order" numbering
 --from 0, taking strand into account. It will not touch transcripts that

@@ -29,6 +29,12 @@ COMMENT ON FUNCTION translate_dna(TEXT,INT) IS
 Translates a DNA sequence to AA sequence based on NCBI genetic code ID (1=standard). See gencode schema module for details
  ';
 
+DECLARE FUNCTION share_exons()
+  RETURNS void;
+COMMENT ON FUNCTION share_exons() IS
+'
+This is a function to 'unshare' exons.  It looks for exons that have the same fmin and fmax and belong to the same gene and only keeps one.  The other, redundant exons are marked obsolete in the feature table.  Nothing is done with those features' entries in the featureprop, feature_dbxref, feature_pub, or feature_cvterm tables.  For the moment, I'm assuming that any annotations that they have when this script is run are identical to their non-obsoleted doppelgangers.  If that's not the case, they could be merged via query.  The bulk of this code was contributed by Robin Houston at GeneDB/Sanger Centre.
+'
 
 DECLARE FUNCTION order_exons(
     parent_type_id INT)
