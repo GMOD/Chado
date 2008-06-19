@@ -4196,7 +4196,7 @@ sub sorter_get_second_tier {
     my @to_return = grep { ! $seen{$_}++ }  
           map { $$_[0] } @$result;
 
-    my %seen = ();
+    %seen = ();
     my @uniq;
     for my $item (@to_return) {
         push(@uniq, $item) unless $seen{$item}++;
@@ -4220,7 +4220,7 @@ sub sorter_get_third_tier {
     my @to_return = grep { ! $seen{$_}++ } 
           map { $$_[0] } @$result;
 
-    my %seen = ();
+    %seen = ();
     my @uniq;
     for my $item (@to_return) {
         push(@uniq, $item) unless $seen{$item}++;
