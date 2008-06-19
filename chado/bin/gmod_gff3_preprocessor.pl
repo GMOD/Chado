@@ -74,7 +74,7 @@ my (@GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
 GetOptions(
     'gfffile=s'   => \@GFFFILE,
     'outfile=s'   => \$OUTFILE,
-    'splitfile=s' => \$SPLITFILE,
+    'splitfile:s' => \$SPLITFILE,
     'onlysplit'   => \$ONLYSPLIT,
     'nosplit'     => \$NOSPLIT,
     'hasrefseq'   => \$HASREFSEQ,
