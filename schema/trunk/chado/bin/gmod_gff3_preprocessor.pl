@@ -34,7 +34,7 @@ $0 - Prepares a GFF3 file for bulk loading into a chado database.
 =head1 DESCRIPTION
 
 
-splitfile  -- Just setting this flag will cause the file to be split 
+splitfile  -- Just setting this flag to 1 will cause the file to be split 
 by reference sequence.  If you provide an optional argument, it will be
 further split according to these rules:
 
@@ -44,8 +44,8 @@ further split according to these rules:
  type=a,b,c   Puts lines with types that match 'a', 'b', or 'c' in a
                      separate file
 
-		     For example, if you wanted all of your analysis results to go in a separate
-		     file, you could indicate '--splitfile type=match', and all cDNA_match,
+For example, if you wanted all of your analysis results to go in a separate
+file, you could indicate '--splitfile type=match', and all cDNA_match,
 EST_match and cross_genome_match features would go into separate files
 (separate by reference sequence).
 
@@ -74,7 +74,7 @@ my (@GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
 GetOptions(
     'gfffile=s'   => \@GFFFILE,
     'outfile=s'   => \$OUTFILE,
-    'splitfile:s' => \$SPLITFILE,
+    'splitfile=s' => \$SPLITFILE,
     'onlysplit'   => \$ONLYSPLIT,
     'nosplit'     => \$NOSPLIT,
     'hasrefseq'   => \$HASREFSEQ,
@@ -85,21 +85,25 @@ GetOptions(
 
 $DBPROFILE ||='default';
 
-my $split_on_source;
-my $split_on_type;
+my ($split_on_source, $split_on_type, $split_on_ref);
 if ($SPLITFILE) {
-    my @splits = split /;/, $SPLITFILE;
-    for (@splits) {
-        my ($tag, $value) = split /=/;
-        $value            =~ s/,/|/g;
-        if ($tag eq 'source') {
-            $split_on_source = $value;
-        }
-        elsif ($tag eq 'type') {
-            $split_on_type   = $value;
-        }
-        else {
-            die "unsupported splitfile tag: $tag\n";
+    if ($SPLITFILE == 1) {
+        $split_on_ref = 1;
+    } 
+    else {
+        my @splits = split /;/, $SPLITFILE;
+        for (@splits) {
+            my ($tag, $value) = split /=/;
+            $value            =~ s/,/|/g;
+            if ($tag eq 'source') {
+                $split_on_source = $value;
+            }
+            elsif ($tag eq 'type') {
+                $split_on_type   = $value;
+            }
+            else {
+                die "unsupported splitfile tag: $tag\n";
+            }
         }
     }
 }
