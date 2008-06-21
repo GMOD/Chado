@@ -2156,8 +2156,18 @@ sub getBases
   my $bases= undef;
   if($usedb && $id) { 
     $bases= $self->getBasesFromDb($id); 
-    return $bases if($bases || $self->{failonerror} || $self->{skiponerror}); 
+
+use constant FIX_AAMISSING_STOP => 1;
+if(FIX_AAMISSING_STOP) {
+    if($makeaa && $bases) { 
+      $bases .='*' unless($bases =~ /\*$/);  # annoying non-standard store
+      if(ref $self->{gotbases}) { $self->{gotbases}->{'md5checksum'}=0; } # no longer valid
+      }
+}
+    return $bases if($bases || $self->{failonerror});
+    # >> no; try from files:  $self->{skiponerror}); 
     }
+    
   unless ($bases) { 
     $bases= $self->getBasesFromFiles($type,$chr,$baseloc,$name,$subrange);   
     if($makeaa) { $bases= $self->dna2protein($bases); }
@@ -2572,34 +2582,53 @@ sub getBasesFromFiles
     $range =~ s/^[\w]*\(?//;  ##s/^([^\d<>-]*)//;  
     $range =~ s/\)?\s*$//;  
     my @locs= split(/,/,$range);
+
+=item handle Bioperl version -strand effects
+
+ 080620: Bioperl versions are unpredictable in how they handle 
+ multiexon -strand thru Location::Split and (Large)PrimarySeq use of revcomp for -split locs.
+ Avoid this by feeding in only +strand exons, but for rare cases of mixed strand genes,
+ then do explicit revcom on final CDS-dna when needed.
+ 
+ Input baseloc is simple form:  complement(x,y,z), NOT messy join(comp(x),comp(y),comp(z)).
+ add_sub_Location(start,stop,exon+strand) will always use exon+strand even when CDS is -topstrand.
+ This still allows per exon -strand,  e.g.,  compl(x,y,compl(z)) => (-x, -y, +z)
+ 
+=cut
+
     if (@locs>1) {
-      my $sloc = Bio::GMOD::Bulkfiles::MySplitLocation->new(); ## bad strand() >> new Bio::Location::Split();
+      ## avoid bad strand() handling in Bio::Location::Split();
+      my $sloc = Bio::GMOD::Bulkfiles::MySplitLocation->new(); 
       my $topstrand= $strand; 
-      $sloc->strand($topstrand); #?? bad ?
-      ##if ($subrb) { unshift(@locs,"$subrb..$start"); } ## FIXME 
-      ##if ($subre) { push(@locs,"$stop..$subre"); }
-      # if ($topstrand < 0) { @locs = reverse @locs; } #?? right?
+      # $sloc->strand($topstrand); # Bioperl action here was bad;  AVOID THIS
+      # if ($topstrand < 0) { @locs = reverse @locs; } # not right now; AVOID THIS
       foreach my $loc (@locs) {
         ($start,$stop,$strand)= $self->maxrange($loc);
-        # $strand= -$strand if ($topstrand < 0);
+        # $strand= -$strand if ($topstrand < 0); # AVOID THIS
         $sloc->add_sub_Location( new Bio::Location::Simple( 
           -start => $start, -end => $stop, -strand => $strand, ));
         }
-      $gotloc= $sloc->to_FTstring();
+      $bases= $dnaseq->subseq($sloc);  # should always return forward strand dna, but for mixed exons
+
+      if($topstrand < 0 && $bases) { $bases= _dna_revcomp($bases);  }
+    # if($topstrand < 0 && $bases) { warn "DEBUG: need _dna_revcomp(bases) for $name, loc=$baseloc; sloc=",$sloc->to_FTstring(),"\n"; }
+
+      $sloc->strand($topstrand); # BUT add in strand for to_FTstring ..
+      $gotloc= $sloc->to_FTstring(); # moved down; might mess w/ exon strands
       ## warn "feat=$name, got featloc=",$gotloc,"\n" if $DEBUG;
-      $bases= $dnaseq->subseq($sloc);    
       }
     else {
-      ## given warnings do we need to swap start,stop for -strand ??
+      ## given warnings do we need to swap start,stop for -strand ?
       my $sloc= new Bio::Location::Simple( 
         -start => $start, -end => $stop, -strand => $strand, );
-      $gotloc= $sloc->to_FTstring();
       $bases= $dnaseq->subseq($sloc);   
+      $gotloc= $sloc->to_FTstring();
       }
      
     }
   
-  print STDERR "dna-file: $name, bases=",length($bases),"\n" if $DEBUG > 1;
+  print STDERR "dna-file: $name, bases=",length($bases),"\n"  if $DEBUG > 1;
+    
   if (!$subrange && ($gotloc ne $baseloc)) {
     my $ok= 0;
     ## check  for silly 123..123 => 123 change 
@@ -2613,6 +2642,13 @@ sub getBasesFromFiles
   return $bases;
 }
 
+sub _dna_revcomp {
+  my($bases)= @_;
+  ## Bioperl: $bases = Bio::PrimarySeq->new(-seq => $bases)->revcom()->seq();
+  ## simple way: 
+  $bases =~ tr/acgtrymkswhbvdnxACGTRYMKSWHBVDNX/tgcayrkmswdvbhnxTGCAYRKMSWDVBHNX/; # complement, doesnt do RNA u/U>t/T
+  return  CORE::reverse $bases; 
+}
 
 
 sub _isold {

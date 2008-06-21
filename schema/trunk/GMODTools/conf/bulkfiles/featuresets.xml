@@ -64,13 +64,14 @@
     types="CDS protein"
     ALSO_types="polypeptide"
     typelabel="protein"
+    dotranslate="1"
     fromdb="1"
     />
   <featmap id="CDS_translation"
     types="CDS"
     typelabel="protein"
     dotranslate="1"
-    fromdb="1"
+    fromdb="0"
     />
   <featmap id="gene"
     types="gene"
