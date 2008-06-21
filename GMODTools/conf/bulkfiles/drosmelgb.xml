@@ -70,6 +70,7 @@
   <featset>transcript</featset>
   <featset>CDS</featset>  <!-- dna of protein coding sequence -->
   <featset>translation</featset> <!-- protein aminos -->
+  <featset>CDS_translation</featset> <!-- compare to protein from db -->
   <featset>ncRNA</featset>
   <featset>pseudogene</featset>
   <featset>transposon</featset>

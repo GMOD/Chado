@@ -77,7 +77,15 @@
     chadofeatsql.xml  --  chado db sql calls to dump features
     chadofeatconv.xml --  feature conversion options
 
-=head1 UPDATES  2008-May, version 1.2a
+=head1 UPDATES  2008-June, version 1.2b
+  
+  - Rationalized -strand, revcomp usage for CDS-Exons.
+    Problems were caused in this by Bioperl version changes
+    (in Location/Split and Seq/LargPrimarySeq). Now Bulkfiles
+    handles -strand, multi-exon CDS in a direct way, hopefully
+    independent of Bioperl version changes.
+  
+=head1 UPDATES  2008-May, version 1.2
 
   - adding (in progress) Genbank Submission table writer, 
     'bulkfiles -format=genbanktbl', with output suited
