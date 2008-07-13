@@ -110,7 +110,6 @@ print start_div({-id=>'invisible',
       "[-] Hide Apollo output<br>",
       end_span,
       start_pre;
-print "$javacmd\n";
 system($javacmd);
 print end_pre,end_div();
 print start_div({-id=>'visible',
