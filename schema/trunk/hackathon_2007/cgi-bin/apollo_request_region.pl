@@ -4,10 +4,10 @@ use strict;
 
 use CGI qw/:standard start_div start_span start_pre start_ul/;
 
-my $working_dir = "/var/www/apollo/tmp/";
-my $apollo      = "/home/ubuntu/apollo/bin/apollo.headless";
+my $working_dir = "/var/www/html/apollo/tmp/";
+my $apollo      = "/home/gmod/downloads/apollo/bin/apollo.headless";
 my $hostname    = url(-base=>1);
-$ENV{PATH}      = '/usr/local/java/bin:/usr/bin:/bin';
+$ENV{PATH}      = '/usr/java/jdk1.5.0_14/bin:/usr/bin:/bin';
 
 unless(param()) { #print the starting page
 
@@ -110,6 +110,7 @@ print start_div({-id=>'invisible',
       "[-] Hide Apollo output<br>",
       end_span,
       start_pre;
+print "$javacmd\n";
 system($javacmd);
 print end_pre,end_div();
 print start_div({-id=>'visible',
@@ -149,7 +150,10 @@ if (!$error_flag) {
     print  p("Click on this link: "
       . a({href=>"$hostname/apollo/tmp/$filename.jnlp"},
           "$filename.jnlp")
-      ." to start Apollo and download the file"),
+      ." to start Apollo and download the file. Click on the "
+      . a({href=>"$hostname/cgi-bin/upload_game.pl"},
+          "Upload game-xml")
+      ." link to upload your annotations."),
 }
 
 print  end_span, end_html; 
@@ -168,66 +172,66 @@ sub write_jnlp {
 
     return <<END;
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp
-spec="1.0+"
-codebase="$hostname/apollo"
-href="$hostname/apollo/tmp/$filename.jnlp">
-<information>
-<title>Apollo</title>
-<vendor>Stein Lab</vendor>
-<description>Apollo, v. 1.6.6 dev (webstart)</description>
-<icon href="apollosplash.gerry.jpg" kind="splash"/> 
-      <!-- A web page containing more information about the
-      application.  This URL will be displayed in
-      the JAWS Application Manager -->
-<homepage href="http://www.fruitfly.org/annot/apollo/" ></homepage>
-  <!-- Declares that the application can run without
-         access to the server it was downloaded from -->
-<offline-allowed />
-</information>
-<security>
-      <!-- Request that the application be given full
-           access to the local (executing) machine,
-           as if it were a regular Java application.
-           Requires that all JAR files be signed
-           by a trusted party -->
-<all-permissions />
-</security>
-<resources>
-  <!-- Specify the versions of the Java Runtime Environment
-         (JRE) that are supported by the application.
-         Multiple entries of this kind are allowed, in which
-         case they are considered to be in order of preference -->
-<j2se version="1.4+ 1.4.2 1.5" initial-heap-size="64m"
-max-heap-size="500m" />
-<jar href="jars/apollo.signed.jar" />
-<jar href="jars/biojava.signed.jar" />
-<jar href="jars/crimson.signed.jar" />
-<jar href="jars/ecp1_0beta.signed.jar" />
-<jar href="jars/ensj-compatibility-19.0.signed.jar" />
-<jar href="jars/ensj.signed.jar" />
-<jar href="jars/jakarta-oro-2.0.6.signed.jar" />
-<jar href="jars/jaxp.signed.jar" />
-<jar href="jars/jnlp.signed.jar" />
-<jar href="jars/junit.signed.jar" />
-<jar href="jars/log4j-1.2.14.signed.jar" />
-<jar href="jars/mysql-connector-java-3.1.8-bin.signed.jar" />
-<jar href="jars/org.mortbay.jetty.signed.jar" />
-<jar href="jars/patbinfree153.signed.jar" />
-<jar href="jars/pg74.213.jdbc3.signed.jar" />
-<jar href="jars/psgr2.signed.jar" />
-<jar href="jars/servlet-tomcat.signed.jar" />
-<jar href="jars/te-common.signed.jar" />
-<jar href="jars/xerces.signed.jar" />
-</resources>
-<application-desc main-class="apollo.main.Apollo">
-<!-- Tell Apollo where to get its data from, and what format the data is
-in -->
-<argument>-i</argument>
-<argument>game</argument>
-<argument>-f</argument>
-<argument>$hostname/apollo/tmp/$filename.xml</argument>
-</application-desc>
+<jnlp codebase="$hostname/apollo/webstart" 
+href="$hostname/apollo/tmp/$filename.jnlp" spec="1.0+">
+  <information>
+    <title>Apollo</title>
+    <vendor>GMOD Summer School 2008</vendor>
+    <description>Apollo Webstart</description>
+    <!-- location of your project's web page -->
+    <homepage href="http://localhost/apollo"/>
+    <!-- if you want to have WebStart add a specific image as your icon,
+            point to the location of the image -->
+    <icon href="images/head-of-apollo.gif" kind="shortcut"/>
+    <!-- create a shortcut on your desktop -->
+    <shortcut online="true">
+      <desktop/>
+    </shortcut>
+    <!-- allow users to launch Apollo when offline -->
+    <offline-allowed/>
+  </information>
+  <!-- request all permissions - might be needed since Apollo might write to local
+          file system -->
+  <security>
+    <all-permissions/>
+  </security>
+  <!-- we require at least Java 1.5, set to start using 64m and up to 500m -->
+  <resources>
+    <j2se initial-heap-size="64m" max-heap-size="500m" version="1.5+"/>
+    <jar href="jars/apollo.jar"/>
+    <jar href="jars/bbop.jar"/>
+    <jar href="jars/biojava.jar"/>
+    <jar href="jars/crimson.jar"/>
+    <jar href="jars/ecp1_0beta.jar"/>
+    <jar href="jars/ensj-compatibility-19.0.jar"/>
+    <jar href="jars/ensj.jar"/>
+    <jar href="jars/jakarta-oro-2.0.6.jar"/>
+    <jar href="jars/jaxp.jar"/>
+    <jar href="jars/jnlp.jar"/>
+    <jar href="jars/junit.jar"/>
+    <jar href="jars/log4j-1.2.14.jar"/>
+    <jar href="jars/macify-1.1.jar"/>
+    <jar href="jars/mysql-connector-java-3.1.8-bin.jar"/>
+    <jar href="jars/obo.jar"/>
+    <jar href="jars/oboedit.jar"/>
+    <jar href="jars/org.mortbay.jetty.jar"/>
+    <jar href="jars/patbinfree153.jar"/>
+    <jar href="jars/pg74.213.jdbc3.jar"/>
+    <jar href="jars/psgr2.jar"/>
+    <jar href="jars/servlet-tomcat.jar"/>
+    <jar href="jars/te-common.jar"/>
+    <jar href="jars/xerces.jar"/>
+  </resources>
+  <!-- where the main method is locate - don't change this -->
+  <application-desc main-class="apollo.main.Apollo">
+    <!-- we can add arguments when launching Apollo - this particular one allows us to
+              load chromosome 1, from 11650000 to 11685000 - great way to have Apollo load
+              specific regions -->
+    <argument>-i</argument>
+    <argument>game</argument>
+    <argument>-f</argument>
+    <argument>$hostname/apollo/tmp/$filename.xml</argument>
+  </application-desc>
 </jnlp>
 END
 ;

@@ -12,11 +12,12 @@ my $gmod_conf = Bio::GMOD::Config->new($GMOD_ROOT);
 my $confdir   = $gmod_conf->confdir;
 my $webapollo = $confdir . "/webapollo.conf";
 
-my $conf   = new Config::General($webapollo);
-my %config = $conf->getall;
+my ($conf,%config);
+eval {$conf   = new Config::General($webapollo);
+      %config = $conf->getall };
 
-my $AUTOLOAD  = $config{'autoload'};
-my $STORE_DIR = $config{'store_dir'};
+my $AUTOLOAD  = $config{'autoload'} || 0;
+my $STORE_DIR = $config{'store_dir'} || "/usr/local/gmod/tmp/apollo";
 
 my $cgi = CGI->new();
 
@@ -82,6 +83,13 @@ else {  #process the uploaded file
               }
               close OUT;
               print $cgi->p(param('fileupload')." was written to $fullfilename");
+
+              #now write username and password
+              my $userinfofile = $fullfilename.".userinfo";
+              open OUT, ">$userinfofile" or die "couldn't open file $!";
+              print OUT $cgi->param('username')."\n";
+              print OUT $cgi->param('password')."\n";
+              close OUT;
           }
 
           print "</pre>\n",
