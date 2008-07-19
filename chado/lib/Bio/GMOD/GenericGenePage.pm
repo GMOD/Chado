@@ -47,6 +47,11 @@ sub new {
   return bless {}, $class;
 }
 
+sub _counter {
+  my $self = shift;
+  $self->{'counter'}++;
+  return $self->{'counter'};
+}
 
 =head2 render_xml
 
@@ -63,17 +68,16 @@ sub render_xml {
 
   my $name = $self->name;
 
-  my $org = $self->organism;
-
   my @syn = $self->synonyms;
   shift @syn;
   my $synonyms = join "\n", map {
     qq|  <name type="synonym">$_</name>|
   } @syn;
 
-  my $dbreferences   = _xml_render_colon_separated_dbrefs( 2, $self->dbxrefs);
-  my $ontology_terms = _xml_render_ontology_terms( 4, $self->ontology_terms);
-  my $literature     = _xml_render_colon_separated_dbrefs( 4, $self->literature_references);
+  my $dbreferences   = $self->_xml_render_colon_separated_dbrefs( 2, $self->dbxrefs);
+  my $organism       = $self->_xml_render_organism();
+  my $ontology_terms = $self->_xml_render_ontology_terms( 4, $self->ontology_terms);
+  my $literature     = $self->_xml_render_colon_separated_dbrefs( 4, $self->literature_references);
 
   my $maplocations = join "\n", map {
     qq|    <mapLocation map="$_->{map_name}" chromosome="$_->{chromosome}" position="$_->{position}" units="$_->{units}" />|
@@ -87,11 +91,7 @@ $synonyms
 
 $dbreferences
 
-  <organism>
-    <name type="common">$org->{common}</name>
-    <name type="scientific">$org->{binomial}</name>
-    <dbReference type="NCBI Taxonomy" id="$org->{ncbi_taxon_id}" />
-  </organism>
+$organism
 
   <mapLocations>
 $maplocations
@@ -109,23 +109,41 @@ $literature
 EOXML
 }
 
+sub _xml_render_organism {
+  my $self = shift;
+  my $counter = $self->_counter;
+  my $org = $self->organism;
+  my $organism = <<END;
+  <organism>
+    <name type="common">$org->{common}</name>
+    <name type="scientific">$org->{binomial}</name>
+    <dbReference type="NCBI Taxonomy" key="$counter" id="$org->{ncbi_taxon_id}" />
+  </organism>
+END
+  return $organism;
+}
+
 sub _xml_render_colon_separated_dbrefs {
-  my ($spaces,@refs) = @_;
-  return join "\n", map {
-    my ($type,$id) = split /:/,$_,2;
-    (' 'x$spaces).qq|<dbReference type="$type" id="$id" />|
-  } @refs;
+  my ($self,$spaces,@refs) = @_;
+  my $refstring = '';
+  for my $ref (@refs) {
+    my $counter = $self->_counter;
+    my ($type,$id) = split /:/,$ref,2;
+    $refstring .= (' 'x$spaces).qq|<dbReference type="$type" key="$counter" id="$id" />\n|
+  }
+  return $refstring;
 }
 
 sub _xml_render_ontology_terms {
-  my ($spaces,%term) = @_;
+  my ($self,$spaces,%term) = @_;
  
   my $xml_string = ''; 
   for my $key (keys %term) {
       my ($type,$id) = split /:/,$key;
       my $value = $term{$key};
+      my $counter = $self->_counter;
       $type = "Go" if ($type eq "GO");
-      $xml_string .= (' 'x$spaces).qq|<dbReference type="$type" id="$key">\n|; 
+      $xml_string .= (' 'x$spaces).qq|<dbReference type="$type" key="$counter" id="$key">\n|; 
       $xml_string .= (' 'x($spaces+2)).qq|<property value="$value" type="term"/>\n|;
       $xml_string .= (' 'x$spaces).qq|</dbReference>\n|;
   }
