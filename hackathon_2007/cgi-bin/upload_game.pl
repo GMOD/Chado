@@ -16,7 +16,7 @@ my ($conf,%config);
 eval {$conf   = new Config::General($webapollo);
       %config = $conf->getall };
 
-my $AUTOLOAD  = $config{'autoload'} || 0;
+my $AUTOLOAD  = $config{'autoload'} || 1;
 my $STORE_DIR = $config{'store_dir'} || "/usr/local/gmod/tmp/apollo";
 
 my $cgi = CGI->new();
@@ -57,39 +57,41 @@ else {  #process the uploaded file
 
           $cgi->p("Config stuff: autoload:$AUTOLOAD, store_dir:$STORE_DIR"),
 
-          "file contents:",
           $cgi->hr,
           "<pre>\n";
 
           my $fh = $cgi->upload( 'fileupload' );
           
+          die "ERROR: the store directory isn't configured" unless $STORE_DIR;
+          my ($s, $ms) = gettimeofday;
+          my $filename = "$s.$ms.".param('fileupload');
+          my $fullfilename = $STORE_DIR . "/" . $filename;
+          open OUT, ">$fullfilename" or die "couldn't open file: $!";
+          #seek $fh, 0, 0; #can be removed after debug prints are removed
           while (<$fh>) {
-              print;
+              print OUT $_;
           }
+          close OUT;
+          print $cgi->p(param('fileupload')." was written to $fullfilename");
 
+          #now write username and password
+          my $userinfofile = $fullfilename.".userinfo";
+          my $username =  $cgi->param('username');
+          my $password =  $cgi->param('password');
+          open OUT, ">$userinfofile" or die "couldn't open file $!";
+          print OUT "$username\n";
+          print OUT "$password\n";
+          close OUT;
+          
 
           if ($AUTOLOAD) {
-              print $cgi->p("Autoload is not yet supported");
-          }
-          else { #save the file for later
-              die "ERROR: the store directory isn't configured" unless $STORE_DIR;
-              my ($s, $ms) = gettimeofday;
-              my $filename = "$s.$ms.".param('fileupload');
-              my $fullfilename = $STORE_DIR . "/" . $filename;
-              open OUT, ">$fullfilename" or die "couldn't open file: $!";
-              seek $fh, 0, 0; #can be removed after debug prints are removed
-              while (<$fh>) {
-                  print OUT $_;
-              }
-              close OUT;
-              print $cgi->p(param('fileupload')." was written to $fullfilename");
+              my $apollo      = "/home/gmod/downloads/apollo/bin/apollo.headless";
+              my $hostname    = url(-base=>1);
+              $ENV{PATH}      = '/usr/java/jdk1.5.0_14/bin:/usr/bin:/bin';
 
-              #now write username and password
-              my $userinfofile = $fullfilename.".userinfo";
-              open OUT, ">$userinfofile" or die "couldn't open file $!";
-              print OUT $cgi->param('username')."\n";
-              print OUT $cgi->param('password')."\n";
-              close OUT;
+              my $javacmd = "$apollo -f $fullfilename -i game  -o chadoDB"; 
+              print "writing to the database; here's the command:\n$javacmd\n";
+              system($javacmd);
           }
 
           print "</pre>\n",
