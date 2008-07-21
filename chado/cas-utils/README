@@ -20,3 +20,42 @@ To install, run
 
 Future additions to this package include tools to fascilitate the 
 Chado/MediaWiki roundtrip.
+
+
+EXAMPLE GBROWSE CONFIG SECTION FOR MAKING A POPUP BALLOON WITH EDIT LINK
+
+L SELECT MENU]
+width = 250
+html  = <table style="width:100%">
+         <tr>
+           <th style="background:lightgrey;cell-padding:5">
+             SELECTION
+             <span style="right:0px;position:absolute;color:blue;cursor:pointer" 
+                   onclick="SelectArea.prototype.cancelRubber()">
+               [X]
+             </span>
+           </th>
+         </tr>
+         <tr>
+           <td>
+             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndSubmit()">
+              Zoom in
+             </span>
+           </td>
+         </tr>
+         <tr>
+           <td>
+             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndRecenter()">
+               Recenter on this region
+             </span>
+           </td>
+         </tr>
+         <tr>
+           <td onmouseup="SelectArea.prototype.cancelRubber()">
+             <a href="/cgi-bin/apollo_request_region.pl?selection=SELECTION">
+              Open this section in Apollo
+             </a>
+           </td>
+         </tr>
+       </table>
+
