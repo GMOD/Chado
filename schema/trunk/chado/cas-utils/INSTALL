@@ -1,1 +1,11 @@
-this needs to have detailed configuration information.
+Run perl Build.PL and it will ask you several questions, or check 
+perl Build.PL -h for commandline configuration options.  After getting the
+configuration the way you like it, run ./Build and sudo ./Build install
+to put the Util module and cgi files in the appropriate place.
+
+I fully expect that there will be things I didn't consider in making this
+first release of this package, even though I tried.  Please let me 
+know what issues you run into using this package.
+
+Scott Cain
+cain.cshl@gmail.com
