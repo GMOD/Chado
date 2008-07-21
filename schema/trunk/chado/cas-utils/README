@@ -1,0 +1,21 @@
+This package contains utility files for the community annotation system.
+Currently, this consists of CGI files for making GAME or Chado XML files
+for use by a WebStart Apollo application and a CGI for users to upload
+their saved GAME or Chado XML files.
+
+In order to work properly, this set of tools requires that several things
+be installed already:
+
+  A Chado database populated with data
+  GBrowse (preferable 1.69 or better)
+  Apollo (both a compiled and signed webstart as well as the compiled
+     application on the server)
+
+
+To install, run
+
+  perl Build.PL
+  ./Build
+  sudo ./Build install
+
+
