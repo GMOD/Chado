@@ -53,6 +53,9 @@ if ($t_chromosome and $t_chromosome =~ /^(\d+)$/) {
 }
 if ($t_start      and $t_start      =~ /^(\d+)$/) {
     $start      = $1;
+    if ($start < 1) {
+        $start = 1;
+    }
 }
 if ($t_end        and $t_end        =~ /^(\d+)$/) {
     $end        = $1;
@@ -61,6 +64,9 @@ if ($t_selection  and $t_selection  =~ /^(\w+):(\d+)\.\.(\d+)$/) {
     $chromosome = $1;
     $start      = $2;
     $end        = $3;
+    if ($start < 1) {
+        $start = 1;
+    }
 }
 if ($t_xmltype and ($t_xmltype =~ /^chado$/ or $t_xmltype =~ /^game$/)) {
     $xmltype = $t_xmltype;
