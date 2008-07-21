@@ -288,7 +288,10 @@ close F;
 
 $build->notes( $_, $OPTIONS{$_} ) for @OPTION_LIST;
 
+$build->add_to_cleanup( 'cas_install.conf', 'lib/Bio/GMOD/CAS/Util.pm');
+
 $build->create_build_script;
+
 
 print "Now run './Build' and './Build install'\n";
 
