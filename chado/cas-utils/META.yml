@@ -1,0 +1,22 @@
+---
+name: cas-utils
+version: 0.1
+author:
+  - Scott Cain
+abstract: A set of cgi scripts and config utilites for making the Apollo webstart/Chado roundtrip easier
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bio::GMOD::DB::Config: 0
+  CGI: 0
+  Config::General: 0
+  Time::HiRes: 0
+provides:
+  Bio::GMOD::CAS::Util:
+    file: lib/Bio/GMOD/CAS/Util.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
