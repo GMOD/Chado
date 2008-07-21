@@ -6,6 +6,16 @@ use File::Spec::Functions qw( catfile catdir );
 use File::Path;
 use File::Copy;
 
+sub ACTION_build {
+    my $self = shift;
+    $self->SUPER::ACTION_build;
+
+    my $PL_file = 'lib/Bio/GMOD/CAS/Util.pm.PL';
+    $self->run_perl_script($PL_file);
+
+    return;
+}
+
 
 sub ACTION_test {
     my $self = shift;
