@@ -21,8 +21,6 @@ print OUT<<'NOGROK';
 package Bio::GMOD::CAS::Util;
 use Config::General;
 
-my $VERSION = 0.1;
-
 sub new {
   my ($class, @args) = @_;
 

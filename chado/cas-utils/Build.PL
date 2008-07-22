@@ -11,10 +11,12 @@ if ( $@ =~ /Can't locate/ ) {
     exit(0);
 }
 
+my $VERSION = 0.1;
+
 my $build = CASBuilder->new(
     module_name => 'cas-utils',
     license     => 'perl',
-    dist_version_from => 'lib/Bio/GMOD/CAS/Util.pm',
+    dist_version=> $VERSION,
     dist_abstract => 'A set of cgi scripts and config utilites for making the Apollo webstart/Chado roundtrip easier',
     dist_author => 'Scott Cain',
     requires    => {

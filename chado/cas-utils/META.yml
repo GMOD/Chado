@@ -12,10 +12,6 @@ requires:
   CGI: 0
   Config::General: 0
   Time::HiRes: 0
-provides:
-  Bio::GMOD::CAS::Util:
-    file: lib/Bio/GMOD/CAS/Util.pm
-    version: 0.1
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
