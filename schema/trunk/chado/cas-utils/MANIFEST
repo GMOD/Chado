@@ -4,7 +4,7 @@ cgi-bin/apollo_request_region.pl
 cgi-bin/upload_game.pl
 GuessDirectories.pm
 INSTALL
-lib/Bio/GMOD/CAS/Util.pm
+lib/Bio/GMOD/CAS/Util.pm.PL
 LICENSE
 MANIFEST			This list of files
 META.yml

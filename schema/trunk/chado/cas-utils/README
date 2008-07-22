@@ -24,7 +24,7 @@ Chado/MediaWiki roundtrip.
 
 EXAMPLE GBROWSE CONFIG SECTION FOR MAKING A POPUP BALLOON WITH EDIT LINK
 
-L SELECT MENU]
+[DETAIL SELECT MENU]
 width = 250
 html  = <table style="width:100%">
          <tr>
