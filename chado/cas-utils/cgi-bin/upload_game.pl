@@ -91,17 +91,12 @@ exit(0);
 
 =pod
 
-A simple config file is required for this file to work which needs to be in
-$GMOD_ROOT/conf/webapollo.conf.  The contents of the file should look something like
-this:
+=head1 AUTHOR
 
-#simple config file for the upload_game.pl cgi script
+Scott Cain, cain.cshl@gmail.com
 
-#load automatically, or save for admin approval
-autoload=0
+=head1 COPYRIGHT
 
-#directory to save uploaded game files in (make sure it exists!)
-store_dir=/usr/local/gmod/tmp/apollo
-
+2008, All rights reserved
 
 =cut
