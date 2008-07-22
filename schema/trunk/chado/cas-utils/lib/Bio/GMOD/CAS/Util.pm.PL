@@ -52,6 +52,18 @@ sub AUTOLOAD {
 
 1;
 
+=pod
+
+=head1 AUTHOR
+
+Scott Cain, cain.cshl@gmail.com
+
+=head1 COPYRIGHT
+
+2008, All rights reserved
+
+=cut
+
 END
 
 close OUT;

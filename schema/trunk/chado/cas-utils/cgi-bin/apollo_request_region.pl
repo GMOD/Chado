@@ -240,3 +240,15 @@ href="$hostname$web_path/$filename.jnlp" spec="1.0+">
 END
 ;
 }
+
+=pod
+
+=head1 AUTHOR
+
+Scott Cain, cain.cshl@gmail.com
+
+=head1 COPYRIGHT
+
+2008, All rights reserved
+
+=cut
