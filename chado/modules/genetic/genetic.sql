@@ -1,4 +1,4 @@
--- $Id: genetic.sql,v 1.30 2007-06-25 19:52:34 emmert Exp $
+-- $Id: genetic.sql,v 1.31 2008-08-25 19:53:14 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -192,13 +192,14 @@ COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotyp
 -- TABLE: phenotype_comparison_cvterm
 -- ================================================
 CREATE TABLE phenotype_comparison_cvterm (
-    pub_id INT NOT NULL,
     phenotype_comparison_cvterm_id serial not null,
     primary key (phenotype_comparison_cvterm_id),
     phenotype_comparison_id int not null,
     FOREIGN KEY (phenotype_comparison_id) references phenotype_comparison (phenotype_comparison_id) on delete cascade,
     cvterm_id int not null,
     FOREIGN KEY (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id INT not null,
+    FOREIGN KEY (pub_id) references pub (pub_id) on delete cascade,
     rank int not null default 0,
     CONSTRAINT phenotype_comparison_cvterm_c1 unique (phenotype_comparison_id, cvterm_id)
 );
