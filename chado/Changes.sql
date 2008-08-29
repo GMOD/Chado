@@ -75,3 +75,7 @@ CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
 
   END;
 ' LANGUAGE 'plpgsql';
+
+
+--added foreign key for pub_id to phenotype_comparison_cvterm
+ALTER TABLE phenotype_comparison_cvterm ADD FOREIGN KEY (pub_id) references pub (pub_id) on delete cascade;
