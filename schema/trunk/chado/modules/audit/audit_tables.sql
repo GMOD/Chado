@@ -3667,10 +3667,10 @@
 
    DROP TABLE audit_phenotype_comparison_cvterm;
    CREATE TABLE audit_phenotype_comparison_cvterm ( 
-       pub_id integer, 
        phenotype_comparison_cvterm_id integer, 
        phenotype_comparison_id integer, 
        cvterm_id integer, 
+       pub_id integer, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -3680,18 +3680,18 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenotype_comparison_cvterm() RETURNS trigger AS
    '
    DECLARE
-       pub_id_var integer; 
        phenotype_comparison_cvterm_id_var integer; 
        phenotype_comparison_id_var integer; 
        cvterm_id_var integer; 
+       pub_id_var integer; 
        rank_var integer; 
        
        transaction_type_var char;
    BEGIN
-       pub_id_var = OLD.pub_id;
        phenotype_comparison_cvterm_id_var = OLD.phenotype_comparison_cvterm_id;
        phenotype_comparison_id_var = OLD.phenotype_comparison_id;
        cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
        rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
@@ -3701,17 +3701,17 @@
        END IF;
 
        INSERT INTO audit_phenotype_comparison_cvterm ( 
-             pub_id, 
              phenotype_comparison_cvterm_id, 
              phenotype_comparison_id, 
              cvterm_id, 
+             pub_id, 
              rank, 
              transaction_type
        ) VALUES ( 
-             pub_id_var, 
              phenotype_comparison_cvterm_id_var, 
              phenotype_comparison_id_var, 
              cvterm_id_var, 
+             pub_id_var, 
              rank_var, 
              transaction_type_var
        );

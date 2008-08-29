@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -1852,7 +1852,7 @@ create table feature_synonym (
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    is_current boolean not null default 'true',
+    is_current boolean not null default 'false',
     is_internal boolean not null default 'false',
     constraint feature_synonym_c1 unique (synonym_id,feature_id,pub_id)
 );
@@ -2066,6 +2066,189 @@ basetype = text,
 stype = text,
 initcond = ''
 );
+
+
+--function to 'unshare' exons.  It looks for exons that have the same fmin
+--and fmax and belong to the same gene and only keeps one.  The other,
+--redundant exons are marked obsolete in the feature table.  Nothing
+--is done with those features' entries in the featureprop, feature_dbxref,
+--feature_pub, or feature_cvterm tables.  For the moment, I'm assuming
+--that any annotations that they have when this script is run are
+--identical to their non-obsoleted doppelgangers.  If that's not the case, 
+--they could be merged via query.
+--
+--The bulk of this code was contributed by Robin Houston at
+--GeneDB/Sanger Centre.
+
+CREATE OR REPLACE FUNCTION share_exons () RETURNS void AS '    
+  DECLARE    
+  BEGIN
+    /* Generate a table of shared exons */
+    CREATE temporary TABLE shared_exons AS
+      SELECT gene.feature_id as gene_feature_id
+           , gene.uniquename as gene_uniquename
+           , transcript1.uniquename as transcript1
+           , exon1.feature_id as exon1_feature_id
+           , exon1.uniquename as exon1_uniquename
+           , transcript2.uniquename as transcript2
+           , exon2.feature_id as exon2_feature_id
+           , exon2.uniquename as exon2_uniquename
+           , exon1_loc.fmin /* = exon2_loc.fmin */
+           , exon1_loc.fmax /* = exon2_loc.fmax */
+      FROM feature gene
+        JOIN cvterm gene_type ON gene.type_id = gene_type.cvterm_id
+        JOIN cv gene_type_cv USING (cv_id)
+        JOIN feature_relationship gene_transcript1 ON gene.feature_id = gene_transcript1.object_id
+        JOIN feature transcript1 ON gene_transcript1.subject_id = transcript1.feature_id
+        JOIN cvterm transcript1_type ON transcript1.type_id = transcript1_type.cvterm_id
+        JOIN cv transcript1_type_cv ON transcript1_type.cv_id = transcript1_type_cv.cv_id
+        JOIN feature_relationship transcript1_exon1 ON transcript1_exon1.object_id = transcript1.feature_id
+        JOIN feature exon1 ON transcript1_exon1.subject_id = exon1.feature_id
+        JOIN cvterm exon1_type ON exon1.type_id = exon1_type.cvterm_id
+        JOIN cv exon1_type_cv ON exon1_type.cv_id = exon1_type_cv.cv_id
+        JOIN featureloc exon1_loc ON exon1_loc.feature_id = exon1.feature_id
+        JOIN feature_relationship gene_transcript2 ON gene.feature_id = gene_transcript2.object_id
+        JOIN feature transcript2 ON gene_transcript2.subject_id = transcript2.feature_id
+        JOIN cvterm transcript2_type ON transcript2.type_id = transcript2_type.cvterm_id
+        JOIN cv transcript2_type_cv ON transcript2_type.cv_id = transcript2_type_cv.cv_id
+        JOIN feature_relationship transcript2_exon2 ON transcript2_exon2.object_id = transcript2.feature_id
+        JOIN feature exon2 ON transcript2_exon2.subject_id = exon2.feature_id
+        JOIN cvterm exon2_type ON exon2.type_id = exon2_type.cvterm_id
+        JOIN cv exon2_type_cv ON exon2_type.cv_id = exon2_type_cv.cv_id
+        JOIN featureloc exon2_loc ON exon2_loc.feature_id = exon2.feature_id
+      WHERE gene_type_cv.name = ''sequence''
+        AND gene_type.name = ''gene''
+        AND transcript1_type_cv.name = ''sequence''
+        AND transcript1_type.name = ''mRNA''
+        AND transcript2_type_cv.name = ''sequence''
+        AND transcript2_type.name = ''mRNA''
+        AND exon1_type_cv.name = ''sequence''
+        AND exon1_type.name = ''exon''
+        AND exon2_type_cv.name = ''sequence''
+        AND exon2_type.name = ''exon''
+        AND exon1.feature_id < exon2.feature_id
+        AND exon1_loc.rank = 0
+        AND exon2_loc.rank = 0
+        AND exon1_loc.fmin = exon2_loc.fmin
+        AND exon1_loc.fmax = exon2_loc.fmax
+    ;
+    
+    /* Choose one of the shared exons to be the canonical representative.
+       We pick the one with the smallest feature_id.
+     */
+    CREATE temporary TABLE canonical_exon_representatives AS
+      SELECT gene_feature_id, min(exon1_feature_id) AS canonical_feature_id, fmin
+      FROM shared_exons
+      GROUP BY gene_feature_id,fmin
+    ;
+    
+    CREATE temporary TABLE exon_replacements AS
+      SELECT DISTINCT shared_exons.exon2_feature_id AS actual_feature_id
+                    , canonical_exon_representatives.canonical_feature_id
+                    , canonical_exon_representatives.fmin
+      FROM shared_exons
+        JOIN canonical_exon_representatives USING (gene_feature_id)
+      WHERE shared_exons.exon2_feature_id <> canonical_exon_representatives.canonical_feature_id
+        AND shared_exons.fmin = canonical_exon_representatives.fmin
+    ;
+    
+    UPDATE feature_relationship 
+      SET subject_id = (
+            SELECT canonical_feature_id
+            FROM exon_replacements
+            WHERE feature_relationship.subject_id = exon_replacements.actual_feature_id)
+      WHERE subject_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+    
+    UPDATE feature_relationship
+      SET object_id = (
+            SELECT canonical_feature_id
+            FROM exon_replacements
+            WHERE feature_relationship.subject_id = exon_replacements.actual_feature_id)
+      WHERE object_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+    
+    UPDATE feature
+      SET is_obsolete = true
+      WHERE feature_id IN (
+        SELECT actual_feature_id FROM exon_replacements
+    );
+  END;    
+' LANGUAGE 'plpgsql';
+
+--This is a function to seek out exons of transcripts and orders them,
+--using feature_relationship.rank, in "transcript order" numbering
+--from 0, taking strand into account. It will not touch transcripts that
+--already have their exons ordered (in case they have a non-obvious
+--ordering due to trans splicing). It takes as an argument the
+--feature.type_id of the parent transcript type (typically, mRNA, although
+--non coding transcript types should work too).
+
+CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
+  DECLARE
+    parent_type      ALIAS FOR $1;
+    exon_id          int;
+    part_of          int;
+    exon_type        int;
+    strand           int;
+    arow             RECORD;
+    order_by         varchar;
+    rowcount         int;
+    exon_count       int;
+    ordered_exons    int;    
+    transcript_id    int;
+  BEGIN
+    SELECT INTO part_of cvterm_id FROM cvterm WHERE name=''part_of''
+      AND cv_id IN (SELECT cv_id FROM cv WHERE name=''relationship'');
+    --SELECT INTO exon_type cvterm_id FROM cvterm WHERE name=''exon''
+    --  AND cv_id IN (SELECT cv_id FROM cv WHERE name=''sequence'');
+
+    --RAISE NOTICE ''part_of %, exon %'',part_of,exon_type;
+
+    FOR transcript_id IN
+      SELECT feature_id FROM feature WHERE type_id = parent_type
+    LOOP
+      SELECT INTO rowcount count(*) FROM feature_relationship
+        WHERE object_id = transcript_id
+          AND rank = 0;
+
+      --Dont modify this transcript if there are already numbered exons or
+      --if there is only one exon
+      IF rowcount = 1 THEN
+        --RAISE NOTICE ''skipping transcript %, row count %'',transcript_id,rowcount;
+        CONTINUE;
+      END IF;
+
+      --need to reverse the order if the strand is negative
+      SELECT INTO strand strand FROM featureloc WHERE feature_id=transcript_id;
+      IF strand > 0 THEN
+          order_by = ''fl.fmin'';      
+      ELSE
+          order_by = ''fl.fmax desc'';
+      END IF;
+
+      exon_count = 0;
+      FOR arow IN EXECUTE 
+        ''SELECT fr.*, fl.fmin, fl.fmax
+          FROM feature_relationship fr, featureloc fl
+          WHERE fr.object_id  = ''||transcript_id||''
+            AND fr.subject_id = fl.feature_id
+            AND fr.type_id    = ''||part_of||''
+            ORDER BY ''||order_by
+      LOOP
+        --number the exons for a given transcript
+        UPDATE feature_relationship
+          SET rank = exon_count 
+          WHERE feature_relationship_id = arow.feature_relationship_id;
+        exon_count = exon_count + 1;
+      END LOOP; 
+
+    END LOOP;
+
+  END;
+' LANGUAGE 'plpgsql';
 -- down the graph: eg from  chromosome to contig
 CREATE OR REPLACE FUNCTION project_point_up(int,int,int,int)
  RETURNS int AS
@@ -2208,6 +2391,21 @@ CREATE OR REPLACE FUNCTION get_feature_id(VARCHAR,VARCHAR,VARCHAR) RETURNS INT
     AND type_id=get_feature_type_id($2)
     AND organism_id=get_organism_id($3)
  ' LANGUAGE 'sql';
+-- DEPENDENCY:
+--  chado/modules/bridges/sofa-bridge.sql
+
+-- The standard Chado pattern for protein coding genes
+-- is a feature of type 'gene' with 'mRNA' features as parts
+-- REQUIRES: 'mrna' view from sofa-bridge.sql
+CREATE OR REPLACE VIEW protein_coding_gene AS
+ SELECT
+  DISTINCT gene.*
+ FROM
+  feature AS gene
+  INNER JOIN feature_relationship AS fr ON (gene.feature_id=fr.object_id)
+  INNER JOIN mrna ON (mrna.feature_id=fr.subject_id);
+
+
 -- introns are implicit from surrounding exons
 -- combines intron features with location and parent transcript
 -- the same intron appearing in multiple transcripts will appear
@@ -3512,7 +3710,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -3636,7 +3834,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -3716,7 +3914,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -3910,19 +4108,20 @@ COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotyp
 -- TABLE: phenotype_comparison_cvterm
 -- ================================================
 CREATE TABLE phenotype_comparison_cvterm (
-    pub_id INT NOT NULL,
     phenotype_comparison_cvterm_id serial not null,
     primary key (phenotype_comparison_cvterm_id),
     phenotype_comparison_id int not null,
     FOREIGN KEY (phenotype_comparison_id) references phenotype_comparison (phenotype_comparison_id) on delete cascade,
     cvterm_id int not null,
     FOREIGN KEY (cvterm_id) references cvterm (cvterm_id) on delete cascade,
+    pub_id INT not null,
+    FOREIGN KEY (pub_id) references pub (pub_id) on delete cascade,
     rank int not null default 0,
     CONSTRAINT phenotype_comparison_cvterm_c1 unique (phenotype_comparison_id, cvterm_id)
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -4017,7 +4216,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -4249,7 +4448,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -4299,7 +4498,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -4492,7 +4691,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -5317,7 +5516,7 @@ CREATE TABLE studyprop_feature (
 create index studyprop_feature_idx1 on studyprop_feature (studyprop_id);
 create index studyprop_feature_idx2 on studyprop_feature (feature_id);
 
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -5605,7 +5804,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.53 2008-03-28 16:05:24 scottcain Exp $
+-- $Id: default_schema.sql,v 1.54 2008-08-29 17:13:50 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --

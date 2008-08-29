@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.67 2008-01-31 04:21:18 scottcain Exp $
+-- $Id: sequence.sql,v 1.68 2008-08-29 17:13:52 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -639,7 +639,7 @@ create table feature_synonym (
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
     pub_id int not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    is_current boolean not null default 'true',
+    is_current boolean not null default 'false',
     is_internal boolean not null default 'false',
     constraint feature_synonym_c1 unique (synonym_id,feature_id,pub_id)
 );
