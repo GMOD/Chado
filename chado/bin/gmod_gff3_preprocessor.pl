@@ -87,7 +87,7 @@ $DBPROFILE ||='default';
 
 my ($split_on_source, $split_on_type, $split_on_ref);
 if ($SPLITFILE) {
-    if ($SPLITFILE == 1) {
+    if ($SPLITFILE and $SPLITFILE !~ /=/ and $SPLITFILE == 1) {
         $split_on_ref = 1;
     } 
     else {

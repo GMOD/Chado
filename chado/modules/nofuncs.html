@@ -1627,7 +1627,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado general module <br />
 	================================================ <br />
@@ -2244,7 +2244,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado cv module <br />
 	================================================================= <br />
@@ -3756,7 +3756,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado pub module <br />
 	================================================================= <br />
@@ -4735,7 +4735,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado organism module <br />
 	============ <br />
@@ -5236,7 +5236,7 @@ pattern. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -8592,7 +8592,7 @@ the default 0 value should be used. </td>
 	<td class="FieldCellName"><a name="feature_synonym-is_current">is_current</a></td>
 	<td class="FieldCellType">boolean</td>
 	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">true</td>
+	<td class="FieldCellDefault">false</td>
 	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature. </td>
 	<td class="FieldCellFK"></td>
 </tr>
@@ -8732,7 +8732,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado companalysis module <br />
 	================================================================= <br />
@@ -9300,7 +9300,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
 	================================================================= <br />
@@ -9841,7 +9841,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
 	2006-04-11 <br />
@@ -11262,15 +11262,6 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
 	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_cvterm_id">phenotype_comparison_cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">11</td>
@@ -11279,7 +11270,7 @@ groups, as they do not fall on a particular chromosome). </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr class="tr-odd">
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_id">phenotype_comparison_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -11288,13 +11279,22 @@ groups, as they do not fall on a particular chromosome). </td>
 	<td class="FieldCellFK"><a href="#phenotype_comparison-phenotype_comparison_id">phenotype_comparison.phenotype_comparison_id</a></td>
 </tr>
 
-<tr class="tr-even">
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-cvterm_id">cvterm_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-pub_id">pub_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-odd">
@@ -11352,11 +11352,6 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>pub_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
 	<td>phenotype_comparison_cvterm_id</td>
 </tr>
 
@@ -11378,6 +11373,16 @@ groups, as they do not fall on a particular chromosome). </td>
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>cvterm_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>pub_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -11417,7 +11422,7 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado map module <br />
 	================================================================= <br />
@@ -12137,7 +12142,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -13563,7 +13568,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado contact module <br />
 	================================================================= <br />
@@ -13880,7 +13885,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado expression module <br />
 	================================================================= <br />
@@ -15367,7 +15372,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado mage module <br />
 	================================================================= <br />
@@ -22167,7 +22172,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	========================================== <br />
 	Chado stock module <br />
 	DEPENDENCIES <br />
@@ -24303,7 +24308,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.13 2008-03-28 16:05:27 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.14 2008-08-29 17:13:51 scottcain Exp $ <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import feature from sequence <br />
