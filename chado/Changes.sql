@@ -79,3 +79,7 @@ CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
 
 --added foreign key for pub_id to phenotype_comparison_cvterm
 ALTER TABLE phenotype_comparison_cvterm ADD FOREIGN KEY (pub_id) references pub (pub_id) on delete cascade;
+
+--Changed the Audit table triggers to work with newer versions of Postgres.
+--This didn't change the the default schema at all (since audit.sql isn't
+--part of the default schema.
