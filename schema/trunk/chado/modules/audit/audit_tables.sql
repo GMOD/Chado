@@ -69,7 +69,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -136,7 +136,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -203,7 +203,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -260,7 +260,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -317,7 +317,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -394,7 +394,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -456,7 +456,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -528,7 +528,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -590,7 +590,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -652,7 +652,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -719,7 +719,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -786,7 +786,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -898,7 +898,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -960,7 +960,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1022,7 +1022,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1099,7 +1099,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1166,7 +1166,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1238,7 +1238,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1295,7 +1295,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1362,7 +1362,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1469,7 +1469,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1571,7 +1571,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1628,7 +1628,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1685,7 +1685,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1752,7 +1752,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1819,7 +1819,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1876,7 +1876,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -1938,7 +1938,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2010,7 +2010,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2067,7 +2067,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2134,7 +2134,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2191,7 +2191,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2263,7 +2263,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2330,7 +2330,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2387,7 +2387,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2444,7 +2444,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2506,7 +2506,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2578,7 +2578,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2630,7 +2630,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2687,7 +2687,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2739,7 +2739,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2831,7 +2831,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2893,7 +2893,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -2970,7 +2970,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3047,7 +3047,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3109,7 +3109,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3166,7 +3166,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3228,7 +3228,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3305,7 +3305,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3362,7 +3362,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3419,7 +3419,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3491,7 +3491,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3563,7 +3563,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3650,7 +3650,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3717,7 +3717,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3779,7 +3779,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3861,7 +3861,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3928,7 +3928,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -3985,7 +3985,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4057,7 +4057,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4114,7 +4114,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4201,7 +4201,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4258,7 +4258,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4315,7 +4315,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4372,7 +4372,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4439,7 +4439,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4511,7 +4511,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4573,7 +4573,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4635,7 +4635,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4697,7 +4697,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4764,7 +4764,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4831,7 +4831,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4898,7 +4898,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -4955,7 +4955,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5017,7 +5017,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5084,7 +5084,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5146,7 +5146,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5203,7 +5203,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5260,7 +5260,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5327,7 +5327,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5414,7 +5414,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5491,7 +5491,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5548,7 +5548,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5680,7 +5680,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5747,7 +5747,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5839,7 +5839,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5906,7 +5906,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -5963,7 +5963,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6035,7 +6035,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6097,7 +6097,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6164,7 +6164,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6221,7 +6221,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6293,7 +6293,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6365,7 +6365,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6432,7 +6432,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6509,7 +6509,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6576,7 +6576,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6648,7 +6648,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6730,7 +6730,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6797,7 +6797,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6859,7 +6859,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -6941,7 +6941,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7008,7 +7008,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7070,7 +7070,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7142,7 +7142,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7214,7 +7214,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7286,7 +7286,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7343,7 +7343,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7400,7 +7400,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7467,7 +7467,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7534,7 +7534,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7606,7 +7606,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7673,7 +7673,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7735,7 +7735,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7817,7 +7817,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7874,7 +7874,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7941,7 +7941,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -7998,7 +7998,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8070,7 +8070,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8127,7 +8127,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8189,7 +8189,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8251,7 +8251,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8308,7 +8308,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8375,7 +8375,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8442,7 +8442,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8499,7 +8499,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8581,7 +8581,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8653,7 +8653,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8710,7 +8710,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8777,7 +8777,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8834,7 +8834,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8896,7 +8896,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -8953,7 +8953,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
@@ -9015,7 +9015,7 @@
        );
 
        IF TG_OP = ''DELETE'' THEN
-           return null;
+           return OLD;
        ELSE
            return NEW;
        END IF;
