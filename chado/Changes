@@ -1,5 +1,26 @@
 Version 1.01
 
+* Fixes to gmod_gff3_preprocessor.pl so that file splitting will work
+as expected.
+* Minor fix to Bio::GMOD::DB::Adaptor (used by gmod_bulk_load_gff3.pl)
+to silence a uninint warning.
+* Created a plpgsql function to share exons (called share_exons) that
+takes exon features that have the same boundaries as another exon and reduces
+them to one feature and fixes up feature_relationship entries so that
+the remaining exon belongs to the right transcript/genes.  This may
+be needed for Apollo.  Thanks to Robin Houston at GeneDB/Sanger Centre
+for contributing much of the code.
+* Created a function to order exons (called order_exons) that will create
+entries in the feature_relationship.rank column to number exons (0 based) 
+from beginning to end in a given transcript.  This was originally needed
+for Apollo, but by the time this function was done, Ed Lee had fixed up
+Apollo to not need it.
+* Fixed the audit module so that the triggers in it work with versions
+of PostgreSQL greater that 8.0.
+* Added a protein_code_gene view; thanks to Chris Mungall.
+
+
+
 
 Below this line are changes up until a few years ago and are included
 for historical purposes.
