@@ -1,5 +1,5 @@
 CREATE SCHEMA genetic_code;
-SET search_path = genetic_code,public;
+SET search_path = genetic_code,public,pg_catalog;
 
 CREATE TABLE gencode (
         gencode_id      INTEGER PRIMARY KEY NOT NULL,
@@ -17,4 +17,4 @@ CREATE TABLE gencode_startcodon (
         gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3)
 );
-SET search_path = public;
+SET search_path = public,pg_catalog;

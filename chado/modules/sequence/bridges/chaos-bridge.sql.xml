@@ -1,7 +1,7 @@
 <bridge_layer schema="chaos">
   <notes>
     Chaos is a simplified view layer over Chado. 
-    To activate, SET search_path=chaos,public;
+    To activate, SET search_path=chaos,public,pg_catalog;
     Be warned - this rewrites standard chado tables like feature
   </notes>
 
