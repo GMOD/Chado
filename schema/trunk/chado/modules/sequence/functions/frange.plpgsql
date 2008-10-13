@@ -1,5 +1,5 @@
 CREATE SCHEMA frange;
-SET search_path = frange,public;
+SET search_path = frange,public,pg_catalog;
 
 CREATE TABLE featuregroup (
     featuregroup_id serial not null,
@@ -282,4 +282,4 @@ BEGIN
 END;   
 ' LANGUAGE 'plpgsql';
 
-SET search_path = public;
+SET search_path = public,pg_catalog;
