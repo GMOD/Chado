@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 
 use strict;
 
@@ -136,6 +136,9 @@ my @safenames = map {safename($_)} @names;
 my @so_relations = ();
 
 msg("generating SO layer....");
+print "CREATE SCHEMA so;\n";
+print "SET search_path=so,public,pg_catalog;\n\n";
+
 foreach my $type (@$ftypes) {
     my $tname = $type->[1];
     my $vname = $namemap{lc($tname)} || die("nothing for @$type");
@@ -276,9 +279,9 @@ foreach my $type (@$ftypes) {
                "    INNER JOIN\n".
                "    feature_relationship AS fr2 ON (fr2.object_id = fr1.object_id)\n".
                "    INNER JOIN\n".
-               "    $vname AS $vname2 ON ($vname1.$vname"."_id = fr2.subject_id);\n".
+               "    $vname AS $vname2 ON ($vname1.$vname"."_id = fr2.subject_id)\n".
                $where.
-               "\n\n",
+               ";\n\n",
                $pvname);
 
         push(@so_relations, $pvname);
@@ -478,6 +481,7 @@ foreach my $fr (@$featurereltriples) {
 }
 
 $dbh->disconnect;
+print "\n\nSET search_path = public,pg_catalog;\n";
 print STDERR "Done!\n";
 exit 0;
 
