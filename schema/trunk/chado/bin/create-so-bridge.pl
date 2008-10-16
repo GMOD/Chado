@@ -340,9 +340,22 @@ sub safename {
     elsif ($n eq 'unorientated_intrachromosomal_transposition') {
       $n = 'unorient_intra_transposition';
     }
+    elsif ($n eq 'natural') {
+      $n = 'so_natural';
+    }
+    elsif ($n eq 'foreign') {
+      $n = 'so_foreign';
+    }
+    elsif ($n eq 'edited_transcript_by A_to_I_substitution') {
+      $n = 'edit_trans_by_a_to_i_sub';
+    }
+    elsif ($n eq '7-methylguanine') {
+      $n = 'seven_methylguanine';
+    }
     elsif ($n eq '') {
       $n = '';
     }
+
 
     else {
       if (length("@parts") > MAX_RELATION_NAME_LEN) {
