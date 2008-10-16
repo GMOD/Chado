@@ -6,21 +6,6 @@ CREATE SCHEMA so;
 SET search_path=so,public,pg_catalog;
 
 --- ************************************************
---- *** relation: sequence_ontology              ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- ************************************************
----
-
-CREATE VIEW sequence_ontology AS
-  SELECT
-    feature_id AS sequence_ontology_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'operation' OR cvterm.name = 'sequence_feature' OR cvterm.name = 'chromosome_variation' OR cvterm.name = 'sequence_attribute' OR cvterm.name = 'replication_mode' OR cvterm.name = 'genome' OR cvterm.name = 'sequence_variant' OR cvterm.name = 'mutation' OR cvterm.name = 'delete' OR cvterm.name = 'insert' OR cvterm.name = 'invert' OR cvterm.name = 'substitute' OR cvterm.name = 'translocate' OR cvterm.name = 'edit_operation' OR cvterm.name = 'insert_U' OR cvterm.name = 'delete_U' OR cvterm.name = 'substitute_A_to_I' OR cvterm.name = 'insert_C' OR cvterm.name = 'insert_dinucleotide' OR cvterm.name = 'substitute_C_to_U' OR cvterm.name = 'insert_G' OR cvterm.name = 'insert_GC' OR cvterm.name = 'insert_GU' OR cvterm.name = 'insert_CU' OR cvterm.name = 'insert_AU' OR cvterm.name = 'insert_AA' OR cvterm.name = 'region' OR cvterm.name = 'junction' OR cvterm.name = 'sequence_alteration' OR cvterm.name = 'base' OR cvterm.name = 'amino_acid' OR cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'match_part' OR cvterm.name = 'polypeptide' OR cvterm.name = 'assembly_component' OR cvterm.name = 'deletion' OR cvterm.name = 'flanking_region' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'assembly' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'repeat_region' OR cvterm.name = 'insertion' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'reagent' OR cvterm.name = 'remark' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'QTL' OR cvterm.name = 'engineered_region' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'nested_region' OR cvterm.name = 'replicon' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'inversion' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'contig_read' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAaseI_hypersensitive_site' OR cvterm.name = 'PCR_product' OR cvterm.name = 'probe' OR cvterm.name = 'clone' OR cvterm.name = 'tag' OR cvterm.name = 'EST' OR cvterm.name = 'rescue_region' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'vector' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'mini_gene' OR cvterm.name = 'BAC_end' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'databank_entry' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'STS' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'aptamer' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'primer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'no_output' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'interband' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'promoter_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'active_peptide' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'clone_insert_end' OR cvterm.name = 'clone_insert_start' OR cvterm.name = 'exon_junction' OR cvterm.name = 'insertion_site' OR cvterm.name = 'polyA_site' OR cvterm.name = 'deletion_junction' OR cvterm.name = 'aberration_junction' OR cvterm.name = 'transposable_element_insertion_site' OR cvterm.name = 'deletion' OR cvterm.name = 'translocation' OR cvterm.name = 'insertion' OR cvterm.name = 'substitution' OR cvterm.name = 'indel' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'nucleotide_deletion' OR cvterm.name = 'nucleotide_insertion' OR cvterm.name = 'nucleotide_duplication' OR cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'inosine' OR cvterm.name = '7-methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'assortment_derived_duplication' OR cvterm.name = 'assortment_derived_deficiency_plus_duplication' OR cvterm.name = 'assortment_derived_deficiency' OR cvterm.name = 'assortment_derived_aneuploid' OR cvterm.name = 'chromosome_number_variation' OR cvterm.name = 'chromosome_structure_variation' OR cvterm.name = 'aneuploid' OR cvterm.name = 'hyperploid' OR cvterm.name = 'hypoploid' OR cvterm.name = 'free_chromosome_arm' OR cvterm.name = 'transposition' OR cvterm.name = 'aneuploid_chromosome' OR cvterm.name = 'intrachromosomal_mutation' OR cvterm.name = 'interchromosomal_mutation' OR cvterm.name = 'compound_chromosome' OR cvterm.name = 'autosynaptic_chromosome' OR cvterm.name = 'complex_chromosomal_mutation' OR cvterm.name = 'uncharacterised_chromosomal_mutation' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'inversion_derived_aneuploid_chromosome' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_duplication' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'interchromosomal_duplication' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'free_duplication' OR cvterm.name = 'insertional_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'uninverted_insertional_duplication' OR cvterm.name = 'inverted_insertional_duplication' OR cvterm.name = 'unoriented_insertional_duplication' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_inversion' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'ring_chromosome' OR cvterm.name = 'chromosome_fission' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'pericentric_inversion' OR cvterm.name = 'paracentric_inversion' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'bipartite_inversion' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'chromosomal_translocation' OR cvterm.name = 'bipartite_duplication' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'translocation_element' OR cvterm.name = 'Robertsonian_fusion' OR cvterm.name = 'reciprocal_chromosomal_translocation' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'cyclic_translocation' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'compound_chromosome_arm' OR cvterm.name = 'homo_compound_chromosome' OR cvterm.name = 'hetero_compound_chromosome' OR cvterm.name = 'dexstrosynaptic_chromosome' OR cvterm.name = 'laevosynaptic_chromosome' OR cvterm.name = 'partially_characterised_chromosomal_mutation' OR cvterm.name = 'polymer_attribute' OR cvterm.name = 'feature_attribute' OR cvterm.name = 'sequence_location' OR cvterm.name = 'nucleic_acid' OR cvterm.name = 'synthetic_sequence' OR cvterm.name = 'protein' OR cvterm.name = 'topology_attribute' OR cvterm.name = 'DNA' OR cvterm.name = 'RNA' OR cvterm.name = 'morpholino' OR cvterm.name = 'PNA' OR cvterm.name = 'LNA' OR cvterm.name = 'TNA' OR cvterm.name = 'GNA' OR cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'R_GNA' OR cvterm.name = 'S_GNA' OR cvterm.name = 'random_sequence' OR cvterm.name = 'designed_sequence' OR cvterm.name = 'linear' OR cvterm.name = 'circular' OR cvterm.name = 'pseudogene_attribute' OR cvterm.name = 'transcript_attribute' OR cvterm.name = 'bound_by_factor' OR cvterm.name = 'flanked' OR cvterm.name = 'gene_attribute' OR cvterm.name = 'retrotransposed' OR cvterm.name = 'transgenic' OR cvterm.name = 'natural' OR cvterm.name = 'engineered' OR cvterm.name = 'foreign' OR cvterm.name = 'reagent_attribute' OR cvterm.name = 'fusion' OR cvterm.name = 'rescue' OR cvterm.name = 'wild_type' OR cvterm.name = 'conserved' OR cvterm.name = 'status' OR cvterm.name = 'intermediate' OR cvterm.name = 'recombinationally_rearranged' OR cvterm.name = 'strand_attribute' OR cvterm.name = 'direction_attribute' OR cvterm.name = 'mobile' OR cvterm.name = 'nuclear_mitochondrial' OR cvterm.name = 'processed' OR cvterm.name = 'unequally_crossed_over' OR cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'enzymatic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'ribozymic' OR cvterm.name = 'bound_by_protein' OR cvterm.name = 'bound_by_nucleic_acid' OR cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'protein_coding' OR cvterm.name = 'non_protein_coding' OR cvterm.name = 'gene_to_gene_feature' OR cvterm.name = 'gene_array_member' OR cvterm.name = 'regulated' OR cvterm.name = 'epigenetically_modified' OR cvterm.name = 'encodes_alternately_spliced_transcripts' OR cvterm.name = 'encodes_alternate_transcription_start_sites' OR cvterm.name = 'intein_containing' OR cvterm.name = 'miRNA_encoding' OR cvterm.name = 'rRNA_encoding' OR cvterm.name = 'scRNA_encoding' OR cvterm.name = 'snoRNA_encoding' OR cvterm.name = 'snRNA_encoding' OR cvterm.name = 'SRP_RNA_encoding' OR cvterm.name = 'stRNA_encoding' OR cvterm.name = 'tmRNA_encoding' OR cvterm.name = 'tRNA_encoding' OR cvterm.name = 'gRNA_encoding' OR cvterm.name = 'C_D_box_snoRNA_encoding' OR cvterm.name = 'H_ACA_box_snoRNA_encoding' OR cvterm.name = 'overlapping' OR cvterm.name = 'inside_intron' OR cvterm.name = 'five_prime_three_prime_overlap' OR cvterm.name = 'five_prime_five_prime_overlap' OR cvterm.name = 'three_prime_three_prime_overlap' OR cvterm.name = 'three_prime_five_prime_overlap' OR cvterm.name = 'antisense' OR cvterm.name = 'inside_intron_antiparallel' OR cvterm.name = 'inside_intron_parallel' OR cvterm.name = 'operon_member' OR cvterm.name = 'gene_cassette_member' OR cvterm.name = 'gene_subarray_member' OR cvterm.name = 'member_of_regulon' OR cvterm.name = 'cassette_array_member' OR cvterm.name = 'transcriptionally_regulated' OR cvterm.name = 'post_translationally_regulated' OR cvterm.name = 'translationally_regulated' OR cvterm.name = 'imprinted' OR cvterm.name = 'transcriptionally_constitutive' OR cvterm.name = 'transcriptionally_induced' OR cvterm.name = 'transcriptionally_repressed' OR cvterm.name = 'autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'silenced' OR cvterm.name = 'silenced_by_DNA_modification' OR cvterm.name = 'silenced_by_RNA_interference' OR cvterm.name = 'silenced_by_histone_modification' OR cvterm.name = 'silenced_by_DNA_methylation' OR cvterm.name = 'silenced_by_histone_methylation' OR cvterm.name = 'silenced_by_histone_deacetylation' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'post_translationally_regulated_by_protein_stability' OR cvterm.name = 'post_translationally_regulated_by_protein_modification' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'imprinted' OR cvterm.name = 'allelically_excluded' OR cvterm.name = 'rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'encodes_1_polypeptide' OR cvterm.name = 'encodes_greater_than_1_polypeptide' OR cvterm.name = 'encodes_disjoint_polypeptides' OR cvterm.name = 'encodes_overlapping_peptides' OR cvterm.name = 'encodes_different_polypeptides_different_stop' OR cvterm.name = 'encodes_overlapping_peptides_different_start' OR cvterm.name = 'encodes_overlapping_polypeptides_different_start_and_stop' OR cvterm.name = 'homologous' OR cvterm.name = 'syntenic' OR cvterm.name = 'orthologous' OR cvterm.name = 'paralogous' OR cvterm.name = 'fragment' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'single' OR cvterm.name = 'double' OR cvterm.name = 'forward' OR cvterm.name = 'reverse' OR cvterm.name = 'organelle_sequence' OR cvterm.name = 'plasmid_location' OR cvterm.name = 'proviral_location' OR cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'kinetoplast_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'endogenous_retroviral_sequence' OR cvterm.name = 'DNA_replication_mode' OR cvterm.name = 'RNA_replication_mode' OR cvterm.name = 'rolling_circle' OR cvterm.name = 'theta_replication' OR cvterm.name = 'copy_number_variation' OR cvterm.name = 'allele' OR cvterm.name = 'haplotype' OR cvterm.name = 'polymorphic_sequence_variant' OR cvterm.name = 'genotype' OR cvterm.name = 'diplotype' OR cvterm.name = 'mutation_affecting_regulatory_region' OR cvterm.name = 'silent_mutation' OR cvterm.name = 'mutation_affecting_copy_number' OR cvterm.name = 'mutation_affecting_transcript' OR cvterm.name = 'mutation_affecting_splicing' OR cvterm.name = 'mutation_affecting_translational_product' OR cvterm.name = 'mutation_affecting_gene_structure' OR cvterm.name = 'mutation_causing_no_change_in_transcript' OR cvterm.name = 'mutation_affecting_complex_change_in_transcript' OR cvterm.name = 'mutation_affecting_transcription' OR cvterm.name = 'mutation_affecting_transcript_sequence' OR cvterm.name = 'mutation_affecting_level_of_transcript' OR cvterm.name = 'mutation_causing_uncharacterised_change_in_transcript' OR cvterm.name = 'mutation_affecting_rate_of_transcription' OR cvterm.name = 'mutation_decreasing_rate_of_transcription' OR cvterm.name = 'mutation_increasing_rate_of_transcription' OR cvterm.name = 'mutation_affecting_coding_sequence' OR cvterm.name = 'mutation_affecting_transcript_processing' OR cvterm.name = 'mutation_affecting_transcript_stability' OR cvterm.name = 'mutation_affecting_transcript_secondary_structure' OR cvterm.name = 'mutation_causing_amino_acid_coding_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_terminator_codon_change_in_transcript' OR cvterm.name = 'mutation_affecting_reading_frame' OR cvterm.name = 'mutation_causing_initiator_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_synonymous_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_non_synonymous_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_nonsense_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_missense_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_conservative_missense_codon_change_in_transcript' OR cvterm.name = 'mutation_causing_nonconservative_missense_codon_change_in_transcript' OR cvterm.name = 'frameshift_mutation' OR cvterm.name = 'plus_1_frameshift_mutation' OR cvterm.name = 'minus_1_frameshift_mutation' OR cvterm.name = 'plus_2_frameshift_mutation' OR cvterm.name = 'minus_2_frameshift_mutation' OR cvterm.name = 'frame_restoring_mutation' OR cvterm.name = 'mutation_affecting_editing' OR cvterm.name = 'mutation_increasing_transcript_stability' OR cvterm.name = 'mutation_decreasing_transcript_stability' OR cvterm.name = 'mutation_causing_compensatory_transcript_secondary_structure_mutation' OR cvterm.name = 'mutation_decreasing_level_of_transcript' OR cvterm.name = 'mutation_increasing_level_of_transcript' OR cvterm.name = 'mutation_causing_partially_characterised_change_in_transcript' OR cvterm.name = 'splice_donor_mutation' OR cvterm.name = 'splice_acceptor_mutation' OR cvterm.name = 'cryptic_splice_activator_mutation' OR cvterm.name = 'mutation_causes_exon_loss' OR cvterm.name = 'mutation_causes_intron_gain' OR cvterm.name = 'cryptic_splice_donor_activation' OR cvterm.name = 'cryptic_splice_acceptor_activation' OR cvterm.name = 'mutation_causing_no_change_of_translational_product' OR cvterm.name = 'mutation_causing_uncharacterised_change_of_translational_product' OR cvterm.name = 'mutation_causing_complex_change_of_translational_product' OR cvterm.name = 'mutation_affecting_level_of_translational_product' OR cvterm.name = 'mutation_affecting_polypeptide_amino_acid_sequence' OR cvterm.name = 'mutation_affecting_3D_structure_of_polypeptide' OR cvterm.name = 'mutation_affecting_polypeptide_function' OR cvterm.name = 'mutation_causing_partially_characterised_change_of_translational_product' OR cvterm.name = 'mutation_decreasing_level_of_translation_product' OR cvterm.name = 'mutation_increasing_level_of_translation_product' OR cvterm.name = 'mutation_causing_amino_acid_substitution' OR cvterm.name = 'mutation_causing_amino_acid_insertion' OR cvterm.name = 'mutation_causing_amino_acid_deletion' OR cvterm.name = 'mutation_causing_polypeptide_truncation' OR cvterm.name = 'mutation_causing_polypeptide_elongation' OR cvterm.name = 'mutation_causing_polypeptide_fusion' OR cvterm.name = 'mutation_causing_conservative_amino_acid_substitution' OR cvterm.name = 'mutation_causing_nonconservative_amino_acid_substitution' OR cvterm.name = 'mutation_causing_polypeptide_N_terminal_elongation' OR cvterm.name = 'mutation_causing_polypeptide_C_terminal_elongation' OR cvterm.name = 'mutation_causing_inframe_polypeptide_N_terminal_elongation' OR cvterm.name = 'mutation_causing_out_of_frame_polypeptide_N_terminal_elongation' OR cvterm.name = 'mutaton_causing_inframe_polypeptide_C_terminal_elongation' OR cvterm.name = 'mutation_causing_out_of_frame_polypeptide_C_terminal_elongation' OR cvterm.name = 'mutation_causing_no_3D_structural_change' OR cvterm.name = 'mutation_causing_uncharacterised_3D_structural_change' OR cvterm.name = 'mutation_causing_complex_3D_structural_change' OR cvterm.name = 'mutation_causing_conformational_change' OR cvterm.name = 'mutation_causing_partially_characterised_3D_structural_change' OR cvterm.name = 'mutation_causing_loss_of_function_of_polypeptide' OR cvterm.name = 'mutation_causing_polypeptide_localization_change' OR cvterm.name = 'mutation_causing_polypeptide_post_translational_processing_change' OR cvterm.name = 'mutation_causing_gain_of_function_of_polypeptide' OR cvterm.name = 'mutation_causing_inactive_ligand_binding_site' OR cvterm.name = 'mutation_causing_polypeptide_post_translational_processing_change' OR cvterm.name = 'mutation_causing_partial_loss_of_function_of_polypeptide' OR cvterm.name = 'mutation_causing_inactive_catalytic_site' OR cvterm.name = 'mutation_causing_gene_fusion' OR cvterm.name = 'Sequence_Ontology';
-
---- ************************************************
 --- *** relation: region                         ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
@@ -37,7 +22,7 @@ CREATE VIEW region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'match_part' OR cvterm.name = 'polypeptide' OR cvterm.name = 'assembly_component' OR cvterm.name = 'deletion' OR cvterm.name = 'flanking_region' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'assembly' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'repeat_region' OR cvterm.name = 'insertion' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'reagent' OR cvterm.name = 'remark' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'QTL' OR cvterm.name = 'engineered_region' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'nested_region' OR cvterm.name = 'replicon' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'inversion' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'contig_read' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAaseI_hypersensitive_site' OR cvterm.name = 'PCR_product' OR cvterm.name = 'probe' OR cvterm.name = 'clone' OR cvterm.name = 'tag' OR cvterm.name = 'EST' OR cvterm.name = 'rescue_region' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'vector' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'mini_gene' OR cvterm.name = 'BAC_end' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'databank_entry' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'STS' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'aptamer' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'primer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'no_output' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'interband' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'promoter_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'active_peptide' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'region';
+  WHERE cvterm.name = 'deletion' OR cvterm.name = 'insertion' OR cvterm.name = 'biomaterial_region' OR cvterm.name = 'experimental_output_artefact' OR cvterm.name = 'biological_region' OR cvterm.name = 'topologically_defined_region' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'reagent' OR cvterm.name = 'engineered_region' OR cvterm.name = 'PCR_product' OR cvterm.name = 'clone' OR cvterm.name = 'rescue_region' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'databank_entry' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'aptamer' OR cvterm.name = 'probe' OR cvterm.name = 'tag' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'synthetic_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'match_part' OR cvterm.name = 'assembly_component' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'remark' OR cvterm.name = 'QTL' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'assembly' OR cvterm.name = 'transcribed_fragment' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'sonicate_fragment' OR cvterm.name = 'contig_read' OR cvterm.name = 'BAC_end' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'overlapping_feature_set' OR cvterm.name = 'no_output' OR cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'sequence_assembly' OR cvterm.name = 'fragment_assembly' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'fingerprint_map' OR cvterm.name = 'STS_map' OR cvterm.name = 'RH_map' OR cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'polypeptide' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'replicon' OR cvterm.name = 'base' OR cvterm.name = 'amino_acid' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'histone_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'nc_RNA_gene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'gRNA_gene' OR cvterm.name = 'miRNA_gene' OR cvterm.name = 'scRNA_gene' OR cvterm.name = 'snoRNA_gene' OR cvterm.name = 'snRNA_gene' OR cvterm.name = 'SRP_RNA_gene' OR cvterm.name = 'stRNA_gene' OR cvterm.name = 'tmRNA_gene' OR cvterm.name = 'tRNA_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'mini_gene' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'interband' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'miRNA_primary_transcript_region' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'cleaved_peptide_region' OR cvterm.name = 'hydrophobic_region' OR cvterm.name = 'polypeptide_conserved_region' OR cvterm.name = 'active_peptide' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'cleaved_for_gpi_anchor_region' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'n_terminal_region' OR cvterm.name = 'c_terminal_region' OR cvterm.name = 'central_hydrophobic_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'gene_segment' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'vector_replicon' OR cvterm.name = 'maxicircle' OR cvterm.name = 'minicircle' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'apicoplast_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'inosine' OR cvterm.name = 'seven_methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'modified_adenosine' OR cvterm.name = 'modified_cytidine' OR cvterm.name = 'modified_guanosine' OR cvterm.name = 'modified_uridine' OR cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'modified_amino_acid_feature' OR cvterm.name = 'modified_glycine' OR cvterm.name = 'modified_L_alanine' OR cvterm.name = 'modified_L_asparagine' OR cvterm.name = 'modified_L_aspartic_acid' OR cvterm.name = 'modified_L_cysteine' OR cvterm.name = 'modified_L_glutamic_acid' OR cvterm.name = 'modified_L_threonine' OR cvterm.name = 'modified_L_tryptophan' OR cvterm.name = 'modified_L_glutamine' OR cvterm.name = 'modified_L_methionine' OR cvterm.name = 'modified_L_isoleucine' OR cvterm.name = 'modified_L_phenylalanine' OR cvterm.name = 'modified_L_histidine' OR cvterm.name = 'modified_L_serine' OR cvterm.name = 'modified_L_lysine' OR cvterm.name = 'modified_L_leucine' OR cvterm.name = 'modified_L_selenocysteine' OR cvterm.name = 'modified_L_valine' OR cvterm.name = 'modified_L_proline' OR cvterm.name = 'modified_L_tyrosine' OR cvterm.name = 'modified_L_arginine' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'flanking_region' OR cvterm.name = 'repeat_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'nested_region' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'five_prime_flanking_region' OR cvterm.name = 'three_prime_flanking_region' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'region';
 
 --- ************************************************
 --- *** relation: sequence_secondary_structure   ***
@@ -344,7 +329,7 @@ CREATE VIEW rna_internal_loop AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_internal_loop';
+  WHERE cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_internal_loop';
 
 --- ************************************************
 --- *** relation: asymmetric_rna_internal_loop   ***
@@ -362,7 +347,7 @@ CREATE VIEW asymmetric_rna_internal_loop AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'asymmetric_RNA_internal_loop';
+  WHERE cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'asymmetric_RNA_internal_loop';
 
 --- ************************************************
 --- *** relation: a_minor_rna_motif              ***
@@ -417,7 +402,7 @@ CREATE VIEW sarcin_like_rna_motif AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'Sarcin_like_RNA_motif';
+  WHERE cvterm.name = 'sarcin_like_RNA_motif';
 
 --- ************************************************
 --- *** relation: symmetric_rna_internal_loop    ***
@@ -688,7 +673,7 @@ CREATE VIEW genomic_clone AS
   WHERE cvterm.name = 'genomic_clone';
 
 --- ************************************************
---- *** relation: operation                      ***
+--- *** relation: sequence_operation             ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** An operation that can be applied to a se ***
@@ -696,13 +681,13 @@ CREATE VIEW genomic_clone AS
 --- ************************************************
 ---
 
-CREATE VIEW operation AS
+CREATE VIEW sequence_operation AS
   SELECT
-    feature_id AS operation_id,
+    feature_id AS sequence_operation_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'delete' OR cvterm.name = 'insert' OR cvterm.name = 'invert' OR cvterm.name = 'substitute' OR cvterm.name = 'translocate' OR cvterm.name = 'edit_operation' OR cvterm.name = 'insert_U' OR cvterm.name = 'delete_U' OR cvterm.name = 'substitute_A_to_I' OR cvterm.name = 'insert_C' OR cvterm.name = 'insert_dinucleotide' OR cvterm.name = 'substitute_C_to_U' OR cvterm.name = 'insert_G' OR cvterm.name = 'insert_GC' OR cvterm.name = 'insert_GU' OR cvterm.name = 'insert_CU' OR cvterm.name = 'insert_AU' OR cvterm.name = 'insert_AA' OR cvterm.name = 'operation';
+  WHERE cvterm.name = 'delete' OR cvterm.name = 'insert' OR cvterm.name = 'invert' OR cvterm.name = 'substitute' OR cvterm.name = 'translocate' OR cvterm.name = 'edit_operation' OR cvterm.name = 'insert_U' OR cvterm.name = 'delete_U' OR cvterm.name = 'substitute_A_to_I' OR cvterm.name = 'insert_C' OR cvterm.name = 'insert_dinucleotide' OR cvterm.name = 'substitute_C_to_U' OR cvterm.name = 'insert_G' OR cvterm.name = 'insert_GC' OR cvterm.name = 'insert_GU' OR cvterm.name = 'insert_CU' OR cvterm.name = 'insert_AU' OR cvterm.name = 'insert_AA' OR cvterm.name = 'sequence_operation';
 
 --- ************************************************
 --- *** relation: pseudogene_attribute           ***
@@ -949,6 +934,8 @@ CREATE VIEW operator AS
 --- *** relation: nuclease_binding_site          ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A region of a molecule that binds to a n ***
+--- *** uclease.                                 ***
 --- ************************************************
 ---
 
@@ -958,7 +945,7 @@ CREATE VIEW nuclease_binding_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_binding_site';
+  WHERE cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'nuclease_binding_site';
 
 --- ************************************************
 --- *** relation: compound_chromosome_arm        ***
@@ -979,6 +966,8 @@ CREATE VIEW compound_chromosome_arm AS
 --- *** relation: restriction_enzyme_binding_site***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A region of a molecule that binds to a r ***
+--- *** estriction enzyme.                       ***
 --- ************************************************
 ---
 
@@ -1663,7 +1652,7 @@ CREATE VIEW sequence_feature AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'region' OR cvterm.name = 'junction' OR cvterm.name = 'sequence_alteration' OR cvterm.name = 'base' OR cvterm.name = 'amino_acid' OR cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'match_part' OR cvterm.name = 'polypeptide' OR cvterm.name = 'assembly_component' OR cvterm.name = 'deletion' OR cvterm.name = 'flanking_region' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'assembly' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'repeat_region' OR cvterm.name = 'insertion' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'reagent' OR cvterm.name = 'remark' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'QTL' OR cvterm.name = 'engineered_region' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'nested_region' OR cvterm.name = 'replicon' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'inversion' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'contig_read' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAaseI_hypersensitive_site' OR cvterm.name = 'PCR_product' OR cvterm.name = 'probe' OR cvterm.name = 'clone' OR cvterm.name = 'tag' OR cvterm.name = 'EST' OR cvterm.name = 'rescue_region' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'vector' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'mini_gene' OR cvterm.name = 'BAC_end' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'databank_entry' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'STS' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'aptamer' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'primer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'no_output' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'interband' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'promoter_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'active_peptide' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'clone_insert_end' OR cvterm.name = 'clone_insert_start' OR cvterm.name = 'exon_junction' OR cvterm.name = 'insertion_site' OR cvterm.name = 'polyA_site' OR cvterm.name = 'deletion_junction' OR cvterm.name = 'aberration_junction' OR cvterm.name = 'transposable_element_insertion_site' OR cvterm.name = 'deletion' OR cvterm.name = 'translocation' OR cvterm.name = 'insertion' OR cvterm.name = 'substitution' OR cvterm.name = 'indel' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'nucleotide_deletion' OR cvterm.name = 'nucleotide_insertion' OR cvterm.name = 'nucleotide_duplication' OR cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'inosine' OR cvterm.name = '7-methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'sequence_feature';
+  WHERE cvterm.name = 'region' OR cvterm.name = 'junction' OR cvterm.name = 'sequence_alteration' OR cvterm.name = 'deletion' OR cvterm.name = 'insertion' OR cvterm.name = 'biomaterial_region' OR cvterm.name = 'experimental_output_artefact' OR cvterm.name = 'biological_region' OR cvterm.name = 'topologically_defined_region' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'reagent' OR cvterm.name = 'engineered_region' OR cvterm.name = 'PCR_product' OR cvterm.name = 'clone' OR cvterm.name = 'rescue_region' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'databank_entry' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'aptamer' OR cvterm.name = 'probe' OR cvterm.name = 'tag' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'synthetic_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'match_part' OR cvterm.name = 'assembly_component' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'remark' OR cvterm.name = 'QTL' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'assembly' OR cvterm.name = 'transcribed_fragment' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'sonicate_fragment' OR cvterm.name = 'contig_read' OR cvterm.name = 'BAC_end' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'overlapping_feature_set' OR cvterm.name = 'no_output' OR cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'sequence_assembly' OR cvterm.name = 'fragment_assembly' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'fingerprint_map' OR cvterm.name = 'STS_map' OR cvterm.name = 'RH_map' OR cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'polypeptide' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'replicon' OR cvterm.name = 'base' OR cvterm.name = 'amino_acid' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'histone_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'nc_RNA_gene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'gRNA_gene' OR cvterm.name = 'miRNA_gene' OR cvterm.name = 'scRNA_gene' OR cvterm.name = 'snoRNA_gene' OR cvterm.name = 'snRNA_gene' OR cvterm.name = 'SRP_RNA_gene' OR cvterm.name = 'stRNA_gene' OR cvterm.name = 'tmRNA_gene' OR cvterm.name = 'tRNA_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'mini_gene' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'interband' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'miRNA_primary_transcript_region' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'cleaved_peptide_region' OR cvterm.name = 'hydrophobic_region' OR cvterm.name = 'polypeptide_conserved_region' OR cvterm.name = 'active_peptide' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'cleaved_for_gpi_anchor_region' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'n_terminal_region' OR cvterm.name = 'c_terminal_region' OR cvterm.name = 'central_hydrophobic_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'gene_segment' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'vector_replicon' OR cvterm.name = 'maxicircle' OR cvterm.name = 'minicircle' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'apicoplast_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'inosine' OR cvterm.name = 'seven_methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'modified_adenosine' OR cvterm.name = 'modified_cytidine' OR cvterm.name = 'modified_guanosine' OR cvterm.name = 'modified_uridine' OR cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'modified_amino_acid_feature' OR cvterm.name = 'modified_glycine' OR cvterm.name = 'modified_L_alanine' OR cvterm.name = 'modified_L_asparagine' OR cvterm.name = 'modified_L_aspartic_acid' OR cvterm.name = 'modified_L_cysteine' OR cvterm.name = 'modified_L_glutamic_acid' OR cvterm.name = 'modified_L_threonine' OR cvterm.name = 'modified_L_tryptophan' OR cvterm.name = 'modified_L_glutamine' OR cvterm.name = 'modified_L_methionine' OR cvterm.name = 'modified_L_isoleucine' OR cvterm.name = 'modified_L_phenylalanine' OR cvterm.name = 'modified_L_histidine' OR cvterm.name = 'modified_L_serine' OR cvterm.name = 'modified_L_lysine' OR cvterm.name = 'modified_L_leucine' OR cvterm.name = 'modified_L_selenocysteine' OR cvterm.name = 'modified_L_valine' OR cvterm.name = 'modified_L_proline' OR cvterm.name = 'modified_L_tyrosine' OR cvterm.name = 'modified_L_arginine' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'flanking_region' OR cvterm.name = 'repeat_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'nested_region' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'five_prime_flanking_region' OR cvterm.name = 'three_prime_flanking_region' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'clone_insert_end' OR cvterm.name = 'clone_insert_start' OR cvterm.name = 'exon_junction' OR cvterm.name = 'insertion_site' OR cvterm.name = 'polyA_site' OR cvterm.name = 'deletion_junction' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'transposable_element_insertion_site' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'translocation_breakpoint' OR cvterm.name = 'insertion_breakpoint' OR cvterm.name = 'deletion_breakpoint' OR cvterm.name = 'deletion' OR cvterm.name = 'translocation' OR cvterm.name = 'insertion' OR cvterm.name = 'substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'indel' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'nucleotide_deletion' OR cvterm.name = 'nucleotide_insertion' OR cvterm.name = 'nucleotide_duplication' OR cvterm.name = 'sequence_feature';
 
 --- ************************************************
 --- *** relation: transposable_element_gene      ***
@@ -2170,7 +2159,7 @@ CREATE VIEW terminator AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'terminator';
+  WHERE cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'terminator';
 
 --- ************************************************
 --- *** relation: d_sequence_secondary_structure ***
@@ -2192,9 +2181,8 @@ CREATE VIEW d_sequence_secondary_structure AS
 --- *** relation: assembly_component             ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A region of sequence which may be used t ***
---- *** o manufacture a longer assembled, sequen ***
---- *** ce.                                      ***
+--- *** A region of known length which may be us ***
+--- *** ed to manufacture a longer region.       ***
 --- ************************************************
 ---
 
@@ -2204,12 +2192,17 @@ CREATE VIEW assembly_component AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'contig_read' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'assembly_component';
+  WHERE cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'sonicate_fragment' OR cvterm.name = 'contig_read' OR cvterm.name = 'BAC_end' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'assembly_component';
 
 --- ************************************************
 --- *** relation: recoded_codon                  ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A codon that has been redefined at trans ***
+--- *** lation. The redefinition may be as a res ***
+--- *** ult of translational bypass, translation ***
+--- *** al frameshifting or stop codon readthrou ***
+--- *** gh.                                      ***
 --- ************************************************
 ---
 
@@ -2219,7 +2212,7 @@ CREATE VIEW recoded_codon AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'recoded_codon';
+  WHERE cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'recoded_codon';
 
 --- ************************************************
 --- *** relation: capped                         ***
@@ -2314,7 +2307,7 @@ CREATE VIEW read AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'contig_read' OR cvterm.name = 'read';
+  WHERE cvterm.name = 'contig_read' OR cvterm.name = 'BAC_end' OR cvterm.name = 'read';
 
 --- ************************************************
 --- *** relation: clone                          ***
@@ -2322,7 +2315,8 @@ CREATE VIEW read AS
 --- ***                                          ***
 --- *** A piece of DNA that has been inserted in ***
 --- ***  a vector so that it can be propagated i ***
---- *** n E. coli or some other organism.        ***
+--- *** n a host bacterium or some other organis ***
+--- *** m.                                       ***
 --- ************************************************
 ---
 
@@ -2375,10 +2369,10 @@ CREATE VIEW bac AS
 --- *** relation: pac                            ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** P1 Artificial Chromosome. These vectors  ***
---- *** can hold large inserts, typically 80-200 ***
---- ***  kb, and propagate in E. coli as a singl ***
---- *** e copy episome.                          ***
+--- *** A single-copy cloning vector that is der ***
+--- *** ived from the F-factor of Escherichia co ***
+--- *** li. PACs can contain large genomic fragm ***
+--- *** ents.                                    ***
 --- ************************************************
 ---
 
@@ -2394,9 +2388,10 @@ CREATE VIEW pac AS
 --- *** relation: plasmid                        ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A self-replicating circular DNA molecule ***
---- ***  that is distinct from a chromosome in t ***
---- *** he organism.                             ***
+--- *** A self replicating, using the hosts cell ***
+--- *** ular machinery, often circular nucleic a ***
+--- *** cid molecule that is distinct from a chr ***
+--- *** omosome in the organism.                 ***
 --- ************************************************
 ---
 
@@ -2567,7 +2562,7 @@ CREATE VIEW enhancer AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'enhancer';
+  WHERE cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhancer';
 
 --- ************************************************
 --- *** relation: enhancer_bound_by_factor       ***
@@ -3012,9 +3007,10 @@ CREATE VIEW three_prime_intron AS
 --- *** relation: rflp_fragment                  ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A polymorphism detectable by the size di ***
---- *** fferences in DNA fragments generated by  ***
---- *** a restriction enzyme.                    ***
+--- *** A DNA fragment used as a reagent to dete ***
+--- *** ct the polymorphic genomic loci by hybri ***
+--- *** dizing against the genomic DNA digested  ***
+--- *** with a given restriction enzyme.         ***
 --- ************************************************
 ---
 
@@ -3718,7 +3714,7 @@ CREATE VIEW mature_transcript AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'mature_transcript';
+  WHERE cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'mature_transcript';
 
 --- ************************************************
 --- *** relation: mrna                           ***
@@ -3754,7 +3750,7 @@ CREATE VIEW tf_binding_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'TF_binding_site';
+  WHERE cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'TF_binding_site';
 
 --- ************************************************
 --- *** relation: orf                            ***
@@ -3774,7 +3770,7 @@ CREATE VIEW orf AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'ORF';
+  WHERE cvterm.name = 'mini_gene' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'ORF';
 
 --- ************************************************
 --- *** relation: transcript_attribute           ***
@@ -3789,7 +3785,7 @@ CREATE VIEW transcript_attribute AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'enzymatic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'ribozymic' OR cvterm.name = 'transcript_attribute';
+  WHERE cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'transcript_attribute';
 
 --- ************************************************
 --- *** relation: foldback_element               ***
@@ -3814,8 +3810,8 @@ CREATE VIEW foldback_element AS
 --- *** relation: flanking_region                ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** The DNA sequences extending on either si ***
---- *** de of a specific locus.                  ***
+--- *** The sequences extending on either side o ***
+--- *** f a specific region.                     ***
 --- ************************************************
 ---
 
@@ -3825,7 +3821,7 @@ CREATE VIEW flanking_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'flanking_region';
+  WHERE cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'five_prime_flanking_region' OR cvterm.name = 'three_prime_flanking_region' OR cvterm.name = 'flanking_region';
 
 --- ************************************************
 --- *** relation: chromosome_variation           ***
@@ -3840,7 +3836,7 @@ CREATE VIEW chromosome_variation AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'assortment_derived_duplication' OR cvterm.name = 'assortment_derived_deficiency_plus_duplication' OR cvterm.name = 'assortment_derived_deficiency' OR cvterm.name = 'assortment_derived_aneuploid' OR cvterm.name = 'chromosome_number_variation' OR cvterm.name = 'chromosome_structure_variation' OR cvterm.name = 'aneuploid' OR cvterm.name = 'hyperploid' OR cvterm.name = 'hypoploid' OR cvterm.name = 'free_chromosome_arm' OR cvterm.name = 'transposition' OR cvterm.name = 'aneuploid_chromosome' OR cvterm.name = 'intrachromosomal_mutation' OR cvterm.name = 'interchromosomal_mutation' OR cvterm.name = 'compound_chromosome' OR cvterm.name = 'autosynaptic_chromosome' OR cvterm.name = 'complex_chromosomal_mutation' OR cvterm.name = 'uncharacterised_chromosomal_mutation' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'inversion_derived_aneuploid_chromosome' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_duplication' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'interchromosomal_duplication' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'free_duplication' OR cvterm.name = 'insertional_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'uninverted_insertional_duplication' OR cvterm.name = 'inverted_insertional_duplication' OR cvterm.name = 'unoriented_insertional_duplication' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_inversion' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'ring_chromosome' OR cvterm.name = 'chromosome_fission' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'pericentric_inversion' OR cvterm.name = 'paracentric_inversion' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'bipartite_inversion' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'chromosomal_translocation' OR cvterm.name = 'bipartite_duplication' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'translocation_element' OR cvterm.name = 'Robertsonian_fusion' OR cvterm.name = 'reciprocal_chromosomal_translocation' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'cyclic_translocation' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'compound_chromosome_arm' OR cvterm.name = 'homo_compound_chromosome' OR cvterm.name = 'hetero_compound_chromosome' OR cvterm.name = 'dexstrosynaptic_chromosome' OR cvterm.name = 'laevosynaptic_chromosome' OR cvterm.name = 'partially_characterised_chromosomal_mutation' OR cvterm.name = 'chromosome_variation';
+  WHERE cvterm.name = 'assortment_derived_duplication' OR cvterm.name = 'assortment_derived_deficiency_plus_duplication' OR cvterm.name = 'assortment_derived_deficiency' OR cvterm.name = 'assortment_derived_aneuploid' OR cvterm.name = 'chromosome_number_variation' OR cvterm.name = 'chromosome_structure_variation' OR cvterm.name = 'aneuploid' OR cvterm.name = 'polyploid' OR cvterm.name = 'hyperploid' OR cvterm.name = 'hypoploid' OR cvterm.name = 'autopolyploid' OR cvterm.name = 'allopolyploid' OR cvterm.name = 'free_chromosome_arm' OR cvterm.name = 'transposition' OR cvterm.name = 'aneuploid_chromosome' OR cvterm.name = 'intrachromosomal_mutation' OR cvterm.name = 'interchromosomal_mutation' OR cvterm.name = 'compound_chromosome' OR cvterm.name = 'autosynaptic_chromosome' OR cvterm.name = 'complex_chromosomal_mutation' OR cvterm.name = 'uncharacterised_chromosomal_mutation' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'inversion_derived_aneuploid_chromosome' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_duplication' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'interchromosomal_duplication' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'free_duplication' OR cvterm.name = 'insertional_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'uninverted_insertional_duplication' OR cvterm.name = 'inverted_insertional_duplication' OR cvterm.name = 'unoriented_insertional_duplication' OR cvterm.name = 'chromosomal_deletion' OR cvterm.name = 'chromosomal_inversion' OR cvterm.name = 'intrachromosomal_duplication' OR cvterm.name = 'ring_chromosome' OR cvterm.name = 'chromosome_fission' OR cvterm.name = 'inversion_derived_bipartite_deficiency' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_deficiency_plus_aneuploid' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'pericentric_inversion' OR cvterm.name = 'paracentric_inversion' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'bipartite_inversion' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'deficient_inversion' OR cvterm.name = 'inversion_derived_deficiency_plus_duplication' OR cvterm.name = 'inversion_derived_bipartite_duplication' OR cvterm.name = 'inversion_derived_duplication_plus_aneuploid' OR cvterm.name = 'intrachromosomal_transposition' OR cvterm.name = 'tandem_duplication' OR cvterm.name = 'deficient_intrachromosomal_transposition' OR cvterm.name = 'inverted_intrachromosomal_transposition' OR cvterm.name = 'uninverted_intrachromosomal_transposition' OR cvterm.name = 'unorientated_intrachromosomal_transposition' OR cvterm.name = 'direct_tandem_duplication' OR cvterm.name = 'inverted_tandem_duplication' OR cvterm.name = 'inverted_ring_chromosome' OR cvterm.name = 'free_ring_duplication' OR cvterm.name = 'chromosomal_translocation' OR cvterm.name = 'bipartite_duplication' OR cvterm.name = 'interchromosomal_transposition' OR cvterm.name = 'translocation_element' OR cvterm.name = 'Robertsonian_fusion' OR cvterm.name = 'reciprocal_chromosomal_translocation' OR cvterm.name = 'deficient_translocation' OR cvterm.name = 'inversion_cum_translocation' OR cvterm.name = 'cyclic_translocation' OR cvterm.name = 'deficient_interchromosomal_transposition' OR cvterm.name = 'inverted_interchromosomal_transposition' OR cvterm.name = 'uninverted_interchromosomal_transposition' OR cvterm.name = 'unorientated_interchromosomal_transposition' OR cvterm.name = 'compound_chromosome_arm' OR cvterm.name = 'homo_compound_chromosome' OR cvterm.name = 'hetero_compound_chromosome' OR cvterm.name = 'dexstrosynaptic_chromosome' OR cvterm.name = 'laevosynaptic_chromosome' OR cvterm.name = 'partially_characterised_chromosomal_mutation' OR cvterm.name = 'chromosome_variation';
 
 --- ************************************************
 --- *** relation: internal_utr                   ***
@@ -3939,7 +3935,7 @@ CREATE VIEW modified_rna_base_feature AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'inosine' OR cvterm.name = '7-methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'modified_RNA_base_feature';
+  WHERE cvterm.name = 'inosine' OR cvterm.name = 'seven_methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'modified_adenosine' OR cvterm.name = 'modified_cytidine' OR cvterm.name = 'modified_guanosine' OR cvterm.name = 'modified_uridine' OR cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'modified_RNA_base_feature';
 
 --- ************************************************
 --- *** relation: rrna                           ***
@@ -3957,7 +3953,7 @@ CREATE VIEW rrna AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'rRNA';
+  WHERE cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'rRNA';
 
 --- ************************************************
 --- *** relation: trna                           ***
@@ -4974,7 +4970,7 @@ CREATE VIEW cds AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'CDS';
+  WHERE cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'CDS';
 
 --- ************************************************
 --- *** relation: cdna_clone                     ***
@@ -5076,7 +5072,7 @@ CREATE VIEW nuclease_hypersensitive_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNAaseI_hypersensitive_site' OR cvterm.name = 'nuclease_hypersensitive_site';
+  WHERE cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'nuclease_hypersensitive_site';
 
 --- ************************************************
 --- *** relation: coding_start                   ***
@@ -5110,7 +5106,7 @@ CREATE VIEW tag AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'SAGE_tag' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'STS' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'tag';
+  WHERE cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'tag';
 
 --- ************************************************
 --- *** relation: rl_subunit_primary_transcript  ***
@@ -5402,7 +5398,7 @@ CREATE VIEW chromosome AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'chromosome';
+  WHERE cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'apicoplast_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'chromosome';
 
 --- ************************************************
 --- *** relation: chromosome_band                ***
@@ -5421,7 +5417,7 @@ CREATE VIEW chromosome_band AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'interband' OR cvterm.name = 'chromosome_band';
+  WHERE cvterm.name = 'chromosome_band';
 
 --- ************************************************
 --- *** relation: ss_recombination_target_region ***
@@ -5478,10 +5474,9 @@ CREATE VIEW splice_enhancer AS
 --- *** relation: est                            ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** Expressed Sequence Tag: The sequence of  ***
---- *** a single sequencing read from a cDNA clo ***
---- *** ne or PCR product; typically a few hundr ***
---- *** ed base pairs long.                      ***
+--- *** A tag produced from a single sequencing  ***
+--- *** read from a cDNA clone or PCR product; t ***
+--- *** ypically a few hundred base pairs long.  ***
 --- ************************************************
 ---
 
@@ -5621,7 +5616,7 @@ CREATE VIEW dna AS
   WHERE cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'DNA';
 
 --- ************************************************
---- *** relation: assembly                       ***
+--- *** relation: sequence_assembly              ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** A sequence of nucleotides that has been  ***
@@ -5630,13 +5625,13 @@ CREATE VIEW dna AS
 --- ************************************************
 ---
 
-CREATE VIEW assembly AS
+CREATE VIEW sequence_assembly AS
   SELECT
-    feature_id AS assembly_id,
+    feature_id AS sequence_assembly_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'assembly';
+  WHERE cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'sequence_assembly';
 
 --- ************************************************
 --- *** relation: g1ihe_target_region            ***
@@ -5709,24 +5704,6 @@ CREATE VIEW flanked AS
   WHERE cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'flanked';
 
 --- ************************************************
---- *** relation: protein                        ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** An attribute describing a sequence compo ***
---- *** sed of amino acid residues joined by pep ***
---- *** tide bonds.                              ***
---- ************************************************
----
-
-CREATE VIEW protein AS
-  SELECT
-    feature_id AS protein_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'protein';
-
---- ************************************************
 --- *** relation: floxed                         ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
@@ -5760,7 +5737,7 @@ CREATE VIEW codon AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'codon';
+  WHERE cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'codon';
 
 --- ************************************************
 --- *** relation: frt_flanked                    ***
@@ -5993,16 +5970,17 @@ CREATE VIEW ribozyme AS
 --- *** relation: rrna_5_8s                      ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** 5.8S ribosomal RNA (5.8S rRNA) is a comp ***
---- *** onent of the large subunit of the eukary ***
---- *** otic ribosome. It is transcribed by RNA  ***
---- *** polymerase I as part of the 45S precurso ***
---- *** r that also contains 18S and 28S rRNA. F ***
---- *** unctionally, it is thought that 5.8S rRN ***
---- *** A may be involved in ribosome translocat ***
---- *** ion. It is also known to form covalent l ***
---- *** inkage to the p53 tumour suppressor prot ***
---- *** ein. 5.8S rRNA is also found in archaea. ***
+--- *** 5_8S ribosomal RNA (5. 8S rRNA) is a com ***
+--- *** ponent of the large subunit of the eukar ***
+--- *** yotic ribosome. It is transcribed by RNA ***
+--- ***  polymerase I as part of the 45S precurs ***
+--- *** or that also contains 18S and 28S rRNA.  ***
+--- *** Functionally, it is thought that 5.8S rR ***
+--- *** NA may be involved in ribosome transloca ***
+--- *** tion. It is also known to form covalent  ***
+--- *** linkage to the p53 tumour suppressor pro ***
+--- *** tein. 5_8S rRNA is also found in archaea ***
+--- *** .                                        ***
 --- ************************************************
 ---
 
@@ -6012,7 +5990,7 @@ CREATE VIEW rrna_5_8s AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'rRNA_5.8S';
+  WHERE cvterm.name = 'rRNA_5_8S';
 
 --- ************************************************
 --- *** relation: rna_6s                         ***
@@ -6598,7 +6576,7 @@ CREATE VIEW sequence_attribute AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polymer_attribute' OR cvterm.name = 'feature_attribute' OR cvterm.name = 'sequence_location' OR cvterm.name = 'nucleic_acid' OR cvterm.name = 'synthetic_sequence' OR cvterm.name = 'protein' OR cvterm.name = 'topology_attribute' OR cvterm.name = 'DNA' OR cvterm.name = 'RNA' OR cvterm.name = 'morpholino' OR cvterm.name = 'PNA' OR cvterm.name = 'LNA' OR cvterm.name = 'TNA' OR cvterm.name = 'GNA' OR cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'R_GNA' OR cvterm.name = 'S_GNA' OR cvterm.name = 'random_sequence' OR cvterm.name = 'designed_sequence' OR cvterm.name = 'linear' OR cvterm.name = 'circular' OR cvterm.name = 'pseudogene_attribute' OR cvterm.name = 'transcript_attribute' OR cvterm.name = 'bound_by_factor' OR cvterm.name = 'flanked' OR cvterm.name = 'gene_attribute' OR cvterm.name = 'retrotransposed' OR cvterm.name = 'transgenic' OR cvterm.name = 'natural' OR cvterm.name = 'engineered' OR cvterm.name = 'foreign' OR cvterm.name = 'reagent_attribute' OR cvterm.name = 'fusion' OR cvterm.name = 'rescue' OR cvterm.name = 'wild_type' OR cvterm.name = 'conserved' OR cvterm.name = 'status' OR cvterm.name = 'intermediate' OR cvterm.name = 'recombinationally_rearranged' OR cvterm.name = 'strand_attribute' OR cvterm.name = 'direction_attribute' OR cvterm.name = 'mobile' OR cvterm.name = 'nuclear_mitochondrial' OR cvterm.name = 'processed' OR cvterm.name = 'unequally_crossed_over' OR cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'enzymatic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'ribozymic' OR cvterm.name = 'bound_by_protein' OR cvterm.name = 'bound_by_nucleic_acid' OR cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'protein_coding' OR cvterm.name = 'non_protein_coding' OR cvterm.name = 'gene_to_gene_feature' OR cvterm.name = 'gene_array_member' OR cvterm.name = 'regulated' OR cvterm.name = 'epigenetically_modified' OR cvterm.name = 'encodes_alternately_spliced_transcripts' OR cvterm.name = 'encodes_alternate_transcription_start_sites' OR cvterm.name = 'intein_containing' OR cvterm.name = 'miRNA_encoding' OR cvterm.name = 'rRNA_encoding' OR cvterm.name = 'scRNA_encoding' OR cvterm.name = 'snoRNA_encoding' OR cvterm.name = 'snRNA_encoding' OR cvterm.name = 'SRP_RNA_encoding' OR cvterm.name = 'stRNA_encoding' OR cvterm.name = 'tmRNA_encoding' OR cvterm.name = 'tRNA_encoding' OR cvterm.name = 'gRNA_encoding' OR cvterm.name = 'C_D_box_snoRNA_encoding' OR cvterm.name = 'H_ACA_box_snoRNA_encoding' OR cvterm.name = 'overlapping' OR cvterm.name = 'inside_intron' OR cvterm.name = 'five_prime_three_prime_overlap' OR cvterm.name = 'five_prime_five_prime_overlap' OR cvterm.name = 'three_prime_three_prime_overlap' OR cvterm.name = 'three_prime_five_prime_overlap' OR cvterm.name = 'antisense' OR cvterm.name = 'inside_intron_antiparallel' OR cvterm.name = 'inside_intron_parallel' OR cvterm.name = 'operon_member' OR cvterm.name = 'gene_cassette_member' OR cvterm.name = 'gene_subarray_member' OR cvterm.name = 'member_of_regulon' OR cvterm.name = 'cassette_array_member' OR cvterm.name = 'transcriptionally_regulated' OR cvterm.name = 'post_translationally_regulated' OR cvterm.name = 'translationally_regulated' OR cvterm.name = 'imprinted' OR cvterm.name = 'transcriptionally_constitutive' OR cvterm.name = 'transcriptionally_induced' OR cvterm.name = 'transcriptionally_repressed' OR cvterm.name = 'autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'silenced' OR cvterm.name = 'silenced_by_DNA_modification' OR cvterm.name = 'silenced_by_RNA_interference' OR cvterm.name = 'silenced_by_histone_modification' OR cvterm.name = 'silenced_by_DNA_methylation' OR cvterm.name = 'silenced_by_histone_methylation' OR cvterm.name = 'silenced_by_histone_deacetylation' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'post_translationally_regulated_by_protein_stability' OR cvterm.name = 'post_translationally_regulated_by_protein_modification' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'imprinted' OR cvterm.name = 'allelically_excluded' OR cvterm.name = 'rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'encodes_1_polypeptide' OR cvterm.name = 'encodes_greater_than_1_polypeptide' OR cvterm.name = 'encodes_disjoint_polypeptides' OR cvterm.name = 'encodes_overlapping_peptides' OR cvterm.name = 'encodes_different_polypeptides_different_stop' OR cvterm.name = 'encodes_overlapping_peptides_different_start' OR cvterm.name = 'encodes_overlapping_polypeptides_different_start_and_stop' OR cvterm.name = 'homologous' OR cvterm.name = 'syntenic' OR cvterm.name = 'orthologous' OR cvterm.name = 'paralogous' OR cvterm.name = 'fragment' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'single' OR cvterm.name = 'double' OR cvterm.name = 'forward' OR cvterm.name = 'reverse' OR cvterm.name = 'organelle_sequence' OR cvterm.name = 'plasmid_location' OR cvterm.name = 'proviral_location' OR cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'kinetoplast_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'endogenous_retroviral_sequence' OR cvterm.name = 'sequence_attribute';
+  WHERE cvterm.name = 'polymer_attribute' OR cvterm.name = 'feature_attribute' OR cvterm.name = 'sequence_location' OR cvterm.name = 'nucleic_acid' OR cvterm.name = 'synthetic_sequence' OR cvterm.name = 'topology_attribute' OR cvterm.name = 'peptidyl' OR cvterm.name = 'DNA' OR cvterm.name = 'RNA' OR cvterm.name = 'morpholino' OR cvterm.name = 'PNA' OR cvterm.name = 'LNA' OR cvterm.name = 'TNA' OR cvterm.name = 'GNA' OR cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'R_GNA' OR cvterm.name = 'S_GNA' OR cvterm.name = 'random_sequence' OR cvterm.name = 'designed_sequence' OR cvterm.name = 'linear' OR cvterm.name = 'circular' OR cvterm.name = 'pseudogene_attribute' OR cvterm.name = 'transcript_attribute' OR cvterm.name = 'bound_by_factor' OR cvterm.name = 'flanked' OR cvterm.name = 'gene_attribute' OR cvterm.name = 'retrotransposed' OR cvterm.name = 'transgenic' OR cvterm.name = 'natural' OR cvterm.name = 'engineered' OR cvterm.name = 'foreign' OR cvterm.name = 'reagent_attribute' OR cvterm.name = 'fusion' OR cvterm.name = 'rescue' OR cvterm.name = 'wild_type' OR cvterm.name = 'conserved' OR cvterm.name = 'status' OR cvterm.name = 'intermediate' OR cvterm.name = 'recombinationally_rearranged' OR cvterm.name = 'strand_attribute' OR cvterm.name = 'direction_attribute' OR cvterm.name = 'enzymatic' OR cvterm.name = 'mobile' OR cvterm.name = 'nuclear_mitochondrial' OR cvterm.name = 'processed' OR cvterm.name = 'unequally_crossed_over' OR cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'bound_by_protein' OR cvterm.name = 'bound_by_nucleic_acid' OR cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'protein_coding' OR cvterm.name = 'non_protein_coding' OR cvterm.name = 'gene_to_gene_feature' OR cvterm.name = 'gene_array_member' OR cvterm.name = 'regulated' OR cvterm.name = 'epigenetically_modified' OR cvterm.name = 'encodes_alternately_spliced_transcripts' OR cvterm.name = 'encodes_alternate_transcription_start_sites' OR cvterm.name = 'intein_containing' OR cvterm.name = 'miRNA_encoding' OR cvterm.name = 'rRNA_encoding' OR cvterm.name = 'scRNA_encoding' OR cvterm.name = 'snoRNA_encoding' OR cvterm.name = 'snRNA_encoding' OR cvterm.name = 'SRP_RNA_encoding' OR cvterm.name = 'stRNA_encoding' OR cvterm.name = 'tmRNA_encoding' OR cvterm.name = 'tRNA_encoding' OR cvterm.name = 'gRNA_encoding' OR cvterm.name = 'C_D_box_snoRNA_encoding' OR cvterm.name = 'H_ACA_box_snoRNA_encoding' OR cvterm.name = 'overlapping' OR cvterm.name = 'inside_intron' OR cvterm.name = 'five_prime_three_prime_overlap' OR cvterm.name = 'five_prime_five_prime_overlap' OR cvterm.name = 'three_prime_three_prime_overlap' OR cvterm.name = 'three_prime_five_prime_overlap' OR cvterm.name = 'antisense' OR cvterm.name = 'inside_intron_antiparallel' OR cvterm.name = 'inside_intron_parallel' OR cvterm.name = 'operon_member' OR cvterm.name = 'gene_cassette_member' OR cvterm.name = 'gene_subarray_member' OR cvterm.name = 'member_of_regulon' OR cvterm.name = 'cassette_array_member' OR cvterm.name = 'transcriptionally_regulated' OR cvterm.name = 'post_translationally_regulated' OR cvterm.name = 'translationally_regulated' OR cvterm.name = 'imprinted' OR cvterm.name = 'transcriptionally_constitutive' OR cvterm.name = 'transcriptionally_induced' OR cvterm.name = 'transcriptionally_repressed' OR cvterm.name = 'autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'silenced' OR cvterm.name = 'silenced_by_DNA_modification' OR cvterm.name = 'silenced_by_RNA_interference' OR cvterm.name = 'silenced_by_histone_modification' OR cvterm.name = 'silenced_by_DNA_methylation' OR cvterm.name = 'silenced_by_histone_methylation' OR cvterm.name = 'silenced_by_histone_deacetylation' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'post_translationally_regulated_by_protein_stability' OR cvterm.name = 'post_translationally_regulated_by_protein_modification' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'imprinted' OR cvterm.name = 'allelically_excluded' OR cvterm.name = 'rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'encodes_1_polypeptide' OR cvterm.name = 'encodes_greater_than_1_polypeptide' OR cvterm.name = 'encodes_disjoint_polypeptides' OR cvterm.name = 'encodes_overlapping_peptides' OR cvterm.name = 'encodes_different_polypeptides_different_stop' OR cvterm.name = 'encodes_overlapping_peptides_different_start' OR cvterm.name = 'encodes_overlapping_polypeptides_different_start_and_stop' OR cvterm.name = 'homologous' OR cvterm.name = 'syntenic' OR cvterm.name = 'orthologous' OR cvterm.name = 'paralogous' OR cvterm.name = 'fragmentary' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'single' OR cvterm.name = 'double' OR cvterm.name = 'forward' OR cvterm.name = 'reverse' OR cvterm.name = 'ribozymic' OR cvterm.name = 'organelle_sequence' OR cvterm.name = 'plasmid_location' OR cvterm.name = 'proviral_location' OR cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'endogenous_retroviral_sequence' OR cvterm.name = 'sequence_attribute';
 
 --- ************************************************
 --- *** relation: gene_attribute                 ***
@@ -6745,7 +6723,7 @@ CREATE VIEW binding_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'binding_site';
+  WHERE cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'histone_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'binding_site';
 
 --- ************************************************
 --- *** relation: protein_binding_site           ***
@@ -6762,7 +6740,7 @@ CREATE VIEW protein_binding_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'protein_binding_site';
+  WHERE cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'histone_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'protein_binding_site';
 
 --- ************************************************
 --- *** relation: rescue_region                  ***
@@ -6778,15 +6756,15 @@ CREATE VIEW rescue_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'rescue_region';
+  WHERE cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_region';
 
 --- ************************************************
 --- *** relation: restriction_fragment           ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** Any of the individual polynucleotide seq ***
---- *** uences produced by digestion of DNA with ***
---- ***  a restriction endonuclease.             ***
+--- *** A region of polynucleotide sequence prod ***
+--- *** uced by digestion with a restriction end ***
+--- *** onuclease.                               ***
 --- ************************************************
 ---
 
@@ -6876,8 +6854,8 @@ CREATE VIEW i_by_partial_processing AS
 --- *** rotein region. In proteins with multiple ***
 --- ***  domains, the combination of the domains ***
 --- ***  determines the function of the protein. ***
---- ***  Region which has been shown to recur th ***
---- *** roughout evolution.                      ***
+--- ***  A region which has been shown to recur  ***
+--- *** throughout evolution.                    ***
 --- ************************************************
 ---
 
@@ -6887,7 +6865,7 @@ CREATE VIEW polypeptide_domain AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'polypeptide_domain';
+  WHERE cvterm.name = 'polypeptide_domain';
 
 --- ************************************************
 --- *** relation: signal_peptide                 ***
@@ -7207,21 +7185,21 @@ CREATE VIEW inverted_ring_chromosome AS
   WHERE cvterm.name = 'inverted_ring_chromosome';
 
 --- ************************************************
---- *** relation: vector                         ***
+--- *** relation: vector_replicon                ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A DNA molecule that can be used to trans ***
---- *** fer DNA molecules between organisms.     ***
+--- *** A replicon that has been modified to act ***
+--- ***  as a vector for foreign sequence.       ***
 --- ************************************************
 ---
 
-CREATE VIEW vector AS
+CREATE VIEW vector_replicon AS
   SELECT
-    feature_id AS vector_id,
+    feature_id AS vector_replicon_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'vector';
+  WHERE cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'vector_replicon';
 
 --- ************************************************
 --- *** relation: ss_oligo                       ***
@@ -7237,7 +7215,7 @@ CREATE VIEW ss_oligo AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'ss_oligo';
+  WHERE cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'ss_oligo';
 
 --- ************************************************
 --- *** relation: ds_oligo                       ***
@@ -7253,7 +7231,7 @@ CREATE VIEW ds_oligo AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'ds_oligo';
+  WHERE cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'ds_oligo';
 
 --- ************************************************
 --- *** relation: polymer_attribute              ***
@@ -7270,7 +7248,7 @@ CREATE VIEW polymer_attribute AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'nucleic_acid' OR cvterm.name = 'synthetic_sequence' OR cvterm.name = 'protein' OR cvterm.name = 'topology_attribute' OR cvterm.name = 'DNA' OR cvterm.name = 'RNA' OR cvterm.name = 'morpholino' OR cvterm.name = 'PNA' OR cvterm.name = 'LNA' OR cvterm.name = 'TNA' OR cvterm.name = 'GNA' OR cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'R_GNA' OR cvterm.name = 'S_GNA' OR cvterm.name = 'random_sequence' OR cvterm.name = 'designed_sequence' OR cvterm.name = 'linear' OR cvterm.name = 'circular' OR cvterm.name = 'polymer_attribute';
+  WHERE cvterm.name = 'nucleic_acid' OR cvterm.name = 'synthetic_sequence' OR cvterm.name = 'topology_attribute' OR cvterm.name = 'peptidyl' OR cvterm.name = 'DNA' OR cvterm.name = 'RNA' OR cvterm.name = 'morpholino' OR cvterm.name = 'PNA' OR cvterm.name = 'LNA' OR cvterm.name = 'TNA' OR cvterm.name = 'GNA' OR cvterm.name = 'cDNA' OR cvterm.name = 'genomic_DNA' OR cvterm.name = 'single_stranded_cDNA' OR cvterm.name = 'double_stranded_cDNA' OR cvterm.name = 'R_GNA' OR cvterm.name = 'S_GNA' OR cvterm.name = 'random_sequence' OR cvterm.name = 'designed_sequence' OR cvterm.name = 'linear' OR cvterm.name = 'circular' OR cvterm.name = 'polymer_attribute';
 
 --- ************************************************
 --- *** relation: three_prime_noncoding_exon     ***
@@ -10354,8 +10332,8 @@ CREATE VIEW rnapol_iii_promoter_type_3 AS
 --- *** relation: c_box                          ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** An RNA polymerase II type 1 promoter wit ***
---- *** h consensus sequence CAnnCCn.            ***
+--- *** An RNA polymerase III type 1 promoter wi ***
+--- *** th consensus sequence CAnnCCn.           ***
 --- ************************************************
 ---
 
@@ -10404,9 +10382,10 @@ CREATE VIEW telomere AS
 --- *** relation: silencer                       ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** Combination of short DNA sequence elemen ***
---- *** ts which suppress the transcription of a ***
---- *** n adjacent gene or genes.                ***
+--- *** A regulatory region which upon binding o ***
+--- *** f transcription factors, suppress the tr ***
+--- *** anscription of the gene or genes they co ***
+--- *** ntrol.                                   ***
 --- ************************************************
 ---
 
@@ -10519,8 +10498,8 @@ CREATE VIEW p_primary_transcript AS
 --- *** relation: m_primary_transcript           ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A primary transcript encoding for more t ***
---- *** han one gene product.                    ***
+--- *** A primary transcript encoding for one ge ***
+--- *** ne product.                              ***
 --- ************************************************
 ---
 
@@ -10705,9 +10684,9 @@ CREATE VIEW srp_rna_encoding AS
 --- *** relation: minisatellite                  ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A repetitive sequence spanning 500 to 20 ***
---- *** ,000 base pairs (a repeat unit is 5 - 30 ***
---- ***  base pairs).                            ***
+--- *** A repeat region containing tandemly repe ***
+--- *** ated sequences having a unit length of 1 ***
+--- *** 0 to 40 bp.                              ***
 --- ************************************************
 ---
 
@@ -10862,7 +10841,7 @@ CREATE VIEW large_subunit_rrna AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'large_subunit_rRNA';
+  WHERE cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'large_subunit_rRNA';
 
 --- ************************************************
 --- *** relation: rrna_5s                        ***
@@ -10943,7 +10922,7 @@ CREATE VIEW ncrna AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ncRNA';
+  WHERE cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ncRNA';
 
 --- ************************************************
 --- *** relation: strna_encoding                 ***
@@ -11209,7 +11188,7 @@ CREATE VIEW transcript AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'transcript';
+  WHERE cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'transcript';
 
 --- ************************************************
 --- *** relation: non_canonical_splice_site      ***
@@ -11372,8 +11351,8 @@ CREATE VIEW exonic_splice_enhancer AS
 --- *** relation: nuclease_sensitive_site        ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A region of nucleotide sequence targetin ***
---- *** g by a nuclease enzyme.                  ***
+--- *** A region of nucleotide sequence targeted ***
+--- ***  by a nuclease enzyme.                   ***
 --- ************************************************
 ---
 
@@ -11383,22 +11362,22 @@ CREATE VIEW nuclease_sensitive_site AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAaseI_hypersensitive_site' OR cvterm.name = 'nuclease_sensitive_site';
+  WHERE cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'nuclease_sensitive_site';
 
 --- ************************************************
---- *** relation: dnaasei_hypersensitive_site    ***
+--- *** relation: dnasei_hypersensitive_site     ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- ************************************************
 ---
 
-CREATE VIEW dnaasei_hypersensitive_site AS
+CREATE VIEW dnasei_hypersensitive_site AS
   SELECT
-    feature_id AS dnaasei_hypersensitive_site_id,
+    feature_id AS dnasei_hypersensitive_site_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNAaseI_hypersensitive_site';
+  WHERE cvterm.name = 'DNAseI_hypersensitive_site';
 
 --- ************************************************
 --- *** relation: translocation_element          ***
@@ -11577,7 +11556,7 @@ CREATE VIEW reagent AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'PCR_product' OR cvterm.name = 'probe' OR cvterm.name = 'clone' OR cvterm.name = 'tag' OR cvterm.name = 'EST' OR cvterm.name = 'rescue_region' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'vector' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'mini_gene' OR cvterm.name = 'BAC_end' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'databank_entry' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'STS' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'aptamer' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'primer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'reagent';
+  WHERE cvterm.name = 'PCR_product' OR cvterm.name = 'clone' OR cvterm.name = 'rescue_region' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'databank_entry' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'aptamer' OR cvterm.name = 'probe' OR cvterm.name = 'tag' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'synthetic_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'reagent';
 
 --- ************************************************
 --- *** relation: oligo                          ***
@@ -11595,7 +11574,7 @@ CREATE VIEW oligo AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'aptamer' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'primer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'oligo';
+  WHERE cvterm.name = 'aptamer' OR cvterm.name = 'probe' OR cvterm.name = 'tag' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'synthetic_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'oligo';
 
 --- ************************************************
 --- *** relation: g_with_stop_codon_read_through ***
@@ -11646,7 +11625,7 @@ CREATE VIEW junction AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'clone_insert_end' OR cvterm.name = 'clone_insert_start' OR cvterm.name = 'exon_junction' OR cvterm.name = 'insertion_site' OR cvterm.name = 'polyA_site' OR cvterm.name = 'deletion_junction' OR cvterm.name = 'aberration_junction' OR cvterm.name = 'transposable_element_insertion_site' OR cvterm.name = 'junction';
+  WHERE cvterm.name = 'clone_insert_end' OR cvterm.name = 'clone_insert_start' OR cvterm.name = 'exon_junction' OR cvterm.name = 'insertion_site' OR cvterm.name = 'polyA_site' OR cvterm.name = 'deletion_junction' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'transposable_element_insertion_site' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'translocation_breakpoint' OR cvterm.name = 'insertion_breakpoint' OR cvterm.name = 'deletion_breakpoint' OR cvterm.name = 'junction';
 
 --- ************************************************
 --- *** relation: remark                         ***
@@ -11662,7 +11641,7 @@ CREATE VIEW remark AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'no_output' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'remark';
+  WHERE cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'overlapping_feature_set' OR cvterm.name = 'no_output' OR cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'remark';
 
 --- ************************************************
 --- *** relation: possible_base_call_error       ***
@@ -11713,7 +11692,7 @@ CREATE VIEW experimental_result_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'no_output' OR cvterm.name = 'experimental_result_region';
+  WHERE cvterm.name = 'overlapping_feature_set' OR cvterm.name = 'no_output' OR cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'experimental_result_region';
 
 --- ************************************************
 --- *** relation: gene                           ***
@@ -11734,7 +11713,7 @@ CREATE VIEW gene AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'gene';
+  WHERE cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'nc_RNA_gene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'gRNA_gene' OR cvterm.name = 'miRNA_gene' OR cvterm.name = 'scRNA_gene' OR cvterm.name = 'snoRNA_gene' OR cvterm.name = 'snRNA_gene' OR cvterm.name = 'SRP_RNA_gene' OR cvterm.name = 'stRNA_gene' OR cvterm.name = 'tmRNA_gene' OR cvterm.name = 'tRNA_gene' OR cvterm.name = 'gene';
 
 --- ************************************************
 --- *** relation: tandem_repeat                  ***
@@ -11884,7 +11863,7 @@ CREATE VIEW dna_motif AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNA_motif';
+  WHERE cvterm.name = 'PSE_motif' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'DNA_motif';
 
 --- ************************************************
 --- *** relation: nucleotide_motif               ***
@@ -11901,7 +11880,7 @@ CREATE VIEW nucleotide_motif AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'nucleotide_motif';
+  WHERE cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'nucleotide_motif';
 
 --- ************************************************
 --- *** relation: rna_motif                      ***
@@ -11917,7 +11896,7 @@ CREATE VIEW rna_motif AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'Sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'RNA_motif';
+  WHERE cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'RNA_motif';
 
 --- ************************************************
 --- *** relation: dicistronic_mrna               ***
@@ -11954,7 +11933,7 @@ CREATE VIEW reading_frame AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'reading_frame';
+  WHERE cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'mini_gene' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'reading_frame';
 
 --- ************************************************
 --- *** relation: blocked_reading_frame          ***
@@ -12135,7 +12114,7 @@ CREATE VIEW crm AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'CRM';
+  WHERE cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'CRM';
 
 --- ************************************************
 --- *** relation: intein                         ***
@@ -12191,7 +12170,7 @@ CREATE VIEW gap AS
   WHERE cvterm.name = 'gap';
 
 --- ************************************************
---- *** relation: fragment                       ***
+--- *** relation: fragmentary                    ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** An attribute to describe a feature that  ***
@@ -12199,13 +12178,13 @@ CREATE VIEW gap AS
 --- ************************************************
 ---
 
-CREATE VIEW fragment AS
+CREATE VIEW fragmentary AS
   SELECT
-    feature_id AS fragment_id,
+    feature_id AS fragmentary_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'fragment';
+  WHERE cvterm.name = 'fragmentary';
 
 --- ************************************************
 --- *** relation: predicted                      ***
@@ -12239,7 +12218,7 @@ CREATE VIEW feature_attribute AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'pseudogene_attribute' OR cvterm.name = 'transcript_attribute' OR cvterm.name = 'bound_by_factor' OR cvterm.name = 'flanked' OR cvterm.name = 'gene_attribute' OR cvterm.name = 'retrotransposed' OR cvterm.name = 'transgenic' OR cvterm.name = 'natural' OR cvterm.name = 'engineered' OR cvterm.name = 'foreign' OR cvterm.name = 'reagent_attribute' OR cvterm.name = 'fusion' OR cvterm.name = 'rescue' OR cvterm.name = 'wild_type' OR cvterm.name = 'conserved' OR cvterm.name = 'status' OR cvterm.name = 'intermediate' OR cvterm.name = 'recombinationally_rearranged' OR cvterm.name = 'strand_attribute' OR cvterm.name = 'direction_attribute' OR cvterm.name = 'mobile' OR cvterm.name = 'nuclear_mitochondrial' OR cvterm.name = 'processed' OR cvterm.name = 'unequally_crossed_over' OR cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'enzymatic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'ribozymic' OR cvterm.name = 'bound_by_protein' OR cvterm.name = 'bound_by_nucleic_acid' OR cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'protein_coding' OR cvterm.name = 'non_protein_coding' OR cvterm.name = 'gene_to_gene_feature' OR cvterm.name = 'gene_array_member' OR cvterm.name = 'regulated' OR cvterm.name = 'epigenetically_modified' OR cvterm.name = 'encodes_alternately_spliced_transcripts' OR cvterm.name = 'encodes_alternate_transcription_start_sites' OR cvterm.name = 'intein_containing' OR cvterm.name = 'miRNA_encoding' OR cvterm.name = 'rRNA_encoding' OR cvterm.name = 'scRNA_encoding' OR cvterm.name = 'snoRNA_encoding' OR cvterm.name = 'snRNA_encoding' OR cvterm.name = 'SRP_RNA_encoding' OR cvterm.name = 'stRNA_encoding' OR cvterm.name = 'tmRNA_encoding' OR cvterm.name = 'tRNA_encoding' OR cvterm.name = 'gRNA_encoding' OR cvterm.name = 'C_D_box_snoRNA_encoding' OR cvterm.name = 'H_ACA_box_snoRNA_encoding' OR cvterm.name = 'overlapping' OR cvterm.name = 'inside_intron' OR cvterm.name = 'five_prime_three_prime_overlap' OR cvterm.name = 'five_prime_five_prime_overlap' OR cvterm.name = 'three_prime_three_prime_overlap' OR cvterm.name = 'three_prime_five_prime_overlap' OR cvterm.name = 'antisense' OR cvterm.name = 'inside_intron_antiparallel' OR cvterm.name = 'inside_intron_parallel' OR cvterm.name = 'operon_member' OR cvterm.name = 'gene_cassette_member' OR cvterm.name = 'gene_subarray_member' OR cvterm.name = 'member_of_regulon' OR cvterm.name = 'cassette_array_member' OR cvterm.name = 'transcriptionally_regulated' OR cvterm.name = 'post_translationally_regulated' OR cvterm.name = 'translationally_regulated' OR cvterm.name = 'imprinted' OR cvterm.name = 'transcriptionally_constitutive' OR cvterm.name = 'transcriptionally_induced' OR cvterm.name = 'transcriptionally_repressed' OR cvterm.name = 'autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'silenced' OR cvterm.name = 'silenced_by_DNA_modification' OR cvterm.name = 'silenced_by_RNA_interference' OR cvterm.name = 'silenced_by_histone_modification' OR cvterm.name = 'silenced_by_DNA_methylation' OR cvterm.name = 'silenced_by_histone_methylation' OR cvterm.name = 'silenced_by_histone_deacetylation' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'post_translationally_regulated_by_protein_stability' OR cvterm.name = 'post_translationally_regulated_by_protein_modification' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'imprinted' OR cvterm.name = 'allelically_excluded' OR cvterm.name = 'rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'encodes_1_polypeptide' OR cvterm.name = 'encodes_greater_than_1_polypeptide' OR cvterm.name = 'encodes_disjoint_polypeptides' OR cvterm.name = 'encodes_overlapping_peptides' OR cvterm.name = 'encodes_different_polypeptides_different_stop' OR cvterm.name = 'encodes_overlapping_peptides_different_start' OR cvterm.name = 'encodes_overlapping_polypeptides_different_start_and_stop' OR cvterm.name = 'homologous' OR cvterm.name = 'syntenic' OR cvterm.name = 'orthologous' OR cvterm.name = 'paralogous' OR cvterm.name = 'fragment' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'single' OR cvterm.name = 'double' OR cvterm.name = 'forward' OR cvterm.name = 'reverse' OR cvterm.name = 'feature_attribute';
+  WHERE cvterm.name = 'pseudogene_attribute' OR cvterm.name = 'transcript_attribute' OR cvterm.name = 'bound_by_factor' OR cvterm.name = 'flanked' OR cvterm.name = 'gene_attribute' OR cvterm.name = 'retrotransposed' OR cvterm.name = 'transgenic' OR cvterm.name = 'natural' OR cvterm.name = 'engineered' OR cvterm.name = 'foreign' OR cvterm.name = 'reagent_attribute' OR cvterm.name = 'fusion' OR cvterm.name = 'rescue' OR cvterm.name = 'wild_type' OR cvterm.name = 'conserved' OR cvterm.name = 'status' OR cvterm.name = 'intermediate' OR cvterm.name = 'recombinationally_rearranged' OR cvterm.name = 'strand_attribute' OR cvterm.name = 'direction_attribute' OR cvterm.name = 'enzymatic' OR cvterm.name = 'mobile' OR cvterm.name = 'nuclear_mitochondrial' OR cvterm.name = 'processed' OR cvterm.name = 'unequally_crossed_over' OR cvterm.name = 'edited' OR cvterm.name = 'capped' OR cvterm.name = 'mRNA_attribute' OR cvterm.name = 'trans_spliced' OR cvterm.name = 'alternatively_spliced' OR cvterm.name = 'monocistronic' OR cvterm.name = 'polycistronic' OR cvterm.name = 'cryptic' OR cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'dicistronic' OR cvterm.name = 'bound_by_protein' OR cvterm.name = 'bound_by_nucleic_acid' OR cvterm.name = 'floxed' OR cvterm.name = 'FRT_flanked' OR cvterm.name = 'protein_coding' OR cvterm.name = 'non_protein_coding' OR cvterm.name = 'gene_to_gene_feature' OR cvterm.name = 'gene_array_member' OR cvterm.name = 'regulated' OR cvterm.name = 'epigenetically_modified' OR cvterm.name = 'encodes_alternately_spliced_transcripts' OR cvterm.name = 'encodes_alternate_transcription_start_sites' OR cvterm.name = 'intein_containing' OR cvterm.name = 'miRNA_encoding' OR cvterm.name = 'rRNA_encoding' OR cvterm.name = 'scRNA_encoding' OR cvterm.name = 'snoRNA_encoding' OR cvterm.name = 'snRNA_encoding' OR cvterm.name = 'SRP_RNA_encoding' OR cvterm.name = 'stRNA_encoding' OR cvterm.name = 'tmRNA_encoding' OR cvterm.name = 'tRNA_encoding' OR cvterm.name = 'gRNA_encoding' OR cvterm.name = 'C_D_box_snoRNA_encoding' OR cvterm.name = 'H_ACA_box_snoRNA_encoding' OR cvterm.name = 'overlapping' OR cvterm.name = 'inside_intron' OR cvterm.name = 'five_prime_three_prime_overlap' OR cvterm.name = 'five_prime_five_prime_overlap' OR cvterm.name = 'three_prime_three_prime_overlap' OR cvterm.name = 'three_prime_five_prime_overlap' OR cvterm.name = 'antisense' OR cvterm.name = 'inside_intron_antiparallel' OR cvterm.name = 'inside_intron_parallel' OR cvterm.name = 'operon_member' OR cvterm.name = 'gene_cassette_member' OR cvterm.name = 'gene_subarray_member' OR cvterm.name = 'member_of_regulon' OR cvterm.name = 'cassette_array_member' OR cvterm.name = 'transcriptionally_regulated' OR cvterm.name = 'post_translationally_regulated' OR cvterm.name = 'translationally_regulated' OR cvterm.name = 'imprinted' OR cvterm.name = 'transcriptionally_constitutive' OR cvterm.name = 'transcriptionally_induced' OR cvterm.name = 'transcriptionally_repressed' OR cvterm.name = 'autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'silenced' OR cvterm.name = 'silenced_by_DNA_modification' OR cvterm.name = 'silenced_by_RNA_interference' OR cvterm.name = 'silenced_by_histone_modification' OR cvterm.name = 'silenced_by_DNA_methylation' OR cvterm.name = 'silenced_by_histone_methylation' OR cvterm.name = 'silenced_by_histone_deacetylation' OR cvterm.name = 'negatively_autoregulated' OR cvterm.name = 'positively_autoregulated' OR cvterm.name = 'post_translationally_regulated_by_protein_stability' OR cvterm.name = 'post_translationally_regulated_by_protein_modification' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'imprinted' OR cvterm.name = 'allelically_excluded' OR cvterm.name = 'rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted' OR cvterm.name = 'paternally_imprinted' OR cvterm.name = 'encodes_1_polypeptide' OR cvterm.name = 'encodes_greater_than_1_polypeptide' OR cvterm.name = 'encodes_disjoint_polypeptides' OR cvterm.name = 'encodes_overlapping_peptides' OR cvterm.name = 'encodes_different_polypeptides_different_stop' OR cvterm.name = 'encodes_overlapping_peptides_different_start' OR cvterm.name = 'encodes_overlapping_polypeptides_different_start_and_stop' OR cvterm.name = 'homologous' OR cvterm.name = 'syntenic' OR cvterm.name = 'orthologous' OR cvterm.name = 'paralogous' OR cvterm.name = 'fragmentary' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'single' OR cvterm.name = 'double' OR cvterm.name = 'forward' OR cvterm.name = 'reverse' OR cvterm.name = 'ribozymic' OR cvterm.name = 'feature_attribute';
 
 --- ************************************************
 --- *** relation: exemplar_mrna                  ***
@@ -12275,7 +12254,7 @@ CREATE VIEW sequence_location AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'organelle_sequence' OR cvterm.name = 'plasmid_location' OR cvterm.name = 'proviral_location' OR cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'kinetoplast_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'endogenous_retroviral_sequence' OR cvterm.name = 'sequence_location';
+  WHERE cvterm.name = 'organelle_sequence' OR cvterm.name = 'plasmid_location' OR cvterm.name = 'proviral_location' OR cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'endogenous_retroviral_sequence' OR cvterm.name = 'sequence_location';
 
 --- ************************************************
 --- *** relation: organelle_sequence             ***
@@ -12290,7 +12269,7 @@ CREATE VIEW organelle_sequence AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'kinetoplast_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'organelle_sequence';
+  WHERE cvterm.name = 'macronuclear_sequence' OR cvterm.name = 'micronuclear_sequence' OR cvterm.name = 'mitochondrial_sequence' OR cvterm.name = 'nuclear_sequence' OR cvterm.name = 'nucleomorphic_sequence' OR cvterm.name = 'plastid_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'organelle_sequence';
 
 --- ************************************************
 --- *** relation: mitochondrial_sequence         ***
@@ -12305,7 +12284,7 @@ CREATE VIEW mitochondrial_sequence AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'kinetoplast_sequence' OR cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'mitochondrial_sequence';
+  WHERE cvterm.name = 'mitochondrial_DNA' OR cvterm.name = 'mitochondrial_sequence';
 
 --- ************************************************
 --- *** relation: nuclear_sequence               ***
@@ -12353,34 +12332,42 @@ CREATE VIEW plastid_sequence AS
   WHERE cvterm.name = 'apicoplast_sequence' OR cvterm.name = 'chromoplast_sequence' OR cvterm.name = 'chloroplast_sequence' OR cvterm.name = 'cyanelle_sequence' OR cvterm.name = 'leucoplast_sequence' OR cvterm.name = 'proplastid_sequence' OR cvterm.name = 'chloroplast_DNA' OR cvterm.name = 'plastid_sequence';
 
 --- ************************************************
---- *** relation: kinetoplast_sequence           ***
+--- *** relation: kinetoplast                    ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A kinetoplast is an interlocked network  ***
+--- *** of thousands of minicircles and tens of  ***
+--- *** maxi circles, located near the base of t ***
+--- *** he flagellum of some protozoan species.  ***
 --- ************************************************
 ---
 
-CREATE VIEW kinetoplast_sequence AS
+CREATE VIEW kinetoplast AS
   SELECT
-    feature_id AS kinetoplast_sequence_id,
+    feature_id AS kinetoplast_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'maxicircle_sequence' OR cvterm.name = 'minicircle_sequence' OR cvterm.name = 'kinetoplast_sequence';
+  WHERE cvterm.name = 'kinetoplast';
 
 --- ************************************************
---- *** relation: maxicircle_sequence            ***
+--- *** relation: maxicircle                     ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A maxicircle is a replicon, part of a ki ***
+--- *** netoplast, that contains open reading fr ***
+--- *** ames and replicates via a rolling circle ***
+--- ***  method.                                 ***
 --- ************************************************
 ---
 
-CREATE VIEW maxicircle_sequence AS
+CREATE VIEW maxicircle AS
   SELECT
-    feature_id AS maxicircle_sequence_id,
+    feature_id AS maxicircle_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'maxicircle_sequence';
+  WHERE cvterm.name = 'maxicircle';
 
 --- ************************************************
 --- *** relation: apicoplast_sequence            ***
@@ -12539,6 +12526,9 @@ CREATE VIEW gene_group_regulatory_region AS
 --- *** relation: clone_insert                   ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** The region of sequence that has been ins ***
+--- *** erted and is being propogated by the clo ***
+--- *** ne.                                      ***
 --- ************************************************
 ---
 
@@ -12940,7 +12930,7 @@ CREATE VIEW engineered AS
 --- *** relation: so_foreign                     ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** An atrribute to describe a region from a ***
+--- *** An attribute to describe a region from a ***
 --- *** nother species.                          ***
 --- ************************************************
 ---
@@ -13469,7 +13459,7 @@ CREATE VIEW mitochondrial_chromosome AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'mitochondrial_chromosome';
+  WHERE cvterm.name = 'mitochondrial_chromosome';
 
 --- ************************************************
 --- *** relation: chloroplast_chromosome         ***
@@ -13573,40 +13563,6 @@ CREATE VIEW micronuclear_chromosome AS
   WHERE cvterm.name = 'micronuclear_chromosome';
 
 --- ************************************************
---- *** relation: kinetoplast_chromosome         ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A chromosome with origin in the kinetopl ***
---- *** ast.                                     ***
---- ************************************************
----
-
-CREATE VIEW kinetoplast_chromosome AS
-  SELECT
-    feature_id AS kinetoplast_chromosome_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'kinetoplast_chromosome';
-
---- ************************************************
---- *** relation: maxicircle_chromosome          ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A chromosome originating in a maxi-circl ***
---- *** e.                                       ***
---- ************************************************
----
-
-CREATE VIEW maxicircle_chromosome AS
-  SELECT
-    feature_id AS maxicircle_chromosome_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'maxicircle_chromosome';
-
---- ************************************************
 --- *** relation: nuclear_chromosome             ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
@@ -13653,7 +13609,7 @@ CREATE VIEW chromosome_part AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'chromosome_breakpoint' OR cvterm.name = 'interband' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'chromosome_part';
+  WHERE cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'interband' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'chromosome_part';
 
 --- ************************************************
 --- *** relation: gene_member_region             ***
@@ -13669,24 +13625,7 @@ CREATE VIEW gene_member_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5.8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'promoter_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'gene_member_region';
-
---- ************************************************
---- *** relation: promoter_region                ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A region of sequence which is part of a  ***
---- *** promoter.                                ***
---- ************************************************
----
-
-CREATE VIEW promoter_region AS
-  SELECT
-    feature_id AS promoter_region_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter_region';
+  WHERE cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'gene_member_region';
 
 --- ************************************************
 --- *** relation: transcript_region              ***
@@ -13702,7 +13641,7 @@ CREATE VIEW transcript_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'transcript_region';
+  WHERE cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'miRNA_primary_transcript_region' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'transcript_region';
 
 --- ************************************************
 --- *** relation: mature_transcript_region       ***
@@ -13718,13 +13657,13 @@ CREATE VIEW mature_transcript_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'mature_transcript_region';
+  WHERE cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'mature_transcript_region';
 
 --- ************************************************
 --- *** relation: primary_transcript_region      ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** A region of a primary transcript.        ***
+--- *** A part of a primary transcript.          ***
 --- ************************************************
 ---
 
@@ -13734,12 +13673,13 @@ CREATE VIEW primary_transcript_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'primary_transcript_region';
+  WHERE cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'miRNA_primary_transcript_region' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'primary_transcript_region';
 
 --- ************************************************
 --- *** relation: mrna_region                    ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A region of an mRNA.                     ***
 --- ************************************************
 ---
 
@@ -13749,7 +13689,7 @@ CREATE VIEW mrna_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'mRNA_region';
+  WHERE cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'mRNA_region';
 
 --- ************************************************
 --- *** relation: utr_region                     ***
@@ -13789,7 +13729,7 @@ CREATE VIEW rrna_primary_transcript_region AS
 --- ***                                          ***
 --- *** Biological sequence region that can be a ***
 --- *** ssigned to a specific subsequence of a p ***
---- *** rotein.                                  ***
+--- *** olypeptide.                              ***
 --- ************************************************
 ---
 
@@ -13799,7 +13739,7 @@ CREATE VIEW polypeptide_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polypeptide_domain' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'active_peptide' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'polypeptide_region';
+  WHERE cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'cleaved_peptide_region' OR cvterm.name = 'hydrophobic_region' OR cvterm.name = 'polypeptide_conserved_region' OR cvterm.name = 'active_peptide' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'cleaved_for_gpi_anchor_region' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'n_terminal_region' OR cvterm.name = 'c_terminal_region' OR cvterm.name = 'central_hydrophobic_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'polypeptide_region';
 
 --- ************************************************
 --- *** relation: repeat_component               ***
@@ -13846,80 +13786,13 @@ CREATE VIEW gene_component_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'gene_component_region';
-
---- ************************************************
---- *** relation: b_rnapol_promoter_region       ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A region which is part of a bacterial RN ***
---- *** A polymerase promoter.                   ***
---- ************************************************
----
-
-CREATE VIEW b_rnapol_promoter_region AS
-  SELECT
-    feature_id AS b_rnapol_promoter_region_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'bacterial_RNApol_promoter_region';
-
---- ************************************************
---- *** relation: rnapol_ii_promoter_region      ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A region of sequence which is a promoter ***
---- ***  for RNA polymerase II.                  ***
---- ************************************************
----
-
-CREATE VIEW rnapol_ii_promoter_region AS
-  SELECT
-    feature_id AS rnapol_ii_promoter_region_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'RNApol_II_promoter_region';
-
---- ************************************************
---- *** relation: r_iii_promoter_type_1_region   ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A region of sequence which is a promoter ***
---- ***  for RNA polymerase III type 1.          ***
---- ************************************************
----
-
-CREATE VIEW r_iii_promoter_type_1_region AS
-  SELECT
-    feature_id AS r_iii_promoter_type_1_region_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'C_box' OR cvterm.name = 'RNApol_III_promoter_type_1_region';
-
---- ************************************************
---- *** relation: r_iii_promoter_type_2_region   ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A region of sequence which is a promoter ***
---- ***  for RNA polymerase III type 2.          ***
---- ************************************************
----
-
-CREATE VIEW r_iii_promoter_type_2_region AS
-  SELECT
-    feature_id AS r_iii_promoter_type_2_region_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'RNApol_III_promoter_type_2_region';
+  WHERE cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'gene_segment' OR cvterm.name = 'gene_component_region';
 
 --- ************************************************
 --- *** relation: tmrna_region                   ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A region of a tmRNA.                     ***
 --- ************************************************
 ---
 
@@ -13980,6 +13853,7 @@ CREATE VIEW five_prime_ltr_component AS
 --- *** relation: cds_region                     ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A region of a CDS.                       ***
 --- ************************************************
 ---
 
@@ -14112,8 +13986,8 @@ CREATE VIEW orthologous AS
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** An attribute describing a kind of homolo ***
---- *** gy where divergence occured after a dupl ***
---- *** ication event.                           ***
+--- *** gy where divergence occurred after a dup ***
+--- *** lication event.                          ***
 --- ************************************************
 ---
 
@@ -14189,7 +14063,7 @@ CREATE VIEW mrna_attribute AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'mRNA_attribute';
+  WHERE cvterm.name = 'polyadenylated' OR cvterm.name = 'exemplar' OR cvterm.name = 'frameshift' OR cvterm.name = 'recoded' OR cvterm.name = 'minus_1_frameshift' OR cvterm.name = 'minus_2_frameshift' OR cvterm.name = 'plus_1_frameshift' OR cvterm.name = 'plus_2_framshift' OR cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'mRNA_attribute';
 
 --- ************************************************
 --- *** relation: exemplar                       ***
@@ -14360,10 +14234,10 @@ CREATE VIEW edited_transcript AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'edited_transcript';
+  WHERE cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'edited_transcript';
 
 --- ************************************************
---- *** relation: et_by a_to_i_substitution      ***
+--- *** relation: et_by_a_to_i_substitution      ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** A transcript that has been edited by A t ***
@@ -14371,13 +14245,13 @@ CREATE VIEW edited_transcript AS
 --- ************************************************
 ---
 
-CREATE VIEW et_by a_to_i_substitution AS
+CREATE VIEW et_by_a_to_i_substitution AS
   SELECT
-    feature_id AS et_by a_to_i_substitution_id,
+    feature_id AS et_by_a_to_i_substitution_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'edited_transcript_by A_to_I_substitution';
+  WHERE cvterm.name = 'edited_transcript_by_A_to_I_substitution';
 
 --- ************************************************
 --- *** relation: bound_by_protein               ***
@@ -14487,9 +14361,9 @@ CREATE VIEW polycistronic AS
 --- *** relation: recoded                        ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** An attribute describing am mRNA sequence ***
---- *** s that has been reprogrammed at translat ***
---- *** ion, causing localized alterations.      ***
+--- *** An attribute describing an mRNA sequence ***
+--- ***  that has been reprogrammed at translati ***
+--- *** on, causing localized alterations.       ***
 --- ************************************************
 ---
 
@@ -14499,7 +14373,7 @@ CREATE VIEW recoded AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'recoded';
+  WHERE cvterm.name = 'codon_redefined' OR cvterm.name = 'recoded_by_translational_bypass' OR cvterm.name = 'translationally_frameshifted' OR cvterm.name = 'minus_1_translationally_frameshifted' OR cvterm.name = 'plus_1_translationally_frameshifted' OR cvterm.name = 'recoded';
 
 --- ************************************************
 --- *** relation: codon_redefined                ***
@@ -14516,7 +14390,7 @@ CREATE VIEW codon_redefined AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'codon_redefined';
+  WHERE cvterm.name = 'codon_redefined';
 
 --- ************************************************
 --- *** relation: stop_codon_read_through        ***
@@ -14909,7 +14783,7 @@ CREATE VIEW status AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'fragment' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'status';
+  WHERE cvterm.name = 'fragmentary' OR cvterm.name = 'predicted' OR cvterm.name = 'validated' OR cvterm.name = 'invalidated' OR cvterm.name = 'independently_known' OR cvterm.name = 'consensus' OR cvterm.name = 'low_complexity' OR cvterm.name = 'supported_by_sequence_similarity' OR cvterm.name = 'orphan' OR cvterm.name = 'predicted_by_ab_initio_computation' OR cvterm.name = 'supported_by_domain_match' OR cvterm.name = 'supported_by_EST_or_cDNA' OR cvterm.name = 'experimentally_determined' OR cvterm.name = 'invalidated_by_chimeric_cDNA' OR cvterm.name = 'invalidated_by_genomic_contamination' OR cvterm.name = 'invalidated_by_genomic_polyA_primed_cDNA' OR cvterm.name = 'invalidated_by_partial_processing' OR cvterm.name = 'status';
 
 --- ************************************************
 --- *** relation: independently_known            ***
@@ -15304,7 +15178,7 @@ CREATE VIEW edited_mrna AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'edited_transcript_by A_to_I_substitution' OR cvterm.name = 'edited_mRNA';
+  WHERE cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'edited_mRNA';
 
 --- ************************************************
 --- *** relation: guide_rna_region               ***
@@ -15945,19 +15819,19 @@ CREATE VIEW cd_stranded_rna_chromosome AS
   WHERE cvterm.name = 'circular_double_stranded_RNA_chromosome';
 
 --- ************************************************
---- *** relation: replication_mode               ***
+--- *** relation: sequence_replication_mode      ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- ************************************************
 ---
 
-CREATE VIEW replication_mode AS
+CREATE VIEW sequence_replication_mode AS
   SELECT
-    feature_id AS replication_mode_id,
+    feature_id AS sequence_replication_mode_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'DNA_replication_mode' OR cvterm.name = 'RNA_replication_mode' OR cvterm.name = 'rolling_circle' OR cvterm.name = 'theta_replication' OR cvterm.name = 'replication_mode';
+  WHERE cvterm.name = 'DNA_replication_mode' OR cvterm.name = 'RNA_replication_mode' OR cvterm.name = 'rolling_circle' OR cvterm.name = 'theta_replication' OR cvterm.name = 'sequence_replication_mode';
 
 --- ************************************************
 --- *** relation: rolling_circle                 ***
@@ -16037,21 +15911,6 @@ CREATE VIEW insertion_sequence AS
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
   WHERE cvterm.name = 'insertion_sequence';
-
---- ************************************************
---- *** relation: minicircle_chromosome          ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- ************************************************
----
-
-CREATE VIEW minicircle_chromosome AS
-  SELECT
-    feature_id AS minicircle_chromosome_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'minicircle_chromosome';
 
 --- ************************************************
 --- *** relation: minicircle_gene                ***
@@ -16134,19 +15993,21 @@ CREATE VIEW grna_encoding AS
   WHERE cvterm.name = 'gRNA_encoding';
 
 --- ************************************************
---- *** relation: minicircle_sequence            ***
+--- *** relation: minicircle                     ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A minicircle is a replicon, part of a ki ***
+--- *** netoplast, that encodes for guide RNAs.  ***
 --- ************************************************
 ---
 
-CREATE VIEW minicircle_sequence AS
+CREATE VIEW minicircle AS
   SELECT
-    feature_id AS minicircle_sequence_id,
+    feature_id AS minicircle_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'minicircle_sequence';
+  WHERE cvterm.name = 'minicircle';
 
 --- ************************************************
 --- *** relation: rd_bacterial_terminator        ***
@@ -16242,6 +16103,9 @@ CREATE VIEW topology_attribute AS
 --- *** relation: linear                         ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A quality of a nucleotide polymer that h ***
+--- *** as a 3'-terminal residue and a 5'-termin ***
+--- *** al residue.                              ***
 --- ************************************************
 ---
 
@@ -16257,6 +16121,8 @@ CREATE VIEW linear AS
 --- *** relation: circular                       ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** A quality of a nucleotide polymer that h ***
+--- *** as no terminal nucleotide residues.      ***
 --- ************************************************
 ---
 
@@ -16837,12 +16703,14 @@ CREATE VIEW chromosome_breakpoint AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'chromosome_breakpoint';
+  WHERE cvterm.name = 'inversion_breakpoint' OR cvterm.name = 'translocation_breakpoint' OR cvterm.name = 'insertion_breakpoint' OR cvterm.name = 'deletion_breakpoint' OR cvterm.name = 'chromosome_breakpoint';
 
 --- ************************************************
 --- *** relation: inversion_breakpoint           ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
+--- *** The point within a chromosome where an i ***
+--- *** nversion begins or ends.                 ***
 --- ************************************************
 ---
 
@@ -17422,7 +17290,7 @@ CREATE VIEW t_cis_regulatory_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'transcriptional_cis_regulatory_region';
+  WHERE cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'transcriptional_cis_regulatory_region';
 
 --- ************************************************
 --- *** relation: splicing_regulatory_region     ***
@@ -17440,21 +17308,6 @@ CREATE VIEW splicing_regulatory_region AS
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
   WHERE cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'splicing_regulatory_region';
-
---- ************************************************
---- *** relation: enhanceosome                   ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- ************************************************
----
-
-CREATE VIEW enhanceosome AS
-  SELECT
-    feature_id AS enhanceosome_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'enhanceosome';
 
 --- ************************************************
 --- *** relation: promoter_targeting_sequence    ***
@@ -17493,7 +17346,7 @@ CREATE VIEW sequence_alteration AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'deletion' OR cvterm.name = 'translocation' OR cvterm.name = 'insertion' OR cvterm.name = 'substitution' OR cvterm.name = 'indel' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'nucleotide_deletion' OR cvterm.name = 'nucleotide_insertion' OR cvterm.name = 'nucleotide_duplication' OR cvterm.name = 'sequence_alteration';
+  WHERE cvterm.name = 'deletion' OR cvterm.name = 'translocation' OR cvterm.name = 'insertion' OR cvterm.name = 'substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'indel' OR cvterm.name = 'inversion' OR cvterm.name = 'transgenic_insertion' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'nucleotide_deletion' OR cvterm.name = 'nucleotide_insertion' OR cvterm.name = 'nucleotide_duplication' OR cvterm.name = 'sequence_alteration';
 
 --- ************************************************
 --- *** relation: sequence_variant               ***
@@ -17553,9 +17406,9 @@ CREATE VIEW propeptide AS
 --- *** relation: immature_peptide_region        ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** An immature_peptide_region is the a regi ***
---- *** on of peptide sequence that is cleaved d ***
---- *** uring maturation.                        ***
+--- *** An immature_peptide_region is the extent ***
+--- ***  of the peptide after it has been transl ***
+--- *** ated and before any processing occurs.   ***
 --- ************************************************
 ---
 
@@ -17565,7 +17418,7 @@ CREATE VIEW immature_peptide_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'immature_peptide_region';
+  WHERE cvterm.name = 'immature_peptide_region';
 
 --- ************************************************
 --- *** relation: active_peptide                 ***
@@ -17629,7 +17482,7 @@ CREATE VIEW polypeptide_motif AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polypeptide_motif';
+  WHERE cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'polypeptide_motif';
 
 --- ************************************************
 --- *** relation: polypeptide_repeat             ***
@@ -17649,25 +17502,6 @@ CREATE VIEW polypeptide_repeat AS
   WHERE cvterm.name = 'polypeptide_repeat';
 
 --- ************************************************
---- *** relation: polypeptide_structural_domain  ***
---- *** relation type: VIEW                      ***
---- ***                                          ***
---- *** A polypeptide domain is a structural dom ***
---- *** ain that is self-stabilizing and folds i ***
---- *** ndependently of the rest of the protein  ***
---- *** chain.                                   ***
---- ************************************************
----
-
-CREATE VIEW polypeptide_structural_domain AS
-  SELECT
-    feature_id AS polypeptide_structural_domain_id,
-    feature.*
-  FROM
-    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polypeptide_structural_domain';
-
---- ************************************************
 --- *** relation: structural_region              ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
@@ -17682,7 +17516,7 @@ CREATE VIEW structural_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'polypeptide_structural_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'structural_region';
+  WHERE cvterm.name = 'polypeptide_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'structural_region';
 
 --- ************************************************
 --- *** relation: membrane_structure             ***
@@ -17821,7 +17655,7 @@ CREATE VIEW polypeptide_secondary_structure AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'polypeptide_secondary_structure';
+  WHERE cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'polypeptide_secondary_structure';
 
 --- ************************************************
 --- *** relation: polypeptide_structural_motif   ***
@@ -18204,20 +18038,20 @@ CREATE VIEW catalytic_residue AS
   WHERE cvterm.name = 'catalytic_residue';
 
 --- ************************************************
---- *** relation: protein_ligand_contact         ***
+--- *** relation: ligand_contact                 ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- *** Residues which interact with a ligand.   ***
 --- ************************************************
 ---
 
-CREATE VIEW protein_ligand_contact AS
+CREATE VIEW ligand_contact AS
   SELECT
-    feature_id AS protein_ligand_contact_id,
+    feature_id AS ligand_contact_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'protein_ligand_contact';
+  WHERE cvterm.name = 'ligand_contact';
 
 --- ************************************************
 --- *** relation: asx_motif                      ***
@@ -20204,9 +20038,9 @@ CREATE VIEW rna_polymerase_promoter AS
 --- *** relation: phage_rna_polymerase_promoter  ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
---- *** Aregion (DNA) to which Bacteriophage RNA ***
---- ***  polymerase binds, to begin transcriptio ***
---- *** n.                                       ***
+--- *** A region (DNA) to which Bacteriophage RN ***
+--- *** A polymerase binds, to begin transcripti ***
+--- *** on.                                      ***
 --- ************************************************
 ---
 
@@ -20449,7 +20283,7 @@ CREATE VIEW protein_coding_gene AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'protein_coding_gene';
+  WHERE cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'protein_coding_gene';
 
 --- ************************************************
 --- *** relation: transgenic_insertion           ***
@@ -20671,7 +20505,7 @@ CREATE VIEW inosine AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'inosine';
+  WHERE cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'inosine';
 
 --- ************************************************
 --- *** relation: seven_methylguanine            ***
@@ -20688,7 +20522,7 @@ CREATE VIEW seven_methylguanine AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = '7-methylguanine';
+  WHERE cvterm.name = 'seven_methylguanine';
 
 --- ************************************************
 --- *** relation: ribothymidine                  ***
@@ -20758,7 +20592,7 @@ CREATE VIEW replicon AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'kinetoplast_chromosome' OR cvterm.name = 'maxicircle_chromosome' OR cvterm.name = 'minicircle_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'replicon';
+  WHERE cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'vector_replicon' OR cvterm.name = 'maxicircle' OR cvterm.name = 'minicircle' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'apicoplast_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'replicon';
 
 --- ************************************************
 --- *** relation: base                           ***
@@ -20776,7 +20610,7 @@ CREATE VIEW base AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'inosine' OR cvterm.name = '7-methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'base';
+  WHERE cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'inosine' OR cvterm.name = 'seven_methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'modified_adenosine' OR cvterm.name = 'modified_cytidine' OR cvterm.name = 'modified_guanosine' OR cvterm.name = 'modified_uridine' OR cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'base';
 
 --- ************************************************
 --- *** relation: amino_acid                     ***
@@ -20794,7 +20628,7 @@ CREATE VIEW amino_acid AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'amino_acid';
+  WHERE cvterm.name = 'modified_amino_acid_feature' OR cvterm.name = 'modified_glycine' OR cvterm.name = 'modified_L_alanine' OR cvterm.name = 'modified_L_asparagine' OR cvterm.name = 'modified_L_aspartic_acid' OR cvterm.name = 'modified_L_cysteine' OR cvterm.name = 'modified_L_glutamic_acid' OR cvterm.name = 'modified_L_threonine' OR cvterm.name = 'modified_L_tryptophan' OR cvterm.name = 'modified_L_glutamine' OR cvterm.name = 'modified_L_methionine' OR cvterm.name = 'modified_L_isoleucine' OR cvterm.name = 'modified_L_phenylalanine' OR cvterm.name = 'modified_L_histidine' OR cvterm.name = 'modified_L_serine' OR cvterm.name = 'modified_L_lysine' OR cvterm.name = 'modified_L_leucine' OR cvterm.name = 'modified_L_selenocysteine' OR cvterm.name = 'modified_L_valine' OR cvterm.name = 'modified_L_proline' OR cvterm.name = 'modified_L_tyrosine' OR cvterm.name = 'modified_L_arginine' OR cvterm.name = 'amino_acid';
 
 --- ************************************************
 --- *** relation: major_tss                      ***
@@ -20859,19 +20693,2988 @@ CREATE VIEW ea_transcription_start_sites AS
   WHERE cvterm.name = 'encodes_alternate_transcription_start_sites';
 
 --- ************************************************
---- *** relation: aberration_junction            ***
+--- *** relation: mirna_primary_transcript_region***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A part of an miRNA primary_transcript.   ***
+--- ************************************************
+---
+
+CREATE VIEW mirna_primary_transcript_region AS
+  SELECT
+    feature_id AS mirna_primary_transcript_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'miRNA_primary_transcript_region';
+
+--- ************************************************
+--- *** relation: pre_mirna                      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The 60-70 nucleotide region remain after ***
+--- ***  Drosha processing of the primary transc ***
+--- *** ript, that folds back upon itself to for ***
+--- *** m a hairpin sructure.                    ***
+--- ************************************************
+---
+
+CREATE VIEW pre_mirna AS
+  SELECT
+    feature_id AS pre_mirna_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'pre_miRNA';
+
+--- ************************************************
+--- *** relation: mirna_stem                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The stem of the hairpin loop formed by f ***
+--- *** olding of the pre-miRNA.                 ***
+--- ************************************************
+---
+
+CREATE VIEW mirna_stem AS
+  SELECT
+    feature_id AS mirna_stem_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'miRNA_stem';
+
+--- ************************************************
+--- *** relation: mirna_loop                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The loop of the hairpin loop formed by f ***
+--- *** olding of the pre-miRNA.                 ***
+--- ************************************************
+---
+
+CREATE VIEW mirna_loop AS
+  SELECT
+    feature_id AS mirna_loop_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'miRNA_loop';
+
+--- ************************************************
+--- *** relation: synthetic_oligo                ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** An oligo composed of synthetic nucleotid ***
+--- *** es.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW synthetic_oligo AS
+  SELECT
+    feature_id AS synthetic_oligo_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'synthetic_oligo';
+
+--- ************************************************
+--- *** relation: assembly                       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region of the genome of known length t ***
+--- *** hat is composed by ordering and aligning ***
+--- ***  two or more different regions.          ***
+--- ************************************************
+---
+
+CREATE VIEW assembly AS
+  SELECT
+    feature_id AS assembly_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'sequence_assembly' OR cvterm.name = 'fragment_assembly' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'fingerprint_map' OR cvterm.name = 'STS_map' OR cvterm.name = 'RH_map' OR cvterm.name = 'assembly';
+
+--- ************************************************
+--- *** relation: fragment_assembly              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A fragment assembly is a genome assembly ***
+--- ***  that orders overlapping fragments of th ***
+--- *** e genome based on landmark sequences. Th ***
+--- *** e base pair distance between the landmar ***
+--- *** ks is known allowing additivity of lengt ***
+--- *** hs.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW fragment_assembly AS
+  SELECT
+    feature_id AS fragment_assembly_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'fingerprint_map' OR cvterm.name = 'STS_map' OR cvterm.name = 'RH_map' OR cvterm.name = 'fragment_assembly';
+
+--- ************************************************
+--- *** relation: fingerprint_map                ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A fingerprint_map is a physical map comp ***
+--- *** osed of restriction fragments.           ***
+--- ************************************************
+---
+
+CREATE VIEW fingerprint_map AS
+  SELECT
+    feature_id AS fingerprint_map_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'fingerprint_map';
+
+--- ************************************************
+--- *** relation: sts_map                        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** An STS map is a physical map organized b ***
+--- *** y the unique STS landmarks.              ***
+--- ************************************************
+---
+
+CREATE VIEW sts_map AS
+  SELECT
+    feature_id AS sts_map_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'STS_map';
+
+--- ************************************************
+--- *** relation: rh_map                         ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A radiation hybrid map is a physical map ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW rh_map AS
+  SELECT
+    feature_id AS rh_map_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'RH_map';
+
+--- ************************************************
+--- *** relation: sonicate_fragment              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A DNA fragment generated by sonication.  ***
+--- *** Sonication is a technique used to sheer  ***
+--- *** DNA into smaller fragments.              ***
+--- ************************************************
+---
+
+CREATE VIEW sonicate_fragment AS
+  SELECT
+    feature_id AS sonicate_fragment_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'sonicate_fragment';
+
+--- ************************************************
+--- *** relation: polyploid                      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A kind of chromosome variation where the ***
+--- ***  chromosome complement is an exact multi ***
+--- *** ple of the haploid number and is greater ***
+--- ***  than the diploid number.                ***
+--- ************************************************
+---
+
+CREATE VIEW polyploid AS
+  SELECT
+    feature_id AS polyploid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'autopolyploid' OR cvterm.name = 'allopolyploid' OR cvterm.name = 'polyploid';
+
+--- ************************************************
+--- *** relation: autopolyploid                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A polyploid where the multiple chromosom ***
+--- *** e set was derived from the same organism ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW autopolyploid AS
+  SELECT
+    feature_id AS autopolyploid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'autopolyploid';
+
+--- ************************************************
+--- *** relation: allopolyploid                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A polyploid where the multiple chromosom ***
+--- *** e set was derived from a different organ ***
+--- *** ism.                                     ***
+--- ************************************************
+---
+
+CREATE VIEW allopolyploid AS
+  SELECT
+    feature_id AS allopolyploid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'allopolyploid';
+
+--- ************************************************
+--- *** relation: h_endonuclease_binding_site    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The binding site (recognition site) of a ***
+--- ***  homing endonuclease. The binding site i ***
+--- *** s typically large.                       ***
+--- ************************************************
+---
+
+CREATE VIEW h_endonuclease_binding_site AS
+  SELECT
+    feature_id AS h_endonuclease_binding_site_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'homing_endonuclease_binding_site';
+
+--- ************************************************
+--- *** relation: octamer_motif                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A sequence element characteristic of som ***
+--- *** e RNA polymerase II promoters with seque ***
+--- *** nce ATTGCAT that binds Pou-domain transc ***
+--- *** ription factors.                         ***
+--- ************************************************
+---
+
+CREATE VIEW octamer_motif AS
+  SELECT
+    feature_id AS octamer_motif_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'octamer_motif';
+
+--- ************************************************
+--- *** relation: apicoplast_chromosome          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A chromosome originating in an apicoplas ***
+--- *** t.                                       ***
+--- ************************************************
+---
+
+CREATE VIEW apicoplast_chromosome AS
+  SELECT
+    feature_id AS apicoplast_chromosome_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'apicoplast_chromosome';
+
+--- ************************************************
+--- *** relation: sequence_collection            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A collection of discontinuous sequences. ***
+--- ************************************************
+---
+
+CREATE VIEW sequence_collection AS
+  SELECT
+    feature_id AS sequence_collection_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'kinetoplast' OR cvterm.name = 'genome' OR cvterm.name = 'sequence_collection';
+
+--- ************************************************
+--- *** relation: overlapping_feature_set        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A continuous region of sequence composed ***
+--- ***  of the overlapping of multiple sequence ***
+--- *** _features, which ultimately provides evi ***
+--- *** dence for another sequence_feature.      ***
+--- ************************************************
+---
+
+CREATE VIEW overlapping_feature_set AS
+  SELECT
+    feature_id AS overlapping_feature_set_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'overlapping_feature_set';
+
+--- ************************************************
+--- *** relation: overlapping_est_set            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A continous experimental result region e ***
+--- *** xtending the length of multiple overlapp ***
+--- *** ing EST's.                               ***
+--- ************************************************
+---
+
+CREATE VIEW overlapping_est_set AS
+  SELECT
+    feature_id AS overlapping_est_set_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'overlapping_EST_set';
+
+--- ************************************************
+--- *** relation: nc_rna_gene                    ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
 --- ************************************************
 ---
 
-CREATE VIEW aberration_junction AS
+CREATE VIEW nc_rna_gene AS
   SELECT
-    feature_id AS aberration_junction_id,
+    feature_id AS nc_rna_gene_id,
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'aberration_junction';
+  WHERE cvterm.name = 'gRNA_gene' OR cvterm.name = 'miRNA_gene' OR cvterm.name = 'scRNA_gene' OR cvterm.name = 'snoRNA_gene' OR cvterm.name = 'snRNA_gene' OR cvterm.name = 'SRP_RNA_gene' OR cvterm.name = 'stRNA_gene' OR cvterm.name = 'tmRNA_gene' OR cvterm.name = 'tRNA_gene' OR cvterm.name = 'nc_RNA_gene';
+
+--- ************************************************
+--- *** relation: grna_gene                      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW grna_gene AS
+  SELECT
+    feature_id AS grna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'gRNA_gene';
+
+--- ************************************************
+--- *** relation: mirna_gene                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW mirna_gene AS
+  SELECT
+    feature_id AS mirna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'miRNA_gene';
+
+--- ************************************************
+--- *** relation: scrna_gene                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW scrna_gene AS
+  SELECT
+    feature_id AS scrna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'scRNA_gene';
+
+--- ************************************************
+--- *** relation: snorna_gene                    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW snorna_gene AS
+  SELECT
+    feature_id AS snorna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'snoRNA_gene';
+
+--- ************************************************
+--- *** relation: snrna_gene                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW snrna_gene AS
+  SELECT
+    feature_id AS snrna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'snRNA_gene';
+
+--- ************************************************
+--- *** relation: srp_rna_gene                   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW srp_rna_gene AS
+  SELECT
+    feature_id AS srp_rna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'SRP_RNA_gene';
+
+--- ************************************************
+--- *** relation: strna_gene                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW strna_gene AS
+  SELECT
+    feature_id AS strna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'stRNA_gene';
+
+--- ************************************************
+--- *** relation: tmrna_gene                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW tmrna_gene AS
+  SELECT
+    feature_id AS tmrna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'tmRNA_gene';
+
+--- ************************************************
+--- *** relation: trna_gene                      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW trna_gene AS
+  SELECT
+    feature_id AS trna_gene_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'tRNA_gene';
+
+--- ************************************************
+--- *** relation: modified_adenosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A modified adenine is an adenine base fe ***
+--- *** ature that has been altered.             ***
+--- ************************************************
+---
+
+CREATE VIEW modified_adenosine AS
+  SELECT
+    feature_id AS modified_adenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'modified_adenosine';
+
+--- ************************************************
+--- *** relation: modified_inosine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A modified inosine is an inosine base fe ***
+--- *** ature that has been altered.             ***
+--- ************************************************
+---
+
+CREATE VIEW modified_inosine AS
+  SELECT
+    feature_id AS modified_inosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'modified_inosine';
+
+--- ************************************************
+--- *** relation: modified_cytidine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A modified cytidine is a cytidine base f ***
+--- *** eature which has been altered.           ***
+--- ************************************************
+---
+
+CREATE VIEW modified_cytidine AS
+  SELECT
+    feature_id AS modified_cytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'modified_cytidine';
+
+--- ************************************************
+--- *** relation: modified_guanosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW modified_guanosine AS
+  SELECT
+    feature_id AS modified_guanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'modified_guanosine';
+
+--- ************************************************
+--- *** relation: modified_uridine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW modified_uridine AS
+  SELECT
+    feature_id AS modified_uridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'modified_uridine';
+
+--- ************************************************
+--- *** relation: one_methylinosine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1-methylinosine is a modified insosine.  ***
+--- ************************************************
+---
+
+CREATE VIEW one_methylinosine AS
+  SELECT
+    feature_id AS one_methylinosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methylinosine';
+
+--- ************************************************
+--- *** relation: one_two_prime_o_dimethylinosine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1,2'-O-dimethylinosine is a modified ino ***
+--- *** sine.                                    ***
+--- ************************************************
+---
+
+CREATE VIEW one_two_prime_o_dimethylinosine AS
+  SELECT
+    feature_id AS one_two_prime_o_dimethylinosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_two_prime_O_dimethylinosine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methylinosine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2'-O-methylinosine is a modified inosine ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methylinosine AS
+  SELECT
+    feature_id AS two_prime_o_methylinosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methylinosine';
+
+--- ************************************************
+--- *** relation: three_methylcytidine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 3-methylcytidine is a modified cytidine. ***
+--- ************************************************
+---
+
+CREATE VIEW three_methylcytidine AS
+  SELECT
+    feature_id AS three_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_methylcytidine';
+
+--- ************************************************
+--- *** relation: five_methylcytidine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5-methylcytidine is a modified cytidine. ***
+--- ************************************************
+---
+
+CREATE VIEW five_methylcytidine AS
+  SELECT
+    feature_id AS five_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methylcytidine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methylcytidine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2'-O-methylcytidine is a modified cytidi ***
+--- *** ne.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methylcytidine AS
+  SELECT
+    feature_id AS two_prime_o_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methylcytidine';
+
+--- ************************************************
+--- *** relation: two_thiocytidine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2-thiocytidine is a modified cytidine.   ***
+--- ************************************************
+---
+
+CREATE VIEW two_thiocytidine AS
+  SELECT
+    feature_id AS two_thiocytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_thiocytidine';
+
+--- ************************************************
+--- *** relation: n4_acetylcytidine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N4-acetylcytidine is a modified cytidine ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW n4_acetylcytidine AS
+  SELECT
+    feature_id AS n4_acetylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N4_acetylcytidine';
+
+--- ************************************************
+--- *** relation: five_formylcytidine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5-formylcytidine is a modified cytidine. ***
+--- ************************************************
+---
+
+CREATE VIEW five_formylcytidine AS
+  SELECT
+    feature_id AS five_formylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_formylcytidine';
+
+--- ************************************************
+--- *** relation: f_two_prime_o_dimethylcytidine ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5,2'-O-dimethylcytidine is a modified cy ***
+--- *** tidine.                                  ***
+--- ************************************************
+---
+
+CREATE VIEW f_two_prime_o_dimethylcytidine AS
+  SELECT
+    feature_id AS f_two_prime_o_dimethylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_two_prime_O_dimethylcytidine';
+
+--- ************************************************
+--- *** relation: na2_prime_o_methylcytidine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N4-acetyl-2'-O-methylcytidine is a modif ***
+--- *** ied cytidine.                            ***
+--- ************************************************
+---
+
+CREATE VIEW na2_prime_o_methylcytidine AS
+  SELECT
+    feature_id AS na2_prime_o_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine';
+
+--- ************************************************
+--- *** relation: lysidine                       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Lysidine is a modified cytidine.         ***
+--- ************************************************
+---
+
+CREATE VIEW lysidine AS
+  SELECT
+    feature_id AS lysidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'lysidine';
+
+--- ************************************************
+--- *** relation: n4_methylcytidine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N4-methylcytidine is a modified cytidine ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW n4_methylcytidine AS
+  SELECT
+    feature_id AS n4_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N4_methylcytidine';
+
+--- ************************************************
+--- *** relation: n4_2_prime_o_dimethylcytidine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N4,2'-O-dimethylcytidine is a modified c ***
+--- *** ytidine.                                 ***
+--- ************************************************
+---
+
+CREATE VIEW n4_2_prime_o_dimethylcytidine AS
+  SELECT
+    feature_id AS n4_2_prime_o_dimethylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N4_2_prime_O_dimethylcytidine';
+
+--- ************************************************
+--- *** relation: five_hydroxymethylcytidine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5-hydroxymethylcytidine is a modified cy ***
+--- *** tidine.                                  ***
+--- ************************************************
+---
+
+CREATE VIEW five_hydroxymethylcytidine AS
+  SELECT
+    feature_id AS five_hydroxymethylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_hydroxymethylcytidine';
+
+--- ************************************************
+--- *** relation: ff_two_prime_o_methylcytidine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5-formyl-2'-O-methylcytidine is a modifi ***
+--- *** ed cytidine.                             ***
+--- ************************************************
+---
+
+CREATE VIEW ff_two_prime_o_methylcytidine AS
+  SELECT
+    feature_id AS ff_two_prime_o_methylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_formyl_two_prime_O_methylcytidine';
+
+--- ************************************************
+--- *** relation: nn2_prime_o_trimethylcytidine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N4_N4_2_prime_O_trimethylcytidine is a m ***
+--- *** odified cytidine.                        ***
+--- ************************************************
+---
+
+CREATE VIEW nn2_prime_o_trimethylcytidine AS
+  SELECT
+    feature_id AS nn2_prime_o_trimethylcytidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine';
+
+--- ************************************************
+--- *** relation: one_methyladenosine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1_methyladenosine is a modified adenosin ***
+--- *** e.                                       ***
+--- ************************************************
+---
+
+CREATE VIEW one_methyladenosine AS
+  SELECT
+    feature_id AS one_methyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methyladenosine';
+
+--- ************************************************
+--- *** relation: two_methyladenosine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methyladenosine is a modified adenosin ***
+--- *** e.                                       ***
+--- ************************************************
+---
+
+CREATE VIEW two_methyladenosine AS
+  SELECT
+    feature_id AS two_methyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methyladenosine';
+
+--- ************************************************
+--- *** relation: n6_methyladenosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_methyladenosine is a modified adenosi ***
+--- *** ne.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW n6_methyladenosine AS
+  SELECT
+    feature_id AS n6_methyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_methyladenosine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methyladenosine    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_methyladenosine is a modified a ***
+--- *** denosine.                                ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methyladenosine AS
+  SELECT
+    feature_id AS two_prime_o_methyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methyladenosine';
+
+--- ************************************************
+--- *** relation: t_methylthio_n6_methyladenosine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methylthio_N6_methyladenosine is a mod ***
+--- *** ified adenosine.                         ***
+--- ************************************************
+---
+
+CREATE VIEW t_methylthio_n6_methyladenosine AS
+  SELECT
+    feature_id AS t_methylthio_n6_methyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methylthio_N6_methyladenosine';
+
+--- ************************************************
+--- *** relation: n6_isopentenyladenosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_isopentenyladenosine is a modified ad ***
+--- *** enosine.                                 ***
+--- ************************************************
+---
+
+CREATE VIEW n6_isopentenyladenosine AS
+  SELECT
+    feature_id AS n6_isopentenyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_isopentenyladenosine';
+
+--- ************************************************
+--- *** relation: tm_n6_isopentenyladenosine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methylthio_N6_isopentenyladenosine is  ***
+--- *** a modified adenosine.                    ***
+--- ************************************************
+---
+
+CREATE VIEW tm_n6_isopentenyladenosine AS
+  SELECT
+    feature_id AS tm_n6_isopentenyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methylthio_N6_isopentenyladenosine';
+
+--- ************************************************
+--- *** relation: nch_adenosine                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_cis_hydroxyisopentenyl_adenosine is a ***
+--- ***  modified adenosine.                     ***
+--- ************************************************
+---
+
+CREATE VIEW nch_adenosine AS
+  SELECT
+    feature_id AS nch_adenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine';
+
+--- ************************************************
+--- *** relation: tmnch_adenosine                ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methylthio_N6_cis_hydroxyisopentenyl_a ***
+--- *** denosine is a modified adenosine.        ***
+--- ************************************************
+---
+
+CREATE VIEW tmnch_adenosine AS
+  SELECT
+    feature_id AS tmnch_adenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine';
+
+--- ************************************************
+--- *** relation: n6_glycinylcarbamoyladenosine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_glycinylcarbamoyladenosine is a modif ***
+--- *** ied adenosine.                           ***
+--- ************************************************
+---
+
+CREATE VIEW n6_glycinylcarbamoyladenosine AS
+  SELECT
+    feature_id AS n6_glycinylcarbamoyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_glycinylcarbamoyladenosine';
+
+--- ************************************************
+--- *** relation: n6_threonylcarbamoyladenosine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_threonylcarbamoyladenosine is a modif ***
+--- *** ied adenosine.                           ***
+--- ************************************************
+---
+
+CREATE VIEW n6_threonylcarbamoyladenosine AS
+  SELECT
+    feature_id AS n6_threonylcarbamoyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_threonylcarbamoyladenosine';
+
+--- ************************************************
+--- *** relation: tmnt_carbamoyladenosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methylthio_N6_threonyl_carbamoyladenos ***
+--- *** ine is a modified adenosine.             ***
+--- ************************************************
+---
+
+CREATE VIEW tmnt_carbamoyladenosine AS
+  SELECT
+    feature_id AS tmnt_carbamoyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine';
+
+--- ************************************************
+--- *** relation: nmnt                           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_methyl_N6_threonylcarbamoyladenosine  ***
+--- *** is a modified adenosine.                 ***
+--- ************************************************
+---
+
+CREATE VIEW nmnt AS
+  SELECT
+    feature_id AS nmnt_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine';
+
+--- ************************************************
+--- *** relation: nh                             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_hydroxynorvalylcarbamoyladenosine is  ***
+--- *** a modified adenosine.                    ***
+--- ************************************************
+---
+
+CREATE VIEW nh AS
+  SELECT
+    feature_id AS nh_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine';
+
+--- ************************************************
+--- *** relation: tmnh_carbamoyladenosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_methylthio_N6_hydroxynorvalyl_carbamoy ***
+--- *** ladenosine is a modified adenosine.      ***
+--- ************************************************
+---
+
+CREATE VIEW tmnh_carbamoyladenosine AS
+  SELECT
+    feature_id AS tmnh_carbamoyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine';
+
+--- ************************************************
+--- *** relation: two_prime_o_riboA_phosphate    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_ribosyladenosine_phosphate is a ***
+--- ***  modified adenosine.                     ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_riboA_phosphate AS
+  SELECT
+    feature_id AS two_prime_o_riboA_phosphate_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_ribosyladenosine_phosphate';
+
+--- ************************************************
+--- *** relation: n6_n6_dimethyladenosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_N6_dimethyladenosine is a modified ad ***
+--- *** enosine.                                 ***
+--- ************************************************
+---
+
+CREATE VIEW n6_n6_dimethyladenosine AS
+  SELECT
+    feature_id AS n6_n6_dimethyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_N6_dimethyladenosine';
+
+--- ************************************************
+--- *** relation: n6_2_prime_o_dimethyladenosine ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_2prime_O_dimethyladenosine is a modif ***
+--- *** ied adenosine.                           ***
+--- ************************************************
+---
+
+CREATE VIEW n6_2_prime_o_dimethyladenosine AS
+  SELECT
+    feature_id AS n6_2_prime_o_dimethyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_2_prime_O_dimethyladenosine';
+
+--- ************************************************
+--- *** relation: nn2po_trimethyladenosine       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_N6_2prime_O_trimethyladenosine is a m ***
+--- *** odified adenosine.                       ***
+--- ************************************************
+---
+
+CREATE VIEW nn2po_trimethyladenosine AS
+  SELECT
+    feature_id AS nn2po_trimethyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine';
+
+--- ************************************************
+--- *** relation: o_two_prime_o_dimethyladenosine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1,2'-O-dimethyladenosine is a modified a ***
+--- *** denosine.                                ***
+--- ************************************************
+---
+
+CREATE VIEW o_two_prime_o_dimethyladenosine AS
+  SELECT
+    feature_id AS o_two_prime_o_dimethyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_two_prime_O_dimethyladenosine';
+
+--- ************************************************
+--- *** relation: n6_acetyladenosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N6_acetyladenosine is a modified adenosi ***
+--- *** ne.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW n6_acetyladenosine AS
+  SELECT
+    feature_id AS n6_acetyladenosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N6_acetyladenosine';
+
+--- ************************************************
+--- *** relation: seven_deazaguanosine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 7-deazaguanosine is a moddified guanosin ***
+--- *** e.                                       ***
+--- ************************************************
+---
+
+CREATE VIEW seven_deazaguanosine AS
+  SELECT
+    feature_id AS seven_deazaguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'seven_deazaguanosine';
+
+--- ************************************************
+--- *** relation: queuosine                      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Queuosine is a modified 7-deazoguanosine ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW queuosine AS
+  SELECT
+    feature_id AS queuosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'queuosine';
+
+--- ************************************************
+--- *** relation: epoxyqueuosine                 ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Epoxyqueuosine is a modified 7-deazoguan ***
+--- *** osine.                                   ***
+--- ************************************************
+---
+
+CREATE VIEW epoxyqueuosine AS
+  SELECT
+    feature_id AS epoxyqueuosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'epoxyqueuosine';
+
+--- ************************************************
+--- *** relation: galactosyl_queuosine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Galactosyl_queuosine is a modified 7-dea ***
+--- *** zoguanosine.                             ***
+--- ************************************************
+---
+
+CREATE VIEW galactosyl_queuosine AS
+  SELECT
+    feature_id AS galactosyl_queuosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'galactosyl_queuosine';
+
+--- ************************************************
+--- *** relation: mannosyl_queuosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Mannosyl_queuosine is a modified 7-deazo ***
+--- *** guanosine.                               ***
+--- ************************************************
+---
+
+CREATE VIEW mannosyl_queuosine AS
+  SELECT
+    feature_id AS mannosyl_queuosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'mannosyl_queuosine';
+
+--- ************************************************
+--- *** relation: s_cyano_seven_deazaguanosine   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 7_cyano_7_deazaguanosine is a modified 7 ***
+--- *** -deazoguanosine.                         ***
+--- ************************************************
+---
+
+CREATE VIEW s_cyano_seven_deazaguanosine AS
+  SELECT
+    feature_id AS s_cyano_seven_deazaguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'seven_cyano_seven_deazaguanosine';
+
+--- ************************************************
+--- *** relation: sa_seven_deazaguanosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 7_aminomethyl_7_deazaguanosine is a modi ***
+--- *** fied 7-deazoguanosine.                   ***
+--- ************************************************
+---
+
+CREATE VIEW sa_seven_deazaguanosine AS
+  SELECT
+    feature_id AS sa_seven_deazaguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'seven_aminomethyl_seven_deazaguanosine';
+
+--- ************************************************
+--- *** relation: archaeosine                    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Archaeosine is a modified 7-deazoguanosi ***
+--- *** ne.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW archaeosine AS
+  SELECT
+    feature_id AS archaeosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'archaeosine';
+
+--- ************************************************
+--- *** relation: one_methylguanosine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1_methylguanosine is a modified guanosin ***
+--- *** e base feature.                          ***
+--- ************************************************
+---
+
+CREATE VIEW one_methylguanosine AS
+  SELECT
+    feature_id AS one_methylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methylguanosine';
+
+--- ************************************************
+--- *** relation: n2_methylguanosine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_methylguanosine is a modified guanosi ***
+--- *** ne base feature.                         ***
+--- ************************************************
+---
+
+CREATE VIEW n2_methylguanosine AS
+  SELECT
+    feature_id AS n2_methylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_methylguanosine';
+
+--- ************************************************
+--- *** relation: seven_methylguanosine          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 7_methylguanosine is a modified guanosin ***
+--- *** e base feature.                          ***
+--- ************************************************
+---
+
+CREATE VIEW seven_methylguanosine AS
+  SELECT
+    feature_id AS seven_methylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'seven_methylguanosine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methylguanosine    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_methylguanosine is a modified g ***
+--- *** uanosine base feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methylguanosine AS
+  SELECT
+    feature_id AS two_prime_o_methylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methylguanosine';
+
+--- ************************************************
+--- *** relation: n2_n2_dimethylguanosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_N2_dimethylguanosine is a modified gu ***
+--- *** anosine base feature.                    ***
+--- ************************************************
+---
+
+CREATE VIEW n2_n2_dimethylguanosine AS
+  SELECT
+    feature_id AS n2_n2_dimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_N2_dimethylguanosine';
+
+--- ************************************************
+--- *** relation: n2_2_prime_o_dimethylguanosine ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_2prime_O_dimethylguanosine is a modif ***
+--- *** ied guanosine base feature.              ***
+--- ************************************************
+---
+
+CREATE VIEW n2_2_prime_o_dimethylguanosine AS
+  SELECT
+    feature_id AS n2_2_prime_o_dimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_2_prime_O_dimethylguanosine';
+
+--- ************************************************
+--- *** relation: nn2po_trimethylguanosine       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_N2_2prime_O_trimethylguanosine is a m ***
+--- *** odified guanosine base feature.          ***
+--- ************************************************
+---
+
+CREATE VIEW nn2po_trimethylguanosine AS
+  SELECT
+    feature_id AS nn2po_trimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine';
+
+--- ************************************************
+--- *** relation: tpor_phosphate                 ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_ribosylguanosine_phosphate is a ***
+--- ***  modified guanosine base feature.        ***
+--- ************************************************
+---
+
+CREATE VIEW tpor_phosphate AS
+  SELECT
+    feature_id AS tpor_phosphate_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_ribosylguanosine_phosphate';
+
+--- ************************************************
+--- *** relation: wybutosine                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Wybutosine is a modified guanosine base  ***
+--- *** feature.                                 ***
+--- ************************************************
+---
+
+CREATE VIEW wybutosine AS
+  SELECT
+    feature_id AS wybutosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'wybutosine';
+
+--- ************************************************
+--- *** relation: peroxywybutosine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Peroxywybutosine is a modified guanosine ***
+--- ***  base feature.                           ***
+--- ************************************************
+---
+
+CREATE VIEW peroxywybutosine AS
+  SELECT
+    feature_id AS peroxywybutosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'peroxywybutosine';
+
+--- ************************************************
+--- *** relation: hydroxywybutosine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Hydroxywybutosine is a modified guanosin ***
+--- *** e base feature.                          ***
+--- ************************************************
+---
+
+CREATE VIEW hydroxywybutosine AS
+  SELECT
+    feature_id AS hydroxywybutosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'hydroxywybutosine';
+
+--- ************************************************
+--- *** relation: undermodified_hydroxywybutosine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Undermodified_hydroxywybutosine is a mod ***
+--- *** ified guanosine base feature.            ***
+--- ************************************************
+---
+
+CREATE VIEW undermodified_hydroxywybutosine AS
+  SELECT
+    feature_id AS undermodified_hydroxywybutosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'undermodified_hydroxywybutosine';
+
+--- ************************************************
+--- *** relation: wyosine                        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Wyosine is a modified guanosine base fea ***
+--- *** ture.                                    ***
+--- ************************************************
+---
+
+CREATE VIEW wyosine AS
+  SELECT
+    feature_id AS wyosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'wyosine';
+
+--- ************************************************
+--- *** relation: methylwyosine                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Methylwyosine is a modified guanosine ba ***
+--- *** se feature.                              ***
+--- ************************************************
+---
+
+CREATE VIEW methylwyosine AS
+  SELECT
+    feature_id AS methylwyosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'methylwyosine';
+
+--- ************************************************
+--- *** relation: n2_7_dimethylguanosine         ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_7_dimethylguanosine is a modified gua ***
+--- *** nosine base feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW n2_7_dimethylguanosine AS
+  SELECT
+    feature_id AS n2_7_dimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_7_dimethylguanosine';
+
+--- ************************************************
+--- *** relation: n2_n2_7_trimethylguanosine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_N2_7_trimethylguanosine is a modified ***
+--- ***  guanosine base feature.                 ***
+--- ************************************************
+---
+
+CREATE VIEW n2_n2_7_trimethylguanosine AS
+  SELECT
+    feature_id AS n2_n2_7_trimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_N2_7_trimethylguanosine';
+
+--- ************************************************
+--- *** relation: o_two_prime_o_dimethylguanosine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1_2prime_O_dimethylguanosine is a modifi ***
+--- *** ed guanosine base feature.               ***
+--- ************************************************
+---
+
+CREATE VIEW o_two_prime_o_dimethylguanosine AS
+  SELECT
+    feature_id AS o_two_prime_o_dimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_two_prime_O_dimethylguanosine';
+
+--- ************************************************
+--- *** relation: four_demethylwyosine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 4_demethylwyosine is a modified guanosin ***
+--- *** e base feature.                          ***
+--- ************************************************
+---
+
+CREATE VIEW four_demethylwyosine AS
+  SELECT
+    feature_id AS four_demethylwyosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'four_demethylwyosine';
+
+--- ************************************************
+--- *** relation: isowyosine                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Isowyosine is a modified guanosine base  ***
+--- *** feature.                                 ***
+--- ************************************************
+---
+
+CREATE VIEW isowyosine AS
+  SELECT
+    feature_id AS isowyosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'isowyosine';
+
+--- ************************************************
+--- *** relation: n72o_trimethylguanosine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** N2_7_2prirme_O_trimethylguanosine is a m ***
+--- *** odified guanosine base feature.          ***
+--- ************************************************
+---
+
+CREATE VIEW n72o_trimethylguanosine AS
+  SELECT
+    feature_id AS n72o_trimethylguanosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'N2_7_2prirme_O_trimethylguanosine';
+
+--- ************************************************
+--- *** relation: five_methyluridine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methyluridine is a modified uridine ba ***
+--- *** se feature.                              ***
+--- ************************************************
+---
+
+CREATE VIEW five_methyluridine AS
+  SELECT
+    feature_id AS five_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methyluridine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methyluridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_methyluridine is a modified uri ***
+--- *** dine base feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methyluridine AS
+  SELECT
+    feature_id AS two_prime_o_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: f_two_prime_o_dimethyluridine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_2_prime_O_dimethyluridine is a modifie ***
+--- *** d uridine base feature.                  ***
+--- ************************************************
+---
+
+CREATE VIEW f_two_prime_o_dimethyluridine AS
+  SELECT
+    feature_id AS f_two_prime_o_dimethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_two_prime_O_dimethyluridine';
+
+--- ************************************************
+--- *** relation: one_methylpseudouridine        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1_methylpseudouridine is a modified urid ***
+--- *** ine base feature.                        ***
+--- ************************************************
+---
+
+CREATE VIEW one_methylpseudouridine AS
+  SELECT
+    feature_id AS one_methylpseudouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methylpseudouridine';
+
+--- ************************************************
+--- *** relation: two_prime_o_methylpseudouridine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2prime_O_methylpseudouridine is a modifi ***
+--- *** ed uridine base feature.                 ***
+--- ************************************************
+---
+
+CREATE VIEW two_prime_o_methylpseudouridine AS
+  SELECT
+    feature_id AS two_prime_o_methylpseudouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_prime_O_methylpseudouridine';
+
+--- ************************************************
+--- *** relation: two_thiouridine                ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_thiouridine is a modified uridine base ***
+--- ***  feature.                                ***
+--- ************************************************
+---
+
+CREATE VIEW two_thiouridine AS
+  SELECT
+    feature_id AS two_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_thiouridine';
+
+--- ************************************************
+--- *** relation: four_thiouridine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 4_thiouridine is a modified uridine base ***
+--- ***  feature.                                ***
+--- ************************************************
+---
+
+CREATE VIEW four_thiouridine AS
+  SELECT
+    feature_id AS four_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'four_thiouridine';
+
+--- ************************************************
+--- *** relation: five_methyl_2_thiouridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methyl_2_thiouridine is a modified uri ***
+--- *** dine base feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW five_methyl_2_thiouridine AS
+  SELECT
+    feature_id AS five_methyl_2_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methyl_2_thiouridine';
+
+--- ************************************************
+--- *** relation: tt_two_prime_o_methyluridine   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 2_thio_2prime_O_methyluridine is a modif ***
+--- *** ied uridine base feature.                ***
+--- ************************************************
+---
+
+CREATE VIEW tt_two_prime_o_methyluridine AS
+  SELECT
+    feature_id AS tt_two_prime_o_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'two_thio_two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: ttat_carboxypropyl_uridine     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 3_3_amino_3_carboxypropyl_uridine is a m ***
+--- *** odified uridine base feature.            ***
+--- ************************************************
+---
+
+CREATE VIEW ttat_carboxypropyl_uridine AS
+  SELECT
+    feature_id AS ttat_carboxypropyl_uridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_three_amino_three_carboxypropyl_uridine';
+
+--- ************************************************
+--- *** relation: five_hydroxyuridine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_hydroxyuridine is a modified uridine b ***
+--- *** ase feature.                             ***
+--- ************************************************
+---
+
+CREATE VIEW five_hydroxyuridine AS
+  SELECT
+    feature_id AS five_hydroxyuridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_hydroxyuridine';
+
+--- ************************************************
+--- *** relation: five_methoxyuridine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methoxyuridine is a modified uridine b ***
+--- *** ase feature.                             ***
+--- ************************************************
+---
+
+CREATE VIEW five_methoxyuridine AS
+  SELECT
+    feature_id AS five_methoxyuridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methoxyuridine';
+
+--- ************************************************
+--- *** relation: uridine_five_oxyacetic_acid    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Uridine_5_oxyacetic_acid is a modified u ***
+--- *** ridine base feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW uridine_five_oxyacetic_acid AS
+  SELECT
+    feature_id AS uridine_five_oxyacetic_acid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'uridine_five_oxyacetic_acid';
+
+--- ************************************************
+--- *** relation: uf_oxyacetic_acid_methyl_ester ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Uridine_5_oxyacetic_acid_methyl_ester is ***
+--- ***  a modified uridine base feature.        ***
+--- ************************************************
+---
+
+CREATE VIEW uf_oxyacetic_acid_methyl_ester AS
+  SELECT
+    feature_id AS uf_oxyacetic_acid_methyl_ester_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester';
+
+--- ************************************************
+--- *** relation: f_carboxyhydroxymethyl_uridine ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxyhydroxymethyl_uridine is a modi ***
+--- *** fied uridine base feature.               ***
+--- ************************************************
+---
+
+CREATE VIEW f_carboxyhydroxymethyl_uridine AS
+  SELECT
+    feature_id AS f_carboxyhydroxymethyl_uridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxyhydroxymethyl_uridine';
+
+--- ************************************************
+--- *** relation: fc_uridine_methyl_ester        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxyhydroxymethyl_uridine_methyl_es ***
+--- *** ter is a modified uridine base feature.  ***
+--- ************************************************
+---
+
+CREATE VIEW fc_uridine_methyl_ester AS
+  SELECT
+    feature_id AS fc_uridine_methyl_ester_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester';
+
+--- ************************************************
+--- *** relation: f_methoxycarbonylmethyluridine ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Five_methoxycarbonylmethyluridine is a m ***
+--- *** odified uridine base feature.            ***
+--- ************************************************
+---
+
+CREATE VIEW f_methoxycarbonylmethyluridine AS
+  SELECT
+    feature_id AS f_methoxycarbonylmethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methoxycarbonylmethyluridine';
+
+--- ************************************************
+--- *** relation: fm_two_prime_o_methyluridine   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Five_methoxycarbonylmethyl_2_prime_O_met ***
+--- *** hyluridine is a modified uridine base fe ***
+--- *** ature.                                   ***
+--- ************************************************
+---
+
+CREATE VIEW fm_two_prime_o_methyluridine AS
+  SELECT
+    feature_id AS fm_two_prime_o_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: five_mcm_2_thiouridine         ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methoxycarbonylmethyl_2_thiouridine is ***
+--- ***  a modified uridine base feature.        ***
+--- ************************************************
+---
+
+CREATE VIEW five_mcm_2_thiouridine AS
+  SELECT
+    feature_id AS five_mcm_2_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: f_aminomethyl_two_thiouridine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_aminomethyl_2_thiouridine is a modifie ***
+--- *** d uridine base feature.                  ***
+--- ************************************************
+---
+
+CREATE VIEW f_aminomethyl_two_thiouridine AS
+  SELECT
+    feature_id AS f_aminomethyl_two_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_aminomethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: five_methylaminomethyluridine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methylaminomethyluridine is a modified ***
+--- ***  uridine base feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW five_methylaminomethyluridine AS
+  SELECT
+    feature_id AS five_methylaminomethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methylaminomethyluridine';
+
+--- ************************************************
+--- *** relation: five_mam_2_thiouridine         ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methylaminomethyl_2_thiouridine is a m ***
+--- *** odified uridine base feature.            ***
+--- ************************************************
+---
+
+CREATE VIEW five_mam_2_thiouridine AS
+  SELECT
+    feature_id AS five_mam_2_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methylaminomethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: fm_two_selenouridine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methylaminomethyl_2_selenouridine is a ***
+--- ***  modified uridine base feature.          ***
+--- ************************************************
+---
+
+CREATE VIEW fm_two_selenouridine AS
+  SELECT
+    feature_id AS fm_two_selenouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methylaminomethyl_two_selenouridine';
+
+--- ************************************************
+--- *** relation: five_carbamoylmethyluridine    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carbamoylmethyluridine is a modified u ***
+--- *** ridine base feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW five_carbamoylmethyluridine AS
+  SELECT
+    feature_id AS five_carbamoylmethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carbamoylmethyluridine';
+
+--- ************************************************
+--- *** relation: five_cm_2_prime_o_methU        ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carbamoylmethyl_2_prime_O_methyluridin ***
+--- *** e is a modified uridine base feature.    ***
+--- ************************************************
+---
+
+CREATE VIEW five_cm_2_prime_o_methU AS
+  SELECT
+    feature_id AS five_cm_2_prime_o_methU_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: fc                             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxymethylaminomethyluridine is a m ***
+--- *** odified uridine base feature.            ***
+--- ************************************************
+---
+
+CREATE VIEW fc AS
+  SELECT
+    feature_id AS fc_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxymethylaminomethyluridine';
+
+--- ************************************************
+--- *** relation: fc_two_prime_o_methyluridine   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxymethylaminomethyl_2_prime_O_met ***
+--- *** hyluridine is a modified uridine base fe ***
+--- *** ature.                                   ***
+--- ************************************************
+---
+
+CREATE VIEW fc_two_prime_o_methyluridine AS
+  SELECT
+    feature_id AS fc_two_prime_o_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: fc_two_thiouridine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxymethylaminomethyl_2_thiouridine ***
+--- ***  is a modified uridine base feature.     ***
+--- ************************************************
+---
+
+CREATE VIEW fc_two_thiouridine AS
+  SELECT
+    feature_id AS fc_two_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: three_methyluridine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 3_methyluridine is a modified uridine ba ***
+--- *** se feature.                              ***
+--- ************************************************
+---
+
+CREATE VIEW three_methyluridine AS
+  SELECT
+    feature_id AS three_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_methyluridine';
+
+--- ************************************************
+--- *** relation: omttatc_pseudouridine          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 1_methyl_3_3_amino_3_carboxypropyl_pseud ***
+--- *** ouridine is a modified uridine base feat ***
+--- *** ure.                                     ***
+--- ************************************************
+---
+
+CREATE VIEW omttatc_pseudouridine AS
+  SELECT
+    feature_id AS omttatc_pseudouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine';
+
+--- ************************************************
+--- *** relation: five_carboxymethyluridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_carboxymethyluridine is a modified uri ***
+--- *** dine base feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW five_carboxymethyluridine AS
+  SELECT
+    feature_id AS five_carboxymethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_carboxymethyluridine';
+
+--- ************************************************
+--- *** relation: t_two_prime_o_dimethyluridine  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 3_2prime_O_dimethyluridine is a modified ***
+--- ***  uridine base feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW t_two_prime_o_dimethyluridine AS
+  SELECT
+    feature_id AS t_two_prime_o_dimethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_two_prime_O_dimethyluridine';
+
+--- ************************************************
+--- *** relation: five_methyldihydrouridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_methyldihydrouridine is a modified uri ***
+--- *** dine base feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW five_methyldihydrouridine AS
+  SELECT
+    feature_id AS five_methyldihydrouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_methyldihydrouridine';
+
+--- ************************************************
+--- *** relation: three_methylpseudouridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 3_methylpseudouridine is a modified urid ***
+--- *** ine base feature.                        ***
+--- ************************************************
+---
+
+CREATE VIEW three_methylpseudouridine AS
+  SELECT
+    feature_id AS three_methylpseudouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_methylpseudouridine';
+
+--- ************************************************
+--- *** relation: five_taurinomethyluridine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_taurinomethyluridine is a modified uri ***
+--- *** dine base feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW five_taurinomethyluridine AS
+  SELECT
+    feature_id AS five_taurinomethyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_taurinomethyluridine';
+
+--- ************************************************
+--- *** relation: f_taurinomethyl_two_thiouridine***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_taurinomethyl_2_thiouridineis a modifi ***
+--- *** ed uridine base feature.                 ***
+--- ************************************************
+---
+
+CREATE VIEW f_taurinomethyl_two_thiouridine AS
+  SELECT
+    feature_id AS f_taurinomethyl_two_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_taurinomethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: fi_uridine                     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_isopentenylaminomethyl_uridine is a mo ***
+--- *** dified uridine base feature.             ***
+--- ************************************************
+---
+
+CREATE VIEW fi_uridine AS
+  SELECT
+    feature_id AS fi_uridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_isopentenylaminomethyl_uridine';
+
+--- ************************************************
+--- *** relation: fi_two_thiouridine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_isopentenylaminomethyl_2_thiouridine i ***
+--- *** s a modified uridine base feature.       ***
+--- ************************************************
+---
+
+CREATE VIEW fi_two_thiouridine AS
+  SELECT
+    feature_id AS fi_two_thiouridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine';
+
+--- ************************************************
+--- *** relation: fi_two_prime_o_methyluridine   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** 5_isopentenylaminomethyl_2prime_O_methyl ***
+--- *** uridine is a modified uridine base featu ***
+--- *** re.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW fi_two_prime_o_methyluridine AS
+  SELECT
+    feature_id AS fi_two_prime_o_methyluridine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine';
+
+--- ************************************************
+--- *** relation: histone_binding_site           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region of a DNA molecule that is bound ***
+--- ***  by a histone.                           ***
+--- ************************************************
+---
+
+CREATE VIEW histone_binding_site AS
+  SELECT
+    feature_id AS histone_binding_site_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'histone_binding_site';
+
+--- ************************************************
+--- *** relation: cds_fragment                   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW cds_fragment AS
+  SELECT
+    feature_id AS cds_fragment_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'CDS_fragment';
+
+--- ************************************************
+--- *** relation: modified_amino_acid_feature    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified amino ac ***
+--- *** id feature.                              ***
+--- ************************************************
+---
+
+CREATE VIEW modified_amino_acid_feature AS
+  SELECT
+    feature_id AS modified_amino_acid_feature_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_glycine' OR cvterm.name = 'modified_L_alanine' OR cvterm.name = 'modified_L_asparagine' OR cvterm.name = 'modified_L_aspartic_acid' OR cvterm.name = 'modified_L_cysteine' OR cvterm.name = 'modified_L_glutamic_acid' OR cvterm.name = 'modified_L_threonine' OR cvterm.name = 'modified_L_tryptophan' OR cvterm.name = 'modified_L_glutamine' OR cvterm.name = 'modified_L_methionine' OR cvterm.name = 'modified_L_isoleucine' OR cvterm.name = 'modified_L_phenylalanine' OR cvterm.name = 'modified_L_histidine' OR cvterm.name = 'modified_L_serine' OR cvterm.name = 'modified_L_lysine' OR cvterm.name = 'modified_L_leucine' OR cvterm.name = 'modified_L_selenocysteine' OR cvterm.name = 'modified_L_valine' OR cvterm.name = 'modified_L_proline' OR cvterm.name = 'modified_L_tyrosine' OR cvterm.name = 'modified_L_arginine' OR cvterm.name = 'modified_amino_acid_feature';
+
+--- ************************************************
+--- *** relation: modified_glycine               ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified glycine  ***
+--- *** amino acid feature.                      ***
+--- ************************************************
+---
+
+CREATE VIEW modified_glycine AS
+  SELECT
+    feature_id AS modified_glycine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_glycine';
+
+--- ************************************************
+--- *** relation: modified_l_alanine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified alanine  ***
+--- *** amino acid feature.                      ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_alanine AS
+  SELECT
+    feature_id AS modified_l_alanine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_alanine';
+
+--- ************************************************
+--- *** relation: modified_l_asparagine          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified asparagi ***
+--- *** ne amino acid feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_asparagine AS
+  SELECT
+    feature_id AS modified_l_asparagine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_asparagine';
+
+--- ************************************************
+--- *** relation: modified_l_aspartic_acid       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified aspartic ***
+--- ***  acid amino acid feature.                ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_aspartic_acid AS
+  SELECT
+    feature_id AS modified_l_aspartic_acid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_aspartic_acid';
+
+--- ************************************************
+--- *** relation: modified_l_cysteine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified cysteine ***
+--- ***  amino acid feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_cysteine AS
+  SELECT
+    feature_id AS modified_l_cysteine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_cysteine';
+
+--- ************************************************
+--- *** relation: modified_l_glutamic_acid       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_glutamic_acid AS
+  SELECT
+    feature_id AS modified_l_glutamic_acid_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_glutamic_acid';
+
+--- ************************************************
+--- *** relation: modified_l_threonine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified threonin ***
+--- *** e amino acid feature.                    ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_threonine AS
+  SELECT
+    feature_id AS modified_l_threonine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_threonine';
+
+--- ************************************************
+--- *** relation: modified_l_tryptophan          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified tryptoph ***
+--- *** an amino acid feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_tryptophan AS
+  SELECT
+    feature_id AS modified_l_tryptophan_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_tryptophan';
+
+--- ************************************************
+--- *** relation: modified_l_glutamine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified glutamin ***
+--- *** e amino acid feature.                    ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_glutamine AS
+  SELECT
+    feature_id AS modified_l_glutamine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_glutamine';
+
+--- ************************************************
+--- *** relation: modified_l_methionine          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified methioni ***
+--- *** ne amino acid feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_methionine AS
+  SELECT
+    feature_id AS modified_l_methionine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_methionine';
+
+--- ************************************************
+--- *** relation: modified_l_isoleucine          ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified isoleuci ***
+--- *** ne amino acid feature.                   ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_isoleucine AS
+  SELECT
+    feature_id AS modified_l_isoleucine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_isoleucine';
+
+--- ************************************************
+--- *** relation: modified_l_phenylalanine       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified phenylal ***
+--- *** anine amino acid feature.                ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_phenylalanine AS
+  SELECT
+    feature_id AS modified_l_phenylalanine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_phenylalanine';
+
+--- ************************************************
+--- *** relation: modified_l_histidine           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified histidie ***
+--- ***  amino acid feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_histidine AS
+  SELECT
+    feature_id AS modified_l_histidine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_histidine';
+
+--- ************************************************
+--- *** relation: modified_l_serine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified serine a ***
+--- *** mino acid feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_serine AS
+  SELECT
+    feature_id AS modified_l_serine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_serine';
+
+--- ************************************************
+--- *** relation: modified_l_lysine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified lysine a ***
+--- *** mino acid feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_lysine AS
+  SELECT
+    feature_id AS modified_l_lysine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_lysine';
+
+--- ************************************************
+--- *** relation: modified_l_leucine             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified leucine  ***
+--- *** amino acid feature.                      ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_leucine AS
+  SELECT
+    feature_id AS modified_l_leucine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_leucine';
+
+--- ************************************************
+--- *** relation: modified_l_selenocysteine      ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified selenocy ***
+--- *** steine amino acid feature.               ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_selenocysteine AS
+  SELECT
+    feature_id AS modified_l_selenocysteine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_selenocysteine';
+
+--- ************************************************
+--- *** relation: modified_l_valine              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified valine a ***
+--- *** mino acid feature.                       ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_valine AS
+  SELECT
+    feature_id AS modified_l_valine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_valine';
+
+--- ************************************************
+--- *** relation: modified_l_proline             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified proline  ***
+--- *** amino acid feature.                      ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_proline AS
+  SELECT
+    feature_id AS modified_l_proline_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_proline';
+
+--- ************************************************
+--- *** relation: modified_l_tyrosine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified tyrosine ***
+--- ***  amino acid feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_tyrosine AS
+  SELECT
+    feature_id AS modified_l_tyrosine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_tyrosine';
+
+--- ************************************************
+--- *** relation: modified_l_arginine            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A post translationally modified arginine ***
+--- ***  amino acid feature.                     ***
+--- ************************************************
+---
+
+CREATE VIEW modified_l_arginine AS
+  SELECT
+    feature_id AS modified_l_arginine_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'modified_L_arginine';
+
+--- ************************************************
+--- *** relation: peptidyl                       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** An attribute describing the nature of a  ***
+--- *** proteinaceous polymer, where by the amin ***
+--- *** o acid units are joined by peptide bonds ***
+--- *** .                                        ***
+--- ************************************************
+---
+
+CREATE VIEW peptidyl AS
+  SELECT
+    feature_id AS peptidyl_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'peptidyl';
+
+--- ************************************************
+--- *** relation: cleaved_for_gpi_anchor_region  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The C-terminal residues of a polypeptide ***
+--- ***  which are exchanged for a GPI-anchor.   ***
+--- ************************************************
+---
+
+CREATE VIEW cleaved_for_gpi_anchor_region AS
+  SELECT
+    feature_id AS cleaved_for_gpi_anchor_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'cleaved_for_gpi_anchor_region';
+
+--- ************************************************
+--- *** relation: biomaterial_region             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region which is intended for use in an ***
+--- ***  experiment.                             ***
+--- ************************************************
+---
+
+CREATE VIEW biomaterial_region AS
+  SELECT
+    feature_id AS biomaterial_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'reagent' OR cvterm.name = 'engineered_region' OR cvterm.name = 'PCR_product' OR cvterm.name = 'clone' OR cvterm.name = 'rescue_region' OR cvterm.name = 'oligo' OR cvterm.name = 'clone_insert' OR cvterm.name = 'cloned_region' OR cvterm.name = 'databank_entry' OR cvterm.name = 'genomic_clone' OR cvterm.name = 'cDNA_clone' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'validated_cDNA_clone' OR cvterm.name = 'invalidated_cDNA_clone' OR cvterm.name = 'chimeric_cDNA_clone' OR cvterm.name = 'genomically_contaminated_cDNA_clone' OR cvterm.name = 'polyA_primed_cDNA_clone' OR cvterm.name = 'partially_processed_cDNA_clone' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'aptamer' OR cvterm.name = 'probe' OR cvterm.name = 'tag' OR cvterm.name = 'ss_oligo' OR cvterm.name = 'ds_oligo' OR cvterm.name = 'DNAzyme' OR cvterm.name = 'synthetic_oligo' OR cvterm.name = 'DNA_aptamer' OR cvterm.name = 'RNA_aptamer' OR cvterm.name = 'microarray_oligo' OR cvterm.name = 'SAGE_tag' OR cvterm.name = 'STS' OR cvterm.name = 'EST' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'five_prime_EST' OR cvterm.name = 'three_prime_EST' OR cvterm.name = 'primer' OR cvterm.name = 'sequencing_primer' OR cvterm.name = 'forward_primer' OR cvterm.name = 'reverse_primer' OR cvterm.name = 'RNAi_reagent' OR cvterm.name = 'DNA_constraint_sequence' OR cvterm.name = 'morpholino_oligo' OR cvterm.name = 'PNA_oligo' OR cvterm.name = 'LNA_oligo' OR cvterm.name = 'TNA_oligo' OR cvterm.name = 'GNA_oligo' OR cvterm.name = 'R_GNA_oligo' OR cvterm.name = 'S_GNA_oligo' OR cvterm.name = 'cloned_cDNA_insert' OR cvterm.name = 'cloned_genomic_insert' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'BAC_cloned_genomic_insert' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'engineered_rescue_region' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'engineered_foreign_region' OR cvterm.name = 'engineered_tag' OR cvterm.name = 'engineered_insert' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'biomaterial_region';
+
+--- ************************************************
+--- *** relation: experimental_output_artefact   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region which is the result of some arb ***
+--- *** itrary experimental procedure. The proce ***
+--- *** dure may be carried out with biological  ***
+--- *** material or inside a computer.           ***
+--- ************************************************
+---
+
+CREATE VIEW experimental_output_artefact AS
+  SELECT
+    feature_id AS experimental_output_artefact_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'match_part' OR cvterm.name = 'assembly_component' OR cvterm.name = 'conserved_region' OR cvterm.name = 'match' OR cvterm.name = 'remark' OR cvterm.name = 'QTL' OR cvterm.name = 'consensus_region' OR cvterm.name = 'low_complexity_region' OR cvterm.name = 'assembly' OR cvterm.name = 'transcribed_fragment' OR cvterm.name = 'read_pair' OR cvterm.name = 'contig' OR cvterm.name = 'read' OR cvterm.name = 'restriction_fragment' OR cvterm.name = 'golden_path_fragment' OR cvterm.name = 'tiling_path_fragment' OR cvterm.name = 'gap' OR cvterm.name = 'sonicate_fragment' OR cvterm.name = 'contig_read' OR cvterm.name = 'BAC_end' OR cvterm.name = 'RFLP_fragment' OR cvterm.name = 'tiling_path_clone' OR cvterm.name = 'coding_conserved_region' OR cvterm.name = 'nc_conserved_region' OR cvterm.name = 'homologous_region' OR cvterm.name = 'syntenic_region' OR cvterm.name = 'paralogous_region' OR cvterm.name = 'orthologous_region' OR cvterm.name = 'nucleotide_match' OR cvterm.name = 'protein_match' OR cvterm.name = 'expressed_sequence_match' OR cvterm.name = 'cross_genome_match' OR cvterm.name = 'translated_nucleotide_match' OR cvterm.name = 'EST_match' OR cvterm.name = 'cDNA_match' OR cvterm.name = 'sequence_difference' OR cvterm.name = 'experimental_result_region' OR cvterm.name = 'polypeptide_sequencing_information' OR cvterm.name = 'possible_base_call_error' OR cvterm.name = 'possible_assembly_error' OR cvterm.name = 'overlapping_feature_set' OR cvterm.name = 'no_output' OR cvterm.name = 'overlapping_EST_set' OR cvterm.name = 'non_adjacent_residues' OR cvterm.name = 'non_terminal_residue' OR cvterm.name = 'sequence_conflict' OR cvterm.name = 'sequence_uncertainty' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'sequence_assembly' OR cvterm.name = 'fragment_assembly' OR cvterm.name = 'supercontig' OR cvterm.name = 'contig' OR cvterm.name = 'tiling_path' OR cvterm.name = 'virtual_sequence' OR cvterm.name = 'golden_path' OR cvterm.name = 'ultracontig' OR cvterm.name = 'fingerprint_map' OR cvterm.name = 'STS_map' OR cvterm.name = 'RH_map' OR cvterm.name = 'experimental_output_artefact';
+
+--- ************************************************
+--- *** relation: biological_region              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region defined by its disposition to b ***
+--- *** e involved in a biological process.      ***
+--- ************************************************
+---
+
+CREATE VIEW biological_region AS
+  SELECT
+    feature_id AS biological_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'sequence_secondary_structure' OR cvterm.name = 'linkage_group' OR cvterm.name = 'polypeptide' OR cvterm.name = 'origin_of_replication' OR cvterm.name = 'recombination_feature' OR cvterm.name = 'CpG_island' OR cvterm.name = 'binding_site' OR cvterm.name = 'pseudogenic_region' OR cvterm.name = 'cap' OR cvterm.name = 'intergenic_region' OR cvterm.name = 'oligo_U_tail' OR cvterm.name = 'polyA_sequence' OR cvterm.name = 'gene' OR cvterm.name = 'nucleotide_motif' OR cvterm.name = 'reading_frame' OR cvterm.name = 'chromosome_part' OR cvterm.name = 'gene_member_region' OR cvterm.name = 'transcript_region' OR cvterm.name = 'polypeptide_region' OR cvterm.name = 'gene_component_region' OR cvterm.name = 'mobile_genetic_element' OR cvterm.name = 'replicon' OR cvterm.name = 'base' OR cvterm.name = 'amino_acid' OR cvterm.name = 'gene_group' OR cvterm.name = 'substitution' OR cvterm.name = 'retron' OR cvterm.name = 'G_quartet' OR cvterm.name = 'base_pair' OR cvterm.name = 'RNA_sequence_secondary_structure' OR cvterm.name = 'DNA_sequence_secondary_structure' OR cvterm.name = 'pseudoknot' OR cvterm.name = 'WC_base_pair' OR cvterm.name = 'sugar_edge_base_pair' OR cvterm.name = 'Hoogsteen_base_pair' OR cvterm.name = 'reverse_Hoogsteen_base_pair' OR cvterm.name = 'wobble_base_pair' OR cvterm.name = 'stem_loop' OR cvterm.name = 'tetraloop' OR cvterm.name = 'i_motif' OR cvterm.name = 'recoding_pseudoknot' OR cvterm.name = 'H_pseudoknot' OR cvterm.name = 'D_loop' OR cvterm.name = 'ARS' OR cvterm.name = 'oriT' OR cvterm.name = 'amplification_origin' OR cvterm.name = 'oriV' OR cvterm.name = 'oriC' OR cvterm.name = 'recombination_hotspot' OR cvterm.name = 'haplotype_block' OR cvterm.name = 'sequence_rearrangement_feature' OR cvterm.name = 'iDNA' OR cvterm.name = 'specific_recombination_site' OR cvterm.name = 'chromosome_breakage_sequence' OR cvterm.name = 'internal_eliminated_sequence' OR cvterm.name = 'macronucleus_destined_segment' OR cvterm.name = 'recombination_feature_of_rearranged_gene' OR cvterm.name = 'site_specific_recombination_target_region' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_feature' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_spacer' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_segment' OR cvterm.name = 'vertebrate_immunoglobulin_T_cell_receptor_rearranged_gene_cluster' OR cvterm.name = 'vertebrate_immune_system_gene_recombination_signal_feature' OR cvterm.name = 'D_gene' OR cvterm.name = 'V_gene' OR cvterm.name = 'J_gene' OR cvterm.name = 'C_gene' OR cvterm.name = 'D_J_C_cluster' OR cvterm.name = 'J_C_cluster' OR cvterm.name = 'J_cluster' OR cvterm.name = 'V_cluster' OR cvterm.name = 'V_J_cluster' OR cvterm.name = 'V_J_C_cluster' OR cvterm.name = 'C_cluster' OR cvterm.name = 'D_cluster' OR cvterm.name = 'D_J_cluster' OR cvterm.name = 'three_prime_D_spacer' OR cvterm.name = 'five_prime_D_spacer' OR cvterm.name = 'J_spacer' OR cvterm.name = 'V_spacer' OR cvterm.name = 'VD_gene' OR cvterm.name = 'DJ_gene' OR cvterm.name = 'VDJ_gene' OR cvterm.name = 'VJ_gene' OR cvterm.name = 'DJ_J_cluster' OR cvterm.name = 'VDJ_J_C_cluster' OR cvterm.name = 'VDJ_J_cluster' OR cvterm.name = 'VJ_C_cluster' OR cvterm.name = 'VJ_J_C_cluster' OR cvterm.name = 'VJ_J_cluster' OR cvterm.name = 'D_DJ_C_cluster' OR cvterm.name = 'D_DJ_cluster' OR cvterm.name = 'D_DJ_J_C_cluster' OR cvterm.name = 'D_DJ_J_cluster' OR cvterm.name = 'V_DJ_cluster' OR cvterm.name = 'V_DJ_J_cluster' OR cvterm.name = 'V_VDJ_C_cluster' OR cvterm.name = 'V_VDJ_cluster' OR cvterm.name = 'V_VDJ_J_cluster' OR cvterm.name = 'V_VJ_C_cluster' OR cvterm.name = 'V_VJ_cluster' OR cvterm.name = 'V_VJ_J_cluster' OR cvterm.name = 'V_D_DJ_C_cluster' OR cvterm.name = 'V_D_DJ_cluster' OR cvterm.name = 'V_D_DJ_J_C_cluster' OR cvterm.name = 'V_D_DJ_J_cluster' OR cvterm.name = 'V_D_J_C_cluster' OR cvterm.name = 'V_D_J_cluster' OR cvterm.name = 'DJ_C_cluster' OR cvterm.name = 'DJ_J_C_cluster' OR cvterm.name = 'VDJ_C_cluster' OR cvterm.name = 'V_DJ_C_cluster' OR cvterm.name = 'V_DJ_J_C_cluster' OR cvterm.name = 'V_VDJ_J_C_cluster' OR cvterm.name = 'V_VJ_J_C_cluster' OR cvterm.name = 'J_gene_recombination_feature' OR cvterm.name = 'D_gene_recombination_feature' OR cvterm.name = 'V_gene_recombination_feature' OR cvterm.name = 'heptamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'nonamer_of_recombination_feature_of_vertebrate_immune_system_gene' OR cvterm.name = 'five_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_recombination_signal_sequence' OR cvterm.name = 'three_prime_D_heptamer' OR cvterm.name = 'five_prime_D_heptamer' OR cvterm.name = 'J_heptamer' OR cvterm.name = 'V_heptamer' OR cvterm.name = 'three_prime_D_nonamer' OR cvterm.name = 'five_prime_D_nonamer' OR cvterm.name = 'J_nonamer' OR cvterm.name = 'V_nonamer' OR cvterm.name = 'integration_excision_site' OR cvterm.name = 'resolution_site' OR cvterm.name = 'inversion_site' OR cvterm.name = 'inversion_site_part' OR cvterm.name = 'attI_site' OR cvterm.name = 'attP_site' OR cvterm.name = 'attB_site' OR cvterm.name = 'attL_site' OR cvterm.name = 'attR_site' OR cvterm.name = 'attC_site' OR cvterm.name = 'attCtn_site' OR cvterm.name = 'loxP_site' OR cvterm.name = 'dif_site' OR cvterm.name = 'FRT_site' OR cvterm.name = 'IRLinv_site' OR cvterm.name = 'IRRinv_site' OR cvterm.name = 'protein_binding_site' OR cvterm.name = 'miRNA_target_site' OR cvterm.name = 'epitope' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'primer_binding_site' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'nuclease_binding_site' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'histone_binding_site' OR cvterm.name = 'restriction_enzyme_binding_site' OR cvterm.name = 'nuclease_sensitive_site' OR cvterm.name = 'homing_endonuclease_binding_site' OR cvterm.name = 'nuclease_hypersensitive_site' OR cvterm.name = 'group_1_intron_homing_endonuclease_target_region' OR cvterm.name = 'DNAseI_hypersensitive_site' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'pseudogene' OR cvterm.name = 'decayed_exon' OR cvterm.name = 'pseudogenic_exon' OR cvterm.name = 'pseudogenic_transcript' OR cvterm.name = 'pseudogenic_rRNA' OR cvterm.name = 'pseudogenic_tRNA' OR cvterm.name = 'processed_pseudogene' OR cvterm.name = 'pseudogene_by_unequal_crossing_over' OR cvterm.name = 'nuclear_mt_pseudogene' OR cvterm.name = 'nuclear_gene' OR cvterm.name = 'mt_gene' OR cvterm.name = 'plastid_gene' OR cvterm.name = 'nucleomorph_gene' OR cvterm.name = 'plasmid_gene' OR cvterm.name = 'proviral_gene' OR cvterm.name = 'transposable_element_gene' OR cvterm.name = 'silenced_gene' OR cvterm.name = 'engineered_gene' OR cvterm.name = 'foreign_gene' OR cvterm.name = 'fusion_gene' OR cvterm.name = 'recombinationally_rearranged_gene' OR cvterm.name = 'gene_with_trans_spliced_transcript' OR cvterm.name = 'gene_with_polycistronic_transcript' OR cvterm.name = 'rescue_gene' OR cvterm.name = 'post_translationally_regulated_gene' OR cvterm.name = 'negatively_autoregulated_gene' OR cvterm.name = 'positively_autoregulated_gene' OR cvterm.name = 'translationally_regulated_gene' OR cvterm.name = 'epigenetically_modified_gene' OR cvterm.name = 'transgene' OR cvterm.name = 'predicted_gene' OR cvterm.name = 'protein_coding_gene' OR cvterm.name = 'retrogene' OR cvterm.name = 'nc_RNA_gene' OR cvterm.name = 'gene_cassette' OR cvterm.name = 'kinetoplast_gene' OR cvterm.name = 'maxicircle_gene' OR cvterm.name = 'minicircle_gene' OR cvterm.name = 'cryptogene' OR cvterm.name = 'apicoplast_gene' OR cvterm.name = 'ct_gene' OR cvterm.name = 'chromoplast_gene' OR cvterm.name = 'cyanelle_gene' OR cvterm.name = 'leucoplast_gene' OR cvterm.name = 'proplastid_gene' OR cvterm.name = 'endogenous_retroviral_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'gene_silenced_by_DNA_modification' OR cvterm.name = 'gene_silenced_by_RNA_interference' OR cvterm.name = 'gene_silenced_by_histone_modification' OR cvterm.name = 'gene_silenced_by_DNA_methylation' OR cvterm.name = 'gene_silenced_by_histone_methylation' OR cvterm.name = 'gene_silenced_by_histone_deacetylation' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_foreign_gene' OR cvterm.name = 'engineered_foreign_transposable_element_gene' OR cvterm.name = 'engineered_fusion_gene' OR cvterm.name = 'recombinationally_inverted_gene' OR cvterm.name = 'recombinationally_rearranged_vertebrate_immune_system_gene' OR cvterm.name = 'gene_with_dicistronic_transcript' OR cvterm.name = 'gene_with_dicistronic_primary_transcript' OR cvterm.name = 'gene_with_dicistronic_mRNA' OR cvterm.name = 'wild_type_rescue_gene' OR cvterm.name = 'gene_rearranged_at_DNA_level' OR cvterm.name = 'maternally_imprinted_gene' OR cvterm.name = 'paternally_imprinted_gene' OR cvterm.name = 'allelically_excluded_gene' OR cvterm.name = 'floxed_gene' OR cvterm.name = 'gene_with_polyadenylated_mRNA' OR cvterm.name = 'gene_with_mRNA_with_frameshift' OR cvterm.name = 'gene_with_edited_transcript' OR cvterm.name = 'gene_with_recoded_mRNA' OR cvterm.name = 'gene_with_stop_codon_read_through' OR cvterm.name = 'gene_with_mRNA_recoded_by_translational_bypass' OR cvterm.name = 'gene_with_transcript_with_translational_frameshift' OR cvterm.name = 'gene_with_stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'gene_with_stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'gRNA_gene' OR cvterm.name = 'miRNA_gene' OR cvterm.name = 'scRNA_gene' OR cvterm.name = 'snoRNA_gene' OR cvterm.name = 'snRNA_gene' OR cvterm.name = 'SRP_RNA_gene' OR cvterm.name = 'stRNA_gene' OR cvterm.name = 'tmRNA_gene' OR cvterm.name = 'tRNA_gene' OR cvterm.name = 'DNA_motif' OR cvterm.name = 'RNA_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'RNA_internal_loop' OR cvterm.name = 'A_minor_RNA_motif' OR cvterm.name = 'RNA_junction_loop' OR cvterm.name = 'hammerhead_ribozyme' OR cvterm.name = 'asymmetric_RNA_internal_loop' OR cvterm.name = 'symmetric_RNA_internal_loop' OR cvterm.name = 'K_turn_RNA_motif' OR cvterm.name = 'sarcin_like_RNA_motif' OR cvterm.name = 'RNA_hook_turn' OR cvterm.name = 'ORF' OR cvterm.name = 'blocked_reading_frame' OR cvterm.name = 'mini_gene' OR cvterm.name = 'rescue_mini_gene' OR cvterm.name = 'chromosome_arm' OR cvterm.name = 'chromosome_band' OR cvterm.name = 'interband' OR cvterm.name = 'chromosomal_regulatory_element' OR cvterm.name = 'chromosomal_structural_element' OR cvterm.name = 'introgressed_chromosome_region' OR cvterm.name = 'matrix_attachment_site' OR cvterm.name = 'centromere' OR cvterm.name = 'telomere' OR cvterm.name = 'transcript' OR cvterm.name = 'regulatory_region' OR cvterm.name = 'polycistronic_transcript' OR cvterm.name = 'transcript_with_translational_frameshift' OR cvterm.name = 'primary_transcript' OR cvterm.name = 'mature_transcript' OR cvterm.name = 'transcript_bound_by_nucleic_acid' OR cvterm.name = 'transcript_bound_by_protein' OR cvterm.name = 'enzymatic_RNA' OR cvterm.name = 'trans_spliced_transcript' OR cvterm.name = 'monocistronic_transcript' OR cvterm.name = 'aberrant_processed_transcript' OR cvterm.name = 'edited_transcript' OR cvterm.name = 'alternatively_spliced_transcript' OR cvterm.name = 'dicistronic_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'protein_coding_primary_transcript' OR cvterm.name = 'nc_primary_transcript' OR cvterm.name = 'polycistronic_primary_transcript' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'mini_exon_donor_RNA' OR cvterm.name = 'antisense_primary_transcript' OR cvterm.name = 'capped_primary_transcript' OR cvterm.name = 'pre_edited_mRNA' OR cvterm.name = 'scRNA_primary_transcript' OR cvterm.name = 'rRNA_primary_transcript' OR cvterm.name = 'tRNA_primary_transcript' OR cvterm.name = 'snRNA_primary_transcript' OR cvterm.name = 'snoRNA_primary_transcript' OR cvterm.name = 'tmRNA_primary_transcript' OR cvterm.name = 'SRP_RNA_primary_transcript' OR cvterm.name = 'miRNA_primary_transcript' OR cvterm.name = 'rRNA_small_subunit_primary_transcript' OR cvterm.name = 'rRNA_large_subunit_primary_transcript' OR cvterm.name = 'alanine_tRNA_primary_transcript' OR cvterm.name = 'arginine_tRNA_primary_transcript' OR cvterm.name = 'asparagine_tRNA_primary_transcript' OR cvterm.name = 'aspartic_acid_tRNA_primary_transcript' OR cvterm.name = 'cysteine_tRNA_primary_transcript' OR cvterm.name = 'glutamic_acid_tRNA_primary_transcript' OR cvterm.name = 'glutamine_tRNA_primary_transcript' OR cvterm.name = 'glycine_tRNA_primary_transcript' OR cvterm.name = 'histidine_tRNA_primary_transcript' OR cvterm.name = 'isoleucine_tRNA_primary_transcript' OR cvterm.name = 'leucine_tRNA_primary_transcript' OR cvterm.name = 'lysine_tRNA_primary_transcript' OR cvterm.name = 'methionine_tRNA_primary_transcript' OR cvterm.name = 'phenylalanine_tRNA_primary_transcript' OR cvterm.name = 'proline_tRNA_primary_transcript' OR cvterm.name = 'serine_tRNA_primary_transcript' OR cvterm.name = 'threonine_tRNA_primary_transcript' OR cvterm.name = 'tryptophan_tRNA_primary_transcript' OR cvterm.name = 'tyrosine_tRNA_primary_transcript' OR cvterm.name = 'valine_tRNA_primary_transcript' OR cvterm.name = 'pyrrolysine_tRNA_primary_transcript' OR cvterm.name = 'selenocysteine_tRNA_primary_transcript' OR cvterm.name = 'methylation_guide_snoRNA_primary_transcript' OR cvterm.name = 'rRNA_cleavage_snoRNA_primary_transcript' OR cvterm.name = 'C_D_box_snoRNA_primary_transcript' OR cvterm.name = 'H_ACA_box_snoRNA_primary_transcript' OR cvterm.name = 'U14_snoRNA_primary_transcript' OR cvterm.name = 'stRNA_primary_transcript' OR cvterm.name = 'dicistronic_primary_transcript' OR cvterm.name = 'mRNA' OR cvterm.name = 'ncRNA' OR cvterm.name = 'mRNA_with_frameshift' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'polycistronic_mRNA' OR cvterm.name = 'exemplar_mRNA' OR cvterm.name = 'capped_mRNA' OR cvterm.name = 'polyadenylated_mRNA' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'consensus_mRNA' OR cvterm.name = 'recoded_mRNA' OR cvterm.name = 'mRNA_with_minus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_1_frameshift' OR cvterm.name = 'mRNA_with_plus_2_frameshift' OR cvterm.name = 'mRNA_with_minus_2_frameshift' OR cvterm.name = 'dicistronic_mRNA' OR cvterm.name = 'mRNA_recoded_by_translational_bypass' OR cvterm.name = 'mRNA_recoded_by_codon_redefinition' OR cvterm.name = 'scRNA' OR cvterm.name = 'rRNA' OR cvterm.name = 'tRNA' OR cvterm.name = 'snRNA' OR cvterm.name = 'snoRNA' OR cvterm.name = 'small_regulatory_ncRNA' OR cvterm.name = 'RNase_MRP_RNA' OR cvterm.name = 'RNase_P_RNA' OR cvterm.name = 'telomerase_RNA' OR cvterm.name = 'vault_RNA' OR cvterm.name = 'Y_RNA' OR cvterm.name = 'rasiRNA' OR cvterm.name = 'SRP_RNA' OR cvterm.name = 'guide_RNA' OR cvterm.name = 'antisense_RNA' OR cvterm.name = 'siRNA' OR cvterm.name = 'stRNA' OR cvterm.name = 'class_II_RNA' OR cvterm.name = 'class_I_RNA' OR cvterm.name = 'piRNA' OR cvterm.name = 'rRNA_cleavage_RNA' OR cvterm.name = 'small_subunit_rRNA' OR cvterm.name = 'large_subunit_rRNA' OR cvterm.name = 'rRNA_18S' OR cvterm.name = 'rRNA_16S' OR cvterm.name = 'rRNA_5_8S' OR cvterm.name = 'rRNA_5S' OR cvterm.name = 'rRNA_28S' OR cvterm.name = 'rRNA_23S' OR cvterm.name = 'rRNA_25S' OR cvterm.name = 'rRNA_21S' OR cvterm.name = 'alanyl_tRNA' OR cvterm.name = 'asparaginyl_tRNA' OR cvterm.name = 'aspartyl_tRNA' OR cvterm.name = 'cysteinyl_tRNA' OR cvterm.name = 'glutaminyl_tRNA' OR cvterm.name = 'glutamyl_tRNA' OR cvterm.name = 'glycyl_tRNA' OR cvterm.name = 'histidyl_tRNA' OR cvterm.name = 'isoleucyl_tRNA' OR cvterm.name = 'leucyl_tRNA' OR cvterm.name = 'lysyl_tRNA' OR cvterm.name = 'methionyl_tRNA' OR cvterm.name = 'phenylalanyl_tRNA' OR cvterm.name = 'prolyl_tRNA' OR cvterm.name = 'seryl_tRNA' OR cvterm.name = 'threonyl_tRNA' OR cvterm.name = 'tryptophanyl_tRNA' OR cvterm.name = 'tyrosyl_tRNA' OR cvterm.name = 'valyl_tRNA' OR cvterm.name = 'pyrrolysyl_tRNA' OR cvterm.name = 'arginyl_tRNA' OR cvterm.name = 'selenocysteinyl_tRNA' OR cvterm.name = 'U1_snRNA' OR cvterm.name = 'U2_snRNA' OR cvterm.name = 'U4_snRNA' OR cvterm.name = 'U4atac_snRNA' OR cvterm.name = 'U5_snRNA' OR cvterm.name = 'U6_snRNA' OR cvterm.name = 'U6atac_snRNA' OR cvterm.name = 'U11_snRNA' OR cvterm.name = 'U12_snRNA' OR cvterm.name = 'C_D_box_snoRNA' OR cvterm.name = 'H_ACA_box_snoRNA' OR cvterm.name = 'U14_snoRNA' OR cvterm.name = 'U3_snoRNA' OR cvterm.name = 'methylation_guide_snoRNA' OR cvterm.name = 'pseudouridylation_guide_snoRNA' OR cvterm.name = 'miRNA' OR cvterm.name = 'RNA_6S' OR cvterm.name = 'CsrB_RsmB_RNA' OR cvterm.name = 'DsrA_RNA' OR cvterm.name = 'OxyS_RNA' OR cvterm.name = 'RprA_RNA' OR cvterm.name = 'RRE_RNA' OR cvterm.name = 'spot_42_RNA' OR cvterm.name = 'tmRNA' OR cvterm.name = 'GcvB_RNA' OR cvterm.name = 'MicF_RNA' OR cvterm.name = 'ribozyme' OR cvterm.name = 'trans_spliced_mRNA' OR cvterm.name = 'monocistronic_primary_transcript' OR cvterm.name = 'monocistronic_mRNA' OR cvterm.name = 'edited_mRNA' OR cvterm.name = 'edited_transcript_by_A_to_I_substitution' OR cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'exon' OR cvterm.name = 'edited_transcript_feature' OR cvterm.name = 'mature_transcript_region' OR cvterm.name = 'primary_transcript_region' OR cvterm.name = 'exon_region' OR cvterm.name = 'anchor_binding_site' OR cvterm.name = 'coding_exon' OR cvterm.name = 'noncoding_exon' OR cvterm.name = 'five_prime_coding_exon' OR cvterm.name = 'interior_exon' OR cvterm.name = 'three_prime_coding_exon' OR cvterm.name = 'exon_of_single_exon_gene' OR cvterm.name = 'interior_coding_exon' OR cvterm.name = 'three_prime_noncoding_exon' OR cvterm.name = 'five_prime_noncoding_exon' OR cvterm.name = 'pre_edited_region' OR cvterm.name = 'editing_block' OR cvterm.name = 'editing_domain' OR cvterm.name = 'unedited_region' OR cvterm.name = 'mRNA_region' OR cvterm.name = 'tmRNA_region' OR cvterm.name = 'guide_RNA_region' OR cvterm.name = 'tRNA_region' OR cvterm.name = 'riboswitch' OR cvterm.name = 'UTR' OR cvterm.name = 'CDS' OR cvterm.name = 'codon' OR cvterm.name = 'five_prime_open_reading_frame' OR cvterm.name = 'UTR_region' OR cvterm.name = 'CDS_region' OR cvterm.name = 'translational_frameshift' OR cvterm.name = 'recoding_stimulatory_region' OR cvterm.name = 'five_prime_UTR' OR cvterm.name = 'three_prime_UTR' OR cvterm.name = 'internal_UTR' OR cvterm.name = 'untranslated_region_polycistronic_mRNA' OR cvterm.name = 'edited_CDS' OR cvterm.name = 'CDS_fragment' OR cvterm.name = 'CDS_independently_known' OR cvterm.name = 'CDS_predicted' OR cvterm.name = 'orphan_CDS' OR cvterm.name = 'CDS_supported_by_sequence_similarity_data' OR cvterm.name = 'CDS_supported_by_domain_match_data' OR cvterm.name = 'CDS_supported_by_EST_or_cDNA_data' OR cvterm.name = 'recoded_codon' OR cvterm.name = 'start_codon' OR cvterm.name = 'stop_codon' OR cvterm.name = 'stop_codon_read_through' OR cvterm.name = 'stop_codon_redefined_as_pyrrolysine' OR cvterm.name = 'stop_codon_redefined_as_selenocysteine' OR cvterm.name = 'non_canonical_start_codon' OR cvterm.name = 'four_bp_start_codon' OR cvterm.name = 'CTG_start_codon' OR cvterm.name = 'ribosome_entry_site' OR cvterm.name = 'upstream_AUG_codon' OR cvterm.name = 'AU_rich_element' OR cvterm.name = 'Bruno_response_element' OR cvterm.name = 'iron_responsive_element' OR cvterm.name = 'internal_ribosome_entry_site' OR cvterm.name = 'Shine_Dalgarno_sequence' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'coding_start' OR cvterm.name = 'coding_end' OR cvterm.name = 'plus_1_translational_frameshift' OR cvterm.name = 'plus_2_translational_frameshift' OR cvterm.name = 'internal_Shine_Dalgarno_sequence' OR cvterm.name = 'SECIS_element' OR cvterm.name = 'three_prime_recoding_site' OR cvterm.name = 'five_prime_recoding_site' OR cvterm.name = 'stop_codon_signal' OR cvterm.name = 'three_prime_stem_loop_structure' OR cvterm.name = 'flanking_three_prime_quadruplet_recoding_signal' OR cvterm.name = 'three_prime_repeat_recoding_signal' OR cvterm.name = 'distant_three_prime_recoding_signal' OR cvterm.name = 'UAG_stop_codon_signal' OR cvterm.name = 'UAA_stop_codon_signal' OR cvterm.name = 'UGA_stop_codon_signal' OR cvterm.name = 'tmRNA_coding_piece' OR cvterm.name = 'tmRNA_acceptor_piece' OR cvterm.name = 'anchor_region' OR cvterm.name = 'template_region' OR cvterm.name = 'anticodon_loop' OR cvterm.name = 'anticodon' OR cvterm.name = 'CCA_tail' OR cvterm.name = 'DHU_loop' OR cvterm.name = 'T_loop' OR cvterm.name = 'splice_site' OR cvterm.name = 'intron' OR cvterm.name = 'clip' OR cvterm.name = 'TSS' OR cvterm.name = 'transcription_end_site' OR cvterm.name = 'spliced_leader_RNA' OR cvterm.name = 'rRNA_primary_transcript_region' OR cvterm.name = 'spliceosomal_intron_region' OR cvterm.name = 'intron_domain' OR cvterm.name = 'miRNA_primary_transcript_region' OR cvterm.name = 'five_prime_splice_site' OR cvterm.name = 'three_prime_splice_site' OR cvterm.name = 'non_canonical_splice_site' OR cvterm.name = 'canonical_splice_site' OR cvterm.name = 'recursive_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'trans_splice_donor_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'trans_splice_acceptor_site' OR cvterm.name = 'SL1_acceptor_site' OR cvterm.name = 'SL2_acceptor_site' OR cvterm.name = 'non_canonical_three_prime_splice_site' OR cvterm.name = 'non_canonical_five_prime_splice_site' OR cvterm.name = 'canonical_three_prime_splice_site' OR cvterm.name = 'canonical_five_prime_splice_site' OR cvterm.name = 'five_prime_intron' OR cvterm.name = 'interior_intron' OR cvterm.name = 'three_prime_intron' OR cvterm.name = 'twintron' OR cvterm.name = 'UTR_intron' OR cvterm.name = 'autocatalytically_spliced_intron' OR cvterm.name = 'spliceosomal_intron' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'endonuclease_spliced_intron' OR cvterm.name = 'five_prime_UTR_intron' OR cvterm.name = 'three_prime_UTR_intron' OR cvterm.name = 'group_I_intron' OR cvterm.name = 'group_II_intron' OR cvterm.name = 'group_III_intron' OR cvterm.name = 'group_IIA_intron' OR cvterm.name = 'group_IIB_intron' OR cvterm.name = 'U2_intron' OR cvterm.name = 'U12_intron' OR cvterm.name = 'archaeal_intron' OR cvterm.name = 'tRNA_intron' OR cvterm.name = 'five_prime_clip' OR cvterm.name = 'three_prime_clip' OR cvterm.name = 'major_TSS' OR cvterm.name = 'minor_TSS' OR cvterm.name = 'transcribed_spacer_region' OR cvterm.name = 'internal_transcribed_spacer_region' OR cvterm.name = 'external_transcribed_spacer_region' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'branch_site' OR cvterm.name = 'polypyrimidine_tract' OR cvterm.name = 'internal_guide_sequence' OR cvterm.name = 'mirtron' OR cvterm.name = 'pre_miRNA' OR cvterm.name = 'miRNA_stem' OR cvterm.name = 'miRNA_loop' OR cvterm.name = 'noncoding_region_of_exon' OR cvterm.name = 'coding_region_of_exon' OR cvterm.name = 'three_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_coding_exon_noncoding_region' OR cvterm.name = 'five_prime_exon_coding_region' OR cvterm.name = 'three_prime_exon_coding_region' OR cvterm.name = 'mature_protein_region' OR cvterm.name = 'immature_peptide_region' OR cvterm.name = 'compositionally_biased_region' OR cvterm.name = 'structural_region' OR cvterm.name = 'polypeptide_variation_site' OR cvterm.name = 'cleaved_peptide_region' OR cvterm.name = 'hydrophobic_region' OR cvterm.name = 'polypeptide_conserved_region' OR cvterm.name = 'active_peptide' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'membrane_structure' OR cvterm.name = 'extramembrane_region' OR cvterm.name = 'intramembrane_region' OR cvterm.name = 'polypeptide_secondary_structure' OR cvterm.name = 'polypeptide_structural_motif' OR cvterm.name = 'intrinsically_unstructured_region' OR cvterm.name = 'cytoplasmic_region' OR cvterm.name = 'non_cytoplasmic_region' OR cvterm.name = 'membrane_loop' OR cvterm.name = 'transmembrane_region' OR cvterm.name = 'asx_motif' OR cvterm.name = 'beta_bulge' OR cvterm.name = 'beta_bulge_loop' OR cvterm.name = 'beta_strand' OR cvterm.name = 'helix' OR cvterm.name = 'nest' OR cvterm.name = 'schellmann_loop' OR cvterm.name = 'st_motif' OR cvterm.name = 'st_staple' OR cvterm.name = 'turn' OR cvterm.name = 'catmat_left_handed_three' OR cvterm.name = 'catmat_left_handed_four' OR cvterm.name = 'catmat_right_handed_three' OR cvterm.name = 'catmat_right_handed_four' OR cvterm.name = 'alpha_beta_motif' OR cvterm.name = 'coil' OR cvterm.name = 'beta_bulge_loop_five' OR cvterm.name = 'beta_bulge_loop_six' OR cvterm.name = 'antiparallel_beta_strand' OR cvterm.name = 'parallel_beta_strand' OR cvterm.name = 'left_handed_helix' OR cvterm.name = 'right_handed_helix' OR cvterm.name = 'alpha_helix' OR cvterm.name = 'pi_helix' OR cvterm.name = 'three_ten_helix' OR cvterm.name = 'nest_left_right' OR cvterm.name = 'nest_right_left' OR cvterm.name = 'schellmann_loop_seven' OR cvterm.name = 'schellmann_loop_six' OR cvterm.name = 'asx_turn' OR cvterm.name = 'beta_turn' OR cvterm.name = 'gamma_turn' OR cvterm.name = 'st_turn' OR cvterm.name = 'asx_turn_left_handed_type_one' OR cvterm.name = 'asx_turn_left_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_two' OR cvterm.name = 'asx_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_one' OR cvterm.name = 'beta_turn_left_handed_type_two' OR cvterm.name = 'beta_turn_right_handed_type_one' OR cvterm.name = 'beta_turn_right_handed_type_two' OR cvterm.name = 'beta_turn_type_six' OR cvterm.name = 'beta_turn_type_eight' OR cvterm.name = 'beta_turn_type_six_a' OR cvterm.name = 'beta_turn_type_six_b' OR cvterm.name = 'beta_turn_type_six_a_one' OR cvterm.name = 'beta_turn_type_six_a_two' OR cvterm.name = 'gamma_turn_classic' OR cvterm.name = 'gamma_turn_inverse' OR cvterm.name = 'st_turn_left_handed_type_one' OR cvterm.name = 'st_turn_left_handed_type_two' OR cvterm.name = 'st_turn_right_handed_type_one' OR cvterm.name = 'st_turn_right_handed_type_two' OR cvterm.name = 'coiled_coil' OR cvterm.name = 'helix_turn_helix' OR cvterm.name = 'natural_variant_site' OR cvterm.name = 'mutated_variant_site' OR cvterm.name = 'alternate_sequence_site' OR cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'cleaved_for_gpi_anchor_region' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'n_terminal_region' OR cvterm.name = 'c_terminal_region' OR cvterm.name = 'central_hydrophobic_region' OR cvterm.name = 'polypeptide_domain' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'non_transcribed_region' OR cvterm.name = 'gene_fragment' OR cvterm.name = 'TSS_region' OR cvterm.name = 'gene_segment' OR cvterm.name = 'mobile_intron' OR cvterm.name = 'extrachromosomal_mobile_genetic_element' OR cvterm.name = 'integrated_mobile_genetic_element' OR cvterm.name = 'plasmid' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'transposable_element' OR cvterm.name = 'proviral_region' OR cvterm.name = 'integron' OR cvterm.name = 'genomic_island' OR cvterm.name = 'integrated_plasmid' OR cvterm.name = 'cointegrated_plasmid' OR cvterm.name = 'retrotransposon' OR cvterm.name = 'DNA_transposon' OR cvterm.name = 'foreign_transposable_element' OR cvterm.name = 'transgenic_transposable_element' OR cvterm.name = 'natural_transposable_element' OR cvterm.name = 'engineered_transposable_element' OR cvterm.name = 'transposon_fragment' OR cvterm.name = 'LTR_retrotransposon' OR cvterm.name = 'non_LTR_retrotransposon' OR cvterm.name = 'RR_tract' OR cvterm.name = 'LINE_element' OR cvterm.name = 'SINE_element' OR cvterm.name = 'terminal_inverted_repeat_element' OR cvterm.name = 'foldback_element' OR cvterm.name = 'conjugative_transposon' OR cvterm.name = 'helitron' OR cvterm.name = 'MITE' OR cvterm.name = 'insertion_sequence' OR cvterm.name = 'polinton' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'engineered_foreign_transposable_element' OR cvterm.name = 'prophage' OR cvterm.name = 'pathogenic_island' OR cvterm.name = 'metabolic_island' OR cvterm.name = 'adaptive_island' OR cvterm.name = 'symbiosis_island' OR cvterm.name = 'cryptic_prophage' OR cvterm.name = 'defective_conjugative_transposon' OR cvterm.name = 'plasmid' OR cvterm.name = 'chromosome' OR cvterm.name = 'vector_replicon' OR cvterm.name = 'maxicircle' OR cvterm.name = 'minicircle' OR cvterm.name = 'viral_sequence' OR cvterm.name = 'engineered_plasmid' OR cvterm.name = 'episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'engineered_episome' OR cvterm.name = 'mitochondrial_chromosome' OR cvterm.name = 'chloroplast_chromosome' OR cvterm.name = 'chromoplast_chromosome' OR cvterm.name = 'cyanelle_chromosome' OR cvterm.name = 'leucoplast_chromosome' OR cvterm.name = 'macronuclear_chromosome' OR cvterm.name = 'micronuclear_chromosome' OR cvterm.name = 'nuclear_chromosome' OR cvterm.name = 'nucleomorphic_chromosome' OR cvterm.name = 'DNA_chromosome' OR cvterm.name = 'RNA_chromosome' OR cvterm.name = 'apicoplast_chromosome' OR cvterm.name = 'double_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_DNA_chromosome' OR cvterm.name = 'linear_double_stranded_DNA_chromosome' OR cvterm.name = 'circular_double_stranded_DNA_chromosome' OR cvterm.name = 'linear_single_stranded_DNA_chromosome' OR cvterm.name = 'circular_single_stranded_DNA_chromosome' OR cvterm.name = 'single_stranded_RNA_chromosome' OR cvterm.name = 'double_stranded_RNA_chromosome' OR cvterm.name = 'linear_single_stranded_RNA_chromosome' OR cvterm.name = 'circular_single_stranded_RNA_chromosome' OR cvterm.name = 'linear_double_stranded_RNA_chromosome' OR cvterm.name = 'circular_double_stranded_RNA_chromosome' OR cvterm.name = 'YAC' OR cvterm.name = 'BAC' OR cvterm.name = 'PAC' OR cvterm.name = 'cosmid' OR cvterm.name = 'phagemid' OR cvterm.name = 'fosmid' OR cvterm.name = 'lambda_vector' OR cvterm.name = 'plasmid_vector' OR cvterm.name = 'phage_sequence' OR cvterm.name = 'ds_RNA_viral_sequence' OR cvterm.name = 'ds_DNA_viral_sequence' OR cvterm.name = 'ss_RNA_viral_sequence' OR cvterm.name = 'negative_sense_ssRNA_viral_sequence' OR cvterm.name = 'positive_sense_ssRNA_viral_sequence' OR cvterm.name = 'ambisense_ssRNA_viral_sequence' OR cvterm.name = 'modified_RNA_base_feature' OR cvterm.name = 'modified_base_site' OR cvterm.name = 'inosine' OR cvterm.name = 'seven_methylguanine' OR cvterm.name = 'ribothymidine' OR cvterm.name = 'modified_adenosine' OR cvterm.name = 'modified_cytidine' OR cvterm.name = 'modified_guanosine' OR cvterm.name = 'modified_uridine' OR cvterm.name = 'modified_inosine' OR cvterm.name = 'methylinosine' OR cvterm.name = 'one_methylinosine' OR cvterm.name = 'one_two_prime_O_dimethylinosine' OR cvterm.name = 'two_prime_O_methylinosine' OR cvterm.name = 'one_methyladenosine' OR cvterm.name = 'two_methyladenosine' OR cvterm.name = 'N6_methyladenosine' OR cvterm.name = 'two_prime_O_methyladenosine' OR cvterm.name = 'two_methylthio_N6_methyladenosine' OR cvterm.name = 'N6_isopentenyladenosine' OR cvterm.name = 'two_methylthio_N6_isopentenyladenosine' OR cvterm.name = 'N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'two_methylthio_N6_cis_hydroxyisopentenyl_adenosine' OR cvterm.name = 'N6_glycinylcarbamoyladenosine' OR cvterm.name = 'N6_threonylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_threonyl_carbamoyladenosine' OR cvterm.name = 'N6_methyl_N6_threonylcarbamoyladenosine' OR cvterm.name = 'N6_hydroxynorvalylcarbamoyladenosine' OR cvterm.name = 'two_methylthio_N6_hydroxynorvalyl_carbamoyladenosine' OR cvterm.name = 'two_prime_O_ribosyladenosine_phosphate' OR cvterm.name = 'N6_N6_dimethyladenosine' OR cvterm.name = 'N6_2_prime_O_dimethyladenosine' OR cvterm.name = 'N6_N6_2_prime_O_trimethyladenosine' OR cvterm.name = 'one_two_prime_O_dimethyladenosine' OR cvterm.name = 'N6_acetyladenosine' OR cvterm.name = 'three_methylcytidine' OR cvterm.name = 'five_methylcytidine' OR cvterm.name = 'two_prime_O_methylcytidine' OR cvterm.name = 'two_thiocytidine' OR cvterm.name = 'N4_acetylcytidine' OR cvterm.name = 'five_formylcytidine' OR cvterm.name = 'five_two_prime_O_dimethylcytidine' OR cvterm.name = 'N4_acetyl_2_prime_O_methylcytidine' OR cvterm.name = 'lysidine' OR cvterm.name = 'N4_methylcytidine' OR cvterm.name = 'N4_2_prime_O_dimethylcytidine' OR cvterm.name = 'five_hydroxymethylcytidine' OR cvterm.name = 'five_formyl_two_prime_O_methylcytidine' OR cvterm.name = 'N4_N4_2_prime_O_trimethylcytidine' OR cvterm.name = 'seven_deazaguanosine' OR cvterm.name = 'one_methylguanosine' OR cvterm.name = 'N2_methylguanosine' OR cvterm.name = 'seven_methylguanosine' OR cvterm.name = 'two_prime_O_methylguanosine' OR cvterm.name = 'N2_N2_dimethylguanosine' OR cvterm.name = 'N2_2_prime_O_dimethylguanosine' OR cvterm.name = 'N2_N2_2_prime_O_trimethylguanosine' OR cvterm.name = 'two_prime_O_ribosylguanosine_phosphate' OR cvterm.name = 'wybutosine' OR cvterm.name = 'peroxywybutosine' OR cvterm.name = 'hydroxywybutosine' OR cvterm.name = 'undermodified_hydroxywybutosine' OR cvterm.name = 'wyosine' OR cvterm.name = 'methylwyosine' OR cvterm.name = 'N2_7_dimethylguanosine' OR cvterm.name = 'N2_N2_7_trimethylguanosine' OR cvterm.name = 'one_two_prime_O_dimethylguanosine' OR cvterm.name = 'four_demethylwyosine' OR cvterm.name = 'isowyosine' OR cvterm.name = 'N2_7_2prirme_O_trimethylguanosine' OR cvterm.name = 'queuosine' OR cvterm.name = 'epoxyqueuosine' OR cvterm.name = 'galactosyl_queuosine' OR cvterm.name = 'mannosyl_queuosine' OR cvterm.name = 'seven_cyano_seven_deazaguanosine' OR cvterm.name = 'seven_aminomethyl_seven_deazaguanosine' OR cvterm.name = 'archaeosine' OR cvterm.name = 'dihydrouridine' OR cvterm.name = 'pseudouridine' OR cvterm.name = 'five_methyluridine' OR cvterm.name = 'two_prime_O_methyluridine' OR cvterm.name = 'five_two_prime_O_dimethyluridine' OR cvterm.name = 'one_methylpseudouridine' OR cvterm.name = 'two_prime_O_methylpseudouridine' OR cvterm.name = 'two_thiouridine' OR cvterm.name = 'four_thiouridine' OR cvterm.name = 'five_methyl_2_thiouridine' OR cvterm.name = 'two_thio_two_prime_O_methyluridine' OR cvterm.name = 'three_three_amino_three_carboxypropyl_uridine' OR cvterm.name = 'five_hydroxyuridine' OR cvterm.name = 'five_methoxyuridine' OR cvterm.name = 'uridine_five_oxyacetic_acid' OR cvterm.name = 'uridine_five_oxyacetic_acid_methyl_ester' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine' OR cvterm.name = 'five_carboxyhydroxymethyl_uridine_methyl_ester' OR cvterm.name = 'five_methoxycarbonylmethyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_methoxycarbonylmethyl_two_thiouridine' OR cvterm.name = 'five_aminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyluridine' OR cvterm.name = 'five_methylaminomethyl_two_thiouridine' OR cvterm.name = 'five_methylaminomethyl_two_selenouridine' OR cvterm.name = 'five_carbamoylmethyluridine' OR cvterm.name = 'five_carbamoylmethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'five_carboxymethylaminomethyl_two_thiouridine' OR cvterm.name = 'three_methyluridine' OR cvterm.name = 'one_methyl_three_three_amino_three_carboxypropyl_pseudouridine' OR cvterm.name = 'five_carboxymethyluridine' OR cvterm.name = 'three_two_prime_O_dimethyluridine' OR cvterm.name = 'five_methyldihydrouridine' OR cvterm.name = 'three_methylpseudouridine' OR cvterm.name = 'five_taurinomethyluridine' OR cvterm.name = 'five_taurinomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_uridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_thiouridine' OR cvterm.name = 'five_isopentenylaminomethyl_two_prime_O_methyluridine' OR cvterm.name = 'methylated_base_feature' OR cvterm.name = 'methylated_C' OR cvterm.name = 'methylated_A' OR cvterm.name = 'modified_amino_acid_feature' OR cvterm.name = 'modified_glycine' OR cvterm.name = 'modified_L_alanine' OR cvterm.name = 'modified_L_asparagine' OR cvterm.name = 'modified_L_aspartic_acid' OR cvterm.name = 'modified_L_cysteine' OR cvterm.name = 'modified_L_glutamic_acid' OR cvterm.name = 'modified_L_threonine' OR cvterm.name = 'modified_L_tryptophan' OR cvterm.name = 'modified_L_glutamine' OR cvterm.name = 'modified_L_methionine' OR cvterm.name = 'modified_L_isoleucine' OR cvterm.name = 'modified_L_phenylalanine' OR cvterm.name = 'modified_L_histidine' OR cvterm.name = 'modified_L_serine' OR cvterm.name = 'modified_L_lysine' OR cvterm.name = 'modified_L_leucine' OR cvterm.name = 'modified_L_selenocysteine' OR cvterm.name = 'modified_L_valine' OR cvterm.name = 'modified_L_proline' OR cvterm.name = 'modified_L_tyrosine' OR cvterm.name = 'modified_L_arginine' OR cvterm.name = 'operon' OR cvterm.name = 'gene_array' OR cvterm.name = 'gene_subarray' OR cvterm.name = 'gene_cassette_array' OR cvterm.name = 'regulon' OR cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'biological_region';
+
+--- ************************************************
+--- *** relation: topologically_defined_region   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A region that is defined according to it ***
+--- *** s relations with other regions within th ***
+--- *** e same sequence.                         ***
+--- ************************************************
+---
+
+CREATE VIEW topologically_defined_region AS
+  SELECT
+    feature_id AS topologically_defined_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'flanking_region' OR cvterm.name = 'repeat_region' OR cvterm.name = 'repeat_component' OR cvterm.name = 'nested_region' OR cvterm.name = 'transposable_element_flanking_region' OR cvterm.name = 'five_prime_flanking_region' OR cvterm.name = 'three_prime_flanking_region' OR cvterm.name = 'satellite_DNA' OR cvterm.name = 'long_terminal_repeat' OR cvterm.name = 'engineered_foreign_repetitive_element' OR cvterm.name = 'inverted_repeat' OR cvterm.name = 'direct_repeat' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'dispersed_repeat' OR cvterm.name = 'tandem_repeat' OR cvterm.name = 'repeat_unit' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'five_prime_LTR' OR cvterm.name = 'three_prime_LTR' OR cvterm.name = 'solo_LTR' OR cvterm.name = 'terminal_inverted_repeat' OR cvterm.name = 'five_prime_terminal_inverted_repeat' OR cvterm.name = 'three_prime_terminal_inverted_repeat' OR cvterm.name = 'target_site_duplication' OR cvterm.name = 'microsatellite' OR cvterm.name = 'minisatellite' OR cvterm.name = 'dinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'trinucleotide_repeat_microsatellite_feature' OR cvterm.name = 'tetranucleotide_repeat_microsatellite_feature' OR cvterm.name = 'non_LTR_retrotransposon_polymeric_tract' OR cvterm.name = 'LTR_component' OR cvterm.name = 'repeat_fragment' OR cvterm.name = 'U5_LTR_region' OR cvterm.name = 'R_LTR_region' OR cvterm.name = 'U3_LTR_region' OR cvterm.name = 'three_prime_LTR_component' OR cvterm.name = 'five_prime_LTR_component' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'R_three_prime_LTR_region' OR cvterm.name = 'U3_three_prime_LTR_region' OR cvterm.name = 'U5_three_prime_LTR_region' OR cvterm.name = 'R_five_prime_LTR_region' OR cvterm.name = 'U5_five_prime_LTR_region' OR cvterm.name = 'U3_five_prime_LTR_region' OR cvterm.name = 'nested_repeat' OR cvterm.name = 'nested_transposon' OR cvterm.name = 'topologically_defined_region';
+
+--- ************************************************
+--- *** relation: translocation_breakpoint       ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The point within a chromosome where a tr ***
+--- *** anslocation begins or ends.              ***
+--- ************************************************
+---
+
+CREATE VIEW translocation_breakpoint AS
+  SELECT
+    feature_id AS translocation_breakpoint_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'translocation_breakpoint';
+
+--- ************************************************
+--- *** relation: insertion_breakpoint           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The point within a chromosome where a in ***
+--- *** sertion begins or ends.                  ***
+--- ************************************************
+---
+
+CREATE VIEW insertion_breakpoint AS
+  SELECT
+    feature_id AS insertion_breakpoint_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'insertion_breakpoint';
+
+--- ************************************************
+--- *** relation: deletion_breakpoint            ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The point within a chromosome where a de ***
+--- *** letion begins or ends.                   ***
+--- ************************************************
+---
+
+CREATE VIEW deletion_breakpoint AS
+  SELECT
+    feature_id AS deletion_breakpoint_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'deletion_breakpoint';
+
+--- ************************************************
+--- *** relation: five_prime_flanking_region     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A flanking region located five prime of  ***
+--- *** a specific region.                       ***
+--- ************************************************
+---
+
+CREATE VIEW five_prime_flanking_region AS
+  SELECT
+    feature_id AS five_prime_flanking_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'five_prime_flanking_region';
+
+--- ************************************************
+--- *** relation: three_prime_flanking_region    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A flanking region located three prime of ***
+--- ***  a specific region.                      ***
+--- ************************************************
+---
+
+CREATE VIEW three_prime_flanking_region AS
+  SELECT
+    feature_id AS three_prime_flanking_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'three_prime_flanking_region';
+
+--- ************************************************
+--- *** relation: transcribed_fragment           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** An experimental region, defined by a til ***
+--- *** ing array experiment to be transcribed a ***
+--- *** t some level.                            ***
+--- ************************************************
+---
+
+CREATE VIEW transcribed_fragment AS
+  SELECT
+    feature_id AS transcribed_fragment_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'transcribed_fragment';
 
 --- ************************************************
 --- *** relation: regulatory_region              ***
@@ -20888,7 +23691,7 @@ CREATE VIEW regulatory_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'promoter_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'TATA_box' OR cvterm.name = 'bacterial_RNApol_promoter_region' OR cvterm.name = 'RNApol_II_promoter_region' OR cvterm.name = 'RNApol_III_promoter_type_1_region' OR cvterm.name = 'RNApol_III_promoter_type_2_region' OR cvterm.name = 'minus_10_signal' OR cvterm.name = 'minus_35_signal' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'PSE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'GC_rich_promoter_region' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'DMv4_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'DMv5_motif' OR cvterm.name = 'DMv3_motif' OR cvterm.name = 'DMv2_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'DPE1_motif' OR cvterm.name = 'DMv1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'NDM2_motif' OR cvterm.name = 'NDM3_motif' OR cvterm.name = 'C_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'enhanceosome' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'regulatory_region';
+  WHERE cvterm.name = 'attenuator' OR cvterm.name = 'terminator' OR cvterm.name = 'TF_binding_site' OR cvterm.name = 'polyA_signal_sequence' OR cvterm.name = 'gene_group_regulatory_region' OR cvterm.name = 'transcriptional_cis_regulatory_region' OR cvterm.name = 'splicing_regulatory_region' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'eukaryotic_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'terminator_of_type_2_RNApol_III_promoter' OR cvterm.name = 'INR_motif' OR cvterm.name = 'DPE_motif' OR cvterm.name = 'BRE_motif' OR cvterm.name = 'CAAT_signal' OR cvterm.name = 'TATA_box' OR cvterm.name = 'A_box' OR cvterm.name = 'B_box' OR cvterm.name = 'C_box' OR cvterm.name = 'DRE_motif' OR cvterm.name = 'E_box_motif' OR cvterm.name = 'MTE' OR cvterm.name = 'INR1_motif' OR cvterm.name = 'GAGA_motif' OR cvterm.name = 'octamer_motif' OR cvterm.name = 'operator' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'bacterial_terminator' OR cvterm.name = 'rho_dependent_bacterial_terminator' OR cvterm.name = 'rho_independent_bacterial_terminator' OR cvterm.name = 'promoter' OR cvterm.name = 'insulator' OR cvterm.name = 'CRM' OR cvterm.name = 'promoter_targeting_sequence' OR cvterm.name = 'bidirectional_promoter' OR cvterm.name = 'RNA_polymerase_promoter' OR cvterm.name = 'RNApol_I_promoter' OR cvterm.name = 'RNApol_II_promoter' OR cvterm.name = 'RNApol_III_promoter' OR cvterm.name = 'bacterial_RNApol_promoter' OR cvterm.name = 'Phage_RNA_Polymerase_Promoter' OR cvterm.name = 'RNApol_III_promoter_type_1' OR cvterm.name = 'RNApol_III_promoter_type_2' OR cvterm.name = 'RNApol_III_promoter_type_3' OR cvterm.name = 'SP6_RNA_Polymerase_Promoter' OR cvterm.name = 'T3_RNA_Polymerase_Promoter' OR cvterm.name = 'T7_RNA_Polymerase_Promoter' OR cvterm.name = 'locus_control_region' OR cvterm.name = 'enhancer' OR cvterm.name = 'silencer' OR cvterm.name = 'enhancer_bound_by_factor' OR cvterm.name = 'splice_enhancer' OR cvterm.name = 'intronic_splice_enhancer' OR cvterm.name = 'exonic_splice_enhancer' OR cvterm.name = 'regulatory_region';
 
 --- ************************************************
 --- *** relation: u14_snorna_primary_transcript  ***
@@ -21187,7 +23990,7 @@ CREATE VIEW biochemical_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'biochemical_region';
+  WHERE cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'biochemical_region';
 
 --- ************************************************
 --- *** relation: molecular_contact_region       ***
@@ -21204,7 +24007,7 @@ CREATE VIEW molecular_contact_region AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'protein_ligand_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'molecular_contact_region';
+  WHERE cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'molecular_contact_region';
 
 --- ************************************************
 --- *** relation: i_unstructured_region          ***
@@ -21388,6 +24191,209 @@ CREATE VIEW no_output AS
   WHERE cvterm.name = 'no_output';
 
 --- ************************************************
+--- *** relation: cleaved_peptide_region         ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The cleaved_peptide_regon is the a regio ***
+--- *** n of peptide sequence that is cleaved du ***
+--- *** ring maturation.                         ***
+--- ************************************************
+---
+
+CREATE VIEW cleaved_peptide_region AS
+  SELECT
+    feature_id AS cleaved_peptide_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'signal_peptide' OR cvterm.name = 'cleaved_initiator_methionine' OR cvterm.name = 'transit_peptide' OR cvterm.name = 'intein' OR cvterm.name = 'propeptide_cleavage_site' OR cvterm.name = 'propeptide' OR cvterm.name = 'cleaved_for_gpi_anchor_region' OR cvterm.name = 'lipoprotein_signal_peptide' OR cvterm.name = 'n_terminal_region' OR cvterm.name = 'c_terminal_region' OR cvterm.name = 'central_hydrophobic_region' OR cvterm.name = 'cleaved_peptide_region';
+
+--- ************************************************
+--- *** relation: coil                           ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Irregular, unstructured regions of a pro ***
+--- *** tein's backbone, as distinct from the re ***
+--- *** gular region (namely alpha helix and bet ***
+--- *** a strand - characterised by specific pat ***
+--- *** terns of main-chain hydrogen bonds).     ***
+--- ************************************************
+---
+
+CREATE VIEW coil AS
+  SELECT
+    feature_id AS coil_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'coil';
+
+--- ************************************************
+--- *** relation: hydrophobic_region             ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Hydrophobic regions are regions with a l ***
+--- *** ow affinity for water.                   ***
+--- ************************************************
+---
+
+CREATE VIEW hydrophobic_region AS
+  SELECT
+    feature_id AS hydrophobic_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'hydrophobic_region';
+
+--- ************************************************
+--- *** relation: n_terminal_region              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The amino-terminal positively-charged re ***
+--- *** gion of the signal peptide (aprox 1-5 aa ***
+--- *** ).                                       ***
+--- ************************************************
+---
+
+CREATE VIEW n_terminal_region AS
+  SELECT
+    feature_id AS n_terminal_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'n_terminal_region';
+
+--- ************************************************
+--- *** relation: c_terminal_region              ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The more polar, carboxy-terminal region  ***
+--- *** of the signal peptide (approx 3-7 aa).   ***
+--- ************************************************
+---
+
+CREATE VIEW c_terminal_region AS
+  SELECT
+    feature_id AS c_terminal_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'c_terminal_region';
+
+--- ************************************************
+--- *** relation: central_hydrophobic_region     ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** The central, hydrophobic region of the s ***
+--- *** ignal peptide (aprox 7-15 aa).           ***
+--- ************************************************
+---
+
+CREATE VIEW central_hydrophobic_region AS
+  SELECT
+    feature_id AS central_hydrophobic_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'central_hydrophobic_region';
+
+--- ************************************************
+--- *** relation: polypeptide_conserved_motif    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A conserved motif is a short (up to 20 a ***
+--- *** mino acids) region of biological interes ***
+--- *** t that is conserved in different protein ***
+--- *** s. They may or may not have functional o ***
+--- *** r structural significance within the pro ***
+--- *** teins in which they are found.           ***
+--- ************************************************
+---
+
+CREATE VIEW polypeptide_conserved_motif AS
+  SELECT
+    feature_id AS polypeptide_conserved_motif_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'polypeptide_conserved_motif';
+
+--- ************************************************
+--- *** relation: binding_motif                  ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A binding motif is a short (up to 20 ami ***
+--- *** no acids) region of biological interest  ***
+--- *** that contains one or more amino acids ex ***
+--- *** perimentally shown to bind to a ligand.  ***
+--- ************************************************
+---
+
+CREATE VIEW binding_motif AS
+  SELECT
+    feature_id AS binding_motif_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'binding_motif';
+
+--- ************************************************
+--- *** relation: catalytic_motif                ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A catalytic motif is a short (up to 20 a ***
+--- *** mino acids) region of biological interes ***
+--- *** t that contains one or more active site  ***
+--- *** residues.                                ***
+--- ************************************************
+---
+
+CREATE VIEW catalytic_motif AS
+  SELECT
+    feature_id AS catalytic_motif_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'catalytic_residue' OR cvterm.name = 'catalytic_motif';
+
+--- ************************************************
+--- *** relation: dna_contact                    ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** Residues involved in interactions with D ***
+--- *** NA.                                      ***
+--- ************************************************
+---
+
+CREATE VIEW dna_contact AS
+  SELECT
+    feature_id AS dna_contact_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'DNA_contact';
+
+--- ************************************************
+--- *** relation: polypeptide_conserved_region   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A subsection of sequence with biological ***
+--- ***  interest that is conserved in different ***
+--- ***  proteins. They may or may not have func ***
+--- *** tional or structural significance within ***
+--- ***  the proteins in which they are found.   ***
+--- ************************************************
+---
+
+CREATE VIEW polypeptide_conserved_region AS
+  SELECT
+    feature_id AS polypeptide_conserved_region_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'polypeptide_domain' OR cvterm.name = 'polypeptide_motif' OR cvterm.name = 'polypeptide_repeat' OR cvterm.name = 'biochemical_region' OR cvterm.name = 'polypeptide_conserved_motif' OR cvterm.name = 'post_translationally_modified_region' OR cvterm.name = 'molecular_contact_region' OR cvterm.name = 'binding_motif' OR cvterm.name = 'catalytic_motif' OR cvterm.name = 'metal_contact' OR cvterm.name = 'protein_protein_contact' OR cvterm.name = 'ligand_contact' OR cvterm.name = 'DNA_contact' OR cvterm.name = 'Ca_contact_site' OR cvterm.name = 'Co_contact_site' OR cvterm.name = 'Cu_contact_site' OR cvterm.name = 'Fe_contact_site' OR cvterm.name = 'Mg_contact_site' OR cvterm.name = 'Mn_contact_site' OR cvterm.name = 'Mo_contact_site' OR cvterm.name = 'Ni_contact_site' OR cvterm.name = 'W_contact_site' OR cvterm.name = 'Zn_contact_site' OR cvterm.name = 'catalytic_residue' OR cvterm.name = 'polypeptide_conserved_region';
+
+--- ************************************************
 --- *** relation: substitution                   ***
 --- *** relation type: VIEW                      ***
 --- ***                                          ***
@@ -21402,7 +24408,7 @@ CREATE VIEW substitution AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'uncharacterised_change_in_nucleotide_sequence' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'partially_characterised_change_in_DNA_sequence' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'substitution';
+  WHERE cvterm.name = 'sequence_length_variation' OR cvterm.name = 'SNP' OR cvterm.name = 'complex_substitution' OR cvterm.name = 'point_mutation' OR cvterm.name = 'simple_sequence_length_variation' OR cvterm.name = 'MNP' OR cvterm.name = 'transition' OR cvterm.name = 'transversion' OR cvterm.name = 'pyrimidine_transition' OR cvterm.name = 'purine_transition' OR cvterm.name = 'C_to_T_transition' OR cvterm.name = 'T_to_C_transition' OR cvterm.name = 'C_to_T_transition_at_pCpG_site' OR cvterm.name = 'A_to_G_transition' OR cvterm.name = 'G_to_A_transition' OR cvterm.name = 'pyrimidine_to_purine_transversion' OR cvterm.name = 'purine_to_pyrimidine_transversion' OR cvterm.name = 'C_to_A_transversion' OR cvterm.name = 'C_to_G_transversion' OR cvterm.name = 'T_to_A_transversion' OR cvterm.name = 'T_to_G_transversion' OR cvterm.name = 'A_to_C_transversion' OR cvterm.name = 'A_to_T_transversion' OR cvterm.name = 'G_to_C_transversion' OR cvterm.name = 'G_to_T_transversion' OR cvterm.name = 'substitution';
 
 --- ************************************************
 --- *** relation: pc_change_in_dna_sequence      ***
@@ -23995,7 +27001,7 @@ CREATE VIEW chromosome_number_variation AS
     feature.*
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
-  WHERE cvterm.name = 'aneuploid' OR cvterm.name = 'hyperploid' OR cvterm.name = 'hypoploid' OR cvterm.name = 'chromosome_number_variation';
+  WHERE cvterm.name = 'aneuploid' OR cvterm.name = 'polyploid' OR cvterm.name = 'hyperploid' OR cvterm.name = 'hypoploid' OR cvterm.name = 'autopolyploid' OR cvterm.name = 'allopolyploid' OR cvterm.name = 'chromosome_number_variation';
 
 --- ************************************************
 --- *** relation: chromosome_structure_variation ***
@@ -24832,6 +27838,25 @@ CREATE VIEW databank_entry AS
   FROM
     feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
   WHERE cvterm.name = 'databank_entry';
+
+--- ************************************************
+--- *** relation: gene_segment                   ***
+--- *** relation type: VIEW                      ***
+--- ***                                          ***
+--- *** A gene component region which acts as a  ***
+--- *** recombinational unit of a gene whose fun ***
+--- *** ctional form is generated through somati ***
+--- *** c recombination.                         ***
+--- ************************************************
+---
+
+CREATE VIEW gene_segment AS
+  SELECT
+    feature_id AS gene_segment_id,
+    feature.*
+  FROM
+    feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)
+  WHERE cvterm.name = 'gene_segment';
 
 
 
