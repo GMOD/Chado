@@ -6,7 +6,7 @@ use Carp;
 use DBI;
 use Getopt::Long;
 use Time::HiRes qw( time );
-use GO::Parser;
+#use GO::Parser;
 use Data::Dumper;
 
 # POD DOCS AT END
@@ -75,12 +75,12 @@ my $child_term_query = "SELECT cvterm.cvterm_id,cvterm.name FROM cvterm JOIN cvt
 my $child_query_handle = $dbh->prepare($child_term_query);
 
 # ==============================================================
-# PARSE SOFA
+# PARSE SOFA  Removed for the time being--SO info from Chado 
 # ==============================================================
-my $p = GO::Parser->new({handler=>'obj'});
-my $f = shift || die "must pass SO or SOFA file";
-$p->parse($f);
-my $graph = $p->handler->graph;
+#my $p = GO::Parser->new({handler=>'obj'});
+#my $f = shift || die "must pass SO or SOFA file";
+#$p->parse($f);
+#my $graph = $p->handler->graph;
 
 
 # ==============================================================

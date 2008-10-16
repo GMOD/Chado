@@ -1,4 +1,4 @@
-$Id: INSTALL.Custom,v 1.6 2007-07-12 17:55:07 scottcain Exp $
+$Id: INSTALL.Custom,v 1.7 2008-10-16 21:48:57 scottcain Exp $
 
 The Chado schema is organized as a set of modules where each module 
 has its own directory in chado/modules/. This structure is designed to allow
@@ -75,6 +75,15 @@ This is optional. The file audit
 
 Delete everything in the non-substituting HEREDOC, insert the
 corresponding section from the corresponding blib/lib/Chado/AutoDBI.pm
+
+10. Regenerate modules/sequence/bridges/sofa-bridge.sql.  This doesn't need
+to be done all the time, but should be done before a release.  Note that the
+create-so-layer.pl script has addtional options for making materialized
+views for doing fast feature type-related queries (which haven't been tested;
+they probably don't work).  Note that it requires an instance of Chado
+that has SO loaded.
+
+  perl bin/create-so-bridge.pl -d 'dbi:Pg:database=chado' > modules/sequence/bridges/so-bridge.sql
 
 
 CUSTOMIZATION USING makedep.pl
