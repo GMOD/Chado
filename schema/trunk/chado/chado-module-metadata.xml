@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- $Id: chado-module-metadata.xml,v 1.22 2007-04-12 18:45:14 briano Exp $ -->
+<!-- $Id: chado-module-metadata.xml,v 1.23 2008-10-16 21:48:57 scottcain Exp $ -->
 <schema_metadata id='chado'>
 
   <title>Chado: A generic model organism database schema</title>
@@ -250,15 +250,16 @@
         <source type='bridge-xml' path='sequence/bridges/chaos-bridge.sql'/>
       </component>
 
-      <component id='sofa-bridge' type='bridge' required='true'>
+      <component id='so-bridge' type='view' required='true'>
         <description>
-          Provides a view for every type in the SOFA ontology. This
+          Provides a view for every type in the SO ontology. This
           means you can do queries such as "SELECT * FROM gene" etc
         </description>
-        <source type='bridge-xml' path='sequence/bridges/sofa-bridge.sql'/>
+        <source type='sql' path='sequence/bridges/so-bridge.sql'/>
       </component>
 
       <component id='implicit-feature-views' type='views' required='true'>
+        <dependency to='sofa-bridge' />
         <description>
           This enhances the SOFA layer with additional queries for
           complex feature types, such as those can be inferred from
