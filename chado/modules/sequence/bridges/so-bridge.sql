@@ -1,3 +1,7 @@
+--This is an automatically generated file; do not edit it as changes will not
+--be saved.  Instead, modify bin/create-so-bridge.pl, which creates this file.
+
+
 CREATE SCHEMA so;
 SET search_path=so,public,pg_catalog;
 

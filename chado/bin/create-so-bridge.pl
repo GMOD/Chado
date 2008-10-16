@@ -116,6 +116,9 @@ my %abbrev = ();
 
 # make them database-safe (remove certain characters)
 $| = 1;
+
+print "--This is an automatically generated file; do not edit it as changes will not\n";
+print "--be saved.  Instead, modify bin/create-so-bridge.pl, which creates this file.\n\n\n";
 if ($schema) {
     print "CREATE SCHEMA $schema;\nSET search_path=$schema,public,pg_catalog;\n\n";
 }
