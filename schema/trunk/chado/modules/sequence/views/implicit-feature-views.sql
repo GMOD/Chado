@@ -3,14 +3,14 @@
 
 -- The standard Chado pattern for protein coding genes
 -- is a feature of type 'gene' with 'mRNA' features as parts
--- REQUIRES: 'mrna' view from sofa-bridge.sql
+-- REQUIRES: 'mrna' view from so-bridge.sql
 CREATE OR REPLACE VIEW protein_coding_gene AS
  SELECT
   DISTINCT gene.*
  FROM
   feature AS gene
   INNER JOIN feature_relationship AS fr ON (gene.feature_id=fr.object_id)
-  INNER JOIN mrna ON (mrna.feature_id=fr.subject_id);
+  INNER JOIN so.mrna ON (mrna.feature_id=fr.subject_id);
 
 
 -- introns are implicit from surrounding exons
