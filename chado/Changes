@@ -17,7 +17,12 @@ for Apollo, but by the time this function was done, Ed Lee had fixed up
 Apollo to not need it.
 * Fixed the audit module so that the triggers in it work with versions
 of PostgreSQL greater that 8.0.
-* Added a protein_code_gene view; thanks to Chris Mungall.
+* Added so-bridge views.  These are a set of views on the feature table
+the use SO terms for the names of the views, making it easy to query for
+genes by doing something like this:  SELECT * FROM so.gene WHERE name='foo'.
+See http://gmod.org/Chado_SO_Views for more information.
+* Added a protein_code_gene view (depends on so-bridge); thanks to Chris
+Mungall.
 
 
 

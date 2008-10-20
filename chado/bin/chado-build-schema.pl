@@ -257,7 +257,7 @@ sub read_source {
     foreach my $source (@sources) {
         my $type = $source->sget('@/type');
         my $path = $source->sget('@/path');
-        if ($ONLY_SQL && ($type ne 'sql' || $path =~ /view/ ) ) {
+        if ($ONLY_SQL && ($type ne 'sql' || $path =~ /view/ || $path =~ /bridge/ ) ) {
             print STDERR "Skipping source $type $path for $id\n";
             next;
         }
