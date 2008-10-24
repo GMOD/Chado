@@ -101,10 +101,12 @@ if ($dbh) {
       $dbh->selectall_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
 			     FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
     die "could not find terms" unless @$trows;
-    $used_type_ids =
-      #$dbh->selectcol_arrayref("SELECT DISTINCT type_id FROM feature");
-      $dbh->selectcol_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
-                             FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
+
+    $used_type_ids = $id_based ?
+      $dbh->selectcol_arrayref("SELECT DISTINCT type_id 
+      FROM feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)")
+      : $dbh->selectcol_arrayref("SELECT DISTINCT cvterm_id
+        FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
 }
 my %used_type_idh = map { $_=>1 } @$used_type_ids;
 my %n2id = map { $_->[1] => $_->[0] } @$trows;
@@ -125,10 +127,12 @@ if ($schema) {
 
 msg("generating SO layer....");
 foreach my $term (@terms) {
-    my $tname = $$term{name};
-    my $def = $$term{definition} || '';
-    my $vname = safename($tname);
+    my $tname    = $$term{name};
+    my $def      = $$term{definition} || '';
+    my $cvtermid = $$term{cvterm_id};
+    my $vname    = safename($tname);
 
+    next if ($id_based && !$used_type_idh{$cvtermid});
 
     my (@cols, @selcols, $sel);
 
@@ -171,10 +175,10 @@ foreach my $term (@terms) {
 	  );
     my $from = "INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)";
     my $where = "cvterm.name = '$tname'";
-#    if ($id_based) {
-#        my $id = $n2id{$tname};        
-#        $where = "feature.type_id = $id";
-#    }
+    if ($id_based) {
+        my $id = $n2id{$tname};        
+        $where = "feature.type_id = $id";
+    }
     if ($do_closure) {
         my @cterms = 
           get_recursive_child_terms_by_type_from_chado($$term{cvterm_id});
@@ -185,14 +189,14 @@ foreach my $term (@terms) {
 #            @pnames = grep { $used_type_idh{$n2id{$_}} } @pnames;
 #        }
 #        @pnames = map {safename($_)} @pnames;
-#        if ($id_based) {
-#            $where = join(' OR ',
-#                          map {"cvterm.name = '$_'"} map {$n2id{$_}} @pnames);
-#        }
-#        else {
+        if ($id_based) {
             $where = join(' OR ',
-                          map {"cvterm.name = '$_'"} @pnames);
-#        }
+                        map {"feature.type_id = '$_'"} map {$n2id{$_}} @pnames);
+        }
+        else {
+            $where = join(' OR ',
+                        map {"cvterm.name = '$_'"} @pnames);
+        }
               
     }
    
