@@ -241,9 +241,10 @@ foreach my $term (@terms) {
 
     if ($RTYPE eq 'TABLE') {
 	print "\n\n--- *** Auto-generated indexes ***\n";
-	foreach my $col (@cols) {
+	foreach my $col (@ifcols) {
 	    print "CREATE INDEX $vname"."_idx_$col ON $vname ($col);\n";
 	}
+        print "\n\n";
     }
 
 
@@ -449,11 +450,13 @@ create-sofa-bridge.pl
 
 =item -d DBI-LOCATOR
 
-Database to use as source (does not actually write to database)
+Database to use as source (does not actually write to database), like 
+'dbi:Pg:database=chado;host=dbserver'
 
 =item -i
 
-use internal surrogate database IDs (layer will be NON-PORTABLE)
+use internal surrogate database IDs (layer will be NON-PORTABLE) and
+only views for which there are features in the feature table will be created.
 
 =item -r|rtype RELATION-TYPE
 
@@ -462,7 +465,7 @@ RELATION-TYPE must be either TABLE or VIEW; the default is VIEW
 This determines whether the layer consists of materialized views (ie
 TABLEs), or views
 
-=item -d|drop
+=item --drop
 
 If this is specified, then DROP VIEW/TABLE statements will be created
 
