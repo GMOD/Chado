@@ -279,6 +279,8 @@ for my $gfffile (@gfffiles) {
 #   -get ref seqs (refseq == id)
 #   -get things with no parent
 
+    print OUT "##gff-version 3\n";
+
     my @refseqs = $db->sorter_get_refseqs();
     for my $refseq (@refseqs) {
         print OUT $refseq;      #already has the line feed
