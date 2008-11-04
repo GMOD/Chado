@@ -1,4 +1,4 @@
-$Id: INSTALL.Chado,v 1.9 2008-04-03 21:20:06 scottcain Exp $
+$Id: INSTALL.Chado,v 1.10 2008-11-04 20:36:20 scottcain Exp $
 
 * COMMAND-LINE INSTALL
 
@@ -382,8 +382,7 @@ and to restore the database, issue this command:
 LOADING DATA
 
 With that, the installation of the schema is complete. Please see the HOWTOs
-at http://wiki.gmod.org for information on loading the Chado schema
-with data.
+at http://gmod.org/ for information on loading the Chado schema with data.
 
 
 GENERIC GENOME BROWSER
