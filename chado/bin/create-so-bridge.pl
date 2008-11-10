@@ -11,7 +11,7 @@ use Data::Dumper;
 
 # POD DOCS AT END
 
-use constant MAX_RELATION_NAME_LEN => 31;
+use constant MAX_RELATION_NAME_LEN => 100; # 31;
 
 my $debug;
 my $help;
@@ -26,6 +26,7 @@ my $counts;
 my $RTYPE = 'VIEW';
 my $schema = 'so';
 my $so_name = 'sequence';
+my $ontology = $so_name;
 my $verbose;
 my $do_closure=1;
 
@@ -41,11 +42,15 @@ GetOptions(
 	   "ptype_id=s"=>\$PROPTYPE_ID,
 	   "rtype|r=s"=>\$RTYPE,
            "verbose|v"=>\$verbose,
+           "ontology|o=s"=>\$ontology,
           );
 if ($help) {
     system("perldoc $0");
     exit 0;
 }
+
+$id_based = 1 unless ($ontology eq 'sequence');
+$schema   = lc($ontology) unless ($ontology eq 'sequence');
 
 if ($RTYPE ne 'VIEW' && $RTYPE ne 'TABLE') {
     die "RTYPE: $RTYPE is not VIEW or TABLE";
@@ -88,7 +93,7 @@ my $child_query_handle = $dbh->prepare($child_term_query);
 # ==============================================================
 # this is only the feature types for which a feature exists within
 # the particular chado implementation
-my @terms = get_so_terms();
+my @terms = get_so_terms($ontology);
 
 # ==============================================================
 # GET CVTERM IDS
@@ -97,16 +102,38 @@ my $trows = [];
 my $used_type_ids;
 if ($dbh) {
     msg("getting type to prop mappings");
-    $trows =
-      $dbh->selectall_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
-			     FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
+    if ($ontology eq 'GO') {
+      $trows =
+        $dbh->selectall_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
+           FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='biological_process' or cv.name='molecular_function' or cv.name='cellular_component'");
+    } 
+    else {
+      $trows =
+        $dbh->selectall_arrayref("SELECT DISTINCT cvterm_id, cvterm.name
+	   FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='$ontology'");
+    }
     die "could not find terms" unless @$trows;
 
-    $used_type_ids = $id_based ?
-      $dbh->selectcol_arrayref("SELECT DISTINCT type_id 
-      FROM feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)")
+    if ($ontology eq 'GO') {
+      $used_type_ids = $dbh->selectcol_arrayref("SELECT DISTINCT cvterm_id
+          FROM cvterm INNER JOIN feature_cvterm USING (cvterm_id)
+          WHERE cv_id IN (SELECT cv_id FROM cv WHERE
+            cv.name='biological_process' 
+            or cv.name='molecular_function' 
+            or cv.name='cellular_component')");
+    }
+    elsif ($ontology ne 'sequence') {
+      $used_type_ids = $dbh->selectcol_arrayref("SELECT DISTINCT cvterm_id
+          FROM cvterm INNER JOIN feature_cvterm USING (cvterm_id)
+          WHERE cv_id IN (SELECT cv_id FROM cv WHERE name = '$ontology'");
+    }
+    else { #sequence
+      $used_type_ids = $id_based ?
+        $dbh->selectcol_arrayref("SELECT DISTINCT type_id 
+        FROM feature INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)")
       : $dbh->selectcol_arrayref("SELECT DISTINCT cvterm_id
         FROM cvterm INNER JOIN cv USING (cv_id) WHERE cv.name='sequence'");
+    }
 }
 my %used_type_idh = map { $_=>1 } @$used_type_ids;
 my %n2id = map { $_->[1] => $_->[0] } @$trows;
@@ -173,9 +200,16 @@ foreach my $term (@terms) {
 	   "    feature %s",
 	   "  WHERE %s",
 	  );
-    my $from = "INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)";
+
+    my $from;
+    if ($ontology eq 'sequence') {
+        $from = "INNER JOIN cvterm ON (feature.type_id = cvterm.cvterm_id)";
+    }
+    else {
+        $from = "INNER JOIN feature_cvterm USING (feature_id) INNER JOIN cvterm USING (cvterm_id)"; 
+    }
     my $where = "cvterm.name = '$tname'";
-    if ($id_based) {
+    if ($id_based and $ontology eq 'sequence') {
         my $id = $n2id{$tname};        
         $where = "feature.type_id = $id";
     }
@@ -189,7 +223,7 @@ foreach my $term (@terms) {
 #            @pnames = grep { $used_type_idh{$n2id{$_}} } @pnames;
 #        }
 #        @pnames = map {safename($_)} @pnames;
-        if ($id_based) {
+        if ($id_based and $ontology eq 'sequence') {
             $where = join(' OR ',
                         map {"feature.type_id = '$_'"} map {$n2id{$_}} @pnames);
         }
@@ -207,10 +241,10 @@ foreach my $term (@terms) {
             print STDERR "no id for $tname\n" unless $id;
             next;
         }
-	$from = "";
+	$from = "" if $ontology eq 'sequence';
 	$cmnt = "--- This view is derived from the cvterm database ID.\n".
 	  "--- This will be more efficient, but the views MUST be regenerated\n".
-	    "--- when the Sequence Ontology in the database changes\n";
+	    "--- when the underlying ontology in the database changes\n";
     }
     
     my $vsql =
@@ -270,7 +304,13 @@ sub safename {
     my $n = lc($orig);
     $n =~ s/\./_/;
     my @parts = ();
-    @parts = split(/_/, $n);
+    if ($orig =~ /\s/) {
+      @parts = split(/ /, $n);
+    }
+    else {
+      @parts = split(/_/, $n);
+    }
+
 #    @parts = map {$abbrev{$_} || $_} @parts;
     #start hard coding some short circuits to make sure everything gets a unqique name
     if ($n eq 'deficient_intrachromosomal_transposition') {
@@ -382,12 +422,18 @@ sub safename {
 	}
       }
       $n = '';
-      while (my $part = shift @parts) {
-	$n .= $part;
-	if (@parts && (length($part) > 1 || length($parts[0]) > 1)) {
-	    $n.= '_';
-	}
+      warn @parts;
+      $n = join('_', @parts);
+      warn $n;
+      for (@parts) {
+         warn $_;
       }
+#      while (my $part = shift @parts) {
+#	$n .= $part;
+#	if (@parts && (length($part) > 1 || length($parts[0]) > 1)) {
+#	    $n.= '_';
+#	}
+#      }
     }
 #    print "NAMEMAP: $orig -> $n\n";
     if ($revnamemap{$n}) {
@@ -400,10 +446,18 @@ sub safename {
 }
 
 sub get_so_terms {
-  my $query = "SELECT cvterm_id, cvterm.name, cvterm.definition FROM cvterm JOIN cv USING (cv_id) WHERE cv.name=? and is_relationshiptype = 0 and cvterm.name not like '%obsolete %' order by cvterm_id";
-
-  my $sth = $dbh->prepare($query);
-  $sth->execute($so_name);
+  my $ontology = shift;
+  my ($query,$sth);
+  if ($ontology eq 'GO') {
+    $query = "SELECT cvterm_id, name, definition FROM cvterm  WHERE cv_id in (SELECT cv_id FROM cv WHERE cv.name='biological_process' or cv.name='molecular_function' or cv.name='cellular_component') and is_relationshiptype = 0 and name not like '%obsolete %' order by cvterm_id";
+    $sth = $dbh->prepare($query);
+    $sth->execute();
+  }
+  else {
+    $query = "SELECT cvterm_id, cvterm.name, cvterm.definition FROM cvterm JOIN cv USING (cv_id) WHERE cv.name=? and is_relationshiptype = 0 and cvterm.name not like '%obsolete %' order by cvterm_id";
+    $sth = $dbh->prepare($query);
+    $sth->execute($ontology);
+  }
 
   my @terms = ();
   while (my $hashref = $sth->fetchrow_hashref) {
