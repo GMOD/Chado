@@ -159,6 +159,8 @@ foreach my $term (@terms) {
     my $cvtermid = $$term{cvterm_id};
     my $vname    = safename($tname);
 
+    next if $vname == -1;
+
     next if ($id_based && !$used_type_idh{$cvtermid});
 
     my (@cols, @selcols, $sel);
@@ -437,12 +439,30 @@ sub safename {
     }
 #    print "NAMEMAP: $orig -> $n\n";
     if ($revnamemap{$n}) {
-        print STDERR "The short name $n already exists; the existing view\n";
-        print STDERR "is called $revnamemap{$n}, and the current view is for $orig\n";
-        die;
+        #figure out if there are any terms that use this term--if not, skip
+        #it with a warning; if so die
+        #We should probably provide a way for the user to supply custom
+        #name mappings to get around this
+        my $non_so_used_query = "SELECT count(feature_id) FROM feature_cvterm INNER JOIN cvterm USING (cvterm_id) WHERE cvterm.name = ?";
+        my $sth = $dbh->prepare($non_so_used_query);
+        $sth->execute($orig); 
+        my ($exists) = $sth->fetchrow_array;
+
+        if ($exists) {
+          print STDERR "The short name $n already exists; the existing view\n";
+          print STDERR "is called $revnamemap{$n}, and the current view is for $orig\n";
+          die;
+        }
+        else {
+          print STDERR "The short name $n already exists; the existing view\n";
+          print STDERR "is called $revnamemap{$n}, and the current view is for $orig.,\n";
+          print STDERR "However, since there is no data that would be contained in this view,\n";
+          print STDERR "it is being skipped.\n\n";
+          return -1; 
+        }
     }
     $revnamemap{$n} = lc($orig);
-    $namemap{lc($orig)} = $n;
+    return $namemap{lc($orig)} = $n;
 }
 
 sub get_so_terms {
