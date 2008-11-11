@@ -159,7 +159,7 @@ foreach my $term (@terms) {
     my $cvtermid = $$term{cvterm_id};
     my $vname    = safename($tname);
 
-    next if $vname == -1;
+    next if $vname eq '-1';
 
     next if ($id_based && !$used_type_idh{$cvtermid});
 
@@ -287,6 +287,9 @@ foreach my $term (@terms) {
 }
 
 $dbh->disconnect if $dbh;
+
+create_lookup_table(%namemap);
+
 print "\n\nSET search_path=public,pg_catalog;\n";
 print STDERR "Done!\n";
 exit 0;
@@ -304,7 +307,7 @@ sub msg {
 sub safename {
     my $orig = shift;
     my $n = lc($orig);
-    $n =~ s/\./_/;
+    $n =~ s/[-.(),`'"]/_/g;
     my @parts = ();
     if ($orig =~ /\s/) {
       @parts = split(/ /, $n);
@@ -506,6 +509,23 @@ sub get_recursive_child_terms_by_type_from_chado {
   }
 
   return @child_terms;
+}
+
+sub create_lookup_table {
+  my %namemap = @_;
+
+  my $table_name = $ontology."_cv_lookup_table";
+
+  print "CREATE TABLE $table_name (".$table_name."_id int, primary key(".$table_name."_id), original_cvterm_name varchar(1024), relation_name varchar(128)));\n";
+
+  for my $orig_name (keys %namemap) {
+    my $table_name = $namemap{$orig_name};
+
+    print "INSERT INTO $table_name (original_cvterm_name,relation_name) VALUES ('$orig_name','$table_name');\n";
+  }
+
+  print "\nCREATE INDEX ".$table_name."_idx ON $table_name (original_cvterm_name);\n";
+  return; 
 }
 
 __END__
