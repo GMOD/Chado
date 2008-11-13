@@ -55,16 +55,6 @@ if ($help) {
 $id_based = 1 unless ($ontology eq 'sequence');
 $schema   = lc($ontology) unless ($ontology eq 'sequence');
 
-if ($use_custom_name_map eq '') {
-    %custom_name_map = get_name_map_from_db();
-} elsif ($use_custom_name_map) {
-    my @pairs = split(',', $use_custom_name_map);
-    for my $pair (@pairs) {
-        my ($tag,$value) = split('=', $pair);
-        $custom_name_map{$tag} = $value;
-    }
-}
-
 if ($RTYPE ne 'VIEW' && $RTYPE ne 'TABLE') {
     die "RTYPE: $RTYPE is not VIEW or TABLE";
 }
@@ -88,6 +78,17 @@ if ($db) {
     msg("Connected");
     $dbh->{RaiseError} = 1;
 }
+
+if (defined $use_custom_name_map and $use_custom_name_map eq '') {
+    %custom_name_map = get_name_map_from_db();
+} elsif ($use_custom_name_map) {
+    my @pairs = split(',', $use_custom_name_map);
+    for my $pair (@pairs) {
+        my ($tag,$value) = split('=', $pair);
+        $custom_name_map{$tag} = $value;
+    }
+}
+
 
 my $child_term_query = "SELECT cvterm.cvterm_id,cvterm.name FROM cvterm JOIN cvterm_relationship ON (cvterm.cvterm_id = cvterm_relationship.subject_id) WHERE cvterm_relationship.object_id = ? AND cvterm_relationship.type_id in (SELECT cvterm_id FROM cvterm WHERE name='is_a') ";
 my $child_query_handle = $dbh->prepare($child_term_query);
@@ -331,7 +332,10 @@ sub safename {
 
 #    @parts = map {$abbrev{$_} || $_} @parts;
     #start hard coding some short circuits to make sure everything gets a unqique name
-    if ($n eq 'deficient_intrachromosomal_transposition') {
+    if ($custom_name_map{$orig}) {
+      $n = $custom_name_map{$orig};
+    }
+    elsif ($n eq 'deficient_intrachromosomal_transposition') {
       $n = 'd_intrachr_transposition';
     }
     elsif ($n eq 'deficient_interchromosomal_transposition') {
@@ -466,14 +470,19 @@ sub safename {
 
         if ($exists) {
           print STDERR "The short name $n already exists; the existing view\n";
-          print STDERR "is called $revnamemap{$n}, and the current view is for $orig\n";
-          die;
+          print STDERR "is called $revnamemap{$n}, and the current view is for $orig\n\n";
+          print STDERR "You may supply the --Custom_namemap argument to overcome this;\n"; 
+          print STDERR "see the documentation for more.\n\n";
+
+          warn %custom_name_map;
+          exit(-1);
         }
         else {
           print STDERR "The short name $n already exists; the existing view\n";
           print STDERR "is called $revnamemap{$n}, and the current view is for $orig.,\n";
           print STDERR "However, since there is no data that would be contained in this view,\n";
-          print STDERR "it is being skipped.\n\n";
+          print STDERR "it is being skipped.  You may supply the --Custom_namemap argument to overcome\n";
+          print STDERR "this; see the documentation for more.\n\n";
           return -1; 
         }
     }
@@ -590,6 +599,18 @@ TABLEs), or views
 If this is specified, then DROP VIEW/TABLE statements will be created
 
 this is useful if you wish to REPLACE an existing SO layer
+
+=item -C|Custom_namemap
+
+If specified without an argument, query the database for a table called
+custom_name_mapping with a column called original_name that contains the
+exact text of the original cvterm and a column called abbreviation that
+has the text of relation name.  This table may contain other columns
+(like a primary key or notes).
+
+You may also specify a argument to -C that is a series of comma delimited
+tag=value pairs, where the part before the equals sign is the orginal
+name of the cvterm and the part after is the relation name.
 
 =back
 
