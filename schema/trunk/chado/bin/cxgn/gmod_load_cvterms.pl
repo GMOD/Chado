@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -120,7 +121,7 @@ Version 0.12, February 2008.
 
 =cut
 
-
+use warnings;
 use strict;
 
 use Getopt::Std;

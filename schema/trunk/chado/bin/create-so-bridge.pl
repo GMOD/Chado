@@ -29,6 +29,8 @@ my $so_name = 'sequence';
 my $ontology = $so_name;
 my $verbose;
 my $do_closure=1;
+my %custom_name_map;
+my $use_custom_name_map;
 
 GetOptions(
            "help|h"=>\$help,
@@ -43,6 +45,7 @@ GetOptions(
 	   "rtype|r=s"=>\$RTYPE,
            "verbose|v"=>\$verbose,
            "ontology|o=s"=>\$ontology,
+           "Custom_namemap:s"=>\$use_custom_name_map,
           );
 if ($help) {
     system("perldoc $0");
@@ -51,6 +54,16 @@ if ($help) {
 
 $id_based = 1 unless ($ontology eq 'sequence');
 $schema   = lc($ontology) unless ($ontology eq 'sequence');
+
+if ($use_custom_name_map eq '') {
+    %custom_name_map = get_name_map_from_db();
+} elsif ($use_custom_name_map) {
+    my @pairs = split(',', $use_custom_name_map);
+    for my $pair (@pairs) {
+        my ($tag,$value) = split('=', $pair);
+        $custom_name_map{$tag} = $value;
+    }
+}
 
 if ($RTYPE ne 'VIEW' && $RTYPE ne 'TABLE') {
     die "RTYPE: $RTYPE is not VIEW or TABLE";
@@ -528,6 +541,19 @@ sub create_lookup_table {
   return; 
 }
 
+sub get_name_map_from_db {
+  my %name_map;
+
+  my $query = "SELECT original_name, abbreviation FROM custom_name_mapping";
+  my $sth   = $dbh->prepare($query);
+  $sth->execute;
+
+  while (my $hashref = $sth->fetchrow_hashref) {
+    $name_map{$$hashref{original_name}} = $$hashref{abbreviation};
+  }
+
+  return %name_map;
+}
 __END__
 
 =head1 NAME
