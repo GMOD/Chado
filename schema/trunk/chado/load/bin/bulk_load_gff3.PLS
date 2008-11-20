@@ -112,6 +112,8 @@ $0 - Bulk loads gff3 files into a chado database.
             for Chado tables cvterm, cv, db, organism, analysis ...
    
  --manual          Detailed manual pages
+ --cusotm_adapter  Use a custom subclass adaptor for Bio::GMOD::DB::Adapter
+                     Provide the name of the adapter as an argument
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -522,7 +524,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
-    $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM );
+    $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -556,6 +558,7 @@ GetOptions(
     'debug'   => \$DEBUG,
     'delete'  => \$DELETE,
     'delete_i_really_mean_it' => \$DELETE_CONFIRM,
+    'custom_adapter=s' => \$CUSTOM_ADAPTER,
 ) 
 # or ( system( 'pod2text', $0 ), exit -1 );
 or pod2usage(-verbose => 1, -exitval => 1);
@@ -652,7 +655,23 @@ my %locgroup = ();
 
 ########################
 
-my $chado = Bio::GMOD::DB::Adapter->new(%argv);
+my $adapter = "Bio::GMOD::DB::Adapter";
+if ($CUSTOM_ADAPTER) {
+  if (eval {require "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER";
+            "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER"->import();
+            1; } ) {
+    $adapter = "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER";
+  }
+  else {
+    warn "While attempting to load Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER\n";
+    warn "an error was encountered.  Please check that this is a valid perl module\n";
+    warn "and that it is in perl's search path.\n";
+    warn "Exiting...\n";
+    exit(-1);
+  }
+}
+
+my $chado = $adapter->new(%argv);
 
 #if we need custom ontology mapping, cache them here
 if ($ONTOLOGY) {
