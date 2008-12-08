@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.128 2008-06-19 17:38:19 scottcain Exp $
+# $Id: Makefile.PL,v 1.129 2008-12-08 16:47:08 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -492,6 +492,7 @@ my @exe_files = (
            'bin/gmod_extract_dbxref_from_gff.pl',
            'bin/gmod_gff3_preprocessor.pl',
            'bin/gmod_make_gff_from_dbxref.pl',
+           'bin/cxgn/gmod_load_cvterms.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );
@@ -520,6 +521,7 @@ WriteMakefile(
       'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.09,
       'GO::Parser'        => 0,
+      'Module::Load'      => 0.2,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
