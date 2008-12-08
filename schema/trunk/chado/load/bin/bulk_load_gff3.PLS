@@ -43,6 +43,7 @@ use URI::Escape;
 use Carp;
 use Bio::GMOD::DB::Adapter;
 use ExtUtils::MakeMaker;  #to get prompt
+use Module::Load;
 
 =head1 NAME
 
@@ -112,8 +113,8 @@ $0 - Bulk loads gff3 files into a chado database.
             for Chado tables cvterm, cv, db, organism, analysis ...
    
  --manual          Detailed manual pages
- --cusotm_adapter  Use a custom subclass adaptor for Bio::GMOD::DB::Adapter
-                     Provide the name of the adapter as an argument
+ --custom_adapter  Use a custom subclass adaptor for Bio::GMOD::DB::Adapter
+                     Provide the path to the adapter as an argument
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -655,18 +656,18 @@ my %locgroup = ();
 
 ########################
 
-my $adapter = "Bio::GMOD::DB::Adapter";
+my $adapter = 'Bio::GMOD::DB::Adapter';
 if ($CUSTOM_ADAPTER) {
-  if (eval {require "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER";
-            "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER"->import();
+  $adapter = "$adapter\:\:$CUSTOM_ADAPTER";
+  unless (eval {load $adapter;
             1; } ) {
-    $adapter = "Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER";
-  }
-  else {
-    warn "While attempting to load Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER\n";
+    warn "\n\nWhile attempting to load Bio::GMOD::DB::Adapter::$CUSTOM_ADAPTER\n";
     warn "an error was encountered.  Please check that this is a valid perl module\n";
     warn "and that it is in perl's search path.\n";
-    warn "Exiting...\n";
+
+    warn "\nError was: $@\n";
+
+    warn "Exiting...\n\n";
     exit(-1);
   }
 }
