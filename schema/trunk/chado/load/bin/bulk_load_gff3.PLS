@@ -858,9 +858,16 @@ END
   #there is a problem.
   #
   if (!$analysis_err_str && !$ANALYSIS && (
-      ((scalar($feature->annotation->get_Annotations('Target'))>0) and
-        ($feature->annotation->get_Annotations('Target'))[0]->value) or
-      (defined($feature->score) and $feature->score ne '.') or
+      ((scalar($feature->annotation->get_Annotations('Target'))>0) 
+         and
+       ((($feature->annotation->get_Annotations('Target'))[0]->can('value') 
+        && ($feature->annotation->get_Annotations('Target'))[0]->value)
+           or
+         (($feature->annotation->get_Annotations('Target'))[0]->can('display_text')
+        && ($feature->annotation->get_Annotations('Target'))[0]->display_text)))
+      or
+      (defined($feature->score) and $feature->score ne '.') 
+      or
       $featuretype =~ /match/ 
       ) ) {
       my @errs;
@@ -880,7 +887,17 @@ END
   if ($ANALYSIS 
       && $featuretype =~ /match/  
       && !defined($feature->annotation->get_Annotations('Target'))) {
-    $chado->cache('feature',($feature->annotation->get_Annotations('ID'))[0]->value,$nextfeature);
+    if (($feature->annotation->get_Annotations('ID'))[0]->can('value')) {
+        $chado->cache('feature',
+                     ($feature->annotation->get_Annotations('ID'))[0]->value,
+                     $nextfeature);
+    }
+    elsif (($feature->annotation->get_Annotations('ID'))[0]->can('display_text')) {
+        $chado->cache('feature',
+                     ($feature->annotation->get_Annotations('ID'))[0]->display_text,
+                     $nextfeature); 
+    }
+
   }
 
 #don't write a featureloc entry for srcfeatures
