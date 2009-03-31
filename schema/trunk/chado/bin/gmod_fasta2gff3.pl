@@ -29,10 +29,10 @@ print OUT "#this file generated from $0\n";
 while (my $seq = $stream->next_seq) {
     my $atts;
     if ($ATTRIBUTES) {
-        $atts = "ID=".$seq->id.";$ATTRIBUTES";
+        $atts = "ID=".$seq->id.";Name=".$seq->id.";$ATTRIBUTES";
     }
     else {
-        $atts = "ID=".$seq->id;
+        $atts = "ID=".$seq->id.";Name=".$seq->id;
     }
     print OUT join("\t",
                    $seq->id,
