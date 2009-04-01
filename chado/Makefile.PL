@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.129 2008-12-08 16:47:08 scottcain Exp $
+# $Id: Makefile.PL,v 1.130 2009-04-01 03:20:35 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -521,7 +521,7 @@ WriteMakefile(
       'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.09,
       'GO::Parser'        => 0,
-      'Module::Load'      => 0.2,
+      'Module::Load'      => 0.16,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
