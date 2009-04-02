@@ -88,7 +88,7 @@ GetOptions(
     'nosplit'     => \$NOSPLIT,
     'hasrefseq'   => \$HASREFSEQ,
     'dbprofile=s' => \$DBPROFILE,
-    'inheritance_tiers=i' => $INHERITANCE_TIERS,
+    'inheritance_tiers=i' => \$INHERITANCE_TIERS,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 @GFFFILE = split(/,/,join(',',@GFFFILE));
