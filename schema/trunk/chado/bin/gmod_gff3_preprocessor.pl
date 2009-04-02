@@ -30,6 +30,8 @@ $0 - Prepares a GFF3 file for bulk loading into a chado database.
  --hasrefseq      Set this if the file contains a reference sequence line
                      (Only needed if not splitting files)
  --dbprofile      Specify a gmod.conf profile name (otherwise use default)
+ --inheritance_tiers How many levels of inheritance do you expect tis file
+                     to have (default: 3)
 
 =head1 DESCRIPTION
 
@@ -48,6 +50,12 @@ For example, if you wanted all of your analysis results to go in a separate
 file, you could indicate '--splitfile type=match', and all cDNA_match,
 EST_match and cross_genome_match features would go into separate files
 (separate by reference sequence).
+
+inheritence_tiers -- The number of levels of inheritance this file has. 
+For example, if the file has "central dogma" genes in it (gene/mRNA/
+exon,polypeptide), then it has 3.  Up to 4 is supported but the higher
+the number, the more slowly it performs.  If you don't know, 3 is a 
+reasonable guess.
 
 =head2 FASTA sequence
 
@@ -69,7 +77,8 @@ it under the same terms as Perl itself.
 
 =cut
 
-my (@GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,$DBPROFILE);
+my (@GFFFILE, $OUTFILE, $SPLITFILE,$ONLYSPLIT,$NOSPLIT,$HASREFSEQ,
+    $DBPROFILE, $INHERITANCE_TIERS);
 
 GetOptions(
     'gfffile=s'   => \@GFFFILE,
@@ -79,11 +88,14 @@ GetOptions(
     'nosplit'     => \$NOSPLIT,
     'hasrefseq'   => \$HASREFSEQ,
     'dbprofile=s' => \$DBPROFILE,
+    'inheritance_tiers=i' => $INHERITANCE_TIERS,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 @GFFFILE = split(/,/,join(',',@GFFFILE));
 
 $DBPROFILE ||='default';
+
+$INHERITANCE_TIERS ||= 3;
 
 my ($split_on_source, $split_on_type, $split_on_ref);
 if ($SPLITFILE) {
@@ -221,13 +233,15 @@ for my $gfffile (@gfffiles) {
     my $fasta   = "$outfile.fasta";
 
     open IN, "<", $gfffile or die "couldn't open $gfffile for reading: $!\n";
-    open FASTA, ">", $fasta or die "couldn't open $fasta for writing: $!\n";
 
     my $fasta_flag = 0;
     print STDERR "Sorting the contents of $gfffile ...\n";
     while( <IN> ) {
         if (/^##FASTA/) {
             $fasta_flag = 1;
+            open FASTA, 
+                 ">", $fasta or die "couldn't open $fasta for writing: $!\n";
+
             print FASTA "##FASTA\n";
             print FASTA;
             next;
@@ -271,6 +285,7 @@ for my $gfffile (@gfffiles) {
         }
     }
     close IN;
+    close FASTA if $fasta_flag;
 
     print STDERR "Writing sorted contents to $outfile ...\n";
     open OUT,">", $outfile or die "couldn't open $outfile for writing: $!\n";
@@ -292,17 +307,27 @@ for my $gfffile (@gfffiles) {
     }
     @no_parents = '';
 
-    my @second_tiers = $db->sorter_get_second_tier();
-    for my $second_tier (@second_tiers) {
-        print OUT $second_tier;
+    if ($INHERITANCE_TIERS >= 2) {
+        my @second_tiers = $db->sorter_get_second_tier();
+        for my $second_tier (@second_tiers) {
+            print OUT $second_tier;
+        }
     }
-    @second_tiers = '';
 
-    my @third_tiers = $db->sorter_get_third_tier();
-    for my $third_tier (@third_tiers) {
-        print OUT $third_tier;
+    if ($INHERITANCE_TIERS >= 3) {
+        my @third_tiers = $db->sorter_get_third_tier();
+        for my $third_tier (@third_tiers) {
+            print OUT $third_tier;
+        }
     }
-    @third_tiers = '';
+
+#yes, four tiers can happen, like transposible_element->te_gene->mRNA->exon
+    if ($INHERITANCE_TIERS >= 4) {
+        my @forth_tiers = $db->sorter_get_fourth_tier();
+        for my $fourth_tier (@forth_tiers) {
+            print OUT $fourth_tier;
+        }
+    }
 
     close OUT;
 
