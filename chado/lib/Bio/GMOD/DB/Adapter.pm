@@ -4229,6 +4229,30 @@ sub sorter_get_third_tier {
     return @uniq;
 }
 
+sub sorter_get_fourth_tier {
+    my $self = shift;
+    my $dbh  = $self->dbh;
+
+#ARGH! need to deal with multiple parents!
+
+    my $sth  = $dbh->prepare("SELECT distinct gffline,parent,id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent in (SELECT id FROM gff_sort_tmp WHERE parent is null))) order by parent,id ") or $self->throw();
+    $sth->execute or $self->throw();
+
+    my $result = $sth->fetchall_arrayref or $self->throw();
+
+    my %seen;
+    my @to_return = grep { ! $seen{$_}++ }
+          map { $$_[0] } @$result;
+
+    %seen = ();
+    my @uniq;
+    for my $item (@to_return) {
+        push(@uniq, $item) unless $seen{$item}++;
+    }
+
+    return @uniq;
+}
+
 =head2 cds_db_exists
 
 =over
