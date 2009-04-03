@@ -83,3 +83,23 @@ ALTER TABLE phenotype_comparison_cvterm ADD FOREIGN KEY (pub_id) references pub 
 --Changed the Audit table triggers to work with newer versions of Postgres.
 --This didn't change the the default schema at all (since audit.sql isn't
 --part of the default schema.
+
+--all_feature_name view also searches featureprop and dbxref.accesion
+--see the comments in modules/sequence/sequence_views.sql  for more
+--information on how this works
+CREATE OR REPLACE VIEW all_feature_names (
+  feature_id,
+  name
+) AS
+SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name FROM feature
+UNION
+SELECT feature_id, name FROM feature where name is not null
+UNION
+SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
+  WHERE fs.synonym_id = s.synonym_id
+UNION
+SELECT fp.feature_id, CAST(substring(fp.value from 0 for 255) as varchar(255)) as name FROM featureprop fp
+UNION
+SELECT fd.feature_id, d.accession FROM feature_dbxref fd, dbxref d
+  WHERE fd.dbxref_id = d.dbxref_id;
+
