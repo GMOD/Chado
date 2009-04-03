@@ -36,7 +36,12 @@ UNION
 SELECT feature_id, name FROM feature where name is not null 
 UNION
 SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
-  WHERE fs.synonym_id = s.synonym_id ;
+  WHERE fs.synonym_id = s.synonym_id 
+UNION
+SELECT fp.feature_id, CAST(substring(fp.value from 0 for 255) as varchar(255)) as name FROM featureprop fp
+UNION
+SELECT fd.feature_id, d.accession FROM feature_dbxref fd, dbxref d
+  WHERE fd.dbxref_id = d.dbxref_id;
 
 --------------------------------
 ---- dfeatureloc ---------------
