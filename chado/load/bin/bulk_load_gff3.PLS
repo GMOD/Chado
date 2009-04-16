@@ -873,7 +873,7 @@ END
       my @errs;
       push @errs, '* Has Target attributes'
            if (scalar($feature->annotation->get_Annotations('Target'))>0 and
-              ($feature->annotation->get_Annotations('Target'))[0]->value);
+              ($feature->annotation->get_Annotations('Target'))[0]->as_text);
       push @errs, '* Has scores'
            if (defined($feature->score) and $feature->score ne '.');
       push @errs, '* Has a match feature type'
