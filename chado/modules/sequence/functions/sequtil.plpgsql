@@ -206,6 +206,7 @@ CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
     exon_count       int;
     ordered_exons    int;    
     transcript_id    int;
+    transcript_row   feature%ROWTYPE;
   BEGIN
     SELECT INTO part_of cvterm_id FROM cvterm WHERE name=''part_of''
       AND cv_id IN (SELECT cv_id FROM cv WHERE name=''relationship'');
@@ -214,9 +215,10 @@ CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
 
     --RAISE NOTICE ''part_of %, exon %'',part_of,exon_type;
 
-    FOR transcript_id IN
-      SELECT feature_id FROM feature WHERE type_id = parent_type
+    FOR transcript_row IN
+      SELECT * FROM feature WHERE type_id = parent_type
     LOOP
+      transcript_id = transcript_row.feature_id;
       SELECT INTO rowcount count(*) FROM feature_relationship
         WHERE object_id = transcript_id
           AND rank = 0;
