@@ -17,7 +17,7 @@
 --
 --   (some update frequency, I chose daily)
 --
---   feature_id integer,name varchar(255)
+--   feature_id integer,name varchar(255),organism_id integer
 --
 --   (the select part of the view below, all on one line)
 --
@@ -29,19 +29,21 @@
 --
 CREATE OR REPLACE VIEW all_feature_names (
   feature_id,
-  name
+  name,
+  organism_id
 ) AS
-SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name FROM feature  
+SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name,organism_id FROM feature  
 UNION
-SELECT feature_id, name FROM feature where name is not null 
+SELECT feature_id, name, organism_id FROM feature where name is not null 
 UNION
-SELECT fs.feature_id,s.name FROM feature_synonym fs, synonym s
-  WHERE fs.synonym_id = s.synonym_id 
+SELECT fs.feature_id,s.name,f.organism_id FROM feature_synonym fs, synonym s, feature f
+  WHERE fs.synonym_id = s.synonym_id AND fs.feature_id = f.feature_id
 UNION
-SELECT fp.feature_id, CAST(substring(fp.value from 0 for 255) as varchar(255)) as name FROM featureprop fp
+SELECT fp.feature_id, CAST(substring(fp.value from 0 for 255) as varchar(255)) as name,f.organism_id FROM featureprop fp, feature f 
+  WHERE f.feature_id = fp.feature_id
 UNION
-SELECT fd.feature_id, d.accession FROM feature_dbxref fd, dbxref d
-  WHERE fd.dbxref_id = d.dbxref_id;
+SELECT fd.feature_id, d.accession, f.organism_id FROM feature_dbxref fd, dbxref d,feature f
+  WHERE fd.dbxref_id = d.dbxref_id AND fd.feature_id = f.feature_id;
 
 --------------------------------
 ---- dfeatureloc ---------------
