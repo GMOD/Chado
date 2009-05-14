@@ -115,6 +115,9 @@ $0 - Bulk loads gff3 files into a chado database.
  --manual          Detailed manual pages
  --custom_adapter  Use a custom subclass adaptor for Bio::GMOD::DB::Adapter
                      Provide the path to the adapter as an argument
+ --private_schema  Load the data into a non-public schema.
+ --use_public_cv   When loading into a non-public schema, load any cv and
+                     cvterm data into the public schema
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -525,7 +528,8 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
-    $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER );
+    $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER,
+    $PRIVATE_SCHEMA, $USE_PUBLIC_CV );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -560,6 +564,8 @@ GetOptions(
     'delete'  => \$DELETE,
     'delete_i_really_mean_it' => \$DELETE_CONFIRM,
     'custom_adapter=s' => \$CUSTOM_ADAPTER,
+    'private_schema=s' => \$PRIVATE_SCHEMA,
+    'use_public_cv'    => \$USE_PUBLIC_CV,
 ) 
 # or ( system( 'pod2text', $0 ), exit -1 );
 or pod2usage(-verbose => 1, -exitval => 1);
@@ -650,6 +656,8 @@ my %argv;
   $argv{dbxref}       = $DBXREF;
   $argv{fp_cv}        = $FP_CV;
   $argv{addpropertycv}= ! $NO_ADDFP_CV; #dgg
+  $argv{private_schema} = $PRIVATE_SCHEMA;
+  $argv{use_public_cv}= $USE_PUBLIC_CV;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();

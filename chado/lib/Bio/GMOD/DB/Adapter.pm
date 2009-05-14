@@ -48,6 +48,12 @@ my @tables = (
    "organism", #dgg
 );
 
+my %use_public_tables = (
+   db                   => "public.db",
+   cv                   => "public.cv",
+   cvterm               => "public.cvterm",
+   organism             => "public.organism",
+);
 
 my %sequences = (
    feature              => "feature_feature_id_seq",
@@ -136,40 +142,40 @@ use constant SEARCH_SYNONYM =>
                "SELECT synonym_id FROM synonym WHERE name=? AND type_id=?";
 
 use constant CREATE_CACHE_TABLE =>
-               "CREATE TABLE tmp_gff_load_cache (
+               "CREATE TABLE public.tmp_gff_load_cache (
                     feature_id int,
                     uniquename varchar(1000),
                     type_id int,
                     organism_id int
                 )";
 use constant DROP_CACHE_TABLE =>
-               "DROP TABLE tmp_gff_load_cache";
+               "DROP TABLE public.tmp_gff_load_cache";
 use constant VERIFY_TMP_TABLE =>
                "SELECT count(*) FROM pg_class WHERE relname=? and relkind='r'";
 use constant POPULATE_CACHE_TABLE =>
-               "INSERT INTO tmp_gff_load_cache
+               "INSERT INTO public.tmp_gff_load_cache
                 SELECT feature_id,uniquename,type_id,organism_id FROM feature";
 use constant CREATE_CACHE_TABLE_INDEX1 =>
                "CREATE INDEX tmp_gff_load_cache_idx1 
-                    ON tmp_gff_load_cache (feature_id)";
+                    ON public.tmp_gff_load_cache (feature_id)";
 use constant CREATE_CACHE_TABLE_INDEX2 =>
                "CREATE INDEX tmp_gff_load_cache_idx2 
-                    ON tmp_gff_load_cache (uniquename)";
+                    ON public.tmp_gff_load_cache (uniquename)";
 use constant CREATE_CACHE_TABLE_INDEX3 =>
                "CREATE INDEX tmp_gff_load_cache_idx3
-                    ON tmp_gff_load_cache (uniquename,type_id,organism_id)";
+                    ON public.tmp_gff_load_cache (uniquename,type_id,organism_id)";
 use constant VALIDATE_TYPE_ID =>
-               "SELECT feature_id FROM tmp_gff_load_cache
+               "SELECT feature_id FROM public.tmp_gff_load_cache
                     WHERE type_id = ? AND
                           organism_id = ? AND
                           uniquename = ?";
 use constant VALIDATE_UNIQUENAME =>
-               "SELECT feature_id FROM tmp_gff_load_cache WHERE uniquename=?";
+               "SELECT feature_id FROM public.tmp_gff_load_cache WHERE uniquename=?";
 use constant INSERT_CACHE_TYPE_ID =>
-               "INSERT INTO tmp_gff_load_cache 
+               "INSERT INTO public.tmp_gff_load_cache 
                   (feature_id,uniquename,type_id,organism_id) VALUES (?,?,?,?)";
 use constant INSERT_CACHE_UNIQUENAME =>
-               "INSERT INTO tmp_gff_load_cache (feature_id,uniquename)
+               "INSERT INTO public.tmp_gff_load_cache (feature_id,uniquename)
                   VALUES (?,?)";
 
 use constant INSERT_GFF_SORT_TMP =>
@@ -198,6 +204,8 @@ sub new {
     my $notrans= $arg{notransact};
     my $skipinit=$arg{skipinit};
 
+    my $private_schema = $arg{private_schema};
+
     my $dbh = DBI->connect(
         "dbi:Pg:dbname=$dbname;port=$dbport;host=$dbhost",
         $dbuser,
@@ -205,6 +213,10 @@ sub new {
         {AutoCommit => $notrans,
          TraceLevel => 0}
     ) or $self->throw("couldn't connect to the database");
+
+    if ($private_schema) {
+        $dbh->do("SET search_path=$private_schema,public,pg_catalog");
+    }
 
     $self->dbh($dbh);
 
@@ -229,11 +241,13 @@ sub new {
     $self->nouniquecache(   $arg{nouniquecache}   );
     $self->recreate_cache(  $arg{recreate_cache}  );
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
-    $self->no_target_syn(   $arg{no_target_syn}  );
-    $self->unique_target(   $arg{unique_target}  );
-    $self->dbxref(          $arg{dbxref}         );
+    $self->no_target_syn(   $arg{no_target_syn}   );
+    $self->unique_target(   $arg{unique_target}   );
+    $self->dbxref(          $arg{dbxref}          );
     $self->fp_cv(           $arg{fp_cv} || 'autocreated' );
     $self->{'addpropertycv'}= $arg{addpropertycv}; # dgg
+    $self->private_schema(  $arg{private_schema}  );
+    $self->use_public_cv(   $arg{use_public_cv}   );
     
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -2046,6 +2060,74 @@ sub unique_target {
     return $self->{'unique_target'};
 }
 
+=head2 private_schema
+
+=over
+
+=item Usage
+
+  $obj->private_schema()        #get existing value
+  $obj->private_schema($newval) #set new value
+
+=item Function
+
+Sets the value of private_schema, the name of the private schema to
+insert data into.  If not set, the public schema will be used.
+
+=item Returns
+
+value of private_schema (a scalar)
+
+=item Arguments
+
+new value of private_schema (to set)
+
+=back
+
+=cut
+
+sub private_schema {
+    my $self = shift;
+    my $private_schema = shift if defined(@_);
+    return $self->{'private_schema'} = $private_schema if defined($private_schema);
+    return $self->{'private_schema'};
+}
+
+
+=head2 use_public_cv
+
+=over
+
+=item Usage
+
+  $obj->use_public_cv()        #get existing value
+  $obj->use_public_cv($newval) #set new value
+
+=item Function
+
+When private_schema is set, this flag tells the loader to insert new
+cv and cvterm data into the public schema instead of the private one.
+
+=item Returns
+
+value of use_public_cv (a scalar)
+
+=item Arguments
+
+new value of use_public_cv (to set)
+
+=back
+
+=cut
+
+sub use_public_cv {
+    my $self = shift;
+    my $use_public_cv = shift if defined(@_);
+    return $self->{'use_public_cv'} = $use_public_cv if defined($use_public_cv);
+    return $self->{'use_public_cv'};
+}
+
+
 =head2 dbxref
 
 =over
@@ -2138,8 +2220,12 @@ sub print_delete {
   my $self = shift;
   my $feature_id = shift;
 
+  my $table = $self->private_schema 
+            ? $self->private_schema . "._feature"
+            : "feature";
+
   my $fh = $self->file_handles('delete');
-  print $fh "DELETE FROM feature WHERE feature_id = $feature_id;\n";
+  print $fh "DELETE FROM $table WHERE feature_id = $feature_id;\n";
   return;
 }
 
@@ -2210,6 +2296,8 @@ sub print_analysis {  # dgg
 sub print_organism {  # dgg
   my $self = shift;
   my ($orgid,$genus,$species,$common) = @_;
+ 
+  my $table = $self->use_public_cv ? 'public.organism' : 'organism';
   
   $common ||= '\N';
   my $abbrev= substr($genus,0,1).'.'.$species;
@@ -2219,7 +2307,7 @@ sub print_organism {  # dgg
     my $q_species  = $self->dbh->quote($species);
     my $q_abbrev   = $self->dbh->quote($abbrev);
     my $q_common   = $common eq '\N' ? 'NULL' : $self->dbh->quote($common);
-    print $fh "INSERT INTO organism $copystring{'organism'} VALUES ($orgid,$q_genus,$q_species,$q_common,$q_abbrev);\n";
+    print $fh "INSERT INTO $table $copystring{'organism'} VALUES ($orgid,$q_genus,$q_species,$q_common,$q_abbrev);\n";
   } else {
     print $fh join("\t",($orgid,$genus,$species,$common,$abbrev) ),"\n";
   }
@@ -2229,13 +2317,15 @@ sub print_organism {  # dgg
 sub print_cvterm {  # dgg
   my $self = shift;
   my ($cvterm_id,$cv_id,$name,$dbxref_id,$definition) = @_;
-  
+ 
+  my $table = $self->use_public_cv ? 'public.cvterm' : 'cvterm';
+ 
   $definition ||= '\N';
   my $fh = $self->file_handles('cvterm');
   if ($self->inserts()) {
     my $q_acc  = $self->dbh->quote($name);
     my $q_desc = $definition eq '\N' ? 'NULL' : $self->dbh->quote($definition);
-    print $fh "INSERT INTO cvterm $copystring{'cvterm'} VALUES ($cvterm_id,$cv_id,$q_acc,$dbxref_id,$q_desc);\n";
+    print $fh "INSERT INTO $table $copystring{'cvterm'} VALUES ($cvterm_id,$cv_id,$q_acc,$dbxref_id,$q_desc);\n";
   } else {
     print $fh join("\t",($cvterm_id,$cv_id,$name,$dbxref_id,$definition)),"\n";
   }
@@ -2245,13 +2335,15 @@ sub print_cvterm {  # dgg
 sub print_cv {  # dgg
   my $self = shift;
   my ($cv_id,$name,$definition) = @_;
-  
+ 
+  my $table = $self->use_public_cv ? 'public.cv' : 'cv';
+ 
   $definition ||= '\N';
   my $fh = $self->file_handles('cv');
   if ($self->inserts()) {
     my $q_acc  = $self->dbh->quote($name);
     my $q_desc = $definition eq '\N' ? 'NULL' : $self->dbh->quote($definition);
-    print $fh "INSERT INTO cv $copystring{'cv'} VALUES ($cv_id,$q_acc,$q_desc);\n";
+    print $fh "INSERT INTO $table $copystring{'cv'} VALUES ($cv_id,$q_acc,$q_desc);\n";
   } else {
     print $fh join("\t",($cv_id,$name,$definition)),"\n";
   }
@@ -2260,13 +2352,15 @@ sub print_cv {  # dgg
 sub print_dbname {  # dgg
   my $self = shift;
   my ($db_id,$name,$description) = @_;
-  
+ 
+  my $table = $self->use_public_cv ? 'public.db' : 'db';
+ 
   $description ||= '\N';
   my $fh = $self->file_handles('db');
   if ($self->inserts()) {
     my $q_acc  = $self->dbh->quote($name);
     my $q_desc = $description eq '\N' ? 'NULL' : $self->dbh->quote($description);
-    print $fh "INSERT INTO db $copystring{'db'} VALUES ($db_id,$q_acc,$q_desc);\n";
+    print $fh "INSERT INTO $table $copystring{'db'} VALUES ($db_id,$q_acc,$q_desc);\n";
   } else {
     print $fh join("\t",($db_id,$name,$description)),"\n";
   }
@@ -2535,12 +2629,14 @@ sub synonyms  {
 
     unless ($self->cache('synonym',$alias)) {
       unless ($self->cache('type','synonym')) {
+        my $cv_table     = $self->use_public_cv ? "public.cv" : "cv";
+        my $cvterm_table = $self->use_public_cv ? "public.cvterm" : "cvterm";
         my $sth
-          = $self->dbh->prepare("SELECT cvterm_id FROM cvterm WHERE 
+          = $self->dbh->prepare("SELECT cvterm_id FROM $cvterm_table WHERE 
               (name='synonym' and cv_id in 
-                 (SELECT cv_id FROM cv WHERE name='null' OR name='local')) OR
+                 (SELECT cv_id FROM $cv_table WHERE name='null' OR name='local')) OR
               (name='exact' and cv_id in 
-                 (SELECT cv_id FROM cv WHERE name='synonym_type') )
+                 (SELECT cv_id FROM $cv_table WHERE name='synonym_type') )
               ORDER BY name");
         $sth->execute;
         my ($syn_type) = $sth->fetchrow_array;
@@ -2636,12 +2732,16 @@ sub load_data {
   }
 
   foreach my $table (@tables) {
+    
     $self->file_handles($files{$table})->autoflush;
     if (-s $self->file_handles($files{$table})->filename <= 4) {
         warn "Skipping $table table since the load file is empty...\n";
         next;
     }
-    $self->copy_from_stdin($table,
+
+    my $l_table = $self->use_public_cv ? $use_public_tables{$table} : $table;
+
+    $self->copy_from_stdin($l_table,
                     $copystring{$table},
                     $files{$table},      #file_handle name
                     $sequences{$table},

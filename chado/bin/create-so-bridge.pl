@@ -444,12 +444,7 @@ sub safename {
 	}
       }
       $n = '';
-      warn @parts;
       $n = join('_', @parts);
-      warn $n;
-      for (@parts) {
-         warn $_;
-      }
 #      while (my $part = shift @parts) {
 #	$n .= $part;
 #	if (@parts && (length($part) > 1 || length($parts[0]) > 1)) {
@@ -472,9 +467,7 @@ sub safename {
           print STDERR "The short name $n already exists; the existing view\n";
           print STDERR "is called $revnamemap{$n}, and the current view is for $orig\n\n";
           print STDERR "You may supply the --Custom_namemap argument to overcome this;\n"; 
-          print STDERR "see the documentation for more.\n\n";
-
-          warn %custom_name_map;
+          print STDERR "see the documentation for more.  Exiting...\n\n";
           exit(-1);
         }
         else {

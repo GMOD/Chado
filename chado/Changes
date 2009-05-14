@@ -24,7 +24,8 @@ See http://gmod.org/Chado_SO_Views for more information.
 * Added a protein_code_gene view (depends on so-bridge); thanks to Chris
 Mungall.
 * Updated all_feature_names view to search featureprop.value and
-dbxref.accession.
+dbxref.accession and added organism_id so GBrowse can limit
+by organism.
 
 
 
