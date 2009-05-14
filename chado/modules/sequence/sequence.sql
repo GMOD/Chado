@@ -1,4 +1,4 @@
--- $Id: sequence.sql,v 1.68 2008-08-29 17:13:52 scottcain Exp $
+-- $Id: sequence.sql,v 1.69 2009-05-14 02:44:23 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -43,6 +43,8 @@ create index feature_idx3 on feature (type_id);
 create index feature_idx4 on feature (uniquename);
 create index feature_idx5 on feature (lower(name));
 
+ALTER TABLE feature ALTER residues SET STORAGE EXTERNAL;
+
 COMMENT ON TABLE feature IS 'A feature is a biological sequence or a
 section of a biological sequence, or a collection of such
 sections. Examples include genes, exons, transcripts, regulatory
@@ -74,7 +76,9 @@ featureloc. It is recommended that the value for this column be
 manifested for features which may may non-contiguous sublocations (e.g.
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
-RNA sequence.';
+RNA sequence. The default storage method for the residues column is
+EXTERNAL, which will store it uncompressed to make substring operations
+faster.';
 
 COMMENT ON COLUMN feature.seqlen IS 'The length of the residue feature. See
 column:residues. This column is partially redundant with the residues
