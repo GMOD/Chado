@@ -240,7 +240,7 @@ in database tables cv, cvterm and feature. Please check your configuration.
   <sql><![CDATA[
     SELECT feat.feature_id -- ? or uniquename
     FROM   feature feat, cvterm featcv, cv socv
-    WHERE  featcv.name in ( '${golden_path}' )    
+    WHERE  featcv.name in ( ${golden_path} )    
        and featcv.cv_id = socv.cv_id 
        and socv.name = '${seq_ontology}'
        and featcv.cvterm_id = feat.type_id
@@ -564,7 +564,7 @@ SELECT
 FROM 
   feature armft, organism org, cvterm featcv, cv socv
 WHERE 
-  featcv.name in ( '${golden_path}' )    
+  featcv.name in ( ${golden_path} )    
   and featcv.cv_id = socv.cv_id and socv.name = '${seq_ontology}'
   and armft.organism_id = org.organism_id
   and armft.type_id = featcv.cvterm_id
