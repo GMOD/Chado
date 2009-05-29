@@ -1,7 +1,7 @@
 package Bio::GMOD::DB::Adapter;
 
 use strict;
-use Carp;
+use Carp qw/cluck confess/;
 use DBI;
 use File::Temp;
 use Data::Dumper;
@@ -2233,9 +2233,13 @@ sub print_seq {
   my $self = shift;
   my ($name,$string) = @_;
 
+  my $uniquename = $self->modified_uniquename(orig_id=>$name)
+                 ? $self->modified_uniquename(orig_id=>$name)
+                 : $name;
+
   my $fh = $self->file_handles('sequence');
-  print $fh "UPDATE feature set residues='$string' WHERE uniquename='$name';\n";
-  print $fh "UPDATE feature set seqlen=length(residues) WHERE uniquename='$name';\n";
+  print $fh "UPDATE feature set residues='$string' WHERE uniquename='$uniquename';\n";
+  print $fh "UPDATE feature set seqlen=length(residues) WHERE uniquename='$uniquename';\n";
 
   return;
 }
@@ -2597,6 +2601,55 @@ sub uniquename_validation {
   }
 }
 
+=head2 modified_uniquename
+
+=over
+
+=item Usage
+
+  $obj->modified_uniquename(orig_id => $id, modified_id => $new_id)
+
+=item Function
+
+Keeps track of uniquenames that had to be modifed from their original
+GFF3 ID so relationships in the GFF3 can be properly represented in Chado.
+
+=item Returns
+
+When called with two pairs of args, nothing.  When called with one pair of
+args, return the value of the other arg.  For example, when called with
+"orig_id => $id", the method would return $new_id.
+
+=item Arguments
+
+Two possible hash pairs: orig_id for the ID that was present in the GFF file
+and modified_id for the uniquename that will be in Chado.
+
+=back
+
+=cut
+
+sub modified_uniquename {
+    my ($self, %argv) = @_;
+
+    if (defined $argv{'orig_id'} && defined $argv{'modified_id'}) { #set
+        $self->{'modified_uniquename'}->{'orig2mod'}->{$argv{'orig_id'}} = $argv{'modified_id'};
+        $self->{'modified_uniquename'}->{'mod2orig'}->{$argv{'modified_id'}} = $argv{'orig_id'};
+        return;
+    }
+    elsif (defined $argv{'orig_id'}) {
+        return $self->{'modified_uniquename'}->{'orig2mod'}->{$argv{'orig_id'}}; 
+    }
+    elsif (defined $argv{'modified_id'}) {
+        return $self->{'modified_uniquename'}->{'mod2orig'}->{$argv{'modified_id'}};
+    }
+    else {
+        cluck"this shouldn't happen in modified_uniquename";
+        return;
+    }
+}
+
+
 sub dump_ana_contents {
   my $self = shift;
   my $anakey = shift;
@@ -2920,16 +2973,19 @@ sub handle_target {
       my $created_target_feature = 0;
 
       #check for an existing feature with the Target's uniquename
-      if ( $self->uniquename_cache(validate=>1,uniquename=>$target_id) ) {
+      my $real_target_id = $self->modified_uniquename(orig_id => $target_id) ?
+                           $self->modified_uniquename(orig_id => $target_id)
+                         : $target_id;
+      if ( $self->uniquename_cache(validate=>1,uniquename=>$real_target_id) ) {
           $self->print_floc(
                             $self->nextfeatureloc,
                             $self->nextfeature,
-                            $self->uniquename_cache(validate=>1,uniquename=>$target_id),
+                            $self->uniquename_cache(validate=>1,uniquename=>$real_target_id),
                             $tstart, $tend, $tstrand, '\N',$rank,'0'
             );
       }
       else {
-          $self->create_target_feature($name,$featuretype,$uniquename,$target_id,$type,$tstart,$tend,$tstrand,$rank);
+          $self->create_target_feature($name,$featuretype,$uniquename,$real_target_id,$type,$tstart,$tend,$tstrand,$rank);
           
           $created_target_feature = 1;
       }
@@ -3544,10 +3600,16 @@ sub handle_CDS {
                if ($feat && defined(($feat->annotation->get_Annotations('Parent'))[0]));
 
     #assume that an exon can have at most one grandparent (gene, operon)
-    my $parent_id = $self->cache('feature',$feat_parents[0]) if $feat_parents[0];
+    my $first_parent = $feat_parents[0];
+    my $f_parent_uniquename 
+            = $self->modified_uniquename(orig_id=>$first_parent)
+            ? $self->modified_uniquename(orig_id=>$first_parent)
+            : $first_parent;
+    my $parent_id = $self->cache('feature',$f_parent_uniquename) if $f_parent_uniquename;
 
     unless ($parent_id) {
-        warn "\n\nThere is a ".$feat->type->name." feature with no parent (ID:$feat_id)  I think that is wrong!\n\n";
+        warn "\n\nThere is a ".$feat->type->name
+        ." feature with no parent (ID:$feat_id)  I think that is wrong!\n\n";
     }
 
     my $feat_grandparent = $self->cache('parent',$parent_id);
@@ -3977,9 +4039,12 @@ sub handle_parent {
     my ($feature) = @_;
 
     for my $p_anot ( $feature->annotation->get_Annotations('Parent') ) {
-        my $pname  = $p_anot->value;
+        my $orig_pname  = $p_anot->value;
+        my $pname = $self->modified_uniquename(orig_id => $orig_pname)
+                    ? $self->modified_uniquename(orig_id => $orig_pname)
+                    : $orig_pname;
         my $parent = $self->cache('feature',$pname);
-        die "\nno parent $pname;\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
+        confess "\nno parent $orig_pname ($pname);\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
 
         $self->cache('parent',$self->nextfeature,$parent);
 
@@ -3994,9 +4059,12 @@ sub handle_derives_from {
     my ($feature) = @_;
 
     for my $p_anot ( $feature->annotation->get_Annotations('Derives_from') ) {
-        my $pname  = $p_anot->value;
+        my $orig_pname  = $p_anot->value;
+        my $pname = $self->modified_uniquename(orig_id => $orig_pname)
+                    ? $self->modified_uniquename(orig_id => $orig_pname)
+                    : $orig_pname; 
         my $parent = $self->cache('feature',$pname);
-        die "no parent ".$pname unless $parent;
+        confess "no parent ".$orig_pname unless $parent;
 
         $self->cache('parent',$self->nextfeature,$parent);
 
@@ -4107,28 +4175,34 @@ sub src_second_chance {
       $src = '\N';
     } else {
 
+      #check to see if the uniquename had to be changed
+      my $src_uniquename = 
+             $self->modified_uniquename(orig_id => $feature->seq_id) ?
+             $self->modified_uniquename(orig_id => $feature->seq_id)
+           : $feature->seq_id;
+
       my ($temp_f_id)= $self->uniquename_cache(
                                         validate => 1,
-                                        uniquename => $feature->seq_id
+                                        uniquename => $src_uniquename
                                               );
-      $self->cache('feature',$feature->seq_id,$temp_f_id);
+      $self->cache('feature',$src_uniquename,$temp_f_id);
 
       unless ($temp_f_id) {
-        $self->{queries}{count_name}->execute($feature->seq_id);
+        $self->{queries}{count_name}->execute($src_uniquename);
         my ($n_rows) = $self->{queries}{count_name}->fetchrow_array;
         if (1 < $n_rows) {
-          $self->throw( "more that one source for ".$feature->seq_id );
+          $self->throw( "more that one source for ".$src_uniquename );
         } elsif ( 1==$n_rows) {
-          $self->{queries}{search_name}->execute($feature->seq_id);
+          $self->{queries}{search_name}->execute($src_uniquename);
           my ($tmp_source) = $self->{queries}{search_name}->fetchrow_array;
-          $self->cache('feature',$feature->seq_id,$tmp_source);
+          $self->cache('feature',$src_uniquename,$tmp_source);
         } else {
           confess "Unable to find srcfeature "
                .$feature->seq_id
                ." in the database.\nPerhaps you need to rerun your data load with the '--recreate_cache' option.";
         }
       }
-      $src = $self->cache('feature',$feature->seq_id);
+      $src = $self->cache('feature',$src_uniquename);
     }
 
     return $src;
@@ -4166,6 +4240,10 @@ sub get_src_seqlen {
       $self->cache('srcfeature',$src,1);
 
     } else { # normal case
+      my $src_uniquename 
+                = $self->modified_uniquename(orig_id=>$feature->seq_id) 
+                ? $self->modified_uniquename(orig_id=>$feature->seq_id)
+                : $feature->seq_id;
       $src = $self->cache('feature',$feature->seq_id);
       $seqlen = '\N';
     }

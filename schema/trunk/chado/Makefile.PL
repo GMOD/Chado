@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.130 2009-04-01 03:20:35 scottcain Exp $
+# $Id: Makefile.PL,v 1.131 2009-05-29 20:33:00 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -505,7 +505,7 @@ WriteMakefile(
 #      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
 #    'NAME'		            => 'chado',
     'NAME'                => 'gmod',
-    'VERSION'             => '1.0',
+    'VERSION'             => '1.1',
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       #'Class::DBI'        => 0.94,
