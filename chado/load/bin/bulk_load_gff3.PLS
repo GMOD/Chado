@@ -839,6 +839,14 @@ END
                                        $chado->organism_id,
                                        $nextfeature);
 
+  if (defined(($feature->annotation->get_Annotations('ID'))[0]) &&
+      ($feature->annotation->get_Annotations('ID'))[0]->value ne $uniquename) {
+    #need to keep a temporary map of modified uniquenames
+    $chado->modified_uniquename(
+          orig_id => ($feature->annotation->get_Annotations('ID'))[0]->value,
+          modified_id => $uniquename);
+  }
+
   my($name)    = defined(($feature->annotation->get_Annotations('Name'))[0]) ?
                    ($feature->annotation->get_Annotations('Name'))[0]->value :
                  defined(($feature->annotation->get_Annotations('ID'))[0])   ?
@@ -847,7 +855,10 @@ END
 
   $name           = $name->value if ref($name);
 
-  if ($uniquename eq $feature->seq_id) { 
+  if ($uniquename eq $feature->seq_id or 
+      (defined( $chado->modified_uniquename(modified_id => $uniquename)) and
+        $chado->modified_uniquename(modified_id => $uniquename) eq $feature->seq_id)) {
+
     $chado->reftype_property($featuretype,$type); #  a reference sequence?? yes 
     } 
   
@@ -952,6 +963,11 @@ END
   if ($feature->annotation->get_Annotations('Alias')) {
     @aliases = map {$_->value} $feature->annotation->get_Annotations('Alias');
   }
+
+  #if the uniquename was modified, put the orig ID in the alias list
+  push @aliases, $chado->modified_uniquename(modified_id=>$uniquename) 
+      if $chado->modified_uniquename(modified_id=>$uniquename);
+
   #Un-denormalizing the synonym table
   #if ($name ne '\N') {
   #  push @aliases, $name;
