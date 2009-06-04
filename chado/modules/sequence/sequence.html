@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta name="generator" content="SQL::Translator::Producer::HTML" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body>
@@ -271,7 +271,7 @@
 
 <em>
 	<br />
-	$Id: sequence.html,v 1.8 2008-08-29 17:13:52 scottcain Exp $ <br />
+	$Id: sequence.html,v 1.9 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -381,7 +381,9 @@ featureloc. It is recommended that the value for this column be
 manifested for features which may may non-contiguous sublocations (e.g.
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
-RNA sequence. </td>
+RNA sequence. The default storage method for the residues column is
+EXTERNAL, which will store it uncompressed to make substring operations
+faster. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -3745,7 +3747,7 @@ the default 0 value should be used. </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08001</a>
+SQL::Translator 0.09004</a>
 
 </body>
 </html>

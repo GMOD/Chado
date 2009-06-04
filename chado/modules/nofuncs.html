@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta name="generator" content="SQL::Translator::Producer::HTML" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body>
@@ -1627,7 +1627,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado general module <br />
 	================================================ <br />
@@ -2244,7 +2244,7 @@
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado cv module <br />
 	================================================================= <br />
@@ -3756,7 +3756,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado pub module <br />
 	================================================================= <br />
@@ -4735,7 +4735,7 @@ default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado organism module <br />
 	============ <br />
@@ -5236,7 +5236,7 @@ pattern. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado sequence module <br />
 	================================================================= <br />
@@ -5346,7 +5346,9 @@ featureloc. It is recommended that the value for this column be
 manifested for features which may may non-contiguous sublocations (e.g.
 transcripts), since derivation at query time is non-trivial. For
 expressed sequence, the DNA sequence should be used rather than the
-RNA sequence. </td>
+RNA sequence. The default storage method for the residues column is
+EXTERNAL, which will store it uncompressed to make substring operations
+faster. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -8732,7 +8734,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado companalysis module <br />
 	================================================================= <br />
@@ -9300,7 +9302,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
 	================================================================= <br />
@@ -9841,7 +9843,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
 	2006-04-11 <br />
@@ -11422,7 +11424,7 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado map module <br />
 	================================================================= <br />
@@ -12142,7 +12144,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado phylogenetics module <br />
 	Richard Bruskiewich <br />
@@ -13568,7 +13570,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado contact module <br />
 	================================================================= <br />
@@ -13885,7 +13887,7 @@ links to the feature (map) upon which the feature is being localized. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado expression module <br />
 	================================================================= <br />
@@ -15372,7 +15374,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado mage module <br />
 	================================================================= <br />
@@ -22172,7 +22174,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	========================================== <br />
 	Chado stock module <br />
 	DEPENDENCIES <br />
@@ -24308,7 +24310,7 @@ the default 0 value should be used. </td>
 
 <em>
 	<br />
-	$Id: nofuncs.html,v 1.15 2008-10-20 15:51:14 scottcain Exp $ <br />
+	$Id: nofuncs.html,v 1.16 2009-06-04 03:19:50 scottcain Exp $ <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import feature from sequence <br />
@@ -25738,7 +25740,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08001</a>
+SQL::Translator 0.09004</a>
 
 </body>
 </html>
