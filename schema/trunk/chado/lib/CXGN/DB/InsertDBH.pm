@@ -71,7 +71,7 @@ CXGN::DB::Connection
 package CXGN::DB::InsertDBH;
 
 
-open (my $TTY, '>', '/dev/tty') or die "what the heck - no TTY??\n";
+
 
 
 sub connect {
@@ -107,6 +107,9 @@ sub connect {
   ######################################################
   # we will prompt the user for a username and password.
 #  my $un = $ENV{"USER"};
+
+  open (my $TTY, '>', '/dev/tty') or die "what the heck - no TTY??\n";
+
   my $un = "postgres";
   print $TTY "Halt! Who goes there? (default \"$un\"): ";
 
@@ -128,7 +131,7 @@ sub connect {
   chomp $dbargs->{dbpass};
   print $TTY "\n"; #newline to let the user know the password was entered
   # done with username/password
-
+  close $TTY;
 
   ###############################################
   # make some default parameters for ease of use, and for safety's sake

@@ -13,7 +13,7 @@ Reads in a configuration file in a certain syntax and stores this configuration 
     <name1> <value1>
 
     #comment
-    <name2> <value2>
+    <name2> <value2>  #another comment
 
     #this example will put multiple values into name3
     <name3> <value3.0> <value3.1> <value3.2>
@@ -91,8 +91,8 @@ sub parse_line
 {
     my $self=shift;
     my($line)=@_;
-    return unless $line;
-    return if $line=~/^\s*#/;
+    $line =~ s/#.+//; #remove any comments from consideration
+    return unless $line =~ /\S/; #ignore empty lines
     my($name,@values)=split(/[\t ]+/,$line);
     unless(defined($values[0])){$values[0]='';}#let's make "no value" be stored as an empty string instead
     return($name,\@values);

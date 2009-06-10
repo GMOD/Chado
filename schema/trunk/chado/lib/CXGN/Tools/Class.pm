@@ -13,47 +13,54 @@ our @EXPORT_OK;
 CXGN::Tools::Class - a bundle of little code snippets that make writing
    robust object-oriented code a little easier
 
-=head1 DESCRIPTION
+=head1 DEPRECATED
 
-none yet
-
-=head1 SYNOPSIS
-
-none yet
-
-=head1 FUNCTIONS
-
-All of the below functions are EXPORT_OK.
-
-=head2 parricide
-
-  Desc: Call DESTROY on all the classes in a list, making sure
-        not to do any one of them twice (originally from Conway
-        p. 176, modified significantly to not try to store state
-        in the destroyed object)
-  Args: (Object, @ISA of that object)
-  Ret : A list of all classes whose destructors get called by recursing
-        up the class inheritance graph.
-  Side Effects: Calls the DESTROY of all of the classes listed in ISA 
-                (and so recursively on all their superclasses, etc.)
-                with the given object as the first argument.
-  Example:
-
-    #in my witchy little class with multiple parent classes...
-    sub DESTROY {
-      # <any cleanups specific to your class>
-      return parricide ($self, our @ISA);
-    }
-
-
-  If all of your classes use this little jimmy, the destructors get
-  automagically chained together, which is usually a good thing.
-
-  Note: you *must* make sure that the return value from parricide gets
-  returned by your destructor, so that parricide can know which
-  superclasses it has destroyed.  Really, this is important.
+This module is deprecated.  Do not use in new code.  Build new code with Moose instead, and sidestep the multiple-inheritance DESTROY problem that parricide() was meant to solve.
 
 =cut
+
+
+# =head1 DESCRIPTION
+
+# none yet
+
+# =head1 SYNOPSIS
+
+# none yet
+
+# =head1 FUNCTIONS
+
+# All of the below functions are EXPORT_OK.
+
+# =head2 parricide
+
+#   Desc: Call DESTROY on all the classes in a list, making sure
+#         not to do any one of them twice (originally from Conway
+#         p. 176, modified significantly to not try to store state
+#         in the destroyed object)
+#   Args: (Object, @ISA of that object)
+#   Ret : A list of all classes whose destructors get called by recursing
+#         up the class inheritance graph.
+#   Side Effects: Calls the DESTROY of all of the classes listed in ISA 
+#                 (and so recursively on all their superclasses, etc.)
+#                 with the given object as the first argument.
+#   Example:
+
+#     #in my witchy little class with multiple parent classes...
+#     sub DESTROY {
+#       # <any cleanups specific to your class>
+#       return parricide ($self, our @ISA);
+#     }
+
+
+#   If all of your classes use this little jimmy, the destructors get
+#   automagically chained together, which is usually a good thing.
+
+#   Note: you *must* make sure that the return value from parricide gets
+#   returned by your destructor, so that parricide can know which
+#   superclasses it has destroyed.  Really, this is important.
+
+# =cut
 
 #my $indentation = 0;
 sub parricide {
@@ -169,11 +176,11 @@ sub super_autoload {
 }
 
 
-=head1 AUTHOR
+# =head1 AUTHOR
 
-Robert Buels
+# Robert Buels and Marty Kreuter
 
-=cut
+# =cut
 
 ###
 1;#

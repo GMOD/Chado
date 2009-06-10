@@ -168,6 +168,7 @@ sub resolve_DBH_exchange {
 	my $pkg = shift;
 	
 	my $lldbh = sub { $this->looks_like_DBH(@_) };
+	no warnings 'once';
 	if( ${$class."::IMPORT_DBH"}  && $lldbh->(${$pkg."::DBH"}) && !$lldbh->(${$class."::DBH"}) ){
 		dprint "$class is pulling its DBH from $pkg\n";
 		$this->send_DBH($pkg, $class);	#Pull the DBH from $pkg

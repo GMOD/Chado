@@ -14,6 +14,7 @@ Naama Menda (nm249@cornell.edu)
 
 package CXGN::Chado::Main;
 
+use base qw / CXGN::DB::Object / ;
 
 =head2 new
 
@@ -31,7 +32,7 @@ sub new {
     my $dbh= shift; 
    
     my $args = {};  
-    my $self = bless $args, $class;
+    my $self = $class->SUPER::new($dbh); #bless $args, $class;
 
    $self->set_dbh($dbh);
   
