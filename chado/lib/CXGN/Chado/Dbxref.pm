@@ -40,6 +40,7 @@ package CXGN::Chado::Dbxref;
 use CXGN::Chado::Cvterm;
 use CXGN::Chado::Publication;
 use CXGN::Chado::Feature;
+use CXGN::Chado::Db;
 
 use base qw / CXGN::Chado::Main /;
 
@@ -139,7 +140,7 @@ sub store {
     my $dbxref_id= $self->get_dbxref_id();
     if (!$dbxref_id) { #do an insert 
 	if (!$self->db_exists() ) { # insert a new db 
-	    print STDERR "Dbxref.pm: storing a new db '".$self->get_db_name() ."'.\n";
+	    print STDERR "***Dbxref.pm: storing a new db '".$self->get_db_name() ."'.\n";
 	    my $db=CXGN::Chado::Db->new($self->get_dbh() );
 	    $db->set_db_name($self->get_db_name() );
 	    $db->store;
@@ -313,7 +314,22 @@ sub set_cv_name {
   $self->{cv_name}=shift;
 }
 
+=head2 get_full_accession
 
+ Usage: $self->get_full_accession()
+ Desc:  Usse this accessor to find the full accession of your cvterm
+        instead of concatenating db_name and accession (e.g. GO:0001234)
+ Ret:   db_name:accession
+ Args:   none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_full_accession {
+    my $self=shift;
+    return $self->get_db_name() . ":" . $self->get_accession();
+}
 
 
 =head2 get_cvterm
@@ -335,10 +351,10 @@ sub get_cvterm {
     #my $dbxref_id= $self->get_dbxref_id();
     my $dbxref_id= shift || $self->get_dbxref_id();
     $cvterm_query->execute($dbxref_id);
-    my $cvterm_id= $cvterm_query->fetchrow_array();
+    my ($cvterm_id) = $cvterm_query->fetchrow_array();
     if (!$cvterm_id) {
 	$cvterm2_query->execute($dbxref_id);
-	my $cvterm_id= $cvterm2_query->fetchrow_array();
+	my ($cvterm_id) = $cvterm2_query->fetchrow_array();
     }
     my $cvterm_obj= CXGN::Chado::Cvterm->new($self->get_dbh(), $cvterm_id);
     return ($cvterm_obj);
@@ -395,7 +411,7 @@ sub get_dbxref_id_by_accession {
                   WHERE accession=? AND db.name = ?" ;
     my $sth = $dbh->prepare($query);
     $sth->execute($accession, $db_name );
-    my $dbxref_id = $sth->fetchrow_array();
+    my ($dbxref_id) = $sth->fetchrow_array();
 
     return $dbxref_id;
 }
@@ -421,7 +437,7 @@ sub get_dbxref_id_by_db_id {
                   WHERE accession=? AND db_id = ?" ;
     my $sth = $dbh->prepare($query);
     $sth->execute($accession, $db_id );
-    my $dbxref_id = $sth->fetchrow_array();
+    my ($dbxref_id) = $sth->fetchrow_array();
 
     return $dbxref_id;
 }
@@ -446,7 +462,7 @@ sub get_publication {
                   WHERE dbxref_id=? " ;
     my $sth = $self->get_dbh()->prepare($query);
     $sth->execute($self->get_dbxref_id() );
-    my $pub_id = $sth->fetchrow_array();
+    my ($pub_id) = $sth->fetchrow_array();
     my $pub_obj= CXGN::Chado::Publication->new($self->get_dbh(), $pub_id);
     
 }
@@ -470,7 +486,7 @@ sub get_feature {
                   WHERE public.feature.dbxref_id=? ";
     my $sth = $self->get_dbh()->prepare($query);
     $sth->execute($self->get_dbxref_id());
-    my $feature_id = $sth->fetchrow_array();
+    my ($feature_id) = $sth->fetchrow_array();
     my $feature_object = CXGN::Chado::Feature->new($self->get_dbh(), $feature_id);
     return $feature_object;
 }
@@ -491,7 +507,7 @@ sub db_exists {
     my $query= "SELECT db_id FROM public.db WHERE name = ?";
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_db_name());
-    my $db_id= $sth->fetchrow_array();
+    my ($db_id) = $sth->fetchrow_array();
     if ($db_id) { return 1; }
     else { return undef ; }
 }
@@ -515,7 +531,7 @@ sub get_cvterm_dbxrefs {
     $sth->execute($self->get_cvterm_id());
     
     my @dbxrefs;
-    while (my $id = $sth->fetchrow_array() ){
+    while (my ($id) = $sth->fetchrow_array() ){
 	my $d=CXGN::Chado::Dbxref->new($self->get_dbh(),$id); 
 	push @dbxrefs, $d;
     }

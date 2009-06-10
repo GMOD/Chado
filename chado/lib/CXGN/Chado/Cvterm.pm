@@ -15,13 +15,21 @@ CXGN::Chado::Cvterm - a class to handle controlled vocabulary terms.
 
 =cut
 
+use Data::Dumper;
 use CXGN::DB::Connection;
+use CXGN::Chado::Dbxref;
+use CXGN::Phenome::Population;
+use CXGN::Chado::Cvterm::CvtermRanking;
+use CXGN::Phenome::Locus;
+use CXGN::Phenome::Individual;
+
+use strict;
+
 
 package CXGN::Chado::Cvterm;
 
-use CXGN::Chado::Dbxref;
 
-use base qw /CXGN::Chado::Main / ;
+use base qw / CXGN::Chado::Main CXGN::Chado::Cvterm::CvtermRanking / ;
 
 
 =head1 IMPLEMENTATION OF THE Bio::Ontology::TermI INTERFACE
@@ -109,9 +117,9 @@ sub ontology {
 =head2 version
 
  Usage:        my $v = $t->version($version)
- Desc:         not sure what that is for. See L<Bio::Ontology::OntologyI>.
- Ret:          [NOT IMPLEMENTED]
- Args:
+ Desc:         synonym for get/set_version . See L<Bio::Ontology::OntologyI>.
+ Ret:          $self->get_version()
+ Args:         $version 
  Side Effects:
  Example:
 
@@ -120,8 +128,8 @@ sub ontology {
 sub version {
     my $self = shift;
     my $version = shift;
-#    $self->set_version($version) if defined($version);
-#    return $self->get_version();
+    $self->set_version($version) if defined($version);
+    return $self->get_version();
 }
 
 =head2 comment
@@ -152,9 +160,9 @@ sub comment {
 	my $sth = $self->get_dbh()->prepare($query);
 	$sth->execute($self->get_cvterm_id(), $comment);
 	my %props; #hash of arrays for cvtermprop_id => comment  pairs
-	my $cvtermprop_id= $sth->fetchrow_array();
+	my ($cvtermprop_id) = $sth->fetchrow_array();
         #my @comments=();
-	#while (my $value = $sth->fetchrow_array()) { push @comments , $value; } 
+	#while (my ($value) = $sth->fetchrow_array()) { push @comments , $value; } 
 	# if yes, update it
 	#if ($cvtermprop_id) { 
 	#    my $update = "UPDATE cvtermprop SET value=? WHERE cvtermprop_id=?";
@@ -234,6 +242,7 @@ sub get_roots {
 
 }
 
+
 =head2 get_namespaces
 
  Usage:         my @namespaces = CXGN::Chado::Cvterm::get_namespaces($dbh)
@@ -312,13 +321,14 @@ sub new_with_term_name {
     my $sth = $dbh->prepare($query);
     $sth->execute($name, $cv_id);
     my ($cvterm_id) = $sth->fetchrow_array();
+ 
     my $self = CXGN::Chado::Cvterm->new($dbh, $cvterm_id);
     return $self;
 }
 
 =head2 new_with_accession
 
- Usage:        my $t = CXGN::Chado::Cvterm->new_with_accession($dbh, "Interpro:IPR000001");
+ Usage:        my $t = CXGN::Chado::Cvterm->new_with_accession($dbh, "InterPro:IPR000001");
  Desc:         an alternate constructor using the accession to define the term.
  Ret:          
  Args:         a database handle [CXGN::DB::Connection], an accession [string]
@@ -334,7 +344,12 @@ sub new_with_accession  {
 
     my ($name_space, $id) = split /\:/, $accession;
     
-    my $query = "SELECT cvterm_id FROM cvterm join dbxref using(dbxref_id) JOIN db USING (db_id)  WHERE db.name=? AND dbxref.accession=?";
+    if ($accession =~ m/^IPR*/ ) { 
+	$name_space = 'InterPro';
+	$id= $accession;
+    }
+    #print STDERR "Cvterm.pm:new_with_accession found namespace:$name_space, id:$id\n";
+    my $query = "SELECT cvterm_id FROM cvterm join dbxref using(dbxref_id) JOIN db USING (db_id)  WHERE db.name=? AND dbxref.accession ilike ?";
 
     my $sth = $dbh->prepare($query);
     $sth->execute($name_space, $id);
@@ -349,12 +364,12 @@ sub new_with_accession  {
 sub fetch {
     my $self=shift;
 
-    my $cvterm_query = $self->get_dbh()->prepare("SELECT  cvterm.cvterm_id, cv.cv_id, cv.name, cvterm.name, cvterm.definition, cvterm.dbxref_id, cvterm.is_obsolete, dbxref.accession, db.name  FROM public.cvterm join public.cv using(cv_id) join public.dbxref using(dbxref_id) join public.db using (db_id) WHERE cvterm_id=?  ");
+    my $cvterm_query = $self->get_dbh()->prepare("SELECT  cvterm.cvterm_id, cv.cv_id, cv.name, cvterm.name, cvterm.definition, cvterm.dbxref_id, cvterm.is_obsolete, cvterm.is_relationshiptype, dbxref.accession, db.name  FROM public.cvterm join public.cv using(cv_id) join public.dbxref using(dbxref_id) join public.db using (db_id) WHERE cvterm_id=?  ");
          	   
     $cvterm_query->execute( $self->get_cvterm_id() );
 
  
-    my ($cvterm_id, $cv_id, $cv_name, $cvterm_name, $definition, $dbxref_id, $obsolete,$accession, $db_name)=$cvterm_query->fetchrow_array();
+    my ($cvterm_id, $cv_id, $cv_name, $cvterm_name, $definition, $dbxref_id, $obsolete,$is_rel,$accession, $db_name)=$cvterm_query->fetchrow_array();
     $self->set_cvterm_id($cvterm_id);
     $self->set_cv_id($cv_id);
     $self->set_cv_name($cv_name);
@@ -362,17 +377,18 @@ sub fetch {
     $self->set_definition($definition);
     $self->set_dbxref_id($dbxref_id);
     $self->set_obsolete($obsolete);
+    $self->set_is_relationshiptype($is_rel);
     $self->set_accession($accession);
     $self->set_db_name($db_name);
 }
 
 =head2 store
 
- Usage:
- Desc:
- Ret:
- Args:
- Side Effects:
+ Usage: $self->store()
+ Desc:  store a new cvterm. Update if cvterm_id exists
+ Ret:   cvterm_id
+ Args:  none
+ Side Effects: store a new dbxref for the cvterm if does not exists already
  Example:
 
 =cut
@@ -397,7 +413,7 @@ sub store {
 	    if (!$self->get_accession()) { die "Need an accession for a CV term!"; }
 	    my $dbxref = CXGN::Chado::Dbxref->new($self->get_dbh());
 	    $dbxref->set_accession($self->get_accession()); 
-	    $dbxref->set_version($self->get_accession());
+	    $dbxref->set_version($self->get_version());
 	    $dbxref->set_description($self->definition());
 	    my $db_name = $self->get_db_name();
 	    if ($db_name) { $dbxref->set_db_name($db_name); }
@@ -405,6 +421,7 @@ sub store {
 	    
 	    my $dbxref_id = $dbxref->store();
 	    $self->set_dbxref_id($dbxref_id);
+	    print STDERR "Inserted new dbxref for accession " . $self->get_db_name() . ":" . $self->get_accession ."\n";
 	}
 	
 	my $query = "INSERT INTO cvterm (cv_id, name, dbxref_id, definition, is_obsolete, is_relationshiptype) VALUES (?, ?, ?, ?,?,?)";
@@ -413,8 +430,6 @@ sub store {
 	$sth->execute($self->get_cv_id(), $self->get_cvterm_name(), $self->get_dbxref_id(), $self->get_definition(), $self->get_obsolete(), $self->get_is_relationshiptype());
 	
 	$cvterm_id =  $self->get_dbh()->last_insert_id("cvterm", "public");
-	#print STDERR "cvterm_id= $cvterm_id\n";
-
 	$self->set_cvterm_id($cvterm_id);
     }
     return $cvterm_id;
@@ -434,6 +449,7 @@ The following class properties have accessors (get_cvterm_id, set_cvterm_id...):
     definition
     dbxref_id
     accession
+    version
     db_name
     obsolete
     is_relationshiptype
@@ -531,6 +547,15 @@ sub set_accession {
   my $self=shift;
   $self->{accession}=shift;
 }
+sub get_version {
+  my $self=shift;
+  return $self->{version};
+}
+
+sub set_version {
+  my $self=shift;
+  $self->{version}=shift;
+}
 
 sub get_db_name {
   my $self=shift;
@@ -565,6 +590,25 @@ sub set_is_relationshiptype {
   $self->{is_relationshiptype}=shift;
 }
 
+
+=head2 get_full_accession
+
+ Usage: $self->get_full_accession()
+ Desc:  Usse this accessor to find the full accession of your cvterm
+        instead of concatenating db_name and accession (e.g. GO:0001234)
+ Ret:   db_name:accession
+ Args:   none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_full_accession {
+    my $self=shift;
+    return $self->get_db_name() . ":" . $self->get_accession();
+}
+
+
 =head2 get_parents
 
  Usage: my @parents = $self->get_parents()
@@ -580,13 +624,12 @@ sub set_is_relationshiptype {
 sub get_parents {
     
     my $self=shift;
-    
-    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id join dbxref on (cvterm.dbxref_id=dbxref.dbxref_id) join db using(db_id) WHERE cvterm_relationship.subject_id= ?  and cvterm.is_obsolete = 0 and db_id=? order by cvterm.name asc");
+    my $parents_sth = $self->get_dbh()->prepare("SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id join dbxref on (cvterm.dbxref_id=dbxref.dbxref_id)  JOIN public.db USING (db_id) WHERE cvterm_relationship.subject_id= ?  and cvterm.is_obsolete = 0 AND db.name=? order by cvterm.name asc");
 
 #SELECT cvterm_relationship.object_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.object_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.subject_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
-    $parents_sth->execute($self->get_cvterm_id(), $self->get_dbxref()->get_db_id());
+    $parents_sth->execute($self->get_cvterm_id(), $self->get_db_name() );
     my @parents = ();
-    while (my ($parent_term_id, $type_id) = $parents_sth->fetchrow_array()) { 
+    while (my ($parent_term_id, $type_id, $cvterm_name) = $parents_sth->fetchrow_array()) { 
 	my $parent_term = CXGN::Chado::Cvterm->new($self->get_dbh(), $parent_term_id);
 	my $relationship_term = CXGN::Chado::Cvterm->new($self->get_dbh(), $type_id);
 	    
@@ -595,7 +638,33 @@ sub get_parents {
     return (@parents);
 }
     
+sub get_ancestors { 
+    my $self = shift;
+    my %ancestors = $self->recursive_ancestors();
+    my @ancestor_list = ();
+    foreach my $k (%ancestors) { 
+	if (defined($ancestors{$k})) { push @ancestor_list, [ $ancestors{$k}->[0], $ancestors{$k}->[1] ]; }
+    }
+    return @ancestor_list;
+}
 
+sub recursive_ancestors { 
+    my $self = shift;
+    my %ancestors = @_;
+    my %a = ();
+    foreach my $p ($self->get_parents()) { 
+	print STDERR "ANCESTOR LIST: adding ".($p->[0]->get_db_name().":".$p->[0]->get_accession() . "rel_type:" . $p->[1]->get_cvterm_name())."\n";
+	$ancestors{$p->[0]->get_accession()} =  [ $p->[0], $p->[1] ];
+        %a = $p->[0]->recursive_ancestors(%ancestors);
+	foreach my $k (keys(%a)) { 
+	    #print STDERR "key= $k, value = ". $a{$k}->[0]->get_cvterm_name() . "--". $a{$k}->[1]->get_cvterm_name() . "\n"; 
+	    $ancestors{$k} = [ $a{$k}->[0], $a{$k}->[1] ];
+	}
+    }
+    return %ancestors;
+}
+
+	
 
 =head2 get_children
   
@@ -613,12 +682,12 @@ sub get_children {
     
     my $self=shift;
     
-    my $children_sth = $self->get_dbh()->prepare("SELECT distinct(cvterm_relationship.subject_id), cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON (cvterm.cvterm_id=cvterm_relationship.subject_id) join dbxref on(cvterm.dbxref_id=dbxref.dbxref_id) join db using(db_id) WHERE cvterm_relationship.object_id= ?  and cvterm.is_obsolete = 0 and db_id=? order by cvterm.name asc");
+    my $children_sth = $self->get_dbh()->prepare("SELECT distinct(cvterm_relationship.subject_id), cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON (cvterm.cvterm_id=cvterm_relationship.subject_id) JOIN public.dbxref USING (dbxref_id) JOIN public.db USING (db_id) WHERE cvterm_relationship.object_id= ?  and cvterm.is_obsolete = 0 AND db.name =? order by cvterm.name asc");
 #SELECT cvterm_relationship.subject_id, cvterm_relationship.type_id, cvterm.name FROM cvterm_relationship join cvterm ON cvterm.cvterm_id=cvterm_relationship.subject_id left join cvtermsynonym on cvtermsynonym.synonym=cvterm.name WHERE cvterm_relationship.object_id= ? and cvtermsynonym.synonym is null and cvterm.is_obsolete = 0 order by cvterm.name asc");
-    $children_sth->execute($self-> get_cvterm_id(), $self->get_dbxref()->get_db_id() );
+    $children_sth->execute($self-> get_cvterm_id() , $self->get_db_name() );
     print STDERR "Parent cvterm id = ".$self->get_cvterm_id()."\n";
     my @children = ();
-    while (my ($child_term_id, $type_id) = $children_sth->fetchrow_array()) { 
+    while (my ($child_term_id, $type_id, $cvterm_name) = $children_sth->fetchrow_array()) { 
 	print STDERR "retrieved child $child_term_id, $type_id\n";
 	my $child_term = CXGN::Chado::Cvterm->new($self->get_dbh(), $child_term_id);
 	my $relationship_term = CXGN::Chado::Cvterm->new($self->get_dbh(), $type_id);
@@ -633,7 +702,7 @@ sub get_children {
 
  Usage: my $childrenNumber = $self->count_children()
  Desc:  a method for fetching the number of children of a cvterm
- Ret:   the number of children
+ Ret:   the number of children for the current db name (this is to avoid counting InterPro children of GO terms)
  Args:  none
  Side Effects: none
  Example:  
@@ -644,11 +713,46 @@ sub count_children {
     my $self = shift;
     my $childNumber = 0;
 
-    my $child_sth = $self->get_dbh()->prepare("SELECT count( cvterm_relationship.subject_id )FROM cvterm_relationship join cvterm on cvterm.cvterm_id = cvterm_relationship.subject_id WHERE cvterm_relationship.object_id= ? and cvterm.is_obsolete = 0");
-    $child_sth->execute($self->get_cvterm_id() );
-    $childNumber = $child_sth->fetchrow_array();
+    my $child_sth = $self->get_dbh()->prepare("SELECT count( cvterm_relationship.subject_id )FROM cvterm_relationship join cvterm on cvterm.cvterm_id = cvterm_relationship.subject_id JOIN dbxref USING (dbxref_id) JOIN db USING (db_id) WHERE cvterm_relationship.object_id= ? and cvterm.is_obsolete = 0 AND db.name = ?");
+    $child_sth->execute($self->get_cvterm_id(), $self->get_db_name() );
+    ($childNumber) = $child_sth->fetchrow_array();
     return $childNumber;
 }
+
+=head2 get_recursive_children
+
+ Usage: $self->get_recursive_children
+ Desc: find all  recursive child terms of this cvterm
+ Ret:  a list of cvterm objects
+ Args: none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_recursive_children {
+    my $self=shift;
+    my %children= $self->recursive_children();
+    $children{$self->get_cvterm_id()}= $self;
+    my @cvterm_list = map( $_ , (values %children) ); #list of cvterm objects for all recursive child terms 
+	
+    return @cvterm_list;
+}
+sub recursive_children {
+    my $self=shift;
+    my %children=@_;
+    my %c=();
+    foreach my $child($self->get_children()) {
+	$children{$child->[0]->get_cvterm_id()} = $child->[0];
+	
+	%c=$child->[0]->recursive_children(%children);
+	foreach my $key (keys %c) {
+	    $children{$key} = $c{$key};
+	}
+    }
+    return %children;
+}
+    
 
 
 =head2 get_synonyms
@@ -672,7 +776,7 @@ sub get_synonyms {
 
     $synonym_sth->execute($cvterm_id);
     my @synonyms = ();
-    while (my $synonym = $synonym_sth->fetchrow_array()) { 
+    while (my ($synonym) = $synonym_sth->fetchrow_array()) { 
 	push @synonyms, $synonym;
     }
     return @synonyms;
@@ -790,7 +894,7 @@ sub term_is_obsolete {
     my $cvterm_id=shift;
     my $obsolete_sth = $self->get_dbh()->prepare("SELECT is_obsolete FROM cvterm WHERE cvterm_id= ?");
     $obsolete_sth->execute($self->get_cvterm_id() );
-    my $obsolete = $obsolete_sth->fetchrow_array();
+    my ($obsolete) = $obsolete_sth->fetchrow_array();
 
     if( $obsolete == 1 ) {
 	return "true";
@@ -866,7 +970,7 @@ sub add_secondary_dbxref {
     my $db=CXGN::Chado::Db->new_with_name($self->get_dbh(), $db_name);
     if ( !($db->get_db_id()) ) {
 	$db->set_db_name($db_name);
-	print STDERR "Cvterm.pm: Storing a new DB: $dbname\n";
+	print STDERR "Cvterm.pm: Storing a new DB: $db_name\n";
 	$db->store();
     }
     #check is $accession exists:
@@ -906,7 +1010,7 @@ sub has_secondary_dbxref {
     my $query = "SELECT cvterm_dbxref_id FROM cvterm_dbxref WHERE cvterm_id= ? AND dbxref_id= ?";
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_cvterm_id(), $dbxref_id);
-    my $id= $sth->fetchrow_array();
+    my ($id) = $sth->fetchrow_array();
     if ($id) { return 1; }
     else { return 0; }
 }
@@ -929,7 +1033,7 @@ sub get_secondary_dbxrefs {
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_cvterm_id() );
     my @secondary;
-    while (my $dbxref_id= $sth->fetchrow_array() ) {
+    while (my ($dbxref_id) = $sth->fetchrow_array() ) {
 	my $dbxref= CXGN::Chado::Dbxref->new($self->get_dbh(),$dbxref_id);
 	my $accession = $dbxref->get_db_name() . ":" . $dbxref->get_accession();
 	push  @secondary, $accession;
@@ -1006,7 +1110,7 @@ sub add_def_dbxref {
                  WHERE cvterm_id=? and dbxref_id=?";
 	my $sth=$self->get_dbh()->prepare($query);
 	$sth->execute($self->get_cvterm_id(), $dbxref_id);
-	print STDERR "Cvterm.pm: Updating is_for_def=1 for definition dbxref ($dbname:$accession) for cvterm". $self->get_cvterm_name() . "\n";
+	#print STDERR "Cvterm.pm: Updating is_for_def=1 for definition dbxref ($dbname:$accession) for cvterm". $self->get_cvterm_name() . "\n";
     }
 }
 
@@ -1028,7 +1132,7 @@ sub get_def_dbxref {
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_cvterm_id());
     my @dbxrefs=();
-    while (my $dbxref_id =$sth->fetchrow_array() ) {  
+    while (my ($dbxref_id) = $sth->fetchrow_array() ) {  
 	my $dbxref=CXGN::Chado::Dbxref->new($self->get_dbh(), $dbxref_id);
 	push @dbxrefs, $dbxref;
     }
@@ -1052,7 +1156,7 @@ sub delete_def_dbxref {
     my $dbxref=shift;
     my $query = "DELETE FROM cvterm_dbxref WHERE cvterm_id=? AND dbxref_id=? AND is_for_definition = 1";
     my $sth=$self->get_dbh()->prepare($query);
-    print "Cvterm.pm found dbxref_id ". $dbxref->get_dbxref_id() ."\n";
+    #print "Cvterm.pm found dbxref_id ". $dbxref->get_dbxref_id() ."\n";
     $sth->execute($self->get_cvterm_id(), $dbxref->get_dbxref_id());
 }
 
@@ -1061,7 +1165,7 @@ sub delete_def_dbxref {
  Usage: CXGN::Chado::Cvterm::get_cvterm_by_name($dbh, $name)
  Desc:  get a cvterm object with name $name
  Ret:   cvterm object. Empty object if name does not exist in cvterm table
- Args:  database handle and a cvterm name
+ Args:  database handle and a cvterm name (and '1' if you want to check for an existing relationship type! ) 
  Side Effects: none
  Example:
 
@@ -1070,10 +1174,12 @@ sub delete_def_dbxref {
 sub get_cvterm_by_name {
     my $dbh=shift;
     my $name=shift;
+    my $is_rel=shift; #optional!
     my $query = "SELECT cvterm_id FROM public.cvterm WHERE name ilike ?";
+    $query .=" AND is_relationshiptype =1 " if $is_rel;
     my $sth=$dbh->prepare($query);
     $sth->execute($name);
-    my $cvterm_id=$sth->fetchrow_array();
+    my ($cvterm_id) = $sth->fetchrow_array();
     my $cvterm= CXGN::Chado::Cvterm->new($dbh, $cvterm_id);
     return $cvterm;
 }
@@ -1097,7 +1203,7 @@ sub cvterm_exists {
     my $query="SELECT cvterm_id FROM public.cvterm WHERE cv_id=? AND  name=? AND is_obsolete=?";
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_cv_id(), $self->get_cvterm_name(), $self->get_obsolete());
-    my $existing_cvterm_id=$sth->fetchrow_array();
+    my ($existing_cvterm_id) = $sth->fetchrow_array();
     if ($cvterm_id == $existing_cvterm_id) { return undef; }
     else { return $existing_cvterm_id ; }
 }
@@ -1131,7 +1237,7 @@ sub obsolete {
  Usage: $self->get_alt_id();
  Desc:  find the alternative id of a term. Meant to be used for finding
         an alternative cvterm for an obsolete term
- Ret:   dbxref_id or undef 
+ Ret:   list of dbxref_ids or undef 
  Args:  none
  Side Effects: none
  Example:
@@ -1140,13 +1246,15 @@ sub obsolete {
 
 sub get_alt_id {
     my $self=shift;
-    my $query = "SELECT cvterm.dbxref_id FROM cvterm WHERE cvterm_id= 
+    my $query = "SELECT cvterm.dbxref_id FROM cvterm WHERE cvterm_id IN
                  (SELECT cvterm_id FROM cvterm_dbxref WHERE dbxref_id= ?)";
-
+    my @alt_ids;
     my $sth=$self->get_dbh()->prepare($query);
     $sth->execute($self->get_dbxref_id() );
-    my $alt_id= $sth->fetchrow_array();
-    return $alt_id || undef ;
+    while (my ($alt_id) = $sth->fetchrow_array()) {
+	push @alt_ids, $alt_id ; 
+    }
+    return @alt_ids || undef ;
 }
 
 =head2 map_to_slim
@@ -1161,7 +1269,7 @@ sub get_alt_id {
  Note:         the db name is stripped off if provided (GO:0003832 is 
                given as 0003832)
  Example:
-
+    
 =cut
 
 sub map_to_slim {
@@ -1170,42 +1278,265 @@ sub map_to_slim {
     
     my %slim_counts = ();
     for (my $i=0; $i<@slim; $i++) { 
+	
+	# strip db name off id
+	#
 	$slim[$i]=~s/.*?(\d+).*/$1/;
 	#print STDERR "SLIM TERM: $slim[$i]\n";
+	
+	# make a unique list of slim terms
+	#
 	$slim_counts{$slim[$i]}=0;
     }
-
-    $slim_counts_ref = $self->get_slim_counts(\%slim_counts);
+    $self->get_slim_counts(\%slim_counts);
+    
+    print Data::Dumper::Dumper(\%slim_counts);
 
     my @matches = ();
-    foreach my $k (keys %$slim_counts_ref) { 
-	if ($slim_counts_ref->{$k}>0) { push @matches, $k; }
+    foreach my $k (keys %slim_counts) { 
+	if ($slim_counts{$k}>0) { push @matches, $k; }
     }
     return @matches;
+    
+    
 }
 
 sub get_slim_counts { 
     my $self = shift;
     my $slim_counts = shift;
-
-    foreach my $p ($self->get_parents()) { 
-	my $id = $p->[0]->identifier();
-	#print STDERR "Checking $id\n";
-	if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
-	    $slim_counts->{$id}++; 
-	    next(); # don't go any more down this branch.
-	}
-	my $sub_counts = $p->[0]->get_slim_counts($slim_counts);
-	foreach my $k (keys(%$sub_counts)) { 
-	    if ($sub_counts->{$k}>0) { $slim_counts->{$k}=1; }
-	}
-    }
-    return $slim_counts;
     
+    my $id = $self->identifier();
+    
+    if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
+	$slim_counts->{$id}++;
+	return;
+    }
+    
+    foreach my $p ($self->get_parents()) { 
+	$p->[0]->get_slim_counts($slim_counts); 
+    }
 }
 
 
+# sub get_slim_counts { 
+#     my $self = shift;
+#     my $slim_counts = shift;
+    
+#     foreach my $p ($self->get_parents()) { 
+# 	my $id = $p->[0]->identifier();
+# 	#print STDERR "Checking $id\n";
+# 	if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
+# 	    $slim_counts->{$id}++; 
+# 	}
+# 	else { 
+# 	    $p->[0]->get_slim_counts($slim_counts); 
+# 	}
+	
 
+#     }
+#     return $slim_counts;
+# }
+    
+# # sub get_slim_term { 
+#     my $self = shift;
+#     my $slim_counts = shift;
+    
+#     my $slim = "";
+#     foreach my $p ($self->get_parents()) { 
+# 	my $id = $p->[0]->identifier();
+# 	if (exists($slim_counts->{$id}) && defined($slim_counts->{$id})) { 
+# 	    $slim = $id; 
+# 	    last();
+# 	}
+#     }
+#     return $slim;
+# }
+
+
+
+=head2 get_all_populations_cvterm
+
+ Usage: my @pops = $cvterm->get_all_populations_cvterm();
+ Desc: returns a list of populations phenotyped for the particular trait (cvterm). 
+ Ret: list of population objects
+ Args: none
+ Side Effects: accesses database
+ Example:
+
+=cut
+
+sub get_all_populations_cvterm {
+    my $self=shift;
+    my $query = "SELECT DISTINCT(phenome.population.population_id) FROM public.phenotype 
+                
+                 LEFT JOIN phenome.individual USING (individual_id)
+                 LEFT JOIN phenome.population USING (population_id)
+                 WHERE observable_id = ?";
+    my $sth=$self->get_dbh->prepare($query);
+    $sth->execute($self->get_cvterm_id());
+    my @populations;
+    while (my ($pop_id) = $sth->fetchrow_array()) {
+	my $pop = CXGN::Phenome::Population->new($self->get_dbh(), $pop_id);
+	push @populations, $pop;
+    }
+    return @populations;
+
+}
+
+=head2 has_qtl_data
+
+  Usage: my $has_qtl = $cvterm->has_qtl_data();
+ Desc: returns 0 or 1 depending on whether a trait has been assayed in a population for genetic and phenotypic data (qtl data). The assumption is if a trait genetic and phenotype data, it is from qtl study.
+ Ret: true or false
+ Args: none
+ Side Effects: accesses the database
+ Example:
+
+=cut
+
+sub has_qtl_data {
+    my $self = shift;
+    my $query = "SELECT DISTINCT (phenome.individual.population_id) FROM phenome.genotype
+                        LEFT JOIN phenome.individual USING (individual_id)
+                        LEFT JOIN public.phenotype USING (individual_id)                                             
+                        WHERE observable_id =?" ;
+    my $sth = $self->get_dbh()->prepare($query);
+    $sth->execute($self->get_cvterm_id());
+    
+    my @pop_ids;
+    while (my ($pop_id) = $sth->fetchrow_array()) {
+
+	push @pop_ids, $pop_id;
+
+    }
+    
+    if (@pop_ids) { 
+	return 1; 
+    } else { return 0;
+	 }
+    
+
+}
+
+
+=head2 get_individuals
+
+ Usage: $self->get_individuals
+ Desc:  find all individuals annotated with this cvterm
+ Ret:   list of Individual objects
+ Args:  none 
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_individuals {
+    my $self=shift;
+    my $query = "SELECT individual_id FROM phenome.individual
+                 JOIN phenome.individual_dbxref USING (individual_id) 
+                 WHERE dbxref_id=?";
+    my $sth=$self->get_dbh()->prepare($query);;
+    $sth->execute($self->get_dbxref_id);
+    my @individuals;
+    while ( my ($individual_id) = $sth->fetchrow_array() ) {
+	my $ind= CXGN::Phenome::Individual->new($self->get_dbh(), $individual_id);
+	push @individuals, $ind;
+    }
+    return @individuals;
+}
+
+=head2 get_loci
+
+ Usage: $self->get_loci()
+ Desc:  find the loci with annotations of this cvterm
+ Ret:   a list of Locus objects
+ Args:  none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_loci {
+    my $self=shift;
+    my $query = "SELECT locus_id FROM phenome.locus
+                 JOIN phenome.locus_dbxref USING (locus_id)
+                 WHERE dbxref_id=?
+                 ORDER BY locus.locus_symbol";
+    my $sth=$self->get_dbh()->prepare($query);;
+    $sth->execute($self->get_dbxref_id);
+    my @loci;
+    while ( my ($locus_id) = $sth->fetchrow_array() ) {
+	my $locus= CXGN::Phenome::Locus->new($self->get_dbh(), $locus_id);
+	push @loci, $locus;
+    }
+    return @loci;
+}
+
+=head2 get_recursive_loci
+
+ Usage: my @loci= $self->get_recursive_loci()
+ Desc:  find all the loci annotated with the cvterm or any of its recursive children
+ Ret:   a list of locus ojects
+ Args:  none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_recursive_loci {
+    my $self=shift;
+    my @cvterms= $self->get_recursive_children();
+    my @cvterm_ids = map ($_->get_cvterm_id, @cvterms);
+    
+    my $query = "SELECT locus_id FROM phenome.locus
+	        JOIN phenome.locus_dbxref USING (locus_id)
+               JOIN public.cvterm USING (dbxref_id) 
+                WHERE cvterm_id =?
+                ORDER BY locus.locus_symbol";
+    my $sth=$self->get_dbh()->prepare($query);;
+    my @loci;
+    foreach my $cvterm_id (@cvterm_ids) {
+	$sth->execute($cvterm_id);
+	while ( my ($locus_id) = $sth->fetchrow_array() ) {
+	    my $locus= CXGN::Phenome::Locus->new($self->get_dbh(), $locus_id);
+	    push @loci, $locus;
+	}
+    }
+    return @loci;
+}
+
+=head2 get_recursive_individuals
+
+ Usage: my @ind= $self->get_recursive_individuals()
+ Desc:  find all the individuals annotated with the cvterm or any of its recursive children
+ Ret:   a list of Individual ojects
+ Args:  none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_recursive_individuals {
+    my $self=shift;
+    my @cvterms= $self->get_recursive_children();
+    my @cvterm_ids = map ($_->get_cvterm_id, @cvterms);
+    
+    my $query = "SELECT individual_id FROM phenome.individual
+	        JOIN phenome.individual_dbxref USING (individual_id)
+               JOIN public.cvterm USING (dbxref_id) 
+                WHERE cvterm_id =?
+                ORDER BY individual.name";
+    my $sth=$self->get_dbh()->prepare($query);;
+    my @ind;
+    foreach my $cvterm_id (@cvterm_ids) {
+	$sth->execute($cvterm_id);
+	while ( my ($individual_id) = $sth->fetchrow_array() ) {
+	    my $individual= CXGN::Phenome::Individual->new($self->get_dbh(), $individual_id);
+	    push @ind, $individual;
+	}
+    }
+    return @ind;
+}
 
 
 ###

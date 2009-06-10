@@ -4,16 +4,17 @@ use vars qw/$AUTOLOAD/;
 use English;
 
 use UNIVERSAL qw/isa/;
-use Carp;
+use Carp qw/cluck croak carp/;
 use DBI;
 
+use CXGN::Debug;
 use CXGN::VHost;
 use CXGN::Tools::Class qw/parricide/;
 
 BEGIN {
   our @EXPORT = qw/connect_db/;
 }
-use base qw/CXGN::Class::Exporter Class::Data::Inheritable/;
+use base qw/CXGN::Class::Exporter Class::Data::Inheritable Class::Accessor/;
 our @EXPORT;
 
 
@@ -72,39 +73,30 @@ BEGIN {
 			pg_endcopy
 
 		      /;
+  foreach my $forward_method (@dbh_methods) {
+      no strict 'refs';
+      *{$forward_method} = sub { shift->_dbh->$forward_method(@_) };
+  }
 }
 
 			
 
 our @dbh_methods;
 
-use Class::MethodMaker [
-  #make two 'new' methods: new and new_no_connect.
-  #new_no_connect internally calls init_no_connect(), while
-  #new() internally calls init_connect()
-  new => [{-init => 'init_no_connect'}, 'new_no_connect',
-	  {-init => 'init_connect'},    'new',
-	 ],
+__PACKAGE__->mk_accessors( '_dbname',
+			   '_dbschema',
+			   '_dbuser',
+			   '_dbpass',
+			   '_dbhost',
+			   '_dbport',
+			   '_dbbranch',
+			   '_dbargs',
+			   '_conf',
+			   '_dsn',
+			   '_dbh',
+			   #note that dbtype is an actual function defined below
+		         );
 
-  scalar => [ '_dbname',
-	      '_dbschema',
-	      '_dbuser',
-	      '_dbpass',
-	      '_dbhost',
-	      '_dbport',
-	      '_dbbranch',
-	      '_dbargs',
-	      '_conf',
-	      '_dsn',
-	      #note that dbtype is an actual function defined below
-
-	      #make a new accessor _dbh that holds a DBI::db. Plus, forward the methods
-	      #named above to the object in this accessor
-	     { -type    => 'DBI::db',
-		-forward => \@dbh_methods, },
-	      '_dbh',
-	    ],
-];
 
 =head1 NAME
 
@@ -150,6 +142,15 @@ shell):
    user@box:~$ ./my_script_that_uses_db_connection.pl
 
 Will specify a user and password for the script to use.
+
+=head1 TRACING
+
+If the CXGN_DB_CONNECTION_TRACE_CONNECTIONS environment variable is
+set, will append backtraces of all database connections to the file
+/tmp/cxgn_db_connections.log
+
+Also, CXGN::DB::Connection supports the standard DBI tracing
+facilities.  See L<DBI> perldoc.
 
 =head1 METHODS
 
@@ -200,18 +201,9 @@ Will specify a user and password for the script to use.
 
 =cut
 
-#the new_no_connect() method is defined by Class::MethodMaker above
-
-=head2 init_no_connect
-
-  Desc: called by new_no_connect to set up object's internal state
-  Args: same as for new_no_connect
-  Ret : nothing
-
-=cut
-#'
-sub init_no_connect {
-  my ($self, $db, $p) = @_;
+sub new_no_connect {
+  my ($class, $db, $p) = @_;
+  my $self = bless {},$class;
 
   # This is a little gross, but it looks weird to have to call new
   # like this when all you want to customize is the dbuser:
@@ -332,9 +324,11 @@ sub init_no_connect {
   }
   # Ensure that dbbranch validates.  qualify_schema will croak otherwise.
   $self->qualify_schema( $self->_dbschema );
+
+  return $self;
 }
 
-=head2 init_connect
+=head2 new
 
   Desc: called by new to set up the new object's internal state
   Args: same as for new
@@ -342,46 +336,67 @@ sub init_no_connect {
 
 =cut
 
-#' <-- For Cperl mode highlighting.
-sub init_connect {
-  my $self = shift;
-  UNIVERSAL::isa($self,'CXGN::DB::Connection')
-      or croak "First argument to init_connect or new() must be a CXGN::DB::Connection or a subclass thereof";
-  $self->init_no_connect(@_);
+sub _compact_backtrace {
+    return join '/', map {join(':',(caller($_))[0,2])} 1..3;
+}
 
-  # Now connect to a DB.
-  $self->_dbh( DBI->connect($self->get_connection_parameters) );
-  $self->trace_msg("created new CXGN::DB::Connection\n",1);
 
-  #generate the search path
-  if ( $self->_dbtype eq 'Pg' ) {
-    my @searchpath = qw/tsearch2 public/;
-    my $qualified_schema = $self->qualify_schema;
-    if( $qualified_schema ) {
-      unshift @searchpath, $qualified_schema;
+my $debug = CXGN::Debug->new;
+
+sub new {
+    my $class = shift;
+
+    UNIVERSAL::isa($class,'CXGN::DB::Connection')
+          or croak "First argument to init_connect or new() must be a CXGN::DB::Connection or a subclass thereof";
+    my $self = $class->new_no_connect(@_);
+
+    # Now connect to a DB.
+    $self->_dbh( DBI->connect($self->get_connection_parameters) );
+    $self->trace_msg('CXGN_TRACE | '._compact_backtrace().' | '.__PACKAGE__."::new | $self | ".$self->_dbh."\n",1);
+
+    #generate the search path
+    if ( $self->_dbtype eq 'Pg' ) {
+        my @searchpath = qw/public/;
+        unshift @searchpath, 'tsearch2' unless $self->_dbh->{pg_server_version} >= 80300;
+        my $qualified_schema = $self->qualify_schema;
+        if ( $qualified_schema ) {
+            unshift @searchpath, $qualified_schema;
+        }
+        $self->do("SET SEARCH_PATH = ".join(',',@searchpath));
     }
-    $self->do("SET SEARCH_PATH = ".join(',',@searchpath));
+    if ( $debug->get_debug || $ENV{CXGN_DB_CONNECTION_TRACE_CONNECTIONS}) {
+        my $trace_str = join '',map {"$_\n"}
+            (
+             "# === DB::Connection parameters ===",
+             "# dbhost:     " . $self->_dbhost,
+             "# dbport:     " . $self->_dbport,
+             "# dbname:     " . $self->_dbname,
+             "# dbuser:     " . $self->_dbuser,
+             "# dbtype:     " . $self->_dbtype,
+             "# dbschema:   " . $self->_dbschema,
+             "# dbbranch:   " . $self->_dbbranch,
+             "# searchpath: " . $self->search_path,
+             "# dbargs:",
+             ( map {
+                 "#  $_ => ".$self->_dbargs->{$_}
+             } keys %{$self->_dbargs}
+             ),
+             "# === End of DB::Connection parameters ==="
+            );
+
+        $debug->debug($trace_str);
+
+        if ( $ENV{CXGN_DB_CONNECTION_TRACE_CONNECTIONS} ) {
+            #warn $trace_str;
+            open my $l,'>>','/tmp/trace.log';
+            local *STDERR_SAVE;
+            open STDERR_SAVE, ">&STDERR" or die "$! saving STDERR";
+            open STDERR, ">>", '/tmp/cxgn_db_connections.log' or die "run3(): $! redirecting STDERR";
+            cluck $trace_str;
+            open STDERR, '>&', \*STDERR_SAVE;
+        }
   }
-  if( (ref $self)->verbose ) {
-    warn map {"$_\n"}
-      (
-       "=== DB::Connection parameters ===",
-       "dbhost:     " . $self->_dbhost,
-       "dbport:     " . $self->_dbport,
-       "dbname:     " . $self->_dbname,
-       "dbuser:     " . $self->_dbuser,
-       "dbtype:     " . $self->_dbtype,
-       "dbschema:   " . $self->_dbschema,
-       "dbbranch:   " . $self->_dbbranch,
-       "searchpath: " . $self->search_path,
-       "dbargs:",
-       ( map {
-	   "  $_ => ".$self->_dbargs->{$_}
-	 } keys %{$self->_dbargs}
-       ),
-       "=== End of DB::Connection parameters ==="
-      );
-  }
+  return $self;
 }
 
 =head2 connect_db
@@ -426,6 +441,25 @@ sub dbh {
 #   carp __PACKAGE__.': the get_dbh() method is deprecated';
 #   return shift;
 # }
+
+=head2 get_actual_dbh
+
+ Usage: my $dbh = $self->get_actual_dbh()
+ Desc: return the actual $dbh object
+ Ret: $dbh, a database connectio object
+ Args: none
+ Side Effects: none
+ Example:
+
+=cut
+
+sub get_actual_dbh {
+  shift->_dbh;
+}
+
+
+
+
 
 =head2 get_connection_parameters
 
@@ -502,6 +536,19 @@ sub dbname { shift->_dbname } #keep this read-only
 
 sub dbhost { shift->_dbhost } #read-only
 
+=head2 dbport
+
+  Usage: my $port = $dbc->dbport
+  Desc :
+  Ret  : the port on the database server
+  Args : none
+  Side Effects: none
+  Example:
+
+=cut
+
+sub dbport { shift->_dbport } #read-only
+
 =head2 dbbranch
 
   Usage: my $branch = $dbc->dbbranch
@@ -548,14 +595,18 @@ sub dbh_param {
 sub DESTROY {
   my $self = shift;
   #warn __PACKAGE__."(pid $PID): destroy called on dbc $self\n";
-  if( $self->_dbh && ! $self->dbh_param('InactiveDestroy') ){
-    #warn "pid $PID disconnecting dbh ".$self->_dbh."\n";
-    #print a warning in the DBI trace when it's enabled
-    $self->trace_msg("(pid $PID) disconnecting in ".__PACKAGE__."::DESTROY\n",1);
-    $self->disconnect(42);
-    $self->_dbh->DESTROY;
-  }
-  return parricide($self,our @ISA);
+
+  return unless $self->_dbh;
+  $self->trace_msg('CXGN_TRACE | '._compact_backtrace().' | '.__PACKAGE__."::DESTROY | $self | ".$self->_dbh."\n",1);
+
+  #      unless( $self->dbh_param('InactiveDestroy') ){
+  #         #warn "pid $PID disconnecting dbh ".$self->_dbh."\n";
+  #        #print a warning in the DBI trace when it's enabled
+  #        $self->disconnect(42);
+  #        $self->_dbh->DESTROY;
+  #    }
+  #}
+  # return parricide($self,our @ISA);
 }
 
 =head2 qualify_schema
@@ -654,7 +705,7 @@ sub base_schema {
    print $sp . "\n";
 
    # This is its output
-   annotation, tsearch2
+   annotation
 
 =cut
 
@@ -802,7 +853,8 @@ sub disconnect {
   }
 
   if( $self->_dbh ) {
-    return $self->_dbh->disconnect;
+      $self->trace_msg('CXGN_TRACE | '._compact_backtrace().' | '.__PACKAGE__."::disconnect | $self | ".$self->_dbh."\n",1);
+      return $self->_dbh->disconnect;
   } else {
     return undef;
   }
@@ -812,17 +864,22 @@ sub disconnect {
 
 =head2 verbose
 
-  Usage: CXGN::DB::Connection->verbose(1);
-  Desc : get/set the verbosity level of CXGN::DB::Connection objects.
-         defaults to 0 in web server, 1 otherwise.
-  Ret  : currently set verbosity level
-  Args : new verbosity level
-  Side Effects: sets the verbosity level for all CXGN::DB::Connection objects
-  Example:
+  DEPRECATED.  This method no longer does anything, this module just uses CXGN::Debug::debug.  
+
+  OLD DOCUMENTATION
+  # Usage: CXGN::DB::Connection->verbose(1);
+  # Desc : get/set the verbosity level of CXGN::DB::Connection objects.
+  #        defaults to 0 in web server, 1 otherwise.
+  # Ret  : currently set verbosity level
+  # Args : new verbosity level
+  # Side Effects: sets the verbosity level for all CXGN::DB::Connection objects
+  # Example:
 
 =cut
 
-__PACKAGE__->mk_classdata( verbose => ($ENV{MOD_PERL} ? 0 : 1) );
+sub verbose {
+    carp "CXGN::DB::Connection::verbose no longer does anything, might as well remove this invocation";
+}
 
 sub is_valid_dbh
 {

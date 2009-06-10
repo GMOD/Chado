@@ -1,5 +1,5 @@
 =head1 NAME
-
+DEPRECATED . USE Ontology.pm instead
 CXGN::Chado::CV 
 A class for handling controlled vocabularies
 

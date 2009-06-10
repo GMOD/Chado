@@ -269,10 +269,10 @@ my $sth = $self->get_dbh()->prepare($query);
 
 =head2 get_all_terms
 
- Usage:
- Desc:
- Ret:
- Args:
+ Usage:     $self->get_all_terms()
+ Desc:            
+ Ret:       a list of Cvterm objects
+ Args:      none
  Side Effects:
  Note:         this function is specified in the 
                L<Bio::Ontology::OntologyI> interface
