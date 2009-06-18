@@ -1,0 +1,11 @@
+create a GFF upload tool.  It would need to:
+
+collect input parameters, like:
+  * organism pull down, plus other (which would have to give full org info)
+  * analysis or not
+  * if contains gene data, does it have both CDS and exon features
+  * turn on --recreate_cache
+  * allow delete by GFF?
+
+Provide a link to a page to follow output.
+
