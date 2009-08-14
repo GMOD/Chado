@@ -85,7 +85,7 @@
   </ontology>
 
   <ontology name="Plant Ontology" order="6">
-    <file type="obo" local="po/po_anatomy.obo" remote="http://brebiou.cshl.edu/viewcvs/*checkout*/Poc/ontology/OBO_format/po_anatomy.obo?rev=HEAD" method="lwp-mirror"/>
+    <file type="obo" local="po/po_anatomy.obo" remote="http://palea.cgrb.oregonstate.edu/viewsvn/Poc/trunk/ontology/OBO_format/po_anatomy.obo?view=co" method="lwp-mirror"/>
   </ontology>
 
 
