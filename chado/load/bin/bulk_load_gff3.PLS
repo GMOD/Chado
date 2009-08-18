@@ -76,7 +76,8 @@ $0 - Bulk loads gff3 files into a chado database.
  --validate        Validate SOFA terms before attempting insert (can
                      cause script startup to be slow, off by default)
  --ontology        Give directions for handling misc Ontology_terms
- --skip_vacuum     Skip vacuuming the tables after the inserts
+ --skip_vacuum     Skip vacuuming the tables after the inserts (default)
+ --no_skip_vaccum  Don't skip vacuuming the tables
  --inserts         Print INSERT statements instead of COPY FROM STDIN
  --noexon          Don't convert CDS features to exons (but still create
                      polypeptide features) 
@@ -529,7 +530,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
     $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER,
-    $PRIVATE_SCHEMA, $USE_PUBLIC_CV );
+    $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -548,6 +549,7 @@ GetOptions(
     'score_col=s'=> \$SCORE_COL,
     'ontology=s' => \$ONTOLOGY,
     'skip_vacuum'=> \$SKIP_VACUUM,
+    'no_skip_vacuum' => \$NO_SKIP_VACUUM,
     'drop_indexes'=>\$DROP_INDEX,
     'inserts'    => \$INSERTS,
     'noexon'     => \$NOEXON,
@@ -625,6 +627,8 @@ if ((defined $ANALYSIS) and ($ANALYSIS eq '')) {
 if ((defined $DBXREF) and ($DBXREF eq '')) {
   $DBXREF=1; #ie, it was on the command line with no arg
 }
+
+$SKIP_VACUUM = $NO_SKIP_VACUUM ? 0 : 1;
 
 my %argv;
   $argv{organism}     = $ORGANISM;
