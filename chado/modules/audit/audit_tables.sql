@@ -9030,3 +9030,710 @@
        EXECUTE PROCEDURE audit_update_delete_library_dbxref ();
 
 
+   DROP TABLE audit_cell_line;
+   CREATE TABLE audit_cell_line ( 
+       cell_line_id integer, 
+       name varchar(255), 
+       uniquename varchar(255), 
+       organism_id integer, 
+       timeaccessioned timestamp, 
+       timelastmodified timestamp, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var varchar(255); 
+       organism_id_var integer; 
+       timeaccessioned_var timestamp; 
+       timelastmodified_var timestamp; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_id_var = OLD.cell_line_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       organism_id_var = OLD.organism_id;
+       timeaccessioned_var = OLD.timeaccessioned;
+       timelastmodified_var = OLD.timelastmodified;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line ( 
+             cell_line_id, 
+             name, 
+             uniquename, 
+             organism_id, 
+             timeaccessioned, 
+             timelastmodified, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_id_var, 
+             name_var, 
+             uniquename_var, 
+             organism_id_var, 
+             timeaccessioned_var, 
+             timelastmodified_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_audit_ud ON cell_line;
+   CREATE TRIGGER cell_line_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line ();
+
+
+   DROP TABLE audit_cell_line_relationship;
+   CREATE TABLE audit_cell_line_relationship ( 
+       cell_line_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_relationship_id_var = OLD.cell_line_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_relationship ( 
+             cell_line_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_relationship_audit_ud ON cell_line_relationship;
+   CREATE TRIGGER cell_line_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_relationship ();
+
+
+   DROP TABLE audit_cell_line_synonym;
+   CREATE TABLE audit_cell_line_synonym ( 
+       cell_line_synonym_id integer, 
+       cell_line_id integer, 
+       synonym_id integer, 
+       pub_id integer, 
+       is_current boolean, 
+       is_internal boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_synonym to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_synonym() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_synonym_id_var integer; 
+       cell_line_id_var integer; 
+       synonym_id_var integer; 
+       pub_id_var integer; 
+       is_current_var boolean; 
+       is_internal_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_synonym_id_var = OLD.cell_line_synonym_id;
+       cell_line_id_var = OLD.cell_line_id;
+       synonym_id_var = OLD.synonym_id;
+       pub_id_var = OLD.pub_id;
+       is_current_var = OLD.is_current;
+       is_internal_var = OLD.is_internal;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_synonym ( 
+             cell_line_synonym_id, 
+             cell_line_id, 
+             synonym_id, 
+             pub_id, 
+             is_current, 
+             is_internal, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_synonym_id_var, 
+             cell_line_id_var, 
+             synonym_id_var, 
+             pub_id_var, 
+             is_current_var, 
+             is_internal_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_synonym_audit_ud ON cell_line_synonym;
+   CREATE TRIGGER cell_line_synonym_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_synonym
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_synonym ();
+
+
+   DROP TABLE audit_cell_line_cvterm;
+   CREATE TABLE audit_cell_line_cvterm ( 
+       cell_line_cvterm_id integer, 
+       cell_line_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_cvterm_id_var integer; 
+       cell_line_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_cvterm_id_var = OLD.cell_line_cvterm_id;
+       cell_line_id_var = OLD.cell_line_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_cvterm ( 
+             cell_line_cvterm_id, 
+             cell_line_id, 
+             cvterm_id, 
+             pub_id, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_cvterm_id_var, 
+             cell_line_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_cvterm_audit_ud ON cell_line_cvterm;
+   CREATE TRIGGER cell_line_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_cvterm ();
+
+
+   DROP TABLE audit_cell_line_dbxref;
+   CREATE TABLE audit_cell_line_dbxref ( 
+       cell_line_dbxref_id integer, 
+       cell_line_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_dbxref_id_var integer; 
+       cell_line_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_dbxref_id_var = OLD.cell_line_dbxref_id;
+       cell_line_id_var = OLD.cell_line_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_dbxref ( 
+             cell_line_dbxref_id, 
+             cell_line_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_dbxref_id_var, 
+             cell_line_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_dbxref_audit_ud ON cell_line_dbxref;
+   CREATE TRIGGER cell_line_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_dbxref ();
+
+
+   DROP TABLE audit_cell_lineprop;
+   CREATE TABLE audit_cell_lineprop ( 
+       cell_lineprop_id integer, 
+       cell_line_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_lineprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_lineprop() RETURNS trigger AS
+   '
+   DECLARE
+       cell_lineprop_id_var integer; 
+       cell_line_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_lineprop_id_var = OLD.cell_lineprop_id;
+       cell_line_id_var = OLD.cell_line_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_lineprop ( 
+             cell_lineprop_id, 
+             cell_line_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             cell_lineprop_id_var, 
+             cell_line_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_lineprop_audit_ud ON cell_lineprop;
+   CREATE TRIGGER cell_lineprop_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_lineprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_lineprop ();
+
+
+   DROP TABLE audit_cell_lineprop_pub;
+   CREATE TABLE audit_cell_lineprop_pub ( 
+       cell_lineprop_pub_id integer, 
+       cell_lineprop_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_lineprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_lineprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       cell_lineprop_pub_id_var integer; 
+       cell_lineprop_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_lineprop_pub_id_var = OLD.cell_lineprop_pub_id;
+       cell_lineprop_id_var = OLD.cell_lineprop_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_lineprop_pub ( 
+             cell_lineprop_pub_id, 
+             cell_lineprop_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             cell_lineprop_pub_id_var, 
+             cell_lineprop_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_lineprop_pub_audit_ud ON cell_lineprop_pub;
+   CREATE TRIGGER cell_lineprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_lineprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_lineprop_pub ();
+
+
+   DROP TABLE audit_cell_line_feature;
+   CREATE TABLE audit_cell_line_feature ( 
+       cell_line_feature_id integer, 
+       cell_line_id integer, 
+       feature_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_feature to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_feature() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_feature_id_var integer; 
+       cell_line_id_var integer; 
+       feature_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_feature_id_var = OLD.cell_line_feature_id;
+       cell_line_id_var = OLD.cell_line_id;
+       feature_id_var = OLD.feature_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_feature ( 
+             cell_line_feature_id, 
+             cell_line_id, 
+             feature_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_feature_id_var, 
+             cell_line_id_var, 
+             feature_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_feature_audit_ud ON cell_line_feature;
+   CREATE TRIGGER cell_line_feature_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_feature
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_feature ();
+
+
+   DROP TABLE audit_cell_line_cvtermprop;
+   CREATE TABLE audit_cell_line_cvtermprop ( 
+       cell_line_cvtermprop_id integer, 
+       cell_line_cvterm_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_cvtermprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_cvtermprop() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_cvtermprop_id_var integer; 
+       cell_line_cvterm_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_cvtermprop_id_var = OLD.cell_line_cvtermprop_id;
+       cell_line_cvterm_id_var = OLD.cell_line_cvterm_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_cvtermprop ( 
+             cell_line_cvtermprop_id, 
+             cell_line_cvterm_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_cvtermprop_id_var, 
+             cell_line_cvterm_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_cvtermprop_audit_ud ON cell_line_cvtermprop;
+   CREATE TRIGGER cell_line_cvtermprop_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_cvtermprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_cvtermprop ();
+
+
+   DROP TABLE audit_cell_line_pub;
+   CREATE TABLE audit_cell_line_pub ( 
+       cell_line_pub_id integer, 
+       cell_line_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_pub() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_pub_id_var integer; 
+       cell_line_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_pub_id_var = OLD.cell_line_pub_id;
+       cell_line_id_var = OLD.cell_line_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_pub ( 
+             cell_line_pub_id, 
+             cell_line_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_pub_id_var, 
+             cell_line_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_pub_audit_ud ON cell_line_pub;
+   CREATE TRIGGER cell_line_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_pub ();
+
+
+   DROP TABLE audit_cell_line_library;
+   CREATE TABLE audit_cell_line_library ( 
+       cell_line_library_id integer, 
+       cell_line_id integer, 
+       library_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cell_line_library to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_library() RETURNS trigger AS
+   '
+   DECLARE
+       cell_line_library_id_var integer; 
+       cell_line_id_var integer; 
+       library_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cell_line_library_id_var = OLD.cell_line_library_id;
+       cell_line_id_var = OLD.cell_line_id;
+       library_id_var = OLD.library_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cell_line_library ( 
+             cell_line_library_id, 
+             cell_line_id, 
+             library_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             cell_line_library_id_var, 
+             cell_line_id_var, 
+             library_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cell_line_library_audit_ud ON cell_line_library;
+   CREATE TRIGGER cell_line_library_audit_ud
+       BEFORE UPDATE OR DELETE ON cell_line_library
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cell_line_library ();
+
+

@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.131 2009-05-29 20:33:00 scottcain Exp $
+# $Id: Makefile.PL,v 1.132 2009-08-28 19:42:14 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -386,14 +386,6 @@ print join("\n",
   "  DEFAULT=$DEFAULT",
 ),"\n\n";
 
-#warn about GO_ROOT for loading ontologies
-unless ($ENV{GO_ROOT}) {
-  warn "\n\n--WARNING-------------------------------------------------\n";
-  warn "The envirnment variable GO_ROOT is not set.\n";
-  warn "Ontology loading may not work correctly without it.\n";
-  warn "----------------------------------------------------------\n\n";
-}
-
 #
 # Save build options.
 #
@@ -602,6 +594,7 @@ graphviz :: \
 	make $working_dir/modules/genetic/genetic.graphviz.png \
 	make $working_dir/modules/phenotype/phenotype.graphviz.png \
 	make $working_dir/modules/library/library.graphviz.png \
+	make $working_dir/modules/cell_line/cell_line.graphviz.png \
 	make $working_dir/modules/mage/mage.graphviz.png \
 	make $working_dir/modules/map/map.graphviz.png \
 	make $working_dir/modules/organism/organism.graphviz.png \
@@ -621,6 +614,7 @@ graphviz_svg :: \
 	make $working_dir/modules/general/general.graphviz.svg \
 	make $working_dir/modules/genetic/genetic.graphviz.svg \
 	make $working_dir/modules/library/library.graphviz.svg \
+	make $working_dir/modules/cell_line/cell_line.graphviz.svg \
 	make $working_dir/modules/mage/mage.graphviz.svg \
 	make $working_dir/modules/map/map.graphviz.svg \
 	make $working_dir/modules/organism/organism.graphviz.svg \
@@ -640,6 +634,7 @@ diagram :: \
 	make $working_dir/modules/general/general.diagram.png \
 	make $working_dir/modules/genetic/genetic.diagram.png \
 	make $working_dir/modules/library/library.diagram.png \
+	make $working_dir/modules/cell_line/cell_line.diagram.png \
 	make $working_dir/modules/mage/mage.diagram.png \
 	make $working_dir/modules/map/map.diagram.png \
 	make $working_dir/modules/organism/organism.diagram.png \
@@ -661,6 +656,7 @@ html :: \
 	make $working_dir/modules/genetic/genetic.html \
 	make $working_dir/modules/phenotype/phenotype.html \
 	make $working_dir/modules/library/library.html \
+	make $working_dir/modules/cell_line/cell_line.html \
 	make $working_dir/modules/mage/mage.html \
 	make $working_dir/modules/map/map.html \
 	make $working_dir/modules/organism/organism.html \
@@ -681,6 +677,7 @@ tex :: \
 	make $working_dir/modules/genetic/genetic.tex \
 	make $working_dir/modules/phenotype/phenotype.tex \
 	make $working_dir/modules/library/library.tex \
+	make $working_dir/modules/cell_line/cell_line.tex \
 	make $working_dir/modules/mage/mage.tex \
 	make $working_dir/modules/map/map.tex \
 	make $working_dir/modules/organism/organism.tex \
@@ -699,10 +696,10 @@ tex :: \
 	sqlt --from PostgreSQL \$< --to Latex > \$@
 
 %.graphviz.png: %.sql
-	$working_dir/bin/pg2graphviz.pl \$< > \$@
+	sqlt-graph -o \$@ --color --db PostgreSQL -l neato --skip-tables-like "^gencode"  \$<
 
 %.graphviz.svg: %.sql
-	$working_dir/bin/pg2graphviz_svg.pl \$< > \$@
+	sqlt-graph -o \$@ --color --db PostgreSQL -l neato --skip-tables-like "^gencode" -t svg \$<
 
 %.diagram.png: %.sql
 	$working_dir/bin/pg2diagram.pl \$< > \$@
