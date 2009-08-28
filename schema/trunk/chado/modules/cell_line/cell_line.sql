@@ -30,7 +30,6 @@ create table cell_line (
         constraint cell_line_c1 unique (uniquename, organism_id)
 );
 grant all on cell_line to PUBLIC;
-grant all on cell_line_cell_line_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -50,7 +49,6 @@ create table cell_line_relationship (
 	constraint cell_line_relationship_c1 unique (subject_id, object_id, type_id)
 );
 grant all on cell_line_relationship to PUBLIC;
-grant all on cell_line_relationship_cell_line_relationship_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -72,7 +70,6 @@ create table cell_line_synonym (
 	constraint cell_line_synonym_c1 unique (synonym_id,cell_line_id,pub_id)	
 );
 grant all on cell_line_synonym to PUBLIC;
-grant all on cell_line_synonym_cell_line_synonym_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -93,7 +90,6 @@ create table cell_line_cvterm (
 	constraint cell_line_cvterm_c1 unique (cell_line_id,cvterm_id,pub_id,rank)
 );
 grant all on cell_line_cvterm to PUBLIC;
-grant all on cell_line_cvterm_cell_line_cvterm_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -112,7 +108,6 @@ create table cell_line_dbxref (
 	constraint cell_line_dbxref_c1 unique (cell_line_id,dbxref_id)
 );
 grant all on cell_line_dbxref to PUBLIC;
-grant all on cell_line_dbxref_cell_line_dbxref_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -132,7 +127,6 @@ create table cell_lineprop (
 	constraint cell_lineprop_c1 unique (cell_line_id,type_id,rank)
 );
 grant all on cell_lineprop to PUBLIC;
-grant all on cell_lineprop_cell_lineprop_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -150,7 +144,6 @@ create table cell_lineprop_pub (
 	constraint cell_lineprop_pub_c1 unique (cell_lineprop_id,pub_id)
 );
 grant all on cell_lineprop_pub to PUBLIC;
-grant all on cell_lineprop_pub_cell_lineprop_pub_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -170,7 +163,6 @@ create table cell_line_feature (
 	constraint cell_line_feature_c1 unique (cell_line_id, feature_id, pub_id)
 );
 grant all on cell_line_feature to PUBLIC;
-grant all on cell_line_feature_cell_line_feature_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -190,7 +182,6 @@ create table cell_line_cvtermprop (
 	constraint cell_line_cvtermprop_c1 unique (cell_line_cvterm_id, type_id, rank)
 );
 grant all on cell_line_cvtermprop to PUBLIC;
-grant all on cell_line_cvtermprop_cell_line_cvtermprop_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -208,7 +199,6 @@ create table cell_line_pub (
 	constraint cell_line_pub_c1 unique (cell_line_id, pub_id)
 );
 grant all on cell_line_pub to PUBLIC;
-grant all on cell_line_pub_cell_line_pub_id_seq to PUBLIC;
 
 
 -- ================================================
@@ -228,5 +218,4 @@ create table cell_line_library (
 	constraint cell_line_library_c1 unique (cell_line_id, library_id, pub_id)
 );
 grant all on cell_line_library to PUBLIC;
-grant all on cell_line_library_cell_line_library_id_seq to PUBLIC;
 
