@@ -90,6 +90,14 @@ can be abbreviated to one letter.
 WARNING: this loader doesn't handle cds and exon features the same way
 as the bulk loader (yet!).
 
+ANOTHER WARNING: This script is incompatible with the Sequence Ontology
+views that are created automatically for Chado and reside in the 
+'so' schema.  Specifically, the view "so.genotype" will cause the 
+initialization of this script to fail.  To fix this problem and use
+this script, you need to remove the genotype view:
+
+  DROP VIEW so.genotype;
+
 The most important thing to know about this loader is that it is SLOW!
 The bulk loader (gmod_bulk_load_gff3.pl, also in this distribution) is
 many times faster (perhaps 100 times faster).  In addition, the bulk
