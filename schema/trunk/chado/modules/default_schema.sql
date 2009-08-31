@@ -1,4 +1,4 @@
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado general module
 --
@@ -131,7 +131,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado cv module
 --
@@ -947,7 +947,7 @@ BEGIN
 END;   
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado pub module
 --
@@ -1083,7 +1083,7 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado organism module
 --
@@ -1211,7 +1211,7 @@ CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR)
  END;
 ' LANGUAGE 'plpgsql';
   
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado sequence module
 --
@@ -31579,7 +31579,7 @@ BEGIN
 END;
 '
 LANGUAGE 'plpgsql';
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado companalysis module
 --
@@ -31703,7 +31703,7 @@ CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR)
 --'DECLARE
 --  v_srcfeature_id       ALIAS FOR $1;
   
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado phenotype module
 --
@@ -31783,7 +31783,7 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado genetics module
 --
@@ -31990,7 +31990,7 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado map module
 --
@@ -32085,7 +32085,7 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado phylogenetics module
 --
@@ -32317,7 +32317,7 @@ CREATE OR REPLACE FUNCTION phylonode_height(INT)
 '
 LANGUAGE 'sql';
 
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado contact module
 --
@@ -32367,7 +32367,7 @@ COMMENT ON TABLE contact_relationship IS 'Model relationships between contacts';
 COMMENT ON COLUMN contact_relationship.subject_id IS 'The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node.';
 COMMENT ON COLUMN contact_relationship.object_id IS 'The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node.';
 COMMENT ON COLUMN contact_relationship.type_id IS 'Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed.';
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado expression module
 --
@@ -32560,7 +32560,7 @@ create table expression_image (
 );
 create index expression_image_idx1 on expression_image (expression_id);
 create index expression_image_idx2 on expression_image (eimage_id);
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado mage module
 --
@@ -33385,7 +33385,7 @@ CREATE TABLE studyprop_feature (
 create index studyprop_feature_idx1 on studyprop_feature (studyprop_id);
 create index studyprop_feature_idx2 on studyprop_feature (feature_id);
 
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- ==========================================
 -- Chado stock module
 --
@@ -33673,7 +33673,7 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
--- $Id: default_schema.sql,v 1.57 2009-08-28 19:42:15 scottcain Exp $
+-- $Id: default_schema.sql,v 1.58 2009-08-31 14:25:36 scottcain Exp $
 -- =================================================================
 -- Dependencies:
 --
@@ -33875,7 +33875,6 @@ create index library_dbxref_idx2 on library_dbxref (dbxref_id);
 -- TABLE: cell_line
 -- ================================================
 
-drop table cell_line cascade;
 create table cell_line (
         cell_line_id serial not null,
         primary key (cell_line_id),
@@ -33894,7 +33893,6 @@ grant all on cell_line to PUBLIC;
 -- TABLE: cell_line_relationship
 -- ================================================
 
-drop table cell_line_relationship cascade;
 create table cell_line_relationship (
 	cell_line_relationship_id serial not null,
 	primary key (cell_line_relationship_id),	
@@ -33913,7 +33911,6 @@ grant all on cell_line_relationship to PUBLIC;
 -- TABLE: cell_line_synonym
 -- ================================================
 
-drop table cell_line_synonym cascade;
 create table cell_line_synonym (
 	cell_line_synonym_id serial not null,
 	primary key (cell_line_synonym_id),
@@ -33934,7 +33931,6 @@ grant all on cell_line_synonym to PUBLIC;
 -- TABLE: cell_line_cvterm
 -- ================================================
 
-drop table cell_line_cvterm cascade;
 create table cell_line_cvterm (
 	cell_line_cvterm_id serial not null,
 	primary key (cell_line_cvterm_id),
@@ -33954,7 +33950,6 @@ grant all on cell_line_cvterm to PUBLIC;
 -- TABLE: cell_line_dbxref
 -- ================================================
 
-drop table cell_line_dbxref cascade;
 create table cell_line_dbxref (
 	cell_line_dbxref_id serial not null,
 	primary key (cell_line_dbxref_id),
@@ -33972,7 +33967,6 @@ grant all on cell_line_dbxref to PUBLIC;
 -- TABLE: cell_lineprop
 -- ================================================
 
-drop table cell_lineprop cascade;
 create table cell_lineprop (
 	cell_lineprop_id serial not null,
 	primary key (cell_lineprop_id),
@@ -33991,7 +33985,6 @@ grant all on cell_lineprop to PUBLIC;
 -- TABLE: cell_lineprop_pub
 -- ================================================
 
-drop table cell_lineprop_pub cascade;
 create table cell_lineprop_pub (
 	cell_lineprop_pub_id serial not null,
 	primary key (cell_lineprop_pub_id),
@@ -34008,7 +34001,6 @@ grant all on cell_lineprop_pub to PUBLIC;
 -- TABLE: cell_line_feature
 -- ================================================
 
-drop table cell_line_feature cascade;
 create table cell_line_feature (
 	cell_line_feature_id serial not null,
 	primary key (cell_line_feature_id),
@@ -34027,7 +34019,6 @@ grant all on cell_line_feature to PUBLIC;
 -- TABLE: cell_line_cvtermprop
 -- ================================================
 
-drop table cell_line_cvtermprop cascade;
 create table cell_line_cvtermprop (
 	cell_line_cvtermprop_id serial not null,
 	primary key (cell_line_cvtermprop_id),
@@ -34046,7 +34037,6 @@ grant all on cell_line_cvtermprop to PUBLIC;
 -- TABLE: cell_line_pub
 -- ================================================
 
-drop table cell_line_pub cascade;
 create table cell_line_pub (
 	cell_line_pub_id serial not null,
 	primary key (cell_line_pub_id),
@@ -34063,7 +34053,6 @@ grant all on cell_line_pub to PUBLIC;
 -- TABLE: cell_line_library
 -- ================================================
 
-drop table cell_line_library cascade;
 create table cell_line_library (
 	cell_line_library_id serial not null,
 	primary key (cell_line_library_id),
