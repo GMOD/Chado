@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- $Id: chado-module-metadata.xml,v 1.24 2009-08-28 19:42:14 scottcain Exp $ -->
+<!-- $Id: chado-module-metadata.xml,v 1.25 2009-08-31 14:25:35 scottcain Exp $ -->
 <schema_metadata id='chado'>
 
   <title>Chado: A generic model organism database schema</title>
@@ -521,7 +521,7 @@
       <source type='sql' path='library/library.sql'/>
     </module>
 
-    <module id='cell_liney'>
+    <module id='cell_line'>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>

@@ -17,7 +17,6 @@
 -- TABLE: cell_line
 -- ================================================
 
-drop table cell_line cascade;
 create table cell_line (
         cell_line_id serial not null,
         primary key (cell_line_id),
@@ -36,7 +35,6 @@ grant all on cell_line to PUBLIC;
 -- TABLE: cell_line_relationship
 -- ================================================
 
-drop table cell_line_relationship cascade;
 create table cell_line_relationship (
 	cell_line_relationship_id serial not null,
 	primary key (cell_line_relationship_id),	
@@ -55,7 +53,6 @@ grant all on cell_line_relationship to PUBLIC;
 -- TABLE: cell_line_synonym
 -- ================================================
 
-drop table cell_line_synonym cascade;
 create table cell_line_synonym (
 	cell_line_synonym_id serial not null,
 	primary key (cell_line_synonym_id),
@@ -76,7 +73,6 @@ grant all on cell_line_synonym to PUBLIC;
 -- TABLE: cell_line_cvterm
 -- ================================================
 
-drop table cell_line_cvterm cascade;
 create table cell_line_cvterm (
 	cell_line_cvterm_id serial not null,
 	primary key (cell_line_cvterm_id),
@@ -96,7 +92,6 @@ grant all on cell_line_cvterm to PUBLIC;
 -- TABLE: cell_line_dbxref
 -- ================================================
 
-drop table cell_line_dbxref cascade;
 create table cell_line_dbxref (
 	cell_line_dbxref_id serial not null,
 	primary key (cell_line_dbxref_id),
@@ -114,7 +109,6 @@ grant all on cell_line_dbxref to PUBLIC;
 -- TABLE: cell_lineprop
 -- ================================================
 
-drop table cell_lineprop cascade;
 create table cell_lineprop (
 	cell_lineprop_id serial not null,
 	primary key (cell_lineprop_id),
@@ -133,7 +127,6 @@ grant all on cell_lineprop to PUBLIC;
 -- TABLE: cell_lineprop_pub
 -- ================================================
 
-drop table cell_lineprop_pub cascade;
 create table cell_lineprop_pub (
 	cell_lineprop_pub_id serial not null,
 	primary key (cell_lineprop_pub_id),
@@ -150,7 +143,6 @@ grant all on cell_lineprop_pub to PUBLIC;
 -- TABLE: cell_line_feature
 -- ================================================
 
-drop table cell_line_feature cascade;
 create table cell_line_feature (
 	cell_line_feature_id serial not null,
 	primary key (cell_line_feature_id),
@@ -169,7 +161,6 @@ grant all on cell_line_feature to PUBLIC;
 -- TABLE: cell_line_cvtermprop
 -- ================================================
 
-drop table cell_line_cvtermprop cascade;
 create table cell_line_cvtermprop (
 	cell_line_cvtermprop_id serial not null,
 	primary key (cell_line_cvtermprop_id),
@@ -188,7 +179,6 @@ grant all on cell_line_cvtermprop to PUBLIC;
 -- TABLE: cell_line_pub
 -- ================================================
 
-drop table cell_line_pub cascade;
 create table cell_line_pub (
 	cell_line_pub_id serial not null,
 	primary key (cell_line_pub_id),
@@ -205,7 +195,6 @@ grant all on cell_line_pub to PUBLIC;
 -- TABLE: cell_line_library
 -- ================================================
 
-drop table cell_line_library cascade;
 create table cell_line_library (
 	cell_line_library_id serial not null,
 	primary key (cell_line_library_id),
