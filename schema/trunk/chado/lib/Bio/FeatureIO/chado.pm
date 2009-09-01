@@ -4,7 +4,7 @@ use strict;
 use base qw(Bio::FeatureIO);
 
 use Bio::SeqIO;
-use Chado::LoadDBI;
+use Bio::Chado::LoadDBI;
 use Data::Dumper;
 
 sub _initialize {

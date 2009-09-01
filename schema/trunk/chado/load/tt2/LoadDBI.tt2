@@ -1,12 +1,12 @@
-package Chado::LoadDBI;
+package Bio::Chado::LoadDBI;
 
 use strict;
 use lib '[% chado_path %]/lib';
-use Chado::AutoDBI;
+use Bio::Chado::AutoDBI;
 
 sub init
 {
-  Chado::DBI->set_db('Main',
+  Bio::Chado::DBI->set_db('Main',
     "dbi:[% db_driver %]:dbname=[% db_name %];[% IF db_port %]port=[% db_port %];[% END %]host=[% db_host %]", 
     "[% db_username %]",
     "[% db_password %]",

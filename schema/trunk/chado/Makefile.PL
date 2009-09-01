@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 # vim: set ft=perl ts=2 expandtab:
-# $Id: Makefile.PL,v 1.132 2009-08-28 19:42:14 scottcain Exp $
+# $Id: Makefile.PL,v 1.133 2009-09-01 15:01:14 scottcain Exp $
 
 $| = 1;
 use constant INSTRUCTIONS => <<HERE
@@ -144,7 +144,7 @@ my $PERL         =  $Config{'startperl'};
 $PERL            =~ s/^\s*#!\s*//;
 my $working_dir  = cwd;
 my $lib_dir      = catdir $working_dir, 'lib';
-my $chado_dir    = catdir $lib_dir, 'Chado';
+my $chado_dir    = catdir $lib_dir, 'Bio/Chado';
 my $build_config = catfile $working_dir, 'build.conf';
 my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
 
@@ -464,7 +464,7 @@ AUTODBI
 
     system(
       "$working_dir/bin/pg2cdbi_viaTT.pl '$DBNAME' '$DBUSER' '$DBPASS' " .
-      "$working_dir/modules/nofuncs.sql > $working_dir/lib/Chado/AutoDBI.pm"
+      "$working_dir/modules/nofuncs.sql > $working_dir/lib/Bio/Chado/AutoDBI.pm"
     ) == 0 or die "bin/pg2cdbi_viaTT.pl failed, is SQL::Translator installed?\n";
 }
 
@@ -532,7 +532,7 @@ WriteMakefile(
     clean                 => {
       FILES               => 
         '$(DISTVNAME).tar$(SUFFIX) load/etc/load.conf build.conf ' .
-        '_build Build lib/Chado/AutoDBI.pm lib/Chado/LoadDBI.pm '.$LOCAL_TMP  
+        '_build Build lib/Bio/Chado/AutoDBI.pm lib/Bio/Chado/LoadDBI.pm '.$LOCAL_TMP  
     },
 );
 

@@ -1,12 +1,12 @@
 [% MACRO printPackage(node) BLOCK %]
-########Chado::[% format_node(node.name) %]########
+########Bio::Chado::CDBI::[% format_node(node.name) %]########
 
-package Chado::[% format_node(node.name) %];
+package Bio::Chado::CDBI::[% format_node(node.name) %];
 use base '[% baseclass %]';
 use Class::DBI::Pager;
 no warnings qw(redefine);
 
-Chado::[% format_node(node.name) %]->set_up_table('[% node.table.name %]');
+Bio::Chado::CDBI::[% format_node(node.name) %]->set_up_table('[% node.table.name %]');
 [% printPKAccessors(node.primary_key, node.table.name) %]
 [% printHasA(node.edges, node) %]
 [% printHasMany(node.edges, node) %]
@@ -28,9 +28,9 @@ Chado::[% format_node(node.name) %]->set_up_table('[% node.table.name %]');
 # Has A
 #
 [% END %] [% IF edge.type == 'import' %]
-Chado::[% format_node(node.name) %]->has_a([% edge.thisfield.name %] => 'Chado::[% format_node(edge.thatnode.name) %]');
+Bio::Chado::CDBI::[% format_node(node.name) %]->has_a([% edge.thisfield.name %] => 'Bio::Chado::CDBI::[% format_node(edge.thatnode.name) %]');
     [% IF node.has(edge.thatnode.name) < 2 %]
-sub Chado::[% format_node(node.name) %]::[% edge.thatnode.table.name %] { return shift->[% edge.thisfield.name %] }
+sub Bio::Chado::CDBI::[% format_node(node.name) %]::[% edge.thatnode.table.name %] { return shift->[% edge.thisfield.name %] }
     [% ELSE %]
 sub [% format_fk(edge.thisnode.table.name,edge.thisfield.name) %] { return shift->[% edge.thisfield.name %] }
     [% END %] [% END %] [% END %] [% END %]
@@ -41,7 +41,7 @@ sub [% format_fk(edge.thisnode.table.name,edge.thisfield.name) %] { return shift
 # Has Many
 #
 [% END %] [% IF edge.type == 'export' %]
-Chado::[% format_node(node.name) %]->has_many('[% edge.thatnode.table.name %]_[% edge.thatfield.name %]', 'Chado::[% format_node(edge.thatnode.name) %]' => '[% edge.thatfield.name %]');
+Bio::Chado::CDBI::[% format_node(node.name) %]->has_many('[% edge.thatnode.table.name %]_[% edge.thatfield.name %]', 'Bio::Chado::CDBI::[% format_node(edge.thatnode.name) %]' => '[% edge.thatfield.name %]');
   [% IF node.via(edge.thatnode.name) >= 1 %]
 sub [% edge.thatnode.table.name %]_[% format_fk(edge.thatnode.table.name,edge.thatfield.name) %]s { return shift->[% edge.thatnode.table.name %]_[% edge.thatfield.name %] }
 #sub [% format_refers(edge.thatnode.table.name,edge.thatfield.name) %] {}

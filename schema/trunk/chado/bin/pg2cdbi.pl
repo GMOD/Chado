@@ -55,7 +55,7 @@ sub x {
     }
   }
 
-  $package_name = 'Chado::' . $package_name;
+  $package_name = 'Bio::Chado::CDBI::' . $package_name;
 
   return $package_name;
 }
