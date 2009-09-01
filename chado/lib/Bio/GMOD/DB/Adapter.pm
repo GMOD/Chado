@@ -2819,14 +2819,14 @@ sub load_data {
 
   unless ($self->skip_vacuum) {
     warn "Optimizing database (this may take a while) ...\n";
-    print STDERR "  (";
+    print STDERR "  ";
     foreach (@tables) {
       print STDERR "$_ ";
       $self->dbh->do("VACUUM ANALYZE $_");
     }
   }
 
-  print STDERR ") Done.\n";
+  print STDERR "\nDone.\n";
 
   warn "\nWhile this script has made an effort to optimize the database, you\n"
     ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
