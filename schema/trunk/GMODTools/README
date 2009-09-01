@@ -247,10 +247,10 @@ GMOD::SeqUtils
       GMOD::SeqUtils is based on GMOD release 0.001 (January 2004) and can
       be expected to change or go obsolete.  Besides contents of
       this package, requirements to run include the perl modules
-      installed with GMOD release, esp. Chado::LoadDBI/AutoDBI and
+      installed with GMOD release, esp. Bio::Chado::LoadDBI/AutoDBI and
       its ancestor classes from CPAN - Class::DBI, Ima::DBI, etc.
       
-  Chado::SeqUtils was written for use with the nascent Daphnia genome database,
+  GMOD::Chado::SeqUtils was written for use with the nascent Daphnia genome database,
       wFleaBase, at http://eugenes.org/daphnia/ See also further information
       at http://eugenes.org/daphnia/database
         

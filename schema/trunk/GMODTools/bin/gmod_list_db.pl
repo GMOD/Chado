@@ -30,20 +30,20 @@ They are optional; %ENV and conf/gmod.conf will also be consulted for them .
   
   Feature summary for Chado  database
   ============================================================
-  Chado::LoadDBI(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,gilbertd,passwd)
+  GMOD::Chado::LoadDBI(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,gilbertd,passwd)
 
-  Features by Chado::Organism  n=12
+  Features by Bio::Chado::CDBI::Organism  n=12
   2053    Daphnia pulex/D.pulex/waterflea
   ------------------------------------------------------------
   
-  Features by Chado::Pub  n=5
+  Features by Bio::Chado::CDBI::Pub  n=5
   397     data/est1.fa 1076639361 type=seq_file
   858     data/microDNA.fa 1075475373 type=seq_file
   397     data/CGBvntr.fa 1076132020 type=seq_file
   401     data/cDNA1.fa 1076732417 type=seq_file
   ------------------------------------------------------------
   
-  Features by Chado::Cv Sequence Ontology, n=897
+  Features by Bio::Chado::CDBI::Cv Sequence Ontology, n=897
   397     EST
   798     cDNA_clone
   858     microsatellite
@@ -57,7 +57,7 @@ They are optional; %ENV and conf/gmod.conf will also be consulted for them .
   WFes    397     id counter for EST by gmod_load_newseq
   ------------------------------------------------------------
   
-  Chado::Feature  total=2053
+  Bio::Chado::CDBI::Feature  total=2053
   
   Duplicate checksums
   Name____        Length  Seq_type        Synonym Feat_id Publication     Checksum
@@ -77,7 +77,7 @@ use warnings;
 use GMOD::Config; # simpler alternate, checks only conf/gmod.conf for ENV settings
 
 # use Chado::LoadDBI; #< moved to  GMOD::Chado::SeqUtils
-use GMOD::Chado::SeqUtils; # common methods for these seq tools
+use Bio::Chado::SeqUtils; # common methods for these seq tools
 use Getopt::Long;
 
 
@@ -117,32 +117,32 @@ $chadoseq->openChadoDB(
 
 my $iter;
 
-$iter = Chado::Organism->retrieve_all;
-print "Features by Chado::Organism  n=",$iter->count,"\n";
+$iter = Bio::Chado::CDBI::Organism->retrieve_all;
+print "Features by Bio::Chado::CDBI::Organism  n=",$iter->count,"\n";
 for (my $org = $iter->first; ($org) ; $org= $iter->next) {
-  my $fit= Chado::Feature->search( organism_id => $org->id  );
+  my $fit= Bio::Chado::CDBI::Feature->search( organism_id => $org->id  );
   next unless (defined $fit && $fit->count > 0);
   print $fit->count, "\t", $org->genus," ",$org->species,"/",$org->abbreviation,"/",$org->common_name,"\n";
   }
 print "-"x60,"\n\n";  
 
 
-$iter = Chado::Pub->retrieve_all;
-print "Features by Chado::Pub  n=",$iter->count,"\n";
+$iter = Bio::Chado::CDBI::Pub->retrieve_all;
+print "Features by Bio::Chado::CDBI::Pub  n=",$iter->count,"\n";
 for (my $pub = $iter->first; ($pub) ; $pub= $iter->next) {
-  my $fit = Chado::Feature_Pub->search( pub_id => $pub->id, );
+  my $fit = Bio::Chado::CDBI::Feature_Pub->search( pub_id => $pub->id, );
   next unless (defined $fit && $fit->count > 0);
   print $fit->count, "\t", $pub->title, " type=",$pub->type_id->name, "\n";
   }
 print "-"x60,"\n\n";  
 
    
-my ($socv)= Chado::Cv->search( name => $chadoseq->SequenceOntology);
+my ($socv)= Bio::Chado::CDBI::Cv->search( name => $chadoseq->SequenceOntology);
 if ($socv) {
-  $iter= Chado::Cvterm->search( cv_id => $socv->id );
-  print "Features by Chado::Cv ".$chadoseq->SequenceOntology.", n=",$iter->count,"\n";
+  $iter= Bio::Chado::CDBI::Cvterm->search( cv_id => $socv->id );
+  print "Features by Bio::Chado::CDBI::Cv ".$chadoseq->SequenceOntology.", n=",$iter->count,"\n";
   for (my $sot = $iter->first; ($sot) ; $sot= $iter->next) {
-    my $fit= Chado::Feature->search( type_id => $sot->id  );
+    my $fit= Bio::Chado::CDBI::Feature->search( type_id => $sot->id  );
     next unless (defined $fit && $fit->count > 0);
     print $fit->count, "\t", $sot->name,"\n";
     }
@@ -151,8 +151,8 @@ print "-"x60,"\n\n";
 
 $chadoseq->listPublicIds(*STDOUT);
 
-$iter = Chado::Feature->retrieve_all;
-print "Chado::Feature  total=",$iter->count,"\n";
+$iter = Bio::Chado::CDBI::Feature->retrieve_all;
+print "Bio::Chado::CDBI::Feature  total=",$iter->count,"\n";
 
 $chadoseq->listDupChecksums(*STDOUT, $iter) 
   if ($dochecksum);
