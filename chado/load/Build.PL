@@ -1,11 +1,11 @@
 use strict;
 use lib 'lib';
-use Chado::Builder;
+use Bio::Chado::Builder;
 use Data::Dumper;
 
 my $VERSION    = 0.01;
 my $conf       = shift;
-my $m          = Chado::Builder->new(
+my $m          = Bio::Chado::Builder->new(
   dist_name    => 'Chado', 
   dist_version => $VERSION, 
   load_conf    => $conf,

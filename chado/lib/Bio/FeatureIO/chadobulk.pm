@@ -638,8 +638,8 @@ sub contact{
  Usage   : $obj->organism($newval)
  Function: 
  Example : 
- Returns : a Chado::Organism object
- Args    : a Chado::Organism object
+ Returns : a Bio::Chado::CDBI::Organism object
+ Args    : a Bio::Chado::CDBI::Organism object
 
 
 =cut

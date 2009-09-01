@@ -51,7 +51,7 @@ use lib 'lib';
 use File::Basename;
 use DBI;
 use Data::Dumper;
-use Chado::LoadDBI;
+use Bio::Chado::LoadDBI;
 use Bio::OntologyIO;
 use Bio::Ontology::TermFactory;
 use Term::ProgressBar;
@@ -78,7 +78,7 @@ my ($ontology_file, $ontology_deffile) = @ARGV;
 #allow non-existant defsfile for this one
 die "USAGE: $0 <dagedit file> [<defs file>]" unless $ontology_file;
 
-Chado::LoadDBI->init();
+Bio::Chado::LoadDBI->init();
 
 #######################################
 # SET UP GLOBAL VARS
@@ -137,9 +137,9 @@ my %predmap = (
 
 #create some default entries to satisfy chado FK requirements of ontology on db table
 
-my($db) = Chado::Db->find_or_create({name => $ontname});
+my($db) = Bio::Chado::CDBI::Db->find_or_create({name => $ontname});
 $db->dbi_commit;
-my($cv) = Chado::Cv->find_or_create({name => $ontname});
+my($cv) = Bio::Chado::CDBI::Cv->find_or_create({name => $ontname});
 $cv->dbi_commit;
 
 my $termfact = Bio::Ontology::TermFactory->new();
@@ -215,15 +215,15 @@ sub load_ontologyterms{
     }
 
 	#we can't use find_or_create here because the name may already be assigned another cv_id...
-	my($predicate_db) = Chado::Cvterm->search(name => predmap($predicate->name));
+	my($predicate_db) = Bio::Chado::CDBI::Cvterm->search(name => predmap($predicate->name));
 
 	if(!$predicate_db){
 		$progress->message("creating predicate term for: ".predmap($predicate->name));
-		my $dbxref = Chado::Dbxref->find_or_create({
+		my $dbxref = Bio::Chado::CDBI::Dbxref->find_or_create({
 				db_id => $db->id,
 				accession => $oborelmap{ predmap($predicate->name) } || predmap($predicate->name),
 							   });
-		$predicate_db = Chado::Cvterm->create({
+		$predicate_db = Bio::Chado::CDBI::Cvterm->create({
 			   name => predmap($predicate->name),
 			   cv_id => $cv->id,
 			   dbxref_id => $dbxref->id,
@@ -243,16 +243,16 @@ sub load_ontologyterms{
   #load root terms
   foreach my $root (@roots) {
     $progress->update(++$loaded);
-    my($root_db) = Chado::Cvterm->search({name => $root->name, cv_id => $cv->id});
+    my($root_db) = Bio::Chado::CDBI::Cvterm->search({name => $root->name, cv_id => $cv->id});
 
         if(!$root_db){
           #warn "oops! ".join '*', ($root->name, $root->identifier, $cv->id) unless $root->name;
           next unless $root->name;
-		  my $dbxref = Chado::Dbxref->find_or_create({
+		  my $dbxref = Bio::Chado::CDBI::Dbxref->find_or_create({
 			db_id => $db->id,
 			accession => $root->identifier,
 							   });
-		  $root_db = Chado::Cvterm->find_or_create({
+		  $root_db = Bio::Chado::CDBI::Cvterm->find_or_create({
 			 name                => $root->name || $oborelmap{ predmap($root->identifier) },
 			 cv_id               => $cv->id,
 			 dbxref_id           => $dbxref->id,
@@ -287,7 +287,7 @@ sub load_ontologytermsR {
 	if (!(exists $allterms{$child->name})) {
 	  warn  "$tab", $child->name , "\n" if DEBUG;
 
-        my($child_db) = Chado::Cvterm->search({name => $child->name, cv_id => $cv->id});
+        my($child_db) = Bio::Chado::CDBI::Cvterm->search({name => $child->name, cv_id => $cv->id});
 	if(!$child_db){
 
 #warn "oops! ".join '*', ($child->name, $child->identifier, $cv->id) unless $child->name;
@@ -296,11 +296,11 @@ sub load_ontologytermsR {
           if ($accession =~ /\S+\:(\S+)/) {
               $accession = $1;
           }
-	  my $dbxref = Chado::Dbxref->find_or_create({
+	  my $dbxref = Bio::Chado::CDBI::Dbxref->find_or_create({
 				  db_id => $db->id,
 				  accession => $accession,
 						 });
-	  $child_db = Chado::Cvterm->find_or_create({
+	  $child_db = Bio::Chado::CDBI::Cvterm->find_or_create({
 				name => $child->name,
 				cv_id => $cv->id,
 				dbxref_id => $dbxref->id,
@@ -356,7 +356,7 @@ sub load_ontologyrels {
 	  $skip++ unless defined $subj_id;
 
 	  next if $skip;
-	  my ($cvtermrel) = Chado::Cvterm_Relationship->find_or_create ({
+	  my ($cvtermrel) = Bio::Chado::CDBI::Cvterm_Relationship->find_or_create ({
 					  subject_id => $subj_id,
 					  object_id => $obj_id,
 					  type_id => $pred_id,
@@ -383,14 +383,14 @@ sub load_dblinks {
       $term_link = substr($term_link, 0, 255);
     }
 
-	my $dbxref_db = Chado::Dbxref->find_or_create ({
+	my $dbxref_db = Bio::Chado::CDBI::Dbxref->find_or_create ({
 				accession => $term_link,
 				db_id => $db->id,
 				version => 0
 						   });
         $dbxref_db->dbi_commit;
 
-	my ($cvtermdbxref) = Chado::Cvterm_Dbxref->find_or_create ({
+	my ($cvtermdbxref) = Bio::Chado::CDBI::Cvterm_Dbxref->find_or_create ({
 			   cvterm_id => $term_db->id,
 			   dbxref_id => $dbxref_db->id
 						  });
@@ -405,11 +405,11 @@ sub load_synonyms {
   my @term_syns = $term->get_synonyms();
   foreach my $term_syn (@term_syns) {
 
-#	Chado::Cvtermsynonym->find_or_create ({
+#	Bio::Chado::CDBI::Cvtermsynonym->find_or_create ({
 #						cvterm_id => $term_db->id,
 #						synonym => $term_syn,
 #					     });
-	my ($synonym) = Chado::Cvtermsynonym->find_or_create ({
+	my ($synonym) = Bio::Chado::CDBI::Cvtermsynonym->find_or_create ({
 						cvterm_id => $term_db->id,
 						synonym => $term_syn,
 					     });
@@ -433,15 +433,20 @@ load_ontology.pl - load DAG-Edit or simple indented hierarchy ontology files int
 
 =head1 DESCRIPTION
 
+WARNING: This script has not been tested in several years and probably does not not
+work.  You should look for a more modern method of loading ontologies, like the
+process the Makefile.PL uses, or the SGN contributed script, gmod_load_cvterms.pl.
+
+
 this script relies on three external modules:
 
 =over
 
 =item Bio::OntologyIO (available from Bioperl)
 
-=item Chado::AutoDBI  (generated from chado/complete.sql using chado/bin/pg2cdbi.pl)
+=item Bio::Chado::AutoDBI  (generated from chado/complete.sql using chado/bin/pg2cdbi.pl)
 
-=item SQL::Translator required to generate Chado::AutoDBI
+=item SQL::Translator required to generate Bio::Chado::AutoDBI
 
 =back
 

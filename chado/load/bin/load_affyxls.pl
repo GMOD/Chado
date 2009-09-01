@@ -1,15 +1,15 @@
 #!/usr/bin/perl
 
-package Chado::Affymetrixdchip;
+package Bio::Chado::CDBI::Affymetrixdchip;
 use lib 'lib';
-use Chado::AutoDBI;
-use base 'Chado::DBI';
+use Bio::Chado::AutoDBI;
+use base 'Bio::Chado::DBI';
 use Class::DBI::View qw(TemporaryTable);
 use Class::DBI::Pager;
 
-Chado::Affymetrixdchip->table('affymetrixdchip');
+Bio::Chado::CDBI::Affymetrixdchip->table('affymetrixdchip');
 
-Chado::Affymetrixdchip->columns(All => qw(
+Bio::Chado::CDBI::Affymetrixdchip->columns(All => qw(
   elementresult_id
   element_id
   quantification_id
@@ -19,17 +19,17 @@ Chado::Affymetrixdchip->columns(All => qw(
   apcall
                                          ));
 
-Chado::Affymetrixdchip->sequence('public.elementresult_elementresult_id_seq');
+Bio::Chado::CDBI::Affymetrixdchip->sequence('public.elementresult_elementresult_id_seq');
 
 sub id { shift->elementresult_id }
 
-Chado::Affymetrixdchip->has_a( element_id => 'Chado::Element' );
+Bio::Chado::CDBI::Affymetrixdchip->has_a( element_id => 'Bio::Chado::CDBI::Element' );
 
 sub element {
   return shift->element_id
 }
 
-Chado::Affymetrixdchip->has_a( quantification_id => 'Chado::Quantification' );
+Bio::Chado::CDBI::Affymetrixdchip->has_a( quantification_id => 'Bio::Chado::CDBI::Quantification' );
 
 sub quantification {
   return shift->quantification_id
@@ -51,7 +51,7 @@ my $LOG = Log::Log4perl->get_logger('load_affyxls');
 my $arraydesigntype = shift @ARGV; $arraydesigntype ||= 'U133';
 my $arrayfile = shift @ARGV;
 
-Chado::Feature->set_sql(affy_probesets => qq{
+Bio::Chado::CDBI::Feature->set_sql(affy_probesets => qq{
   SELECT feature.name,feature.feature_id,element.element_id FROM feature,element,arraydesign WHERE
   arraydesign.name = '$arraydesigntype' and feature.feature_id = element.feature_id
 });
@@ -98,27 +98,27 @@ while(my $arrayio = $affx->next_array){
   $LOG->info("cvterms: ".join(', ', keys %cvterm));
   #might want to break here if %cvterm is undef (likely due to missing/malformed cvterm line in array file)
 
-  my($array)     = Chado::Arraydesign->search(name => $arraydesigntype);
-  ($array)     ||= Chado::Arraydesign->search(name => 'unknown');
+  my($array)     = Bio::Chado::CDBI::Arraydesign->search(name => $arraydesigntype);
+  ($array)     ||= Bio::Chado::CDBI::Arraydesign->search(name => 'unknown');
   $LOG->debug("loaded record for array type: ".$array->name);
 
-  my($nulltype)               = Chado::Cvterm->search( name => 'null' );
-  my($oligo)                  = Chado::Cvterm->search( name => 'microarray_oligo' );
+  my($nulltype)               = Bio::Chado::CDBI::Cvterm->search( name => 'null' );
+  my($oligo)                  = Bio::Chado::CDBI::Cvterm->search( name => 'microarray_oligo' );
   die "couldn't find ontology term 'microarray_oligo', did you load the Sequence Ontology?" unless ref($oligo);
   $LOG->debug("loaded records for generic cvterms");
 
-  my($human)                  = Chado::Organism->search( common_name => 'human' );
+  my($human)                  = Bio::Chado::CDBI::Organism->search( common_name => 'human' );
   $LOG->debug("loaded record for organism");
-  my $operator                = Chado::Contact->find_or_create( { name => 'UCLA Microarray Core' });
+  my $operator                = Bio::Chado::CDBI::Contact->find_or_create( { name => 'UCLA Microarray Core' });
   $LOG->debug("loaded record for hybridization operator");
-  my $operator_quantification = Chado::Contact->find_or_create( { name => $ENV{USER} });
+  my $operator_quantification = Bio::Chado::CDBI::Contact->find_or_create( { name => $ENV{USER} });
   $LOG->debug("loaded record for database operator");
-  my $analysis                = Chado::Analysis->find_or_create({ name => 'keystone normalization', program => 'dChip unix', programversion => '1.0'});
+  my $analysis                = Bio::Chado::CDBI::Analysis->find_or_create({ name => 'keystone normalization', program => 'dChip unix', programversion => '1.0'});
   $LOG->debug("loaded record for normalization algorithm");
 
-  my $protocol_assay          = Chado::Protocol->find_or_create({ name => 'default assay protocol', type_id => $nulltype });
-  my $protocol_acquisition    = Chado::Protocol->find_or_create({ name => 'default acquisition protocol', type_id => $nulltype });
-  my $protocol_quantification = Chado::Protocol->find_or_create({ name => 'default quantification protocol', type_id => $nulltype });
+  my $protocol_assay          = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default assay protocol', type_id => $nulltype });
+  my $protocol_acquisition    = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default acquisition protocol', type_id => $nulltype });
+  my $protocol_quantification = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default quantification protocol', type_id => $nulltype });
   $LOG->debug("loaded records for protocols");
 
   push @txn, $operator;
@@ -128,7 +128,7 @@ while(my $arrayio = $affx->next_array){
   push @txn, $protocol_acquisition;
   push @txn, $protocol_quantification;
 
-  my $biomaterial = Chado::Biomaterial->find_or_create({ name => $sample_id , taxon_id => $human});
+  my $biomaterial = Bio::Chado::CDBI::Biomaterial->find_or_create({ name => $sample_id , taxon_id => $human});
   if(!$biomaterial->description and $arrayio->id){
     $biomaterial->description($arrayio->id);
     $biomaterial->update;
@@ -138,11 +138,11 @@ while(my $arrayio = $affx->next_array){
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
-    my($chado_cvterm) = Chado::Cvterm->search(name => $cvterm);
+    my($chado_cvterm) = Bio::Chado::CDBI::Cvterm->search(name => $cvterm);
     if(!$chado_cvterm){
-      my($chado_dbxref) = Chado::Dbxref->search(accession => $cvterm);
+      my($chado_dbxref) = Bio::Chado::CDBI::Dbxref->search(accession => $cvterm);
       my $fatal = undef;
-      ($chado_cvterm) = Chado::Cvterm->search(dbxref_id => $chado_dbxref)
+      ($chado_cvterm) = Bio::Chado::CDBI::Cvterm->search(dbxref_id => $chado_dbxref)
         or $fatal = "couldn't find cvterm for $cvterm, you need to create it";
       if($fatal){
         $LOG->fatal($fatal) and die $fatal;
@@ -150,7 +150,7 @@ while(my $arrayio = $affx->next_array){
     }
 
     if(length($cvterm{$cvterm})){
-      my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
+      my $biomaterialprop = Bio::Chado::CDBI::Biomaterialprop->find_or_create({
                                                                     biomaterial_id => $biomaterial->id,
                                                                     type_id => $chado_cvterm,
                                                                     value => $cvterm{$cvterm},
@@ -158,7 +158,7 @@ while(my $arrayio = $affx->next_array){
       $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: ". $cvterm{$cvterm});
       push @txn, $biomaterialprop;
     } else {
-      my $biomaterialprop = Chado::Biomaterialprop->find_or_create({
+      my $biomaterialprop = Bio::Chado::CDBI::Biomaterialprop->find_or_create({
                                                                     biomaterial_id => $biomaterial->id,
                                                                     type_id => $chado_cvterm,
                                                                    });
@@ -167,7 +167,7 @@ while(my $arrayio = $affx->next_array){
     }
   }
 
-  my $assay = Chado::Assay->find_or_create({
+  my $assay = Bio::Chado::CDBI::Assay->find_or_create({
 									arraydesign_id => $array->id,
 									operator_id => $operator->id,
                                     name => $chip_id,
@@ -181,13 +181,13 @@ while(my $arrayio = $affx->next_array){
   $LOG->debug("assay_id: ".$assay->id);
   push @txn, $assay;
 
-  my $assay_biomaterial = Chado::Assay_Biomaterial->find_or_create({
+  my $assay_biomaterial = Bio::Chado::CDBI::Assay_Biomaterial->find_or_create({
                                                             biomaterial_id => $biomaterial->id,
                                                             assay_id => $assay->id,
                                                            });
   push @txn, $assay_biomaterial;
 
-  my $acquisition = Chado::Acquisition->find_or_create({
+  my $acquisition = Bio::Chado::CDBI::Acquisition->find_or_create({
 												assay_id => $assay->id,
 												protocol_id => $protocol_acquisition->id,
 											   });
@@ -199,7 +199,7 @@ while(my $arrayio = $affx->next_array){
   }
   push @txn, $acquisition;
 
-  my $quantification = Chado::Quantification->find_or_create({
+  my $quantification = Bio::Chado::CDBI::Quantification->find_or_create({
 													  acquisition_id => $acquisition->id,
 													  protocol_id => $protocol_acquisition->id,
 													  operator_id => $operator_quantification->id,
@@ -231,7 +231,7 @@ while(my $arrayio = $affx->next_array){
   my($sth,%feature);
   my $sth;
   $LOG->debug("caching features...");
-  $sth = Chado::Feature->sql_affy_probesets;
+  $sth = Bio::Chado::CDBI::Feature->sql_affy_probesets;
   $sth->execute;
   while(my $row = $sth->fetchrow_hashref){
     #warn $row->{name};
@@ -255,10 +255,10 @@ while(my $arrayio = $affx->next_array){
 
     if(!$feature){
       #the feature may exist, but not be linked to an element (ergo array) yet.
-      ($feature) = Chado::Feature->search(name => $featuregroup->id);
+      ($feature) = Bio::Chado::CDBI::Feature->search(name => $featuregroup->id);
 
       if(!ref($feature)){
-        $feature = Chado::Feature->find_or_create({
+        $feature = Bio::Chado::CDBI::Feature->find_or_create({
                                                    organism_id => $human,
                                                    type_id => $oligo,
                                                    name => $featuregroup->id,
@@ -274,7 +274,7 @@ while(my $arrayio = $affx->next_array){
 	if(!$element){
       $progress->message("creating element for: ".$featuregroup->id);
 
-	  $element = Chado::Element->find_or_create({
+	  $element = Bio::Chado::CDBI::Element->find_or_create({
 												 feature_id => $feature,
 												 arraydesign_id => $array,
 												 subclass_view => 'affymetrixdchip',
@@ -283,7 +283,7 @@ while(my $arrayio = $affx->next_array){
       push @txn, $element;
 	}
 
-	my $ad = Chado::Affymetrixdchip->create({
+	my $ad = Bio::Chado::CDBI::Affymetrixdchip->create({
 											 element_id => $element,
 											 quantification_id => $quantification->id,
 											 subclass_view => 'affymetrixdchip',

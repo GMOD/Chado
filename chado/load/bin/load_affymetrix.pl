@@ -2,8 +2,8 @@
 
 use strict;
 use lib 'lib';
-use Chado::LoadDBI;
-use Chado::AutoDBI;
+use Bio::Chado::LoadDBI;
+use Bio::Chado::AutoDBI;
 use XML::Simple;
 use Data::Dumper;
 
@@ -13,20 +13,20 @@ die "USAGE: $0 <filename>" unless $filename;
 
 open(my $fh,"zcat $filename |") or die "couldn't open file $filename : $!";
 
-Chado::LoadDBI->init();
+Bio::Chado::LoadDBI->init();
 
 my %DATABASE = ();
 my $database_sequence = 0;
 
-my $nullcv      = Chado::Cv->find_or_create({ name => 'null' });
-my $nullcontact = Chado::Contact->find_or_create({ description => 'null' });
-my $nulldb      = Chado::Db->find_or_create({ contact_id => $nullcontact->id, name => 'null' });
-my $nulldbxref  = Chado::Dbxref->find_or_create({ db_id => $nulldb->id, accession => 'null' });
-my $nullcvterm  = Chado::Cvterm->find_or_create({ dbxref_id => $nulldbxref->id, name => 'null', cv_id => $nullcv->id });
-my $nullpub     = Chado::Pub->find_or_create({ miniref => '', title => 'Affy MAGE-ML', type_id => $nullcvterm->id });
-my $term_affysynonym = Chado::Cvterm->find_or_create({ dbxref_id => $nulldbxref->id, name => 'Affymetrix synonym', cv_id => $nullcv->id });
+my $nullcv      = Bio::Chado::CDBI::Cv->find_or_create({ name => 'null' });
+my $nullcontact = Bio::Chado::CDBI::Contact->find_or_create({ description => 'null' });
+my $nulldb      = Bio::Chado::CDBI::Db->find_or_create({ contact_id => $nullcontact->id, name => 'null' });
+my $nulldbxref  = Bio::Chado::CDBI::Dbxref->find_or_create({ db_id => $nulldb->id, accession => 'null' });
+my $nullcvterm  = Bio::Chado::CDBI::Cvterm->find_or_create({ dbxref_id => $nulldbxref->id, name => 'null', cv_id => $nullcv->id });
+my $nullpub     = Bio::Chado::CDBI::Pub->find_or_create({ miniref => '', title => 'Affy MAGE-ML', type_id => $nullcvterm->id });
+my $term_affysynonym = Bio::Chado::CDBI::Cvterm->find_or_create({ dbxref_id => $nulldbxref->id, name => 'Affymetrix synonym', cv_id => $nullcv->id });
 
-my($organism) = Chado::Organism->find_or_create({
+my($organism) = Bio::Chado::CDBI::Organism->find_or_create({
 												abbreviation => 'H.sapiens',
 												genus        => 'Homo',
 #												taxgroup     => '9606', #NCBI TaxonomyID
@@ -34,7 +34,7 @@ my($organism) = Chado::Organism->find_or_create({
 												common_name  => 'Human'
 											   });
 
-my($cv) = Chado::Cv->find_or_create({
+my($cv) = Bio::Chado::CDBI::Cv->find_or_create({
 									 name => 'Affymetrix Feature Properties'
 									});
 
@@ -58,8 +58,8 @@ sub processDatabase_assnlist {
   my $xmld = XMLin($xml);
 
   foreach my $database (@{$xmld->{Database}}){
-	next if $DATABASE{$database->{identifier}} = Chado::Db->search(name => $database->{identifier});
-	my $db_obj = Chado::Db->create({
+	next if $DATABASE{$database->{identifier}} = Bio::Chado::CDBI::Db->search(name => $database->{identifier});
+	my $db_obj = Bio::Chado::CDBI::Db->create({
 									name  => $database->{identifier},
 									url   => $database->{URI},
 									contact_id => $nullcontact->id,
@@ -77,12 +77,12 @@ sub processBioSequence {
   $identifier =~ s/U133[AB]/U133/;
   my($dbname,$name) = $identifier =~ /^(.+:)(.+)$/;
 warn $identifier;
-  my($db) = Chado::Db->find_or_create({name => $dbname, contact_id => $nullcontact->id});
+  my($db) = Bio::Chado::CDBI::Db->find_or_create({name => $dbname, contact_id => $nullcontact->id});
   $db->commit if $db->is_changed;
 
-  my($dbxref) = Chado::Dbxref->find_or_create({db_id => $db->id, accession => $name});
+  my($dbxref) = Bio::Chado::CDBI::Dbxref->find_or_create({db_id => $db->id, accession => $name});
 
-  my $feature = Chado::Feature->find_or_create({
+  my $feature = Bio::Chado::CDBI::Feature->find_or_create({
 												dbxref_id => $dbxref->id,
 												organism_id => $organism->id,
 												name => $name,
@@ -95,13 +95,13 @@ warn $identifier;
   $feature->update;
 
   if($xmld->{name}){
-	my $synonym = Chado::Synonym->find_or_create({
+	my $synonym = Bio::Chado::CDBI::Synonym->find_or_create({
 												  name => substr($xmld->{name},0,255),
 												  synonym_sgml => '',
 												  type_id => $term_affysynonym->id,
 												 });
 
-	my $fsynonym = Chado::Feature_Synonym->find_or_create({
+	my $fsynonym = Bio::Chado::CDBI::Feature_Synonym->find_or_create({
 														   feature_id => $feature->id,
 														   synonym_id => $synonym->id,
 														   pub_id     => $nullpub->id,
@@ -117,12 +117,12 @@ warn $identifier;
 	  $term = "GO:$num";
 	}
 
-	my($cvterm) = Chado::Cvterm->find_or_create({
+	my($cvterm) = Bio::Chado::CDBI::Cvterm->find_or_create({
 												 name => $term,
 												 cv_id => $cv->id,
 												});
 	
- 	my $featureprop = Chado::Featureprop->find_or_create({
+ 	my $featureprop = Bio::Chado::CDBI::Featureprop->find_or_create({
 														  feature_id => $feature->id,
 														  type_id => $cvterm->id,
 														  value => $nvt->{value},
@@ -139,7 +139,7 @@ warn $identifier;
 	my $accession = $dbentry->{accession};
 
 
-	my($fd) = Chado::Feature_Dbxref->find_or_create({
+	my($fd) = Bio::Chado::CDBI::Feature_Dbxref->find_or_create({
 													 feature_id => $feature->id,
 													 dbxref_id  => $dbxref->id,
 													});
@@ -148,17 +148,17 @@ warn $identifier;
 	foreach my $dbref (keys %{$dbentry->{Database_assnref}}){
 	  my $identifier = $dbentry->{Database_assnref}->{$dbref}->{identifier};
 
-	  my($db) = Chado::Db->search(name => $identifier);
+	  my($db) = Bio::Chado::CDBI::Db->search(name => $identifier);
 	  if(!$db){
-		$db = Chado::Db->find_or_create({
+		$db = Bio::Chado::CDBI::Db->find_or_create({
 										 name => $identifier,
 										 contact_id => $nullcontact->id
 										});
 	  }
 
-	  my($dbxref) = Chado::Dbxref->find_or_create(db_id => $db->id, accession => $accession);
+	  my($dbxref) = Bio::Chado::CDBI::Dbxref->find_or_create(db_id => $db->id, accession => $accession);
 
-	  my($fd) = Chado::Feature_Dbxref->find_or_create({
+	  my($fd) = Bio::Chado::CDBI::Feature_Dbxref->find_or_create({
 													   feature_id => $feature->id,
 													   dbxref_id  => $dbxref->id,
 													  });
@@ -182,12 +182,12 @@ warn $identifier;
 			        $dbentry->{PropertySets_assnlist}->{NameValueType}->{type} : '';
 		}
 
-		my  $cvterm = Chado::Cvterm->find_or_create({
+		my  $cvterm = Bio::Chado::CDBI::Cvterm->find_or_create({
 													 name => $term,
 													 cv_id => $cv->id,
 													});
 
-		my $dbxrefprop = Chado::Dbxrefprop->find_or_create({
+		my $dbxrefprop = Bio::Chado::CDBI::Dbxrefprop->find_or_create({
 															dbxref_id => $dbxref->id,
 															type_id => $cvterm->id,
 															value => $value,
@@ -205,23 +205,23 @@ warn $identifier;
 	  : ($xmld->{OntologyEntries_assnlist}->{$ontology});
 
 	foreach my $term (@terms){
-	  my($cv) = Chado::Cv->find_or_create(name => _cv_remap($term->{category}));
+	  my($cv) = Bio::Chado::CDBI::Cv->find_or_create(name => _cv_remap($term->{category}));
 
 	  if($term->{value} =~ /^GO:(\d+)/){
 		my $num = sprintf("%07d",$1);
 		$term->{value} = "GO:$num";
 	  }
 
-	  my($cvterm) = Chado::Cvterm->search(name => $term->{value}, cv_id => $cv->id);
+	  my($cvterm) = Bio::Chado::CDBI::Cvterm->search(name => $term->{value}, cv_id => $cv->id);
 	  if(!$cvterm){
-		$cvterm = Chado::Cvterm->find_or_create({
+		$cvterm = Bio::Chado::CDBI::Cvterm->find_or_create({
 												 name => $term->{value},
 												 cv_id => $cv->id,
 												 definition => $term->{description},
 												});
 	  }
 
-		my $featurecvterm = Chado::Feature_Cvterm->find_or_create({
+		my $featurecvterm = Bio::Chado::CDBI::Feature_Cvterm->find_or_create({
 														 feature_id => $feature->id,
 														 cvterm_id => $cvterm->id,
 														 pub_id => $nullpub->id,
