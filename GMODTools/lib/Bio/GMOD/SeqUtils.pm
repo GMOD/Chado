@@ -101,8 +101,8 @@ sub openChadoDB {
   GMOD::Chado::LoadDBI->init( %{$self->{dbvalues}} );
   
   # some useful values for readwrite only ?
-  # ($nullpub)    = Chado::Pub->search( miniref   => 'null' );
-  ($nullcontact) = Chado::Contact->search( name  => 'null' );
+  # ($nullpub)    = Bio::Chado::CDBI::Pub->search( miniref   => 'null' );
+  ($nullcontact) = Bio::Chado::CDBI::Contact->search( name  => 'null' );
   $self->initAutoCvTable();
 }
 
@@ -110,7 +110,7 @@ sub openChadoDB {
 
 =item getDatabaseOpenParams()
 
- Runtime checks for Chado::LoadDBI values of
+ Runtime checks for Bio::Chado::CDBI::LoadDBI values of
    NAME HOST PORT USERNAME PASSWORD  [from getDatabaseParamKeys()]
 
  Checks %ENV for $GMOD_SERVICE_key, CHADO_DB_key,  e.g. 
@@ -159,7 +159,7 @@ sub getDatabaseOpenParams {
 
 =item getSeqType($seqtype, $ontology)
 
- return Chado::Cvterm matching seqtype from ontology. 
+ return Bio::Chado::CDBI::Cvterm matching seqtype from ontology. 
  Supports use of SO seq types
 
 =cut
@@ -172,8 +172,8 @@ sub getSeqType {
   
   return $cvterm{$seqtype} if ($cvterm{$seqtype});
   
-  my @sotype =  Chado::Cvterm->search( name => $seqtype ) 
-             || Chado::Cvterm->search_like( name => "%$seqtype%" );  
+  my @sotype =  Bio::Chado::CDBI::Cvterm->search( name => $seqtype ) 
+             || Bio::Chado::CDBI::Cvterm->search_like( name => "%$seqtype%" );  
   
   unless(@sotype) {
     print STDERR "Seq type=$seqtype not found. Please choose a type from $ontname";
@@ -195,7 +195,7 @@ sub getSeqType {
   $sotype = $sotype->first() 
     if defined( $sotype ) and $sotype->isa('Class::DBI::Iterator');
 
-  my ($socv) = Chado::Cv->search( name => $ontname );
+  my ($socv) = Bio::Chado::CDBI::Cv->search( name => $ontname );
   unless ($socv) {
     print STDERR "Ontology $ontname is not loaded; using $seqtype";
     $self->cache_cvterm($seqtype);
@@ -216,10 +216,10 @@ sub getSeqType {
 
 sub initAutoCvTable {
   my ( $self ) = @_;
-  ($self->{autocv}) = Chado::Cv->search( name => 'autocreated' );
+  ($self->{autocv}) = Bio::Chado::CDBI::Cv->search( name => 'autocreated' );
   
   if(!$self->{autocv} && $self->{readwrite}) {   
-    ($self->{autocv}) = Chado::Cv->find_or_create( {
+    ($self->{autocv}) = Bio::Chado::CDBI::Cv->find_or_create( {
       name       => 'autocreated',
       definition => "auto created by $0",
       } );
@@ -228,10 +228,10 @@ sub initAutoCvTable {
 
 =item cache_cvterm( $name [, $cv] )
 
- Look for $name in Chado::Cvterm.
+ Look for $name in Bio::Chado::CDBI::Cvterm.
  If not found and readwrite, add to cvterm table, with cv->id (autocv default)
  Store in hash for frequent reuse.
- return Chado::Cvterm  
+ return Bio::Chado::CDBI::Cvterm  
 
 =cut
 
@@ -242,14 +242,14 @@ sub cache_cvterm {
 
   unless (defined $cvterm{$name}) {
     my ($term) =
-       Chado::Cvterm->search( name => $name )
-    || Chado::Cvterm->search( name => ucfirst($name) );
+       Bio::Chado::CDBI::Cvterm->search( name => $name )
+    || Bio::Chado::CDBI::Cvterm->search( name => ucfirst($name) );
     
     if ( $term ) {
       $term = $term->first() if defined( $term ) and $term->isa('Class::DBI::Iterator');
       } 
     elsif ($self->{readwrite} && $cv) {
-      $term = Chado::Cvterm->find_or_create( {
+      $term = Bio::Chado::CDBI::Cvterm->find_or_create( {
               name       => $name,
               cv_id      => $cv->id,
               definition => "auto created by $0",
@@ -268,7 +268,7 @@ sub cache_cvterm {
 
 =item getOrganism( $organism, $quiet)
 
- return Chado::Organism matching common name, abbreviation (best) or genus.
+ return Bio::Chado::CDBI::Organism matching common name, abbreviation (best) or genus.
  Prompts for choice if ! $quiet
 
 =cut
@@ -279,9 +279,9 @@ sub getOrganism {
   my $chadorg= $org_cache{$organism};
   return $chadorg if $chadorg;
 
-  my $iter = Chado::Organism->search( common_name => lc($organism) )
-    || Chado::Organism->search( abbreviation => ucfirst($organism) )
-    || Chado::Organism->search( genus => $organism  );
+  my $iter = Bio::Chado::CDBI::Organism->search( common_name => lc($organism) )
+    || Bio::Chado::CDBI::Organism->search( abbreviation => ucfirst($organism) )
+    || Bio::Chado::CDBI::Organism->search( genus => $organism  );
 
   if ($iter) { 
     if ( $iter->count == 1 ) { #? || quiet
@@ -303,7 +303,7 @@ sub getOrganism {
     print STDERR "The organism '$organism' could not be found.\n";
     unless($quiet) {
       print STDERR "Available organisms:\n";
-      $iter = Chado::Organism->retrieve_all;
+      $iter = Bio::Chado::CDBI::Organism->retrieve_all;
       for (my $org = $iter->first; ($org) ; $org= $iter->next) {
         print STDERR "  ".$org->genus." ".$org->species."/".$org->abbreviation."/".$org->common_name."\n"; 
         }
@@ -333,7 +333,7 @@ fetch synonym values, returns (wantarray) ? list : first
 
 sub getSynonyms {
   my ($self, $chado_feature)   = @_;
-  my @ftsyn  = Chado::Feature_Synonym->search(
+  my @ftsyn  = Bio::Chado::CDBI::Feature_Synonym->search(
               feature_id => $chado_feature->id,
               # pub_id     => $pub->id,
               );
@@ -360,7 +360,7 @@ sub getSynonyms {
 sub getPubFeatures {
   my ($self, $pub)   = @_;
   my @allfeats= ();
-  my @fpub = Chado::Feature_Pub->search(
+  my @fpub = Bio::Chado::CDBI::Feature_Pub->search(
       pub_id     => $pub->id,
       { order_by=>'feature_id' },
       );
@@ -383,7 +383,7 @@ sub getPubFeatures {
 sub getFeaturePubs {
   my ($self, $ft)   = @_;
   my @items= ();
-  my @fpub = Chado::Feature_Pub->search(
+  my @fpub = Bio::Chado::CDBI::Feature_Pub->search(
       feature_id     => $ft->id,
       { order_by=>'pub_id' },
       );
@@ -402,7 +402,7 @@ sub getDbxrefs {
   my ($self, $chado_feature)   = @_;
   my @dbxrefs= ();
   
-  my @feature_dbxref = Chado::Feature_Dbxref->search(
+  my @feature_dbxref = Bio::Chado::CDBI::Feature_Dbxref->search(
     feature_id => $chado_feature->id,
     );
 
@@ -432,7 +432,7 @@ sub getProperties {
   my ($self, $chado_feature)   = @_;
   my %props= ();
 
-   my @featureprop = Chado::Featureprop->search(
+   my @featureprop = Bio::Chado::CDBI::Featureprop->search(
       feature_id => $chado_feature->id,
       );
     
@@ -453,7 +453,7 @@ sub getProperties {
 
 =item dumpSequences($outh, @chado_features)
 
-  Write sequences to $outh from Chado::Features.
+  Write sequences to $outh from Bio::Chado::CDBI::Features.
   Includes seq_type, synonyms, feature_properties, feature_dbxrefs on defline
   Only fasta dump now.  E.g.
   
@@ -475,7 +475,7 @@ sub dumpSequences {
   # print "dumpSequences n= ".scalar(@chado_features)."\n"  if $self->{verbose};
     
   if (!defined($chado_features)) {
-    warn "Need Chado::Feature param"; 
+    warn "Need Bio::Chado::CDBI::Feature param"; 
     return -1;
     }
   elsif ($chado_features->isa('Class::DBI::Iterator')) {
@@ -495,7 +495,7 @@ sub dumpSequences {
   if (ref $chado_features =~ /ARRAY/) {
     @fts= @$chado_features;
     }
-  elsif ($chado_features->isa('Chado::Feature')) {
+  elsif ($chado_features->isa('Bio::Chado::CDBI::Feature')) {
     @fts= ($chado_features);
     }
   foreach my $ft (@fts) {
@@ -585,9 +585,9 @@ sub getFeatureDefline {
 sub lastPublicId {
   my($self, $idtag, $idclass, $lastid)= @_;
 
-  my ($iddb) = Chado::Db->search( name => IDCounter ); # $dbIdCounter  
+  my ($iddb) = Bio::Chado::CDBI::Db->search( name => IDCounter ); # $dbIdCounter  
   if (!$iddb && $self->{readwrite}) {  
-    ($iddb) = Chado::Db->find_or_create( {
+    ($iddb) = Bio::Chado::CDBI::Db->find_or_create( {
           name       =>  IDCounter,
           description => "database id counters created by $0",
           contact_id => $nullcontact, #??
@@ -598,7 +598,7 @@ sub lastPublicId {
     }
 
   #? save idbx
-  my ($idbx) = Chado::Dbxref->search( accession => $idtag , db_id => $iddb->id);
+  my ($idbx) = Bio::Chado::CDBI::Dbxref->search( accession => $idtag , db_id => $iddb->id);
   $idbx = $idbx->first()  
     if defined($idbx) and $idbx->isa('Class::DBI::Iterator');
 
@@ -615,7 +615,7 @@ sub lastPublicId {
   } else {
     $lastid= 0;
     if ( $self->{readwrite} ) {
-      $idbx=  Chado::Dbxref->find_or_create( {
+      $idbx=  Bio::Chado::CDBI::Dbxref->find_or_create( {
                 accession  => $idtag,
                 version    => $lastid,  # our data !
                 db_id      => $iddb->id,
@@ -639,9 +639,9 @@ sub listPublicIds {
   my ($self, $outhandle)= @_;
   print $outhandle "\nPublic ID counter\n";
   print $outhandle join("\t",qw(ID_Tag Last_ID Description)),"\n";
-  my ($iddb) = Chado::Db->search( name => IDCounter );
+  my ($iddb) = Bio::Chado::CDBI::Db->search( name => IDCounter );
   if ($iddb) {
-    my $iter = Chado::Dbxref->search( db_id => $iddb->id);
+    my $iter = Bio::Chado::CDBI::Dbxref->search( db_id => $iddb->id);
     for (my $idbx= $iter->first(); ($idbx); $idbx= $iter->next()) {
        my $idtag = $idbx->accession();
        my $lastid= $idbx->version();  
@@ -656,7 +656,7 @@ sub listPublicIds {
 =item listDupChecksums( $outhandle, [$feature_iterator])
 
 checks thru features md5checksum for duplicates and lists any
-if feature_iterator is null, checks all Chado::Feature 
+if feature_iterator is null, checks all Bio::Chado::CDBI::Feature 
  
 =cut
 
@@ -667,7 +667,7 @@ sub listDupChecksums {
     join("\t",qw(Name____ Length Seq_type Synonym Feat_id Publication Checksum)),"\n";
   
   my %checks=();
-  $iter = Chado::Feature->retrieve_all unless($iter);
+  $iter = Bio::Chado::CDBI::Feature->retrieve_all unless($iter);
   for (my $fit = $iter->first; ($fit) ; $fit= $iter->next) {
     my $ck= $fit->md5checksum;
     next unless($ck);
@@ -676,7 +676,7 @@ sub listDupChecksums {
     
   foreach my $ck (keys %checks) {
     next unless ($checks{$ck}>1);
-    $iter= Chado::Feature->search( md5checksum => $ck  );
+    $iter= Bio::Chado::CDBI::Feature->search( md5checksum => $ck  );
     for (my $fit = $iter->first; ($fit) ; $fit= $iter->next) {
       my $syn= $self->getSynonyms($fit);
       my @pub= $self->getFeaturePubs($fit); 

@@ -151,7 +151,7 @@ $chadoseq->openChadoDB(
 my @chado_features= ();
 my $featiter= undef;
 
-my ($pub)= Chado::Pub->search_like( title => $pubTitle ) if ($pubTitle) ;
+my ($pub)= Bio::Chado::CDBI::Pub->search_like( title => $pubTitle ) if ($pubTitle) ;
 if ($pub) {
   # @chado_features=  
   $featiter= $chadoseq->getPubFeatures($pub);
@@ -174,9 +174,9 @@ else {
     push @where, ( 'organism_id' => $org->id );
     }
   
-  print "Chado::Feature->search where=",join(',',@where),"\n" if $verbose;
+  print "Bio::Chado::CDBI::Feature->search where=",join(',',@where),"\n" if $verbose;
   # @chado_features= 
-  $featiter= Chado::Feature->search( 
+  $featiter= Bio::Chado::CDBI::Feature->search( 
       @where, { 'order_by' => 'feature_id' } 
       );
   }

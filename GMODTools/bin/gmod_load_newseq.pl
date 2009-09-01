@@ -30,7 +30,7 @@ Cut from gmod_load_gff3.pl
   Argos::Config using ARGOS_SERVICE=daphnia
   Argos::Config reading configs at /export/home/bio/biodb/gmod/conf 
   Argos::Config reading configs at /export/home/bio/biodb/daphnia/conf 
-  Chado::LoadDBI(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,,passwd)
+  GMOD::Chado::LoadDBI(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,,passwd)
   Working with Daphnia pulex.
   .................................................. 50=WFcl0001545
   .................................................. 100=WFcl0001595
@@ -173,8 +173,8 @@ $chadoseq->openChadoDB(
 
 # find needed cvterm and other pieces of information
 $chadoseq->cache_cvterm($_) foreach (@needed_cvterms);
-($nullpub)        = Chado::Pub->search( miniref          => 'null' );
-($nullcontact)    = Chado::Contact->search( name         => 'null' );
+($nullpub)        = Bio::Chado::CDBI::Pub->search( miniref          => 'null' );
+($nullcontact)    = Bio::Chado::CDBI::Contact->search( name         => 'null' );
 
 $chado_organism= $chadoseq->getOrganism( $ORGANISM);
 die unless($chado_organism);
@@ -195,7 +195,7 @@ print "parsing sequence as $seqSubformat\n" if $verbose;
 
 
 my $mtime = ( stat($INFILE) )[9];
-my ($pub) = Chado::Pub->search( title => $INFILE . " " . $mtime );
+my ($pub) = Bio::Chado::CDBI::Pub->search( title => $INFILE . " " . $mtime );
 if ( $pub ) { #and !$FORCE_LOAD 
     print "\nIt appears that you have already loaded this exact file\n";
     print "Do you want to continue [no]? ";
@@ -206,7 +206,7 @@ if ( $pub ) { #and !$FORCE_LOAD
     }
 
     $reloading=1;
-    my $featpubs= Chado::Feature_Pub->search( pub_id  => $pub->id );
+    my $featpubs= Bio::Chado::CDBI::Feature_Pub->search( pub_id  => $pub->id );
     if ($featpubs) {
       print "Deleting ".$featpubs->count." existing features for ".$pub->title."\n";
       ## $featpubs->delete_all; ## doesn't cascade over to delete assoc. features !
@@ -218,7 +218,7 @@ if ( $pub ) { #and !$FORCE_LOAD
   }
 else {
   my $pubtype= $chadoseq->cache_cvterm('seq_file');
-  $pub = Chado::Pub->find_or_create( {
+  $pub = Bio::Chado::CDBI::Pub->find_or_create( {
           title      => $INFILE . " " . $mtime,
           miniref    => $INFILE . " " . $mtime,
           uniquename => $INFILE . " " . $mtime,
@@ -328,7 +328,7 @@ sub nextPublicId {
 =item loadSequences(organism_id,$seq_type_id, $seqin)
 
   read thru input sequence file, parsed by Bio::SeqIO 
-  and load each to Chado::Features table.
+  and load each to Bio::Chado::CDBI::Features table.
   Return ($nadded, $ndups)
   
 =cut
@@ -368,13 +368,13 @@ sub loadSequences {
     
     my $chado_feature= undef;
     
-    ($chado_feature) = Chado::Feature->search( { name => $id } )
+    ($chado_feature) = Bio::Chado::CDBI::Feature->search( { name => $id } )
       ; #unless ($GENERATE_PUBID); << do anyway, don't allow dups
       
     # add option here to check for $md5checksum + $seqlen ??
     if ( $checkdups && ! $chado_feature ) {
         # may be several matches, need to check each
-      my $iter = Chado::Feature->search( {
+      my $iter = Bio::Chado::CDBI::Feature->search( {
          organism_id => $organism_id,
          seqlen => $seqlen,
          md5checksum => $md5checksum,
@@ -398,7 +398,7 @@ sub loadSequences {
      }
      
     unless ( $chado_feature ) {
-      $chado_feature = Chado::Feature->create(
+      $chado_feature = Bio::Chado::CDBI::Feature->create(
         {
           organism_id => $organism_id,
           name      => $id,
@@ -475,7 +475,7 @@ sub load_Synonyms {
     my $syntype= $chadoseq->cache_cvterm('synonym');
     print " load syns=".join(',',@names)."\n" if ($verbose);
     foreach my $name (@names) {
-        my ($chado_synonym1) = Chado::Synonym->find_or_create(
+        my ($chado_synonym1) = Bio::Chado::CDBI::Synonym->find_or_create(
             {
                 name         => $name,
                 synonym_sgml => $name,
@@ -483,7 +483,7 @@ sub load_Synonyms {
             }
         );
 
-        my ($chado_synonym2) = Chado::Feature_Synonym->find_or_create(
+        my ($chado_synonym2) = Bio::Chado::CDBI::Feature_Synonym->find_or_create(
             {
                 synonym_id => $chado_synonym1->id,
                 feature_id => $chado_feature->id,
@@ -508,7 +508,7 @@ sub load_Synonyms {
 sub add_Featurepub {
     my ($chado_feature,$pub)   = @_;
 
-    my ($chado_fpub) = Chado::Feature_Pub->find_or_create(
+    my ($chado_fpub) = Bio::Chado::CDBI::Feature_Pub->find_or_create(
         {
             feature_id => $chado_feature->id,
             pub_id     => $pub->id,
@@ -536,12 +536,12 @@ sub load_Dbxref {
     ## it is name stored in Db table, so shouldn't all be prefix-less??
     ## e.g. GenBank is public Db name, not DB:GenBank
     ## Standard accession is GenBank:AF000001, UniProt:AC000000, not DB:GenBank....
-    ## should correspond to Chado::Db->name":"Chado::Dbxref->name
+    ## should correspond to Bio::Chado::CDBI::Db->name":"Bio::Chado::CDBI::Dbxref->name
     
-    my ($db) = Chado::Db->search( name => $tag )
-          ||  Chado::Db->search( name => "DB:".$tag );
+    my ($db) = Bio::Chado::CDBI::Db->search( name => $tag )
+          ||  Bio::Chado::CDBI::Db->search( name => "DB:".$tag );
     unless ( $db ) {
-        $db = Chado::Db->find_or_create( {
+        $db = Bio::Chado::CDBI::Db->find_or_create( {
                 name       => $tag,
                 contact_id =>  $nullcontact,
             } );
@@ -549,12 +549,12 @@ sub load_Dbxref {
     die "couldn't create db $db" unless $db;
     push @transaction, $db;
 
-    my ($dbxref) = Chado::Dbxref->find_or_create( {
+    my ($dbxref) = Bio::Chado::CDBI::Dbxref->find_or_create( {
             db_id     => $db->id,
             accession => $accession
         } );
     
-    my ($feature_dbxref) = Chado::Feature_Dbxref->find_or_create( {
+    my ($feature_dbxref) = Bio::Chado::CDBI::Feature_Dbxref->find_or_create( {
             feature_id => $chado_feature->id,
             dbxref_id  => $dbxref->id,
         } );
@@ -581,7 +581,7 @@ sub load_Properties {
     my $proptype= $chadoseq->cache_cvterm($propname);
     my $value= $props{$propname};
     ##if (defined $value) {
-    my ($featureprop) = Chado::Featureprop->find_or_create( {
+    my ($featureprop) = Bio::Chado::CDBI::Featureprop->find_or_create( {
             feature_id => $chado_feature->id,
             type_id    => $proptype->id,
             value      => $value,
@@ -635,8 +635,8 @@ dghome2% bin/gmod_load_newseq.pl -v \
    
 Argos::Config using ARGOS_SERVICE=GMOD at /bio/biodb/gmod/lib/Argos/Config.pm line 55.
 
-Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=chado-test,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
-Chado::LoadDBI set_db(Main,dbi:Pg:dbname=chado-test;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
+GMOD::Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=chado-test,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
+GMOD::Chado::LoadDBI set_db(Main,dbi:Pg:dbname=chado-test;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
 Working with Daphnia pulex.
 
 Ontology Sequence Ontology is not loaded; using cDNA at bin/gmod_load_newseq.pl line 309.
@@ -664,8 +664,8 @@ Done
 
 dghome2%  bin/gmod_dump_seq.pl -v -pub='%CGBvntr%' --org="D.pulex" |more
 Argos::Config using ARGOS_SERVICE=GMOD at /bio/biodb/gmod/lib/Argos/Config.pm line 55.
-Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=chado-test,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
-Chado::LoadDBI set_db(Main,dbi:Pg:dbname=chado-test;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
+GMOD::Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=chado-test,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
+GMOD::Chado::LoadDBI set_db(Main,dbi:Pg:dbname=chado-test;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
 Working with Daphnia pulex.
 getFeaturePub 5 n= 0
 
@@ -724,8 +724,8 @@ dghome2%   bin/gmod_load_newseq.pl -v \
    --in=$b/daphnia/data/CGBvntr.fa ->    --in=$b/daphnia/data/CGBvntr.fa  --format=fasta  \
    --type=cDNA  --idmake="WFcd ->    --type=cDNA  --idmake="WFcd"
 Argos::Config using ARGOS_SERVICE=GMOD at /bio/biodb/gmod/lib/Argos/Config.pm line 55.
-Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=daphnia,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
-Chado::LoadDBI set_db(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
+GMOD::Chado::LoadDBI args=HOST=localhost,USERNAME=gilbertd,NAME=daphnia,PASSWORD=,PORT=7302 at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 89.
+GMOD::Chado::LoadDBI set_db(Main,dbi:Pg:dbname=daphnia;port=7302;host=localhost,gilbertd,passwd) at /bio/biodb/gmod/lib/Chado/LoadDBI.pm line 118.
 Working with Daphnia pulex.
 These terms from Sequence Ontology match. Please choose one:
 cDNA_match

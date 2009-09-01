@@ -1,4 +1,4 @@
-package Chado::DBI;
+package GMOD::Chado::DBI;
 use strict;
 use base 'Class::DBI::Pg';
 
@@ -24,7 +24,7 @@ sub init {
   warn "GMOD::Chado::LoadDBI(dbi:Pg:dbname=$dbname$port$host,$vals{USERNAME},passwd)\n" 
     if $ENV{'DEBUG'};
     
-  Chado::DBI->set_db(
+  GMOD::Chado::DBI->set_db(
   'Main',
   "dbi:Pg:dbname=$dbname$port$host", 
    $vals{USERNAME},  
@@ -34,7 +34,7 @@ sub init {
     }
   );
 
-  require Chado::AutoDBI; # now init database tables, etc.
+  require Bio::Chado::AutoDBI; # now init database tables, etc.
 }
 
   
