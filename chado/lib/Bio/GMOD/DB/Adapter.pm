@@ -6,6 +6,7 @@ use DBI;
 use File::Temp;
 use Data::Dumper;
 use URI::Escape;
+use Sys::Hostname;
 use Bio::SeqFeature::Generic;
 use Bio::GMOD::DB::Adapter::FeatureIterator;
 
@@ -182,6 +183,18 @@ use constant INSERT_GFF_SORT_TMP =>
                "INSERT INTO gff_sort_tmp (refseq,id,parent,gffline)
                   VALUES (?,?,?,?)";
 
+use constant CREATE_META_TABLE =>
+               "CREATE TABLE gff_meta (
+                     name        varchar(100),
+                     hostname    varchar(100),
+                     starttime   timestamp not null default now() 
+                )";
+use constant SELECT_FROM_META =>
+               "SELECT name,hostname,starttime FROM gff_meta";
+use constant INSERT_INTO_META =>
+               "INSERT INTO gff_meta (name,hostname) VALUES (?,?)";
+use constant DELETE_FROM_META =>
+               "DELETE FROM gff_meta";
 
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
@@ -1192,6 +1205,111 @@ sub initialize_uniquename_cache {
         $dbh->commit;
         print STDERR "Done.\n";
     }
+    return;
+}
+
+=head2 place_lock
+
+=over
+
+=item Usage
+
+  $obj->place_lock()
+
+=item Function
+
+To place a row in the gff_meta table (creating that table if necessary) 
+that will prevent other users/processes from doing GFF bulk loads while
+the current process is running.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+None
+
+=back
+
+=cut
+
+sub place_lock {
+    my ($self, %argv) = @_;
+
+    #first determine if the meta table exists
+    my $dbh = $self->dbh;
+    my $sth = $dbh->prepare(VERIFY_TMP_TABLE);
+    $sth->execute('gff_meta');
+
+    my ($table_exists) = $sth->fetchrow_array;
+
+    if (!$table_exists) {
+       print STDERR "Creating gff_meta table...\n";
+       $dbh->do(CREATE_META_TABLE); 
+    } 
+
+    #check for existing lock
+    my $select_query = $dbh->prepare(SELECT_FROM_META);
+    $select_query->execute();
+    my @result = $select_query->fetchrow_array;
+
+    if (scalar @result > 0) {
+        my ($name,$host,$time) = @result;
+        my (undef,$pid)  = split /\-/, $name;
+
+        print STDERR "\n\n\nWARNING: There is another gmod_bulk_load_gff3.pl process\n";
+        print STDERR "running on $host, with a process id of $pid\n";
+        print STDERR "which started at $time\n";
+        print STDERR "\nIf that process is no longer running, you can remove the lock by providing\n";
+        print STDERR "the --remove_lock flag when running gmod_bulk_load_gff3.pl\n\n";
+        print STDERR "Note that if the last bulk load process crashed, you may also need the\n";
+        print STDERR "--recreate_cache option as well\n\n";
+
+        exit(-2);
+    }
+
+
+    my $pid = $$;
+    my $name = "gmod_bulk_load_gff3.pl-$pid";
+    my $hostname = hostname;
+
+    my $insert_query = $dbh->prepare(INSERT_INTO_META);
+    $insert_query->execute($name,$hostname);
+
+    return;
+}
+
+=head2 remove_lock
+
+=over
+
+=item Usage
+
+  $obj->remove_lock()
+
+=item Function
+
+To remove the row in the gff_meta table that prevents other gmod_bulk_load_gff3.pl processes from running while the current process is running.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+Nothing
+
+=back
+
+=cut
+
+sub remove_lock {
+    my ($self, %argv) = @_;
+
+    my $dbh = $self->dbh;
+    $dbh->do(DELETE_FROM_META);
+
     return;
 }
 
