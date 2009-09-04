@@ -34,7 +34,7 @@ print OUT <<'!NO!SUBS!';
 
 use strict;
 use warnings;
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
+use lib '/Users/cain/cvs_stuff/schema/chado/lib';
 use Bio::FeatureIO;
 use Getopt::Long;
 use Data::Dumper;
@@ -82,6 +82,7 @@ $0 - Bulk loads gff3 files into a chado database.
  --noexon          Don't convert CDS features to exons (but still create
                      polypeptide features) 
  --recreate_cache  Causes the uniquename cache to be recreated
+ --remove_lock     Remove the lock to allow a new process to run
  --save_tmpfiles   Save the temp files used for loading the database
  --no_target_syn   By default, the loader adds the targetId in 
                      the synonyms list of the feature. This flag 
@@ -418,6 +419,19 @@ continue.
 
 =back
 
+=item The run lock
+
+The bulk loader is not a multiuser application.  If two separate
+bulk load processes try to load data into the database at the same
+time, at least one and possibly all loads will fail.  To keep this from
+happening, the bulk loader places a lock in the database to prevent
+other gmod_bulk_load_gff3.pl processes from running at the same time.
+When the application exits normally, this lock will be removed, but if
+it crashes for some reason, the lock will not be removed.  To remove the
+lock from the command line, provide the flag --remove_lock.  Note that
+if the loader crashed necessitating the removal of the lock, you also
+may need to rebuild the uniquename cache (see the next section).
+
 =item The uniquename cache
 
 The loader uses the chado database to create a table that caches
@@ -531,7 +545,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
     $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER,
-    $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM, $END_SQL );
+    $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM, $END_SQL, $REMOVE_LOCK, );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -556,6 +570,7 @@ GetOptions(
     'noexon'     => \$NOEXON,
     'nouniquecache'=> \$NOUNIQUECACHE,
     'recreate_cache'=> \$RECREATE_CACHE,
+    'remove_lock'   => \$REMOVE_LOCK,
     'save_tmpfiles'=>\$SAVE_TMPFILES,
     'no_target_syn'=> \$NO_TARGET_SYN,
     'unique_target' => \$UNIQUE_TARGET,
@@ -688,6 +703,9 @@ if ($CUSTOM_ADAPTER) {
 
 my $chado = $adapter->new(%argv);
 
+$chado->remove_lock() if $REMOVE_LOCK;
+$chado->place_lock();
+
 #if we need custom ontology mapping, cache them here
 if ($ONTOLOGY) {
   my @pairs = split /\,/, $ONTOLOGY;
@@ -746,6 +764,7 @@ if ($DELETE && !$DELETE_CONFIRM) {
     }
     else {
         warn "OK, I'm stopping instead.\n\n";
+        $chado->remove_lock();
         exit(0);
     }
 }
@@ -1036,6 +1055,7 @@ if ($END_SQL) {
   $chado->dbh->do($END_SQL);
 }
 
+$chado->remove_lock();
 exit(0);
 
 !NO!SUBS!
