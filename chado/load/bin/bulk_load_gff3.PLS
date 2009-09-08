@@ -703,7 +703,7 @@ if ($CUSTOM_ADAPTER) {
 
 my $chado = $adapter->new(%argv);
 
-$chado->remove_lock() if $REMOVE_LOCK;
+$chado->remove_lock(force => 1) if $REMOVE_LOCK;
 $chado->place_lock();
 
 #if we need custom ontology mapping, cache them here

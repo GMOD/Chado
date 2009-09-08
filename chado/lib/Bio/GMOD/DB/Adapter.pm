@@ -194,7 +194,7 @@ use constant SELECT_FROM_META =>
 use constant INSERT_INTO_META =>
                "INSERT INTO gff_meta (name,hostname) VALUES (?,?)";
 use constant DELETE_FROM_META =>
-               "DELETE FROM gff_meta";
+               "DELETE FROM gff_meta WHERE name = ? AND hostname = ?";
 
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
@@ -1252,23 +1252,23 @@ sub place_lock {
     #check for existing lock
     my $select_query = $dbh->prepare(SELECT_FROM_META);
     $select_query->execute();
-    my @result = $select_query->fetchrow_array;
 
-    if (scalar @result > 0) {
+    while (my @result = $select_query->fetchrow_array) {
         my ($name,$host,$time) = @result;
-        my (undef,$pid)  = split /\-/, $name;
+        my ($progname,$pid)  = split /\-/, $name;
 
-        print STDERR "\n\n\nWARNING: There is another gmod_bulk_load_gff3.pl process\n";
-        print STDERR "running on $host, with a process id of $pid\n";
-        print STDERR "which started at $time\n";
-        print STDERR "\nIf that process is no longer running, you can remove the lock by providing\n";
-        print STDERR "the --remove_lock flag when running gmod_bulk_load_gff3.pl\n\n";
-        print STDERR "Note that if the last bulk load process crashed, you may also need the\n";
-        print STDERR "--recreate_cache option as well\n\n";
+        if ($progname = 'gmod_bulk_load_gff3.pl') {
+            print STDERR "\n\n\nWARNING: There is another gmod_bulk_load_gff3.pl process\n";
+            print STDERR "running on $host, with a process id of $pid\n";
+            print STDERR "which started at $time\n";
+            print STDERR "\nIf that process is no longer running, you can remove the lock by providing\n";
+            print STDERR "the --remove_lock flag when running gmod_bulk_load_gff3.pl\n\n";
+            print STDERR "Note that if the last bulk load process crashed, you may also need the\n";
+            print STDERR "--recreate_cache option as well\n\n";
 
-        exit(-2);
+            exit(-2);
+        }
     }
-
 
     my $pid = $$;
     my $name = "gmod_bulk_load_gff3.pl-$pid";
@@ -1298,7 +1298,7 @@ Nothing
 
 =item Arguments
 
-Nothing
+None
 
 =back
 
@@ -1308,7 +1308,18 @@ sub remove_lock {
     my ($self, %argv) = @_;
 
     my $dbh = $self->dbh;
-    $dbh->do(DELETE_FROM_META);
+    my $select_query = $dbh->prepare(SELECT_FROM_META);
+    $select_query->execute();
+
+    my $delete_query = $dbh->prepare(DELETE_FROM_META);
+
+    while (my @result = $select_query->fetchrow_array) {
+        my ($name,$host,$time) = @result;
+
+        if ($name =~ /gmod_bulk_load_gff3/) {
+            $delete_query->execute($name,$host);
+        }
+    }
 
     return;
 }
