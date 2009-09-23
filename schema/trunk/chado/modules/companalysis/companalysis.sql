@@ -53,7 +53,8 @@ create table analysisprop (
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
-    constraint analysisprop_c1 unique (analysis_id,type_id,value)
+    rank int not null default 0,
+    constraint analysisprop_c1 unique (library_id,type_id,rank)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
 create index analysisprop_idx2 on analysisprop (type_id);
