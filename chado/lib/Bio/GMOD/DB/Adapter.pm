@@ -1125,6 +1125,10 @@ sub organism_id {
     } else { # 2nd way
       $sth = $self->dbh->prepare("SELECT organism_id FROM organism WHERE common_name = ? OR abbreviation = ?");
       $sth->execute($organism_name, $organism_name);
+
+      if ($sth->rows > 1) {
+          die "more than one organism with the common name $organism_name,\ntry using the abbreviation or the genus and species in quotes instead";
+      }
     }
     ($orgid) = $sth->fetchrow_array; 
 
