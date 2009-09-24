@@ -155,8 +155,8 @@ lib/Bio/GMOD/DB/Tools/ETA.pm
 lib/Bio/GMOD/Load.pm
 lib/Bio/GMOD/Load/GFF.pm
 lib/Bio/GMOD/SeqUtils.pm
-lib/Chado/Builder.pm
-lib/Chado/Config.pm
+lib/Bio/Chado/Builder.pm
+lib/Bio/Chado/Config.pm
 lib/CXGN/Chado/CV.pm
 lib/CXGN/Chado/Cvterm.pm
 lib/CXGN/Chado/Db.pm
