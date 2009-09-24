@@ -1127,7 +1127,7 @@ sub organism_id {
       $sth->execute($organism_name, $organism_name);
 
       if ($sth->rows > 1) {
-          die "more than one organism with the common name $organism_name,\ntry using the abbreviation or the genus and species in quotes instead";
+          die "\n\nMore than one organism with the common name $organism_name,\ntry using the abbreviation or the genus and species in quotes instead\n\n";
       }
     }
     ($orgid) = $sth->fetchrow_array; 
