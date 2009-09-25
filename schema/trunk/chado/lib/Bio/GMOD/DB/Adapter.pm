@@ -170,6 +170,10 @@ use constant VALIDATE_TYPE_ID =>
                     WHERE type_id = ? AND
                           organism_id = ? AND
                           uniquename = ?";
+use constant VALIDATE_ORGANISM_ID =>
+               "SELECT feature_id FROM public.tmp_gff_load_cache
+                    WHERE organism_id = ? AND
+                          uniquename = ?";
 use constant VALIDATE_UNIQUENAME =>
                "SELECT feature_id FROM public.tmp_gff_load_cache WHERE uniquename=?";
 use constant INSERT_CACHE_TYPE_ID =>
@@ -326,6 +330,8 @@ sub prepare_queries {
                                   = $dbh->prepare(SEARCH_SYNONYM);
   $self->{'queries'}{'validate_type_id'}
                                   = $dbh->prepare(VALIDATE_TYPE_ID);
+  $self->{'queries'}{'validate_organism_id'}
+                                  = $dbh->prepare(VALIDATE_ORGANISM_ID);
   $self->{'queries'}{'validate_uniquename'}
                                   = $dbh->prepare(VALIDATE_UNIQUENAME);
   $self->{'queries'}{'insert_cache_type_id'}
@@ -992,6 +998,16 @@ sub uniquename_cache {
             my ($feature_id) 
                  = $self->{'queries'}{'validate_type_id'}->fetchrow_array; 
 
+            return $feature_id;
+        }
+        elsif (defined $argv{organism_id}) { #validate uniquename and organism
+            $self->{'queries'}{'validate_organism_id'}->execute(
+                $argv{organism_id},
+                $argv{uniquename},
+            ); 
+
+            my ($feature_id)
+                 = $self->{'queries'}{'validate_organism_id'}->fetchrow_array;
             return $feature_id;
         }
         else { #just validate the uniquename
@@ -2366,8 +2382,10 @@ sub print_seq {
   my $self = shift;
   my ($name,$string) = @_;
 
-  my $uniquename = $self->modified_uniquename(orig_id=>$name)
-                 ? $self->modified_uniquename(orig_id=>$name)
+  my $organism_id = $self->organism_id;
+
+  my $uniquename = $self->modified_uniquename(orig_id=>$name, organism_id => $organism_id)
+                 ? $self->modified_uniquename(orig_id=>$name, organism_id => $organism_id)
                  : $name;
 
   my $fh = $self->file_handles('sequence');
@@ -2740,7 +2758,9 @@ sub uniquename_validation {
 
 =item Usage
 
-  $obj->modified_uniquename(orig_id => $id, modified_id => $new_id)
+  $obj->modified_uniquename(orig_id     => $id, 
+                            modified_id => $new_id, 
+                            organism_id => $organism_id)
 
 =item Function
 
@@ -2749,14 +2769,15 @@ GFF3 ID so relationships in the GFF3 can be properly represented in Chado.
 
 =item Returns
 
-When called with two pairs of args, nothing.  When called with one pair of
-args, return the value of the other arg.  For example, when called with
-"orig_id => $id", the method would return $new_id.
+When called with all three pairs of args, nothing.  When called with one of
+orig_id or modified_id args, return the value of the other arg.  For example,
+when called with "orig_id => $id", the method would return $new_id.
 
 =item Arguments
 
 Two possible hash pairs: orig_id for the ID that was present in the GFF file
-and modified_id for the uniquename that will be in Chado.
+and modified_id for the uniquename that will be in Chado.  Additionally,
+the organism_id hash pair must be supplied.
 
 =back
 
@@ -2765,16 +2786,29 @@ and modified_id for the uniquename that will be in Chado.
 sub modified_uniquename {
     my ($self, %argv) = @_;
 
+    if (!defined $argv{'organism_id'}) {
+        confess "organism_id must be supplied to the modified_uniquename method";
+    }
+
     if (defined $argv{'orig_id'} && defined $argv{'modified_id'}) { #set
-        $self->{'modified_uniquename'}->{'orig2mod'}->{$argv{'orig_id'}} = $argv{'modified_id'};
-        $self->{'modified_uniquename'}->{'mod2orig'}->{$argv{'modified_id'}} = $argv{'orig_id'};
+
+        cluck "organism_id is: ",$argv{'organism_id'};
+
+        $self->{'modified_uniquename'}->
+                    {$argv{'organism_id'}}->
+                         {'orig2mod'}->
+                              {$argv{'orig_id'}} = $argv{'modified_id'};
+        $self->{'modified_uniquename'}->
+                    {$argv{'organism_id'}}->
+                         {'mod2orig'}->
+                              {$argv{'modified_id'}} = $argv{'orig_id'};
         return;
     }
     elsif (defined $argv{'orig_id'}) {
-        return $self->{'modified_uniquename'}->{'orig2mod'}->{$argv{'orig_id'}}; 
+        return $self->{'modified_uniquename'}->{$argv{'organism_id'}}->{'orig2mod'}->{$argv{'orig_id'}}; 
     }
     elsif (defined $argv{'modified_id'}) {
-        return $self->{'modified_uniquename'}->{'mod2orig'}->{$argv{'modified_id'}};
+        return $self->{'modified_uniquename'}->{$argv{'organism_id'}}->{'mod2orig'}->{$argv{'modified_id'}};
     }
     else {
         cluck"this shouldn't happen in modified_uniquename";
@@ -3091,6 +3125,7 @@ sub handle_target {
     my $self = shift;
     my ($feature, $uniquename,$name,$featuretype,$type) = @_;
 
+    my $organism_id = $self->organism_id;
     my @targets = $feature->annotation->get_Annotations('Target');
     my $rank = 1;
     foreach my $target (@targets) {
@@ -3106,8 +3141,8 @@ sub handle_target {
       my $created_target_feature = 0;
 
       #check for an existing feature with the Target's uniquename
-      my $real_target_id = $self->modified_uniquename(orig_id => $target_id) ?
-                           $self->modified_uniquename(orig_id => $target_id)
+      my $real_target_id = $self->modified_uniquename(orig_id => $target_id, organism_id => $organism_id) ?
+                           $self->modified_uniquename(orig_id => $target_id, organism_id => $organism_id)
                          : $target_id;
       if ( $self->uniquename_cache(validate=>1,uniquename=>$real_target_id) ) {
           $self->print_floc(
@@ -3724,6 +3759,8 @@ sub handle_CDS {
     my $feat = shift;
     my $dbh  = $self->dbh;
 
+    my $organism_id = $self->organism_id;
+
 #    warn Dumper($feat);
 
     my $feat_id     = ($feat->annotation->get_Annotations('ID'))[0]->value
@@ -3735,8 +3772,8 @@ sub handle_CDS {
     #assume that an exon can have at most one grandparent (gene, operon)
     my $first_parent = $feat_parents[0];
     my $f_parent_uniquename 
-            = $self->modified_uniquename(orig_id=>$first_parent)
-            ? $self->modified_uniquename(orig_id=>$first_parent)
+            = $self->modified_uniquename(orig_id=>$first_parent, organism_id => $organism_id)
+            ? $self->modified_uniquename(orig_id=>$first_parent, organism_id => $organism_id)
             : $first_parent;
     my $parent_id = $self->cache('feature',$f_parent_uniquename) if $f_parent_uniquename;
 
@@ -4171,10 +4208,12 @@ sub handle_parent {
     my $self = shift;
     my ($feature) = @_;
 
+    my $organism_id = $self->organism_id;
+
     for my $p_anot ( $feature->annotation->get_Annotations('Parent') ) {
         my $orig_pname  = $p_anot->value;
-        my $pname = $self->modified_uniquename(orig_id => $orig_pname)
-                    ? $self->modified_uniquename(orig_id => $orig_pname)
+        my $pname = $self->modified_uniquename(orig_id => $orig_pname, organism_id => $organism_id)
+                    ? $self->modified_uniquename(orig_id => $orig_pname, organism_id => $organism_id)
                     : $orig_pname;
         my $parent = $self->cache('feature',$pname);
         confess "\nno parent $orig_pname ($pname);\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
@@ -4191,10 +4230,12 @@ sub handle_derives_from {
     my $self = shift;
     my ($feature) = @_;
 
+    my $organism_id = $self->organism_id;
+
     for my $p_anot ( $feature->annotation->get_Annotations('Derives_from') ) {
         my $orig_pname  = $p_anot->value;
-        my $pname = $self->modified_uniquename(orig_id => $orig_pname)
-                    ? $self->modified_uniquename(orig_id => $orig_pname)
+        my $pname = $self->modified_uniquename(orig_id => $orig_pname, organism_id => $organism_id)
+                    ? $self->modified_uniquename(orig_id => $orig_pname, organism_id => $organism_id)
                     : $orig_pname; 
         my $parent = $self->cache('feature',$pname);
         confess "no parent ".$orig_pname unless $parent;
@@ -4303,6 +4344,8 @@ sub src_second_chance {
     my $self = shift;
     my ($feature) = @_;
 
+    my $organism_id = $self->organism_id;
+
     my $src;
     if($feature->seq_id eq '.'){
       $src = '\N';
@@ -4310,8 +4353,8 @@ sub src_second_chance {
 
       #check to see if the uniquename had to be changed
       my $src_uniquename = 
-             $self->modified_uniquename(orig_id => $feature->seq_id) ?
-             $self->modified_uniquename(orig_id => $feature->seq_id)
+             $self->modified_uniquename(orig_id => $feature->seq_id, organism_id => $organism_id) ?
+             $self->modified_uniquename(orig_id => $feature->seq_id, organism_id => $organism_id)
            : $feature->seq_id;
 
       my ($temp_f_id)= $self->uniquename_cache(
@@ -4361,6 +4404,8 @@ sub get_src_seqlen {
     my $self = shift;
     my ($feature) = @_;
 
+    my $organism_id = $self->organism_id;
+
     my ($src,$seqlen);
     if ( defined(($feature->annotation->get_Annotations('ID'))[0])
          && $feature->seq_id
@@ -4374,10 +4419,16 @@ sub get_src_seqlen {
 
     } else { # normal case
       my $src_uniquename 
-                = $self->modified_uniquename(orig_id=>$feature->seq_id) 
-                ? $self->modified_uniquename(orig_id=>$feature->seq_id)
+                = $self->modified_uniquename(orig_id=>$feature->seq_id, organism_id => $organism_id) 
+                ? $self->modified_uniquename(orig_id=>$feature->seq_id, organism_id => $organism_id)
                 : $feature->seq_id;
-      $src = $self->cache('feature',$feature->seq_id);
+      $src = $self->uniquename_cache(
+                                        validate    => 1,
+                                        organism_id => $organism_id,
+                                        uniquename  => $src_uniquename
+                                    );
+      warn "using new src sub";
+#      $src = $self->cache('feature',$feature->seq_id);
       $seqlen = '\N';
     }
 
