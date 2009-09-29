@@ -42,7 +42,7 @@ use CXGN::Chado::Publication;
 use CXGN::Chado::Feature;
 use CXGN::Chado::Db;
 
-use base qw / CXGN::Chado::Main /;
+use base qw / CXGN::DB::Object /;
 
 
 =head2 new
@@ -137,22 +137,31 @@ sub fetch {
 
 sub store {
     my $self= shift;
-    my $dbxref_id= $self->get_dbxref_id();
+    my $dbxref_id= $self->get_dbxref_id() ;
     if (!$dbxref_id) { #do an insert 
 	if (!$self->db_exists() ) { # insert a new db 
-	    print STDERR "***Dbxref.pm: storing a new db '".$self->get_db_name() ."'.\n";
+	    $self->d( "***Dbxref.pm: storing a new db '".$self->get_db_name() ."'.\n");
 	    my $db=CXGN::Chado::Db->new($self->get_dbh() );
 	    $db->set_db_name($self->get_db_name() );
 	    $db->store;
 	    $self->set_db_id($db->get_db_id() );
+	}else { 
+	    my $q= "SELECT db_id FROM db WHERE db.name = ?";
+	    my $s=$self->get_dbh()->prepare($q);
+	    $s->execute($self->get_db_name() ) ;
+	    my ($db_id)= $s->fetchrow_array();
+	    $self->set_db_id($db_id);
 	}
-	#insert the new dbxref 
-	my $query = "INSERT INTO public.dbxref (db_id, accession, description, version) VALUES((SELECT db_id FROM db WHERE db.name = ?),?,?,?)";
-	my $sth= $self->get_dbh()->prepare($query);
-	if (!$self->get_version()) { $self->set_version(""); } #version field is not null
-	$sth->execute($self->get_db_name, $self->get_accession, $self->get_description, $self->get_version());
-	$dbxref_id=  $self->get_dbh()->last_insert_id("dbxref", "public");
-	$self->set_dbxref_id($dbxref_id);
+	my $existing_id= $self->exists_in_database();
+	if (!$existing_id) {
+	    #insert the new dbxref 
+	    my $query = "INSERT INTO public.dbxref (db_id, accession, description, version) VALUES(?,?,?,?)";
+	    my $sth= $self->get_dbh()->prepare($query);
+	    if (!$self->get_version()) { $self->set_version(""); } #version field is not null
+	    $sth->execute($self->get_db_id, $self->get_accession, $self->get_description, $self->get_version());
+	    $dbxref_id=  $self->get_dbh()->last_insert_id("dbxref", "public");
+	    $self->set_dbxref_id($dbxref_id);
+	} else { $self->set_dbxref_id($existing_id); }
     }else {	 # do an update
 	my $query = "UPDATE public.dbxref SET description=?, version=? WHERE dbxref_id=?";
 	my $sth= $self->get_dbh()->prepare($query);
@@ -160,6 +169,28 @@ sub store {
     }
     return $dbxref_id; 
 }
+
+=head2 exists_in_database
+
+ Usage: $self->exists_in_database() 
+ Desc:   check if the dbxref exists with the db_id, accession, and version
+         prior to updating 
+ Ret:    dbxref_id or undef if no dbxref exists
+ Args:   non 
+ Side Effects: none
+ Example:
+
+=cut
+
+sub exists_in_database {
+    my $self=shift;
+    my $query="SELECT dbxref_id FROM public.dbxref WHERE db_id=? AND  accession=?";
+    my $sth=$self->get_dbh()->prepare($query);
+    $sth->execute($self->get_db_id(), $self->get_accession());
+    my ($existing_id) = $sth->fetchrow_array();
+    return $existing_id;
+}
+
 
 =head2 Class properties
 The following class properties have accessors (get_dbxref_id, set_dbxref_id...):  

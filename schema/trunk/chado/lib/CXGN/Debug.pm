@@ -1,5 +1,3 @@
-
-
 =head1 NAME
 
 CXGN::Debug - a utility class for handling debug messages
@@ -47,7 +45,6 @@ use strict;
 package CXGN::Debug;
 
 use CXGN::VHost;
-require Apache2::RequestUtil;
 
 =head2 new()
 
@@ -129,6 +126,8 @@ sub debug {
         warn "$message";
 
         if ($ENV{MOD_PERL}) {
+            require Apache2::RequestUtil
+                or die "must have Apache2::RequestUtil installed to use CXGN::Debug under mod_perl";
             my $r= Apache2::Request->new();
             $r->log()->debug($message);
         }
@@ -140,3 +139,9 @@ sub d {
     my $self = shift;
     $self->debug(@_);
 }
+
+
+###
+1;#do not remove
+###
+
