@@ -111,7 +111,7 @@ sub connect {
   open (my $TTY, '>', '/dev/tty') or die "what the heck - no TTY??\n";
 
   my $un = "postgres";
-  print $TTY "Halt! Who goes there? (default \"$un\"): ";
+  print $TTY "Database username for write access (default \"$un\"): ";
 
   use Term::ReadKey;
   ReadMode 'normal';
@@ -122,7 +122,7 @@ sub connect {
   }
   $dbargs->{dbuser} = $un;
 
-  print $TTY 'Password for write access: ';
+  print $TTY 'Password: ';
 
   use Term::ReadKey;
   ReadMode 'noecho';

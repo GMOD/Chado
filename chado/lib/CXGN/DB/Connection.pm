@@ -1,7 +1,5 @@
 package CXGN::DB::Connection;
 use strict;
-use vars qw/$AUTOLOAD/;
-use English;
 
 use UNIVERSAL qw/isa/;
 use Carp qw/cluck croak carp/;
@@ -191,8 +189,6 @@ facilities.  See L<DBI> perldoc.
 
 =cut
 
-#the new() method is now defined by Class::MethodMaker above
-
 =head2 new_no_connect
 
   Desc: Same as above, except does not connect to the database.
@@ -328,18 +324,9 @@ sub new_no_connect {
   return $self;
 }
 
-=head2 new
-
-  Desc: called by new to set up the new object's internal state
-  Args: same as for new
-  Ret : nothing
-
-=cut
-
 sub _compact_backtrace {
     return join '/', map {join(':',(caller($_))[0,2])} 1..3;
 }
-
 
 my $debug = CXGN::Debug->new;
 
@@ -431,16 +418,6 @@ sub dbh {
   return shift;
 }
 
-# =head2 get_dbh
-
-# Alias for dbh method.
-
-# =cut
-
-# sub get_dbh {
-#   carp __PACKAGE__.': the get_dbh() method is deprecated';
-#   return shift;
-# }
 
 =head2 get_actual_dbh
 
@@ -456,10 +433,6 @@ sub dbh {
 sub get_actual_dbh {
   shift->_dbh;
 }
-
-
-
-
 
 =head2 get_connection_parameters
 
@@ -482,8 +455,6 @@ sub get_connection_parameters {
 }
 
 =head2 dbtype
-
-  PRIVATE
 
   Desc: get the database type set on this connection
   Args: none
@@ -513,15 +484,35 @@ sub _dbtype {
 =head2 dbname
 
   Usage: my $n = $dbc->dbname
-  Desc :
   Ret  : the name of the database we're currently connected to
   Args : none
   Side Effects: none
-  Example:
 
 =cut
 
 sub dbname { shift->_dbname } #keep this read-only
+
+=head2 dbuser
+
+  Usage: my $n = $dbc->dbname
+  Ret  : the name of the db user for this connection
+  Args : none
+  Side Effects: none
+
+=cut
+
+sub dbuser { shift->_dbuser } #keep this read-only
+
+=head2 dbpass
+
+  Usage: my $n = $dbc->dbpass
+  Ret  : the password used for this connection
+  Args : none
+  Side Effects: none
+
+=cut
+
+sub dbpass { shift->_dbpass } #keep this read-only
 
 =head2 dbhost
 

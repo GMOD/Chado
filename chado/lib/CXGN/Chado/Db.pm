@@ -40,7 +40,7 @@ use strict;
 
 package CXGN::Chado::Db;
 
-use base qw / CXGN::Chado::Main /;
+use base qw / CXGN::DB::Object /;
 
 
 =head2 new

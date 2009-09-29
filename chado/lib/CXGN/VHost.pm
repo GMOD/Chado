@@ -372,6 +372,55 @@ sub _get_conf {
     }
 }
 
+=head2 get_conf_keys
+
+ Usage:        my @keys = $vh->get_conf_keys();
+ Desc:         returns all the possible conf keys 
+               defined for the current $vh object
+ Ret:          a list of strings
+ Args:         none
+ Side Effects: none
+
+=cut
+
+sub get_conf_keys {
+    my $self = shift;
+
+    my @keys = ();
+    @keys = keys %{$self->{vhost_config}};
+
+    @keys = (@keys, keys(%{$self->{conf_object}->get_conf_hashref_single_values}));
+
+    return @keys;
+
+}
+
+=head2 get_conf_hash
+
+ Usage:
+ Desc:
+ Ret:
+ Args:
+ Side Effects:
+ Example:
+
+=cut
+
+sub get_conf_hash {
+    my $self = shift;
+
+    my %hash = ();
+
+    foreach my $k ($self->get_conf_keys()) { 
+	$hash{$k} = $self->get_conf($k);
+    }
+    return %hash;
+    
+}
+
+
+
+
 
 # no arguments.  returns a piece of text containing a <VirtualHost>
 # block for a vhost that does nothing but direct requests for the
