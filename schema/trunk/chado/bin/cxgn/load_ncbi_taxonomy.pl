@@ -8,12 +8,37 @@
  Usage: perl load_ncbi_taxonomy.pl -H [dbhost] -D [dbname] [-vt] -i file
 
 populate a chado database with organism information (see the organism module and phylogeny module)
-Requires downloading from  NCBI
-ftp://ftp.ncbi.nih.gov/pub/taxonomy/
-names.dmp
-nodes.dmp
 
-parameters
+=head2 Prerequisites
+
+=over 4
+
+=item 1. Load taxonomy cvterms 
+
+see load_taxonomy_cvterms.pl
+
+=item 2. A cvterm with name = 'synonym'
+This is required for storing the organism synonyms as organismprops.
+
+<in SGN this term is stored under a 'null' cv name. It is not hardcoded in this script, since different databases might have a 'synonym' term stored under different cv>
+
+=item 3. Download NCBI taxonomy files 
+
+ftp://ftp.ncbi.nih.gov/pub/taxonomy/
+
+Save these 2 files in the same dir. of this script 
+ names.dmp
+ nodes.dmp
+
+=item 4. Download a taxon_id list from NCBI
+
+Optional. This filter file will include the taxons you would like to store in your tree (see option -i).
+Without this file the entire NCBI taxonomy will be stored in your database! 
+
+=back 
+
+
+=head2 parameters
 
 =over 7
 
@@ -94,7 +119,7 @@ Adapted from GMOD load_taxonomy.pl:
 by
 Naama Menda <nm249@cornell.edu>
 
-=head1 VERSION AND DATE
+=head1 VERISON AND DATE
 
 Version 1.0, June 2009.
 
