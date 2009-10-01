@@ -9,13 +9,17 @@ use URI::Escape;
 
 =head1 NAME
                                                                                 
-dump_gff3.pl - Dump gff3 from a chado database.
+DEPRECATED dump_gff3.pl - Dump gff3 from a chado database.
                                                                                 
 =head1 SYNOPSIS
                                                                                 
   % dump_gff3.pl [--organism human] [--refseq Chr_1] > out.gff
                                                                                 
 =head1 COMMAND-LINE OPTIONS
+
+WARNING: This script has been DEPRECATED and is no longer supported.
+Please use gmod_bulkfiles.pl for getting GFF3 dumps from a Chado database.
+
 
 If no arguments are provided, dump_gff3.pl will dump all features
 for the default organism in the database.  The command line options
@@ -39,6 +43,15 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
                                                                                 
 =cut
+
+print STDERR <<END;
+
+This script is quite old and no longer supported.  Please use 
+gmod_bulkfiles.pl for getting GFF out of Chado.
+
+END
+
+exit(0);
 
 
 my ($ORGANISM,$REFSEQ,$DBCONF,$FEATURE_IDS);
