@@ -922,15 +922,34 @@ sub initialize {
     }
     cache_cvterm('region',$so->id); #make sure to get the SO region term
 
-    ($chado_organism) = Bio::Chado::CDBI::Organism->search( common_name => lc($ORGANISM))
-        unless $chado_organism;
-    ($chado_organism) = Bio::Chado::CDBI::Organism->search( abbreviation => ucfirst($ORGANISM))
-        unless($chado_organism);
-    ($chado_organism) = Bio::Chado::CDBI::Organism->search( genus => $ORGANISM  )
-        unless($chado_organism);
+    my @chado_organisms = Bio::Chado::CDBI::Organism->search( common_name => lc($ORGANISM));
+    if (scalar @chado_organisms > 1) {
+        die "More than one organism has the common name $ORGANISM.  Please\n"
+         . "rerun the loader, specifying the the abbreviation or the genus\n"
+         . "and species enclosed in quotes\n\n";
+    }
+    elsif (scalar @chado_organisms == 1) {
+        $chado_organism = $chado_organisms[0];
+    }
+ 
+    @chado_organisms = Bio::Chado::CDBI::Organism->search( abbreviation => ucfirst($ORGANISM)) unless($chado_organism);
+    if (scalar @chado_organisms > 1) {
+        die "More than one organism has the abbreviation $ORGANISM.  Please\n"
+         . "rerun the loader, specifying the the genus and species enclosed in quotes\n\n";
+    }
+    elsif (scalar @chado_organisms == 1) {
+        $chado_organism = $chado_organisms[0];
+    }
+    else {
+        my ($genus, $species) = split /\s+/, $ORGANISM;
+        ($chado_organism) = Bio::Chado::CDBI::Organism->search(
+                                                   genus   => $genus,
+                                                   species => $species  );
+    }
 
-    ($chado_db)       = Bio::Chado::CDBI::Db->search( name              => $SRC_DB ) if $SRC_DB;
-    ($nullpub)        = Bio::Chado::CDBI::Pub->search( miniref          => 'null' );
+
+    ($chado_db) = Bio::Chado::CDBI::Db->search( name    => $SRC_DB ) if $SRC_DB;
+    ($nullpub)  = Bio::Chado::CDBI::Pub->search(miniref => 'null' );
 
     unless ($chado_organism) {
       warn "\n\nCouldn't find or create organism $ORGANISM.\n";
