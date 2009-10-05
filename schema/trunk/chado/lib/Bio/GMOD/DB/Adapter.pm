@@ -4427,7 +4427,6 @@ sub get_src_seqlen {
                                         organism_id => $organism_id,
                                         uniquename  => $src_uniquename
                                     );
-      warn "using new src sub";
 #      $src = $self->cache('feature',$feature->seq_id);
       $seqlen = '\N';
     }
