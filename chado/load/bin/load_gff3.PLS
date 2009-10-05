@@ -266,6 +266,21 @@ $feature_count += load_segments($gffio);
 
 while ( my $gff_feature = $gffio->next_feature() ) {
 
+    cache_cvterm( $gff_feature->primary_tag, $so->id );
+    my ($chado_type) = $cvterm{ $gff_feature->primary_tag };
+
+    die $gff_feature->primary_tag
+      . " could not be found in your cvterm table.\n"
+      . "Either the Sequence Ontology was incorrectly loaded,\n"
+      . "or this file doesn't contain GFF3"
+      unless $chado_type;
+
+    if ($gff_feature->primary_tag eq "CDS") {
+        warn "This GFF file contains CDS features, but this loader has not\n"
+      . "yet been modified to handle CDS features in the standard GMOD/Chado\n"
+      . "way.  It is suggested that you use gmod_bulk_load_gff3.pl instead\n\n";
+    }
+
     my ($id) =
         $gff_feature->has_tag('ID')
       ? $gff_feature->get_tag_values('ID')
@@ -314,15 +329,6 @@ while ( my $gff_feature = $gffio->next_feature() ) {
         );
         $dbxref{$id} = $chado_dbxref;
     }
-
-    cache_cvterm( $gff_feature->primary_tag, $so->id );
-    my ($chado_type) = $cvterm{ $gff_feature->primary_tag };
-
-    die $gff_feature->primary_tag
-      . " could not be found in your cvterm table.\n"
-      . "Either the Sequence Ontology was incorrectly loaded,\n"
-      . "or this file doesn't contain GFF3"
-      unless $chado_type;
 
     my $chado_feature =
       load_feature_locations( $gff_feature, $chado_type, $id );
