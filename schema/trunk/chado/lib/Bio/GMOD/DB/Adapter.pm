@@ -2792,7 +2792,7 @@ sub modified_uniquename {
 
     if (defined $argv{'orig_id'} && defined $argv{'modified_id'}) { #set
 
-        cluck "organism_id is: ",$argv{'organism_id'};
+        #cluck "organism_id is: ",$argv{'organism_id'};
 
         $self->{'modified_uniquename'}->
                     {$argv{'organism_id'}}->
