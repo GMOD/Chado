@@ -139,7 +139,7 @@ use Getopt::Std;
 
 our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i, $opt_p, $opt_g);
 
-getopts('H:D:i:p:tv');
+getopts('H:D:i:p:g:tv');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
