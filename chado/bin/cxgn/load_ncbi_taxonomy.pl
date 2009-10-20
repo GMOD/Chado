@@ -11,18 +11,13 @@ populate a chado database with organism information (see the organism module and
 
 =head2 Prerequisites
 
-=over 4
+=over 3
 
 =item 1. Load taxonomy cvterms 
 
 see load_taxonomy_cvterms.pl
 
-=item 2. A cvterm with name = 'synonym'
-This is required for storing the organism synonyms as organismprops.
-
-<in SGN this term is stored under a 'null' cv name. It is not hardcoded in this script, since different databases might have a 'synonym' term stored under different cv>
-
-=item 3. Download NCBI taxonomy files 
+=item 2. Download NCBI taxonomy files 
 
 ftp://ftp.ncbi.nih.gov/pub/taxonomy/
 
@@ -30,7 +25,7 @@ Save these 2 files in the same dir. of this script
  names.dmp
  nodes.dmp
 
-=item 4. Download a taxon_id list from NCBI
+=item 3. Download a taxon_id list from NCBI
 
 Optional. This filter file will include the taxons you would like to store in your tree (see option -i).
 Without this file the entire NCBI taxonomy will be stored in your database! 
@@ -121,11 +116,10 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERISON AND DATE
 
-Version 1.0, June 2009.
+Version 2.0, October 2009.
 
 =head1 TODO
 
-Add an option for updating phlonode (requires wiping out the phylonodes of this phylotree and recalulating everything) 
 
 
 =cut
@@ -134,11 +128,7 @@ Add an option for updating phlonode (requires wiping out the phylonodes of this 
 #! /usr/bin/perl
 
 use strict;
-use CXGN::DB::InsertDBH;
-use CXGN::DB::Connection;
-use CXGN::Chado::Organism;
-use CXGN::Chado::Db;
-use CXGN::Chado::Dbxref;
+
 
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
@@ -156,39 +146,48 @@ my $dbname = $opt_D;
 my $infile = $opt_i;
 my $phylotree_name= $opt_p || 'NCBI taxonomy tree';
 my $DBPROFILE = $opt_g ;
-my $gmod_conf = Bio::GMOD::Config->new() if $opt_g;
-my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) if $opt_g;
 
 print "H= $opt_H, D= $opt_D, v=$opt_v, t=$opt_t, i=$opt_i  \n";
 
-my $dbh;
-if (!$dbhost && !$dbname) { 
-    $dbh= CXGN::DB::Connection->new();
-} else {
+my ($dbh, $schema);
+
+if ($opt_g) {
+    my $DBPROFILE = $opt_g;
+    $DBPROFILE ||= 'default';
+    my $gmod_conf = Bio::GMOD::Config->new() ;
+    my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) ;
+    
+    $dbhost ||= $db_conf->host();
+    $dbname ||= $db_conf->name();
+    
+    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+    
+    $schema= Bio::Chado::Schema->connect( $db_conf->dbh(), $db_conf->user(), $db_conf->password() );
+    $dbh=$schema->storage->dbh();
+
+}else { 
+    require CXGN::DB::InsertDBH;
     $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
 				       dbname=>$dbname,
-				       dbschema => 'public', 
-				       #dbprofile=>$DBPROFILE,
+				       dbschema=>'public',
 				     } );
+    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
 }
-
-my $schema= Bio::Chado::Schema->connect(  sub { $dbh->get_actual_dbh() },
-					  { on_connect_do => ['SET search_path TO public, sgn'],
-					  },);
+if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 my $sth;
 my %okay_level = map { chomp; $_=>1 } grep { $_ !~ /^#/ } <DATA>;
 my %node = ();
 my %seen = ();
 my %seq  = (
-  db       => 'db_db_id_seq',
-  organism => 'organism_organism_id_seq',
-  dbxref   => 'dbxref_dbxref_id_seq',
-  organism_dbxref => 'organism_dbxref_organism_dbxref_id_seq',
-  phylotree=> 'phylotree_phylotree_id_seq',
-  phylonode=> 'phylonode_phylonode_id_seq',
-  phylonode_organism => 'phylonode_organism_phylonode_organism_id_seq',
-);
+    db       => 'db_db_id_seq',
+    organism => 'organism_organism_id_seq',
+    dbxref   => 'dbxref_dbxref_id_seq',
+    organism_dbxref => 'organism_dbxref_organism_dbxref_id_seq',
+    phylotree=> 'phylotree_phylotree_id_seq',
+    phylonode=> 'phylonode_phylonode_id_seq',
+    phylonode_organism => 'phylonode_organism_phylonode_organism_id_seq',
+    );
 
 
 
@@ -196,16 +195,13 @@ my %seq  = (
 
 my $db_name= 'DB:NCBI_taxonomy';
 
-my $db=CXGN::Chado::Db->new_with_name($dbh, $db_name);
-my $db_id = $db->get_db_id();
-if (!$db_id) {
-    $db->set_db_name($db_name);
-    $db->set_url('ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=');
-    $db->set_urlprefix('http://');
-    print STDERR "String a new db for $db_name!\n";
-    $db_id=$db->store();
-}
+my $db= $schema->resultset("General::Db")->find_or_create(
+    { name => $db_name } ); 
 
+$db->url('ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=');
+$db->urlprefix('http://');
+$db->update();
+my $db_id = $db->get_column('db_id');
 
 ########
 
@@ -225,15 +221,15 @@ foreach my $key( keys %seq) {
 #store a new phylotree for NCBI taxonomy
 
 my  $tree_accession= 'taxonomy'; 
-my $tree_dbxref=CXGN::Chado::Dbxref->new_with_accession($dbh, $tree_accession, $db_id);
-my $tree_dbxref_id= $tree_dbxref->get_dbxref_id();
-if ( !$tree_dbxref_id ) {
-    $tree_dbxref->set_accession($tree_accession);
-    $tree_dbxref->set_db_name($db_name);
-    print STDERR "Storing a new dbxref for $tree_accession (db_name = $db_name) !\n";
-    $tree_dbxref_id=$tree_dbxref->store();
-    print STDERR "the tree dbxref_id is $tree_dbxref_id!!!\n\n";
-}
+
+my $tree_dbxref = $schema->resultset("General::Dbxref")->find_or_create(
+    { accession => $tree_accession,
+      db_id => $db_id,
+    } );
+
+my $tree_dbxref_id = $tree_dbxref->get_column('dbxref_id');
+print STDERR "Dbxref for $tree_accession (db_name = $db_name\n";
+print STDERR "The tree dbxref_id is $tree_dbxref_id!\n\n";
 
 my $phylotree = $schema->resultset('Phylogeny::Phylotree')->find_or_create(
     { dbxref_id => $tree_dbxref_id,
@@ -242,7 +238,7 @@ my $phylotree = $schema->resultset('Phylogeny::Phylotree')->find_or_create(
     );
 
 my $phylotree_id = $phylotree->phylotree_id();
-print STDERR "Created a new phylotee with id $phylotree_id!!!!\n\n\n";
+print STDERR "Created a new phylotee with id $phylotree_id\n\n\n";
 
 #remove all existing phylonodes for this tree and reset the database sequence
 
@@ -269,44 +265,45 @@ open (ERR, ">$error") || die "Can't open error file for writing ($error)!\n";
 #read in the taxonomy tree
 open( NODE, "nodes.dmp" );
 while ( my $line = <NODE> ) {
-  my ( $id, $parent, $level ) = split /\t\|\t/, $line;
-  next unless $okay_level{ $level };
-  if ($infile) { next() unless exists $tax_file{$id} ; }  # skip nodes not in tax_file 
-  $node{ $id }{ 'parent_taxid' } = $parent;
-  $node{ $id }{ 'self_taxid'   } = $id;
-  $node{ $id }{ 'level'        } = $level;
-##  $node{ $id }{ 'organism_id'  } = $next_organism++; #do we really need an incremented organism_id??
+    my ( $id, $parent, $level ) = split /\s+\|\s+/, $line;
+    
+    next unless $okay_level{ $level };
+    if ($infile) { next() unless exists $tax_file{$id} ; }  # skip nodes not in tax_file 
+    $node{ $id }{ 'parent_taxid' } = $parent;
+    $node{ $id }{ 'self_taxid'   } = $id;
+    $node{ $id }{ 'level'        } = $level;
 }
+
 close( NODE );
 
 open( NAME, "names.dmp" );
 while ( my $line = <NAME> ) {
-  #next unless $line =~ /scientific name/;
-  my ( $id, $name ) = split /\t\|\t/, $line;
-  next unless $node{ $id }; #skip nodes  
-  if ( $line =~ /scientific name/) {
-      $node{ $id }{ 'name' } = $name;
-      $node{ $id }{ 'name' } .= " Taxonomy:$id" if $seen{ $name }++;
-  } elsif  ( $line =~ /common name/) { #  genbank common names 
-      push(@{ $node{ $id }{ 'common_name' } } , $name);
-      push(@{ $node{$id}{ 'synonyms' } }, $name);
-     
-  } elsif ( $line =~ /synonym/ ) {
-      push @{ $node{$id}{ 'synonyms' } }, $name;
-  }
+    #next unless $line =~ /scientific name/;
+    my ( $id, $name ) = split /\t\|\t/, $line;
+    next unless $node{ $id }; #skip nodes  
+    if ( $line =~ /scientific name/) {
+	$node{ $id }{ 'name' } = $name;
+	$node{ $id }{ 'name' } .= " Taxonomy:$id" if $seen{ $name }++;
+    } elsif  ( $line =~ /common name/) { #  genbank common names 
+	push(@{ $node{ $id }{ 'common_name' } } , $name);
+	push(@{ $node{$id}{ 'synonyms' } }, $name);
+	
+    } elsif ( $line =~ /synonym/ ) {
+	push @{ $node{$id}{ 'synonyms' } }, $name;
+    }
 }
 
 close( NAME );
 
 foreach my $id ( keys %node ) {
-  if ( $node{ $id }{ 'level' } eq 'species' ) {
-    $node{ $id }{ 'genus' }   = $node{ $node{ $id }{ 'parent_taxid' } }{ 'name' };
-    $node{ $id }{ 'species' } = $node{ $id }{ 'name' };
-  }
-  else {
-    $node{ $id }{ 'genus'   } = $node{ $id }{ 'level' };
-    $node{ $id }{ 'species' } = $node{ $id }{ 'name' };
-  }
+    if ( $node{ $id }{ 'level' } eq 'species' ) {
+	$node{ $id }{ 'genus' }   = $node{ $node{ $id }{ 'parent_taxid' } }{ 'name' };
+	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
+    }
+    else {
+	$node{ $id }{ 'genus'   } = $node{ $id }{ 'level' };
+	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
+    }
 }
 
 
@@ -333,100 +330,112 @@ my $node_count=0;
 eval {
     my $root_id;
     my $organism_id = $maxval{'organism'};
-    foreach my $id ( keys %node ) {
-	######
-	#Store the genbank taxon_id in dbxref and in organism_dbxref
-	#
-	my $genbank_taxon_accession= $node{ $id }{ 'self_taxid' };
-	my $dbxref= CXGN::Chado::Dbxref->new_with_accession($dbh, $genbank_taxon_accession, $db_id);
-	my $dbxref_id = $dbxref->get_dbxref_id();
-	if (!$dbxref_id) {
-	    $dbxref->set_db_name($db_name);
-	    $dbxref->set_accession( $genbank_taxon_accession );
-	    $dbxref_id= $dbxref->store();
-	}
-	
-		
-	my $organism= CXGN::Chado::Organism->new($schema);
-	my $abbreviation;
-	if ($node{ $id }{level} eq 'species' ) {
+  NODE: foreach my $id ( keys %node ) {
+      ######
+      #Store the genbank taxon_id in dbxref and in organism_dbxref
+      #
+      my $genbank_taxon_accession= $node{ $id }{ 'self_taxid' };
+      if (!$genbank_taxon_accession) { 
+	  print ERR "SKIPPING: No record found for genbank taxon id $id! Check your infile !\n";
+	  next NODE;
+      }
+      my $dbxref = $schema->resultset("General::Dbxref")->find_or_create(
+	  { accession => $genbank_taxon_accession,
+	    db_id => $db_id,
+	  });
+      my $dbxref_id = $dbxref->get_column('dbxref_id');
+      
+      my $abbreviation;
+      if ($node{ $id }{level} eq 'species' ) {
 	    
-	    if ( $node{ $id }{ 'species' } =~ m/(.*)\s(.*)/ ) {
-		my $gen=$1;
-		my $sp=$2;
-		$abbreviation= uc( substr( $gen ,0, 1 ) ) . "." .  $sp;
-	    }
-	}
-    	my $common_name;
-	
-	my $c= @{ $node{$id}{'common_name'} } if (defined @{ $node{$id}{'common_name'}}); 
-	$common_name =    join("," , @{ $node{ $id }{ 'common_name' } }) if $c;
-
-	$organism->set_genus($node{ $id }{ 'genus' } );
-	$organism->set_species($node{ $id }{ 'species' } );
-	$organism->set_common_name($common_name);
-	$organism->set_abbreviation($abbreviation );
-	print STDERR "Genus= " . $organism->get_genus() . " Species= " . $organism->get_species() . "\n";
-	my $existing_id = $organism->exists_in_database();
-	if ($existing_id) {
-	    $organism=CXGN::Chado::Organism->new($schema, $existing_id);
-	    print STDERR "Organism $existing_id exists in database! ($abbreviation)\n"; 
-	    $organism->set_genus($node{ $id }{ 'genus' } );
-	    $organism->set_species($node{ $id }{ 'species' } );
-	    $organism->set_common_name($common_name);
-	    $organism->set_abbreviation($abbreviation);
-	}else { 	
-	    print STDERR "New organism: " . $organism->get_species() . "\n"; 
-	    print ERR "New organism: " . $organism->get_species() . "\n"; 
-	}
-	
-	#store the organism in the organism table:
-	$organism->store();
-	
-	print STDERR   " COMMON_NAME= " . $organism->get_common_name() . "\n" if $common_name;
-	my $organism_id= $organism->get_organism_id();
-	
-	###########################################
-	#store the organism synonyms 
-	foreach (@{$node{ $id }{synonyms} } ) { 
-	    $organism->add_synonym($_);  #an organismprop. Requires to have name = 'synonym' in the cvterm table.  
-	    print STDERR $node{ $id }{name} . " LEVEL=( " . $node{ $id }{level} . ") Synonym is $_ \n" ; 
-	} 
-	####################################################################
-	
-	
-	my $organism_dbxref = $schema->resultset('Organism::OrganismDbxref')->find_or_create( 
-	    {
-		organism_id => $organism_id,
-		dbxref_id   => $dbxref_id,
-	    },
-	    );
-	
-	#get the cvterm_id of the taxonomy level
-	my $level= $node{ $id }{level};
-        my ($level_cvterm) = $schema->resultset("Cv::Cvterm")->find( 
-	    {
-		name  => $level,
-		cv_id => $schema->resultset("Cv::Cv")->find( { name => 'taxonomy' } )->get_column('cv_id'),
-	    },
-	    );
-       
-	my $level_id = $level_cvterm->get_column("cvterm_id") if $level_cvterm ;
-	
-	if (!$level_cvterm) {
-	    print STDERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
-	    print ERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
-	    
-	}
+	  if ( $node{ $id }{ 'species' } =~ m/(.*)\s(.*)/ ) {
+	      my $gen=$1;
+	      my $sp=$2;
+	      $abbreviation= uc( substr( $gen ,0, 1 ) ) . "." .  $sp;
+	  }
+      }
+      my $common_name;
+      my $c= @{ $node{$id}{'common_name'} } if (defined @{ $node{$id}{'common_name'}}); 
+      $common_name =    join("," , @{ $node{ $id }{ 'common_name' } }) if $c;
+      
+      my $genus = $node{ $id }{ 'genus' } ;
+      my $species = $node{ $id }{ 'species' } ;
+      
+      my ($organism, $update, $insert);
+      
+      #this is just for checking if the organism is already stored in the database
+      #
+      #if ($species =~ m/(.*)\s(.*)/) { 
+      #    $species = $2;
+      #    $genus = $1;
+      #}
+      $organism = $schema->resultset('Organism::Organism')->search(
+	  {
+	      genus   => { 'ilike'=> $genus },
+	      species => {'ilike' => $species }
+	  })->single();
+      if (!$organism) {  #create a new empty row object 
+	  $organism = $schema->resultset('Organism::Organism')->new({});
+	  $insert=1;
+      } else { $update = 1; }
+      
+      $organism->set_column(genus => $node{ $id }{ 'genus' } );
+      $organism->set_column(species => $node{ $id }{ 'species' } );
+      $organism->set_column(abbreviation => $abbreviation );
+      $organism->set_column(common_name => $common_name );
+      
+      if ($update) {
+	  $organism->update();
+	  print STDERR "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+	  print ERR "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+      }
+      if ($insert) {
+	  $organism->insert();
+	    print STDERR "New organism" . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+	  print ERR "New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+      }
+      	my $organism_id= $organism->get_column('organism_id');
+      
+      ###########################################
+      #store the organism synonyms 
+      foreach (@{$node{ $id }{synonyms} } ) {
+	  $organism->create_organismprops( { synonym => $_ }, { autocreate => 1} , );
+	  print STDERR $node{ $id }{name} . " LEVEL=( " . $node{ $id }{level} . ") Synonym is $_ \n" ; 
+      } 
+      ####################################################################
+      
+      my $organism_dbxref = $schema->resultset('Organism::OrganismDbxref')->find_or_create( 
+	  {
+	      organism_id => $organism_id,
+	      dbxref_id   => $dbxref_id,
+	  },
+	  );
+      
+      #get the cvterm_id of the taxonomy level
+      my $level= $node{ $id }{level};
+      my ($level_cvterm) = $schema->resultset("Cv::Cvterm")->find( 
+	  {
+	      name  => $level,
+	      cv_id => $schema->resultset("Cv::Cv")->find( { name => 'taxonomy' } )->get_column('cv_id'),
+	  },
+	  );
+      
+      my $level_id = $level_cvterm->get_column("cvterm_id") if $level_cvterm ;
+      
+      if (!$level_cvterm) {
+	  print STDERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
+	  print ERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
+	  
+      }
       #store a new phylonode_id + phylonode_organism. This is necessary for storing later the parent_phylonode_id
-	# and eventuay the left_idx and right_idx.
-	
-	$phylonode{ $id }{ 'phylonode_id' } = $next_phylonode_id++;
-	$phylonode{ $id }{ 'organism_id' } = $organism_id;
-	$phylonode{ $id }{ 'parent_taxid' } = $node{ $id }{ 'parent_taxid' };
-	$phylonode{ $id }{ 'type_id' } = $level_id ; 
-	
-    }
+      # and eventuay the left_idx and right_idx.
+      
+      $phylonode{ $id }{ 'phylonode_id' } = $next_phylonode_id++;
+      $phylonode{ $id }{ 'organism_id' } = $organism_id;
+      $phylonode{ $id }{ 'parent_taxid' } = $node{ $id }{ 'parent_taxid' };
+      $phylonode{ $id }{ 'type_id' } = $level_id ; 
+      
+  }
     
     
 #now that all the organisms are stored, we can sore the relationships (=phylonodes) 
@@ -452,7 +461,7 @@ eval {
     
     our $ctr = 1;
     print STDERR "the root_id is $root_id\n";
-   
+    
     walktree($root_id);
     
     print STDERR "Updating the phylonode and phylonode_organism tables\n\n";
@@ -460,7 +469,6 @@ eval {
 	"INSERT INTO phylonode (phylonode_id, phylotree_id, parent_phylonode_id, left_idx, right_idx, type_id) SELECT phylonode_id, phylotree_id, parent_phylonode_id, left_idx, right_idx, type_id  FROM tmp_phylonode",
 	"INSERT INTO phylonode_organism (phylonode_id, organism_id) SELECT phylonode_id, organism_id FROM tmp_phylonode"
 	);
-    
     
     
     foreach (@updates) { $dbh->do( $_ );  }
@@ -531,7 +539,7 @@ sub set_maxval {
 
 #http://www.eyesopen.com/docs/cplusprog_1_2/node220.html
 __DATA__
-no rank
+    no rank
 superkingdom
 subkingdom
 kingdom
