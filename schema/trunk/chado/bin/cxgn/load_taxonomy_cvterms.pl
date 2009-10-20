@@ -1,32 +1,84 @@
+
+=head1 NAME
+
+ load_taxonomy_cvterms.pl
+    
+=head1 DESCRIPTION
+
+ Usage: perl load_taxonomy_cvterms.pl -H [dbhost] -D [dbname] [-t] -g gmod_dbprofile
+
+populate a chado database with NCBI taxon terms 
+
+
+=head2 parameters
+
+=over 4
+
+=item -H
+
+hostname for database
+
+=item -D
+
+database name
+
+ 
+=item -t
+
+trial mode. Do not perform any store operations at all.
+
+
+=item -g
+
+GMOD database profile name (can provide host and DB name) Default: 'default'
+
+
+=back
+
+=cut
+
 #!/usr/bin/perl
 use strict;
-use CXGN::DB::Connection;
-use CXGN::DB::InsertDBH;
+
+use Bio::GMOD::Config;
+use Bio::GMOD::DB::Config;
 
 use Bio::Chado::Schema;
 
 use Getopt::Std;
 
 
-our ($opt_H, $opt_D, $opt_v,  $opt_t);
+our ($opt_H, $opt_D, $opt_g,  $opt_t);
 
-getopts('H:vtD:');
+getopts('H:g:tD:');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 
-my $dbh;
+my ($dbh, $schema);
 
-if (!$dbhost && !$dbname) { 
-    $dbh= CXGN::DB::Connection->new();
-}else {
+if ($opt_g) {
+    my $DBPROFILE = $opt_g;
+    $DBPROFILE ||= 'default';
+    my $gmod_conf = Bio::GMOD::Config->new() ;
+    my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) ;
     
-    $dbh = CXGN::DB::InsertDBH->new( { dbhost => $dbhost,
-				       dbname => $dbname,
+    $dbhost ||= $db_conf->host();
+    $dbname ||= $db_conf->name();
+    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+    $schema= Bio::Chado::Schema->connect( $db_conf->dbh(), $db_conf->user(), $db_conf->password() );
+    
+    $dbh=$schema->storage->dbh();
+    
+}else { 
+    require CXGN::DB::InsertDBH;
+    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
+				       dbname=>$dbname,
+				       dbschema=>'public',
 				     } );
+    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
 }
-my $schema= Bio::Chado::Schema->connect(  sub { $dbh->get_actual_dbh() },
-    );
+if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 
 eval {
@@ -53,13 +105,13 @@ eval {
 		accession => "taxonomy:$tax",
 	    }); 
 	my $dbxref_id = $dbxref->get_column('dbxref_id');
-
+	
 	my $cvterm = $schema->resultset("Cv::Cvterm")->find_or_create(
 	    {
 		cv_id => $cv_id,
 		name  => $tax,
 		dbxref_id => $dbxref_id,
-
+		
 	    });
 	my $cvterm_id= $cvterm->get_column('cvterm_id');
 	print STDERR "Stored cvterm for $tax ($cvterm_id)\n";
