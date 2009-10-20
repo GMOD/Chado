@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 
 =head1 NAME
 
@@ -117,25 +116,22 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 0.12, February 2008.
+Version 0.13, August 2009.
 
 =cut
 
-use warnings;
+
 use strict;
 
 use Getopt::Std;
 use Bio::OntologyIO;
 use Bio::Ontology::OntologyI;
-use CXGN::DB::InsertDBH;
-use CXGN::Chado::Db;
-use CXGN::Chado::Dbxref;
-use CXGN::Chado::CV;
-use CXGN::Chado::Cvterm;
-use CXGN::Chado::Ontology;
-use CXGN::Chado::Relationship;
+
+
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
+
+use Bio::Chado::Schema;
 
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
      $opt_u, $opt_o, $opt_p);
@@ -144,16 +140,30 @@ getopts('F:d:H:o:n:vD:tup:');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
+my ($dbh, $schema);
 
-my $DBPROFILE = $opt_p;
-$DBPROFILE ||= undef;
-my $gmod_conf = Bio::GMOD::Config->new();
-my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
+if ($opt_p) {
+    my $DBPROFILE = $opt_p;
+    $DBPROFILE ||= 'default';
+    my $gmod_conf = Bio::GMOD::Config->new() if $opt_p;
+    my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) if $opt_p;
+    
+    $dbhost ||= $db_conf->host();
+    $dbname ||= $db_conf->name();
+    
+    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+    
+    $schema= Bio::Chado::Schema->connect( $db_conf->dbh(), $db_conf->user(), $db_conf->password() );
+    $dbh=$schema->storage->dbh();
+} else {
+    require CXGN::DB::InsertDBH;
+    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
+				       dbname=>$dbname,
+				       dbschema=>'public',
+				     } );
+    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
+}
 
-$dbhost ||= $db_conf->host();
-$dbname ||= $db_conf->name();
-
-if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
 
 my $error = 0; # keep track of input errors (in command line switches).
 if (!$opt_D and !$dbname) { 
@@ -166,6 +176,8 @@ if (!$opt_F) { $opt_F="obo"; }
 if ($opt_t) { 
     print STDERR "Trial mode - rolling back all changes at the end.\n";
 }
+if ($opt_u) { print STDERR "This script will UPDATE cvterms stored in your database from the input file! \n"; }
+else { print STDERR "WARNING: If your databse is already population with cvterms, not running in UPDATE mode (option -u) may cause database conflicts, such as violating unique constraints!\n"; }
 
 if (!$opt_d) { $opt_d="GO"; } # the database name that Dbxrefs should refer to
 print STDERR "Default for -d: $opt_d (specifies the database names for Dbxref objects)\n";
@@ -182,17 +194,10 @@ if (!$file) {
 
 die "Some required command lines parameters not set. Aborting.\n" if $error;
 
-if ($opt_o) { open (OUT, ">$opt_o") ||die "can't open error file $file for writting.\n" ; }
+if ($opt_o) { open (OUT, ">$opt_o") ||die "can't open error file $opt_o for writting.\n" ; }
 
 
-my $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				      dbname=>$dbname,  
-                                      #dbprofile=>$DBPROFILE,
-				   } );
-
-
-print STDERR "Connected to database $dbname on host $dbhost.\n";
-print OUT "Connected to database $dbname on host $dbhost.\n" if $opt_o;
+message( "Connected to database $dbname on host $dbhost.\n", 1);
 
 
 print STDERR "Parsing the ontology $file...\n";
@@ -208,105 +213,117 @@ while( my $ont = $parser->next_ontology() ) {
 
 foreach my $new_ont(@onts) {
     my $new_ont_name=$new_ont->name();
-    print STDERR "....found namespace  '$new_ont_name' \n"; 
+    message("....found namespace  '$new_ont_name' \n", 1); 
     
-    if ($opt_n && ( $opt_n ne $new_ont_name) ) { print STDERR "$opt_n: skipping to next ontology..\n"; next (); } 
-    
+    if ($opt_n && ( $opt_n ne $new_ont_name) ) { 
+	message ("$opt_n: skipping to next ontology..\n",1);
+	next (); 
+    } 
+    my $rel_cv;
     #check if relationship ontology is already loaded:
     if ($new_ont_name ne 'relationship') {
-	my $rel_cv= CXGN::Chado::Ontology->new_with_name($dbh, 'relationship');
-	my @rel=$rel_cv->get_predicate_terms();
+	$rel_cv= $schema->resultset("Cv::Cv")->find_or_create( { name => 'relationship' } , { key => 'cv_c1' }, );
+	my @rel= $schema->resultset("Cv::Cvterm")->search(
+	    { cv_id => $rel_cv->get_column('cv_id'),
+	      is_relationshiptype => 1,
+	    });
+	
 	if (!@rel) {
 	    warn "Relationship ontology must be loaded first!!\n" ;
 	    exit(0);
 	}
     }
+    ####add Typedef parsing to obo.pm!###
+    ####store a new cv if the ontology namespace does not exist
+    my $cv= $schema->resultset('Cv::Cv')->find_or_create( { name => $new_ont_name } , { key => 'cv_c1' }, );
     
-    my $cv = CXGN::Chado::Ontology->new_with_name($dbh, $new_ont->name()); # also get a CXGN::Chado::Ontology object for the cv_id (see later).
-    #store a new cv if the ontology namespace does not exist
-    if (!$cv->get_cv_id() ) { 
-	$cv->name($new_ont_name);
-	$cv->store();
-    }
-    print STDERR "cv_id = ".($cv->get_cv_id())."\n";
-    
-    my $db_ont;
-    
+    print STDERR "cv_id = ".($cv->get_column('cv_id') )."\n";
     
     print STDERR "Updating an ontology in the database...\n";
-    $db_ont = CXGN::Chado::Ontology->new_with_name($dbh, $new_ont->name());
-    my $ontology_name=$db_ont->name();
-    print STDERR "Ontology name: ".($db_ont->name())."\n";
-    print OUT "Ontology name: ".($db_ont->name())."\n" if $opt_o;
-
+        my $db_ont = $cv;
+    
+    my $ontology_name=$db_ont->get_column('name');
+    message("Ontology name: ".($db_ont->name())."\n", 1);
     
     my %file_relationships = (); # relationships currently defined in the file
     my %db_relationships = ();
     
     eval { 
+	my $db = $schema->resultset("General::Db")->find_or_create( 
+	    { name => $opt_d }, { key => 'db_c1' }, );
+	
 	print STDERR "Getting all the terms of the new ontology...\n";
 	my (@all_file_terms) = $new_ont->get_all_terms();
 	my (@all_file_predicate_terms) = $new_ont->get_predicate_terms();
-	print STDERR "***found ".(scalar(@all_file_predicate_terms))." predicate terms!.\n";
-	
-	print STDERR "Retrieved ".(scalar(@all_file_terms))." terms.\n";
-	print OUT "Retrieved ".(scalar(@all_file_terms))." terms.\n" if $opt_o;	
-	
+	###my (@all_file_typedefs) = $new_ont->get_all_typedefs();
+	message( "***found ".(scalar(@all_file_predicate_terms))." predicate terms!.\n", 1);
+	message( "Retrieved ".(scalar(@all_file_terms))." terms.\n", 1);
         
 	#look at all predecate terms (Typedefs)
-	my @all_db_predicate_terms = $db_ont->get_predicate_terms();
+	my @all_db_predicate_terms= $db_ont->search_related('cvterms' , { is_relationshiptype => 1} );  
 	foreach my $t(@all_file_predicate_terms) {           #look at predicate terms in file
-	    if (!grep (/^$t$/, @all_db_predicate_terms ) ) { #didn't find predicate term in this cv in the database
-		my $p_term= CXGN::Chado::Cvterm::get_cvterm_by_name($dbh, $t->name());
-		if ( ($p_term->get_cv_id()) ) {    #maybe it's stored with another cv_id?
-		    print STDERR "predicate term '" .$t->name() . "' already exists with cv_id " . $p_term->get_cv_id() . "\n";
-		    print OUT "predicate term already exists with cv_id " . $p_term->get_cv_id() . "\n" if $opt_o;
-		}else { 
-		    my $cv = CXGN::Chado::CV->new_with_name($dbh, $new_ont_name);
-		    my $cv_id= $cv->get_cv_id();
-		    if (!$cv_id) { 
-			$cv->set_cv_name("relationship");
-			$cv_id= $cv->store();
-		    }
-		    if (($cv->get_cv_name()) eq 'relationship' ) { $p_term->set_db_name('OBO_REL'); }
-		    else { $p_term->set_db_name($opt_d); }
- 
-		    $p_term->name($t->name() );
-		    $p_term->identifier($t->identifier()) || $p_term->identifier($t->name() );
-		    $p_term->definition( $t->definition() );
-		    my $ontology= $t->ontology()->name();
-		    $p_term->set_obsolete($t->is_obsolete() );
-		    $p_term->set_is_relationshiptype(1);
-		    $p_term->set_cv_id($cv_id);
-		    $p_term->store();
-		    print STDERR "Stored new relationshiptype '" .  $t->name() . "'\n";
-		    print OUT "Stored new relationshiptype '" .  $t->name() . "'\n" if $opt_o;
-		}
+	    my ($p_term) = $schema->resultset('Cv::Cvterm')->search( 
+		{ name => $t->name(),
+		  is_relationshiptype => 1,
+		});
+	    #maybe it's stored with another cv_id?
+	    if ($p_term) {
+		message("predicate term '" .$t->name() . "' already exists with cv_id " . $p_term->get_column('cv_id') . "\n", 1);
+	    }else { #need to store the predicate term under $cv  
+	
+		#this stores the relationship types under 'relationship' cv namespace
+		#terms defined as '[Typedef]' in the obo file should actually be stored as relationshiptype
+		#but with the current ontology cv namespace .
+		#To do this we need to add to the obo parser (Bio::OntologyIO::obo.pm)
+		#a 'get_typedefs' funciton
+		my $accession = $t->identifier() || $t->name();
+		my $p_term_db = $schema->resultset("General::Db")->find_or_create( { name => $opt_d }, { key => 'db_c1' }, );
+		my $p_term_dbxref = $schema->resultset("General::Dbxref")->find_or_create( 
+		    {   db_id     => $p_term_db->get_column('db_id'),
+			accession => $accession,
+			version   => $t->version() || '',
+		    },
+		    { key => 'dbxref_c1' } ,
+		    );
+		my $p_term = $schema->resultset("Cv::Cvterm")->find_or_create( 
+		    { cv_id  => $cv->get_column('cv_id'),
+		      name   => $t->name(),
+		      dbxref_id => $p_term_dbxref->get_column('dbxref_id'),
+		      definition => $t->definition(),
+		      is_obsolete=> $t->is_obsolete(),
+		      is_relationshiptype => 1,
+		    },
+		    { key => 'cvterm_c1' },
+		    );
+		
+		message("Stored new relationshiptype '" .  $t->name() . "'\n",1);
 	    }
 	}
-
 	print STDERR "Getting all the terms of the current ontology...\n";
 	
-	my @all_db_terms = $db_ont->get_all_terms();
-
+	#a list of Bio::Chado::Schema::Cvterm objects
+	my @all_db_terms = $schema->resultset("Cv::Cvterm")->search( 
+	    { cv_id => $db_ont->get_column('cv_id'),
+	      is_relationshiptype => 0,
+	    })->all();
 	print STDERR "Indexing terms and relationships...\n";
 	my %file_index = ();  # index of term objects in the db with accession as key
-	my %db_index = ();
+	my %db_index = (); # this hash will be populated with accession => cvterm_object
 	
 	foreach my $t (@all_file_terms) { 
 	    my $id = $t->identifier();
 	    $id=~ s/\w+\:(.*)/$1/g;
 	    $file_index{$id} = $t;
+	    message("Found term in file :  $id\n", 1);
 	}
 	
 	my $c_count = 0;  # count of db terms    
 	foreach my $t (@all_db_terms) { 
 	    $c_count++;
-	    my $id = $t->identifier();
-	    $id=~ s/\w+\:(.*)/$1/g;
+	    my ($id )= $t->search_related('dbxref')->first()->get_column('accession');
 	    $db_index{$id} = $t;
+	    message("Found term in DB: $id\n", 1);
 	}
-	
 	
 	my %novel_terms = ();
 	my @removed_terms = ();
@@ -317,15 +334,16 @@ foreach my $new_ont(@onts) {
 	print STDERR "Determining which terms are new...\n";
 	#exit();
 	
-	foreach my $k (keys(%file_index)) { 
-	    #print STDERR "Checking $k...\n";
+	FILE_INDEX: foreach my $k (keys(%file_index)) { 
 	    if (!exists($db_index{$k})) { 
+		if (!$file_index{$k}->name() ) { next FILE_INDEX; } #skip if term in file has no name. 
+		#This happens in InterPro file - which is translated from xml to obo.
+		
 		if ($opt_v) { print STDERR "Novel term: $k ".($file_index{$k}->name())."\n"; }
 		else { print STDERR "."; }
 		print OUT "Novel term: $k ".($file_index{$k}->name())."\n" if $opt_o;
-
-		$novel_terms{$k}=$file_index{$k};
 		
+		$novel_terms{$k}=$file_index{$k};
 	    }
 	}
 	
@@ -334,53 +352,69 @@ foreach my $new_ont(@onts) {
 	
 	foreach my $k (keys(%db_index)) { 
 	    if (!exists($file_index{$k})) { 
-		print STDERR "Term not in file: $k\n";
-		print OUT "Term not in file: $k\n" if $opt_o;
+		
 		my $name = $db_index{$k}->name(); #get the name in the database 
-		
+		message( "Term not in file: $name \n",1);
 		unless( $name =~ m/obsolete.*$opt_d:$k/ ) {
-		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $k . ")" ;  #add the 'obsolete' suffix 
-		    $db_index{$k}->name($ob_name );
-		    print STDERR "**modified name for $opt_d:$k - '$ob_name' \n " ; 
+		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $name . ")" ;  #add the 'obsolete' suffix 
+		    $db_index{$k}->set_column(name => $ob_name );
+		    message( "**modified name for $opt_d:$name - '$ob_name' \n " , 1); 
 		}
-		$db_index{$k}->set_obsolete("1");
-		$db_index{$k}->store();
 		
-		print STDERR " obsoleted term $k!.\n";
+		$db_index{$k}->set_column(is_obsolete => 1 );
+		$db_index{$k}->update();
+				
+		print STDERR " obsoleted term  $name!.\n";
 		push @removed_terms, $db_index{$k};
 	    }
 	}
-	
 	
 	print STDERR "Inserting and updating terms...\n";
 
 	my $count = 0;
 	my $u_count=0;
-	foreach my $k (keys(%file_index)) {
+	UPDATE: foreach my $k (keys(%file_index)) {
 	    $count++;
 	    if (!exists($novel_terms{$k})) { 
 		#update the term if run with -u option.
 		
 		if ($opt_u) {
 		    $u_count++;
-		    $db_index{$k}->name($file_index{$k}->name());
-		    $db_index{$k}->definition($file_index{$k}->definition());
-		    $db_index{$k}->comment($file_index{$k}->comment());
-		    $db_index{$k}->set_obsolete($file_index{$k}->is_obsolete());
 		    message( "updating information for term $k...\n");
-		    print OUT "*updating information for term " . $k  . "*\n" if $opt_o;
+		    if (!$file_index{$k} || !$db_index{$k} ) { message ("SKIPPING term $k! No value found\n", 1); next UPDATE; } 
+		    $db_index{$k}->set_column(name => $file_index{$k}->name()  );
+		    $db_index{$k}->set_column( definition => $file_index{$k}->definition() );
+		    $db_index{$k}->set_column(is_obsolete => $file_index{$k}->is_obsolete() );
+		    
 		    my $name = $db_index{$k}->name();
 		    #changing the name of obsolete terms to "$name (obsolete $db:$accession)"
 		    #to avoid violating the cvterm unique constaint (name, cv_id, is_obsolete)
-		    if ($db_index{$k}->get_obsolete() ) { 
+		    if ($db_index{$k}->is_obsolete() ) { 
 			unless( $name =~ m/obsolete.*$opt_d:$k/ ) {
 			    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $k . ")" ;  
-			    $db_index{$k}->name($ob_name );
-			    print STDERR "**modified name for $opt_d:$k - '$ob_name' \n " ; 
+			    $db_index{$k}->set_column( name=>$ob_name );
+			    print STDERR "**modified name for $opt_d:$k - '$ob_name' version: " . $file_index{$k}->version() . " \n " ; 
 			}
 		    }
-		    $db_index{$k}->store();
+		    $db_index{$k}->update();
 		    
+		    #update dbxref version 
+		    if ( $file_index{$k}->version() ) {
+			my ($dbxref)=$db_index{$k}->search_related('dbxref');
+			$dbxref->set_column(version => $file_index{$k}->version() );
+			$dbxref->update();
+		    }
+		    #add comment as a cvtermprop
+		    my ($comment_cvterm) = $schema->resultset("Cv::Cvterm")->search( { name => 'comment'} ); 
+		    if ($file_index{$k}->comment() ) {
+			my $cvtermprop= $schema->resultset("Cv::Cvtermprop")->find_or_create(
+			    { cvterm_id => $db_index{$k}->get_column('cvterm_id'),
+			      type_id   => $comment_cvterm->get_column('cvterm_id'),
+			      value     => $file_index{$k}->comment(),
+			    },
+			    );
+		    }
+		    ###############################
 		    # deal with synonyms here... 
 		    my %file_synonyms = ();
 		    foreach my $s ($file_index{$k}->get_synonyms()) { 
@@ -389,63 +423,42 @@ foreach my $new_ont(@onts) {
 			$file_synonyms{uc($s)}=1;
 			
 			message("...adding synonym  '$s'  to the database...\n");
-			print OUT "...adding synonym  '$s'  to the database...\n" if $opt_o;
-			
 			$db_index{$k}->add_synonym($s);
 		    }
 		    
-		    foreach my $s ($db_index{$k}->get_synonyms()) { 
-			if (!exists($file_synonyms{uc($s)}) ) { 
-			    print STDERR "Note: deleting synonym '$s' from cvterm ". $db_index{$k}->get_cvterm_name(). "...\n";
-			    print OUT "Note: deleting synonym '$s' from cvterm ". $db_index{$k}->get_cvterm_name(). "...\n" if $opt_o;
+		    foreach my $s ($db_index{$k}->search_related('cvtermsynonyms')) {
+			my $s_name= $s->get_column('synonym');
+			if (!exists($file_synonyms{uc($s_name)}) ) { 
+			    message( "Note: deleting synonym '$s' from cvterm ". $db_index{$k}->get_column('name') . "...\n",1);
 			    $db_index{$k}->delete_synonym($s);
 			}
 		    }
 		    #deal with secondary ids (alt_id field).
 		    # Stored in cvterm_dbxref with the field 'is_for_definition' = 0
+		    
+		    #delete all cvterm dbxrefs before loading the new ones from the file
+		    my @secondary_dbxrefs= $db_index{$k}->search_related('cvterm_dbxrefs');
+		    foreach (@secondary_dbxrefs) { $_->delete(); }
+		    
 		    my %file_secondary_ids = ();
 		    foreach my $i ($file_index{$k}->get_secondary_ids()) { 
 			$file_secondary_ids{uc($i)}=1;
 			message("adding secondary id $i to the database...\n");
-			print OUT "adding secondary id $i to the database...\n" if $opt_o;
 			
 			$db_index{$k}->add_secondary_dbxref($i);
 			
 		    }
-		    foreach my $i ($db_index{$k}->get_secondary_dbxrefs()) {
-			if (!exists($file_secondary_ids{uc($i)})) { 
-			    print STDERR "Note: deleting secondary id $i from cvterm_dbxref...\n";
-			    print OUT "Note: deleting secondary id $i from cvterm_dbxref...\n" if $opt_o;
-			    $db_index{$k}->delete_secondary_dbxref($i);
-			}
-		    }
-		    # Definition dbxrefs. get_dblinks gets the dbxref in the definition tag
+		    #########
+                    # Definition dbxrefs. get_dblinks gets the dbxref in the definition tag
 		    # and all xref_analog tags. This will store in the database cvterm_dbxrefs with 
 		    #the fiels 'is_for_definition' = 1 
+		    
 		    my %file_def_dbxrefs=();
-		    foreach my $r ($file_index{$k}->get_dblinks() ) { #store definition's dbxrefs in cvterm_dbxref
-			#my $id= $r->primary_id();
-			#my $db= $r->database();
-			my ($db, $id) = split /:/, $r;
-			my $def_dbxref= $db . ":" . $id;
+		    #store definition's dbxrefs in cvterm_dbxref
+		    foreach my $def_dbxref ($file_index{$k}->get_dblinks() ) { 
 			$file_def_dbxrefs{uc($def_dbxref)}=1;
-			message("adding definition dbxref $db:$id to cvterm_dbxref\n");
-			print OUT "adding definition dbxref $db:$id to cvterm_dbxref\n" if $opt_o;
-			
-			$db_index{$k}->add_def_dbxref($db, $id); 
-		    }
-		    my @def_dbxrefs = $db_index{$k}->get_def_dbxref();
-		    foreach my $r (@def_dbxrefs) {
-			if ($r->get_dbxref_id()) {
-			    my $db= $r->get_db_name();
-			    my $acc=$r->get_accession();
-			    my $def_dbxref=$db . ":" . $acc;
-			    if (!exists($file_def_dbxrefs{uc($def_dbxref)})) { 
-				print STDERR "Note: deleting definition dbxref '$def_dbxref' from cvterm_dbxref...\n";
-				print OUT "Note: deleting definition dbxref '$def_dbxref' from cvterm_dbxref...\n" if $opt_o;
-				$db_index{$k}->delete_def_dbxref($r);
-			    }
-			}
+			message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
+			$db_index{$k}->add_secondary_dbxref($def_dbxref, 1); 
 		    }
 		}
 	    }
@@ -454,64 +467,70 @@ foreach my $new_ont(@onts) {
 	my $n_count=0;
 	foreach my $k (keys(%novel_terms)) {
 	    $n_count++;
-	    my $new_term = CXGN::Chado::Cvterm->new($dbh);
 	    my $name = $novel_terms{$k}->name();
-	    $new_term->name($name);
-	    $new_term->identifier(numeric_id($novel_terms{$k}->identifier()));
-	    $new_term->definition($novel_terms{$k}->definition());
-	    $new_term->set_db_name($opt_d);
-	    $new_term->set_cv_id($cv->get_cv_id());
-	    $new_term->set_obsolete($novel_terms{$k}->is_obsolete());
+	    my $version = $novel_terms{$k}->version();
 	    
-	    #changing the name of obsolete terms to "$name (obsolete $db:$accession)"
-	    #to avoid violating the cvterm unique constaint (name, cv_id, is_obsolete)
-	    if ($novel_terms{$k}->is_obsolete() ) {
-		unless( $name =~ m/obsolete.*$opt_d:$k/ ) {
+	    my $accession = numeric_id($novel_terms{$k}->identifier());
+	    message("Inserting novel term '$name'  (accession = '$accession', version = '$version'\n");
+	    
+	    my $new_term_dbxref = $schema->resultset("General::Dbxref")->find_or_create( 
+		{   db_id     => $db->get_column('db_id'),
+		    accession => $accession,
+		    version   => $version || '',
+		},
+		{ key => 'dbxref_c1' } ,
+		);
+	   
+	    if ($novel_terms{$k}->is_obsolete() == 1 ) {
+		unless( $name =~ m/obsolete.*$opt_d:$k/i ) {
 		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $k . ")" ;  
-		    $novel_terms{$k}->name($ob_name );
+		    $name = $ob_name ;
 		    print STDERR "**modified name for $opt_d:$k - '$ob_name' \n " ; 
 		}
 	    }
-	    if ($opt_v) { print STDERR "Storing term $k...\n"; }
-	    print OUT "Storing term $k...\n" if $opt_o;
-	    
-	    if (!$opt_t) { 
-		if ($count % 100==0)  { print STDERR "."; }
-		$new_term->store();
-		$new_term->comment($novel_terms{$k}->comment()); #store comment in cvterm_prop
+	    if (!$opt_t) {
+		my $new_term= $schema->resultset("Cv::Cvterm")->create(
+		    { cv_id  =>$cv->cv_id(),
+		      name   => $name,
+		      definition => $novel_terms{$k}->definition(),
+		      dbxref_id  => $new_term_dbxref-> dbxref_id(),
+		      is_obsolete=> $novel_terms{$k}->is_obsolete(),
+		    }
+		    );
 		
-		foreach my $s ($novel_terms{$k}->get_synonyms()) { #store synonyms in cvtermsynonym
+		#changing the name of obsolete terms to "$name (obsolete $db:$accession)"
+		#to avoid violating the cvterm unique constaint (name, cv_id, is_obsolete)
+		
+		message("Storing term $k...name = " . $novel_terms{$k}->name() . "\n"); 
+		
+		if ($count % 100==0)  { print STDERR "."; }
+		my $comment = $novel_terms{$k}->comment();
+		$new_term->create_cvtermprops( { comment => $comment } , { autocreated => 1 } ) if $comment;  
+		
+                #store synonyms in cvtermsynonym
+		foreach my $s ($novel_terms{$k}->get_synonyms() ) { 
 		    $s=~ s/\s+$//; 
 		    $s =~ s/\\//g;
 		    message("...adding synonym  '$s'  to the database...\n");
-		    print OUT "...adding synonym  '$s'  to the database...\n" if $opt_o;
 		    $new_term->add_synonym($s);  #need to add a type_id to each synonym!
 		}
 		
 		foreach my $i ($novel_terms{$k}->get_secondary_ids()) { #store secondary ids in cvterm_dbxref
 		    message("adding secondary dbxref '$i' to cvterm_dbxref\n");
-		    print OUT "adding secondary dbxref '$i' to cvterm_dbxref\n" if $opt_o;
-		    
+		    		    
 		    $new_term->add_secondary_dbxref($i);
 		}
 		foreach my $r ($novel_terms{$k}->get_dblinks() ) { #store definition's dbxrefs in cvterm_dbxref
-		    #my $id= $r->primary_id();
-		    #my $db= $r->database();
-		    my ($db, $id) = split /:/, $r;
-		    my $def_dbxref= $db . ":" . $id;
-		    #$file_def_dbxrefs{uc($def_dbxref)}=1;
-		    message("adding definition dbxref $db:$id to cvterm_dbxref\n");
-		    print OUT "adding definition dbxref $db:$id to cvterm_dbxref\n" if $opt_o;
-		    
-		    $new_term->add_def_dbxref($db, $id);
+		    my $def_dbxref= $r;
+		    message("adding definition dbxref $r to cvterm_dbxref\n");
+		    $new_term->add_secondary_dbxref($r, 1);
 		}
 	    }
-	}   
-	
-	
-	print STDERR "Updated $u_count existing terms, inserted $n_count new terms!\n";
-	print OUT "Updated $u_count existing terms, inserted $n_count new terms!\n";
+	}
 
+	##################################
+	message ("Updated $u_count existing terms, inserted $n_count new terms!\n",1);
+	
 	print STDERR "Parsing out the relationships...\n";
 	print STDERR "Looking at relationships in file.\n";
 	
@@ -525,99 +544,131 @@ foreach my $new_ont(@onts) {
 		my $s = $r->subject_term();
 		my $o = $r->object_term();
 		my $key = numeric_id($s->identifier())."-".numeric_id($o->identifier());
-		message("Looking at relationship in file: $key\n");
+		message("Looking at relationship in file: $key\n" );
 		if ($t_count % 100==0) { message("."); }
 		$file_relationships{$key} = $r; # create the hash entry for this relationship	
 	    }
 	}
-	print STDERR "\n";
-	print STDERR "Looking at relationships in database.\n";
-
+	print STDERR "\nLooking at relationships in database.\n";
+	
 	# indexing the database relationships
 	foreach my $k (keys %db_index) {     
-	    foreach my $r ($db_ont->get_relationships($db_index{$k})) { 
-		my $s = $r->subject_term();
-		my $o = $r->object_term();
-		
-		my $key = numeric_id($s->identifier())."-".numeric_id($o->identifier());
-		message("Looking at relationship in db: $key\n");
-		$db_relationships{$key}=$r;
+	    ###foreach my $r ($db_ont->get_relationships($db_index{$k})) { 
+	    foreach my $r ($db_index{$k}->search_related('cvterm_relationship_subject_ids') ) { 
+		if ($r) {
+		    my ($s) = $r->search_related('subject');
+		    my ($o) = $r->search_related('object'); 
+		    #terms might have moved to a different cv namespace 
+		    if ($s->cv_id() eq $o->cv_id() ) { 
+			my $key = numeric_id($s->search_related('dbxref')->first()->accession)."-".numeric_id($o->search_related('dbxref')->first()->accession);
+			message("Looking at relationship in db: $key\n");
+			$db_relationships{$key}=$r;
+		    }
+		}
 	    }
 	}
-	
-			
 	print STDERR "Relationships not in the file...\n";
 	
 	foreach my $k (keys(%db_relationships)) { 
-	    if (!(exists($file_relationships{$k}) && defined($file_relationships{$k}))) { 
+	    if (! (exists($file_relationships{$k}) && defined($file_relationships{$k})) ) { 
 		push @removed_relationships, $k;
-		print STDERR "Deleted relationship: $k... \n";
-		print OUT "Deleted relationship: $k... \n" if $opt_o;
-
+		message("Deleted relationship: $k... \n",1);
+	
 		$db_relationships{$k}->delete();
 		print STDERR "gone.\n";
 	    }
 	}
 	
-	
-	
-	
 	print STDERR "\n";
-#print STDERR scalar(@novel_terms). " novel terms (of ".(scalar(keys(%db_terms))).") were found and stored. \n";
 	
+	#####################################
 	my $r_count = 0;
-	foreach my $r (keys(%file_relationships)) { 
+	RELATIONSHIP: foreach my $r (keys(%file_relationships)) { 
 	    $r_count++;
 	    if (!exists($db_relationships{$r})) {
 		if ($opt_v) { print STDERR "Novel relationship: $r\n"; }
 		elsif ($r_count % 100 == 0) { print STDERR "."; } 
 		print OUT "Novel relationship: $r\n" if $opt_o;
 		
+		####
+		#convert the Bio::Ontology::OBOTerm objects to Bio::Chado::Schema::Cv::Cvterm objects
+		my $subject_accession = $file_relationships{$r}->subject_term()->identifier();
+	
+		my ($s_db, $s_acc) = split ':', $subject_accession;
+		my ($subject_dbxref)= $schema->resultset("General::Dbxref")->find( 
+		    { accession => $s_acc,
+		      db_id     => $db->db_id(),
+		    } );
+	
+		my ($subject_term)= $schema->resultset('Cv::Cvterm')->find(
+		    { cv_id => $cv->cv_id(),
+		      dbxref_id => $subject_dbxref->dbxref_id(),
+		    });
+		
+		
+		if (!$subject_term ) { 
+		    message("cvterm does not exist for subject term '$subject_accession'.Skipping..\n" ,1); 
+		    next RELATIONSHIP; 
+		}
+		
+		my $object_accession = $file_relationships{$r}->object_term()->identifier();
+		my ($o_db, $o_acc) = split ':', $object_accession;
+		my ($object_dbxref)= $schema->resultset("General::Dbxref")->find( 
+		    { accession => $o_acc,
+		      db_id     => $db->db_id(),
+		    } );
+		my ($object_term)= $schema->resultset('Cv::Cvterm')->find(
+		    { cv_id => $cv->cv_id(),
+		      dbxref_id => $object_dbxref->dbxref_id(),
+		    });
+				
+		if (!$object_term ) {
+		    message("cvterm does not exist for object term $object_accession . SKIPPING!\n",1); 
+		    next RELATIONSHIP;
+		}
+		
+		############################################
 		push @novel_relationships, $r;
-		
-		# create a new relationship object
-		my $new_rel = CXGN::Chado::Relationship->new($dbh);
-		
-		# convert the Bio::Ontology::OBOTerm objects to CXGN::Chado::Cvterm objects
-		my $subject_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $file_relationships{$r}->subject_term()->name(), $cv->get_cv_id());
-		$new_rel->subject_term($subject_term);
-		
-		my $object_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $file_relationships{$r}->object_term()->name(), $cv->get_cv_id());
-		$new_rel->object_term($object_term);
-		
 		my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
-		my $rel_cv_id= CXGN::Chado::Ontology->new_with_name($dbh, "relationship")->identifier();
-		my $cv_id= $db_ont->identifier();
 		
-		my $predicate_term = CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $rel_cv_id);
-		if (!$predicate_term->get_cvterm_id()) {
-		    $predicate_term=CXGN::Chado::Cvterm->new_with_term_name($dbh, $predicate_term_name, $cv_id);
-		    if (!$predicate_term->get_cvterm_id()) { 
+		my $predicate_term;
+		my ($rel_db)= $schema->resultset('General::Db')->search( { name => 'OBO_REL' } );
+		($predicate_term) = $schema->resultset('General::Dbxref')->search(
+		    { accession => { 'ilike' , "$predicate_term_name" }, 
+		      db_id     => $rel_db->db_id(), 
+		    })->search_related('cvterm') if $rel_db;
+		if (!$predicate_term) {
+		    ($predicate_term) = $schema->resultset('Cv::Cvterm')->search( 
+			{ name => { 'ilike' , $predicate_term_name } ,
+			  cv_id=> $cv->cv_id(),
+			}
+			);
+		    
+		    if (!$predicate_term) { 
 			die "The predicate term $predicate_term_name does not exist in the database\n";  
 		    }
 		}
-		$new_rel->predicate_term($predicate_term);
-		if ($opt_v) { print STDERR "Storing relationship $r. type cv_id=" . $predicate_term->get_cv_id() ."\n"; }
 		if (!$opt_t) { 
-		    $new_rel->store();
+		    message("Storing relationship $r. type cv_id=" . $predicate_term->cv_id() ."\n" ,1); 
+		    my $new_rel = $schema->resultset('Cv::CvtermRelationship')->create(
+			{ subject_id => $subject_term->cvterm_id(),
+			  object_id  => $object_term->cvterm_id(),
+			  type_id    => $predicate_term->cvterm_id(),
+			}
+			);
 		}
 	    }   
 	}
-	print STDERR $ontology_name." : ". scalar(@novel_relationships)." novel relationships among ".(scalar(keys(%file_relationships)))." were found and stored.\n";
-	print OUT $ontology_name ." : " . scalar(@novel_relationships)." novel relationships among ".(scalar(keys(%file_relationships)))." were found and stored.\n" if $opt_o;
+	message($ontology_name." : ". scalar(@novel_relationships)." novel relationships among ".(scalar(keys(%file_relationships)))." were found and stored.\n", 1);
+	
     };
     
     if ($@ || ($opt_t)) { 
-	print STDERR "Either running as trial mode (-t) or AN ERROR OCCURRED: $@\n"; 
-	print OUT "Either running as trial mode (-t) or AN ERROR OCCURRED: $@\n" if $opt_o; 
-	
+	message( "Either running as trial mode (-t) or AN ERROR OCCURRED: $@\n",1); 
 	$dbh->rollback();
 	exit(0);
     }
-    else { 
-	$dbh->commit();
-    }
-    
+    else {  $dbh->commit(); }
 }
 
 print STDERR "Done.\n";
@@ -639,13 +690,13 @@ sub recursive_children {
 
 sub message { 
     my $message = shift;
-    if ($opt_v) { 
-	print STDERR "$message";
-    }
+    my $default=shift;
+    if ($opt_v || $default) {  print STDERR "$message"; }
+    print OUT "$message" if $opt_o;
 }
 
 sub numeric_id { 
     my $id = shift;
-    $id =~ s/.*\:(\d+)$/$1/g;
+    $id =~ s/.*\:(.*)$/$1/g;
     return $id;
 }
