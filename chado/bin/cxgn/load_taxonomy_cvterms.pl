@@ -65,8 +65,15 @@ if ($opt_g) {
     
     $dbhost ||= $db_conf->host();
     $dbname ||= $db_conf->name();
+    my $dbdriver=$db_conf->driver();
+    my $dbport = $db_conf->port();
     if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    $schema= Bio::Chado::Schema->connect( $db_conf->dbh(), $db_conf->user(), $db_conf->password() );
+    
+    my $dsn = "dbi:$dbdriver:dbname=$dbname";
+    $dsn .= ";host=$dbhost";
+    $dsn .= ";port=$dbport" if $dbport;
+    
+    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 } );
     
     $dbh=$schema->storage->dbh();
     
@@ -134,6 +141,7 @@ if($@) {
 }
 
 __DATA__
+no rank
 superkingdom
 subkingdom
 kingdom

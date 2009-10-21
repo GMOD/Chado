@@ -161,8 +161,10 @@ if ($opt_g) {
     $dbname ||= $db_conf->name();
     
     if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    
-    $schema= Bio::Chado::Schema->connect( $db_conf->dbh(), $db_conf->user(), $db_conf->password() );
+    my $dsn = "dbi:".$db_conf->driver.":dbname=$dbname";
+    $dsn .= ";host=$dbhost";
+    $dsn .= ";port=".$db_conf->port if $db_conf->port;
+    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 });
     $dbh=$schema->storage->dbh();
 
 }else { 
@@ -214,7 +216,7 @@ foreach my $key( keys %seq) {
     $sth=$dbh->prepare($query);
     $sth->execute();
     my ($next) = $sth->fetchrow_array();
-    print STDERR "max $key is $next!\n";
+    #print STDERR "max $key is $next!\n";
     $maxval{$key}= $next;
 }
 
@@ -228,8 +230,7 @@ my $tree_dbxref = $schema->resultset("General::Dbxref")->find_or_create(
     } );
 
 my $tree_dbxref_id = $tree_dbxref->get_column('dbxref_id');
-print STDERR "Dbxref for $tree_accession (db_name = $db_name\n";
-print STDERR "The tree dbxref_id is $tree_dbxref_id!\n\n";
+
 
 my $phylotree = $schema->resultset('Phylogeny::Phylotree')->find_or_create(
     { dbxref_id => $tree_dbxref_id,
@@ -279,7 +280,7 @@ close( NODE );
 open( NAME, "names.dmp" );
 while ( my $line = <NAME> ) {
     #next unless $line =~ /scientific name/;
-    my ( $id, $name ) = split /\t\|\t/, $line;
+    my ( $id, $name ) = split /\s+\|\s+/, $line;
     next unless $node{ $id }; #skip nodes  
     if ( $line =~ /scientific name/) {
 	$node{ $id }{ 'name' } = $name;
@@ -360,7 +361,6 @@ eval {
       
       my $genus = $node{ $id }{ 'genus' } ;
       my $species = $node{ $id }{ 'species' } ;
-      
       my ($organism, $update, $insert);
       
       #this is just for checking if the organism is already stored in the database
@@ -391,7 +391,7 @@ eval {
       }
       if ($insert) {
 	  $organism->insert();
-	    print STDERR "New organism" . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+	    print STDERR "New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
 	  print ERR "New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
       }
       	my $organism_id= $organism->get_column('organism_id');
@@ -511,7 +511,7 @@ if ($@ || $opt_t) {
     foreach my $key ( keys %seq ) { 
 	my $value= $seq{$key};
 	my $maxvalue= $maxval{$key} || 0;
-	print STDERR "$key: $value, $maxvalue \n";
+	#print STDERR "$key: $value, $maxvalue \n";
 	if ($maxvalue) { $dbh->do("SELECT setval ('$value', $maxvalue, true)") ;  }
 	else {  $dbh->do("SELECT setval ('$value', 1, false)");  }
     }
@@ -532,14 +532,14 @@ sub set_maxval {
     $sth=$dbh->prepare($query);
     $sth->execute();
     my ($next) = $sth->fetchrow_array();
-    print STDERR "max $key is $next!\n";
+    #print STDERR "max $key is $next!\n";
     return $next;
 }
 
 
 #http://www.eyesopen.com/docs/cplusprog_1_2/node220.html
 __DATA__
-    no rank
+no rank
 superkingdom
 subkingdom
 kingdom
