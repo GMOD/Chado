@@ -211,9 +211,7 @@ sub organism {
 sub dbh {
     my $self = shift;
 
-    my $dsn = "dbi:Pg:dbname=".$self->name();
-    $dsn .= ";host=".$self->host() if $self->host();
-    $dsn .= ";port=".$self->port() if $self->port();
+    my $dsn = $self->dsn;
 
     my $dbh = DBI->connect( $dsn, $self->user(), $self->password() )
         or die "couldn't create db connection:$!";
@@ -221,6 +219,29 @@ sub dbh {
 
     return $dbh;
 }
+
+=head2 dsn
+                                                                                
+ Title   : dsn
+ Usage   : $dsn = $dbconf->dsn();
+ Function: return a database connection string
+ Returns : see above
+ Args    : none
+ Status  : Public
+                                                                                
+=cut
+
+
+sub dsn {
+    my $self = shift;
+
+    my $dsn = "dbi:Pg:dbname=".$self->name();
+    $dsn .= ";host=".$self->host() if $self->host();
+    $dsn .= ";port=".$self->port() if $self->port();
+ 
+    return $dsn;
+}
+
 
 
 1;
