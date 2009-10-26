@@ -1277,7 +1277,7 @@ sub place_lock {
         my ($name,$host,$time) = @result;
         my ($progname,$pid)  = split /\-/, $name;
 
-        if ($progname = 'gmod_bulk_load_gff3.pl') {
+        if ($progname eq 'gmod_bulk_load_gff3.pl') {
             print STDERR "\n\n\nWARNING: There is another gmod_bulk_load_gff3.pl process\n";
             print STDERR "running on $host, with a process id of $pid\n";
             print STDERR "which started at $time\n";
