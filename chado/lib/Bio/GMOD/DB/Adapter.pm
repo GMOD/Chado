@@ -199,6 +199,8 @@ use constant INSERT_INTO_META =>
                "INSERT INTO gff_meta (name,hostname) VALUES (?,?)";
 use constant DELETE_FROM_META =>
                "DELETE FROM gff_meta WHERE name = ? AND hostname = ?";
+use constant TMP_TABLE_CLEANUP =>
+               "DELETE FROM tmp_gff_load_cache WHERE feature_id >= ?";
 
 my $ALLOWED_UNIQUENAME_CACHE_KEYS =
                "feature_id|type_id|organism_id|uniquename|validate";
@@ -553,7 +555,13 @@ new value of nextfeature (to set)
 ## dgg; keep - this is public; 
 sub nextfeature {
     my $self = shift;
-    return $self->nextoid('feature',@_);
+
+    my $fid = $self->nextoid('feature',@_);
+    if (!$self->first_feature_id() ) {
+        $self->first_feature_id( $fid );
+    }
+
+    return $fid;
 #     my $arg = shift if defined(@_);
 #     if (defined($arg) && $arg eq '++') {
 #         return $self->{'nextfeature'}++;
@@ -1328,20 +1336,94 @@ sub remove_lock {
     my ($self, %argv) = @_;
 
     my $dbh = $self->dbh;
-    my $select_query = $dbh->prepare(SELECT_FROM_META);
-    $select_query->execute();
+    my $select_query = $dbh->prepare(SELECT_FROM_META) or warn "select prepare failed";
+    $select_query->execute() or warn "select from meta failed";
 
-    my $delete_query = $dbh->prepare(DELETE_FROM_META);
+    my $delete_query = $dbh->prepare(DELETE_FROM_META) or warn "delete prepare failed";
 
     while (my @result = $select_query->fetchrow_array) {
         my ($name,$host,$time) = @result;
 
         if ($name =~ /gmod_bulk_load_gff3/) {
-            $delete_query->execute($name,$host);
+            $delete_query->execute($name,$host) or warn "removing the lock failed!";
+            $dbh->commit or warn "commit failed";
         }
     }
 
     return;
+}
+
+=head2 cleanup_tmp_table
+
+=over
+
+=item Usage
+
+  $obj->cleanup_tmp_table()
+
+=item Function
+
+Called when there is an abnormal exit from a loading program.  It deletes
+entries in the tmp_gff_load_cache table that have feature_ids that were used
+during the current session.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+None (it needs the first feature_id, but that is stored in the object).
+
+=back
+
+=cut
+
+sub cleanup_tmp_table {
+    my $self = shift;
+
+    my $dbh = $self->dbh;
+    my $first_feature = $self->first_feature_id();
+    return unless $first_feature;
+
+    my $delete_query = $dbh->prepare(TMP_TABLE_CLEANUP);
+
+
+    warn "Attempting to clean up the loader temp table (so that --recreate_cache\nwon't be needed)...\n";
+    $delete_query->execute($first_feature); 
+
+    return;
+}
+
+=head2 first_feature_id
+
+=over
+
+=item Usage
+
+  $obj->first_feature_id()        #get existing value
+  $obj->first_feature_id($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of first_feature_id (a scalar), that is, the feature_id of the first
+feature parsed in the current session.
+
+=item Arguments
+
+new value of first_feature_id (to set)
+
+=back
+
+=cut
+
+sub first_feature_id {
+    my $self = shift;
+    my $first_feature_id = shift if defined(@_);
+    return $self->{'first_feature_id'} = $first_feature_id if defined($first_feature_id);
+    return $self->{'first_feature_id'};
 }
 
 

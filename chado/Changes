@@ -26,8 +26,16 @@ Mungall.
 * Updated all_feature_names view to search featureprop.value and
 dbxref.accession and added organism_id so GBrowse can limit
 by organism.
-
-
+* Fixed gmod_bulk_load_gff3.pl to deal correctly with the case that
+mulitple organisms have the same common name.  If the user tries to
+use a common name that corresponds to more than one organism, it will
+die gracefully.
+* Fixed gmod_bulk_load_gff3.pl so that featureloc.srcfeature_id will
+not be sometimes set incorrectly when there are multiple organisms
+with chromosomes (or other srcfeatures) with the same name.  If you have
+a database that has been affected by this bug, see http://....  for a fix.
+* Added a __DIE__ signal handler to gmod_bulk_load_gff3.pl so that the
+databsae will be cleaned up in most cases before the loader croaks.
 
 
 

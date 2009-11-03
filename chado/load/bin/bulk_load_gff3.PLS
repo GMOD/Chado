@@ -590,6 +590,8 @@ GetOptions(
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $MANPAGE;
 
+$SIG{__DIE__} = $SIG{INT} = 'cleanup_handler';
+
 my $ORGANISM_FROM_CMDLINE = $ORGANISM;
 
 unless ($DBNAME) {
@@ -705,6 +707,7 @@ my $chado = $adapter->new(%argv);
 
 $chado->remove_lock(force => 1) if $REMOVE_LOCK;
 $chado->place_lock();
+my $lock = 1;
 
 #if we need custom ontology mapping, cache them here
 if ($ONTOLOGY) {
@@ -1058,6 +1061,22 @@ if ($END_SQL) {
 
 $chado->remove_lock();
 exit(0);
+
+
+sub cleanup_handler {
+    warn "@_\nAbnormal termination, trying to clean up...\n\n" if @_;  #gets the message that the die signal sent if there is one
+    if ($chado && $chado->dbh->ping) {
+        #$chado->dbh->{AutoCommit} = 1;
+        $chado->cleanup_tmp_table;
+        if ($lock) {
+            warn "Trying to remove the run lock (so that --remove_lock won't be needed)...\n";
+            $chado->remove_lock; #remove the lock only if we've set it
+        }
+        $chado->dbh->rollback;
+        print STDERR "Exiting...\n";
+    }
+    exit(1);
+}
 
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
