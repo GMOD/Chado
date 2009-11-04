@@ -220,9 +220,6 @@ according to these simple rules:
 otherwise, it is assigned a uniquename that is equal to
 'auto' concatenated with the feature_id.
 
-(Note that this is a potential problem as there is no check
-to make sure that it is appropriately unique.)
-
 =item If there is a Name tag, it's value is set to feature.name;
 
 otherwise it is null.
@@ -525,6 +522,14 @@ analysis table.  The format will probably be tag value pairs:
   --analysis match:Rice_est=rice_est_blast, \
              match:Maize_cDNA=maize_cdna_blast, \
              mRNA=genscan_prediction,exon=genscan_prediction
+
+=item Grouping features by ID
+
+The GFF3 specification allows features like CDSes and match_parts to
+be grouped together by sharing the same ID.  This loader does not support
+this method of grouping.  Instead the parent feature must be explicitly
+created before the parts and the parts must refer to the parent with the 
+Parent tag.
 
 =back
 
