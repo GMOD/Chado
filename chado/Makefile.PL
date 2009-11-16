@@ -148,7 +148,7 @@ my $chado_dir    = catdir $lib_dir, 'Bio/Chado';
 my $build_config = catfile $working_dir, 'build.conf';
 my $load_config  = catfile $working_dir, 'load', 'etc', 'load.conf';
 
-my $all_args = join( '|', qw[LIB RECONFIGURE DEFAULTS PREFIX INSTALLSITEMAN1DIR INSTALLSITEMAN3DIR ], keys %args );
+my $all_args = join( '|', qw[LIB RECONFIGURE DEFAULTS PREFIX INSTALLSITEMAN1DIR INSTALLSITEMAN3DIR INSTALL_BASE], keys %args );
 my %env_required = map {$_=>1} qw(GMOD_ROOT CHADO_DB_NAME CHADO_DB_USERNAME); #CHADO_DB_PASSWORD is valid if undefined
 my $all_envs = join( '|', keys %env_required );
 
@@ -196,6 +196,7 @@ foreach ( @argv ) {
 }
 @ARGV = ();
 push @ARGV, "PREFIX=$opts{PREFIX}" if $opts{PREFIX};
+push @ARGV, "INSTALL_BASE=$opts{INSTALL_BASE}" if $opts{INSTALL_BASE};
 $O{'GMOD_ROOT'} = $opts{PREFIX} if $opts{PREFIX};
 push @ARGV, "INSTALLSITEMAN1DIR=$opts{INSTALLSITEMAN1DIR}" if $opts{INSTALLSITEMAN1DIR};
 push @ARGV, "INSTALLSITEMAN3DIR=$opts{INSTALLSITEMAN3DIR}" if $opts{INSTALLSITEMAN3DIR};
@@ -532,7 +533,7 @@ WriteMakefile(
     clean                 => {
       FILES               => 
         '$(DISTVNAME).tar$(SUFFIX) load/etc/load.conf build.conf ' .
-        '_build Build lib/Bio/Chado/AutoDBI.pm lib/Bio/Chado/LoadDBI.pm '.$LOCAL_TMP  
+        '_build Build lib/Bio/Chado/AutoDBI.pm '.$LOCAL_TMP  
     },
 );
 
