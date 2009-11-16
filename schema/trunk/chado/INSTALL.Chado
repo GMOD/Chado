@@ -135,7 +135,7 @@ GO_ROOT as  directed in the go-perl INSTALL doc.
 
 - ant
       
-When installing from cvs, ant is needed to move GMODTools files
+When installing from svn, ant is needed to move GMODTools files
 from schema/GMODTools into schema/chado.  When installing from
 a distribution, this is not necessary, as the files will have
 already been moved as part of the build process.
