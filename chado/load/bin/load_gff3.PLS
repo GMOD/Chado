@@ -34,7 +34,7 @@ if ($OPTIONS{PREFIX}) {
 print OUT <<'!NO!SUBS!';
 use strict;
 use warnings;
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
+use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
 use Bio::Tools::GFF;
 use Bio::SeqIO;
 use Bio::Chado::AutoDBI;
@@ -100,10 +100,9 @@ this script, you need to remove the genotype view:
 
 The most important thing to know about this loader is that it is SLOW!
 The bulk loader (gmod_bulk_load_gff3.pl, also in this distribution) is
-many times faster (perhaps 100 times faster).  In addition, the bulk
-loader currently implements a more complete load and is more flexible.
-The only real advantage is the this loader is easier to port to other
-database systems because it runs on Class::DBI middleware.
+many times faster (perhaps 100 times faster).  The only real advantage
+is the this loader is easier to port to other database systems because
+it runs on Class::DBI middleware.
 
 The gmod_load_gff3.pl script takes genomic annotations in the GFF3 format
 and loads them into several tables in chado.  (see
@@ -189,6 +188,12 @@ By providing the command line flag --uniquename, the user indicates what
 GFF tag to uses as the feature.uniquename when inserting into the feature
 table.  Note that this name must be unique among all features in the feature
 table; if it is not, the load of that feature will probably fail.
+
+=item Analysis Results
+
+Currently, this loader doesn't capture analysis results.  That is, it doesn't
+populate the analysis or analysisfeature tables and ignores the score column
+in the GFF3.
 
 =back
 
