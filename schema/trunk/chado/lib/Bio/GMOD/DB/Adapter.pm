@@ -1346,7 +1346,7 @@ sub remove_lock {
 
         if ($name =~ /gmod_bulk_load_gff3/) {
             $delete_query->execute($name,$host) or warn "removing the lock failed!";
-            $dbh->commit or warn "commit failed";
+            $dbh->commit;
         }
     }
 
@@ -2463,6 +2463,7 @@ sub print_delete {
 sub print_seq {
   my $self = shift;
   my ($name,$string) = @_;
+  my $dbh = $self->dbh;
 
   my $organism_id = $self->organism_id;
 
@@ -2470,9 +2471,19 @@ sub print_seq {
                  ? $self->modified_uniquename(orig_id=>$name, organism_id => $organism_id)
                  : $name;
 
+  my $fid_query = "SELECT feature_id FROM tmp_gff_load_cache WHERE uniquename = ? AND organism_id = ? AND feature_id >= ?";
+  my $sth = $dbh->prepare($fid_query);
+  $sth->execute($uniquename,$organism_id,$self->first_feature_id); 
+  
+  if ($sth->rows != 1) {
+    warn "No feature found for $uniquename, org_id:$organism_id when trying to add sequence";
+    return;
+  }
+  my ($feature_id) = $sth->fetchrow_array;
+
   my $fh = $self->file_handles('sequence');
-  print $fh "UPDATE feature set residues='$string' WHERE uniquename='$uniquename';\n";
-  print $fh "UPDATE feature set seqlen=length(residues) WHERE uniquename='$uniquename';\n";
+  print $fh "UPDATE feature set residues='$string' WHERE feature_id=$feature_id;\n";
+  print $fh "UPDATE feature set seqlen=length(residues) WHERE feature_id=$feature_id;\n";
 
   return;
 }
