@@ -6,7 +6,6 @@ bin/config.PLS
 bin/create-bridge-sql.pl
 bin/create-so-bridge.pl
 bin/cxgn/gmod_load_cvterms.pl
-bin/cxgn/load_cvterms.pl
 bin/cxgn/load_ncbi_taxonomy.pl
 bin/cxgn/load_taxonomy_cvterms.pl
 bin/dbi.tt2
