@@ -3,7 +3,7 @@ use lib 'lib';
 use Bio::Chado::Builder;
 use Data::Dumper;
 
-my $VERSION    = 0.01;
+my $VERSION    = 1.1;
 my $conf       = shift;
 my $m          = Bio::Chado::Builder->new(
   dist_name    => 'Chado', 
