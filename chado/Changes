@@ -36,6 +36,9 @@ with chromosomes (or other srcfeatures) with the same name.  If you have
 a database that has been affected by this bug, see http://....  for a fix.
 * Added a __DIE__ signal handler to gmod_bulk_load_gff3.pl so that the
 databsae will be cleaned up in most cases before the loader croaks.
+* Fixed gmod_bulk_load_gff3.pl so that when loading dna sequence from the
+fasta section it won't accidentally add sequence to a feature that has
+the same uniquename but different organism_id to the actual target.
 
 
 
