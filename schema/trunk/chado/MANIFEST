@@ -170,7 +170,7 @@ lib/Bio/GMOD/Load/GFF.pm
 lib/Bio/GMOD/SeqUtils.pm
 LICENSE
 load/bin/bulk_load_gff3.PLS
-load/bin/load_gff3.PLS
+#load/bin/load_gff3.PLS
 load/Build.PL
 load/etc/chap.obo
 load/etc/extra.sql
