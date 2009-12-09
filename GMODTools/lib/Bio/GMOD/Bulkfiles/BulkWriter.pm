@@ -93,7 +93,13 @@ sub _init_base
   ## add these to %ENV before reading blastfiles.xml so ${vars} get replaced ..
   my $sconfig= $self->handler_config;
   my @keys = qw( species org date title rel relfull relid release_url );
-  @ENV{@keys} = @{%$sconfig}{@keys};
+  
+#@ENV{@keys} = @{%$sconfig}{@keys};
+  foreach my $next_key (@keys) {
+   # printf STDERR "(%s) %s\n", ($next_key, $sconfig->{$next_key});
+    $ENV->{$next_key} = $sconfig->{$next_key};
+  }
+
 
 	$self->init(); # preconfig inits
 	
