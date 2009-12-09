@@ -1569,15 +1569,20 @@ sub update_sequences {
       my $sth          = $self->dbh->prepare($max_id_query);
       $sth->execute;
       my ($max_id)     = $sth->fetchrow_array();
+
+       warn "$table $max_id";
       
       my $curval_query = "SELECT nextval('$sequences{$table}')";
       $sth             = $self->dbh->prepare($curval_query);
       $sth->execute;
       my ($curval)     = $sth->fetchrow_array();      
 
+       warn "$table $curval";
+
       if ($max_id > $curval) {
           my $setval_query = "SELECT setval('$sequences{$table}',$max_id)";
           $sth             = $self->dbh->prepare($setval_query);
+          $sth->execute;
       }
 
     }
