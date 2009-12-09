@@ -84,6 +84,8 @@ $0 - Bulk loads gff3 files into a chado database.
  --recreate_cache  Causes the uniquename cache to be recreated
  --remove_lock     Remove the lock to allow a new process to run
  --save_tmpfiles   Save the temp files used for loading the database
+ --random_tmp_dir  Use a randomly generated tmp dir (the default is
+                     to use the current directory)
  --no_target_syn   By default, the loader adds the targetId in 
                      the synonyms list of the feature. This flag 
                      desactivate this.
@@ -547,7 +549,7 @@ it under the same terms as Perl itself.
 my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
-    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,
+    $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,$RANDOM_TMP_DIR,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
     $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER,
     $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM, $END_SQL, $REMOVE_LOCK, );
@@ -577,6 +579,7 @@ GetOptions(
     'recreate_cache'=> \$RECREATE_CACHE,
     'remove_lock'   => \$REMOVE_LOCK,
     'save_tmpfiles'=>\$SAVE_TMPFILES,
+    'random_tmp_dir'=>\$RANDOM_TMP_DIR,
     'no_target_syn'=> \$NO_TARGET_SYN,
     'unique_target' => \$UNIQUE_TARGET,
     'dbxref:s'      => \$DBXREF,
@@ -679,6 +682,7 @@ my %argv;
   $argv{nouniquecache}= $NOUNIQUECACHE;
   $argv{recreate_cache}=$RECREATE_CACHE;
   $argv{save_tmpfiles}= $SAVE_TMPFILES;
+  $argv{random_tmp_dir}=$RANDOM_TMP_DIR;
   $argv{no_target_syn}= $NO_TARGET_SYN;
   $argv{unique_target}= $UNIQUE_TARGET;
   $argv{dbxref}       = $DBXREF;
@@ -1077,7 +1081,7 @@ sub cleanup_handler {
             warn "Trying to remove the run lock (so that --remove_lock won't be needed)...\n";
             $chado->remove_lock; #remove the lock only if we've set it
         }
-        $chado->dbh->rollback;
+        #$chado->dbh->rollback;
         print STDERR "Exiting...\n";
     }
     exit(1);

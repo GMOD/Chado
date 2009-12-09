@@ -3,7 +3,7 @@ package Bio::GMOD::DB::Adapter;
 use strict;
 use Carp qw/cluck confess/;
 use DBI;
-use File::Temp;
+use File::Temp qw/ tempdir /;
 use Data::Dumper;
 use URI::Escape;
 use Sys::Hostname;
@@ -260,6 +260,7 @@ sub new {
     $self->nouniquecache(   $arg{nouniquecache}   );
     $self->recreate_cache(  $arg{recreate_cache}  );
     $self->save_tmpfiles(   $arg{save_tmpfiles}   );
+    $self->random_tmp_dir(  $arg{random_tmp_dir}  );
     $self->no_target_syn(   $arg{no_target_syn}   );
     $self->unique_target(   $arg{unique_target}   );
     $self->dbxref(          $arg{dbxref}          );
@@ -899,12 +900,17 @@ sub file_handles {
         return $self->{file_handles}{$fhhame};
     }
     else {
+        my $file_path = "./";
+        if ($self->random_tmp_dir ) {
+            $file_path = tempdir( CLEANUP => $self->save_tmpfiles() ? 0 : 1 );
+        }
         for my $key (keys %files) {
             $self->{file_handles}{$files{$key}} 
                 = new File::Temp(
                                  TEMPLATE => "chado-$key-XXXX", #dgg; was $keyXXXX
-                                 SUFFIX => '.dat',
+                                 SUFFIX   => '.dat',
                                  UNLINK   => $self->save_tmpfiles() ? 0 : 1, 
+                                 DIR      => $file_path,
                                 );
         }
         return;
@@ -1349,7 +1355,7 @@ sub remove_lock {
 
         if ($name =~ /gmod_bulk_load_gff3/) {
             $delete_query->execute($name,$host) or warn "removing the lock failed!";
-            #$dbh->commit;
+            $dbh->commit;
         }
     }
 
@@ -2243,6 +2249,37 @@ sub save_tmpfiles {
     my $save_tmpfiles = shift if defined(@_);
     return $self->{'save_tmpfiles'} = $save_tmpfiles if defined($save_tmpfiles);    return $self->{'save_tmpfiles'};
 }
+
+=head2 random_tmp_dir
+
+=over
+
+=item Usage
+
+  $obj->random_tmp_dir()        #get existing value
+  $obj->random_tmp_dir($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of random_tmp_dir (a scalar)
+
+=item Arguments
+
+new value of random_tmp_dir (to set)
+
+=back
+
+=cut
+
+sub random_tmp_dir {
+    my $self = shift;
+    my $random_tmp_dir = shift if defined(@_);
+    return $self->{'random_tmp_dir'} = $random_tmp_dir if defined($random_tmp_dir);
+    return $self->{'random_tmp_dir'};
+}
+
 
 =head2 no_target_syn
 
