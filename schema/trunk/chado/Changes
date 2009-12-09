@@ -39,6 +39,11 @@ databsae will be cleaned up in most cases before the loader croaks.
 * Fixed gmod_bulk_load_gff3.pl so that when loading dna sequence from the
 fasta section it won't accidentally add sequence to a feature that has
 the same uniquename but different organism_id to the actual target.
+* Adding a update_sequences method for use by gmod_bulk_load_gff3.pl
+that will check the next value available to the database sequences
+that generate primary keys and update them when necessary.  This
+can happen when another database load adds data to chado but does
+not update the sequence.
 
 
 
