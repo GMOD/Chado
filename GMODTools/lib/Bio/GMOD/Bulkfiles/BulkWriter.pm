@@ -97,7 +97,7 @@ sub _init_base
 #@ENV{@keys} = @{%$sconfig}{@keys};
   foreach my $next_key (@keys) {
    # printf STDERR "(%s) %s\n", ($next_key, $sconfig->{$next_key});
-    $ENV->{$next_key} = $sconfig->{$next_key};
+    $ENV{$next_key} = $sconfig->{$next_key};
   }
 
 
