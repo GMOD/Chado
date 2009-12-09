@@ -1355,7 +1355,7 @@ sub remove_lock {
 
         if ($name =~ /gmod_bulk_load_gff3/) {
             $delete_query->execute($name,$host) or warn "removing the lock failed!";
-            $dbh->commit;
+            $dbh->commit unless $self->dbh->{AutoCommit};
         }
     }
 
