@@ -1225,12 +1225,15 @@ sub initialize_uniquename_cache {
         print STDERR "Populating table...\n";
         $dbh->do(POPULATE_CACHE_TABLE);
 
-        print STDERR "Creating indexes...";
+        print STDERR "Creating indexes...\n";
         $dbh->do(CREATE_CACHE_TABLE_INDEX1);
         $dbh->do(CREATE_CACHE_TABLE_INDEX2);
         $dbh->do(CREATE_CACHE_TABLE_INDEX3);
 
         $dbh->commit;
+
+        print STDERR "Adjusting the primary key sequences (if necessary)...";
+        $self->update_sequences();
         print STDERR "Done.\n";
     }
     return;
@@ -1346,7 +1349,7 @@ sub remove_lock {
 
         if ($name =~ /gmod_bulk_load_gff3/) {
             $delete_query->execute($name,$host) or warn "removing the lock failed!";
-            $dbh->commit;
+            #$dbh->commit;
         }
     }
 
@@ -1528,55 +1531,62 @@ sub initialize_sequences {
     }
     return;
 }
-#     my $sth = $self->dbh->prepare("select nextval('$sequences{feature}')");
-#     $sth->execute;
-#     my ($nextfeature) = $sth->fetchrow_array();
-#     $self->nextfeature($nextfeature);
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{featureloc}')");
-#     $sth->execute;
-#     my ($nextfeatureloc) = $sth->fetchrow_array();
-#     $self->nextfeatureloc($nextfeatureloc);
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_relationship}')");
-#     $sth->execute;
-#     ($nextfeaturerel) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{featureprop}')");
-#     $sth->execute;
-#     ($nextfeatureprop) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_cvterm}')");
-#     $sth->execute;
-#     ($nextfeaturecvterm) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{synonym}')");
-#     $sth->execute;
-#     ($nextsynonym) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_synonym}')");
-#     $sth->execute;
-#     ($nextfeaturesynonym) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{feature_dbxref}')");
-#     $sth->execute;
-#     ($nextfeaturedbxref) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{dbxref}')");
-#     $sth->execute;
-#     ($nextdbxref) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{cvterm}')");
-#     $sth->execute;
-#     ($nextcvterm) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{db}')");
-#     $sth->execute;
-#     ($nextdbname) = $sth->fetchrow_array();
-# 
-#     $sth = $self->dbh->prepare("select nextval('$sequences{analysisfeature}')");
-#     $sth->execute;
-#     ($nextanalysisfeature) = $sth->fetchrow_array();
+
+
+=head2 update_sequences
+
+=over
+
+=item Usage
+
+  $obj->update_sequences()
+
+=item Function
+
+Checks the maximum value of the primary key of the sequence's table
+and modifies the nextval of the sequence if they are out of sync.
+It then (re)initializes the sequence cache.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+None
+
+=back
+
+=cut
+
+sub update_sequences {
+    my $self = shift;
+
+    foreach my $table (@tables) {
+
+      my $id_name      = $table."_id";
+      my $max_id_query = "SELECT max($id_name) FROM $table";
+      my $sth          = $self->dbh->prepare($max_id_query);
+      $sth->execute;
+      my ($max_id)     = $sth->fetchrow_array();
+      
+      my $curval_query = "SELECT nextval('$sequences{$table}')";
+      $sth             = $self->dbh->prepare($curval_query);
+      $sth->execute;
+      my ($curval)     = $sth->fetchrow_array();      
+
+      if ($max_id > $curval) {
+          my $setval_query = "SELECT setval('$sequences{$table}',$max_id)";
+          $sth             = $self->dbh->prepare($setval_query);
+      }
+
+    }
+
+    $self->initialize_sequences();
+    return;
+
+
+}
 
 
 =head2 dbh
