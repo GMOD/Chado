@@ -44,6 +44,9 @@ that will check the next value available to the database sequences
 that generate primary keys and update them when necessary.  This
 can happen when another database load adds data to chado but does
 not update the sequence.
+* Adding the ability to specify that gmod_bulk_load_gff3.pl use the
+system tmp directory rather than using the current working directory
+for writing the temporary load files.
 
 
 
