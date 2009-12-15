@@ -242,8 +242,9 @@ for my $gfffile (@gfffiles) {
             open FASTA, 
                  ">", $fasta or die "couldn't open $fasta for writing: $!\n";
 
-            print FASTA "##FASTA\n";
+            print FASTA "##gff-version 3\n";
             print FASTA;
+            print FASTA "\n";  #extra cr works around bug in Bio::FeatureIO::gff
             next;
         }
         elsif ($fasta_flag) {
