@@ -47,7 +47,8 @@ not update the sequence.
 * Adding the ability to specify that gmod_bulk_load_gff3.pl use the
 system tmp directory rather than using the current working directory
 for writing the temporary load files.
-
+* Added a --fastafile option to gmod_bulk_load_gff3.pl to use when 
+loading fasta files.
 
 
 Below this line are changes up until a few years ago and are included
