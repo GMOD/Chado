@@ -2527,8 +2527,12 @@ sub print_seq {
   my $sth = $dbh->prepare($fid_query);
   $sth->execute($uniquename,$organism_id,$self->first_feature_id); 
   
-  if ($sth->rows != 1) {
+  if ($sth->rows == 0) {
     warn "No feature found for $uniquename, org_id:$organism_id when trying to add sequence";
+    return;
+  }
+  elsif ($sth->rows > 1) {
+    warn "More than one feature found for $uniquename, org_id:$organism_id when trying to add sequence";
     return;
   }
   my ($feature_id) = $sth->fetchrow_array;
