@@ -1575,15 +1575,11 @@ sub update_sequences {
       my $sth          = $self->dbh->prepare($max_id_query);
       $sth->execute;
       my ($max_id)     = $sth->fetchrow_array();
-
-       warn "$table $max_id";
       
       my $curval_query = "SELECT nextval('$sequences{$table}')";
       $sth             = $self->dbh->prepare($curval_query);
       $sth->execute;
       my ($curval)     = $sth->fetchrow_array();      
-
-       warn "$table $curval";
 
       if ($max_id > $curval) {
           my $setval_query = "SELECT setval('$sequences{$table}',$max_id)";
@@ -2535,6 +2531,41 @@ sub print_seq {
     warn "More than one feature found for $uniquename, org_id:$organism_id when trying to add sequence";
     return;
   }
+  my ($feature_id) = $sth->fetchrow_array;
+
+  my $fh = $self->file_handles('sequence');
+  print $fh "UPDATE feature set residues='$string' WHERE feature_id=$feature_id;\n";
+  print $fh "UPDATE feature set seqlen=length(residues) WHERE feature_id=$feature_id;\n";
+
+  return;
+}
+
+sub print_fasta {
+  my $self = shift;
+  my ($uniquename,$string) = @_;
+  my $dbh = $self->dbh;
+  my $organism_id = $self->organism_id;
+
+  #assume that the fasta ID matches the uniquename (ie, no munging when it went into the database)
+  my $fid_query = "SELECT feature_id FROM feature WHERE uniquename = ? AND organism_id = ?";
+  my $sth = $dbh->prepare($fid_query);
+  $sth->execute($uniquename,$organism_id);
+
+  if ($sth->rows == 0) {
+    warn <<END;
+No features where found with a unqiuename of $uniquename
+and an organism_id of $organism_id.  Are you sure you have the uniquename
+right?  It might have been changed when loaded into the database to ensure
+uniqueness.  Skipping this sequence...
+
+END
+    return;
+  } 
+  elsif ($sth->rows > 1) {
+    warn "More than one feature found for $uniquename, org_id:$organism_id when trying to add sequence, skipping...\n\n";
+    return;
+  }
+
   my ($feature_id) = $sth->fetchrow_array;
 
   my $fh = $self->file_handles('sequence');

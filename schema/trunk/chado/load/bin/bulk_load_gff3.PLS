@@ -36,6 +36,7 @@ use strict;
 use warnings;
 use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
 use Bio::FeatureIO;
+use Bio::SeqIO;
 use Getopt::Long;
 use Data::Dumper;
 use Pod::Usage;
@@ -58,6 +59,7 @@ $0 - Bulk loads gff3 files into a chado database.
 
  --gfffile         The file containing GFF3 (optional, can read 
                      from stdin)
+ --fastafile       Fasta file to load sequence from
  --organism        The organism for the data 
                     (use the value 'fromdata' to read from GFF organism=xxx)
  --dbprofile       Database config profile name
@@ -336,6 +338,18 @@ and the features will be stored as is.
 
 =over
 
+=item Loading fasta file
+
+When the --fastafile is provided with an argument that is the path to
+a file containing fasta sequence, the loader will attempt to update the
+feature table with the sequence provided.  Note that the ID provided in the
+fasta description line must exactly match what is in the feature table
+uniquename field.  Be careful if it is possible that the uniquename of the
+feature was changed to ensure uniqueness when it was loaded from the
+original GFF.  Also note that when loading sequence from a fasta file, 
+loading GFF from standard in is disabled.  Sorry for any inconvenience.
+
+
 =item ##sequence-region
 
 This script does not use sequence-region directives for anything.
@@ -546,7 +560,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
+my ($ORGANISM, $GFFFILE,$FASTAFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT, 
     $ANALYSIS, $ANALYSIS_GROUP, $GLOBAL_ANALYSIS, $NOLOAD, $VALIDATE, $INSERTS,
     $NOTRANSACT, $NOSEQUENCE, $SCORE_COL, $ONTOLOGY, $SKIP_VACUUM,
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,$RANDOM_TMP_DIR,
@@ -557,6 +571,7 @@ my ($ORGANISM, $GFFFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST, $DBPORT,
 GetOptions(
     'organism=s' => \$ORGANISM,
     'gfffile=s'  => \$GFFFILE,
+    'fastafile=s'=> \$FASTAFILE,
     'dbprofile=s'=> \$DBPROFILE,
     'dbname=s'   => \$DBNAME,
     'dbuser=s'   => \$DBUSER,
@@ -660,6 +675,7 @@ $SKIP_VACUUM = $NO_SKIP_VACUUM ? 0 : 1;
 my %argv;
   $argv{organism}     = $ORGANISM;
   $argv{gfffile}      = $GFFFILE;
+  $argv{fastafile}    = $FASTAFILE;
   $argv{dbprofile}    = $DBPROFILE;
   $argv{dbname}       = $DBNAME;
   $argv{dbuser}       = $DBUSER;
@@ -730,11 +746,11 @@ if ($ONTOLOGY) {
 $chado->file_handles();
 
 my $gffio;
-if ($GFFFILE eq 'stdin') {
+if ($GFFFILE eq 'stdin' and !$FASTAFILE) {
     $gffio = Bio::FeatureIO->new(-fh   => \*STDIN , 
                                  -format => 'gff', 
                                  -validate_terms => $VALIDATE);
-} else {
+} elsif ($GFFFILE and $GFFFILE ne 'stdin') {
     $gffio = Bio::FeatureIO->new(-file => $GFFFILE, 
                                  -format => 'gff', 
                                  -validate_terms => $VALIDATE);
@@ -755,7 +771,7 @@ elsif ($ORGANISM_FROM_CMDLINE) {
     $chado->organism_id($ORGANISM)
        or die "$ORGANISM organism not found in the database";
 }
-elsif ($gffio->organism) {
+elsif (defined $gffio && $gffio->organism) {
     $ORGANISM = $gffio->organism;
     $chado->organism($ORGANISM);
     $chado->organism_id($ORGANISM)
@@ -786,7 +802,8 @@ my $processing_CDS = 0;
 my $feature_iterator; my $itern=0; my %seen_organism;
 FEATURE:
 while(my $feature = 
-  (defined $feature_iterator && $feature_iterator->next_feature) || $gffio->next_feature){
+  (defined $feature_iterator && $feature_iterator->next_feature) 
+    || (defined $gffio && $gffio->next_feature)){
   $chado->primary_dbxref('');
   
   my $featuretype = $feature->type->name;
@@ -1052,12 +1069,21 @@ $chado->end_files();
 #$validate_uniquename->finish;
 
 #deal with sequence 
-unless ($NOSEQUENCE) {
+unless ($NOSEQUENCE or !defined $gffio) { #ugh--reversed unless logic
   while (my $seq = $gffio->next_seq) {
     my $string = $seq->seq();
     my $name   = $seq->display_id();
     $chado->print_seq($name,$string);
   }
+}
+
+if ($FASTAFILE) {
+    #use SeqIO to parse the fasta file
+    my $in = Bio::SeqIO->new(-file   => $FASTAFILE,
+                             -format => 'fasta');
+    while (my $seq = $in->next_seq) {
+        $chado->print_fasta($seq->display_id,$seq->seq);
+    }
 }
 
 $chado->flush_caches();
