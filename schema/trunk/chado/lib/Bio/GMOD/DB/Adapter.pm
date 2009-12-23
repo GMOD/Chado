@@ -2534,8 +2534,8 @@ sub print_seq {
   my ($feature_id) = $sth->fetchrow_array;
 
   my $fh = $self->file_handles('sequence');
-  print $fh "UPDATE feature set residues='$string' WHERE feature_id=$feature_id;\n";
-  print $fh "UPDATE feature set seqlen=length(residues) WHERE feature_id=$feature_id;\n";
+  my $len = length($string);
+  print $fh "UPDATE feature set residues='$string', seqlen=$len WHERE feature_id=$feature_id;\n";
 
   return;
 }
@@ -2569,8 +2569,8 @@ END
   my ($feature_id) = $sth->fetchrow_array;
 
   my $fh = $self->file_handles('sequence');
-  print $fh "UPDATE feature set residues='$string' WHERE feature_id=$feature_id;\n";
-  print $fh "UPDATE feature set seqlen=length(residues) WHERE feature_id=$feature_id;\n";
+  my $len = length($string);
+  print $fh "UPDATE feature set residues='$string',seqlen=$len WHERE feature_id=$feature_id;\n";
 
   return;
 }
