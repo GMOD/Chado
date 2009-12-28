@@ -52,8 +52,6 @@ if ($help) {
     exit 0;
 }
 
-warn $use_custom_name_map;
-
 $id_based = 1 unless ($ontology eq 'sequence');
 $schema   = lc($ontology) unless ($ontology eq 'sequence');
 
@@ -87,7 +85,6 @@ if (defined $use_custom_name_map and $use_custom_name_map eq '') {
     my @pairs = split(',', $use_custom_name_map);
     for my $pair (@pairs) {
         my ($tag,$value) = split('=', $pair);
-        warn "$tag, $value";
         $custom_name_map{$tag} = $value;
     }
 }
