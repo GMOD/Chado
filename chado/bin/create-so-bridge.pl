@@ -278,16 +278,17 @@ foreach my $term (@terms) {
             $defcmt .= sprintf("--- *** %-40s ***\n",substr($def,0,$S,''));
         }
     }
-    printf("--- ************************************************\n".
-	   "--- *** relation: %-31s***\n".
-	   "--- *** relation type: $RTYPE                      ***\n".
-	   "--- ***                                          ***\n".
+
+    my $print_str = "--- ************************************************\n".
+           "--- *** relation: $vname ***\n".
+           "--- *** relation type: $RTYPE                      ***\n".
+           "--- ***                                          ***\n".
            $defcmt.
-	   "--- ************************************************\n".
-	   "---\n".
-	   "\n".
-	   "$vsql;\n\n",
-	  $vname);
+           "--- ************************************************\n".
+           "---\n".
+           "\n".
+           "$vsql;\n\n";
+    print $print_str;
 
     if ($RTYPE eq 'TABLE') {
 	print "\n\n--- *** Auto-generated indexes ***\n";
