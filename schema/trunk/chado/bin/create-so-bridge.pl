@@ -52,6 +52,8 @@ if ($help) {
     exit 0;
 }
 
+warn $use_custom_name_map;
+
 $id_based = 1 unless ($ontology eq 'sequence');
 $schema   = lc($ontology) unless ($ontology eq 'sequence');
 
@@ -85,6 +87,7 @@ if (defined $use_custom_name_map and $use_custom_name_map eq '') {
     my @pairs = split(',', $use_custom_name_map);
     for my $pair (@pairs) {
         my ($tag,$value) = split('=', $pair);
+        warn "$tag, $value";
         $custom_name_map{$tag} = $value;
     }
 }
@@ -531,12 +534,12 @@ sub create_lookup_table {
 
   my $table_name = $ontology."_cv_lookup_table";
 
-  print "CREATE TABLE $table_name (".$table_name."_id int, primary key(".$table_name."_id), original_cvterm_name varchar(1024), relation_name varchar(128)));\n";
+  print "CREATE TABLE $table_name (".$table_name."_id serial not null, primary key(".$table_name."_id), original_cvterm_name varchar(1024), relation_name varchar(128));\n";
 
   for my $orig_name (keys %namemap) {
-    my $table_name = $namemap{$orig_name};
+    my $munged_table_name = $namemap{$orig_name};
 
-    print "INSERT INTO $table_name (original_cvterm_name,relation_name) VALUES ('$orig_name','$table_name');\n";
+    print "INSERT INTO $table_name (original_cvterm_name,relation_name) VALUES ('$orig_name','$munged_table_name');\n";
   }
 
   print "\nCREATE INDEX ".$table_name."_idx ON $table_name (original_cvterm_name);\n";
