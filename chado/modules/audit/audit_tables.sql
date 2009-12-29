@@ -2852,6 +2852,7 @@
        analysis_id integer, 
        type_id integer, 
        value text, 
+       rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2864,6 +2865,7 @@
        analysis_id_var integer; 
        type_id_var integer; 
        value_var text; 
+       rank_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2871,6 +2873,7 @@
        analysis_id_var = OLD.analysis_id;
        type_id_var = OLD.type_id;
        value_var = OLD.value;
+       rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -2883,12 +2886,14 @@
              analysis_id, 
              type_id, 
              value, 
+             rank, 
              transaction_type
        ) VALUES ( 
              analysisprop_id_var, 
              analysis_id_var, 
              type_id_var, 
              value_var, 
+             rank_var, 
              transaction_type_var
        );
 
@@ -2983,6 +2988,73 @@
        BEFORE UPDATE OR DELETE ON analysisfeature
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_analysisfeature ();
+
+
+   DROP TABLE audit_analysisfeatureprop;
+   CREATE TABLE audit_analysisfeatureprop ( 
+       analysisfeatureprop_id integer, 
+       analysisfeature_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_analysisfeatureprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_analysisfeatureprop() RETURNS trigger AS
+   '
+   DECLARE
+       analysisfeatureprop_id_var integer; 
+       analysisfeature_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       analysisfeatureprop_id_var = OLD.analysisfeatureprop_id;
+       analysisfeature_id_var = OLD.analysisfeature_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_analysisfeatureprop ( 
+             analysisfeatureprop_id, 
+             analysisfeature_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             analysisfeatureprop_id_var, 
+             analysisfeature_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER analysisfeatureprop_audit_ud ON analysisfeatureprop;
+   CREATE TRIGGER analysisfeatureprop_audit_ud
+       BEFORE UPDATE OR DELETE ON analysisfeatureprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_analysisfeatureprop ();
 
 
    DROP TABLE audit_phenotype;

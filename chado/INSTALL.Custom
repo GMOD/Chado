@@ -74,9 +74,9 @@ This is optional. The file audit
 9. edit bin/AutoDBI.PL
 
 Delete everything in the non-substituting HEREDOC, insert the
-corresponding section from the corresponding blib/lib/Chado/AutoDBI.pm
+corresponding section from the corresponding blib/lib/Bio/Chado/AutoDBI.pm
 
-10. Regenerate modules/sequence/bridges/sofa-bridge.sql.  This doesn't need
+10. Regenerate modules/sequence/bridges/so-bridge.sql.  This doesn't need
 to be done all the time, but should be done before a release.  Note that the
 create-so-layer.pl script has addtional options for making materialized
 views for doing fast feature type-related queries (which haven't been tested;

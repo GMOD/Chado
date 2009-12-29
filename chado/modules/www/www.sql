@@ -32,7 +32,7 @@ create table wwwuser (
 );
 create index wwwuser_idx1 on wwwuser (username);
 
-COMMENT ON TABLE WWWUSER IS 'Keep track of WWW users. This may also be useful in an audit module at some point.';
+COMMENT ON TABLE wwwuser IS 'Keep track of WWW users. This may also be useful in an audit module at some point.';
 
 -- ================================================
 -- TABLE: wwwuser_project
@@ -51,7 +51,7 @@ create table wwwuser_project (
 create index wwwuser_project_idx1 on wwwuser_project(wwwuser_id);
 create index wwwuser_project_idx2 on wwwuser_project(project_id);
 
-COMMENT ON TABLE WWWUSER_PROJECT IS 'Link wwwuser accounts to projects';
+COMMENT ON TABLE wwwuser_project IS 'Link wwwuser accounts to projects';
 
 -- ================================================
 -- TABLE: wwwuser_author
@@ -70,7 +70,7 @@ create table wwwuser_author (
 create index wwwuser_author_idx1 on wwwuser_author(wwwuser_id);
 create index wwwuser_author_idx2 on wwwuser_author(author_id);
 
-COMMENT ON TABLE WWWUSER_AUTHOR IS 'Track wwwuser interest in authors.';
+COMMENT ON TABLE wwwuser_author IS 'Track wwwuser interest in authors.';
 
 -- ================================================
 -- TABLE: wwwuser_cvterm
@@ -89,7 +89,7 @@ create table wwwuser_cvterm (
 create index wwwuser_cvterm_idx1 on wwwuser_cvterm(wwwuser_id);
 create index wwwuser_cvterm_idx2 on wwwuser_cvterm(cvterm_id);
 
-COMMENT ON TABLE WWWUSER_CVTERM IS 'Track wwwuser interest in cvterms.';
+COMMENT ON TABLE wwwuser_cvterm IS 'Track wwwuser interest in cvterms.';
 
 -- ================================================
 -- TABLE: wwwuser_expression
@@ -108,7 +108,7 @@ create table wwwuser_expression (
 create index wwwuser_expression_idx1 on wwwuser_expression(wwwuser_id);
 create index wwwuser_expression_idx2 on wwwuser_expression(expression_id);
 
-COMMENT ON TABLE WWWUSER_EXPRESSION IS 'Track wwwuser interest in expressions.';
+COMMENT ON TABLE wwwuser_expression IS 'Track wwwuser interest in expressions.';
 
 -- ================================================
 -- TABLE: wwwuser_feature
@@ -127,7 +127,7 @@ create table wwwuser_feature (
 create index wwwuser_feature_idx1 on wwwuser_feature(wwwuser_id);
 create index wwwuser_feature_idx2 on wwwuser_feature(feature_id);
 
-COMMENT ON TABLE WWWUSER_FEATURE IS 'Track wwwuser interest in features.';
+COMMENT ON TABLE wwwuser_feature IS 'Track wwwuser interest in features.';
 
 -- ================================================
 -- TABLE: wwwuser_genotype
@@ -146,7 +146,7 @@ create table wwwuser_genotype (
 create index wwwuser_genotype_idx1 on wwwuser_genotype(wwwuser_id);
 create index wwwuser_genotype_idx2 on wwwuser_genotype(genotype_id);
 
-COMMENT ON TABLE WWWUSER_GENOTYPE IS 'Track wwwuser interest in genotypes.';
+COMMENT ON TABLE wwwuser_genotype IS 'Track wwwuser interest in genotypes.';
 
 -- ================================================
 -- TABLE: wwwuser_interaction
@@ -165,7 +165,7 @@ create table wwwuser_interaction (
 create index wwwuser_interaction_idx1 on wwwuser_interaction(wwwuser_id);
 create index wwwuser_interaction_idx2 on wwwuser_interaction(interaction_id);
 
-COMMENT ON TABLE WWWUSER_INTERACTION IS 'Track wwwuser interest in interactions.';
+COMMENT ON TABLE wwwuser_interaction IS 'Track wwwuser interest in interactions.';
 
 -- ================================================
 -- TABLE: wwwuser_organism
@@ -184,7 +184,7 @@ create table wwwuser_organism (
 create index wwwuser_organism_idx1 on wwwuser_organism(wwwuser_id);
 create index wwwuser_organism_idx2 on wwwuser_organism(organism_id);
 
-COMMENT ON TABLE WWWUSER_ORGANISM IS 'Track wwwuser interest in
+COMMENT ON TABLE wwwuser_organism IS 'Track wwwuser interest in
 organisms.';
 
 -- ================================================
@@ -204,7 +204,7 @@ create table wwwuser_phenotype (
 create index wwwuser_phenotype_idx1 on wwwuser_phenotype(wwwuser_id);
 create index wwwuser_phenotype_idx2 on wwwuser_phenotype(phenotype_id);
 
-COMMENT ON TABLE WWWUSER_PHENOTYPE IS 'Track wwwuser interest in phenotypes.';
+COMMENT ON TABLE wwwuser_phenotype IS 'Track wwwuser interest in phenotypes.';
 
 -- ================================================
 -- TABLE: wwwuser_pub
@@ -223,7 +223,7 @@ create table wwwuser_pub (
 create index wwwuser_pub_idx1 on wwwuser_pub(wwwuser_id);
 create index wwwuser_pub_idx2 on wwwuser_pub(pub_id);
 
-COMMENT ON TABLE WWWUSER_PUB IS 'Track wwwuser interest in publications.';
+COMMENT ON TABLE wwwuser_pub IS 'Track wwwuser interest in publications.';
 
 -- ================================================
 -- TABLE: wwwuserrelationship
@@ -242,4 +242,4 @@ create table wwwuserrelationship (
 create index wwwuserrelationship_idx1 on wwwuserrelationship(subjwwwuser_id);
 create index wwwuserrelationship_idx2 on wwwuserrelationship(objwwwuser_id);
 
-COMMENT ON TABLE WWWUSERRELATIONSHIP IS 'Track wwwuser interest in other wwwusers.';
+COMMENT ON TABLE wwwuserrelationship IS 'Track wwwuser interest in other wwwusers.';
