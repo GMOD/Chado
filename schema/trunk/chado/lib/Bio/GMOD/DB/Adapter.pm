@@ -3171,13 +3171,12 @@ sub load_data {
       print STDERR "$_ ";
       $self->dbh->do("VACUUM ANALYZE $_");
     }
+    warn "\nWhile this script has made an effort to optimize the database, you\n"
+      ."should probably also run VACUUM FULL ANALYZE on the database as well.\n";
+
   }
 
   print STDERR "\nDone.\n";
-
-  warn "\nWhile this script has made an effort to optimize the database, you\n"
-    ."should probably also run VACUUM FULL ANALYZE on the database as well\n";
-
 }
 
 
