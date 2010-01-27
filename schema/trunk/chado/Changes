@@ -49,6 +49,9 @@ system tmp directory rather than using the current working directory
 for writing the temporary load files.
 * Added a --fastafile option to gmod_bulk_load_gff3.pl to use when 
 loading fasta files.
+* Removed the cause of the error messages at the end of ontology loading:
+it was a patch to correct for bad behavior that DBIx::DBStag which was
+fixed some time ago.
 
 
 Below this line are changes up until a few years ago and are included
