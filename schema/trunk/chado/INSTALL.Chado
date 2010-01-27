@@ -6,27 +6,19 @@ If you experience problems, please email them to the gmod-schema mailing list
 at gmod-schema@lists.sourceforge.net.  
 
 This release will work with the most recent release of the Generic 
-Genome Browser (Gbrowse) version 1.68. If you experience difficulties 
-with Gbrowse and Chado, you might want to look at getting a CVS
+Genome Browser (GBrowse) version 1.68 or better. If you experience difficulties 
+with GBrowse and Chado, you might want to look at getting a svn
 checkout of the gbrowse-stable branch.  The installation instructions
-for Gbrowse are included in that package. 
-
-This release of Chado and GMOD also comes with example functions for
-allowing Apollo (http://www.gmod.org/apollo) to read and
-write directly to the database, allowing creation and editing of
-genome features as well as a sample database.  Please see the file
-README.Apollo for some details on setting this up.
-
+for GBrowse are included in that package.  Additionally, for working
+with GBrowse, you will need the Bio::DB::Das::Chado modules that you
+can get from CPAN.
 
 PREREQUISITES
 
 - PostgreSQL
 
-Currently GMOD developers are using 7.4 and 8.1-2 (PostgreSQL 8.3 may not
-work with some tools written for Chado; this is being investigated
-currently). The only considerations in choosing what version of PostgreSQL
-to use is that version 7.4 is incompatible with the functions for making
-CMap integration more seamless.
+Currently GMOD developers are using 8.1 or better (PostgreSQL 8.4 has not
+been tested).
 
 Items to do with Postgres to make it ready to go:
 
@@ -36,15 +28,17 @@ Items to do with Postgres to make it ready to go:
 
         tcpip_socket = true
 
-      (This option is not available and not needed in PostgreSQL 8.1.)
+      (This option is not available and not needed in PostgreSQL 8.1 or better.)
 
     * Create a database user with permission to drop and add databases;
       the database user name should be the same as your Unix user name to
       allow the software build to progress smoothly (must be done as user
       postgres; createuser is a commandline program that comes with the
       PostgreSQL package):
-        
+       
+        $ sudo su - postgres 
         $ createuser --createdb <your username> 
+        $ exit                     # to exit out of the postgres user's shell
 
     * Tell postgres that it can use the plpgsql language (as user
       postgres; createlang is a commandline program that comes with
@@ -57,10 +51,14 @@ Items to do with Postgres to make it ready to go:
       the comments in pg_hba.conf regarding permissions.  An example
       pg_hba.conf looks like this (which is very loose permissions):
 
-      # TYPE  DATABASE    USER        IP-ADDRESS        IP-MASK           METHOD
+      # TYPE  DATABASE    USER        CIDR-ADDRESS          METHOD
                                                                                 
-      local   all         all                                             trust
-      host    all         all         127.0.0.1         255.255.255.255   trust
+      local   all         all                               trust
+      # IPv4 local connections:
+      host    all         all         127.0.0.1/32          trust
+      # IPv6 local connections:
+      host    all         all         ::1/128               trust
+
 
     * For Pg 8.1+, if you want to allow remote connections, the
       listen_addresses option may need to be modified; it does
@@ -95,6 +93,10 @@ or
  
    /etc/rc (for OS X 10.3)
 
+or
+
+  /etc/sysctl.conf (for OS X 10.5)
+
 to increase the values of shmmax and shmall, like this:
 
           sysctl -w kern.sysv.shmmax=52428800 # bytes: 50 megs
@@ -116,21 +118,16 @@ and make these changes to the postgresql.conf file:
          sort_mem=2048
          max_connections = 32
 
-
-- Apache
-
-Version 1.3.* or 2.0.*. See http://apache.org.
-
-
 - BioPerl
 		
-bioperl-live or a version greater than 1.5.2. See http://bioperl.org.
+bioperl-live or a version 1.6.1 or better.  See http://bioperl.org.
 
 
 - go-perl
       
-Get from http://search.cpan.org/~cmungall/go-perl/. Be sure to set
-GO_ROOT as  directed in the go-perl INSTALL doc.
+Can be obtained from CPAN using the cpan shell with the command
+
+  cpan> install GO::Parser
 
 
 - ant
@@ -150,7 +147,7 @@ modules below except for SQL::Translator, which is optional.
     * CGI                      (GBrowse)
     * GD                       (GBrowse)
     * DBI                      (GBrowse, Chado)
-    * DBD::Pg (1.49 or better) (GBrowse, Chado)
+    * DBD::Pg                  (GBrowse, Chado)
     * SQL::Translator          (chado) (only for a custom Chado schema)
     * Digest::MD5              (GBrowse)
     * Text::Shellwords         (GBrowse)
@@ -198,8 +195,6 @@ are always available when you log in.
 
    * CHADO_DB_PORT: The port on which the database is listening [opt]
 
-   * GO_ROOT: As defined by the go-perl INSTALL document
-
 As indicated, the host, port, and password are optional.
 
 *   Note: a mechanism exists to pass these variables directly to the
@@ -223,9 +218,8 @@ used by Chado and its associated tools:
 
         *   Use the simple install (uses default database schema) [Y]
 
-        Answering yes skips questions about what exensions to use, and
-        eliminates the need to have SQL::Translator installed.  This
-        is recomended, and that is all that is necessary in order to use
+        Answering yes eliminates the need to have SQL::Translator installed.
+        This is recomended, and that is all that is necessary in order to use
         the full schema and run GBrowse and GMODWeb on top of it.
 
         *   Use values in '/home/scott/gmod/build.conf'? [Y]
@@ -268,7 +262,7 @@ used by Chado and its associated tools:
         The organism name should be one what will be in the organism table.
         When the database is created, several organisms will be there
         by default; these include: human, fruitfly, mouse, mosquito,
-        rat, mouse-ear cress, worm, zebrafish, rice, and yeast.  (The
+        rat, Arabidopsis thaliana, worm, zebrafish, rice, and yeast.  (The
         insert statements that create these default organisms are 
         contained in load/etc/initialize.sql).
 
@@ -334,17 +328,6 @@ up until this point in the installation.   Also note that loading
 a large ontology like the Gene Ontology will take several minutes
 (perhaps as long as an hour).
 
-At the time of this release, DBIx::DBStag is printing an error 
-when loading some ontologies like this:
-
-  DBD::Pg::db do failed: ERROR:  duplicate key violates unique
-    constraint "cvterm_c1"
-  DBD::Pg::db do failed: ERROR:  duplicate key violates unique constraint
-    "cvterm_c1"
-
-The cause of these errors is known and does not indicate a problem
-with the database or the install procedure.
-
 Note that since `make ontologies` downloads ontology files from their
 online repositories, this step is prone to failure due to network
 problems.  
@@ -372,35 +355,17 @@ It is a good idea at this point to make a back up of the database,
 particularly if you loaded a large ontology like GO.  To make a complete
 dump of the database, issue this command:
 
-        $ pg_dump <database name>  >  <ontologies only sql filename>
+        $ pg_dump db_name  >  db_dump.sql
 
 and to restore the database, issue this command:
 
-        $ psql <database name> <  <ontologies only sql filename>
+        $ psql db_name <  db_dump.sql
 
 
 LOADING DATA
 
 With that, the installation of the schema is complete. Please see the HOWTOs
 at http://gmod.org/ for information on loading the Chado schema with data.
-
-
-GENERIC GENOME BROWSER
-
-Finally, to browse the data in Chado, install the Generic Genome Browser,
-GBrowse.  To do this execute the following commands (substituting the
-version number for the 'x's):
-
-    $ tar -zxvf Generic-Genome-Browser-x.xx.tar.gz
-    $ cd Generic-Genome-Browser-x.xx
-  
-And follow the instruction in the INSTALL documentation.
-
-After installing GBrowse, go to 
-
-  http://localhost/gbrowse/docs/pod/README-chado.html
-
-for more information on configuring GBrowse to work with Chado.
 
 
 CUSTOM DATABASE SCHEMAS
