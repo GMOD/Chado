@@ -9,6 +9,7 @@
 -- :import dbxref from general
 -- :import organism from organism
 -- :import genotype from genetic
+-- :import contact from contact
 
 -- ================================================
 -- TABLE: stock
