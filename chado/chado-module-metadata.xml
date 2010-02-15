@@ -499,6 +499,7 @@
       <dependency to='cv'/>
       <dependency to='pub'/>
       <dependency to='general'/>
+      <dependency to='contact'/>
       <status code='beta'>
         In use at ParameciumDB
       </status>
