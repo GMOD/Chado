@@ -7,8 +7,11 @@ my $VERSION    = 1.1;
 my $conf       = shift;
 my $m          = Bio::Chado::Builder->new(
   dist_name    => 'Chado', 
+  dist_author  => 'Allen Day',
+  dist_abstract => 'Supplemental Build script for Chado--not stand alone',
   dist_version => $VERSION, 
   load_conf    => $conf,
+  module_name  => 'BioChado_supplemental',
 );
 
 print "initializing load scripts...\n";
