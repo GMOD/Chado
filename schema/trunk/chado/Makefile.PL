@@ -511,6 +511,7 @@ WriteMakefile(
       'DBI'               => 0,
       'DBD::Pg'           => 1.49,
       'XML::Simple'       => 2.09,
+      'XML::Twig'         => 0,
       'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.11,
       'GO::Parser'        => 0,
