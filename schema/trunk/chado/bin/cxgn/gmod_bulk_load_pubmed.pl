@@ -144,13 +144,13 @@ if ($opt_g) {
 if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
 if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
 if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
-if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
+#if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
 
 my $dsn = "dbi:$driver:dbname=$dbname";
 $dsn .= ";host=$dbhost";
 $dsn .= ";port=$port";
 
-$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass, { AutoCommit=>0 });
+$schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'', { AutoCommit=>0 });
 
 $dbh=$schema->storage->dbh();
 
