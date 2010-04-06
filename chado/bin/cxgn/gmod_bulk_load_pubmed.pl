@@ -115,7 +115,7 @@ if ($opt_g) {
     my $dsn = "dbi:".$db_conf->driver.":dbname=$dbname";
     $dsn .= ";host=$dbhost";
     $dsn .= ";port=".$db_conf->port if $db_conf->port;
-    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 });
+    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password()||'', { AutoCommit=>0 });
     $dbh=$schema->storage->dbh();
 
 }else { 
