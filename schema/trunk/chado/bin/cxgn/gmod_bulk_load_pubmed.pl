@@ -38,13 +38,31 @@ GMOD database profile name (can provide host and DB name) Default: 'default'
 
 =back
 
+=head2 If not using a GMOD database profile (option -g) then you must provide the following parameters
+
+=over 3
+
+=item -u
+
+user name 
+
+=item -d 
+
+database driver name (i.e. 'Pg' for postgres)
+
+=item -p 
+
+password for youe user to connect to the database
+
+
+=back
 
 The script stores pubmed entries in the database.
 Existing ones are ignored. 
 Input file should contain a list of pubmed ids. Then a new Publication object (Bio::Chado::Schema::Pub::Pub) with accession= PMID,
-the publication specs are fetched from Entrez (See CXGN::Tools::Pubmed.pm) which sets the different fields in the Publication object. When the publication is stored, a new dbxref is stored first (see Chado General module)   
+the publication specs are fetched from Entrez (using eUtils) which sets the different fields in the Publication object. When the publication is stored, a new dbxref is stored first (see Chado General module)   
 
-This script works with Chado schema and accesse the following tables:
+=head2 This script works with Chado schema and accesse the following tables:
 
 =over 5
 
@@ -68,7 +86,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 1.0, January 2010.
+Version 1.1, April 2010.
 
 =cut
 
@@ -85,9 +103,9 @@ use XML::Twig;
 
 use Getopt::Std;
 
-our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i,  $opt_g);
+our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i,  $opt_g, $opt_p, $opt_d, $opt_u);
 
-getopts('H:D:i:p:g:tv');
+getopts('H:D:i:p:g:p:d:u:tv');
 
 our $publication;
 
@@ -95,11 +113,15 @@ our $publication;
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 my $infile = $opt_i;
+my $pass = $opt_p;
+my $driver = $opt_d;
+my $user = $opt_u;
 
 my $DBPROFILE = $opt_g ;
 
-print "H= $opt_H, D= $opt_D, v=$opt_v, t=$opt_t, i=$opt_i  \n";
+print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t, i=$opt_i  \n";
 
+my $port;
 my ($dbh, $schema);
 
 if ($opt_g) {
@@ -110,21 +132,28 @@ if ($opt_g) {
     
     $dbhost ||= $db_conf->host();
     $dbname ||= $db_conf->name();
+    $driver = $db_conf->driver();
     
-    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    my $dsn = "dbi:".$db_conf->driver.":dbname=$dbname";
-    $dsn .= ";host=$dbhost";
-    $dsn .= ";port=".$db_conf->port if $db_conf->port;
-    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password()||'', { AutoCommit=>0 });
-    $dbh=$schema->storage->dbh();
 
-}else { 
-    require CXGN::DB::InsertDBH;
-    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				       dbname=>$dbname,
-				     } );
-    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
+    $port= $db_conf->port();
+    
+    $user= $db_conf->user();
+    $pass= $db_conf->password();
 }
+
+if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
+if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
+if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
+
+my $dsn = "dbi:$driver:dbname=$dbname";
+$dsn .= ";host=$dbhost";
+$dsn .= ";port=$port";
+
+$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass, { AutoCommit=>0 });
+
+$dbh=$schema->storage->dbh();
+
 if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 print STDOUT "Connected to database $dbname on host $dbhost.\n";
@@ -262,7 +291,6 @@ if($@) {
     foreach my $key ( keys %seq ) { 
 	my $value= $seq{$key};
 	my $maxvalue= $maxval{$key} || 0;
-	#print STDERR "$key: $value, $maxvalue \n";
 	if ($maxvalue) { $dbh->do("SELECT setval ('$value', $maxvalue, true)") ;  }
 	else {  $dbh->do("SELECT setval ('$value', 1, false)");  }
     }
@@ -277,7 +305,7 @@ if($@) {
 	foreach my $key ( keys %seq ) { 
 	    my $value= $seq{$key};
 	    my $maxvalue= $maxval{$key} || 0;
-	    #print STDERR "$key: $value, $maxvalue \n";
+	    
 	    if ($maxvalue) { $dbh->do("SELECT setval ('$value', $maxvalue, true)") ;  }
 	    else {  $dbh->do("SELECT setval ('$value', 1, false)");  }
 	}
