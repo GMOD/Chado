@@ -100,6 +100,7 @@ use Bio::GMOD::DB::Config;
 
 use Bio::Chado::Schema;
 use XML::Twig;
+use LWP::Simple qw/ get /;
 
 use Getopt::Std;
 
@@ -372,7 +373,7 @@ sub reset_sequences {
 sub fetch_pubmed {
     
     my $accession=shift;
-    my $pub_xml = `wget "eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=$accession&rettype=xml&retmode=text"  -O -  `;
+    my $pub_xml = get("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=$accession&rettype=xml&retmode=text");
     
     eval {
 	my $twig=XML::Twig->new(
