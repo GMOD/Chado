@@ -518,6 +518,7 @@ WriteMakefile(
       'GO::Parser'        => 0,
       'Module::Load'      => 0.16,
       'Bio::Root::Version'=> 1.0069,
+      'LWP::Simple'       => 0,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
