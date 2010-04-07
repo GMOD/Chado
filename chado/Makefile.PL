@@ -486,11 +486,12 @@ my @exe_files = (
            'bin/gmod_gff3_preprocessor.pl',
            'bin/gmod_make_gff_from_dbxref.pl',
            'bin/cxgn/gmod_load_cvterms.pl',
+           'bin/cxgn/gmod_bulk_load_pubmed.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );
 
-if ($ant or !-e "$working_dir/../GMODTools") {
+if ($ant and -e "$working_dir/../GMODTools") {
     push @exe_files, 'bin/gmod_bulkfiles.pl', 'bin/gmod_gff2biomart5.pl';
 }
 
