@@ -52,6 +52,7 @@ loading fasta files.
 * Removed the cause of the error messages at the end of ontology loading:
 it was a patch to correct for bad behavior that DBIx::DBStag which was
 fixed some time ago.
+* Added gmod_bulk_pub_loader.pl contributed by SGN.
 
 
 Below this line are changes up until a few years ago and are included
