@@ -35,7 +35,7 @@ Items to do with Postgres to make it ready to go:
       allow the software build to progress smoothly (must be done as user
       postgres; createuser is a commandline program that comes with the
       PostgreSQL package):
-       
+        
         $ sudo su - postgres 
         $ createuser --createdb <your username> 
         $ exit                     # to exit out of the postgres user's shell
@@ -44,7 +44,9 @@ Items to do with Postgres to make it ready to go:
       postgres; createlang is a commandline program that comes with
       the PostgreSQL package):
 
+        $ sudo su - postgres 
         $ createlang plpgsql template1
+        $ exit                     # to exit out of the postgres user's shell
 
     * Edit the pg_hba.conf (either as the user 'root' or 'postgres') to give
       the user created above permission to access the database.  Read
@@ -64,11 +66,12 @@ Items to do with Postgres to make it ready to go:
       listen_addresses option may need to be modified; it does
       allow a wildcard '*', which corresponds to all available
       IP interfaces (it does *not* specify the IP addresses that
-      are allowed to connect).
+      are allowed to connect).  Set this in postresql.conf file, which
+      is in the same directory as pg_hba.conf.
 
 For information on tuning postgres for performance, see
 
-    http://www.gmod.org/wiki/index.php/PostgreSQL_Performance_Tips
+    http://gmod.org/wiki/PostgreSQL_Performance_Tips
 
 and
 
