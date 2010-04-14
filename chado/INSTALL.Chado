@@ -117,8 +117,8 @@ For a Linux box with 512M RAM, use these values in /etc/sysctl.conf:
 
 and make these changes to the postgresql.conf file:
 
-         tcpip_socket = true
-         sort_mem=2048
+         tcpip_socket = true  # Replaced with listen_addresses in Postgres 8.0+
+         work_mem=2048        # This is "sort_mem" if using Postgres 7.x
          max_connections = 32
 
 - BioPerl
