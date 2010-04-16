@@ -172,7 +172,7 @@ INSTALL THE CHADO SCHEMA
 
 - Set environmental variables
 
-First, you must should set the following variables in your environment.
+First, you must set some variables in your environment.
 If you are using bash or a bash-like shell, this is done via a command
 like this:
 
@@ -182,11 +182,13 @@ If you are using tcsh or another csh-like shell, it is done like this:
 
        $ setenv VARNAME value
 
-To make life easier on yourself, you will probably want to put those
+To make life easier on yourself, you will probably also want to put those
 commands in your .tcshrc or .bashrc file so that the envirnment variables
 are always available when you log in. 
 
-   * GMOD_ROOT: The location of your GMOD installation (e.g., "/usr/local/gmod")
+   * GMOD_ROOT: The location of your Chado installation 
+     (e.g., "/usr/local/gmod").  Will contain the source files that define 
+     the schema, as well as configuration settings and temp space.
 
    * CHADO_DB_NAME: The name of your Chado database
 
@@ -200,6 +202,7 @@ are always available when you log in.
 
 As indicated, the host, port, and password are optional.
 
+
 *   Note: a mechanism exists to pass these variables directly to the
     installer during the "perl Makefile.PL" step.  By giving key=value pairs,
     it is possible to avoid setting environmental variables.  The syntax is as:
@@ -212,7 +215,8 @@ the install process will work.
 
 - Create the Makefile and other configuration files
 
-Run the following command:
+From the chado directory (the same directory INSTALL.Chado is in) run the 
+following command:
 
   $ perl Makefile.PL   
 
@@ -268,6 +272,10 @@ used by Chado and its associated tools:
         rat, Arabidopsis thaliana, worm, zebrafish, rice, and yeast.  (The
         insert statements that create these default organisms are 
         contained in load/etc/initialize.sql).
+
+        *   Do you want to make this the default chado instance? [y]
+
+        :TODO: Define what it means to be the default Chado instance.
 
         If you answered 'No' to the simple install question, AutoDBI.pm
         will now be created by SQL::Translator, see the CUSTOM DATABASE
