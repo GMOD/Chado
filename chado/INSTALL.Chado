@@ -61,6 +61,13 @@ Items to do with Postgres to make it ready to go:
       # IPv6 local connections:
       host    all         all         ::1/128               trust
 
+      NOTE: If you are setting up a production Chado instance, now is a 
+      good time to decide how you want to define users and do client 
+      authenication for your database.  Postgresql supports several methods 
+      for defining users, including using operating system users, LDAP,
+      Kerberos and many others.  See the Postgesql manual for more:
+      http://www.postgresql.org/docs/8.4/interactive/client-authentication.html
+      http://www.postgresql.org/docs/8.4/interactive/user-manag.html
 
     * For Pg 8.1+, if you want to allow remote connections, the
       listen_addresses option may need to be modified; it does
@@ -275,7 +282,11 @@ used by Chado and its associated tools:
 
         *   Do you want to make this the default chado instance? [y]
 
-        :TODO: Define what it means to be the default Chado instance.
+        You can have more than one Chado instance on a server, each with a
+        different name.  You can supply one of those names when loading
+        GFF, for example "--dbprofile fly_staging".  If you don't supply the
+        --dbprofile option, it will just use the default database parameters.
+
 
         If you answered 'No' to the simple install question, AutoDBI.pm
         will now be created by SQL::Translator, see the CUSTOM DATABASE
