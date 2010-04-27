@@ -461,7 +461,8 @@ foreach my $new_ont(@onts) {
 		    
 		    my %file_def_dbxrefs=();
 		    #store definition's dbxrefs in cvterm_dbxref
-		    foreach my $def_dbxref ($file_index{$k}->get_dblinks() ) { 
+		    foreach my $dblink ($file_index{$k}->get_dbxrefs() ) { 
+			my $def_dbxref = $dblink->database() . ':' .  $dblink->primary_id();
 			$file_def_dbxrefs{uc($def_dbxref)}=1;
 			message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
 			$db_index{$k}->add_secondary_dbxref($def_dbxref, 1); 
@@ -526,8 +527,8 @@ foreach my $new_ont(@onts) {
 		    		    
 		    $new_term->add_secondary_dbxref($i);
 		}
-		foreach my $r ($novel_terms{$k}->get_dblinks() ) { #store definition's dbxrefs in cvterm_dbxref
-		    my $def_dbxref= $r;
+		foreach my $r ($novel_terms{$k}->get_dbxrefs() ) { #store definition's dbxrefs in cvterm_dbxref
+		    my $def_dbxref= $r->primary_id();
 		    message("adding definition dbxref $r to cvterm_dbxref\n");
 		    $new_term->add_secondary_dbxref($r, 1);
 		}
