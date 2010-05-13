@@ -197,7 +197,7 @@ sub recurse {
 		  {
 		      subject_id => $s,
 		      object_id  => $object,
-		      type_id    => $is_a->cxterm_id(),
+		      type_id    => $is_a->cvterm_id(),
 		      cv_id      => $cv_id,
 		      pathdistance => $tdist
 		  }, { key => 'cvtermpath_c1' } , );
