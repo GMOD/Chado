@@ -1,5 +1,82 @@
 #!/usr/bin/perl
 
+=pod
+
+=head1 NAME
+
+gmod_make_cvtermpath.pl
+
+=head1 USAGE 
+
+ perl gmod_make_cvtermpath.pl -H [dbhost] -D [dbname]  [-vt] -c cvname
+ perl gmod_make_cvtermpath.pl -g [GMODConf_profile] -c cvname
+
+=head2 Parameters
+
+=over 6
+
+=item -H
+
+Hostname for database 
+
+=item -D
+
+Database name 
+
+=item -c 
+
+Name of ontology (cv.name) to compute the transitive closure on. (Required)
+
+=item -v
+
+Verbose output
+ 
+=item -t
+
+Trial mode. Do not perform any store operations at all. (Not implemented)
+
+=item -g
+
+GMOD database profile name (can provide host and DB name) Default: 'default'
+
+=back
+
+=head2 If not using a GMOD database profile (option -g) then you must provide the following parameters
+
+=over 3
+
+=item -u
+
+Database user name 
+
+=item -d 
+
+Database driver name (e.g. 'Pg' for postgres)
+
+=item -p 
+
+Password for your user to connect to the database
+
+=back
+
+=head1 DESCRIPTION
+
+This script calculates the transitive closure on the ontology terms in the cvterm
+table.  As this is a computationaly intensive operation, doing so on a large
+cv like the Gene Ontology can take several hours.  For more information on what
+a transative closure is, please see:
+
+  http://www.geneontology.org/GO.database.shtml#graphs
+
+=head1 AUTHOR
+
+Naama Menda <nm249@cornell.edu>
+
+=head1 VERSION AND DATE
+
+Version 1.1, April 2010.
+
+=cut
 
 
 use strict;
@@ -11,6 +88,7 @@ use Bio::Ontology::TermFactory;
 use Bio::Chado::Schema;
 ##########
 use Bio::GMOD::Config;
+use Bio::GMOD::DB::Config;
 use Getopt::Std;
 
 our ($opt_H, $opt_D, $opt_v, $opt_t,  $opt_g, $opt_p, $opt_d, $opt_u, $opt_c);
@@ -24,14 +102,15 @@ my $pass = $opt_p;
 my $driver = $opt_d;
 my $user = $opt_u;
 my $cvname = $opt_c;
+my $verbose = $opt_v;
 
 my $DBPROFILE = $opt_g ;
 
-print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t , cvname = $opt_c  \n";
+print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t , cvname = $opt_c  \n" if $verbose;
 
 my $port = '5432';
 
-if ($opt_g) {
+if (!($opt_H and $opt_D) ) {
     my $DBPROFILE = $opt_g;
     $DBPROFILE ||= 'default';
     my $gmod_conf = Bio::GMOD::Config->new() ;
@@ -51,7 +130,9 @@ if ($opt_g) {
 if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
 if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
 if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
-if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
+
+#we can allow blank passwords
+#if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
 if (!$cvname) { die "Need to provide -c cv.name ! \n" ; } 
 
 my $dsn = "dbi:$driver:dbname=$dbname";
@@ -64,7 +145,7 @@ my $db=$schema->storage->dbh();
 
 if (!$schema || !$db) { die "No schema or dbh is avaiable! \n"; }
 
-print STDOUT "Connected to database $dbname on host $dbhost.\n";
+print STDOUT "Connected to database $dbname on host $dbhost.\n" if $verbose;
 ##########
 
 
@@ -94,7 +175,7 @@ while(my $cvterm_id = $sth_cvterm->fetchrow_array){
 
 
 my $cv_id;
-warn "select cv_id from cv where name = '$cvname'";
+warn "select cv_id from cv where name = '$cvname'" if $verbose;
 my $sth_cv = $db->prepare("select cv_id from cv where name = '$cvname'");
 $sth_cv->execute;
 while(my $cv = $sth_cv->fetchrow_hashref){
@@ -177,7 +258,7 @@ sub recurse {
 		      cv_id      => $cv_id,
 		      pathdistance => $tdist
 		  }, { key => 'cvtermpath_c1' } , );
-	      print STDOUT "Inserting ($s,$object,$type,$cv_id , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id(). "\n";
+	      print STDOUT "Inserting ($s,$object,$type,$cv_id , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id(). "\n" if $verbose;
 	      my $ttdist = -1 * $tdist;
 	      
 	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
@@ -188,7 +269,7 @@ sub recurse {
 		      cv_id      => $cv_id,
 		      pathdistance => $ttdist
 		  }, { key => 'cvtermpath_c1' } , );
-	      print STDOUT "Inserting ($object,$subject,$type,$cv_id , $ttdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n";
+	      print STDOUT "Inserting ($object,$subject,$type,$cv_id , $ttdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" if $verbose;
 	  } else {
 
 	      my $is_a = $schema->resultset("Cv::Cvterm")->search({ name => 'is_a' })->first();
@@ -201,7 +282,7 @@ sub recurse {
 		      cv_id      => $cv_id,
 		      pathdistance => $tdist
 		  }, { key => 'cvtermpath_c1' } , );
-	      print STDOUT "Inserting ($s,$object, $type, " . $is_a->cv_id() . "  , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n";
+	      print STDOUT "Inserting ($s,$object, $type, " . $is_a->cv_id() . "  , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" if $verbose;
           
 	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
 		  {
@@ -211,7 +292,7 @@ sub recurse {
 		      cv_id      => $cv_id,
 		      pathdistance => -$tdist
 		  }, { key => 'cvtermpath_c1' } , );
-	      print STDOUT "Inserting ($object,$subject, " . $is_a->cvterm_id() . " ,$cv_id , -$tdist) into cvtermpath... path_id = " . $path->cvtermpath_id() . "\n";   
+	      print STDOUT "Inserting ($object,$subject, " . $is_a->cvterm_id() . " ,$cv_id , -$tdist) into cvtermpath... path_id = " . $path->cvtermpath_id() . "\n" if $verbose;   
 	  }
 	  $tdist--;
 	}
