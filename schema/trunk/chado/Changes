@@ -32,8 +32,7 @@ use a common name that corresponds to more than one organism, it will
 die gracefully.
 * Fixed gmod_bulk_load_gff3.pl so that featureloc.srcfeature_id will
 not be sometimes set incorrectly when there are multiple organisms
-with chromosomes (or other srcfeatures) with the same name.  If you have
-a database that has been affected by this bug, see http://....  for a fix.
+with chromosomes (or other srcfeatures) with the same name. 
 * Added a __DIE__ signal handler to gmod_bulk_load_gff3.pl so that the
 databsae will be cleaned up in most cases before the loader croaks.
 * Fixed gmod_bulk_load_gff3.pl so that when loading dna sequence from the
