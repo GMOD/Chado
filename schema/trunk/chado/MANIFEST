@@ -7,6 +7,7 @@ bin/create-bridge-sql.pl
 bin/create-so-bridge.pl
 bin/cxgn/gmod_bulk_load_pubmed.pl
 bin/cxgn/gmod_load_cvterms.pl
+bin/cxgn/make_cvtermpath.pl
 bin/cxgn/load_ncbi_taxonomy.pl
 bin/cxgn/load_taxonomy_cvterms.pl
 bin/dbi.tt2
@@ -23,8 +24,6 @@ bin/gmod_make_gff_from_dbxref.pl
 bin/gmod_materialized_view_tool.pl
 bin/gmod_sort_gff3.pl
 bin/interactions2SIF.pl
-bin/make_cvtermpath.pl
-bin/make_cvtermpath.sh
 bin/make_partial_indexes.pl
 bin/pg2cdbi.pl
 bin/pg2cdbi_viaTT.pl

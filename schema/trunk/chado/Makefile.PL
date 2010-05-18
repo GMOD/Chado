@@ -487,6 +487,7 @@ my @exe_files = (
            'bin/gmod_make_gff_from_dbxref.pl',
            'bin/cxgn/gmod_load_cvterms.pl',
            'bin/cxgn/gmod_bulk_load_pubmed.pl',
+           'bin/cxgn/gmod_make_cvtermpath.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );
@@ -583,8 +584,8 @@ src_install ::
 log4perl.conf ::
 	\$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" '$root'
 
-cvtermpath ::
-	$working_dir/bin/make_cvtermpath.sh
+#cvtermpath ::
+#	$working_dir/bin/make_cvtermpath.sh
 
 images :: graphviz graphviz_svg diagram
 
