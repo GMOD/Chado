@@ -857,7 +857,7 @@ END
     $cds_err_str = 
          "\n\nThere are both CDS and exon features in this file, but\n"
         ."you did not set the --noexon option, which you probably want.\n"
-        ."Please see `perldoc gmod_bulk_load_gff3.pl for more information."
+        ."Please see `perldoc gmod_bulk_load_gff3.pl for more information.\n"
         ."Failure to set this option may result in loader crashes.\n\n";
     warn $cds_err_str;
   }
