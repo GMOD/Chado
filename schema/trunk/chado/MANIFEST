@@ -7,7 +7,7 @@ bin/create-bridge-sql.pl
 bin/create-so-bridge.pl
 bin/cxgn/gmod_bulk_load_pubmed.pl
 bin/cxgn/gmod_load_cvterms.pl
-bin/cxgn/make_cvtermpath.pl
+bin/cxgn/gmod_make_cvtermpath.pl
 bin/cxgn/load_ncbi_taxonomy.pl
 bin/cxgn/load_taxonomy_cvterms.pl
 bin/dbi.tt2
