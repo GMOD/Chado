@@ -519,7 +519,7 @@ WriteMakefile(
       'DBIx::DBStag'      => 0.11,
       'GO::Parser'        => 0,
       'Module::Load'      => 0.16,
-      'Bio::Root::Version'=> 1.0069,
+      'Bio::Root::Version'=> 1.006001,
       'LWP::Simple'       => 0,
     }, 
     'PL_FILES'            => {
