@@ -435,7 +435,7 @@ foreach my $new_ont(@onts) {
 		    foreach my $s ($db_index{$k}->search_related('cvtermsynonyms')) {
 			my $s_name= $s->get_column('synonym');
 			if (!exists($file_synonyms{uc($s_name)}) ) { 
-			    message( "Note: deleting synonym '$s' from cvterm ". $db_index{$k}->get_column('name') . "...\n",1);
+			    message( "Note: deleting synonym ' " . $s->synonym() . "' from cvterm ". $db_index{$k}->get_column('name') . "...\n",1);
 			    $db_index{$k}->delete_synonym($s);
 			}
 		    }
@@ -479,7 +479,9 @@ foreach my $new_ont(@onts) {
 	    
 	    my $accession = numeric_id($novel_terms{$k}->identifier());
 	    message("Inserting novel term '$name'  (accession = '$accession', version = '$version'\n");
-	    
+	    #write a special case for interpro domains 
+	    #those have accession IPR000xxxx
+	    #
 	    my $new_term_dbxref = $schema->resultset("General::Dbxref")->find_or_create( 
 		{   db_id     => $db->get_column('db_id'),
 		    accession => $accession,
@@ -528,9 +530,9 @@ foreach my $new_ont(@onts) {
 		    $new_term->add_secondary_dbxref($i);
 		}
 		foreach my $r ($novel_terms{$k}->get_dbxrefs() ) { #store definition's dbxrefs in cvterm_dbxref
-		    my $def_dbxref= $r->primary_id();
-		    message("adding definition dbxref $r to cvterm_dbxref\n");
-		    $new_term->add_secondary_dbxref($r, 1);
+		    my $def_dbxref= $r->database() . ':' . $r->primary_id();
+		    message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
+		    $new_term->add_secondary_dbxref($def_dbxref, 1);
 		}
 	    }
 	}
@@ -561,7 +563,7 @@ foreach my $new_ont(@onts) {
 	# indexing the database relationships
 	foreach my $k (keys %db_index) {     
 	    ###foreach my $r ($db_ont->get_relationships($db_index{$k})) { 
-	    foreach my $r ($db_index{$k}->search_related('cvterm_relationship_subject_ids') ) { 
+	    foreach my $r ($db_index{$k}->search_related('cvterm_relationship_subjects') ) { 
 		if ($r) {
 		    my ($s) = $r->search_related('subject');
 		    my ($o) = $r->search_related('object'); 
