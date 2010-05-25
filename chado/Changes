@@ -1,4 +1,9 @@
-Version 1.01
+Version 1.11 Tue May 25 11:10:47 EDT 2010
+* fixed an issue with accessing the primary_id of
+Bio::Annotation::DBLink objects (Naama)
+
+
+Version 1.1
 
 * Fixes to gmod_gff3_preprocessor.pl so that file splitting will work
 as expected.
