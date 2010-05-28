@@ -361,7 +361,7 @@ foreach my $new_ont(@onts) {
 		
 		my $name = $db_index{$k}->name(); #get the name in the database 
 		message( "Term not in file: $name \n",1);
-		unless( $name =~ m/obsolete.*$opt_d:$k/ ) {
+		unless( $name =~ m/obsolete.*$opt_d:/ ) {
 		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $name . ")" ;  #add the 'obsolete' suffix 
 		    $db_index{$k}->set_column(name => $ob_name );
 		    message( "**modified name for $opt_d:$name - '$ob_name' \n " , 1); 
