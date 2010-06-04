@@ -315,12 +315,13 @@ foreach my $new_ont(@onts) {
 	print STDERR "Indexing terms and relationships...\n";
 	my %file_index = ();  # index of term objects in the db with accession as key
 	my %db_index = (); # this hash will be populated with accession => cvterm_object
-	
+	my $db_namespace ;
 	foreach my $t (@all_file_terms) { 
-	    my $id = $t->identifier();
-	    $id=~ s/\w+\:(.*)/$1/g;
-	    $file_index{$id} = $t;
-	    message("Found term in file :  $id\n", 1);
+	    my ($prefix, $id) = split (/\:/, $t->identifier()); #=~ s/\w+\:(.*)/$1/g;
+	    $db_namespace = $prefix if !$db_namespace;
+	    
+	    $file_index{$id} = $t  if ($db_namespace eq $prefix) ;
+	    message("Found term in file :  $prefix:$id\n", 1);
 	}
 	
 	my $c_count = 0;  # count of db terms    
@@ -514,7 +515,7 @@ foreach my $new_ont(@onts) {
 		
 		if ($count % 100==0)  { print STDERR "."; }
 		my $comment = $novel_terms{$k}->comment();
-		$new_term->create_cvtermprops( { comment => $comment } , { autocreated => 1 } ) if $comment;  
+		$new_term->create_cvtermprops( { comment => $comment } , { autocreate => 1 } ) if $comment;  
 		
                 #store synonyms in cvtermsynonym
 		foreach my $s ($novel_terms{$k}->get_synonyms() ) { 
@@ -552,6 +553,12 @@ foreach my $new_ont(@onts) {
 	    foreach my $r (@all_relationships) { 
 		my $s = $r->subject_term();
 		my $o = $r->object_term();
+		my ($s_db_name, undef) = split (/\:/ , $s->identifier);
+		my ($o_db_name, undef) = split (/\:/, $o->identifier);
+		if ($s_db_name ne $o_db_name) { 
+		    print "*********************************************subject $s_db_name != object $o_db_name. Skipping!!\n";
+		    next();
+		}
 		my $key = numeric_id($s->identifier())."-".numeric_id($o->identifier());
 		message("Looking at relationship in file: $key\n" );
 		if ($t_count % 100==0) { message("."); }
@@ -608,7 +615,10 @@ foreach my $new_ont(@onts) {
 		    { accession => $s_acc,
 		      db_id     => $db->db_id(),
 		    } );
-	
+		if (!$subject_dbxref ) { 
+		    message("dbxref does not exist for subject term '$s_acc'.Skipping..\n" ,1); 
+		    next RELATIONSHIP; 
+		}
 		my ($subject_term)= $schema->resultset('Cv::Cvterm')->find(
 		    { cv_id => $cv->cv_id(),
 		      dbxref_id => $subject_dbxref->dbxref_id(),
@@ -626,6 +636,11 @@ foreach my $new_ont(@onts) {
 		    { accession => $o_acc,
 		      db_id     => $db->db_id(),
 		    } );
+					
+		if (!$object_dbxref ) {
+		    message("dbxref does not exist for object term $o_acc . SKIPPING!\n",1); 
+		    next RELATIONSHIP;
+		}
 		my ($object_term)= $schema->resultset('Cv::Cvterm')->find(
 		    { cv_id => $cv->cv_id(),
 		      dbxref_id => $object_dbxref->dbxref_id(),
