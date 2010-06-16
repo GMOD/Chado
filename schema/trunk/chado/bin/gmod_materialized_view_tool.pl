@@ -418,6 +418,7 @@ sub prompt_create_mv {
 
         $name = validate(
             {
+                resp   => $VIEWNAME,
                 prompt =>
                   "Give your materialized view a name (word characters only): ",
                 test => sub {
@@ -438,6 +439,7 @@ sub prompt_create_mv {
 
         $location = validate(
             {
+                resp   => $TABLENAME,
                 prompt =>
                   "Where will this MV be located? (schemaname.tablename): ",
                 regexp => '^\w+\.\w+$'
@@ -450,6 +452,7 @@ sub prompt_create_mv {
             if ( "$SCHEMA.$view" eq $location ) {
                 $remove_view = validate(
                     {
+                        resp   => $YES ? 'y' : '',
                         prompt =>
                           "A view with this name already exists; do you want"
                           ." to replace it\nwith a materialized view? [y|n] ",
@@ -467,6 +470,7 @@ sub prompt_create_mv {
 
         my $refresh_time = validate(
             {
+                resp   => $REFRESH_TIME,
                 prompt =>
                      "How often, in seconds, should the MV be refreshed?\n"
                     ."You can also type 'daily', 'weekly', 'monthly' (30 days), or 'yearly' (365 days): ",
@@ -491,6 +495,7 @@ sub prompt_create_mv {
 
         my $mv_specs = validate(
             {
+                resp   => $COLUMNDEF,
                 prompt =>
 "Enter specifications for the materialized view, OR provide a file in which\n"
 ."the specs are written ('? for help): ",
@@ -521,6 +526,7 @@ sub prompt_create_mv {
 
         my $query = validate(
             {
+                resp   => $SQLQUERY,
                 prompt =>
                         "Enter the SQL query for the materialized view,\n"
                        ."or a file containing only the query: ",
@@ -549,6 +555,7 @@ sub prompt_create_mv {
 
         my $indexes = validate(
             {
+                resp   => $INDEXFIELDS,
                 prompt =>
 "Enter a comma separated list of fields to index (or return for none):",
                 test => sub {
@@ -566,6 +573,7 @@ sub prompt_create_mv {
 
         my $special_indexes = validate(
             {
+                resp   => $SPECIALINDEX,
                 prompt =>
                    "Enter the SQL queries for special indexes,\n"
                    ."or a file containing only the query (or return for none): ",
@@ -610,6 +618,7 @@ sub prompt_create_mv {
         print "Special index query: $special_indexes\n";
         my $resp = validate(
             {
+                resp   => $YES ? 'y' : '',
                 prompt => "Enter 'y' to confirm, 'n' to re-enter data: ",
                 regexp => '^y|n$'
             }
