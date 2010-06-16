@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 
 use strict;
-use lib '/home/cain/cvs_stuff/schema/chado/lib';
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
 
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
@@ -428,6 +426,7 @@ sub prompt_create_mv {
                     if ( $exists{$t} ) {
                         print "MV '$_' already exists!  Current names taken: "
                           . join( ", ", @NAMES ) . "\n";
+                        die "$VIEWNAME already exists and must be explicitly removed with '--dematerialize $VIEWNAME'" if ($VIEWNAME);
                     }
                     unless ( $t =~ /^\w+$/ ) {
                         print "Invalid format, use word characters only($t)\n";
@@ -818,12 +817,12 @@ sub dematerialize_view {
     my $create_view_query = "CREATE VIEW $schema.$table ($columns) AS $query";
     $dbh->do($create_view_query) or die "problem creating view: ".$dbh->errstr;
 
-    #change refresh_time to make it near infinite
-    #that is, about 20 years
+    #this used to set the update time to 20 years rather than deleting the
+    #entry.  Now it just deletes the entry
     my $update_query = $dbh->prepare(
-         "UPDATE materialized_view SET refresh_time=630720000 where name = ?");
+         "DELETE FROM  materialized_view WHERE name = ?");
     $update_query->execute($view) 
-         or die "problem changing refresh_time ".$dbh->errstr;
+         or die "problem delete deleted MV from materialized_view table: ".$dbh->errstr;
     $dbh->commit();
     return;
 }
