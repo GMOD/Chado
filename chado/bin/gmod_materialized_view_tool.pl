@@ -875,9 +875,11 @@ sub validate {
     my $error_msg = $args->{regexp_error};
     $error_msg ||= "Invalid format, try again";
     while ( !$valid ) {
-        print "\n" . $args->{prompt};
-        $resp = <STDIN>;
-        chomp $resp;
+        unless ($resp) {
+            print "\n" . $args->{prompt};
+            $resp = <STDIN>;
+            chomp $resp;
+        }
         if ( exists( $args->{test} ) ) {
             $valid = 1 if $args->{test}->($resp);
         }
