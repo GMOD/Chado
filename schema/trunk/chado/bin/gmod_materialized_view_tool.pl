@@ -20,19 +20,27 @@ materialized views for Chado.
 
 =head1 COMMAND-LINE OPTIONS
 
- --create_view                    Guides user through creating a MV
- --update_view viewname           Refreshes data in named MV
- --automatic                      Refreshes data in all MV that are out of date
- --dematerialize viewname         Creates a true view, removing the MV
- --dbprofile profilename          DB profile options to use (default is 'default')
- --list                           Gives a list of MV
- --status                         Gives the status of all MV
- --help                           Prints this documentation and quits
+ --create_view              Guides user through creating a MV
+ --update_view viewname     Refreshes data in named MV
+ --automatic                Refreshes data in all MV that are out of date
+ --dematerialize viewname   Creates a true view, removing the MV
+ --dbprofile profilename    DB profile options to use (default is 'default')
+ --list                     Gives a list of MV
+ --status                   Gives the status of all MV
+ --view_name                Name of the view to be created
+ --table_name               Schema qualified name of the table
+ --refresh_time             Frequency at which the view should be updated
+ --column_def               List of columns with types
+ --sql_query                Select query to define table contents
+ --index_fields             List of fields to build indexes on
+ --special_index            SQL to create special indexes
+ --yes                      Assume yes to any yes/no question
+ --help                     Prints this documentation and quits
 
 Note that the options can be shortened.  For example, '--de' is
 an acceptable shortening of --dematerialize.  For options that have a
 unique first letter, the short (single hyphened) version of the option
-may be used, like '-c' for --create_view.
+may be used, like '-a' for --automatic.
 
 =head1 DESCRIPTION
 
@@ -79,30 +87,32 @@ be empty.
 
 =head1 OPTIONS
 
-=head2 --create_view
+=over
+
+=item --create_view
 
 Guides the user through a series of prompts to create a new materialized view.
 
-=head2 --update_view viewname
+=item  --update_view viewname
 
 Updates the data in a materialized view by first deleting the data in 
 the table and then running the query that defines the data to repopulate it. 
 
-=head2 --automatic
+=item  --automatic
 
 Automatically updates all of the MVs that are currently marked out of 
 date according to the update frequency that was specified when the MV
 was created.  This option is very useful in a cron job to update MVs
 on a regular basis.
 
-=head2 --dematerialize viewname
+=item  --dematerialize viewname
 
 Takes a MV and turns into a standard view.  This might be done if
 the database administrator desides that the downsides of the MV scheme
 is not working for a given view, if for example, the data in the underlying
 tables is changing to frequently or the MV is taking up too much disk space.
 
-=head2 --dbprofile
+=item  --dbprofile
 
 The name of the DB profile to use for database connectivity.  These
 profiles are kept in $GMOD_ROOT/conf (typically /usr/local/gmod/conf)
@@ -110,18 +120,68 @@ and contain information like the database name, user name and password.
 The default value is 'default' which was created when the Chado
 database was created.
 
-=head2 --list
+=item  --list
 
 Gives a list of current MVs.
 
-=head2 --status
+=item  --status
 
 Gives the status of all MVs, including whether they are considered
 current or out of date.
 
-=head2 --help
+=item  --help
 
 Prints this documetation and quits.
+
+=back
+
+=head1 NONINTERACTIVE VIEW CREATION
+
+The following options are provided to allow the creation of materialized
+views in a non-interactive way.  If any of the below flags are omitted, you
+will be prompted for the appropriate values.
+
+=over
+
+=item --view_name
+
+This is the name that this tool will use later to refer to the MV as; 
+typically it will be the same as the name of the MV in the database, 
+but it doesn't have to be.
+
+=item --table_name
+
+The schema qualified name of the table, like "public.all_feature_names"
+
+=item --refresh_time
+
+Frequency at which the view should be updated.  This can either be a number
+of seconds, or one of 'daily', 'weekly', or 'monthly'.
+
+=item --column_def
+
+List of columns with types, like
+"feature_id integer,name varchar(255),organism_id integer".
+
+=item --sql_query
+
+Select query to define table contents; see the note above about how
+the SQL must be written for this query.
+
+=item --index_fields
+
+List of fields to build indexes on.
+
+=item --special_index
+
+SQL to create special indexes.  This allows you to create functional
+and full text search indexes.
+
+=item --yes
+
+Assume yes to any yes/no question
+
+=back
 
 =head1 AUTHORS
 
@@ -140,7 +200,9 @@ our $TABLE  = "materialized_view";
 our $SCHEMA = "public";
 
 my ( $DBPROFILE, $STATUS, $LIST, $NAME, $DEMATERIALIZE, $CREATE_VIEW,
-    $UPDATE_VIEW, $AUTOMATIC, $HELP );
+    $UPDATE_VIEW, $AUTOMATIC, $HELP,
+    $VIEWNAME, $TABLENAME, $REFRESH_TIME, $COLUMNDEF, $SQLQUERY, $INDEXFIELDS,
+    $SPECIALINDEX, $YES,);
 
 GetOptions(
     'dbprofile=s'     => \$DBPROFILE,
@@ -150,6 +212,14 @@ GetOptions(
     'update_view=s'   => \$UPDATE_VIEW,
     'automatic'       => \$AUTOMATIC,
     'dematerialize=s' => \$DEMATERIALIZE,
+    'view_name=s'     => \$VIEWNAME,
+    'table_name=s'    => \$TABLENAME,
+    'refresh_time=s'  => \$REFRESH_TIME,
+    'column_def=s'    => \$COLUMNDEF,
+    'sql_query=s'     => \$SQLQUERY,
+    'index_fields=s'  => \$INDEXFIELDS,
+    'special_index=s' => \$SPECIALINDEX,
+    'yes'             => \$YES, 
     'help'            => \$HELP,
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
