@@ -871,7 +871,7 @@ sub extract_cols_from_specs {
 sub validate {
     my $args      = shift;
     my $valid     = 0;
-    my $resp      = "";
+    my $resp      = $args->{resp} || "";
     my $error_msg = $args->{regexp_error};
     $error_msg ||= "Invalid format, try again";
     while ( !$valid ) {
