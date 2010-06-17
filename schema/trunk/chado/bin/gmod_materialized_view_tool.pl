@@ -767,6 +767,7 @@ sub dematerialize_view {
     my $view   = shift;
     my $really = validate(
         {
+            resp   => $YES ? 'y' : '',
             prompt => 
 "Really remove the materialized view? Enter 'y' to confirm, 'n' to exit: ",
             regexp => '^y|n$'
