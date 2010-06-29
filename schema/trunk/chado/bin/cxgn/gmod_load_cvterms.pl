@@ -9,7 +9,7 @@ Usage: perl load_cvterms.pl -H dbhost -D dbname [-vdntuFo] file
 
 parameters
 
-=over 9
+=over 10
 
 =item -H
 
@@ -23,11 +23,15 @@ database name [required if -p isn't used]
 
 GMOD database profile name (can provide host and DB name) Default: 'default'
 
+=item -d
+
+driver name (e.g. 'Pg' for postgres). Driver name can be provided in gmod_config
+
 =item -v
 
 verbose output
 
-=item -d
+=item -s
 
 database name for linking (must be in db table) Default: GO
 
@@ -136,46 +140,58 @@ use Bio::Chado::Schema;
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
      $opt_u, $opt_o, $opt_p);
 
-getopts('F:d:H:o:n:vD:tup:');
+getopts('F:d:H:o:n:vD:tu:p:s:');
+
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
-my ($dbh, $schema);
+my $pass = $opt_p;
+my $driver = $opt_d;
+my $user = $opt_u;
+my $verbose = $opt_v;
 
-if ($opt_p) {
-    my $DBPROFILE = $opt_p;
+my $DBPROFILE = $opt_p ;
+
+print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t   \n" if $verbose;
+
+my $port = '5432';
+my $opt_s ||= 'GO'; # the database name that Dbxrefs should refer to
+
+if (!($opt_H and $opt_D) ) {
     $DBPROFILE ||= 'default';
-    my $gmod_conf = Bio::GMOD::Config->new() if $opt_p;
-    my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) if $opt_p;
+    my $gmod_conf = Bio::GMOD::Config->new() ;
+    my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) ;
     
     $dbhost ||= $db_conf->host();
     $dbname ||= $db_conf->name();
+    $driver ||= $db_conf->driver();
     
-    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    my $dbdriver=$db_conf->driver();
-    my $dbport = $db_conf->port();
+
+    $port= $db_conf->port() || '5432';
     
-    my $dsn = "dbi:$dbdriver:dbname=$dbname";
-    $dsn .= ";host=$dbhost";
-    $dsn .= ";port=$dbport" if $dbport;
-    
-    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 } );
-    $dbh=$schema->storage->dbh();
-} else {
-    require CXGN::DB::InsertDBH;
-    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				       dbname=>$dbname,
-				       dbschema=>'public',
-				     } );
-    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
+    $user= $db_conf->user();
+    $pass= $db_conf->password();
 }
 
+if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
+if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
 
+
+my $dsn = "dbi:$driver:dbname=$dbname";
+$dsn .= ";host=$dbhost";
+$dsn .= ";port=$port";
+
+my $schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'', { AutoCommit=>0 });
+
+my $dbh=$schema->storage->dbh();
+
+if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
+
+#######################3
+
+      
 my $error = 0; # keep track of input errors (in command line switches).
-if (!$opt_D and !$dbname) { 
-    print STDERR "Option -D required. Must be a valid database name.\n";
-    $error=1;
-}
 
 if (!$opt_F) { $opt_F="obo"; }
 
@@ -185,8 +201,7 @@ if ($opt_t) {
 if ($opt_u) { print STDERR "This script will UPDATE cvterms stored in your database from the input file! \n"; }
 else { print STDERR "WARNING: If your databse is already population with cvterms, not running in UPDATE mode (option -u) may cause database conflicts, such as violating unique constraints!\n"; }
 
-if (!$opt_d) { $opt_d="GO"; } # the database name that Dbxrefs should refer to
-print STDERR "Default for -d: $opt_d (specifies the database names for Dbxref objects)\n";
+print STDERR "Default for -s: $opt_s (specifies the database names for Dbxref objects)\n";
 
 print STDERR "Default for -F: File format set to $opt_F\n";
 
@@ -256,7 +271,7 @@ foreach my $new_ont(@onts) {
     
     eval { 
 	my $db = $schema->resultset("General::Db")->find_or_create( 
-	    { name => $opt_d }, { key => 'db_c1' }, );
+	    { name => $opt_s }, { key => 'db_c1' }, );
 	
 	print STDERR "Getting all the terms of the new ontology...\n";
 	my (@all_file_terms) = $new_ont->get_all_terms();
@@ -283,7 +298,7 @@ foreach my $new_ont(@onts) {
 		#To do this we need to add to the obo parser (Bio::OntologyIO::obo.pm)
 		#a 'get_typedefs' funciton
 		my $accession = $t->identifier() || $t->name();
-		my $p_term_db = $schema->resultset("General::Db")->find_or_create( { name => $opt_d }, { key => 'db_c1' }, );
+		my $p_term_db = $schema->resultset("General::Db")->find_or_create( { name => $opt_s }, { key => 'db_c1' }, );
 		my $p_term_dbxref = $schema->resultset("General::Dbxref")->find_or_create( 
 		    {   db_id     => $p_term_db->get_column('db_id'),
 			accession => $accession,
@@ -362,10 +377,10 @@ foreach my $new_ont(@onts) {
 		
 		my $name = $db_index{$k}->name(); #get the name in the database 
 		message( "Term not in file: $name \n",1);
-		unless( $name =~ m/obsolete.*$opt_d:/ ) {
-		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $name . ")" ;  #add the 'obsolete' suffix 
+		unless( $name =~ m/obsolete.*$opt_s:/ ) {
+		    my $ob_name = $name . " (obsolete " . $opt_s . ":" . $name . ")" ;  #add the 'obsolete' suffix 
 		    $db_index{$k}->set_column(name => $ob_name );
-		    message( "**modified name for $opt_d:$name - '$ob_name' \n " , 1); 
+		    message( "**modified name for $opt_s:$name - '$ob_name' \n " , 1); 
 		}
 		
 		$db_index{$k}->set_column(is_obsolete => 1 );
@@ -397,10 +412,10 @@ foreach my $new_ont(@onts) {
 		    #changing the name of obsolete terms to "$name (obsolete $db:$accession)"
 		    #to avoid violating the cvterm unique constaint (name, cv_id, is_obsolete)
 		    if ($db_index{$k}->is_obsolete() ) { 
-			unless( $name =~ m/obsolete.*$opt_d:$k/ ) {
-			    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $k . ")" ;  
+			unless( $name =~ m/obsolete.*$opt_s:$k/ ) {
+			    my $ob_name = $name . " (obsolete " . $opt_s . ":" . $k . ")" ;  
 			    $db_index{$k}->set_column( name=>$ob_name );
-			    print STDERR "**modified name for $opt_d:$k - '$ob_name' version: " . $file_index{$k}->version() . " \n " ; 
+			    print STDERR "**modified name for $opt_s:$k - '$ob_name' version: " . $file_index{$k}->version() . " \n " ; 
 			}
 		    }
 		    $db_index{$k}->update();
@@ -492,10 +507,10 @@ foreach my $new_ont(@onts) {
 		);
 	   
 	    if ($novel_terms{$k}->is_obsolete() == 1 ) {
-		unless( $name =~ m/obsolete.*$opt_d:$k/i ) {
-		    my $ob_name = $name . " (obsolete " . $opt_d . ":" . $k . ")" ;  
+		unless( $name =~ m/obsolete.*$opt_s:$k/i ) {
+		    my $ob_name = $name . " (obsolete " . $opt_s . ":" . $k . ")" ;  
 		    $name = $ob_name ;
-		    print STDERR "**modified name for $opt_d:$k - '$ob_name' \n " ; 
+		    print STDERR "**modified name for $opt_s:$k - '$ob_name' \n " ; 
 		}
 	    }
 	    if (!$opt_t) {

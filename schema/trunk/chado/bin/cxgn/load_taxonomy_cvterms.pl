@@ -12,7 +12,7 @@ populate a chado database with NCBI taxon terms
 
 =head2 parameters
 
-=over 4
+=over 7
 
 =item -H
 
@@ -32,6 +32,18 @@ trial mode. Do not perform any store operations at all.
 
 GMOD database profile name (can provide host and DB name) Default: 'default'
 
+=item -u
+
+username. Override username in gmod_config 
+
+=item -d 
+
+driver. Override driver name in gmod_config
+
+=item -p 
+
+password. Override password in gmod_config
+
 
 =back
 
@@ -50,10 +62,14 @@ use Getopt::Std;
 
 our ($opt_H, $opt_D, $opt_g,  $opt_t);
 
-getopts('H:g:tD:');
+getopts('H:g:tD:d:u:p:');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
+my $driver = $opt_d;
+my $user = $opt_u;
+my $pass = $opt_p;
+my $port;
 
 my ($dbh, $schema);
 
@@ -65,26 +81,23 @@ if ($opt_g) {
     
     $dbhost ||= $db_conf->host();
     $dbname ||= $db_conf->name();
-    my $dbdriver=$db_conf->driver();
-    my $dbport = $db_conf->port();
-    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    
-    my $dsn = "dbi:$dbdriver:dbname=$dbname";
-    $dsn .= ";host=$dbhost";
-    $dsn .= ";port=$dbport" if $dbport;
-    
-    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 } );
-    
-    $dbh=$schema->storage->dbh();
-    
-}else { 
-    require CXGN::DB::InsertDBH;
-    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				       dbname=>$dbname,
-				       dbschema=>'public',
-				     } );
-    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
-}
+    $driver ||= $db_conf->driver();
+    $port   ||= $db_conf->port();
+    $pass   ||= $db_conf->password();
+    $user   ||= $db_conf->user();
+}   
+
+if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+
+my $dsn = "dbi:$driver:dbname=$dbname";
+$dsn .= ";host=$dbhost";
+$dsn .= ";port=$port" if $port;
+
+$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass, { AutoCommit=>0 } );
+
+$dbh=$schema->storage->dbh();
+
+
 if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 
