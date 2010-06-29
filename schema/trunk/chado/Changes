@@ -1,12 +1,12 @@
-Version 1.12 2010-06-29
-* Fixes issue with dependencies on CXGN-specific code. Now all 
-db connection parameters for cxgn - contributed scripts should be passed 
-in a gmod_config file, or in command line options as listed in the POD.
-
-
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
 Bio::Annotation::DBLink objects (Naama)
+* Fixes issue with dependencies on CXGN-specific code. Now all
+db connection parameters for cxgn - contributed scripts should be passed
+in a gmod_config file, or in command line options as listed in the POD.
+* Made gmod_materialized_view_tool.pl able to accept all configuration
+parameters on the command line (this is to make it work with automatic
+MV creation for full text searching) (Scott).
 
 
 Version 1.1
