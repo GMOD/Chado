@@ -35,7 +35,7 @@ Without this file the entire NCBI taxonomy will be stored in your database!
 
 =head2 parameters
 
-=over 7
+=over 9
 
 =item -H
 
@@ -71,6 +71,19 @@ trial mode. Do not perform any store operations at all.
 =item -g
 
 GMOD database profile name (can provide host and DB name) Default: 'default'
+
+=item -u
+
+username. Override username in gmod_config 
+
+=item -d 
+
+driver. Override driver name in gmod_config
+
+=item -s 
+
+password. Override password in gmod_config
+
 
 =back
 
@@ -137,44 +150,56 @@ use Bio::Chado::Schema;
 
 use Getopt::Std;
 
-our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i, $opt_p, $opt_g);
+our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i, $opt_p, $opt_g, $opt_u, $opt_s, $opt_d);
 
-getopts('H:D:i:p:g:tv');
+getopts('H:D:i:p:g:u:s:d:tv');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 my $infile = $opt_i;
 my $phylotree_name= $opt_p || 'NCBI taxonomy tree';
+my $user = $opt_u;
+my $pass = $opt_s;
+my $driver = $opt_d;
+my $port;
+
 my $DBPROFILE = $opt_g ;
+
 
 print "H= $opt_H, D= $opt_D, v=$opt_v, t=$opt_t, i=$opt_i  \n";
 
 my ($dbh, $schema);
 
-if ($opt_g) {
-    my $DBPROFILE = $opt_g;
+################
+
+if (!($opt_H and $opt_D) ) {
     $DBPROFILE ||= 'default';
     my $gmod_conf = Bio::GMOD::Config->new() ;
     my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE ) ;
     
     $dbhost ||= $db_conf->host();
     $dbname ||= $db_conf->name();
+    $driver ||= $db_conf->driver();
     
-    if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
-    my $dsn = "dbi:".$db_conf->driver.":dbname=$dbname";
-    $dsn .= ";host=$dbhost";
-    $dsn .= ";port=".$db_conf->port if $db_conf->port;
-    $schema= Bio::Chado::Schema->connect( $dsn, $db_conf->user(), $db_conf->password(), { AutoCommit=>0 });
-    $dbh=$schema->storage->dbh();
 
-}else { 
-    require CXGN::DB::InsertDBH;
-    $dbh = CXGN::DB::InsertDBH->new( { dbhost=>$dbhost,
-				       dbname=>$dbname,
-				       dbschema=>'public',
-				     } );
-    $schema= Bio::Chado::Schema->connect( sub { $dbh->get_actual_dbh() } );   
+    $port= $db_conf->port();
+    
+    $user= $db_conf->user();
+    $pass= $db_conf->password();
 }
+
+###################
+
+if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
+
+my $dsn = "dbi:$driver:dbname=$dbname";
+$dsn .= ";host=$dbhost";
+$dsn .= ";port=$port" if $port;
+
+$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass, { AutoCommit=>0 });
+$dbh=$schema->storage->dbh();
+
+
 if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 my $sth;

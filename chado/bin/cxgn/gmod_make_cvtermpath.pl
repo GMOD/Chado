@@ -43,19 +43,32 @@ GMOD database profile name (can provide host and DB name) Default: 'default'
 
 =head2 If not using a GMOD database profile (option -g) then you must provide the following parameters
 
-=over 3
+=over 5
 
-=item -u
+=item -D 
 
-Database user name 
+Database name 
+
+=item -H 
+
+Hostname
+
 
 =item -d 
 
 Database driver name (e.g. 'Pg' for postgres)
 
+=item -u
+
+[Optional- if default user is not used]
+Database user name 
+
 =item -p 
 
+[Optional- if you need a password to connect to your database] 
 Password for your user to connect to the database
+
+
 
 =back
 
