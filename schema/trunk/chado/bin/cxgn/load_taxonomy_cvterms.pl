@@ -60,7 +60,7 @@ use Bio::Chado::Schema;
 use Getopt::Std;
 
 
-our ($opt_H, $opt_D, $opt_g,  $opt_t);
+our ($opt_H, $opt_D, $opt_g,  $opt_t, $opt_d, $opt_u, $opt_p);
 
 getopts('H:g:tD:d:u:p:');
 
