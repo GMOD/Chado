@@ -147,9 +147,9 @@ use Bio::GMOD::DB::Config;
 use Bio::Chado::Schema;
 
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
-     $opt_u, $opt_o, $opt_p, $opt_r, $opt_g);
+     $opt_u, $opt_o, $opt_p, $opt_r, $opt_g, $opt_s);
 
-getopts('F:d:H:o:n:vD:tu:p:s:r:g:');
+getopts('F:d:H:o:n:vD:tp:us:r:g:');
 
 
 my $dbhost = $opt_H;
@@ -164,7 +164,8 @@ my $DBPROFILE = $opt_g ;
 print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t   \n" if $verbose;
 
 my $port = '5432';
-my $opt_s || die  " Need -s db.name argument! \n " ; # the database name that Dbxrefs should refer to
+
+if (!$opt_s)  { die  " Need -s db.name argument! \n " ; } # the database name that Dbxrefs should refer to
 
 if (!($opt_H and $opt_D) ) {
     $DBPROFILE ||= 'default';
