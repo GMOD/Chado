@@ -9,7 +9,7 @@ Usage: perl load_cvterms.pl -H dbhost -D dbname [-vdntuFo] file
 
 parameters
 
-=over 10
+=over 13
 
 =item -H
 
@@ -19,21 +19,26 @@ hostname for database [required if -p isn't used]
 
 database name [required if -p isn't used]
 
-=item -p
+=item -p 
 
-GMOD database profile name (can provide host and DB name) Default: 'default'
+password (if you need to provide a password to connect to your db)
+
+=item -r 
+
+username (if you need to provide a username to connect to your database) 
+
 
 =item -d
 
 driver name (e.g. 'Pg' for postgres). Driver name can be provided in gmod_config
 
-=item -v
+=item -g
 
-verbose output
+GMOD database profile name (can provide host, DB name, password, username, and driver) Default: 'default'
 
 =item -s
 
-database name for linking (must be in db table) Default: GO
+database name for linking (must be in db table) 
 
 =item -n
 
@@ -48,6 +53,10 @@ L<Bio::OntologyIO>. Default: obo
 =item -u 
 
 update all the terms. Without -u, the terms in the database won't be updated to the contents of the file, in terms of definitions, etc. New terms will still be added.
+
+=item -v
+
+verbose output
 
 =item -o 
 
@@ -120,7 +129,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 0.13, August 2009.
+Version 0.14, July 2010.
 
 =cut
 
@@ -138,24 +147,24 @@ use Bio::GMOD::DB::Config;
 use Bio::Chado::Schema;
 
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
-     $opt_u, $opt_o, $opt_p);
+     $opt_u, $opt_o, $opt_p, $opt_r, $opt_g);
 
-getopts('F:d:H:o:n:vD:tu:p:s:');
+getopts('F:d:H:o:n:vD:tu:p:s:r:g:');
 
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 my $pass = $opt_p;
 my $driver = $opt_d;
-my $user = $opt_u;
+my $user = $opt_r;
 my $verbose = $opt_v;
 
-my $DBPROFILE = $opt_p ;
+my $DBPROFILE = $opt_g ;
 
 print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t   \n" if $verbose;
 
 my $port = '5432';
-my $opt_s ||= 'GO'; # the database name that Dbxrefs should refer to
+my $opt_s || die  " Need -s db.name argument! \n " ; # the database name that Dbxrefs should refer to
 
 if (!($opt_H and $opt_D) ) {
     $DBPROFILE ||= 'default';

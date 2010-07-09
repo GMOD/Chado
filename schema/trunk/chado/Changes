@@ -7,7 +7,7 @@ in a gmod_config file, or in command line options as listed in the POD.
 * Made gmod_materialized_view_tool.pl able to accept all configuration
 parameters on the command line (this is to make it work with automatic
 MV creation for full text searching) (Scott).
-
+* fixed messed up gmod_load_cvterms.pl -p and -u options (Naama)
 
 Version 1.1
 
