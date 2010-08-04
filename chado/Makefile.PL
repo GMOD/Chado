@@ -498,9 +498,9 @@ if ($ant and -e "$working_dir/../GMODTools") {
 
 WriteMakefile(
 #      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
-#    'NAME'		            => 'chado',
-    'NAME'                => 'gmod',
-    'VERSION'             => '1.1',
+    'NAME'		            => 'chado',
+#    'NAME'                => 'gmod',
+    'VERSION'             => '1.11',
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       #'Class::DBI'        => 0.94,
