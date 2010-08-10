@@ -15,6 +15,9 @@ use XML::Simple;
 use LWP::Simple qw(mirror is_success status_message);
 use Log::Log4perl;
 use DBI;
+use IPC::Cmd ();
+my $go2fmt = IPC::Cmd::can_run('go2fmt') ? 'go2fmt' : 'go2fmt.pl'; #< detect new version of go2fmt
+
 Log::Log4perl::init('load/etc/log.conf');
 no warnings;
 
@@ -270,14 +273,16 @@ sub ACTION_ontologies {
       my $sys_call;
       if ($file->{type} eq 'obo') {
         $sys_call = join( ' ',
-           'go2fmt.pl -p obo_text -w xml',
+           $go2fmt,
+           '-p obo_text -w xml',
            catfile( $conf->{'path'}{'data'}, $file->{'local'}),
            '| go-apply-xslt oboxml_to_chadoxml - >',
            catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
         );
       } elsif ($file->{type} eq 'ontology') {
         $sys_call = join( ' ',
-           'go2fmt.pl -p go_ont -w xml',
+           $go2fmt,
+           '-p go_ont -w xml',
            catfile( $conf->{'path'}{'data'}, $file->{'local'}),
            '| go-apply-xslt oboxml_to_chadoxml - >',
            catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
@@ -317,7 +322,8 @@ sub ACTION_ontologies {
 
       if ($deffile) {
         $sys_call = join( ' ',
-          'go2fmt.pl -p go_def -w xml',
+          $go2fmt,
+          '-p go_def -w xml',
           catfile( $conf->{'path'}{'data'}, $deffile->{'local'}),
           '|  go-apply-xslt oboxml_to_chadoxml - >',
           catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
