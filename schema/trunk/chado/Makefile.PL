@@ -500,7 +500,7 @@ WriteMakefile(
 #      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
     'NAME'		            => 'chado',
 #    'NAME'                => 'gmod',
-    'VERSION'             => '1.11',
+    'VERSION'             => '1.12',
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       #'Class::DBI'        => 0.94,
