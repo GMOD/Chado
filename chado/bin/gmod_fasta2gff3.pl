@@ -20,6 +20,8 @@ my $gfffile  = $GFFFILENAME || 'out.gff';
 my $type     = $TYPE        || 'EST';
 my $source   = $SOURCE      || '.';
 
+-r $fastadir or die "fasta dir '$fastadir' not found or not readable\n";
+
 open OUT, ">", $gfffile or die "couldn't open $gfffile for writing: $!\n";
 
 my $stream = Bio::DB::Fasta->new($fastadir)->get_PrimarySeq_stream;
