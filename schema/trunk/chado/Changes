@@ -2,6 +2,8 @@ Version 1.12 Tue Aug 10 13:59:05 EDT 2010
 * Added some error checking to gmod_fasta2gff3.pl (Rob)
 * Updated Bio::Chado::Builder to detect recent versions of go-perl.  They
 no longer have .pl at the end of the go2fmt script name (Rob)
+* The GFF3 bulk loader will now ignore ##sequence-region directives;
+previously, their presence caused the loader to fail (Scott)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
