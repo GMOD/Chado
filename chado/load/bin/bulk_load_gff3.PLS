@@ -749,10 +749,12 @@ my $gffio;
 if ($GFFFILE eq 'stdin' and !$FASTAFILE) {
     $gffio = Bio::FeatureIO->new(-fh   => \*STDIN , 
                                  -format => 'gff', 
+                                 -ignore_seq_region => 1,
                                  -validate_terms => $VALIDATE);
 } elsif ($GFFFILE and $GFFFILE ne 'stdin') {
     $gffio = Bio::FeatureIO->new(-file => $GFFFILE, 
                                  -format => 'gff', 
+                                 -ignore_seq_region => 1,
                                  -validate_terms => $VALIDATE);
 }
 
