@@ -477,14 +477,29 @@
       <source type='sql' path='expression/expression.sql'/>
     </module>
 
+    <module id='project'>
+      <dependency to="cv"/>
+      <dependency to="contact"/>
+      <dependency to="pub"/>
+      <status code='beta'>
+      </status>
+      <description>
+The project table has been moved from general to its own module and has been
+expanded to provide properties, publications and contacts.
+      </description>
+      <source type='sql' path='project/project.sql'/>
+    </module>
+
+
     <module id='mage'>
-	      <dependency to='sequence'/>
-   	   <dependency to='cv'/>
+	<dependency to='sequence'/>
+   	<dependency to='cv'/>
       	<dependency to='pub'/>
       	<dependency to='general'/>
- 			<dependency to='organism'/>
- 			<dependency to='contact'/>
- 			<dependency to='companalysis'/>
+ 	<dependency to='organism'/>
+ 	<dependency to='contact'/>
+ 	<dependency to='companalysis'/>
+        <dependency to='project'/> 
       <status code='beta'>
         In use at UCLA/Allen Day
       </status>
@@ -576,6 +591,27 @@
       </component>
     </module>
 
+    <module id='natural-diversity'>
+      <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='phenotype'/>
+      <dependency to='organism'/>
+      <dependency to='genetic'/>
+      <dependency to='contact'/>
+      <dependency to='general'/>
+      <dependency to='stock'/>
+      <dependency to='project'/>
+      <status code='beta'>
+      </status>
+      <description>
+Natural diversity module for dealing with populations, samples, genotypes,
+phenotypes and results of other assays.
+      </description>
+      <source type='sql' path='natural_diversity/natural_diversity.sql'/>
+    </module>
+
+
 <!--
     Since this is dynamically generated from a given schema, this should
     either be done at a later step, or if requested, dynamically generated
@@ -595,6 +631,8 @@
       <dependency to='organism'/>
       <dependency to='phylogeny'/>
       <dependency to='rad'/>
+      <dependency to='project'/>
+      <dependency to='natural-diversity'/>
 
       <status code='beta'>
         In use at...?
@@ -605,6 +643,7 @@
       <source type='sql' path='audit/audit_tables.sql'/>
     </module>
 -->
+
 
   </modules>
 </schema_metadata>

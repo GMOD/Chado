@@ -218,63 +218,6 @@
        EXECUTE PROCEDURE audit_update_delete_dbxref ();
 
 
-   DROP TABLE audit_project;
-   CREATE TABLE audit_project ( 
-       project_id integer, 
-       name varchar(255), 
-       description varchar(255), 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_project to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_project() RETURNS trigger AS
-   '
-   DECLARE
-       project_id_var integer; 
-       name_var varchar(255); 
-       description_var varchar(255); 
-       
-       transaction_type_var char;
-   BEGIN
-       project_id_var = OLD.project_id;
-       name_var = OLD.name;
-       description_var = OLD.description;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_project ( 
-             project_id, 
-             name, 
-             description, 
-             transaction_type
-       ) VALUES ( 
-             project_id_var, 
-             name_var, 
-             description_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER project_audit_ud ON project;
-   CREATE TRIGGER project_audit_ud
-       BEFORE UPDATE OR DELETE ON project
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_project ();
-
-
    DROP TABLE audit_cv;
    CREATE TABLE audit_cv ( 
        cv_id integer, 
@@ -5290,6 +5233,306 @@
        EXECUTE PROCEDURE audit_update_delete_expression_image ();
 
 
+   DROP TABLE audit_project;
+   CREATE TABLE audit_project ( 
+       project_id integer, 
+       name varchar(255), 
+       description varchar(255), 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project() RETURNS trigger AS
+   '
+   DECLARE
+       project_id_var integer; 
+       name_var varchar(255); 
+       description_var varchar(255); 
+       
+       transaction_type_var char;
+   BEGIN
+       project_id_var = OLD.project_id;
+       name_var = OLD.name;
+       description_var = OLD.description;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project ( 
+             project_id, 
+             name, 
+             description, 
+             transaction_type
+       ) VALUES ( 
+             project_id_var, 
+             name_var, 
+             description_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_audit_ud ON project;
+   CREATE TRIGGER project_audit_ud
+       BEFORE UPDATE OR DELETE ON project
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project ();
+
+
+   DROP TABLE audit_projectprop;
+   CREATE TABLE audit_projectprop ( 
+       projectprop_id integer, 
+       project_id integer, 
+       cvterm_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_projectprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_projectprop() RETURNS trigger AS
+   '
+   DECLARE
+       projectprop_id_var integer; 
+       project_id_var integer; 
+       cvterm_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       projectprop_id_var = OLD.projectprop_id;
+       project_id_var = OLD.project_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_projectprop ( 
+             projectprop_id, 
+             project_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             projectprop_id_var, 
+             project_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER projectprop_audit_ud ON projectprop;
+   CREATE TRIGGER projectprop_audit_ud
+       BEFORE UPDATE OR DELETE ON projectprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_projectprop ();
+
+
+   DROP TABLE audit_project_relationship;
+   CREATE TABLE audit_project_relationship ( 
+       project_relationship_id integer, 
+       subject_project_id integer, 
+       object_project_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       project_relationship_id_var integer; 
+       subject_project_id_var integer; 
+       object_project_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_relationship_id_var = OLD.project_relationship_id;
+       subject_project_id_var = OLD.subject_project_id;
+       object_project_id_var = OLD.object_project_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_relationship ( 
+             project_relationship_id, 
+             subject_project_id, 
+             object_project_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             project_relationship_id_var, 
+             subject_project_id_var, 
+             object_project_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_relationship_audit_ud ON project_relationship;
+   CREATE TRIGGER project_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON project_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_relationship ();
+
+
+   DROP TABLE audit_project_pub;
+   CREATE TABLE audit_project_pub ( 
+       project_pub_id integer, 
+       project_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_pub() RETURNS trigger AS
+   '
+   DECLARE
+       project_pub_id_var integer; 
+       project_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_pub_id_var = OLD.project_pub_id;
+       project_id_var = OLD.project_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_pub ( 
+             project_pub_id, 
+             project_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             project_pub_id_var, 
+             project_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_pub_audit_ud ON project_pub;
+   CREATE TRIGGER project_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON project_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_pub ();
+
+
+   DROP TABLE audit_project_contact;
+   CREATE TABLE audit_project_contact ( 
+       project_contact_id integer, 
+       project_id integer, 
+       contact_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_contact() RETURNS trigger AS
+   '
+   DECLARE
+       project_contact_id_var integer; 
+       project_id_var integer; 
+       contact_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_contact_id_var = OLD.project_contact_id;
+       project_id_var = OLD.project_id;
+       contact_id_var = OLD.contact_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_contact ( 
+             project_contact_id, 
+             project_id, 
+             contact_id, 
+             transaction_type
+       ) VALUES ( 
+             project_contact_id_var, 
+             project_id_var, 
+             contact_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_contact_audit_ud ON project_contact;
+   CREATE TRIGGER project_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON project_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_contact ();
+
+
    DROP TABLE audit_mageml;
    CREATE TABLE audit_mageml ( 
        mageml_id integer, 
@@ -8157,6 +8400,68 @@
        EXECUTE PROCEDURE audit_update_delete_stock_relationship ();
 
 
+   DROP TABLE audit_stock_relationship_cvterm;
+   CREATE TABLE audit_stock_relationship_cvterm ( 
+       stock_relationship_cvterm_id integer, 
+       stock_relatiohship_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_cvterm_id_var integer; 
+       stock_relatiohship_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_cvterm_id_var = OLD.stock_relationship_cvterm_id;
+       stock_relatiohship_id_var = OLD.stock_relatiohship_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship_cvterm ( 
+             stock_relationship_cvterm_id, 
+             stock_relatiohship_id, 
+             cvterm_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_cvterm_id_var, 
+             stock_relatiohship_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_cvterm_audit_ud ON stock_relationship_cvterm;
+   CREATE TRIGGER stock_relationship_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship_cvterm ();
+
+
    DROP TABLE audit_stock_relationship_pub;
    CREATE TABLE audit_stock_relationship_pub ( 
        stock_relationship_pub_id integer, 
@@ -9807,5 +10112,1225 @@
        BEFORE UPDATE OR DELETE ON cell_line_library
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_cell_line_library ();
+
+
+   DROP TABLE audit_nd_geolocation;
+   CREATE TABLE audit_nd_geolocation ( 
+       geolocation_id integer, 
+       description varchar(255), 
+       latitude real, 
+       longitude real, 
+       geodetic_datum varchar(32), 
+       altitude real, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_geolocation to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_geolocation() RETURNS trigger AS
+   '
+   DECLARE
+       geolocation_id_var integer; 
+       description_var varchar(255); 
+       latitude_var real; 
+       longitude_var real; 
+       geodetic_datum_var varchar(32); 
+       altitude_var real; 
+       
+       transaction_type_var char;
+   BEGIN
+       geolocation_id_var = OLD.geolocation_id;
+       description_var = OLD.description;
+       latitude_var = OLD.latitude;
+       longitude_var = OLD.longitude;
+       geodetic_datum_var = OLD.geodetic_datum;
+       altitude_var = OLD.altitude;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_geolocation ( 
+             geolocation_id, 
+             description, 
+             latitude, 
+             longitude, 
+             geodetic_datum, 
+             altitude, 
+             transaction_type
+       ) VALUES ( 
+             geolocation_id_var, 
+             description_var, 
+             latitude_var, 
+             longitude_var, 
+             geodetic_datum_var, 
+             altitude_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_geolocation_audit_ud ON nd_geolocation;
+   CREATE TRIGGER nd_geolocation_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_geolocation
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_geolocation ();
+
+
+   DROP TABLE audit_nd_assay;
+   CREATE TABLE audit_nd_assay ( 
+       assay_id integer, 
+       geolocation_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay() RETURNS trigger AS
+   '
+   DECLARE
+       assay_id_var integer; 
+       geolocation_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_id_var = OLD.assay_id;
+       geolocation_id_var = OLD.geolocation_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay ( 
+             assay_id, 
+             geolocation_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_id_var, 
+             geolocation_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_audit_ud ON nd_assay;
+   CREATE TRIGGER nd_assay_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay ();
+
+
+   DROP TABLE audit_nd_assay_project;
+   CREATE TABLE audit_nd_assay_project ( 
+       assay_project_id integer, 
+       project_id integer, 
+       assay_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_project to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_project() RETURNS trigger AS
+   '
+   DECLARE
+       assay_project_id_var integer; 
+       project_id_var integer; 
+       assay_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_project_id_var = OLD.assay_project_id;
+       project_id_var = OLD.project_id;
+       assay_id_var = OLD.assay_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_project ( 
+             assay_project_id, 
+             project_id, 
+             assay_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_project_id_var, 
+             project_id_var, 
+             assay_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_project_audit_ud ON nd_assay_project;
+   CREATE TRIGGER nd_assay_project_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_project
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_project ();
+
+
+   DROP TABLE audit_nd_assayprop;
+   CREATE TABLE audit_nd_assayprop ( 
+       assayprop_id integer, 
+       assay_id integer, 
+       cvterm_id integer, 
+       value varchar(255), 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assayprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assayprop() RETURNS trigger AS
+   '
+   DECLARE
+       assayprop_id_var integer; 
+       assay_id_var integer; 
+       cvterm_id_var integer; 
+       value_var varchar(255); 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assayprop_id_var = OLD.assayprop_id;
+       assay_id_var = OLD.assay_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assayprop ( 
+             assayprop_id, 
+             assay_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             assayprop_id_var, 
+             assay_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assayprop_audit_ud ON nd_assayprop;
+   CREATE TRIGGER nd_assayprop_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assayprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assayprop ();
+
+
+   DROP TABLE audit_nd_assay_pub;
+   CREATE TABLE audit_nd_assay_pub ( 
+       assay_pub_id integer, 
+       assay_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_pub() RETURNS trigger AS
+   '
+   DECLARE
+       assay_pub_id_var integer; 
+       assay_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_pub_id_var = OLD.assay_pub_id;
+       assay_id_var = OLD.assay_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_pub ( 
+             assay_pub_id, 
+             assay_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_pub_id_var, 
+             assay_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_pub_audit_ud ON nd_assay_pub;
+   CREATE TRIGGER nd_assay_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_pub ();
+
+
+   DROP TABLE audit_nd_geolocationprop;
+   CREATE TABLE audit_nd_geolocationprop ( 
+       geolocationprop_id integer, 
+       geolocation_id integer, 
+       cvterm_id integer, 
+       value varchar(250), 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_geolocationprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_geolocationprop() RETURNS trigger AS
+   '
+   DECLARE
+       geolocationprop_id_var integer; 
+       geolocation_id_var integer; 
+       cvterm_id_var integer; 
+       value_var varchar(250); 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       geolocationprop_id_var = OLD.geolocationprop_id;
+       geolocation_id_var = OLD.geolocation_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_geolocationprop ( 
+             geolocationprop_id, 
+             geolocation_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             geolocationprop_id_var, 
+             geolocation_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_geolocationprop_audit_ud ON nd_geolocationprop;
+   CREATE TRIGGER nd_geolocationprop_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_geolocationprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_geolocationprop ();
+
+
+   DROP TABLE audit_nd_protocol;
+   CREATE TABLE audit_nd_protocol ( 
+       protocol_id integer, 
+       name varchar(255), 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_protocol to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocol() RETURNS trigger AS
+   '
+   DECLARE
+       protocol_id_var integer; 
+       name_var varchar(255); 
+       
+       transaction_type_var char;
+   BEGIN
+       protocol_id_var = OLD.protocol_id;
+       name_var = OLD.name;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_protocol ( 
+             protocol_id, 
+             name, 
+             transaction_type
+       ) VALUES ( 
+             protocol_id_var, 
+             name_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_protocol_audit_ud ON nd_protocol;
+   CREATE TRIGGER nd_protocol_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_protocol
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_protocol ();
+
+
+   DROP TABLE audit_nd_reagent;
+   CREATE TABLE audit_nd_reagent ( 
+       reagent_id integer, 
+       name varchar(80), 
+       type_id integer, 
+       feature_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_reagent to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagent() RETURNS trigger AS
+   '
+   DECLARE
+       reagent_id_var integer; 
+       name_var varchar(80); 
+       type_id_var integer; 
+       feature_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       reagent_id_var = OLD.reagent_id;
+       name_var = OLD.name;
+       type_id_var = OLD.type_id;
+       feature_id_var = OLD.feature_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_reagent ( 
+             reagent_id, 
+             name, 
+             type_id, 
+             feature_id, 
+             transaction_type
+       ) VALUES ( 
+             reagent_id_var, 
+             name_var, 
+             type_id_var, 
+             feature_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_reagent_audit_ud ON nd_reagent;
+   CREATE TRIGGER nd_reagent_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_reagent
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_reagent ();
+
+
+   DROP TABLE audit_nd_protocol_reagent;
+   CREATE TABLE audit_nd_protocol_reagent ( 
+       protocol_reagent_id integer, 
+       protocol_id integer, 
+       reagent_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_protocol_reagent to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocol_reagent() RETURNS trigger AS
+   '
+   DECLARE
+       protocol_reagent_id_var integer; 
+       protocol_id_var integer; 
+       reagent_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       protocol_reagent_id_var = OLD.protocol_reagent_id;
+       protocol_id_var = OLD.protocol_id;
+       reagent_id_var = OLD.reagent_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_protocol_reagent ( 
+             protocol_reagent_id, 
+             protocol_id, 
+             reagent_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             protocol_reagent_id_var, 
+             protocol_id_var, 
+             reagent_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_protocol_reagent_audit_ud ON nd_protocol_reagent;
+   CREATE TRIGGER nd_protocol_reagent_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_protocol_reagent
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_protocol_reagent ();
+
+
+   DROP TABLE audit_nd_protocolprop;
+   CREATE TABLE audit_nd_protocolprop ( 
+       protocolprop_id integer, 
+       protocol_id integer, 
+       cvterm_id integer, 
+       value varchar(255), 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_protocolprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocolprop() RETURNS trigger AS
+   '
+   DECLARE
+       protocolprop_id_var integer; 
+       protocol_id_var integer; 
+       cvterm_id_var integer; 
+       value_var varchar(255); 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       protocolprop_id_var = OLD.protocolprop_id;
+       protocol_id_var = OLD.protocol_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_protocolprop ( 
+             protocolprop_id, 
+             protocol_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             protocolprop_id_var, 
+             protocol_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_protocolprop_audit_ud ON nd_protocolprop;
+   CREATE TRIGGER nd_protocolprop_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_protocolprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_protocolprop ();
+
+
+   DROP TABLE audit_nd_assay_stock;
+   CREATE TABLE audit_nd_assay_stock ( 
+       assay_stock_id integer, 
+       assay_id integer, 
+       stock_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_stock() RETURNS trigger AS
+   '
+   DECLARE
+       assay_stock_id_var integer; 
+       assay_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_stock_id_var = OLD.assay_stock_id;
+       assay_id_var = OLD.assay_id;
+       stock_id_var = OLD.stock_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_stock ( 
+             assay_stock_id, 
+             assay_id, 
+             stock_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_stock_id_var, 
+             assay_id_var, 
+             stock_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_stock_audit_ud ON nd_assay_stock;
+   CREATE TRIGGER nd_assay_stock_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_stock ();
+
+
+   DROP TABLE audit_nd_assay_protocol;
+   CREATE TABLE audit_nd_assay_protocol ( 
+       assay_protocol_id integer, 
+       assay_id integer, 
+       protocol_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_protocol to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_protocol() RETURNS trigger AS
+   '
+   DECLARE
+       assay_protocol_id_var integer; 
+       assay_id_var integer; 
+       protocol_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_protocol_id_var = OLD.assay_protocol_id;
+       assay_id_var = OLD.assay_id;
+       protocol_id_var = OLD.protocol_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_protocol ( 
+             assay_protocol_id, 
+             assay_id, 
+             protocol_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_protocol_id_var, 
+             assay_id_var, 
+             protocol_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_protocol_audit_ud ON nd_assay_protocol;
+   CREATE TRIGGER nd_assay_protocol_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_protocol
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_protocol ();
+
+
+   DROP TABLE audit_nd_assay_phenotype;
+   CREATE TABLE audit_nd_assay_phenotype ( 
+       assay_phenotype_id integer, 
+       assay_id integer, 
+       phenotype_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_phenotype to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_phenotype() RETURNS trigger AS
+   '
+   DECLARE
+       assay_phenotype_id_var integer; 
+       assay_id_var integer; 
+       phenotype_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_phenotype_id_var = OLD.assay_phenotype_id;
+       assay_id_var = OLD.assay_id;
+       phenotype_id_var = OLD.phenotype_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_phenotype ( 
+             assay_phenotype_id, 
+             assay_id, 
+             phenotype_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_phenotype_id_var, 
+             assay_id_var, 
+             phenotype_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_phenotype_audit_ud ON nd_assay_phenotype;
+   CREATE TRIGGER nd_assay_phenotype_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_phenotype
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_phenotype ();
+
+
+   DROP TABLE audit_nd_assay_genotype;
+   CREATE TABLE audit_nd_assay_genotype ( 
+       assay_genotype_id integer, 
+       assay_id integer, 
+       genotype_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_genotype to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_genotype() RETURNS trigger AS
+   '
+   DECLARE
+       assay_genotype_id_var integer; 
+       assay_id_var integer; 
+       genotype_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_genotype_id_var = OLD.assay_genotype_id;
+       assay_id_var = OLD.assay_id;
+       genotype_id_var = OLD.genotype_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_genotype ( 
+             assay_genotype_id, 
+             assay_id, 
+             genotype_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_genotype_id_var, 
+             assay_id_var, 
+             genotype_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_genotype_audit_ud ON nd_assay_genotype;
+   CREATE TRIGGER nd_assay_genotype_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_genotype
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_genotype ();
+
+
+   DROP TABLE audit_nd_reagent_relationship;
+   CREATE TABLE audit_nd_reagent_relationship ( 
+       reagent_relationship_id integer, 
+       subject_reagent_id integer, 
+       object_reagent_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_reagent_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagent_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       reagent_relationship_id_var integer; 
+       subject_reagent_id_var integer; 
+       object_reagent_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       reagent_relationship_id_var = OLD.reagent_relationship_id;
+       subject_reagent_id_var = OLD.subject_reagent_id;
+       object_reagent_id_var = OLD.object_reagent_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_reagent_relationship ( 
+             reagent_relationship_id, 
+             subject_reagent_id, 
+             object_reagent_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             reagent_relationship_id_var, 
+             subject_reagent_id_var, 
+             object_reagent_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_reagent_relationship_audit_ud ON nd_reagent_relationship;
+   CREATE TRIGGER nd_reagent_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_reagent_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_reagent_relationship ();
+
+
+   DROP TABLE audit_nd_reagentprop;
+   CREATE TABLE audit_nd_reagentprop ( 
+       reagentprop_id integer, 
+       reagent_id integer, 
+       cvterm_id integer, 
+       value varchar(255), 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_reagentprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagentprop() RETURNS trigger AS
+   '
+   DECLARE
+       reagentprop_id_var integer; 
+       reagent_id_var integer; 
+       cvterm_id_var integer; 
+       value_var varchar(255); 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       reagentprop_id_var = OLD.reagentprop_id;
+       reagent_id_var = OLD.reagent_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_reagentprop ( 
+             reagentprop_id, 
+             reagent_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             reagentprop_id_var, 
+             reagent_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_reagentprop_audit_ud ON nd_reagentprop;
+   CREATE TRIGGER nd_reagentprop_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_reagentprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_reagentprop ();
+
+
+   DROP TABLE audit_nd_assay_stockprop;
+   CREATE TABLE audit_nd_assay_stockprop ( 
+       assay_stockprop_id integer, 
+       assay_stock_id integer, 
+       cvterm_id integer, 
+       value varchar(255), 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_stockprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_stockprop() RETURNS trigger AS
+   '
+   DECLARE
+       assay_stockprop_id_var integer; 
+       assay_stock_id_var integer; 
+       cvterm_id_var integer; 
+       value_var varchar(255); 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_stockprop_id_var = OLD.assay_stockprop_id;
+       assay_stock_id_var = OLD.assay_stock_id;
+       cvterm_id_var = OLD.cvterm_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_stockprop ( 
+             assay_stockprop_id, 
+             assay_stock_id, 
+             cvterm_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             assay_stockprop_id_var, 
+             assay_stock_id_var, 
+             cvterm_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_stockprop_audit_ud ON nd_assay_stockprop;
+   CREATE TRIGGER nd_assay_stockprop_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_stockprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_stockprop ();
+
+
+   DROP TABLE audit_nd_assay_stock_dbxref;
+   CREATE TABLE audit_nd_assay_stock_dbxref ( 
+       assay_stock_dbxref_id integer, 
+       assay_stock_id integer, 
+       dbxref_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_stock_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_stock_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       assay_stock_dbxref_id_var integer; 
+       assay_stock_id_var integer; 
+       dbxref_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_stock_dbxref_id_var = OLD.assay_stock_dbxref_id;
+       assay_stock_id_var = OLD.assay_stock_id;
+       dbxref_id_var = OLD.dbxref_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_stock_dbxref ( 
+             assay_stock_dbxref_id, 
+             assay_stock_id, 
+             dbxref_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_stock_dbxref_id_var, 
+             assay_stock_id_var, 
+             dbxref_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_stock_dbxref_audit_ud ON nd_assay_stock_dbxref;
+   CREATE TRIGGER nd_assay_stock_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_stock_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_stock_dbxref ();
+
+
+   DROP TABLE audit_nd_assay_dbxref;
+   CREATE TABLE audit_nd_assay_dbxref ( 
+       assay_dbxref_id integer, 
+       assay_id integer, 
+       dbxref_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       assay_dbxref_id_var integer; 
+       assay_id_var integer; 
+       dbxref_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_dbxref_id_var = OLD.assay_dbxref_id;
+       assay_id_var = OLD.assay_id;
+       dbxref_id_var = OLD.dbxref_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_dbxref ( 
+             assay_dbxref_id, 
+             assay_id, 
+             dbxref_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_dbxref_id_var, 
+             assay_id_var, 
+             dbxref_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_dbxref_audit_ud ON nd_assay_dbxref;
+   CREATE TRIGGER nd_assay_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_dbxref ();
+
+
+   DROP TABLE audit_nd_assay_contact;
+   CREATE TABLE audit_nd_assay_contact ( 
+       assay_contact_id integer, 
+       assay_id integer, 
+       contact_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_assay_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_assay_contact() RETURNS trigger AS
+   '
+   DECLARE
+       assay_contact_id_var integer; 
+       assay_id_var integer; 
+       contact_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       assay_contact_id_var = OLD.assay_contact_id;
+       assay_id_var = OLD.assay_id;
+       contact_id_var = OLD.contact_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_assay_contact ( 
+             assay_contact_id, 
+             assay_id, 
+             contact_id, 
+             transaction_type
+       ) VALUES ( 
+             assay_contact_id_var, 
+             assay_id_var, 
+             contact_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_assay_contact_audit_ud ON nd_assay_contact;
+   CREATE TRIGGER nd_assay_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_assay_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_assay_contact ();
 
 

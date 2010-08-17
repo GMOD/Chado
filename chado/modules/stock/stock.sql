@@ -20,7 +20,7 @@ create table stock (
        primary key (stock_id),
        dbxref_id int,
        foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-       organism_id int not null,
+       organism_id int,
        foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
        name varchar(255),
        uniquename text not null,
@@ -39,7 +39,7 @@ create index stock_idx4 on stock (uniquename);
 COMMENT ON TABLE stock IS 'Any stock can be globally identified by the
 combination of organism, uniquename and stock type. A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype.';
 COMMENT ON COLUMN stock.dbxref_id IS 'The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref.';
-COMMENT ON COLUMN stock.organism_id IS 'The organism_id is the organism to which the stock belongs. This column is mandatory.';
+COMMENT ON COLUMN stock.organism_id IS 'The organism_id is the organism to which the stock belongs. This column should only be left blank if the organism cannot be determined.';
 COMMENT ON COLUMN stock.type_id IS 'The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm.';
 COMMENT ON COLUMN stock.description IS 'The description is the genetic description provided in the stock list.';
 COMMENT ON COLUMN stock.name IS 'The name is a human-readable local name for a stock.';
@@ -136,6 +136,24 @@ COMMENT ON COLUMN stock_relationship.rank IS 'stock_relationship.rank is the ord
 COMMENT ON COLUMN stock_relationship.value IS 'stock_relationship.value is for additional notes or comments.';
 
 
+
+-- ================================================
+-- TABLE: stock_relationship_cvterm
+-- ================================================
+
+CREATE TABLE stock_relationship_cvterm (
+	stock_relationship_cvterm_id SERIAL NOT NULL,
+	PRIMARY KEY (stock_relationship_cvterm_id),
+	stock_relatiohship_id integer NOT NULL,
+	--FOREIGN KEY (stock_relationship_id) references stock_relationship (stock_relationship_id) ON DELETE CASCADE INITIALLY DEFERRED,
+	cvterm_id integer NOT NULL,
+	FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE RESTRICT,
+	pub_id integer,
+	FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE RESTRICT
+);
+COMMENT ON TABLE stock_relationship_cvterm is 'For germplasm maintenance and pedigree data, stock_relationship. type_id will record cvterms such as "is a female parent of", "a parent for mutation", "is a group_id of", "is a source_id of", etc The cvterms for higher categories such as "generative", "derivative" or "maintenance" can be stored in table stock_relationship_cvterm';
+
+
 -- ================================================
 -- TABLE: stock_relationship_pub
 -- ================================================
@@ -143,7 +161,7 @@ COMMENT ON COLUMN stock_relationship.value IS 'stock_relationship.value is for a
 create table stock_relationship_pub (
       stock_relationship_pub_id serial not null,
       primary key (stock_relationship_pub_id),
-      stock_relationship_id int not null,
+      stock_relationship_id integer not null,
       foreign key (stock_relationship_id) references stock_relationship (stock_relationship_id) on delete cascade INITIALLY DEFERRED,
       pub_id int not null,
       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,

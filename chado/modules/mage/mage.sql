@@ -12,7 +12,7 @@
 -- :import contact from contact
 -- :import dbxref from general
 -- :import tableinfo from general
--- :import project from general
+-- :import project from project
 -- :import analysis from companalysis
 -- =================================================================
 

@@ -67,16 +67,3 @@ COMMENT ON TABLE dbxref IS 'A unique, global, public, stable identifier. Not nec
 
 COMMENT ON COLUMN dbxref.accession IS 'The local part of the identifier. Guaranteed by the db authority to be unique for that db.';
 
--- ================================================
--- TABLE: project
--- ================================================
-
-create table project (
-    project_id serial not null,  
-    primary key (project_id),
-    name varchar(255) not null,
-    description varchar(255) not null,
-    constraint project_c1 unique (name)
-);
-
-COMMENT ON TABLE project IS NULL;

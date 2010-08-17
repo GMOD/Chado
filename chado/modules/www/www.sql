@@ -12,7 +12,7 @@
 -- :import organism from organism
 -- :import genotype from genetic
 -- :import expression from expression
--- :import project from general
+-- :import project from project
 --
 -- WARNING: unresolvable dependency 'author'! 
 -- =================================================================
