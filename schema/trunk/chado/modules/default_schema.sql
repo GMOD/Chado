@@ -36634,6 +36634,18 @@ LANGUAGE plpgsql;
 --
 --   y
 --
+-- OR, you could execute this command (the materialized view tool has been
+-- updated to allow this all to be supplied on the command line):
+--
+-- (yes, it's all one really long line, to make copy and pasting easier)
+-- gmod_materialized_view_tool.pl --create_view --view_name all_feature_names --table_name public.all_feature_names --refresh_time daily --column_def "feature_id integer,name varchar(255),organism_id integer" --sql_query "SELECT feature_id,CAST(substring(uniquename from 0 for 255) as varchar(255)) as name,organism_id FROM feature UNION SELECT feature_id, name, organism_id FROM feature where name is not null UNION SELECT fs.feature_id,s.name,f.organism_id FROM feature_synonym fs, synonym s, feature f WHERE fs.synonym_id = s.synonym_id AND fs.feature_id = f.feature_id UNION SELECT fp.feature_id, CAST(substring(fp.value from 0 for 255) as varchar(255)) as name,f.organism_id FROM featureprop fp, feature f WHERE f.feature_id = fp.feature_id UNION SELECT fd.feature_id, d.accession, f.organism_id FROM feature_dbxref fd, dbxref d,feature f WHERE fd.dbxref_id = d.dbxref_id AND fd.feature_id = f.feature_id" --index_fields "feature_id,name" --special_index "create index all_feature_names_lower_name on all_feature_names (lower(name))" --yes
+--
+--
+-- OR, even more complicated, you could use this command to create a materialized view
+-- for use with full text searching on PostgreSQL 8.4 or better:
+--
+-- gmod_materialized_view_tool.pl --create_view --view_name all_feature_names --table_name public.all_feature_names --refresh_time daily --column_def "feature_id integer,name varchar(255),organism_id integer,searchable_name tsvector" --sql_query "SELECT feature_id, CAST(substring(uniquename FROM 0 FOR 255) AS varchar(255)) AS name, organism_id, to_tsvector('english', CAST(substring(uniquename FROM 0 FOR 255) AS varchar(255))) AS searchable_name FROM feature UNION SELECT feature_id, name, organism_id, to_tsvector('english', name) AS searchable_name FROM feature WHERE name IS NOT NULL UNION SELECT fs.feature_id, s.name, f.organism_id, to_tsvector('english', s.name) AS searchable_name FROM feature_synonym fs, synonym s, feature f WHERE fs.synonym_id = s.synonym_id AND fs.feature_id = f.feature_id UNION SELECT fp.feature_id, CAST(substring(fp.value FROM 0 FOR 255) AS varchar(255)) AS name, f.organism_id, to_tsvector('english',CAST(substring(fp.value FROM 0 FOR 255) AS varchar(255))) AS searchable_name FROM featureprop fp, feature f WHERE f.feature_id = fp.feature_id UNION SELECT fd.feature_id, d.accession, f.organism_id,to_tsvector('english',d.accession) AS searchable_name FROM feature_dbxref fd, dbxref d,feature f WHERE fd.dbxref_id = d.dbxref_id AND fd.feature_id = f.feature_id" --index_fields "feature_id,name" --special_index "CREATE INDEX searchable_all_feature_names_idx ON all_feature_names USING gin(searchable_name)" --yes 
+--
 CREATE OR REPLACE VIEW all_feature_names (
   feature_id,
   name,
@@ -36993,7 +37005,7 @@ FROM
 -- represent geo information.
 
 CREATE TABLE nd_geolocation (
-    geolocation_id serial PRIMARY KEY NOT NULL,
+    nd_geolocation_id serial PRIMARY KEY NOT NULL,
     description character varying(255),
     latitude real,
     longitude real,
@@ -37016,55 +37028,55 @@ COMMENT ON COLUMN nd_geolocation.altitude IS 'The altitude (elevation) of the lo
 
 
 
-CREATE TABLE nd_assay (
-    assay_id serial PRIMARY KEY NOT NULL,
-    geolocation_id integer NOT NULL references nd_geolocation (geolocation_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment (
+    nd_experiment_id serial PRIMARY KEY NOT NULL,
+    nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED 
 );
 
 --
---used to be nd_diversityexperiemnt_project
-CREATE TABLE nd_assay_project (
-    assay_project_id serial PRIMARY KEY NOT NULL,
+--used to be nd_diversityexperiment_project
+--then was nd_assay_project
+CREATE TABLE nd_experiment_project (
+    nd_experiment_project_id serial PRIMARY KEY NOT NULL,
     project_id integer not null references project (project_id) on delete cascade INITIALLY DEFERRED,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED
 );
 
 
 
-CREATE TABLE nd_assayprop (
-    assayprop_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experimentprop (
+    nd_experimentprop_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value character varying(255) NOT NULL,
     rank integer NOT NULL default 0,
-    constraint nd_assayprop_c1 unique (assay_id,cvterm_id,rank)
+    constraint nd_experimentprop_c1 unique (nd_experiment_id,cvterm_id,rank)
 );
 
-create table nd_assay_pub (
-       assay_pub_id serial not null,
-       primary key (assay_pub_id),
-       assay_id int not null,
-       foreign key (assay_id) references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+create table nd_experiment_pub (
+       nd_experiment_pub_id serial PRIMARY KEY not null,
+       nd_experiment_id int not null,
+       foreign key (nd_experiment_id) references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-       constraint assay_pub_c1 unique (assay_id,pub_id)
+       constraint nd_experiment_pub_c1 unique (nd_experiment_id,pub_id)
 );
-create index assay_pub_idx1 on nd_assay_pub (assay_id);
-create index assay_pub_idx2 on nd_assay_pub (pub_id);
+create index nd_experiment_pub_idx1 on nd_experiment_pub (nd_experiment_id);
+create index nd_experiment_pub_idx2 on nd_experiment_pub (pub_id);
 
-COMMENT ON TABLE nd_assay_pub IS 'Linking nd_assay(s) to publication(s)';
+COMMENT ON TABLE nd_experiment_pub IS 'Linking nd_experiment(s) to publication(s)';
 
 
 
 
 CREATE TABLE nd_geolocationprop (
-    geolocationprop_id serial PRIMARY KEY NOT NULL,
-    geolocation_id integer NOT NULL references nd_geolocation (geolocation_id) on delete cascade INITIALLY DEFERRED,
+    nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
+    nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
     cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(250),
-    rank integer NOT NULL,
-    constraint nd_geolocationprop_c1 unique (geolocation_id,cvterm_id,rank)
+    rank integer NOT NULL DEFAULT 0,
+    constraint nd_geolocationprop_c1 unique (nd_geolocation_id,cvterm_id,rank)
 );
 
 COMMENT ON TABLE nd_geolocationprop IS 'Property/value associations for geolocations. This table can store the properties such as location and environment';
@@ -37077,22 +37089,22 @@ COMMENT ON COLUMN nd_geolocationprop.rank IS 'The rank of the property value, if
 
 
 CREATE TABLE nd_protocol (
-    protocol_id serial PRIMARY KEY  NOT NULL,
+    nd_protocol_id serial PRIMARY KEY  NOT NULL,
     name character varying(255) NOT NULL unique
 );
 
-COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part of the assay.';
+COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part of the experiment.';
 
 COMMENT ON COLUMN nd_protocol.name IS 'The protocol name.';
 
 CREATE TABLE nd_reagent (
-    reagent_id serial PRIMARY KEY NOT NULL,
+    nd_reagent_id serial PRIMARY KEY NOT NULL,
     name character varying(80) NOT NULL,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     feature_id integer
 );
 
-COMMENT ON TABLE nd_reagent IS 'A reagent such as a primer, an enzyme, an adapter oligo, a linker oligo. Reagents are used in genotyping assays, or in any other kind of assay.';
+COMMENT ON TABLE nd_reagent IS 'A reagent such as a primer, an enzyme, an adapter oligo, a linker oligo. Reagents are used in genotyping experiments, or in any other kind of experiment.';
 
 COMMENT ON COLUMN nd_reagent.name IS 'The name of the reagent. The name should be unique for a given type.';
 
@@ -37103,25 +37115,25 @@ COMMENT ON COLUMN nd_reagent.feature_id IS 'If the reagent is a primer, the feat
 
 
 CREATE TABLE nd_protocol_reagent (
-    protocol_reagent_id serial PRIMARY KEY NOT NULL,
-    protocol_id integer NOT NULL references nd_protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
-    reagent_id integer NOT NULL references nd_reagent (reagent_id) on delete cascade INITIALLY DEFERRED,
+    nd_protocol_reagent_id serial PRIMARY KEY NOT NULL,
+    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
+    reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 
 CREATE TABLE nd_protocolprop (
-    protocolprop_id serial PRIMARY KEY NOT NULL,
-    protocol_id integer NOT NULL references nd_protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
+    nd_protocolprop_id serial PRIMARY KEY NOT NULL,
+    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
     cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_protocolprop_c1 unique (protocol_id,cvterm_id,rank)
+    constraint nd_protocolprop_c1 unique (nd_protocol_id,cvterm_id,rank)
 );
 
 COMMENT ON TABLE nd_protocolprop IS 'Property/value associations for protocol.';
 
-COMMENT ON COLUMN nd_protocolprop.protocol_id IS 'The protocol to which the property applies.';
+COMMENT ON COLUMN nd_protocolprop.nd_protocol_id IS 'The protocol to which the property applies.';
 
 COMMENT ON COLUMN nd_protocolprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
@@ -37131,53 +37143,53 @@ COMMENT ON COLUMN nd_protocolprop.rank IS 'The rank of the property value, if th
 
 
 
-CREATE TABLE nd_assay_stock (
-    assay_stock_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_stock (
+    nd_experiment_stock_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     stock_id integer NOT NULL references stock (stock_id)  on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
-COMMENT ON TABLE nd_assay_stock IS 'Part of a stock or a clone of a stock that is used in an assay';
+COMMENT ON TABLE nd_experiment_stock IS 'Part of a stock or a clone of a stock that is used in an experiment';
 
 
-COMMENT ON COLUMN nd_assay_stock.stock_id IS 'stock used in the extraction or the corresponding stock for the clone';
+COMMENT ON COLUMN nd_experiment_stock.stock_id IS 'stock used in the extraction or the corresponding stock for the clone';
 
 
-CREATE TABLE nd_assay_protocol (
-    assay_protocol_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id integer NOT NULL references nd_protocol (protocol_id) on delete cascade INITIALLY DEFERRED
+CREATE TABLE nd_experiment_protocol (
+    nd_experiment_protocol_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED
 );
 
-COMMENT ON TABLE nd_assay_protocol IS 'Linking table: assays to the protocols they involve.';
+COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the protocols they involve.';
 
 
-CREATE TABLE nd_assay_phenotype (
-    assay_phenotype_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL UNIQUE REFERENCES nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_phenotype (
+    nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL UNIQUE REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED
 ); 
 
-COMMENT ON TABLE nd_assay_phenotype IS 'Linking table: assays to the phenotypes they produce. There is a one-to-one relationship between an assay and a phenotype since each phenotype record should point to one assay. Add a new assay_id for each phenotype record.';
+COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
-CREATE TABLE nd_assay_genotype (
-    assay_genotype_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL UNIQUE references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_genotype (
+    nd_experiment_genotype_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL UNIQUE references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED 
 );
 
-COMMENT ON TABLE nd_assay_genotype IS 'Linking table: assays to the genotypes they produce. There is a one-to-one relationship between an assay and a genotype since each genotype record should point to one assay. Add a new assay_id for each genotype record.';
+COMMENT ON TABLE nd_experiment_genotype IS 'Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record.';
 
 
 CREATE TABLE nd_reagent_relationship (
-    reagent_relationship_id serial PRIMARY KEY NOT NULL,
-    subject_reagent_id integer NOT NULL references nd_reagent (reagent_id) on delete cascade INITIALLY DEFERRED,
-    object_reagent_id integer NOT NULL  references nd_reagent (reagent_id) on delete cascade INITIALLY DEFERRED,
+    nd_reagent_relationship_id serial PRIMARY KEY NOT NULL,
+    subject_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
+    object_reagent_id integer NOT NULL  references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
-COMMENT ON TABLE nd_reagent_relationship IS 'Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme assay reagents.';
+COMMENT ON TABLE nd_reagent_relationship IS 'Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents.';
 
 COMMENT ON COLUMN nd_reagent_relationship.subject_reagent_id IS 'The subject reagent in the relationship. In parent/child terminology, the subject is the child. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object.';
 
@@ -37187,55 +37199,55 @@ COMMENT ON COLUMN nd_reagent_relationship.type_id IS 'The type (or predicate) of
 
 
 CREATE TABLE nd_reagentprop (
-    reagentprop_id serial PRIMARY KEY NOT NULL,
-    reagent_id integer NOT NULL references nd_reagent (reagent_id) on delete cascade INITIALLY DEFERRED,
+    nd_reagentprop_id serial PRIMARY KEY NOT NULL,
+    nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_reagentprop_c1 unique (reagent_id,cvterm_id,rank)
+    constraint nd_reagentprop_c1 unique (nd_reagent_id,cvterm_id,rank)
 );
 
-CREATE TABLE nd_assay_stockprop (
-    assay_stockprop_id serial PRIMARY KEY NOT NULL,
-    assay_stock_id integer NOT NULL references nd_assay_stock (assay_stock_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_stockprop (
+    nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
     cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_assay_stockprop_c1 unique (assay_stock_id,cvterm_id,rank)
+    constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,cvterm_id,rank)
 );
 
-COMMENT ON TABLE nd_assay_stockprop IS 'Property/value associations for assay_stocks. This table can store the properties such as treatment';
+COMMENT ON TABLE nd_experiment_stockprop IS 'Property/value associations for experiment_stocks. This table can store the properties such as treatment';
 
-COMMENT ON COLUMN nd_assay_stockprop.assay_stock_id IS 'The assay_stock to which the property applies.';
+COMMENT ON COLUMN nd_experiment_stockprop.nd_experiment_stock_id IS 'The experiment_stock to which the property applies.';
 
-COMMENT ON COLUMN nd_assay_stockprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_experiment_stockprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
-COMMENT ON COLUMN nd_assay_stockprop.value IS 'The value of the property.';
+COMMENT ON COLUMN nd_experiment_stockprop.value IS 'The value of the property.';
 
-COMMENT ON COLUMN nd_assay_stockprop.rank IS 'The rank of the property value, if the property has an array of values.';
+COMMENT ON COLUMN nd_experiment_stockprop.rank IS 'The rank of the property value, if the property has an array of values.';
 
 
-CREATE TABLE nd_assay_stock_dbxref (
-    assay_stock_dbxref_id serial PRIMARY KEY NOT NULL,
-    assay_stock_id integer NOT NULL references nd_assay_stock (assay_stock_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_stock_dbxref (
+    nd_experiment_stock_dbxref_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id integer NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
 );
 
-COMMENT ON TABLE nd_assay_stock_dbxref IS 'Cross-reference assay_stock to accessions, images, etc';
+COMMENT ON TABLE nd_experiment_stock_dbxref IS 'Cross-reference experiment_stock to accessions, images, etc';
 
 
 
-CREATE TABLE nd_assay_dbxref (
-    assay_dbxref_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_dbxref (
+    nd_experiment_dbxref_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     dbxref_id integer NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
 );
 
-COMMENT ON TABLE nd_assay_dbxref IS 'Cross-reference assay to accessions, images, etc';
+COMMENT ON TABLE nd_experiment_dbxref IS 'Cross-reference experiment to accessions, images, etc';
 
 
-CREATE TABLE nd_assay_contact (
-    assay_contact_id serial PRIMARY KEY NOT NULL,
-    assay_id integer NOT NULL references nd_assay (assay_id) on delete cascade INITIALLY DEFERRED,
+CREATE TABLE nd_experiment_contact (
+    nd_experiment_contact_id serial PRIMARY KEY NOT NULL,
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     contact_id integer NOT NULL references contact (contact_id) on delete cascade INITIALLY DEFERRED
 );
