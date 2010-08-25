@@ -502,23 +502,23 @@ Bio::Chado::CDBI::Feature_Cvterm->has_many('feature_cvterm_pub_feature_cvterm_id
 #
  
   
-sub feature_cvterm_dbxref_feature_cvterms { return shift->feature_cvterm_dbxref_feature_cvterm_id }
+sub feature_cvterm_pub_feature_cvterms { return shift->feature_cvterm_pub_feature_cvterm_id }
 
    
  
   
-sub feature_cvterm_pub_feature_cvterms { return shift->feature_cvterm_pub_feature_cvterm_id }
+sub feature_cvterm_dbxref_feature_cvterms { return shift->feature_cvterm_dbxref_feature_cvterm_id }
 
    
 # one to many to one
  
   
 # one2one #
-sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->feature_cvterm_dbxref_feature_cvterm_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_pub_feature_cvterm_id }
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->feature_cvterm_pub_feature_cvterm_id }
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->feature_cvterm_dbxref_feature_cvterm_id }
 
 # one to many to many
  
@@ -817,6 +817,72 @@ sub Bio::Chado::CDBI::Cell_Line_Feature::pub { return shift->pub_id }
 #many to many to many
 
  
+
+1;
+
+########Bio::Chado::CDBI::Nd_Geolocation########
+
+package Bio::Chado::CDBI::Nd_Geolocation;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Geolocation->set_up_table('nd_geolocation');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_geolocation_id }
+sub nd_geolocation { shift->nd_geolocation_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+   
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Nd_Geolocation->has_many('nd_experiment_nd_geolocation_id', 'Bio::Chado::CDBI::Nd_Experiment' => 'nd_geolocation_id');
+   
+Bio::Chado::CDBI::Nd_Geolocation->has_many('nd_geolocationprop_nd_geolocation_id', 'Bio::Chado::CDBI::Nd_Geolocationprop' => 'nd_geolocation_id');
+  
+    
+sub nd_geolocationprops { return shift->nd_geolocationprop_nd_geolocation_id }
+     
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+sub nd_experiment_nd_geolocations { return shift->nd_experiment_nd_geolocation_id }
+
+   
+# one to many to one
+ 
+  
+# one2one #
+sub cvterms { my $self = shift; return map $_->type_id, $self->nd_experiment_nd_geolocation_id }
+
+# one to many to many
+ 
+  
+#many to many to one
+ 
+  
+#many to many to many
+
+
+   
 
 1;
 
@@ -1503,6 +1569,57 @@ sub Bio::Chado::CDBI::Phylonode_Organism::organism { return shift->organism_id }
 
 1;
 
+########Bio::Chado::CDBI::Nd_Experiment_Pub########
+
+package Bio::Chado::CDBI::Nd_Experiment_Pub;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Pub->set_up_table('nd_experiment_pub');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_pub_id }
+sub nd_experiment_pub { shift->nd_experiment_pub_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Pub->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Pub::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Pub->has_a(pub_id => 'Bio::Chado::CDBI::Pub');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Pub::pub { return shift->pub_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
 ########Bio::Chado::CDBI::Biomaterial_Dbxref########
 
 package Bio::Chado::CDBI::Biomaterial_Dbxref;
@@ -1581,12 +1698,15 @@ sub genotype { shift->genotype_id }
   
   
   
+  
    
 
 #
 # Has Many
 #
  
+Bio::Chado::CDBI::Genotype->has_many('nd_experiment_genotype_genotype_id', 'Bio::Chado::CDBI::Nd_Experiment_Genotype' => 'genotype_id');
+   
 Bio::Chado::CDBI::Genotype->has_many('stock_genotype_genotype_id', 'Bio::Chado::CDBI::Stock_Genotype' => 'genotype_id');
    
 Bio::Chado::CDBI::Genotype->has_many('phendesc_genotype_id', 'Bio::Chado::CDBI::Phendesc' => 'genotype_id');
@@ -1613,80 +1733,73 @@ Bio::Chado::CDBI::Genotype->has_many('phenstatement_genotype_id', 'Bio::Chado::C
 #
  
   
+sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
+
+   
+ 
+  
+sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
+
+   
+ 
+  
+sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
+
+   
+ 
+  
+sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
+
+   
+ 
+  
+sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
+
+  
+sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
+
+   
+ 
+  
+sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
+
+  
+sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
+
+   
+ 
+  
+sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
+
+  
+  
+sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
+
+   
+ 
+  
+sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
+
+  
+sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
+
+  
+   
+ 
+  
+  
+sub nd_experiment_genotype_genotypes { return shift->nd_experiment_genotype_genotype_id }
+ 
+ 
+  
   
 sub stock_genotype_genotypes { return shift->stock_genotype_genotype_id }
  
- 
-  
-sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
-
-  
-sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
-
-   
- 
-  
-sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
-
-  
-  
-sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
-
-   
- 
-  
-sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
-
-  
-sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
-
-   
- 
-  
-sub phenotype_comparison_genotype1s { return shift->phenotype_comparison_genotype1_id }
-
-  
-sub phenotype_comparison_genotype2s { return shift->phenotype_comparison_genotype2_id }
-
-  
-   
- 
-  
-sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
-
-   
- 
-  
-sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
-
-   
- 
-  
-sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
-
-   
- 
-  
-sub phenstatement_genotypes { return shift->phenstatement_genotype_id }
-
-   
 # one to many to one
  
   
 # one2one #
-sub stocks { my $self = shift; return map $_->stock_id, $self->stock_genotype_genotype_id }
-
-  
-  
-  
-  
-  
-
 sub cvterms { my $self = shift; return map $_->type_id, $self->phenstatement_genotype_id }
-
-  
-
-sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_genotype_id }
 
   
 
@@ -1694,10 +1807,27 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_genotyp
 
   
 
+sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_genotype_id }
+
+  
+
 sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_genotype_id }
+
+  
+  
+  
+  
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_genotype_genotype_id }
+
+  
+
+sub stocks { my $self = shift; return map $_->stock_id, $self->stock_genotype_genotype_id }
 
 # one to many to many
  
+  
   
   
   
@@ -1711,6 +1841,9 @@ sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstate
  
   
   
+  
+  
+  
 # many2one #
   
   
@@ -1720,7 +1853,6 @@ sub phenotype_comparison_genotype1_organisms { my $self = shift; return map $_->
 sub phenotype_comparison_genotype2_organisms { my $self = shift; return map $_->organism_id, $self->phenotype_comparison_genotype2_id }
     
    
-  
   
 
   
@@ -1735,10 +1867,13 @@ sub phenotype_comparison_genotype2_pubs { my $self = shift; return map $_->pub_i
   
   
   
-  
 #many to many to many
 
 
+  
+  
+  
+  
   
   
   
@@ -1766,7 +1901,6 @@ sub phenotype_comparison_genotype2_environment2s { my $self = shift; return map 
     
    
   
-  
 
   
   
@@ -1790,8 +1924,6 @@ sub phenotype_comparison_genotype2_phenotype2s { my $self = shift; return map $_
     
     
    
-  
-  
   
    
 
@@ -1895,6 +2027,8 @@ sub Bio::Chado::CDBI::Dbxref::db { return shift->db_id }
   
   
   
+  
+  
    
 
 #
@@ -1972,6 +2106,8 @@ Bio::Chado::CDBI::Dbxref->has_many('study_dbxref_id', 'Bio::Chado::CDBI::Study' 
     
 sub studys { return shift->study_dbxref_id }
       
+Bio::Chado::CDBI::Dbxref->has_many('nd_experiment_stock_dbxref_dbxref_id', 'Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref' => 'dbxref_id');
+   
 Bio::Chado::CDBI::Dbxref->has_many('element_dbxref_id', 'Bio::Chado::CDBI::Element' => 'dbxref_id');
    
 Bio::Chado::CDBI::Dbxref->has_many('library_dbxref_dbxref_id', 'Bio::Chado::CDBI::Library_Dbxref' => 'dbxref_id');
@@ -1980,6 +2116,8 @@ Bio::Chado::CDBI::Dbxref->has_many('library_dbxref_dbxref_id', 'Bio::Chado::CDBI
 sub library_dbxrefs { return shift->library_dbxref_dbxref_id }
       
 Bio::Chado::CDBI::Dbxref->has_many('phylonode_dbxref_dbxref_id', 'Bio::Chado::CDBI::Phylonode_Dbxref' => 'dbxref_id');
+   
+Bio::Chado::CDBI::Dbxref->has_many('nd_experiment_dbxref_dbxref_id', 'Bio::Chado::CDBI::Nd_Experiment_Dbxref' => 'dbxref_id');
    
 Bio::Chado::CDBI::Dbxref->has_many('cvterm_dbxref_id', 'Bio::Chado::CDBI::Cvterm' => 'dbxref_id');
   
@@ -1997,6 +2135,26 @@ sub phylotrees { return shift->phylotree_dbxref_id }
 #
 # Has Compound Many (many to many relationships in all their flavors)
 #
+ 
+  
+  
+sub organism_dbxref_dbxrefs { return shift->organism_dbxref_dbxref_id }
+ 
+ 
+  
+  
+sub nd_experiment_dbxref_dbxrefs { return shift->nd_experiment_dbxref_dbxref_id }
+ 
+ 
+  
+  
+sub phylonode_dbxref_dbxrefs { return shift->phylonode_dbxref_dbxref_id }
+ 
+ 
+  
+  
+sub biomaterial_dbxref_dbxrefs { return shift->biomaterial_dbxref_dbxref_id }
+ 
  
   
   
@@ -2020,22 +2178,28 @@ sub feature_cvterm_dbxref_dbxrefs { return shift->feature_cvterm_dbxref_dbxref_i
  
   
   
-sub organism_dbxref_dbxrefs { return shift->organism_dbxref_dbxref_id }
- 
- 
-  
-  
-sub biomaterial_dbxref_dbxrefs { return shift->biomaterial_dbxref_dbxref_id }
- 
- 
-  
-  
-sub phylonode_dbxref_dbxrefs { return shift->phylonode_dbxref_dbxref_id }
+sub nd_experiment_stock_dbxref_dbxrefs { return shift->nd_experiment_stock_dbxref_dbxref_id }
  
 # one to many to one
  
   
 # one2one #
+sub organisms { my $self = shift; return map $_->organism_id, $self->organism_dbxref_dbxref_id }
+
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_dbxref_dbxref_id }
+
+  
+
+sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode_dbxref_dbxref_id }
+
+  
+
+sub biomaterials { my $self = shift; return map $_->biomaterial_id, $self->biomaterial_dbxref_dbxref_id }
+
+  
+
 sub cvterms { my $self = shift; return map $_->type_id, $self->element_dbxref_id }
 
   
@@ -2052,18 +2216,12 @@ sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self-
 
   
 
-sub organisms { my $self = shift; return map $_->organism_id, $self->organism_dbxref_dbxref_id }
-
-  
-
-sub biomaterials { my $self = shift; return map $_->biomaterial_id, $self->biomaterial_dbxref_dbxref_id }
-
-  
-
-sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode_dbxref_dbxref_id }
+sub nd_experiment_stocks { my $self = shift; return map $_->nd_experiment_stock_id, $self->nd_experiment_stock_dbxref_dbxref_id }
 
 # one to many to many
  
+  
+  
   
   
   
@@ -2080,9 +2238,13 @@ sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode
   
   
   
+  
+  
 #many to many to many
 
 
+  
+  
   
   
   
@@ -2282,11 +2444,14 @@ sub pub { shift->pub_id }
   
   
   
+  
  
 Bio::Chado::CDBI::Pub->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
     
 sub Bio::Chado::CDBI::Pub::cvterm { return shift->type_id }
       
+  
+  
   
   
   
@@ -2344,6 +2509,8 @@ sub phenotype_comparison_cvterms { return shift->phenotype_comparison_cvterm_pub
       
 Bio::Chado::CDBI::Pub->has_many('phylonode_pub_pub_id', 'Bio::Chado::CDBI::Phylonode_Pub' => 'pub_id');
    
+Bio::Chado::CDBI::Pub->has_many('nd_experiment_pub_pub_id', 'Bio::Chado::CDBI::Nd_Experiment_Pub' => 'pub_id');
+   
 Bio::Chado::CDBI::Pub->has_many('phylotree_pub_pub_id', 'Bio::Chado::CDBI::Phylotree_Pub' => 'pub_id');
     
 Bio::Chado::CDBI::Pub->has_many('libraryprop_pub_pub_id', 'Bio::Chado::CDBI::Libraryprop_Pub' => 'pub_id');
@@ -2369,6 +2536,11 @@ Bio::Chado::CDBI::Pub->has_many('pub_dbxref_pub_id', 'Bio::Chado::CDBI::Pub_Dbxr
   
     
 sub pub_dbxrefs { return shift->pub_dbxref_pub_id }
+      
+Bio::Chado::CDBI::Pub->has_many('stock_relationship_cvterm_pub_id', 'Bio::Chado::CDBI::Stock_Relationship_Cvterm' => 'pub_id');
+  
+    
+sub stock_relationship_cvterms { return shift->stock_relationship_cvterm_pub_id }
       
 Bio::Chado::CDBI::Pub->has_many('phendesc_pub_id', 'Bio::Chado::CDBI::Phendesc' => 'pub_id');
   
@@ -2434,6 +2606,8 @@ Bio::Chado::CDBI::Pub->has_many('cell_line_pub_pub_id', 'Bio::Chado::CDBI::Cell_
 Bio::Chado::CDBI::Pub->has_many('featuremap_pub_pub_id', 'Bio::Chado::CDBI::Featuremap_Pub' => 'pub_id');
    
 Bio::Chado::CDBI::Pub->has_many('phenstatement_pub_id', 'Bio::Chado::CDBI::Phenstatement' => 'pub_id');
+   
+Bio::Chado::CDBI::Pub->has_many('project_pub_pub_id', 'Bio::Chado::CDBI::Project_Pub' => 'pub_id');
   
 
 
@@ -2443,41 +2617,61 @@ Bio::Chado::CDBI::Pub->has_many('phenstatement_pub_id', 'Bio::Chado::CDBI::Phens
 #
  
   
+sub pub_relationship_subjects { return shift->pub_relationship_subject_id }
+
   
-sub libraryprop_pub_pubs { return shift->libraryprop_pub_pub_id }
- 
- 
-  
-  
-sub library_cvterm_pubs { return shift->library_cvterm_pub_id }
- 
- 
-  
-  
-sub library_cvterm_pubs { return shift->library_cvterm_pub_id }
- 
- 
-  
-sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+sub pub_relationship_objects { return shift->pub_relationship_object_id }
 
    
  
   
   
-  
-sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+sub library_cvterm_pubs { return shift->library_cvterm_pub_id }
  
  
   
   
-  
-sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+sub library_cvterm_pubs { return shift->library_cvterm_pub_id }
  
  
   
   
+sub library_pub_pubs { return shift->library_pub_pub_id }
+ 
+ 
   
-sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+  
+sub cell_line_library_pubs { return shift->cell_line_library_pub_id }
+ 
+ 
+  
+  
+sub cell_line_library_pubs { return shift->cell_line_library_pub_id }
+ 
+ 
+  
+  
+sub phenstatement_pubs { return shift->phenstatement_pub_id }
+ 
+ 
+  
+  
+sub phenstatement_pubs { return shift->phenstatement_pub_id }
+ 
+ 
+  
+  
+sub phenstatement_pubs { return shift->phenstatement_pub_id }
+ 
+ 
+  
+  
+sub phenstatement_pubs { return shift->phenstatement_pub_id }
+ 
+ 
+  
+  
+sub feature_cvterm_pub_pubs { return shift->feature_cvterm_pub_pub_id }
  
  
   
@@ -2486,12 +2680,62 @@ sub featuremap_pub_pubs { return shift->featuremap_pub_pub_id }
  
  
   
-sub pub_relationship_subjects { return shift->pub_relationship_subject_id }
-
   
-sub pub_relationship_objects { return shift->pub_relationship_object_id }
+sub feature_pub_pubs { return shift->feature_pub_pub_id }
+ 
+ 
+  
+  
+sub libraryprop_pub_pubs { return shift->libraryprop_pub_pub_id }
+ 
+ 
+  
+  
+sub cell_lineprop_pub_pubs { return shift->cell_lineprop_pub_pub_id }
+ 
+ 
+  
+  
+sub stock_cvterm_pubs { return shift->stock_cvterm_pub_id }
+ 
+ 
+  
+  
+sub stock_cvterm_pubs { return shift->stock_cvterm_pub_id }
+ 
+ 
+  
+sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
 
    
+ 
+  
+  
+  
+sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+ 
+ 
+  
+  
+  
+sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+ 
+ 
+  
+  
+  
+sub phenotype_comparison_pubs { return shift->phenotype_comparison_pub_id }
+ 
+ 
+  
+  
+sub stock_relationship_pub_pubs { return shift->stock_relationship_pub_pub_id }
+ 
+ 
+  
+  
+sub feature_relationship_pub_pubs { return shift->feature_relationship_pub_pub_id }
+ 
  
   
   
@@ -2505,17 +2749,7 @@ sub stockprop_pub_pubs { return shift->stockprop_pub_pub_id }
  
   
   
-sub cell_lineprop_pub_pubs { return shift->cell_lineprop_pub_pub_id }
- 
- 
-  
-  
-sub cell_line_feature_pubs { return shift->cell_line_feature_pub_id }
- 
- 
-  
-  
-sub cell_line_feature_pubs { return shift->cell_line_feature_pub_id }
+sub featureloc_pub_pubs { return shift->featureloc_pub_pub_id }
  
  
   
@@ -2525,87 +2759,12 @@ sub feature_relationshipprop_pub_pubs { return shift->feature_relationshipprop_p
  
   
   
-sub stock_cvterm_pubs { return shift->stock_cvterm_pub_id }
- 
- 
-  
-  
-sub stock_cvterm_pubs { return shift->stock_cvterm_pub_id }
- 
- 
-  
-  
-sub feature_cvterm_pub_pubs { return shift->feature_cvterm_pub_pub_id }
- 
- 
-  
-  
-sub stock_pub_pubs { return shift->stock_pub_pub_id }
- 
- 
-  
-  
-sub feature_relationship_pub_pubs { return shift->feature_relationship_pub_pub_id }
- 
- 
-  
-  
-sub featureprop_pub_pubs { return shift->featureprop_pub_pub_id }
- 
- 
-  
-  
 sub phylonode_pub_pubs { return shift->phylonode_pub_pub_id }
  
  
   
   
-sub stock_relationship_pub_pubs { return shift->stock_relationship_pub_pub_id }
- 
- 
-  
-  
-sub library_pub_pubs { return shift->library_pub_pub_id }
- 
- 
-  
-  
-sub feature_pub_pubs { return shift->feature_pub_pub_id }
- 
- 
-  
-  
-sub featureloc_pub_pubs { return shift->featureloc_pub_pub_id }
- 
- 
-  
-  
-sub phenstatement_pubs { return shift->phenstatement_pub_id }
- 
- 
-  
-  
-sub phenstatement_pubs { return shift->phenstatement_pub_id }
- 
- 
-  
-  
-sub phenstatement_pubs { return shift->phenstatement_pub_id }
- 
- 
-  
-  
-sub phenstatement_pubs { return shift->phenstatement_pub_id }
- 
- 
-  
-  
-sub cell_line_library_pubs { return shift->cell_line_library_pub_id }
- 
- 
-  
-  
-sub cell_line_library_pubs { return shift->cell_line_library_pub_id }
+sub featureprop_pub_pubs { return shift->featureprop_pub_pub_id }
  
  
   
@@ -2625,16 +2784,38 @@ sub feature_expression_pubs { return shift->feature_expression_pub_id }
  
   
   
+sub nd_experiment_pub_pubs { return shift->nd_experiment_pub_pub_id }
+ 
+ 
+  
+  
 sub expression_pub_pubs { return shift->expression_pub_pub_id }
+ 
+ 
+  
+  
+sub cell_line_feature_pubs { return shift->cell_line_feature_pub_id }
+ 
+ 
+  
+  
+sub cell_line_feature_pubs { return shift->cell_line_feature_pub_id }
+ 
+ 
+  
+  
+sub project_pub_pubs { return shift->project_pub_pub_id }
+ 
+ 
+  
+  
+sub stock_pub_pubs { return shift->stock_pub_pub_id }
  
 # one to many to one
  
   
-# one2one #
-sub libraryprops { my $self = shift; return map $_->libraryprop_id, $self->libraryprop_pub_pub_id }
-
   
-
+# one2one #
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->library_cvterm_pub_id }
 
   
@@ -2643,39 +2824,51 @@ sub librarys { my $self = shift; return map $_->library_id, $self->library_cvter
 
   
 
-sub organisms { my $self = shift; return map $_->organism_id, $self->phenotype_comparison_pub_id }
+sub librarys { my $self = shift; return map $_->library_id, $self->library_pub_pub_id }
 
   
+
+sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_library_pub_id }
+
   
+
+sub librarys { my $self = shift; return map $_->library_id, $self->cell_line_library_pub_id }
+
   
+
+sub cvterms { my $self = shift; return map $_->type_id, $self->phenstatement_pub_id }
+
+  
+
+sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_pub_id }
+
+  
+
+sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_pub_id }
+
+  
+
+sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_pub_id }
+
+  
+
+sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_pub_pub_id }
+
   
 
 sub featuremaps { my $self = shift; return map $_->featuremap_id, $self->featuremap_pub_pub_id }
 
   
+
+sub features { my $self = shift; return map $_->feature_id, $self->feature_pub_pub_id }
+
   
 
-sub phylotrees { my $self = shift; return map $_->phylotree_id, $self->phylotree_pub_pub_id }
-
-  
-
-sub stockprops { my $self = shift; return map $_->stockprop_id, $self->stockprop_pub_pub_id }
+sub libraryprops { my $self = shift; return map $_->libraryprop_id, $self->libraryprop_pub_pub_id }
 
   
 
 sub cell_lineprops { my $self = shift; return map $_->cell_lineprop_id, $self->cell_lineprop_pub_pub_id }
-
-  
-
-sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_feature_pub_id }
-
-  
-
-sub features { my $self = shift; return map $_->feature_id, $self->cell_line_feature_pub_id }
-
-  
-
-sub feature_relationshipprops { my $self = shift; return map $_->feature_relationshipprop_id, $self->feature_relationshipprop_pub_pub_id }
 
   
 
@@ -2687,11 +2880,14 @@ sub stocks { my $self = shift; return map $_->stock_id, $self->stock_cvterm_pub_
 
   
 
-sub feature_cvterms { my $self = shift; return map $_->feature_cvterm_id, $self->feature_cvterm_pub_pub_id }
+sub organisms { my $self = shift; return map $_->organism_id, $self->phenotype_comparison_pub_id }
 
   
+  
+  
+  
 
-sub stocks { my $self = shift; return map $_->stock_id, $self->stock_pub_pub_id }
+sub stock_relationships { my $self = shift; return map $_->stock_relationship_id, $self->stock_relationship_pub_pub_id }
 
   
 
@@ -2699,23 +2895,11 @@ sub feature_relationships { my $self = shift; return map $_->feature_relationshi
 
   
 
-sub featureprops { my $self = shift; return map $_->featureprop_id, $self->featureprop_pub_pub_id }
+sub phylotrees { my $self = shift; return map $_->phylotree_id, $self->phylotree_pub_pub_id }
 
   
 
-sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode_pub_pub_id }
-
-  
-
-sub stock_relationships { my $self = shift; return map $_->stock_relationship_id, $self->stock_relationship_pub_pub_id }
-
-  
-
-sub librarys { my $self = shift; return map $_->library_id, $self->library_pub_pub_id }
-
-  
-
-sub features { my $self = shift; return map $_->feature_id, $self->feature_pub_pub_id }
+sub stockprops { my $self = shift; return map $_->stockprop_id, $self->stockprop_pub_pub_id }
 
   
 
@@ -2723,27 +2907,15 @@ sub featurelocs { my $self = shift; return map $_->featureloc_id, $self->feature
 
   
 
-sub cvterms { my $self = shift; return map $_->type_id, $self->phenstatement_pub_id }
+sub feature_relationshipprops { my $self = shift; return map $_->feature_relationshipprop_id, $self->feature_relationshipprop_pub_pub_id }
 
   
 
-sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_pub_id }
+sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode_pub_pub_id }
 
   
 
-sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_pub_id }
-
-  
-
-sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_pub_id }
-
-  
-
-sub librarys { my $self = shift; return map $_->library_id, $self->cell_line_library_pub_id }
-
-  
-
-sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_library_pub_id }
+sub featureprops { my $self = shift; return map $_->featureprop_id, $self->featureprop_pub_pub_id }
 
   
 
@@ -2759,10 +2931,44 @@ sub features { my $self = shift; return map $_->feature_id, $self->feature_expre
 
   
 
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_pub_pub_id }
+
+  
+
 sub expressions { my $self = shift; return map $_->expression_id, $self->expression_pub_pub_id }
+
+  
+
+sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_feature_pub_id }
+
+  
+
+sub features { my $self = shift; return map $_->feature_id, $self->cell_line_feature_pub_id }
+
+  
+
+sub projects { my $self = shift; return map $_->project_id, $self->project_pub_pub_id }
+
+  
+
+sub stocks { my $self = shift; return map $_->stock_id, $self->stock_pub_pub_id }
 
 # one to many to many
  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -2773,7 +2979,7 @@ sub expressions { my $self = shift; return map $_->expression_id, $self->express
   
   
     
-sub phenotype_comparison_genotype1s { my $self = shift; return map $_->genotype1_id, $self->phenotype_comparison_pub_id }
+sub phenotype_comparison_environment1s { my $self = shift; return map $_->environment1_id, $self->phenotype_comparison_pub_id }
     
   
      
@@ -2783,7 +2989,7 @@ sub phenotype_comparison_genotype1s { my $self = shift; return map $_->genotype1
   
   
     
-sub phenotype_comparison_environment1s { my $self = shift; return map $_->environment1_id, $self->phenotype_comparison_pub_id }
+sub phenotype_comparison_genotype1s { my $self = shift; return map $_->genotype1_id, $self->phenotype_comparison_pub_id }
     
   
      
@@ -2814,28 +3020,8 @@ sub phenotype_comparison_phenotype1s { my $self = shift; return map $_->phenotyp
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 #many to many to one
  
-  
-  
-  
-  
-  
-  
-  
-  
   
 # many2one #
   
@@ -2873,9 +3059,21 @@ sub pub_relationship_object_types { my $self = shift; return map $_->type_id, $s
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 #many to many to many
 
 
+  
+  
   
   
   
@@ -3048,6 +3246,57 @@ sub Bio::Chado::CDBI::Dbxrefprop::dbxref { return shift->dbxref_id }
 Bio::Chado::CDBI::Dbxrefprop->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
     
 sub Bio::Chado::CDBI::Dbxrefprop::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Contact########
+
+package Bio::Chado::CDBI::Nd_Experiment_Contact;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Contact->set_up_table('nd_experiment_contact');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_contact_id }
+sub nd_experiment_contact { shift->nd_experiment_contact_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Contact->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Contact::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Contact->has_a(contact_id => 'Bio::Chado::CDBI::Contact');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Contact::contact { return shift->contact_id }
        
 
 #
@@ -3634,6 +3883,108 @@ sub Bio::Chado::CDBI::Featureloc_Pub::pub { return shift->pub_id }
 
 1;
 
+########Bio::Chado::CDBI::Nd_Reagentprop########
+
+package Bio::Chado::CDBI::Nd_Reagentprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Reagentprop->set_up_table('nd_reagentprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_reagentprop_id }
+sub nd_reagentprop { shift->nd_reagentprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Reagentprop->has_a(nd_reagent_id => 'Bio::Chado::CDBI::Nd_Reagent');
+    
+sub Bio::Chado::CDBI::Nd_Reagentprop::nd_reagent { return shift->nd_reagent_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Reagentprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Reagentprop::cvterm { return shift->cvterm_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Project########
+
+package Bio::Chado::CDBI::Nd_Experiment_Project;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Project->set_up_table('nd_experiment_project');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_project_id }
+sub nd_experiment_project { shift->nd_experiment_project_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Project->has_a(project_id => 'Bio::Chado::CDBI::Project');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Project::project { return shift->project_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Project->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Project::nd_experiment { return shift->nd_experiment_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
 ########Bio::Chado::CDBI::Feature########
 
 package Bio::Chado::CDBI::Feature;
@@ -3819,19 +4170,19 @@ sub feature_genotype_chromosome_ids { my $self = shift; return $self->feature_ge
 #
  
   
-sub element_features { return shift->element_feature_id }
+sub feature_pub_features { return shift->feature_pub_feature_id }
 
    
  
   
-sub element_features { return shift->element_feature_id }
+sub studyprop_feature_features { return shift->studyprop_feature_feature_id }
 
    
  
   
-sub element_features { return shift->element_feature_id }
-
-   
+  
+sub studyprop_feature_features { return shift->studyprop_feature_feature_id }
+ 
  
   
 sub feature_phenotype_features { return shift->feature_phenotype_feature_id }
@@ -3839,12 +4190,27 @@ sub feature_phenotype_features { return shift->feature_phenotype_feature_id }
    
  
   
+sub feature_expression_features { return shift->feature_expression_feature_id }
+
+   
+ 
   
-sub studyprop_feature_features { return shift->studyprop_feature_feature_id }
+  
+sub feature_expression_features { return shift->feature_expression_feature_id }
  
  
   
-sub studyprop_feature_features { return shift->studyprop_feature_feature_id }
+sub element_features { return shift->element_feature_id }
+
+   
+ 
+  
+sub element_features { return shift->element_feature_id }
+
+   
+ 
+  
+sub element_features { return shift->element_feature_id }
 
    
  
@@ -3854,33 +4220,42 @@ sub library_feature_features { return shift->library_feature_feature_id }
  
  
   
-sub cell_line_feature_features { return shift->cell_line_feature_feature_id }
-
-   
- 
-  
   
 sub cell_line_feature_features { return shift->cell_line_feature_feature_id }
  
  
   
-sub feature_pub_features { return shift->feature_pub_feature_id }
+sub cell_line_feature_features { return shift->cell_line_feature_feature_id }
 
    
- 
-  
-sub feature_expression_features { return shift->feature_expression_feature_id }
-
-   
- 
-  
-  
-sub feature_expression_features { return shift->feature_expression_feature_id }
- 
 # one to many to one
  
   
 # one2one #
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_pub_feature_id }
+
+  
+
+sub cvterms { my $self = shift; return map $_->type_id, $self->studyprop_feature_feature_id }
+
+  
+
+sub studyprops { my $self = shift; return map $_->studyprop_id, $self->studyprop_feature_feature_id }
+
+  
+
+sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->feature_phenotype_feature_id }
+
+  
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->feature_expression_feature_id }
+
+  
+
+sub expressions { my $self = shift; return map $_->expression_id, $self->feature_expression_feature_id }
+
+  
+
 sub cvterms { my $self = shift; return map $_->type_id, $self->element_feature_id }
 
   
@@ -3893,23 +4268,7 @@ sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->eleme
 
   
 
-sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->feature_phenotype_feature_id }
-
-  
-
-sub studyprops { my $self = shift; return map $_->studyprop_id, $self->studyprop_feature_feature_id }
-
-  
-
-sub cvterms { my $self = shift; return map $_->type_id, $self->studyprop_feature_feature_id }
-
-  
-
 sub librarys { my $self = shift; return map $_->library_id, $self->library_feature_feature_id }
-
-  
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_feature_feature_id }
 
   
 
@@ -3917,15 +4276,7 @@ sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->feature_pub_feature_id }
-
-  
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->feature_expression_feature_id }
-
-  
-
-sub expressions { my $self = shift; return map $_->expression_id, $self->feature_expression_feature_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_feature_feature_id }
 
 # one to many to many
  
@@ -4268,6 +4619,16 @@ Bio::Chado::CDBI::Cell_Line->has_many('cell_line_pub_cell_line_id', 'Bio::Chado:
 #
  
   
+sub cell_line_library_cell_lines { return shift->cell_line_library_cell_line_id }
+
+   
+ 
+  
+sub cell_line_library_cell_lines { return shift->cell_line_library_cell_line_id }
+
+   
+ 
+  
 sub cell_line_relationship_subjects { return shift->cell_line_relationship_subject_id }
 
   
@@ -4276,51 +4637,41 @@ sub cell_line_relationship_objects { return shift->cell_line_relationship_object
    
  
   
-sub cell_line_feature_cell_lines { return shift->cell_line_feature_cell_line_id }
-
-   
- 
-  
-sub cell_line_feature_cell_lines { return shift->cell_line_feature_cell_line_id }
-
-   
- 
-  
-sub cell_line_library_cell_lines { return shift->cell_line_library_cell_line_id }
-
-   
- 
-  
-sub cell_line_library_cell_lines { return shift->cell_line_library_cell_line_id }
-
-   
- 
-  
 sub cell_line_pub_cell_lines { return shift->cell_line_pub_cell_line_id }
+
+   
+ 
+  
+sub cell_line_feature_cell_lines { return shift->cell_line_feature_cell_line_id }
+
+   
+ 
+  
+sub cell_line_feature_cell_lines { return shift->cell_line_feature_cell_line_id }
 
    
 # one to many to one
  
   
-  
 # one2one #
-sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_feature_cell_line_id }
-
-  
-
-sub features { my $self = shift; return map $_->feature_id, $self->cell_line_feature_cell_line_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_library_cell_line_id }
 
   
 
 sub librarys { my $self = shift; return map $_->library_id, $self->cell_line_library_cell_line_id }
 
   
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_library_cell_line_id }
-
   
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_pub_cell_line_id }
+
+  
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_feature_cell_line_id }
+
+  
+
+sub features { my $self = shift; return map $_->feature_id, $self->cell_line_feature_cell_line_id }
 
 # one to many to many
  
@@ -4333,6 +4684,8 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_pub_cell_li
 #many to many to one
  
   
+  
+  
 # many2one #
   
   
@@ -4342,8 +4695,6 @@ sub cell_line_relationship_subject_types { my $self = shift; return map $_->type
 sub cell_line_relationship_object_types { my $self = shift; return map $_->type_id, $self->cell_line_relationship_object_id }
     
    
-  
-  
   
   
   
@@ -4733,6 +5084,7 @@ sub Bio::Chado::CDBI::Stock::cvterm { return shift->type_id }
   
   
   
+  
    
 
 #
@@ -4762,6 +5114,8 @@ sub stock_relationship_object_ids { my $self = shift; return $self->stock_relati
       
 Bio::Chado::CDBI::Stock->has_many('stockcollection_stock_stock_id', 'Bio::Chado::CDBI::Stockcollection_Stock' => 'stock_id');
    
+Bio::Chado::CDBI::Stock->has_many('nd_experiment_stock_stock_id', 'Bio::Chado::CDBI::Nd_Experiment_Stock' => 'stock_id');
+   
 Bio::Chado::CDBI::Stock->has_many('stockprop_stock_id', 'Bio::Chado::CDBI::Stockprop' => 'stock_id');
   
     
@@ -4775,17 +5129,27 @@ sub stockprops { return shift->stockprop_stock_id }
 #
  
   
+sub stock_cvterm_stocks { return shift->stock_cvterm_stock_id }
+
+   
+ 
+  
+sub stock_cvterm_stocks { return shift->stock_cvterm_stock_id }
+
+   
+ 
+  
+sub nd_experiment_stock_stocks { return shift->nd_experiment_stock_stock_id }
+
+   
+ 
+  
+  
+sub nd_experiment_stock_stocks { return shift->nd_experiment_stock_stock_id }
+ 
+ 
+  
 sub stock_genotype_stocks { return shift->stock_genotype_stock_id }
-
-   
- 
-  
-sub stock_cvterm_stocks { return shift->stock_cvterm_stock_id }
-
-   
- 
-  
-sub stock_cvterm_stocks { return shift->stock_cvterm_stock_id }
 
    
  
@@ -4802,15 +5166,23 @@ sub stock_pub_stocks { return shift->stock_pub_stock_id }
  
   
 # one2one #
-sub genotypes { my $self = shift; return map $_->genotype_id, $self->stock_genotype_stock_id }
-
-  
-
 sub cvterms { my $self = shift; return map $_->cvterm_id, $self->stock_cvterm_stock_id }
 
   
 
 sub pubs { my $self = shift; return map $_->pub_id, $self->stock_cvterm_stock_id }
+
+  
+
+sub cvterms { my $self = shift; return map $_->type_id, $self->nd_experiment_stock_stock_id }
+
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_stock_stock_id }
+
+  
+
+sub genotypes { my $self = shift; return map $_->genotype_id, $self->stock_genotype_stock_id }
 
   
 
@@ -4827,8 +5199,12 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->stock_pub_stock_id }
   
   
   
+  
+  
 #many to many to one
  
+  
+  
   
   
   
@@ -4837,6 +5213,8 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->stock_pub_stock_id }
 #many to many to many
 
 
+  
+  
   
   
   
@@ -5121,13 +5499,34 @@ sub project { shift->project_id }
 #
 # Has A
 #
+  
+  
+  
+  
+  
+  
    
 
 #
 # Has Many
 #
  
+Bio::Chado::CDBI::Project->has_many('nd_experiment_project_project_id', 'Bio::Chado::CDBI::Nd_Experiment_Project' => 'project_id');
+   
+Bio::Chado::CDBI::Project->has_many('project_contact_project_id', 'Bio::Chado::CDBI::Project_Contact' => 'project_id');
+   
 Bio::Chado::CDBI::Project->has_many('assay_project_project_id', 'Bio::Chado::CDBI::Assay_Project' => 'project_id');
+   
+Bio::Chado::CDBI::Project->has_many('project_relationship_subject_project_id', 'Bio::Chado::CDBI::Project_Relationship' => 'subject_project_id');
+   
+Bio::Chado::CDBI::Project->has_many('project_relationship_object_project_id', 'Bio::Chado::CDBI::Project_Relationship' => 'object_project_id');
+   
+Bio::Chado::CDBI::Project->has_many('projectprop_project_id', 'Bio::Chado::CDBI::Projectprop' => 'project_id');
+  
+    
+sub projectprops { return shift->projectprop_project_id }
+      
+Bio::Chado::CDBI::Project->has_many('project_pub_project_id', 'Bio::Chado::CDBI::Project_Pub' => 'project_id');
   
 
 
@@ -5137,25 +5536,133 @@ Bio::Chado::CDBI::Project->has_many('assay_project_project_id', 'Bio::Chado::CDB
 #
  
   
+sub nd_experiment_project_projects { return shift->nd_experiment_project_project_id }
+
+   
+ 
+  
+sub project_contact_projects { return shift->project_contact_project_id }
+
+   
+ 
+  
   
 sub assay_project_projects { return shift->assay_project_project_id }
  
+ 
+  
+sub project_relationship_subject_projects { return shift->project_relationship_subject_project_id }
+
+  
+sub project_relationship_object_projects { return shift->project_relationship_object_project_id }
+
+   
+ 
+  
+sub project_pub_projects { return shift->project_pub_project_id }
+
+   
 # one to many to one
  
   
 # one2one #
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_project_project_id }
+
+  
+
+sub contacts { my $self = shift; return map $_->contact_id, $self->project_contact_project_id }
+
+  
+
 sub assays { my $self = shift; return map $_->assay_id, $self->assay_project_project_id }
+
+  
+  
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->project_pub_project_id }
 
 # one to many to many
  
   
+  
+  
+  
+  
 #many to many to one
  
+  
+  
+  
+  
+# many2one #
+  
+  
+sub project_relationship_subject_project_types { my $self = shift; return map $_->type_id, $self->project_relationship_subject_project_id }
+    
+  
+sub project_relationship_object_project_types { my $self = shift; return map $_->type_id, $self->project_relationship_object_project_id }
+    
+   
   
 #many to many to many
 
 
+  
+  
+  
+  
    
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Genotype########
+
+package Bio::Chado::CDBI::Nd_Experiment_Genotype;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Genotype->set_up_table('nd_experiment_genotype');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_genotype_id }
+sub nd_experiment_genotype { shift->nd_experiment_genotype_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Genotype->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Genotype::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Genotype->has_a(genotype_id => 'Bio::Chado::CDBI::Genotype');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Genotype::genotype { return shift->genotype_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
 
 1;
 
@@ -5448,6 +5955,113 @@ sub Bio::Chado::CDBI::Stock_Genotype::genotype { return shift->genotype_id }
 
 1;
 
+########Bio::Chado::CDBI::Nd_Protocolprop########
+
+package Bio::Chado::CDBI::Nd_Protocolprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Protocolprop->set_up_table('nd_protocolprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_protocolprop_id }
+sub nd_protocolprop { shift->nd_protocolprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Protocolprop->has_a(nd_protocol_id => 'Bio::Chado::CDBI::Nd_Protocol');
+    
+sub Bio::Chado::CDBI::Nd_Protocolprop::nd_protocol { return shift->nd_protocol_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Protocolprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Protocolprop::cvterm { return shift->cvterm_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Protocol_Reagent########
+
+package Bio::Chado::CDBI::Nd_Protocol_Reagent;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Protocol_Reagent->set_up_table('nd_protocol_reagent');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_protocol_reagent_id }
+sub nd_protocol_reagent { shift->nd_protocol_reagent_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Protocol_Reagent->has_a(nd_protocol_id => 'Bio::Chado::CDBI::Nd_Protocol');
+    
+sub Bio::Chado::CDBI::Nd_Protocol_Reagent::nd_protocol { return shift->nd_protocol_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Protocol_Reagent->has_a(reagent_id => 'Bio::Chado::CDBI::Nd_Reagent');
+    
+sub Bio::Chado::CDBI::Nd_Protocol_Reagent::nd_reagent { return shift->reagent_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Protocol_Reagent->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Protocol_Reagent::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+   
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
 ########Bio::Chado::CDBI::Protocolparam########
 
 package Bio::Chado::CDBI::Protocolparam;
@@ -5546,6 +6160,187 @@ sub Bio::Chado::CDBI::Control::tableinfo { return shift->tableinfo_id }
 # Has Many
 #
    
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment########
+
+package Bio::Chado::CDBI::Nd_Experiment;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment->set_up_table('nd_experiment');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_id }
+sub nd_experiment { shift->nd_experiment_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+  
+  
+  
+ 
+Bio::Chado::CDBI::Nd_Experiment->has_a(nd_geolocation_id => 'Bio::Chado::CDBI::Nd_Geolocation');
+    
+sub Bio::Chado::CDBI::Nd_Experiment::nd_geolocation { return shift->nd_geolocation_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Experiment::cvterm { return shift->type_id }
+      
+  
+  
+  
+  
+   
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_pub_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Pub' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_contact_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Contact' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_project_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Project' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_genotype_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Genotype' => 'nd_experiment_id');
+     
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_phenotype_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Phenotype' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_stock_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Stock' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_dbxref_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Dbxref' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experiment_protocol_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experiment_Protocol' => 'nd_experiment_id');
+   
+Bio::Chado::CDBI::Nd_Experiment->has_many('nd_experimentprop_nd_experiment_id', 'Bio::Chado::CDBI::Nd_Experimentprop' => 'nd_experiment_id');
+  
+    
+sub nd_experimentprops { return shift->nd_experimentprop_nd_experiment_id }
+     
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+  
+sub nd_experiment_project_nd_experiments { return shift->nd_experiment_project_nd_experiment_id }
+ 
+ 
+  
+sub nd_experiment_stock_nd_experiments { return shift->nd_experiment_stock_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_stock_nd_experiments { return shift->nd_experiment_stock_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_phenotype_nd_experiments { return shift->nd_experiment_phenotype_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_protocol_nd_experiments { return shift->nd_experiment_protocol_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_dbxref_nd_experiments { return shift->nd_experiment_dbxref_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_genotype_nd_experiments { return shift->nd_experiment_genotype_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_contact_nd_experiments { return shift->nd_experiment_contact_nd_experiment_id }
+
+   
+ 
+  
+sub nd_experiment_pub_nd_experiments { return shift->nd_experiment_pub_nd_experiment_id }
+
+   
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Project_Contact########
+
+package Bio::Chado::CDBI::Project_Contact;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Project_Contact->set_up_table('project_contact');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->project_contact_id }
+sub project_contact { shift->project_contact_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Project_Contact->has_a(project_id => 'Bio::Chado::CDBI::Project');
+    
+sub Bio::Chado::CDBI::Project_Contact::project { return shift->project_id }
+      
+ 
+Bio::Chado::CDBI::Project_Contact->has_a(contact_id => 'Bio::Chado::CDBI::Contact');
+    
+sub Bio::Chado::CDBI::Project_Contact::contact { return shift->contact_id }
+       
+
+#
+# Has Many
+#
+  
 
 
 # one to many to one
@@ -5768,6 +6563,57 @@ sub Bio::Chado::CDBI::Pub_Dbxref::pub { return shift->pub_id }
 Bio::Chado::CDBI::Pub_Dbxref->has_a(dbxref_id => 'Bio::Chado::CDBI::Dbxref');
     
 sub Bio::Chado::CDBI::Pub_Dbxref::dbxref { return shift->dbxref_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Stock_Relationship_Cvterm########
+
+package Bio::Chado::CDBI::Stock_Relationship_Cvterm;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Stock_Relationship_Cvterm->set_up_table('stock_relationship_cvterm');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->stock_relationship_cvterm_id }
+sub stock_relationship_cvterm { shift->stock_relationship_cvterm_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Stock_Relationship_Cvterm->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Stock_Relationship_Cvterm::cvterm { return shift->cvterm_id }
+      
+ 
+Bio::Chado::CDBI::Stock_Relationship_Cvterm->has_a(pub_id => 'Bio::Chado::CDBI::Pub');
+    
+sub Bio::Chado::CDBI::Stock_Relationship_Cvterm::pub { return shift->pub_id }
        
 
 #
@@ -6445,6 +7291,99 @@ sub Bio::Chado::CDBI::Phylonodeprop::cvterm { return shift->type_id }
 
 1;
 
+########Bio::Chado::CDBI::Nd_Protocol########
+
+package Bio::Chado::CDBI::Nd_Protocol;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Protocol->set_up_table('nd_protocol');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_protocol_id }
+sub nd_protocol { shift->nd_protocol_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+  
+   
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Nd_Protocol->has_many('nd_protocolprop_nd_protocol_id', 'Bio::Chado::CDBI::Nd_Protocolprop' => 'nd_protocol_id');
+  
+    
+sub nd_protocolprops { return shift->nd_protocolprop_nd_protocol_id }
+      
+Bio::Chado::CDBI::Nd_Protocol->has_many('nd_protocol_reagent_nd_protocol_id', 'Bio::Chado::CDBI::Nd_Protocol_Reagent' => 'nd_protocol_id');
+   
+Bio::Chado::CDBI::Nd_Protocol->has_many('nd_experiment_protocol_nd_protocol_id', 'Bio::Chado::CDBI::Nd_Experiment_Protocol' => 'nd_protocol_id');
+  
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+sub nd_protocol_reagent_nd_protocols { return shift->nd_protocol_reagent_nd_protocol_id }
+
+   
+ 
+  
+sub nd_protocol_reagent_nd_protocols { return shift->nd_protocol_reagent_nd_protocol_id }
+
+   
+ 
+  
+  
+sub nd_experiment_protocol_nd_protocols { return shift->nd_experiment_protocol_nd_protocol_id }
+ 
+# one to many to one
+ 
+  
+# one2one #
+sub cvterms { my $self = shift; return map $_->type_id, $self->nd_protocol_reagent_nd_protocol_id }
+
+  
+
+sub nd_reagents { my $self = shift; return map $_->reagent_id, $self->nd_protocol_reagent_nd_protocol_id }
+
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_protocol_nd_protocol_id }
+
+# one to many to many
+ 
+  
+  
+  
+#many to many to one
+ 
+  
+  
+  
+#many to many to many
+
+
+  
+  
+   
+
+1;
+
 ########Bio::Chado::CDBI::Study########
 
 package Bio::Chado::CDBI::Study;
@@ -6752,6 +7691,57 @@ sub Bio::Chado::CDBI::Stockprop_Pub::pub { return shift->pub_id }
 
 1;
 
+########Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref########
+
+package Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref->set_up_table('nd_experiment_stock_dbxref');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_stock_dbxref_id }
+sub nd_experiment_stock_dbxref { shift->nd_experiment_stock_dbxref_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref->has_a(nd_experiment_stock_id => 'Bio::Chado::CDBI::Nd_Experiment_Stock');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref::nd_experiment_stock { return shift->nd_experiment_stock_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref->has_a(dbxref_id => 'Bio::Chado::CDBI::Dbxref');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref::dbxref { return shift->dbxref_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
 ########Bio::Chado::CDBI::Cvtermprop########
 
 package Bio::Chado::CDBI::Cvtermprop;
@@ -7020,6 +8010,108 @@ sub Bio::Chado::CDBI::Expressionprop::expression { return shift->expression_id }
 Bio::Chado::CDBI::Expressionprop->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
     
 sub Bio::Chado::CDBI::Expressionprop::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Phenotype########
+
+package Bio::Chado::CDBI::Nd_Experiment_Phenotype;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Phenotype->set_up_table('nd_experiment_phenotype');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_phenotype_id }
+sub nd_experiment_phenotype { shift->nd_experiment_phenotype_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Phenotype->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Phenotype::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Phenotype->has_a(phenotype_id => 'Bio::Chado::CDBI::Phenotype');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Phenotype::phenotype { return shift->phenotype_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Stockprop########
+
+package Bio::Chado::CDBI::Nd_Experiment_Stockprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Stockprop->set_up_table('nd_experiment_stockprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_stockprop_id }
+sub nd_experiment_stockprop { shift->nd_experiment_stockprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stockprop->has_a(nd_experiment_stock_id => 'Bio::Chado::CDBI::Nd_Experiment_Stock');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stockprop::nd_experiment_stock { return shift->nd_experiment_stock_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stockprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stockprop::cvterm { return shift->cvterm_id }
        
 
 #
@@ -7611,7 +8703,6 @@ sub librarys { return shift->library_organism_id }
  
   
   
-  
 sub phenotype_comparison_organisms { return shift->phenotype_comparison_organism_id }
  
  
@@ -7621,6 +8712,7 @@ sub phenotype_comparison_organisms { return shift->phenotype_comparison_organism
 sub phenotype_comparison_organisms { return shift->phenotype_comparison_organism_id }
  
  
+  
   
   
 sub phenotype_comparison_organisms { return shift->phenotype_comparison_organism_id }
@@ -7644,11 +8736,11 @@ sub phylonode_organism_organisms { return shift->phylonode_organism_organism_id 
 # one to many to one
  
   
-  
-  
 # one2one #
 sub pubs { my $self = shift; return map $_->pub_id, $self->phenotype_comparison_organism_id }
 
+  
+  
   
   
 
@@ -7661,17 +8753,8 @@ sub phylonodes { my $self = shift; return map $_->phylonode_id, $self->phylonode
 # one to many to many
  
   
+  
 # one2many #
-  
-  
-  
-    
-sub phenotype_comparison_genotype1s { my $self = shift; return map $_->genotype1_id, $self->phenotype_comparison_organism_id }
-    
-  
-     
-  
-
   
   
   
@@ -7681,6 +8764,15 @@ sub phenotype_comparison_environment1s { my $self = shift; return map $_->enviro
   
      
   
+
+  
+  
+  
+    
+sub phenotype_comparison_genotype1s { my $self = shift; return map $_->genotype1_id, $self->phenotype_comparison_organism_id }
+    
+  
+     
   
 
   
@@ -7832,6 +8924,116 @@ sub Bio::Chado::CDBI::Cell_Line_Cvtermprop::cvterm { return shift->type_id }
 #many to many to many
 
  
+
+1;
+
+########Bio::Chado::CDBI::Nd_Reagent########
+
+package Bio::Chado::CDBI::Nd_Reagent;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Reagent->set_up_table('nd_reagent');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_reagent_id }
+sub nd_reagent { shift->nd_reagent_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+  
+ 
+Bio::Chado::CDBI::Nd_Reagent->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Reagent::cvterm { return shift->type_id }
+      
+  
+   
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Nd_Reagent->has_many('nd_reagentprop_nd_reagent_id', 'Bio::Chado::CDBI::Nd_Reagentprop' => 'nd_reagent_id');
+  
+    
+sub nd_reagentprops { return shift->nd_reagentprop_nd_reagent_id }
+      
+Bio::Chado::CDBI::Nd_Reagent->has_many('nd_protocol_reagent_reagent_id', 'Bio::Chado::CDBI::Nd_Protocol_Reagent' => 'reagent_id');
+    
+Bio::Chado::CDBI::Nd_Reagent->has_many('nd_reagent_relationship_subject_reagent_id', 'Bio::Chado::CDBI::Nd_Reagent_Relationship' => 'subject_reagent_id');
+   
+Bio::Chado::CDBI::Nd_Reagent->has_many('nd_reagent_relationship_object_reagent_id', 'Bio::Chado::CDBI::Nd_Reagent_Relationship' => 'object_reagent_id');
+  
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+sub nd_reagent_relationship_subject_reagents { return shift->nd_reagent_relationship_subject_reagent_id }
+
+  
+sub nd_reagent_relationship_object_reagents { return shift->nd_reagent_relationship_object_reagent_id }
+
+   
+ 
+  
+sub nd_protocol_reagent_reagents { return shift->nd_protocol_reagent_reagent_id }
+
+   
+ 
+  
+  
+sub nd_protocol_reagent_reagents { return shift->nd_protocol_reagent_reagent_id }
+ 
+# one to many to one
+ 
+  
+  
+# one2one #
+sub cvterms { my $self = shift; return map $_->type_id, $self->nd_protocol_reagent_reagent_id }
+
+  
+
+sub nd_protocols { my $self = shift; return map $_->nd_protocol_id, $self->nd_protocol_reagent_reagent_id }
+
+# one to many to many
+ 
+  
+  
+  
+#many to many to one
+ 
+  
+# many2one #
+  
+  
+sub nd_reagent_relationship_subject_reagent_types { my $self = shift; return map $_->type_id, $self->nd_reagent_relationship_subject_reagent_id }
+    
+  
+sub nd_reagent_relationship_object_reagent_types { my $self = shift; return map $_->type_id, $self->nd_reagent_relationship_object_reagent_id }
+    
+   
+  
+  
+#many to many to many
+
+
+  
+  
+   
 
 1;
 
@@ -8116,6 +9318,62 @@ sub object { return shift->object_id }
 
 1;
 
+########Bio::Chado::CDBI::Project_Relationship########
+
+package Bio::Chado::CDBI::Project_Relationship;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Project_Relationship->set_up_table('project_relationship');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->project_relationship_id }
+sub project_relationship { shift->project_relationship_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Project_Relationship->has_a(subject_project_id => 'Bio::Chado::CDBI::Project');
+    
+sub subject_project { return shift->subject_project_id }
+      
+ 
+Bio::Chado::CDBI::Project_Relationship->has_a(object_project_id => 'Bio::Chado::CDBI::Project');
+    
+sub object_project { return shift->object_project_id }
+      
+ 
+Bio::Chado::CDBI::Project_Relationship->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Project_Relationship::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+   
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
 ########Bio::Chado::CDBI::Phylonode########
 
 package Bio::Chado::CDBI::Phylonode;
@@ -8204,12 +9462,12 @@ Bio::Chado::CDBI::Phylonode->has_many('phylonode_dbxref_phylonode_id', 'Bio::Cha
 #
  
   
-sub phylonode_pub_phylonodes { return shift->phylonode_pub_phylonode_id }
+sub phylonode_dbxref_phylonodes { return shift->phylonode_dbxref_phylonode_id }
 
    
  
   
-sub phylonode_dbxref_phylonodes { return shift->phylonode_dbxref_phylonode_id }
+sub phylonode_pub_phylonodes { return shift->phylonode_pub_phylonode_id }
 
    
  
@@ -8221,11 +9479,11 @@ sub phylonode_organism_phylonodes { return shift->phylonode_organism_phylonode_i
  
   
 # one2one #
-sub pubs { my $self = shift; return map $_->pub_id, $self->phylonode_pub_phylonode_id }
+sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->phylonode_dbxref_phylonode_id }
 
   
 
-sub dbxrefs { my $self = shift; return map $_->dbxref_id, $self->phylonode_dbxref_phylonode_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->phylonode_pub_phylonode_id }
 
   
 
@@ -8639,12 +9897,12 @@ sub feature_expression_expressions { return shift->feature_expression_expression
    
  
   
-sub expression_pub_expressions { return shift->expression_pub_expression_id }
+sub expression_image_expressions { return shift->expression_image_expression_id }
 
    
  
   
-sub expression_image_expressions { return shift->expression_image_expression_id }
+sub expression_pub_expressions { return shift->expression_pub_expression_id }
 
    
 # one to many to one
@@ -8659,11 +9917,11 @@ sub features { my $self = shift; return map $_->feature_id, $self->feature_expre
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->expression_pub_expression_id }
+sub eimages { my $self = shift; return map $_->eimage_id, $self->expression_image_expression_id }
 
   
 
-sub eimages { my $self = shift; return map $_->eimage_id, $self->expression_image_expression_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->expression_pub_expression_id }
 
 # one to many to many
  
@@ -9430,119 +10688,6 @@ sub Bio::Chado::CDBI::Feature_Cvterm_Pub::pub { return shift->pub_id }
 
 1;
 
-########Bio::Chado::CDBI::Contact########
-
-package Bio::Chado::CDBI::Contact;
-use base 'Bio::Chado::DBI';
-use Class::DBI::Pager;
-no warnings qw(redefine);
-
-Bio::Chado::CDBI::Contact->set_up_table('contact');
-
-#
-# Primary key accessors
-#
-
-sub id { shift->contact_id }
-sub contact { shift->contact_id }
- 
-
-
-
-#
-# Has A
-#
-  
-  
-  
-  
-  
-  
-  
-  
- 
-Bio::Chado::CDBI::Contact->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
-    
-sub Bio::Chado::CDBI::Contact::cvterm { return shift->type_id }
-       
-
-#
-# Has Many
-#
- 
-Bio::Chado::CDBI::Contact->has_many('quantification_operator_id', 'Bio::Chado::CDBI::Quantification' => 'operator_id');
-  
-    
-sub quantifications { return shift->quantification_operator_id }
-      
-Bio::Chado::CDBI::Contact->has_many('arraydesign_manufacturer_id', 'Bio::Chado::CDBI::Arraydesign' => 'manufacturer_id');
-  
-    
-sub arraydesigns { return shift->arraydesign_manufacturer_id }
-      
-Bio::Chado::CDBI::Contact->has_many('contact_relationship_subject_id', 'Bio::Chado::CDBI::Contact_Relationship' => 'subject_id');
-   
-Bio::Chado::CDBI::Contact->has_many('contact_relationship_object_id', 'Bio::Chado::CDBI::Contact_Relationship' => 'object_id');
-   
-Bio::Chado::CDBI::Contact->has_many('biomaterial_biosourceprovider_id', 'Bio::Chado::CDBI::Biomaterial' => 'biosourceprovider_id');
-  
-    
-sub biomaterials { return shift->biomaterial_biosourceprovider_id }
-      
-Bio::Chado::CDBI::Contact->has_many('assay_operator_id', 'Bio::Chado::CDBI::Assay' => 'operator_id');
-  
-    
-sub assays { return shift->assay_operator_id }
-      
-Bio::Chado::CDBI::Contact->has_many('study_contact_id', 'Bio::Chado::CDBI::Study' => 'contact_id');
-  
-    
-sub studys { return shift->study_contact_id }
-      
-Bio::Chado::CDBI::Contact->has_many('stockcollection_contact_id', 'Bio::Chado::CDBI::Stockcollection' => 'contact_id');
-  
-    
-sub stockcollections { return shift->stockcollection_contact_id }
-      
-
-
-
-#
-# Has Compound Many (many to many relationships in all their flavors)
-#
- 
-  
-  
-sub contact_relationship_subjects { return shift->contact_relationship_subject_id }
-
-  
-sub contact_relationship_objects { return shift->contact_relationship_object_id }
- 
-# one to many to one
- 
-  
-# one to many to many
- 
-  
-#many to many to one
- 
-  
-# many2one #
-  
-  
-sub contact_relationship_subject_types { my $self = shift; return map $_->type_id, $self->contact_relationship_subject_id }
-    
-  
-sub contact_relationship_object_types { my $self = shift; return map $_->type_id, $self->contact_relationship_object_id }
-    
-   
-#many to many to many
-
-
-   
-
-1;
-
 ########Bio::Chado::CDBI::Library########
 
 package Bio::Chado::CDBI::Library;
@@ -9628,24 +10773,24 @@ sub library_cvterm_librarys { return shift->library_cvterm_library_id }
    
  
   
-sub library_feature_librarys { return shift->library_feature_library_id }
-
-   
- 
-  
 sub library_pub_librarys { return shift->library_pub_library_id }
 
    
  
   
+  
+sub cell_line_library_librarys { return shift->cell_line_library_library_id }
+ 
+ 
+  
 sub cell_line_library_librarys { return shift->cell_line_library_library_id }
 
    
  
   
-  
-sub cell_line_library_librarys { return shift->cell_line_library_library_id }
- 
+sub library_feature_librarys { return shift->library_feature_library_id }
+
+   
 # one to many to one
  
   
@@ -9658,11 +10803,11 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_librar
 
   
 
-sub features { my $self = shift; return map $_->feature_id, $self->library_feature_library_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->library_pub_library_id }
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->library_pub_library_id }
+sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_library_library_id }
 
   
 
@@ -9670,7 +10815,7 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->cell_line_library_lib
 
   
 
-sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line_library_library_id }
+sub features { my $self = shift; return map $_->feature_id, $self->library_feature_library_id }
 
 # one to many to many
  
@@ -9697,6 +10842,274 @@ sub cell_lines { my $self = shift; return map $_->cell_line_id, $self->cell_line
   
   
    
+
+1;
+
+########Bio::Chado::CDBI::Contact########
+
+package Bio::Chado::CDBI::Contact;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Contact->set_up_table('contact');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->contact_id }
+sub contact { shift->contact_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+Bio::Chado::CDBI::Contact->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Contact::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Contact->has_many('quantification_operator_id', 'Bio::Chado::CDBI::Quantification' => 'operator_id');
+  
+    
+sub quantifications { return shift->quantification_operator_id }
+      
+Bio::Chado::CDBI::Contact->has_many('arraydesign_manufacturer_id', 'Bio::Chado::CDBI::Arraydesign' => 'manufacturer_id');
+  
+    
+sub arraydesigns { return shift->arraydesign_manufacturer_id }
+      
+Bio::Chado::CDBI::Contact->has_many('contact_relationship_subject_id', 'Bio::Chado::CDBI::Contact_Relationship' => 'subject_id');
+   
+Bio::Chado::CDBI::Contact->has_many('contact_relationship_object_id', 'Bio::Chado::CDBI::Contact_Relationship' => 'object_id');
+   
+Bio::Chado::CDBI::Contact->has_many('nd_experiment_contact_contact_id', 'Bio::Chado::CDBI::Nd_Experiment_Contact' => 'contact_id');
+   
+Bio::Chado::CDBI::Contact->has_many('project_contact_contact_id', 'Bio::Chado::CDBI::Project_Contact' => 'contact_id');
+   
+Bio::Chado::CDBI::Contact->has_many('biomaterial_biosourceprovider_id', 'Bio::Chado::CDBI::Biomaterial' => 'biosourceprovider_id');
+  
+    
+sub biomaterials { return shift->biomaterial_biosourceprovider_id }
+      
+Bio::Chado::CDBI::Contact->has_many('assay_operator_id', 'Bio::Chado::CDBI::Assay' => 'operator_id');
+  
+    
+sub assays { return shift->assay_operator_id }
+      
+Bio::Chado::CDBI::Contact->has_many('study_contact_id', 'Bio::Chado::CDBI::Study' => 'contact_id');
+  
+    
+sub studys { return shift->study_contact_id }
+      
+Bio::Chado::CDBI::Contact->has_many('stockcollection_contact_id', 'Bio::Chado::CDBI::Stockcollection' => 'contact_id');
+  
+    
+sub stockcollections { return shift->stockcollection_contact_id }
+      
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+  
+sub project_contact_contacts { return shift->project_contact_contact_id }
+ 
+ 
+  
+  
+sub nd_experiment_contact_contacts { return shift->nd_experiment_contact_contact_id }
+ 
+ 
+  
+  
+sub contact_relationship_subjects { return shift->contact_relationship_subject_id }
+
+  
+sub contact_relationship_objects { return shift->contact_relationship_object_id }
+ 
+# one to many to one
+ 
+  
+# one2one #
+sub projects { my $self = shift; return map $_->project_id, $self->project_contact_contact_id }
+
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_contact_contact_id }
+
+  
+# one to many to many
+ 
+  
+  
+  
+#many to many to one
+ 
+  
+  
+  
+# many2one #
+  
+  
+sub contact_relationship_subject_types { my $self = shift; return map $_->type_id, $self->contact_relationship_subject_id }
+    
+  
+sub contact_relationship_object_types { my $self = shift; return map $_->type_id, $self->contact_relationship_object_id }
+    
+   
+#many to many to many
+
+
+  
+  
+   
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Stock########
+
+package Bio::Chado::CDBI::Nd_Experiment_Stock;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Stock->set_up_table('nd_experiment_stock');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_stock_id }
+sub nd_experiment_stock { shift->nd_experiment_stock_id }
+ 
+
+
+
+#
+# Has A
+#
+  
+  
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stock::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock->has_a(stock_id => 'Bio::Chado::CDBI::Stock');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stock::stock { return shift->stock_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Stock::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Stock->has_many('nd_experiment_stock_dbxref_nd_experiment_stock_id', 'Bio::Chado::CDBI::Nd_Experiment_Stock_Dbxref' => 'nd_experiment_stock_id');
+   
+Bio::Chado::CDBI::Nd_Experiment_Stock->has_many('nd_experiment_stockprop_nd_experiment_stock_id', 'Bio::Chado::CDBI::Nd_Experiment_Stockprop' => 'nd_experiment_stock_id');
+  
+    
+sub nd_experiment_stockprops { return shift->nd_experiment_stockprop_nd_experiment_stock_id }
+        
+
+
+
+#
+# Has Compound Many (many to many relationships in all their flavors)
+#
+ 
+  
+sub nd_experiment_stock_dbxref_nd_experiment_stocks { return shift->nd_experiment_stock_dbxref_nd_experiment_stock_id }
+
+   
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Dbxref########
+
+package Bio::Chado::CDBI::Nd_Experiment_Dbxref;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Dbxref->set_up_table('nd_experiment_dbxref');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_dbxref_id }
+sub nd_experiment_dbxref { shift->nd_experiment_dbxref_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Dbxref->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Dbxref::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Dbxref->has_a(dbxref_id => 'Bio::Chado::CDBI::Dbxref');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Dbxref::dbxref { return shift->dbxref_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
 
 1;
 
@@ -9742,6 +11155,266 @@ sub Bio::Chado::CDBI::Feature_Synonym::pub { return shift->pub_id }
 # Has Many
 #
    
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experiment_Protocol########
+
+package Bio::Chado::CDBI::Nd_Experiment_Protocol;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experiment_Protocol->set_up_table('nd_experiment_protocol');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experiment_protocol_id }
+sub nd_experiment_protocol { shift->nd_experiment_protocol_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experiment_Protocol->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Protocol::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experiment_Protocol->has_a(nd_protocol_id => 'Bio::Chado::CDBI::Nd_Protocol');
+    
+sub Bio::Chado::CDBI::Nd_Experiment_Protocol::nd_protocol { return shift->nd_protocol_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Reagent_Relationship########
+
+package Bio::Chado::CDBI::Nd_Reagent_Relationship;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Reagent_Relationship->set_up_table('nd_reagent_relationship');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_reagent_relationship_id }
+sub nd_reagent_relationship { shift->nd_reagent_relationship_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Reagent_Relationship->has_a(subject_reagent_id => 'Bio::Chado::CDBI::Nd_Reagent');
+    
+sub subject_reagent { return shift->subject_reagent_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Reagent_Relationship->has_a(object_reagent_id => 'Bio::Chado::CDBI::Nd_Reagent');
+    
+sub object_reagent { return shift->object_reagent_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Reagent_Relationship->has_a(type_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Reagent_Relationship::cvterm { return shift->type_id }
+       
+
+#
+# Has Many
+#
+   
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Geolocationprop########
+
+package Bio::Chado::CDBI::Nd_Geolocationprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Geolocationprop->set_up_table('nd_geolocationprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_geolocationprop_id }
+sub nd_geolocationprop { shift->nd_geolocationprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Geolocationprop->has_a(nd_geolocation_id => 'Bio::Chado::CDBI::Nd_Geolocation');
+    
+sub Bio::Chado::CDBI::Nd_Geolocationprop::nd_geolocation { return shift->nd_geolocation_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Geolocationprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Geolocationprop::cvterm { return shift->cvterm_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Projectprop########
+
+package Bio::Chado::CDBI::Projectprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Projectprop->set_up_table('projectprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->projectprop_id }
+sub projectprop { shift->projectprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Projectprop->has_a(project_id => 'Bio::Chado::CDBI::Project');
+    
+sub Bio::Chado::CDBI::Projectprop::project { return shift->project_id }
+      
+ 
+Bio::Chado::CDBI::Projectprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Projectprop::cvterm { return shift->cvterm_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
+
+########Bio::Chado::CDBI::Nd_Experimentprop########
+
+package Bio::Chado::CDBI::Nd_Experimentprop;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Nd_Experimentprop->set_up_table('nd_experimentprop');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->nd_experimentprop_id }
+sub nd_experimentprop { shift->nd_experimentprop_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Nd_Experimentprop->has_a(nd_experiment_id => 'Bio::Chado::CDBI::Nd_Experiment');
+    
+sub Bio::Chado::CDBI::Nd_Experimentprop::nd_experiment { return shift->nd_experiment_id }
+      
+ 
+Bio::Chado::CDBI::Nd_Experimentprop->has_a(cvterm_id => 'Bio::Chado::CDBI::Cvterm');
+    
+sub Bio::Chado::CDBI::Nd_Experimentprop::cvterm { return shift->cvterm_id }
+       
+
+#
+# Has Many
+#
+  
 
 
 # one to many to one
@@ -10139,6 +11812,19 @@ sub cvterm { shift->cvterm_id }
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
  
 Bio::Chado::CDBI::Cvterm->has_a(cv_id => 'Bio::Chado::CDBI::Cv');
     
@@ -10255,6 +11941,11 @@ Bio::Chado::CDBI::Cvterm->has_many('protocol_type_id', 'Bio::Chado::CDBI::Protoc
     
 sub protocols { return shift->protocol_type_id }
       
+Bio::Chado::CDBI::Cvterm->has_many('nd_reagentprop_cvterm_id', 'Bio::Chado::CDBI::Nd_Reagentprop' => 'cvterm_id');
+  
+    
+sub nd_reagentprops { return shift->nd_reagentprop_cvterm_id }
+      
 Bio::Chado::CDBI::Cvterm->has_many('feature_type_id', 'Bio::Chado::CDBI::Feature' => 'type_id');
   
 sub feature_types { return shift->feature_type_id }
@@ -10322,6 +12013,13 @@ Bio::Chado::CDBI::Cvterm->has_many('phylonode_relationship_type_id', 'Bio::Chado
     
 sub phylonode_relationships { return shift->phylonode_relationship_type_id }
       
+Bio::Chado::CDBI::Cvterm->has_many('nd_protocolprop_cvterm_id', 'Bio::Chado::CDBI::Nd_Protocolprop' => 'cvterm_id');
+  
+    
+sub nd_protocolprops { return shift->nd_protocolprop_cvterm_id }
+      
+Bio::Chado::CDBI::Cvterm->has_many('nd_protocol_reagent_type_id', 'Bio::Chado::CDBI::Nd_Protocol_Reagent' => 'type_id');
+   
 Bio::Chado::CDBI::Cvterm->has_many('protocolparam_datatype_id', 'Bio::Chado::CDBI::Protocolparam' => 'datatype_id');
   
     
@@ -10336,6 +12034,16 @@ Bio::Chado::CDBI::Cvterm->has_many('control_type_id', 'Bio::Chado::CDBI::Control
   
     
 sub controls { return shift->control_type_id }
+      
+Bio::Chado::CDBI::Cvterm->has_many('nd_experiment_type_id', 'Bio::Chado::CDBI::Nd_Experiment' => 'type_id');
+  
+sub nd_experiment_types { return shift->nd_experiment_type_id }
+#sub --nd_experiment--type_id-- {}
+   
+Bio::Chado::CDBI::Cvterm->has_many('stock_relationship_cvterm_cvterm_id', 'Bio::Chado::CDBI::Stock_Relationship_Cvterm' => 'cvterm_id');
+  
+    
+sub stock_relationship_cvterms { return shift->stock_relationship_cvterm_cvterm_id }
       
 Bio::Chado::CDBI::Cvterm->has_many('phendesc_type_id', 'Bio::Chado::CDBI::Phendesc' => 'type_id');
   
@@ -10393,6 +12101,11 @@ Bio::Chado::CDBI::Cvterm->has_many('expressionprop_type_id', 'Bio::Chado::CDBI::
     
 sub expressionprops { return shift->expressionprop_type_id }
       
+Bio::Chado::CDBI::Cvterm->has_many('nd_experiment_stockprop_cvterm_id', 'Bio::Chado::CDBI::Nd_Experiment_Stockprop' => 'cvterm_id');
+  
+    
+sub nd_experiment_stockprops { return shift->nd_experiment_stockprop_cvterm_id }
+      
 Bio::Chado::CDBI::Cvterm->has_many('acquisitionprop_type_id', 'Bio::Chado::CDBI::Acquisitionprop' => 'type_id');
   
     
@@ -10410,6 +12123,11 @@ Bio::Chado::CDBI::Cvterm->has_many('cell_line_cvtermprop_type_id', 'Bio::Chado::
     
 sub cell_line_cvtermprops { return shift->cell_line_cvtermprop_type_id }
       
+Bio::Chado::CDBI::Cvterm->has_many('nd_reagent_type_id', 'Bio::Chado::CDBI::Nd_Reagent' => 'type_id');
+  
+sub nd_reagent_types { return shift->nd_reagent_type_id }
+#sub --nd_reagent--type_id-- {}
+   
 Bio::Chado::CDBI::Cvterm->has_many('studyprop_type_id', 'Bio::Chado::CDBI::Studyprop' => 'type_id');
   
 sub studyprop_types { return shift->studyprop_type_id }
@@ -10420,6 +12138,8 @@ Bio::Chado::CDBI::Cvterm->has_many('elementresult_relationship_type_id', 'Bio::C
     
 sub elementresult_relationships { return shift->elementresult_relationship_type_id }
       
+Bio::Chado::CDBI::Cvterm->has_many('project_relationship_type_id', 'Bio::Chado::CDBI::Project_Relationship' => 'type_id');
+   
 Bio::Chado::CDBI::Cvterm->has_many('phylonode_type_id', 'Bio::Chado::CDBI::Phylonode' => 'type_id');
   
     
@@ -10482,16 +12202,35 @@ Bio::Chado::CDBI::Cvterm->has_many('expression_cvterm_cvterm_type_id', 'Bio::Cha
     
 sub expression_cvterm_cvterm_type_ids { my $self = shift; return $self->expression_cvterm_cvterm_type_id(@_) }
       
-Bio::Chado::CDBI::Cvterm->has_many('contact_type_id', 'Bio::Chado::CDBI::Contact' => 'type_id');
-  
-    
-sub contacts { return shift->contact_type_id }
-      
 Bio::Chado::CDBI::Cvterm->has_many('library_type_id', 'Bio::Chado::CDBI::Library' => 'type_id');
   
 sub library_types { return shift->library_type_id }
 #sub --library--type_id-- {}
    
+Bio::Chado::CDBI::Cvterm->has_many('contact_type_id', 'Bio::Chado::CDBI::Contact' => 'type_id');
+  
+    
+sub contacts { return shift->contact_type_id }
+      
+Bio::Chado::CDBI::Cvterm->has_many('nd_experiment_stock_type_id', 'Bio::Chado::CDBI::Nd_Experiment_Stock' => 'type_id');
+   
+Bio::Chado::CDBI::Cvterm->has_many('nd_reagent_relationship_type_id', 'Bio::Chado::CDBI::Nd_Reagent_Relationship' => 'type_id');
+   
+Bio::Chado::CDBI::Cvterm->has_many('nd_geolocationprop_cvterm_id', 'Bio::Chado::CDBI::Nd_Geolocationprop' => 'cvterm_id');
+  
+    
+sub nd_geolocationprops { return shift->nd_geolocationprop_cvterm_id }
+      
+Bio::Chado::CDBI::Cvterm->has_many('projectprop_cvterm_id', 'Bio::Chado::CDBI::Projectprop' => 'cvterm_id');
+  
+    
+sub projectprops { return shift->projectprop_cvterm_id }
+      
+Bio::Chado::CDBI::Cvterm->has_many('nd_experimentprop_cvterm_id', 'Bio::Chado::CDBI::Nd_Experimentprop' => 'cvterm_id');
+  
+    
+sub nd_experimentprops { return shift->nd_experimentprop_cvterm_id }
+      
 Bio::Chado::CDBI::Cvterm->has_many('phenotype_cvterm_cvterm_id', 'Bio::Chado::CDBI::Phenotype_Cvterm' => 'cvterm_id');
   
     
@@ -10548,41 +12287,6 @@ sub phylotrees { return shift->phylotree_type_id }
  
   
   
-sub library_cvterm_cvterms { return shift->library_cvterm_cvterm_id }
- 
- 
-  
-sub library_cvterm_cvterms { return shift->library_cvterm_cvterm_id }
-
-   
- 
-  
-  
-sub element_types { return shift->element_type_id }
- 
- 
-  
-sub element_types { return shift->element_type_id }
-
-   
- 
-  
-  
-sub element_types { return shift->element_type_id }
- 
- 
-  
-  
-sub studyprop_feature_types { return shift->studyprop_feature_type_id }
- 
- 
-  
-  
-sub studyprop_feature_types { return shift->studyprop_feature_type_id }
- 
- 
-  
-  
   
 sub pub_relationship_types { return shift->pub_relationship_type_id }
  
@@ -10590,41 +12294,64 @@ sub pub_relationship_types { return shift->pub_relationship_type_id }
   
   
   
+sub nd_reagent_relationship_types { return shift->nd_reagent_relationship_type_id }
+ 
+ 
+  
+sub library_cvterm_cvterms { return shift->library_cvterm_cvterm_id }
+
+   
+ 
+  
+  
+sub library_cvterm_cvterms { return shift->library_cvterm_cvterm_id }
+ 
+ 
+  
+sub phenstatement_types { return shift->phenstatement_type_id }
+
+   
+ 
+  
+  
+sub phenstatement_types { return shift->phenstatement_type_id }
+ 
+ 
+  
+  
+sub phenstatement_types { return shift->phenstatement_type_id }
+ 
+ 
+  
+  
+sub phenstatement_types { return shift->phenstatement_type_id }
+ 
+ 
+  
+  
+sub studyprop_feature_types { return shift->studyprop_feature_type_id }
+ 
+ 
+  
+  
+sub studyprop_feature_types { return shift->studyprop_feature_type_id }
+ 
+ 
+  
+sub stock_cvterm_cvterms { return shift->stock_cvterm_cvterm_id }
+
+   
+ 
+  
+  
+sub stock_cvterm_cvterms { return shift->stock_cvterm_cvterm_id }
+ 
+ 
+  
+  
+  
 sub cell_line_relationship_types { return shift->cell_line_relationship_type_id }
  
- 
-  
-  
-sub environment_cvterm_cvterms { return shift->environment_cvterm_cvterm_id }
- 
- 
-  
-sub contact_relationship_types { return shift->contact_relationship_type_id }
-
-  
-   
- 
-  
-  
-sub quantification_relationship_types { return shift->quantification_relationship_type_id }
-
-   
- 
-  
-sub stock_cvterm_cvterms { return shift->stock_cvterm_cvterm_id }
-
-   
- 
-  
-  
-sub stock_cvterm_cvterms { return shift->stock_cvterm_cvterm_id }
- 
- 
-  
-  
-sub biomaterial_relationship_types { return shift->biomaterial_relationship_type_id }
-
-   
  
   
 sub cvterm_relationship_types { return shift->cvterm_relationship_type_id }
@@ -10638,32 +12365,137 @@ sub cvterm_relationship_objects { return shift->cvterm_relationship_object_id }
  
   
   
-sub phenstatement_types { return shift->phenstatement_type_id }
+sub nd_experiment_stock_types { return shift->nd_experiment_stock_type_id }
  
  
   
   
-sub phenstatement_types { return shift->phenstatement_type_id }
+sub nd_experiment_stock_types { return shift->nd_experiment_stock_type_id }
  
  
   
-sub phenstatement_types { return shift->phenstatement_type_id }
+  
+sub quantification_relationship_types { return shift->quantification_relationship_type_id }
 
    
  
   
   
-sub phenstatement_types { return shift->phenstatement_type_id }
+sub nd_protocol_reagent_types { return shift->nd_protocol_reagent_type_id }
  
+ 
+  
+  
+sub nd_protocol_reagent_types { return shift->nd_protocol_reagent_type_id }
+ 
+ 
+  
+  
+sub nd_experiment_types { return shift->nd_experiment_type_id }
+ 
+ 
+  
+  
+sub element_types { return shift->element_type_id }
+ 
+ 
+  
+sub element_types { return shift->element_type_id }
+
+   
+ 
+  
+  
+sub element_types { return shift->element_type_id }
+ 
+ 
+  
+  
+sub environment_cvterm_cvterms { return shift->environment_cvterm_cvterm_id }
+ 
+ 
+  
+  
+  
+sub project_relationship_types { return shift->project_relationship_type_id }
+ 
+ 
+  
+sub contact_relationship_types { return shift->contact_relationship_type_id }
+
+  
+   
+ 
+  
+  
+sub biomaterial_relationship_types { return shift->biomaterial_relationship_type_id }
+
+   
 # one to many to one
  
   
+  
+  
 # one2one #
+sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_cvterm_id }
+
+  
+
 sub librarys { my $self = shift; return map $_->library_id, $self->library_cvterm_cvterm_id }
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->library_cvterm_cvterm_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_type_id }
+
+  
+
+sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_type_id }
+
+  
+
+sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_type_id }
+
+  
+
+sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_type_id }
+
+  
+
+sub studyprops { my $self = shift; return map $_->studyprop_id, $self->studyprop_feature_type_id }
+
+  
+
+sub features { my $self = shift; return map $_->feature_id, $self->studyprop_feature_type_id }
+
+  
+
+sub pubs { my $self = shift; return map $_->pub_id, $self->stock_cvterm_cvterm_id }
+
+  
+
+sub stocks { my $self = shift; return map $_->stock_id, $self->stock_cvterm_cvterm_id }
+
+  
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_stock_type_id }
+
+  
+
+sub stocks { my $self = shift; return map $_->stock_id, $self->nd_experiment_stock_type_id }
+
+  
+  
+
+sub nd_reagents { my $self = shift; return map $_->reagent_id, $self->nd_protocol_reagent_type_id }
+
+  
+
+sub nd_protocols { my $self = shift; return map $_->nd_protocol_id, $self->nd_protocol_reagent_type_id }
+
+  
+
+sub nd_geolocations { my $self = shift; return map $_->nd_geolocation_id, $self->nd_experiment_type_id }
 
   
 
@@ -10679,54 +12511,13 @@ sub arraydesigns { my $self = shift; return map $_->arraydesign_id, $self->eleme
 
   
 
-sub studyprops { my $self = shift; return map $_->studyprop_id, $self->studyprop_feature_type_id }
-
-  
-
-sub features { my $self = shift; return map $_->feature_id, $self->studyprop_feature_type_id }
-
-  
-  
-  
-
 sub environments { my $self = shift; return map $_->environment_id, $self->environment_cvterm_cvterm_id }
 
   
   
   
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->stock_cvterm_cvterm_id }
-
-  
-
-sub stocks { my $self = shift; return map $_->stock_id, $self->stock_cvterm_cvterm_id }
-
-  
-  
-
-sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_type_id }
-
-  
-
-sub environments { my $self = shift; return map $_->environment_id, $self->phenstatement_type_id }
-
-  
-
-sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_type_id }
-
-  
-
-sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_type_id }
-
 # one to many to many
  
-  
-  
-  
-  
-  
-  
-  
   
 # one2many #
   
@@ -10743,11 +12534,59 @@ sub pub_relationship_subjects { my $self = shift; return map $_->subject_id, $se
   
   
     
+sub nd_reagent_relationship_subject_reagents { my $self = shift; return map $_->subject_reagent_id, $self->nd_reagent_relationship_type_id }
+    
+  
+     
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+    
 sub cell_line_relationship_subjects { my $self = shift; return map $_->subject_id, $self->cell_line_relationship_type_id }
     
   
      
   
+  
+  
+
+  
+  
+  
+    
+sub quantification_relationship_subjects { my $self = shift; return map $_->subject_id, $self->quantification_relationship_type_id }
+    
+  
+     
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+    
+sub project_relationship_subject_projects { my $self = shift; return map $_->subject_project_id, $self->project_relationship_type_id }
+    
+  
+     
   
 
   
@@ -10764,28 +12603,19 @@ sub contact_relationship_subjects { my $self = shift; return map $_->subject_id,
   
   
     
-sub quantification_relationship_subjects { my $self = shift; return map $_->subject_id, $self->quantification_relationship_type_id }
-    
-  
-     
-  
-  
-  
-
-  
-  
-  
-    
 sub biomaterial_relationship_subjects { my $self = shift; return map $_->subject_id, $self->biomaterial_relationship_type_id }
     
   
      
-  
-  
-  
-  
 #many to many to one
  
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -10808,6 +12638,13 @@ sub biomaterial_relationship_subjects { my $self = shift; return map $_->subject
 #many to many to many
 
 
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -10949,6 +12786,34 @@ Bio::Chado::CDBI::Environment->has_many('phenstatement_environment_id', 'Bio::Ch
 #
  
   
+sub phenstatement_environments { return shift->phenstatement_environment_id }
+
+   
+ 
+  
+sub phenstatement_environments { return shift->phenstatement_environment_id }
+
+   
+ 
+  
+  
+sub phenstatement_environments { return shift->phenstatement_environment_id }
+ 
+ 
+  
+sub phenstatement_environments { return shift->phenstatement_environment_id }
+
+   
+ 
+  
+sub phenotype_comparison_environment1s { return shift->phenotype_comparison_environment1_id }
+
+  
+sub phenotype_comparison_environment2s { return shift->phenotype_comparison_environment2_id }
+
+   
+ 
+  
 sub phenotype_comparison_environment1s { return shift->phenotype_comparison_environment1_id }
 
   
@@ -10964,14 +12829,6 @@ sub phenotype_comparison_environment1s { return shift->phenotype_comparison_envi
   
 sub phenotype_comparison_environment2s { return shift->phenotype_comparison_environment2_id }
  
- 
-  
-sub phenotype_comparison_environment1s { return shift->phenotype_comparison_environment1_id }
-
-  
-sub phenotype_comparison_environment2s { return shift->phenotype_comparison_environment2_id }
-
-   
  
   
 sub phenotype_comparison_environment1s { return shift->phenotype_comparison_environment1_id }
@@ -10986,43 +12843,11 @@ sub phenotype_comparison_environment2s { return shift->phenotype_comparison_envi
 sub environment_cvterm_environments { return shift->environment_cvterm_environment_id }
 
    
- 
-  
-sub phenstatement_environments { return shift->phenstatement_environment_id }
-
-   
- 
-  
-  
-sub phenstatement_environments { return shift->phenstatement_environment_id }
- 
- 
-  
-sub phenstatement_environments { return shift->phenstatement_environment_id }
-
-   
- 
-  
-sub phenstatement_environments { return shift->phenstatement_environment_id }
-
-   
 # one to many to one
  
   
-  
-  
-  
-  
 # one2one #
-sub cvterms { my $self = shift; return map $_->cvterm_id, $self->environment_cvterm_environment_id }
-
-  
-
 sub cvterms { my $self = shift; return map $_->type_id, $self->phenstatement_environment_id }
-
-  
-
-sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_environment_id }
 
   
 
@@ -11030,7 +12855,19 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_environ
 
   
 
+sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_environment_id }
+
+  
+
 sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstatement_environment_id }
+
+  
+  
+  
+  
+  
+
+sub cvterms { my $self = shift; return map $_->cvterm_id, $self->environment_cvterm_environment_id }
 
 # one to many to many
  
@@ -11046,6 +12883,10 @@ sub phenotypes { my $self = shift; return map $_->phenotype_id, $self->phenstate
 #many to many to one
  
   
+  
+  
+  
+  
 # many2one #
   
   
@@ -11055,7 +12896,6 @@ sub phenotype_comparison_environment1_organisms { my $self = shift; return map $
 sub phenotype_comparison_environment2_organisms { my $self = shift; return map $_->organism_id, $self->phenotype_comparison_environment2_id }
     
    
-  
   
 
   
@@ -11069,12 +12909,14 @@ sub phenotype_comparison_environment2_pubs { my $self = shift; return map $_->pu
   
   
   
-  
-  
-  
 #many to many to many
 
 
+  
+  
+  
+  
+  
   
   
 # many2many #
@@ -11101,7 +12943,6 @@ sub phenotype_comparison_environment2_genotype2s { my $self = shift; return map 
     
    
   
-  
 
   
   
@@ -11125,10 +12966,6 @@ sub phenotype_comparison_environment2_phenotype2s { my $self = shift; return map
     
     
    
-  
-  
-  
-  
    
 
 1;
@@ -11269,6 +13106,7 @@ sub phenotype { shift->phenotype_id }
   
   
   
+  
  
 Bio::Chado::CDBI::Phenotype->has_a(observable_id => 'Bio::Chado::CDBI::Cvterm');
     
@@ -11296,6 +13134,8 @@ sub assay { return shift->assay_id }
  
 Bio::Chado::CDBI::Phenotype->has_many('feature_phenotype_phenotype_id', 'Bio::Chado::CDBI::Feature_Phenotype' => 'phenotype_id');
    
+Bio::Chado::CDBI::Phenotype->has_many('nd_experiment_phenotype_phenotype_id', 'Bio::Chado::CDBI::Nd_Experiment_Phenotype' => 'phenotype_id');
+   
 Bio::Chado::CDBI::Phenotype->has_many('phenotype_comparison_phenotype1_id', 'Bio::Chado::CDBI::Phenotype_Comparison' => 'phenotype1_id');
    
 Bio::Chado::CDBI::Phenotype->has_many('phenotype_comparison_phenotype2_id', 'Bio::Chado::CDBI::Phenotype_Comparison' => 'phenotype2_id');
@@ -11315,80 +13155,77 @@ Bio::Chado::CDBI::Phenotype->has_many('phenstatement_phenotype_id', 'Bio::Chado:
 #
  
   
+sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
+
+   
+ 
+  
+sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
+
+   
+ 
+  
+  
+sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
+ 
+ 
+  
+  
+sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
+ 
+ 
+  
+sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
+
+  
+sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
+
+   
+ 
+  
+sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
+
+  
+sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
+
+   
+ 
+  
+  
+  
+sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
+
+  
+sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
+ 
+ 
+  
+  
+  
+sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
+
+  
+sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
+ 
+ 
+  
+  
+sub nd_experiment_phenotype_phenotypes { return shift->nd_experiment_phenotype_phenotype_id }
+ 
+ 
+  
   
 sub feature_phenotype_phenotypes { return shift->feature_phenotype_phenotype_id }
  
- 
-  
-sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
-
-  
-sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
-
-   
- 
-  
-  
-  
-sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
-
-  
-sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
- 
- 
-  
-  
-  
-sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
-
-  
-sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
- 
- 
-  
-sub phenotype_comparison_phenotype1s { return shift->phenotype_comparison_phenotype1_id }
-
-  
-sub phenotype_comparison_phenotype2s { return shift->phenotype_comparison_phenotype2_id }
-
-   
- 
-  
-sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
-
-   
- 
-  
-  
-sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
- 
- 
-  
-  
-sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
- 
- 
-  
-sub phenstatement_phenotypes { return shift->phenstatement_phenotype_id }
-
-   
 # one to many to one
  
   
 # one2one #
-sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
-
-  
-  
-  
-  
-  
-
 sub cvterms { my $self = shift; return map $_->type_id, $self->phenstatement_phenotype_id }
 
   
 
-sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_phenotype_id }
+sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_phenotype_id }
 
   
 
@@ -11396,10 +13233,23 @@ sub environments { my $self = shift; return map $_->environment_id, $self->phens
 
   
 
-sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_phenotype_id }
+sub genotypes { my $self = shift; return map $_->genotype_id, $self->phenstatement_phenotype_id }
+
+  
+  
+  
+  
+  
+
+sub nd_experiments { my $self = shift; return map $_->nd_experiment_id, $self->nd_experiment_phenotype_phenotype_id }
+
+  
+
+sub features { my $self = shift; return map $_->feature_id, $self->feature_phenotype_phenotype_id }
 
 # one to many to many
  
+  
   
   
   
@@ -11413,6 +13263,9 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->phenstatement_phenoty
  
   
   
+  
+  
+  
 # many2one #
   
   
@@ -11422,8 +13275,6 @@ sub phenotype_comparison_phenotype1_organisms { my $self = shift; return map $_-
 sub phenotype_comparison_phenotype2_organisms { my $self = shift; return map $_->organism_id, $self->phenotype_comparison_phenotype2_id }
     
    
-  
-  
   
 
   
@@ -11444,31 +13295,11 @@ sub phenotype_comparison_phenotype2_pubs { my $self = shift; return map $_->pub_
   
   
   
+  
+  
+  
+  
 # many2many #
-  
-  
-    
-    
-sub phenotype_comparison_phenotype1_genotype1s { my $self = shift; return map $_->phenotype_comparison_genotype1s, $self->phenotype_comparison_phenotype1s }
-      
-    
-sub phenotype_comparison_phenotype1_genotype2s { my $self = shift; return map $_->phenotype_comparison_genotype2s, $self->phenotype_comparison_phenotype1s }
-      
-    
-    
-  
-    
-    
-sub phenotype_comparison_phenotype2_genotype1s { my $self = shift; return map $_->phenotype_comparison_genotype1s, $self->phenotype_comparison_phenotype2s }
-      
-    
-sub phenotype_comparison_phenotype2_genotype2s { my $self = shift; return map $_->phenotype_comparison_genotype2s, $self->phenotype_comparison_phenotype2s }
-      
-    
-    
-   
-  
-
   
   
     
@@ -11492,8 +13323,29 @@ sub phenotype_comparison_phenotype2_environment2s { my $self = shift; return map
     
    
   
+
   
   
+    
+    
+sub phenotype_comparison_phenotype1_genotype1s { my $self = shift; return map $_->phenotype_comparison_genotype1s, $self->phenotype_comparison_phenotype1s }
+      
+    
+sub phenotype_comparison_phenotype1_genotype2s { my $self = shift; return map $_->phenotype_comparison_genotype2s, $self->phenotype_comparison_phenotype1s }
+      
+    
+    
+  
+    
+    
+sub phenotype_comparison_phenotype2_genotype1s { my $self = shift; return map $_->phenotype_comparison_genotype1s, $self->phenotype_comparison_phenotype2s }
+      
+    
+sub phenotype_comparison_phenotype2_genotype2s { my $self = shift; return map $_->phenotype_comparison_genotype2s, $self->phenotype_comparison_phenotype2s }
+      
+    
+    
+   
   
    
 
@@ -11586,6 +13438,56 @@ sub pubs { my $self = shift; return map $_->pub_id, $self->phylotree_pub_phylotr
 
 1;
 
+########Bio::Chado::CDBI::Project_Pub########
+
+package Bio::Chado::CDBI::Project_Pub;
+use base 'Bio::Chado::DBI';
+use Class::DBI::Pager;
+no warnings qw(redefine);
+
+Bio::Chado::CDBI::Project_Pub->set_up_table('project_pub');
+
+#
+# Primary key accessors
+#
+
+sub id { shift->project_pub_id }
+sub project_pub { shift->project_pub_id }
+ 
+
+
+
+#
+# Has A
+#
+ 
+Bio::Chado::CDBI::Project_Pub->has_a(project_id => 'Bio::Chado::CDBI::Project');
+    
+sub Bio::Chado::CDBI::Project_Pub::project { return shift->project_id }
+      
+ 
+Bio::Chado::CDBI::Project_Pub->has_a(pub_id => 'Bio::Chado::CDBI::Pub');
+    
+sub Bio::Chado::CDBI::Project_Pub::pub { return shift->pub_id }
+       
+
+#
+# Has Many
+#
+  
+
+
+# one to many to one
+ 
+# one to many to many
+ 
+#many to many to one
+ 
+#many to many to many
+
+ 
+
+1;
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
