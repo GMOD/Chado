@@ -62,10 +62,10 @@ CREATE TABLE nd_experiment_project (
 CREATE TABLE nd_experimentprop (
     nd_experimentprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value character varying(255) NOT NULL,
     rank integer NOT NULL default 0,
-    constraint nd_experimentprop_c1 unique (nd_experiment_id,cvterm_id,rank)
+    constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
 create table nd_experiment_pub (
@@ -87,15 +87,15 @@ COMMENT ON TABLE nd_experiment_pub IS 'Linking nd_experiment(s) to publication(s
 CREATE TABLE nd_geolocationprop (
     nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
     nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(250),
     rank integer NOT NULL DEFAULT 0,
-    constraint nd_geolocationprop_c1 unique (nd_geolocation_id,cvterm_id,rank)
+    constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_geolocationprop IS 'Property/value associations for geolocations. This table can store the properties such as location and environment';
 
-COMMENT ON COLUMN nd_geolocationprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_geolocationprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_geolocationprop.value IS 'The value of the property.';
 
@@ -139,17 +139,17 @@ CREATE TABLE nd_protocol_reagent (
 CREATE TABLE nd_protocolprop (
     nd_protocolprop_id serial PRIMARY KEY NOT NULL,
     nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_protocolprop_c1 unique (nd_protocol_id,cvterm_id,rank)
+    constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_protocolprop IS 'Property/value associations for protocol.';
 
 COMMENT ON COLUMN nd_protocolprop.nd_protocol_id IS 'The protocol to which the property applies.';
 
-COMMENT ON COLUMN nd_protocolprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_protocolprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_protocolprop.value IS 'The value of the property.';
 
@@ -215,26 +215,26 @@ COMMENT ON COLUMN nd_reagent_relationship.type_id IS 'The type (or predicate) of
 CREATE TABLE nd_reagentprop (
     nd_reagentprop_id serial PRIMARY KEY NOT NULL,
     nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_reagentprop_c1 unique (nd_reagent_id,cvterm_id,rank)
+    constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
 CREATE TABLE nd_experiment_stockprop (
     nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,cvterm_id,rank)
+    constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_experiment_stockprop IS 'Property/value associations for experiment_stocks. This table can store the properties such as treatment';
 
 COMMENT ON COLUMN nd_experiment_stockprop.nd_experiment_stock_id IS 'The experiment_stock to which the property applies.';
 
-COMMENT ON COLUMN nd_experiment_stockprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_experiment_stockprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_experiment_stockprop.value IS 'The value of the property.';
 
