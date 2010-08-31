@@ -30,11 +30,11 @@ CREATE TABLE projectprop (
 	PRIMARY KEY (projectprop_id),
 	project_id integer NOT NULL,
 	FOREIGN KEY (project_id) REFERENCES project (project_id) ON DELETE CASCADE,
-	cvterm_id integer NOT NULL,
-	FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+	type_id integer NOT NULL,
+	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
 	value text,
 	rank integer not null default 0,
-	CONSTRAINT projectprop_c1 UNIQUE (project_id, cvterm_id, rank)
+	CONSTRAINT projectprop_c1 UNIQUE (project_id, type_id, rank)
 );
 
 -- ================================================
