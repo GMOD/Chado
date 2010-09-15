@@ -11,7 +11,7 @@ if ( $@ =~ /Can't locate/ ) {
     exit(0);
 }
 
-my $VERSION = 0.1;
+my $VERSION = 0.2;
 
 my $build = CASBuilder->new(
     module_name => 'cas-utils',
@@ -43,6 +43,7 @@ my @OPTION_LIST = qw[
   PROJECT_HOME
   WEB_PATH
   HEADLESS_APOLLO
+  ACCESS_METHOD
 ];
 
 my @ARGS =  ( qw[ PREFIX ], @OPTION_LIST );
@@ -103,6 +104,10 @@ my %ARGS = (
         desc    => 'The path to the Apollo binary that has been modified to run "headless"',
         default => '/usr/bin/apollo.headless',
     },
+    ACCESS_METHOD => {
+        desc    => 'Database access method: XML or direct?',
+        default => 'direct',
+    },
 );
 
 my $OPTIONS = join( '|', @ARGS );
@@ -131,6 +136,7 @@ my $USAGE = join(
                 : ( $_ eq 'HTDOCS' ) ? '$PREFIX + $WEB_DOCUMENT_ROOT + '
                 : ( $_ eq 'CONF' )   ? '$GMOD_ROOT + conf/'
                 : ( $_ eq 'UPLOAD_DIR' ) ? '$GMOD_ROOT + tmp/'
+                : ( $_ eq 'ACCESS_METHOD' ) ? ''
                 : '$PREFIX + ',
                 $ARGS{$_}{'default'}
               )
@@ -246,6 +252,10 @@ unless ($using_install_conf) {
     $OPTIONS{'PROJECT_HOME'} ||= $build->prompt(
               "\nPlease give your project's homepage",
               $ARGS{'PROJECT_HOME'}{'default'}
+        );
+    $OPTIONS{'ACCESS_METHOD'} ||= $build->prompt(
+              "\nPlease provide the database access method: XML or direct",
+              $ARGS{'ACCESS_METHOD'}{'default'}
         );
 
 

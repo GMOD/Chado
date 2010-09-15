@@ -1,0 +1,4 @@
+0.2 Wed Sep 15 21:26:14 BST 2010
+* Modified apollo_request_region.pl to optionally return a jnlp
+that allows direct database access.
+
