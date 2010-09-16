@@ -147,13 +147,15 @@ END
     $error_flag = 1;
   }
 
-  open OUT, ">$working_dir/$filename.jnlp" 
-   or handle_error(
-        p("I couldn't open file $working_dir/$filename.jnlp for writing: $!"));
+  write_jnlp_filesystem();
 
-  print OUT write_jnlp();
-
-  close OUT;
+#  open OUT, ">$working_dir/$filename.jnlp" 
+#   or handle_error(
+#        p("I couldn't open file $working_dir/$filename.jnlp for writing: $!"));
+#
+#  print OUT write_jnlp();
+#
+#  close OUT;
 
   if (-e "$working_dir/$filename.jnlp") {
     print p("Created the file $filename.jnlp.");
@@ -176,14 +178,26 @@ END
 print  end_span, end_html; 
 } #end if to give html page to click on xml based jnlp link
 elsif ($t_direct) {
+
+  write_jnlp_filesystem();
+
   my $file_contents = write_jnlp($t_direct);
 
-  print header(-type => 'application/x-java-jnlp-file'),
+  print header(-type => 'application/x-java-jnlp-file',
+               -attachment => "$filename.jnlp"),
         $file_contents ;
 }
 
 
 exit(0);
+
+sub write_jnlp_filesystem {
+  open OUT, ">$working_dir/$filename.jnlp";
+  print OUT write_jnlp($t_direct);
+  close OUT;
+
+  return;
+}
 
 sub handle_error {
     my $failure = shift;
@@ -193,10 +207,10 @@ sub handle_error {
 
 sub write_jnlp {
     my $direct = shift;
-
+    
     my $file =<<END
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp codebase="$hostname/apollo/webstart" 
+<jnlp codebase="$hostname/apollo/webstart"
 href="$hostname$web_path/$filename.jnlp" spec="1.0+">
   <information>
     <title>Apollo</title>
