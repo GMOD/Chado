@@ -4,6 +4,10 @@ Version 1.12 Tue Aug 10 13:59:05 EDT 2010
 no longer have .pl at the end of the go2fmt script name (Rob)
 * The GFF3 bulk loader will now ignore ##sequence-region directives;
 previously, their presence caused the loader to fail (Scott)
+* added a check for the nodes file downloaded from NCBI. There have been
+cases of missing nodes/parents. Code dies if parent is missing. User
+must check the nodes file. This needs further investigation with NCBI
+taxonomy. (Naama)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
