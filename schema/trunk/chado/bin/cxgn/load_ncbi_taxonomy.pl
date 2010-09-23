@@ -203,7 +203,7 @@ $dbh=$schema->storage->dbh();
 if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
 
 my $sth;
-my %okay_level = map { chomp; $_=>1 } grep { $_ !~ /^#/ } <DATA>;
+my %okay_level = map { chomp; $_=>1 } grep { $_ !~ /^\#/ } <DATA>;
 my %node = ();
 my %seen = ();
 my %seq  = (
@@ -241,7 +241,6 @@ foreach my $key( keys %seq) {
     $sth=$dbh->prepare($query);
     $sth->execute();
     my ($next) = $sth->fetchrow_array();
-    #print STDERR "max $key is $next!\n";
     $maxval{$key}= $next;
 }
 
@@ -264,7 +263,7 @@ my $phylotree = $schema->resultset('Phylogeny::Phylotree')->find_or_create(
     );
 
 my $phylotree_id = $phylotree->phylotree_id();
-print STDERR "Created a new phylotee with id $phylotree_id\n\n\n";
+message( "Created a new phylotee with id $phylotree_id\n\n\n", 1);
 
 #remove all existing phylonodes for this tree and reset the database sequence
 
@@ -275,7 +274,7 @@ $maxval{phylonode} = set_maxval( 'phylonode' );
 $maxval{phylonode_organism} = set_maxval( 'phylonode_organism' ); 
 
 
-my %tax_file=() ; # hash for soring taxonomy ids from -i 
+my %tax_file=() ; # hash for storing taxonomy ids from -i 
 if ($infile) {
     open (INFILE, "<$infile") || die "Can't open infile $infile!!\n\n";  #
     while (my $t_id = <INFILE>) {
@@ -292,9 +291,20 @@ open (ERR, ">$error") || die "Can't open error file for writing ($error)!\n";
 open( NODE, "nodes.dmp" );
 while ( my $line = <NODE> ) {
     my ( $id, $parent, $level ) = split /\s+\|\s+/, $line;
-    
+    ###message("id = $id, parent = $parent, level = $level\n",1);
     next unless $okay_level{ $level };
-    if ($infile) { next() unless exists $tax_file{$id} ; }  # skip nodes not in tax_file 
+    
+    # check for data consistency 
+    if ($infile) { 
+	if (  exists $tax_file{$id}  ) {
+	    # check if the parent is in the taxfile
+	    if ( $parent && !(exists $tax_file{ $parent } ) ) {
+		message ("Parent $parent for tax_id $id does not exist in your input file ! This means $id is your root, or you need to check your input!\n",1); 
+	    }
+	} else{  next(); } # skip nodes not in tax_file  
+    }
+    
+    ###message("STORING NODE is node hash\n",1);
     $node{ $id }{ 'parent_taxid' } = $parent;
     $node{ $id }{ 'self_taxid'   } = $id;
     $node{ $id }{ 'level'        } = $level;
@@ -306,8 +316,10 @@ open( NAME, "names.dmp" );
 while ( my $line = <NAME> ) {
     #next unless $line =~ /scientific name/;
     my ( $id, $name ) = split /\s+\|\s+/, $line;
+    ###message("NAMES: id = $id, name = $name\n",1);
     next unless $node{ $id }; #skip nodes  
     if ( $line =~ /scientific name/) {
+	###message("Storing scientific name '$name'\n",1);
 	$node{ $id }{ 'name' } = $name;
 	$node{ $id }{ 'name' } .= " Taxonomy:$id" if $seen{ $name }++;
     } elsif  ( $line =~ /common name/) { #  genbank common names 
@@ -322,16 +334,28 @@ while ( my $line = <NAME> ) {
 close( NAME );
 
 foreach my $id ( keys %node ) {
-    if ( $node{ $id }{ 'level' } eq 'species' ) {
-	$node{ $id }{ 'genus' }   = $node{ $node{ $id }{ 'parent_taxid' } }{ 'name' };
-	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
+    ###message("Looking at id $id in node hash... level = " . $node{ $id }{'level'} . "\n",1);
+    my $parent_taxid = $node{ $id }{ 'parent_taxid' } ;
+    if (!$tax_file{$parent_taxid}) { 
+	message("No parent id found for  species " . $node{ $id }{ 'name' } . " (id = $id) !! This means your species is the root node, or there is an error in yout input file \n", 1);
     }
-    else {
+    if ( $node{ $id }{ 'level' } eq 'species' ) {
+	# load the genus name from the parent_taxid
+	if (!$tax_file{$parent_taxid}) {
+	    die "No parent id found for  species " . $node{ $id }{ 'name' } . " (id = $id) !! Check your input file !!\n" ;
+	}
+	
+	$node{ $id }{ 'genus' }   = $node{ $parent_taxid }{ 'name' };
+	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
+	###message("FOUND SPECIES: " . $node{ $id }{ 'name' } . " genus = " . $node{ $id }{ 'genus' } . "\n" , 1);
+	
+    } else {
+	###message("FOUND NODE NAME: " . $node{ $node{ $id }{ 'parent_taxid' }}{ 'name' } . "( genus = " . $node{ $id }{ 'level' } . " species = " . $node{ $id }{ 'name' } . "\n",1); 
+	
 	$node{ $id }{ 'genus'   } = $node{ $id }{ 'level' };
 	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
     }
 }
-
 
 
 ##########################
@@ -373,7 +397,7 @@ eval {
       
       my $abbreviation;
       if ($node{ $id }{level} eq 'species' ) {
-	    
+	  ###message("Found species " . $node{ $id }{ 'species' } . "\n" ,1) ;
 	  if ( $node{ $id }{ 'species' } =~ m/(.*)\s(.*)/ ) {
 	      my $gen=$1;
 	      my $sp=$2;
@@ -388,12 +412,9 @@ eval {
       my $species = $node{ $id }{ 'species' } ;
       my ($organism, $update, $insert);
       
-      #this is just for checking if the organism is already stored in the database
-      #
-      #if ($species =~ m/(.*)\s(.*)/) { 
-      #    $species = $2;
-      #    $genus = $1;
-      #}
+      ###message("looking at organism $genbank_taxon_accession, genus=$genus, species=$species\n");
+
+      if (!$genus || !$species) { die "NO GENUS OR SPECIES FOUND FOR tax_id $genbank_taxon_accession! Check your input file! \n" ; } 
       $organism = $schema->resultset('Organism::Organism')->search(
 	  {
 	      genus   => { 'ilike'=> $genus },
@@ -411,13 +432,11 @@ eval {
       
       if ($update) {
 	  $organism->update();
-	  print STDERR "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
-	  print ERR "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
-      }
+	  message( "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n", 1); 
+	      }
       if ($insert) {
 	  $organism->insert();
-	    print STDERR "New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
-	  print ERR "New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n"; 
+	    message("New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n", 1); 
       }
       	my $organism_id= $organism->get_column('organism_id');
       
@@ -425,7 +444,7 @@ eval {
       #store the organism synonyms 
       foreach (@{$node{ $id }{synonyms} } ) {
 	  $organism->create_organismprops( { synonym => $_ }, { autocreate => 1} , );
-	  print STDERR $node{ $id }{name} . " LEVEL=( " . $node{ $id }{level} . ") Synonym is $_ \n" ; 
+	  message( $node{ $id }{name} . " LEVEL=( " . $node{ $id }{level} . ") Synonym is $_ \n" ); 
       } 
       ####################################################################
       
@@ -438,19 +457,16 @@ eval {
       
       #get the cvterm_id of the taxonomy level
       my $level= $node{ $id }{level};
-      my ($level_cvterm) = $schema->resultset("Cv::Cvterm")->find( 
-	  {
-	      name  => $level,
-	      cv_id => $schema->resultset("Cv::Cv")->find( { name => 'taxonomy' } )->get_column('cv_id'),
-	  },
-	  );
+      my $taxonomy_cv = $schema->resultset("Cv::Cv")->find( { name => 'taxonomy' } );
+      if (!$taxonomy_cv) { die "No cv found for 'taxonomy' . Did you run 'load_taxonomy_cvterms.pl' ? See the perldoc for more details \n\n"; } 
+      my ($level_cvterm) = $taxonomy_cv->find_related("cvterms" , { name  => $level } ) ;
       
       my $level_id = $level_cvterm->get_column("cvterm_id") if $level_cvterm ;
       
       if (!$level_cvterm) {
-	  print STDERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
-	  print ERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
 	  
+	  print ERR "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') \n\n";
+	  die "No cvterm found for type $level! Check your cvterm table for loaded taxonomy (cv name should be 'taxonomy') . See perldoc load_taxonomy_cvterms.pl \n\n";
       }
       #store a new phylonode_id + phylonode_organism. This is necessary for storing later the parent_phylonode_id
       # and eventuay the left_idx and right_idx.
@@ -463,7 +479,7 @@ eval {
   }
     
     
-#now that all the organisms are stored, we can sore the relationships (=phylonodes) 
+#now that all the organisms are stored, we can store the relationships (=phylonodes) 
     my %stored=();
     my %test=();
     foreach my $id (keys %phylonode ) {
@@ -472,7 +488,9 @@ eval {
 	my $organism_id = $phylonode{ $id }{ 'organism_id' } ;
 	my $parent_phylonode_id = $phylonode{ $phylonode{ $id }{ 'parent_taxid' } }{ 'phylonode_id' } || 'NULL';
 	$root_id = $phylonode_id if $parent_phylonode_id eq 'NULL';
-	if ($parent_phylonode_id eq 'NULL') { print STDERR "organism $organism_id does not have a parent! (phylonode_id = $phylonode_id)\n"; }
+	if ($parent_phylonode_id eq 'NULL') { 
+	    message("organism $organism_id does not have a parent! (phylonode_id = $phylonode_id)\n", 1); 
+	}
 	my $type_id = $phylonode{ $id }{'type_id'} || 'NULL';
 	push @{$test{$parent_phylonode_id} } , $phylonode_id ;  
 	my $insert="INSERT INTO tmp_phylonode (phylotree_id, phylonode_id, parent_phylonode_id, organism_id, type_id) 
@@ -484,12 +502,12 @@ eval {
     
     #now walk through the tmp table and update the indexes
     
-    our $ctr = 1;
-    print STDERR "the root_id is $root_id\n";
+    message( "the root_id is $root_id\n",1);
     
-    walktree($root_id);
+    if (!$root_id) { die "No organism id found for root node! \n" ; }
+    walktree($root_id, 1);
     
-    print STDERR "Updating the phylonode and phylonode_organism tables\n\n";
+    message( "Updating the phylonode and phylonode_organism tables\n\n");
     my @updates=(
 	"INSERT INTO phylonode (phylonode_id, phylotree_id, parent_phylonode_id, left_idx, right_idx, type_id) SELECT phylonode_id, phylotree_id, parent_phylonode_id, left_idx, right_idx, type_id  FROM tmp_phylonode",
 	"INSERT INTO phylonode_organism (phylonode_id, organism_id) SELECT phylonode_id, organism_id FROM tmp_phylonode"
@@ -500,6 +518,7 @@ eval {
     
     sub walktree {
 	my $id = shift;
+	my $ctr = shift; 
 	
 	my $children = $dbh->prepare("SELECT phylonode_id
                               FROM tmp_phylonode
@@ -511,17 +530,17 @@ eval {
                               SET right_idx = ?
                               WHERE phylonode_id = ?");
 	
-	print STDERR "\nwalking the tree for $id...\n";
+	message("\nwalking the tree for $id...\n");
 	$setleft->execute($ctr++, $id);
-	print STDERR "Setting left index= $ctr for parent $id\n\n";
+	message("Setting left index= $ctr for parent $id\n\n");
 	$children->execute($id);
 	
 	while(my ($id) = $children->fetchrow_array() ) {
-	    print STDERR "Found child_id $id \n ";
-	    walktree($id);
+	    message( "Found child_id $id \n ");
+	    walktree($id, $ctr);
 	}
 	$setright->execute($ctr++, $id);
-	print STDERR "Setting right index= $ctr for id $id\n\n";
+	message( "Setting right index= $ctr for id $id\n\n");
     }
     
 };
@@ -529,21 +548,18 @@ eval {
 if ($@ || $opt_t) { 
     $dbh->rollback();
     
-    print STDERR "Rolling back! \n $@\n Resetting database sequences...\n";
-    print ERR "Rolling back! \n $@\n Resetting database sequences...\n";
+    message( "Rolling back! \n $@\n Resetting database sequences...\n", 1);
     
     #reset sequences
     foreach my $key ( keys %seq ) { 
 	my $value= $seq{$key};
 	my $maxvalue= $maxval{$key} || 0;
-	#print STDERR "$key: $value, $maxvalue \n";
 	if ($maxvalue) { $dbh->do("SELECT setval ('$value', $maxvalue, true)") ;  }
 	else {  $dbh->do("SELECT setval ('$value', 1, false)");  }
     }
 }else {    
-    print STDERR "Commiting!! \n";
-    print STDERR "Inserted $node_count phylonodes. \n";
-    print ERR "Inserted $node_count phylonodes. \n";
+    message( "Commiting!! \n");
+    message("Inserted $node_count phylonodes. \n",1 );
     
     $dbh->commit(); 
 }
@@ -557,10 +573,15 @@ sub set_maxval {
     $sth=$dbh->prepare($query);
     $sth->execute();
     my ($next) = $sth->fetchrow_array();
-    #print STDERR "max $key is $next!\n";
     return $next;
 }
 
+sub message {
+    my $message = shift;
+    my $s = shift;
+    print STDOUT $message;
+    print ERR $message if $s;
+}
 
 #http://www.eyesopen.com/docs/cplusprog_1_2/node220.html
 __DATA__
