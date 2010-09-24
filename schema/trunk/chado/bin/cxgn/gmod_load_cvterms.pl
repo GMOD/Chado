@@ -508,14 +508,26 @@ foreach my $new_ont(@onts) {
 	    #write a special case for interpro domains 
 	    #those have accession IPR000xxxx
 	    #
-	    my $new_term_dbxref = $schema->resultset("General::Dbxref")->find_or_create( 
+	    #There's a potential issue with updating cvterms which have been moved  to another cv namespace. 
+	    #In such cases, a dbxref is found, but we cannot store a new cvterm with the same dbxref_id (see cvterm_c2). 
+	    # A new dbxref will be created to overcome this problem 
+	    my $new_term_dbxref = $schema->resultset("General::Dbxref")->find( 
 		{   db_id     => $db->get_column('db_id'),
 		    accession => $accession,
 		    version   => $version || '',
 		},
 		{ key => 'dbxref_c1' } ,
 		);
-	   
+	    if ($new_term_dbxref) { $version = $version+1 ; }
+	    
+	    $new_term_dbxref =  $schema->resultset("General::Dbxref")->create( 
+		{   db_id     => $db->get_column('db_id'),
+		    accession => $accession,
+		    version   => $version || '',
+		},
+		{ key => 'dbxref_c1' } ,
+		);
+	    
 	    if ($novel_terms{$k}->is_obsolete() == 1 ) {
 		unless( $name =~ m/obsolete.*$opt_s:$k/i ) {
 		    my $ob_name = $name . " (obsolete " . $opt_s . ":" . $k . ")" ;  
