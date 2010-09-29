@@ -13,15 +13,8 @@ gmod_make_cvtermpath.pl
 
 =head2 Parameters
 
-=over 6
+=over 4
 
-=item -H
-
-Hostname for database 
-
-=item -D
-
-Database name 
 
 =item -c 
 
