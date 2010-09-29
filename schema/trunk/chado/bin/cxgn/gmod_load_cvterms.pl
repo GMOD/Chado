@@ -9,28 +9,7 @@ Usage: perl load_cvterms.pl -H dbhost -D dbname [-vdntuFo] file
 
 parameters
 
-=over 13
-
-=item -H
-
-hostname for database [required if -p isn't used]
-
-=item -D
-
-database name [required if -p isn't used]
-
-=item -p 
-
-password (if you need to provide a password to connect to your db)
-
-=item -r 
-
-username (if you need to provide a username to connect to your database) 
-
-
-=item -d
-
-driver name (e.g. 'Pg' for postgres). Driver name can be provided in gmod_config
+=over 8
 
 =item -g
 
@@ -38,7 +17,7 @@ GMOD database profile name (can provide host, DB name, password, username, and d
 
 =item -s
 
-database name for linking (must be in db table) 
+database name for linking (must be in db table, e.g. GO ) 
 
 =item -n
 
@@ -68,6 +47,36 @@ trial mode. Don't perform any store operations at all.
 (trial mode cannot test inserting associated data for new terms)
 
 =back
+
+
+The following options are required if not using GMOD profile
+
+
+=over 5
+
+=item -H
+
+hostname for database [required if -p isn't used]
+
+=item -D
+
+database name [required if -p isn't used]
+
+=item -p 
+
+password (if you need to provide a password to connect to your db)
+
+=item -r 
+
+username (if you need to provide a username to connect to your database) 
+
+
+=item -d
+
+driver name (e.g. 'Pg' for postgres). Driver name can be provided in gmod_config
+
+=back
+
 
 The script parses the ontology in the file and the corresponding ontology in the database, if present. It compares which terms are new in the file compared to the database and inserts them, and compares all the relationships that are new and inserts them. It removes the relationships that were not specified in the file from the database. It never removes a term entry from the database. 
 
@@ -129,7 +138,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 0.14, July 2010.
+Version 0.15, September 2010.
 
 =cut
 
@@ -729,7 +738,11 @@ foreach my $new_ont(@onts) {
 	$dbh->rollback();
 	exit(0);
     }
-    else {  $dbh->commit(); }
+    else {  
+	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermoath.pl . See the perldoc for more info. \n\n", 1);
+	
+	$dbh->commit(); 
+    }
 }
 
 print STDERR "Done.\n";
@@ -752,7 +765,7 @@ sub recursive_children {
 sub message { 
     my $message = shift;
     my $default=shift;
-    if ($opt_v || $default) {  print STDERR "$message"; }
+    if ($opt_v || $default) {  print STDOUT "$message"; }
     print OUT "$message" if $opt_o;
 }
 
