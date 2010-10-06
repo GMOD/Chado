@@ -81,13 +81,15 @@ SELECT fr.subject_id as feature_id, 'Parent' as type,  parent.uniquename
 as attribute
 FROM feature_relationship fr, feature parent
 WHERE  fr.object_id=parent.feature_id AND fr.type_id = (SELECT cvterm_id
-FROM cvterm WHERE name='part_of')
+FROM cvterm WHERE name='part_of' and cv_id in (select cv_id
+  FROM cv WHERE name='relationship'))
 UNION ALL
 SELECT fr.subject_id as feature_id, 'Derived_from' as type,
 parent.uniquename as attribute
 FROM feature_relationship fr, feature parent
 WHERE  fr.object_id=parent.feature_id AND fr.type_id = (SELECT cvterm_id
-FROM cvterm WHERE name='derives_from')
+FROM cvterm WHERE name='derives_from' and cv_id in (select cv_id
+  FROM cv WHERE name='relationship'))
 UNION ALL
 SELECT fl.feature_id, 'Target' as type, target.name || ' ' || fl.fmin+1
 || ' ' || fl.fmax || ' ' || fl.strand as attribute
