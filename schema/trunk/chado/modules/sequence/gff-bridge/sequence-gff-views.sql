@@ -84,7 +84,7 @@ WHERE  fr.object_id=parent.feature_id AND fr.type_id = (SELECT cvterm_id
 FROM cvterm WHERE name='part_of' and cv_id in (select cv_id
   FROM cv WHERE name='relationship'))
 UNION ALL
-SELECT fr.subject_id as feature_id, 'Derived_from' as type,
+SELECT fr.subject_id as feature_id, 'Derives_from' as type,
 parent.uniquename as attribute
 FROM feature_relationship fr, feature parent
 WHERE  fr.object_id=parent.feature_id AND fr.type_id = (SELECT cvterm_id
