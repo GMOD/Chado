@@ -521,6 +521,7 @@ WriteMakefile(
       'Module::Load'      => 0.16,
       'Bio::Root::Version'=> 1.006001,
       'LWP::Simple'       => 0,
+      'IPC::Cmd'          => 0,
     }, 
     'PL_FILES'            => {
 #          'load/bin/load_affymetrix.PLS' => 'load/bin/gmod_load_affymetrix.pl',
