@@ -116,7 +116,11 @@ score, strand, phase, seqlen, name, organism_id
 ) AS
 SELECT
 f.feature_id, sf.name, gffdbx.accession, cv.name,
-fl.fmin+1, fl.fmax, af.significance, fl.strand,
+fl.fmin+1, fl.fmax, af.significance,
+ CASE WHEN fl.strand=-1 THEN '-'
+      WHEN fl.strand=1  THEN '+'
+      ELSE '.'
+ END,
 fl.phase, f.seqlen, f.name, f.organism_id
 FROM feature f
 LEFT JOIN featureloc fl ON (f.feature_id = fl.feature_id)
