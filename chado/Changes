@@ -8,6 +8,8 @@ previously, their presence caused the loader to fail (Scott)
 cases of missing nodes/parents. Code dies if parent is missing. User
 must check the nodes file. This needs further investigation with NCBI
 taxonomy. (Naama)
+* Fix the code in the gff-bridge in the sequence module so that GFF dumping
+from GBrowse will work correctly (Scott)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
