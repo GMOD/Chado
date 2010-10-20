@@ -305,3 +305,30 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
+
+
+
+-- ================================================
+-- TABLE: stock_dbxrefprop
+-- ================================================
+
+create table stock_dbxrefprop (
+       stock_dbxrefprop_id serial not null,
+       primary key (stock_dbxrefprop_id),
+       stock_dbxref_id int not null,
+       foreign key (stock_dbxref_id) references stock_dbxref (stock_dbxref_id) on delete cascade INITIALLY DEFERRED,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+       value text null,
+       rank int not null default 0,
+       constraint stock_dbxrefprop_c1 unique (stock_dbxref_id,type_id,rank)
+);
+create index stock_dbxrefprop_idx1 on stock_dbxrefprop (stock_dbxref_id);
+create index stock_dbxrefprop_idx2 on stock_dbxrefprop (type_id);
+
+COMMENT ON TABLE stock_dbxrefprop IS 'A stock_dbxref can have any number of
+slot-value property tags attached to it. This is useful for storing properties related to dbxref annotations of stocks, such as evidence codes, and references, and metadata, such as create/modify dates. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for
+the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
