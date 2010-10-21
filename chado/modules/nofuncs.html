@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (168 tables)
+	Table listing (169 tables)
  -->
 
 <a name="top" />
@@ -1576,6 +1576,18 @@
 
 <!-- 
 	End link to table 'stockcollection_stock'
+ -->
+
+<!-- 
+	Start link to table 'stock_dbxrefprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="stock_dbxrefprop-link" href="#stock_dbxrefprop">stock_dbxrefprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'stock_dbxrefprop'
  -->
 
 <!-- 
@@ -16029,7 +16041,7 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="projectprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="projectprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -16089,12 +16101,12 @@ the default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -16104,7 +16116,7 @@ the default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>project_id, cvterm_id, rank</td>
+	<td>project_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -25635,6 +25647,190 @@ the default 0 value should be used. </td>
 <hr />
 
 <!-- 
+	Starting table 'stock_dbxrefprop'
+ -->
+
+<a name="stock_dbxrefprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	stock_dbxrefprop
+</h3></td>
+		<a name="stock_dbxrefprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: stock_dbxrefprop <br />
+	================================================ <br />
+	A stock_dbxref can have any number of
+	slot-value property tags attached to it. This is useful for storing properties related to dbxref annotations of stocks, such as evidence codes, and references, and metadata, such as create/modify dates. This is an alternative to
+	hardcoding a list of columns in the relational schema, and is
+	completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for
+	the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxrefprop_id">stock_dbxrefprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxref_id">stock_dbxref_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#stock_dbxref-stock_dbxref_id">stock_dbxref.stock_dbxref_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_dbxrefprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_dbxrefprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_dbxrefprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_dbxrefprop_idx1</td>
+	<td>stock_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_dbxrefprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>stock_dbxrefprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>stock_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>stock_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>stock_dbxref_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
 	Starting table 'library'
  -->
 
@@ -29203,7 +29399,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experimentprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experimentprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -29263,12 +29459,12 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -29283,7 +29479,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_experiment_id, cvterm_id, rank</td>
+	<td>nd_experiment_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -29293,7 +29489,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -29522,7 +29718,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocationprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -29582,12 +29778,12 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -29597,7 +29793,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_geolocation_id, cvterm_id, rank</td>
+	<td>nd_geolocation_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -29607,7 +29803,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -30061,7 +30257,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocolprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -30121,12 +30317,12 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -30136,7 +30332,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_protocol_id, cvterm_id, rank</td>
+	<td>nd_protocol_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -30146,7 +30342,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -30928,7 +31124,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagentprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -30988,12 +31184,12 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -31003,7 +31199,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_reagent_id, cvterm_id, rank</td>
+	<td>nd_reagent_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -31013,7 +31209,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -31088,7 +31284,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -31148,12 +31344,12 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -31163,7 +31359,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_experiment_stock_id, cvterm_id, rank</td>
+	<td>nd_experiment_stock_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -31173,7 +31369,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -31566,7 +31762,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11005</a>
+SQL::Translator 0.11003</a>
 
 </body>
 </html>
