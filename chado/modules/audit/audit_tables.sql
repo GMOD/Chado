@@ -5294,7 +5294,7 @@
    CREATE TABLE audit_projectprop ( 
        projectprop_id integer, 
        project_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5307,7 +5307,7 @@
    DECLARE
        projectprop_id_var integer; 
        project_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -5315,7 +5315,7 @@
    BEGIN
        projectprop_id_var = OLD.projectprop_id;
        project_id_var = OLD.project_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -5328,14 +5328,14 @@
        INSERT INTO audit_projectprop ( 
              projectprop_id, 
              project_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              projectprop_id_var, 
              project_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
@@ -8891,6 +8891,73 @@
        EXECUTE PROCEDURE audit_update_delete_stockcollection_stock ();
 
 
+   DROP TABLE audit_stock_dbxrefprop;
+   CREATE TABLE audit_stock_dbxrefprop ( 
+       stock_dbxrefprop_id integer, 
+       stock_dbxref_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_dbxrefprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxrefprop() RETURNS trigger AS
+   '
+   DECLARE
+       stock_dbxrefprop_id_var integer; 
+       stock_dbxref_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_dbxrefprop_id_var = OLD.stock_dbxrefprop_id;
+       stock_dbxref_id_var = OLD.stock_dbxref_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_dbxrefprop ( 
+             stock_dbxrefprop_id, 
+             stock_dbxref_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_dbxrefprop_id_var, 
+             stock_dbxref_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_dbxrefprop_audit_ud ON stock_dbxrefprop;
+   CREATE TRIGGER stock_dbxrefprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_dbxrefprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_dbxrefprop ();
+
+
    DROP TABLE audit_library;
    CREATE TABLE audit_library ( 
        library_id integer, 
@@ -10304,7 +10371,7 @@
    CREATE TABLE audit_nd_experimentprop ( 
        nd_experimentprop_id integer, 
        nd_experiment_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value varchar(255), 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10317,7 +10384,7 @@
    DECLARE
        nd_experimentprop_id_var integer; 
        nd_experiment_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var varchar(255); 
        rank_var integer; 
        
@@ -10325,7 +10392,7 @@
    BEGIN
        nd_experimentprop_id_var = OLD.nd_experimentprop_id;
        nd_experiment_id_var = OLD.nd_experiment_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -10338,14 +10405,14 @@
        INSERT INTO audit_nd_experimentprop ( 
              nd_experimentprop_id, 
              nd_experiment_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              nd_experimentprop_id_var, 
              nd_experiment_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
@@ -10428,7 +10495,7 @@
    CREATE TABLE audit_nd_geolocationprop ( 
        nd_geolocationprop_id integer, 
        nd_geolocation_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value varchar(250), 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10441,7 +10508,7 @@
    DECLARE
        nd_geolocationprop_id_var integer; 
        nd_geolocation_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var varchar(250); 
        rank_var integer; 
        
@@ -10449,7 +10516,7 @@
    BEGIN
        nd_geolocationprop_id_var = OLD.nd_geolocationprop_id;
        nd_geolocation_id_var = OLD.nd_geolocation_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -10462,14 +10529,14 @@
        INSERT INTO audit_nd_geolocationprop ( 
              nd_geolocationprop_id, 
              nd_geolocation_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              nd_geolocationprop_id_var, 
              nd_geolocation_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
@@ -10671,7 +10738,7 @@
    CREATE TABLE audit_nd_protocolprop ( 
        nd_protocolprop_id integer, 
        nd_protocol_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value varchar(255), 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10684,7 +10751,7 @@
    DECLARE
        nd_protocolprop_id_var integer; 
        nd_protocol_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var varchar(255); 
        rank_var integer; 
        
@@ -10692,7 +10759,7 @@
    BEGIN
        nd_protocolprop_id_var = OLD.nd_protocolprop_id;
        nd_protocol_id_var = OLD.nd_protocol_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -10705,14 +10772,14 @@
        INSERT INTO audit_nd_protocolprop ( 
              nd_protocolprop_id, 
              nd_protocol_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              nd_protocolprop_id_var, 
              nd_protocol_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
@@ -11033,7 +11100,7 @@
    CREATE TABLE audit_nd_reagentprop ( 
        nd_reagentprop_id integer, 
        nd_reagent_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value varchar(255), 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -11046,7 +11113,7 @@
    DECLARE
        nd_reagentprop_id_var integer; 
        nd_reagent_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var varchar(255); 
        rank_var integer; 
        
@@ -11054,7 +11121,7 @@
    BEGIN
        nd_reagentprop_id_var = OLD.nd_reagentprop_id;
        nd_reagent_id_var = OLD.nd_reagent_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -11067,14 +11134,14 @@
        INSERT INTO audit_nd_reagentprop ( 
              nd_reagentprop_id, 
              nd_reagent_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              nd_reagentprop_id_var, 
              nd_reagent_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
@@ -11100,7 +11167,7 @@
    CREATE TABLE audit_nd_experiment_stockprop ( 
        nd_experiment_stockprop_id integer, 
        nd_experiment_stock_id integer, 
-       cvterm_id integer, 
+       type_id integer, 
        value varchar(255), 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -11113,7 +11180,7 @@
    DECLARE
        nd_experiment_stockprop_id_var integer; 
        nd_experiment_stock_id_var integer; 
-       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var varchar(255); 
        rank_var integer; 
        
@@ -11121,7 +11188,7 @@
    BEGIN
        nd_experiment_stockprop_id_var = OLD.nd_experiment_stockprop_id;
        nd_experiment_stock_id_var = OLD.nd_experiment_stock_id;
-       cvterm_id_var = OLD.cvterm_id;
+       type_id_var = OLD.type_id;
        value_var = OLD.value;
        rank_var = OLD.rank;
        
@@ -11134,14 +11201,14 @@
        INSERT INTO audit_nd_experiment_stockprop ( 
              nd_experiment_stockprop_id, 
              nd_experiment_stock_id, 
-             cvterm_id, 
+             type_id, 
              value, 
              rank, 
              transaction_type
        ) VALUES ( 
              nd_experiment_stockprop_id_var, 
              nd_experiment_stock_id_var, 
-             cvterm_id_var, 
+             type_id_var, 
              value_var, 
              rank_var, 
              transaction_type_var
