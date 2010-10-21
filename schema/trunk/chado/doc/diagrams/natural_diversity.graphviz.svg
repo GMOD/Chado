@@ -44,7 +44,7 @@
 <polyline style="fill:none;stroke:black;" points="37,-445 217,-445 "/>
 <text text-anchor="start" x="45" y="-427.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_geolocationprop_id</text>
 <text text-anchor="start" x="45" y="-410.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_geolocation_id</text>
-<text text-anchor="start" x="45" y="-393.9" style="font-family:Times New Roman;font-size:14.00;">&#45; cvterm_id</text>
+<text text-anchor="start" x="45" y="-393.9" style="font-family:Times New Roman;font-size:14.00;">&#45; type_id</text>
 <text text-anchor="start" x="45" y="-376.9" style="font-family:Times New Roman;font-size:14.00;">&#45; value</text>
 <text text-anchor="start" x="45" y="-359.9" style="font-family:Times New Roman;font-size:14.00;">&#45; rank</text>
 </g>
@@ -74,7 +74,7 @@
 <polyline style="fill:none;stroke:black;" points="709,-843 889,-843 "/>
 <text text-anchor="start" x="717" y="-825.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_experimentprop_id</text>
 <text text-anchor="start" x="717" y="-808.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_experiment_id</text>
-<text text-anchor="start" x="717" y="-791.9" style="font-family:Times New Roman;font-size:14.00;">&#45; cvterm_id</text>
+<text text-anchor="start" x="717" y="-791.9" style="font-family:Times New Roman;font-size:14.00;">&#45; type_id</text>
 <text text-anchor="start" x="717" y="-774.9" style="font-family:Times New Roman;font-size:14.00;">&#45; value</text>
 <text text-anchor="start" x="717" y="-757.9" style="font-family:Times New Roman;font-size:14.00;">&#45; rank</text>
 </g>
@@ -212,7 +212,7 @@
 <polyline style="fill:none;stroke:black;" points="578,-94 734,-94 "/>
 <text text-anchor="start" x="586" y="-76.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_protocolprop_id</text>
 <text text-anchor="start" x="586" y="-59.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_protocol_id</text>
-<text text-anchor="start" x="586" y="-42.9" style="font-family:Times New Roman;font-size:14.00;">&#45; cvterm_id</text>
+<text text-anchor="start" x="586" y="-42.9" style="font-family:Times New Roman;font-size:14.00;">&#45; type_id</text>
 <text text-anchor="start" x="586" y="-25.9" style="font-family:Times New Roman;font-size:14.00;">&#45; value</text>
 <text text-anchor="start" x="586" y="-8.9" style="font-family:Times New Roman;font-size:14.00;">&#45; rank</text>
 </g>
@@ -263,7 +263,7 @@
 <polyline style="fill:none;stroke:black;" points="1181,-153 1336,-153 "/>
 <text text-anchor="start" x="1188.5" y="-135.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_reagentprop_id</text>
 <text text-anchor="start" x="1188.5" y="-118.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_reagent_id</text>
-<text text-anchor="start" x="1188.5" y="-101.9" style="font-family:Times New Roman;font-size:14.00;">&#45; cvterm_id</text>
+<text text-anchor="start" x="1188.5" y="-101.9" style="font-family:Times New Roman;font-size:14.00;">&#45; type_id</text>
 <text text-anchor="start" x="1188.5" y="-84.9" style="font-family:Times New Roman;font-size:14.00;">&#45; value</text>
 <text text-anchor="start" x="1188.5" y="-67.9" style="font-family:Times New Roman;font-size:14.00;">&#45; rank</text>
 </g>
@@ -279,7 +279,7 @@
 <polyline style="fill:none;stroke:black;" points="58,-131 281,-131 "/>
 <text text-anchor="start" x="65.5" y="-113.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_experiment_stockprop_id</text>
 <text text-anchor="start" x="65.5" y="-96.9" style="font-family:Times New Roman;font-size:14.00;">&#45; nd_experiment_stock_id</text>
-<text text-anchor="start" x="65.5" y="-79.9" style="font-family:Times New Roman;font-size:14.00;">&#45; cvterm_id</text>
+<text text-anchor="start" x="65.5" y="-79.9" style="font-family:Times New Roman;font-size:14.00;">&#45; type_id</text>
 <text text-anchor="start" x="65.5" y="-62.9" style="font-family:Times New Roman;font-size:14.00;">&#45; value</text>
 <text text-anchor="start" x="65.5" y="-45.9" style="font-family:Times New Roman;font-size:14.00;">&#45; rank</text>
 </g>
