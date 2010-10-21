@@ -2211,11 +2211,11 @@ CREATE TABLE projectprop (
 	PRIMARY KEY (projectprop_id),
 	project_id integer NOT NULL,
 	FOREIGN KEY (project_id) REFERENCES project (project_id) ON DELETE CASCADE,
-	cvterm_id integer NOT NULL,
-	FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
+	type_id integer NOT NULL,
+	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
 	value text,
 	rank integer not null default 0,
-	CONSTRAINT projectprop_c1 UNIQUE (project_id, cvterm_id, rank)
+	CONSTRAINT projectprop_c1 UNIQUE (project_id, type_id, rank)
 );
 
 -- ================================================
@@ -3397,6 +3397,33 @@ create index stockcollection_stock_idx2 on stockcollection_stock (stock_id);
 
 COMMENT ON TABLE stockcollection_stock IS 'stockcollection_stock links
 a stock collection to the stocks which are contained in the collection.';
+
+
+
+-- ================================================
+-- TABLE: stock_dbxrefprop
+-- ================================================
+
+create table stock_dbxrefprop (
+       stock_dbxrefprop_id serial not null,
+       primary key (stock_dbxrefprop_id),
+       stock_dbxref_id int not null,
+       foreign key (stock_dbxref_id) references stock_dbxref (stock_dbxref_id) on delete cascade INITIALLY DEFERRED,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+       value text null,
+       rank int not null default 0,
+       constraint stock_dbxrefprop_c1 unique (stock_dbxref_id,type_id,rank)
+);
+create index stock_dbxrefprop_idx1 on stock_dbxrefprop (stock_dbxref_id);
+create index stock_dbxrefprop_idx2 on stock_dbxrefprop (type_id);
+
+COMMENT ON TABLE stock_dbxrefprop IS 'A stock_dbxref can have any number of
+slot-value property tags attached to it. This is useful for storing properties related to dbxref annotations of stocks, such as evidence codes, and references, and metadata, such as create/modify dates. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for
+the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
 -- $Id: library.sql,v 1.10 2008-03-25 16:00:43 emmert Exp $
 -- =================================================================
 -- Dependencies:
@@ -3854,10 +3881,10 @@ CREATE TABLE nd_experiment_project (
 CREATE TABLE nd_experimentprop (
     nd_experimentprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value character varying(255) NOT NULL,
     rank integer NOT NULL default 0,
-    constraint nd_experimentprop_c1 unique (nd_experiment_id,cvterm_id,rank)
+    constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
 create table nd_experiment_pub (
@@ -3879,15 +3906,15 @@ COMMENT ON TABLE nd_experiment_pub IS 'Linking nd_experiment(s) to publication(s
 CREATE TABLE nd_geolocationprop (
     nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
     nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(250),
     rank integer NOT NULL DEFAULT 0,
-    constraint nd_geolocationprop_c1 unique (nd_geolocation_id,cvterm_id,rank)
+    constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_geolocationprop IS 'Property/value associations for geolocations. This table can store the properties such as location and environment';
 
-COMMENT ON COLUMN nd_geolocationprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_geolocationprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_geolocationprop.value IS 'The value of the property.';
 
@@ -3931,17 +3958,17 @@ CREATE TABLE nd_protocol_reagent (
 CREATE TABLE nd_protocolprop (
     nd_protocolprop_id serial PRIMARY KEY NOT NULL,
     nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_protocolprop_c1 unique (nd_protocol_id,cvterm_id,rank)
+    constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_protocolprop IS 'Property/value associations for protocol.';
 
 COMMENT ON COLUMN nd_protocolprop.nd_protocol_id IS 'The protocol to which the property applies.';
 
-COMMENT ON COLUMN nd_protocolprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_protocolprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_protocolprop.value IS 'The value of the property.';
 
@@ -4007,26 +4034,26 @@ COMMENT ON COLUMN nd_reagent_relationship.type_id IS 'The type (or predicate) of
 CREATE TABLE nd_reagentprop (
     nd_reagentprop_id serial PRIMARY KEY NOT NULL,
     nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_reagentprop_c1 unique (nd_reagent_id,cvterm_id,rank)
+    constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
 CREATE TABLE nd_experiment_stockprop (
     nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value character varying(255),
     rank integer DEFAULT 0 NOT NULL,
-    constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,cvterm_id,rank)
+    constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
 
 COMMENT ON TABLE nd_experiment_stockprop IS 'Property/value associations for experiment_stocks. This table can store the properties such as treatment';
 
 COMMENT ON COLUMN nd_experiment_stockprop.nd_experiment_stock_id IS 'The experiment_stock to which the property applies.';
 
-COMMENT ON COLUMN nd_experiment_stockprop.cvterm_id IS 'The name of the property as a reference to a controlled vocabulary term.';
+COMMENT ON COLUMN nd_experiment_stockprop.type_id IS 'The name of the property as a reference to a controlled vocabulary term.';
 
 COMMENT ON COLUMN nd_experiment_stockprop.value IS 'The value of the property.';
 

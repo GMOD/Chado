@@ -288,7 +288,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="projectprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="projectprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -348,12 +348,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -363,7 +363,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>project_id, cvterm_id, rank</td>
+	<td>project_id, type_id, rank</td>
 </tr>
 
 </table>
