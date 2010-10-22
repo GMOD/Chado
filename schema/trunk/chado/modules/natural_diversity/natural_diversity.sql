@@ -181,16 +181,18 @@ COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the pr
 
 CREATE TABLE nd_experiment_phenotype (
     nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+   constraint nd_experiment_phenotype_c1 unique (nd_experiment_id,phenotype_id)
 ); 
 
 COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
 CREATE TABLE nd_experiment_genotype (
     nd_experiment_genotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED 
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED ,
+    constraint nd_experiment_genotype_c1 unique (nd_experiment_id,genotype_id)
 );
 
 COMMENT ON TABLE nd_experiment_genotype IS 'Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record.';
