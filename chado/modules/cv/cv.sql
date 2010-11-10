@@ -296,7 +296,7 @@ create table cvprop (
     foreign key (cv_id) references cv (cv_id) INITIALLY DEFERRED,
     type_id int not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    value text not null default '',
+    value text,
     rank int not null default 0,
     constraint cvprop_c1 unique (cv_id,type_id,rank)
 );
