@@ -10,6 +10,10 @@ must check the nodes file. This needs further investigation with NCBI
 taxonomy. (Naama)
 * Fix the code in the gff-bridge in the sequence module so that GFF dumping
 from GBrowse will work correctly (Scott)
+* Added a cvprop table to capture things like obo file version from
+a loaded cv. (Scott)
+* Removed the "DB:" prefix from all of the names of databases that go
+into the db table. (Scott)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
