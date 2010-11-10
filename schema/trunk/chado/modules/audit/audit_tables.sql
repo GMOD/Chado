@@ -744,6 +744,73 @@
        EXECUTE PROCEDURE audit_update_delete_dbxrefprop ();
 
 
+   DROP TABLE audit_cvprop;
+   CREATE TABLE audit_cvprop ( 
+       cvprop_id integer, 
+       cv_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_cvprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_cvprop() RETURNS trigger AS
+   '
+   DECLARE
+       cvprop_id_var integer; 
+       cv_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       cvprop_id_var = OLD.cvprop_id;
+       cv_id_var = OLD.cv_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_cvprop ( 
+             cvprop_id, 
+             cv_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             cvprop_id_var, 
+             cv_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER cvprop_audit_ud ON cvprop;
+   CREATE TRIGGER cvprop_audit_ud
+       BEFORE UPDATE OR DELETE ON cvprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_cvprop ();
+
+
    DROP TABLE audit_pub;
    CREATE TABLE audit_pub ( 
        pub_id integer, 

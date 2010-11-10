@@ -728,7 +728,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experimentprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experimentprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -788,12 +788,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -808,7 +808,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_experiment_id, cvterm_id, rank</td>
+	<td>nd_experiment_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -818,7 +818,7 @@
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -1047,7 +1047,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocationprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -1107,12 +1107,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1122,7 +1122,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_geolocation_id, cvterm_id, rank</td>
+	<td>nd_geolocation_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1132,7 +1132,7 @@
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -1586,7 +1586,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocolprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -1646,12 +1646,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1661,7 +1661,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_protocol_id, cvterm_id, rank</td>
+	<td>nd_protocol_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1671,7 +1671,7 @@
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -2038,7 +2038,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
 </tr>
 
@@ -2070,11 +2070,6 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>nd_experiment_id</td>
 </tr>
@@ -2087,6 +2082,11 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>nd_experiment_id, phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2175,7 +2175,7 @@
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
@@ -2207,11 +2207,6 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>nd_experiment_id</td>
 </tr>
@@ -2224,6 +2219,11 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>nd_experiment_id, genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2453,7 +2453,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagentprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -2513,12 +2513,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2528,7 +2528,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_reagent_id, cvterm_id, rank</td>
+	<td>nd_reagent_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2538,7 +2538,7 @@
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -2613,7 +2613,7 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-cvterm_id">cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-type_id">type_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
@@ -2673,12 +2673,12 @@
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2688,7 +2688,7 @@
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>nd_experiment_stock_id, cvterm_id, rank</td>
+	<td>nd_experiment_stock_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
@@ -2698,7 +2698,7 @@
 
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -3091,7 +3091,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11005</a>
+SQL::Translator 0.11003</a>
 
 </body>
 </html>

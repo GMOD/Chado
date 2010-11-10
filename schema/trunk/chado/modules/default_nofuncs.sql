@@ -355,6 +355,33 @@ create index dbxrefprop_idx2 on dbxrefprop (type_id);
 COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop.';
 
 
+-- ================================================
+-- TABLE: cvprop
+-- ================================================
+create table cvprop (
+    cvprop_id serial not null,
+    primary key (cvprop_id),
+    cv_id int not null,
+    foreign key (cv_id) references cv (cv_id) INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
+    value text not null default '',
+    rank int not null default 0,
+    constraint cvprop_c1 unique (cv_id,type_id,rank)
+);
+
+COMMENT ON TABLE cvprop IS 'Additional extensible properties can be attached to a cv using this table.  A notable example would be the cv version';
+
+COMMENT ON COLUMN cvprop.type_id IS 'The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.';
+COMMENT ON COLUMN cvprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation.';
+
+COMMENT ON COLUMN cvprop.rank IS 'Property-Value ordering. Any
+cv can have multiple values for any particular property type -
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used.';
+
+
 -- $Id: pub.sql,v 1.27 2007-02-19 20:50:44 briano Exp $
 -- ==========================================
 -- Chado pub module
@@ -4000,16 +4027,18 @@ COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the pr
 
 CREATE TABLE nd_experiment_phenotype (
     nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+   constraint nd_experiment_phenotype_c1 unique (nd_experiment_id,phenotype_id)
 ); 
 
 COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
 CREATE TABLE nd_experiment_genotype (
     nd_experiment_genotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED 
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED ,
+    constraint nd_experiment_genotype_c1 unique (nd_experiment_id,genotype_id)
 );
 
 COMMENT ON TABLE nd_experiment_genotype IS 'Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record.';

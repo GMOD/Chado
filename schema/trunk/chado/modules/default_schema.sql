@@ -406,6 +406,33 @@ create index dbxrefprop_idx2 on dbxrefprop (type_id);
 COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop.';
 
 
+-- ================================================
+-- TABLE: cvprop
+-- ================================================
+create table cvprop (
+    cvprop_id serial not null,
+    primary key (cvprop_id),
+    cv_id int not null,
+    foreign key (cv_id) references cv (cv_id) INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
+    value text not null default '',
+    rank int not null default 0,
+    constraint cvprop_c1 unique (cv_id,type_id,rank)
+);
+
+COMMENT ON TABLE cvprop IS 'Additional extensible properties can be attached to a cv using this table.  A notable example would be the cv version';
+
+COMMENT ON COLUMN cvprop.type_id IS 'The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.';
+COMMENT ON COLUMN cvprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation.';
+
+COMMENT ON COLUMN cvprop.rank IS 'Property-Value ordering. Any
+cv can have multiple values for any particular property type -
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used.';
+
+
 CREATE OR REPLACE VIEW cv_root AS
  SELECT 
   cv_id,
@@ -36404,30 +36431,15 @@ CREATE OR REPLACE VIEW gffatts (
     type,
     attribute
 ) AS
-SELECT feature_id, 'cvterm' AS type,  s.name AS attribute
+SELECT feature_id, 'Ontology_term' AS type,  s.name AS attribute
 FROM cvterm s, feature_cvterm fs
 WHERE fs.cvterm_id = s.cvterm_id
 UNION ALL
-SELECT feature_id, 'dbxref' AS type, d.name || ':' || s.accession AS attribute
+SELECT feature_id, 'Dbxref' AS type, d.name || ':' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.dbxref_id = s.dbxref_id and s.db_id = d.db_id
---SELECT feature_id, 'expression' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.expression_id = s.expression_id
---UNION ALL
---SELECT fg.feature_id, 'genotype' AS type, g.uniquename||': '||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE g.gcontext_id = fg.gcontext_id
---UNION ALL
---SELECT feature_id, 'genotype' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.genotype_id = s.genotype_id
---UNION ALL
---SELECT feature_id, 'phenotype' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.phenotype_id = s.phenotype_id
 UNION ALL
-SELECT feature_id, 'synonym' AS type, s.name AS attribute
+SELECT feature_id, 'Alias' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs
 WHERE fs.synonym_id = s.synonym_id
 UNION ALL
@@ -36513,13 +36525,15 @@ feature_id, ref, source, type, fstart, fend,
 score, strand, phase, seqlen, name, organism_id
 ) AS
 SELECT
-f.feature_id, sf.name, gffdbx.accession, cv.name,
-fl.fmin+1, fl.fmax, af.significance,
+f.feature_id, sf.name, 
+ COALESCE(gffdbx.accession,'.'::varchar(255)), cv.name,
+fl.fmin+1, fl.fmax, 
+ COALESCE(CAST(af.significance AS text), '.'),
  CASE WHEN fl.strand=-1 THEN '-'
       WHEN fl.strand=1  THEN '+'
       ELSE '.'
  END,
-fl.phase, f.seqlen, f.name, f.organism_id
+ COALESCE(CAST(fl.phase AS text), '.'), f.seqlen, f.name, f.organism_id
 FROM feature f
 LEFT JOIN featureloc fl ON (f.feature_id = fl.feature_id)
 LEFT JOIN feature sf ON (fl.srcfeature_id = sf.feature_id)
@@ -36541,31 +36555,15 @@ CREATE FUNCTION  gfffeatureatts (integer)
 RETURNS SETOF gffatts
 AS
 '
-SELECT feature_id, ''cvterm'' AS type,  s.name AS attribute
+SELECT feature_id, ''Ontology_term'' AS type,  s.name AS attribute
 FROM cvterm s, feature_cvterm fs
 WHERE fs.feature_id= $1 AND fs.cvterm_id = s.cvterm_id
 UNION
-SELECT feature_id, ''dbxref'' AS type, d.name || '':'' || s.accession AS attribute
+SELECT feature_id, ''Dbxref'' AS type, d.name || '':'' || s.accession AS attribute
 FROM dbxref s, feature_dbxref fs, db d
 WHERE fs.feature_id= $1 AND fs.dbxref_id = s.dbxref_id AND s.db_id = d.db_id
---UNION
---SELECT feature_id, ''expression'' AS type, s.description AS attribute
---FROM expression s, feature_expression fs
---WHERE fs.feature_id= $1 AND fs.expression_id = s.expression_id
---UNION
---SELECT fg.feature_id, ''genotype'' AS type, g.uniquename||'': ''||g.description AS attribute
---FROM gcontext g, feature_gcontext fg
---WHERE fg.feature_id= $1 AND g.gcontext_id = fg.gcontext_id
---UNION
---SELECT feature_id, ''genotype'' AS type, s.description AS attribute
---FROM genotype s, feature_genotype fs
---WHERE fs.feature_id= $1 AND fs.genotype_id = s.genotype_id
---UNION
---SELECT feature_id, ''phenotype'' AS type, s.description AS attribute
---FROM phenotype s, feature_phenotype fs
---WHERE fs.feature_id= $1 AND fs.phenotype_id = s.phenotype_id
 UNION
-SELECT feature_id, ''synonym'' AS type, s.name AS attribute
+SELECT feature_id, ''Alias'' AS type, s.name AS attribute
 FROM synonym s, feature_synonym fs
 WHERE fs.feature_id= $1 AND fs.synonym_id = s.synonym_id
 UNION
@@ -37200,16 +37198,18 @@ COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the pr
 
 CREATE TABLE nd_experiment_phenotype (
     nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+   constraint nd_experiment_phenotype_c1 unique (nd_experiment_id,phenotype_id)
 ); 
 
 COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
 CREATE TABLE nd_experiment_genotype (
     nd_experiment_genotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL UNIQUE references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED 
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED ,
+    constraint nd_experiment_genotype_c1 unique (nd_experiment_id,genotype_id)
 );
 
 COMMENT ON TABLE nd_experiment_genotype IS 'Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record.';
