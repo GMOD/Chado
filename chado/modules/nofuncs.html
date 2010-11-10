@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (169 tables)
+	Table listing (170 tables)
  -->
 
 <a name="top" />
@@ -160,6 +160,18 @@
 
 <!-- 
 	End link to table 'dbxrefprop'
+ -->
+
+<!-- 
+	Start link to table 'cvprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="cvprop-link" href="#cvprop">cvprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'cvprop'
  -->
 
 <!-- 
@@ -4063,6 +4075,168 @@ default 0 value should be used. </td>
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>dbxref_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'cvprop'
+ -->
+
+<a name="cvprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	cvprop
+</h3></td>
+		<a name="cvprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: cvprop <br />
+	================================================ <br />
+	Additional extensible properties can be attached to a cv using this table.  A notable example would be the cv version 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="cvprop-cvprop_id">cvprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="cvprop-cv_id">cv_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="cvprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="cvprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="cvprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+cv can have multiple values for any particular property type -
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cvprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>cv_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>cv_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>value</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>cv_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -30709,7 +30883,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
 </tr>
 
@@ -30741,11 +30915,6 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>nd_experiment_id</td>
 </tr>
@@ -30758,6 +30927,11 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>phenotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>nd_experiment_id, phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -30846,7 +31020,7 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
 	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
@@ -30878,11 +31052,6 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id</td>
-</tr>
-
-<tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>nd_experiment_id</td>
 </tr>
@@ -30895,6 +31064,11 @@ the synonym has been used publicly and deliberately (e.g. in a paper), it my als
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>nd_experiment_id, genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
