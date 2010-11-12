@@ -17,18 +17,17 @@
 CREATE TABLE phenotype (
     phenotype_id SERIAL NOT NULL,
     primary key (phenotype_id),
-    uniquename TEXT,  
+    uniquename TEXT NOT NULL,  
     observable_id INT,
     FOREIGN KEY (observable_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     attr_id INT,
     FOREIGN KEY (attr_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     value TEXT,
-    units_id INT,
-    FOREIGN KEY (units_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     cvalue_id INT,
     FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     assay_id INT,
     FOREIGN KEY (assay_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    CONSTRAINT phenotype_c1 UNIQUE (uniquename)
 );
 CREATE INDEX phenotype_idx1 ON phenotype (cvalue_id);
 CREATE INDEX phenotype_idx2 ON phenotype (observable_id);
@@ -40,26 +39,8 @@ observable effects of non-wild type function. E.g. Obs=eye, attribute=color, cva
 COMMENT ON COLUMN phenotype.observable_id IS 'The entity: e.g. anatomy_part, biological_process.';
 COMMENT ON COLUMN phenotype.attr_id IS 'Phenotypic attribute (quality, property, attribute, character) - drawn from PATO.';
 COMMENT ON COLUMN phenotype.value IS 'Value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate.';
-COMMENT ON COLUMN phenotype.units_id IS 'Phenotype value units of measurement.';
 COMMENT ON COLUMN phenotype.cvalue_id IS 'Phenotype attribute value (state).';
 COMMENT ON COLUMN phenotype.assay_id IS 'Evidence type.';
-
--- ================================================                             
--- TABLE: phenotypeprop                                                         
--- ================================================                             
-                                                                                
-CREATE TABLE phenotypeprop (                                                    
-    phenotypeprop_id serial NOT NULL,                                       
-    PRIMARY KEY (phenotypeprop_id),                                         
-    phenotype_id integer NOT NULL,                                          
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELET\
-E CASCADE,                                                                      
-    type_id integer NOT NULL,                                               
-    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,  
-    value text,                                                             
-    rank integer not null default 0,                                        
-    CONSTRAINT phenotypeprop_c1 UNIQUE (phenotype_id, type_id, rank)        
-);                                                                              
 
 -- ================================================
 -- TABLE: phenotype_cvterm
@@ -78,7 +59,7 @@ CREATE TABLE phenotype_cvterm (
 CREATE INDEX phenotype_cvterm_idx1 ON phenotype_cvterm (phenotype_id);
 CREATE INDEX phenotype_cvterm_idx2 ON phenotype_cvterm (cvterm_id);
 
-COMMENT ON TABLE phenotype_cvterm IS 'Deprecated and superceded by phenotypeprop.';
+COMMENT ON TABLE phenotype_cvterm IS NULL;
 
 -- ================================================
 -- TABLE: feature_phenotype
