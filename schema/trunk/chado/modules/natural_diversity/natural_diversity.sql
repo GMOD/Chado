@@ -68,7 +68,7 @@ CREATE TABLE nd_experimentprop (
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
-create table nd_experiment_pub (
+CREATE TABLE nd_experiment_pub (
        nd_experiment_pub_id serial PRIMARY KEY not null,
        nd_experiment_id int not null,
        foreign key (nd_experiment_id) references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
