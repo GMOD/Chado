@@ -515,7 +515,6 @@ WriteMakefile(
       'XML::Simple'       => 2.09,
       'XML::Twig'         => 0,
       'Bio::Chado::Schema'=> 0, #can this load without a db? probably
-      'Log::Log4perl'     => 0.39,
       'DBIx::DBStag'      => 0.11,
       'GO::Parser'        => 0,
       'Module::Load'      => 0.16,
@@ -530,7 +529,6 @@ WriteMakefile(
           'load/bin/bulk_load_gff3.PLS'       => 'load/bin/gmod_bulk_load_gff3.pl',
           'install_util/conf_install.PLS'    => 'install_util/conf_install.pl',
           'install_util/src_install.PLS'     => 'install_util/src_install.pl',
-          'install_util/log4perl.conf.PLS'   => 'install_util/log4perl.conf.pl',
     },
     EXE_FILES             => \@exe_files,
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
@@ -556,7 +554,7 @@ print INSTRUCTIONS;
 sub MY::install {
   package MY;
   my $inherited = shift->SUPER::install(@_);
-  $inherited =~ s/doc_install/doc_install conf_install src_install log4perl.conf/;
+  $inherited =~ s/doc_install/doc_install conf_install src_install/;
   $inherited;
 }
 
@@ -581,9 +579,6 @@ conf_install ::
 
 src_install ::
 	\$(PERL) \"$working_dir/install_util/src_install.pl\" '$root'
-
-log4perl.conf ::
-	\$(PERL) \"$working_dir/install_util/log4perl.conf.pl\" '$root'
 
 #cvtermpath ::
 #	$working_dir/bin/make_cvtermpath.sh
