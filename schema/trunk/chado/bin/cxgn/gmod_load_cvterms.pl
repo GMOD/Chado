@@ -1,9 +1,10 @@
+#!/usr/bin/env perl
 
 =head1 NAME
 
 load_cvterms.pl
 
-=head1 DESCRIPTION
+=head1 SYNOPSIS
 
 Usage: perl load_cvterms.pl -H dbhost -D dbname [-vdntuFo] file
 
@@ -146,9 +147,10 @@ Version 0.15, September 2010.
 use strict;
 
 use Getopt::Std;
+use Pod::Usage;
+
 use Bio::OntologyIO;
 use Bio::Ontology::OntologyI;
-
 
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
@@ -158,8 +160,8 @@ use Bio::Chado::Schema;
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
      $opt_u, $opt_o, $opt_p, $opt_r, $opt_g, $opt_s);
 
-getopts('F:d:H:o:n:vD:tp:us:r:g:');
-
+getopts('F:d:H:o:n:vD:tp:us:r:g:')
+    or pod2usage();
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
