@@ -1,0 +1,14 @@
+<!-- TMPL_LOOP name="schemas" --><!-- TMPL_LOOP name="tables" --><!-- TMPL_UNLESS name="view_definition" -->__TABLE_START__<protect><noinclude>{{ChadoTableTemplateHeader}}</noinclude>
+{{ChadoTableDesc|__MODULE__|<!-- TMPL_VAR ESCAPE="HTML" name="table" -->|<!-- TMPL_IF name="table_comment" --><!-- TMPL_VAR ESCAPE="HTML" name="table_comment" --><!-- /TMPL_IF name="table_comment" -->}}
+{{ChadoColumnsHeader|__MODULE__|<!-- TMPL_VAR ESCAPE="HTML" name="table" -->}}
+<!-- TMPL_LOOP name="columns" -->{{ChadoColumnDesc|<!-- TMPL_LOOP name="column_constraints" --><!-- TMPL_VAR name="column_constraints" --><!-- TMPL_IF name="column_fk" -->{{ChadoModuleTableLink|__FK_MODULE__|<!-- TMPL_VAR ESCAPE="HTML" name="column_fk_table" -->}}<!-- /TMPL_IF name="column_fk" --><!-- /TMPL_LOOP name="column_constraints" -->|<!-- TMPL_VAR ESCAPE="HTML" name="column" -->|<!-- TMPL_VAR ESCAPE="HTML" name="column_type" -->|<!-- TMPL_LOOP name="column_constraints" --><!-- TMPL_IF name="column_primary_key" -->''PRIMARY KEY''<br />
+<!-- /TMPL_IF name="column_primary_key" --><!-- TMPL_IF name="column_unique" -->''UNIQUE<!-- TMPL_IF name="column_unique_keygroup" -->#<!-- TMPL_VAR name="column_unique_keygroup" --><!-- /TMPL_IF name="column_unique_keygroup" -->''<br />
+<!-- /TMPL_IF name="column_unique" --><!-- /TMPL_LOOP name="column_constraints" --><!-- TMPL_IF name="column_constraint_notnull" -->''NOT NULL''<br />
+<!-- /TMPL_IF name="column_constraint_notnull" --><!-- TMPL_IF name="column_default" -->''DEFAULT ''<!-- TMPL_VAR ESCAPE="HTML" name="column_default" --><br />
+<!-- /TMPL_IF name="column_default" --><!-- TMPL_IF name="column_comment" --><!-- TMPL_VAR ESCAPE="HTML" name="column_comment" --><!-- /TMPL_IF name="column_comment" -->}}
+<!-- /TMPL_LOOP name="columns" -->{{ChadoColumnsFooter}}
+
+{{ChadoTablesReferencingHeader|<!-- TMPL_VAR ESCAPE="HTML" name="table" -->}}
+<!-- TMPL_IF name="fk_schemas" --><!-- TMPL_LOOP name="fk_schemas" -->{{ChadoReferencingTable|__FK_MODULE__|<!-- TMPL_VAR ESCAPE="HTML" name="fk_table" -->}}
+<!-- /TMPL_LOOP name="fk_schemas" --><!-- TMPL_ELSE name="fk_schemas" -->* None.<!-- /TMPL_IF name="fk_schemas" --></protect>
+<!-- /TMPL_UNLESS name="view_definition"><!-- /TMPL_LOOP name="tables" --><!-- /TMPL_LOOP name="schemas" -->
