@@ -1,0 +1,292 @@
+{
+  "modules" : [
+{ 
+  "module" : "General",
+  "tables" : [
+    "tableinfo",
+    "db",
+    "dbxref",
+    "dbxrefprop"
+  ]
+},
+
+{
+  "module" : "CV",
+  "tables" : [
+    "cv",
+    "cvterm",
+    "cvterm_relationship",
+    "cvtermpath",
+    "cvtermsynonym",
+    "cvterm_dbxref",
+    "cvtermprop" 
+  ]
+},
+
+{ 
+  "module" : "Publication",
+  "tables" : [
+    "pub",
+    "pub_relationship",
+    "pub_dbxref",
+    "pubauthor",
+    "pubprop"
+  ]
+},
+
+{
+  "module" : "Organism",
+  "tables" : [
+    "organism",
+    "organism_dbxref",
+    "organismprop"
+  ]
+},
+
+{
+  "module" : "Sequence",
+  "tables" : [
+    "feature",
+    "featureloc",
+    "featureloc_pub",
+    "feature_pub",
+    "feature_pubprop",
+    "featureprop",
+    "featureprop_pub",
+    "feature_dbxref",
+    "feature_relationship",
+    "feature_relationship_pub",
+    "feature_relationshipprop",
+    "feature_relationshipprop_pub",
+    "feature_cvterm",
+    "feature_cvtermprop",
+    "feature_cvterm_dbxref",
+    "feature_cvterm_pub",
+    "featuregroup",
+    "synonym",
+    "feature_synonym",
+    "gencode", 
+    "gencode_codon_aa", 
+    "gencode_startcodon"
+  ]
+},
+
+{
+  "module" : "Companalysis",
+  "tables" : [
+    "analysis",
+    "analysisprop",
+    "analysisfeature",
+    "analysisfeatureprop"
+  ]
+},
+
+{
+  "module" : "Cell Line",
+  "tables" : [
+    "cell_line",
+    "cell_line_relationship",
+    "cell_line_synonym",
+    "cell_line_cvterm",
+    "cell_line_dbxref",
+    "cell_lineprop",
+    "cell_lineprop_pub",
+    "cell_line_feature",
+    "cell_line_cvtermprop",
+    "cell_line_pub",
+    "cell_line_library"
+  ]
+},
+
+{
+  "module" : "Contact",
+  "tables" : [
+    "contact",
+    "contact_relationship"
+  ]
+},
+
+{
+  "module" : "Expression",
+  "tables" : [
+    "expression",
+    "expression_cvterm",
+    "expression_cvtermprop",
+    "expressionprop",
+    "expression_pub",
+    "feature_expression",
+    "feature_expressionprop",
+    "eimage",
+    "expression_image"
+  ]
+},
+
+{
+  "module" : "Genetic",
+  "tables" : [
+    "genotype",
+    "feature_genotype",
+    "environment",
+    "environment_cvterm",
+    "phenstatement",
+    "phendesc",
+    "phenotype_comparison",
+    "phenotype_comparison_cvterm"
+  ]
+},
+
+{
+  "module" : "Library",
+  "tables" : [
+    "library",
+    "library_synonym",
+    "library_pub",
+    "libraryprop",
+    "libraryprop_pub",
+    "library_cvterm",
+    "library_feature",
+    "library_dbxref"
+  ]
+},
+
+{
+  "module" : "Mage",
+  "tables" : [
+    "mageml",
+    "magedocumentation",
+    "protocol",
+    "protocolparam",
+    "channel",
+    "arraydesign",
+    "arraydesignprop",
+    "assay",
+    "assayprop",
+    "assay_project",
+    "biomaterial",
+    "biomaterial_relationship",
+    "biomaterialprop",
+    "biomaterial_dbxref",
+    "treatment",
+    "biomaterial_treatment",
+    "assay_biomaterial",
+    "acquisition",
+    "acquisitionprop",
+    "acquisition_relationship",
+    "quantification",
+    "quantificationprop",
+    "quantification_relationship",
+    "control",
+    "element",
+    "elementresult",
+    "element_relationship",
+    "elementresult_relationship",
+    "study",
+    "study_assay",
+    "studydesign",
+    "studydesignprop",
+    "studyfactor",
+    "studyfactorvalue",
+    "studyprop",
+    "studyprop_feature"
+  ]
+},
+
+{
+  "module" : "Map",
+  "tables" : [
+    "featuremap",
+    "featurerange",
+    "featurepos",
+    "featuremap_pub"
+  ]
+},
+
+{
+  "module" : "Natural Diversity",
+  "tables" : [
+    "nd_geolocation",
+    "nd_experiment",
+    "nd_experiment_project",
+    "nd_experimentprop",
+    "nd_experiment_pub",
+    "nd_geolocationprop",
+    "nd_protocol",
+    "nd_reagent",
+    "nd_protocol_reagent",
+    "nd_protocolprop",
+    "nd_experiment_stock",
+    "nd_experiment_protocol",
+    "nd_experiment_phenotype",
+    "nd_experiment_genotype",
+    "nd_reagent_relationship",
+    "nd_reagentprop",
+    "nd_experiment_stockprop",
+    "nd_experiment_stock_dbxref",
+    "nd_experiment_dbxref",
+    "nd_experiment_contact"
+  ]
+},
+
+{
+  "module" : "Phenotype",
+  "tables" : [
+    "phenotype",
+    "phenotype_cvterm",
+    "feature_phenotype"
+  ]
+},
+
+{
+  "module" : "Phylogeny",
+  "tables" : [
+    "phylotree",
+    "phylotree_pub",
+    "phylonode",
+    "phylonode_dbxref",
+    "phylonode_pub",
+    "phylonode_organism",
+    "phylonodeprop",
+    "phylonode_relationship"
+  ]
+},
+
+{
+  "module" : "Project",
+  "tables" : [
+    "project",
+    "projectprop",
+    "project_relationship",
+    "project_pub",
+    "project_contact"
+  ]
+},
+
+{
+  "module" : "Stock",
+  "tables" : [
+    "stock",
+    "stock_pub",
+    "stockprop",
+    "stockprop_pub",
+    "stock_relationship",
+    "stock_relationship_cvterm",
+    "stock_relationship_pub",
+    "stock_dbxref",
+    "stock_cvterm",
+    "stock_genotype",
+    "stockcollection",
+    "stockcollectionprop",
+    "stockcollection_stock",
+    "stock_dbxrefprop"
+  ]
+},
+
+{
+  "module" : "Internal",
+  "tables" : [
+    "materialized_view",
+    "sequence_cv_lookup_table"
+  ]
+}
+]
+}
