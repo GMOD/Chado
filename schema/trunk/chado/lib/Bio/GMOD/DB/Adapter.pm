@@ -32,6 +32,12 @@ my ( $part_of,$derives_from,$sofa_id);
 # @tables array sets the order for which things will be inserted into
 # the database
 my @tables = (
+   "organism", #dgg
+   "analysis", #dgg
+   "db", ## dgg
+   "dbxref",
+   "cv", ## dgg
+   "cvterm", ## dgg
    "feature",
    "featureloc",
    "feature_relationship",
@@ -39,14 +45,8 @@ my @tables = (
    "feature_cvterm",
    "synonym",
    "feature_synonym",
-   "dbxref",
    "feature_dbxref",
    "analysisfeature",
-   "cvterm", ## dgg
-   "db", ## dgg
-   "cv", ## dgg
-   "analysis", #dgg
-   "organism", #dgg
 );
 
 my %use_public_tables = (
