@@ -176,7 +176,7 @@ print "H= $opt_H, D= $opt_D, u=$opt_u, d=$opt_d, v=$opt_v, t=$opt_t   \n" if $ve
 
 my $port = '5432';
 
-if (!$opt_s)  { die  " Need -s db.name argument! \n " ; } # the database name that Dbxrefs should refer to
+if (!$opt_s)  { die  " Need -s db.name argument! (e.g. GO , PO, etc.\n " ; } # the database name that Dbxrefs should refer to
 
 if (!($opt_H and $opt_D) ) {
     $DBPROFILE ||= 'default';
@@ -196,7 +196,7 @@ if (!($opt_H and $opt_D) ) {
 
 if (!$dbhost && !$dbname) { die "Need -D dbname and -H hostname arguments.\n"; }
 if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
-if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
+if (!$user) { die "Need -r user_name, or provide one in -g gmod_conf\n"; }
 
 
 my $dsn = "dbi:$driver:dbname=$dbname";
@@ -741,7 +741,7 @@ foreach my $new_ont(@onts) {
 	exit(0);
     }
     else {  
-	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermoath.pl . See the perldoc for more info. \n\n", 1);
+	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
 	
 	$dbh->commit(); 
     }
