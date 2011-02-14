@@ -83,7 +83,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERSION AND DATE
 
-Version 1.1, April 2010.
+Version 1.2, Feb. 2011.
 
 =cut
 
@@ -166,7 +166,8 @@ my %type;
 my %subject;
 my %object;
 my %black;
-my(%root,%leaf);
+my %root;
+our %leaf;
 my %sot;
 
 my $sth_type = $db->prepare("select cvterm_id from cvterm where cv_id = (select cv_id from cv where name ilike 'Relationship')");
@@ -205,9 +206,12 @@ $sth_cvterm_relationship->execute;
 while(my $cvterm_relationship = $sth_cvterm_relationship->fetchrow_hashref){
   $subject{$cvterm_relationship->{subject_id}}++;
   $object{$cvterm_relationship->{object_id}}++;
+
+  #hash of subject-object-type. Stores all the relationships defined in cvterm_relationship table.
   $sot{$cvterm_relationship->{subject_id}}{$cvterm_relationship->{object_id}}{$cvterm_relationship->{type_id}}++;
 }
 
+#populate hash of roots (terms without parents (objects)) and hash of leaves (terms without child terms (subjects)) 
 foreach my $cvterm (keys %cvterm){
   $root{$cvterm}++ if(!$subject{$cvterm} and  $object{$cvterm});
   $leaf{$cvterm}++ if( $subject{$cvterm} and !$object{$cvterm});
@@ -216,49 +220,73 @@ foreach my $cvterm (keys %cvterm){
 my %leafbak = %leaf;
 %sot = ();
 
-while(keys %leaf){
-  foreach my $leaf (keys %leaf){
-	foreach my $type (keys %type){
-	  recurse([$leaf],$type,1);
-	}
-	delete $leaf{$leaf};
-  }
+# this is a hash for storing the already-processed leaves for a given type term.
+our %seen ; 
 
-  #  print "**************************************\n";
+ 
+while(keys %leaf){
+    foreach my $l (keys %leaf){
+	foreach my $type (keys %type){
+	    #add the leaf-type term to the seen list.
+	    $seen{$l}{$type}++;
+	    #sending the leaf as an arrayref to the recurse fuction. Distance starts with 1
+	    recurse([$l],$type,1);
+	}
+	delete $leaf{$l};
+	message("DELETED leaf $l ! number of leaves is now : " .(scalar(keys(%leaf))) . "\n" ) ;
+    }
+    message("DONE recursing leaves \n");
 }
+message("DONE FIRST LEAF RECURSIION! About to create the transitive path.\n");
 
 %leaf = %leafbak;
+%seen = ();
+
 
 while(keys %leaf){
-  foreach my $leaf (keys %leaf){
-	recurse([$leaf],undef,1);
-	delete $leaf{$leaf};
-  }
-
-  #  print "**************************************\n";
+    foreach my $le (sort keys %leaf){
+	$seen{$le}{0}++;
+	#calling recurse with leaf $le
+	recurse([$le],0,1);
+	#deleting the leaf from the list
+	delete $leaf{$le};
+       message("Deleted leaf $le!  after deleting number of leaves is : " .(scalar(keys(%leaf))) . "\n");
+    }
+    message("FINISHED RECURSING for the transitive path (type = IS_A) \n");
 }
 
 
 sub recurse {
   my($subjects,$type,$dist) = @_;
- 
+  
+  # start with the last subject
   my $subject = $subjects->[-1];
-#  print $subject,"\n";
-
+  #get the parents for the subject with this type (defaults to IS_A)
   my @objects = objects($subject,$type);
+  
+  #if there are no parents for this path, exit the loop (and the next leaf will be sent here again)
   if(!@objects){
-	$leaf{$subject}++;
-	return;
+      $leaf{$subject}++ ;
+      return;
   }
   my $path;
+  
+  # foreach parent construct a path with each child
   foreach my $object (@objects){
-	my $tdist = $dist;
-	foreach my $s (@$subjects){
+      my $tdist = $dist;
+      # loop through the child terms
+      foreach my $s (@$subjects){
+	  #next if the path was seen (subject-object-type-distance)
 	  next if $sot{$s}{$object}{$type}{$tdist};
+	  if (exists($sot{$s}{$object}) && exists($sot{$object}{$s})) { 
+	      die " YOU HAVE A CYCLE IN YOUR ONTOLOGY for $s, $object ($type, $tdist)    C8-( \n" ;
+	  }
 	  $sot{$s}{$object}{$type}{$tdist}++;
-	 
-#	  print $tdist,"\t"x$dist,"\t",$s,"\t",$object,"\t",$type||'transitive',"\n";
-	  if(defined $type){
+	  
+	  print $tdist,"\t"x$dist,"\t",$s,"\t" , $object,"\t" ,$type||'transitive',"\n";
+	  
+	  # if type is defined , create a path using it (see the first looping through %leaf keys) 
+	  if($type){
 	      
 	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
 		  {
@@ -280,7 +308,7 @@ sub recurse {
 		      pathdistance => $ttdist
 		  }, { key => 'cvtermpath_c1' } , );
 	      message( "Inserting ($object,$subject,$type,$cv_id , $ttdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" );
-	  } else {
+	  } else {  # if type exists (see second looping through %leaf keys) create a path using the is_a type
               message("No type defined! Using default IS_A relationship\n");
 	      my $is_a = $schema->resultset("Cv::Cvterm")->search({ name => 'is_a' })->first();
 
@@ -305,22 +333,23 @@ sub recurse {
 	      message( "Inserting ($object,$subject, " . $is_a->cvterm_id() . " ,$cv_id , -$tdist) into cvtermpath... path_id = " . $path->cvtermpath_id() . "\n" );
 	  }
 	  $tdist--;
-	}
-	$tdist = $dist;
-	recurse([@$subjects,$object],$type,$dist+1);
-	$db->commit();
+      }
+      $tdist = $dist;
+      # recurse with arrayref of subjects and the object, increment the pathdistance
+      recurse([@$subjects,$object],$type,$dist+1);
+      
+      $db->commit();
   }
   
 }
 
 #-------------------
 
-
 sub objects {
   my($subject,$type) = @_;
-  #warn $subject;
+  
   my @cvterm_rel;
-  if(defined($type)){
+  if($type){
             
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { subject_id  => $subject,
@@ -341,8 +370,9 @@ sub objects {
 
 sub subjects {
   my($object,$type) = @_;
+  
   my @cvterm_rel;
-  if(defined($type)){
+  if($type){
 
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { object_id  => $object,
@@ -351,7 +381,7 @@ sub subjects {
 	  );
 
   } else {
-
+      
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { object_id  => $object }
 	  );
