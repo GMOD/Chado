@@ -305,7 +305,7 @@ foreach my $new_ont(@onts) {
 	my @all_db_predicate_terms= $db_ont->search_related('cvterms' , { is_relationshiptype => 1} );  
 	foreach my $t(@all_file_predicate_terms) {           #look at predicate terms in file
 	    my ($p_term) = $schema->resultset('Cv::Cvterm')->search( 
-		{ name => $t->name(),
+		{ 'lower(name)' => { 'like' , lc( $t->name() ) },
 		  is_relationshiptype => 1,
 		});
 	    #maybe it's stored with another cv_id?
@@ -706,18 +706,17 @@ foreach my $new_ont(@onts) {
 		my $predicate_term;
 		my ($rel_db)= $schema->resultset('General::Db')->search( { name => 'OBO_REL' } );
 		($predicate_term) = $schema->resultset('General::Dbxref')->search(
-		    { accession => { 'ilike' , "$predicate_term_name" }, 
+		    { 'lower(accession)' => { 'like' , lc($predicate_term_name) },
 		      db_id     => $rel_db->db_id(), 
 		    })->search_related('cvterm') if $rel_db;
 		if (!$predicate_term) {
-		    ($predicate_term) = $schema->resultset('Cv::Cvterm')->search( 
-			{ name => { 'ilike' , $predicate_term_name } ,
+		    ($predicate_term) = $schema->resultset('Cv::Cvterm')->search(
+			{ 'lower(name)' => { 'like' , lc($predicate_term_name) } ,
 			  cv_id=> $cv->cv_id(),
 			}
 			);
-		    
 		    if (!$predicate_term) { 
-			die "The predicate term $predicate_term_name does not exist in the database\n";  
+			die "The predicate term $predicate_term_name does not exist in the database\n";
 		    }
 		}
 		if (!$opt_t) { 
