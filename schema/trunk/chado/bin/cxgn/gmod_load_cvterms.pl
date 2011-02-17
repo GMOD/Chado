@@ -473,7 +473,7 @@ foreach my $new_ont(@onts) {
 			my $s_name= $s->get_column('synonym');
 			if (!exists($file_synonyms{uc($s_name)}) ) { 
 			    message( "Note: deleting synonym ' " . $s->synonym() . "' from cvterm ". $db_index{$k}->get_column('name') . "...\n",1);
-			    $db_index{$k}->delete_synonym($s);
+			    $db_index{$k}->delete_synonym($s_name);
 			}
 		    }
 		    #deal with secondary ids (alt_id field).
