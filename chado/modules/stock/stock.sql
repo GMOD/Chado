@@ -207,13 +207,55 @@ create table stock_cvterm (
      foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
      pub_id int not null,
      foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-     constraint stock_cvterm_c1 unique (stock_id,cvterm_id,pub_id)
-);
+     is_not boolean not null default false,
+     rank integer not null default 0,
+     constraint stock_cvterm_c1 unique (stock_id,cvterm_id,pub_id,rank)
+ );
 create index stock_cvterm_idx1 on stock_cvterm (stock_id);
 create index stock_cvterm_idx2 on stock_cvterm (cvterm_id);
 create index stock_cvterm_idx3 on stock_cvterm (pub_id);
 
 COMMENT ON TABLE stock_cvterm IS 'stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id.';
+
+
+-- ================================================
+-- TABLE: stock_cvtermprop
+-- ================================================
+
+create table stock_cvtermprop (
+    stock_cvtermprop_id serial not null,
+    primary key (stock_cvtermprop_id),
+    stock_cvterm_id int not null,
+    foreign key (stock_cvterm_id) references stock_cvterm (stock_cvterm_id) on delete cascade,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint stock_cvtermprop_c1 unique (stock_cvterm_id,type_id,rank)
+);
+create index stock_cvtermprop_idx1 on stock_cvtermprop (stock_cvterm_id);
+create index stock_cvtermprop_idx2 on stock_cvtermprop (type_id);
+
+COMMENT ON TABLE stock_cvtermprop IS 'Extensible properties for
+stock to cvterm associations. Examples: GO evidence codes;
+qualifiers; metadata such as the date on which the entry was curated
+and the source of the association. See the stockprop table for
+meanings of type_id, value and rank.';
+
+COMMENT ON COLUMN stock_cvtermprop.type_id IS 'The name of the
+property/slot is a cvterm. The meaning of the property is defined in
+that cvterm. cvterms may come from the OBO evidence code cv.';
+
+COMMENT ON COLUMN stock_cvtermprop.value IS 'The value of the
+property, represented as text. Numeric values are converted to their
+text representation. This is less efficient than using native database
+types, but is easier to query.';
+
+COMMENT ON COLUMN stock_cvtermprop.rank IS 'Property-Value
+ordering. Any stock_cvterm can have multiple values for any particular
+property type - these are ordered in a list using rank, counting from
+zero. For properties that are single-valued rather than multi-valued,
+the default 0 value should be used.';
 
 
 -- ================================================
