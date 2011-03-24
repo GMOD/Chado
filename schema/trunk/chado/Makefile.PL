@@ -514,7 +514,7 @@ WriteMakefile(
       'DBD::Pg'           => 1.49,
       'XML::Simple'       => 2.09,
       'XML::Twig'         => 0,
-      'Bio::Chado::Schema'=> 0, #can this load without a db? probably
+      'Bio::Chado::Schema'=> 0,
       'DBIx::DBStag'      => 0.11,
       'GO::Parser'        => 0,
       'Module::Load'      => 0.16,
