@@ -4109,7 +4109,7 @@ ORDER BY cds.fmin,cds.gff_id
 
                 $polyp_ac->add_Annotation(
                     'Note',Bio::Annotation::SimpleValue->new(
-                     'polypeptide feature inferred from GFF3 CDS feature'));
+                     'polypeptide feature inferred from GFF3 feature'));
                 $polyp_ac->add_Annotation(
                     'Derives_from',Bio::Annotation::SimpleValue->new(
                       $parent_id));
