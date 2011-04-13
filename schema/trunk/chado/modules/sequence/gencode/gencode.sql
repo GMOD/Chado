@@ -16,6 +16,7 @@ CREATE INDEX gencode_codon_aa_i1 ON gencode_codon_aa(gencode_id,codon,aa);
 
 CREATE TABLE gencode_startcodon (
         gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
-        codon           CHAR(3)
+        codon           CHAR(3),
+        CONSTRAINT gencode_startcodon_unique UNIQUE( gencode_id, codon )
 );
 SET search_path = public,pg_catalog;
