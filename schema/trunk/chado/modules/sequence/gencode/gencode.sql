@@ -9,7 +9,8 @@ CREATE TABLE gencode (
 CREATE TABLE gencode_codon_aa (
         gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3) NOT NULL,
-        aa              CHAR(1) NOT NULL
+        aa              CHAR(1) NOT NULL,
+        CONSTRAINT gencode_codon_unique UNIQUE( gencode_id, codon )
 );
 CREATE INDEX gencode_codon_aa_i1 ON gencode_codon_aa(gencode_id,codon,aa);
 
