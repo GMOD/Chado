@@ -63,7 +63,7 @@ CREATE TABLE nd_experimentprop (
     nd_experimentprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
-    value character varying(255) NOT NULL,
+    value character varying(255),
     rank integer NOT NULL default 0,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
@@ -104,7 +104,8 @@ COMMENT ON COLUMN nd_geolocationprop.rank IS 'The rank of the property value, if
 
 CREATE TABLE nd_protocol (
     nd_protocol_id serial PRIMARY KEY  NOT NULL,
-    name character varying(255) NOT NULL unique
+    name character varying(255) NOT NULL unique,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part of the experiment.';
