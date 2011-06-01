@@ -2,7 +2,9 @@
 -- ==========================================
 -- Chado phenotype module
 --
-
+-- 05-31-2011
+-- added 'name' column to phenotype. non-unique human readable field.
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -17,7 +19,8 @@
 CREATE TABLE phenotype (
     phenotype_id SERIAL NOT NULL,
     primary key (phenotype_id),
-    uniquename TEXT NOT NULL,  
+    uniquename TEXT NOT NULL,
+    name TEXT default null,
     observable_id INT,
     FOREIGN KEY (observable_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     attr_id INT,
