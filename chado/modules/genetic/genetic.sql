@@ -2,6 +2,9 @@
 -- ==========================================
 -- Chado genetics module
 --
+-- changes 2011-05-31
+--   added type_id to genotype (can be null for backward compatibility)
+--   added genotypeprop table
 -- 2006-04-11
 --   split out phenotype tables into phenotype module
 --
@@ -35,8 +38,10 @@ create table genotype (
     genotype_id serial not null,
     primary key (genotype_id),
     name text,
-    uniquename text not null,      
+    uniquename text not null,
     description varchar(255),
+    type_id INT NOT NULL,
+    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     constraint genotype_c1 unique (uniquename)
 );
 create index genotype_idx1 on genotype(uniquename);
@@ -205,3 +210,20 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
+
+-- ================================================
+-- TABLE: genotypeprop
+-- ================================================
+create table genotypeprop (
+    genotypeprop_id serial not null,
+    primary key (genotypeprop_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint genotypeprop_c1 unique (genotype_id,type_id,rank)
+);
+create index genotypeprop_idx1 on genotypeprop (genotype_id);
+create index genotypeprop_idx2 on genotypeprop (type_id);
