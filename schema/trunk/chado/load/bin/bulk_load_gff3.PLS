@@ -268,19 +268,9 @@ The values are stored as featureprop entries for the feature.
 
 =item Any custom (ie, lowercase-first) tags
 
-Custom tags are supported, provided they already have an entry in the
-cvterm table. Their values are stored in the featureprop table with
-a type predefined the database administrator.  For example, if you
-have a custom tab, 'orf_classification', you need an entry in the
-dbxref and cvterm tables something like this:
-
-  INSERT INTO dbxref (db_id,accession)
-    VALIES ( (SELECT db_id FROM db WHERE name='null'),
-             'autocreated:orf_classification');
-  INSERT INTO cvterm (name,dbxref_id,cv_id)
-    VALUES ('orf_classification',
-             (SELECT cv_id FROM cv WHERE name='local'),
-             (SELECT dbxref_id FROM dbxref WHERE accession='autocreated:orf_classification'));
+Custom tags are supported.  If the tag doesn't already exist in 
+the cvterm table, it will be created.  The value will stored with its 
+associated cvterm in the featureprop table.
 
 =item Ontology_term
 
