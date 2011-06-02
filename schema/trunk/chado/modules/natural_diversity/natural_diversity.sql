@@ -63,7 +63,7 @@ CREATE TABLE nd_experimentprop (
     nd_experimentprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
-    value character varying(255),
+    value text null,
     rank integer NOT NULL default 0,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
@@ -88,7 +88,7 @@ CREATE TABLE nd_geolocationprop (
     nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
     nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(250),
+    value text null,
     rank integer NOT NULL DEFAULT 0,
     constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
@@ -141,7 +141,7 @@ CREATE TABLE nd_protocolprop (
     nd_protocolprop_id serial PRIMARY KEY NOT NULL,
     nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
@@ -219,7 +219,7 @@ CREATE TABLE nd_reagentprop (
     nd_reagentprop_id serial PRIMARY KEY NOT NULL,
     nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
@@ -228,7 +228,7 @@ CREATE TABLE nd_experiment_stockprop (
     nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
