@@ -27,7 +27,9 @@ no warnings;
 
 Calls the psql command and pipes in the contents of the 
 load/etc/initialize.sql file.  Put any insert statements that
-your data load needs here.
+your data load needs here.  Also executes gmod_add_organism.pl
+if the common_name provided in the perl Makefile.PL step isn't
+present in the database.
 
 =item ncbi()
 
@@ -81,6 +83,18 @@ sub ACTION_prepdb {
   $m->log->debug("system call: $sys_call");
 
   system( $sys_call ) == 0 or croak "Error executing '$sys_call': $?";
+
+  $m->log->debug("Checking for organism");
+
+  my $db_org = $conf->{'database'}{'db_organism'};
+
+  if ($db_org and ($db_org ne 'none')) {
+      my $result = `bin/gmod_add_organism.pl --name_only --common_name $db_org`;
+      unless ($result) {
+          print "Adding $db_org to the database...\n";
+          system('bin/gmod_add_organism.pl','--common_name',$db_org);
+      }  
+  } 
 
   $m->log->info("leaving ACTION_prepdb");
 }

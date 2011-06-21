@@ -423,6 +423,7 @@ if ( -e $config_template ) {
       db_password  => $DBPASS,
       db_host      => $DBHOST,
       db_port      => $DBPORT,
+      db_organism  => $DBORGANISM, 
       local_tmp    => $LOCAL_TMP,
       working_dir  => $working_dir,
       external_ddl => $external,
@@ -488,6 +489,7 @@ my @exe_files = (
            'bin/gmod_load_cvterms.pl',
            'bin/gmod_bulk_load_pubmed.pl',
            'bin/gmod_make_cvtermpath.pl',
+           'bin/gmod_add_organism.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );

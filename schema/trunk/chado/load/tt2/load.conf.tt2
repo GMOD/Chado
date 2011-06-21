@@ -6,6 +6,7 @@
     <db_password>[% db_password %]</db_password>
     <db_host>[% db_host %]</db_host>
     <db_port>[% db_port %]</db_port>
+    <db_organism>[% db_organism %]</db_organism>
   </database>
 
   <build>
