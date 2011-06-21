@@ -5,6 +5,7 @@ bin/chado-fix-flybase-instance.pl
 bin/config.PLS
 bin/create-bridge-sql.pl
 bin/create-so-bridge.pl
+bin/gmod_add_organism.pl
 bin/gmod_bulk_load_pubmed.pl
 bin/gmod_load_cvterms.pl
 bin/gmod_make_cvtermpath.pl
