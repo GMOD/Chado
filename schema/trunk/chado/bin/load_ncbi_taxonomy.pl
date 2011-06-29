@@ -2,7 +2,7 @@
 =head1 NAME
 
  load_ncbi_taxonomy.pl
-    
+
 =head1 DESCRIPTION
 
  Usage: perl load_ncbi_taxonomy.pl -H [dbhost] -D [dbname] [-vt] -i file
@@ -30,7 +30,7 @@ Save these 2 files in the same dir. of this script
 Optional. This filter file will include the taxons you would like to store in your tree (see option -i).
 Without this file the entire NCBI taxonomy will be stored in your database! 
 
-=back 
+=back
 
 
 =head2 parameters
@@ -45,7 +45,7 @@ hostname for database
 
 database name
 
-=item -i 
+=item -i
 
 input file [optional]
 
@@ -53,16 +53,16 @@ List taxonomy ids to be stored. The rest of the taxons in the name and node file
 http://www.ncbi.nlm.nih.gov/sites/entrez?db=Taxonomy 
 and search by taxid (e.g. txis4070[Subtree] )  
 
-=item p [optional]
+=item -p
 
-phylotree name 
+phylotree name  [optional]
 
-name you phylotree. Default = 'NCBI taxonomy tree' 
+name you phylotree. Default = 'NCBI taxonomy tree'
 
 =item -v
 
 verbose output
- 
+
 =item -t
 
 trial mode. Do not perform any store operations at all.
@@ -530,17 +530,17 @@ eval {
                               SET right_idx = ?
                               WHERE phylonode_id = ?");
 	
-	message("\nwalking the tree for $id...\n");
+	message("\nwalking the tree for $id...\n" , 1);
 	$setleft->execute($ctr++, $id);
-	message("Setting left index= $ctr for parent $id\n\n");
+	message("Setting left index= $ctr for parent $id\n\n",1);
 	$children->execute($id);
 	
 	while(my ($id) = $children->fetchrow_array() ) {
-	    message( "Found child_id $id \n ");
+	    message( "Found child_id $id \n",1);
 	    walktree($id, $ctr);
 	}
 	$setright->execute($ctr++, $id);
-	message( "Setting right index= $ctr for id $id\n\n");
+	message( "Setting right index= $ctr for id $id\n\n",1);
     }
     
 };

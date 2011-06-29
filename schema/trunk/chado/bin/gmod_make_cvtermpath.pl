@@ -140,7 +140,6 @@ if (!$driver) { die "Need -d (dsn) driver, or provide one in -g gmod_conf\n"; }
 if (!$user) { die "Need -u user_name, or provide one in -g gmod_conf\n"; }
 
 #we can allow blank passwords
-#if (!$pass) { die "Need -p password, or provide one in -g gmod_conf\n"; }
 if (!$cvname) { die "Need to provide -c cv.name ! \n" ; }
 
 my $dsn = "dbi:$driver:dbname=$dbname";
@@ -159,7 +158,6 @@ print STDOUT "Connected to database $dbname on host $dbhost.\n" if $verbose;
 
 if ($opt_o) { open (OUT, ">$opt_o") ||die "can't open error file $opt_o for writting.\n" ; }
 
-#die "USAGE: $0 <dbhost> <dbname> <cvname>" unless $dbhost and $dbname and $cvname;
 
 
 my %type;
@@ -170,14 +168,14 @@ my %root;
 our %leaf;
 my %sot;
 
-my $sth_type = $db->prepare("select cvterm_id from cvterm where cv_id = (select cv_id from cv where name ilike 'Relationship')");
-$sth_type->execute;
+my $sth_type = $db->prepare("select cvterm_id from cvterm where is_relationshiptype = ?");
+$sth_type->execute(1);
 while(my $type_id = $sth_type->fetchrow){
   $type{$type_id}++;
 }
 
 my %cvterm;
-my $sth_cvterm = $db->prepare("select cvterm_id from cvterm");
+my $sth_cvterm = $db->prepare("select cvterm_id from cvterm WHERE is_relationshiptype = 0");
 $sth_cvterm->execute;
 while(my $cvterm_id = $sth_cvterm->fetchrow_array){
   $cvterm{$cvterm_id}++;
