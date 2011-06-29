@@ -517,10 +517,10 @@ eval {
     foreach (@updates) { $dbh->do( $_ );  }
     
     sub walktree {
-	my $id = shift;
-	my $ctr = shift; 
-	
-	my $children = $dbh->prepare("SELECT phylonode_id
+	my $phylonode_id = shift;
+	our $ctr = shift;
+        message("walking the tree for id $phylonode_id, index count is $ctr\n",1);
+	my $children = $dbh->prepare("SELECT phylonode_id, organism_id
                               FROM tmp_phylonode
                               WHERE parent_phylonode_id = ?");
 	my $setleft  = $dbh->prepare("UPDATE tmp_phylonode
@@ -529,20 +529,18 @@ eval {
 	my $setright = $dbh->prepare("UPDATE tmp_phylonode
                               SET right_idx = ?
                               WHERE phylonode_id = ?");
-	
-	message("\nwalking the tree for $id...\n" , 1);
-	$setleft->execute($ctr++, $id);
-	message("Setting left index= $ctr for parent $id\n\n",1);
-	$children->execute($id);
-	
-	while(my ($id) = $children->fetchrow_array() ) {
-	    message( "Found child_id $id \n",1);
-	    walktree($id, $ctr);
+
+	$setleft->execute($ctr++, $phylonode_id);
+	message("Setting left index= $ctr for parent $phylonode_id\n\n",1);
+	$children->execute($phylonode_id);
+
+	while(my ($child_id, $organism_id) = $children->fetchrow_array() ) {
+	    message( "Found child_id $child_id (organism_id = $organism_id) \n",1);
+	    walktree($child_id, $ctr);
 	}
-	$setright->execute($ctr++, $id);
-	message( "Setting right index= $ctr for id $id\n\n",1);
+	$setright->execute($ctr++, $phylonode_id);
+	message( "Setting right index= $ctr for phylonode id $phylonode_id\n\n",1);
     }
-    
 };
 
 if ($@ || $opt_t) { 
