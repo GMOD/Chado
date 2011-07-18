@@ -811,6 +811,68 @@
        EXECUTE PROCEDURE audit_update_delete_cvprop ();
 
 
+   DROP TABLE audit_chadoprop;
+   CREATE TABLE audit_chadoprop ( 
+       chadoprop_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_chadoprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_chadoprop() RETURNS trigger AS
+   '
+   DECLARE
+       chadoprop_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       chadoprop_id_var = OLD.chadoprop_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_chadoprop ( 
+             chadoprop_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             chadoprop_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER chadoprop_audit_ud ON chadoprop;
+   CREATE TRIGGER chadoprop_audit_ud
+       BEFORE UPDATE OR DELETE ON chadoprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_chadoprop ();
+
+
    DROP TABLE audit_pub;
    CREATE TABLE audit_pub ( 
        pub_id integer, 
@@ -3071,6 +3133,7 @@
    CREATE TABLE audit_phenotype ( 
        phenotype_id integer, 
        uniquename text, 
+       name text, 
        observable_id integer, 
        attr_id integer, 
        value text, 
@@ -3086,6 +3149,7 @@
    DECLARE
        phenotype_id_var integer; 
        uniquename_var text; 
+       name_var text; 
        observable_id_var integer; 
        attr_id_var integer; 
        value_var text; 
@@ -3096,6 +3160,7 @@
    BEGIN
        phenotype_id_var = OLD.phenotype_id;
        uniquename_var = OLD.uniquename;
+       name_var = OLD.name;
        observable_id_var = OLD.observable_id;
        attr_id_var = OLD.attr_id;
        value_var = OLD.value;
@@ -3111,6 +3176,7 @@
        INSERT INTO audit_phenotype ( 
              phenotype_id, 
              uniquename, 
+             name, 
              observable_id, 
              attr_id, 
              value, 
@@ -3120,6 +3186,7 @@
        ) VALUES ( 
              phenotype_id_var, 
              uniquename_var, 
+             name_var, 
              observable_id_var, 
              attr_id_var, 
              value_var, 
@@ -3269,6 +3336,7 @@
        name text, 
        uniquename text, 
        description varchar(255), 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3281,6 +3349,7 @@
        name_var text; 
        uniquename_var text; 
        description_var varchar(255); 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3288,6 +3357,7 @@
        name_var = OLD.name;
        uniquename_var = OLD.uniquename;
        description_var = OLD.description;
+       type_id_var = OLD.type_id;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -3300,12 +3370,14 @@
              name, 
              uniquename, 
              description, 
+             type_id, 
              transaction_type
        ) VALUES ( 
              genotype_id_var, 
              name_var, 
              uniquename_var, 
              description_var, 
+             type_id_var, 
              transaction_type_var
        );
 
@@ -3812,6 +3884,73 @@
        BEFORE UPDATE OR DELETE ON phenotype_comparison_cvterm
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_phenotype_comparison_cvterm ();
+
+
+   DROP TABLE audit_genotypeprop;
+   CREATE TABLE audit_genotypeprop ( 
+       genotypeprop_id integer, 
+       genotype_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_genotypeprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_genotypeprop() RETURNS trigger AS
+   '
+   DECLARE
+       genotypeprop_id_var integer; 
+       genotype_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       genotypeprop_id_var = OLD.genotypeprop_id;
+       genotype_id_var = OLD.genotype_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_genotypeprop ( 
+             genotypeprop_id, 
+             genotype_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             genotypeprop_id_var, 
+             genotype_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER genotypeprop_audit_ud ON genotypeprop;
+   CREATE TRIGGER genotypeprop_audit_ud
+       BEFORE UPDATE OR DELETE ON genotypeprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_genotypeprop ();
 
 
    DROP TABLE audit_featuremap;
@@ -8654,6 +8793,8 @@
        stock_id integer, 
        cvterm_id integer, 
        pub_id integer, 
+       is_not boolean, 
+       rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -8666,6 +8807,8 @@
        stock_id_var integer; 
        cvterm_id_var integer; 
        pub_id_var integer; 
+       is_not_var boolean; 
+       rank_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -8673,6 +8816,8 @@
        stock_id_var = OLD.stock_id;
        cvterm_id_var = OLD.cvterm_id;
        pub_id_var = OLD.pub_id;
+       is_not_var = OLD.is_not;
+       rank_var = OLD.rank;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -8685,12 +8830,16 @@
              stock_id, 
              cvterm_id, 
              pub_id, 
+             is_not, 
+             rank, 
              transaction_type
        ) VALUES ( 
              stock_cvterm_id_var, 
              stock_id_var, 
              cvterm_id_var, 
              pub_id_var, 
+             is_not_var, 
+             rank_var, 
              transaction_type_var
        );
 
@@ -8708,6 +8857,73 @@
        BEFORE UPDATE OR DELETE ON stock_cvterm
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_stock_cvterm ();
+
+
+   DROP TABLE audit_stock_cvtermprop;
+   CREATE TABLE audit_stock_cvtermprop ( 
+       stock_cvtermprop_id integer, 
+       stock_cvterm_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_cvtermprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvtermprop() RETURNS trigger AS
+   '
+   DECLARE
+       stock_cvtermprop_id_var integer; 
+       stock_cvterm_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_cvtermprop_id_var = OLD.stock_cvtermprop_id;
+       stock_cvterm_id_var = OLD.stock_cvterm_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_cvtermprop ( 
+             stock_cvtermprop_id, 
+             stock_cvterm_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_cvtermprop_id_var, 
+             stock_cvterm_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_cvtermprop_audit_ud ON stock_cvtermprop;
+   CREATE TRIGGER stock_cvtermprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_cvtermprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_cvtermprop ();
 
 
    DROP TABLE audit_stock_genotype;
@@ -10439,7 +10655,7 @@
        nd_experimentprop_id integer, 
        nd_experiment_id integer, 
        type_id integer, 
-       value varchar(255), 
+       value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -10452,7 +10668,7 @@
        nd_experimentprop_id_var integer; 
        nd_experiment_id_var integer; 
        type_id_var integer; 
-       value_var varchar(255); 
+       value_var text; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -10563,7 +10779,7 @@
        nd_geolocationprop_id integer, 
        nd_geolocation_id integer, 
        type_id integer, 
-       value varchar(250), 
+       value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -10576,7 +10792,7 @@
        nd_geolocationprop_id_var integer; 
        nd_geolocation_id_var integer; 
        type_id_var integer; 
-       value_var varchar(250); 
+       value_var text; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -10629,6 +10845,7 @@
    CREATE TABLE audit_nd_protocol ( 
        nd_protocol_id integer, 
        name varchar(255), 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10639,11 +10856,13 @@
    DECLARE
        nd_protocol_id_var integer; 
        name_var varchar(255); 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
        nd_protocol_id_var = OLD.nd_protocol_id;
        name_var = OLD.name;
+       type_id_var = OLD.type_id;
        
        IF TG_OP = ''DELETE'' THEN
            transaction_type_var = ''D'';
@@ -10654,10 +10873,12 @@
        INSERT INTO audit_nd_protocol ( 
              nd_protocol_id, 
              name, 
+             type_id, 
              transaction_type
        ) VALUES ( 
              nd_protocol_id_var, 
              name_var, 
+             type_id_var, 
              transaction_type_var
        );
 
@@ -10806,7 +11027,7 @@
        nd_protocolprop_id integer, 
        nd_protocol_id integer, 
        type_id integer, 
-       value varchar(255), 
+       value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -10819,7 +11040,7 @@
        nd_protocolprop_id_var integer; 
        nd_protocol_id_var integer; 
        type_id_var integer; 
-       value_var varchar(255); 
+       value_var text; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -11168,7 +11389,7 @@
        nd_reagentprop_id integer, 
        nd_reagent_id integer, 
        type_id integer, 
-       value varchar(255), 
+       value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -11181,7 +11402,7 @@
        nd_reagentprop_id_var integer; 
        nd_reagent_id_var integer; 
        type_id_var integer; 
-       value_var varchar(255); 
+       value_var text; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -11235,7 +11456,7 @@
        nd_experiment_stockprop_id integer, 
        nd_experiment_stock_id integer, 
        type_id integer, 
-       value varchar(255), 
+       value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -11248,7 +11469,7 @@
        nd_experiment_stockprop_id_var integer; 
        nd_experiment_stock_id_var integer; 
        type_id_var integer; 
-       value_var varchar(255); 
+       value_var text; 
        rank_var integer; 
        
        transaction_type_var char;

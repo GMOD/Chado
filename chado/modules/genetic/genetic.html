@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta name="generator" content="SQL::Translator::Producer::HTML" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body>
@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (8 tables)
+	Table listing (9 tables)
  -->
 
 <a name="top" />
@@ -126,6 +126,18 @@
 	End link to table 'phenotype_comparison_cvterm'
  -->
 
+<!-- 
+	Start link to table 'genotypeprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="genotypeprop-link" href="#genotypeprop">genotypeprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'genotypeprop'
+ -->
+
 </table>
 
 <!-- 
@@ -151,9 +163,12 @@
 
 <em>
 	<br />
-	$Id: genetic.html,v 1.8 2008-08-29 17:13:52 scottcain Exp $ <br />
+	$Id: genetic.sql,v 1.31 2008-08-25 19:53:14 scottcain Exp $ <br />
 	========================================== <br />
 	Chado genetics module <br />
+	changes 2011-05-31 <br />
+	added type_id to genotype (can be null for backward compatibility) <br />
+	added genotypeprop table <br />
 	2006-04-11 <br />
 	split out phenotype tables into phenotype module <br />
 	redesigned 2003-10-28 <br />
@@ -242,6 +257,15 @@ typically derived from the features making up the genotype. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotype-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
 </table>
 
 <h3>
@@ -294,6 +318,16 @@ typically derived from the features making up the genotype. </td>
 <tr class="IndexCell">
 	<td>NOT NULL</td>
 	<td>uniquename</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1709,8 +1743,187 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <hr />
 
+<!-- 
+	Starting table 'genotypeprop'
+ -->
+
+<a name="genotypeprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	genotypeprop
+</h3></td>
+		<a name="genotypeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: genotypeprop <br />
+	================================================
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotypeprop-genotypeprop_id">genotypeprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="genotypeprop-genotype_id">genotype_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotypeprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="genotypeprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="genotypeprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>genotypeprop_idx1</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>genotypeprop_idx2</td>
+	<td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotypeprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>genotype_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>genotype_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08001</a>
+SQL::Translator 0.11003</a>
 
 </body>
 </html>

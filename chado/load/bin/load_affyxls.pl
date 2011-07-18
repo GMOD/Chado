@@ -42,11 +42,8 @@ use lib 'lib';
 use strict;
 use Bio::Expression::MicroarrayIO;
 use Data::Dumper;
-use Term::ProgressBar;
-use Log::Log4perl;
-Log::Log4perl::init('load/etc/log.conf');
 
-my $LOG = Log::Log4perl->get_logger('load_affyxls');
+my $DEBUG = 1;
 
 my $arraydesigntype = shift @ARGV; $arraydesigntype ||= 'U133';
 my $arrayfile = shift @ARGV;
@@ -61,15 +58,12 @@ my $affx = Bio::Expression::MicroarrayIO->new(
 						-format   => 'dchipxls', #dchipxls
 					   );
 
-$LOG->debug("created new Bio::Expression::MicroarrayIO $affx");
 
 while(my $arrayio = $affx->next_array){
   my @txn = ();
   last unless $arrayio->id;
 
   print STDERR "loading array ".$arrayio->id." (filename: $arrayfile)\n";
-  $LOG->info("filename: ".$arrayfile);
-  $LOG->info("loading array: ".$arrayio->id);
 
   my $cvterms;
   my $sample_id;
@@ -91,35 +85,31 @@ while(my $arrayio = $affx->next_array){
   $chip_id   ||= $arrayio->id;
   $sample_id ||= $arrayio->id;
 
-  $LOG->info("chip_id: $chip_id");
-  $LOG->info("sample_id: $sample_id");
-
   my %cvterm = make_cvterms($cvterms);
-  $LOG->info("cvterms: ".join(', ', keys %cvterm));
   #might want to break here if %cvterm is undef (likely due to missing/malformed cvterm line in array file)
 
   my($array)     = Bio::Chado::CDBI::Arraydesign->search(name => $arraydesigntype);
   ($array)     ||= Bio::Chado::CDBI::Arraydesign->search(name => 'unknown');
-  $LOG->debug("loaded record for array type: ".$array->name);
+  warn "loaded record for array type: ".$array->name if $DEBUG;
 
   my($nulltype)               = Bio::Chado::CDBI::Cvterm->search( name => 'null' );
   my($oligo)                  = Bio::Chado::CDBI::Cvterm->search( name => 'microarray_oligo' );
   die "couldn't find ontology term 'microarray_oligo', did you load the Sequence Ontology?" unless ref($oligo);
-  $LOG->debug("loaded records for generic cvterms");
+  warn "loaded records for generic cvterms" if $DEBUG;
 
   my($human)                  = Bio::Chado::CDBI::Organism->search( common_name => 'human' );
-  $LOG->debug("loaded record for organism");
+  warn "loaded record for organism"if $DEBUG;
   my $operator                = Bio::Chado::CDBI::Contact->find_or_create( { name => 'UCLA Microarray Core' });
-  $LOG->debug("loaded record for hybridization operator");
+  warn "loaded record for hybridization operator" if $DEBUG;
   my $operator_quantification = Bio::Chado::CDBI::Contact->find_or_create( { name => $ENV{USER} });
-  $LOG->debug("loaded record for database operator");
+  warn "loaded record for database operator" if $DEBUG;
   my $analysis                = Bio::Chado::CDBI::Analysis->find_or_create({ name => 'keystone normalization', program => 'dChip unix', programversion => '1.0'});
-  $LOG->debug("loaded record for normalization algorithm");
+  warn "loaded record for normalization algorithm" if $DEBUG;
 
   my $protocol_assay          = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default assay protocol', type_id => $nulltype });
   my $protocol_acquisition    = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default acquisition protocol', type_id => $nulltype });
   my $protocol_quantification = Bio::Chado::CDBI::Protocol->find_or_create({ name => 'default quantification protocol', type_id => $nulltype });
-  $LOG->debug("loaded records for protocols");
+  warn "loaded records for protocols" if $DEBUG;
 
   push @txn, $operator;
   push @txn, $operator_quantification;
@@ -134,7 +124,7 @@ while(my $arrayio = $affx->next_array){
     $biomaterial->update;
     $newchip++ ;
   }
-  $LOG->debug("biomaterial_id: ".$biomaterial->id);
+  warn "biomaterial_id: ".$biomaterial->id if $DEBUG;
   push @txn, $biomaterial;
 
   foreach my $cvterm (keys %cvterm){
@@ -145,7 +135,7 @@ while(my $arrayio = $affx->next_array){
       ($chado_cvterm) = Bio::Chado::CDBI::Cvterm->search(dbxref_id => $chado_dbxref)
         or $fatal = "couldn't find cvterm for $cvterm, you need to create it";
       if($fatal){
-        $LOG->fatal($fatal) and die $fatal;
+        die $fatal;
       }
     }
 
@@ -155,14 +145,12 @@ while(my $arrayio = $affx->next_array){
                                                                     type_id => $chado_cvterm,
                                                                     value => $cvterm{$cvterm},
                                                                    });
-      $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: ". $cvterm{$cvterm});
       push @txn, $biomaterialprop;
     } else {
       my $biomaterialprop = Bio::Chado::CDBI::Biomaterialprop->find_or_create({
                                                                     biomaterial_id => $biomaterial->id,
                                                                     type_id => $chado_cvterm,
                                                                    });
-      $LOG->info("biomaterial has prop: ". $chado_cvterm->name .", value: none");
       push @txn, $biomaterialprop;
     }
   }
@@ -178,7 +166,7 @@ while(my $arrayio = $affx->next_array){
     $assay->update;
     $newchip++;
   }
-  $LOG->debug("assay_id: ".$assay->id);
+  warn "assay_id: ".$assay->id if $DEBUG;
   push @txn, $assay;
 
   my $assay_biomaterial = Bio::Chado::CDBI::Assay_Biomaterial->find_or_create({
@@ -230,7 +218,7 @@ while(my $arrayio = $affx->next_array){
   ##############################
   my($sth,%feature);
   my $sth;
-  $LOG->debug("caching features...");
+  warn "caching features..." if $DEBUG;
   $sth = Bio::Chado::CDBI::Feature->sql_affy_probesets;
   $sth->execute;
   while(my $row = $sth->fetchrow_hashref){
@@ -238,10 +226,9 @@ while(my $arrayio = $affx->next_array){
 	$feature{$row->{name}}{feature_id} = $row->{feature_id};
 	$feature{$row->{name}}{element_id} = $row->{element_id};
   }
-  $LOG->debug("cached features: ".scalar(keys %feature));
+  warn "cached features: ".scalar(keys %feature)) if $DEBUG;
 
   my $c = 0;
-  $LOG->info("featuregroups loading...");
   foreach my $featuregroup ($arrayio->each_featuregroup){
     $c++;
     $progress_update = $progress->update($c) if($c > $progress_update);
@@ -293,11 +280,9 @@ while(my $arrayio = $affx->next_array){
 								});
     push @txn, $ad;
   }
-  $LOG->info("featuregroups loaded: ". $c);
+  warn "featuregroups loaded: ". $c if $DEBUG;
 
-  $LOG->info("transaction commiting...");
   $_->dbi_commit foreach @txn;
-  $LOG->info("transaction commited...");
 }
 
 sub make_cvterms {

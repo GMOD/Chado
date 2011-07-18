@@ -381,6 +381,29 @@ these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
 default 0 value should be used.';
 
+-- ================================================
+-- TABLE: chadoprop
+-- ================================================
+create table chadoprop (
+    chadoprop_id serial not null,
+    primary key (chadoprop_id),
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
+    value text,
+    rank int not null default 0,
+    constraint chadoprop_c1 unique (type_id,rank)
+);
+
+COMMENT ON TABLE chadoprop IS 'This table is different from other prop tables in the database, as it is for storing information about the database itself, like schema version';
+
+COMMENT ON COLUMN chadoprop.type_id IS 'The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.';
+COMMENT ON COLUMN chadoprop.value IS 'The value of the property, represented as text. Numeric values are converted to their text representation.';
+
+COMMENT ON COLUMN chadoprop.rank IS 'Property-Value ordering. Any
+cv can have multiple values for any particular property type -
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used.';
 
 -- $Id: pub.sql,v 1.27 2007-02-19 20:50:44 briano Exp $
 -- ==========================================
@@ -1383,7 +1406,9 @@ CREATE TABLE analysisfeatureprop (
 -- ==========================================
 -- Chado phenotype module
 --
-
+-- 05-31-2011
+-- added 'name' column to phenotype. non-unique human readable field.
+--
 -- =================================================================
 -- Dependencies:
 --
@@ -1398,7 +1423,8 @@ CREATE TABLE analysisfeatureprop (
 CREATE TABLE phenotype (
     phenotype_id SERIAL NOT NULL,
     primary key (phenotype_id),
-    uniquename TEXT NOT NULL,  
+    uniquename TEXT NOT NULL,
+    name TEXT default null,
     observable_id INT,
     FOREIGN KEY (observable_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     attr_id INT,
@@ -1463,6 +1489,9 @@ COMMENT ON TABLE feature_phenotype IS NULL;
 -- ==========================================
 -- Chado genetics module
 --
+-- changes 2011-05-31
+--   added type_id to genotype (can be null for backward compatibility)
+--   added genotypeprop table
 -- 2006-04-11
 --   split out phenotype tables into phenotype module
 --
@@ -1496,8 +1525,10 @@ create table genotype (
     genotype_id serial not null,
     primary key (genotype_id),
     name text,
-    uniquename text not null,      
+    uniquename text not null,
     description varchar(255),
+    type_id INT NOT NULL,
+    FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     constraint genotype_c1 unique (uniquename)
 );
 create index genotype_idx1 on genotype(uniquename);
@@ -1666,6 +1697,23 @@ CREATE TABLE phenotype_comparison_cvterm (
 );
 CREATE INDEX phenotype_comparison_cvterm_idx1 on phenotype_comparison_cvterm (phenotype_comparison_id);
 CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (cvterm_id);
+
+-- ================================================
+-- TABLE: genotypeprop
+-- ================================================
+create table genotypeprop (
+    genotypeprop_id serial not null,
+    primary key (genotypeprop_id),
+    genotype_id int not null,
+    foreign key (genotype_id) references genotype (genotype_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    value text null,
+    rank int not null default 0,
+    constraint genotypeprop_c1 unique (genotype_id,type_id,rank)
+);
+create index genotypeprop_idx1 on genotypeprop (genotype_id);
+create index genotypeprop_idx2 on genotypeprop (type_id);
 -- $Id: map.sql,v 1.14 2007-03-23 15:18:02 scottcain Exp $
 -- ==========================================
 -- Chado map module
@@ -3953,7 +4001,7 @@ CREATE TABLE nd_experimentprop (
     nd_experimentprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
-    value character varying(255) NOT NULL,
+    value text null,
     rank integer NOT NULL default 0,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
@@ -3978,7 +4026,7 @@ CREATE TABLE nd_geolocationprop (
     nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
     nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(250),
+    value text null,
     rank integer NOT NULL DEFAULT 0,
     constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
@@ -3994,7 +4042,8 @@ COMMENT ON COLUMN nd_geolocationprop.rank IS 'The rank of the property value, if
 
 CREATE TABLE nd_protocol (
     nd_protocol_id serial PRIMARY KEY  NOT NULL,
-    name character varying(255) NOT NULL unique
+    name character varying(255) NOT NULL unique,
+    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part of the experiment.';
@@ -4030,7 +4079,7 @@ CREATE TABLE nd_protocolprop (
     nd_protocolprop_id serial PRIMARY KEY NOT NULL,
     nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
@@ -4108,7 +4157,7 @@ CREATE TABLE nd_reagentprop (
     nd_reagentprop_id serial PRIMARY KEY NOT NULL,
     nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
@@ -4117,7 +4166,7 @@ CREATE TABLE nd_experiment_stockprop (
     nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
     nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    value character varying(255),
+    value text null,
     rank integer DEFAULT 0 NOT NULL,
     constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );

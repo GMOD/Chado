@@ -3,6 +3,7 @@ package Bio::Chado::Builder;
 # vim: set ft=perl ts=2 expandtab:
 
 use strict;
+use warnings;
 use base 'Module::Build';
 use Carp;
 use Data::Dumper;
@@ -13,13 +14,11 @@ use Data::Dumper;
 use Template;
 use XML::Simple;
 use LWP::Simple qw(mirror is_success status_message);
-use Log::Log4perl;
 use DBI;
 use IPC::Cmd ();
+my $DEBUG = 0;
 my $go2fmt = IPC::Cmd::can_run('go2fmt') ? 'go2fmt' : 'go2fmt.pl'; #< detect new version of go2fmt
 
-Log::Log4perl::init('load/etc/log.conf');
-no warnings;
 
 =head1 ACTIONS
 
@@ -70,8 +69,6 @@ sub ACTION_prepdb {
   # the XML config object
   my $conf = $m->conf;
 
-  $m->log->info("entering ACTION_prepdb");
-
   my $db_name   = $conf->{'database'}{'db_name'}  || '';
   my $db_host   = $conf->{'database'}{'db_host'}  || '';
   my $db_port   = $conf->{'database'}{'db_port'}  || '';
@@ -80,11 +77,11 @@ sub ACTION_prepdb {
   my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
   my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
 
-  $m->log->debug("system call: $sys_call");
+  warn "system call: $sys_call" if $DEBUG;
 
   system( $sys_call ) == 0 or croak "Error executing '$sys_call': $?";
 
-  $m->log->debug("Checking for organism");
+  warn "Checking for organism" if $DEBUG;
 
   my $db_org = $conf->{'database'}{'db_organism'};
 
@@ -96,7 +93,6 @@ sub ACTION_prepdb {
       }  
   } 
 
-  $m->log->info("leaving ACTION_prepdb");
 }
 
 =head2 ACTION_ncbi
@@ -115,8 +111,6 @@ sub ACTION_ncbi {
   # the XML config object
   my $conf = $m->conf;
 
-  $m->log->info("entering ACTION_ncbi");
-
   # print out the available refseq datasets
   my %ncbis = printAndReadOptions($m,$conf,"ncbi");
 
@@ -125,14 +119,11 @@ sub ACTION_ncbi {
   # but only actively loaded for those the user selects
   fetchAndLoadFiles($m, $conf, "refseq", "./load/bin/load_gff3.pl --organism Human --srcdb DB:refseq --gfffile", \%ncbis);
   fetchAndLoadFiles($m, $conf, "locuslink", "./load/bin/load_locuslink.pl", \%ncbis);
-  $m->log->info("leaving ACTION_ncbi");
 }
 
 sub ACTION_mageml {
   my $m    = shift;
   my $conf = $m->conf;
-
-  $m->log->info("entering ACTION_mageml");
 
   print "Available MAGE-ML annotation files:\n";
 
@@ -162,7 +153,7 @@ sub ACTION_mageml {
       $fullpath =~ s!^(.+)/[^/]*!$1!;
 
       unless ( -d $fullpath ) {
-        $m->log->debug("mkpath $fullpath");
+        warn "mkpath $fullpath" if $DEBUG;
         mkpath( $fullpath, 0, 0711 )
           or print "Couldn't make path '$fullpath': $!\n";
       }
@@ -176,7 +167,7 @@ sub ACTION_mageml {
       print "    loading...";
 
       my $sys_call = "./load/bin/load_affymetrix.pl $fullpath";
-      $m->log->debug( "system call: $sys_call" );
+      warn "system call: $sys_call" if $DEBUG;
 
       my $result = system( $sys_call );
       if ( $result != 0 ) { 
@@ -188,8 +179,6 @@ sub ACTION_mageml {
       }
     }
   }
-
-  $m->log->info("leaving ACTION_mageml");
 }
 
 sub ACTION_ontologies {
@@ -203,8 +192,6 @@ sub ACTION_ontologies {
   my $db_pass   = $conf->{'database'}{'db_password'}  || '';
 
   $db_pass = '' if (ref $db_pass eq 'HASH');
-
-  $m->log->info("entering ACTION_ontologies");
 
   print "Available ontologies:\n";
 
@@ -233,7 +220,7 @@ sub ACTION_ontologies {
       my $fullpath = catfile($conf->{path}{data}, $file->{local});
       $fullpath =~ s!^(.+)/[^/]*!$1!;
       unless ( -d $fullpath ) {
-        $m->log->debug("mkpath $fullpath");
+        warn "mkpath $fullpath" if $DEBUG;
         mkpath( $fullpath, 0, 0711 )
           or print "Couldn't make path '$fullpath': $!\n";
       }
@@ -257,7 +244,7 @@ sub ACTION_ontologies {
       my $fullpath = catfile($conf->{path}{data}, $file->{local});
       $fullpath =~ s!^(.+)/[^/]*!$1!;
       unless ( -d $fullpath ) {
-        $m->log->debug("mkpath $fullpath");
+        warn "mkpath $fullpath" if $DEBUG;
         mkpath( $fullpath, 0, 0711 )
           or print "Couldn't make path '$fullpath': $!\n";
       }
@@ -305,14 +292,13 @@ sub ACTION_ontologies {
         die "what kind of file is ".$_->{type}."?";
       }
 
-      $m->log->debug( "system call: $sys_call" );
+      warn "system call: $sys_call" if $DEBUG;
 
       my $result = system( $sys_call );
 
       if ( $result != 0 ) {
         print "System call '$sys_call' failed: $?\n";
-        $m->log->fatal("failed: $?");
-        die;
+        die "failed: $?";
       }
 
       # loading chadoxml
@@ -324,14 +310,13 @@ sub ACTION_ontologies {
         catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
       ); 
 
-      $m->log->debug( "system call: $sys_call" );
+      warn "system call: $sys_call" if $DEBUG;
 
       $result = system( $sys_call );
 
       if ( $result != 0 ) {
         print "System call '$sys_call' failed: $?\n";
-        $m->log->fatal("failed: $?");
-        die;
+        die "failed: $?";
       }
 
       if ($deffile) {
@@ -343,14 +328,13 @@ sub ACTION_ontologies {
           catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
         );
 
-        $m->log->debug( "system call: $sys_call" );
+        warn "system call: $sys_call" if $DEBUG;
 
         $result = system( $sys_call );
 
         if ( $result != 0 ) {
           print "System call '$sys_call' failed: $?\n";
-          $m->log->fatal("failed: $?");
-          die;
+          die "failed: $?";
         }
 
 
@@ -359,7 +343,7 @@ sub ACTION_ontologies {
           catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
         );
 
-        $m->log->debug( "system call: $sys_call" );
+        warn "system call: $sys_call" if $DEBUG;
 
         $result = system( $sys_call );
 
@@ -367,45 +351,28 @@ sub ACTION_ontologies {
 
       if ( $result != 0 ) {
         print "System call '$sys_call' failed: $?\n";
-        $m->log->fatal("failed: $?");
-        die;
+        die "failed: $?";
       }
       else {
         $m->_loaded( catfile($conf->{'path'}{'data'}, $file->{'local'}), 1 );
         $m->_loaded( catfile($conf->{'path'}{'data'}, $deffile->{'local'}), 1 ) if $deffile;
         print "done!\n";
-        $m->log->debug("done!");
+        warn "done!" if $DEBUG;
       }
     }
   }
-
-  #fix up DBIx::DBStag stomping on part_of and derives_from
-#  $m->log->debug("fix up DBIx::DBStag stomping on part_of and derives_from");
-#  my $dbh = DBI->connect("dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port",
-#                         $db_user, $db_pass);
-#  $dbh->do("UPDATE cvterm SET 
-#                     cv_id = (SELECT cv_id FROM cv WHERE name='relationship')
-#                     WHERE name='derives_from'"); 
-#  $dbh->do("UPDATE cvterm SET
-#                     cv_id = (SELECT cv_id FROM cv WHERE name='relationship')
-#                     WHERE name='part_of'");
-#  $dbh->disconnect;
-
-  $m->log->info("leaving ACTION_ontologies");
 }
 
 sub ACTION_tokenize {
   my $m    = shift;
   my $conf = $m->conf;
 
-  $m->log->info('entering ACTION_tokenize');
-
   my $template = Template->new(
     {
       INTERPOLATE => 0,
       RELATIVE    => 1,
     }
-  ) || ( $m->log->fatal("Template error: $Template::ERROR") and die );
+  ) ||  die "Template error: $Template::ERROR" ;
 
   foreach my $templatefile ( keys %{ $conf->{template}{file} } ) {
 
@@ -424,19 +391,17 @@ sub ACTION_tokenize {
 
     my $tokenized;
 
-    $m->log->debug(Dumper($tokens));
+    warn Dumper($tokens) if $DEBUG;
 
     $template->process( 
       $conf->{template}{file}{$templatefile}{in}, 
       $tokens,
       \$tokenized,
-    ) || ( $m->log->fatal( "Template error: " . $template->error() ) and die );
+    ) ||  die "Template error: " . $template->error() ;
     open( OUT, '>' . $conf->{template}{file}{$templatefile}{out} );
     print OUT $tokenized;
     close(OUT);
   }
-
-  $m->log->info('leaving ACTION_tokenize');
 }
 
 =head1 NON-ACTIONS
@@ -455,7 +420,6 @@ sub ACTION_tokenize {
 =cut
 sub fetchAndLoadFiles {
   my ( $m, $conf, $type, $command, $itm ) = @_;
-  $m->log->info('entering fetchAndLoadFiles');
 
   foreach my $key ( keys %$itm ) {
     print "fetching files for $key\n";
@@ -469,7 +433,7 @@ sub fetchAndLoadFiles {
         $fullpath =~ s!^(.+)/[^/]*!$1!;
 
         unless ( -d $fullpath ) {
-          $m->log->debug("mkpath $fullpath");
+          warn "mkpath $fullpath" if $DEBUG;
           mkpath( $fullpath, 0, 0711 )
             or print "Couldn't make path '$fullpath': $!\n";
         }
@@ -483,25 +447,22 @@ sub fetchAndLoadFiles {
         print "    loading...";
 
         my $sys_call = join( ' ', $command, $fullpath );
-        $m->log->debug( "system call: $sys_call" );
+        warn "system call: $sys_call" if $DEBUG;
 
         my $result = system( $sys_call );
 
         if ( $result != 0 ) {
           print "failed: $!\n";
-          $m->log->fatal("failed: $!");
-          die;
+          die "failed: $!";
         }
         else {
           $m->_loaded( $fullpath, 1 );
           print "done!\n";
-          $m->log->debug("done!");
+          warn "done!" if $DEBUG;
         }
       }
     }
   }
-
-  $m->log->info('leaving fetchAndLoadFiles');
 }
 
 
@@ -558,17 +519,6 @@ sub conf {
   );
 
   return $self->{conf};
-}
-
-sub log {
-  my $m = shift;
-  if(!$m->{log}){
-	my $pack = ref($m);
-	$pack =~ s/::/./g;
-	$m->{log} = Log::Log4perl->get_logger($pack);
-	$m->{log}->info("starting log for $pack");
-  }
-  return $m->{log};
 }
 
 sub _loaded {

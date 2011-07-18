@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (9 tables)
+	Table listing (10 tables)
  -->
 
 <a name="top" />
@@ -136,6 +136,18 @@
 
 <!-- 
 	End link to table 'cvprop'
+ -->
+
+<!-- 
+	Start link to table 'chadoprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="chadoprop-link" href="#chadoprop">chadoprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'chadoprop'
  -->
 
 </table>
@@ -1736,7 +1748,7 @@ default 0 value should be used. </td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td>
+	<td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -1797,7 +1809,140 @@ default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>value</td>
+	<td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td>
+	<td>cv_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'chadoprop'
+ -->
+
+<a name="chadoprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	chadoprop
+</h3></td>
+		<a name="chadoprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: chadoprop <br />
+	================================================ <br />
+	This table is different from other prop tables in the database, as it is for storing information about the database itself, like schema version 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="chadoprop-chadoprop_id">chadoprop_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">11</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="chadoprop-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="chadoprop-value">value</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="chadoprop-rank">rank</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault">0</td>
+	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+cv can have multiple values for any particular property type -
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used. </td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>chadoprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1807,7 +1952,7 @@ default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>UNIQUE</td>
-	<td>cv_id, type_id, rank</td>
+	<td>type_id, rank</td>
 </tr>
 
 </table>
