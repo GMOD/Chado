@@ -738,10 +738,10 @@
 
 <tr class="tr-even">
 	<td class="FieldCellName"><a name="nd_experimentprop-value">value</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
+	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
 </tr>
 
@@ -794,11 +794,6 @@
 <tr class="IndexCell">
 	<td>FOREIGN KEY</td>
 	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>value</td>
 </tr>
 
 <tr class="IndexCell">
@@ -1057,9 +1052,9 @@
 
 <tr class="tr-even">
 	<td class="FieldCellName"><a name="nd_geolocationprop-value">value</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">250</td>
-	<td class="FieldCellDefault"></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
 	<td class="FieldCellOther">The value of the property. </td>
 	<td class="FieldCellFK"></td>
 </tr>
@@ -1206,6 +1201,15 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_protocol-type_id">type_id</a></td>
+	<td class="FieldCellType">integer</td>
+	<td class="FieldCellSize">10</td>
+	<td class="FieldCellDefault"></td>
+	<td class="FieldCellOther">NOT NULL</td>
+	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
 </table>
 
 <h3>
@@ -1236,6 +1240,21 @@
 <tr class="IndexCell">
 	<td>UNIQUE</td>
 	<td>name</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>type_id</td>
 </tr>
 
 </table>
@@ -1596,9 +1615,9 @@
 
 <tr class="tr-even">
 	<td class="FieldCellName"><a name="nd_protocolprop-value">value</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
 	<td class="FieldCellOther">The value of the property. </td>
 	<td class="FieldCellFK"></td>
 </tr>
@@ -2463,9 +2482,9 @@
 
 <tr class="tr-even">
 	<td class="FieldCellName"><a name="nd_reagentprop-value">value</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
 	<td class="FieldCellOther"></td>
 	<td class="FieldCellFK"></td>
 </tr>
@@ -2623,9 +2642,9 @@
 
 <tr class="tr-even">
 	<td class="FieldCellName"><a name="nd_experiment_stockprop-value">value</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">NULL</td>
 	<td class="FieldCellOther">The value of the property. </td>
 	<td class="FieldCellFK"></td>
 </tr>

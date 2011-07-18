@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta name="generator" content="SQL::Translator::Producer::HTML" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body>
@@ -91,9 +91,11 @@
 
 <em>
 	<br />
-	$Id: phenotype.html,v 1.4 2007-07-12 17:55:11 scottcain Exp $ <br />
+	$Id: phenotype.sql,v 1.6 2007-04-27 16:09:46 emmert Exp $ <br />
 	========================================== <br />
 	Chado phenotype module <br />
+	05-31-2011 <br />
+	added 'name' column to phenotype. non-unique human readable field. <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import cvterm from cv <br />
@@ -149,6 +151,15 @@
 </tr>
 
 <tr class="tr-odd">
+	<td class="FieldCellName"><a name="phenotype-name">name</a></td>
+	<td class="FieldCellType">text</td>
+	<td class="FieldCellSize">64000</td>
+	<td class="FieldCellDefault">null</td>
+	<td class="FieldCellOther"></td>
+	<td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phenotype-observable_id">observable_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -157,7 +168,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr class="tr-even">
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phenotype-attr_id">attr_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -166,7 +177,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr class="tr-odd">
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phenotype-value">value</a></td>
 	<td class="FieldCellType">text</td>
 	<td class="FieldCellSize">64000</td>
@@ -175,7 +186,7 @@
 	<td class="FieldCellFK"></td>
 </tr>
 
-<tr class="tr-even">
+<tr class="tr-odd">
 	<td class="FieldCellName"><a name="phenotype-cvalue_id">cvalue_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -184,7 +195,7 @@
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
-<tr class="tr-odd">
+<tr class="tr-even">
 	<td class="FieldCellName"><a name="phenotype-assay_id">assay_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
@@ -610,7 +621,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08_01</a>
+SQL::Translator 0.11003</a>
 
 </body>
 </html>
