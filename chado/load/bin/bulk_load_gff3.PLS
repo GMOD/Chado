@@ -125,6 +125,9 @@ $0 - Bulk loads gff3 files into a chado database.
  --use_public_cv   When loading into a non-public schema, load any cv and
                      cvterm data into the public schema
  --end_sql         SQL code to execute after the data load is complete
+ --allow_external_parent 
+                   Allow Parent tags to refer to IDs outside the current
+                   GFF file
 
 Note that all of the arguments that begin 'db' as well as organism can
 be provided by default by Bio::GMOD::Config, which was installed when
@@ -537,13 +540,25 @@ this method of grouping.  Instead the parent feature must be explicitly
 created before the parts and the parts must refer to the parent with the 
 Parent tag.
 
+=item External Parent IDs
+
+The GFF3 specification states that IDs are only valid within a single
+GFF file, so you can't have Parent tags that refer to IDs in another 
+file.  By specificifying the "allow_external_parent" flag, you can
+relax this restriction.  A word of warning however: if the parent feature's
+uniquename/ID was modified during loading (to make it unique), this
+functionality won't work, as it won't beable to find the original
+feature correctly.  Actually, it may be worse than not working,
+it may attach child features to the wrong parent.  This is why it is
+a bad idea to use this functionality!  Please use with caution.
+
 =back
 
 =head1 AUTHORS
 
-Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>cain@cshl.orgE<gt>
+Allen Day E<lt>allenday@ucla.eduE<gt>, Scott Cain E<lt>scain@cpan.orgE<gt>
 
-Copyright (c) 2004
+Copyright (c) 2011
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -556,7 +571,8 @@ my ($ORGANISM, $GFFFILE,$FASTAFILE,$DBPROFILE, $DBNAME, $DBUSER, $DBPASS,$DBHOST
     $DROP_INDEX, $NOEXON, $NOUNIQUECACHE, $RECREATE_CACHE, $SAVE_TMPFILES,$RANDOM_TMP_DIR,
     $NO_TARGET_SYN, $UNIQUE_TARGET, $DBXREF, $FP_CV, $NO_ADDFP_CV, 
     $MANPAGE, $DEBUG, $DELETE, $DELETE_CONFIRM, $CUSTOM_ADAPTER,
-    $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM, $END_SQL, $REMOVE_LOCK, );
+    $PRIVATE_SCHEMA, $USE_PUBLIC_CV, $NO_SKIP_VACUUM, $END_SQL, $REMOVE_LOCK,
+    $ALLOW_EXTERNAL_PARENT, );
 
 GetOptions(
     'organism=s' => \$ORGANISM,
@@ -598,6 +614,7 @@ GetOptions(
     'private_schema=s' => \$PRIVATE_SCHEMA,
     'use_public_cv'    => \$USE_PUBLIC_CV,
     'end_sql:s'        => \$END_SQL,
+    'allow_external_parent' => \$ALLOW_EXTERNAL_PARENT,
 ) 
 # or ( system( 'pod2text', $0 ), exit -1 );
 or pod2usage(-verbose => 1, -exitval => 1);
@@ -696,6 +713,7 @@ my %argv;
   $argv{addpropertycv}= ! $NO_ADDFP_CV; #dgg
   $argv{private_schema} = $PRIVATE_SCHEMA;
   $argv{use_public_cv}= $USE_PUBLIC_CV;
+  $argv{allow_external_parent} = $ALLOW_EXTERNAL_PARENT;
 
 #allow a feature_id to be referenced by multiple featureloc.feature_id's
 my %locgroup = ();

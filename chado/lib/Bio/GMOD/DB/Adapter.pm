@@ -268,6 +268,7 @@ sub new {
     $self->{'addpropertycv'}= $arg{addpropertycv}; # dgg
     $self->private_schema(  $arg{private_schema}  );
     $self->use_public_cv(   $arg{use_public_cv}   );
+    $self->allow_external_parent($arg{allow_external_parent});
     
     $self->{const}{source_success} = 1; #flag to indicate GFF_source is in db table
 
@@ -1078,6 +1079,41 @@ sub fp_cv {
     return $self->{'fp_cv'} = $fp_cv if defined($fp_cv);
     return $self->{'fp_cv'};
 }
+
+=head2 allow_external_parent
+
+=over
+
+=item Usage
+
+  $obj->allow_external_parent()        #get existing value
+  $obj->allow_external_parent($newval) #set new value
+
+=item Function
+
+Flag to allow the GFF parser to look in the database for
+a Parent ID, which is not allowed by the GFF3 spec.
+
+=item Returns
+
+value of allow_external_parent (a scalar)
+
+=item Arguments
+
+new value of allow_external_parent (to set)
+
+=back
+
+=cut
+
+sub allow_external_parent {
+    my $self = shift;
+    my $allow_external_parent = shift if defined(@_);
+
+    return $self->{'allow_external_parent'} = $allow_external_parent if defined($allow_external_parent);
+    return $self->{'allow_external_parent'};
+}
+
 
 
 =head2 recreate_cache
@@ -4395,6 +4431,14 @@ sub handle_parent {
                     ? $self->modified_uniquename(orig_id => $orig_pname, organism_id => $organism_id)
                     : $orig_pname;
         my $parent = $self->cache('feature',$pname);
+
+        if (!$parent and $self->allow_external_parent() ) {
+            #the uniquename_cache method returns the feature_id when called with "validate"
+            $parent = $self->uniquename_cache( validate    => 1,
+                                        organism_id => $organism_id,
+                                        uniquename  => $pname);        
+        }
+
         confess "\nno parent $orig_pname ($pname);\nyou probably need to rerun the loader with the --recreate_cache option\n\n" unless $parent;
 
         $self->cache('parent',$self->nextfeature,$parent);
