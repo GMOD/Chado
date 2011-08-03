@@ -61,6 +61,7 @@ if ($FORCE and $VERSION >0) {
 }
 elsif (defined $VERSION) {
     my $version = determine_version($dbh);
+    print "$version\n";
 }
 elsif ($PROPERTY eq 'all') {
     my %prop = get_all_properties($dbh);
@@ -76,7 +77,7 @@ sub set_version {
     my $version = shift;
     my $dbh     = shift;
 
-    unless (looks_like_number($version) and $version > 1.19){
+    if (looks_like_number($version) and $version > 1.19){
         my $set_query = "INSERT INTO chadoprop (type_id, value) VALUES ((SELECT cvterm_id FROM cvterm WHERE cv_id in (SELECT cv_id FROM cv WHERE name = 'chado_properties') AND name = 'version'),?)";
         my $sth = $dbh->prepare($set_query);
         $sth->execute($version) or die "database error: $!";
@@ -89,11 +90,36 @@ sub set_version {
 sub determine_version {
     my $dbh = shift;
 
+    my $table_query = "SELECT 1 FROM pg_tables WHERE tablename = ?";
+    my $sth = $dbh->prepare($table_query);
+
     #if chadoprop exists, query it
+    $sth->execute('chadoprop');
+    if ($sth->fetchrow_array) {
+        my $version_query = "SELECT value FROM chadoprop WHERE type_id in (SELECT cvterm_id FROM cvterm WHERE cv_id in (SELECT cv_id FROM cv WHERE name = 'chado_properties') AND name = 'version')";
+
+        my $isth = $dbh->prepare($version_query);
+        $isth->execute();
+        my ($version) = $isth->fetchrow_array();
+        return $version;
+    }   
 
     #if cvprop table exists, then it's 1.11 (or 1.1, same schema)
+    $sth->execute('cvprop');
+    if ($sth->fetchrow_array) {
+        return '1.11';
+    }
 
     #if all_feature_names, then it's 1.0
+    my $view_query = "SELECT 1 FROM pg_views WHERE viewname =?";
+    $sth = $dbh->prepare($view_query);
+    $sth->execute('all_feature_names');
+    if ($sth->fetchrow_array) {
+        return '1';
+    }
+ 
+    #must be something older
+    return 'unknown';
 }
 
 sub get_all_properties {
