@@ -46,6 +46,8 @@ use File::Spec::Functions qw[ catfile catdir ];
 use Template;
 use Module::Build;
 
+my $VERSION = 1.2;
+
 my %args    =  (
   DBDRIVER  => {
     default => 'PostgreSQL'
@@ -385,6 +387,7 @@ print join("\n",
   "  LOCAL_TMP=$LOCAL_TMP",
   "  DBORGANISM=$DBORGANISM",
   "  DEFAULT=$DEFAULT",
+  "  VERSION=$VERSION",
 ),"\n\n";
 
 #
@@ -402,6 +405,7 @@ if ( open CONF, ">$build_config" ) {
   $conf{'PREFIX'}   = $opts{'PREFIX'};
   $conf{'LIB'}      = $opts{'LIB'};
   $conf{'DEFAULT'}  = $DEFAULT;
+  $conf{'VERSION'}  = $VERSION;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";
@@ -502,7 +506,7 @@ WriteMakefile(
 #      'INSTALLSITELIB' => '$(INSTALLSITEARCH)',
     'NAME'		            => 'chado',
 #    'NAME'                => 'gmod',
-    'VERSION'             => '1.2',
+    'VERSION'             => $VERSION,
     'PREREQ_PM'		        => { 
       #'SQL::Translator'   => 0.05,
       #'Class::DBI'        => 0.94,

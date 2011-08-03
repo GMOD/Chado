@@ -74,6 +74,7 @@ sub ACTION_prepdb {
   my $db_port   = $conf->{'database'}{'db_port'}  || '';
   my $db_user   = $conf->{'database'}{'db_username'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
+  my $schema_version = $conf->{'build'}{'version'};
   my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
   my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
 
