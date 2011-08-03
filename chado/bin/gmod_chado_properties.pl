@@ -124,9 +124,33 @@ sub determine_version {
 
 sub get_all_properties {
     my $dbh = shift;
+
+    my $props_query = "SELECT cvterm.name, cp.value, cp.rank FROM chadoprop cp JOIN cvterm ON (cvterm.cvterm_id = cp.type_id)";
+    my $sth = $dbh->prepare($props_query);
+    $sth->execute();
+
+    print_table($sth);
+    return;
 }
 
 sub get_property {
     my $tag = shift;
     my $dbh = shift;
+
+    my $prop_query = "SELECT cvterm.name, cp.value, cp.rank FROM chadoprop cp JOIN cvterm ON (cvterm.cvterm_id = cp.type_id) WHERE cvterm.name = ?";
+    my $sth = $dbh->prepare($prop_query);
+    $sth->execute($tag);
+
+    print_table($sth);
+    return;
+}
+
+sub print_table {
+    my $sth = shift;
+
+    print "tag\tvalue\trank\n";
+    while (my @row = $sth->fetchrow_array) {
+        print join("\t", @row)."\n";
+    }
+    return;
 }
