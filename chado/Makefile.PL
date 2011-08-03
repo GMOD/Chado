@@ -494,6 +494,7 @@ my @exe_files = (
            'bin/gmod_bulk_load_pubmed.pl',
            'bin/gmod_make_cvtermpath.pl',
            'bin/gmod_add_organism.pl',
+           'bin/gmod_chado_properties.pl',
 #           'bin/gmod_bulkfiles.pl',
 #           'bin/gmod_gff2biomart5.pl',
 );
@@ -738,6 +739,9 @@ prepdb ::
 
 ontologies ::
 	./Build ontologies
+
+update ::
+	./Build update
 
 rm_locks ::
 	`find $LOCAL_TMP -name "*$DBNAME" -exec rm -f '{}' ';'`
