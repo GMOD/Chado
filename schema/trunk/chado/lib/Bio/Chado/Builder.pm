@@ -16,13 +16,19 @@ use XML::Simple;
 use LWP::Simple qw(mirror is_success status_message);
 use DBI;
 use IPC::Cmd ();
+use Scalar::Util qw(looks_like_number);
 my $DEBUG = 0;
 my $go2fmt = IPC::Cmd::can_run('go2fmt') ? 'go2fmt' : 'go2fmt.pl'; #< detect new version of go2fmt
 
 
 =head1 ACTIONS
 
-= item prepdb()
+=item update()
+
+Checks an existing default Chado schema to determine its
+version and attempts to update it to the current release.
+
+=item prepdb()
 
 Calls the psql command and pipes in the contents of the 
 load/etc/initialize.sql file.  Put any insert statements that
@@ -74,7 +80,7 @@ sub ACTION_prepdb {
   my $db_port   = $conf->{'database'}{'db_port'}  || '';
   my $db_user   = $conf->{'database'}{'db_username'}  || '';
   my $build_dir = $conf->{'build'}{'working_dir'} || '';
-  my $schema_version = $conf->{'build'}{'version'};
+  my $schema_version = $m->dist_version;
   my $init_sql  = catfile( $build_dir, 'load', 'etc', 'initialize.sql' );
   my $sys_call  = "psql -h $db_host -p $db_port -U $db_user -f $init_sql $db_name";
 
@@ -94,6 +100,43 @@ sub ACTION_prepdb {
       }  
   } 
 
+}
+
+=head2 ACTION_update
+
+ Title   : ACTION_update
+ Usage   :
+ Function: Attempts to update an existing Chado schema
+ Example :
+ Returns : 
+ Args    :
+
+=cut
+
+sub ACTION_update {  # the build object $m
+  my $m = shift;
+  # the XML config object
+  my $conf = $m->conf;
+
+  my $db_name   = $conf->{'database'}{'db_name'}  || '';
+  my $db_host   = $conf->{'database'}{'db_host'}  || '';
+  my $db_port   = $conf->{'database'}{'db_port'}  || '';
+  my $db_user   = $conf->{'database'}{'db_username'}  || '';
+  my $build_dir = $conf->{'build'}{'working_dir'} || '';
+  my $schema_version = $m->dist_version;
+
+  my $version = `gmod_chado_properties.pl --dbprofile $db_name --version`; 
+  chomp $version;
+
+  if (looks_like_number($version) and $version < $schema_version) {
+    print "Attempting schema update.\n";
+  } 
+  elsif (looks_like_number($version) and $version >= $schema_version) {
+    print "No update necessary.\n";
+  }
+  else {
+    print "Unable to determine schema version; exiting...\n";
+  } 
 }
 
 =head2 ACTION_ncbi
