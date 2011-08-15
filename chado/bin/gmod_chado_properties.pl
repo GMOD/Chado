@@ -105,7 +105,7 @@ sub determine_version {
     }   
 
     #if cvprop table exists, then it's 1.11 (or 1.1, same schema)
-    $sth->execute('cvprop');
+    $sth->execute('cell_line');
     if ($sth->fetchrow_array) {
         return '1.11';
     }
