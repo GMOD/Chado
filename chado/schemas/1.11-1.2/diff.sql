@@ -131,7 +131,7 @@ ALTER TABLE stock alter organism_id drop not null;
  CREATE TABLE stock_relationship_cvterm (
  	stock_relationship_cvterm_id SERIAL NOT NULL,
  	PRIMARY KEY (stock_relationship_cvterm_id),
- 	stock_relatiohship_id integer NOT NULL,
+ 	stock_relationship_id integer NOT NULL,
  	FOREIGN KEY (stock_relationship_id) references stock_relationship (stock_relationship_id) ON DELETE CASCADE INITIALLY DEFERRED,
  	cvterm_id integer NOT NULL,
  	FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE RESTRICT,
