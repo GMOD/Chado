@@ -130,6 +130,7 @@ sub ACTION_update {  # the build object $m
 
   if (looks_like_number($version) and $version < $schema_version) {
     print "Attempting schema update.\n";
+    system("gmod_update_chado.pl --dbprofile $db_name");
   } 
   elsif (looks_like_number($version) and $version >= $schema_version) {
     print "No update necessary.\n";
