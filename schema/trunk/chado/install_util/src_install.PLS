@@ -49,6 +49,7 @@ if (! (-e $src_dir) ) {
 }
 
 copy_tree('modules',$src_dir);
+copy_tree('schemas',$src_dir);
 
 chdir $origdir;                                                                                
 !NO!SUBS!
