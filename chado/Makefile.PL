@@ -580,9 +580,10 @@ sub MY::c_o {
 # TODO: this should be rewritten to use the metadata xml
 sub MY::postamble {
   my $root = "GMOD_ROOT=$O{GMOD_ROOT}";
+  my $version = "VERSION=$VERSION";
   qq{
 conf_install ::
-	\$(PERL) \"$working_dir/install_util/conf_install.pl\" '$root'
+	\$(PERL) \"$working_dir/install_util/conf_install.pl\" '$root' '$version'
 
 src_install ::
 	\$(PERL) \"$working_dir/install_util/src_install.pl\" '$root'

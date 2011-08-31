@@ -25,6 +25,7 @@ foreach (@ARGV) {
 
 my %options = map {split /=/} @ARGV;
 my $gmod_root = $options{GMOD_ROOT};
+my $version   = $options{VERSION};
 my $confdir   = "$gmod_root/conf";
 my $tmpdir    = "$gmod_root/tmp";
 
@@ -66,6 +67,7 @@ my $dbconf      = "$confdir/$confitems{DBNAME}.conf";
 open GMODCONF, ">$gmodconf" or die "unable to open $gmodconf: $!";
 print GMODCONF "CONF=$gmod_root/conf\n";
 print GMODCONF "TMP=$gmod_root/tmp\n";
+print GMODCONF "VERSION=$version\n";
 close GMODCONF;
 
 open DBCONF,  ">$dbconf" or die "unable to open $dbconf: $!";

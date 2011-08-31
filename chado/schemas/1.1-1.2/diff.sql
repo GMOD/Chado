@@ -42,12 +42,12 @@
  properties that are single-valued rather than multi-valued, the
  default 0 value should be used.';
 
-ALTER TABLE gencode_startcodon ADD  CONSTRAINT gencode_startcodon_unique UNIQUE( gencode_id, codon );
+ALTER TABLE genetic_code.gencode_startcodon ADD  CONSTRAINT gencode_startcodon_unique UNIQUE( gencode_id, codon );
 
 ALTER TABLE phenotype ADD COLUMN name TEXT default null;
 
 ALTER TABLE genotype ADD COLUMN type_id INT NOT NULL;
-ALTER TABLE genotype ADD CONSTRAINT FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE;
+ALTER TABLE genotype ADD CONSTRAINT genotype_type_id_fkey FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE;
 
 
  create table genotypeprop (
@@ -138,9 +138,7 @@ ALTER TABLE stock alter organism_id drop not null;
  	pub_id integer,
  	FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE RESTRICT
  );
-< COMMENT ON TABLE stock_relationship_cvterm is 'For germplasm maintenance and pedigree data, stock_relationship. type_id will record cvterms such as "is a female parent of", "a parent for mutation", "is a group_id of", "is a source_id of", etc The cvterms for higher categories such as "generative", "derivative" or "maintenance" can be stored in table stock_relationship_cvterm';
-< 
-< 
+COMMENT ON TABLE stock_relationship_cvterm is 'For germplasm maintenance and pedigree data, stock_relationship. type_id will record cvterms such as "is a female parent of", "a parent for mutation", "is a group_id of", "is a source_id of", etc The cvterms for higher categories such as "generative", "derivative" or "maintenance" can be stored in table stock_relationship_cvterm';
 
 
 alter table stock_cvterm add column is_not boolean not null default false;

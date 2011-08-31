@@ -12,6 +12,7 @@ Bio::GMOD::Config -- a GMOD utility package for reading config files
     my $conf    = Bio::GMOD::Config->new();
     my $tmpdir  = $conf->tmpdir();
     my $confdir = $conf->confdir();
+    my $version = $conf->version();
 
     my @dbnames = $conf->available_dbs();
 
@@ -201,6 +202,24 @@ sub confdir {
     shift->{'confdir'};
 }
 
+=head2 version
+
+ Title   : version
+ Usage   : $version = $config->version();
+ Function: returns the version of the currently installed Chado software
+ Returns : see above
+ Args    : none
+ Status  : public
+
+
+=cut
+
+
+sub version {
+    shift->get_tag_value('VERSION');;
+}
+
+
 =head2 tmp
 
  Title   : tmp
@@ -240,9 +259,9 @@ sub gmod_root {
 
 =head1 AUTHOR
                                                                                 
-Scott Cain E<lt>cain@cshl.orgE<gt>.
+Scott Cain E<lt>scain@cpan.orgE<gt>.
                                                                                 
-Copyright (c) 2004 Cold Spring Harbor Laboratory
+Copyright (c) 2011 Cold Spring Harbor Laboratory
                                                                                 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
