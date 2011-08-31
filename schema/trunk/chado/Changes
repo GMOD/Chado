@@ -17,6 +17,10 @@ into the db table. (Scott)
 * Removed the dependency on Log::Log4perl (it was overkill for what it
 was being used for) (Scott)
 * Bumped the version to 1.2 because of the new schema module. (Scott)
+* Added gmod_chado_properties.pl to examine the chadoprop table and return
+values on the command line (like the schema version) (Scott)
+* Added gmod_update_chado.pl to update the schema automatically, and added
+a make target (make update) to make updating easier. (Scott)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
