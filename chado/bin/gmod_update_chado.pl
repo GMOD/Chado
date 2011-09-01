@@ -59,9 +59,11 @@ if ($current_version >= $version) {
 
 if (!defined $FORCE) {
     print <<END
+
 The schema needs updating; this will add columns and/or tables, and should
 not delete any data, but we still advise you to back up your database
 before continuing.  
+
 END
 ;
     my $YN = prompt ("Continue with update?", "y");
