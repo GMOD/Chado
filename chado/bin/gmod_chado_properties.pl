@@ -30,6 +30,9 @@ The main use of this script is to get or set the schema version for use during
 schema updates.  It can also get any named property (based on the cvterm in
 the chadoprop table), or a list of all properties in the chadoprop table.
 
+In older (pre-1.2) versions of Chado, updating the schema version has the 
+side effect of creating the chadoprop table and a chado_properties cv.
+
 =head1 AUTHOR
 
 Scott Cain E<lt>scain@cpan.orgE<gt>
@@ -78,13 +81,49 @@ sub set_version {
     my $dbh     = shift;
 
     if (looks_like_number($version) and $version > 1.19){
-        my $set_query = "INSERT INTO chadoprop (type_id, value) VALUES ((SELECT cvterm_id FROM cvterm WHERE cv_id in (SELECT cv_id FROM cv WHERE name = 'chado_properties') AND name = 'version'),?)";
-        my $sth = $dbh->prepare($set_query);
-        $sth->execute($version) or die "database error: $!";
+        #first make sure the chado_properties cv is available
+        my $cp_query = "SELECT cv_id FROM cv WHERE name = 'chado_properties'";
+        my $sth = $dbh->prepare($cp_query);
+        $sth->execute();
+        my ($cv_id) = $sth->fetchrow_array;
+
+        my $cvterm_id;
+        unless ($cv_id) {
+            #chado_properties is not available, so create it
+            my $cv_insert = "insert into cv (name,definition) values ('chado_properties','Terms that are used in the chadoprop table to describe the state of the database')";
+            $dbh->do($cv_insert);
+
+            insert_version_term($dbh);
+        }
+
+        #check that the version term is available
+        my $version_query = "SELECT cvterm_id FROM cvterm WHERE cv_id in (SELECT cv_id FROM cv WHERE name = 'chado_properties') AND name = 'version'";
+        $sth = $dbh->prepare($version_query);
+        $sth->execute();
+        ($cvterm_id) = $sth->fetchrow_array;
+
+        unless ($cvterm_id) {
+            insert_version_term($dbh); 
+
+            $sth->execute();
+            ($cvterm_id) = $sth->fetchrow_array;
+        }
+
+        my $set_query = "INSERT INTO chadoprop (type_id, value) VALUES (?,?)";
+        $sth = $dbh->prepare($set_query);
+        $sth->execute($cvterm_id,$version) or die "database error: $!";
     }
     else {
         die "$version doesn't look like a valid version number.";
     }
+}
+
+sub insert_version_term {
+    my $dbh = shift;
+
+    $dbh->do("insert into dbxref (db_id,accession) values ((select db_id from db where name='null'), 'chado_properties:version')");
+    $dbh->do("insert into cvterm (name,definition,cv_id,dbxref_id) values ('version','Chado schema version',(select cv_id from cv where name = 'chado_properties'),(select dbxref_id from dbxref where accession='chado_properties:version'));");
+
 }
 
 sub determine_version {
