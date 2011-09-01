@@ -57,6 +57,20 @@ if ($current_version >= $version) {
     exit(0);
 }
 
+if (!defined $FORCE) {
+    print <<END
+The schema needs updating; this will add columns and/or tables, and should
+not delete any data, but we still advise you to back up your database
+before continuing.  
+END
+;
+    my $YN = prompt ("Continue with update?", "y");
+    if ($YN =~ /^n/i) {
+        print  "OK, exiting...\n";
+        exit(0);
+    }
+}
+
 #build path to get updates from
 my $path = "$gmod_root/src/chado/schemas/$current_version-$version/diff.sql";
 warn $path;
@@ -69,6 +83,9 @@ my $dbname = $db_conf->name;
 my $syscommand = "cat $path | psql -U $dbuser -p $dbport -h $dbhost $dbname";
 warn $syscommand;
 system($syscommand) == 0 or die "failed updating database";
+
+#now update the schema version in the chadoprop table
+system("gmod_chado_properties.pl --version $version --force --dbprof $DBPROFILE");
 
 print "Updating $dbname complete.\n";
 
