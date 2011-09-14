@@ -8609,7 +8609,7 @@
    DROP TABLE audit_stock_relationship_cvterm;
    CREATE TABLE audit_stock_relationship_cvterm ( 
        stock_relationship_cvterm_id integer, 
-       stock_relatiohship_id integer, 
+       stock_relationship_id integer, 
        cvterm_id integer, 
        pub_id integer, 
        transaction_date timestamp not null default now(),
@@ -8621,14 +8621,14 @@
    '
    DECLARE
        stock_relationship_cvterm_id_var integer; 
-       stock_relatiohship_id_var integer; 
+       stock_relationship_id_var integer; 
        cvterm_id_var integer; 
        pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
        stock_relationship_cvterm_id_var = OLD.stock_relationship_cvterm_id;
-       stock_relatiohship_id_var = OLD.stock_relatiohship_id;
+       stock_relationship_id_var = OLD.stock_relationship_id;
        cvterm_id_var = OLD.cvterm_id;
        pub_id_var = OLD.pub_id;
        
@@ -8640,13 +8640,13 @@
 
        INSERT INTO audit_stock_relationship_cvterm ( 
              stock_relationship_cvterm_id, 
-             stock_relatiohship_id, 
+             stock_relationship_id, 
              cvterm_id, 
              pub_id, 
              transaction_type
        ) VALUES ( 
              stock_relationship_cvterm_id_var, 
-             stock_relatiohship_id_var, 
+             stock_relationship_id_var, 
              cvterm_id_var, 
              pub_id_var, 
              transaction_type_var

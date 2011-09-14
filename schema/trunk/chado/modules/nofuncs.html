@@ -24937,12 +24937,12 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relatiohship_id">stock_relatiohship_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relationship_id">stock_relationship_id</a></td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
 	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellFK"><a href="#stock_relationship-stock_relationship_id">stock_relationship.stock_relationship_id</a></td>
 </tr>
 
 <tr class="tr-odd">
@@ -24950,7 +24950,7 @@ the default 0 value should be used. </td>
 	<td class="FieldCellType">integer</td>
 	<td class="FieldCellSize">10</td>
 	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, FOREIGN KEY (stock_relationship_id) references stock_relationship (stock_relationship_id) ON DELETE CASCADE INITIALLY DEFERRED,</td>
+	<td class="FieldCellOther">NOT NULL</td>
 	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
@@ -24987,7 +24987,12 @@ the default 0 value should be used. </td>
 
 <tr class="IndexCell">
 	<td>NOT NULL</td>
-	<td>stock_relatiohship_id</td>
+	<td>stock_relationship_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td>
+	<td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
