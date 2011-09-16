@@ -6,6 +6,7 @@ CVS
 \.swp$
 \.old$
 \.tmp$
+\.svn
 .*modules/.*\.png$
 .*modules/.*\.svg$
 Makefile$
@@ -30,4 +31,7 @@ load/bin/new_gff_loader.pl
 load/bin/load_ontology.PLS
 ^src/
 bin/gmod_materialize_gbrowse_views.pl
+Class-DBI-Pg-0.06-multiple-schemata.patch
+^chaos-xml
+log4perl.conf
 
