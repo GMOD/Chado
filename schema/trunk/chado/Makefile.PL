@@ -13,7 +13,11 @@ Makefile written.  Now you should do the following, in order:
          STEP 3 WILL DELETE ANY DATA IN A DATABASE WITH THE 
             DATABASE NAME YOU PROVIDED!
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*WARNING-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-  3. make load_schema (loads SQL schema into database)
+  3a. make load_schema (loads SQL schema into database)
+
+or
+
+  3b. make update     (update an old Chado schema and stop here)
   4. make prepdb      (loads basic data)
   5. make ontologies  (loads data for various ontologies)
 
