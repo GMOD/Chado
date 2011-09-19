@@ -96,7 +96,7 @@ CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR)
   RETURNS INT AS 
 'DECLARE
    v_dbname                ALIAS FOR $1;
-   v_accession             ALIAS FOR $1;
+   v_accession             ALIAS FOR $2;
 
    v_db_id                 INTEGER;
    v_dbxref_id             INTEGER;
