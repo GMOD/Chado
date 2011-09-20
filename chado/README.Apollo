@@ -1,3 +1,18 @@
+Note that this document is quite old, and while it may still work
+this way, it can't be guaranteed.  Most people who use Apollo
+with Chado do not do it this way anymore and instead use the 
+adapter that comes with Apollo (sometimes known as the "Crabtree
+adapter" after the original author Jonathan Crabtree).  For 
+more information on it, see the Apollo tutorial at the GMOD
+website:
+
+  http://gmod.org/wiki/Apollo_Tutorial
+
+Scott
+9/20/2011
+
+
+
 This needs to be better documented, but here is a start:
 
 In order to use Apollo read/write with chado, here are things that need to
