@@ -341,6 +341,5 @@ stag-templates/chado-roi.stg
 stag-templates/chado-upstream-of-alignment.stg
 stag-templates/make-publish
 stag-templates/README
-t/01_okay.t
 TODO
 UPGRADE.txt
