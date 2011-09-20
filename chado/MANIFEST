@@ -148,12 +148,10 @@ load/bin/bulk_load_gff3.PLS
 load/bin/load_gff3.PLS
 load/Build.PL
 load/etc/chap.obo
-load/etc/cv_property.obo
 load/etc/extra.sql
 load/etc/feature_property.obo
 load/etc/genbank_feature_property.obo
 load/etc/initialize.sql
-load/etc/log.conf
 load/etc/README
 load/logs/load.log
 Makefile.PL
