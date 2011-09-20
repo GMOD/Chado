@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+#This is old code and hasn't been tested!
 use strict;
 
 my @nucs = qw(T C A G);
