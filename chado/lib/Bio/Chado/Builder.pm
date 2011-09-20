@@ -92,7 +92,7 @@ sub ACTION_prepdb {
 
   my $db_org = $conf->{'database'}{'db_organism'};
 
-  if ($db_org and ($db_org ne 'none')) {
+  if ($db_org and $db_org ne 'none' and ref $db_org ne 'HASH') {
       my $result = `bin/gmod_add_organism.pl --name_only --common_name $db_org`;
       unless ($result) {
           print "Adding $db_org to the database...\n";
