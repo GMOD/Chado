@@ -153,7 +153,6 @@ load/etc/feature_property.obo
 load/etc/genbank_feature_property.obo
 load/etc/initialize.sql
 load/etc/README
-load/logs/load.log
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
