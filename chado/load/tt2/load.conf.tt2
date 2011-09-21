@@ -80,12 +80,13 @@
   </ontology>
 
 -->
-
+<!--
   <ontology name="Cell Ontology" order="5">
     <file type="obo" local="obo/anatomy/cell_type/cell.obo" remote="http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/cell_type/cell.obo?rev=HEAD" method="lwp-mirror"/>
   </ontology>
+-->
 
-  <ontology name="Plant Ontology" order="6">
+  <ontology name="Plant Ontology" order="5">
     <file type="obo" local="po/po_anatomy.obo" remote="http://palea.cgrb.oregonstate.edu/viewsvn/Poc/trunk/ontology/OBO_format/po_anatomy.obo?view=co" method="lwp-mirror"/>
   </ontology>
 
