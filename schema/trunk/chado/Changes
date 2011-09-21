@@ -21,6 +21,8 @@ was being used for) (Scott)
 values on the command line (like the schema version) (Scott)
 * Added gmod_update_chado.pl to update the schema automatically, and added
 a make target (make update) to make updating easier. (Scott)
+* Removed cell_type ontology from 'make ontologies' list as it wasn't loading
+via stag_storenode.pl at release time (Scott)
 
 Version 1.11 Tue May 25 11:10:47 EDT 2010
 * fixed an issue with accessing the primary_id of
