@@ -54,7 +54,7 @@ open LOCALCONF, $localconf or die "unable to open $localconf: $!";
 while (<LOCALCONF>) {
     chomp;
     my ($key, $value) = split /=/;
-    if ($key =~ /^DB/ or $key eq 'DEFAULT') {
+    if ($key =~ /^DB/ or $key eq 'DEFAULT' or $key eq 'SCHEMA') {
         $confitems{$key} = $value;
     }
 }

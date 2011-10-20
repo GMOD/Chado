@@ -50,7 +50,7 @@ use File::Spec::Functions qw[ catfile catdir ];
 use Template;
 use Module::Build;
 
-my $VERSION = 1.2;
+my $VERSION = 1.21;
 
 my %args    =  (
   DBDRIVER  => {
@@ -83,6 +83,9 @@ my %args    =  (
   },
   DEFAULT   => {
     default => 'y'
+  },
+  SCHEMA    => {
+    default => 'public'
   },
 );
 
@@ -237,7 +240,7 @@ my %db_lookup = reverse %VALID_DBS;
 # Now figure out where the values are coming from -- build.conf, 
 # command-line, or prompt().
 #
-my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,
+my ( $DBDRIVER, $DBNAME, $DBUSER, $DBPASS, $DBHOST, $DBPORT,$SCHEMA,
   $SQLFILES, $EXTERNAL_DDL, $LOCAL_TMP, $DBORGANISM, $APOLLO, $DEFAULT);
 
 $O{'SIMPLE'} = prompt(
@@ -263,6 +266,7 @@ if ( $opts{'RECONFIGURE'} && %conf ) {
   $DBORGANISM=$conf{'DBORGANISM'}|| '';
   $APOLLO   = $conf{'APOLLP'}   || '';
   $DEFAULT  = $conf{'DEFAULT'}  || '';
+  $SCHEMA   = $conf{'SCHEMA'}   || '';
 }
 elsif ( $opts{'DEFAULTS'} ) {
   $DBDRIVER = $args{'DBDRIVER'}{'default'};
@@ -275,6 +279,7 @@ elsif ( $opts{'DEFAULTS'} ) {
   $DBORGANISM=$args{'DBORGANISM'}{'default'};
   $APOLLO   = $args{'APOLLO'}{'default'};
   $DEFAULT  = $args{'DEFAULT'}{'default'};
+  $SCHEMA   = $args{'SCHEMA'}{'default'};
 }
 elsif ( %opts ) {
   $DBDRIVER = $opts{'DBDRIVER'} || '';
@@ -287,6 +292,7 @@ elsif ( %opts ) {
   $DBORGANISM=$opts{'DBORGANISM'}|| '';
   $APOLLO   = $opts{'APOLLO'}   || '';
   $DEFAULT  = $opts{'DEFAULT'}  || '';
+  $SCHEMA   = $opts{'SCHEMA'}   || '';
 }
 
 if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
@@ -327,6 +333,10 @@ if ( !$opts{'DEFAULTS'} && !$opts{'RECONFIGURE'} ) {
   
   $DBPORT ||= prompt( 'What is your database port?', 
     $conf{'DBPORT'} || $args{'DBPORT'}{'default'}
+  );
+
+  $SCHEMA ||= prompt( 'What schema will Chado reside in?',
+    $conf{'SCHEMA'} || $args{'SCHEMA'}{'default'}
   );
 
   $LOCAL_TMP ||= prompt( 'Where shall downloaded ontologies go?',
@@ -388,6 +398,7 @@ print join("\n",
   "  DBPASS=$DBPASS",
   "  DBHOST=$DBHOST",
   "  DBPORT=$DBPORT",
+  "  SCHEMA=$SCHEMA",
   "  LOCAL_TMP=$LOCAL_TMP",
   "  DBORGANISM=$DBORGANISM",
   "  DEFAULT=$DEFAULT",
@@ -410,6 +421,7 @@ if ( open CONF, ">$build_config" ) {
   $conf{'LIB'}      = $opts{'LIB'};
   $conf{'DEFAULT'}  = $DEFAULT;
   $conf{'VERSION'}  = $VERSION;
+  $conf{'SCHEMA'}   = $SCHEMA;
 
   print CONF map { "$_=$conf{ $_ }\n" } keys %conf;
   close CONF or die "Can't write file '$build_config': $!\n";
