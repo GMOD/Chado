@@ -1,3 +1,7 @@
+Version 1.21 Thu Oct 20 10:52:55 EDT 2011
+* Added rudimentary support for non-public schemas in Postgres, though it's
+only good for Tripal at the moment.
+
 Version 1.2 Tue Aug 10 13:59:05 EDT 2010
 * Added some error checking to gmod_fasta2gff3.pl (Rob)
 * Updated Bio::Chado::Builder to detect recent versions of go-perl.  They
