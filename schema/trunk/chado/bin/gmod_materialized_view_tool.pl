@@ -228,6 +228,7 @@ $DBPROFILE ||= 'default';
 my $gmod_conf = Bio::GMOD::Config->new();
 my $db_conf = Bio::GMOD::DB::Config->new( $gmod_conf, $DBPROFILE );
 
+$SCHEMA = $db_conf->schema || $SCHEMA;
 my $dbh = $db_conf->dbh;
 $dbh->{AutoCommit} = 0;
 
