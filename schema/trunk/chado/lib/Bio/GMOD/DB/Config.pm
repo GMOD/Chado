@@ -177,6 +177,22 @@ sub sqlfile {
     shift->get_tag_value('SQLFILE');
 }
 
+=head2 schema
+                                                                                
+ Title   : schema
+ Usage   : $schema = $dbconf->schema();
+ Function: Returns the schema chado resides in (usually public)
+ Returns : see above
+ Args    : none
+ Status  : Public
+                                                                                
+=cut
+
+sub schema {
+    shift->get_tag_value('SCHEMA');
+}
+
+
 =head2 organism
                                                                                 
  Title   : organism
