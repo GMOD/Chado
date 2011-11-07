@@ -81,3 +81,25 @@ CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
 COMMENT ON TABLE feature_phenotype IS NULL;
+
+
+
+create table phenotypeprop (
+       phenotypeprop_id serial not null,
+       primary key (phenotypeprop_id),
+       phenotype_id int not null,
+       foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+       type_id int not null,
+       foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+       value text null,
+       rank int not null default 0,
+       constraint phenotypeprop_c1 unique (phenotype_id,type_id,rank)
+);
+create index phenotypeprop_idx1 on phenotypeprop (phenotype_id);
+create index phenotypeprop_idx2 on phenotypeprop (type_id);
+
+COMMENT ON TABLE phenotypeprop IS 'A phenotype can have any number of
+slot-value property tags attached to it. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, phenotypeprop_c1, for
+the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
