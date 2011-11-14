@@ -100,6 +100,9 @@ sub ACTION_prepdb {
       }  
   } 
 
+  #set the chado schema version in the database
+  system("gmod_chado_properties.pl --dbprofile $db_name --force --version $schema_version"); 
+
 }
 
 =head2 ACTION_update
