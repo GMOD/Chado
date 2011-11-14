@@ -1,6 +1,8 @@
 Version 1.21 Thu Oct 20 10:52:55 EDT 2011
 * Added rudimentary support for non-public schemas in Postgres, though it's
 only good for Tripal at the moment.
+* Fixed database initialization step "make prepdb" so that the version of the
+schema gets set in the chadoprop table.
 
 Version 1.2 Tue Aug 10 13:59:05 EDT 2010
 * Added some error checking to gmod_fasta2gff3.pl (Rob)
