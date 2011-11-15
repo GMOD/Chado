@@ -87,6 +87,7 @@ sub set_version {
         $sth->execute();
         my ($cv_id) = $sth->fetchrow_array;
 
+        my $new_chadoprop = 0;
         my $cvterm_id;
         unless ($cv_id) {
             #chado_properties is not available, so create it
@@ -94,6 +95,7 @@ sub set_version {
             $dbh->do($cv_insert);
 
             insert_version_term($dbh);
+            $new_chadoprop = 1;
         }
 
         #check that the version term is available
@@ -107,11 +109,39 @@ sub set_version {
 
             $sth->execute();
             ($cvterm_id) = $sth->fetchrow_array;
+            $new_chadoprop = 1;
         }
 
-        my $set_query = "INSERT INTO chadoprop (type_id, value) VALUES (?,?)";
-        $sth = $dbh->prepare($set_query);
-        $sth->execute($cvterm_id,$version) or die "database error: $!";
+        #find out if there's already a version in there
+        # and if the chadoprop table exists
+        my $table_query = "SELECT 1 FROM pg_tables WHERE tablename = ?";
+        $sth = $dbh->prepare($table_query);
+        $sth->execute('chadoprop');
+        
+        if ($sth->fetchrow_array) {
+            #chadoprop table exists, so check in it for a value
+            my $version_query = "SELECT value FROM chadoprop WHERE type_id in (SELECT cvterm_id FROM cvterm WHERE cv_id in (SELECT cv_id FROM cv WHERE name = 'chado_properties') AND name = 'version')";
+            my $isth = $dbh->prepare($version_query); 
+            $isth->execute();
+            my ($old_version) = $isth->fetchrow_array();
+
+            if (defined($old_version)) {
+                #there is a version in there, update it
+                my $update_query = "UPDATE chadoprop SET value = $version WHERE type_id = $cvterm_id";
+                $dbh->do($update_query);
+            }
+            else {
+                #no version but the table exists, (assume 1.2) and insert new value
+                my $set_query = "INSERT INTO chadoprop (type_id, value) VALUES (?,?)";
+                $sth = $dbh->prepare($set_query);
+                $sth->execute($cvterm_id,$version) or die "database error: $!";
+            }
+
+        } 
+        else {
+            die "The chadoprop table doesn't seem to exist; perhaps there is a problem with Chado?";
+        }
+
     }
     else {
         die "$version doesn't look like a valid version number.";
