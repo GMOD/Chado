@@ -34,7 +34,7 @@ if ($OPTIONS{PREFIX}) {
 print OUT <<'!NO!SUBS!';
 use strict;
 use warnings;
-use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
+#use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
 use Bio::Tools::GFF;
 use Bio::SeqIO;
 use Bio::Chado::AutoDBI;
