@@ -75,7 +75,6 @@ END
 
 #build path to get updates from
 my $path = "$gmod_root/src/chado/schemas/$current_version-$version/diff.sql";
-warn $path;
 
 my $dbuser = $db_conf->user;
 my $dbport = $db_conf->port;
@@ -83,7 +82,6 @@ my $dbhost = $db_conf->host;
 my $dbname = $db_conf->name;
 
 my $syscommand = "cat $path | psql -U $dbuser -p $dbport -h $dbhost $dbname";
-warn $syscommand;
 system($syscommand) == 0 or die "failed updating database";
 
 #now update the schema version in the chadoprop table
