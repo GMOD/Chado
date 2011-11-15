@@ -2,8 +2,8 @@
 use strict;
 
 use Getopt::Long;
-use lib '/home/cain/cvs_stuff/schema/chado/lib';
-use lib '/home/scott/cvs_stuff/schema/chado/lib';
+#use lib '/home/cain/cvs_stuff/schema/chado/lib';
+#use lib '/home/scott/cvs_stuff/schema/chado/lib';
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 use Bio::Chado::Schema;

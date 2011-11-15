@@ -34,7 +34,7 @@ print OUT <<'!NO!SUBS!';
 
 use strict;
 use warnings;
-use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
+#use lib '/Users/cain/cvs_stuff/schema/trunk/chado/lib';
 use Bio::FeatureIO;
 use Bio::SeqIO;
 use Getopt::Long;
