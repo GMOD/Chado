@@ -170,7 +170,12 @@ sub determine_version {
         my $isth = $dbh->prepare($version_query);
         $isth->execute();
         my ($version) = $isth->fetchrow_array();
-        return $version;
+
+        return $version if defined($version);
+
+        #if the table exists but doesn't return a version, assume 1.2 (due to bug
+        # in that release).
+        return 1.2;
     }   
 
     #if cvprop table exists, then it's 1.11 (or 1.1, same schema)
