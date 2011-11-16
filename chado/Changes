@@ -3,8 +3,8 @@ Version 1.21 Thu Oct 20 10:52:55 EDT 2011
 only good for Tripal at the moment.
 * Fixed database initialization step "make prepdb" so that the version of the
 schema gets set in the chadoprop table.
-* Fixed bug in gmod_chado_properties.pl that caused it to crash when updating the 
-schema version.
+* Fixed bug in gmod_chado_properties.pl that caused it to crash when updating
+the schema version.
 
 Version 1.2 Tue Aug 10 13:59:05 EDT 2010
 * Added some error checking to gmod_fasta2gff3.pl (Rob)
