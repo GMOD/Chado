@@ -50,7 +50,7 @@ use File::Spec::Functions qw[ catfile catdir ];
 use Template;
 use Module::Build;
 
-my $VERSION = 1.21;
+my $VERSION = 1.22;
 
 my %args    =  (
   DBDRIVER  => {
