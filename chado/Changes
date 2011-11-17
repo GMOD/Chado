@@ -1,3 +1,7 @@
+Version 1.11 Thu Nov 17 12:48:10 EST 2011
+* Created a script to automatically create the schemas dirs for a release and
+add them to the manifest.
+
 Version 1.21 Thu Oct 20 10:52:55 EDT 2011
 * Added rudimentary support for non-public schemas in Postgres, though it's
 only good for Tripal at the moment.
