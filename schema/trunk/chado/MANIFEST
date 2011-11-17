@@ -343,3 +343,22 @@ stag-templates/make-publish
 stag-templates/README
 TODO
 UPGRADE.txt
+schemas/1-1.21
+schemas/1-1.21/diff.sql
+schemas/1.1-1.21
+schemas/1.1-1.21/diff.sql
+schemas/1.11-1.21
+schemas/1.11-1.21/diff.sql
+schemas/1.2-1.21
+schemas/1.2-1.21/diff.sql
+#the following added by generate_diff_dirs.pl
+schemas/1-1.22
+schemas/1-1.22/diff.sql
+schemas/1.1-1.22
+schemas/1.1-1.22/diff.sql
+schemas/1.11-1.22
+schemas/1.11-1.22/diff.sql
+schemas/1.2-1.22
+schemas/1.2-1.22/diff.sql
+schemas/1.21-1.22
+schemas/1.21-1.22/diff.sql
