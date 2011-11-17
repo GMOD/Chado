@@ -25,7 +25,7 @@ for my $dir (@dirs) {
         my $newdir = $dir.'-'.$VERSION;
         mkdir $newdir;
         system("touch $newdir/diff.sql");
-        push @add_to_manifest, "schemas/$newdir", "schemas/$newdir/diff.sql";
+        push @add_to_manifest, "schemas/$newdir/diff.sql";
         system("svn add $newdir");
     }
 }
