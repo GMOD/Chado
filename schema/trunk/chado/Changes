@@ -1,4 +1,8 @@
-Version 1.11 Thu Nov 17 12:48:10 EST 2011
+Version 1.23 Thu Dec  1 14:45:22 EST 2011
+* Added $VERSION to Bio::GMOD::DB::Config so that when installing 
+Bio::DB::Das::Chado it would be happy.
+
+Version 1.22 Thu Nov 17 12:48:10 EST 2011
 * Created a script to automatically create the schemas dirs for a release and
 add them to the manifest.
 

@@ -33,6 +33,7 @@ use File::Spec::Functions qw/ catdir catfile /;
 use vars '@ISA';
 use base qw/ Bio::GMOD::Config /;
 
+my $VERSION = 1.23;
 
 =head2 new
 
