@@ -156,6 +156,7 @@ use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 
 use Bio::Chado::Schema;
+use Try::Tiny;
 
 our ($opt_d, $opt_h, $opt_H, $opt_F, $opt_n, $opt_D, $opt_v, $opt_t, 
      $opt_u, $opt_o, $opt_p, $opt_r, $opt_g, $opt_s);
@@ -203,11 +204,9 @@ my $dsn = "dbi:$driver:dbname=$dbname";
 $dsn .= ";host=$dbhost";
 $dsn .= ";port=$port";
 
-my $schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'', { AutoCommit=>0 });
+my $schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'');
 
-my $dbh=$schema->storage->dbh();
-
-if (!$schema || !$dbh) { die "No schema or dbh is avaiable! \n"; }
+if (!$schema) { die "No schema is avaiable! \n"; }
 
 #######################
 
@@ -251,42 +250,43 @@ while( my $ont = $parser->next_ontology() ) {
     push @onts, $ont;
 }
 message("Default namespace is " . $default_ont->name . " \n" , 1);
+
 my $default_cv= $schema->resultset('Cv::Cv')->find_or_create( { name => $default_ont->name } , { key => 'cv_c1' }, );
 
 foreach my $new_ont(@onts) {
-    my $new_ont_name=$new_ont->name();
-    message("....found namespace  '$new_ont_name' \n", 1);
+    my $coderef = sub {
+	my $new_ont_name=$new_ont->name();
+	message("....found namespace  '$new_ont_name' \n", 1);
 
-    if ($opt_n && ( $opt_n ne $new_ont_name) ) {
-	message ("$opt_n: skipping to next ontology..\n",1);
-	next ();
-    }
-    my $rel_cv;
-    #check if relationship ontology is already loaded:
-    if ($new_ont_name ne 'relationship') {
-	$rel_cv= $schema->resultset("Cv::Cv")->find_or_create( { name => 'relationship' } , { key => 'cv_c1' }, );
-	my @rel= $schema->resultset("Cv::Cvterm")->search(
-	    { cv_id => $rel_cv->get_column('cv_id'),
-	      is_relationshiptype => 1,
-	    });
-	if (!@rel) {
-	    warn "Relationship ontology must be loaded first!!\n" ;
-	    exit(0);
+	if ($opt_n && ( $opt_n ne $new_ont_name) ) {
+	    message ("$opt_n: skipping to next ontology..\n",1);
+	    next ();
 	}
-    }
-    ####add Typedef parsing to obo.pm!###
-    ####store a new cv if the ontology namespace does not exist
-    my $cv= $schema->resultset('Cv::Cv')->find_or_create( { name => $new_ont_name } , { key => 'cv_c1' }, );
+	my $rel_cv;
+	#check if relationship ontology is already loaded:
+	if ($new_ont_name ne 'relationship') {
+	    $rel_cv= $schema->resultset("Cv::Cv")->find_or_create( { name => 'relationship' } , { key => 'cv_c1' }, );
+	    my @rel= $schema->resultset("Cv::Cvterm")->search(
+		{ cv_id => $rel_cv->get_column('cv_id'),
+		  is_relationshiptype => 1,
+		});
+	    if (!@rel) {
+		warn "Relationship ontology must be loaded first!!\n" ;
+		exit(0);
+	    }
+	}
+	####add Typedef parsing to obo.pm!###
+	####store a new cv if the ontology namespace does not exist
+	my $cv= $schema->resultset('Cv::Cv')->find_or_create( { name => $new_ont_name } , { key => 'cv_c1' }, );
 
-    print STDERR "cv_id = ".($cv->get_column('cv_id') )."\n";
-    print STDERR "Updating an ontology in the database...\n";
-    my $db_ont = $cv;
-    my $ontology_name=$db_ont->get_column('name');
-    message("Ontology name: ".($db_ont->name())."\n", 1);
-    my %file_relationships = (); # relationships currently defined in the file
-    my %db_relationships = ();
-
-    eval {
+	print STDERR "cv_id = ".($cv->get_column('cv_id') )."\n";
+	print STDERR "Updating an ontology in the database...\n";
+	my $db_ont = $cv;
+	my $ontology_name=$db_ont->get_column('name');
+	message("Ontology name: ".($db_ont->name())."\n", 1);
+	my %file_relationships = (); # relationships currently defined in the file
+	my %db_relationships = ();
+	######
 	my $db = $schema->resultset("General::Db")->find_or_create( 
 	    { name => $opt_s }, { key => 'db_c1' }, );
 
@@ -395,7 +395,7 @@ foreach my $new_ont(@onts) {
                   $db_index{$k}->set_column(name => $name );
                   $db_index{$k}->set_column( definition => $file_index{$k}->definition() );
                   $db_index{$k}->set_column(is_obsolete => $file_index{$k}->is_obsolete() );
-
+		  
                   #changing the name of obsolete terms to "$name (obsolete $db:$accession)"
                   #to avoid violating the cvterm unique constaint (name, cv_id, is_obsolete)
                   if ($db_index{$k}->is_obsolete() ) {
@@ -476,9 +476,9 @@ foreach my $new_ont(@onts) {
 
                   my %file_secondary_ids = ();
                   foreach my $i ($file_index{$k}->get_secondary_ids()) { 
+		      $i = substr($i, 0, 255); #dbxref.accession is varchar(255) maybe it needs to be text?
                       $file_secondary_ids{uc($i)}=1;
                       message("adding secondary id $i to the database...\n");
-
                       $db_index{$k}->add_secondary_dbxref($i);
                   }
                   #########
@@ -638,7 +638,7 @@ foreach my $new_ont(@onts) {
 	print STDERR "\n";
 	#####################################
 	my $r_count = 0;
-	RELATIONSHIP: foreach my $r (keys(%file_relationships)) { 
+      RELATIONSHIP: foreach my $r (keys(%file_relationships)) { 
 	    $r_count++;
 	    if (!exists($db_relationships{$r})) {
 		if ($opt_v) { print STDERR "Novel relationship: $r\n"; }
@@ -737,24 +737,22 @@ foreach my $new_ont(@onts) {
 			);
 		}
 	    }
-	}
+      }
 	message($ontology_name." : ". scalar(@novel_relationships)." novel relationships among ".(scalar(keys(%file_relationships)))." were found and stored.\n", 1);
-    };
 
-    if ($@ || ($opt_t)) {
-	message( "Either running as trial mode (-t) or AN ERROR OCCURRED: $@\n",1); 
-	$dbh->rollback();
-	exit(0);
-    }
-    else {
+	if ($opt_t) {
+	    die "TEST RUN! rolling back\n";
+	}
+    };
+    
+    try {
+	$schema->txn_do($coderef);
 	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
-        $dbh->commit();
+    } catch {
+	# Transaction failed
+	die "An error occured! Rolling back! " . $_ . "\n";
     }
 }
-
-print STDERR "Done.\n";
-
-
 
 sub recursive_children {
     my $ont = shift;
