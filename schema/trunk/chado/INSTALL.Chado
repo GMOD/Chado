@@ -17,7 +17,7 @@ PREREQUISITES
 
 - PostgreSQL
 
-Currently GMOD developers are using 8.1 or better (PostgreSQL 8.4 has not
+Currently GMOD developers are using 8.1 or better (PostgreSQL 9 has not
 been tested).
 
 Items to do with Postgres to make it ready to go:
@@ -172,7 +172,7 @@ modules below except for SQL::Translator, which is optional.
     * XML::Simple              (Chado)
     * LWP                      (Chado)
     * Template                 (Chado)
-    * Log::Log4perl            (Chado)
+    * Bio::Chado::Schema       (Chado)
   
 
 INSTALL THE CHADO SCHEMA
