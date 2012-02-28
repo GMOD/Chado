@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #This is old code and hasn't been tested!
 use strict;
+use warnings;
 
 my @nucs = qw(T C A G);
 my $x = 0;

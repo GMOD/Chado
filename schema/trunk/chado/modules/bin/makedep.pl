@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/env perl
 #
 # (c) Hilmar Lapp, hlapp at gmx.net, 2007.
 #
@@ -6,6 +6,7 @@
 # as Perl itself. Consult the Perl Artistic License.
 
 use strict;
+use warnings;
 use Getopt::Long;
 
 #################################################################

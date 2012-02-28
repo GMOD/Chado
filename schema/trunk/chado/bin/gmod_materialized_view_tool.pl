@@ -1,6 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
 
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;

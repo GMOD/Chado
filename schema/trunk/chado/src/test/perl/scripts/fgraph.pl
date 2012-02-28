@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 use GraphViz;
 use XML::NestArray qw(:all);
@@ -7,6 +7,7 @@ use Getopt::Long;
 
 use FileHandle;
 use strict;
+use warnings;
 use Data::Dumper;
 
 my @valid_fmts = qw(png gd pic ps gd mif pcl gd2 jpeg vrml svg);

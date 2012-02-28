@@ -49,7 +49,7 @@ password. Override password in gmod_config
 
 =cut
 
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 
 use Bio::GMOD::Config;

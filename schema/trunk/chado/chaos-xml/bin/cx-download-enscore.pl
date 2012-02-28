@@ -1,6 +1,7 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/env perl 
 
 use strict;
+use warnings;
 use Getopt::Long;
 use File::Glob ':glob';
 

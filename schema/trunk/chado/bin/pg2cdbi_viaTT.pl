@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # vim: set ft=perl ts=2 expandtab:
 
 use strict;

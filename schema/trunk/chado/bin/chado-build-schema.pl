@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl 
 
 use strict;
+use warnings;
 use Data::Stag;
 use FileHandle;
 use Getopt::Long;

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/env perl
 use XML::NestArray qw(:all);
 use XML::NestArray::ITextParser;
 use XML::NestArray::Base;
@@ -6,6 +6,7 @@ use Bio::XML::Sequence::Transform;
 
 use FileHandle;
 use strict;
+use warnings;
 use Data::Dumper;
 
 my $nudata = Node([]);

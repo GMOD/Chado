@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #$Id: load_taxonomy.pl,v 1.1 2006-04-17 05:22:22 allenday Exp $
 #download from ftp://ftp.ncbi.nih.gov/pub/taxonomy/
 use strict;

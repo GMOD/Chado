@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl 
 use strict;
+use warnings;
 
 use Getopt::Long;
 #use lib '/home/cain/cvs_stuff/schema/chado/lib';

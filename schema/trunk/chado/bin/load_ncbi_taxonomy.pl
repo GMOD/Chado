@@ -138,7 +138,7 @@ Version 2.0, October 2009.
 =cut
 
 
-#! /usr/bin/perl
+#! /usr/bin/env perl
 
 use strict;
 

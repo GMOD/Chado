@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 foreach $f (@ARGV) {
     open(F,$f) || die("no $f");

@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 use strict;
+use warnings;
 
 open ONTO, "ad_hoc_cv" or die "couldn't open ad_hoc_cv:$!\n"; 
 open INSERTS, ">cv_inserts.sql" or die "couldn't open cv_inserts.sql: $!\n";
