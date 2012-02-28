@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 # DDLTRANS: Transform sql schema definitions into various useful formats.
 # (DDL=data definition language, the schema defining subset of SQL -- create table, etc.)

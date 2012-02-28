@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 use FindBin qw($RealBin);
 use lib (($ENV{SOI_ROOT}) ||

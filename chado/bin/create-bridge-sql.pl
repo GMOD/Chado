@@ -1,8 +1,9 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/env perl
 
 # usage docs at end of file
 
 use strict;
+use warnings;
 use Data::Stag;
 
 my %relation_type_h = ();

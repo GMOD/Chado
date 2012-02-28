@@ -91,8 +91,9 @@ Version 1.1, April 2010.
 =cut
 
 
-#! /usr/bin/perl
+#! /usr/bin/env perl
 use strict;
+use warnings;
 
 
 use Bio::GMOD::Config;

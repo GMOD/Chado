@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 package Bio::Chado::CDBI::Affymetrixdchip;
 use lib 'lib';
