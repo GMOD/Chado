@@ -53,7 +53,7 @@ List taxonomy ids to be stored. The rest of the taxons in the name and node file
 http://www.ncbi.nlm.nih.gov/sites/entrez?db=Taxonomy 
 and search by taxid (e.g. txis4070[Subtree] )  
 
-=item -p
+=item -n
 
 phylotree name  [optional]
 
@@ -80,7 +80,7 @@ username. Override username in gmod_config
 
 driver. Override driver name in gmod_config
 
-=item -s 
+=item -p
 
 password. Override password in gmod_config
 
@@ -129,7 +129,7 @@ Naama Menda <nm249@cornell.edu>
 
 =head1 VERISON AND DATE
 
-Version 2.0, October 2009.
+Version 2.1, March 2012.
 
 =head1 TODO
 
@@ -147,19 +147,19 @@ use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 
 use Bio::Chado::Schema;
-
+use Try::Tiny;
 use Getopt::Std;
 
-our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i, $opt_p, $opt_g, $opt_u, $opt_s, $opt_d);
+our ($opt_H, $opt_D, $opt_v, $opt_t, $opt_i, $opt_p, $opt_g, $opt_u, $opt_n, $opt_d);
 
-getopts('H:D:i:p:g:u:s:d:tv');
+getopts('H:D:i:p:g:u:n:d:tv');
 
 my $dbhost = $opt_H;
 my $dbname = $opt_D;
 my $infile = $opt_i;
-my $phylotree_name= $opt_p || 'NCBI taxonomy tree';
+my $phylotree_name= $opt_n || 'NCBI taxonomy tree';
 my $user = $opt_u;
-my $pass = $opt_s;
+my $pass = $opt_p;
 my $driver = $opt_d;
 my $port;
 
@@ -196,7 +196,7 @@ my $dsn = "dbi:$driver:dbname=$dbname";
 $dsn .= ";host=$dbhost";
 $dsn .= ";port=$port" if $port;
 
-$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass, { AutoCommit=>0 });
+$schema= Bio::Chado::Schema->connect( $dsn, $user, $pass||'');
 $dbh=$schema->storage->dbh();
 
 
@@ -377,7 +377,7 @@ my $next_phylonode_id= $maxval{'phylonode'} +1  ;
 my %phylonode=();
 my $node_count=0;
 
-eval {
+my $coderef = sub {
     my $root_id;
     my $organism_id = $maxval{'organism'};
   NODE: foreach my $id ( keys %node ) {
@@ -417,10 +417,13 @@ eval {
       if (!$genus || !$species) { die "NO GENUS OR SPECIES FOUND FOR tax_id $genbank_taxon_accession! Check your input file! \n" ; } 
       $organism = $schema->resultset('Organism::Organism')->search(
 	  {
-	      genus   => { 'ilike'=> $genus },
 	      species => {'ilike' => $species }
-	  })->single();
-      if (!$organism) {  #create a new empty row object 
+	  })->single; # lookup is by species only . NCBI species should be unique!
+      if (!$organism) {  #maybe the organism is already loaded with the ncbi taxonomy id, but the species name has changed?
+	  my $organism_dbxref = $dbxref->organism_dbxrefs->single;
+	  $organism= $organism_dbxref->organism if $organism_dbxref;
+      }
+      if (!$organism) { #create a new empty row object 
 	  $organism = $schema->resultset('Organism::Organism')->new({});
 	  $insert=1;
       } else { $update = 1; }
@@ -433,12 +436,12 @@ eval {
       if ($update) {
 	  $organism->update();
 	  message( "*Updating organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n", 1); 
-	      }
+      }
       if ($insert) {
 	  $organism->insert();
-	    message("New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n", 1); 
+	  message("New organism " . $organism->get_column('organism_id') . " (species=" . $organism->species . ")\n", 1); 
       }
-      	my $organism_id= $organism->get_column('organism_id');
+      my $organism_id= $organism->get_column('organism_id');
       
       ###########################################
       #store the organism synonyms 
@@ -541,12 +544,15 @@ eval {
 	$setright->execute($ctr++, $phylonode_id);
 	message( "Setting right index= $ctr for phylonode id $phylonode_id\n\n",1);
     }
+    if ($opt_t) { die "TEST RUN! rolling back!\n"; }
 };
+try {
+    $schema->txn_do($coderef);
+    message( "Commiting!! \n");
+    message("Inserted $node_count phylonodes. \n",1 );
 
-if ($@ || $opt_t) { 
-    $dbh->rollback();
-    
-    message( "Rolling back! \n $@\n Resetting database sequences...\n", 1);
+} catch {
+    message( "An error occured! Rolling back! \n $_ \n Resetting database sequences...\n", 1);
     
     #reset sequences
     foreach my $key ( keys %seq ) { 
@@ -555,13 +561,7 @@ if ($@ || $opt_t) {
 	if ($maxvalue) { $dbh->do("SELECT setval ('$value', $maxvalue, true)") ;  }
 	else {  $dbh->do("SELECT setval ('$value', 1, false)");  }
     }
-}else {    
-    message( "Commiting!! \n");
-    message("Inserted $node_count phylonodes. \n",1 );
-    
-    $dbh->commit(); 
-}
-
+};
 
 sub set_maxval {
     my $key=shift;
