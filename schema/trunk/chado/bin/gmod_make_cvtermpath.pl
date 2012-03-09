@@ -99,6 +99,7 @@ use Bio::Chado::Schema;
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 use Getopt::Std;
+use Try::Tiny;
 
 our ($opt_H, $opt_D, $opt_v, $opt_t,  $opt_g, $opt_p, $opt_d, $opt_u, $opt_c, $opt_o);
 
@@ -146,7 +147,7 @@ my $dsn = "dbi:$driver:dbname=$dbname";
 $dsn .= ";host=$dbhost";
 $dsn .= ";port=$port";
 
-my $schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'', { AutoCommit=>0 });
+my $schema= Bio::Chado::Schema->connect($dsn, $user, $pass||'');
 
 my $db=$schema->storage->dbh();
 
@@ -219,9 +220,9 @@ my %leafbak = %leaf;
 %sot = ();
 
 # this is a hash for storing the already-processed leaves for a given type term.
-our %seen ; 
+our %seen ;
 
- 
+
 while(keys %leaf){
     foreach my $l (keys %leaf){
 	foreach my $type (keys %type){
@@ -256,107 +257,106 @@ while(keys %leaf){
 
 sub recurse {
   my($subjects,$type,$dist) = @_;
-  
+
   # start with the last subject
   my $subject = $subjects->[-1];
   #get the parents for the subject with this type (defaults to IS_A)
   my @objects = objects($subject,$type);
-  
+
   #if there are no parents for this path, exit the loop (and the next leaf will be sent here again)
   if(!@objects){
       $leaf{$subject}++ ;
       return;
   }
   my $path;
-  
+
   # foreach parent construct a path with each child
   foreach my $object (@objects){
-      my $tdist = $dist;
-      # loop through the child terms
-      foreach my $s (@$subjects){
-	  #next if the path was seen (subject-object-type-distance)
-	  next if $sot{$s}{$object}{$type}{$tdist};
-	  if (exists($sot{$s}{$object}) && exists($sot{$object}{$s})) { 
-	      die " YOU HAVE A CYCLE IN YOUR ONTOLOGY for $s, $object ($type, $tdist)    C8-( \n" ;
-	  }
-	  $sot{$s}{$object}{$type}{$tdist}++;
-	  
-	  print $tdist,"\t"x$dist,"\t",$s,"\t" , $object,"\t" ,$type||'transitive',"\n";
-	  
-	  # if type is defined , create a path using it (see the first looping through %leaf keys) 
-	  if($type){
-	      
-	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
-		  {
-		      subject_id => $s,
-		      object_id  => $object,
-		      type_id    => $type,
-		      cv_id      => $cv_id,
-		      pathdistance => $tdist
-		  }, { key => 'cvtermpath_c1' } , );
-	      message( "Inserting ($s,$object,$type,$cv_id , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id(). "\n" );
-	      my $ttdist = -1 * $tdist;
+      my $coderef = sub {
+          my $tdist = $dist;
+          # loop through the child terms
+          foreach my $s (@$subjects){
+              #next if the path was seen (subject-object-type-distance)
+              next if $sot{$s}{$object}{$type}{$tdist};
+              if (exists($sot{$s}{$object}) && exists($sot{$object}{$s})) { 
+                  die " YOU HAVE A CYCLE IN YOUR ONTOLOGY for $s, $object ($type, $tdist)    C8-( \n" ;
+              }
+              $sot{$s}{$object}{$type}{$tdist}++;
+              print $tdist,"\t"x$dist,"\t",$s,"\t" , $object,"\t" ,$type||'transitive',"\n";
 
-	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
-		  {
-		      subject_id => $object,
-		      object_id  => $subject,
-		      type_id    => $type,
-		      cv_id      => $cv_id,
-		      pathdistance => $ttdist
-		  }, { key => 'cvtermpath_c1' } , );
-	      message( "Inserting ($object,$subject,$type,$cv_id , $ttdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" );
-	  } else {  # if type exists (see second looping through %leaf keys) create a path using the is_a type
-              message("No type defined! Using default IS_A relationship\n");
-	      my $is_a = $schema->resultset("Cv::Cvterm")->search({ name => 'is_a' })->first();
+              # if type is defined , create a path using it (see the first looping through %leaf keys) 
+              if($type){
+                  $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
+                      {
+                          subject_id => $s,
+                          object_id  => $object,
+                          type_id    => $type,
+                          cv_id      => $cv_id,
+                          pathdistance => $tdist
+                      }, { key => 'cvtermpath_c1' } , );
+                  message( "Inserting ($s,$object,$type,$cv_id , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id(). "\n" );
+                  my $ttdist = -1 * $tdist;
 
-	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
-		  {
-		      subject_id => $s,
-		      object_id  => $object,
-		      type_id    => $is_a->cvterm_id(),
-		      cv_id      => $cv_id,
-		      pathdistance => $tdist
-		  }, { key => 'cvtermpath_c1' } , );
-	      message("Inserting ($s,$object, $type, " . $is_a->cv_id() . "  , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" );
+                  $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
+                      {
+                          subject_id => $object,
+                          object_id  => $subject,
+                          type_id    => $type,
+                          cv_id      => $cv_id,
+                          pathdistance => $ttdist
+                      }, { key => 'cvtermpath_c1' } , );
+                  message( "Inserting ($object,$subject,$type,$cv_id , $ttdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" );
+              } else {  # if type exists (see second looping through %leaf keys) create a path using the is_a type
+                  message("No type defined! Using default IS_A relationship\n");
+                  my $is_a = $schema->resultset("Cv::Cvterm")->search({ name => 'is_a' })->first();
 
-	      $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
-		  {
-		      subject_id => $object,
-		      object_id  => $subject,
-		      type_id    => $is_a->cvterm_id(),
-		      cv_id      => $cv_id,
-		      pathdistance => -$tdist
-		  }, { key => 'cvtermpath_c1' } , );
-	      message( "Inserting ($object,$subject, " . $is_a->cvterm_id() . " ,$cv_id , -$tdist) into cvtermpath... path_id = " . $path->cvtermpath_id() . "\n" );
-	  }
-	  $tdist--;
-      }
-      $tdist = $dist;
-      # recurse with arrayref of subjects and the object, increment the pathdistance
-      recurse([@$subjects,$object],$type,$dist+1);
-      
-      $db->commit();
-  }
-  
-}
+                  $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
+                      {
+                          subject_id => $s,
+                          object_id  => $object,
+                          type_id    => $is_a->cvterm_id(),
+                          cv_id      => $cv_id,
+                          pathdistance => $tdist
+                      }, { key => 'cvtermpath_c1' } , );
+                  message("Inserting ($s,$object, $type, " . $is_a->cv_id() . "  , $tdist) into cvtermpath...path_id = " . $path->cvtermpath_id() . "\n" );
+
+                  $path = $schema->resultset("Cv::Cvtermpath")->find_or_create( 
+                      {
+                          subject_id => $object,
+                          object_id  => $subject,
+                          type_id    => $is_a->cvterm_id(),
+                          cv_id      => $cv_id,
+                          pathdistance => -$tdist
+                      }, { key => 'cvtermpath_c1' } , );
+                  message( "Inserting ($object,$subject, " . $is_a->cvterm_id() . " ,$cv_id , -$tdist) into cvtermpath... path_id = " . $path->cvtermpath_id() . "\n" );
+              }
+              $tdist--;
+          }
+          $tdist = $dist;
+          # recurse with arrayref of subjects and the object, increment the pathdistance
+          recurse([@$subjects,$object],$type,$dist+1);
+      };
+      try {
+          $schema->txn_do($coderef);
+      } catch {
+          die "An error occured. Rolling back! " . $_ . "\n\n";
+      };
+  } #object
+} #recurse
 
 #-------------------
 
 sub objects {
   my($subject,$type) = @_;
-  
   my @cvterm_rel;
   if($type){
-            
+
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { subject_id  => $subject,
 	    type_id     => $type ,
 	  }
 	  );
-      
   } else {
-      
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { subject_id  => $subject }
 	  );
@@ -368,7 +368,6 @@ sub objects {
 
 sub subjects {
   my($object,$type) = @_;
-  
   my @cvterm_rel;
   if($type){
 
@@ -379,7 +378,6 @@ sub subjects {
 	  );
 
   } else {
-      
       @cvterm_rel = $schema->resultset("Cv::CvtermRelationship")->search(
 	  { object_id  => $object }
 	  );
