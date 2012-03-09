@@ -690,7 +690,7 @@ foreach my $new_ont(@onts) {
 		    next RELATIONSHIP;
 		}
 		############################################
-		push @novel_relationships, $r;
+                push @novel_relationships, $r;
 		my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
 
 		my $predicate_term;
@@ -729,7 +729,11 @@ foreach my $new_ont(@onts) {
 		}
 		if (!$opt_t) {
 		    message("Storing relationship $r. type cv_id=" . $predicate_term->cv_id() ."\n" ,1);
-		    my $new_rel = $schema->resultset('Cv::CvtermRelationship')->create(
+		    if ( $subject_term->cv_id != $object_term->cv_id ) {
+                        message("Wait!  subjcet term has cv namespace " . $subject_term->cv->name . " which is different from the namespace of the object term (" . $object_term->cv->name . "). Cross referencing relationships across namespaces is not supported (yet.. ) SKIPPING this relationship! \n");
+                        next RELATIONSHIP;
+                    }
+                    my $new_rel = $schema->resultset('Cv::CvtermRelationship')->create(
 			{ subject_id => $subject_term->cvterm_id(),
 			  object_id  => $object_term->cvterm_id(),
 			  type_id    => $predicate_term->cvterm_id(),
@@ -744,14 +748,14 @@ foreach my $new_ont(@onts) {
 	    die "TEST RUN! rolling back\n";
 	}
     };
-    
+
     try {
 	$schema->txn_do($coderef);
 	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
     } catch {
 	# Transaction failed
 	die "An error occured! Rolling back! " . $_ . "\n";
-    }
+    };
 }
 
 sub recursive_children {
