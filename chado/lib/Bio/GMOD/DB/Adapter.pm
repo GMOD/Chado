@@ -4688,7 +4688,7 @@ sub sorter_create_table  {
     refseq   varchar(4000),
     id       varchar(4000),
     parent   varchar(4000),
-    gffline  varchar(4000),
+    gffline  varchar(8000),
     row_id   serial not null,
     primary key(row_id)
     ) "); 
@@ -4720,7 +4720,8 @@ sub sorter_insert_line {
     my $self = shift;
     my ($refseq, $id, $parent, $line) = @_;
     $self->{'queries'}{'insert_gff_sort_tmp'}->execute(
-                                               $refseq, $id, $parent, $line);
+                                               $refseq, $id, $parent, $line)
+        or die "Inserting into the sort table failed:$!,\nProbably due to this line: $line\n";
     return;
 }
 
