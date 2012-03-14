@@ -352,7 +352,7 @@ sub ACTION_ontologies {
       # loading chadoxml
       my $stag_string = "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'";
       $stag_string .= " --user $db_user " if $db_user;
-      $stag_string .= " --password $db_pass " if $db_pass;
+      $stag_string .= " --password '$db_pass' " if $db_pass;
       $sys_call = join( ' ',
         $stag_string,
         catfile( $conf->{'path'}{'data'}, $file->{'local'}.'xml')
