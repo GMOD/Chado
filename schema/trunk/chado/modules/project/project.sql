@@ -12,14 +12,17 @@
 -- ================================================
 
 create table project (
-    project_id serial not null,  
+    project_id serial not null,
     primary key (project_id),
     name varchar(255) not null,
     description varchar(255) not null,
     constraint project_c1 unique (name)
 );
 
-COMMENT ON TABLE project IS NULL;
+COMMENT ON TABLE project IS
+'A project is some kind of planned endeavor.  Used primarily by other
+Chado modules to group experiments, stocks, and so forth that are
+associated with eachother administratively or organizationally.';
 
 -- ================================================
 -- TABLE: projectprop
@@ -36,6 +39,8 @@ CREATE TABLE projectprop (
 	rank integer not null default 0,
 	CONSTRAINT projectprop_c1 UNIQUE (project_id, type_id, rank)
 );
+COMMENT ON TABLE project IS
+'Standard Chado flexible property table for projects.';
 
 -- ================================================
 -- TABLE: project_relationship
@@ -52,9 +57,13 @@ CREATE TABLE project_relationship (
 	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE RESTRICT,
 	CONSTRAINT project_relationship_c1 UNIQUE (subject_project_id, object_project_id, type_id)
 );
-COMMENT ON TABLE project_relationship IS 'A project can be composed of several smaller scale projects';
-COMMENT ON COLUMN project_relationship.type_id IS 'The type of relationship being stated, such as "is part of".';
 
+COMMENT ON TABLE project_relationship IS
+'Linking table for relating projects to each other.  For example, a
+given project could be composed of several smaller subprojects';
+
+COMMENT ON COLUMN project_relationship.type_id IS
+'The cvterm type of the relationship being stated, such as "part of".';
 
 create table project_pub (
        project_pub_id serial not null,
@@ -68,7 +77,7 @@ create table project_pub (
 create index project_pub_idx1 on project_pub (project_id);
 create index project_pub_idx2 on project_pub (pub_id);
 
-COMMENT ON TABLE project_pub IS 'Linking project(s) to publication(s)';
+COMMENT ON TABLE project_pub IS 'Linking table for associating projects and publications.';
 
 
 create table project_contact (
@@ -83,4 +92,4 @@ create table project_contact (
 create index project_contact_idx1 on project_contact (project_id);
 create index project_contact_idx2 on project_contact (contact_id);
 
-COMMENT ON TABLE project_contact IS 'Linking project(s) to contact(s)';
+COMMENT ON TABLE project_contact IS 'Linking table for associating projects and contacts.';
