@@ -1,3 +1,8 @@
+-- ==========================================
+-- Chado project module. Used primarily by other Chado modules to
+-- group experiments, stocks, and so forth that are associated with
+-- eachother administratively or organizationally.
+--
 -- =================================================================
 -- Dependencies:
 --
