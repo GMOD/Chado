@@ -572,6 +572,7 @@ foreach my $new_ont(@onts) {
 		    $new_term->add_secondary_dbxref($i);
 		}
 		foreach my $r ($novel_terms{$k}->get_dbxrefs() ) { #store definition's dbxrefs in cvterm_dbxref
+		    if (!$r->database || !$r->primary_id) { next; } # skip def. dbxrefs without both db_name and accession
 		    my $def_dbxref= $r->database() . ':' . $r->primary_id();
 		    message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
 		    $new_term->add_secondary_dbxref($def_dbxref, 1);
