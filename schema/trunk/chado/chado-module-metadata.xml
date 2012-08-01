@@ -556,8 +556,8 @@ expanded to provide properties, publications and contacts.
       <status code='beta'>
       </status>
       <description>
-          A collection of bridge codes that have multiple dependancies
-          so they don't happily go where is most obvious
+          A collection of bridge codes that have multiple dependencies
+          so they don't happily go where is most obvious.
       </description>
 
       <component id='gff-bridge' type='bridge'>
