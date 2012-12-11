@@ -5,6 +5,9 @@ Bio::DB::Das::Chado it would be happy.
 mishmash that was being used in various scripts.
 * Fixed the GFF3 preprocessor so that if an insert into the sorting table fails,
 the script will die to avoid losing GFF lines in the resulting file.
+* Modified Makefile.PL so that if using PREFIX it won't stomp on the 
+GMOD_ROOT envirnment variable (that is, everything goes in PREFIX, except what
+goes in GMOD_ROOT).
 
 Version 1.22 Thu Nov 17 12:48:10 EST 2011
 * Created a script to automatically create the schemas dirs for a release and
