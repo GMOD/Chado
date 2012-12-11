@@ -206,7 +206,7 @@ foreach ( @argv ) {
 @ARGV = ();
 push @ARGV, "PREFIX=$opts{PREFIX}" if $opts{PREFIX};
 push @ARGV, "INSTALL_BASE=$opts{INSTALL_BASE}" if $opts{INSTALL_BASE};
-$O{'GMOD_ROOT'} = $opts{PREFIX} if $opts{PREFIX};
+$O{'GMOD_ROOT'} = $opts{PREFIX} if ($opts{PREFIX} and !$ENV{GMOD_ROOT});
 push @ARGV, "INSTALLSITEMAN1DIR=$opts{INSTALLSITEMAN1DIR}" if $opts{INSTALLSITEMAN1DIR};
 push @ARGV, "INSTALLSITEMAN3DIR=$opts{INSTALLSITEMAN3DIR}" if $opts{INSTALLSITEMAN3DIR};
 push @ARGV, "LIB=$opts{LIB}" if $opts{LIB};
