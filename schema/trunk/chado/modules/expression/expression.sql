@@ -21,10 +21,11 @@ create table expression (
        uniquename text not null,
        md5checksum character(32),
        description text,
-       constraint expression_c1 unique(uniquename)       
+       constraint expression_c1 unique (uniquename)       
 );
 
 COMMENT ON TABLE expression IS 'The expression table is essentially a bridge table.';
+
 
 -- ================================================
 -- TABLE: expression_cvterm
@@ -40,11 +41,12 @@ create table expression_cvterm (
        rank int not null default 0,
        cvterm_type_id int not null,
        foreign key (cvterm_type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-       constraint expression_cvterm_c1 unique(expression_id,cvterm_id,cvterm_type_id)
+       constraint expression_cvterm_c1 unique (expression_id,cvterm_id,rank,cvterm_type_id)
 );
 create index expression_cvterm_idx1 on expression_cvterm (expression_id);
 create index expression_cvterm_idx2 on expression_cvterm (cvterm_id);
 create index expression_cvterm_idx3 on expression_cvterm (cvterm_type_id);
+
 
 --================================================
 -- TABLE: expression_cvtermprop
@@ -112,7 +114,7 @@ create table expression_pub (
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-       constraint expression_pub_c1 unique(expression_id,pub_id)       
+       constraint expression_pub_c1 unique (expression_id,pub_id)       
 );
 create index expression_pub_idx1 on expression_pub (expression_id);
 create index expression_pub_idx2 on expression_pub (pub_id);
@@ -131,7 +133,7 @@ create table feature_expression (
        foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
        pub_id int not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-       constraint feature_expression_c1 unique(expression_id,feature_id,pub_id)       
+       constraint feature_expression_c1 unique (expression_id,feature_id,pub_id)       
 );
 create index feature_expression_idx1 on feature_expression (expression_id);
 create index feature_expression_idx2 on feature_expression (feature_id);
