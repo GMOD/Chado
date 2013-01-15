@@ -7,6 +7,9 @@
 -- :import cvterm from cv
 -- :import pub from pub
 -- :import organism from organism
+-- :import expression from expression
+-- :import interaction from interaction
+-- :import strain from strain
 -- =================================================================
 
 -- ================================================
@@ -178,6 +181,133 @@ create index library_dbxref_idx1 on library_dbxref (library_id);
 create index library_dbxref_idx2 on library_dbxref (dbxref_id);
 
 
+-- ================================================
+-- TABLE: library_expression
+-- ================================================
+
+create table library_expression (
+    library_expression_id serial not null,
+    primary key (library_expression_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    expression_id int not null,
+    foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id),
+    constraint library_expression_c1 unique (library_id,expression_id)
+);
+create index library_expression_idx1 on library_expression (library_id);
+create index library_expression_idx2 on library_expression (expression_id);
+create index library_expression_idx3 on library_expression (pub_id);
 
 
+-- ================================================
+-- TABLE: library_expressionprop
+-- ================================================
 
+create table library_expressionprop (
+    library_expressionprop_id serial not null,
+    primary key (library_expressionprop_id),
+    library_expression_id int not null,
+    foreign key (library_expression_id) references library_expression (library_expression_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    value text null,
+    rank int not null default 0,
+    constraint library_expressionprop_c1 unique (library_expression_id,type_id,rank)
+);
+create index library_expressionprop_idx1 on library_expressionprop (library_expression_id);
+create index library_expressionprop_idx2 on library_expressionprop (type_id);
+
+
+-- ================================================
+-- TABLE: library_featureprop
+-- ================================================
+
+create table library_featureprop (
+    library_featureprop_id serial not null,
+    primary key (library_featureprop_id),
+    library_feature_id int not null,
+    foreign key (library_feature_id) references library_feature (library_feature_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    value text null,
+    rank int not null default 0,
+    constraint library_featureprop_c1 unique (library_feature_id,type_id,rank)
+);
+create index library_featureprop_idx1 on library_featureprop (library_feature_id);
+create index library_featureprop_idx2 on library_featureprop (type_id);
+
+
+-- ================================================
+-- TABLE: library_interaction
+-- ================================================
+
+create table library_interaction (
+    library_interaction_id serial not null,
+    primary key (library_interaction_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    interaction_id int not null,
+    foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id),
+    constraint library_interaction_c1 unique (interaction_id,library_id,pub_id)
+);
+create index library_interaction_idx1 on library_interaction (interaction_id);
+create index library_interaction_idx2 on library_interaction (library_id);
+create index library_interaction_idx3 on library_interaction (pub_id);
+
+
+-- ================================================
+-- TABLE: library_relationship
+-- ================================================
+
+create table library_relationship (
+    library_relationship_id serial not null,
+    primary key (library_relationship_id),
+    subject_id int not null,
+    foreign key (subject_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    object_id int not null,
+    foreign key (object_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    type_id int not null,
+    foreign key (type_id) references cvterm (cvterm_id),
+    constraint library_relationship_c1 unique (subject_id,object_id,type_id)
+);
+create index library_relationship_idx1 on library_relationship (subject_id);
+create index library_relationship_idx2 on library_relationship (object_id);
+create index library_relationship_idx3 on library_relationship (type_id);
+
+
+-- ================================================
+-- TABLE: library_relationship_pub
+-- ================================================
+
+create table library_relationship_pub (
+    library_relationship_pub_id serial not null,
+    primary key (library_relationship_pub_id),
+    library_relationship_id int not null,
+    foreign key (library_relationship_id) references library_relationship (library_relationship_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id),
+    constraint library_relationship_pub_c1 unique (library_relationship_id,pub_id)
+);
+create index library_relationship_pub_idx1 on library_relationship_pub (library_relationship_id);
+create index library_relationship_pub_idx2 on library_relationship_pub (pub_id);
+
+
+-- ================================================
+-- TABLE: library_strain
+-- ================================================
+
+create table library_strain (
+    library_strain_id serial not null,
+    primary key (library_strain_id),
+    library_id int not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    strain_id int not null,
+    foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
+    constraint library_strain_c1 unique (library_id,strain_id)
+);
+create index library_strain_idx1 on library_strain (library_id);
+create index library_strain_idx2 on library_strain (strain_id);
