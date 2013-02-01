@@ -18,7 +18,7 @@ my %userdata =  map {split /\s*\:\s*/, $_ } split "\n", $userdata;
 exit 0 if (-f "$Bin/gitc_lock");
 
 #check if user specifically doesn't want to call home
-#exit 0 if ($userdata{'NoCallHome'});
+exit 0 if ($userdata{'NoCallHome'});
 
 my $ipaddress = $instance->publicIpv4;
 
