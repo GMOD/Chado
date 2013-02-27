@@ -355,6 +355,23 @@ create index strain_dbxref_idx1 on strain_dbxref (strain_id);
 create index strain_dbxref_idx2 on strain_dbxref (dbxref_id);
 
 
+-- ================================================                                                                               
+-- TABLE: strain_pub                                                                                                              
+-- ================================================                                                                               
+drop table strain_pub cascade;
+create table strain_pub (
+       strain_pub_id serial not null,
+       primary key (strain_pub_id),
+       strain_id int not null,
+       foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
+       pub_id int not null,
+       foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+       unique(strain_id,pub_id)
+);
+create index strain_pub_idx1 on strain_pub (strain_id);
+create index strain_pub_idx2 on strain_pub (pub_id);
+
+
 -- ================================================
 -- TABLE: strain_synonym
 -- ================================================
