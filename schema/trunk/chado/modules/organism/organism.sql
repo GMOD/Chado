@@ -149,7 +149,7 @@ zero. For properties that are single-valued rather than multi-valued,
 the default 0 value should be used';
 
 
---================================================
+-- ================================================
 -- TABLE: organism_cvtermprop
 -- ================================================
 
@@ -232,7 +232,7 @@ create index strain_cvterm_idx2 on strain_cvterm (cvterm_id);
 
 COMMENT ON TABLE strain_cvterm IS 'strain to cvterm associations. Examples: GOid';
 
---================================================
+-- ================================================
 -- TABLE: strain_cvtermprop
 -- ================================================
 
@@ -292,6 +292,26 @@ create index strain_relationship_idx1 on strain_relationship (subject_id);
 create index strain_relationship_idx2 on strain_relationship (object_id);
 
 COMMENT ON TABLE strain_relationship IS 'Relationships between strains, eg, progenitor.';
+
+
+-- ================================================
+-- TABLE: strain_relationship_pub
+-- ================================================
+
+drop table strain_relationship_pub cascade;
+create table strain_relationship_pub (
+        strain_relationship_pub_id serial not null,
+        primary key (strain_relationship_pub_id),
+	strain_relationship_id int not null,
+        foreign key (strain_relationship_id) references strain_relationship (strain_relationship_id) on delete cascade INITIALLY DEFERRED,
+	pub_id int not null,
+	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+	constraint strain_relationship_pub_c1 unique (strain_relationship_id,pub_id)
+);
+create index strain_relationship_pub_idx1 on strain_relationship_pub (strain_relationship_id);
+create index strain_relationship_pub_idx2 on strain_relationship_pub (pub_id);
+
+COMMENT ON TABLE strain_relationship_pub IS 'Provenance. Attach optional evidence to a strain_relationship in the form of a publication.';
 
 
 -- ================================================
@@ -358,6 +378,7 @@ create index strain_dbxref_idx2 on strain_dbxref (dbxref_id);
 -- ================================================                                                                               
 -- TABLE: strain_pub                                                                                                              
 -- ================================================                                                                               
+
 drop table strain_pub cascade;
 create table strain_pub (
        strain_pub_id serial not null,
@@ -462,3 +483,26 @@ create index strain_phenotype_idx1 ON strain_phenotype (strain_id);
 create index strain_phenotype_idx2 ON strain_phenotype (phenotype_id);
 
 COMMENT on table strain_phenotype IS 'Links phenotype(s) associated with a given strain.  Types may be, eg, "selected" or "unassigned".';
+
+
+-- ================================================
+-- TABLE: strain_phenotypeprop
+-- ================================================
+
+drop table strain_phenotypeprop cascade;
+create table strain_phenotypeprop (
+        strain_phenotypeprop_id serial not null,
+        primary key (strain_phenotypeprop_id),
+	strain_phenotype_id int not null,
+        foreign key (strain_phenotype_id) references strain_phenotype (strain_phenotype_id) on delete cascade INITIALLY DEFERRED,
+	type_id int not null,
+	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+	value text null,
+        rank int not null default 0,
+        constraint strain_phenotypeprop_c1 unique (strain_phenotype_id,type_id,rank)
+);
+create index strain_phenotypeprop_idx1 on strain_phenotypeprop (strain_phenotype_id);
+create index strain_phenotypeprop_idx2 on strain_phenotypeprop (type_id);
+
+COMMENT ON TABLE strain_phenotypeprop IS 'Attributes of a strain_phenotype relationship.  Eg, a comment';
+
