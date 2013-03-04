@@ -1,3 +1,7 @@
+Version 1.24 Mon Mar  4 17:18:47 EST 2013
+* Patched gmod_bulk_load_gff3.pl (provided by Alexie P) to fix the 
+"orgainism from data" option.
+
 Version 1.23 Thu Dec  1 14:45:22 EST 2011
 * Added $VERSION to Bio::GMOD::DB::Config so that when installing 
 Bio::DB::Das::Chado it would be happy.
