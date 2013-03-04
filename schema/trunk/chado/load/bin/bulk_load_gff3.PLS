@@ -826,7 +826,11 @@ while(my $feature =
               ? ($feature->annotation->get_Annotations('organism'))[0]
               : '';
     if($gff_organism && $gff_organism ne $chado->organism()) {
-      $ORGANISM = "$gff_organism";# is it pesky bperl object?
+      #next 4 lines patch by Alexie P.
+      $ORGANISM = "$gff_organism";# is it pesky bperl object? # sadly yes
+      if (ref($gff_organism)){
+         $ORGANISM = $gff_organism->value();
+      }
       warn "Organism $ORGANISM from data\n" unless($seen_organism{$ORGANISM}++);
       $chado->organism($ORGANISM);
       $chado->organism_id($ORGANISM) #? dont die if many orgs? auto-add *
