@@ -1,4 +1,5 @@
 Version 1.24 Mon Mar  4 17:18:47 EST 2013
+* Fixed ncbi_taxonomy loader to load entire NCBI taxonomy (Naama)
 * Patched gmod_bulk_load_gff3.pl (provided by Alexie P) to fix the 
 "orgainism from data" option.
 
