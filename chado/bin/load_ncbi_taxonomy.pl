@@ -290,68 +290,76 @@ open (ERR, ">$error") || die "Can't open error file for writing ($error)!\n";
 #read in the taxonomy tree
 open( NODE, "nodes.dmp" );
 while ( my $line = <NODE> ) {
+    chomp $line;
     my ( $id, $parent, $level ) = split /\s+\|\s+/, $line;
     ###message("id = $id, parent = $parent, level = $level\n",1);
-    next unless $okay_level{ $level };
-    
-    # check for data consistency 
-    if ($infile) { 
+    if ( !($okay_level{ $level } ) ) {
+        message("Node rank not found in the database (" . $okay_level{ $level } . "). Skipping\n");
+        next;
+    }
+    # check for data consistency
+    if ($infile) {
 	if (  exists $tax_file{$id}  ) {
 	    # check if the parent is in the taxfile
 	    if ( $parent && !(exists $tax_file{ $parent } ) ) {
-		message ("Parent $parent for tax_id $id does not exist in your input file ! This means $id is your root, or you need to check your input!\n",1); 
+		message ("Parent $parent for tax_id '" . $id . "' does not exist in your input file ! This means $id is your root, or you need to check your input!\n",1); 
 	    }
 	} else{  next(); } # skip nodes not in tax_file  
     }
-    
+
     ###message("STORING NODE is node hash\n",1);
-    $node{ $id }{ 'parent_taxid' } = $parent;
-    $node{ $id }{ 'self_taxid'   } = $id;
-    $node{ $id }{ 'level'        } = $level;
+    $node{$id}{ 'parent_taxid' } = $parent;
+    $node{$id}{ 'self_taxid'   } = $id;
+    $node{$id}{ 'level'        } = $level;
 }
 
 close( NODE );
 
 open( NAME, "names.dmp" );
 while ( my $line = <NAME> ) {
-    #next unless $line =~ /scientific name/;
+    chomp $line;
     my ( $id, $name ) = split /\s+\|\s+/, $line;
     ###message("NAMES: id = $id, name = $name\n",1);
-    next unless $node{ $id }; #skip nodes  
+    next unless $node{$id}; #skip nodes
     if ( $line =~ /scientific name/) {
 	###message("Storing scientific name '$name'\n",1);
-	$node{ $id }{ 'name' } = $name;
-	$node{ $id }{ 'name' } .= " Taxonomy:$id" if $seen{ $name }++;
+	$node{$id}{ 'name' } = $name;
+	$node{$id}{ 'name' } .= " Taxonomy:$id" if $seen{ $name }++;
     } elsif  ( $line =~ /common name/) { #  genbank common names 
-	push(@{ $node{ $id }{ 'common_name' } } , $name);
+	push(@{ $node{$id}{ 'common_name' } } , $name);
 	push(@{ $node{$id}{ 'synonyms' } }, $name);
-	
+
     } elsif ( $line =~ /synonym/ ) {
 	push @{ $node{$id}{ 'synonyms' } }, $name;
     }
+    # populate $tax_file with the ids from the names file if a filtering file is not passed
+    if (!$infile) {
+	$tax_file{$id} = $id;
+    }
+    #
 }
 
 close( NAME );
 
 foreach my $id ( keys %node ) {
-    ###message("Looking at id $id in node hash... level = " . $node{ $id }{'level'} . "\n",1);
-    my $parent_taxid = $node{ $id }{ 'parent_taxid' } ;
-    if (!$tax_file{$parent_taxid}) { 
-	message("No parent id found for  species " . $node{ $id }{ 'name' } . " (id = $id) !! This means your species is the root node, or there is an error in yout input file \n", 1);
+    ##message("Looking at id '" . $id . "' in node hash... level = " . $node{$id}{'level'} . "\n",1);
+    my $parent_taxid = $node{$id}{ 'parent_taxid' } ;
+    if (!$tax_file{$parent_taxid}) {
+	message("No parent id found for  species " . $node{ $id }{ 'name' } . " (id = '" . $id . "') !! This means your species is the root node, or there is an error in yout input file \n\n", 1);
     }
     if ( $node{ $id }{ 'level' } eq 'species' ) {
 	# load the genus name from the parent_taxid
 	if (!$tax_file{$parent_taxid}) {
-	    die "No parent id found for  species " . $node{ $id }{ 'name' } . " (id = $id) !! Check your input file !!\n" ;
+	    die "No parent id found for species " . $node{ $id }{ 'name' } . " (id = '" . $id . "') !! Check your input file !!\n" ;
 	}
-	
+
 	$node{ $id }{ 'genus' }   = $node{ $parent_taxid }{ 'name' };
 	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
 	###message("FOUND SPECIES: " . $node{ $id }{ 'name' } . " genus = " . $node{ $id }{ 'genus' } . "\n" , 1);
-	
+
     } else {
-	###message("FOUND NODE NAME: " . $node{ $node{ $id }{ 'parent_taxid' }}{ 'name' } . "( genus = " . $node{ $id }{ 'level' } . " species = " . $node{ $id }{ 'name' } . "\n",1); 
-	
+	###message("FOUND NODE NAME: " . $node{ $node{ $id }{ 'parent_taxid' }}{ 'name' } . "( genus = " . $node{ $id }{ 'level' } . " species = " . $node{ $id }{ 'name' } . "\n",1);
+
 	$node{ $id }{ 'genus'   } = $node{ $id }{ 'level' };
 	$node{ $id }{ 'species' } = $node{ $id }{ 'name' };
     }
