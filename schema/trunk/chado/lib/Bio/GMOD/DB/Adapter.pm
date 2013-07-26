@@ -1506,6 +1506,9 @@ sub initialize_ontology {
     $sth->execute;
     ($part_of) = $sth->fetchrow_array();
 
+    warn "\n\nWARNING:\nUnable to find a 'part_of' term in the relationship ontology;\nIt's absense indicates that there is something really wrong with the database.\nConsider stopping and checking the state of your cvterm table.\n\n\n";
+
+
     $sth = $self->dbh->prepare(
       "select cvterm_id from cvterm where name = 'derives_from' and cv_id in (
          SELECT cv_id FROM cv WHERE name='relationship' 
@@ -3432,6 +3435,7 @@ sub create_target_feature {
       $tuniquename = $target_id;
       $name = $target_id;
     }
+###FIXME: put  my $tuniquename = $target_id.'_'.$self->nextfeature; in else here
     $self->print_f($self->nextfeature, $self->organism_id(), $name,$tuniquename , $type, '\N','\N');
  
 

@@ -16,7 +16,7 @@ To use the updater, you can start the installation like you normally would:
 
   perl Makefile.PL
   make
-  make install
+  sudo make install
 
 and then, rather than doing the next step (make load_schema) which would wipe
 out the current database, do
