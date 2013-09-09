@@ -56,6 +56,8 @@ create table organism_dbxref (
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
 
+COMMENT ON TABLE library_dbxref IS 'Links a library to dbxrefs.';
+
 
 -- ================================================
 -- TABLE: organismprop
@@ -117,6 +119,8 @@ create table organism_pub (
 );
 create index organism_pub_idx1 on organism_pub (organism_id);
 create index organism_pub_idx2 on organism_pub (pub_id);
+
+COMMENT ON TABLE organism_pub IS 'Attribution for organism.';
 
 
 -- ================================================
@@ -374,10 +378,12 @@ create table strain_dbxref (
 create index strain_dbxref_idx1 on strain_dbxref (strain_id);
 create index strain_dbxref_idx2 on strain_dbxref (dbxref_id);
 
+COMMENT ON TABLE strain_dbxref IS 'Links a strain to dbxrefs. This is for secondary identifiers; primary identifiers should use strain.dbxref_id.';
 
--- ================================================                                                                               
--- TABLE: strain_pub                                                                                                              
--- ================================================                                                                               
+
+-- ================================================
+-- TABLE: strain_pub
+-- ================================================
 
 drop table strain_pub cascade;
 create table strain_pub (
@@ -391,6 +397,8 @@ create table strain_pub (
 );
 create index strain_pub_idx1 on strain_pub (strain_id);
 create index strain_pub_idx2 on strain_pub (pub_id);
+
+COMMENT ON TABLE strain_pub IS 'Provenance.  Linking table between strains and publications that mention them.';
 
 
 -- ================================================

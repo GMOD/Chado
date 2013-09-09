@@ -45,6 +45,7 @@ COMMENT ON COLUMN phenotype.value IS 'Value of attribute - unconstrained free te
 COMMENT ON COLUMN phenotype.cvalue_id IS 'Phenotype attribute value (state).';
 COMMENT ON COLUMN phenotype.assay_id IS 'Evidence type.';
 
+
 -- ================================================
 -- TABLE: phenotype_cvterm
 -- ================================================
@@ -62,7 +63,8 @@ CREATE TABLE phenotype_cvterm (
 CREATE INDEX phenotype_cvterm_idx1 ON phenotype_cvterm (phenotype_id);
 CREATE INDEX phenotype_cvterm_idx2 ON phenotype_cvterm (cvterm_id);
 
-COMMENT ON TABLE phenotype_cvterm IS NULL;
+COMMENT ON TABLE phenotype_cvterm IS 'phenotype to cvterm associations.';
+
 
 -- ================================================
 -- TABLE: feature_phenotype
@@ -80,9 +82,12 @@ CREATE TABLE feature_phenotype (
 CREATE INDEX feature_phenotype_idx1 ON feature_phenotype (feature_id);
 CREATE INDEX feature_phenotype_idx2 ON feature_phenotype (phenotype_id);
 
-COMMENT ON TABLE feature_phenotype IS NULL;
+COMMENT ON TABLE feature_phenotype IS 'Linking table between features and phenotypes.';
 
 
+-- ================================================
+-- TABLE: phenotypeprop
+-- ================================================
 
 create table phenotypeprop (
        phenotypeprop_id serial not null,
@@ -98,8 +103,4 @@ create table phenotypeprop (
 create index phenotypeprop_idx1 on phenotypeprop (phenotype_id);
 create index phenotypeprop_idx2 on phenotypeprop (type_id);
 
-COMMENT ON TABLE phenotypeprop IS 'A phenotype can have any number of
-slot-value property tags attached to it. This is an alternative to
-hardcoding a list of columns in the relational schema, and is
-completely extensible. There is a unique constraint, phenotypeprop_c1, for
-the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+COMMENT ON TABLE phenotypeprop IS 'A phenotype can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, phenotypeprop_c1, for the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';

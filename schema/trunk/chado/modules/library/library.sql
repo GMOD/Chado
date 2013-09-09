@@ -35,8 +35,7 @@ create index library_idx1 on library (organism_id);
 create index library_idx2 on library (type_id);
 create index library_idx3 on library (uniquename);
 
-COMMENT ON COLUMN library.type_id IS 'The type_id foreign key links
-to a controlled vocabulary of library types. Examples of this would be: "cDNA_library" or "genomic_library"';
+COMMENT ON COLUMN library.type_id IS 'The type_id foreign key links to a controlled vocabulary of library types. Examples of this would be: "cDNA_library" or "genomic_library"';
 
 
 -- ================================================
@@ -60,9 +59,13 @@ create index library_synonym_idx1 on library_synonym (synonym_id);
 create index library_synonym_idx2 on library_synonym (library_id);
 create index library_synonym_idx3 on library_synonym (pub_id);
 
+COMMENT ON TABLE library_synonym IS 'Linking table between library and synonym.';
+
 COMMENT ON COLUMN library_synonym.is_current IS 'The is_current bit indicates whether the linked synonym is the current -official- symbol for the linked library.';
+
 COMMENT ON COLUMN library_synonym.pub_id IS 'The pub_id link is for
 relating the usage of a given synonym to the publication in which it was used.';
+
 COMMENT ON COLUMN library_synonym.is_internal IS 'Typically a synonym
 exists so that somebody querying the database with an obsolete name
 can find the object they are looking for under its current name.  If
@@ -85,6 +88,8 @@ create table library_pub (
 create index library_pub_idx1 on library_pub (library_id);
 create index library_pub_idx2 on library_pub (pub_id);
 
+COMMENT ON TABLE library_pub IS 'Attribution for a library.';
+
 
 -- ================================================
 -- TABLE: libraryprop
@@ -104,6 +109,8 @@ create table libraryprop (
 create index libraryprop_idx1 on libraryprop (library_id);
 create index libraryprop_idx2 on libraryprop (type_id);
 
+COMMENT ON TABLE libraryprop IS 'Tag-value properties - follows standard chado model.';
+
 
 -- ================================================
 -- TABLE: libraryprop_pub
@@ -120,6 +127,8 @@ create table libraryprop_pub (
 );
 create index libraryprop_pub_idx1 on libraryprop_pub (libraryprop_id);
 create index libraryprop_pub_idx2 on libraryprop_pub (pub_id);
+
+COMMENT ON TABLE libraryprop_pub IS 'Attribution for libraryprop.';
 
 
 -- ================================================
@@ -180,6 +189,8 @@ create table library_dbxref (
 create index library_dbxref_idx1 on library_dbxref (library_id);
 create index library_dbxref_idx2 on library_dbxref (dbxref_id);
 
+COMMENT ON TABLE library_dbxref IS 'Links a library to dbxrefs.';
+
 
 -- ================================================
 -- TABLE: library_expression
@@ -200,6 +211,8 @@ create index library_expression_idx1 on library_expression (library_id);
 create index library_expression_idx2 on library_expression (expression_id);
 create index library_expression_idx3 on library_expression (pub_id);
 
+COMMENT ON TABLE library_expression IS 'Links a library to expression statements.';
+
 
 -- ================================================
 -- TABLE: library_expressionprop
@@ -219,6 +232,8 @@ create table library_expressionprop (
 create index library_expressionprop_idx1 on library_expressionprop (library_expression_id);
 create index library_expressionprop_idx2 on library_expressionprop (type_id);
 
+COMMENT ON TABLE library_expressionprop IS 'Attributes of a library_expression relationship.';
+
 
 -- ================================================
 -- TABLE: library_featureprop
@@ -237,6 +252,8 @@ create table library_featureprop (
 );
 create index library_featureprop_idx1 on library_featureprop (library_feature_id);
 create index library_featureprop_idx2 on library_featureprop (type_id);
+
+COMMENT ON TABLE library_featureprop IS 'Attributes of a library_feature relationship.';
 
 
 -- ================================================
@@ -258,6 +275,8 @@ create index library_interaction_idx1 on library_interaction (interaction_id);
 create index library_interaction_idx2 on library_interaction (library_id);
 create index library_interaction_idx3 on library_interaction (pub_id);
 
+COMMENT ON TABLE library_interaction IS 'Links a library to an interaction.';
+
 
 -- ================================================
 -- TABLE: library_relationship
@@ -278,6 +297,8 @@ create index library_relationship_idx1 on library_relationship (subject_id);
 create index library_relationship_idx2 on library_relationship (object_id);
 create index library_relationship_idx3 on library_relationship (type_id);
 
+COMMENT ON TABLE library_relationship IS 'Relationships between libraries.';
+
 
 -- ================================================
 -- TABLE: library_relationship_pub
@@ -295,6 +316,8 @@ create table library_relationship_pub (
 create index library_relationship_pub_idx1 on library_relationship_pub (library_relationship_id);
 create index library_relationship_pub_idx2 on library_relationship_pub (pub_id);
 
+COMMENT ON TABLE library_relationship_pub IS 'Provenance of library_relationship.';
+
 
 -- ================================================
 -- TABLE: library_strain
@@ -311,3 +334,5 @@ create table library_strain (
 );
 create index library_strain_idx1 on library_strain (library_id);
 create index library_strain_idx2 on library_strain (strain_id);
+
+COMMENT ON TABLE library_strain IS 'Links a library to a strain.';
