@@ -46,31 +46,6 @@ however, some applications may expect this to be resolvable - to be
 decided.';
 
 -- ================================================
--- TABLE: dbprop
--- ================================================
-
-create table dbprop (
-  dbprop_id serial not null,
-  primary key (dbprop_id),
-  db_id int not null,
-  type_id int not null,
-  value text null,
-  rank int not null default 0,
-  foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-  foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
-  constraint dbprop_c1 unique (db_id,type_id,rank)
-);
-create index dbprop_idx1 on dbprop (db_id);
-create index dbprop_idx2 on dbprop (type_id);
-
-COMMENT ON TABLE dbprop IS 'An external database can have any number of
-slot-value property tags attached to it. This is an alternative to
-hardcoding a list of columns in the relational schema, and is
-completely extensible. There is a unique constraint, dbprop_c1, for
-the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
-
-
--- ================================================
 -- TABLE: dbxref
 -- ================================================
 
@@ -480,6 +455,32 @@ cv can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
 default 0 value should be used.';
+
+
+-- ================================================
+-- TABLE: dbprop
+-- ================================================
+
+create table dbprop (
+  dbprop_id serial not null,
+  primary key (dbprop_id),
+  db_id int not null,
+  type_id int not null,
+  value text null,
+  rank int not null default 0,
+  foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+  foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
+  constraint dbprop_c1 unique (db_id,type_id,rank)
+);
+create index dbprop_idx1 on dbprop (db_id);
+create index dbprop_idx2 on dbprop (type_id);
+
+COMMENT ON TABLE dbprop IS 'An external database can have any number of
+slot-value property tags attached to it. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, dbprop_c1, for
+the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
 
 CREATE OR REPLACE VIEW cv_root AS
  SELECT 
@@ -1194,11 +1195,11 @@ present, as the common_name column is not always unique (e.g. environmental
 samples). If a particular strain or subspecies is to be represented, this 
 is appended onto the species name. Follows standard NCBI taxonomy pattern.';
 
-COMMENT ON COLUMN organism.type_id IS ‘If an infraspecific name 
+COMMENT ON COLUMN organism.type_id IS 'If an infraspecific name 
 is provided then this field should be set to a CV term that 
 specifies the type of infraspecific name.  Examples of valid 
 terms include subspecies,  variety, subvariety, forma, and subforma. 
-If an infraspecific name is not provided then this field can be set as NULL’
+If an infraspecific name is not provided then this field can be set as NULL';
 
 -- ================================================
 -- TABLE: organism_dbxref
@@ -38555,7 +38556,7 @@ COMMENT ON TABLE analysis_cvterm IS 'Associate a term from a cv with an analysis
 
 COMMENT ON COLUMN analysis_cvterm.is_not IS 'If this is set to true, then this annotation is interpreted as a NEGATIVE annotation - i.e. the analysis does NOT have the specified term.';
 
-- ================================================
+-- ================================================
 -- TABLE: analysis_relationship
 -- ================================================
 
@@ -38980,11 +38981,11 @@ CREATE TABLE featuremapprop (
     value text,
     rank integer DEFAULT 0 NOT NULL,
     FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
-    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
-    CONSTRAINT featuremapprop_c1 UNIQUE (featuremap_id, type_id, rank),
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
+    CONSTRAINT featuremapprop_c1 UNIQUE (featuremap_id, type_id, rank)
 );
 create index featuremapprop_idx1 on featuremapprop(featuremap_id);
-create index featuremapprop_idx1 on featuremapprop(type_id);
+create index featuremapprop_idx2 on featuremapprop(type_id);
 
 COMMENT ON TABLE featuremapprop IS 'Property or attribute of a featuremap.';
 
@@ -39134,7 +39135,6 @@ create table phylotreeprop (
   constraint phylotreeprop_c1 unique (phylotree_id,type_id,rank)
 );
 create index phylotreeprop_idx1 on phylotreeprop (phylotree_id);
-create index phylotreeprop_idx2 on phylotreeprop (type_id);
 create index phylotreeprop_idx2 on phylotreeprop (type_id);
 
 COMMENT ON TABLE phylotreeprop IS 'A phylotree can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.';
@@ -39449,25 +39449,6 @@ CREATE INDEX featuremap_contact_idx1 ON featuremap_contact USING btree (featurem
 CREATE INDEX featuremap_contact_idx2 ON featuremap_contact USING btree (contact_id);
 
 COMMENT ON TABLE featuremap_contact IS 'Links contact(s) with a featuremap.  Used to indicate a particular person or organization responsible for constrution of or that can provide more information on a particular featuremap.';
-
-
--- ================================================
--- TABLE: library_contact
--- ================================================
-
-CREATE TABLE library_contact (
-    library_contact_id serial primary key NOT NULL,
-    library_id integer NOT NULL,
-    contact_id integer NOT NULL,
-    CONSTRAINT library_contact_c1 UNIQUE (library_id, contact_id),
-    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
-    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE
-);
-
-CREATE INDEX library_contact_idx1 ON library USING btree (library_id);
-CREATE INDEX library_contact_idx2 ON contact USING btree (contact_id);
-
-COMMENT ON TABLE library_contact IS 'Links contact(s) with a library.  Used to indicate a particular person or organization responsible for creation of or that can provide more information on a particular library.';
 
 
 -- ================================================
@@ -41063,9 +41044,9 @@ CREATE TABLE feature_stock (
   type_id INT NOT NULL,
   rank INT NOT NULL DEFAULT 0,
   PRIMARY KEY (feature_stock_id),
-  FOREIGN KEY (feature_id) REFERENCES chado.feature (feature_id) ON DELETE CASCADE INITIALLY DEFERRED,
-  FOREIGN KEY (stock_id) REFERENCES chado.stock (stock_id) ON DELETE CASCADE INITIALLY DEFERRED,
-  FOREIGN KEY (type_id) REFERENCES chado.cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (stock_id) REFERENCES stock (stock_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
   CONSTRAINT feature_stock_c1 UNIQUE (feature_id, stock_id, type_id, rank)  
 );
 create index feature_stock_idx1 on feature_stock (feature_stock_id);
@@ -41073,43 +41054,6 @@ create index feature_stock_idx2 on feature_stock (feature_id);
 create index feature_stock_idx3 on feature_stock (stock_id);
 create index feature_stock_idx4 on feature_stock (type_id);
 
-
--- ================================================
--- TABLE: featuremap_stock
--- ================================================
-CREATE TABLE featuremap_stock (
-  featuremap_stock_id SERIAL NOT NULL,
-  featuremap_id INT NOT NULL,
-  stock_id INT NOT NULL,
-  type_id INT,
-  PRIMARY KEY (featuremap_stock_id),
-  FOREIGN KEY (featuremap_id) REFERENCES chado.featuremap (featuremap_id) ON DELETE CASCADE INITIALLY DEFERRED,
-  FOREIGN KEY (stock_id) REFERENCES chado.stock (stock_id)  ON DELETE CASCADE INITIALLY DEFERRED
-  FOREIGN KEY (type_id) REFERENCES chado.cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
-  CONSTRAINT featuremap_stock_c1 UNIQUE (featuremap_id, stock_id, type_id)  
-);
-
-create index featuremap_stock_idx1 on featuremap_stock (featuremap_stock_id);
-create index featuremap_stock_idx2 on featuremap_stock (featuremap_id);
-create index featuremap_stock_idx3 on featuremap_stock (stock_id);
-create index featuremap_stock_idx4 on featuremap_stock (type_id);
-
--- ================================================
--- TABLE: library_stock
--- ================================================
-CREATE TABLE library_stock (
-    library_stock_id serial primary key NOT NULL,
-    library_id integer NOT NULL,
-    stock_id integer NOT NULL,
-    CONSTRAINT library_stock_c1 UNIQUE (library_id, stock_id),
-    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
-    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
-);
-
-CREATE INDEX library_stock_idx1 ON library USING btree (library_id);
-CREATE INDEX library_stock_idx2 ON stock USING btree (stock_id);
-
-COMMENT ON TABLE library_stock IS 'Links stock(s) with a library.  Used to indicate a particular person or organization responsible for the association of or that can provide more information on a particular library''s stocks.';
 
 -- ================================================
 -- TABLE: featuremap_dbxref
@@ -41154,17 +41098,20 @@ COMMENT ON TABLE featuremap_organism IS 'Links a featuremap to the organism(s) w
 -- TABLE: featuremap_stock
 -- ================================================
 CREATE TABLE featuremap_stock (
-    featuremap_stock_id serial primary key NOT NULL,
-    featuremap_id integer NOT NULL,
-    stock_id integer NOT NULL,
-    CONSTRAINT featuremap_stock_c1 UNIQUE (featuremap_id, stock_id),
-    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
-    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
-    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE        
+  featuremap_stock_id SERIAL NOT NULL,
+  featuremap_id INT NOT NULL,
+  stock_id INT NOT NULL,
+  type_id INT,
+  PRIMARY KEY (featuremap_stock_id),
+  FOREIGN KEY (featuremap_id) REFERENCES featuremap (featuremap_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (stock_id) REFERENCES stock (stock_id)  ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  CONSTRAINT featuremap_stock_c1 UNIQUE (featuremap_id, stock_id, type_id)  
 );
 
-CREATE INDEX featuremap_stock_idx1 ON featuremap_stock USING btree (featuremap_id);
-CREATE INDEX featuremap_stock_idx2 ON featuremap_stock USING btree (stock_id);
+create index featuremap_stock_idx1 on featuremap_stock (featuremap_id);
+create index featuremap_stock_idx2 on featuremap_stock (stock_id);
+create index featuremap_stock_idx3 on featuremap_stock (type_id);
 
 COMMENT ON TABLE featuremap_stock  IS 'Links a featuremap to stock(s) with which it is associated.';
 
@@ -41350,7 +41297,41 @@ create index library_dbxref_idx1 on library_dbxref (library_id);
 create index library_dbxref_idx2 on library_dbxref (dbxref_id);
 
 
+-- ================================================
+-- TABLE: library_contact
+-- ================================================
 
+CREATE TABLE library_contact (
+    library_contact_id serial primary key NOT NULL,
+    library_id integer NOT NULL,
+    contact_id integer NOT NULL,
+    CONSTRAINT library_contact_c1 UNIQUE (library_id, contact_id),
+    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE
+);
+
+CREATE INDEX library_contact_idx1 ON library USING btree (library_id);
+CREATE INDEX library_contact_idx2 ON contact USING btree (contact_id);
+
+COMMENT ON TABLE library_contact IS 'Links contact(s) with a library.  Used to indicate a particular person or organization responsible for creation of or that can provide more information on a particular library.';
+
+
+-- ================================================
+-- TABLE: library_stock
+-- ================================================
+CREATE TABLE library_stock (
+    library_stock_id serial primary key NOT NULL,
+    library_id integer NOT NULL,
+    stock_id integer NOT NULL,
+    CONSTRAINT library_stock_c1 UNIQUE (library_id, stock_id),
+    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
+);
+
+CREATE INDEX library_stock_idx1 ON library USING btree (library_id);
+CREATE INDEX library_stock_idx2 ON stock USING btree (stock_id);
+
+COMMENT ON TABLE library_stock IS 'Links stock(s) with a library.  Used to indicate a particular person or organization responsible for the association of or that can provide more information on a particular library''s stocks.';
 
 
 -- ==========================================
@@ -42187,8 +42168,8 @@ CREATE TABLE nd_geolocation (
     altitude real
 );
 CREATE INDEX nd_geolocation_idx1 ON nd_geolocation (latitude);
-CREATE INDEX nd_geolocation_idx1 ON nd_geolocation (longitude);
-CREATE INDEX nd_geolocation_idx1 ON nd_geolocation (altitude);
+CREATE INDEX nd_geolocation_idx2 ON nd_geolocation (longitude);
+CREATE INDEX nd_geolocation_idx3 ON nd_geolocation (altitude);
 
 COMMENT ON TABLE nd_geolocation IS 'The geo-referencable location of the stock. NOTE: This entity is subject to change as a more general and possibly more OpenGIS-compliant geolocation module may be introduced into Chado.';
 
@@ -42215,11 +42196,11 @@ CREATE TABLE nd_experiment (
 CREATE INDEX nd_experiment_idx1 ON nd_experiment (nd_geolocation_id);
 CREATE INDEX nd_experiment_idx2 ON nd_experiment (type_id);
 
-COMMENT ON TABLE nd_experiment IS ‘This is the core table for the natural diversity module, 
+COMMENT ON TABLE nd_experiment IS 'This is the core table for the natural diversity module, 
 representing each individual assay that is undertaken (this is usually *not* an 
 entire experiment). Each nd_experiment should give rise to a single genotype or 
 phenotype and be described via 1 (or more) protocols. Collections of assays that 
-relate to each other should be linked to the same record in the project table.’;
+relate to each other should be linked to the same record in the project table.';
 
 -- ================================================
 -- TABLE: nd_experiment_project
@@ -42228,13 +42209,13 @@ relate to each other should be linked to the same record in the project table.�
 CREATE TABLE nd_experiment_project (
     nd_experiment_project_id serial PRIMARY KEY NOT NULL,
     project_id integer not null references project (project_id) on delete cascade INITIALLY DEFERRED,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     CONSTRAINT nd_experiment_project_c1 unique (project_id, nd_experiment_id)
 );
 CREATE INDEX nd_experiment_project_idx1 ON nd_experiment_project (project_id);
 CREATE INDEX nd_experiment_project_idx2 ON nd_experiment_project (nd_experiment_id);
 
-COMMENT ON TABLE nd_experiment IS ‘Used to group together related nd_experiment records. All nd_experiments 
+COMMENT ON TABLE nd_experiment_project IS 'Used to group together related nd_experiment records. All nd_experiments 
 should be linked to at least one project.';
 
 -- ================================================
@@ -42323,7 +42304,7 @@ CREATE TABLE nd_reagent (
     nd_reagent_id serial PRIMARY KEY NOT NULL,
     name character varying(80) NOT NULL,
     type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    feature_id integer NULL references feature (feature_id) on delete cascade INITIALLY DEFERRED,
+    feature_id integer NULL references feature (feature_id) on delete cascade INITIALLY DEFERRED
 );
 CREATE INDEX nd_reagent_idx1 ON nd_reagent (type_id);
 CREATE INDEX nd_reagent_idx2 ON nd_reagent (feature_id);
@@ -42414,13 +42395,13 @@ COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the pr
 -- ================================================
 
 CREATE TABLE nd_experiment_phenotype (
-    nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+   nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
+   nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+   phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
    constraint nd_experiment_phenotype_c1 unique (nd_experiment_id,phenotype_id)
 ); 
 CREATE INDEX nd_experiment_phenotype_idx1 ON nd_experiment_phenotype (nd_experiment_id);
-CREATE INDEX nd_experiment_phenotype_idx2 ON nd_experiment_phenotype (constraint);
+CREATE INDEX nd_experiment_phenotype_idx2 ON nd_experiment_phenotype (phenotype_id);
 
 COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
@@ -42449,18 +42430,13 @@ CREATE TABLE nd_reagent_relationship (
     object_reagent_id integer NOT NULL  references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id integer NOT NULL  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
-CREATE INDEX nd_reagent_relationship_idx1 ON nd_reagent_relationship (nd_experiment_id);
-CREATE INDEX nd_reagent_relationship_idx2 ON nd_reagent_relationship (subject_reagent_id);
-CREATE INDEX nd_reagent_relationship_idx3 ON nd_reagent_relationship (object_reagent_id);
-CREATE INDEX nd_reagent_relationship_idx4 ON nd_reagent_relationship (type_id);
-
+CREATE INDEX nd_reagent_relationship_idx1 ON nd_reagent_relationship (subject_reagent_id);
+CREATE INDEX nd_reagent_relationship_idx2 ON nd_reagent_relationship (object_reagent_id);
+CREATE INDEX nd_reagent_relationship_idx3 ON nd_reagent_relationship (type_id);
 
 COMMENT ON TABLE nd_reagent_relationship IS 'Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents.';
-
 COMMENT ON COLUMN nd_reagent_relationship.subject_reagent_id IS 'The subject reagent in the relationship. In parent/child terminology, the subject is the child. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object.';
-
 COMMENT ON COLUMN nd_reagent_relationship.object_reagent_id IS 'The object reagent in the relationship. In parent/child terminology, the object is the parent. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object.';
-
 COMMENT ON COLUMN nd_reagent_relationship.type_id IS 'The type (or predicate) of the relationship. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object.';
 
 -- ================================================
@@ -42476,9 +42452,8 @@ CREATE TABLE nd_reagentprop (
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
-CREATE INDEX nd_reagentprop_idx1 ON nd_reagentprop (nd_experiment_id);
-CREATE INDEX nd_reagentprop_idx2 ON nd_reagentprop (nd_reagent_id);
-CREATE INDEX nd_reagentprop_idx3 ON nd_reagentprop (type_id);
+CREATE INDEX nd_reagentprop_idx1 ON nd_reagentprop (nd_reagent_id);
+CREATE INDEX nd_reagentprop_idx2 ON nd_reagentprop (type_id);
 
 
 -- ================================================
