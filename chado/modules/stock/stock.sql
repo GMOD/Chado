@@ -208,7 +208,7 @@ create table stock_cvterm (
      pub_id bigint not null,
      foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
      is_not boolean not null default false,
-     rank bigint not null default 0,
+     rank int not null default 0,
      constraint stock_cvterm_c1 unique (stock_id,cvterm_id,pub_id,rank)
  );
 create index stock_cvterm_idx1 on stock_cvterm (stock_id);

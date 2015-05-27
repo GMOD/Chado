@@ -41,7 +41,7 @@ CREATE TABLE projectprop (
 	type_id bigint NOT NULL,
 	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
 	value text,
-	rank bigint not null default 0,
+	rank int not null default 0,
 	CONSTRAINT projectprop_c1 UNIQUE (project_id, type_id, rank)
 );
 COMMENT ON TABLE project IS

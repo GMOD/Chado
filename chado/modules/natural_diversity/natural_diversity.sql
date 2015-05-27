@@ -64,7 +64,7 @@ CREATE TABLE nd_experimentprop (
     nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value text null,
-    rank bigint NOT NULL default 0,
+    rank int NOT NULL default 0,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
@@ -89,7 +89,7 @@ CREATE TABLE nd_geolocationprop (
     nd_geolocation_id bigint NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank bigint NOT NULL DEFAULT 0,
+    rank int NOT NULL DEFAULT 0,
     constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
 
@@ -142,7 +142,7 @@ CREATE TABLE nd_protocolprop (
     nd_protocol_id bigint NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank bigint DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
 
@@ -220,7 +220,7 @@ CREATE TABLE nd_reagentprop (
     nd_reagent_id bigint NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank bigint DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
@@ -229,7 +229,7 @@ CREATE TABLE nd_experiment_stockprop (
     nd_experiment_stock_id bigint NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank bigint DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
 

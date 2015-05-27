@@ -511,7 +511,7 @@ create table feature_cvterm (
     pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     is_not boolean not null default false,
-    rank bigint not null default 0,
+    rank int not null default 0,
     constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id,rank)
 );
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
