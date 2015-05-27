@@ -22,7 +22,7 @@
 -- ================================================
 
 create table wwwuser (
-	wwwuser_id serial not null,
+	wwwuser_id bigserial not null,
 	primary key (wwwuser_id),
 	username varchar(32) not null,
 	unique(username),
@@ -39,11 +39,11 @@ COMMENT ON TABLE wwwuser IS 'Keep track of WWW users. This may also be useful in
 -- ================================================
 
 create table wwwuser_project (
-	wwwuser_project_id serial not null,
+	wwwuser_project_id bigserial not null,
 	primary key (wwwuser_project_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	project_id int not null,
+	project_id bigint not null,
 	foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,project_id)
@@ -58,11 +58,11 @@ COMMENT ON TABLE wwwuser_project IS 'Link wwwuser accounts to projects';
 -- ================================================
 
 create table wwwuser_author (
-	wwwuser_author_id serial not null,
+	wwwuser_author_id bigserial not null,
 	primary key (wwwuser_author_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	author_id int not null,
+	author_id bigint not null,
 	foreign key (author_id) references author (author_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,author_id)
@@ -77,11 +77,11 @@ COMMENT ON TABLE wwwuser_author IS 'Track wwwuser interest in authors.';
 -- ================================================
 
 create table wwwuser_cvterm (
-	wwwuser_cvterm_id serial not null,
+	wwwuser_cvterm_id bigserial not null,
 	primary key (wwwuser_cvterm_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	cvterm_id int not null,
+	cvterm_id bigint not null,
 	foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,cvterm_id)
@@ -96,11 +96,11 @@ COMMENT ON TABLE wwwuser_cvterm IS 'Track wwwuser interest in cvterms.';
 -- ================================================
 
 create table wwwuser_expression (
-	wwwuser_expression_id serial not null,
+	wwwuser_expression_id bigserial not null,
 	primary key (wwwuser_expression_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	expression_id int not null,
+	expression_id bigint not null,
 	foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,expression_id)
@@ -115,11 +115,11 @@ COMMENT ON TABLE wwwuser_expression IS 'Track wwwuser interest in expressions.';
 -- ================================================
 
 create table wwwuser_feature (
-	wwwuser_feature_id serial not null,
+	wwwuser_feature_id bigserial not null,
 	primary key (wwwuser_feature_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	feature_id int not null,
+	feature_id bigint not null,
 	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,feature_id)
@@ -134,11 +134,11 @@ COMMENT ON TABLE wwwuser_feature IS 'Track wwwuser interest in features.';
 -- ================================================
 
 create table wwwuser_genotype (
-	wwwuser_genotype_id serial not null,
+	wwwuser_genotype_id bigserial not null,
 	primary key (wwwuser_genotype_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	genotype_id int not null,
+	genotype_id bigint not null,
 	foreign key (genotype_id) references genotype (genotype_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,genotype_id)
@@ -153,11 +153,11 @@ COMMENT ON TABLE wwwuser_genotype IS 'Track wwwuser interest in genotypes.';
 -- ================================================
 
 create table wwwuser_interaction (
-	wwwuser_interaction_id serial not null,
+	wwwuser_interaction_id bigserial not null,
 	primary key (wwwuser_interaction_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	interaction_id int not null,
+	interaction_id bigint not null,
 	foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,interaction_id)
@@ -172,11 +172,11 @@ COMMENT ON TABLE wwwuser_interaction IS 'Track wwwuser interest in interactions.
 -- ================================================
 
 create table wwwuser_organism (
-	wwwuser_organism_id serial not null,
+	wwwuser_organism_id bigserial not null,
 	primary key (wwwuser_organism_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	organism_id int not null,
+	organism_id bigint not null,
 	foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,organism_id)
@@ -192,11 +192,11 @@ organisms.';
 -- ================================================
 
 create table wwwuser_phenotype (
-	wwwuser_phenotype_id serial not null,
+	wwwuser_phenotype_id bigserial not null,
 	primary key (wwwuser_phenotype_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	phenotype_id int not null,
+	phenotype_id bigint not null,
 	foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,phenotype_id)
@@ -211,11 +211,11 @@ COMMENT ON TABLE wwwuser_phenotype IS 'Track wwwuser interest in phenotypes.';
 -- ================================================
 
 create table wwwuser_pub (
-	wwwuser_pub_id serial not null,
+	wwwuser_pub_id bigserial not null,
 	primary key (wwwuser_pub_id),
-	wwwuser_id int not null,
+	wwwuser_id bigint not null,
 	foreign key (wwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(wwwuser_id,pub_id)
@@ -230,11 +230,11 @@ COMMENT ON TABLE wwwuser_pub IS 'Track wwwuser interest in publications.';
 -- ================================================
 
 create table wwwuserrelationship (
-	wwwuserrelationship_id serial not null,
+	wwwuserrelationship_id bigserial not null,
 	primary key (wwwuserrelationship_id),
-	objwwwuser_id int not null,
+	objwwwuser_id bigint not null,
 	foreign key (objwwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
-	subjwwwuser_id int not null,
+	subjwwwuser_id bigint not null,
 	foreign key (subjwwwuser_id) references wwwuser (wwwuser_id) on delete cascade INITIALLY DEFERRED,
 	world_read smallint not null default 1,
 	unique(objwwwuser_id,subjwwwuser_id)

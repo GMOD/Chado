@@ -17,7 +17,7 @@
 -- ================================================
 
 create table project (
-    project_id serial not null,
+    project_id bigserial not null,
     primary key (project_id),
     name varchar(255) not null,
     description varchar(255) not null,
@@ -34,14 +34,14 @@ associated with eachother administratively or organizationally.';
 -- ================================================
 
 CREATE TABLE projectprop (
-	projectprop_id serial NOT NULL,
+	projectprop_id bigserial NOT NULL,
 	PRIMARY KEY (projectprop_id),
-	project_id integer NOT NULL,
+	project_id bigint NOT NULL,
 	FOREIGN KEY (project_id) REFERENCES project (project_id) ON DELETE CASCADE,
-	type_id integer NOT NULL,
+	type_id bigint NOT NULL,
 	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
 	value text,
-	rank integer not null default 0,
+	rank int not null default 0,
 	CONSTRAINT projectprop_c1 UNIQUE (project_id, type_id, rank)
 );
 COMMENT ON TABLE project IS
@@ -52,13 +52,13 @@ COMMENT ON TABLE project IS
 -- ================================================
 
 CREATE TABLE project_relationship (
-	project_relationship_id serial NOT NULL,
+	project_relationship_id bigserial NOT NULL,
 	PRIMARY KEY (project_relationship_id),
-	subject_project_id integer NOT NULL,
+	subject_project_id bigint NOT NULL,
 	FOREIGN KEY (subject_project_id) REFERENCES project (project_id) ON DELETE CASCADE,
-	object_project_id integer NOT NULL,
+	object_project_id bigint NOT NULL,
 	FOREIGN KEY (object_project_id) REFERENCES project (project_id) ON DELETE CASCADE,
-	type_id integer NOT NULL,
+	type_id bigint NOT NULL,
 	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE RESTRICT,
 	CONSTRAINT project_relationship_c1 UNIQUE (subject_project_id, object_project_id, type_id)
 );
@@ -71,11 +71,11 @@ COMMENT ON COLUMN project_relationship.type_id IS
 'The cvterm type of the relationship being stated, such as "part of".';
 
 create table project_pub (
-       project_pub_id serial not null,
+       project_pub_id bigserial not null,
        primary key (project_pub_id),
-       project_id int not null,
+       project_id bigint not null,
        foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint project_pub_c1 unique (project_id,pub_id)
 );
@@ -86,11 +86,11 @@ COMMENT ON TABLE project_pub IS 'Linking table for associating projects and publ
 
 
 create table project_contact (
-       project_contact_id serial not null,
+       project_contact_id bigserial not null,
        primary key (project_contact_id),
-       project_id int not null,
+       project_id bigint not null,
        foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
-       contact_id int not null,
+       contact_id bigint not null,
        foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
        constraint project_contact_c1 unique (project_id,contact_id)
 );

@@ -14,7 +14,7 @@
 -- ================================================
 
 create table analysis (
-    analysis_id serial not null,
+    analysis_id bigserial not null,
     primary key (analysis_id),
     name varchar(255),
     description text,
@@ -46,11 +46,11 @@ COMMENT ON COLUMN analysis.sourceuri IS 'This is an optional, permanent URL or U
 -- ================================================
 
 create table analysisprop (
-    analysisprop_id serial not null,
+    analysisprop_id bigserial not null,
     primary key (analysisprop_id),
-    analysis_id int not null,
+    analysis_id bigint not null,
     foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
@@ -64,11 +64,11 @@ create index analysisprop_idx2 on analysisprop (type_id);
 -- ================================================
 
 create table analysisfeature (
-    analysisfeature_id serial not null,
+    analysisfeature_id bigserial not null,
     primary key (analysisfeature_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    analysis_id int not null,
+    analysis_id bigint not null,
     foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     rawscore double precision,
     normscore double precision,
@@ -96,9 +96,9 @@ COMMENT ON COLUMN analysisfeature.rawscore IS 'This is the native score generate
 
 CREATE TABLE analysisfeatureprop (
     analysisfeatureprop_id SERIAL PRIMARY KEY,
-    analysisfeature_id INTEGER NOT NULL REFERENCES analysisfeature(analysisfeature_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
-    type_id INTEGER NOT NULL REFERENCES cvterm(cvterm_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
+    analysisfeature_id bigint NOT NULL REFERENCES analysisfeature(analysisfeature_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
+    type_id bigint NOT NULL REFERENCES cvterm(cvterm_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
     value TEXT,
-    rank INTEGER NOT NULL,
+    rank int NOT NULL,
     CONSTRAINT analysisfeature_id_type_id_rank UNIQUE(analysisfeature_id, type_id, rank)
 );
