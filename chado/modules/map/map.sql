@@ -63,7 +63,7 @@ COMMENT ON COLUMN featurerange.featuremap_id IS 'featuremap_id is the id of the 
 create table featurepos (
     featurepos_id bigserial not null,
     primary key (featurepos_id),
-    featuremap_id bigserial not null,
+    featuremap_id bigint not null,
     foreign key (featuremap_id) references featuremap (featuremap_id) on delete cascade INITIALLY DEFERRED,
     feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
