@@ -40,7 +40,7 @@ create table magedocumentation (
     foreign key (mageml_id) references mageml (mageml_id) on delete cascade INITIALLY DEFERRED,
     tableinfo_id bigint not null,
     foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id bigint not null,
+    row_id int not null,
     mageidentifier text not null
 );
 create index magedocumentation_idx1 on magedocumentation (mageml_id);
@@ -540,7 +540,7 @@ create table control (
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     tableinfo_id bigint not null,
     foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id bigint not null,
+    row_id int not null,
     name text null,
     value text null,
     rank int not null default 0
