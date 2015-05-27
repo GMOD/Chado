@@ -16,18 +16,18 @@
 -- ================================================
 
 create table feature (
-    feature_id serial not null,
+    feature_id bigserial not null,
     primary key (feature_id),
-    dbxref_id int,
+    dbxref_id bigint,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
-    organism_id int not null,
+    organism_id bigint not null,
     foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
     name varchar(255),
     uniquename text not null,
     residues text,
-    seqlen int,
+    seqlen bigint,
     md5checksum char(32),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     is_analysis boolean not null default 'false',
     is_obsolete boolean not null default 'false',
@@ -129,15 +129,15 @@ available to software interacting with chado.';
 -- ================================================
 
 create table featureloc (
-    featureloc_id serial not null,
+    featureloc_id bigserial not null,
     primary key (featureloc_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    srcfeature_id int,
+    srcfeature_id bigint,
     foreign key (srcfeature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    fmin int,
+    fmin bigint,
     is_fmin_partial boolean not null default 'false',
-    fmax int,
+    fmax bigint,
     is_fmax_partial boolean not null default 'false',
     strand smallint,
     phase int,
@@ -245,11 +245,11 @@ the rightmost part of the range is unknown/unbounded.';
 -- ================================================
 
 create table featureloc_pub (
-    featureloc_pub_id serial not null,
+    featureloc_pub_id bigserial not null,
     primary key (featureloc_pub_id),
-    featureloc_id int not null,
+    featureloc_id bigint not null,
     foreign key (featureloc_id) references featureloc (featureloc_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint featureloc_pub_c1 unique (featureloc_id,pub_id)
 );
@@ -264,11 +264,11 @@ COMMENT ON TABLE featureloc_pub IS 'Provenance of featureloc. Linking table betw
 -- ================================================
 
 create table feature_pub (
-    feature_pub_id serial not null,
+    feature_pub_id bigserial not null,
     primary key (feature_pub_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint feature_pub_c1 unique (feature_id,pub_id)
 );
@@ -283,11 +283,11 @@ COMMENT ON TABLE feature_pub IS 'Provenance. Linking table between features and 
 -- ================================================
 
 create table feature_pubprop (
-    feature_pubprop_id serial not null,
+    feature_pubprop_id bigserial not null,
     primary key (feature_pubprop_id),
-    feature_pub_id int not null,
+    feature_pub_id bigint not null,
     foreign key (feature_pub_id) references feature_pub (feature_pub_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -303,11 +303,11 @@ COMMENT ON TABLE feature_pubprop IS 'Property or attribute of a feature_pub link
 -- ================================================
 
 create table featureprop (
-    featureprop_id serial not null,
+    featureprop_id bigserial not null,
     primary key (featureprop_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -341,11 +341,11 @@ property-value pairs must be differentiated by rank.';
 -- ================================================
 
 create table featureprop_pub (
-    featureprop_pub_id serial not null,
+    featureprop_pub_id bigserial not null,
     primary key (featureprop_pub_id),
-    featureprop_id int not null,
+    featureprop_id bigint not null,
     foreign key (featureprop_id) references featureprop (featureprop_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint featureprop_pub_c1 unique (featureprop_id,pub_id)
 );
@@ -360,11 +360,11 @@ COMMENT ON TABLE featureprop_pub IS 'Provenance. Any featureprop assignment can 
 -- ================================================
 
 create table feature_dbxref (
-    feature_dbxref_id serial not null,
+    feature_dbxref_id bigserial not null,
     primary key (feature_dbxref_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     is_current boolean not null default 'true',
     constraint feature_dbxref_c1 unique (feature_id,dbxref_id)
@@ -382,13 +382,13 @@ COMMENT ON COLUMN feature_dbxref.is_current IS 'True if this secondary dbxref is
 -- ================================================
 
 create table feature_relationship (
-    feature_relationship_id serial not null,
+    feature_relationship_id bigserial not null,
     primary key (feature_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -424,11 +424,11 @@ COMMENT ON COLUMN feature_relationship.value IS 'Additional notes or comments.';
 -- ================================================
  
 create table feature_relationship_pub (
-	feature_relationship_pub_id serial not null,
+	feature_relationship_pub_id bigserial not null,
 	primary key (feature_relationship_pub_id),
-	feature_relationship_id int not null,
+	feature_relationship_id bigint not null,
 	foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint feature_relationship_pub_c1 unique (feature_relationship_id,pub_id)
 );
@@ -443,11 +443,11 @@ COMMENT ON TABLE feature_relationship_pub IS 'Provenance. Attach optional eviden
 -- ================================================
 
 create table feature_relationshipprop (
-    feature_relationshipprop_id serial not null,
+    feature_relationshipprop_id bigserial not null,
     primary key (feature_relationshipprop_id),
-    feature_relationship_id int not null,
+    feature_relationship_id bigint not null,
     foreign key (feature_relationship_id) references feature_relationship (feature_relationship_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -484,11 +484,11 @@ the default 0 value should be used.';
 -- ================================================
 
 create table feature_relationshipprop_pub (
-    feature_relationshipprop_pub_id serial not null,
+    feature_relationshipprop_pub_id bigserial not null,
     primary key (feature_relationshipprop_pub_id),
-    feature_relationshipprop_id int not null,
+    feature_relationshipprop_id bigint not null,
     foreign key (feature_relationshipprop_id) references feature_relationshipprop (feature_relationshipprop_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint feature_relationshipprop_pub_c1 unique (feature_relationshipprop_id,pub_id)
 );
@@ -502,16 +502,16 @@ COMMENT ON TABLE feature_relationshipprop_pub IS 'Provenance for feature_relatio
 -- ================================================
 
 create table feature_cvterm (
-    feature_cvterm_id serial not null,
+    feature_cvterm_id bigserial not null,
     primary key (feature_cvterm_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     is_not boolean not null default false,
-    rank integer not null default 0,
+    rank bigint not null default 0,
     constraint feature_cvterm_c1 unique (feature_id,cvterm_id,pub_id,rank)
 );
 create index feature_cvterm_idx1 on feature_cvterm (feature_id);
@@ -530,11 +530,11 @@ COMMENT ON COLUMN feature_cvterm.is_not IS 'If this is set to true, then this an
 -- ================================================
 
 create table feature_cvtermprop (
-    feature_cvtermprop_id serial not null,
+    feature_cvtermprop_id bigserial not null,
     primary key (feature_cvtermprop_id),
-    feature_cvterm_id int not null,
+    feature_cvterm_id bigint not null,
     foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -570,11 +570,11 @@ the default 0 value should be used.';
 -- ================================================
 
 create table feature_cvterm_dbxref (
-    feature_cvterm_dbxref_id serial not null,
+    feature_cvterm_dbxref_id bigserial not null,
     primary key (feature_cvterm_dbxref_id),
-    feature_cvterm_id int not null,
+    feature_cvterm_id bigint not null,
     foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     constraint feature_cvterm_dbxref_c1 unique (feature_cvterm_id,dbxref_id)
 );
@@ -588,11 +588,11 @@ COMMENT ON TABLE feature_cvterm_dbxref IS 'Additional dbxrefs for an association
 -- ================================================
 
 create table feature_cvterm_pub (
-    feature_cvterm_pub_id serial not null,
+    feature_cvterm_pub_id bigserial not null,
     primary key (feature_cvterm_pub_id),
-    feature_cvterm_id int not null,
+    feature_cvterm_id bigint not null,
     foreign key (feature_cvterm_id) references feature_cvterm (feature_cvterm_id) on delete cascade,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint feature_cvterm_pub_c1 unique (feature_cvterm_id,pub_id)
 );
@@ -610,10 +610,10 @@ any IDs after the pipe symbol in the publications column.';
 -- ================================================
 
 create table synonym (
-    synonym_id serial not null,
+    synonym_id bigserial not null,
     primary key (synonym_id),
     name varchar(255) not null,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     synonym_sgml varchar(255) not null,
     constraint synonym_c1 unique (name,type_id)
@@ -635,13 +635,13 @@ COMMENT ON COLUMN synonym.type_id IS 'Types would be symbol and fullname for now
 -- ================================================
 
 create table feature_synonym (
-    feature_synonym_id serial not null,
+    feature_synonym_id bigserial not null,
     primary key (feature_synonym_id),
-    synonym_id int not null,
+    synonym_id bigint not null,
     foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     is_current boolean not null default 'false',
     is_internal boolean not null default 'false',

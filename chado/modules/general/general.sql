@@ -7,13 +7,13 @@
 -- ================================================
 
 create table tableinfo (
-    tableinfo_id serial not null,
+    tableinfo_id bigserial not null,
     primary key (tableinfo_id),
     name varchar(30) not null,
     primary_key_column varchar(30) null,
     is_view int not null default 0,
-    view_on_table_id int null,
-    superclass_table_id int null,
+    view_on_table_id bigint null,
+    superclass_table_id bigint null,
     is_updateable int not null default 1,
     modification_date date not null default now(),
     constraint tableinfo_c1 unique (name)
@@ -26,7 +26,7 @@ COMMENT ON TABLE tableinfo IS NULL;
 -- ================================================
 
 create table db (
-    db_id serial not null,
+    db_id bigserial not null,
     primary key (db_id),
     name varchar(255) not null,
 --    contact_id int,
@@ -50,9 +50,9 @@ decided.';
 -- ================================================
 
 create table dbxref (
-    dbxref_id serial not null,
+    dbxref_id bigserial not null,
     primary key (dbxref_id),
-    db_id int not null,
+    db_id bigint not null,
     foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
     accession varchar(255) not null,
     version varchar(255) not null default '',

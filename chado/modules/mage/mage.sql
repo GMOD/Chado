@@ -21,7 +21,7 @@
 -- ================================================
 
 create table mageml (
-    mageml_id serial not null,
+    mageml_id bigserial not null,
     primary key (mageml_id),
     mage_package text not null,
     mage_ml text not null
@@ -34,13 +34,13 @@ COMMENT ON TABLE mageml IS 'This table is for storing extra bits of MAGEml in a 
 -- ================================================
 
 create table magedocumentation (
-    magedocumentation_id serial not null,
+    magedocumentation_id bigserial not null,
     primary key (magedocumentation_id),
-    mageml_id int not null,
+    mageml_id bigint not null,
     foreign key (mageml_id) references mageml (mageml_id) on delete cascade INITIALLY DEFERRED,
-    tableinfo_id int not null,
+    tableinfo_id bigint not null,
     foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id int not null,
+    row_id bigint not null,
     mageidentifier text not null
 );
 create index magedocumentation_idx1 on magedocumentation (mageml_id);
@@ -54,13 +54,13 @@ COMMENT ON TABLE magedocumentation IS NULL;
 -- ================================================
 
 create table protocol (
-    protocol_id serial not null,
+    protocol_id bigserial not null,
     primary key (protocol_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int null,
+    pub_id bigint null,
     foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name text not null,
     uri text null,
@@ -80,14 +80,14 @@ COMMENT ON TABLE protocol IS 'Procedural notes on how data was prepared and proc
 -- ================================================
 
 create table protocolparam (
-    protocolparam_id serial not null,
+    protocolparam_id bigserial not null,
     primary key (protocolparam_id),
-    protocol_id int not null,
+    protocol_id bigint not null,
     foreign key (protocol_id) references protocol (protocol_id) on delete cascade INITIALLY DEFERRED,
     name text not null,
-    datatype_id int null,
+    datatype_id bigint null,
     foreign key (datatype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    unittype_id int null,
+    unittype_id bigint null,
     foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     value text null,
     rank int not null default 0
@@ -104,7 +104,7 @@ protocol. For example, if the protocol is a soak, this might include attributes 
 -- ================================================
 
 create table channel (
-    channel_id serial not null,
+    channel_id bigserial not null,
     primary key (channel_id),
     name text not null,
     definition text not null,
@@ -118,17 +118,17 @@ COMMENT ON TABLE channel IS 'Different array platforms can record signals from o
 -- ================================================
 
 create table arraydesign (
-    arraydesign_id serial not null,
+    arraydesign_id bigserial not null,
     primary key (arraydesign_id),
-    manufacturer_id int not null,
+    manufacturer_id bigint not null,
     foreign key (manufacturer_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    platformtype_id int not null,
+    platformtype_id bigint not null,
     foreign key (platformtype_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    substratetype_id int null,
+    substratetype_id bigint null,
     foreign key (substratetype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    protocol_id int null,
+    protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name text not null,
     version text null,
@@ -160,11 +160,11 @@ as material (glass, nylon) and spot dimensions (in rows/columns).';
 -- ================================================
 
 create table arraydesignprop (
-    arraydesignprop_id serial not null,
+    arraydesignprop_id bigserial not null,
     primary key (arraydesignprop_id),
-    arraydesign_id int not null,
+    arraydesign_id bigint not null,
     foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -180,18 +180,18 @@ COMMENT ON TABLE arraydesignprop IS 'Extra array design properties that are not 
 -- ================================================
 
 create table assay (
-    assay_id serial not null,
+    assay_id bigserial not null,
     primary key (assay_id),
-    arraydesign_id int not null,
+    arraydesign_id bigint not null,
     foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
+    protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     assaydate timestamp null default current_timestamp,
     arrayidentifier text null,
     arraybatchidentifier text null,
-    operator_id int not null,
+    operator_id bigint not null,
     foreign key (operator_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name text null,
     description text null,
@@ -211,11 +211,11 @@ an array, combined with the conditions used to create the array
 -- ================================================
 
 create table assayprop (
-    assayprop_id serial not null,
+    assayprop_id bigserial not null,
     primary key (assayprop_id),
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -231,11 +231,11 @@ COMMENT ON TABLE assayprop IS 'Extra assay properties that are not accounted for
 -- ================================================
 
 create table assay_project (
-    assay_project_id serial not null,
+    assay_project_id bigserial not null,
     primary key (assay_project_id),
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) INITIALLY DEFERRED,
-    project_id int not null,
+    project_id bigint not null,
     foreign key (project_id) references project (project_id) INITIALLY DEFERRED,
     constraint assay_project_c1 unique (assay_id,project_id)
 );
@@ -249,13 +249,13 @@ COMMENT ON TABLE assay_project IS 'Link assays to projects.';
 -- ================================================
 
 create table biomaterial (
-    biomaterial_id serial not null,
+    biomaterial_id bigserial not null,
     primary key (biomaterial_id),
-    taxon_id int null,
+    taxon_id bigint null,
     foreign key (taxon_id) references organism (organism_id) on delete set null INITIALLY DEFERRED,
-    biosourceprovider_id int null,
+    biosourceprovider_id bigint null,
     foreign key (biosourceprovider_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name text null,
     description text null,
@@ -272,13 +272,13 @@ COMMENT ON TABLE biomaterial IS 'A biomaterial represents the MAGE concept of Bi
 -- ================================================
 
 create table biomaterial_relationship (
-    biomaterial_relationship_id serial not null,
+    biomaterial_relationship_id bigserial not null,
     primary key (biomaterial_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references biomaterial (biomaterial_id) INITIALLY DEFERRED,
     constraint biomaterial_relationship_c1 unique (subject_id,object_id,type_id)
 );
@@ -293,11 +293,11 @@ COMMENT ON TABLE biomaterial_relationship IS 'Relate biomaterials to one another
 -- ================================================
 
 create table biomaterialprop (
-    biomaterialprop_id serial not null,
+    biomaterialprop_id bigserial not null,
     primary key (biomaterialprop_id),
-    biomaterial_id int not null,
+    biomaterial_id bigint not null,
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -313,11 +313,11 @@ COMMENT ON TABLE biomaterialprop IS 'Extra biomaterial properties that are not a
 -- ================================================
 
 create table biomaterial_dbxref (
-    biomaterial_dbxref_id serial not null,
+    biomaterial_dbxref_id bigserial not null,
     primary key (biomaterial_dbxref_id),
-    biomaterial_id int not null,
+    biomaterial_id bigint not null,
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     constraint biomaterial_dbxref_c1 unique (biomaterial_id,dbxref_id)
 );
@@ -329,14 +329,14 @@ create index biomaterial_dbxref_idx2 on biomaterial_dbxref (dbxref_id);
 -- ================================================
 
 create table treatment (
-    treatment_id serial not null,
+    treatment_id bigserial not null,
     primary key (treatment_id),
     rank int not null default 0,
-    biomaterial_id int not null,
+    biomaterial_id bigint not null,
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
+    protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
     name text null
 );
@@ -352,13 +352,13 @@ treatments. Examples of treatments: apoxia, fluorophore and biotin labeling.';
 -- ================================================
 
 create table biomaterial_treatment (
-    biomaterial_treatment_id serial not null,
+    biomaterial_treatment_id bigserial not null,
     primary key (biomaterial_treatment_id),
-    biomaterial_id int not null,
+    biomaterial_id bigint not null,
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    treatment_id int not null,
+    treatment_id bigint not null,
     foreign key (treatment_id) references treatment (treatment_id) on delete cascade INITIALLY DEFERRED,
-    unittype_id int null,
+    unittype_id bigint null,
     foreign key (unittype_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     value float(15) null,
     rank int not null default 0,
@@ -375,13 +375,13 @@ COMMENT ON TABLE biomaterial_treatment IS 'Link biomaterials to treatments. Trea
 -- ================================================
 
 create table assay_biomaterial (
-    assay_biomaterial_id serial not null,
+    assay_biomaterial_id bigserial not null,
     primary key (assay_biomaterial_id),
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    biomaterial_id int not null,
+    biomaterial_id bigint not null,
     foreign key (biomaterial_id) references biomaterial (biomaterial_id) on delete cascade INITIALLY DEFERRED,
-    channel_id int null,
+    channel_id bigint null,
     foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
     rank int not null default 0,
     constraint assay_biomaterial_c1 unique (assay_id,biomaterial_id,channel_id,rank)
@@ -397,13 +397,13 @@ COMMENT ON TABLE assay_biomaterial IS 'A biomaterial can be hybridized many time
 -- ================================================
 
 create table acquisition (
-    acquisition_id serial not null,
+    acquisition_id bigserial not null,
     primary key (acquisition_id),
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references  assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    protocol_id int null,
+    protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    channel_id int null,
+    channel_id bigint null,
     foreign key (channel_id) references channel (channel_id) on delete set null INITIALLY DEFERRED,
     acquisitiondate timestamp null default current_timestamp,
     name text null,
@@ -421,11 +421,11 @@ COMMENT ON TABLE acquisition IS 'This represents the scanning of hybridized mate
 -- ================================================
 
 create table acquisitionprop (
-    acquisitionprop_id serial not null,
+    acquisitionprop_id bigserial not null,
     primary key (acquisitionprop_id),
-    acquisition_id int not null,
+    acquisition_id bigint not null,
     foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -441,13 +441,13 @@ COMMENT ON TABLE acquisitionprop IS 'Parameters associated with image acquisitio
 -- ================================================
 
 create table acquisition_relationship (
-    acquisition_relationship_id serial not null,
+    acquisition_relationship_id bigserial not null,
     primary key (acquisition_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -464,15 +464,15 @@ COMMENT ON TABLE acquisition_relationship IS 'Multiple monochrome images may be 
 -- ================================================
 
 create table quantification (
-    quantification_id serial not null,
+    quantification_id bigserial not null,
     primary key (quantification_id),
-    acquisition_id int not null,
+    acquisition_id bigint not null,
     foreign key (acquisition_id) references acquisition (acquisition_id) on delete cascade INITIALLY DEFERRED,
-    operator_id int null,
+    operator_id bigint null,
     foreign key (operator_id) references contact (contact_id) on delete set null INITIALLY DEFERRED,
-    protocol_id int null,
+    protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
-    analysis_id int not null,
+    analysis_id bigint not null,
     foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     quantificationdate timestamp null default current_timestamp,
     name text null,
@@ -491,11 +491,11 @@ COMMENT ON TABLE quantification IS 'Quantification is the transformation of an i
 -- ================================================
 
 create table quantificationprop (
-    quantificationprop_id serial not null,
+    quantificationprop_id bigserial not null,
     primary key (quantificationprop_id),
-    quantification_id int not null,
+    quantification_id bigint not null,
     foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -511,13 +511,13 @@ COMMENT ON TABLE quantificationprop IS 'Extra quantification properties that are
 -- ================================================
 
 create table quantification_relationship (
-    quantification_relationship_id serial not null,
+    quantification_relationship_id bigserial not null,
     primary key (quantification_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     constraint quantification_relationship_c1 unique (subject_id,object_id,type_id)
 );
@@ -532,15 +532,15 @@ COMMENT ON TABLE quantification_relationship IS 'There may be multiple rounds of
 -- ================================================
 
 create table control (
-    control_id serial not null,
+    control_id bigserial not null,
     primary key (control_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
-    tableinfo_id int not null,
+    tableinfo_id bigint not null,
     foreign key (tableinfo_id) references tableinfo (tableinfo_id) on delete cascade INITIALLY DEFERRED,
-    row_id int not null,
+    row_id bigint not null,
     name text null,
     value text null,
     rank int not null default 0
@@ -557,15 +557,15 @@ COMMENT ON TABLE control IS NULL;
 -- ================================================
 
 create table element (
-    element_id serial not null,
+    element_id bigserial not null,
     primary key (element_id),
-    feature_id int null,
+    feature_id bigint null,
     foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    arraydesign_id int not null,
+    arraydesign_id bigint not null,
     foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int null,
+    type_id bigint null,
     foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     constraint element_c1 unique (feature_id,arraydesign_id)
 );
@@ -581,11 +581,11 @@ COMMENT ON TABLE element IS 'Represents a feature of the array. This is typicall
 -- ================================================
 
 create table elementresult (
-    elementresult_id serial not null,
+    elementresult_id bigserial not null,
     primary key (elementresult_id),
-    element_id int not null,
+    element_id bigint not null,
     foreign key (element_id) references element (element_id) on delete cascade INITIALLY DEFERRED,
-    quantification_id int not null,
+    quantification_id bigint not null,
     foreign key (quantification_id) references quantification (quantification_id) on delete cascade INITIALLY DEFERRED,
     signal float not null,
     constraint elementresult_c1 unique (element_id,quantification_id)
@@ -601,13 +601,13 @@ COMMENT ON TABLE elementresult IS 'An element on an array produces a measurement
 -- ================================================
 
 create table element_relationship (
-    element_relationship_id serial not null,
+    element_relationship_id bigserial not null,
     primary key (element_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references element (element_id) INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references element (element_id) INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -625,13 +625,13 @@ COMMENT ON TABLE element_relationship IS 'Sometimes we want to combine measureme
 -- ================================================
 
 create table elementresult_relationship (
-    elementresult_relationship_id serial not null,
+    elementresult_relationship_id bigserial not null,
     primary key (elementresult_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references elementresult (elementresult_id) INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -649,13 +649,13 @@ COMMENT ON TABLE elementresult_relationship IS 'Sometimes we want to combine mea
 -- ================================================
 
 create table study (
-    study_id serial not null,
+    study_id bigserial not null,
     primary key (study_id),
-    contact_id int not null,
+    contact_id bigint not null,
     foreign key (contact_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int null,
+    pub_id bigint null,
     foreign key (pub_id) references pub (pub_id) on delete set null INITIALLY DEFERRED,
-    dbxref_id int null,
+    dbxref_id bigint null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     name text not null,
     description text null,
@@ -672,11 +672,11 @@ COMMENT ON TABLE study IS NULL;
 -- ================================================
 
 create table study_assay (
-    study_assay_id serial not null,
+    study_assay_id bigserial not null,
     primary key (study_assay_id),
-    study_id int not null,
+    study_id bigint not null,
     foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     constraint study_assay_c1 unique (study_id,assay_id)
 );
@@ -690,9 +690,9 @@ COMMENT ON TABLE study_assay IS NULL;
 -- ================================================
 
 create table studydesign (
-    studydesign_id serial not null,
+    studydesign_id bigserial not null,
     primary key (studydesign_id),
-    study_id int not null,
+    study_id bigint not null,
     foreign key (study_id) references study (study_id) on delete cascade INITIALLY DEFERRED,
     description text null
 );
@@ -705,11 +705,11 @@ COMMENT ON TABLE studydesign IS NULL;
 -- ================================================
 
 create table studydesignprop (
-    studydesignprop_id serial not null,
+    studydesignprop_id bigserial not null,
     primary key (studydesignprop_id),
-    studydesign_id int not null,
+    studydesign_id bigint not null,
     foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -725,11 +725,11 @@ COMMENT ON TABLE studydesignprop IS NULL;
 -- ================================================
 
 create table studyfactor (
-    studyfactor_id serial not null,
+    studyfactor_id bigserial not null,
     primary key (studyfactor_id),
-    studydesign_id int not null,
+    studydesign_id bigint not null,
     foreign key (studydesign_id) references studydesign (studydesign_id) on delete cascade INITIALLY DEFERRED,
-    type_id int null,
+    type_id bigint null,
     foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
     name text not null,
     description text null
@@ -744,11 +744,11 @@ COMMENT ON TABLE studyfactor IS NULL;
 -- ================================================
 
 create table studyfactorvalue (
-    studyfactorvalue_id serial not null,
+    studyfactorvalue_id bigserial not null,
     primary key (studyfactorvalue_id),
-    studyfactor_id int not null,
+    studyfactor_id bigint not null,
     foreign key (studyfactor_id) references studyfactor (studyfactor_id) on delete cascade INITIALLY DEFERRED,
-    assay_id int not null,
+    assay_id bigint not null,
     foreign key (assay_id) references assay (assay_id) on delete cascade INITIALLY DEFERRED,
     factorvalue text null,
     name text null,
@@ -791,11 +791,11 @@ COMMENT ON TABLE studyfactorvalue IS NULL;
 --
 --studyprop
 create table studyprop (
-    studyprop_id serial not null,
+    studyprop_id bigserial not null,
         primary key (studyprop_id),
-    study_id int not null,
+    study_id bigint not null,
         foreign key (study_id) references study (study_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade,  
     value text null,
     rank int not null default 0,
@@ -808,13 +808,13 @@ create index studyprop_idx2 on studyprop (type_id);
 
 --studyprop_feature
 CREATE TABLE studyprop_feature (
-    studyprop_feature_id serial NOT NULL,
+    studyprop_feature_id bigserial NOT NULL,
     primary key (studyprop_feature_id),
-    studyprop_id integer NOT NULL,
+    studyprop_id bigint NOT NULL,
     foreign key (studyprop_id) references studyprop(studyprop_id) on delete cascade,
-    feature_id integer NOT NULL,
+    feature_id bigint NOT NULL,
     foreign key (feature_id) references feature (feature_id) on delete cascade,
-    type_id integer,
+    type_id bigint,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
     unique (studyprop_id, feature_id)
     );

@@ -15,7 +15,7 @@
 
 drop table organism cascade;
 create table organism (
-	organism_id serial not null,
+	organism_id bigserial not null,
 	primary key (organism_id),
 	abbreviation varchar(255) null,
 	genus varchar(255) not null,
@@ -45,11 +45,11 @@ pattern.';
 
 drop table organism_dbxref cascade;
 create table organism_dbxref (
-    organism_dbxref_id serial not null,
+    organism_dbxref_id bigserial not null,
     primary key (organism_dbxref_id),
-    organism_id int not null,
+    organism_id bigint not null,
     foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     constraint organism_dbxref_c1 unique (organism_id,dbxref_id)
 );
@@ -65,11 +65,11 @@ COMMENT ON TABLE library_dbxref IS 'Links a library to dbxrefs.';
 
 drop table organismprop cascade;
 create table organismprop (
-    organismprop_id serial not null,
+    organismprop_id bigserial not null,
     primary key (organismprop_id),
-    organism_id int not null,
+    organism_id bigint not null,
     foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -87,11 +87,11 @@ COMMENT ON TABLE organismprop IS 'Tag-value properties - follows standard chado 
 
 drop table organismprop_pub cascade;
 create table organismprop_pub (
-    organismprop_pub_id serial not null,
+    organismprop_pub_id bigserial not null,
     primary key (organismprop_pub_id),
-    organismprop_id int not null,
+    organismprop_id bigint not null,
     foreign key (organismprop_id) references organismprop (organismprop_id) on delete cascade INITIALLY DEFERRED,
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -109,11 +109,11 @@ COMMENT ON TABLE organismprop_pub IS 'Attribution for organismprop.';
 
 drop table organism_pub cascade;
 create table organism_pub (
-       organism_pub_id serial not null,
+       organism_pub_id bigserial not null,
        primary key (organism_pub_id),
-       organism_id int not null,
+       organism_id bigint not null,
        foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint organism_pub_c1 unique (organism_id,pub_id)
 );
@@ -129,15 +129,15 @@ COMMENT ON TABLE organism_pub IS 'Attribution for organism.';
 
 drop table organism_cvterm cascade;
 create table organism_cvterm (
-       organism_cvterm_id serial not null,
+       organism_cvterm_id bigserial not null,
        primary key (organism_cvterm_id),
-       organism_id int not null,
+       organism_id bigint not null,
        foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY
 DEFERRED,
-       cvterm_id int not null,
+       cvterm_id bigint not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        rank int not null default 0,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint organism_cvterm_c1 unique(organism_id,cvterm_id,pub_id) 
 );
@@ -159,11 +159,11 @@ the default 0 value should be used';
 
 drop table organism_cvtermprop cascade;
 create table organism_cvtermprop (
-    organism_cvtermprop_id serial not null,
+    organism_cvtermprop_id bigserial not null,
     primary key (organism_cvtermprop_id),
-    organism_cvterm_id int not null,
+    organism_cvterm_id bigint not null,
     foreign key (organism_cvterm_id) references organism_cvterm (organism_cvterm_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -197,13 +197,13 @@ the default 0 value should be used';
 
 drop table strain cascade;
 create table strain (
-	strain_id serial not null,
+	strain_id bigserial not null,
 	primary key (strain_id),
 	name varchar(255) null,
 	uniquename text not null,
-	organism_id int not null,
+	organism_id bigint not null,
 	foreign key (organism_id) references organism (organism_id) on delete cascade INITIALLY DEFERRED,
-	dbxref_id int null,
+	dbxref_id bigint null,
 	foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
 	is_obsolete boolean not null default 'false',
 	constraint strain_c1 unique (organism_id, uniquename)
@@ -221,13 +221,13 @@ COMMENT ON TABLE strain IS 'A characterized strain of a given organism.';
 
 drop table strain_cvterm cascade;
 create table strain_cvterm (
-       strain_cvterm_id serial not null,
+       strain_cvterm_id bigserial not null,
        primary key (strain_cvterm_id),
-       strain_id int not null,
+       strain_id bigint not null,
        foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-       cvterm_id int not null,
+       cvterm_id bigint not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-        pub_id int not null,
+        pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint strain_cvterm_c1 unique(strain_id,cvterm_id,pub_id) 
 );
@@ -242,11 +242,11 @@ COMMENT ON TABLE strain_cvterm IS 'strain to cvterm associations. Examples: GOid
 
 drop table strain_cvtermprop cascade;
 create table strain_cvtermprop (
-    strain_cvtermprop_id serial not null,
+    strain_cvtermprop_id bigserial not null,
     primary key (strain_cvtermprop_id),
-    strain_cvterm_id int not null,
+    strain_cvterm_id bigint not null,
     foreign key (strain_cvterm_id) references strain_cvterm (strain_cvterm_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -280,13 +280,13 @@ the default 0 value should be used';
 
 drop table strain_relationship cascade;
 create table strain_relationship (
-	strain_relationship_id serial not null,
+	strain_relationship_id bigserial not null,
 	primary key (strain_relationship_id),
-	subject_id int not null,
+	subject_id bigint not null,
 	foreign key (subject_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-	object_id int not null,
+	object_id bigint not null,
 	foreign key (object_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-	type_id int not null,
+	type_id bigint not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value text null,
 	rank int not null default 0,
@@ -304,11 +304,11 @@ COMMENT ON TABLE strain_relationship IS 'Relationships between strains, eg, prog
 
 drop table strain_relationship_pub cascade;
 create table strain_relationship_pub (
-        strain_relationship_pub_id serial not null,
+        strain_relationship_pub_id bigserial not null,
         primary key (strain_relationship_pub_id),
-	strain_relationship_id int not null,
+	strain_relationship_id bigint not null,
         foreign key (strain_relationship_id) references strain_relationship (strain_relationship_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	constraint strain_relationship_pub_c1 unique (strain_relationship_id,pub_id)
 );
@@ -324,11 +324,11 @@ COMMENT ON TABLE strain_relationship_pub IS 'Provenance. Attach optional evidenc
 
 drop table strainprop cascade;
 create table strainprop (
-	strainprop_id serial not null,
+	strainprop_id bigserial not null,
 	primary key (strainprop_id),
-	strain_id int not null,
+	strain_id bigint not null,
 	foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-	type_id int not null,
+	type_id bigint not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value text null,
 	rank int not null default 0,
@@ -346,11 +346,11 @@ COMMENT ON TABLE strainprop IS 'Attributes of a given strain';
 
 drop table strainprop_pub cascade;
 create table strainprop_pub (
-	strainprop_pub_id serial not null,
+	strainprop_pub_id bigserial not null,
 	primary key (strainprop_pub_id),
-	strainprop_id int not null,
+	strainprop_id bigint not null,
 	foreign key (strainprop_id) references strainprop (strainprop_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	constraint strainprop_pub_c1 unique (strainprop_id,pub_id)
 );
@@ -366,11 +366,11 @@ COMMENT ON TABLE strainprop_pub IS 'Provenance.  Any strainprop assignment can o
 
 drop table strain_dbxref cascade;
 create table strain_dbxref (
-    strain_dbxref_id serial not null,
+    strain_dbxref_id bigserial not null,
     primary key (strain_dbxref_id),
-    strain_id int not null,
+    strain_id bigint not null,
     foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     is_current boolean not null default 'true',
     constraint strain_dbxref_c1 unique (strain_id,dbxref_id)
@@ -387,11 +387,11 @@ COMMENT ON TABLE strain_dbxref IS 'Links a strain to dbxrefs. This is for second
 
 drop table strain_pub cascade;
 create table strain_pub (
-       strain_pub_id serial not null,
+       strain_pub_id bigserial not null,
        primary key (strain_pub_id),
-       strain_id int not null,
+       strain_id bigint not null,
        foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        unique(strain_id,pub_id)
 );
@@ -407,13 +407,13 @@ COMMENT ON TABLE strain_pub IS 'Provenance.  Linking table between strains and p
 
 drop table strain_synonym cascade;
 create table strain_synonym (
-	strain_synonym_id serial not null,
+	strain_synonym_id bigserial not null,
 	primary key (strain_synonym_id),
-	strain_id int not null,
+	strain_id bigint not null,
 	foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-	synonym_id int not null,
+	synonym_id bigint not null,
 	foreign key (synonym_id) references synonym (synonym_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	is_current boolean not null default 'false',
 	is_internal boolean not null default 'false',
@@ -432,13 +432,13 @@ COMMENT ON TABLE strain_synonym IS 'Linking table between strain and synonym.';
 
 drop table strain_feature cascade;
 create table strain_feature (
-	strain_feature_id serial not null,
+	strain_feature_id bigserial not null,
 	primary key (strain_feature_id),
-	strain_id int not null,
+	strain_id bigint not null,
 	foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-	feature_id int not null,
+	feature_id bigint not null,
 	foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	constraint strain_feature_c1 unique (strain_id,feature_id,pub_id)
 );
@@ -455,11 +455,11 @@ be, eg, "homozygous" or "heterozygous".';
 
 drop table strain_featureprop cascade;
 create table strain_featureprop (
-	strain_featureprop_id serial not null,
+	strain_featureprop_id bigserial not null,
 	primary key (strain_featureprop_id),
-	strain_feature_id int not null,
+	strain_feature_id bigint not null,
 	foreign key (strain_feature_id) references strain_feature (strain_feature_id) on delete cascade INITIALLY DEFERRED,
-	type_id int not null,
+	type_id bigint not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value text null,
 	rank int not null default 0,
@@ -477,13 +477,13 @@ COMMENT ON TABLE strain_featureprop IS 'Attributes of a strain_feature relations
 
 drop table strain_phenotype cascade;
 create table strain_phenotype (
-	strain_phenotype_id SERIAL NOT NULL,
+	strain_phenotype_id bigserial NOT NULL,
 	primary key (strain_phenotype_id),
-	strain_id INT NOT NULL,
+	strain_id bigint NOT NULL,
 	foreign key (strain_id) references strain (strain_id) on delete cascade,
-	phenotype_id INT NOT NULL,
+	phenotype_id bigint NOT NULL,
 	foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade,
-	pub_id int not null,
+	pub_id bigint not null,
 	foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
 	constraint strain_phenotype_c1 unique (strain_id,phenotype_id,pub_id)
 );
@@ -499,11 +499,11 @@ COMMENT on table strain_phenotype IS 'Links phenotype(s) associated with a given
 
 drop table strain_phenotypeprop cascade;
 create table strain_phenotypeprop (
-        strain_phenotypeprop_id serial not null,
+        strain_phenotypeprop_id bigserial not null,
         primary key (strain_phenotypeprop_id),
-	strain_phenotype_id int not null,
+	strain_phenotype_id bigint not null,
         foreign key (strain_phenotype_id) references strain_phenotype (strain_phenotype_id) on delete cascade INITIALLY DEFERRED,
-	type_id int not null,
+	type_id bigint not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 	value text null,
         rank int not null default 0,

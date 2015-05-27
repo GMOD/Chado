@@ -23,14 +23,14 @@
 -- ================================================
 
 create table phylotree (
-	phylotree_id serial not null,
+	phylotree_id bigserial not null,
 	primary key (phylotree_id),
-   dbxref_id int not null,
+   dbxref_id bigint not null,
    foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 	name varchar(255) null,
-	type_id int,
+	type_id bigint,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
-	analysis_id int null,
+	analysis_id bigint null,
    foreign key (analysis_id) references analysis (analysis_id) on delete cascade,
 	comment text null,
 	unique(phylotree_id)
@@ -46,11 +46,11 @@ COMMENT ON COLUMN phylotree.type_id IS 'Type: protein, nucleotide, taxonomy, for
 -- ================================================
 
 create table phylotree_pub (
-       phylotree_pub_id serial not null,
+       phylotree_pub_id bigserial not null,
        primary key (phylotree_pub_id),
-       phylotree_id int not null,
+       phylotree_id bigint not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade,
        unique(phylotree_id, pub_id)
 );
@@ -64,17 +64,17 @@ COMMENT ON TABLE phylotree_pub IS 'Tracks citations global to the tree e.g. mult
 -- ================================================
 
 create table phylonode (
-       phylonode_id serial not null,
+       phylonode_id bigserial not null,
        primary key (phylonode_id),
-       phylotree_id int not null,
+       phylotree_id bigint not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
-       parent_phylonode_id int null,
+       parent_phylonode_id bigint null,
        foreign key (parent_phylonode_id) references phylonode (phylonode_id) on delete cascade,
        left_idx int not null,
        right_idx int not null,
-       type_id int,
+       type_id bigint,
        foreign key(type_id) references cvterm (cvterm_id) on delete cascade,
-       feature_id int,
+       feature_id bigint,
        foreign key (feature_id) references feature (feature_id) on delete cascade,
        label varchar(255) null,
        distance float  null,
@@ -96,12 +96,12 @@ COMMENT ON COLUMN phylonode.parent_phylonode_id IS 'Root phylonode can have null
 -- ================================================
 
 create table phylonode_dbxref (
-       phylonode_dbxref_id serial not null,
+       phylonode_dbxref_id bigserial not null,
        primary key (phylonode_dbxref_id),
 
-       phylonode_id int not null,
+       phylonode_id bigint not null,
        foreign key (phylonode_id) references phylonode (phylonode_id) on delete cascade,
-       dbxref_id int not null,
+       dbxref_id bigint not null,
        foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade,
 
        unique(phylonode_id,dbxref_id)
@@ -117,12 +117,12 @@ COMMENT ON TABLE phylonode_dbxref IS 'For example, for orthology, paralogy group
 -- ================================================
 
 create table phylonode_pub (
-       phylonode_pub_id serial not null,
+       phylonode_pub_id bigserial not null,
        primary key (phylonode_pub_id),
 
-       phylonode_id int not null,
+       phylonode_id bigint not null,
        foreign key (phylonode_id) references phylonode (phylonode_id) on delete cascade,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade,
 
        unique(phylonode_id, pub_id)
@@ -135,12 +135,12 @@ create index phylonode_pub_idx2 on phylonode_pub (pub_id);
 -- ================================================
 
 create table phylonode_organism (
-       phylonode_organism_id serial not null,
+       phylonode_organism_id bigserial not null,
        primary key (phylonode_organism_id),
 
-       phylonode_id int not null,
+       phylonode_id bigint not null,
        foreign key (phylonode_id) references phylonode (phylonode_id) on delete cascade,
-       organism_id int not null,
+       organism_id bigint not null,
        foreign key (organism_id) references organism (organism_id) on delete cascade,
 
        unique(phylonode_id)
@@ -157,12 +157,12 @@ COMMENT ON COLUMN phylonode_organism.phylonode_id IS 'One phylonode cannot refer
 -- ================================================
 
 create table phylonodeprop (
-       phylonodeprop_id serial not null,
+       phylonodeprop_id bigserial not null,
        primary key (phylonodeprop_id),
 
-       phylonode_id int not null,
+       phylonode_id bigint not null,
        foreign key (phylonode_id) references phylonode (phylonode_id) on delete cascade,
-       type_id int not null,
+       type_id bigint not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 
        value text not null default '',
@@ -181,16 +181,16 @@ COMMENT ON COLUMN phylonodeprop.type_id IS 'type_id could designate phylonode hi
 -- ================================================
 
 create table phylonode_relationship (
-       phylonode_relationship_id serial not null,
+       phylonode_relationship_id bigserial not null,
        primary key (phylonode_relationship_id),
-       subject_id int not null,
+       subject_id bigint not null,
        foreign key (subject_id) references phylonode (phylonode_id) on delete cascade,
-       object_id int not null,
+       object_id bigint not null,
        foreign key (object_id) references phylonode (phylonode_id) on delete cascade,
-       type_id int not null,
+       type_id bigint not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
        rank int,
-       phylotree_id int not null,
+       phylotree_id bigint not null,
        foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade,
        unique(subject_id, object_id, type_id)
 );

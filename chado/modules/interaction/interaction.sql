@@ -27,10 +27,10 @@
 
 drop table interaction cascade;
 create table interaction (
-       	interaction_id serial NOT NULL,
+       	interaction_id bigserial NOT NULL,
        	primary key (interaction_id),
 	uniquename text NOT NULL,
-        type_id int NOT NULL,
+        type_id bigint NOT NULL,
         foreign key (type_id) references cvterm (cvterm_id)
 	on delete cascade INITIALLY DEFERRED,
         description text,
@@ -47,11 +47,11 @@ create index interaction_idx2 on interaction (type_id);
 
 drop table interactionprop cascade;
 create table interactionprop (
-    interactionprop_id serial not null,
+    interactionprop_id bigserial not null,
     primary key (interactionprop_id),
-    interaction_id int not null,
+    interaction_id bigint not null,
     foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -67,11 +67,11 @@ create index interactionprop_idx2 on interactionprop (type_id);
 
 drop table interactionprop_pub cascade;
 create table interactionprop_pub (
-       interactionprop_pub_id serial not null,
+       interactionprop_pub_id bigserial not null,
        primary key (interactionprop_pub_id),
-       interactionprop_id int not null,
+       interactionprop_id bigint not null,
           foreign key (interactionprop_id) references interactionprop (interactionprop_id) on delete cascade INITIALLY DEFERRED,
-     pub_id int not null,
+     pub_id bigint not null,
      foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
      constraint interactionprop_pub_c1 unique (interactionprop_id,pub_id)
 );
@@ -85,11 +85,11 @@ create index interactionprop_pub_idx2 on interactionprop_pub (pub_id);
 
 drop table interaction_pub cascade;
 create table interaction_pub (
-       interaction_pub_id serial not null,
+       interaction_pub_id bigserial not null,
        primary key (interaction_pub_id),
-       interaction_id int not null,
+       interaction_id bigint not null,
        foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint interaction_pub_c1 unique(interaction_id,pub_id)       
 );
@@ -103,13 +103,13 @@ create index interaction_pub_idx2 on interaction_pub (pub_id);
 
 drop table interaction_expression cascade;
 create table interaction_expression (
-       interaction_expression_id serial not null,
+       interaction_expression_id bigserial not null,
        primary key (interaction_expression_id),
-       expression_id int not null,
+       expression_id bigint not null,
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-       interaction_id int not null,
+       interaction_id bigint not null,
        foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint interaction_expression_c1 unique (expression_id,interaction_id,pub_id)       
 );
@@ -124,11 +124,11 @@ create index interaction_expression_idx3 on interaction_expression (pub_id);
 
 drop table interaction_expressionprop;
 create table interaction_expressionprop (
-    interaction_expressionprop_id serial not null,
+    interaction_expressionprop_id bigserial not null,
     primary key (interaction_expressionprop_id),
-    interaction_expression_id int not null,
+    interaction_expression_id bigint not null,
     foreign key (interaction_expression_id) references interaction_expression (interaction_expression_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -144,11 +144,11 @@ create index interaction_expressionprop_idx2 on interaction_expressionprop (type
 
 drop table interaction_cvterm cascade;
 create table interaction_cvterm (
-       interaction_cvterm_id serial not null,
+       interaction_cvterm_id bigserial not null,
        primary key (interaction_cvterm_id),
-       interaction_id int not null,
+       interaction_id bigint not null,
        foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-       cvterm_id int not null,
+       cvterm_id bigint not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        constraint interaction_cvterm_c1 unique (interaction_id,cvterm_id)
 );
@@ -162,11 +162,11 @@ create index interaction_cvterm_idx2 on interaction_cvterm (cvterm_id);
 
 drop table interaction_cvtermprop cascade;
 create table interaction_cvtermprop (
-    interaction_cvtermprop_id serial not null,
+    interaction_cvtermprop_id bigserial not null,
     primary key (interaction_cvtermprop_id),
-    interaction_cvterm_id int not null,
+    interaction_cvterm_id bigint not null,
     foreign key (interaction_cvterm_id) references interaction_cvterm (interaction_cvterm_id) on delete cascade,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -182,13 +182,13 @@ create index interaction_cvtermprop_idx2 on interaction_cvtermprop (type_id);
 
 drop table feature_interaction cascade;
 create table feature_interaction (
-       feature_interaction_id serial not null,
+       feature_interaction_id bigserial not null,
        primary key (feature_interaction_id),
-       feature_id int not null,
+       feature_id bigint not null,
        foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-       interaction_id int not null,
+       interaction_id bigint not null,
        foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-       role_id int not null,
+       role_id bigint not null,
        foreign key (role_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        rank int not null default 0,
        constraint feature_interaction_c1 unique (feature_id,interaction_id, role_id)
@@ -207,11 +207,11 @@ create index feature_interaction_idx3 on feature_interaction (role_id);
 
 drop table feature_interactionprop cascade;
 create table feature_interactionprop (
-       feature_interactionprop_id serial not null,
+       feature_interactionprop_id bigserial not null,
        primary key (feature_interactionprop_id),
-       feature_interaction_id int not null,
+       feature_interaction_id bigint not null,
        foreign key (feature_interaction_id) references feature_interaction (feature_interaction_id) on delete cascade INITIALLY DEFERRED,
-       type_id int not null,
+       type_id bigint not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
@@ -227,11 +227,11 @@ create index feature_interactionprop_idx2 on feature_interactionprop (type_id);
 
 drop table feature_interaction_pub cascade;
 create table feature_interaction_pub (
-       feature_interaction_pub_id serial not null,
+       feature_interaction_pub_id bigserial not null,
        primary key (feature_interaction_pub_id),
-       feature_interaction_id int not null,
+       feature_interaction_id bigint not null,
        foreign key (feature_interaction_id) references feature_interaction (feature_interaction_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint feature_interaction_pub_c1 unique(feature_interaction_id,pub_id)       
 );
@@ -245,13 +245,13 @@ create index feature_interaction_pub_idx2 on feature_interaction_pub (pub_id);
 
 drop table interaction_cell_line cascade;
 create table interaction_cell_line (
-       interaction_cell_line_id serial not null,
+       interaction_cell_line_id bigserial not null,
        primary key (interaction_cell_line_id),
-       cell_line_id int not null,
+       cell_line_id bigint not null,
        foreign key (cell_line_id) references cell_line (cell_line_id) on delete cascade INITIALLY DEFERRED,
-       interaction_id int not null,
+       interaction_id bigint not null,
        foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint interaction_cell_line_c1 unique (cell_line_id,interaction_id,pub_id)       
 );
@@ -266,7 +266,7 @@ create index interaction_cell_line_idx3 on interaction_cell_line (pub_id);
 
 drop table interaction_group cascade;
 create table interaction_group (
-       interaction_group_id serial not null,
+       interaction_group_id bigserial not null,
        primary key (interaction_group_id),
        uniquename text NOT NULL,
        is_obsolete boolean not null default false,
@@ -282,11 +282,11 @@ create index interaction_group_idx1 on interaction_group (uniquename);
 
 drop table interaction_group_feature_interaction cascade;
 create table interaction_group_feature_interaction (
-       interaction_group_feature_interaction_id serial not null,
+       interaction_group_feature_interaction_id bigserial not null,
        primary key (interaction_group_feature_interaction_id),
-       interaction_group_id int not null,
+       interaction_group_id bigint not null,
        foreign key (interaction_group_id) references interaction_group (interaction_group_id) on delete cascade INITIALLY DEFERRED,
-       feature_interaction_id int not null,
+       feature_interaction_id bigint not null,
        foreign key (feature_interaction_id) references feature_interaction (feature_interaction_id) on delete cascade INITIALLY DEFERRED,
        rank int not null default 0,
        constraint interaction_group_feature_interaction_c1 unique (interaction_group_id,feature_interaction_id,rank)       

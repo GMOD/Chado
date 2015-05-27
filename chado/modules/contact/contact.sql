@@ -13,9 +13,9 @@
 -- ================================================
 
 create table contact (
-    contact_id serial not null,
+    contact_id bigserial not null,
     primary key (contact_id),
-    type_id int null,
+    type_id bigint null,
     foreign key (type_id) references cvterm (cvterm_id),
     name varchar(255) not null,
     description varchar(255) null,
@@ -30,13 +30,13 @@ COMMENT ON COLUMN contact.type_id IS 'What type of contact is this?  E.g. "perso
 -- ================================================
 
 create table contact_relationship (
-    contact_relationship_id serial not null,
+    contact_relationship_id bigserial not null,
     primary key (contact_relationship_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     constraint contact_relationship_c1 unique (subject_id,object_id,type_id)
 );
