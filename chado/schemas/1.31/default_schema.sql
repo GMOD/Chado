@@ -38582,6 +38582,24 @@ COMMENT ON COLUMN analysis_relationship.type_id IS 'analysis_relationship.type_i
 COMMENT ON COLUMN analysis_relationship.rank IS 'analysis_relationship.rank is the ordering of subject analysiss with respect to the object analysis may be important where rank is used to order these; starts from zero.';
 COMMENT ON COLUMN analysis_relationship.value IS 'analysis_relationship.value is for additional notes or comments.';
 
+-- ================================================
+-- TABLE: analysis_pub
+-- ================================================
+
+create table analysis_pub (
+    analysis_pub_id serial not null,
+    primary key (analysis_pub_id),
+    analysis_id int not null,
+    foreign key (analysis_id) references feature (analysis_id) on delete cascade INITIALLY DEFERRED,
+    pub_id int not null,
+    foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
+    constraint analysis_pub_c1 unique (analysis_id, pub_id)
+);
+create index analysis_pub_idx1 on analysis_pub (analysis_id);
+create index analysis_pub_idx2 on analysis_pub (pub_id);
+
+COMMENT ON TABLE analysis_pub IS 'Provenance. Linking table between analyses and the publications that mention them.';
+
 
 CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR) 
   RETURNS INT AS 
@@ -39758,6 +39776,26 @@ create index project_pub_idx1 on project_pub (project_id);
 create index project_pub_idx2 on project_pub (pub_id);
 
 COMMENT ON TABLE project_pub IS 'Linking project(s) to publication(s)';
+
+
+-- ================================================
+-- TABLE: analysis_project
+-- ================================================
+
+create table analysis_project (
+       analysis_project_id serial not null,
+       primary key (analysis_project_id),
+       project_id int not null,
+       foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
+       analysis_id int not null,
+       foreign key (analysis_id) references pub (analysis_id) on delete cascade INITIALLY DEFERRED,
+       rank int not null default 0,
+       constraint analysis_project_c1 unique (project_id,analysis_id)
+);
+create index analysis_project_idx1 on analysis_project (project_id);
+create index analysis_project_idx2 on analysis_project (analysis_id);
+
+COMMENT ON TABLE analysis_project IS 'Links an analysis to a project that may contain multiple analyses. The rank column can be used to specify a simple ordering in which analyses were executed.';
 
 -- ================================================
 -- TABLE: project_contact
