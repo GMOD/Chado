@@ -6,11 +6,12 @@
 -- ============
 -- :import cvterm from cv
 -- :import pub from pub
--- :import dbxref from general
+-- :import dbxref from db
 -- :import organism from organism
 -- :import genotype from genetic
 -- :import contact from contact
-
+-- :import feature from sequence
+-- :import featuremap from map
 -- ================================================
 -- TABLE: stock
 -- ================================================
@@ -373,4 +374,91 @@ slot-value property tags attached to it. This is useful for storing properties r
 hardcoding a list of columns in the relational schema, and is
 completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for
 the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
+-- ================================================
+-- TABLE: stockcollection_db
+-- ================================================
+
+CREATE TABLE stockcollection_db (
+    stockcollection_db_id bigserial primary key NOT NULL,
+    stockcollection_id bigint NOT NULL,
+    db_id bigint NOT NULL,
+    CONSTRAINT stockcollection_db_c1 UNIQUE (stockcollection_id, db_id),
+    FOREIGN KEY (db_id) REFERENCES db(db_id) ON DELETE CASCADE,
+    FOREIGN KEY (stockcollection_id) REFERENCES stockcollection(stockcollection_id) ON DELETE CASCADE
+);
+
+CREATE INDEX stockcollection_db_idx1 ON stockcollection_db USING btree (stockcollection_id);
+CREATE INDEX stockcollection_db_idx2 ON stockcollection_db USING btree (db_id);
+
+COMMENT ON TABLE stockcollection_db IS 'Stock collections may be respresented 
+by an external online database. This table associates a stock collection with 
+a database where its member stocks can be found. Individual stock that are part 
+of this collction should have entries in the stock_dbxref table with the same 
+db_id record';
+
+
+-- ================================================
+-- TABLE: stock_feature
+-- ================================================
+
+CREATE TABLE stock_feature (
+  stock_feature_id bigserial NOT NULL,
+  feature_id bigint NOT NULL,
+  stock_id bigint NOT NULL,
+  type_id bigint NOT NULL,
+  rank INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (stock_feature_id),
+  FOREIGN KEY (feature_id) REFERENCES feature (feature_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (stock_id) REFERENCES stock (stock_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  CONSTRAINT stock_feature_c1 UNIQUE (feature_id, stock_id, type_id, rank)  
+);
+create index stock_feature_idx1 on stock_feature (stock_feature_id);
+create index stock_feature_idx2 on stock_feature (feature_id);
+create index stock_feature_idx3 on stock_feature (stock_id);
+create index stock_feature_idx4 on stock_feature (type_id);
+
+COMMENT ON TABLE stock_featuremap  IS 'Links a stock to a feature.';
+
+
+-- ================================================
+-- TABLE: stock_featuremap
+-- ================================================
+
+CREATE TABLE stock_featuremap (
+  stock_featuremap_id bigserial NOT NULL,
+  featuremap_id bigint NOT NULL,
+  stock_id bigint NOT NULL,
+  type_id bigint,
+  PRIMARY KEY (stock_featuremap_id),
+  FOREIGN KEY (featuremap_id) REFERENCES featuremap (featuremap_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (stock_id) REFERENCES stock (stock_id)  ON DELETE CASCADE INITIALLY DEFERRED,
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE INITIALLY DEFERRED,
+  CONSTRAINT stock_featuremap_c1 UNIQUE (featuremap_id, stock_id, type_id)  
+);
+
+create index stock_featuremap_idx1 on stock_featuremap (featuremap_id);
+create index stock_featuremap_idx2 on stock_featuremap (stock_id);
+create index stock_featuremap_idx3 on stock_featuremap (type_id);
+
+COMMENT ON TABLE stock_featuremap  IS 'Links a featuremap to a stock.';
+
+
+-- ================================================
+-- TABLE: stock_library
+-- ================================================
+CREATE TABLE stock_library (
+    stock_library_id bigserial primary key NOT NULL,
+    library_id bigint NOT NULL,
+    stock_id bigint NOT NULL,
+    CONSTRAINT stock_library_c1 UNIQUE (library_id, stock_id),
+    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
+);
+
+CREATE INDEX stock_library_idx1 ON library USING btree (library_id);
+CREATE INDEX stock_library_idx2 ON stock USING btree (stock_id);
+
+COMMENT ON TABLE stock_library IS 'Links a stock with a library.';
 

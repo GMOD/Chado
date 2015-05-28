@@ -10,7 +10,7 @@
 -- :import pub from pub
 -- :import organism from organism
 -- :import contact from contact
--- :import dbxref from general
+-- :import dbxref from db
 -- :import tableinfo from general
 -- :import project from project
 -- :import analysis from companalysis

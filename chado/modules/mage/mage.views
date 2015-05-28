@@ -8,7 +8,7 @@
 -- using views to filter.
 
 CREATE TABLE affymetrixprobeset (
-  element_id serial not null,
+  element_id bigserial not null,
   primary key (element_id),
   feature_id int null,
   foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
@@ -33,7 +33,7 @@ CREATE UNIQUE INDEX affymetrixprobeset_idx6 ON affymetrixprobeset (name,arraydes
 CREATE UNIQUE INDEX affymetrixprobeset_idx7 ON affymetrixprobeset (feature_id,arraydesign_id);
 
 CREATE TABLE affymetrixprobe (
-  element_id serial not null,
+  element_id bigserial not null,
   primary key (element_id),
   feature_id int null,
   foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,

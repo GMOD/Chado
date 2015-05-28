@@ -8,7 +8,7 @@
 -- :import synonym from sequence
 -- :import library from library
 -- :import cvterm from cv
--- :import dbxref from general
+-- :import dbxref from db
 -- :import pub from pub
 -- :import organism from organism
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

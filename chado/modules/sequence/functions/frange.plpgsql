@@ -2,7 +2,7 @@ CREATE SCHEMA frange;
 SET search_path = frange,public,pg_catalog;
 
 CREATE TABLE featuregroup (
-    featuregroup_id serial not null,
+    featuregroup_id bigserial not null,
     primary key (featuregroup_id),
 
     subject_id int not null,
