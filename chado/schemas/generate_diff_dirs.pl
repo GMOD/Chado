@@ -11,7 +11,7 @@ die unless $VERSION;
 #make this versions directory
 mkdir $VERSION;
 copy("../modules/default_schema.sql", $VERSION);
-system("svn add $VERSION");
+system("git add $VERSION");
 
 #make the diff dirs and skelton diff files
 my @add_to_manifest;
@@ -26,7 +26,7 @@ for my $dir (@dirs) {
         mkdir $newdir;
         system("touch $newdir/diff.sql");
         push @add_to_manifest, "schemas/$newdir/diff.sql";
-        system("svn add $newdir");
+        system("git add $newdir");
     }
 }
 

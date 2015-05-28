@@ -19,7 +19,7 @@
 -- represent geo information.
 
 CREATE TABLE nd_geolocation (
-    nd_geolocation_id serial PRIMARY KEY NOT NULL,
+    nd_geolocation_id bigserial PRIMARY KEY NOT NULL,
     description character varying(255),
     latitude real,
     longitude real,
@@ -43,36 +43,36 @@ COMMENT ON COLUMN nd_geolocation.altitude IS 'The altitude (elevation) of the lo
 
 
 CREATE TABLE nd_experiment (
-    nd_experiment_id serial PRIMARY KEY NOT NULL,
-    nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED 
+    nd_experiment_id bigserial PRIMARY KEY NOT NULL,
+    nd_geolocation_id bigint NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED 
 );
 
 --
 --used to be nd_diversityexperiment_project
 --then was nd_assay_project
 CREATE TABLE nd_experiment_project (
-    nd_experiment_project_id serial PRIMARY KEY NOT NULL,
-    project_id integer not null references project (project_id) on delete cascade INITIALLY DEFERRED,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_project_id bigserial PRIMARY KEY NOT NULL,
+    project_id bigint not null references project (project_id) on delete cascade INITIALLY DEFERRED,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED
 );
 
 
 
 CREATE TABLE nd_experimentprop (
-    nd_experimentprop_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
+    nd_experimentprop_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value text null,
-    rank integer NOT NULL default 0,
+    rank int NOT NULL default 0,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
 CREATE TABLE nd_experiment_pub (
-       nd_experiment_pub_id serial PRIMARY KEY not null,
-       nd_experiment_id int not null,
+       nd_experiment_pub_id bigserial PRIMARY KEY not null,
+       nd_experiment_id bigint not null,
        foreign key (nd_experiment_id) references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint nd_experiment_pub_c1 unique (nd_experiment_id,pub_id)
 );
@@ -85,11 +85,11 @@ COMMENT ON TABLE nd_experiment_pub IS 'Linking nd_experiment(s) to publication(s
 
 
 CREATE TABLE nd_geolocationprop (
-    nd_geolocationprop_id serial PRIMARY KEY NOT NULL,
-    nd_geolocation_id integer NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    nd_geolocationprop_id bigserial PRIMARY KEY NOT NULL,
+    nd_geolocation_id bigint NOT NULL references nd_geolocation (nd_geolocation_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank integer NOT NULL DEFAULT 0,
+    rank int NOT NULL DEFAULT 0,
     constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
 
@@ -103,9 +103,9 @@ COMMENT ON COLUMN nd_geolocationprop.rank IS 'The rank of the property value, if
 
 
 CREATE TABLE nd_protocol (
-    nd_protocol_id serial PRIMARY KEY  NOT NULL,
+    nd_protocol_id bigserial PRIMARY KEY  NOT NULL,
     name character varying(255) NOT NULL unique,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part of the experiment.';
@@ -113,9 +113,9 @@ COMMENT ON TABLE nd_protocol IS 'A protocol can be anything that is done as part
 COMMENT ON COLUMN nd_protocol.name IS 'The protocol name.';
 
 CREATE TABLE nd_reagent (
-    nd_reagent_id serial PRIMARY KEY NOT NULL,
+    nd_reagent_id bigserial PRIMARY KEY NOT NULL,
     name character varying(80) NOT NULL,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     feature_id integer
 );
 
@@ -130,19 +130,19 @@ COMMENT ON COLUMN nd_reagent.feature_id IS 'If the reagent is a primer, the feat
 
 
 CREATE TABLE nd_protocol_reagent (
-    nd_protocol_reagent_id serial PRIMARY KEY NOT NULL,
-    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
-    reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
+    nd_protocol_reagent_id bigserial PRIMARY KEY NOT NULL,
+    nd_protocol_id bigint NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
+    reagent_id bigint NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 
 CREATE TABLE nd_protocolprop (
-    nd_protocolprop_id serial PRIMARY KEY NOT NULL,
-    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    nd_protocolprop_id bigserial PRIMARY KEY NOT NULL,
+    nd_protocol_id bigint NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank integer DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
 
@@ -159,10 +159,10 @@ COMMENT ON COLUMN nd_protocolprop.rank IS 'The rank of the property value, if th
 
 
 CREATE TABLE nd_experiment_stock (
-    nd_experiment_stock_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    stock_id integer NOT NULL references stock (stock_id)  on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_stock_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    stock_id bigint NOT NULL references stock (stock_id)  on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_experiment_stock IS 'Part of a stock or a clone of a stock that is used in an experiment';
@@ -172,27 +172,27 @@ COMMENT ON COLUMN nd_experiment_stock.stock_id IS 'stock used in the extraction 
 
 
 CREATE TABLE nd_experiment_protocol (
-    nd_experiment_protocol_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    nd_protocol_id integer NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_protocol_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    nd_protocol_id bigint NOT NULL references nd_protocol (nd_protocol_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_experiment_protocol IS 'Linking table: experiments to the protocols they involve.';
 
 
 CREATE TABLE nd_experiment_phenotype (
-    nd_experiment_phenotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    phenotype_id integer NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
+    nd_experiment_phenotype_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL REFERENCES nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    phenotype_id bigint NOT NULL references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
    constraint nd_experiment_phenotype_c1 unique (nd_experiment_id,phenotype_id)
 ); 
 
 COMMENT ON TABLE nd_experiment_phenotype IS 'Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.';
 
 CREATE TABLE nd_experiment_genotype (
-    nd_experiment_genotype_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    genotype_id integer NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED ,
+    nd_experiment_genotype_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    genotype_id bigint NOT NULL references genotype (genotype_id) on delete cascade INITIALLY DEFERRED ,
     constraint nd_experiment_genotype_c1 unique (nd_experiment_id,genotype_id)
 );
 
@@ -200,10 +200,10 @@ COMMENT ON TABLE nd_experiment_genotype IS 'Linking table: experiments to the ge
 
 
 CREATE TABLE nd_reagent_relationship (
-    nd_reagent_relationship_id serial PRIMARY KEY NOT NULL,
-    subject_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    object_reagent_id integer NOT NULL  references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
+    nd_reagent_relationship_id bigserial PRIMARY KEY NOT NULL,
+    subject_reagent_id bigint NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
+    object_reagent_id bigint NOT NULL  references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_reagent_relationship IS 'Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents.';
@@ -216,20 +216,20 @@ COMMENT ON COLUMN nd_reagent_relationship.type_id IS 'The type (or predicate) of
 
 
 CREATE TABLE nd_reagentprop (
-    nd_reagentprop_id serial PRIMARY KEY NOT NULL,
-    nd_reagent_id integer NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    nd_reagentprop_id bigserial PRIMARY KEY NOT NULL,
+    nd_reagent_id bigint NOT NULL references nd_reagent (nd_reagent_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank integer DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
 CREATE TABLE nd_experiment_stockprop (
-    nd_experiment_stockprop_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
-    type_id integer NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+    nd_experiment_stockprop_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_stock_id bigint NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
+    type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
-    rank integer DEFAULT 0 NOT NULL,
+    rank int DEFAULT 0 NOT NULL,
     constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
 
@@ -245,9 +245,9 @@ COMMENT ON COLUMN nd_experiment_stockprop.rank IS 'The rank of the property valu
 
 
 CREATE TABLE nd_experiment_stock_dbxref (
-    nd_experiment_stock_dbxref_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_stock_id integer NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id integer NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_stock_dbxref_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_stock_id bigint NOT NULL references nd_experiment_stock (nd_experiment_stock_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id bigint NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_experiment_stock_dbxref IS 'Cross-reference experiment_stock to accessions, images, etc';
@@ -255,16 +255,16 @@ COMMENT ON TABLE nd_experiment_stock_dbxref IS 'Cross-reference experiment_stock
 
 
 CREATE TABLE nd_experiment_dbxref (
-    nd_experiment_dbxref_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id integer NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_dbxref_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    dbxref_id bigint NOT NULL references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED
 );
 
 COMMENT ON TABLE nd_experiment_dbxref IS 'Cross-reference experiment to accessions, images, etc';
 
 
 CREATE TABLE nd_experiment_contact (
-    nd_experiment_contact_id serial PRIMARY KEY NOT NULL,
-    nd_experiment_id integer NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
-    contact_id integer NOT NULL references contact (contact_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_contact_id bigserial PRIMARY KEY NOT NULL,
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
+    contact_id bigint NOT NULL references contact (contact_id) on delete cascade INITIALLY DEFERRED
 );

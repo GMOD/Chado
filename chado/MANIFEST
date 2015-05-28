@@ -360,3 +360,19 @@ schemas/1.11-1.23/diff.sql
 schemas/1.2-1.23/diff.sql
 schemas/1.21-1.23/diff.sql
 schemas/1.22-1.23/diff.sql
+#the following added by generate_diff_dirs.pl
+schemas/1-1.31/diff.sql
+schemas/1.1-1.31/diff.sql
+schemas/1.11-1.31/diff.sql
+schemas/1.2-1.31/diff.sql
+schemas/1.21-1.31/diff.sql
+schemas/1.22-1.31/diff.sql
+schemas/1.23-1.31/diff.sql
+#the following added by generate_diff_dirs.pl
+schemas/1-1.31/diff.sql
+schemas/1.1-1.31/diff.sql
+schemas/1.11-1.31/diff.sql
+schemas/1.2-1.31/diff.sql
+schemas/1.21-1.31/diff.sql
+schemas/1.22-1.31/diff.sql
+schemas/1.23-1.31/diff.sql

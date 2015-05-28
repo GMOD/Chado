@@ -16,7 +16,7 @@
 -- ================================================
 
 create table expression (
-       expression_id serial not null,
+       expression_id bigserial not null,
        primary key (expression_id),
        uniquename text not null,
        md5checksum character(32),
@@ -32,14 +32,14 @@ COMMENT ON TABLE expression IS 'The expression table is essentially a bridge tab
 -- ================================================
 
 create table expression_cvterm (
-       expression_cvterm_id serial not null,
+       expression_cvterm_id bigserial not null,
        primary key (expression_cvterm_id),
-       expression_id int not null,
+       expression_id bigint not null,
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-       cvterm_id int not null,
+       cvterm_id bigint not null,
        foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        rank int not null default 0,
-       cvterm_type_id int not null,
+       cvterm_type_id bigint not null,
        foreign key (cvterm_type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        constraint expression_cvterm_c1 unique (expression_id,cvterm_id,rank,cvterm_type_id)
 );
@@ -53,11 +53,11 @@ create index expression_cvterm_idx3 on expression_cvterm (cvterm_type_id);
 -- ================================================
 
 create table expression_cvtermprop (
-    expression_cvtermprop_id serial not null,
+    expression_cvtermprop_id bigserial not null,
     primary key (expression_cvtermprop_id),
-    expression_cvterm_id int not null,
+    expression_cvterm_id bigint not null,
     foreign key (expression_cvterm_id) references expression_cvterm (expression_cvterm_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -89,11 +89,11 @@ the default 0 value should be used.';
 -- ================================================
 
 create table expressionprop (
-    expressionprop_id serial not null,
+    expressionprop_id bigserial not null,
     primary key (expressionprop_id),
-    expression_id int not null,
+    expression_id bigint not null,
     foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
@@ -108,11 +108,11 @@ create index expressionprop_idx2 on expressionprop (type_id);
 -- ================================================
 
 create table expression_pub (
-       expression_pub_id serial not null,
+       expression_pub_id bigserial not null,
        primary key (expression_pub_id),
-       expression_id int not null,
+       expression_id bigint not null,
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint expression_pub_c1 unique (expression_id,pub_id)       
 );
@@ -125,13 +125,13 @@ create index expression_pub_idx2 on expression_pub (pub_id);
 -- ================================================
 
 create table feature_expression (
-       feature_expression_id serial not null,
+       feature_expression_id bigserial not null,
        primary key (feature_expression_id),
-       expression_id int not null,
+       expression_id bigint not null,
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-       feature_id int not null,
+       feature_id bigint not null,
        foreign key (feature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
-       pub_id int not null,
+       pub_id bigint not null,
        foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
        constraint feature_expression_c1 unique (expression_id,feature_id,pub_id)       
 );
@@ -145,11 +145,11 @@ create index feature_expression_idx3 on feature_expression (pub_id);
 -- ================================================
 
 create table feature_expressionprop (
-       feature_expressionprop_id serial not null,
+       feature_expressionprop_id bigserial not null,
        primary key (feature_expressionprop_id),
-       feature_expression_id int not null,
+       feature_expression_id bigint not null,
        foreign key (feature_expression_id) references feature_expression (feature_expression_id) on delete cascade INITIALLY DEFERRED,
-       type_id int not null,
+       type_id bigint not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
@@ -167,7 +167,7 @@ feature_expression (comments, for example). Modeled on feature_cvtermprop.';
 -- ================================================
 
 create table eimage (
-		eimage_id serial not null,
+		eimage_id bigserial not null,
       primary key (eimage_id),
       eimage_data text,
       eimage_type varchar(255) not null,
@@ -183,11 +183,11 @@ COMMENT ON COLUMN eimage.eimage_type IS 'Describes the type of data in eimage_da
 -- ================================================
 
 create table expression_image (
-       expression_image_id serial not null,
+       expression_image_id bigserial not null,
        primary key (expression_image_id),
-       expression_id int not null,
+       expression_id bigint not null,
        foreign key (expression_id) references expression (expression_id) on delete cascade INITIALLY DEFERRED,
-       eimage_id int not null,
+       eimage_id bigint not null,
        foreign key (eimage_id) references eimage (eimage_id) on delete cascade INITIALLY DEFERRED,
        constraint expression_image_c1 unique(expression_id,eimage_id)
 );
