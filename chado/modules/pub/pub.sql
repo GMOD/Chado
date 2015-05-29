@@ -6,7 +6,9 @@
 -- Dependencies:
 --
 -- :import cvterm from cv
--- :import dbxref from general
+-- :import dbxref from db
+-- :import analysis from companalysis
+-- :import contact from contact
 -- =================================================================
 
 -- ================================================
@@ -134,3 +136,21 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
+
+-- ================================================
+-- TABLE: pubauthor_contact
+-- ================================================
+
+CREATE TABLE pubauthor_contact (
+    pubauthor_contact_id bigserial primary key NOT NULL,
+    contact_id bigint NOT NULL,
+    pubauthor_id bigint NOT NULL,
+    CONSTRAINT pubauthor_contact_c1 UNIQUE (contact_id, pubauthor_id),
+    FOREIGN KEY (pubauthor_id) REFERENCES pubauthor(pubauthor_id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE
+);
+
+CREATE INDEX pubauthor_contact_idx1 ON pubauthor USING btree (pubauthor_id);
+CREATE INDEX pubauthor_contact_idx2 ON contact USING btree (contact_id);
+
+COMMENT ON TABLE pubauthor_contact IS 'An author on a publication may have a corresponding entry in the contact table and this table can link the two.';

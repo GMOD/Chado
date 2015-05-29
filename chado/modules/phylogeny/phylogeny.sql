@@ -14,7 +14,7 @@
 -- :import cvterm from cv
 -- :import pub from pub
 -- :import organism from organism
--- :import dbxref from general
+-- :import dbxref from db
 -- :import analysis from companalysis
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,6 +60,44 @@ create index phylotree_pub_idx2 on phylotree_pub (pub_id);
 COMMENT ON TABLE phylotree_pub IS 'Tracks citations global to the tree e.g. multiple sequence alignment supporting tree construction.';
 
 -- ================================================
+-- TABLE: phylotreeprop
+-- ================================================
+
+create table phylotreeprop (
+  phylotreeprop_id bigserial not null,
+  phylotree_id bigint not null,
+  type_id bigint not null,
+  value text null,
+  rank int not null default 0,
+  primary key (phylotreeprop_id),
+  foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade INITIALLY DEFERRED,
+  foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+  constraint phylotreeprop_c1 unique (phylotree_id,type_id,rank)
+);
+create index phylotreeprop_idx1 on phylotreeprop (phylotree_id);
+create index phylotreeprop_idx2 on phylotreeprop (type_id);
+
+COMMENT ON TABLE phylotreeprop IS 'A phylotree can have any number of slot-value property 
+tags attached to it. This is an alternative to hardcoding a list of columns in the 
+relational schema, and is completely extensible.';
+
+COMMENT ON COLUMN phylotreeprop.type_id IS 'The name of the property/slot is a cvterm. 
+The meaning of the property is defined in that cvterm.';
+
+COMMENT ON COLUMN phylotreeprop.value IS 'The value of the property, represented as text. 
+Numeric values are converted to their text representation. This is less efficient than 
+using native database types, but is easier to query.';
+
+COMMENT ON COLUMN phylotreeprop.rank IS 'Property-Value ordering. Any
+phylotree can have multiple values for any particular property type 
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used';
+
+COMMENT ON INDEX phylotreeprop_c1 IS 'For any one phylotree, multivalued
+property-value pairs must be differentiated by rank.';
+
+-- ================================================
 -- TABLE: phylonode
 -- ================================================
 
@@ -82,6 +120,9 @@ create table phylonode (
        unique(phylotree_id, left_idx),
        unique(phylotree_id, right_idx)
 );
+
+CREATE INDEX phylonode_parent_phylonode_id_idx ON phylonode (parent_phylonode_id);
+
 COMMENT ON TABLE phylonode IS 'This is the most pervasive
        element in the phylogeny module, cataloging the "phylonodes" of
        tree graphs. Edges are implied by the parent_phylonode_id

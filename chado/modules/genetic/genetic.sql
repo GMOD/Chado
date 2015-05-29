@@ -28,7 +28,7 @@
 -- :import phenotype from phenotype
 -- :import cvterm from cv
 -- :import pub from pub
--- :import dbxref from general
+-- :import dbxref from db
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -- ================================================
@@ -39,7 +39,7 @@ create table genotype (
     primary key (genotype_id),
     name text,
     uniquename text not null,
-    description varchar(255),
+    description text,
     type_id bigint NOT NULL,
     FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     constraint genotype_c1 unique (uniquename)

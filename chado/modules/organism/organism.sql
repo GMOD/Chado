@@ -6,7 +6,7 @@
 -- DEPENDENCIES
 -- ============
 -- :import cvterm from cv
--- :import dbxref from general
+-- :import dbxref from db
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -- ================================================
@@ -21,8 +21,11 @@ create table organism (
 	genus varchar(255) not null,
 	species varchar(255) not null,
 	common_name varchar(255) null,
+  infraspecific_name varchar(1024) null,
+  type_id bigint default null,
+  FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
 	comment text null,
-	constraint organism_c1 unique (genus,species)
+	constraint organism_c1 unique (genus,species,type_id,infraspecific_name)
 );
 
 COMMENT ON TABLE organism IS 'The organismal taxonomic
@@ -37,6 +40,15 @@ is present, as the common_name column is not always unique (e.g. environmental
 samples). If a particular strain or subspecies is to be represented,
 this is appended onto the species name. Follows standard NCBI taxonomy
 pattern.';
+
+COMMENT ON COLUMN organism.type_id IS 'A controlled vocabulary term that
+specifies the organism rank below species. It is used when an infraspecific 
+name is provided.  Ideally, the rank should be a valid ICN name such as 
+subspecies, varietas, subvarietas, forma and subforma';
+
+COMMENT ON COLUMN organism.infraspecific_name IS 'The scientific name for any taxon 
+below the rank of species.  The rank should be specified using the type_id field
+and the name is provided here.';
 
 
 -- ================================================
@@ -189,4 +201,30 @@ ordering. Any organism_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
 the default 0 value should be used';
+
+-- ================================================
+-- TABLE: organism_relationship
+-- ================================================
+
+CREATE TABLE organism_relationship (
+    organism_relationship_id bigserial primary key NOT NULL,
+    subject_id bigint NOT NULL,
+    object_id bigint NOT NULL,
+    type_id bigint NOT NULL,
+    rank integer DEFAULT 0 NOT NULL,
+    CONSTRAINT organism_relationship_c1 UNIQUE (subject_id, object_id, type_id, rank),
+    FOREIGN KEY (object_id) REFERENCES organism(organism_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES organism(organism_id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE    
+);
+
+CREATE INDEX organism_relationship_idx1 ON organism_relationship USING btree (subject_id);
+CREATE INDEX organism_relationship_idx2 ON organism_relationship USING btree (object_id);
+CREATE INDEX organism_relationship_idx3 ON organism_relationship USING btree (type_id);
+
+COMMENT ON TABLE organism_relationship IS 'Specifies relationships between organisms 
+that are not taxonomic. For example, in breeding, relationships such as 
+"sterile_with", "incompatible_with", or "fertile_with" would be appropriate. Taxonomic
+relatinoships should be housed in the phylogeny tables.';
+
 

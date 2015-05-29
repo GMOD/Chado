@@ -8,7 +8,8 @@
 -- :import cvterm from cv
 -- :import pub from pub
 -- :import organism from organism
--- :import dbxref from general
+-- :import dbxref from db
+-- :import contact from contact
 -- =================================================================
 
 -- ================================================
@@ -658,3 +659,22 @@ COMMENT ON COLUMN feature_synonym.pub_id IS 'The pub_id link is for relating the
 COMMENT ON COLUMN feature_synonym.is_current IS 'The is_current boolean indicates whether the linked synonym is the  current -official- symbol for the linked feature.';
 
 COMMENT ON COLUMN feature_synonym.is_internal IS 'Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name.  If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym. If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym.';
+
+-- ================================================
+-- TABLE: feature_contact
+-- ================================================
+
+CREATE TABLE feature_contact (
+    feature_contact_id bigserial primary key NOT NULL,
+    feature_id bigint NOT NULL,
+    contact_id bigint NOT NULL,
+    CONSTRAINT feature_contact_c1 UNIQUE (feature_id, contact_id),
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE,
+    FOREIGN KEY (feature_id) REFERENCES feature(feature_id) ON DELETE CASCADE
+);
+
+CREATE INDEX feature_contact_idx1 ON feature_contact USING btree (feature_id);
+CREATE INDEX feature_contact_idx2 ON feature_contact USING btree (contact_id);
+
+COMMENT ON TABLE feature_contact IS 'Links contact(s) with a feature.  Used to indicate a particular 
+person or organization responsible for discovery or that can provide more information on a particular feature.';

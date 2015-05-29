@@ -8,6 +8,9 @@
 -- :import feature from sequence
 -- :import cvterm from cv
 -- :import pub from pub
+-- :import contact from contact
+-- :import dbxref from db
+-- :import organism from organism
 -- =================================================================
 
 -- ================================================
@@ -78,6 +81,25 @@ create index featurepos_idx3 on featurepos (map_feature_id);
 COMMENT ON COLUMN featurepos.map_feature_id IS 'map_feature_id
 links to the feature (map) upon which the feature is being localized.';
 
+-- ================================================
+-- TABLE: featureposprop
+-- ================================================
+
+CREATE TABLE featureposprop (
+    featureposprop_id bigserial primary key NOT NULL,
+    featurepos_id bigint NOT NULL,
+    type_id bigint NOT NULL,
+    value text,
+    rank integer DEFAULT 0 NOT NULL,
+    CONSTRAINT featureposprop_c1 UNIQUE (featurepos_id, type_id, rank),
+    FOREIGN KEY (featurepos_id) REFERENCES featurepos(featurepos_id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
+);
+
+CREATE INDEX featureposprop_idx1 ON featureposprop USING btree (featurepos_id);
+CREATE INDEX featureposprop_idx2 ON featureposprop USING btree (type_id);
+
+COMMENT ON TABLE featureposprop IS 'Property or attribute of a featurepos record.';
 
 -- ================================================
 -- TABLE: featuremap_pub
@@ -93,3 +115,85 @@ create table featuremap_pub (
 );
 create index featuremap_pub_idx1 on featuremap_pub (featuremap_id);
 create index featuremap_pub_idx2 on featuremap_pub (pub_id);
+
+-- ================================================
+-- TABLE: featuremapprop
+-- ================================================
+
+CREATE TABLE featuremapprop (
+    featuremapprop_id bigserial primary key NOT NULL,
+    featuremap_id bigint NOT NULL,
+    type_id bigint NOT NULL,
+    value text,
+    rank integer DEFAULT 0 NOT NULL,
+    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
+    CONSTRAINT featuremapprop_c1 UNIQUE (featuremap_id, type_id, rank)
+);
+create index featuremapprop_idx1 on featuremapprop(featuremap_id);
+create index featuremapprop_idx2 on featuremapprop(type_id);
+
+COMMENT ON TABLE featuremapprop IS 'A featuremap can have any number of slot-value property 
+tags attached to it. This is an alternative to hardcoding a list of columns in the 
+relational schema, and is completely extensible.';
+
+-- ================================================
+-- TABLE: featuremap_contact
+-- ================================================
+CREATE TABLE featuremap_contact (
+    featuremap_contact_id bigserial primary key NOT NULL,
+    featuremap_id bigint NOT NULL,
+    contact_id bigint NOT NULL,
+    CONSTRAINT featuremap_contact_c1 UNIQUE (featuremap_id, contact_id),
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE,
+    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE
+);
+
+CREATE INDEX featuremap_contact_idx1 ON featuremap_contact USING btree (featuremap_id);
+CREATE INDEX featuremap_contact_idx2 ON featuremap_contact USING btree (contact_id);
+
+COMMENT ON TABLE featuremap_contact IS 'Links contact(s) with a featuremap.  Used to 
+indicate a particular person or organization responsible for constrution of or 
+that can provide more information on a particular featuremap.';
+
+
+-- ================================================
+-- TABLE: featuremap_dbxref
+-- ================================================
+
+CREATE TABLE featuremap_dbxref (
+    featuremap_dbxref_id bigserial primary key NOT NULL,
+    featuremap_id bigint NOT NULL,
+    dbxref_id bigint NOT NULL,
+    is_current boolean DEFAULT true NOT NULL,
+    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
+    FOREIGN KEY (dbxref_id) REFERENCES dbxref(dbxref_id) ON DELETE CASCADE
+);
+
+CREATE INDEX featuremap_dbxref_idx1 ON featuremap_dbxref USING btree (featuremap_id);
+CREATE INDEX featuremap_dbxref_idx2 ON featuremap_dbxref USING btree (dbxref_id);
+
+COMMENT ON TABLE feature_dbxref IS 'Links a feature to dbxrefs.';
+
+COMMENT ON COLUMN feature_dbxref.is_current IS 'True if this secondary dbxref is 
+the most up to date accession in the corresponding db. Retired accessions 
+should set this field to false';
+
+
+-- ================================================
+-- TABLE: featuremap_organism
+-- ================================================
+
+CREATE TABLE featuremap_organism (
+    featuremap_organism_id bigserial primary key NOT NULL,
+    featuremap_id bigint NOT NULL,
+    organism_id bigint NOT NULL,
+    CONSTRAINT featuremap_organism_c1 UNIQUE (featuremap_id, organism_id),
+    FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
+    FOREIGN KEY (organism_id) REFERENCES organism(organism_id) ON DELETE CASCADE
+);
+
+CREATE INDEX featuremap_organism_idx1 ON featuremap_organism USING btree (featuremap_id);
+CREATE INDEX featuremap_organism_idx2 ON featuremap_organism USING btree (organism_id);
+
+COMMENT ON TABLE featuremap_organism IS 'Links a featuremap to the organism(s) with which it is associated.';

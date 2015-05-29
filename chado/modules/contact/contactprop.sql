@@ -6,11 +6,11 @@
 -- the cvterms come from FOAF project, see the spec at http://xmlns.com/foaf/spec/
 
 create table contactprop (
-	contactprop_id serial not null,
+	contactprop_id bigserial not null,
 	primary key (contactprop_id),
-	contact_id int not null,
+	contact_id bigint not null,
 	foreign key (contact_id) references contact (contact_id) on delete cascade,
-	type_id int not null,
+	type_id bigint not null,
 	foreign key (type_id) references cvterm (cvterm_id) on delete cascade,
 	value text,
 

@@ -9,7 +9,8 @@
 -- :import organism from organism
 -- :import expression from expression
 -- :import interaction from interaction
--- :import strain from strain
+-- :import dbxref from db
+-- :import contact from contact
 -- =================================================================
 
 -- ================================================
@@ -136,7 +137,8 @@ COMMENT ON TABLE libraryprop_pub IS 'Attribution for libraryprop.';
 -- ================================================
 
 create table library_cvterm (
-    library_cvterm_id bigserial not null,
+    library_cvterm_id bigserial not n';
+    ull,
     primary key (library_cvterm_id),
     library_id bigint not null,
     foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
@@ -320,19 +322,21 @@ COMMENT ON TABLE library_relationship_pub IS 'Provenance of library_relationship
 
 
 -- ================================================
--- TABLE: library_strain
+-- TABLE: library_contact
 -- ================================================
+';
 
-create table library_strain (
-    library_strain_id bigserial not null,
-    primary key (library_strain_id),
-    library_id bigint not null,
-    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
-    strain_id bigint not null,
-    foreign key (strain_id) references strain (strain_id) on delete cascade INITIALLY DEFERRED,
-    constraint library_strain_c1 unique (library_id,strain_id)
+CREATE TABLE library_contact (
+    library_contact_id bigserial primary key NOT NULL,
+    library_id bigint NOT NULL,
+    contact_id bigint NOT NULL,
+    CONSTRAINT library_contact_c1 UNIQUE (library_id, contact_id),
+    FOREIGN KEY (library_id) REFERENCES library(library_id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE
 );
-create index library_strain_idx1 on library_strain (library_id);
-create index library_strain_idx2 on library_strain (strain_id);
 
-COMMENT ON TABLE library_strain IS 'Links a library to a strain.';
+CREATE INDEX library_contact_idx1 ON library USING btree (library_id);
+CREATE INDEX library_contact_idx2 ON contact USING btree (contact_id);
+
+COMMENT ON TABLE library_contact IS 'Links contact(s) with a library.  Used to indicate a particular person or organization responsible for creation of or that can provide more information on a particular library.';
+
