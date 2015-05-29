@@ -74,7 +74,7 @@ relate to each other should be linked to the same record in the project table.';
 CREATE TABLE nd_experiment_project (
     nd_experiment_project_id bigserial PRIMARY KEY NOT NULL,
     project_id bigint not null references project (project_id) on delete cascade INITIALLY DEFERRED,
-    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED
+    nd_experiment_id bigint NOT NULL references nd_experiment (nd_experiment_id) on delete cascade INITIALLY DEFERRED,
     CONSTRAINT nd_experiment_project_c1 unique (project_id, nd_experiment_id)
 );
 CREATE INDEX nd_experiment_project_idx1 ON nd_experiment_project (project_id);

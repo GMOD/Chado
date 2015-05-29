@@ -137,8 +137,7 @@ COMMENT ON TABLE libraryprop_pub IS 'Attribution for libraryprop.';
 -- ================================================
 
 create table library_cvterm (
-    library_cvterm_id bigserial not n';
-    ull,
+    library_cvterm_id bigserial not null,
     primary key (library_cvterm_id),
     library_id bigint not null,
     foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
@@ -324,7 +323,6 @@ COMMENT ON TABLE library_relationship_pub IS 'Provenance of library_relationship
 -- ================================================
 -- TABLE: library_contact
 -- ================================================
-';
 
 CREATE TABLE library_contact (
     library_contact_id bigserial primary key NOT NULL,

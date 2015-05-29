@@ -68,7 +68,7 @@ create table organism_dbxref (
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
 
-COMMENT ON TABLE library_dbxref IS 'Links a library to dbxrefs.';
+COMMENT ON TABLE organism_dbxref IS 'Links a library to dbxrefs.';
 
 
 -- ================================================

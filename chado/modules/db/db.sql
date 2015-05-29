@@ -44,27 +44,3 @@ COMMENT ON TABLE dbxref IS 'A unique, global, public, stable identifier. Not nec
 
 COMMENT ON COLUMN dbxref.accession IS 'The local part of the identifier. Guaranteed by the db authority to be unique for that db.';
 
-
--- ================================================
--- TABLE: dbprop
--- ================================================
-
-create table dbprop (
-  dbprop_id bigserial not null,
-  primary key (dbprop_id),
-  db_id bigint not null,
-  type_id bigint not null,
-  value text null,
-  rank int not null default 0,
-  foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-  foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
-  constraint dbprop_c1 unique (db_id,type_id,rank)
-);
-create index dbprop_idx1 on dbprop (db_id);
-create index dbprop_idx2 on dbprop (type_id);
-
-COMMENT ON TABLE dbprop IS 'An external database can have any number of
-slot-value property tags attached to it. This is an alternative to
-hardcoding a list of columns in the relational schema, and is
-completely extensible. There is a unique constraint, dbprop_c1, for
-the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
