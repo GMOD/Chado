@@ -13,7 +13,6 @@
 -- TABLE: organism
 -- ================================================
 
-drop table organism cascade;
 create table organism (
 	organism_id bigserial not null,
 	primary key (organism_id),
@@ -55,7 +54,6 @@ and the name is provided here.';
 -- TABLE: organism_dbxref
 -- ================================================
 
-drop table organism_dbxref cascade;
 create table organism_dbxref (
     organism_dbxref_id bigserial not null,
     primary key (organism_dbxref_id),
@@ -75,7 +73,6 @@ COMMENT ON TABLE organism_dbxref IS 'Links an organism to a dbxref.';
 -- TABLE: organismprop
 -- ================================================
 
-drop table organismprop cascade;
 create table organismprop (
     organismprop_id bigserial not null,
     primary key (organismprop_id),
@@ -97,7 +94,6 @@ COMMENT ON TABLE organismprop IS 'Tag-value properties - follows standard chado 
 -- TABLE: organismprop_pub
 -- ================================================
 
-drop table organismprop_pub cascade;
 create table organismprop_pub (
     organismprop_pub_id bigserial not null,
     primary key (organismprop_pub_id),
@@ -119,7 +115,6 @@ COMMENT ON TABLE organismprop_pub IS 'Attribution for organismprop.';
 -- TABLE: organism_pub
 -- ================================================
 
-drop table organism_pub cascade;
 create table organism_pub (
        organism_pub_id bigserial not null,
        primary key (organism_pub_id),
@@ -139,7 +134,6 @@ COMMENT ON TABLE organism_pub IS 'Attribution for organism.';
 -- TABLE: organism_cvterm
 -- ================================================
 
-drop table organism_cvterm cascade;
 create table organism_cvterm (
        organism_cvterm_id bigserial not null,
        primary key (organism_cvterm_id),
@@ -169,7 +163,6 @@ the default 0 value should be used';
 -- TABLE: organism_cvtermprop
 -- ================================================
 
-drop table organism_cvtermprop cascade;
 create table organism_cvtermprop (
     organism_cvtermprop_id bigserial not null,
     primary key (organism_cvtermprop_id),
