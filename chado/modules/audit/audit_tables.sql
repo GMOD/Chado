@@ -4,12 +4,12 @@
 
    DROP TABLE audit_tableinfo;
    CREATE TABLE audit_tableinfo ( 
-       tableinfo_id integer, 
+       tableinfo_id bigint, 
        name varchar(30), 
        primary_key_column varchar(30), 
        is_view integer, 
-       view_on_table_id integer, 
-       superclass_table_id integer, 
+       view_on_table_id bigint, 
+       superclass_table_id bigint, 
        is_updateable integer, 
        modification_date date, 
        transaction_date timestamp not null default now(),
@@ -86,7 +86,7 @@
 
    DROP TABLE audit_db;
    CREATE TABLE audit_db ( 
-       db_id integer, 
+       db_id bigint, 
        name varchar(255), 
        description varchar(255), 
        urlprefix varchar(255), 
@@ -153,8 +153,8 @@
 
    DROP TABLE audit_dbxref;
    CREATE TABLE audit_dbxref ( 
-       dbxref_id integer, 
-       db_id integer, 
+       dbxref_id bigint, 
+       db_id bigint, 
        accession varchar(255), 
        version varchar(255), 
        description text, 
@@ -277,11 +277,11 @@
 
    DROP TABLE audit_cvterm;
    CREATE TABLE audit_cvterm ( 
-       cvterm_id integer, 
-       cv_id integer, 
+       cvterm_id bigint, 
+       cv_id bigint, 
        name varchar(1024), 
        definition text, 
-       dbxref_id integer, 
+       dbxref_id bigint, 
        is_obsolete integer, 
        is_relationshiptype integer, 
        transaction_date timestamp not null default now(),
@@ -354,10 +354,10 @@
 
    DROP TABLE audit_cvterm_relationship;
    CREATE TABLE audit_cvterm_relationship ( 
-       cvterm_relationship_id integer, 
-       type_id integer, 
-       subject_id integer, 
-       object_id integer, 
+       cvterm_relationship_id bigint, 
+       type_id bigint, 
+       subject_id bigint, 
+       object_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -416,11 +416,11 @@
 
    DROP TABLE audit_cvtermpath;
    CREATE TABLE audit_cvtermpath ( 
-       cvtermpath_id integer, 
-       type_id integer, 
-       subject_id integer, 
-       object_id integer, 
-       cv_id integer, 
+       cvtermpath_id bigint, 
+       type_id bigint, 
+       subject_id bigint, 
+       object_id bigint, 
+       cv_id bigint, 
        pathdistance integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -488,10 +488,10 @@
 
    DROP TABLE audit_cvtermsynonym;
    CREATE TABLE audit_cvtermsynonym ( 
-       cvtermsynonym_id integer, 
-       cvterm_id integer, 
+       cvtermsynonym_id bigint, 
+       cvterm_id bigint, 
        synonym varchar(1024), 
-       type_id integer, 
+       type_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -550,9 +550,9 @@
 
    DROP TABLE audit_cvterm_dbxref;
    CREATE TABLE audit_cvterm_dbxref ( 
-       cvterm_dbxref_id integer, 
-       cvterm_id integer, 
-       dbxref_id integer, 
+       cvterm_dbxref_id bigint, 
+       cvterm_id bigint, 
+       dbxref_id bigint, 
        is_for_definition integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -612,9 +612,9 @@
 
    DROP TABLE audit_cvtermprop;
    CREATE TABLE audit_cvtermprop ( 
-       cvtermprop_id integer, 
-       cvterm_id integer, 
-       type_id integer, 
+       cvtermprop_id bigint, 
+       cvterm_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -679,9 +679,9 @@
 
    DROP TABLE audit_dbxrefprop;
    CREATE TABLE audit_dbxrefprop ( 
-       dbxrefprop_id integer, 
-       dbxref_id integer, 
-       type_id integer, 
+       dbxrefprop_id bigint, 
+       dbxref_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -746,9 +746,9 @@
 
    DROP TABLE audit_cvprop;
    CREATE TABLE audit_cvprop ( 
-       cvprop_id integer, 
-       cv_id integer, 
-       type_id integer, 
+       cvprop_id bigint, 
+       cv_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -813,8 +813,8 @@
 
    DROP TABLE audit_chadoprop;
    CREATE TABLE audit_chadoprop ( 
-       chadoprop_id integer, 
-       type_id integer, 
+       chadoprop_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -875,7 +875,7 @@
 
    DROP TABLE audit_pub;
    CREATE TABLE audit_pub ( 
-       pub_id integer, 
+       pub_id bigint, 
        title text, 
        volumetitle text, 
        volume varchar(255), 
@@ -885,7 +885,7 @@
        pages varchar(255), 
        miniref varchar(255), 
        uniquename text, 
-       type_id integer, 
+       type_id bigint, 
        is_obsolete boolean, 
        publisher varchar(255), 
        pubplace varchar(255), 
@@ -987,10 +987,10 @@
 
    DROP TABLE audit_pub_relationship;
    CREATE TABLE audit_pub_relationship ( 
-       pub_relationship_id integer, 
-       subject_id integer, 
-       object_id integer, 
-       type_id integer, 
+       pub_relationship_id bigint, 
+       subject_id bigint, 
+       object_id bigint, 
+       type_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1049,9 +1049,9 @@
 
    DROP TABLE audit_pub_dbxref;
    CREATE TABLE audit_pub_dbxref ( 
-       pub_dbxref_id integer, 
-       pub_id integer, 
-       dbxref_id integer, 
+       pub_dbxref_id bigint, 
+       pub_id bigint, 
+       dbxref_id bigint, 
        is_current boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -1111,8 +1111,8 @@
 
    DROP TABLE audit_pubauthor;
    CREATE TABLE audit_pubauthor ( 
-       pubauthor_id integer, 
-       pub_id integer, 
+       pubauthor_id bigint, 
+       pub_id bigint, 
        rank integer, 
        editor boolean, 
        surname varchar(100), 
@@ -1188,9 +1188,9 @@
 
    DROP TABLE audit_pubprop;
    CREATE TABLE audit_pubprop ( 
-       pubprop_id integer, 
-       pub_id integer, 
-       type_id integer, 
+       pubprop_id bigint, 
+       pub_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1255,7 +1255,7 @@
 
    DROP TABLE audit_organism;
    CREATE TABLE audit_organism ( 
-       organism_id integer, 
+       organism_id bigint, 
        abbreviation varchar(255), 
        genus varchar(255), 
        species varchar(255), 
@@ -1327,9 +1327,9 @@
 
    DROP TABLE audit_organism_dbxref;
    CREATE TABLE audit_organism_dbxref ( 
-       organism_dbxref_id integer, 
-       organism_id integer, 
-       dbxref_id integer, 
+       organism_dbxref_id bigint, 
+       organism_id bigint, 
+       dbxref_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1384,9 +1384,9 @@
 
    DROP TABLE audit_organismprop;
    CREATE TABLE audit_organismprop ( 
-       organismprop_id integer, 
-       organism_id integer, 
-       type_id integer, 
+       organismprop_id bigint, 
+       organism_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1451,15 +1451,15 @@
 
    DROP TABLE audit_feature;
    CREATE TABLE audit_feature ( 
-       feature_id integer, 
-       dbxref_id integer, 
-       organism_id integer, 
+       feature_id bigint, 
+       dbxref_id bigint, 
+       organism_id bigint, 
        name varchar(255), 
        uniquename text, 
        residues text, 
        seqlen integer, 
        md5checksum char(32), 
-       type_id integer, 
+       type_id bigint, 
        is_analysis boolean, 
        is_obsolete boolean, 
        timeaccessioned timestamp, 
@@ -1558,9 +1558,9 @@
 
    DROP TABLE audit_featureloc;
    CREATE TABLE audit_featureloc ( 
-       featureloc_id integer, 
-       feature_id integer, 
-       srcfeature_id integer, 
+       featureloc_id bigint, 
+       feature_id bigint, 
+       srcfeature_id bigint, 
        fmin integer, 
        is_fmin_partial boolean, 
        fmax integer, 
@@ -1660,9 +1660,9 @@
 
    DROP TABLE audit_featureloc_pub;
    CREATE TABLE audit_featureloc_pub ( 
-       featureloc_pub_id integer, 
-       featureloc_id integer, 
-       pub_id integer, 
+       featureloc_pub_id bigint, 
+       featureloc_id bigint, 
+       pub_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1717,9 +1717,9 @@
 
    DROP TABLE audit_feature_pub;
    CREATE TABLE audit_feature_pub ( 
-       feature_pub_id integer, 
-       feature_id integer, 
-       pub_id integer, 
+       feature_pub_id bigint, 
+       feature_id bigint, 
+       pub_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1774,9 +1774,9 @@
 
    DROP TABLE audit_feature_pubprop;
    CREATE TABLE audit_feature_pubprop ( 
-       feature_pubprop_id integer, 
-       feature_pub_id integer, 
-       type_id integer, 
+       feature_pubprop_id bigint, 
+       feature_pub_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1841,9 +1841,9 @@
 
    DROP TABLE audit_featureprop;
    CREATE TABLE audit_featureprop ( 
-       featureprop_id integer, 
-       feature_id integer, 
-       type_id integer, 
+       featureprop_id bigint, 
+       feature_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1908,9 +1908,9 @@
 
    DROP TABLE audit_featureprop_pub;
    CREATE TABLE audit_featureprop_pub ( 
-       featureprop_pub_id integer, 
-       featureprop_id integer, 
-       pub_id integer, 
+       featureprop_pub_id bigint, 
+       featureprop_id bigint, 
+       pub_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1965,9 +1965,9 @@
 
    DROP TABLE audit_feature_dbxref;
    CREATE TABLE audit_feature_dbxref ( 
-       feature_dbxref_id integer, 
-       feature_id integer, 
-       dbxref_id integer, 
+       feature_dbxref_id bigint, 
+       feature_id bigint, 
+       dbxref_id bigint, 
        is_current boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -2027,10 +2027,10 @@
 
    DROP TABLE audit_feature_relationship;
    CREATE TABLE audit_feature_relationship ( 
-       feature_relationship_id integer, 
-       subject_id integer, 
-       object_id integer, 
-       type_id integer, 
+       feature_relationship_id bigint, 
+       subject_id bigint, 
+       object_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2099,9 +2099,9 @@
 
    DROP TABLE audit_feature_relationship_pub;
    CREATE TABLE audit_feature_relationship_pub ( 
-       feature_relationship_pub_id integer, 
-       feature_relationship_id integer, 
-       pub_id integer, 
+       feature_relationship_pub_id bigint, 
+       feature_relationship_id bigint, 
+       pub_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2156,9 +2156,9 @@
 
    DROP TABLE audit_feature_relationshipprop;
    CREATE TABLE audit_feature_relationshipprop ( 
-       feature_relationshipprop_id integer, 
-       feature_relationship_id integer, 
-       type_id integer, 
+       feature_relationshipprop_id bigint, 
+       feature_relationship_id bigint, 
+       type_id bigint, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2223,9 +2223,9 @@
 
    DROP TABLE audit_feature_relationshipprop_pub;
    CREATE TABLE audit_feature_relationshipprop_pub ( 
-       feature_relationshipprop_pub_id integer, 
-       feature_relationshipprop_id integer, 
-       pub_id integer, 
+       feature_relationshipprop_pub_id bigint, 
+       feature_relationshipprop_id bigint, 
+       pub_id bigint, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2280,10 +2280,10 @@
 
    DROP TABLE audit_feature_cvterm;
    CREATE TABLE audit_feature_cvterm ( 
-       feature_cvterm_id integer, 
-       feature_id integer, 
-       cvterm_id integer, 
-       pub_id integer, 
+       feature_cvterm_id bigint, 
+       feature_id bigint, 
+       cvterm_id bigint, 
+       pub_id bigint, 
        is_not boolean, 
        rank integer, 
        transaction_date timestamp not null default now(),
