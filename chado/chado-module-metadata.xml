@@ -446,10 +446,10 @@ produce it as a separate add on
 -->
 
     <module id='phylogeny'>
-      <dependency to='db'/>
+      <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='organism'/>
       <dependency to='companalysis'/>	
       <status code='beta'>
