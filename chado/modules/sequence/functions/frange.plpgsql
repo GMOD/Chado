@@ -5,16 +5,16 @@ CREATE TABLE featuregroup (
     featuregroup_id bigserial not null,
     primary key (featuregroup_id),
 
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    group_id int not null,
+    group_id bigint not null,
     foreign key (group_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    srcfeature_id int null,
+    srcfeature_id bigint null,
     foreign key (srcfeature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
     fmin int null,

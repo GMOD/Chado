@@ -6,7 +6,7 @@
 
 --DROP TYPE feature_by_fx_type CASCADE;
 CREATE TYPE feature_by_fx_type AS (
-    feature_id INTEGER,
+    feature_id bigint,
     depth INT
 );
 

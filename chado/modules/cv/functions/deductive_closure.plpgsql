@@ -1,4 +1,4 @@
-CREATE TYPE closure_result AS (cvterm_id INTEGER, pathdistance INTEGER);
+CREATE TYPE closure_result AS (cvterm_id bigint, pathdistance INTEGER);
 
 -- results may not be distinct
 CREATE OR REPLACE FUNCTION _closure_over_IS_A(INTEGER, INTEGER) RETURNS SETOF INTEGER AS

@@ -22,7 +22,7 @@ CREATE VIEW godb.v_go_acc AS
   INNER JOIN public.db USING (db_id);
 --materialized view
 CREATE TABLE godb.go_acc (
-  dbxref_id int,
+  dbxref_id bigint,
   acc text
 );
 CREATE INDEX go_acc_idx1 ON godb.go_acc (dbxref_id);
@@ -158,9 +158,9 @@ FROM public.cvterm_relationship;
 --materialized view
 CREATE TABLE godb.term2term (
   id int,
-  relationship_type_id int,
-  term1_id int,
-  term2_id int
+  relationship_type_id bigint,
+  term1_id bigint,
+  term2_id bigint
 );
 CREATE INDEX term2term_idx1 ON godb.term2term (id);
 CREATE INDEX term2term_idx2 ON godb.term2term (relationship_type_id);
@@ -181,8 +181,8 @@ FROM public.cvtermpath;
 --materialized view
 CREATE TABLE godb.graph_path (
   id int,
-  term1_id int,
-  term2_id int,
+  term1_id bigint,
+  term2_id bigint,
   distance int 
 );
 CREATE INDEX graph_path_idx1 ON godb.graph_path (id);
