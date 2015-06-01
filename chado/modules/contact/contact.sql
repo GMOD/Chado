@@ -12,7 +12,7 @@
 -- TABLE: contact
 -- ================================================
 
-create table contact (
+CREATE TABLE contact (
     contact_id bigserial not null,
     primary key (contact_id),
     type_id bigint null,

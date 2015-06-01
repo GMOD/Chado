@@ -108,7 +108,7 @@ CREATE TABLE analysisfeatureprop (
     CONSTRAINT analysisfeature_id_type_id_rank UNIQUE(analysisfeature_id, type_id, rank)
 );
 create index analysisfeatureprop_idx1 on analysisfeatureprop (analysisfeature_id);
-create index analysisfeatureprop_idx2 on analysisfeatureprop (type_id)
+create index analysisfeatureprop_idx2 on analysisfeatureprop (type_id);
 
 -- ================================================
 -- TABLE: analysis_dbxref
@@ -204,7 +204,7 @@ create table analysis_pub (
     analysis_pub_id bigserial not null,
     primary key (analysis_pub_id),
     analysis_id bigint not null,
-    foreign key (analysis_id) references feature (analysis_id) on delete cascade INITIALLY DEFERRED,
+    foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
     pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     constraint analysis_pub_c1 unique (analysis_id, pub_id)

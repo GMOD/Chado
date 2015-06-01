@@ -140,7 +140,7 @@ create table project_analysis (
        project_id bigint not null,
        foreign key (project_id) references project (project_id) on delete cascade INITIALLY DEFERRED,
        analysis_id bigint not null,
-       foreign key (analysis_id) references pub (analysis_id) on delete cascade INITIALLY DEFERRED,
+       foreign key (analysis_id) references analysis (analysis_id) on delete cascade INITIALLY DEFERRED,
        rank int not null default 0,
        constraint project_analysis_c1 unique (project_id,analysis_id)
 );

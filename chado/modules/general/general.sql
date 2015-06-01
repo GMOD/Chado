@@ -20,3 +20,4 @@ create table tableinfo (
 );
 
 COMMENT ON TABLE tableinfo IS NULL;
+

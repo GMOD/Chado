@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS INT
+CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS BIGINT
  AS '
   SELECT organism_id 
   FROM organism
@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR,VARCHAR) RETURNS INT
     AND species=$2
  ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR) RETURNS INT
+CREATE OR REPLACE FUNCTION get_organism_id(VARCHAR) RETURNS BIGINT
  AS ' 
 SELECT organism_id
   FROM organism
@@ -15,7 +15,7 @@ SELECT organism_id
     AND species=substring($1,position('' '' IN $1)+1)
  ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_organism_id_abbrev(VARCHAR) RETURNS INT
+CREATE OR REPLACE FUNCTION get_organism_id_abbrev(VARCHAR) RETURNS BIGINT
  AS '
 SELECT organism_id
   FROM organism
