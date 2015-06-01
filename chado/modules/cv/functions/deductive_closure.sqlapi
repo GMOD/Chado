@@ -1,6 +1,6 @@
-CREATE TYPE closure_result AS (cvterm_id INTEGER, pathdistance INTEGER);
+CREATE TYPE closure_result AS (cvterm_id bigint, pathdistance INTEGER);
 
-DECLARE FUNCTION closure_over_is_a(cvterm_id INTEGER) RETURNS SETOF INTEGER;
+DECLARE FUNCTION closure_over_is_a(cvterm_id bigint) RETURNS SETOF INTEGER;
 
 COMMENT ON FUNCTION closure_over_is_a(INTEGER) IS 'Performs the
 deductive closure over the is_a relation. Returns every cvterm_id
@@ -10,7 +10,7 @@ Implements the rule:
 X is_a Z <= X is_a Y, Y is_a Z   [transitive]
 ';
 
-DECLARE FUNCTION closure_over_reflexive_is_a(cvterm_id INTEGER) RETURNS SETOF INTEGER;
+DECLARE FUNCTION closure_over_reflexive_is_a(cvterm_id bigint) RETURNS SETOF INTEGER;
 
 COMMENT ON FUNCTION closure_over_reflexive_is_a(INTEGER) IS 'Performs the
 deductive closure over the is_a relation, treating the is_a relation as reflexive. i.e.
@@ -18,12 +18,12 @@ deductive closure over the is_a relation, treating the is_a relation as reflexiv
 X is_a X  [reflexive]
 ';
 
-DECLARE FUNCTION closure_over_relation(cvterm_id INTEGER, 
-                                       relation_cvterm_id INTEGER) 
+DECLARE FUNCTION closure_over_relation(cvterm_id bigint, 
+                                       relation_cvterm_id bigint) 
         RETURNS SETOF INTEGER;
 
-DECLARE FUNCTION closure_over_relation_with_dist(cvterm_id INTEGER, 
-                                                 relation_cvterm_id INTEGER) 
+DECLARE FUNCTION closure_over_relation_with_dist(cvterm_id bigint, 
+                                                 relation_cvterm_id bigint) 
         RETURNS SETOF closure_result;
 
 COMMENT ON FUNCTION closure_over_relation_with_dist(INTEGER,INTEGER) IS

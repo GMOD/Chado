@@ -96,7 +96,7 @@ DECLARE
     rtn     int;
 BEGIN
 
-    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
     CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
 
     SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(rootid, cvid);
@@ -138,7 +138,7 @@ DECLARE
     rtn     int;
 BEGIN
 
-    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
     CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
 
     FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
@@ -158,7 +158,7 @@ CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cv_id int;
+    cv_id bigint;
     rtn int;
 BEGIN
 

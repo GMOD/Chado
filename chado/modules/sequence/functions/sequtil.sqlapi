@@ -37,7 +37,7 @@ This is a function to 'unshare' exons.  It looks for exons that have the same fm
 '
 
 DECLARE FUNCTION order_exons(
-    parent_type_id INT)
+    parent_type_id bigint)
   RETURNS void;
 COMMENT ON FUNCTION order_exons(INT) IS 
  '

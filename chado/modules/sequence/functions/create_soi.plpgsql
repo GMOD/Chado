@@ -10,9 +10,9 @@
 
 --DROP TYPE soi_type CASCADE;
 CREATE TYPE soi_type AS (
-    type_id INT,
-    subject_id INT,
-    object_id INT
+    type_id bigint,
+    subject_id bigint,
+    object_id bigint
 );
 
 CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
@@ -79,8 +79,8 @@ DECLARE
     isa_id cvterm.cvterm_id%TYPE;
     soi_term TEXT := ''soi'';
     soi_def TEXT := ''ontology of SO feature instantiated in database'';
-    soi_cvid INTEGER;
-    soiterm_id INTEGER;
+    soi_cvid bigint;
+    soiterm_id bigint;
     pcount INTEGER;
     count INTEGER := 0;
     cquery TEXT;
@@ -99,7 +99,7 @@ BEGIN
     INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
     SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
 
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
+    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id bigint, subject_id bigint, object_id bigint);
     CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
 
     INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
@@ -119,7 +119,7 @@ BEGIN
     raise notice ''all types in feature after delete child %'',pcount;
 
     --- create feature type relationship (store in tmpcvtr)
-    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
+    CREATE TEMP TABLE tmproot (cv_id bigint not null, cvterm_id bigint not null, status INTEGER DEFAULT 0);
     cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
     ---temp use tmpcvtr to hold instantiated SO relationship for speed
     ---use soterm_id as type_id, will delete from tmpcvtr

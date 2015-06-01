@@ -278,7 +278,7 @@ CREATE TABLE feature_namegenerator (
   feature_namegenerator_id serial not null,
   primary key (feature_namegenerator_id),
   name varchar(255),
-  type_id int,
+  type_id bigint,
   foreign key (type_id)  references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
   count int
 --  constraint feature_namegenerator_c1 unique (name,type_id)
