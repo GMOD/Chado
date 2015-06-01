@@ -492,6 +492,20 @@ produce it as a separate add on
       <source type='sql' path='expression/expression.sql'/>
     </module>
 
+    <module id='library'>
+      <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='organism'/>
+      <dependency to='db'/>
+      <status code='beta'>
+      </status>
+      <description>
+        For describing molecular libraries
+      </description>
+      <source type='sql' path='library/library.sql'/>
+    </module>
+
     <module id='stock'>
       <dependency to='genetic'/>
       <dependency to='cv'/>
@@ -540,20 +554,6 @@ expanded to provide properties, publications and contacts.
         Alternative expression module, based on MAGE model
       </description>
       <source type='sql' path='mage/mage.sql'/>
-    </module>
-
-    <module id='library'>
-      <dependency to='sequence'/>
-      <dependency to='cv'/>
-      <dependency to='pub'/>
-      <dependency to='organism'/>
-      <dependency to='db'/>
-      <status code='beta'>
-      </status>
-      <description>
-        For describing molecular libraries
-      </description>
-      <source type='sql' path='library/library.sql'/>
     </module>
 
     <module id='cell_line'>
