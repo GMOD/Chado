@@ -17,8 +17,8 @@ CREATE TABLE featuregroup (
     srcfeature_id bigint null,
     foreign key (srcfeature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    fmin int null,
-    fmax int null,
+    fmin bigint null,
+    fmax bigint null,
     strand int null,
     is_root int not null default 0,
 
@@ -31,7 +31,7 @@ CREATE INDEX featuregroup_idx4 ON featuregroup (srcfeature_id);
 CREATE INDEX featuregroup_idx5 ON featuregroup (strand);
 CREATE INDEX featuregroup_idx6 ON featuregroup (is_root);
 
-CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT g2.*
   FROM  featuregroup g1,
         featuregroup g2
@@ -42,32 +42,32 @@ CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4, varchar) RETURNS setof feat
     AND boxquery($1, $2) @ boxrange(g1.fmin,g2.fmax)
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupcontains(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupcontains(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin <= $1 AND fmax >= $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupinside(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupinside(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin >= $1 AND fmax <= $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupidentical(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupidentical(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin = $1 AND fmax = $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(bigint, bigint) RETURNS setof featuregroup AS '
   SELECT *
   FROM featuregroup
   WHERE is_root = 1
     AND boxquery($1, $2) @ boxrange(fmin,fmax)
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupoverlaps(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -97,7 +97,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupcontains(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupcontains(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -129,7 +129,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupinside(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupinside(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -161,7 +161,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupidentical(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupidentical(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -194,9 +194,9 @@ END;
 ' LANGUAGE 'plpgsql';
 
 --functional index that depends on the above functions
-CREATE INDEX bingroup_boxrange ON featuregroup USING RTREE (boxrange(fmin, fmax)) WHERE is_root = 1;
+CREATE INDEX bingroup_boxrange ON featuregroup USING gist (boxrange(fmin, fmax)) WHERE is_root = 1;
 
-CREATE OR REPLACE FUNCTION _fill_featuregroup(INTEGER, INTEGER) RETURNS INTEGER AS '
+CREATE OR REPLACE FUNCTION _fill_featuregroup(bigint, bigint) RETURNS INTEGER AS '
 DECLARE
     groupid alias for $1;
     parentid alias for $2;
@@ -223,8 +223,8 @@ CREATE OR REPLACE FUNCTION fill_featuregroup() RETURNS INTEGER AS '
 DECLARE
     p featuregroup%ROWTYPE;
     l featureloc%ROWTYPE;
-    isa int;
-    c int;
+    isa bigint;
+    -- c int;  the c variable isnt used
 BEGIN
     TRUNCATE featuregroup;
     SELECT INTO isa cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');

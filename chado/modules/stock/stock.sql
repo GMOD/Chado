@@ -419,7 +419,7 @@ create index stock_feature_idx2 on stock_feature (feature_id);
 create index stock_feature_idx3 on stock_feature (stock_id);
 create index stock_feature_idx4 on stock_feature (type_id);
 
-COMMENT ON TABLE stock_featuremap  IS 'Links a stock to a feature.';
+COMMENT ON TABLE stock_feature  IS 'Links a stock to a feature.';
 
 
 -- ================================================
@@ -457,7 +457,7 @@ CREATE TABLE stock_library (
     FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
 );
 
-CREATE INDEX stock_library_idx1 ON library USING btree (library_id);
+CREATE INDEX stock_library_idx1 ON stock USING btree (library_id);
 CREATE INDEX stock_library_idx2 ON stock USING btree (stock_id);
 
 COMMENT ON TABLE stock_library IS 'Links a stock with a library.';

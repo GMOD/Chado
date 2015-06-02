@@ -936,7 +936,7 @@ DECLARE
     rtn     int;
 BEGIN
 
-    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
     CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
 
     SELECT INTO rtn _fill_cvtermpath4root2detect_cycle(rootid, cvid);
@@ -978,7 +978,7 @@ DECLARE
     rtn     int;
 BEGIN
 
-    CREATE TEMP TABLE tmpcvtermpath(object_id int, subject_id int, cv_id int, type_id int, pathdistance int);
+    CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
     CREATE INDEX tmp_cvtpath1 ON tmpcvtermpath(object_id, subject_id);
 
     FOR root IN SELECT DISTINCT t.* from cvterm t LEFT JOIN cvterm_relationship r ON (t.cvterm_id = r.subject_id) INNER JOIN cvterm_relationship r2 ON (t.cvterm_id = r2.object_id) WHERE t.cv_id = cvid AND r.subject_id is null LOOP
@@ -998,7 +998,7 @@ CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cv_id int;
+    cv_id bigint;
     rtn int;
 BEGIN
 
@@ -1252,7 +1252,6 @@ COMMENT ON TABLE pubauthor_contact IS 'An author on a publication may have a cor
 -- TABLE: organism
 -- ================================================
 
-drop table organism cascade;
 create table organism (
 	organism_id bigserial not null,
 	primary key (organism_id),
@@ -1294,7 +1293,6 @@ and the name is provided here.';
 -- TABLE: organism_dbxref
 -- ================================================
 
-drop table organism_dbxref cascade;
 create table organism_dbxref (
     organism_dbxref_id bigserial not null,
     primary key (organism_dbxref_id),
@@ -1307,14 +1305,13 @@ create table organism_dbxref (
 create index organism_dbxref_idx1 on organism_dbxref (organism_id);
 create index organism_dbxref_idx2 on organism_dbxref (dbxref_id);
 
-COMMENT ON TABLE library_dbxref IS 'Links a library to dbxrefs.';
+COMMENT ON TABLE organism_dbxref IS 'Links an organism to a dbxref.';
 
 
 -- ================================================
 -- TABLE: organismprop
 -- ================================================
 
-drop table organismprop cascade;
 create table organismprop (
     organismprop_id bigserial not null,
     primary key (organismprop_id),
@@ -1336,7 +1333,6 @@ COMMENT ON TABLE organismprop IS 'Tag-value properties - follows standard chado 
 -- TABLE: organismprop_pub
 -- ================================================
 
-drop table organismprop_pub cascade;
 create table organismprop_pub (
     organismprop_pub_id bigserial not null,
     primary key (organismprop_pub_id),
@@ -1358,7 +1354,6 @@ COMMENT ON TABLE organismprop_pub IS 'Attribution for organismprop.';
 -- TABLE: organism_pub
 -- ================================================
 
-drop table organism_pub cascade;
 create table organism_pub (
        organism_pub_id bigserial not null,
        primary key (organism_pub_id),
@@ -1378,7 +1373,6 @@ COMMENT ON TABLE organism_pub IS 'Attribution for organism.';
 -- TABLE: organism_cvterm
 -- ================================================
 
-drop table organism_cvterm cascade;
 create table organism_cvterm (
        organism_cvterm_id bigserial not null,
        primary key (organism_cvterm_id),
@@ -1408,7 +1402,6 @@ the default 0 value should be used';
 -- TABLE: organism_cvtermprop
 -- ================================================
 
-drop table organism_cvtermprop cascade;
 create table organism_cvtermprop (
     organism_cvtermprop_id bigserial not null,
     primary key (organism_cvtermprop_id),
@@ -2232,30 +2225,30 @@ SET search_path = public,pg_catalog;
 --
 
 -- create a point
-CREATE OR REPLACE FUNCTION create_point (int, int) RETURNS point AS
+CREATE OR REPLACE FUNCTION create_point (bigint, bigint) RETURNS point AS
  'SELECT point ($1, $2)'
 LANGUAGE 'sql';
 
 -- create a range box
 -- (make this immutable so we can index it)
-CREATE OR REPLACE FUNCTION boxrange (int, int) RETURNS box AS
+CREATE OR REPLACE FUNCTION boxrange (bigint, bigint) RETURNS box AS
  'SELECT box (create_point(0, $1), create_point($2,500000000))'
 LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
-CREATE OR REPLACE FUNCTION boxquery (int, int) RETURNS box AS
+CREATE OR REPLACE FUNCTION boxquery (bigint, bigint) RETURNS box AS
  'SELECT box (create_point($1, $2), create_point($1, $2))'
 LANGUAGE 'sql' IMMUTABLE;
 
 --functional index that depends on the above functions
-CREATE INDEX binloc_boxrange ON featureloc USING RTREE (boxrange(fmin, fmax));
+CREATE INDEX binloc_boxrange ON featureloc USING GIST (boxrange(fmin, fmax));
 
 
-CREATE OR REPLACE FUNCTION featureloc_slice(int, int) RETURNS setof featureloc AS
+CREATE OR REPLACE FUNCTION featureloc_slice(bigint, bigint) RETURNS setof featureloc AS
   'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION featureloc_slice(varchar, int, int)
+CREATE OR REPLACE FUNCTION featureloc_slice(varchar, bigint, bigint)
   RETURNS setof featureloc AS
   'SELECT featureloc.* 
    FROM featureloc 
@@ -2264,7 +2257,7 @@ CREATE OR REPLACE FUNCTION featureloc_slice(varchar, int, int)
    AND srcf.name = $1 '
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
+CREATE OR REPLACE FUNCTION featureloc_slice(int, bigint, bigint)
   RETURNS setof featureloc AS
   'SELECT * 
    FROM featureloc 
@@ -2274,7 +2267,7 @@ LANGUAGE 'sql';
 
 
 -- can we not just do these as views?
-CREATE OR REPLACE FUNCTION feature_overlaps(int)
+CREATE OR REPLACE FUNCTION feature_overlaps(bigint)
  RETURNS setof feature AS
  'SELECT feature.*
   FROM feature
@@ -2285,7 +2278,7 @@ CREATE OR REPLACE FUNCTION feature_overlaps(int)
    ( x.fmax >= y.fmin AND x.fmin <= y.fmax ) '
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION feature_disjoint_from(int)
+CREATE OR REPLACE FUNCTION feature_disjoint_from(bigint)
  RETURNS setof feature AS
  'SELECT feature.*
   FROM feature
@@ -2310,23 +2303,24 @@ LANGUAGE 'sql';
 
 
 
-CREATE OR REPLACE FUNCTION boxrange (int, int, int) RETURNS box AS
+CREATE OR REPLACE FUNCTION boxrange (bigint, bigint, bigint) RETURNS box AS
  'SELECT box (create_point($1, $2), create_point($1,$3))'
 LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
-CREATE OR REPLACE FUNCTION boxquery (int, int, int) RETURNS box AS
+CREATE OR REPLACE FUNCTION boxquery (bigint, bigint, bigint) RETURNS box AS
  'SELECT box (create_point($1, $2), create_point($1, $3))'
 LANGUAGE 'sql' IMMUTABLE;
 
-CREATE INDEX binloc_boxrange_src ON featureloc USING RTREE (boxrange(srcfeature_id,fmin, fmax));
+CREATE INDEX binloc_boxrange_src ON featureloc USING GIST (boxrange(srcfeature_id,fmin, fmax));
 
-CREATE OR REPLACE FUNCTION featureloc_slice(int, int, int)
+CREATE OR REPLACE FUNCTION featureloc_slice(bigint, bigint, bigint)
   RETURNS setof featureloc AS
   'SELECT * 
    FROM featureloc 
    WHERE boxquery($1, $2, $3) && boxrange(srcfeature_id,fmin,fmax)'   
 LANGUAGE 'sql';
+
 -- reverse_string
 CREATE OR REPLACE FUNCTION reverse_string(TEXT) RETURNS TEXT AS 
 '
@@ -2977,24 +2971,24 @@ CREATE OR REPLACE FUNCTION store_feature_synonym
 
 -- dependency_on: [sequtil,sequence-cv-helper]
 
-CREATE OR REPLACE FUNCTION subsequence(INT,INT,INT,INT)
+CREATE OR REPLACE FUNCTION subsequence(bigint,bigint,bigint,INT)
  RETURNS TEXT AS
  'SELECT 
   CASE WHEN $4<0 
-   THEN reverse_complement(substring(srcf.residues,$2+1,($3-$2)))
-   ELSE substring(residues,$2+1,($3-$2))
+   THEN reverse_complement(substring(srcf.residues,CAST(($2+1) as int),CAST(($3-$2) as int)))
+   ELSE substring(residues,CAST(($2+1) as int),CAST(($3-$2) as int))
   END AS residues
   FROM feature AS srcf
   WHERE
    srcf.feature_id=$1'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_featureloc(INT)
+CREATE OR REPLACE FUNCTION subsequence_by_featureloc(bigint)
  RETURNS TEXT AS
  'SELECT 
   CASE WHEN strand<0 
-   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
-   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+   THEN reverse_complement(substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int)))
+   ELSE substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int))
   END AS residues
   FROM feature AS srcf
    INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
@@ -3002,12 +2996,12 @@ CREATE OR REPLACE FUNCTION subsequence_by_featureloc(INT)
    featureloc_id=$1'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_feature(INT,INT,INT)
+CREATE OR REPLACE FUNCTION subsequence_by_feature(bigint,INT,INT)
  RETURNS TEXT AS
  'SELECT 
   CASE WHEN strand<0 
-   THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
-   ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+   THEN reverse_complement(substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int)))
+   ELSE substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int))
   END AS residues
   FROM feature AS srcf
    INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
@@ -3017,7 +3011,7 @@ CREATE OR REPLACE FUNCTION subsequence_by_feature(INT,INT,INT)
    featureloc.locgroup=$3'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_feature(INT)
+CREATE OR REPLACE FUNCTION subsequence_by_feature(bigint)
  RETURNS TEXT AS 'SELECT subsequence_by_feature($1,0,0)'
 LANGUAGE 'sql';
 
@@ -3027,7 +3021,7 @@ LANGUAGE 'sql';
 --   (allows user to construct queries that only get subsequences of
 --    part_of subfeatures)
 
-CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT,INT,INT)
+CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(bigint,bigint,INT,INT)
  RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_rtype_id   ALIAS FOR $2;
@@ -3040,8 +3034,8 @@ BEGIN
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
-     THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
-     ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+     THEN reverse_complement(substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int)))
+     ELSE substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int))
     END AS residues
     FROM feature AS srcf
      INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
@@ -3061,12 +3055,12 @@ END
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT,INT)
+CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(bigint,bigint)
  RETURNS TEXT AS
  'SELECT subsequence_by_subfeatures($1,$2,0,0)'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(INT)
+CREATE OR REPLACE FUNCTION subsequence_by_subfeatures(bigint)
  RETURNS TEXT AS
 '
 SELECT subsequence_by_subfeatures($1,get_feature_relationship_type_id(''part_of''),0,0)
@@ -3075,7 +3069,7 @@ LANGUAGE 'sql';
 
 
 -- constrained by subfeature.type_id (eg exons of a transcript)
-CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT,INT,INT)
+CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(bigint,bigint,INT,INT)
  RETURNS TEXT AS '
 DECLARE v_feature_id ALIAS FOR $1;
 DECLARE v_ftype_id   ALIAS FOR $2;
@@ -3088,8 +3082,8 @@ BEGIN
  FOR seqrow IN
    SELECT
     CASE WHEN strand<0 
-     THEN reverse_complement(substring(srcf.residues,fmin+1,(fmax-fmin)))
-     ELSE substring(srcf.residues,fmin+1,(fmax-fmin))
+     THEN reverse_complement(substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int)))
+     ELSE substring(srcf.residues,CAST(fmin+1 as int),CAST((fmax-fmin) as int))
     END AS residues
   FROM feature AS srcf
    INNER JOIN featureloc ON (srcf.feature_id=featureloc.srcfeature_id)
@@ -3109,7 +3103,7 @@ END
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(INT,INT)
+CREATE OR REPLACE FUNCTION subsequence_by_typed_subfeatures(bigint,bigint)
  RETURNS TEXT AS
  'SELECT subsequence_by_typed_subfeatures($1,$2,0,0)'
 LANGUAGE 'sql';
@@ -3183,20 +3177,20 @@ CREATE TABLE featuregroup (
     featuregroup_id bigserial not null,
     primary key (featuregroup_id),
 
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    group_id int not null,
+    group_id bigint not null,
     foreign key (group_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    srcfeature_id int null,
+    srcfeature_id bigint null,
     foreign key (srcfeature_id) references feature (feature_id) on delete cascade INITIALLY DEFERRED,
 
-    fmin int null,
-    fmax int null,
+    fmin bigint null,
+    fmax bigint null,
     strand int null,
     is_root int not null default 0,
 
@@ -3209,7 +3203,7 @@ CREATE INDEX featuregroup_idx4 ON featuregroup (srcfeature_id);
 CREATE INDEX featuregroup_idx5 ON featuregroup (strand);
 CREATE INDEX featuregroup_idx6 ON featuregroup (is_root);
 
-CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT g2.*
   FROM  featuregroup g1,
         featuregroup g2
@@ -3220,32 +3214,32 @@ CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4, varchar) RETURNS setof feat
     AND boxquery($1, $2) @ boxrange(g1.fmin,g2.fmax)
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupcontains(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupcontains(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin <= $1 AND fmax >= $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupinside(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupinside(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin >= $1 AND fmax <= $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupidentical(int4, int4, varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupidentical(bigint, bigint, varchar) RETURNS setof featuregroup AS '
   SELECT *
   FROM groupoverlaps($1,$2,$3)
   WHERE fmin = $1 AND fmax = $2
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupoverlaps(int4, int4) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(bigint, bigint) RETURNS setof featuregroup AS '
   SELECT *
   FROM featuregroup
   WHERE is_root = 1
     AND boxquery($1, $2) @ boxrange(fmin,fmax)
 ' LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION groupoverlaps(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupoverlaps(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -3275,7 +3269,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupcontains(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupcontains(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -3307,7 +3301,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupinside(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupinside(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -3339,7 +3333,7 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION groupidentical(_int4, _int4, _varchar) RETURNS setof featuregroup AS '
+CREATE OR REPLACE FUNCTION groupidentical(_int8, _int8, _varchar) RETURNS setof featuregroup AS '
 DECLARE
     mins alias for $1;
     maxs alias for $2;
@@ -3372,9 +3366,9 @@ END;
 ' LANGUAGE 'plpgsql';
 
 --functional index that depends on the above functions
-CREATE INDEX bingroup_boxrange ON featuregroup USING RTREE (boxrange(fmin, fmax)) WHERE is_root = 1;
+CREATE INDEX bingroup_boxrange ON featuregroup USING gist (boxrange(fmin, fmax)) WHERE is_root = 1;
 
-CREATE OR REPLACE FUNCTION _fill_featuregroup(INTEGER, INTEGER) RETURNS INTEGER AS '
+CREATE OR REPLACE FUNCTION _fill_featuregroup(bigint, bigint) RETURNS INTEGER AS '
 DECLARE
     groupid alias for $1;
     parentid alias for $2;
@@ -3401,8 +3395,8 @@ CREATE OR REPLACE FUNCTION fill_featuregroup() RETURNS INTEGER AS '
 DECLARE
     p featuregroup%ROWTYPE;
     l featureloc%ROWTYPE;
-    isa int;
-    c int;
+    isa bigint;
+    -- c int;  the c variable isnt used
 BEGIN
     TRUNCATE featuregroup;
     SELECT INTO isa cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
@@ -3473,9 +3467,9 @@ SET search_path = public,pg_catalog;
 
 --DROP TYPE soi_type CASCADE;
 CREATE TYPE soi_type AS (
-    type_id INT,
-    subject_id INT,
-    object_id INT
+    type_id bigint,
+    subject_id bigint,
+    object_id bigint
 );
 
 CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
@@ -3542,8 +3536,8 @@ DECLARE
     isa_id cvterm.cvterm_id%TYPE;
     soi_term TEXT := ''soi'';
     soi_def TEXT := ''ontology of SO feature instantiated in database'';
-    soi_cvid INTEGER;
-    soiterm_id INTEGER;
+    soi_cvid bigint;
+    soiterm_id bigint;
     pcount INTEGER;
     count INTEGER := 0;
     cquery TEXT;
@@ -3562,7 +3556,7 @@ BEGIN
     INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
     SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
 
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id INT, subject_id INT, object_id INT);
+    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id bigint, subject_id bigint, object_id bigint);
     CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
 
     INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
@@ -3582,7 +3576,7 @@ BEGIN
     raise notice ''all types in feature after delete child %'',pcount;
 
     --- create feature type relationship (store in tmpcvtr)
-    CREATE TEMP TABLE tmproot (cv_id INTEGER not null, cvterm_id INTEGER not null, status INTEGER DEFAULT 0);
+    CREATE TEMP TABLE tmproot (cv_id bigint not null, cvterm_id bigint not null, status INTEGER DEFAULT 0);
     cquery := ''SELECT * FROM tmproot tmp WHERE tmp.status = 0;'';
     ---temp use tmpcvtr to hold instantiated SO relationship for speed
     ---use soterm_id as type_id, will delete from tmpcvtr
@@ -3626,7 +3620,7 @@ LANGUAGE 'plpgsql';
 
 --DROP TYPE feature_by_fx_type CASCADE;
 CREATE TYPE feature_by_fx_type AS (
-    feature_id INTEGER,
+    feature_id bigint,
     depth INT
 );
 
