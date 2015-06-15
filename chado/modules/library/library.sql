@@ -8,7 +8,6 @@
 -- :import pub from pub
 -- :import organism from organism
 -- :import expression from expression
--- :import interaction from interaction
 -- :import dbxref from db
 -- :import contact from contact
 -- =================================================================
@@ -255,29 +254,6 @@ create index library_featureprop_idx1 on library_featureprop (library_feature_id
 create index library_featureprop_idx2 on library_featureprop (type_id);
 
 COMMENT ON TABLE library_featureprop IS 'Attributes of a library_feature relationship.';
-
-
--- ================================================
--- TABLE: library_interaction
--- ================================================
-
-create table library_interaction (
-    library_interaction_id bigserial not null,
-    primary key (library_interaction_id),
-    library_id bigint not null,
-    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
-    interaction_id bigint not null,
-    foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
-    pub_id bigint not null,
-    foreign key (pub_id) references pub (pub_id),
-    constraint library_interaction_c1 unique (interaction_id,library_id,pub_id)
-);
-create index library_interaction_idx1 on library_interaction (interaction_id);
-create index library_interaction_idx2 on library_interaction (library_id);
-create index library_interaction_idx3 on library_interaction (pub_id);
-
-COMMENT ON TABLE library_interaction IS 'Links a library to an interaction.';
-
 
 -- ================================================
 -- TABLE: library_relationship
