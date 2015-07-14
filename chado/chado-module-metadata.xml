@@ -273,10 +273,6 @@
         <source type='bridge-xml' path='sequence/bridges/chaos-bridge.sql'/>
       </component>
 
-<!--
-This makes the schema HUGE and I don't know if anybody uses it; should
-produce it as a separate add on
-
       <component id='so-bridge' type='view' required='true'>
         <description>
           Provides a view for every type in the SO ontology. This
@@ -284,7 +280,6 @@ produce it as a separate add on
         </description>
         <source type='sql' path='sequence/bridges/so-bridge.sql'/>
       </component>
--->
 
       <component id='implicit-feature-views' type='views' required='true'>
         <dependency to='sofa-bridge' />

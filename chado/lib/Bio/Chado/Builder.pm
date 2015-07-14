@@ -19,6 +19,7 @@ use IPC::Cmd ();
 use Scalar::Util qw(looks_like_number);
 my $DEBUG = 0;
 my $go2fmt = IPC::Cmd::can_run('go2fmt') ? 'go2fmt' : 'go2fmt.pl'; #< detect new version of go2fmt
+my $stagstore = IPC::Cmd::can_run('stag-storenode.pl') ? 'stag-storenode.pl' : 'stag-storenode';
 
 
 =head1 ACTIONS
@@ -350,7 +351,7 @@ sub ACTION_ontologies {
       }
 
       # loading chadoxml
-      my $stag_string = "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'";
+      my $stag_string = "$stagstore -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'";
       $stag_string .= " --user $db_user " if $db_user;
       $stag_string .= " --password '$db_pass' " if $db_pass;
       $sys_call = join( ' ',
