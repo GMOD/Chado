@@ -457,8 +457,8 @@ CREATE TABLE stock_library (
     FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
 );
 
-CREATE INDEX stock_library_idx1 ON stock USING btree (library_id);
-CREATE INDEX stock_library_idx2 ON stock USING btree (stock_id);
+CREATE INDEX stock_library_idx1 ON stock_library USING btree (library_id);
+CREATE INDEX stock_library_idx2 ON stock_library USING btree (stock_id);
 
 COMMENT ON TABLE stock_library IS 'Links a stock with a library.';
 

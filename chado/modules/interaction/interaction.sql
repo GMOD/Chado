@@ -293,3 +293,27 @@ create table interaction_group_feature_interaction (
 );
 create index interaction_group_feature_interaction_idx1 on interaction_group_feature_interaction (interaction_group_id);
 create index interaction_group_feature_interaction_idx2 on interaction_group_feature_interaction (feature_interaction_id);
+
+
+-- ================================================
+-- TABLE: library_interaction
+-- ================================================
+
+create table library_interaction (
+    library_interaction_id bigserial not null,
+    primary key (library_interaction_id),
+    library_id bigint not null,
+    foreign key (library_id) references library (library_id) on delete cascade INITIALLY DEFERRED,
+    interaction_id bigint not null,
+    foreign key (interaction_id) references interaction (interaction_id) on delete cascade INITIALLY DEFERRED,
+    pub_id bigint not null,
+    foreign key (pub_id) references pub (pub_id),
+    constraint library_interaction_c1 unique (interaction_id,library_id,pub_id)
+);
+create index library_interaction_idx1 on library_interaction (interaction_id);
+create index library_interaction_idx2 on library_interaction (library_id);
+create index library_interaction_idx3 on library_interaction (pub_id);
+
+COMMENT ON TABLE library_interaction IS 'Links a library to an interaction.';
+
+
