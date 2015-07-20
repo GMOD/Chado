@@ -1506,7 +1506,9 @@ sub initialize_ontology {
     $sth->execute;
     ($part_of) = $sth->fetchrow_array();
 
-    warn "\n\nWARNING:\nUnable to find a 'part_of' term in the relationship ontology;\nIt's absense indicates that there is something really wrong with the database.\nConsider stopping and checking the state of your cvterm table.\n\n\n";
+    if ($sth->rows == 0) {
+        warn "\n\nWARNING:\nUnable to find a 'part_of' term in the relationship ontology;\nIt's absense indicates that there is something really wrong with the database.\nConsider stopping and checking the state of your cvterm table.\n\n\n";
+    }
 
 
     $sth = $self->dbh->prepare(
