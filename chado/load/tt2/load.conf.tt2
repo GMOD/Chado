@@ -43,18 +43,18 @@
   <!-- ontologies -->
   <!--            -->
   <ontology name="Relationship Ontology" order="1">
-    <file type="obo"    local="obo/OBO_REL/ro.obo" remote="http://www.obofoundry.org/ro/ro.obo" method="lwp-mirror"/>
+    <file type="obo"    local="obo/OBO_REL/ro.obo" remote="http://purl.obolibrary.org/obo/ro.obo" method="lwp-mirror"/>
   </ontology>
 
 
   <ontology name="Sequence Ontology" order="2">
-    <file type="obo"    local="song/so.obo"   remote="http://song.cvs.sourceforge.net/*checkout*/song/ontology/so.obo"   method="lwp-mirror"/>
+    <file type="obo"    local="song/so.obo"   remote="http://purl.obolibrary.org/obo/so.obo"   method="lwp-mirror"/>
   <!--  <file type="obo"    local="song/so.obo"   remote="http://easynews.dl.sourceforge.net/sourceforge/song/so.obo"   method="lwp-mirror"/> -->
   <!--  <file type="obo"    local="song/so.obo"   remote="http://www.gmod.org/files/so.obo"   method="lwp-mirror"/> -->
   </ontology>
 
   <ontology name="Gene Ontology" order="3">
-    <file type="obo"    local="go/go.obo" remote="http://www.geneontology.org/ontology/gene_ontology.obo" method="/usr/bin/lwp-mirror"/>
+    <file type="obo"    local="go/go.obo" remote="http://purl.obolibrary.org/obo/go.obo" method="/usr/bin/lwp-mirror"/>
   </ontology>
 
   <ontology name="Chado Feature Properties" order="4">
@@ -87,7 +87,7 @@
 -->
 
   <ontology name="Plant Ontology" order="5">
-    <file type="obo" local="po/po_anatomy.obo" remote="http://palea.cgrb.oregonstate.edu/viewsvn/Poc/trunk/ontology/OBO_format/po_anatomy.obo?view=co" method="lwp-mirror"/>
+    <file type="obo" local="po/po_anatomy.obo" remote="http://purl.obolibrary.org/obo/po.obo" method="lwp-mirror"/>
   </ontology>
 
 
