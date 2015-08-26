@@ -49,3 +49,20 @@ hardcoding a list of columns in the relational schema, and is
 completely extensible. There is a unique constraint, dbprop_c1, for
 the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
 
+--not sure about the syntax of the ALTER TYPE command, but this is probably right
+--from functions/deductive_closure.plpgsql
+ALTER TYPE closure_result ALTER ATTRIBUTE cvterm_id TYPE bigint;
+
+--I don't think I need to include *.sqlapi changes
+
+--There are definitely residual bugs in the functions. They must not have been caught during the load becuase the functions don't get evaluated.  Ugh, that's going to be a lot of things to fix.
+--on the upside, since the functions are all "CREATE OR REPLACE" the results won't have to go here.
+
+--from bridges/godb-bridge.plpgsql
+ALTER TABLE godb.go_acc ALTER COLUMN dbxref_id TYPE bigint;
+
+ALTER TABLE godb.term2term ALTER COLUMN relationship_type_id TYPE bigint;
+ALTER TABLE godb.term2term ALTER COLUMN term1_id TYPE bigint;
+ALTER TABLE godb.term2term ALTER COLUMN term2_id TYPE bigint;
+ALTER TABLE godb.graph_path ALTER COLUMN term1_id TYPE bigint;
+ALTER TABLE godb.graph_path ALTER COLUMN term2_id TYPE bigint;
