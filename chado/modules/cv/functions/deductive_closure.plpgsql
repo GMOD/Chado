@@ -1,7 +1,7 @@
 CREATE TYPE closure_result AS (cvterm_id bigint, pathdistance INTEGER);
 
 -- results may not be distinct
-CREATE OR REPLACE FUNCTION _closure_over_IS_A(INTEGER, INTEGER) RETURNS SETOF INTEGER AS
+CREATE OR REPLACE FUNCTION _closure_over_IS_A(BIGINT, BIGINT) RETURNS SETOF BIGINT AS
 $$
 DECLARE
     term        ALIAS FOR $1;
@@ -25,7 +25,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION closure_over_IS_A(INTEGER) RETURNS SETOF INTEGER AS
+CREATE OR REPLACE FUNCTION closure_over_IS_A(BIGINT) RETURNS SETOF BIGINT AS
 $$
 DECLARE
     is_a_id           INTEGER;
@@ -40,7 +40,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION closure_over_reflexive_IS_A(INTEGER) RETURNS SETOF INTEGER AS
+CREATE OR REPLACE FUNCTION closure_over_reflexive_IS_A(BIGINT) RETURNS SETOF BIGINT AS
 $$
 DECLARE
     is_a_id           INTEGER;
@@ -61,7 +61,7 @@ LANGUAGE 'plpgsql';
 --  X R Z <= X is_a* Y, Y R Z
 -- but not:
 --  X R Z <= X R Y, Y is_a+ Z
-CREATE OR REPLACE FUNCTION _closure_over_relation_with_dist_partial(INTEGER,INTEGER,INTEGER,INTEGER) RETURNS SETOF closure_result AS
+CREATE OR REPLACE FUNCTION _closure_over_relation_with_dist_partial(BIGINT,BIGINT,BIGINT,INTEGER) RETURNS SETOF closure_result AS
 $$
 DECLARE
     term                ALIAS FOR $1; 
@@ -95,7 +95,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION closure_over_relation_with_dist(INTEGER,INTEGER) RETURNS SETOF closure_result AS
+CREATE OR REPLACE FUNCTION closure_over_relation_with_dist(BIGINT,BIGINT) RETURNS SETOF closure_result AS
 $$
 DECLARE
     is_a_id           INTEGER;
