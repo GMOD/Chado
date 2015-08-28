@@ -1,11 +1,11 @@
 
 CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_program            ALIAS FOR $1;
    v_programversion     ALIAS FOR $2;
    v_sourcename         ALIAS FOR $3;
-   pkval                INTEGER;
+   pkval                BIGINT;
  BEGIN
     SELECT INTO pkval analysis_id
       FROM analysis
