@@ -1,10 +1,10 @@
 set search_path=public,so,frange,genetic_code;
 DROP VIEW IF EXISTS db_dbxref_count CASCADE;
+DROP VIEW IF EXISTS stats_paths_to_root CASCADE;
 DROP VIEW IF EXISTS cv_root CASCADE;
 DROP VIEW IF EXISTS cv_leaf CASCADE;
 DROP VIEW IF EXISTS common_ancestor_cvterm CASCADE;
 DROP VIEW IF EXISTS common_descendant_cvterm CASCADE;
-DROP VIEW IF EXISTS stats_paths_to_root CASCADE;
 DROP VIEW IF EXISTS cv_cvterm_count CASCADE;
 DROP VIEW IF EXISTS cv_cvterm_count_with_obs CASCADE;
 DROP VIEW IF EXISTS cv_link_count CASCADE;
@@ -214,6 +214,7 @@ DROP VIEW IF EXISTS valine_trna_primary_transcript CASCADE;
 DROP VIEW IF EXISTS snrna_primary_transcript CASCADE;
 DROP VIEW IF EXISTS snorna_primary_transcript CASCADE;
 DROP VIEW IF EXISTS mature_transcript CASCADE;
+DROP VIEW IF EXISTS protein_coding_gene CASCADE;
 DROP VIEW IF EXISTS mrna CASCADE;
 DROP VIEW IF EXISTS tf_binding_site CASCADE;
 DROP VIEW IF EXISTS orf CASCADE;
@@ -1107,7 +1108,6 @@ DROP VIEW IF EXISTS group_iii_intron CASCADE;
 DROP VIEW IF EXISTS noncoding_region_of_exon CASCADE;
 DROP VIEW IF EXISTS coding_region_of_exon CASCADE;
 DROP VIEW IF EXISTS endonuclease_spliced_intron CASCADE;
-DROP VIEW IF EXISTS protein_coding_gene CASCADE;
 DROP VIEW IF EXISTS transgenic_insertion CASCADE;
 DROP VIEW IF EXISTS retrogene CASCADE;
 DROP VIEW IF EXISTS silenced_by_rna_interference CASCADE;
@@ -1843,17 +1843,18 @@ DROP VIEW IF EXISTS stop_codon_signal CASCADE;
 DROP VIEW IF EXISTS databank_entry CASCADE;
 DROP VIEW IF EXISTS gene_segment CASCADE;
 DROP VIEW IF EXISTS protein_coding_gene CASCADE;
-DROP VIEW IF EXISTS intron_combined_view CASCADE;
 DROP VIEW IF EXISTS intronloc_view CASCADE;
+DROP VIEW IF EXISTS intron_combined_view CASCADE;
 DROP VIEW IF EXISTS gffatts CASCADE;
 DROP VIEW IF EXISTS gff3atts CASCADE;
 DROP VIEW IF EXISTS gff3view CASCADE;
 DROP VIEW IF EXISTS all_feature_names CASCADE;
 DROP VIEW IF EXISTS dfeatureloc CASCADE;
+DROP VIEW IF EXISTS f_loc CASCADE;
 DROP VIEW IF EXISTS f_type CASCADE;
 DROP VIEW IF EXISTS fnr_type CASCADE;
-DROP VIEW IF EXISTS f_loc CASCADE;
 DROP VIEW IF EXISTS fp_key CASCADE;
+DROP VIEW IF EXISTS featureset_meets CASCADE;
 DROP VIEW IF EXISTS feature_meets CASCADE;
 DROP VIEW IF EXISTS feature_meets_on_same_strand CASCADE;
 DROP VIEW IF EXISTS feature_disjoint CASCADE;
@@ -1862,7 +1863,7 @@ DROP VIEW IF EXISTS feature_intersection CASCADE;
 DROP VIEW IF EXISTS feature_difference CASCADE;
 DROP VIEW IF EXISTS feature_distance CASCADE;
 DROP VIEW IF EXISTS feature_contains CASCADE;
-DROP VIEW IF EXISTS featureset_meets CASCADE;
+
 --
 -- Name: feature_by_fx_type; Type: TYPE; Schema: public; Owner: chado
 --
