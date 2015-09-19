@@ -4049,8 +4049,11 @@ ALTER SEQUENCE featuremapprop_featuremapprop_id_seq OWNED BY featuremapprop.feat
 ALTER TABLE featurepos 
     ALTER featurepos_id TYPE bigint,
     ALTER featuremap_id TYPE bigint,
+    ALTER featuremap_id DROP DEFAULT,
     ALTER feature_id TYPE bigint,
     ALTER map_feature_id TYPE bigint;
+
+DROP SEQUENCE featurepos_featuremap_id_seq;
     
 --
 -- Name: featureposprop; Type: TABLE; Schema: public; Owner: chado; Tablespace: 
@@ -6015,7 +6018,8 @@ ALTER TABLE ONLY featuremapprop ALTER COLUMN featuremapprop_id SET DEFAULT nextv
 -- Name: featureposprop_id; Type: DEFAULT; Schema: public; Owner: chado
 --
 
-ALTER TABLE ONLY featureposprop ALTER COLUMN featureposprop_id SET DEFAULT nextval('featureposprop_featureposprop_id_seq'::regclass);
+ALTER TABLE ONLY featureposprop 
+  ALTER COLUMN featureposprop_id SET DEFAULT nextval('featureposprop_featureposprop_id_seq'::regclass);
 
 --
 -- Name: library_contact_id; Type: DEFAULT; Schema: public; Owner: chado
@@ -37654,23 +37658,28 @@ CREATE VIEW protein_coding AS
 -- Name: protein_coding_gene; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE OR REPLACE VIEW protein_coding_gene AS
- SELECT DISTINCT gene.feature_id,
-    gene.dbxref_id,
-    gene.organism_id,
-    gene.name,
-    gene.uniquename,
-    gene.residues,
-    gene.seqlen,
-    gene.md5checksum,
-    gene.type_id,
-    gene.is_analysis,
-    gene.is_obsolete,
-    gene.timeaccessioned,
-    gene.timelastmodified
-   FROM ((feature gene
-     JOIN feature_relationship fr ON ((gene.feature_id = fr.object_id)))
-     JOIN so.mrna ON ((mrna.feature_id = fr.subject_id)));
+--
+-- Name: protein_coding_gene; Type: VIEW; Schema: so; Owner: -
+--
+
+CREATE VIEW protein_coding_gene AS
+ SELECT feature.feature_id AS protein_coding_gene_id,
+    feature.feature_id,
+    feature.dbxref_id,
+    feature.organism_id,
+    feature.name,
+    feature.uniquename,
+    feature.residues,
+    feature.seqlen,
+    feature.md5checksum,
+    feature.type_id,
+    feature.is_analysis,
+    feature.is_obsolete,
+    feature.timeaccessioned,
+    feature.timelastmodified
+   FROM (feature
+     JOIN cvterm ON ((feature.type_id = cvterm.cvterm_id)))
+  WHERE (((((((((((cvterm.name)::text = 'gene_with_polyadenylated_mRNA'::text) OR ((cvterm.name)::text = 'gene_with_mRNA_with_frameshift'::text)) OR ((cvterm.name)::text = 'gene_with_edited_transcript'::text)) OR ((cvterm.name)::text = 'gene_with_recoded_mRNA'::text)) OR ((cvterm.name)::text = 'gene_with_stop_codon_read_through'::text)) OR ((cvterm.name)::text = 'gene_with_mRNA_recoded_by_translational_bypass'::text)) OR ((cvterm.name)::text = 'gene_with_transcript_with_translational_frameshift'::text)) OR ((cvterm.name)::text = 'gene_with_stop_codon_redefined_as_pyrrolysine'::text)) OR ((cvterm.name)::text = 'gene_with_stop_codon_redefined_as_selenocysteine'::text)) OR ((cvterm.name)::text = 'protein_coding_gene'::text));
 
 --
 -- Name: protein_coding_primary_transcript; Type: VIEW; Schema: so; Owner: -
