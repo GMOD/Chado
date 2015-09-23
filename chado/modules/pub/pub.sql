@@ -6,7 +6,9 @@
 -- Dependencies:
 --
 -- :import cvterm from cv
--- :import dbxref from general
+-- :import dbxref from db
+-- :import analysis from companalysis
+-- :import contact from contact
 -- =================================================================
 
 -- ================================================
@@ -14,7 +16,7 @@
 -- ================================================
 
 create table pub (
-    pub_id serial not null,
+    pub_id bigserial not null,
     primary key (pub_id),
     title text,
     volumetitle text,
@@ -25,7 +27,7 @@ create table pub (
     pages varchar(255),
     miniref varchar(255),
     uniquename text not null,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     is_obsolete boolean default 'false',
     publisher varchar(255),
@@ -47,13 +49,13 @@ COMMENT ON COLUMN pub.type_id IS  'The type of the publication (book, journal, p
 -- ================================================
 
 create table pub_relationship (
-    pub_relationship_id serial not null,
+    pub_relationship_id bigserial not null,
     primary key (pub_relationship_id),
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
 
     constraint pub_relationship_c1 unique (subject_id,object_id,type_id)
@@ -72,11 +74,11 @@ when one publication also appears in another pub.';
 -- ================================================
 
 create table pub_dbxref (
-    pub_dbxref_id serial not null,
+    pub_dbxref_id bigserial not null,
     primary key (pub_dbxref_id),
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     is_current boolean not null default 'true',
     constraint pub_dbxref_c1 unique (pub_id,dbxref_id)
@@ -93,9 +95,9 @@ e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden...';
 -- ================================================
 
 create table pubauthor (
-    pubauthor_id serial not null,
+    pubauthor_id bigserial not null,
     primary key (pubauthor_id),
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
     rank int not null,
     editor boolean default 'false',
@@ -119,11 +121,11 @@ COMMENT ON COLUMN pubauthor.editor IS 'Indicates whether the author is an editor
 -- ================================================
 
 create table pubprop (
-    pubprop_id serial not null,
+    pubprop_id bigserial not null,
     primary key (pubprop_id),
-    pub_id int not null,
+    pub_id bigint not null,
     foreign key (pub_id) references pub (pub_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text not null,
     rank integer,
@@ -134,3 +136,21 @@ create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
+
+-- ================================================
+-- TABLE: pubauthor_contact
+-- ================================================
+
+CREATE TABLE pubauthor_contact (
+    pubauthor_contact_id bigserial primary key NOT NULL,
+    contact_id bigint NOT NULL,
+    pubauthor_id bigint NOT NULL,
+    CONSTRAINT pubauthor_contact_c1 UNIQUE (contact_id, pubauthor_id),
+    FOREIGN KEY (pubauthor_id) REFERENCES pubauthor(pubauthor_id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE
+);
+
+CREATE INDEX pubauthor_contact_idx1 ON pubauthor USING btree (pubauthor_id);
+CREATE INDEX pubauthor_contact_idx2 ON contact USING btree (contact_id);
+
+COMMENT ON TABLE pubauthor_contact IS 'An author on a publication may have a corresponding entry in the contact table and this table can link the two.';

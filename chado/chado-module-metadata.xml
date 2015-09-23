@@ -25,35 +25,44 @@
 
     <module id='general' required='true'>
       <description>
-        General purpose tables, including dbxrefs
+        General purpose tables, not including dbxrefs anymore
       </description>
       <source type='sql' path='general/general.sql'/>
 
-      <component id='general-report' type='views' required='true'>
+    </module>
+
+    <module id='db' required='true'>
+      <description>
+        Databases (genbank, flybase, etc) and DBxrefs
+      </description>
+      <source type='sql' path='db/db.sql'/>
+
+      <component id='db-views' type='views' required='true'>
         <description>
-          Standard Chado SQL Reports for the general module
+          Standard Chado SQL Views for the db module
         </description>
-        <source type='sql' path='general/views/general-report.sql'/>
+        <source type='sql' path='db/views/db-report.sql'/>
       </component>
 
-      <component id='general-loading-api' type='dbapi'>
+      <component id='db-loading-api' type='dbapi'>
         <description>
-          A DBMS API for the general module's loading functions
+          A DBMS API for the db module's loading functions
         </description>
-        <source type='sqli' path='general/functions/general-loading.sqlapi'/>
+        <source type='sqli' path='db/functions/db-loading.sqlapi'/>
       </component>
 
-      <component id='general-loading' type='code'>
+      <component id='db-loading' type='code'>
         <description>
-          Postgres code for helping with loading the general module
+          Postgres code for helping with loading the db module
         </description>
-        <implements to='general-loading-api'/>
-        <source type='plpgsql' path='general/functions/general-loading.plpgsql'/>
-      </component>
+        <implements to='db-loading-api'/>
+        <source type='plpgsql' path='db/functions/db-loading.plpgsql'/>
+      </component> 
+
     </module>
 
     <module id='cv' required='true'>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <description>
         Controlled vocabularies and ontologies
       </description>
@@ -103,9 +112,22 @@
       </component>
     </module>
 
-    <module id='pub' required='true'>
-      <dependency to='general'/>
+    <module id='contact'>
       <dependency to='cv'/>
+      <dependency to='db'/>
+      <status code='alpha'>
+        In use at UCLA/Allen Day
+      </status>
+      <description>
+        model persons, institutes, groups, organizations, etc
+      </description>
+      <source type='sql' path='contact/contact.sql'/>
+    </module>
+
+    <module id='pub' required='true'>
+      <dependency to='db'/>
+      <dependency to='cv'/>
+      <dependency to='contact'/>
       <description>
         Bibliographic data on publications
       </description>
@@ -113,7 +135,7 @@
     </module>
 
     <module id='organism' required='true'>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='cv'/>
       <description>
         Species data - does not include phylogeny
@@ -144,10 +166,11 @@
     </module>
 
     <module id='sequence' required='true'>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='organism'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
+      <dependency to='contact'/>
       <description>
         Sequence and sequence features, their localization and properties
       </description>
@@ -333,7 +356,7 @@
 
     <module id='companalysis'  required='true'>
       <!--added required, since sequence_views is requred and it depends on companalysis-->
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <description>
@@ -360,7 +383,7 @@
     </module>
 
     <module id='phenotype'>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
@@ -374,7 +397,7 @@
     </module>
 
     <module id='genetic'>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
@@ -389,7 +412,7 @@
     </module>
 
     <module id='map'>
-      <dependency to='sequence'/>
+      <dependency to='db'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
       <status code='alpha'>
@@ -421,7 +444,7 @@
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='organism'/>
       <dependency to='companalysis'/>	
       <status code='beta'>
@@ -450,24 +473,11 @@
       </component>
     </module>
 
-    <module id='contact'>
-      <dependency to='cv'/>
-      <dependency to='general'/>
-      <status code='alpha'>
-        In use at UCLA/Allen Day
-      </status>
-      <description>
-        model persons, institutes, groups, organizations, etc
-      </description>
-      <source type='sql' path='contact/contact.sql'/>
-    </module>
-
-
     <module id='expression'>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <status code='alpha'>
         In use at FlyBase
       </status>
@@ -477,10 +487,41 @@
       <source type='sql' path='expression/expression.sql'/>
     </module>
 
+    <module id='library'>
+      <dependency to='sequence'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='organism'/>
+      <dependency to='db'/>
+      <status code='beta'>
+      </status>
+      <description>
+        For describing molecular libraries
+      </description>
+      <source type='sql' path='library/library.sql'/>
+    </module>
+
+    <module id='stock'>
+      <dependency to='genetic'/>
+      <dependency to='cv'/>
+      <dependency to='pub'/>
+      <dependency to='db'/>
+      <dependency to='contact'/>
+      <status code='beta'>
+        In use at ParameciumDB
+      </status>
+      <description>
+        For tracking stock collections
+      </description>
+      <source type='sql' path='stock/stock.sql'/>
+    </module>
+
     <module id='project'>
       <dependency to="cv"/>
       <dependency to="contact"/>
       <dependency to="pub"/>
+      <dependency to='db'/>
+      <dependency to='stock'/>
       <status code='beta'>
       </status>
       <description>
@@ -500,6 +541,7 @@ expanded to provide properties, publications and contacts.
  	<dependency to='contact'/>
  	<dependency to='companalysis'/>
         <dependency to='project'/> 
+        <dependency to='db'/>
       <status code='beta'>
         In use at UCLA/Allen Day
       </status>
@@ -509,40 +551,13 @@ expanded to provide properties, publications and contacts.
       <source type='sql' path='mage/mage.sql'/>
     </module>
 
-    <module id='stock'>
-      <dependency to='genetic'/>
-      <dependency to='cv'/>
-      <dependency to='pub'/>
-      <dependency to='general'/>
-      <dependency to='contact'/>
-      <status code='beta'>
-        In use at ParameciumDB
-      </status>
-      <description>
-        For tracking stock collections
-      </description>
-      <source type='sql' path='stock/stock.sql'/>
-    </module>
-
-    <module id='library'>
-      <dependency to='sequence'/>
-      <dependency to='cv'/>
-      <dependency to='pub'/>
-      <dependency to='organism'/>
-      <status code='beta'>
-      </status>
-      <description>
-        For describing molecular libraries
-      </description>
-      <source type='sql' path='library/library.sql'/>
-    </module>
-
     <module id='cell_line'>
       <dependency to='sequence'/>
       <dependency to='cv'/>
       <dependency to='pub'/>
       <dependency to='organism'/>
       <dependency to='library'/>
+      <dependency to='db'/>
       <status code='beta'>
       </status>
       <description>
@@ -599,7 +614,7 @@ expanded to provide properties, publications and contacts.
       <dependency to='organism'/>
       <dependency to='genetic'/>
       <dependency to='contact'/>
-      <dependency to='general'/>
+      <dependency to='db'/>
       <dependency to='stock'/>
       <dependency to='project'/>
       <status code='beta'>

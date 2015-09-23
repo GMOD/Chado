@@ -5,14 +5,14 @@
 -- =================================================================
 -- Dependencies:
 --
--- :import dbxref from general
+-- :import dbxref from db
 -- =================================================================
 
 -- ================================================
 -- TABLE: cv
 -- ================================================
 create table cv (
-    cv_id serial not null,
+    cv_id bigserial not null,
     primary key (cv_id),
     name varchar(255) not null,
    definition text,
@@ -35,13 +35,13 @@ membership of this ontology.';
 -- TABLE: cvterm
 -- ================================================
 create table cvterm (
-    cvterm_id serial not null,
+    cvterm_id bigserial not null,
     primary key (cvterm_id),
-    cv_id int not null,
+    cv_id bigint not null,
     foreign key (cv_id) references cv (cv_id) on delete cascade INITIALLY DEFERRED,
     name varchar(1024) not null,
     definition text,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete set null INITIALLY DEFERRED,
     is_obsolete int not null default 0,
     is_relationshiptype int not null default 0,
@@ -97,13 +97,13 @@ COMMENT ON INDEX cvterm_c2 IS 'The OBO identifier is globally unique.';
 -- TABLE: cvterm_relationship
 -- ================================================
 create table cvterm_relationship (
-    cvterm_relationship_id serial not null,
+    cvterm_relationship_id bigserial not null,
     primary key (cvterm_relationship_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     constraint cvterm_relationship_c1 unique (subject_id,object_id,type_id)
 );
@@ -137,15 +137,15 @@ ontology, although other relationship types are allowed.';
 -- TABLE: cvtermpath
 -- ================================================
 create table cvtermpath (
-    cvtermpath_id serial not null,
+    cvtermpath_id bigserial not null,
     primary key (cvtermpath_id),
-    type_id int,
+    type_id bigint,
     foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    cv_id int not null,
+    cv_id bigint not null,
     foreign key (cv_id) references cv (cv_id) on delete cascade INITIALLY DEFERRED,
     pathdistance int,
     constraint cvtermpath_c1 unique (subject_id,object_id,type_id,pathdistance)
@@ -176,12 +176,12 @@ from zero (reflexive relationship).';
 -- TABLE: cvtermsynonym
 -- ================================================
 create table cvtermsynonym (
-    cvtermsynonym_id serial not null,
+    cvtermsynonym_id bigserial not null,
     primary key (cvtermsynonym_id),
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     synonym varchar(1024) not null,
-    type_id int,
+    type_id bigint,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade  INITIALLY DEFERRED,
     constraint cvtermsynonym_c1 unique (cvterm_id,synonym)
 );
@@ -201,11 +201,11 @@ narrower, or broader than.';
 -- TABLE: cvterm_dbxref
 -- ================================================
 create table cvterm_dbxref (
-    cvterm_dbxref_id serial not null,
+    cvterm_dbxref_id bigserial not null,
     primary key (cvterm_dbxref_id),
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) on delete cascade INITIALLY DEFERRED,
     is_for_definition int not null default 0,
     constraint cvterm_dbxref_c1 unique (cvterm_id,dbxref_id)
@@ -239,11 +239,11 @@ it is a dbxref for provenance information for the definition.';
 -- TABLE: cvtermprop
 -- ================================================
 create table cvtermprop ( 
-    cvtermprop_id serial not null, 
+    cvtermprop_id bigserial not null, 
     primary key (cvtermprop_id), 
-    cvterm_id int not null, 
+    cvterm_id bigint not null, 
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade, 
-    type_id int not null, 
+    type_id bigint not null, 
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade, 
     value text not null default '', 
     rank int not null default 0,
@@ -270,11 +270,11 @@ default 0 value should be used.';
 -- TABLE: dbxrefprop
 -- ================================================
 create table dbxrefprop (
-    dbxrefprop_id serial not null,
+    dbxrefprop_id bigserial not null,
     primary key (dbxrefprop_id),
-    dbxref_id int not null,
+    dbxref_id bigint not null,
     foreign key (dbxref_id) references dbxref (dbxref_id) INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     value text not null default '',
     rank int not null default 0,
@@ -290,11 +290,11 @@ COMMENT ON TABLE dbxrefprop IS 'Metadata about a dbxref. Note that this is not d
 -- TABLE: cvprop
 -- ================================================
 create table cvprop (
-    cvprop_id serial not null,
+    cvprop_id bigserial not null,
     primary key (cvprop_id),
-    cv_id int not null,
+    cv_id bigint not null,
     foreign key (cv_id) references cv (cv_id) INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
@@ -316,9 +316,9 @@ default 0 value should be used.';
 -- TABLE: chadoprop
 -- ================================================
 create table chadoprop (
-    chadoprop_id serial not null,
+    chadoprop_id bigserial not null,
     primary key (chadoprop_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
@@ -335,4 +335,29 @@ cv can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
 default 0 value should be used.';
+
+
+-- ================================================
+-- TABLE: dbprop
+-- ================================================
+
+create table dbprop (
+  dbprop_id bigserial not null,
+  primary key (dbprop_id),
+  db_id bigint not null,
+  type_id bigint not null,
+  value text null,
+  rank int not null default 0,
+  foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+  foreign key (db_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
+  constraint dbprop_c1 unique (db_id,type_id,rank)
+);
+create index dbprop_idx1 on dbprop (db_id);
+create index dbprop_idx2 on dbprop (type_id);
+
+COMMENT ON TABLE dbprop IS 'An external database can have any number of
+slot-value property tags attached to it. This is an alternative to
+hardcoding a list of columns in the relational schema, and is
+completely extensible. There is a unique constraint, dbprop_c1, for
+the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
 

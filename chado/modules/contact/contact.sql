@@ -12,10 +12,10 @@
 -- TABLE: contact
 -- ================================================
 
-create table contact (
-    contact_id serial not null,
+CREATE TABLE contact (
+    contact_id bigserial not null,
     primary key (contact_id),
-    type_id int null,
+    type_id bigint null,
     foreign key (type_id) references cvterm (cvterm_id),
     name varchar(255) not null,
     description varchar(255) null,
@@ -26,17 +26,39 @@ COMMENT ON TABLE contact IS 'Model persons, institutes, groups, organizations, e
 COMMENT ON COLUMN contact.type_id IS 'What type of contact is this?  E.g. "person", "lab".';
 
 -- ================================================
+-- TABLE: contactprop
+-- ================================================
+CREATE TABLE contactprop (
+    contactprop_id bigserial primary key not null,
+    contact_id bigint NOT NULL,
+    type_id bigint NOT NULL,
+    value text,
+    rank integer DEFAULT 0 NOT NULL,
+    CONSTRAINT contactprop_c1 UNIQUE (contact_id, type_id, rank),    
+    FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
+);
+
+CREATE INDEX contactprop_idx1 ON contactprop USING btree (contact_id);
+CREATE INDEX contactprop_idx2 ON contactprop USING btree (type_id);
+
+COMMENT ON TABLE contactprop IS 'A contact can have any number of slot-value property 
+tags attached to it. This is an alternative to hardcoding a list of columns in the 
+relational schema, and is completely extensible.';
+
+
+-- ================================================
 -- TABLE: contact_relationship
 -- ================================================
 
 create table contact_relationship (
-    contact_relationship_id serial not null,
+    contact_relationship_id bigserial not null,
     primary key (contact_relationship_id),
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
-    subject_id int not null,
+    subject_id bigint not null,
     foreign key (subject_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
-    object_id int not null,
+    object_id bigint not null,
     foreign key (object_id) references contact (contact_id) on delete cascade INITIALLY DEFERRED,
     constraint contact_relationship_c1 unique (subject_id,object_id,type_id)
 );

@@ -28,19 +28,19 @@
 -- :import phenotype from phenotype
 -- :import cvterm from cv
 -- :import pub from pub
--- :import dbxref from general
+-- :import dbxref from db
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -- ================================================
 -- TABLE: genotype
 -- ================================================
 create table genotype (
-    genotype_id serial not null,
+    genotype_id bigserial not null,
     primary key (genotype_id),
     name text,
     uniquename text not null,
-    description varchar(255),
-    type_id INT NOT NULL,
+    description text,
+    type_id bigint NOT NULL,
     FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     constraint genotype_c1 unique (uniquename)
 );
@@ -59,17 +59,17 @@ for display purposes.';
 -- TABLE: feature_genotype
 -- ================================================
 create table feature_genotype (
-    feature_genotype_id serial not null,
+    feature_genotype_id bigserial not null,
     primary key (feature_genotype_id),
-    feature_id int not null,
+    feature_id bigint not null,
     foreign key (feature_id) references feature (feature_id) on delete cascade,
-    genotype_id int not null,
+    genotype_id bigint not null,
     foreign key (genotype_id) references genotype (genotype_id) on delete cascade,
-    chromosome_id int,
+    chromosome_id bigint,
     foreign key (chromosome_id) references feature (feature_id) on delete set null,
     rank int not null,
     cgroup    int not null,
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
     constraint feature_genotype_c1 unique (feature_id, genotype_id, cvterm_id, chromosome_id, rank, cgroup)
 );
@@ -89,7 +89,7 @@ COMMENT ON COLUMN feature_genotype.chromosome_id IS 'A feature of SO type "chrom
 -- TABLE: environment
 -- ================================================
 create table environment (
-    environment_id serial not NULL,
+    environment_id bigserial not NULL,
     primary key  (environment_id),
     uniquename text not null,
     description text,
@@ -104,11 +104,11 @@ COMMENT ON TABLE environment IS 'The environmental component of a phenotype desc
 -- TABLE: environment_cvterm
 -- ================================================
 create table environment_cvterm (
-    environment_cvterm_id serial not null,
+    environment_cvterm_id bigserial not null,
     primary key  (environment_cvterm_id),
-    environment_id int not null,
+    environment_id bigint not null,
     foreign key (environment_id) references environment (environment_id) on delete cascade,
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     foreign key (cvterm_id) references cvterm (cvterm_id) on delete cascade,
     constraint environment_cvterm_c1 unique (environment_id, cvterm_id)
 );
@@ -121,17 +121,17 @@ COMMENT ON TABLE environment_cvterm IS NULL;
 -- TABLE: phenstatement
 -- ================================================
 CREATE TABLE phenstatement (
-    phenstatement_id SERIAL NOT NULL,
+    phenstatement_id bigserial NOT NULL,
     primary key (phenstatement_id),
-    genotype_id INT NOT NULL,
+    genotype_id bigint NOT NULL,
     FOREIGN KEY (genotype_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
-    environment_id INT NOT NULL,
+    environment_id bigint NOT NULL,
     FOREIGN KEY (environment_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
-    phenotype_id INT NOT NULL,
+    phenotype_id bigint NOT NULL,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    type_id INT NOT NULL,
+    type_id bigint NOT NULL,
     FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
-    pub_id INT NOT NULL,
+    pub_id bigint NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
     CONSTRAINT phenstatement_c1 UNIQUE (genotype_id,phenotype_id,environment_id,type_id,pub_id)
 );
@@ -144,16 +144,16 @@ COMMENT ON TABLE phenstatement IS 'Phenotypes are things like "larval lethal".  
 -- TABLE: phendesc
 -- ================================================
 CREATE TABLE phendesc (
-    phendesc_id SERIAL NOT NULL,
+    phendesc_id bigserial NOT NULL,
     primary key (phendesc_id),
-    genotype_id INT NOT NULL,
+    genotype_id bigint NOT NULL,
     FOREIGN KEY (genotype_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
-    environment_id INT NOT NULL,
+    environment_id bigint NOT NULL,
     FOREIGN KEY (environment_id) REFERENCES environment ( environment_id) ON DELETE CASCADE,
     description TEXT NOT NULL,
-    type_id INT NOT NULL,
+    type_id bigint NOT NULL,
         FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
-    pub_id INT NOT NULL,
+    pub_id bigint NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
     CONSTRAINT phendesc_c1 UNIQUE (genotype_id,environment_id,type_id,pub_id)
 );
@@ -167,23 +167,23 @@ COMMENT ON TABLE phendesc IS 'A summary of a _set_ of phenotypic statements for 
 -- TABLE: phenotype_comparison
 -- ================================================
 CREATE TABLE phenotype_comparison (
-    phenotype_comparison_id SERIAL NOT NULL,
+    phenotype_comparison_id bigserial NOT NULL,
     primary key (phenotype_comparison_id),
-    genotype1_id INT NOT NULL,
+    genotype1_id bigint NOT NULL,
         FOREIGN KEY (genotype1_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
-    environment1_id INT NOT NULL,
+    environment1_id bigint NOT NULL,
         FOREIGN KEY (environment1_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
-    genotype2_id INT NOT NULL,
+    genotype2_id bigint NOT NULL,
         FOREIGN KEY (genotype2_id) REFERENCES genotype (genotype_id) ON DELETE CASCADE,
-    environment2_id INT NOT NULL,
+    environment2_id bigint NOT NULL,
         FOREIGN KEY (environment2_id) REFERENCES environment (environment_id) ON DELETE CASCADE,
-    phenotype1_id INT NOT NULL,
+    phenotype1_id bigint NOT NULL,
         FOREIGN KEY (phenotype1_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    phenotype2_id INT,
+    phenotype2_id bigint,
         FOREIGN KEY (phenotype2_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    pub_id INT NOT NULL,
+    pub_id bigint NOT NULL,
     FOREIGN KEY (pub_id) REFERENCES pub (pub_id) ON DELETE CASCADE,
-    organism_id INT NOT NULL,
+    organism_id bigint NOT NULL,
     FOREIGN KEY (organism_id) REFERENCES organism (organism_id) ON DELETE CASCADE,
     CONSTRAINT phenotype_comparison_c1 UNIQUE (genotype1_id,environment1_id,genotype2_id,environment2_id,phenotype1_id,pub_id)
 );
@@ -197,13 +197,13 @@ COMMENT ON TABLE phenotype_comparison IS 'Comparison of phenotypes e.g., genotyp
 -- TABLE: phenotype_comparison_cvterm
 -- ================================================
 CREATE TABLE phenotype_comparison_cvterm (
-    phenotype_comparison_cvterm_id serial not null,
+    phenotype_comparison_cvterm_id bigserial not null,
     primary key (phenotype_comparison_cvterm_id),
-    phenotype_comparison_id int not null,
+    phenotype_comparison_id bigint not null,
     FOREIGN KEY (phenotype_comparison_id) references phenotype_comparison (phenotype_comparison_id) on delete cascade,
-    cvterm_id int not null,
+    cvterm_id bigint not null,
     FOREIGN KEY (cvterm_id) references cvterm (cvterm_id) on delete cascade,
-    pub_id INT not null,
+    pub_id bigint not null,
     FOREIGN KEY (pub_id) references pub (pub_id) on delete cascade,
     rank int not null default 0,
     CONSTRAINT phenotype_comparison_cvterm_c1 unique (phenotype_comparison_id, cvterm_id)
@@ -215,11 +215,11 @@ CREATE INDEX  phenotype_comparison_cvterm_idx2 on phenotype_comparison_cvterm (c
 -- TABLE: genotypeprop
 -- ================================================
 create table genotypeprop (
-    genotypeprop_id serial not null,
+    genotypeprop_id bigserial not null,
     primary key (genotypeprop_id),
-    genotype_id int not null,
+    genotype_id bigint not null,
     foreign key (genotype_id) references genotype (genotype_id) on delete cascade INITIALLY DEFERRED,
-    type_id int not null,
+    type_id bigint not null,
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,

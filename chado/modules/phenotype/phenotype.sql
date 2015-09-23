@@ -17,18 +17,18 @@
 -- ================================================
 
 CREATE TABLE phenotype (
-    phenotype_id SERIAL NOT NULL,
+    phenotype_id bigserial NOT NULL,
     primary key (phenotype_id),
     uniquename TEXT NOT NULL,
     name TEXT default null,
-    observable_id INT,
+    observable_id bigint,
     FOREIGN KEY (observable_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
-    attr_id INT,
+    attr_id bigint,
     FOREIGN KEY (attr_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     value TEXT,
-    cvalue_id INT,
+    cvalue_id bigint,
     FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
-    assay_id INT,
+    assay_id bigint,
     FOREIGN KEY (assay_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     CONSTRAINT phenotype_c1 UNIQUE (uniquename)
 );
@@ -51,11 +51,11 @@ COMMENT ON COLUMN phenotype.assay_id IS 'Evidence type.';
 -- ================================================
 
 CREATE TABLE phenotype_cvterm (
-    phenotype_cvterm_id SERIAL NOT NULL,
+    phenotype_cvterm_id bigserial NOT NULL,
     primary key (phenotype_cvterm_id),
-    phenotype_id INT NOT NULL,
+    phenotype_id bigint NOT NULL,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
-    cvterm_id INT NOT NULL,
+    cvterm_id bigint NOT NULL,
     FOREIGN KEY (cvterm_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     rank int not null default 0,
     CONSTRAINT phenotype_cvterm_c1 UNIQUE (phenotype_id, cvterm_id, rank)
@@ -71,11 +71,11 @@ COMMENT ON TABLE phenotype_cvterm IS 'phenotype to cvterm associations.';
 -- ================================================
 
 CREATE TABLE feature_phenotype (
-    feature_phenotype_id SERIAL NOT NULL,
+    feature_phenotype_id bigserial NOT NULL,
     primary key (feature_phenotype_id),
-    feature_id INT NOT NULL,
+    feature_id bigint NOT NULL,
     FOREIGN KEY (feature_id) REFERENCES feature (feature_id) ON DELETE CASCADE,
-    phenotype_id INT NOT NULL,
+    phenotype_id bigint NOT NULL,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype (phenotype_id) ON DELETE CASCADE,
     CONSTRAINT feature_phenotype_c1 UNIQUE (feature_id,phenotype_id)       
 );
@@ -90,11 +90,11 @@ COMMENT ON TABLE feature_phenotype IS 'Linking table between features and phenot
 -- ================================================
 
 create table phenotypeprop (
-       phenotypeprop_id serial not null,
+       phenotypeprop_id bigserial not null,
        primary key (phenotypeprop_id),
-       phenotype_id int not null,
+       phenotype_id bigint not null,
        foreign key (phenotype_id) references phenotype (phenotype_id) on delete cascade INITIALLY DEFERRED,
-       type_id int not null,
+       type_id bigint not null,
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
