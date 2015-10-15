@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION _get_all_subject_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -20,7 +20,7 @@ LANGUAGE 'plpgsql';
 
 ---arg: parent term id
 ---return: all children term id and their parent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_all_subject_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -43,7 +43,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_graph_below(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -64,7 +64,7 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_graph_above(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
@@ -84,7 +84,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION _get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION _get_all_object_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
@@ -105,7 +105,7 @@ LANGUAGE 'plpgsql';
 
 ---arg: child term id
 ---return: all parent term id and their childrent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_all_object_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;

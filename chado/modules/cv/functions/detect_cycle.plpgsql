@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS BIGINT AS
 '
 DECLARE
     origin alias for $1;
@@ -11,7 +11,7 @@ DECLARE
     exist_c int;
     ccount  int;
     ecount  int;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id = ''|| origin || '' AND p2.subject_id = '' || child_id || ''AND '' || depth || ''> 0'';
@@ -50,16 +50,16 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(BIGINT, BIGINT) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(BIGINT, BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     ccount int;
     cterm cvterm_relationship%ROWTYPE;
     child cvterm_relationship%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
@@ -88,12 +88,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT, BIGINT) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT, BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     rootid alias for $2;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
@@ -110,12 +110,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(BIGINT) RETURNS SETOF INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(BIGINT) RETURNS SETOF BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     root cvterm%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
 
@@ -130,12 +130,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     root cvterm%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
@@ -154,12 +154,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS BIGINT AS
 '
 DECLARE
     cvname alias for $1;
     cv_id bigint;
-    rtn int;
+    rtn bigint;
 BEGIN
 
     SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;

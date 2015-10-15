@@ -28,7 +28,7 @@ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION closure_over_IS_A(BIGINT) RETURNS SETOF BIGINT AS
 $$
 DECLARE
-    is_a_id           INTEGER;
+    is_a_id           BIGINT;
     r                 RECORD;
 BEGIN
     SELECT INTO is_a_id get_cvterm_id_for_is_a();
@@ -43,7 +43,7 @@ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION closure_over_reflexive_IS_A(BIGINT) RETURNS SETOF BIGINT AS
 $$
 DECLARE
-    is_a_id           INTEGER;
+    is_a_id           BIGINT;
     r                 RECORD;
 BEGIN
     SELECT INTO is_a_id get_cvterm_id_for_is_a();
@@ -98,7 +98,7 @@ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION closure_over_relation_with_dist(BIGINT,BIGINT) RETURNS SETOF closure_result AS
 $$
 DECLARE
-    is_a_id           INTEGER;
+    is_a_id           BIGINT;
     r                 closure_result%ROWTYPE;
     r_plus_is_a       closure_result%ROWTYPE;
 BEGIN
@@ -141,7 +141,7 @@ CREATE OR REPLACE FUNCTION seed_cvtermpath() RETURNS INT AS
 $$
 DECLARE
   num_assertions        INTEGER;
-  is_a_id               INTEGER;
+  is_a_id               BIGINT;
 BEGIN
   RAISE LOG 'Seeding cvtermpath';
 
@@ -203,7 +203,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION forward_chain_iteration_rule_is_a() RETURNS INT AS
 $$
 DECLARE
-    is_a_id           INTEGER;
+    is_a_id           BIGINT;
     num_assertions    INTEGER;
 BEGIN
     RAISE LOG 'Applying rule: IS_A';
@@ -234,7 +234,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION forward_chain_iteration_rule_trans_over_is_a() RETURNS INT AS
 $$
 DECLARE
-    is_a_id           INTEGER;
+    is_a_id           BIGINT;
     num_assertions    INTEGER;
 BEGIN
     RAISE LOG 'Applying rule: TRANS_OVER_IS_A';
