@@ -2582,7 +2582,7 @@ CREATE OR REPLACE FUNCTION order_exons (bigint) RETURNS void AS '
 ' LANGUAGE 'plpgsql';
 -- down the graph: eg from  chromosome to contig
 CREATE OR REPLACE FUNCTION project_point_up(bigint,bigint,bigint,bigint)
- RETURNS int AS
+ RETURNS bigint AS
 'SELECT
   CASE WHEN $4<0
    THEN $3-$1             -- rev strand
@@ -2592,7 +2592,7 @@ LANGUAGE 'sql';
 
 -- down the graph: eg from contig to chromosome
 CREATE OR REPLACE FUNCTION project_point_down(bigint,bigint,bigint,bigint)
- RETURNS int AS
+ RETURNS bigint AS
 'SELECT
   CASE WHEN $4<0
    THEN $3-$1
