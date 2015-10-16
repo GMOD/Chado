@@ -18,7 +18,7 @@ DECLARE
   prefix       varchar;
   suffix       varchar;
   id           varchar;
-  maxid        int;
+  maxid        bigint;
 BEGIN
   SELECT INTO prefix cp.value FROM cvtermprop cp, cvterm, cv
                              WHERE cvterm.name = ''prefix'' and
@@ -140,10 +140,9 @@ CREATE TRIGGER tr_feature_del BEFORE DELETE ON feature for EACH ROW EXECUTE PROC
 DROP TRIGGER feature_assignname_tr_i ON feature;
 CREATE OR REPLACE FUNCTION feature_assignname_fn_i() RETURNS TRIGGER AS '
 DECLARE
-  maxid      int;
-  pos        int;
+  maxid      bigint;
   id         varchar(255);
-  max_id     int;
+  max_id     bigint;
   is_anal    feature.is_analysis%TYPE;
   prefix     cvtermprop.value%TYPE;
   suffix     cvtermprop.value%TYPE;
@@ -316,10 +315,10 @@ CREATE TRIGGER feature_assignname_tr_i AFTER INSERT ON feature for EACH ROW EXEC
 DROP TRIGGER feature_relationship_tr_d  ON feature_relationship;
 CREATE OR REPLACE FUNCTION feature_relationship_fn_d() RETURNS TRIGGER AS '
 DECLARE
-  maxid         int;
+  maxid         bigint;
   id            varchar(255);
   loginfo       varchar(255);
-  len           int;
+  len           bigint;
   f_row_g       feature%ROWTYPE;
   f_row_e       feature%ROWTYPE;
   f_row_t       feature%ROWTYPE;
@@ -417,7 +416,7 @@ CREATE TABLE trigger_log(
    value   varchar(255) not null,
    timeaccessioned   timestamp not null default current_timestamp,
    table_name   varchar(50),
-   id      int 
+   id      bigint 
 );
 
 GRANT ALL ON TABLE trigger_log TO PUBLIC;
@@ -427,13 +426,13 @@ DROP TRIGGER feature_relationship_propagatename_tr_i ON feature_relationship;
 
 CREATE OR REPLACE FUNCTION feature_relationship_propagatename_fn_i() RETURNS TRIGGER AS '
 DECLARE
-  maxid        int;
-  exon_id      int;
+  maxid        bigint;
+  exon_id      bigint;
   id           varchar(255);
-  maxid_fb     int;
+  maxid_fb     bigint;
   id_fb        varchar(255);
   loginfo      varchar(255);
-  len          int;
+  len          bigint;
   prefix       varchar;
   suffix       varchar;
   f_row_g      feature%ROWTYPE;
@@ -896,7 +895,7 @@ END;
 --   -the feature_id of the old gene that was split
 --   -the feature_id of the new genes
 --WARNING: COMPLETELY UNTESTED
-CREATE OR REPLACE FUNCTION apollo_split(int,int,int) RETURNS int AS
+CREATE OR REPLACE FUNCTION apollo_split(bigint,bigint,bigint) RETURNS bigint AS
 '
 DECLARE
   f_id                  ALIAS FOR $1;

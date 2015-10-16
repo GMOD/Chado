@@ -27,13 +27,13 @@ CREATE OR REPLACE FUNCTION reverse_complement(TEXT) RETURNS TEXT AS
 LANGUAGE 'sql';
 
 -- DNA to AA
-CREATE OR REPLACE FUNCTION translate_dna(TEXT,INT) RETURNS TEXT AS 
+CREATE OR REPLACE FUNCTION translate_dna(TEXT,BIGINT) RETURNS TEXT AS 
 '
  DECLARE 
   dnaseq ALIAS FOR $1;
   gcode ALIAS FOR $2;
   translation TEXT;
-  dnaseqlen INT;
+  dnaseqlen BIGINT;
   codon CHAR(3);
   aa CHAR(1);
   i INT;
@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION translate_dna(TEXT) RETURNS TEXT AS
 LANGUAGE 'sql';
 
 
-CREATE OR REPLACE FUNCTION translate_codon(TEXT,INT) RETURNS CHAR AS
+CREATE OR REPLACE FUNCTION translate_codon(TEXT,BIGINT) RETURNS CHAR AS
  'SELECT aa FROM genetic_code.gencode_codon_aa WHERE codon=$1 AND gencode_id=$2'
 LANGUAGE 'sql';
 
@@ -193,19 +193,19 @@ CREATE OR REPLACE FUNCTION share_exons () RETURNS void AS '
 --feature.type_id of the parent transcript type (typically, mRNA, although
 --non coding transcript types should work too).
 
-CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
+CREATE OR REPLACE FUNCTION order_exons (bigint) RETURNS void AS '
   DECLARE
     parent_type      ALIAS FOR $1;
-    exon_id          int;
-    part_of          int;
-    exon_type        int;
+    exon_id          bigint;
+    part_of          bigint;
+    exon_type        bigint;
     strand           int;
     arow             RECORD;
     order_by         varchar;
     rowcount         int;
     exon_count       int;
     ordered_exons    int;    
-    transcript_id    int;
+    transcript_id    bigint;
     transcript_row   feature%ROWTYPE;
   BEGIN
     SELECT INTO part_of cvterm_id FROM cvterm WHERE name=''part_of''

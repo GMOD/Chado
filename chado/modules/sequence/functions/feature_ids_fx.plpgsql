@@ -71,7 +71,7 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_sub_feature_ids(bigint) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     root alias for $1;
@@ -90,7 +90,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_up_feature_ids(bigint) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     leaf alias for $1;
@@ -108,7 +108,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_sub_feature_ids(bigint, integer) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     root alias for $1;
@@ -129,7 +129,7 @@ END;
 LANGUAGE 'plpgsql';
 
 --- depth is reversed and meanless when union with results from get_sub_feature_ids
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_up_feature_ids(bigint, integer) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     leaf alias for $1;

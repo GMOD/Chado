@@ -2,12 +2,12 @@ CREATE SCHEMA genetic_code;
 SET search_path = genetic_code,public,pg_catalog;
 
 CREATE TABLE gencode (
-        gencode_id      INTEGER PRIMARY KEY NOT NULL,
+        gencode_id      BIGINT PRIMARY KEY NOT NULL,
         organismstr     VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE gencode_codon_aa (
-        gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
+        gencode_id      BIGINT NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3) NOT NULL,
         aa              CHAR(1) NOT NULL,
         CONSTRAINT gencode_codon_unique UNIQUE( gencode_id, codon )
@@ -15,7 +15,7 @@ CREATE TABLE gencode_codon_aa (
 CREATE INDEX gencode_codon_aa_i1 ON gencode_codon_aa(gencode_id,codon,aa);
 
 CREATE TABLE gencode_startcodon (
-        gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
+        gencode_id      BIGINT NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3),
         CONSTRAINT gencode_startcodon_unique UNIQUE( gencode_id, codon )
 );
