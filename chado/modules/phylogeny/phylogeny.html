@@ -17,12 +17,12 @@
 <hr />
 
 <!-- 
-	Table listing (8 tables)
+	Table listing (9 tables)
  -->
 
 <a name="top" />
 
-<table class="LinkTable" width="100%">
+<table width="100%" class="LinkTable">
 
 <tr>
 	<td class="LinkTableCell"><h2 class="LinkTableTitle">
@@ -52,6 +52,18 @@
 
 <!-- 
 	End link to table 'phylotree_pub'
+ -->
+
+<!-- 
+	Start link to table 'phylotreeprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="phylotreeprop-link" href="#phylotreeprop">phylotreeprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'phylotreeprop'
  -->
 
 <!-- 
@@ -134,12 +146,11 @@
 
 <a name="phylotree" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylotree
-</h3></td>
-		<a name="phylotree"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylotree"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -164,7 +175,7 @@
 	:import cvterm from cv <br />
 	:import pub from pub <br />
 	:import organism from organism <br />
-	:import dbxref from general <br />
+	:import dbxref from db <br />
 	:import analysis from companalysis <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	================================================ <br />
@@ -197,57 +208,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylotree-phylotree_id">phylotree_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylotree-phylotree_id">phylotree_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylotree-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="phylotree-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylotree-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylotree-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylotree-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Type: protein, nucleotide, taxonomy, for example. The type should be any SO type, or "taxonomy". </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phylotree-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">Type: protein, nucleotide, taxonomy, for example. The type should be any SO type, or "taxonomy". </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylotree-analysis_id">analysis_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+	<td class="FieldCellName"><a name="phylotree-analysis_id">analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylotree-comment">comment</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -268,8 +249,7 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylotree_idx1</td>
-	<td>phylotree_id</td>
+	<td>phylotree_idx1</td><td>phylotree_id</td>
 </tr>
 
 </table>
@@ -290,33 +270,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylotree_id</td>
+	<td>NOT NULL</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>analysis_id</td>
+	<td>FOREIGN KEY</td><td>analysis_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylotree_id</td>
+	<td>UNIQUE</td><td>phylotree_id</td>
 </tr>
 
 </table>
@@ -329,12 +303,11 @@
 
 <a name="phylotree_pub" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylotree_pub
-</h3></td>
-		<a name="phylotree_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylotree_pub"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -376,30 +349,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylotree_pub-phylotree_pub_id">phylotree_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylotree_pub-phylotree_pub_id">phylotree_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylotree_pub-phylotree_id">phylotree_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+	<td class="FieldCellName"><a name="phylotree_pub-phylotree_id">phylotree_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylotree_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phylotree_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -420,13 +378,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylotree_pub_idx1</td>
-	<td>phylotree_id</td>
+	<td>phylotree_pub_idx1</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylotree_pub_idx2</td>
-	<td>pub_id</td>
+	<td>phylotree_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -447,33 +403,181 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylotree_pub_id</td>
+	<td>NOT NULL</td><td>phylotree_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylotree_id</td>
+	<td>NOT NULL</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylotree_id</td>
+	<td>FOREIGN KEY</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylotree_id, pub_id</td>
+	<td>UNIQUE</td><td>phylotree_id, pub_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'phylotreeprop'
+ -->
+
+<a name="phylotreeprop" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	phylotreeprop
+</h3></td> <a name="phylotreeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: phylotreeprop <br />
+	================================================ <br />
+	A phylotree can have any number of slot-value property 
+	tags attached to it. This is an alternative to hardcoding a list of columns in the 
+	relational schema, and is completely extensible. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phylotreeprop-phylotreeprop_id">phylotreeprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phylotreeprop-phylotree_id">phylotree_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phylotreeprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property/slot is a cvterm. 
+The meaning of the property is defined in that cvterm. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="phylotreeprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the property, represented as text. 
+Numeric values are converted to their text representation. This is less efficient than 
+using native database types, but is easier to query. </td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="phylotreeprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+phylotree can have multiple values for any particular property type 
+these are ordered in a list using rank, counting from zero. For
+properties that are single-valued rather than multi-valued, the
+default 0 value should be used </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylotreeprop_idx1</td><td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylotreeprop_idx2</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>phylotreeprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>phylotree_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>phylotree_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -490,8 +594,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonode
-</h3></td>
-		<a name="phylonode"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonode"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -503,6 +606,8 @@
 
 <em>
 	<br />
+	For any one phylotree, multivalued
+	property-value pairs must be differentiated by rank.  <br />
 	================================================ <br />
 	TABLE: phylonode <br />
 	================================================ <br />
@@ -537,84 +642,60 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode-phylonode_id">phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode-phylonode_id">phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode-phylotree_id">phylotree_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+	<td class="FieldCellName"><a name="phylonode-phylotree_id">phylotree_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode-parent_phylonode_id">parent_phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">Root phylonode can have null parent_phylonode_id value. </td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode-parent_phylonode_id">parent_phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">Root phylonode can have null parent_phylonode_id value. </td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode-left_idx">left_idx</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode-left_idx">left_idx</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode-right_idx">right_idx</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode-right_idx">right_idx</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Type: e.g. root, interior, leaf. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phylonode-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">Type: e.g. root, interior, leaf. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Phylonodes can have optional features attached to them e.g. a protein or nucleotide sequence usually attached to a leaf of the phylotree for non-leaf nodes, the feature may be a feature that is an instance of SO:match; this feature is the alignment of all leaf features beneath it. </td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="phylonode-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">Phylonodes can have optional features attached to them e.g. a protein or nucleotide sequence usually attached to a leaf of the phylotree for non-leaf nodes, the feature may be a feature that is an instance of SO:match; this feature is the alignment of all leaf features beneath it. </td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode-label">label</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode-label">label</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode-distance">distance</a></td>
-	<td class="FieldCellType">float</td>
-	<td class="FieldCellSize">20</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode-distance">distance</a></td> <td class="FieldCellType">float</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>phylonode_parent_phylonode_id_idx</td><td>parent_phylonode_id</td>
 </tr>
 
 </table>
@@ -635,53 +716,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_id</td>
+	<td>NOT NULL</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylotree_id</td>
+	<td>NOT NULL</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylotree_id</td>
+	<td>FOREIGN KEY</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>parent_phylonode_id</td>
+	<td>FOREIGN KEY</td><td>parent_phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>left_idx</td>
+	<td>NOT NULL</td><td>left_idx</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>right_idx</td>
+	<td>NOT NULL</td><td>right_idx</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylotree_id, left_idx</td>
+	<td>UNIQUE</td><td>phylotree_id, left_idx</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylotree_id, right_idx</td>
+	<td>UNIQUE</td><td>phylotree_id, right_idx</td>
 </tr>
 
 </table>
@@ -694,12 +765,11 @@
 
 <a name="phylonode_dbxref" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonode_dbxref
-</h3></td>
-		<a name="phylonode_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonode_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -741,30 +811,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_dbxref_id">phylonode_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_dbxref_id">phylonode_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_id">phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_dbxref-phylonode_id">phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 </table>
@@ -785,13 +840,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_dbxref_idx1</td>
-	<td>phylonode_id</td>
+	<td>phylonode_dbxref_idx1</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_dbxref_idx2</td>
-	<td>dbxref_id</td>
+	<td>phylonode_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -812,33 +865,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_dbxref_id</td>
+	<td>NOT NULL</td><td>phylonode_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_id</td>
+	<td>NOT NULL</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylonode_id</td>
+	<td>FOREIGN KEY</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylonode_id, dbxref_id</td>
+	<td>UNIQUE</td><td>phylonode_id, dbxref_id</td>
 </tr>
 
 </table>
@@ -855,8 +902,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonode_pub
-</h3></td>
-		<a name="phylonode_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonode_pub"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -897,30 +943,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_pub-phylonode_pub_id">phylonode_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode_pub-phylonode_pub_id">phylonode_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_pub-phylonode_id">phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_pub-phylonode_id">phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -941,13 +972,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_pub_idx1</td>
-	<td>phylonode_id</td>
+	<td>phylonode_pub_idx1</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_pub_idx2</td>
-	<td>pub_id</td>
+	<td>phylonode_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -968,33 +997,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_pub_id</td>
+	<td>NOT NULL</td><td>phylonode_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_id</td>
+	<td>NOT NULL</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylonode_id</td>
+	<td>FOREIGN KEY</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylonode_id, pub_id</td>
+	<td>UNIQUE</td><td>phylonode_id, pub_id</td>
 </tr>
 
 </table>
@@ -1011,8 +1034,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonode_organism
-</h3></td>
-		<a name="phylonode_organism"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonode_organism"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1054,30 +1076,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_organism-phylonode_organism_id">phylonode_organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode_organism-phylonode_organism_id">phylonode_organism_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_organism-phylonode_id">phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, One phylonode cannot refer to >1 organism. </td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_organism-phylonode_id">phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, One phylonode cannot refer to >1 organism. </td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_organism-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_organism-organism_id">organism_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
 </table>
@@ -1098,13 +1105,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_organism_idx1</td>
-	<td>phylonode_id</td>
+	<td>phylonode_organism_idx1</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_organism_idx2</td>
-	<td>organism_id</td>
+	<td>phylonode_organism_idx2</td><td>organism_id</td>
 </tr>
 
 </table>
@@ -1125,33 +1130,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_organism_id</td>
+	<td>NOT NULL</td><td>phylonode_organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_id</td>
+	<td>NOT NULL</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylonode_id</td>
+	<td>FOREIGN KEY</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_id</td>
+	<td>NOT NULL</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>organism_id</td>
+	<td>FOREIGN KEY</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylonode_id</td>
+	<td>UNIQUE</td><td>phylonode_id</td>
 </tr>
 
 </table>
@@ -1168,8 +1167,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonodeprop
-</h3></td>
-		<a name="phylonodeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonodeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1210,48 +1208,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonodeprop-phylonodeprop_id">phylonodeprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonodeprop-phylonodeprop_id">phylonodeprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonodeprop-phylonode_id">phylonode_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonodeprop-phylonode_id">phylonode_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonodeprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, type_id could designate phylonode hierarchy relationships, for example: species taxonomy (kingdom, order, family, genus, species), "ortholog/paralog", "fold/superfold", etc. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phylonodeprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, type_id could designate phylonode hierarchy relationships, for example: species taxonomy (kingdom, order, family, genus, species), "ortholog/paralog", "fold/superfold", etc. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonodeprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonodeprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonodeprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, It is not clear how useful the rank concept is here, leave it in for now.</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonodeprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, It is not clear how useful the rank concept is here, leave it in for now.</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1272,13 +1245,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonodeprop_idx1</td>
-	<td>phylonode_id</td>
+	<td>phylonodeprop_idx1</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonodeprop_idx2</td>
-	<td>type_id</td>
+	<td>phylonodeprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1299,43 +1270,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonodeprop_id</td>
+	<td>NOT NULL</td><td>phylonodeprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_id</td>
+	<td>NOT NULL</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylonode_id</td>
+	<td>FOREIGN KEY</td><td>phylonode_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>value</td>
+	<td>NOT NULL</td><td>value</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phylonode_id, type_id, value, rank</td>
+	<td>UNIQUE</td><td>phylonode_id, type_id, value, rank</td>
 </tr>
 
 </table>
@@ -1348,12 +1311,11 @@
 
 <a name="phylonode_relationship" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phylonode_relationship
-</h3></td>
-		<a name="phylonode_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phylonode_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1398,57 +1360,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_relationship-phylonode_relationship_id">phylonode_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-phylonode_relationship_id">phylonode_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phylonode-phylonode_id">phylonode.phylonode_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phylonode_relationship-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phylonode_relationship-phylotree_id">phylotree_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
+	<td class="FieldCellName"><a name="phylonode_relationship-phylotree_id">phylotree_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#phylotree-phylotree_id">phylotree.phylotree_id</a></td>
 </tr>
 
 </table>
@@ -1469,18 +1401,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>phylonode_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_relationship_idx2</td>
-	<td>object_id</td>
+	<td>phylonode_relationship_idx2</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phylonode_relationship_idx3</td>
-	<td>type_id</td>
+	<td>phylonode_relationship_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1501,53 +1430,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylonode_relationship_id</td>
+	<td>NOT NULL</td><td>phylonode_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phylotree_id</td>
+	<td>NOT NULL</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phylotree_id</td>
+	<td>FOREIGN KEY</td><td>phylotree_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id</td>
 </tr>
 
 </table>
@@ -1555,7 +1474,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11005</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

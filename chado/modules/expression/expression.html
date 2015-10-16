@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Description of Schema</title>
-<meta name="generator" content="SQL::Translator::Producer::HTML, 1.15" />
+<meta name="generator" content="SQL::Translator::Producer::HTML" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body>
@@ -146,12 +146,11 @@
 
 <a name="expression" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expression
-</h3></td>
-		<a name="expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -163,7 +162,7 @@
 
 <em>
 	<br />
-	$Id: expression.html,v 1.3 2007-03-23 15:18:02 scottcain Exp $ <br />
+	$Id: expression.sql,v 1.14 2007-03-23 15:18:02 scottcain Exp $ <br />
 	========================================== <br />
 	Chado expression module <br />
 	================================================================= <br />
@@ -202,39 +201,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression-uniquename">uniquename</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression-uniquename">uniquename</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression-md5checksum">md5checksum</a></td>
-	<td class="FieldCellType">char</td>
-	<td class="FieldCellSize">32</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression-md5checksum">md5checksum</a></td> <td class="FieldCellType">char</td> <td class="FieldCellSize">32</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -255,18 +234,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>uniquename</td>
+	<td>NOT NULL</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>uniquename</td>
+	<td>UNIQUE</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -283,8 +259,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expression_cvterm
-</h3></td>
-		<a name="expression_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expression_cvterm"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -325,48 +300,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvterm-expression_cvterm_id">expression_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression_cvterm-expression_cvterm_id">expression_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_cvterm-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+	<td class="FieldCellName"><a name="expression_cvterm-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="expression_cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_cvterm-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression_cvterm-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvterm-cvterm_type_id">cvterm_type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="expression_cvterm-cvterm_type_id">cvterm_type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -387,18 +337,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_cvterm_idx1</td>
-	<td>expression_id</td>
+	<td>expression_cvterm_idx1</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_cvterm_idx2</td>
-	<td>cvterm_id</td>
+	<td>expression_cvterm_idx2</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_cvterm_idx3</td>
-	<td>cvterm_type_id</td>
+	<td>expression_cvterm_idx3</td><td>cvterm_type_id</td>
 </tr>
 
 </table>
@@ -419,48 +366,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_cvterm_id</td>
+	<td>NOT NULL</td><td>expression_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
+	<td>FOREIGN KEY</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_type_id</td>
+	<td>NOT NULL</td><td>cvterm_type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_type_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_id, cvterm_id, cvterm_type_id</td>
+	<td>UNIQUE</td><td>expression_id, cvterm_id, rank, cvterm_type_id</td>
 </tr>
 
 </table>
@@ -473,12 +411,11 @@
 
 <a name="expression_cvtermprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expression_cvtermprop
-</h3></td>
-		<a name="expression_cvtermprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expression_cvtermprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -521,57 +458,32 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvtermprop_id">expression_cvtermprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvtermprop_id">expression_cvtermprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvterm_id">expression_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression_cvterm-expression_cvterm_id">expression_cvterm.expression_cvterm_id</a></td>
+	<td class="FieldCellName"><a name="expression_cvtermprop-expression_cvterm_id">expression_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression_cvterm-expression_cvterm_id">expression_cvterm.expression_cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvtermprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+	<td class="FieldCellName"><a name="expression_cvtermprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_cvtermprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">The value of the
+	<td class="FieldCellName"><a name="expression_cvtermprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the
 property, represented as text. Numeric values are converted to their
 text representation. This is less efficient than using native database
-types, but is easier to query. </td>
-	<td class="FieldCellFK"></td>
+types, but is easier to query. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_cvtermprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
+	<td class="FieldCellName"><a name="expression_cvtermprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
 ordering. Any expression_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used. </td>
-	<td class="FieldCellFK"></td>
+the default 0 value should be used. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -592,13 +504,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_cvtermprop_idx1</td>
-	<td>expression_cvterm_id</td>
+	<td>expression_cvtermprop_idx1</td><td>expression_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_cvtermprop_idx2</td>
-	<td>type_id</td>
+	<td>expression_cvtermprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -619,38 +529,31 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_cvtermprop_id</td>
+	<td>NOT NULL</td><td>expression_cvtermprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_cvterm_id</td>
+	<td>NOT NULL</td><td>expression_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_cvterm_id</td>
+	<td>FOREIGN KEY</td><td>expression_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_cvterm_id, type_id, rank</td>
+	<td>UNIQUE</td><td>expression_cvterm_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -663,12 +566,11 @@ the default 0 value should be used. </td>
 
 <a name="expressionprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expressionprop
-</h3></td>
-		<a name="expressionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expressionprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -709,48 +611,23 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expressionprop-expressionprop_id">expressionprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expressionprop-expressionprop_id">expressionprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expressionprop-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+	<td class="FieldCellName"><a name="expressionprop-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expressionprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="expressionprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expressionprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expressionprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expressionprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expressionprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -771,13 +648,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expressionprop_idx1</td>
-	<td>expression_id</td>
+	<td>expressionprop_idx1</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expressionprop_idx2</td>
-	<td>type_id</td>
+	<td>expressionprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -798,38 +673,31 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expressionprop_id</td>
+	<td>NOT NULL</td><td>expressionprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
+	<td>FOREIGN KEY</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_id, type_id, rank</td>
+	<td>UNIQUE</td><td>expression_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -846,8 +714,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expression_pub
-</h3></td>
-		<a name="expression_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expression_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -888,30 +755,15 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_pub-expression_pub_id">expression_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression_pub-expression_pub_id">expression_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_pub-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+	<td class="FieldCellName"><a name="expression_pub-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="expression_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -932,13 +784,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_pub_idx1</td>
-	<td>expression_id</td>
+	<td>expression_pub_idx1</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_pub_idx2</td>
-	<td>pub_id</td>
+	<td>expression_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -959,33 +809,27 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_pub_id</td>
+	<td>NOT NULL</td><td>expression_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
+	<td>FOREIGN KEY</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_id, pub_id</td>
+	<td>UNIQUE</td><td>expression_id, pub_id</td>
 </tr>
 
 </table>
@@ -998,12 +842,11 @@ the default 0 value should be used. </td>
 
 <a name="feature_expression" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	feature_expression
-</h3></td>
-		<a name="feature_expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="feature_expression"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1044,39 +887,19 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expression-feature_expression_id">feature_expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_expression-feature_expression_id">feature_expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_expression-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+	<td class="FieldCellName"><a name="feature_expression-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expression-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="feature_expression-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_expression-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="feature_expression-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -1097,18 +920,15 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_expression_idx1</td>
-	<td>expression_id</td>
+	<td>feature_expression_idx1</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_expression_idx2</td>
-	<td>feature_id</td>
+	<td>feature_expression_idx2</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_expression_idx3</td>
-	<td>pub_id</td>
+	<td>feature_expression_idx3</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1129,43 +949,35 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_expression_id</td>
+	<td>NOT NULL</td><td>feature_expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
+	<td>FOREIGN KEY</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_id</td>
+	<td>NOT NULL</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_id, feature_id, pub_id</td>
+	<td>UNIQUE</td><td>expression_id, feature_id, pub_id</td>
 </tr>
 
 </table>
@@ -1182,8 +994,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	feature_expressionprop
-</h3></td>
-		<a name="feature_expressionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="feature_expressionprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1226,48 +1037,23 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expressionprop-feature_expressionprop_id">feature_expressionprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_expressionprop-feature_expressionprop_id">feature_expressionprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_expressionprop-feature_expression_id">feature_expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#feature_expression-feature_expression_id">feature_expression.feature_expression_id</a></td>
+	<td class="FieldCellName"><a name="feature_expressionprop-feature_expression_id">feature_expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature_expression-feature_expression_id">feature_expression.feature_expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expressionprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="feature_expressionprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_expressionprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_expressionprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_expressionprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_expressionprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1288,13 +1074,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_expressionprop_idx1</td>
-	<td>feature_expression_id</td>
+	<td>feature_expressionprop_idx1</td><td>feature_expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_expressionprop_idx2</td>
-	<td>type_id</td>
+	<td>feature_expressionprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1315,38 +1099,31 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_expressionprop_id</td>
+	<td>NOT NULL</td><td>feature_expressionprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_expression_id</td>
+	<td>NOT NULL</td><td>feature_expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_expression_id</td>
+	<td>FOREIGN KEY</td><td>feature_expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>feature_expression_id, type_id, rank</td>
+	<td>UNIQUE</td><td>feature_expression_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1359,12 +1136,11 @@ the default 0 value should be used. </td>
 
 <a name="eimage" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	eimage
-</h3></td>
-		<a name="eimage"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="eimage"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1405,39 +1181,19 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="eimage-eimage_id">eimage_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="eimage-eimage_id">eimage_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="eimage-eimage_data">eimage_data</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">We expect images in eimage_data (e.g. JPEGs) to be uuencoded. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="eimage-eimage_data">eimage_data</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">We expect images in eimage_data (e.g. JPEGs) to be uuencoded. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="eimage-eimage_type">eimage_type</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, Describes the type of data in eimage_data. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="eimage-eimage_type">eimage_type</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, Describes the type of data in eimage_data. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="eimage-image_uri">image_uri</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="eimage-image_uri">image_uri</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1458,13 +1214,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>eimage_id</td>
+	<td>NOT NULL</td><td>eimage_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>eimage_type</td>
+	<td>NOT NULL</td><td>eimage_type</td>
 </tr>
 
 </table>
@@ -1481,8 +1235,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	expression_image
-</h3></td>
-		<a name="expression_image"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="expression_image"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1523,30 +1276,15 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_image-expression_image_id">expression_image_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="expression_image-expression_image_id">expression_image_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="expression_image-expression_id">expression_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
+	<td class="FieldCellName"><a name="expression_image-expression_id">expression_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#expression-expression_id">expression.expression_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="expression_image-eimage_id">eimage_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#eimage-eimage_id">eimage.eimage_id</a></td>
+	<td class="FieldCellName"><a name="expression_image-eimage_id">eimage_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#eimage-eimage_id">eimage.eimage_id</a></td>
 </tr>
 
 </table>
@@ -1567,13 +1305,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_image_idx1</td>
-	<td>expression_id</td>
+	<td>expression_image_idx1</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>expression_image_idx2</td>
-	<td>eimage_id</td>
+	<td>expression_image_idx2</td><td>eimage_id</td>
 </tr>
 
 </table>
@@ -1594,33 +1330,27 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_image_id</td>
+	<td>NOT NULL</td><td>expression_image_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>expression_id</td>
+	<td>NOT NULL</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>expression_id</td>
+	<td>FOREIGN KEY</td><td>expression_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>eimage_id</td>
+	<td>NOT NULL</td><td>eimage_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>eimage_id</td>
+	<td>FOREIGN KEY</td><td>eimage_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>expression_id, eimage_id</td>
+	<td>UNIQUE</td><td>expression_id, eimage_id</td>
 </tr>
 
 </table>
@@ -1628,7 +1358,7 @@ the default 0 value should be used. </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.08_01</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

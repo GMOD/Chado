@@ -17,12 +17,12 @@
 <hr />
 
 <!-- 
-	Table listing (15 tables)
+	Table listing (19 tables)
  -->
 
 <a name="top" />
 
-<table class="LinkTable" width="100%">
+<table width="100%" class="LinkTable">
 
 <tr>
 	<td class="LinkTableCell"><h2 class="LinkTableTitle">
@@ -210,6 +210,54 @@
 	End link to table 'stock_dbxrefprop'
  -->
 
+<!-- 
+	Start link to table 'stockcollection_db'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="stockcollection_db-link" href="#stockcollection_db">stockcollection_db</a></td>
+</tr>
+
+<!-- 
+	End link to table 'stockcollection_db'
+ -->
+
+<!-- 
+	Start link to table 'stock_feature'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="stock_feature-link" href="#stock_feature">stock_feature</a></td>
+</tr>
+
+<!-- 
+	End link to table 'stock_feature'
+ -->
+
+<!-- 
+	Start link to table 'stock_featuremap'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="stock_featuremap-link" href="#stock_featuremap">stock_featuremap</a></td>
+</tr>
+
+<!-- 
+	End link to table 'stock_featuremap'
+ -->
+
+<!-- 
+	Start link to table 'stock_library'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="stock_library-link" href="#stock_library">stock_library</a></td>
+</tr>
+
+<!-- 
+	End link to table 'stock_library'
+ -->
+
 </table>
 
 <!-- 
@@ -218,12 +266,11 @@
 
 <a name="stock" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock
-</h3></td>
-		<a name="stock"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -242,10 +289,12 @@
 	============ <br />
 	:import cvterm from cv <br />
 	:import pub from pub <br />
-	:import dbxref from general <br />
+	:import dbxref from db <br />
 	:import organism from organism <br />
 	:import genotype from genetic <br />
 	:import contact from contact <br />
+	:import feature from sequence <br />
+	:import featuremap from map <br />
 	================================================ <br />
 	TABLE: stock <br />
 	================================================ <br />
@@ -277,75 +326,35 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref. </td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="stock-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref. </td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, The organism_id is the organism to which the stock belongs. This column should only be left blank if the organism cannot be determined. </td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+	<td class="FieldCellName"><a name="stock-organism_id">organism_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, The organism_id is the organism to which the stock belongs. This column should only be left blank if the organism cannot be determined. </td> <td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The name is a human-readable local name for a stock. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The name is a human-readable local name for a stock. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock-uniquename">uniquename</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock-uniquename">uniquename</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The description is the genetic description provided in the stock list. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The description is the genetic description provided in the stock list. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock-is_obsolete">is_obsolete</a></td>
-	<td class="FieldCellType">boolean</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock-is_obsolete">is_obsolete</a></td> <td class="FieldCellType">boolean</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">false</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -366,28 +375,23 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_name_ind1</td>
-	<td>name</td>
+	<td>stock_name_ind1</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_idx1</td>
-	<td>dbxref_id</td>
+	<td>stock_idx1</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_idx2</td>
-	<td>organism_id</td>
+	<td>stock_idx2</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_idx3</td>
-	<td>type_id</td>
+	<td>stock_idx3</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_idx4</td>
-	<td>uniquename</td>
+	<td>stock_idx4</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -408,43 +412,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>organism_id</td>
+	<td>FOREIGN KEY</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>uniquename</td>
+	<td>NOT NULL</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_obsolete</td>
+	<td>NOT NULL</td><td>is_obsolete</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>organism_id, uniquename, type_id</td>
+	<td>UNIQUE</td><td>organism_id, uniquename, type_id</td>
 </tr>
 
 </table>
@@ -457,12 +453,11 @@
 
 <a name="stock_pub" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_pub
-</h3></td>
-		<a name="stock_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -504,30 +499,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_pub-stock_pub_id">stock_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_pub-stock_pub_id">stock_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_pub-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_pub-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="stock_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -548,13 +528,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_pub_idx1</td>
-	<td>stock_id</td>
+	<td>stock_pub_idx1</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_pub_idx2</td>
-	<td>pub_id</td>
+	<td>stock_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -575,33 +553,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_pub_id</td>
+	<td>NOT NULL</td><td>stock_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_id, pub_id</td>
+	<td>UNIQUE</td><td>stock_id, pub_id</td>
 </tr>
 
 </table>
@@ -614,12 +586,11 @@
 
 <a name="stockprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stockprop
-</h3></td>
-		<a name="stockprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stockprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -665,48 +636,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockprop-stockprop_id">stockprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockprop-stockprop_id">stockprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockprop-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stockprop-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stockprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -727,13 +673,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stockprop_idx1</td>
-	<td>stock_id</td>
+	<td>stockprop_idx1</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockprop_idx2</td>
-	<td>type_id</td>
+	<td>stockprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -754,38 +698,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockprop_id</td>
+	<td>NOT NULL</td><td>stockprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_id, type_id, rank</td>
+	<td>UNIQUE</td><td>stock_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -802,8 +739,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stockprop_pub
-</h3></td>
-		<a name="stockprop_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stockprop_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -845,30 +781,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockprop_pub-stockprop_pub_id">stockprop_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockprop_pub-stockprop_pub_id">stockprop_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockprop_pub-stockprop_id">stockprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stockprop-stockprop_id">stockprop.stockprop_id</a></td>
+	<td class="FieldCellName"><a name="stockprop_pub-stockprop_id">stockprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stockprop-stockprop_id">stockprop.stockprop_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockprop_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="stockprop_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -889,13 +810,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stockprop_pub_idx1</td>
-	<td>stockprop_id</td>
+	<td>stockprop_pub_idx1</td><td>stockprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockprop_pub_idx2</td>
-	<td>pub_id</td>
+	<td>stockprop_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -916,33 +835,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockprop_pub_id</td>
+	<td>NOT NULL</td><td>stockprop_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockprop_id</td>
+	<td>NOT NULL</td><td>stockprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stockprop_id</td>
+	<td>FOREIGN KEY</td><td>stockprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stockprop_id, pub_id</td>
+	<td>UNIQUE</td><td>stockprop_id, pub_id</td>
 </tr>
 
 </table>
@@ -955,12 +868,11 @@
 
 <a name="stock_relationship" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_relationship
-</h3></td>
-		<a name="stock_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_relationship"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1001,57 +913,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship-stock_relationship_id">stock_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_relationship-stock_relationship_id">stock_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock. </td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock. </td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock. </td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock. </td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">stock_relationship.value is for additional notes or comments. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_relationship-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">stock_relationship.value is for additional notes or comments. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_relationship-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1072,18 +954,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>stock_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_relationship_idx2</td>
-	<td>object_id</td>
+	<td>stock_relationship_idx2</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_relationship_idx3</td>
-	<td>type_id</td>
+	<td>stock_relationship_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1104,48 +983,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_relationship_id</td>
+	<td>NOT NULL</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, rank</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1158,12 +1028,11 @@
 
 <a name="stock_relationship_cvterm" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_relationship_cvterm
-</h3></td>
-		<a name="stock_relationship_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_relationship_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1205,39 +1074,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relationship_cvterm_id">stock_relationship_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relationship_cvterm_id">stock_relationship_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relationship_id">stock_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock_relationship-stock_relationship_id">stock_relationship.stock_relationship_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_cvterm-stock_relationship_id">stock_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#stock_relationship-stock_relationship_id">stock_relationship.stock_relationship_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship_cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship_cvterm-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_cvterm-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -1258,33 +1107,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_relationship_cvterm_id</td>
+	<td>NOT NULL</td><td>stock_relationship_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_relationship_id</td>
+	<td>NOT NULL</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_relationship_id</td>
+	<td>FOREIGN KEY</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1297,12 +1140,11 @@
 
 <a name="stock_relationship_pub" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_relationship_pub
-</h3></td>
-		<a name="stock_relationship_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_relationship_pub"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1344,30 +1186,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship_pub-stock_relationship_pub_id">stock_relationship_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_relationship_pub-stock_relationship_pub_id">stock_relationship_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_relationship_pub-stock_relationship_id">stock_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock_relationship-stock_relationship_id">stock_relationship.stock_relationship_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_pub-stock_relationship_id">stock_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock_relationship-stock_relationship_id">stock_relationship.stock_relationship_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_relationship_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="stock_relationship_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -1388,13 +1215,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_relationship_pub_idx1</td>
-	<td>stock_relationship_id</td>
+	<td>stock_relationship_pub_idx1</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_relationship_pub_idx2</td>
-	<td>pub_id</td>
+	<td>stock_relationship_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1415,33 +1240,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_relationship_pub_id</td>
+	<td>NOT NULL</td><td>stock_relationship_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_relationship_id</td>
+	<td>NOT NULL</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_relationship_id</td>
+	<td>FOREIGN KEY</td><td>stock_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_relationship_id, pub_id</td>
+	<td>UNIQUE</td><td>stock_relationship_id, pub_id</td>
 </tr>
 
 </table>
@@ -1458,8 +1277,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_dbxref
-</h3></td>
-		<a name="stock_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_dbxref"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1501,39 +1319,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_dbxref-stock_dbxref_id">stock_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_dbxref-stock_dbxref_id">stock_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_dbxref-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_dbxref-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="stock_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_dbxref-is_current">is_current</a></td>
-	<td class="FieldCellType">boolean</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">true</td>
-	<td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_dbxref-is_current">is_current</a></td> <td class="FieldCellType">boolean</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">true</td> <td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1554,13 +1352,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_dbxref_idx1</td>
-	<td>stock_id</td>
+	<td>stock_dbxref_idx1</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_dbxref_idx2</td>
-	<td>dbxref_id</td>
+	<td>stock_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -1581,38 +1377,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_dbxref_id</td>
+	<td>NOT NULL</td><td>stock_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_current</td>
+	<td>NOT NULL</td><td>is_current</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_id, dbxref_id</td>
+	<td>UNIQUE</td><td>stock_id, dbxref_id</td>
 </tr>
 
 </table>
@@ -1629,8 +1418,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_cvterm
-</h3></td>
-		<a name="stock_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1672,57 +1460,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvterm-stock_cvterm_id">stock_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_cvterm-stock_cvterm_id">stock_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_cvterm-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_cvterm-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock_cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_cvterm-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="stock_cvterm-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvterm-is_not">is_not</a></td>
-	<td class="FieldCellType">boolean</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">false</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_cvterm-is_not">is_not</a></td> <td class="FieldCellType">boolean</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">false</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_cvterm-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_cvterm-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1743,18 +1501,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_cvterm_idx1</td>
-	<td>stock_id</td>
+	<td>stock_cvterm_idx1</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_cvterm_idx2</td>
-	<td>cvterm_id</td>
+	<td>stock_cvterm_idx2</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_cvterm_idx3</td>
-	<td>pub_id</td>
+	<td>stock_cvterm_idx3</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1775,53 +1530,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_cvterm_id</td>
+	<td>NOT NULL</td><td>stock_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_not</td>
+	<td>NOT NULL</td><td>is_not</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_id, cvterm_id, pub_id, rank</td>
+	<td>UNIQUE</td><td>stock_id, cvterm_id, pub_id, rank</td>
 </tr>
 
 </table>
@@ -1838,8 +1583,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_cvtermprop
-</h3></td>
-		<a name="stock_cvtermprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_cvtermprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1885,57 +1629,32 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvtermprop-stock_cvtermprop_id">stock_cvtermprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_cvtermprop-stock_cvtermprop_id">stock_cvtermprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_cvtermprop-stock_cvterm_id">stock_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock_cvterm-stock_cvterm_id">stock_cvterm.stock_cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock_cvtermprop-stock_cvterm_id">stock_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock_cvterm-stock_cvterm_id">stock_cvterm.stock_cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvtermprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
+	<td class="FieldCellName"><a name="stock_cvtermprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the
 property/slot is a cvterm. The meaning of the property is defined in
-that cvterm. cvterms may come from the OBO evidence code cv. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+that cvterm. cvterms may come from the OBO evidence code cv. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_cvtermprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">The value of the
+	<td class="FieldCellName"><a name="stock_cvtermprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the
 property, represented as text. Numeric values are converted to their
 text representation. This is less efficient than using native database
-types, but is easier to query. </td>
-	<td class="FieldCellFK"></td>
+types, but is easier to query. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_cvtermprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
+	<td class="FieldCellName"><a name="stock_cvtermprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value
 ordering. Any stock_cvterm can have multiple values for any particular
 property type - these are ordered in a list using rank, counting from
 zero. For properties that are single-valued rather than multi-valued,
-the default 0 value should be used. </td>
-	<td class="FieldCellFK"></td>
+the default 0 value should be used. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1956,13 +1675,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_cvtermprop_idx1</td>
-	<td>stock_cvterm_id</td>
+	<td>stock_cvtermprop_idx1</td><td>stock_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_cvtermprop_idx2</td>
-	<td>type_id</td>
+	<td>stock_cvtermprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1983,38 +1700,31 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_cvtermprop_id</td>
+	<td>NOT NULL</td><td>stock_cvtermprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_cvterm_id</td>
+	<td>NOT NULL</td><td>stock_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_cvterm_id</td>
+	<td>FOREIGN KEY</td><td>stock_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_cvterm_id, type_id, rank</td>
+	<td>UNIQUE</td><td>stock_cvterm_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -2027,12 +1737,11 @@ the default 0 value should be used. </td>
 
 <a name="stock_genotype" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_genotype
-</h3></td>
-		<a name="stock_genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_genotype"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2075,30 +1784,15 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_genotype-stock_genotype_id">stock_genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_genotype-stock_genotype_id">stock_genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_genotype-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stock_genotype-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_genotype-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="stock_genotype-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 </table>
@@ -2119,13 +1813,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_genotype_idx1</td>
-	<td>stock_id</td>
+	<td>stock_genotype_idx1</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_genotype_idx2</td>
-	<td>genotype_id</td>
+	<td>stock_genotype_idx2</td><td>genotype_id</td>
 </tr>
 
 </table>
@@ -2146,33 +1838,27 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_genotype_id</td>
+	<td>NOT NULL</td><td>stock_genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_id, genotype_id</td>
+	<td>UNIQUE</td><td>stock_id, genotype_id</td>
 </tr>
 
 </table>
@@ -2189,8 +1875,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stockcollection
-</h3></td>
-		<a name="stockcollection"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stockcollection"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2232,48 +1917,23 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollection-stockcollection_id">stockcollection_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollection-stockcollection_id">stockcollection_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockcollection-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, type_id is the collection type cv. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stockcollection-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, type_id is the collection type cv. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollection-contact_id">contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">contact_id links to the contact information for the collection. </td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="stockcollection-contact_id">contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">contact_id links to the contact information for the collection. </td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockcollection-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">name is the collection. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollection-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">name is the collection. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollection-uniquename">uniquename</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, uniqename is the value of the collection cv. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollection-uniquename">uniquename</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, uniqename is the value of the collection cv. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2294,23 +1954,19 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_name_ind1</td>
-	<td>name</td>
+	<td>stockcollection_name_ind1</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_idx1</td>
-	<td>contact_id</td>
+	<td>stockcollection_idx1</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_idx2</td>
-	<td>type_id</td>
+	<td>stockcollection_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_idx3</td>
-	<td>uniquename</td>
+	<td>stockcollection_idx3</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -2331,33 +1987,27 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockcollection_id</td>
+	<td>NOT NULL</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>contact_id</td>
+	<td>FOREIGN KEY</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>uniquename</td>
+	<td>NOT NULL</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>uniquename, type_id</td>
+	<td>UNIQUE</td><td>uniquename, type_id</td>
 </tr>
 
 </table>
@@ -2374,8 +2024,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stockcollectionprop
-</h3></td>
-		<a name="stockcollectionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stockcollectionprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2419,48 +2068,23 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollectionprop-stockcollectionprop_id">stockcollectionprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollectionprop-stockcollectionprop_id">stockcollectionprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockcollectionprop-stockcollection_id">stockcollection_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stockcollection-stockcollection_id">stockcollection.stockcollection_id</a></td>
+	<td class="FieldCellName"><a name="stockcollectionprop-stockcollection_id">stockcollection_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stockcollection-stockcollection_id">stockcollection.stockcollection_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollectionprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv for the type_id is "stockcollection property type". </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stockcollectionprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The cv for the type_id is "stockcollection property type". </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockcollectionprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollectionprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollectionprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollectionprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2481,13 +2105,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollectionprop_idx1</td>
-	<td>stockcollection_id</td>
+	<td>stockcollectionprop_idx1</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollectionprop_idx2</td>
-	<td>type_id</td>
+	<td>stockcollectionprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2508,38 +2130,31 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockcollectionprop_id</td>
+	<td>NOT NULL</td><td>stockcollectionprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockcollection_id</td>
+	<td>NOT NULL</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stockcollection_id</td>
+	<td>FOREIGN KEY</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stockcollection_id, type_id, rank</td>
+	<td>UNIQUE</td><td>stockcollection_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -2556,8 +2171,7 @@ the default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stockcollection_stock
-</h3></td>
-		<a name="stockcollection_stock"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stockcollection_stock"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2600,30 +2214,15 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollection_stock-stockcollection_stock_id">stockcollection_stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stockcollection_stock-stockcollection_stock_id">stockcollection_stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stockcollection_stock-stockcollection_id">stockcollection_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stockcollection-stockcollection_id">stockcollection.stockcollection_id</a></td>
+	<td class="FieldCellName"><a name="stockcollection_stock-stockcollection_id">stockcollection_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stockcollection-stockcollection_id">stockcollection.stockcollection_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stockcollection_stock-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="stockcollection_stock-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 </table>
@@ -2644,13 +2243,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_stock_idx1</td>
-	<td>stockcollection_id</td>
+	<td>stockcollection_stock_idx1</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stockcollection_stock_idx2</td>
-	<td>stock_id</td>
+	<td>stockcollection_stock_idx2</td><td>stock_id</td>
 </tr>
 
 </table>
@@ -2671,33 +2268,27 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockcollection_stock_id</td>
+	<td>NOT NULL</td><td>stockcollection_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stockcollection_id</td>
+	<td>NOT NULL</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stockcollection_id</td>
+	<td>FOREIGN KEY</td><td>stockcollection_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stockcollection_id, stock_id</td>
+	<td>UNIQUE</td><td>stockcollection_id, stock_id</td>
 </tr>
 
 </table>
@@ -2710,12 +2301,11 @@ the default 0 value should be used. </td>
 
 <a name="stock_dbxrefprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	stock_dbxrefprop
-</h3></td>
-		<a name="stock_dbxrefprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="stock_dbxrefprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2761,48 +2351,23 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxrefprop_id">stock_dbxrefprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxrefprop_id">stock_dbxrefprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxref_id">stock_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#stock_dbxref-stock_dbxref_id">stock_dbxref.stock_dbxref_id</a></td>
+	<td class="FieldCellName"><a name="stock_dbxrefprop-stock_dbxref_id">stock_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock_dbxref-stock_dbxref_id">stock_dbxref.stock_dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_dbxrefprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="stock_dbxrefprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="stock_dbxrefprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_dbxrefprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="stock_dbxrefprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="stock_dbxrefprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2823,13 +2388,11 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_dbxrefprop_idx1</td>
-	<td>stock_dbxref_id</td>
+	<td>stock_dbxrefprop_idx1</td><td>stock_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>stock_dbxrefprop_idx2</td>
-	<td>type_id</td>
+	<td>stock_dbxrefprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2850,38 +2413,607 @@ the default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_dbxrefprop_id</td>
+	<td>NOT NULL</td><td>stock_dbxrefprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_dbxref_id</td>
+	<td>NOT NULL</td><td>stock_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_dbxref_id</td>
+	<td>FOREIGN KEY</td><td>stock_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>stock_dbxref_id, type_id, rank</td>
+	<td>UNIQUE</td><td>stock_dbxref_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'stockcollection_db'
+ -->
+
+<a name="stockcollection_db" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	stockcollection_db
+</h3></td> <a name="stockcollection_db"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: stockcollection_db <br />
+	================================================ <br />
+	Stock collections may be respresented 
+	by an external online database. This table associates a stock collection with 
+	a database where its member stocks can be found. Individual stock that are part 
+	of this collction should have entries in the stock_dbxref table with the same 
+	db_id record 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stockcollection_db-stockcollection_db_id">stockcollection_db_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stockcollection_db-stockcollection_id">stockcollection_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stockcollection-stockcollection_id">stockcollection.stockcollection_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stockcollection_db-db_id">db_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#db-db_id">db.db_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>stockcollection_db_idx1</td><td>stockcollection_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stockcollection_db_idx2</td><td>db_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stockcollection_db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stockcollection_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>stockcollection_id, db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>stockcollection_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'stock_feature'
+ -->
+
+<a name="stock_feature" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	stock_feature
+</h3></td> <a name="stock_feature"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: stock_feature <br />
+	================================================ <br />
+	Links a stock to a feature. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_feature-stock_feature_id">stock_feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_feature-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_feature-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_feature-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_feature-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_feature_idx1</td><td>stock_feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_feature_idx2</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_feature_idx3</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_feature_idx4</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>feature_id, stock_id, type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'stock_featuremap'
+ -->
+
+<a name="stock_featuremap" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	stock_featuremap
+</h3></td> <a name="stock_featuremap"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: stock_featuremap <br />
+	================================================ <br />
+	Links a featuremap to a stock. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_featuremap-stock_featuremap_id">stock_featuremap_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_featuremap-featuremap_id">featuremap_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#featuremap-featuremap_id">featuremap.featuremap_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_featuremap-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_featuremap-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_featuremap_idx1</td><td>featuremap_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_featuremap_idx2</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_featuremap_idx3</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_featuremap_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>featuremap_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>featuremap_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>featuremap_id, stock_id, type_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'stock_library'
+ -->
+
+<a name="stock_library" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	stock_library
+</h3></td> <a name="stock_library"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: stock_library <br />
+	================================================ <br />
+	Links a stock with a library. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_library-stock_library_id">stock_library_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="stock_library-library_id">library_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#library-library_id">library.library_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="stock_library-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_library_idx1</td><td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>stock_library_idx2</td><td>stock_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>library_id, stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>library_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 </table>
@@ -2889,7 +3021,7 @@ the default 0 value should be used. </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

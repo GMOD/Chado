@@ -470,12 +470,11 @@
 
 <a name="mageml" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	mageml
-</h3></td>
-		<a name="mageml"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="mageml"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -497,7 +496,7 @@
 	:import pub from pub <br />
 	:import organism from organism <br />
 	:import contact from contact <br />
-	:import dbxref from general <br />
+	:import dbxref from db <br />
 	:import tableinfo from general <br />
 	:import project from project <br />
 	:import analysis from companalysis <br />
@@ -532,30 +531,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="mageml-mageml_id">mageml_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="mageml-mageml_id">mageml_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="mageml-mage_package">mage_package</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="mageml-mage_package">mage_package</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="mageml-mage_ml">mage_ml</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="mageml-mage_ml">mage_ml</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -576,18 +560,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>mageml_id</td>
+	<td>NOT NULL</td><td>mageml_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>mage_package</td>
+	<td>NOT NULL</td><td>mage_package</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>mage_ml</td>
+	<td>NOT NULL</td><td>mage_ml</td>
 </tr>
 
 </table>
@@ -604,8 +585,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	magedocumentation
-</h3></td>
-		<a name="magedocumentation"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="magedocumentation"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -647,48 +627,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="magedocumentation-magedocumentation_id">magedocumentation_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="magedocumentation-magedocumentation_id">magedocumentation_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="magedocumentation-mageml_id">mageml_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#mageml-mageml_id">mageml.mageml_id</a></td>
+	<td class="FieldCellName"><a name="magedocumentation-mageml_id">mageml_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#mageml-mageml_id">mageml.mageml_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="magedocumentation-tableinfo_id">tableinfo_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#tableinfo-tableinfo_id">tableinfo.tableinfo_id</a></td>
+	<td class="FieldCellName"><a name="magedocumentation-tableinfo_id">tableinfo_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#tableinfo-tableinfo_id">tableinfo.tableinfo_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="magedocumentation-row_id">row_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="magedocumentation-row_id">row_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="magedocumentation-mageidentifier">mageidentifier</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="magedocumentation-mageidentifier">mageidentifier</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -709,18 +664,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>magedocumentation_idx1</td>
-	<td>mageml_id</td>
+	<td>magedocumentation_idx1</td><td>mageml_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>magedocumentation_idx2</td>
-	<td>tableinfo_id</td>
+	<td>magedocumentation_idx2</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>magedocumentation_idx3</td>
-	<td>row_id</td>
+	<td>magedocumentation_idx3</td><td>row_id</td>
 </tr>
 
 </table>
@@ -741,38 +693,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>magedocumentation_id</td>
+	<td>NOT NULL</td><td>magedocumentation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>mageml_id</td>
+	<td>NOT NULL</td><td>mageml_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>mageml_id</td>
+	<td>FOREIGN KEY</td><td>mageml_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>tableinfo_id</td>
+	<td>NOT NULL</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>tableinfo_id</td>
+	<td>FOREIGN KEY</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>row_id</td>
+	<td>NOT NULL</td><td>row_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>mageidentifier</td>
+	<td>NOT NULL</td><td>mageidentifier</td>
 </tr>
 
 </table>
@@ -785,12 +730,11 @@
 
 <a name="protocol" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	protocol
-</h3></td>
-		<a name="protocol"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="protocol"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -832,84 +776,39 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocol-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocol-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="protocol-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocol-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="protocol-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocol-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="protocol-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocol-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocol-uri">uri</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-uri">uri</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocol-protocoldescription">protocoldescription</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-protocoldescription">protocoldescription</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocol-hardwaredescription">hardwaredescription</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-hardwaredescription">hardwaredescription</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocol-softwaredescription">softwaredescription</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocol-softwaredescription">softwaredescription</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -930,18 +829,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>protocol_idx1</td>
-	<td>type_id</td>
+	<td>protocol_idx1</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>protocol_idx2</td>
-	<td>pub_id</td>
+	<td>protocol_idx2</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>protocol_idx3</td>
-	<td>dbxref_id</td>
+	<td>protocol_idx3</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -962,38 +858,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>protocol_id</td>
+	<td>NOT NULL</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -1010,8 +899,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	protocolparam
-</h3></td>
-		<a name="protocolparam"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="protocolparam"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1054,66 +942,31 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocolparam-protocolparam_id">protocolparam_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocolparam-protocolparam_id">protocolparam_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocolparam-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="protocolparam-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocolparam-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocolparam-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocolparam-datatype_id">datatype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="protocolparam-datatype_id">datatype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocolparam-unittype_id">unittype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="protocolparam-unittype_id">unittype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="protocolparam-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocolparam-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="protocolparam-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="protocolparam-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1134,18 +987,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>protocolparam_idx1</td>
-	<td>protocol_id</td>
+	<td>protocolparam_idx1</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>protocolparam_idx2</td>
-	<td>datatype_id</td>
+	<td>protocolparam_idx2</td><td>datatype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>protocolparam_idx3</td>
-	<td>unittype_id</td>
+	<td>protocolparam_idx3</td><td>unittype_id</td>
 </tr>
 
 </table>
@@ -1166,38 +1016,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>protocolparam_id</td>
+	<td>NOT NULL</td><td>protocolparam_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>protocol_id</td>
+	<td>NOT NULL</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>datatype_id</td>
+	<td>FOREIGN KEY</td><td>datatype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>unittype_id</td>
+	<td>FOREIGN KEY</td><td>unittype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 </table>
@@ -1214,8 +1057,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	channel
-</h3></td>
-		<a name="channel"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="channel"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1257,30 +1099,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="channel-channel_id">channel_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="channel-channel_id">channel_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="channel-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="channel-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="channel-definition">definition</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="channel-definition">definition</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1301,23 +1128,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>channel_id</td>
+	<td>NOT NULL</td><td>channel_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>definition</td>
+	<td>NOT NULL</td><td>definition</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -1334,8 +1157,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	arraydesign
-</h3></td>
-		<a name="arraydesign"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="arraydesign"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1380,165 +1202,75 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-arraydesign_id">arraydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-arraydesign_id">arraydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-manufacturer_id">manufacturer_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="arraydesign-manufacturer_id">manufacturer_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-platformtype_id">platformtype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="arraydesign-platformtype_id">platformtype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-substratetype_id">substratetype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="arraydesign-substratetype_id">substratetype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="arraydesign-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="arraydesign-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-version">version</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-version">version</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-array_dimensions">array_dimensions</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-array_dimensions">array_dimensions</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-element_dimensions">element_dimensions</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-element_dimensions">element_dimensions</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-num_of_elements">num_of_elements</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_of_elements">num_of_elements</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-num_array_columns">num_array_columns</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_array_columns">num_array_columns</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-num_array_rows">num_array_rows</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_array_rows">num_array_rows</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-num_grid_columns">num_grid_columns</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_grid_columns">num_grid_columns</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-num_grid_rows">num_grid_rows</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_grid_rows">num_grid_rows</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesign-num_sub_columns">num_sub_columns</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_sub_columns">num_sub_columns</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesign-num_sub_rows">num_sub_rows</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesign-num_sub_rows">num_sub_rows</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1559,28 +1291,23 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesign_idx1</td>
-	<td>manufacturer_id</td>
+	<td>arraydesign_idx1</td><td>manufacturer_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesign_idx2</td>
-	<td>platformtype_id</td>
+	<td>arraydesign_idx2</td><td>platformtype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesign_idx3</td>
-	<td>substratetype_id</td>
+	<td>arraydesign_idx3</td><td>substratetype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesign_idx4</td>
-	<td>protocol_id</td>
+	<td>arraydesign_idx4</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesign_idx5</td>
-	<td>dbxref_id</td>
+	<td>arraydesign_idx5</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -1601,53 +1328,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_id</td>
+	<td>NOT NULL</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>manufacturer_id</td>
+	<td>NOT NULL</td><td>manufacturer_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>manufacturer_id</td>
+	<td>FOREIGN KEY</td><td>manufacturer_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>platformtype_id</td>
+	<td>NOT NULL</td><td>platformtype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>platformtype_id</td>
+	<td>FOREIGN KEY</td><td>platformtype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>substratetype_id</td>
+	<td>FOREIGN KEY</td><td>substratetype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -1664,8 +1381,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	arraydesignprop
-</h3></td>
-		<a name="arraydesignprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="arraydesignprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1707,48 +1423,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesignprop-arraydesignprop_id">arraydesignprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesignprop-arraydesignprop_id">arraydesignprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesignprop-arraydesign_id">arraydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
+	<td class="FieldCellName"><a name="arraydesignprop-arraydesign_id">arraydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesignprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="arraydesignprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="arraydesignprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesignprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="arraydesignprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="arraydesignprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1769,13 +1460,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesignprop_idx1</td>
-	<td>arraydesign_id</td>
+	<td>arraydesignprop_idx1</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>arraydesignprop_idx2</td>
-	<td>type_id</td>
+	<td>arraydesignprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1796,38 +1485,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesignprop_id</td>
+	<td>NOT NULL</td><td>arraydesignprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_id</td>
+	<td>NOT NULL</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>arraydesign_id</td>
+	<td>FOREIGN KEY</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>arraydesign_id, type_id, rank</td>
+	<td>UNIQUE</td><td>arraydesign_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1840,12 +1522,11 @@
 
 <a name="assay" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	assay
-</h3></td>
-		<a name="assay"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="assay"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1889,93 +1570,43 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay-arraydesign_id">arraydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
+	<td class="FieldCellName"><a name="assay-arraydesign_id">arraydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="assay-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay-assaydate">assaydate</a></td>
-	<td class="FieldCellType">timestamp</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-assaydate">assaydate</a></td> <td class="FieldCellType">timestamp</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">current_timestamp</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay-arrayidentifier">arrayidentifier</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-arrayidentifier">arrayidentifier</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay-arraybatchidentifier">arraybatchidentifier</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-arraybatchidentifier">arraybatchidentifier</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay-operator_id">operator_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="assay-operator_id">operator_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="assay-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1996,23 +1627,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_idx1</td>
-	<td>arraydesign_id</td>
+	<td>assay_idx1</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_idx2</td>
-	<td>protocol_id</td>
+	<td>assay_idx2</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_idx3</td>
-	<td>operator_id</td>
+	<td>assay_idx3</td><td>operator_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_idx4</td>
-	<td>dbxref_id</td>
+	<td>assay_idx4</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2033,43 +1660,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_id</td>
+	<td>NOT NULL</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>arraydesign_id</td>
+	<td>FOREIGN KEY</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>operator_id</td>
+	<td>NOT NULL</td><td>operator_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>operator_id</td>
+	<td>FOREIGN KEY</td><td>operator_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -2086,8 +1705,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	assayprop
-</h3></td>
-		<a name="assayprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="assayprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2129,48 +1747,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assayprop-assayprop_id">assayprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assayprop-assayprop_id">assayprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assayprop-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="assayprop-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assayprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="assayprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assayprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assayprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assayprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assayprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2191,13 +1784,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>assayprop_idx1</td>
-	<td>assay_id</td>
+	<td>assayprop_idx1</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assayprop_idx2</td>
-	<td>type_id</td>
+	<td>assayprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2218,38 +1809,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assayprop_id</td>
+	<td>NOT NULL</td><td>assayprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>assay_id, type_id, rank</td>
+	<td>UNIQUE</td><td>assay_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -2266,8 +1850,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	assay_project
-</h3></td>
-		<a name="assay_project"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="assay_project"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2309,30 +1892,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay_project-assay_project_id">assay_project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay_project-assay_project_id">assay_project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay_project-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="assay_project-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay_project-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="assay_project-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 </table>
@@ -2353,13 +1921,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_project_idx1</td>
-	<td>assay_id</td>
+	<td>assay_project_idx1</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_project_idx2</td>
-	<td>project_id</td>
+	<td>assay_project_idx2</td><td>project_id</td>
 </tr>
 
 </table>
@@ -2380,33 +1946,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_project_id</td>
+	<td>NOT NULL</td><td>assay_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>assay_id, project_id</td>
+	<td>UNIQUE</td><td>assay_id, project_id</td>
 </tr>
 
 </table>
@@ -2423,8 +1983,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	biomaterial
-</h3></td>
-		<a name="biomaterial"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="biomaterial"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2466,57 +2025,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial-taxon_id">taxon_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial-taxon_id">taxon_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial-biosourceprovider_id">biosourceprovider_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial-biosourceprovider_id">biosourceprovider_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2537,18 +2066,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_idx1</td>
-	<td>taxon_id</td>
+	<td>biomaterial_idx1</td><td>taxon_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_idx2</td>
-	<td>biosourceprovider_id</td>
+	<td>biomaterial_idx2</td><td>biosourceprovider_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_idx3</td>
-	<td>dbxref_id</td>
+	<td>biomaterial_idx3</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2569,28 +2095,23 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>taxon_id</td>
+	<td>FOREIGN KEY</td><td>taxon_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biosourceprovider_id</td>
+	<td>FOREIGN KEY</td><td>biosourceprovider_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -2607,8 +2128,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	biomaterial_relationship
-</h3></td>
-		<a name="biomaterial_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="biomaterial_relationship"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2650,39 +2170,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_relationship-biomaterial_relationship_id">biomaterial_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial_relationship-biomaterial_relationship_id">biomaterial_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 </table>
@@ -2703,18 +2203,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>biomaterial_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_relationship_idx2</td>
-	<td>object_id</td>
+	<td>biomaterial_relationship_idx2</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_relationship_idx3</td>
-	<td>type_id</td>
+	<td>biomaterial_relationship_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2735,43 +2232,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_relationship_id</td>
+	<td>NOT NULL</td><td>biomaterial_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id</td>
 </tr>
 
 </table>
@@ -2784,12 +2273,11 @@
 
 <a name="biomaterialprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	biomaterialprop
-</h3></td>
-		<a name="biomaterialprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="biomaterialprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2831,48 +2319,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterialprop-biomaterialprop_id">biomaterialprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterialprop-biomaterialprop_id">biomaterialprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterialprop-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="biomaterialprop-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterialprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="biomaterialprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterialprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterialprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterialprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterialprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -2893,13 +2356,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterialprop_idx1</td>
-	<td>biomaterial_id</td>
+	<td>biomaterialprop_idx1</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterialprop_idx2</td>
-	<td>type_id</td>
+	<td>biomaterialprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2920,38 +2381,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterialprop_id</td>
+	<td>NOT NULL</td><td>biomaterialprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biomaterial_id</td>
+	<td>FOREIGN KEY</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>biomaterial_id, type_id, rank</td>
+	<td>UNIQUE</td><td>biomaterial_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -2964,12 +2418,11 @@
 
 <a name="biomaterial_dbxref" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	biomaterial_dbxref
-</h3></td>
-		<a name="biomaterial_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="biomaterial_dbxref"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3010,30 +2463,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_dbxref-biomaterial_dbxref_id">biomaterial_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial_dbxref-biomaterial_dbxref_id">biomaterial_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_dbxref-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_dbxref-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 </table>
@@ -3054,13 +2492,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_dbxref_idx1</td>
-	<td>biomaterial_id</td>
+	<td>biomaterial_dbxref_idx1</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_dbxref_idx2</td>
-	<td>dbxref_id</td>
+	<td>biomaterial_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -3081,33 +2517,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_dbxref_id</td>
+	<td>NOT NULL</td><td>biomaterial_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biomaterial_id</td>
+	<td>FOREIGN KEY</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>biomaterial_id, dbxref_id</td>
+	<td>UNIQUE</td><td>biomaterial_id, dbxref_id</td>
 </tr>
 
 </table>
@@ -3120,12 +2550,11 @@
 
 <a name="treatment" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	treatment
-</h3></td>
-		<a name="treatment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="treatment"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3168,57 +2597,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="treatment-treatment_id">treatment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="treatment-treatment_id">treatment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="treatment-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="treatment-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="treatment-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="treatment-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="treatment-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="treatment-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="treatment-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="treatment-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="treatment-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="treatment-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -3239,18 +2638,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>treatment_idx1</td>
-	<td>biomaterial_id</td>
+	<td>treatment_idx1</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>treatment_idx2</td>
-	<td>type_id</td>
+	<td>treatment_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>treatment_idx3</td>
-	<td>protocol_id</td>
+	<td>treatment_idx3</td><td>protocol_id</td>
 </tr>
 
 </table>
@@ -3271,38 +2667,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>treatment_id</td>
+	<td>NOT NULL</td><td>treatment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biomaterial_id</td>
+	<td>FOREIGN KEY</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 </table>
@@ -3319,8 +2708,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	biomaterial_treatment
-</h3></td>
-		<a name="biomaterial_treatment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="biomaterial_treatment"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3362,57 +2750,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_treatment-biomaterial_treatment_id">biomaterial_treatment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-biomaterial_treatment_id">biomaterial_treatment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_treatment-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_treatment-treatment_id">treatment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#treatment-treatment_id">treatment.treatment_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-treatment_id">treatment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#treatment-treatment_id">treatment.treatment_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_treatment-unittype_id">unittype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-unittype_id">unittype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="biomaterial_treatment-value">value</a></td>
-	<td class="FieldCellType">float</td>
-	<td class="FieldCellSize">15</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-value">value</a></td> <td class="FieldCellType">float</td> <td class="FieldCellSize">15</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="biomaterial_treatment-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="biomaterial_treatment-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -3433,18 +2791,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_treatment_idx1</td>
-	<td>biomaterial_id</td>
+	<td>biomaterial_treatment_idx1</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_treatment_idx2</td>
-	<td>treatment_id</td>
+	<td>biomaterial_treatment_idx2</td><td>treatment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>biomaterial_treatment_idx3</td>
-	<td>unittype_id</td>
+	<td>biomaterial_treatment_idx3</td><td>unittype_id</td>
 </tr>
 
 </table>
@@ -3465,43 +2820,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_treatment_id</td>
+	<td>NOT NULL</td><td>biomaterial_treatment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biomaterial_id</td>
+	<td>FOREIGN KEY</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>treatment_id</td>
+	<td>NOT NULL</td><td>treatment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>treatment_id</td>
+	<td>FOREIGN KEY</td><td>treatment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>unittype_id</td>
+	<td>FOREIGN KEY</td><td>unittype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>biomaterial_id, treatment_id</td>
+	<td>UNIQUE</td><td>biomaterial_id, treatment_id</td>
 </tr>
 
 </table>
@@ -3514,12 +2861,11 @@
 
 <a name="assay_biomaterial" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	assay_biomaterial
-</h3></td>
-		<a name="assay_biomaterial"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="assay_biomaterial"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3561,48 +2907,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay_biomaterial-assay_biomaterial_id">assay_biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay_biomaterial-assay_biomaterial_id">assay_biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay_biomaterial-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="assay_biomaterial-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay_biomaterial-biomaterial_id">biomaterial_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
+	<td class="FieldCellName"><a name="assay_biomaterial-biomaterial_id">biomaterial_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#biomaterial-biomaterial_id">biomaterial.biomaterial_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="assay_biomaterial-channel_id">channel_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"><a href="#channel-channel_id">channel.channel_id</a></td>
+	<td class="FieldCellName"><a name="assay_biomaterial-channel_id">channel_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"><a href="#channel-channel_id">channel.channel_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="assay_biomaterial-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="assay_biomaterial-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -3623,18 +2944,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_biomaterial_idx1</td>
-	<td>assay_id</td>
+	<td>assay_biomaterial_idx1</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_biomaterial_idx2</td>
-	<td>biomaterial_id</td>
+	<td>assay_biomaterial_idx2</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>assay_biomaterial_idx3</td>
-	<td>channel_id</td>
+	<td>assay_biomaterial_idx3</td><td>channel_id</td>
 </tr>
 
 </table>
@@ -3655,43 +2973,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_biomaterial_id</td>
+	<td>NOT NULL</td><td>assay_biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>biomaterial_id</td>
+	<td>NOT NULL</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>biomaterial_id</td>
+	<td>FOREIGN KEY</td><td>biomaterial_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>channel_id</td>
+	<td>FOREIGN KEY</td><td>channel_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>assay_id, biomaterial_id, channel_id, rank</td>
+	<td>UNIQUE</td><td>assay_id, biomaterial_id, channel_id, rank</td>
 </tr>
 
 </table>
@@ -3708,8 +3018,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	acquisition
-</h3></td>
-		<a name="acquisition"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="acquisition"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3751,66 +3060,31 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition-acquisition_id">acquisition_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition-acquisition_id">acquisition_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="acquisition-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="acquisition-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition-channel_id">channel_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#channel-channel_id">channel.channel_id</a></td>
+	<td class="FieldCellName"><a name="acquisition-channel_id">channel_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#channel-channel_id">channel.channel_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition-acquisitiondate">acquisitiondate</a></td>
-	<td class="FieldCellType">timestamp</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition-acquisitiondate">acquisitiondate</a></td> <td class="FieldCellType">timestamp</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">current_timestamp</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition-uri">uri</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition-uri">uri</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -3831,18 +3105,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_idx1</td>
-	<td>assay_id</td>
+	<td>acquisition_idx1</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_idx2</td>
-	<td>protocol_id</td>
+	<td>acquisition_idx2</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_idx3</td>
-	<td>channel_id</td>
+	<td>acquisition_idx3</td><td>channel_id</td>
 </tr>
 
 </table>
@@ -3863,33 +3134,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>acquisition_id</td>
+	<td>NOT NULL</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>channel_id</td>
+	<td>FOREIGN KEY</td><td>channel_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -3902,12 +3167,11 @@
 
 <a name="acquisitionprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	acquisitionprop
-</h3></td>
-		<a name="acquisitionprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="acquisitionprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -3949,48 +3213,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisitionprop-acquisitionprop_id">acquisitionprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisitionprop-acquisitionprop_id">acquisitionprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisitionprop-acquisition_id">acquisition_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
+	<td class="FieldCellName"><a name="acquisitionprop-acquisition_id">acquisition_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisitionprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="acquisitionprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisitionprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisitionprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisitionprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisitionprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -4011,13 +3250,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisitionprop_idx1</td>
-	<td>acquisition_id</td>
+	<td>acquisitionprop_idx1</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisitionprop_idx2</td>
-	<td>type_id</td>
+	<td>acquisitionprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -4038,38 +3275,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>acquisitionprop_id</td>
+	<td>NOT NULL</td><td>acquisitionprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>acquisition_id</td>
+	<td>NOT NULL</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>acquisition_id</td>
+	<td>FOREIGN KEY</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>acquisition_id, type_id, rank</td>
+	<td>UNIQUE</td><td>acquisition_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -4086,8 +3316,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	acquisition_relationship
-</h3></td>
-		<a name="acquisition_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="acquisition_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -4129,57 +3358,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition_relationship-acquisition_relationship_id">acquisition_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-acquisition_relationship_id">acquisition_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="acquisition_relationship-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="acquisition_relationship-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="acquisition_relationship-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -4200,18 +3399,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>acquisition_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_relationship_idx2</td>
-	<td>type_id</td>
+	<td>acquisition_relationship_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>acquisition_relationship_idx3</td>
-	<td>object_id</td>
+	<td>acquisition_relationship_idx3</td><td>object_id</td>
 </tr>
 
 </table>
@@ -4232,48 +3428,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>acquisition_relationship_id</td>
+	<td>NOT NULL</td><td>acquisition_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, rank</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -4290,8 +3477,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	quantification
-</h3></td>
-		<a name="quantification"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="quantification"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -4333,75 +3519,35 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification-quantification_id">quantification_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantification-quantification_id">quantification_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification-acquisition_id">acquisition_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
+	<td class="FieldCellName"><a name="quantification-acquisition_id">acquisition_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#acquisition-acquisition_id">acquisition.acquisition_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification-operator_id">operator_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="quantification-operator_id">operator_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification-protocol_id">protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
+	<td class="FieldCellName"><a name="quantification-protocol_id">protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#protocol-protocol_id">protocol.protocol_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification-analysis_id">analysis_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+	<td class="FieldCellName"><a name="quantification-analysis_id">analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification-quantificationdate">quantificationdate</a></td>
-	<td class="FieldCellType">timestamp</td>
-	<td class="FieldCellSize">0</td>
-	<td class="FieldCellDefault">current_timestamp</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantification-quantificationdate">quantificationdate</a></td> <td class="FieldCellType">timestamp</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">current_timestamp</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantification-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification-uri">uri</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantification-uri">uri</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -4422,23 +3568,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_idx1</td>
-	<td>acquisition_id</td>
+	<td>quantification_idx1</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_idx2</td>
-	<td>operator_id</td>
+	<td>quantification_idx2</td><td>operator_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_idx3</td>
-	<td>protocol_id</td>
+	<td>quantification_idx3</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_idx4</td>
-	<td>analysis_id</td>
+	<td>quantification_idx4</td><td>analysis_id</td>
 </tr>
 
 </table>
@@ -4459,43 +3601,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>quantification_id</td>
+	<td>NOT NULL</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>acquisition_id</td>
+	<td>NOT NULL</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>acquisition_id</td>
+	<td>FOREIGN KEY</td><td>acquisition_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>operator_id</td>
+	<td>FOREIGN KEY</td><td>operator_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>protocol_id</td>
+	<td>FOREIGN KEY</td><td>protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>analysis_id</td>
+	<td>NOT NULL</td><td>analysis_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>analysis_id</td>
+	<td>FOREIGN KEY</td><td>analysis_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name, analysis_id</td>
+	<td>UNIQUE</td><td>name, analysis_id</td>
 </tr>
 
 </table>
@@ -4512,8 +3646,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	quantificationprop
-</h3></td>
-		<a name="quantificationprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="quantificationprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -4555,48 +3688,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantificationprop-quantificationprop_id">quantificationprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantificationprop-quantificationprop_id">quantificationprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantificationprop-quantification_id">quantification_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
+	<td class="FieldCellName"><a name="quantificationprop-quantification_id">quantification_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantificationprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="quantificationprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantificationprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantificationprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantificationprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantificationprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -4617,13 +3725,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>quantificationprop_idx1</td>
-	<td>quantification_id</td>
+	<td>quantificationprop_idx1</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantificationprop_idx2</td>
-	<td>type_id</td>
+	<td>quantificationprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -4644,38 +3750,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>quantificationprop_id</td>
+	<td>NOT NULL</td><td>quantificationprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>quantification_id</td>
+	<td>NOT NULL</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>quantification_id</td>
+	<td>FOREIGN KEY</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>quantification_id, type_id, rank</td>
+	<td>UNIQUE</td><td>quantification_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -4692,8 +3791,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	quantification_relationship
-</h3></td>
-		<a name="quantification_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="quantification_relationship"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -4735,39 +3833,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification_relationship-quantification_relationship_id">quantification_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="quantification_relationship-quantification_relationship_id">quantification_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
+	<td class="FieldCellName"><a name="quantification_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="quantification_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="quantification_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="quantification_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
+	<td class="FieldCellName"><a name="quantification_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
 </tr>
 
 </table>
@@ -4788,18 +3866,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>quantification_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_relationship_idx2</td>
-	<td>type_id</td>
+	<td>quantification_relationship_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>quantification_relationship_idx3</td>
-	<td>object_id</td>
+	<td>quantification_relationship_idx3</td><td>object_id</td>
 </tr>
 
 </table>
@@ -4820,43 +3895,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>quantification_relationship_id</td>
+	<td>NOT NULL</td><td>quantification_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id</td>
 </tr>
 
 </table>
@@ -4873,8 +3940,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	control
-</h3></td>
-		<a name="control"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="control"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -4916,75 +3982,35 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="control-control_id">control_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="control-control_id">control_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="control-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="control-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="control-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="control-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="control-tableinfo_id">tableinfo_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#tableinfo-tableinfo_id">tableinfo.tableinfo_id</a></td>
+	<td class="FieldCellName"><a name="control-tableinfo_id">tableinfo_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#tableinfo-tableinfo_id">tableinfo.tableinfo_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="control-row_id">row_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="control-row_id">row_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="control-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="control-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="control-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="control-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="control-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="control-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -5005,23 +4031,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>control_idx1</td>
-	<td>type_id</td>
+	<td>control_idx1</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>control_idx2</td>
-	<td>assay_id</td>
+	<td>control_idx2</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>control_idx3</td>
-	<td>tableinfo_id</td>
+	<td>control_idx3</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>control_idx4</td>
-	<td>row_id</td>
+	<td>control_idx4</td><td>row_id</td>
 </tr>
 
 </table>
@@ -5042,48 +4064,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>control_id</td>
+	<td>NOT NULL</td><td>control_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>tableinfo_id</td>
+	<td>NOT NULL</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>tableinfo_id</td>
+	<td>FOREIGN KEY</td><td>tableinfo_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>row_id</td>
+	<td>NOT NULL</td><td>row_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 </table>
@@ -5096,12 +4109,11 @@
 
 <a name="element" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	element
-</h3></td>
-		<a name="element"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="element"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -5143,48 +4155,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element-element_id">element_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="element-element_id">element_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="element-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">UNIQUE</td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="element-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">UNIQUE</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element-arraydesign_id">arraydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
+	<td class="FieldCellName"><a name="element-arraydesign_id">arraydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#arraydesign-arraydesign_id">arraydesign.arraydesign_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="element-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="element-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="element-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 </table>
@@ -5205,23 +4192,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>element_idx1</td>
-	<td>feature_id</td>
+	<td>element_idx1</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_idx2</td>
-	<td>arraydesign_id</td>
+	<td>element_idx2</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_idx3</td>
-	<td>type_id</td>
+	<td>element_idx3</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_idx4</td>
-	<td>dbxref_id</td>
+	<td>element_idx4</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -5242,38 +4225,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>element_id</td>
+	<td>NOT NULL</td><td>element_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>arraydesign_id</td>
+	<td>NOT NULL</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>arraydesign_id</td>
+	<td>FOREIGN KEY</td><td>arraydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>feature_id, arraydesign_id</td>
+	<td>UNIQUE</td><td>feature_id, arraydesign_id</td>
 </tr>
 
 </table>
@@ -5290,8 +4266,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	elementresult
-</h3></td>
-		<a name="elementresult"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="elementresult"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -5333,39 +4308,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="elementresult-elementresult_id">elementresult_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="elementresult-elementresult_id">elementresult_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="elementresult-element_id">element_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
+	<td class="FieldCellName"><a name="elementresult-element_id">element_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="elementresult-quantification_id">quantification_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
+	<td class="FieldCellName"><a name="elementresult-quantification_id">quantification_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#quantification-quantification_id">quantification.quantification_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="elementresult-signal">signal</a></td>
-	<td class="FieldCellType">float</td>
-	<td class="FieldCellSize">20</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="elementresult-signal">signal</a></td> <td class="FieldCellType">float</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -5386,18 +4341,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_idx1</td>
-	<td>element_id</td>
+	<td>elementresult_idx1</td><td>element_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_idx2</td>
-	<td>quantification_id</td>
+	<td>elementresult_idx2</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_idx3</td>
-	<td>signal</td>
+	<td>elementresult_idx3</td><td>signal</td>
 </tr>
 
 </table>
@@ -5418,38 +4370,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>elementresult_id</td>
+	<td>NOT NULL</td><td>elementresult_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>element_id</td>
+	<td>NOT NULL</td><td>element_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>element_id</td>
+	<td>FOREIGN KEY</td><td>element_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>quantification_id</td>
+	<td>NOT NULL</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>quantification_id</td>
+	<td>FOREIGN KEY</td><td>quantification_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>signal</td>
+	<td>NOT NULL</td><td>signal</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>element_id, quantification_id</td>
+	<td>UNIQUE</td><td>element_id, quantification_id</td>
 </tr>
 
 </table>
@@ -5466,8 +4411,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	element_relationship
-</h3></td>
-		<a name="element_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="element_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -5509,57 +4453,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element_relationship-element_relationship_id">element_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="element_relationship-element_relationship_id">element_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="element_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
+	<td class="FieldCellName"><a name="element_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="element_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="element_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
+	<td class="FieldCellName"><a name="element_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#element-element_id">element.element_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="element_relationship-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="element_relationship-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="element_relationship-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="element_relationship-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -5580,23 +4494,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>element_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>element_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_relationship_idx2</td>
-	<td>type_id</td>
+	<td>element_relationship_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_relationship_idx3</td>
-	<td>object_id</td>
+	<td>element_relationship_idx3</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>element_relationship_idx4</td>
-	<td>value</td>
+	<td>element_relationship_idx4</td><td>value</td>
 </tr>
 
 </table>
@@ -5617,48 +4527,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>element_relationship_id</td>
+	<td>NOT NULL</td><td>element_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, rank</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -5671,12 +4572,11 @@
 
 <a name="elementresult_relationship" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	elementresult_relationship
-</h3></td>
-		<a name="elementresult_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="elementresult_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -5718,57 +4618,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="elementresult_relationship-elementresult_relationship_id">elementresult_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-elementresult_relationship_id">elementresult_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="elementresult_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#elementresult-elementresult_id">elementresult.elementresult_id</a></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#elementresult-elementresult_id">elementresult.elementresult_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="elementresult_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="elementresult_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#elementresult-elementresult_id">elementresult.elementresult_id</a></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#elementresult-elementresult_id">elementresult.elementresult_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="elementresult_relationship-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="elementresult_relationship-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="elementresult_relationship-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -5789,23 +4659,19 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_relationship_idx1</td>
-	<td>subject_id</td>
+	<td>elementresult_relationship_idx1</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_relationship_idx2</td>
-	<td>type_id</td>
+	<td>elementresult_relationship_idx2</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_relationship_idx3</td>
-	<td>object_id</td>
+	<td>elementresult_relationship_idx3</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>elementresult_relationship_idx4</td>
-	<td>value</td>
+	<td>elementresult_relationship_idx4</td><td>value</td>
 </tr>
 
 </table>
@@ -5826,48 +4692,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>elementresult_relationship_id</td>
+	<td>NOT NULL</td><td>elementresult_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, rank</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -5884,8 +4741,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	study
-</h3></td>
-		<a name="study"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="study"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -5927,57 +4783,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="study-study_id">study_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="study-study_id">study_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="study-contact_id">contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="study-contact_id">contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="study-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="study-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="study-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="study-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="study-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="study-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="study-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="study-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -5998,18 +4824,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>study_idx1</td>
-	<td>contact_id</td>
+	<td>study_idx1</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>study_idx2</td>
-	<td>pub_id</td>
+	<td>study_idx2</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>study_idx3</td>
-	<td>dbxref_id</td>
+	<td>study_idx3</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -6030,38 +4853,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>study_id</td>
+	<td>NOT NULL</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>contact_id</td>
+	<td>NOT NULL</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>contact_id</td>
+	<td>FOREIGN KEY</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -6074,12 +4890,11 @@
 
 <a name="study_assay" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	study_assay
-</h3></td>
-		<a name="study_assay"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="study_assay"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6121,30 +4936,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="study_assay-study_assay_id">study_assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="study_assay-study_assay_id">study_assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="study_assay-study_id">study_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
+	<td class="FieldCellName"><a name="study_assay-study_id">study_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="study_assay-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="study_assay-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 </table>
@@ -6165,13 +4965,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>study_assay_idx1</td>
-	<td>study_id</td>
+	<td>study_assay_idx1</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>study_assay_idx2</td>
-	<td>assay_id</td>
+	<td>study_assay_idx2</td><td>assay_id</td>
 </tr>
 
 </table>
@@ -6192,33 +4990,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>study_assay_id</td>
+	<td>NOT NULL</td><td>study_assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>study_id</td>
+	<td>NOT NULL</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>study_id</td>
+	<td>FOREIGN KEY</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>study_id, assay_id</td>
+	<td>UNIQUE</td><td>study_id, assay_id</td>
 </tr>
 
 </table>
@@ -6235,8 +5027,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studydesign
-</h3></td>
-		<a name="studydesign"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studydesign"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6278,30 +5069,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studydesign-studydesign_id">studydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studydesign-studydesign_id">studydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studydesign-study_id">study_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
+	<td class="FieldCellName"><a name="studydesign-study_id">study_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studydesign-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studydesign-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -6322,8 +5098,7 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studydesign_idx1</td>
-	<td>study_id</td>
+	<td>studydesign_idx1</td><td>study_id</td>
 </tr>
 
 </table>
@@ -6344,18 +5119,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studydesign_id</td>
+	<td>NOT NULL</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>study_id</td>
+	<td>NOT NULL</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>study_id</td>
+	<td>FOREIGN KEY</td><td>study_id</td>
 </tr>
 
 </table>
@@ -6368,12 +5140,11 @@
 
 <a name="studydesignprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studydesignprop
-</h3></td>
-		<a name="studydesignprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studydesignprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6415,48 +5186,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studydesignprop-studydesignprop_id">studydesignprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studydesignprop-studydesignprop_id">studydesignprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studydesignprop-studydesign_id">studydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#studydesign-studydesign_id">studydesign.studydesign_id</a></td>
+	<td class="FieldCellName"><a name="studydesignprop-studydesign_id">studydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#studydesign-studydesign_id">studydesign.studydesign_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studydesignprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="studydesignprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studydesignprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studydesignprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studydesignprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studydesignprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -6477,13 +5223,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studydesignprop_idx1</td>
-	<td>studydesign_id</td>
+	<td>studydesignprop_idx1</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>studydesignprop_idx2</td>
-	<td>type_id</td>
+	<td>studydesignprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -6504,38 +5248,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studydesignprop_id</td>
+	<td>NOT NULL</td><td>studydesignprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studydesign_id</td>
+	<td>NOT NULL</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>studydesign_id</td>
+	<td>FOREIGN KEY</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>studydesign_id, type_id, rank</td>
+	<td>UNIQUE</td><td>studydesign_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -6548,12 +5285,11 @@
 
 <a name="studyfactor" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studyfactor
-</h3></td>
-		<a name="studyfactor"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studyfactor"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6595,48 +5331,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactor-studyfactor_id">studyfactor_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactor-studyfactor_id">studyfactor_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyfactor-studydesign_id">studydesign_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#studydesign-studydesign_id">studydesign.studydesign_id</a></td>
+	<td class="FieldCellName"><a name="studyfactor-studydesign_id">studydesign_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#studydesign-studydesign_id">studydesign.studydesign_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactor-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="studyfactor-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyfactor-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactor-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactor-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactor-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -6657,13 +5368,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studyfactor_idx1</td>
-	<td>studydesign_id</td>
+	<td>studyfactor_idx1</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>studyfactor_idx2</td>
-	<td>type_id</td>
+	<td>studyfactor_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -6684,28 +5393,23 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyfactor_id</td>
+	<td>NOT NULL</td><td>studyfactor_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studydesign_id</td>
+	<td>NOT NULL</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>studydesign_id</td>
+	<td>FOREIGN KEY</td><td>studydesign_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 </table>
@@ -6718,12 +5422,11 @@
 
 <a name="studyfactorvalue" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studyfactorvalue
-</h3></td>
-		<a name="studyfactorvalue"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studyfactorvalue"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6765,57 +5468,27 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactorvalue-studyfactorvalue_id">studyfactorvalue_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-studyfactorvalue_id">studyfactorvalue_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyfactorvalue-studyfactor_id">studyfactor_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#studyfactor-studyfactor_id">studyfactor.studyfactor_id</a></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-studyfactor_id">studyfactor_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#studyfactor-studyfactor_id">studyfactor.studyfactor_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactorvalue-assay_id">assay_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-assay_id">assay_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#assay-assay_id">assay.assay_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyfactorvalue-factorvalue">factorvalue</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-factorvalue">factorvalue</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyfactorvalue-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyfactorvalue-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyfactorvalue-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -6836,13 +5509,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studyfactorvalue_idx1</td>
-	<td>studyfactor_id</td>
+	<td>studyfactorvalue_idx1</td><td>studyfactor_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>studyfactorvalue_idx2</td>
-	<td>assay_id</td>
+	<td>studyfactorvalue_idx2</td><td>assay_id</td>
 </tr>
 
 </table>
@@ -6863,33 +5534,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyfactorvalue_id</td>
+	<td>NOT NULL</td><td>studyfactorvalue_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyfactor_id</td>
+	<td>NOT NULL</td><td>studyfactor_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>studyfactor_id</td>
+	<td>FOREIGN KEY</td><td>studyfactor_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>assay_id</td>
+	<td>NOT NULL</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>assay_id</td>
+	<td>FOREIGN KEY</td><td>assay_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 </table>
@@ -6902,12 +5567,11 @@
 
 <a name="studyprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studyprop
-</h3></td>
-		<a name="studyprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studyprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -6969,48 +5633,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyprop-studyprop_id">studyprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyprop-studyprop_id">studyprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyprop-study_id">study_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
+	<td class="FieldCellName"><a name="studyprop-study_id">study_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#study-study_id">study.study_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="studyprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -7031,13 +5670,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studyprop_idx1</td>
-	<td>study_id</td>
+	<td>studyprop_idx1</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>studyprop_idx2</td>
-	<td>type_id</td>
+	<td>studyprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -7058,38 +5695,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyprop_id</td>
+	<td>NOT NULL</td><td>studyprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>study_id</td>
+	<td>NOT NULL</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>study_id</td>
+	<td>FOREIGN KEY</td><td>study_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>study_id, type_id, rank</td>
+	<td>UNIQUE</td><td>study_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -7106,8 +5736,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	studyprop_feature
-</h3></td>
-		<a name="studyprop_feature"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="studyprop_feature"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -7146,39 +5775,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyprop_feature-studyprop_feature_id">studyprop_feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="studyprop_feature-studyprop_feature_id">studyprop_feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyprop_feature-studyprop_id">studyprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#studyprop-studyprop_id">studyprop.studyprop_id</a></td>
+	<td class="FieldCellName"><a name="studyprop_feature-studyprop_id">studyprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#studyprop-studyprop_id">studyprop.studyprop_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="studyprop_feature-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="studyprop_feature-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="studyprop_feature-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="studyprop_feature-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -7199,13 +5808,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>studyprop_feature_idx1</td>
-	<td>studyprop_id</td>
+	<td>studyprop_feature_idx1</td><td>studyprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>studyprop_feature_idx2</td>
-	<td>feature_id</td>
+	<td>studyprop_feature_idx2</td><td>feature_id</td>
 </tr>
 
 </table>
@@ -7226,38 +5833,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyprop_feature_id</td>
+	<td>NOT NULL</td><td>studyprop_feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>studyprop_id</td>
+	<td>NOT NULL</td><td>studyprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>studyprop_id</td>
+	<td>FOREIGN KEY</td><td>studyprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_id</td>
+	<td>NOT NULL</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>studyprop_id, feature_id</td>
+	<td>UNIQUE</td><td>studyprop_id, feature_id</td>
 </tr>
 
 </table>
@@ -7265,7 +5865,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

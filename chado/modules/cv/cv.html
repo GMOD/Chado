@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (10 tables)
+	Table listing (11 tables)
  -->
 
 <a name="top" />
@@ -150,6 +150,18 @@
 	End link to table 'chadoprop'
  -->
 
+<!-- 
+	Start link to table 'dbprop'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="dbprop-link" href="#dbprop">dbprop</a></td>
+</tr>
+
+<!-- 
+	End link to table 'dbprop'
+ -->
+
 </table>
 
 <!-- 
@@ -162,8 +174,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cv
-</h3></td>
-		<a name="cv"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cv"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -180,7 +191,7 @@
 	Chado cv module <br />
 	================================================================= <br />
 	Dependencies: <br />
-	:import dbxref from general <br />
+	:import dbxref from db <br />
 	================================================================= <br />
 	================================================ <br />
 	TABLE: cv <br />
@@ -215,33 +226,18 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cv-cv_id">cv_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cv-cv_id">cv_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cv-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This
+	<td class="FieldCellName"><a name="cv-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the ontology. This
 corresponds to the obo-format -namespace-. cv names uniquely identify
-the cv. In OBO file format, the cv.name is known as the namespace. </td>
-	<td class="FieldCellFK"></td>
+the cv. In OBO file format, the cv.name is known as the namespace. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cv-definition">definition</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A text description of the criteria for
-membership of this ontology. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cv-definition">definition</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">A text description of the criteria for
+membership of this ontology. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -262,18 +258,15 @@ membership of this ontology. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cv_id</td>
+	<td>NOT NULL</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -286,12 +279,11 @@ membership of this ontology. </td>
 
 <a name="cvterm" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvterm
-</h3></td>
-		<a name="cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvterm"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -336,78 +328,43 @@ membership of this ontology. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm-cv_id">cv_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The cv or ontology or namespace to which
-this cvterm belongs. </td>
-	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
+	<td class="FieldCellName"><a name="cvterm-cv_id">cv_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The cv or ontology or namespace to which
+this cvterm belongs. </td> <td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">1024</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name or
-label for the cvterm. Uniquely identifies a cvterm within a cv. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvterm-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">1024</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, A concise human-readable name or
+label for the cvterm. Uniquely identifies a cvterm within a cv. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm-definition">definition</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A human-readable text
-definition. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvterm-definition">definition</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">A human-readable text
+definition. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Primary identifier dbxref - The
+	<td class="FieldCellName"><a name="cvterm-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, Primary identifier dbxref - The
 unique global OBO identifier for this cvterm.  Note that a cvterm may
-have multiple secondary dbxrefs - see also table: cvterm_dbxref. </td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+have multiple secondary dbxrefs - see also table: cvterm_dbxref. </td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm-is_obsolete">is_obsolete</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see
+	<td class="FieldCellName"><a name="cvterm-is_obsolete">is_obsolete</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Boolean 0=false,1=true; see
 GO documentation for details of obsoletion. Note that two terms with
-different primary dbxrefs may exist if one is obsolete. </td>
-	<td class="FieldCellFK"></td>
+different primary dbxrefs may exist if one is obsolete. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm-is_relationshiptype">is_relationshiptype</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL, Boolean
+	<td class="FieldCellName"><a name="cvterm-is_relationshiptype">is_relationshiptype</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL, Boolean
 0=false,1=true relations or relationship types (also known as Typedefs
 in OBO format, or as properties or slots) form a cv/ontology in
 themselves. We use this flag to indicate whether this cvterm is an
 actual term/class/universal or a relation. Relations may be drawn from
-the OBO Relations ontology, but are not exclusively drawn from there. </td>
-	<td class="FieldCellFK"></td>
+the OBO Relations ontology, but are not exclusively drawn from there. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -428,18 +385,15 @@ the OBO Relations ontology, but are not exclusively drawn from there. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_idx1</td>
-	<td>cv_id</td>
+	<td>cvterm_idx1</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_idx2</td>
-	<td>name</td>
+	<td>cvterm_idx2</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_idx3</td>
-	<td>dbxref_id</td>
+	<td>cvterm_idx3</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -460,53 +414,43 @@ the OBO Relations ontology, but are not exclusively drawn from there. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cv_id</td>
+	<td>NOT NULL</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cv_id</td>
+	<td>FOREIGN KEY</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_obsolete</td>
+	<td>NOT NULL</td><td>is_obsolete</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_relationshiptype</td>
+	<td>NOT NULL</td><td>is_relationshiptype</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name, cv_id, is_obsolete</td>
+	<td>UNIQUE</td><td>name, cv_id, is_obsolete</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>dbxref_id</td>
+	<td>UNIQUE</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -523,8 +467,7 @@ the OBO Relations ontology, but are not exclusively drawn from there. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvterm_relationship
-</h3></td>
-		<a name="cvterm_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvterm_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -583,46 +526,26 @@ the OBO Relations ontology, but are not exclusively drawn from there. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm_relationship-cvterm_relationship_id">cvterm_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvterm_relationship-cvterm_relationship_id">cvterm_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The nature of the
+	<td class="FieldCellName"><a name="cvterm_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The nature of the
 relationship between subject and object. Note that relations are also
 housed in the cvterm table, typically from the OBO relationship
-ontology, although other relationship types are allowed. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+ontology, although other relationship types are allowed. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm_relationship-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The subject of
+	<td class="FieldCellName"><a name="cvterm_relationship-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The subject of
 the subj-predicate-obj sentence. The cvterm_relationship is about the
-subject. In a graph, this typically corresponds to the child node. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+subject. In a graph, this typically corresponds to the child node. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm_relationship-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The object of the
+	<td class="FieldCellName"><a name="cvterm_relationship-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The object of the
 subj-predicate-obj sentence. The cvterm_relationship refers to the
-object. In a graph, this typically corresponds to the parent node. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+object. In a graph, this typically corresponds to the parent node. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -643,18 +566,15 @@ object. In a graph, this typically corresponds to the parent node. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_relationship_idx1</td>
-	<td>type_id</td>
+	<td>cvterm_relationship_idx1</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_relationship_idx2</td>
-	<td>subject_id</td>
+	<td>cvterm_relationship_idx2</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_relationship_idx3</td>
-	<td>object_id</td>
+	<td>cvterm_relationship_idx3</td><td>object_id</td>
 </tr>
 
 </table>
@@ -675,43 +595,35 @@ object. In a graph, this typically corresponds to the parent node. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_relationship_id</td>
+	<td>NOT NULL</td><td>cvterm_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id</td>
 </tr>
 
 </table>
@@ -728,8 +640,7 @@ object. In a graph, this typically corresponds to the parent node. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvtermpath
-</h3></td>
-		<a name="cvtermpath"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvtermpath"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -772,65 +683,35 @@ object. In a graph, this typically corresponds to the parent node. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermpath-cvtermpath_id">cvtermpath_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvtermpath-cvtermpath_id">cvtermpath_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermpath-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, The relationship type that
+	<td class="FieldCellName"><a name="cvtermpath-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, The relationship type that
 this is a closure over. If null, then this is a closure over ALL
 relationship types. If non-null, then this references a relationship
 cvterm - note that the closure will apply to both this relationship
-AND the OBO_REL:is_a (subclass) relationship. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+AND the OBO_REL:is_a (subclass) relationship. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermpath-subject_id">subject_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermpath-subject_id">subject_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermpath-object_id">object_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermpath-object_id">object_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermpath-cv_id">cv_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, Closures will mostly be within
+	<td class="FieldCellName"><a name="cvtermpath-cv_id">cv_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, Closures will mostly be within
 one cv. If the closure of a relationship traverses a cv, then this
-refers to the cv of the object_id cvterm. </td>
-	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
+refers to the cv of the object_id cvterm. </td> <td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermpath-pathdistance">pathdistance</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, The number of steps
+	<td class="FieldCellName"><a name="cvtermpath-pathdistance">pathdistance</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, The number of steps
 required to get from the subject cvterm to the object cvterm, counting
-from zero (reflexive relationship). </td>
-	<td class="FieldCellFK"></td>
+from zero (reflexive relationship). </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -851,23 +732,19 @@ from zero (reflexive relationship). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermpath_idx1</td>
-	<td>type_id</td>
+	<td>cvtermpath_idx1</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermpath_idx2</td>
-	<td>subject_id</td>
+	<td>cvtermpath_idx2</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermpath_idx3</td>
-	<td>object_id</td>
+	<td>cvtermpath_idx3</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermpath_idx4</td>
-	<td>cv_id</td>
+	<td>cvtermpath_idx4</td><td>cv_id</td>
 </tr>
 
 </table>
@@ -888,48 +765,39 @@ from zero (reflexive relationship). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvtermpath_id</td>
+	<td>NOT NULL</td><td>cvtermpath_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_id</td>
+	<td>NOT NULL</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_id</td>
+	<td>FOREIGN KEY</td><td>subject_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_id</td>
+	<td>NOT NULL</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_id</td>
+	<td>FOREIGN KEY</td><td>object_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cv_id</td>
+	<td>NOT NULL</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cv_id</td>
+	<td>FOREIGN KEY</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_id, object_id, type_id, pathdistance</td>
+	<td>UNIQUE</td><td>subject_id, object_id, type_id, pathdistance</td>
 </tr>
 
 </table>
@@ -946,8 +814,7 @@ from zero (reflexive relationship). </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvtermsynonym
-</h3></td>
-		<a name="cvtermsynonym"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvtermsynonym"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -993,40 +860,20 @@ from zero (reflexive relationship). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermsynonym-cvtermsynonym_id">cvtermsynonym_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvtermsynonym-cvtermsynonym_id">cvtermsynonym_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermsynonym-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermsynonym-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermsynonym-synonym">synonym</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">1024</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvtermsynonym-synonym">synonym</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">1024</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermsynonym-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A synonym can be exact,
-narrower, or broader than. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermsynonym-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">A synonym can be exact,
+narrower, or broader than. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -1047,8 +894,7 @@ narrower, or broader than. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermsynonym_idx1</td>
-	<td>cvterm_id</td>
+	<td>cvtermsynonym_idx1</td><td>cvterm_id</td>
 </tr>
 
 </table>
@@ -1069,33 +915,27 @@ narrower, or broader than. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvtermsynonym_id</td>
+	<td>NOT NULL</td><td>cvtermsynonym_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>synonym</td>
+	<td>NOT NULL</td><td>synonym</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>cvterm_id, synonym</td>
+	<td>UNIQUE</td><td>cvterm_id, synonym</td>
 </tr>
 
 </table>
@@ -1108,12 +948,11 @@ narrower, or broader than. </td>
 
 <a name="cvterm_dbxref" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvterm_dbxref
-</h3></td>
-		<a name="cvterm_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvterm_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1169,42 +1008,22 @@ narrower, or broader than. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm_dbxref-cvterm_dbxref_id">cvterm_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvterm_dbxref-cvterm_dbxref_id">cvterm_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm_dbxref-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvterm_dbxref-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvterm_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="cvterm_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvterm_dbxref-is_for_definition">is_for_definition</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL, A
+	<td class="FieldCellName"><a name="cvterm_dbxref-is_for_definition">is_for_definition</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL, A
 cvterm.definition should be supported by one or more references. If
 this column is true, the dbxref is not for a term in an external database -
-it is a dbxref for provenance information for the definition. </td>
-	<td class="FieldCellFK"></td>
+it is a dbxref for provenance information for the definition. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1225,13 +1044,11 @@ it is a dbxref for provenance information for the definition. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_dbxref_idx1</td>
-	<td>cvterm_id</td>
+	<td>cvterm_dbxref_idx1</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvterm_dbxref_idx2</td>
-	<td>dbxref_id</td>
+	<td>cvterm_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -1252,38 +1069,31 @@ it is a dbxref for provenance information for the definition. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_dbxref_id</td>
+	<td>NOT NULL</td><td>cvterm_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>is_for_definition</td>
+	<td>NOT NULL</td><td>is_for_definition</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>cvterm_id, dbxref_id</td>
+	<td>UNIQUE</td><td>cvterm_id, dbxref_id</td>
 </tr>
 
 </table>
@@ -1296,12 +1106,11 @@ it is a dbxref for provenance information for the definition. </td>
 
 <a name="cvtermprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvtermprop
-</h3></td>
-		<a name="cvtermprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvtermprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1343,52 +1152,27 @@ it is a dbxref for provenance information for the definition. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermprop-cvtermprop_id">cvtermprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvtermprop-cvtermprop_id">cvtermprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermprop-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermprop-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvtermprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvtermprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvtermprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The value of the property, represented as text. Numeric values are converted to their text representation. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvtermprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+	<td class="FieldCellName"><a name="cvtermprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
 cvterm can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
-default 0 value should be used. </td>
-	<td class="FieldCellFK"></td>
+default 0 value should be used. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1409,13 +1193,11 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermprop_idx1</td>
-	<td>cvterm_id</td>
+	<td>cvtermprop_idx1</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>cvtermprop_idx2</td>
-	<td>type_id</td>
+	<td>cvtermprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1436,43 +1218,35 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvtermprop_id</td>
+	<td>NOT NULL</td><td>cvtermprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>value</td>
+	<td>NOT NULL</td><td>value</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>cvterm_id, type_id, value, rank</td>
+	<td>UNIQUE</td><td>cvterm_id, type_id, value, rank</td>
 </tr>
 
 </table>
@@ -1489,8 +1263,7 @@ default 0 value should be used. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	dbxrefprop
-</h3></td>
-		<a name="dbxrefprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="dbxrefprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1532,48 +1305,23 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="dbxrefprop-dbxrefprop_id">dbxrefprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="dbxrefprop-dbxrefprop_id">dbxrefprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="dbxrefprop-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="dbxrefprop-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="dbxrefprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="dbxrefprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="dbxrefprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="dbxrefprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="dbxrefprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="dbxrefprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1594,13 +1342,11 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>dbxrefprop_idx1</td>
-	<td>dbxref_id</td>
+	<td>dbxrefprop_idx1</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>dbxrefprop_idx2</td>
-	<td>type_id</td>
+	<td>dbxrefprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1621,43 +1367,35 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxrefprop_id</td>
+	<td>NOT NULL</td><td>dbxrefprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>value</td>
+	<td>NOT NULL</td><td>value</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>dbxref_id, type_id, rank</td>
+	<td>UNIQUE</td><td>dbxref_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1670,12 +1408,11 @@ default 0 value should be used. </td>
 
 <a name="cvprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	cvprop
-</h3></td>
-		<a name="cvprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="cvprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1717,52 +1454,27 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvprop-cvprop_id">cvprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvprop-cvprop_id">cvprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvprop-cv_id">cv_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
+	<td class="FieldCellName"><a name="cvprop-cv_id">cv_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cv-cv_id">cv.cv_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="cvprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="cvprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="cvprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="cvprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+	<td class="FieldCellName"><a name="cvprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
 cv can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
-default 0 value should be used. </td>
-	<td class="FieldCellFK"></td>
+default 0 value should be used. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1783,38 +1495,31 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvprop_id</td>
+	<td>NOT NULL</td><td>cvprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cv_id</td>
+	<td>NOT NULL</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cv_id</td>
+	<td>FOREIGN KEY</td><td>cv_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>cv_id, type_id, rank</td>
+	<td>UNIQUE</td><td>cv_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1827,12 +1532,11 @@ default 0 value should be used. </td>
 
 <a name="chadoprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	chadoprop
-</h3></td>
-		<a name="chadoprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="chadoprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1874,43 +1578,23 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="chadoprop-chadoprop_id">chadoprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="chadoprop-chadoprop_id">chadoprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="chadoprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="chadoprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="chadoprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="chadoprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The value of the property, represented as text. Numeric values are converted to their text representation. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="chadoprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
+	<td class="FieldCellName"><a name="chadoprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, Property-Value ordering. Any
 cv can have multiple values for any particular property type -
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
-default 0 value should be used. </td>
-	<td class="FieldCellFK"></td>
+default 0 value should be used. </td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1931,28 +1615,172 @@ default 0 value should be used. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>chadoprop_id</td>
+	<td>NOT NULL</td><td>chadoprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>type_id, rank</td>
+	<td>UNIQUE</td><td>type_id, rank</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'dbprop'
+ -->
+
+<a name="dbprop" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	dbprop
+</h3></td> <a name="dbprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: dbprop <br />
+	================================================ <br />
+	An external database can have any number of
+	slot-value property tags attached to it. This is an alternative to
+	hardcoding a list of columns in the relational schema, and is
+	completely extensible. There is a unique constraint, dbprop_c1, for
+	the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="dbprop-dbprop_id">dbprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="dbprop-db_id">db_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#db-db_id">db.db_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="dbprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="dbprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="dbprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>dbprop_idx1</td><td>db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>dbprop_idx2</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>dbprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>db_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>db_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1960,7 +1788,7 @@ default 0 value should be used. </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

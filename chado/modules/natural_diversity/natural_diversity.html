@@ -17,12 +17,12 @@
 <hr />
 
 <!-- 
-	Table listing (20 tables)
+	Table listing (21 tables)
  -->
 
 <a name="top" />
 
-<table class="LinkTable" width="100%">
+<table width="100%" class="LinkTable">
 
 <tr>
 	<td class="LinkTableCell"><h2 class="LinkTableTitle">
@@ -270,6 +270,18 @@
 	End link to table 'nd_experiment_contact'
  -->
 
+<!-- 
+	Start link to table 'nd_experiment_analysis'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="nd_experiment_analysis-link" href="#nd_experiment_analysis">nd_experiment_analysis</a></td>
+</tr>
+
+<!-- 
+	End link to table 'nd_experiment_analysis'
+ -->
+
 </table>
 
 <!-- 
@@ -282,8 +294,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_geolocation
-</h3></td>
-		<a name="nd_geolocation"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_geolocation"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -311,6 +322,9 @@
 	this probably needs some work, depending on how cross-database we <br />
 	want to be.  In Postgres, at least, there are much better ways to <br />
 	represent geo information. <br />
+	================================================ <br />
+	TABLE: nd_geolocation <br />
+	================================================ <br />
 	The geo-referencable location of the stock. NOTE: This entity is subject to change as a more general and possibly more OpenGIS-compliant geolocation module may be introduced into Chado. 
 </em>
 
@@ -338,57 +352,56 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocation-nd_geolocation_id">nd_geolocation_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-nd_geolocation_id">nd_geolocation_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_geolocation-description">description</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">A textual representation of the location, if this is the original georeference. Optional if the original georeference is available in lat/long coordinates. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">A textual representation of the location, if this is the original georeference. Optional if the original georeference is available in lat/long coordinates. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocation-latitude">latitude</a></td>
-	<td class="FieldCellType">real</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The decimal latitude coordinate of the georeference, using positive and negative sign to indicate N and S, respectively. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-latitude">latitude</a></td> <td class="FieldCellType">real</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The decimal latitude coordinate of the georeference, using positive and negative sign to indicate N and S, respectively. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_geolocation-longitude">longitude</a></td>
-	<td class="FieldCellType">real</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The decimal longitude coordinate of the georeference, using positive and negative sign to indicate E and W, respectively. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-longitude">longitude</a></td> <td class="FieldCellType">real</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The decimal longitude coordinate of the georeference, using positive and negative sign to indicate E and W, respectively. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocation-geodetic_datum">geodetic_datum</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">32</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The geodetic system on which the geo-reference coordinates are based. For geo-references measured between 1984 and 2010, this will typically be WGS84. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-geodetic_datum">geodetic_datum</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">32</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The geodetic system on which the geo-reference coordinates are based. For geo-references measured between 1984 and 2010, this will typically be WGS84. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_geolocation-altitude">altitude</a></td>
-	<td class="FieldCellType">real</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">The altitude (elevation) of the location in meters. If the altitude is only known as a range, this is the average, and altitude_dev will hold half of the width of the range. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocation-altitude">altitude</a></td> <td class="FieldCellType">real</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">The altitude (elevation) of the location in meters. If the altitude is only known as a range, this is the average, and altitude_dev will hold half of the width of the range. </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_geolocation_idx1</td><td>latitude</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_geolocation_idx2</td><td>longitude</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_geolocation_idx3</td><td>altitude</td>
 </tr>
 
 </table>
@@ -409,8 +422,7 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_geolocation_id</td>
+	<td>NOT NULL</td><td>nd_geolocation_id</td>
 </tr>
 
 </table>
@@ -427,129 +439,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment
-</h3></td>
-		<a name="nd_experiment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
-	</tr>
-</table>
-
-<table border="1">
-
-<tr>
-	<th class="FieldHeader">
-		Field Name
-	</th>
-	<th class="FieldHeader">
-		Data Type
-	</th>
-	<th class="FieldHeader">
-		Size
-	</th>
-	<th class="FieldHeader">
-		Default Value
-	</th>
-	<th class="FieldHeader">
-		Other
-	</th>
-	<th class="FieldHeader">
-		Foreign Key
-	</th>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
-</tr>
-
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment-nd_geolocation_id">nd_geolocation_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_geolocation-nd_geolocation_id">nd_geolocation.nd_geolocation_id</a></td>
-</tr>
-
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
-</tr>
-
-</table>
-
-<h3>
-	Constraints
-</h3>
-
-<table border="1">
-
-<tr class="IndexRow">
-	<th>
-		Type
-	</th>
-	<th>
-		Fields
-	</th>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_geolocation_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_geolocation_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_geolocation_id</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
-</tr>
-
-</table>
-
-<hr />
-
-<!-- 
-	Starting table 'nd_experiment_project'
- -->
-
-<a name="nd_experiment_project" />
-
-<table class="TableHeader" width="100%">
-	<tr class="TableHeaderRow">
-		<td class="TableHeaderCell"><h3>
-	nd_experiment_project
-</h3></td>
-		<a name="nd_experiment_project"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -561,8 +451,14 @@
 
 <em>
 	<br />
-	used to be nd_diversityexperiment_project <br />
-	then was nd_assay_project
+	================================================ <br />
+	TABLE: nd_experiment <br />
+	================================================ <br />
+	This is the core table for the natural diversity module, 
+	representing each individual assay that is undertaken (this is usually *not* an 
+	entire experiment). Each nd_experiment should give rise to a single genotype or 
+	phenotype and be described via 1 (or more) protocols. Collections of assays that 
+	relate to each other should be linked to the same record in the project table. 
 </em>
 
 <table border="1">
@@ -589,30 +485,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_project-nd_experiment_project_id">nd_experiment_project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_project-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment-nd_geolocation_id">nd_geolocation_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_geolocation-nd_geolocation_id">nd_geolocation.nd_geolocation_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_project-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_idx1</td><td>nd_geolocation_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -633,38 +539,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_project_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -672,19 +571,35 @@
 <hr />
 
 <!-- 
-	Starting table 'nd_experimentprop'
+	Starting table 'nd_experiment_project'
  -->
 
-<a name="nd_experimentprop" />
+<a name="nd_experiment_project" />
 
 <table class="TableHeader" width="100%">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
-	nd_experimentprop
-</h3></td>
-		<a name="nd_experimentprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	nd_experiment_project
+</h3></td> <a name="nd_experiment_project"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_experiment_project <br />
+	================================================ <br />
+	used to be nd_diversityexperiment_project <br />
+	then was nd_assay_project <br />
+	Used to group together related nd_experiment records. All nd_experiments 
+	should be linked to at least one project. 
+</em>
 
 <table border="1">
 
@@ -710,48 +625,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experimentprop-nd_experimentprop_id">nd_experimentprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_project-nd_experiment_project_id">nd_experiment_project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experimentprop-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_project-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experimentprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_project-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
-<tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experimentprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
 </tr>
 
-<tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experimentprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+<tr class="IndexCell">
+	<td>nd_experiment_project_idx1</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_project_idx2</td><td>nd_experiment_id</td>
 </tr>
 
 </table>
@@ -772,48 +679,192 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experimentprop_id</td>
+	<td>NOT NULL</td><td>nd_experiment_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>UNIQUE</td><td>project_id, nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id, type_id, rank</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'nd_experimentprop'
+ -->
+
+<a name="nd_experimentprop" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	nd_experimentprop
+</h3></td> <a name="nd_experimentprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_experimentprop <br />
+	================================================ <br />
+	An nd_experiment can have any number of
+	slot-value property tags attached to it. This is an alternative to
+	hardcoding a list of columns in the relational schema, and is
+	completely extensible. There is a unique constraint, stockprop_c1, for
+	the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_experimentprop-nd_experimentprop_id">nd_experimentprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="nd_experimentprop-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_experimentprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="nd_experimentprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_experimentprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>nd_experimentprop_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experimentprop_idx2</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>nd_experimentprop_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>nd_experiment_id, type_id, rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -826,12 +877,11 @@
 
 <a name="nd_experiment_pub" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_pub
-</h3></td>
-		<a name="nd_experiment_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -843,6 +893,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_pub <br />
+	================================================ <br />
 	Linking nd_experiment(s) to publication(s) 
 </em>
 
@@ -870,30 +923,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_pub-nd_experiment_pub_id">nd_experiment_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_pub-nd_experiment_pub_id">nd_experiment_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_pub-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_pub-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -914,13 +952,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>nd_experiment_pub_idx1</td>
-	<td>nd_experiment_id</td>
+	<td>nd_experiment_pub_idx1</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>nd_experiment_pub_idx2</td>
-	<td>pub_id</td>
+	<td>nd_experiment_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -941,33 +977,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_pub_id</td>
+	<td>NOT NULL</td><td>nd_experiment_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id, pub_id</td>
+	<td>UNIQUE</td><td>nd_experiment_id, pub_id</td>
 </tr>
 
 </table>
@@ -980,12 +1010,11 @@
 
 <a name="nd_geolocationprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_geolocationprop
-</h3></td>
-		<a name="nd_geolocationprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_geolocationprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -997,6 +1026,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_geolocationprop <br />
+	================================================ <br />
 	Property/value associations for geolocations. This table can store the properties such as location and environment 
 </em>
 
@@ -1024,48 +1056,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocationprop-nd_geolocationprop_id">nd_geolocationprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-nd_geolocationprop_id">nd_geolocationprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_geolocationprop-nd_geolocation_id">nd_geolocation_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_geolocation-nd_geolocation_id">nd_geolocation.nd_geolocation_id</a></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-nd_geolocation_id">nd_geolocation_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_geolocation-nd_geolocation_id">nd_geolocation.nd_geolocation_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocationprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_geolocationprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">The value of the property. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the property. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_geolocationprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_geolocationprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_geolocationprop_idx1</td><td>nd_geolocation_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_geolocationprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1086,48 +1118,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_geolocationprop_id</td>
+	<td>NOT NULL</td><td>nd_geolocationprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_geolocation_id</td>
+	<td>NOT NULL</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_geolocation_id</td>
+	<td>FOREIGN KEY</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_geolocation_id, type_id, rank</td>
+	<td>UNIQUE</td><td>nd_geolocation_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_geolocation_id</td>
+	<td>FOREIGN KEY</td><td>nd_geolocation_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1140,12 +1163,11 @@
 
 <a name="nd_protocol" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_protocol
-</h3></td>
-		<a name="nd_protocol"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_protocol"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1157,6 +1179,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_protocol <br />
+	================================================ <br />
 	A protocol can be anything that is done as part of the experiment. 
 </em>
 
@@ -1184,30 +1209,36 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocol-nd_protocol_id">nd_protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocol-nd_protocol_id">nd_protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_protocol-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The protocol name. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocol-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The protocol name. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocol-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocol-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocol_idx1</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1228,33 +1259,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocol_id</td>
+	<td>NOT NULL</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1267,12 +1292,11 @@
 
 <a name="nd_reagent" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_reagent
-</h3></td>
-		<a name="nd_reagent"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_reagent"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1284,6 +1308,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_reagent <br />
+	=============================================== <br />
 	A reagent such as a primer, an enzyme, an adapter oligo, a linker oligo. Reagents are used in genotyping experiments, or in any other kind of experiment. 
 </em>
 
@@ -1311,39 +1338,44 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagent-nd_reagent_id">nd_reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagent-nd_reagent_id">nd_reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagent-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">80</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The name of the reagent. The name should be unique for a given type. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagent-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">80</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, The name of the reagent. The name should be unique for a given type. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagent-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The type of the reagent, for example linker oligomer, or forward primer. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagent-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, The type of the reagent, for example linker oligomer, or forward primer. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagent-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">If the reagent is a primer, the feature that it corresponds to. More generally, the corresponding feature for any reagent that has a sequence that maps to another sequence. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagent-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">If the reagent is a primer, the feature that it corresponds to. More generally, the corresponding feature for any reagent that has a sequence that maps to another sequence. </td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagent_idx1</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagent_idx2</td><td>feature_id</td>
 </tr>
 
 </table>
@@ -1364,28 +1396,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_reagent_id</td>
+	<td>NOT NULL</td><td>nd_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 </table>
@@ -1398,14 +1433,26 @@
 
 <a name="nd_protocol_reagent" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_protocol_reagent
-</h3></td>
-		<a name="nd_protocol_reagent"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_protocol_reagent"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_protocol_reagent <br />
+	================================================
+</em>
 
 <table border="1">
 
@@ -1431,39 +1478,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocol_reagent-nd_protocol_reagent_id">nd_protocol_reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocol_reagent-nd_protocol_reagent_id">nd_protocol_reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_protocol_reagent-nd_protocol_id">nd_protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocol_reagent-nd_protocol_id">nd_protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocol_reagent-reagent_id">reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocol_reagent-reagent_id">reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_protocol_reagent-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocol_reagent-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocol_reagent_idx1</td><td>nd_protocol_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocol_reagent_idx2</td><td>reagent_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocol_reagent_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1484,53 +1540,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocol_reagent_id</td>
+	<td>NOT NULL</td><td>nd_protocol_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocol_id</td>
+	<td>NOT NULL</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>reagent_id</td>
+	<td>NOT NULL</td><td>reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>reagent_id</td>
+	<td>FOREIGN KEY</td><td>reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>reagent_id</td>
+	<td>FOREIGN KEY</td><td>reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1547,8 +1593,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_protocolprop
-</h3></td>
-		<a name="nd_protocolprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_protocolprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1560,6 +1605,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_protocolprop <br />
+	================================================ <br />
 	Property/value associations for protocol. 
 </em>
 
@@ -1587,48 +1635,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocolprop-nd_protocolprop_id">nd_protocolprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-nd_protocolprop_id">nd_protocolprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_protocolprop-nd_protocol_id">nd_protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The protocol to which the property applies. </td>
-	<td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-nd_protocol_id">nd_protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The protocol to which the property applies. </td> <td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocolprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_protocolprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">The value of the property. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the property. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_protocolprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_protocolprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocolprop_idx1</td><td>nd_protocol_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_protocolprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1649,48 +1697,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocolprop_id</td>
+	<td>NOT NULL</td><td>nd_protocolprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocol_id</td>
+	<td>NOT NULL</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_protocol_id, type_id, rank</td>
+	<td>UNIQUE</td><td>nd_protocol_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1703,12 +1742,11 @@
 
 <a name="nd_experiment_stock" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_stock
-</h3></td>
-		<a name="nd_experiment_stock"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_stock"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1720,6 +1758,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_stock <br />
+	================================================ <br />
 	Part of a stock or a clone of a stock that is used in an experiment 
 </em>
 
@@ -1747,39 +1788,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_stock-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stock-stock_id">stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, stock used in the extraction or the corresponding stock for the clone </td>
-	<td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, stock used in the extraction or the corresponding stock for the clone </td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_stock-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stock_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stock_idx2</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stock_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1800,53 +1850,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_stock_id</td>
+	<td>NOT NULL</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>stock_id</td>
+	<td>NOT NULL</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>stock_id</td>
+	<td>FOREIGN KEY</td><td>stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1859,12 +1899,11 @@
 
 <a name="nd_experiment_protocol" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_protocol
-</h3></td>
-		<a name="nd_experiment_protocol"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_protocol"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1876,6 +1915,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_protocol <br />
+	================================================ <br />
 	Linking table: experiments to the protocols they involve. 
 </em>
 
@@ -1903,30 +1945,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_experiment_protocol_id">nd_experiment_protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_experiment_protocol_id">nd_experiment_protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_protocol_id">nd_protocol_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_protocol-nd_protocol_id">nd_protocol_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_protocol-nd_protocol_id">nd_protocol.nd_protocol_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_protocol_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_protocol_idx2</td><td>nd_protocol_id</td>
 </tr>
 
 </table>
@@ -1947,38 +1999,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_protocol_id</td>
+	<td>NOT NULL</td><td>nd_experiment_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_protocol_id</td>
+	<td>NOT NULL</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_protocol_id</td>
+	<td>FOREIGN KEY</td><td>nd_protocol_id</td>
 </tr>
 
 </table>
@@ -1991,12 +2036,11 @@
 
 <a name="nd_experiment_phenotype" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_phenotype
-</h3></td>
-		<a name="nd_experiment_phenotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_phenotype"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2008,6 +2052,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_phenotype <br />
+	================================================ <br />
 	Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record. 
 </em>
 
@@ -2035,30 +2082,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_phenotype-nd_experiment_phenotype_id">nd_experiment_phenotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_phenotype-nd_experiment_phenotype_id">nd_experiment_phenotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_phenotype-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_phenotype-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_phenotype-phenotype_id">phenotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_phenotype-phenotype_id">phenotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_phenotype_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_phenotype_idx2</td><td>phenotype_id</td>
 </tr>
 
 </table>
@@ -2079,43 +2136,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_phenotype_id</td>
+	<td>NOT NULL</td><td>nd_experiment_phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype_id</td>
+	<td>NOT NULL</td><td>phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype_id</td>
+	<td>FOREIGN KEY</td><td>phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id, phenotype_id</td>
+	<td>UNIQUE</td><td>nd_experiment_id, phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype_id</td>
+	<td>FOREIGN KEY</td><td>phenotype_id</td>
 </tr>
 
 </table>
@@ -2128,12 +2177,11 @@
 
 <a name="nd_experiment_genotype" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_genotype
-</h3></td>
-		<a name="nd_experiment_genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2145,6 +2193,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_genotype <br />
+	================================================ <br />
 	Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record. 
 </em>
 
@@ -2172,30 +2223,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_genotype-nd_experiment_genotype_id">nd_experiment_genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_genotype-nd_experiment_genotype_id">nd_experiment_genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_genotype-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_genotype-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_genotype-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_genotype-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_genotype_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_genotype_idx2</td><td>genotype_id</td>
 </tr>
 
 </table>
@@ -2216,43 +2277,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_genotype_id</td>
+	<td>NOT NULL</td><td>nd_experiment_genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_id, genotype_id</td>
+	<td>UNIQUE</td><td>nd_experiment_id, genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 </table>
@@ -2269,8 +2322,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_reagent_relationship
-</h3></td>
-		<a name="nd_reagent_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_reagent_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2282,6 +2334,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_reagent_relationship <br />
+	================================================ <br />
 	Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents. 
 </em>
 
@@ -2309,39 +2364,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagent_relationship-nd_reagent_relationship_id">nd_reagent_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagent_relationship-nd_reagent_relationship_id">nd_reagent_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagent_relationship-subject_reagent_id">subject_reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The subject reagent in the relationship. In parent/child terminology, the subject is the child. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td>
-	<td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagent_relationship-subject_reagent_id">subject_reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, The subject reagent in the relationship. In parent/child terminology, the subject is the child. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td> <td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagent_relationship-object_reagent_id">object_reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The object reagent in the relationship. In parent/child terminology, the object is the parent. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td>
-	<td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagent_relationship-object_reagent_id">object_reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, The object reagent in the relationship. In parent/child terminology, the object is the parent. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td> <td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagent_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL, The type (or predicate) of the relationship. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagent_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL, The type (or predicate) of the relationship. For example, in "linkerA 3prime-overhang-linker enzymeA" linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagent_relationship_idx1</td><td>subject_reagent_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagent_relationship_idx2</td><td>object_reagent_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagent_relationship_idx3</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2362,53 +2426,43 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_reagent_relationship_id</td>
+	<td>NOT NULL</td><td>nd_reagent_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_reagent_id</td>
+	<td>NOT NULL</td><td>subject_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_reagent_id</td>
+	<td>FOREIGN KEY</td><td>subject_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_reagent_id</td>
+	<td>NOT NULL</td><td>object_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_reagent_id</td>
+	<td>FOREIGN KEY</td><td>object_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_reagent_id</td>
+	<td>FOREIGN KEY</td><td>subject_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_reagent_id</td>
+	<td>FOREIGN KEY</td><td>object_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2425,10 +2479,22 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_reagentprop
-</h3></td>
-		<a name="nd_reagentprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_reagentprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_reagentprop <br />
+	================================================
+</em>
 
 <table border="1">
 
@@ -2454,48 +2520,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagentprop-nd_reagentprop_id">nd_reagentprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-nd_reagentprop_id">nd_reagentprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagentprop-nd_reagent_id">nd_reagent_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-nd_reagent_id">nd_reagent_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#nd_reagent-nd_reagent_id">nd_reagent.nd_reagent_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagentprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_reagentprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_reagentprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_reagentprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagentprop_idx1</td><td>nd_reagent_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_reagentprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2516,48 +2582,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_reagentprop_id</td>
+	<td>NOT NULL</td><td>nd_reagentprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_reagent_id</td>
+	<td>NOT NULL</td><td>nd_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_reagent_id</td>
+	<td>FOREIGN KEY</td><td>nd_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_reagent_id, type_id, rank</td>
+	<td>UNIQUE</td><td>nd_reagent_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_reagent_id</td>
+	<td>FOREIGN KEY</td><td>nd_reagent_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2570,12 +2627,11 @@
 
 <a name="nd_experiment_stockprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_stockprop
-</h3></td>
-		<a name="nd_experiment_stockprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_stockprop"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2587,6 +2643,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_stockprop <br />
+	================================================ <br />
 	Property/value associations for experiment_stocks. This table can store the properties such as treatment 
 </em>
 
@@ -2614,48 +2673,48 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-nd_experiment_stockprop_id">nd_experiment_stockprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-nd_experiment_stockprop_id">nd_experiment_stockprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-nd_experiment_stock_id">nd_experiment_stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The experiment_stock to which the property applies. </td>
-	<td class="FieldCellFK"><a href="#nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock.nd_experiment_stock_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-nd_experiment_stock_id">nd_experiment_stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The experiment_stock to which the property applies. </td> <td class="FieldCellFK"><a href="#nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock.nd_experiment_stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The name of the property as a reference to a controlled vocabulary term. </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther">The value of the property. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther">The value of the property. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stockprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_stockprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL, The rank of the property value, if the property has an array of values. </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stockprop_idx1</td><td>nd_experiment_stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stockprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2676,48 +2735,39 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_stockprop_id</td>
+	<td>NOT NULL</td><td>nd_experiment_stockprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_stock_id</td>
+	<td>NOT NULL</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_stock_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>nd_experiment_stock_id, type_id, rank</td>
+	<td>UNIQUE</td><td>nd_experiment_stock_id, type_id, rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_stock_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -2730,12 +2780,11 @@
 
 <a name="nd_experiment_stock_dbxref" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_stock_dbxref
-</h3></td>
-		<a name="nd_experiment_stock_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_stock_dbxref"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2747,6 +2796,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_stock_dbxref <br />
+	================================================ <br />
 	Cross-reference experiment_stock to accessions, images, etc 
 </em>
 
@@ -2774,30 +2826,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-nd_experiment_stock_dbxref_id">nd_experiment_stock_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-nd_experiment_stock_dbxref_id">nd_experiment_stock_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-nd_experiment_stock_id">nd_experiment_stock_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock.nd_experiment_stock_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-nd_experiment_stock_id">nd_experiment_stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment_stock-nd_experiment_stock_id">nd_experiment_stock.nd_experiment_stock_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_stock_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stock_dbxref_idx1</td><td>nd_experiment_stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_stock_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2818,38 +2880,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_stock_dbxref_id</td>
+	<td>NOT NULL</td><td>nd_experiment_stock_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_stock_id</td>
+	<td>NOT NULL</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_stock_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_stock_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_stock_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2862,12 +2917,11 @@
 
 <a name="nd_experiment_dbxref" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_dbxref
-</h3></td>
-		<a name="nd_experiment_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -2879,6 +2933,9 @@
 
 <em>
 	<br />
+	================================================ <br />
+	TABLE: nd_experiment_dbxref <br />
+	=============================================== <br />
 	Cross-reference experiment to accessions, images, etc 
 </em>
 
@@ -2906,30 +2963,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_dbxref-nd_experiment_dbxref_id">nd_experiment_dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_dbxref-nd_experiment_dbxref_id">nd_experiment_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_dbxref-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_dbxref-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_dbxref-dbxref_id">dbxref_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_dbxref_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_dbxref_idx2</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2950,38 +3017,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_dbxref_id</td>
+	<td>NOT NULL</td><td>nd_experiment_dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>dbxref_id</td>
+	<td>NOT NULL</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>dbxref_id</td>
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
 </tr>
 
 </table>
@@ -2994,14 +3054,26 @@
 
 <a name="nd_experiment_contact" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	nd_experiment_contact
-</h3></td>
-		<a name="nd_experiment_contact"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="nd_experiment_contact"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_experiment_contact <br />
+	================================================
+</em>
 
 <table border="1">
 
@@ -3027,30 +3099,40 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_contact-nd_experiment_contact_id">nd_experiment_contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="nd_experiment_contact-nd_experiment_contact_id">nd_experiment_contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="nd_experiment_contact-nd_experiment_id">nd_experiment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_contact-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="nd_experiment_contact-contact_id">contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="nd_experiment_contact-contact_id">contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_contact_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_contact_idx2</td><td>contact_id</td>
 </tr>
 
 </table>
@@ -3071,38 +3153,184 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_contact_id</td>
+	<td>NOT NULL</td><td>nd_experiment_contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>nd_experiment_id</td>
+	<td>NOT NULL</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>contact_id</td>
+	<td>NOT NULL</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>contact_id</td>
+	<td>FOREIGN KEY</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>nd_experiment_id</td>
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>contact_id</td>
+	<td>FOREIGN KEY</td><td>contact_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'nd_experiment_analysis'
+ -->
+
+<a name="nd_experiment_analysis" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	nd_experiment_analysis
+</h3></td> <a name="nd_experiment_analysis"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: nd_experiment_analysis <br />
+	================================================ <br />
+	An analysis that is used in an experiment 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_experiment_analysis-nd_experiment_analysis_id">nd_experiment_analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="nd_experiment_analysis-nd_experiment_id">nd_experiment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#nd_experiment-nd_experiment_id">nd_experiment.nd_experiment_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="nd_experiment_analysis-analysis_id">analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="nd_experiment_analysis-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_analysis_idx1</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_analysis_idx2</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>nd_experiment_analysis_idx3</td><td>type_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>nd_experiment_analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>nd_experiment_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 </table>
@@ -3110,7 +3338,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>

@@ -17,7 +17,7 @@
 <hr />
 
 <!-- 
-	Table listing (5 tables)
+	Table listing (9 tables)
  -->
 
 <a name="top" />
@@ -90,6 +90,54 @@
 	End link to table 'project_contact'
  -->
 
+<!-- 
+	Start link to table 'project_dbxref'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="project_dbxref-link" href="#project_dbxref">project_dbxref</a></td>
+</tr>
+
+<!-- 
+	End link to table 'project_dbxref'
+ -->
+
+<!-- 
+	Start link to table 'project_analysis'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="project_analysis-link" href="#project_analysis">project_analysis</a></td>
+</tr>
+
+<!-- 
+	End link to table 'project_analysis'
+ -->
+
+<!-- 
+	Start link to table 'project_feature'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="project_feature-link" href="#project_feature">project_feature</a></td>
+</tr>
+
+<!-- 
+	End link to table 'project_feature'
+ -->
+
+<!-- 
+	Start link to table 'project_stock'
+ -->
+
+<tr class="LinkTableRow">
+	<td class="LinkTableCell"><a id="project_stock-link" href="#project_stock">project_stock</a></td>
+</tr>
+
+<!-- 
+	End link to table 'project_stock'
+ -->
+
 </table>
 
 <!-- 
@@ -98,12 +146,11 @@
 
 <a name="project" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	project
-</h3></td>
-		<a name="project"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="project"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -115,16 +162,27 @@
 
 <em>
 	<br />
+	========================================== <br />
+	Chado project module. Used primarily by other Chado modules to <br />
+	group experiments, stocks, and so forth that are associated with <br />
+	eachother administratively or organizationally. <br />
 	================================================================= <br />
 	Dependencies: <br />
 	:import cvterm from cv <br />
 	:import pub from pub <br />
 	:import contact from contact <br />
+	:import dbxref from db <br />
+	:import analysis from companalysis <br />
+	:import feature from sequence <br />
+	:import stock from stock <br />
 	================================================================= <br />
 	================================================ <br />
 	TABLE: project <br />
 	================================================ <br />
-	NULL
+	A project is some kind of planned endeavor.  Used primarily by other
+	Chado modules to group experiments, stocks, and so forth that are
+	associated with eachother administratively or organizationally.  <br />
+	Standard Chado flexible property table for projects. 
 </em>
 
 <table border="1">
@@ -151,30 +209,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="project-name">name</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project-name">name</a></td> <td class="FieldCellType">varchar</td> <td class="FieldCellSize">255</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project-description">description</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -195,23 +238,15 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>name</td>
+	<td>NOT NULL</td><td>name</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>description</td>
-</tr>
-
-<tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>name</td>
+	<td>UNIQUE</td><td>name</td>
 </tr>
 
 </table>
@@ -224,12 +259,11 @@
 
 <a name="projectprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	projectprop
-</h3></td>
-		<a name="projectprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="projectprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -270,48 +304,23 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="projectprop-projectprop_id">projectprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="projectprop-projectprop_id">projectprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="projectprop-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="projectprop-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="projectprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="projectprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="projectprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="projectprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="projectprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="projectprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -332,38 +341,31 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>projectprop_id</td>
+	<td>NOT NULL</td><td>projectprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>project_id, type_id, rank</td>
+	<td>UNIQUE</td><td>project_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -376,12 +378,11 @@
 
 <a name="project_relationship" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	project_relationship
-</h3></td>
-		<a name="project_relationship"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="project_relationship"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -396,7 +397,8 @@
 	================================================ <br />
 	TABLE: project_relationship <br />
 	================================================ <br />
-	A project can be composed of several smaller scale projects 
+	Linking table for relating projects to each other.  For example, a
+	given project could be composed of several smaller subprojects 
 </em>
 
 <table border="1">
@@ -423,39 +425,19 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_relationship-project_relationship_id">project_relationship_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project_relationship-project_relationship_id">project_relationship_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="project_relationship-subject_project_id">subject_project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="project_relationship-subject_project_id">subject_project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_relationship-object_project_id">object_project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="project_relationship-object_project_id">object_project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="project_relationship-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The type of relationship being stated, such as "is part of". </td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="project_relationship-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The cvterm type of the relationship being stated, such as "part of". </td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -476,43 +458,35 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_relationship_id</td>
+	<td>NOT NULL</td><td>project_relationship_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>subject_project_id</td>
+	<td>NOT NULL</td><td>subject_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>subject_project_id</td>
+	<td>FOREIGN KEY</td><td>subject_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>object_project_id</td>
+	<td>NOT NULL</td><td>object_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>object_project_id</td>
+	<td>FOREIGN KEY</td><td>object_project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>subject_project_id, object_project_id, type_id</td>
+	<td>UNIQUE</td><td>subject_project_id, object_project_id, type_id</td>
 </tr>
 
 </table>
@@ -529,8 +503,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	project_pub
-</h3></td>
-		<a name="project_pub"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="project_pub"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -542,7 +515,10 @@
 
 <em>
 	<br />
-	Linking project(s) to publication(s) 
+	================================================ <br />
+	TABLE: project_pub <br />
+	================================================ <br />
+	Linking table for associating projects and publications. 
 </em>
 
 <table border="1">
@@ -569,30 +545,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_pub-project_pub_id">project_pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project_pub-project_pub_id">project_pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="project_pub-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="project_pub-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_pub-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="project_pub-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -613,13 +574,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>project_pub_idx1</td>
-	<td>project_id</td>
+	<td>project_pub_idx1</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>project_pub_idx2</td>
-	<td>pub_id</td>
+	<td>project_pub_idx2</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -640,33 +599,27 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_pub_id</td>
+	<td>NOT NULL</td><td>project_pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>project_id, pub_id</td>
+	<td>UNIQUE</td><td>project_id, pub_id</td>
 </tr>
 
 </table>
@@ -679,12 +632,11 @@
 
 <a name="project_contact" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	project_contact
-</h3></td>
-		<a name="project_contact"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="project_contact"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -696,7 +648,10 @@
 
 <em>
 	<br />
-	Linking project(s) to contact(s) 
+	================================================ <br />
+	TABLE: project_contact <br />
+	================================================ <br />
+	Linking table for associating projects and contacts. 
 </em>
 
 <table border="1">
@@ -723,30 +678,15 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_contact-project_contact_id">project_contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="project_contact-project_contact_id">project_contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="project_contact-project_id">project_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+	<td class="FieldCellName"><a name="project_contact-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="project_contact-contact_id">contact_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
+	<td class="FieldCellName"><a name="project_contact-contact_id">contact_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#contact-contact_id">contact.contact_id</a></td>
 </tr>
 
 </table>
@@ -767,13 +707,11 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>project_contact_idx1</td>
-	<td>project_id</td>
+	<td>project_contact_idx1</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>project_contact_idx2</td>
-	<td>contact_id</td>
+	<td>project_contact_idx2</td><td>contact_id</td>
 </tr>
 
 </table>
@@ -794,33 +732,576 @@
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_contact_id</td>
+	<td>NOT NULL</td><td>project_contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>project_id</td>
+	<td>NOT NULL</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>project_id</td>
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>contact_id</td>
+	<td>NOT NULL</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>contact_id</td>
+	<td>FOREIGN KEY</td><td>contact_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>project_id, contact_id</td>
+	<td>UNIQUE</td><td>project_id, contact_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'project_dbxref'
+ -->
+
+<a name="project_dbxref" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	project_dbxref
+</h3></td> <a name="project_dbxref"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: project_dbxref <br />
+	================================================ <br />
+	project_dbxref links a project to dbxrefs. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_dbxref-project_dbxref_id">project_dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_dbxref-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_dbxref-dbxref_id">dbxref_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#dbxref-dbxref_id">dbxref.dbxref_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_dbxref-is_current">is_current</a></td> <td class="FieldCellType">boolean</td> <td class="FieldCellSize">0</td> <td class="FieldCellDefault">true</td> <td class="FieldCellOther">NOT NULL, The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked project. </td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_dbxref_idx1</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_dbxref_idx2</td><td>dbxref_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>is_current</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>dbxref_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>project_id, dbxref_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'project_analysis'
+ -->
+
+<a name="project_analysis" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	project_analysis
+</h3></td> <a name="project_analysis"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: project_analysis <br />
+	================================================ <br />
+	Links an analysis to a project that may contain multiple analyses. 
+	The rank column can be used to specify a simple ordering in which analyses were executed. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_analysis-project_analysis_id">project_analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_analysis-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_analysis-analysis_id">analysis_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#analysis-analysis_id">analysis.analysis_id</a></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_analysis-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_analysis_idx1</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_analysis_idx2</td><td>analysis_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>analysis_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>rank</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>project_id, analysis_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'project_feature'
+ -->
+
+<a name="project_feature" />
+
+<table width="100%" class="TableHeader">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	project_feature
+</h3></td> <a name="project_feature"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: project_feature <br />
+	================================================ <br />
+	This table is intended associate records in the feature table with a project. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_feature-project_feature_id">project_feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_feature-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_feature-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_feature_idx1</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_feature_idx2</td><td>project_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>feature_id, project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>feature_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>project_id</td>
+</tr>
+
+</table>
+
+<hr />
+
+<!-- 
+	Starting table 'project_stock'
+ -->
+
+<a name="project_stock" />
+
+<table class="TableHeader" width="100%">
+	<tr class="TableHeaderRow">
+		<td class="TableHeaderCell"><h3>
+	project_stock
+</h3></td> <a name="project_stock"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
+	</tr>
+</table>
+
+<b>
+	Comments:
+</b>
+
+<br />
+
+<em>
+	<br />
+	================================================ <br />
+	TABLE: project_stock <br />
+	================================================ <br />
+	This table is intended associate records in the stock table with a project. 
+</em>
+
+<table border="1">
+
+<tr>
+	<th class="FieldHeader">
+		Field Name
+	</th>
+	<th class="FieldHeader">
+		Data Type
+	</th>
+	<th class="FieldHeader">
+		Size
+	</th>
+	<th class="FieldHeader">
+		Default Value
+	</th>
+	<th class="FieldHeader">
+		Other
+	</th>
+	<th class="FieldHeader">
+		Foreign Key
+	</th>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_stock-project_stock_id">project_stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
+</tr>
+
+<tr class="tr-even">
+	<td class="FieldCellName"><a name="project_stock-stock_id">stock_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#stock-stock_id">stock.stock_id</a></td>
+</tr>
+
+<tr class="tr-odd">
+	<td class="FieldCellName"><a name="project_stock-project_id">project_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#project-project_id">project.project_id</a></td>
+</tr>
+
+</table>
+
+<h3>
+	Indices
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Name
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_stock_idx1</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>project_stock_idx2</td><td>project_id</td>
+</tr>
+
+</table>
+
+<h3>
+	Constraints
+</h3>
+
+<table border="1">
+
+<tr class="IndexRow">
+	<th>
+		Type
+	</th>
+	<th>
+		Fields
+	</th>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>NOT NULL</td><td>project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>UNIQUE</td><td>stock_id, project_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>stock_id</td>
+</tr>
+
+<tr class="IndexCell">
+	<td>FOREIGN KEY</td><td>project_id</td>
 </tr>
 
 </table>
@@ -828,7 +1309,7 @@
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>
